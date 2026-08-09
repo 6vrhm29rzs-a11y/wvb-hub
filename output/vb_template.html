@@ -1,0 +1,740 @@
+<meta charset="utf-8">
+<title>NCAA Women's Volleyball — Ratings, Bracket & Tracker</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* ============================ TOKENS ============================ */
+:root{
+  --bg:#f4f5f8; --surface:#ffffff; --surface-2:#eceff4; --surface-3:#e3e7ee;
+  --ink:#141821; --ink-2:#4b5262; --ink-3:#7b8494; --line:#dde2ea; --line-2:#cfd5df;
+  --accent:#e0551d; --accent-ink:#ffffff; --accent-soft:#fbe6da;
+  --court:#0a938c; --court-soft:#d7efed;
+  --good:#157a55; --bad:#c33d38; --warn:#b7791a;
+  --sos-lo:#e7ebf6; --sos-hi:#3f3d9e;         /* indigo sequential: easy->hard */
+  --rpi-lo:#f6d8c6; --rpi-hi:#d84e13;          /* amber sequential */
+  --shadow:0 1px 2px rgba(18,22,33,.05),0 8px 24px rgba(18,22,33,.06);
+  --radius:12px;
+  --font-display:"Arial Narrow","Helvetica Neue",system-ui,sans-serif;
+  --font-body:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --font-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0b1019; --surface:#121a27; --surface-2:#18212f; --surface-3:#1f2a3b;
+    --ink:#e9eef6; --ink-2:#9daabd; --ink-3:#6b7688; --line:#243043; --line-2:#2d3a4f;
+    --accent:#ff6a3d; --accent-ink:#1a0f08; --accent-soft:#3a1f10;
+    --court:#22c2bb; --court-soft:#0e3330;
+    --good:#3bbd8a; --bad:#e4645e; --warn:#d6a13f;
+    --sos-lo:#1a2540; --sos-hi:#8f8dff;
+    --rpi-lo:#4a2814; --rpi-hi:#ff6a3d;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="light"]{
+  --bg:#f4f5f8; --surface:#ffffff; --surface-2:#eceff4; --surface-3:#e3e7ee;
+  --ink:#141821; --ink-2:#4b5262; --ink-3:#7b8494; --line:#dde2ea; --line-2:#cfd5df;
+  --accent:#e0551d; --accent-ink:#ffffff; --accent-soft:#fbe6da;
+  --court:#0a938c; --court-soft:#d7efed;
+  --good:#157a55; --bad:#c33d38; --warn:#b7791a;
+  --sos-lo:#e7ebf6; --sos-hi:#3f3d9e; --rpi-lo:#f6d8c6; --rpi-hi:#d84e13;
+  --shadow:0 1px 2px rgba(18,22,33,.05),0 8px 24px rgba(18,22,33,.06);
+}
+:root[data-theme="dark"]{
+  --bg:#0b1019; --surface:#121a27; --surface-2:#18212f; --surface-3:#1f2a3b;
+  --ink:#e9eef6; --ink-2:#9daabd; --ink-3:#6b7688; --line:#243043; --line-2:#2d3a4f;
+  --accent:#ff6a3d; --accent-ink:#1a0f08; --accent-soft:#3a1f10;
+  --court:#22c2bb; --court-soft:#0e3330;
+  --good:#3bbd8a; --bad:#e4645e; --warn:#d6a13f;
+  --sos-lo:#1a2540; --sos-hi:#8f8dff; --rpi-lo:#4a2814; --rpi-hi:#ff6a3d;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);
+  font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.tnum{font-variant-numeric:tabular-nums}
+h1,h2,h3{text-wrap:balance;margin:0}
+a{color:inherit}
+
+/* ============================ HEADER ============================ */
+header{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--surface) 88%,transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.head-in{max-width:1180px;margin:0 auto;padding:14px 22px 0;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.mark{display:flex;align-items:baseline;gap:10px;margin-right:auto}
+.mark .glyph{font-family:var(--font-display);font-weight:700;font-size:30px;letter-spacing:.02em;
+  color:var(--accent);line-height:1;transform:scaleY(1.06)}
+.mark .name{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.14em;
+  font-weight:700;font-size:16px}
+.mark .name b{color:var(--accent)}
+.mark .sub{font-size:11px;color:var(--ink-3);letter-spacing:.14em;text-transform:uppercase;margin-left:2px}
+.seasons{display:flex;border:1px solid var(--line-2);border-radius:99px;overflow:hidden;font-family:var(--font-display);
+  text-transform:uppercase;letter-spacing:.08em;font-size:13px}
+.seasons button{background:transparent;border:0;color:var(--ink-2);padding:6px 14px;cursor:pointer;font:inherit}
+.seasons button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.iconbtn{background:var(--surface-2);border:1px solid var(--line);color:var(--ink-2);width:36px;height:36px;
+  border-radius:9px;cursor:pointer;display:grid;place-items:center;font-size:15px}
+.iconbtn:hover{color:var(--ink)}
+nav.tabs{max-width:1180px;margin:0 auto;padding:0 22px;display:flex;gap:4px}
+nav.tabs button{background:transparent;border:0;border-bottom:2.5px solid transparent;color:var(--ink-2);
+  font-family:var(--font-display);text-transform:uppercase;letter-spacing:.1em;font-weight:700;font-size:14px;
+  padding:14px 14px 12px;cursor:pointer}
+nav.tabs button .n{font-size:10px;color:var(--ink-3);margin-left:6px;letter-spacing:0}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-color:var(--accent)}
+/* net motif */
+.net{height:8px;background-image:repeating-linear-gradient(90deg,var(--line-2) 0 1px,transparent 1px 7px);
+  border-bottom:1px solid var(--line);opacity:.8}
+
+/* ============================ LAYOUT ============================ */
+main{max-width:1180px;margin:0 auto;padding:26px 22px 90px}
+.view{display:none;animation:fade .3s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.view,.view.active{animation:none}}
+.eyebrow{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.16em;font-size:12px;
+  color:var(--ink-3);font-weight:700}
+.viewhead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:2px 0 18px;flex-wrap:wrap}
+.viewhead h2{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.03em;font-size:26px;line-height:1}
+.viewhead p{margin:6px 0 0;color:var(--ink-2);font-size:13.5px;max-width:60ch}
+.est{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--warn);
+  border:1px solid color-mix(in srgb,var(--warn) 45%,var(--line));border-radius:99px;padding:2px 9px;
+  text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.est::before{content:"";width:6px;height:6px;border-radius:99px;background:var(--warn)}
+
+/* ============================ STAT TILES ============================ */
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+@media(max-width:820px){.tiles{grid-template-columns:repeat(2,1fr)}}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 15px;
+  box-shadow:var(--shadow);position:relative;overflow:hidden}
+.tile::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+.tile.court::before{background:var(--court)}
+.tile .k{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-3);font-weight:600}
+.tile .v{font-family:var(--font-display);font-weight:700;font-size:30px;line-height:1.05;margin-top:6px;letter-spacing:.01em}
+.tile .v small{font-size:15px;color:var(--ink-2);font-weight:400}
+.tile .d{font-size:12px;color:var(--ink-2);margin-top:3px}
+
+/* ============================ CARD / TABLE ============================ */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.toolbar{display:flex;gap:10px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.toolbar input,.toolbar select{background:var(--surface-2);border:1px solid var(--line);color:var(--ink);
+  border-radius:8px;padding:7px 10px;font:inherit;font-size:13px}
+.toolbar input{min-width:150px}
+.toolbar .sp{margin-left:auto;font-size:12px;color:var(--ink-3)}
+.wctl{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--ink-2);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.wctl input[type=range]{width:110px;accent-color:var(--accent);cursor:pointer}
+.wctl b{color:var(--accent);font-family:var(--font-display);font-size:14px;min-width:32px;text-align:right}
+.rp2026 .banner{background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 35%,var(--line));
+  border-radius:12px;padding:12px 15px;margin-bottom:16px;font-size:13.5px;line-height:1.55}
+.rp2026 .banner b{color:var(--accent)}
+.illus{display:inline-block;background:var(--warn);color:#1a1206;border-radius:5px;padding:0 6px;
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.pill{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;border:1px solid;
+  border-radius:99px;padding:2px 10px;white-space:nowrap}
+.rpnote{color:var(--ink-2);font-size:12.5px;margin-top:14px;line-height:1.6}
+.rpnote a{color:var(--accent)}
+.rrow{cursor:pointer}
+.rrow .exp{color:var(--ink-3);font-size:11px;margin-left:6px;letter-spacing:.04em}
+.rrow.open{background:var(--surface-2)}
+.rrow.open .exp{color:var(--accent)}
+.rrow:hover{background:var(--surface-2)}
+.rdet>td{background:var(--surface-2);padding:0;border-bottom:2px solid var(--line-2)}
+.rosterwrap{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:14px 18px}
+.rosterwrap.three{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:820px){.rosterwrap,.rosterwrap.three{grid-template-columns:1fr}}
+.rcol h5{margin:0 0 8px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:.07em;font-size:12px}
+.rcol h5.rr{color:var(--good)} .rcol h5.rd{color:var(--bad)} .rcol h5.ri{color:var(--court)}
+.pl .xt{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--bad);
+  border:1px solid color-mix(in srgb,var(--bad) 45%,var(--line));border-radius:4px;padding:0 4px;flex:none}
+.pl{display:flex;align-items:baseline;gap:8px;padding:4px 0;border-bottom:1px solid var(--line);font-size:13px}
+.pl.muted{color:var(--ink-3);border:0}
+.pl .pn{font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl .py{color:var(--ink-3);font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;flex:none}
+.pl .pp{font-variant-numeric:tabular-nums;color:var(--ink-2);min-width:46px;text-align:right;flex:none}
+.twrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:720px}
+thead th{position:sticky;top:0;background:var(--surface-2);text-align:left;font-family:var(--font-display);
+  text-transform:uppercase;letter-spacing:.06em;font-size:12px;color:var(--ink-2);font-weight:700;
+  padding:10px 12px;border-bottom:1px solid var(--line-2);white-space:nowrap;cursor:pointer;user-select:none}
+thead th.num{text-align:right}
+thead th[aria-sort] .ar{color:var(--accent)}
+tbody td{padding:9px 12px;border-bottom:1px solid var(--line);font-size:14px;white-space:nowrap}
+tbody tr:hover{background:var(--surface-2)}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+.rank{font-family:var(--font-display);font-weight:700;font-size:17px;color:var(--ink-2);width:30px}
+tr.seedrow .rank{color:var(--accent)}
+.team{display:flex;align-items:center;gap:10px}
+.team .logo{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;font-family:var(--font-display);
+  font-weight:700;font-size:12px;color:#fff;letter-spacing:.02em;flex:none}
+.team .nm{font-weight:600}
+/* real team logos: white chip so colored SVGs read on both themes */
+.logo.lg{background:#fff !important;border:1px solid var(--line);overflow:hidden;padding:2px;box-sizing:border-box}
+.logo.lg img{width:100%;height:100%;object-fit:contain;display:block}
+.logo.sm{width:18px;height:18px;border-radius:5px;flex:none}
+.logo.xl{width:52px !important;height:52px !important;border-radius:12px}
+.champbox .logo.lg{margin:12px auto 8px}
+.chip{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-2);background:var(--surface-3);
+  border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-weight:600}
+.badge-seed{font-family:var(--font-display);font-weight:700;font-size:12px;color:var(--accent);
+  border:1px solid color-mix(in srgb,var(--accent) 40%,var(--line));border-radius:5px;padding:1px 6px}
+/* metric bars */
+.metric{display:flex;align-items:center;gap:9px;justify-content:flex-end}
+.metric .val{font-variant-numeric:tabular-nums;font-weight:600;min-width:44px;text-align:right}
+.bar{height:8px;width:96px;background:var(--surface-3);border-radius:99px;overflow:hidden;flex:none}
+.bar > i{display:block;height:100%;border-radius:99px}
+.sos{display:inline-block;min-width:52px;text-align:center;border-radius:6px;padding:3px 8px;font-weight:600;
+  font-variant-numeric:tabular-nums;font-size:13px}
+.wp{color:var(--ink-2);font-variant-numeric:tabular-nums}
+
+/* ============================ BRACKET ============================ */
+.bracket{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:16px;margin-bottom:8px;align-items:stretch}
+@media(max-width:820px){.bracket{grid-template-columns:1fr;gap:14px}}
+.round{display:flex;flex-direction:column;justify-content:space-around;gap:12px}
+.round.mid{justify-content:space-around}
+.round.end{justify-content:center;gap:16px}
+.rlbl{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.1em;font-size:11px;
+  color:var(--ink-3);font-weight:700;text-align:center;padding-bottom:2px}
+.matchcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);
+  padding:11px 13px}
+.matchcard .lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-3);font-weight:700;margin-bottom:8px}
+.mteam{display:flex;align-items:center;gap:10px;padding:5px 0}
+.mteam .logo{width:24px;height:24px;border-radius:6px}
+.mteam .nm{font-weight:600}
+.mteam.win .nm{color:var(--ink)}
+.mteam.loss{opacity:.5}
+.mteam .sd{font-family:var(--font-display);font-weight:700;color:var(--ink-3);width:22px}
+.mteam .sc{margin-left:auto;font-family:var(--font-display);font-weight:700;font-size:18px}
+.champbox{background:linear-gradient(160deg,var(--accent),color-mix(in srgb,var(--accent) 70%,#000));
+  color:var(--accent-ink);border-radius:14px;padding:18px 16px;text-align:center;box-shadow:var(--shadow)}
+.champbox .t{font-size:11px;text-transform:uppercase;letter-spacing:.16em;opacity:.9;font-weight:700}
+.champbox .logo{width:52px;height:52px;border-radius:12px;margin:12px auto 8px;display:grid;place-items:center;
+  font-family:var(--font-display);font-weight:700;font-size:22px;background:rgba(255,255,255,.16);color:#fff}
+.champbox .who{font-family:var(--font-display);font-weight:700;font-size:24px;letter-spacing:.02em;line-height:1}
+.champbox .sc{margin-top:8px;font-size:13px;opacity:.92}
+.regions{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:820px){.regions{grid-template-columns:repeat(2,1fr)}}
+.region h4{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.08em;font-size:13px;
+  color:var(--ink-2);margin:0 0 8px;padding-bottom:6px;border-bottom:2px solid var(--line-2)}
+.seedline{display:flex;align-items:center;gap:9px;padding:6px 2px;border-bottom:1px solid var(--line)}
+.seedline .sd{font-family:var(--font-display);font-weight:700;color:var(--ink-3);width:20px;font-size:14px}
+.seedline .logo{width:22px;height:22px;border-radius:6px}
+.seedline .nm{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis}
+
+/* ============================ TRACKER ============================ */
+.trackgrid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+@media(max-width:900px){.trackgrid{grid-template-columns:1fr}}
+.feed{max-height:520px;overflow-y:auto}
+.result{display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--line)}
+.result .dt{font-size:11px;color:var(--ink-3);width:52px;flex:none;font-variant-numeric:tabular-nums}
+.result .teams{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.result .ln{display:flex;align-items:center;gap:8px}
+.result .ln .nm{font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.result .ln.w .nm{font-weight:700}
+.result .ln.l{color:var(--ink-2)}
+.result .ln .df{margin-left:auto;font-size:11px;color:var(--good);font-weight:700;text-transform:uppercase}
+.result .sc{font-family:var(--font-display);font-weight:700;font-size:20px;color:var(--ink-2)}
+.teamcard .hd{display:flex;align-items:center;gap:12px;padding:16px}
+.teamcard .hd .logo{width:44px;height:44px;border-radius:11px;display:grid;place-items:center;
+  font-family:var(--font-display);font-weight:700;font-size:18px;color:#fff}
+.teamcard .hd .nm{font-family:var(--font-display);font-weight:700;font-size:22px;letter-spacing:.01em;line-height:1}
+.teamcard .hd .meta{font-size:12px;color:var(--ink-2);margin-top:3px}
+.teamcard select{margin-left:auto}
+.rpibox{padding:4px 16px 16px}
+.rpibox .formula{font-family:var(--font-mono);font-size:12px;color:var(--ink-2);background:var(--surface-2);
+  border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin-bottom:14px;overflow-x:auto}
+.rpibox .formula b{color:var(--accent)}
+.rpirow{display:grid;grid-template-columns:120px 1fr 58px;align-items:center;gap:10px;margin-bottom:11px}
+.rpirow .lab{font-size:12px;color:var(--ink-2)}
+.rpirow .lab b{display:block;color:var(--ink);font-size:13px;font-weight:600}
+.rpirow .track{height:12px;background:var(--surface-3);border-radius:99px;overflow:hidden}
+.rpirow .track > i{display:block;height:100%;border-radius:99px}
+.rpirow .num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;font-size:13px}
+.rpitotal{display:flex;align-items:baseline;justify-content:space-between;border-top:2px solid var(--line-2);
+  padding-top:12px;margin-top:6px}
+.rpitotal .big{font-family:var(--font-display);font-weight:700;font-size:30px;color:var(--accent)}
+
+/* empty state (2026) */
+.empty{text-align:center;padding:70px 20px;color:var(--ink-2)}
+.empty .ic{font-size:40px}
+.empty h3{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.05em;font-size:22px;margin:12px 0 6px;color:var(--ink)}
+.empty p{max-width:46ch;margin:0 auto;font-size:14px}
+
+footer{max-width:1180px;margin:0 auto;padding:0 22px 40px;color:var(--ink-3);font-size:12px;line-height:1.7}
+footer b{color:var(--ink-2)}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px;border-radius:4px}
+/* tooltip */
+#tip{position:fixed;z-index:100;pointer-events:none;background:var(--ink);color:var(--surface);
+  font-size:12px;padding:6px 9px;border-radius:7px;box-shadow:var(--shadow);opacity:0;transition:opacity .1s;max-width:240px}
+:root[data-theme="dark"] #tip,@media(prefers-color-scheme:dark){#tip{background:#0a0f18}}
+</style>
+
+<header>
+  <div class="head-in">
+    <div class="mark">
+      <span class="glyph">◑</span>
+      <div>
+        <div class="name"><b>WVB</b> Ratings Lab <span class="sub">Division I Women's</span></div>
+      </div>
+    </div>
+    <div class="seasons" role="group" aria-label="Season">
+      <button data-season="2025" aria-pressed="true">2025</button>
+      <button data-season="2026" aria-pressed="false">2026</button>
+    </div>
+    <button class="iconbtn" id="themeBtn" title="Toggle theme" aria-label="Toggle light/dark">◐</button>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-view="rankings">Rankings<span class="n" id="nRank"></span></button>
+    <button role="tab" aria-selected="false" data-view="bracket">Post-Season</button>
+    <button role="tab" aria-selected="false" data-view="tracker">Data Tracker</button>
+  </nav>
+  <div class="net"></div>
+</header>
+
+<main>
+  <!-- ===================== RANKINGS ===================== -->
+  <section class="view active" id="view-rankings" role="tabpanel">
+    <div class="viewhead">
+      <div>
+        <div class="eyebrow">Division I · Women's Indoor</div>
+        <h2 id="rk-title">Power Ratings — Your Model</h2>
+        <p id="rk-desc"></p>
+      </div>
+      <span class="est" title="Your formula: Adj = Z(points/set) + weight × Z(schedule). Offense only.">Your model · offense only</span>
+    </div>
+    <div class="tiles" id="tiles"></div>
+    <div class="card">
+      <div class="toolbar">
+        <input id="search" type="search" placeholder="Search team…" aria-label="Search team">
+        <select id="confFilter" aria-label="Filter by conference"><option value="">All conferences</option></select>
+        <label class="wctl" title="How heavily strength of schedule is weighted in Adj Score">SOS weight
+          <input id="sosw" type="range" min="1" max="3" step="0.5" value="2" aria-label="SOS weight">
+          <b id="soswlab">2.0×</b></label>
+        <span class="sp" id="rowcount"></span>
+      </div>
+      <div class="twrap">
+        <table id="rktable">
+          <thead><tr id="rkhead"></tr></thead>
+          <tbody id="rkbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== BRACKET ===================== -->
+  <section class="view" id="view-bracket" role="tabpanel">
+    <div class="viewhead">
+      <div>
+        <div class="eyebrow">NCAA Championship</div>
+        <h2 id="br-title">The Bracket</h2>
+        <p id="br-desc"></p>
+      </div>
+    </div>
+    <div id="br-body"></div>
+  </section>
+
+  <!-- ===================== TRACKER ===================== -->
+  <section class="view" id="view-tracker" role="tabpanel">
+    <div class="viewhead">
+      <div>
+        <div class="eyebrow">Results In · Ratings Out</div>
+        <h2>Data Tracker</h2>
+        <p>A match's kills, aces and blocks feed points/set; points/set and schedule feed the Adj Score on the first tab. Pick any team to see how its rating is built.</p>
+      </div>
+      <span class="est">2025 postseason results</span>
+    </div>
+    <div id="tk-body"></div>
+  </section>
+</main>
+
+<footer id="foot"></footer>
+<div id="tip" role="status"></div>
+
+<script>
+const DATA = __DATA__;
+const MODEL = __MODEL__;
+
+/* ---------- theme ---------- */
+const root=document.documentElement, tb=document.getElementById('themeBtn');
+try{const s=localStorage.getItem('so-theme'); if(s) root.setAttribute('data-theme',s);}catch(e){}
+tb.onclick=()=>{const cur=root.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  const nx=cur==='dark'?'light':'dark'; root.setAttribute('data-theme',nx); try{localStorage.setItem('so-theme',nx)}catch(e){}
+  rerender();};
+
+/* ---------- helpers ---------- */
+const CONF={ /* strength proxy ~ opponents' win% */
+ "SEC":.605,"Big Ten":.600,"Big 12":.565,"ACC":.552,"Big East":.548,"Pac-12":.560,
+ "WCC":.522,"American":.500,"AAC":.500,"Mountain West":.500,"Sun Belt":.487,"A-10":.487,
+ "Atlantic 10":.487,"Ivy":.492,"Big West":.495,"MVC":.498,"C-USA":.485,"MAC":.483,"WAC":.478
+};
+const ABBR={"Texas A&M":"TAM","Kentucky":"KEN","Nebraska":"NEB","Pittsburgh":"PITT","Wisconsin":"WIS",
+ "Texas":"TEX","Stanford":"STAN","Purdue":"PUR","Louisville":"LOU","Creighton":"CREI","SMU":"SMU",
+ "Arizona State":"ASU","Indiana":"IND","Kansas":"KU","Minnesota":"MINN","Miami (FL)":"MIA",
+ "Southern California":"USC","TCU":"TCU","North Carolina":"UNC","Baylor":"BAY","Cal Poly":"CP",
+ "Colorado":"COLO","Iowa State":"ISU","Tennessee":"TENN","BYU":"BYU","Penn State":"PSU"};
+const strengthOf=c=>CONF[c]??.480;
+function abbr(n){ if(ABBR[n])return ABBR[n];
+  const w=n.replace(/[^A-Za-z ]/g,'').trim().split(/\s+/);
+  return (w.length===1?w[0].slice(0,3):w.map(x=>x[0]).join('')).slice(0,4).toUpperCase();}
+function hueFor(name){let h=0;for(const ch of name)h=(h*31+ch.charCodeAt(0))%360;return h;}
+function logoStyle(name){const h=hueFor(name);return `background:hsl(${h} 42% 40%)`;}
+const LOGOS=(typeof MODEL!=='undefined'&&MODEL.logos)||{};
+const LGALIAS={"Pittsburgh":"Pitt","Southern California":"USC","Miami (FL)":"Miami","Penn St.":"Penn State","Arizona St.":"Arizona State","Iowa St.":"Iowa State","Michigan St.":"Michigan State","Western Ky.":"Western Kentucky"};
+function logoURI(n){return LOGOS[n]||LOGOS[LGALIAS[n]]||null;}
+function LG(n,cls){const u=logoURI(n);const c=cls?(' '+cls):'';return u?`<span class="logo lg${c}"><img src="${u}" alt="${n}" loading="lazy"></span>`:`<span class="logo${c}" style="${logoStyle(n)}">${abbr(n)}</span>`;}
+const pct=x=>x==null?'—':(x*100).toFixed(1)+'%';
+function lerpHex(a,b,t){const p=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+  const [ar,ag,ab]=p(a),[br,bg,bb]=p(b);const m=(x,y)=>Math.round(x+(y-x)*t).toString(16).padStart(2,'0');
+  return '#'+m(ar,br)+m(ag,bg)+m(ab,bb);}
+function cssvar(v){return getComputedStyle(root).getPropertyValue(v).trim();}
+
+/* ---------- Cody's model:  Adj = Z(Pts/Set) + W·Z(SOS) ---------- */
+const seedMap={}; (DATA.tournament?.top_seeds||[]).forEach(s=>{if(s&&s.team)seedMap[s.team]=s.seed;}); // for bracket
+const M=(typeof MODEL!=='undefined'&&MODEL.teams)?MODEL.teams:[];
+let SOSW=(typeof MODEL!=='undefined'&&MODEL.sos_weight!=null)?MODEL.sos_weight:2;
+const mean=a=>a.reduce((s,x)=>s+x,0)/(a.length||1);
+const pstd=a=>{const m=mean(a);return Math.sqrt(mean(a.map(x=>(x-m)**2)));};
+const ppsArr=M.map(t=>t.pps), sosArr=M.map(t=>t.sos);
+const mP=mean(ppsArr),sP=pstd(ppsArr),mS=mean(sosArr),sS=pstd(sosArr);
+const teams=M.map(t=>{
+  const zp=sP?(t.pps-mP)/sP:0, zs=sS?(mS-t.sos)/sS:0;   // tougher schedule (lower rank #) => higher Z
+  return {...t,zp,zs,adj:0};
+});
+function computeAdj(){teams.forEach(t=>t.adj=t.zp+SOSW*t.zs);}
+function assignRanks(){
+  [...teams].sort((a,b)=>b.adj-a.adj).forEach((t,i)=>t.rank=i+1);
+  [...teams].sort((a,b)=>b.pps-a.pps).forEach((t,i)=>t.ppsRank=i+1);
+  [...teams].sort((a,b)=>a.sos-b.sos).forEach((t,i)=>t.sosRank=i+1);
+}
+computeAdj();assignRanks();
+const ppsDom=[Math.min(...ppsArr),Math.max(...ppsArr)];
+const sosDom=[Math.min(...sosArr),Math.max(...sosArr)];      // rank domain (min = toughest)
+const adjDom=()=>[Math.min(...teams.map(t=>t.adj)),Math.max(...teams.map(t=>t.adj))];
+const norm=(x,[lo,hi])=>hi>lo?(x-lo)/(hi-lo):.5;
+
+/* ---------- tooltip ---------- */
+const tip=document.getElementById('tip');
+function bindTip(el,html){el.addEventListener('mousemove',e=>{tip.innerHTML=html;tip.style.opacity=1;
+  tip.style.left=Math.min(e.clientX+14,innerWidth-250)+'px';tip.style.top=(e.clientY+16)+'px';});
+  el.addEventListener('mouseleave',()=>tip.style.opacity=0);}
+
+/* ===================== RANKINGS ===================== */
+const COLS=[
+ {k:'rank',t:'#',num:true},
+ {k:'team',t:'Team'},
+ {k:'record',t:'Rec',num:true},
+ {k:'adj',t:'Adj Score',num:true},
+ {k:'pps',t:'Pts/Set',num:true},
+ {k:'kps',t:'K/s',num:true},
+ {k:'aps',t:'A/s',num:true},
+ {k:'bps',t:'B/s',num:true},
+ {k:'sos',t:'SOS',num:true},
+ {k:'rpi',t:'RPI',num:true},
+];
+const LOWBETTER=new Set(['rank','sos','ssf']);
+function recWL(t){if(!t.record)return null;const m=String(t.record).match(/(\d+)\D+(\d+)/);return m?[+m[1],+m[2]]:null;}
+let sortK='rank',sortDir=1,q='',confq='';
+function buildHead(){
+  const tr=document.getElementById('rkhead');tr.innerHTML='';
+  COLS.forEach(c=>{const th=document.createElement('th');th.className=c.num?'num':'';
+    th.innerHTML=c.t+(sortK===c.k?` <span class="ar">${sortDir>0?'▲':'▼'}</span>`:'');
+    if(sortK===c.k)th.setAttribute('aria-sort',sortDir>0?'ascending':'descending');
+    th.tabIndex=0;
+    th.onclick=()=>{if(sortK===c.k)sortDir*=-1;else{sortK=c.k;sortDir=LOWBETTER.has(c.k)?1:-1;}drawRows();buildHead();};
+    th.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();th.click();}};
+    tr.appendChild(th);});
+}
+function rerender(){
+  if(season!=='2025')return;
+  if(inited.rankings){buildHead();drawRows();}
+  if(inited.tracker){const s=document.getElementById('tc-sel');if(s)drawTeam(s.value);}
+  if(inited.bracket){initBracket();}
+}
+function drawRows(){
+  const body=document.getElementById('rkbody');body.innerHTML='';
+  let rows=teams.filter(t=>(!q||t.team.toLowerCase().includes(q))&&(!confq||t.conf===confq));
+  const val=t=>{const wl=recWL(t);return {rank:t.rank,team:t.team.toLowerCase(),record:wl?wl[0]/(wl[0]+wl[1]):-1,adj:t.adj,pps:t.pps,kps:t.kps,aps:t.aps,bps:t.bps,sos:t.sos,rpi:t.rpi??-1}[sortK];};
+  rows.sort((a,b)=>{const x=val(a),y=val(b);return (x<y?-1:x>y?1:0)*sortDir||a.rank-b.rank;});
+  document.getElementById('rowcount').textContent=rows.length+' teams';
+  const aDom=adjDom();
+  for(const t of rows){
+    const tr=document.createElement('tr'); if(t.rank<=16)tr.className='seedrow';
+    const adjT=norm(t.adj,aDom), ppsT=norm(t.pps,ppsDom), sosI=1-norm(t.sos,sosDom); // sosI: tough=1
+    const adjC=lerpHex(cssvar('--rpi-lo'),cssvar('--rpi-hi'),adjT);
+    const sosBg=lerpHex(cssvar('--sos-lo'),cssvar('--sos-hi'),sosI);
+    const sosFg=sosI>.55?'#fff':cssvar('--ink');
+    const lift=t.ppsRank-t.rank;
+    const wl=recWL(t);
+    tr.innerHTML=`
+      <td class="num"><span class="rank">${t.rank}</span></td>
+      <td><div class="team">${LG(t.team)}
+          <span class="nm">${t.team}</span> ${t.conf?`<span class="chip">${t.conf}</span>`:''}</div></td>
+      <td class="num tnum">${wl?`${wl[0]}–${wl[1]}`:'<span style="color:var(--ink-3)">—</span>'}</td>
+      <td class="num"><div class="metric"><span class="val">${t.adj>=0?'+':''}${t.adj.toFixed(2)}</span>
+          <span class="bar" data-tip="Adj = Z(pts/set) ${t.zp>=0?'+':''}${t.zp.toFixed(2)} + ${SOSW}×Z(SOS) ${t.zs>=0?'+':''}${t.zs.toFixed(2)}${lift?` · schedule lifts it ${lift>0?'+':''}${lift} vs offense-only`:''}"><i style="width:${(6+adjT*94).toFixed(0)}%;background:${adjC}"></i></span></div></td>
+      <td class="num"><div class="metric"><span class="val">${t.pps.toFixed(2)}</span>
+          <span class="bar" data-tip="Points per set (kills+aces+blocks) · #${t.ppsRank} offense"><i style="width:${(6+ppsT*94).toFixed(0)}%;background:${cssvar('--court')}"></i></span></div></td>
+      <td class="num tnum">${t.kps.toFixed(2)}</td>
+      <td class="num tnum">${t.aps.toFixed(2)}</td>
+      <td class="num tnum">${t.bps.toFixed(2)}</td>
+      <td class="num"><span class="sos" style="background:${sosBg};color:${sosFg}" data-tip="Your model's schedule rank (sheet 1, thru Oct 22) — this is what drives Adj. #${t.sos} of the pool, lower = tougher">#${t.sos}</span></td>
+      <td class="num tnum" ${t.rpi!=null?`data-tip="Official NCAA RPI, final 2025 (stats.ncaa.org): ${t.rpi.toFixed(4)} · national rank #${t.rpiRank} of 348 · non-conf schedule rank #${t.ncRpiRank}"`:''}>${t.rpi!=null?`<span style="font-weight:600">${t.rpi.toFixed(3)}</span> <span style="color:var(--ink-3);font-size:11px">#${t.rpiRank}</span>`:'<span style="color:var(--ink-3)">—</span>'}</td>`;
+    body.appendChild(tr);
+  }
+  body.querySelectorAll('[data-tip]').forEach(el=>bindTip(el,el.getAttribute('data-tip')));
+}
+function buildTiles(){
+  const byAdj=[...teams].sort((a,b)=>b.adj-a.adj)[0];
+  const byPps=[...teams].sort((a,b)=>b.pps-a.pps)[0];
+  const tough=[...teams].sort((a,b)=>a.sos-b.sos)[0];
+  const lifter=[...teams].map(t=>({t,lift:t.ppsRank-t.rank})).sort((a,b)=>b.lift-a.lift)[0];
+  const T=[
+   {cls:'',k:'Top Rated',v:byAdj?byAdj.team:'—',d:byAdj?`Adj +${byAdj.adj.toFixed(2)} · ${byAdj.conf||''}`:''},
+   {cls:'court',k:'Best Offense',v:byPps?byPps.team:'—',d:byPps?`${byPps.pps.toFixed(2)} pts/set`:''},
+   {cls:'court',k:'Toughest Slate',v:tough?tough.team:'—',d:tough?`SOS #${tough.sos} nationally`:''},
+   {cls:'',k:'Schedule Lift',v:lifter&&lifter.lift>0?`+${lifter.lift}`:'—',d:lifter&&lifter.lift>0?`${lifter.t.team} climbs vs offense-only`:'no schedule swing'},
+  ];
+  document.getElementById('tiles').innerHTML=T.map(t=>`<div class="tile ${t.cls}">
+    <div class="k">${t.k}</div><div class="v">${t.v}</div><div class="d">${t.d}</div></div>`).join('');
+}
+function weightLabel(){const el=document.getElementById('soswlab');if(el)el.textContent=SOSW.toFixed(1)+'×';
+  const d=document.getElementById('rk-desc');
+  if(d)d.innerHTML=`<b>Adj Score = Z(points/set) + ${SOSW.toFixed(1)}× Z(schedule).</b> Your model — offense only (kills+aces+blocks per set), schedule ${SOSW==2?'double':SOSW.toFixed(1)+'×'}-weighted. ${(typeof MODEL!=='undefined'&&MODEL.asof)?MODEL.asof+'. ':''}Drag the dial to see how much schedule drives it.`;}
+function applyWeight(w){SOSW=w;computeAdj();assignRanks();buildTiles();drawRows();weightLabel();}
+function initRankings(){
+  document.getElementById('rk-title').textContent='Power Ratings — Your Model';
+  document.getElementById('nRank').textContent=teams.length;
+  const cf=document.getElementById('confFilter');
+  [...new Set(teams.map(t=>t.conf).filter(Boolean))].sort().forEach(c=>{const o=document.createElement('option');o.value=o.textContent=c;cf.appendChild(o);});
+  cf.onchange=e=>{confq=e.target.value;drawRows();};
+  document.getElementById('search').oninput=e=>{q=e.target.value.trim().toLowerCase();drawRows();};
+  const sl=document.getElementById('sosw');
+  if(sl){sl.value=SOSW;sl.oninput=e=>applyWeight(+e.target.value);}
+  weightLabel();buildTiles();buildHead();drawRows();
+}
+
+/* ===================== BRACKET ===================== */
+function mteam(name,seed,sets,win){return `<div class="mteam ${win?'win':'loss'}">
+  <span class="sd">${seed?seed:''}</span>${LG(name)}
+  <span class="nm">${name}</span><span class="sc">${sets??''}</span></div>`;}
+function matchCard(m,lbl){
+  if(!m)return '';
+  const [ws,ls]=(m.score||'-').split('-');
+  return `<div class="matchcard"><div class="lbl">${lbl}</div>
+    ${mteam(m.winner,seedMap[m.winner],ws,true)}
+    ${mteam(m.loser,seedMap[m.loser],ls,false)}</div>`;
+}
+function initBracket(){
+  const t=DATA.tournament||{};
+  document.getElementById('br-title').textContent=`${DATA.meta?.season||''} NCAA Tournament`.trim();
+  document.getElementById('br-desc').textContent=`64 teams · ${t.auto_bids||31} conference automatic bids + ${t.at_large||33} at-large selections across ${(t.regions&&t.regions.length)||4} regionals. The path below is the real road to the title.`;
+  const R=DATA.recent_results||[];
+  const has=s=>r=>(r.round||'').toLowerCase().includes(s);
+  const regFinals=R.filter(has('regional final'));
+  const semis=R.filter(has('national semifinal'));
+  const final=R.find(has('national championship'));
+  const regionOf=r=>(String(r.round).match(/\(([^)]+)\)/)||[])[1]||'';
+  // order regional finals so each pod aligns under its semifinal
+  let ordered=[];
+  semis.forEach(s=>[s.winner,s.loser].forEach(tm=>{
+    const rf=regFinals.find(x=>x.winner===tm&&!ordered.includes(x)); if(rf)ordered.push(rf);}));
+  regFinals.forEach(rf=>{if(!ordered.includes(rf))ordered.push(rf);});
+
+  const champ=t.champion;
+  const champBox=`<div class="champbox"><div class="t">National Champion</div>
+    ${LG(champ||'','xl')}
+    <div class="who">${champ||'TBD'}</div>
+    <div class="sc">${t.runner_up?`def. ${t.runner_up}`:''}${final&&final.score?` · ${final.score.replace('-','–')}`:''}</div></div>`;
+
+  let bracket='';
+  if(regFinals.length){
+    bracket=`<div class="bracket">
+      <div class="round"><div class="rlbl">Regional Finals</div>
+        ${ordered.map(m=>matchCard(m,'Elite Eight · '+regionOf(m))).join('')}</div>
+      <div class="round mid"><div class="rlbl">National Semifinals</div>
+        ${semis.map(m=>matchCard(m,'Final Four')).join('')}</div>
+      <div class="round end"><div class="rlbl">Championship</div>
+        ${matchCard(final,'Title Match')}${champBox}</div>
+    </div>`;
+  }
+
+  // top-16 national seeds by seed line (no region claim — flagged uncertain within lines)
+  const seeds=(t.top_seeds||[]).filter(s=>s&&s.team).slice(0,16).sort((a,b)=>a.seed-b.seed);
+  let seedGrid='';
+  if(seeds.length){
+    const lines=[[],[],[],[]];
+    seeds.forEach(s=>lines[Math.floor((s.seed-1)/4)].push(s));
+    const names=['Seeds 1–4','Seeds 5–8','Seeds 9–12','Seeds 13–16'];
+    seedGrid=`<h3 class="eyebrow" style="margin:26px 0 4px">Top 16 national seeds</h3>
+      <p style="color:var(--ink-2);font-size:13px;margin:0 0 14px">Regional hosts: ${(t.regions||[]).join(' · ')}. Advancers in <b>bold</b>.</p>
+      <div class="regions">${lines.map((c,i)=>`<div class="region"><h4>${names[i]}</h4>${
+        c.map(s=>{const adv=ordered.some(m=>m.winner===s.team)||semis.some(m=>m.winner===s.team)||champ===s.team;
+          return `<div class="seedline"><span class="sd">${s.seed}</span>
+            ${LG(s.team)}
+            <span class="nm" style="${adv?'font-weight:700':''}">${s.team}</span></div>`;}).join('')
+      }</div>`).join('')}</div>`;
+  }
+  document.getElementById('br-body').innerHTML=(bracket+seedGrid)||
+    '<div class="empty"><div class="ic">🏐</div><h3>Bracket pending</h3><p>Tournament data will appear here.</p></div>';
+}
+
+/* ===================== TRACKER ===================== */
+function initTracker(){
+  const res=DATA.recent_results||[];
+  const feed=res.map(r=>{const w=r.winner,l=r.loser,dt=(r.date||'').slice(5);
+    return `<div class="result"><span class="dt">${dt}</span>
+      <div class="teams">
+        <div class="ln w">${LG(w,'sm')}<span class="nm">${w}</span><span class="df">Win</span></div>
+        <div class="ln l">${LG(l,'sm')}<span class="nm">${l}</span></div>
+      </div><span class="sc">${r.score||''}</span></div>`;}).join('');
+  const opts=teams.map(t=>`<option value="${t.team}">${t.team}</option>`).join('');
+  document.getElementById('tk-body').innerHTML=`
+    <div class="trackgrid">
+      <div class="card"><div class="toolbar"><b style="font-family:var(--font-display);text-transform:uppercase;letter-spacing:.08em">Recent results</b><span class="sp">${res.length} matches logged</span></div>
+        <div class="feed">${feed||'<div class="empty"><p>No results yet.</p></div>'}</div></div>
+      <div class="card teamcard">
+        <div class="hd"><span class="logo" id="tc-logo"></span><div><div class="nm" id="tc-name"></div><div class="meta" id="tc-meta"></div></div>
+          <select id="tc-sel" aria-label="Choose team">${opts}</select></div>
+        <div class="rpibox" id="tc-rpi"></div>
+      </div>
+    </div>`;
+  const sel=document.getElementById('tc-sel');
+  sel.onchange=e=>drawTeam(e.target.value);
+  drawTeam(teams[0]?.team);
+}
+function drawTeam(name){
+  const t=teams.find(x=>x.team===name);if(!t)return;
+  const asof=(typeof MODEL!=='undefined'&&MODEL.asof)?MODEL.asof:'';
+  const logo=document.getElementById('tc-logo');
+  {const u=logoURI(t.team); if(u){logo.className='logo lg';logo.style.cssText='';logo.innerHTML=`<img src="${u}" alt="${t.team}">`;}else{logo.className='logo';logo.style.cssText=logoStyle(t.team);logo.textContent=abbr(t.team);}}
+  document.getElementById('tc-name').textContent=t.team;
+  document.getElementById('tc-meta').textContent=`${t.conf||''} · #${t.rank} in Adj · ${t.pps.toFixed(2)} pts/set · SOS #${t.sos}`;
+  const acc=cssvar('--accent'),court=cssvar('--court'),sosc=cssvar('--sos-hi');
+  const maxK=Math.max(...teams.map(x=>x.kps)),maxA=Math.max(...teams.map(x=>x.aps)),maxB=Math.max(...teams.map(x=>x.bps));
+  const comp=[['Kills / set',t.kps,acc,maxK],['Aces / set',t.aps,court,maxA],['Blocks / set',t.bps,sosc,maxB]];
+  const crows=comp.map(([lab,v,c,mx])=>`<div class="rpirow">
+     <div class="lab"><b>${lab}</b>per-set avg</div>
+     <div class="track" data-tip="${lab}: ${v.toFixed(2)} per set"><i style="width:${(v/mx*100).toFixed(0)}%;background:${c}"></i></div>
+     <div class="num">${v.toFixed(2)}</div></div>`).join('');
+  const zmap=z=>Math.max(2,Math.min(100,(z+3)/6*100));  // z in [-3,3] -> bar %
+  const zrows=[['Z · points/set',t.zp,'1',acc],['Z · schedule',t.zs,SOSW.toFixed(1)+'×',sosc]].map(([lab,z,w,c])=>`<div class="rpirow">
+     <div class="lab"><b>${lab}</b>weight ${w}</div>
+     <div class="track" data-tip="${lab}: ${z>=0?'+':''}${z.toFixed(2)}"><i style="width:${zmap(z).toFixed(0)}%;background:${c};opacity:${z<0?.5:1}"></i></div>
+     <div class="num">${z>=0?'+':''}${z.toFixed(2)}</div></div>`).join('');
+  document.getElementById('tc-rpi').innerHTML=`
+    <div class="eyebrow" style="margin-bottom:8px">Per-set production  →  Pts/Set ${t.pps.toFixed(2)}</div>
+    ${crows}
+    <div class="formula" style="margin-top:14px">Adj = <b>1</b>·Z(Pts/Set) + <b>${SOSW.toFixed(1)}</b>·Z(SOS)</div>
+    ${zrows}
+    <div class="rpitotal"><div><div class="eyebrow">Adj Score</div>
+      <div style="font-size:12px;color:var(--ink-2)">rank #${t.rank} of ${teams.length}${asof?' · '+asof:''}</div></div>
+      <div class="big">${t.adj>=0?'+':''}${t.adj.toFixed(2)}</div></div>`;
+  document.getElementById('tc-rpi').querySelectorAll('[data-tip]').forEach(el=>bindTip(el,el.getAttribute('data-tip')));
+}
+
+/* ===================== NAV / SEASON ===================== */
+const views={rankings:initRankings,bracket:initBracket,tracker:initTracker};
+let inited={};
+let season='2025';
+function show(v){
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.view===v));
+  document.querySelectorAll('.view').forEach(s=>s.classList.toggle('active',s.id==='view-'+v));
+  if(season==='2026'){season2026(v);return;}
+  restore2025();
+  if(!inited[v]){views[v]();inited[v]=true;}
+}
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>show(b.dataset.view));
+
+function season2026(v){ if(v==='rankings')render2026Rankings(); else renderEmpty(v); }
+// illustrative, deterministic returning % (45–90%) until official player data is pulled
+function retPct(name){let h=0;for(const c of name)h=(h*33+c.charCodeAt(0))%1009;return 0.45+(h/1009)*0.45;}
+function render2026Rankings(){
+  const el=document.getElementById('view-rankings');
+  el.querySelectorAll('.tiles,.card,.empty.season').forEach(n=>n.style.display='none');
+  let host=el.querySelector('.rp2026');
+  if(!host){host=document.createElement('div');host.className='rp2026';el.appendChild(host);}
+  host.style.display='';
+  const rows=teams.map(t=>{const real=t.ret2026!=null;
+      const grad=t.ret2026, net=t.ret2026net;
+      const ret=real?(net!=null?net:grad):retPct(t.team);
+      return {team:t.team,conf:t.conf,pps:t.pps,ret,grad,net,proj:t.pps*ret,real,dep1:t.dep1,dep2:t.dep2,roster:t.roster,xin:t.xin,xout:t.xout,inPts:t.inPts};})
+    .sort((a,b)=>b.ret-a.ret);
+  const anyReal=rows.some(r=>r.real);
+  const anyXfer=rows.some(r=>r.net!=null);
+  const tasof=(typeof MODEL!=='undefined'&&MODEL.transfers_asof)?MODEL.transfers_asof:'';
+  const stats=(DATA.official_sources||{}).stats_site||'#';
+  const clamp=x=>Math.max(0,Math.min(1,x));
+  const outlook=r=>r.ret>=.8?['Veteran core',cssvar('--good')]:r.ret>=.6?['Reload',cssvar('--warn')]:['Rebuild',cssvar('--bad')];
+  const plLine=p=>`<div class="pl" title="${p.k} kills · ${p.a} aces · ${p.b} blocks"><span class="pn">${p.n}</span><span class="py">${p.yr}${p.pos?' · '+p.pos:''}</span>${p.xfer?'<span class="xt">transfer</span>':''}<span class="pp">${p.pts}</span></div>`;
+  const inLine=x=>`<div class="pl"><span class="pn">${x.n}</span><span class="py">from ${x.from||'?'}</span><span class="pp">${x.pts!=null?x.pts:'—'}</span></div>`;
+  const rosterHtml=r=>{ if(!r.roster) return '';
+    const retP=r.roster.filter(p=>p.ret&&!p.xfer), dep=r.roster.filter(p=>!p.ret||p.xfer);
+    const hasX=r.xin!==undefined; const xin=r.xin||[];
+    const cols=[
+      `<div class="rcol"><h5 class="rr">Returning · ${retP.length}</h5>${retP.map(plLine).join('')||'<div class="pl muted">—</div>'}</div>`,
+      `<div class="rcol"><h5 class="rd">Departing · ${dep.length}</h5>${dep.map(plLine).join('')||'<div class="pl muted">none</div>'}</div>`];
+    if(hasX) cols.push(`<div class="rcol"><h5 class="ri">Incoming transfers · ${xin.length}</h5>${xin.map(inLine).join('')||'<div class="pl muted">none tracked</div>'}</div>`);
+    return `<div class="rosterwrap${hasX?' three':''}">${cols.join('')}</div>`;};
+  const banner=anyReal
+    ? `<b>2026 — Returning Production.</b> Share of each team's 2025 per-set output (Pts/Set = kills + aces + blocks) coming back, from <b>official 2025 player stats</b> (stats.ncaa.org).`
+      + (anyXfer
+          ? ` Graduation <b>plus transfer-portal moves</b> from a <span class="illus" title="non-official portal tracker">non-official tracker</span>${tasof?' ('+tasof+')':''} — Returning % is <b>net of transfers out</b>; incoming shown separately.`
+          : ` Graduation-based (Sr/Gr depart); <b>transfers not yet included</b>.`)
+      + `${rows.some(r=>r.roster)?' <b>Click any team</b> for its roster'+(anyXfer?' + transfers.':'.'):''}`
+    : `<b>2026 preview — Returning Production.</b> How much of each team's 2025 per-set output (Pts/Set = kills + aces + blocks) comes back next season. <span class="illus">Returning % illustrative</span> until official 2025 player stats (stats.ncaa.org) are pulled — method below.`;
+  host.innerHTML=`
+    <div class="banner">${banner}</div>
+    <div class="card"><div class="twrap"><table>
+      <thead><tr><th>Team</th><th class="num">2025 Pts/Set</th><th class="num">Returning %</th><th class="num">Proj 2026 Pts/Set</th><th>Outlook</th></tr></thead>
+      <tbody>${rows.map(r=>{const[ol,oc]=outlook(r);const retC=lerpHex(cssvar('--rpi-lo'),cssvar('--rpi-hi'),clamp(r.ret));
+        const nx=(r.xout||[]).filter(x=>x.wasRet).length, ni=(r.xin||[]).length;
+        const tip=r.real?(r.net!=null
+            ? `Net ${(r.net*100).toFixed(0)}% incl. transfers (grad-only ${(r.grad*100).toFixed(0)}%)${nx?` · ${nx} out`:''}${ni?` · ${ni} in`:''}`
+            : (r.dep1?`Top loss: ${r.dep1}${r.dep2?' · '+r.dep2:''}`:'Returns nearly all production'))
+          :'illustrative placeholder';
+        const canX=!!r.roster;
+        return `<tr class="${canX?'rrow':''}">
+          <td><div class="team">${LG(r.team)}<span class="nm">${r.team}</span> ${r.conf?`<span class="chip">${r.conf}</span>`:''}${canX?`<span class="exp">▸ roster</span>`:''}</div></td>
+          <td class="num tnum">${r.pps.toFixed(2)}</td>
+          <td class="num"><div class="metric"><span class="val">${(r.ret*100).toFixed(0)}%</span><span class="bar" data-tip="${tip}"><i style="width:${(clamp(r.ret)*100).toFixed(0)}%;background:${retC}"></i></span></div></td>
+          <td class="num tnum">${r.proj.toFixed(2)}</td>
+          <td><span class="pill" style="color:${oc};border-color:${oc}">${ol}</span></td></tr>${canX?`<tr class="rdet" style="display:none"><td colspan="5">${rosterHtml(r)}</td></tr>`:''}`;}).join('')}
+      </tbody></table></div></div>
+    <p class="rpnote"><b>Method.</b> Returning % = (2025 points by players still on the roster) ÷ (team's 2025 points), points = kills + aces + block credit. Departing = class Sr/Gr ${anyXfer?'or entered the transfer portal':''}. Player stats: official <a href="${stats}" target="_blank" rel="noopener">stats.ncaa.org</a>.${anyXfer?` <b>Transfers:</b> non-official tracker${(typeof MODEL!=='undefined'&&MODEL.transfers_source)?' — '+MODEL.transfers_source:''}${tasof?' ('+tasof+')':''}; incoming shown with prior-school points where the old team is in this set. Signees (HS recruits) not counted. Portal data is incomplete — verify/edit as needed.`:` <b>Transfers not yet included.</b>`}</p>`;
+  host.querySelectorAll('[data-tip]').forEach(el=>bindTip(el,el.getAttribute('data-tip')));
+  host.querySelectorAll('tr.rrow').forEach(tr=>tr.addEventListener('click',()=>{
+    const d=tr.nextElementSibling; if(d&&d.classList.contains('rdet')){d.style.display=d.style.display==='none'?'':'none'; tr.classList.toggle('open');}
+  }));
+}
+
+function renderEmpty(v){
+  const el=document.getElementById('view-'+v);
+  el.querySelectorAll('.tiles,.card,#br-body,#tk-body,.rp2026').forEach(n=>n.style.display='none');
+  let e=el.querySelector('.empty.season');
+  if(!e){
+    e=document.createElement('div');e.className='empty season';
+    const isBr=v==='bracket';
+    e.innerHTML=`<div class="ic">🏐</div><h3>2026 — ${isBr?'field not set':'no matches yet'}</h3>
+      <p>${isBr?'The 2026 bracket is announced late November 2026 and will render here in the same format as 2025 once the field drops.':'The Division I women’s season opens late August 2026. Log matches here and the ratings update live — the same engine as 2025.'}</p>`;
+    el.appendChild(e);
+  }
+  e.style.display='';
+}
+function restore2025(){
+  document.querySelectorAll('.empty.season,.rp2026').forEach(n=>n.style.display='none');
+  document.querySelectorAll('.tiles,.card,#br-body,#tk-body').forEach(n=>n.style.display='');
+}
+document.querySelectorAll('.seasons button').forEach(b=>b.onclick=()=>{
+  season=b.dataset.season;
+  document.querySelectorAll('.seasons button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  const cur=document.querySelector('nav.tabs button[aria-selected="true"]').dataset.view;
+  if(season==='2025'){restore2025(); if(!inited[cur]){views[cur]();inited[cur]=true;}}
+  else season2026(cur);
+});
+
+/* footer */
+const os=DATA.official_sources||{};
+const A=(u,t)=>u?`<a href="${u}" target="_blank" rel="noopener">${t}</a>`:t;
+document.getElementById('foot').innerHTML=
+ `<b>Ratings</b> — your Adj Score model: points/set (kills + aces + blocks) with schedule weighted${(typeof MODEL!=='undefined'&&MODEL.asof)?', '+MODEL.asof:''} · offense only. Adj = Z(points/set) + weight × Z(SOS), z-scores relative to this ${teams.length}-team pool. <b>Records + RPI are official NCAA</b> — final 2025 RPI report, ${A((typeof MODEL!=='undefined'&&MODEL.official_source)||os.rpi_site,'stats.ncaa.org')}.
+  <br><b>Bracket &amp; champion</b> — official NCAA (${A(os.champion&&os.champion.url,'NCAA.com')}): Texas A&amp;M def. Kentucky 3–0; Final Four &amp; top‑4 seeds confirmed. Seeds 5–16 are not published on an official page — those rest on ESPN/Wikipedia.
+  <br><b>Point the tracker at official NCAA data</b> for records, per‑set stats &amp; RPI: ${A(os.stats_site,'team stats')} · ${A(os.rpi_site,'RPI')} · ${A(os.bracket_site,'bracket')}. The NCAA publishes stats, RPI and the bracket — but not a Top‑25 poll (that's AVCA/AP). Built for personal use.`;
+
+initRankings(); inited.rankings=true;
+</script>

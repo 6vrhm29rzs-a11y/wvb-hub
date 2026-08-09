@@ -1,0 +1,52 @@
+# --- Credentials: none exist in this repo today. These rules are preventive. ---
+# Drive access currently runs through the claude.ai MCP connector (server-side OAuth),
+# so there is no local client_secret/token file. If a future pipeline ever uses a
+# local Google API client, its secrets land here and MUST stay untracked.
+*.env
+.env*
+client_secret*.json
+credentials*.json
+token*.json
+service-account*.json
+service_account*.json
+*oauth*.json
+.netrc
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+*.keychain*
+
+# --- Local tool/editor state ---
+.claude/settings.local.json
+.vscode/
+.idea/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+
+# --- OS ---
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+
+# --- Incidental artifacts, not project sources ---
+# A dump of a Claude Code terminal session. Scanned clean of secrets, but it is a
+# conversation transcript rather than a build input -- excluded from a PUBLIC repo
+# by default. Delete this line if you want it tracked.
+full terminal convo.pdf
+
+# --- Local caches / scratch (pipeline byproducts, not history) ---
+.cache/
+cache/
+*.log
+*.tmp
+scratch/
