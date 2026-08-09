@@ -17,11 +17,17 @@
 ## Measured facts (don't re-derive)
 - `ncaa.com` works from a **datacenter IP** (Akamai block is only `stats.ncaa.org`) → daily pipeline can be fully cloud.
 - Team per-set stats: `ncaa-api.henrygd.me/stats/volleyball-women/d1/current/team/{id}` (or parse ncaa.com), paginated 7×50 = 348. **45 Hitting% (Kills/Errors/Total Attacks), 46 Kills/Set, 47 Assists/Set, 48 Aces/Set, 49 Blocks/Set (Solos+Assists sep), 50 Digs/Set, 51 W-L%.** RPI ranking endpoint = 348 teams but no raw RPI/SOS → derive + reconcile vs official rank ordering + figstats.
-- Open gap: **opponent points/set** → verify ncaa.com box scores (`/game/{id}/boxscore`) yield it. Class year → school roster pages (annual). KPI = proprietary, fetch-only. AQ count/method → config + per-conference data.
+- **SOLVED 2026-08-09 — opponent points/set.** Not in `/boxscore`; it's in **`/game/{id}` → `linescores[]`** = `{period, home, visit}` per set (both teams ⇒ points for AND against, per set). `/boxscore` → `teamBoxscore[].teamStats.points` = the **match total** (rally points, NOT the kills+aces+blocks stat formula), and its per-set `sets[]` array is **attack-only** (kills/attackErrors/attackAttempts/hit%) — no scores. **Cross-check: Σ linescores == teamStats.points**, verified on 4 games (3-set, two 5-set incl. 15-13/15-12 deciders, championship 6500718). Game ids via `/scoreboard/volleyball-women/d1/{YYYY}/{MM}/{DD}/all-conf`. Dead endpoints: `gameInfo`/`scoringSummary`/`teamStats`/`linescore` → 422.
+- **Python is 3.9.6** (system, Command Line Tools) — **target 3.9**: no `X | Y` unions, no builtin generics (`list[str]`) in annotations, no `match`. Use `typing.List/Dict/Optional/Union`. Decided over upgrading, to avoid a version change mid-build.
+- Class year → school roster pages (annual). KPI = proprietary, fetch-only. AQ count/method → config + per-conference data.
 
 ## What exists here
 `output/vb_dashboard.html` (built dashboard, **40-team sample**, embedded logos) + `vb_template.html` (source; `scripts/build_vb.py` injects data). `data/vb_*.json` = the 40-team datasets (model, rosters, transfers, official RPI, logos). Scale to **all 348** in Phase 1.
 
+## Git
+Repo initialized 2026-08-09 on `main`, commit `499a537` (20 files). Identity set **repo-local** (`Cody` / GitHub noreply) — global config untouched. `.gitignore` blocks credentials preventively (there are none: Drive auth is the claude.ai MCP connector's server-side OAuth, not a local `token.json`), plus `.claude/settings.local.json` and `full terminal convo.pdf` (transcript, not a build input — one line to re-include). `gh` authed as `6vrhm29rzs-a11y`.
+**Push is Cody's to run** — auto-mode blocks outward publishing:
+`gh repo create wvb-hub --public --source=. --remote=origin --push`
+
 ## Next steps
-1. **git init + commit + push** to a GitHub repo `wvb-hub` (public if Cody isn't on a paid plan) — Cody must OK the repo/push.
-2. **Phase 1:** fetch all 348 (ids 45–51, raw, paced); **verify box-score → opponent points/set**; produce clean 2025 `data.json` in `Data/` (metric-agnostic, source-tiered, dated); reconcile vs official RPI rank ordering.
+**Phase 1** (do not start mid-session — a paced 7 cats × 7 pages crawl, and an interrupted run leaves a partial dataset that looks complete): fetch all 348 (ids 45–51, raw counts, ~1–2 req/s); build the game-log side on `/game/{id}` linescores for points for/against per set; produce clean 2025 `data.json` in `Data/` (metric-agnostic, source-tiered, dated); reconcile vs official RPI rank ordering. **Metric still deferred by design** — measure net-points/set vs TCV vs original Adj against 2025 outcomes.
