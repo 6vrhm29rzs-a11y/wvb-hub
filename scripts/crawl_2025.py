@@ -189,13 +189,30 @@ def crawl_schedule():
     print("schedule: %d dates fetched, %d already on disk" % (fetched, skipped))
 
 
-def game_ids_from_schedule():
-    # type: () -> List[str]
-    """Unique gameIDs across every scoreboard file, in date order."""
+def game_ids_from_schedule(include_future=False):
+    # type: (bool) -> List[str]
+    """Unique gameIDs across every scoreboard file, in date order.
+
+    *** FUTURE FIXTURES ARE EXCLUDED BY DEFAULT, and that is load-bearing. ***
+    ncaa.com publishes the whole season's schedule in advance -- the 2026 slate
+    is already listed today with gameState 'pre'. A scheduled game is by
+    definition not final, so the "refetch anything non-final" rule would refetch
+    every unplayed fixture in the season on every run: ~10,000 requests and
+    ~2 hours nightly, achieving nothing, until those matches are actually
+    played. A game cannot have a result before it is played, so anything dated
+    after today is skipped.
+    """
+    today = datetime.date.today()
     seen = set()  # type: Set[str]
     ids = []  # type: List[str]
     for name in sorted(os.listdir(SCOREBOARD_DIR)):
         if not name.endswith(".json"):
+            continue
+        try:
+            day = datetime.date(*[int(x) for x in name[:-5].split("-")])
+        except Exception:
+            continue
+        if not include_future and day > today:
             continue
         with open(os.path.join(SCOREBOARD_DIR, name)) as fh:
             data = json.load(fh)

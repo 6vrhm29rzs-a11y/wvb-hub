@@ -140,6 +140,32 @@ def main():
         check("torn trailing line is skipped, good records survive",
               (len(recs3), recs3[0]["note"]), (1, "good"))
 
+        # ---------------- future fixtures must not be crawled ---------------
+        print()
+        print("FUTURE FIXTURES -- published-but-unplayed games must be skipped")
+        import crawl_2025 as C
+        sbdir = os.path.join(tmp, "sb")
+        os.makedirs(sbdir)
+        real_today = datetime.date.today()
+        past_day = real_today - datetime.timedelta(days=2)
+        future_day = real_today + datetime.timedelta(days=30)
+        with open(os.path.join(sbdir, past_day.isoformat() + ".json"), "w") as fh:
+            json.dump(sb([game("past1", "final", "FINAL")]), fh)
+        with open(os.path.join(sbdir, future_day.isoformat() + ".json"), "w") as fh:
+            json.dump(sb([game("fut1", "pre"), game("fut2", "pre")]), fh)
+        orig = C.SCOREBOARD_DIR
+        C.SCOREBOARD_DIR = sbdir
+        try:
+            got = C.game_ids_from_schedule()
+            allids = C.game_ids_from_schedule(include_future=True)
+        finally:
+            C.SCOREBOARD_DIR = orig
+        # THE BUG: without the date filter these unplayed fixtures are "not
+        # final" forever, so they would be refetched on every single run.
+        check("future fixtures excluded from the crawl list", got, ["past1"])
+        check("include_future=True still sees them", sorted(allids),
+              ["fut1", "fut2", "past1"])
+
         print()
         if FAILED:
             print("FAILED: %d" % len(FAILED))
