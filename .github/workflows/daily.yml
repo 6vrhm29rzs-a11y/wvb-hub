@@ -1,0 +1,110 @@
+name: daily pipeline
+
+# Runs the same scripts a human runs locally -- no CI-only fork of the logic.
+#
+# This also dissolves the git-permission collision: the commit happens here with
+# CI credentials, so the local rule (git push / gh api require a human) stays
+# exactly as tight as it is.
+#
+# 09:15 UTC = ~05:15 ET, after the previous day's late West-coast matches have
+# finished and been posted.
+
+on:
+  schedule:
+    - cron: "15 9 * * *"
+  workflow_dispatch:
+    inputs:
+      season:
+        description: "Season to crawl (e.g. 2026)"
+        required: false
+        default: "2026"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: daily-pipeline
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    env:
+      WVB_SEASON: ${{ github.event.inputs.season || '2026' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"   # match the local target; no version drift
+
+      # Guard the invariants BEFORE touching the network. If the freshness
+      # semantics ever regress, a daily run would silently re-freeze partial
+      # days -- the exact bug this test was written for.
+      - name: Freshness regression test
+        run: python3 scripts/test_crawl_freshness.py
+
+      - name: Record pre-run state
+        id: pre
+        run: |
+          echo "games=$(wc -l < data/raw/$WVB_SEASON/games.jsonl 2>/dev/null || echo 0)" >> $GITHUB_OUTPUT
+
+      # Incremental by construction: crawl_2025.py refetches only dates that are
+      # not yet authoritative (past AND all games final) and games not yet final.
+      # Measured against 2025: a median in-season day is ~57 requests (~0.7 min),
+      # p90 ~239 (~2.8 min), busiest ~435 (~5.2 min). A full recrawl is ~124 min.
+      - name: Incremental crawl
+        run: |
+          python3 scripts/crawl_2025.py schedule
+          python3 scripts/crawl_2025.py games
+          python3 scripts/crawl_2025.py boxscores
+          python3 scripts/crawl_2025.py stats || echo "stats unavailable this early in the season; continuing"
+
+      # A FAILED RUN MUST NOT OVERWRITE GOOD DATA WITH PARTIAL DATA.
+      # The crawl is append-only and resumable, so a mid-crawl failure leaves a
+      # known-partial log rather than a corrupted one. This gate stops a
+      # partial/garbled crawl from reaching the published dashboard: the game
+      # count must not go DOWN, which is the signature of a truncated fetch.
+      - name: Sanity gate
+        run: |
+          post=$(wc -l < data/raw/$WVB_SEASON/games.jsonl 2>/dev/null || echo 0)
+          pre=${{ steps.pre.outputs.games }}
+          echo "games before=$pre after=$post"
+          if [ "$post" -lt "$pre" ]; then
+            echo "::error::game log SHRANK ($pre -> $post). Refusing to publish."
+            exit 1
+          fi
+
+      - name: Rebuild derived outputs
+        run: |
+          python3 scripts/build_dataset.py
+          python3 scripts/rpi_2025.py || echo "RPI needs a game graph; skipping this early"
+          python3 scripts/rating_2025.py
+          python3 scripts/build_vb.py
+
+      - name: Reconcile (report, do not block)
+        run: python3 scripts/reconcile_2025.py || true
+
+      # Only data/raw is committed. Derived outputs are gitignored and rebuilt
+      # on read -- raw is the part that cannot be regenerated, and the rankings
+      # endpoint cannot be season-pinned, so a season's official table is gone
+      # once it rolls over.
+      - name: Commit raw snapshot
+        run: |
+          git config user.name  "wvb-hub bot"
+          git config user.email "noreply@github.com"
+          git add data/raw output/vb_dashboard.html
+          if git diff --cached --quiet; then
+            echo "nothing changed"
+          else
+            git commit -m "daily: raw snapshot $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push
+          fi
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - uses: actions/deploy-pages@v4

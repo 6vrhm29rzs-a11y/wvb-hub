@@ -43,8 +43,9 @@ import collections
 from typing import Dict, List, Optional, Tuple
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-RAW = os.path.join(REPO, "data", "raw", "2025")
-OUT = os.path.join(REPO, "data", "rpi_2025.json")
+SEASON = int(os.environ.get("WVB_SEASON", "2025"))
+RAW = os.path.join(REPO, "data", "raw", str(SEASON))
+OUT = os.path.join(REPO, "data", "rpi_%d.json" % SEASON)
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from reconcile_2025 import norm  # noqa: E402
@@ -61,15 +62,27 @@ def load_di_games():
     Each game is (winner_key, loser_key, game_id). Division I membership is
     taken from the official RPI table.
     """
-    rpi_rows = json.load(open(os.path.join(RAW, "rpi_official.json")))["data"]
+    from gamelog import load_games_jsonl as _lg
+    from membership import resolve as _resolve
+    _all = _lg(os.path.join(RAW, "games.jsonl"))
+    di, official_rows, _src = _resolve(RAW, _all)
     teams = {}
-    for r in rpi_rows:
-        teams[norm(r["School"])] = {
-            "school": r["School"],
-            "official_rank": int(r["Rank"]),
+    for k in di:
+        r = official_rows.get(k, {})
+        nm = r.get("School")
+        if not nm:
+            for g in _all:      # fall back to the name the feed used
+                for t in (g.get("teams") or []):
+                    if norm(t.get("name_short")) == k:
+                        nm = t.get("name_short")
+                        break
+                if nm:
+                    break
+        teams[k] = {
+            "school": nm or k,
+            "official_rank": int(r["Rank"]) if r.get("Rank") else None,
             "conference": r.get("Conf"),
         }
-    di = set(teams)
 
     from gamelog import load_games_jsonl
     games = []

@@ -30,7 +30,8 @@ import collections
 from typing import Any, Dict, List, Optional
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-RAW = os.path.join(REPO, "data", "raw", "2025")
+SEASON = int(os.environ.get("WVB_SEASON", "2025"))
+RAW = os.path.join(REPO, "data", "raw", str(SEASON))
 OUT_DIR = os.path.join(REPO, "data")
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -113,7 +114,10 @@ def load_stats():
 def main():
     games = load_games()
     stats = load_stats()
-    rpi_rows = json.load(open(os.path.join(RAW, "rpi_official.json")))["data"]
+    from membership import resolve as resolve_membership
+    di_names, official_rows, di_source = resolve_membership(RAW, games)
+    rpi_rows = list(official_rows.values())
+    print("D-I membership: %s" % di_source)
 
     # Division-I membership comes from the official RPI table, NOT from the
     # per-team `division` field on /game/{id}. That field reports the team's
@@ -121,7 +125,7 @@ def main():
     # 2025 in D-I (official record 20-9) but is now served as `div3`, while
     # West Florida is served as `div1` on an all-D-II schedule. See
     # scripts/reconcile_2025.py -- using the raw field leaves 18 teams short.
-    di_names = {norm(r["School"]) for r in rpi_rows}
+
 
     # ---- per-team aggregation from the game log (DERIVED) ----
     agg = collections.defaultdict(lambda: {
@@ -174,7 +178,7 @@ def main():
                 e["points_against"] += home_pts
 
     # ---- official RPI table, joined by normalized name ----
-    rpi_by_norm = {norm(r["School"]): r for r in rpi_rows}
+    rpi_by_norm = official_rows
     agg_by_norm = {}
     for tid, e in agg.items():
         agg_by_norm.setdefault(norm(e["name_short"]), tid)
@@ -319,7 +323,7 @@ def main():
     # has no season pin, so once the season rolls over the official RPI table for
     # a past season is gone permanently. Store raw, derive everything else --
     # the same principle already governing raw counts vs derived rates.
-    out_path = os.path.join(OUT_DIR, "data_2025.json")
+    out_path = os.path.join(OUT_DIR, "data_%d.json" % SEASON)
     with open(out_path, "w") as fh:
         json.dump(payload, fh, indent=1)
 

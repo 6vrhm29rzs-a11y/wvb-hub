@@ -9,8 +9,10 @@ data = json.load(open(base/"data/vb2025.json"))              # bracket + results
 #     python3 scripts/build_dataset.py && python3 scripts/rating_2025.py
 # `fitted: True` tells the template to use the fitted composite and leave the
 # hand-weighted SOS dial inert -- otherwise the dial silently overwrites it.
-_rate = json.load(open(base/"data/rating_2025.json"))
-_ds_p = base/"data/data_2025.json"
+import os as _os
+_SEASON = int(_os.environ.get("WVB_SEASON", "2025"))
+_rate = json.load(open(base/("data/rating_%d.json" % _SEASON)))
+_ds_p = base/("data/data_%d.json" % _SEASON)
 _tot  = {}
 if _ds_p.exists():
     for t in json.load(open(_ds_p))["teams"]:
@@ -28,6 +30,9 @@ def _blocks(nm):
     return round((bs + ba / 2.0) / float(st["sets"]), 3)
 model = {
     "fitted": True,
+    "generated_at": _rate["meta"].get("generated_at_utc"),
+    "data_through": _rate["meta"].get("data_through"),
+    "matches_in_data": _rate["meta"].get("matches_in_data"),
     "asof": "final 2025 (through Dec 21, 2025)",
     "sos_weight": 2,
     "weights": _rate["meta"]["weights"],

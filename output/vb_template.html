@@ -303,6 +303,7 @@ footer b{color:var(--ink-2)}
 
 <main>
   <!-- ===================== RANKINGS ===================== -->
+  <div id="freshbar" style="display:none;margin:10px 14px 0;padding:10px 14px;border-radius:10px;font-size:13px;line-height:1.45"></div>
   <section class="view active" id="view-rankings" role="tabpanel">
     <div class="viewhead">
       <div>
@@ -427,6 +428,35 @@ const ppsDom=[Math.min(...ppsArr),Math.max(...ppsArr)];
 const sosDom=[Math.min(...sosArr),Math.max(...sosArr)];      // rank domain (min = toughest)
 const adjDom=()=>[Math.min(...teams.map(t=>t.adj)),Math.max(...teams.map(t=>t.adj))];
 const norm=(x,[lo,hi])=>hi>lo?(x-lo)/(hi-lo):.5;
+
+/* ---------- data freshness ----------
+   Computed in the browser against the VIEWER'S clock, deliberately. A
+   server-side "is stale" flag cannot work here: the page is a static artifact,
+   so if the pipeline stops running the page freezes with whatever flag it was
+   built with and keeps looking fresh forever. Comparing now() to the build
+   timestamp is the only check that survives the pipeline dying, which is
+   exactly the failure it exists to catch. Cody reads this on a phone and cannot
+   see CI logs. */
+const STALE_HOURS=36;
+(function freshness(){
+  const el=document.getElementById('freshbar'); if(!el) return;
+  const gen=(typeof MODEL!=='undefined')?MODEL.generated_at:null;
+  const through=(typeof MODEL!=='undefined')?MODEL.data_through:null;
+  if(!gen){el.style.display='';el.style.background='#fde8e8';el.style.color='#8a1c1c';
+    el.innerHTML='<b>Unknown data age.</b> This build carries no timestamp — treat every number on this page as unverified.';return;}
+  const t=new Date(gen.endsWith('Z')?gen:gen+'Z');
+  const hrs=(Date.now()-t.getTime())/3.6e6;
+  const when=t.toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+  const thru=through?` · matches through <b>${through}</b>`:'';
+  el.style.display='';
+  if(hrs>STALE_HOURS){
+    el.style.background='#fde8e8';el.style.color='#8a1c1c';el.style.border='1px solid #f0b4b4';
+    el.innerHTML=`<b>⚠ STALE — last updated ${Math.floor(hrs/24)}d ${Math.floor(hrs%24)}h ago (${when}).</b> The daily pipeline has not succeeded since then, so these are old numbers being shown as if current.${thru}`;
+  }else{
+    el.style.background='var(--bg-2,#f2f4f7)';el.style.color='var(--ink-2,#555)';
+    el.innerHTML=`Updated <b>${when}</b> (${hrs<1?'under an hour':Math.round(hrs)+'h'} ago)${thru}.`;
+  }
+})();
 
 /* ---------- tooltip ---------- */
 const tip=document.getElementById('tip');

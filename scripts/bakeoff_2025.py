@@ -56,8 +56,9 @@ import collections
 from typing import Dict, List, Optional, Tuple
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-RAW = os.path.join(REPO, "data", "raw", "2025")
-OUT = os.path.join(REPO, "data", "bakeoff_2025.json")
+SEASON = int(os.environ.get("WVB_SEASON", "2025"))
+RAW = os.path.join(REPO, "data", "raw", str(SEASON))
+OUT = os.path.join(REPO, "data", "bakeoff_%d.json" % SEASON)
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from reconcile_2025 import norm  # noqa: E402
@@ -79,8 +80,9 @@ def to_i(v):
 # ------------------------------------------------------------------------ load
 
 def load():
-    rpi_rows = json.load(open(os.path.join(RAW, "rpi_official.json")))["data"]
-    di = {norm(r["School"]) for r in rpi_rows}
+    from gamelog import load_games_jsonl as _lg
+    from membership import resolve as _resolve
+    di, _official, _src = _resolve(RAW, _lg(os.path.join(RAW, "games.jsonl")))
 
     box = {}
     bpath = os.path.join(RAW, "boxscores.jsonl")
@@ -134,6 +136,7 @@ def load():
                 pf, pa = (hp, ap) if tt.get("is_home") else (ap, hp)
                 side.append({
                     "key": norm(tt.get("name_short")),
+                    "name_short": tt.get("name_short"),
                     "points_for": pf, "points_against": pa, "sets": nsets,
                     "is_home": bool(tt.get("is_home")),
                     "box": blines.get(str(tt.get("team_id"))),

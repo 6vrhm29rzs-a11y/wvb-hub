@@ -42,19 +42,19 @@ API = "https://ncaa-api.henrygd.me"
 # therefore CURRENT-ONLY and cannot be re-fetched for a past season. The 2025
 # table captured in data/raw/2025/rpi_official.json is IRREPLACEABLE -- it is
 # also the authority for Division-I membership. Do not delete it.
-SEASON = 2025
+SEASON = int(os.environ.get("WVB_SEASON", "2025"))
 UA = "wvb-hub/0.1 (personal research project; contact via github.com/6vrhm29rzs-a11y/wvb-hub)"
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-RAW = os.path.join(REPO, "data", "raw", "2025")
+RAW = os.path.join(REPO, "data", "raw", str(SEASON))
 SCOREBOARD_DIR = os.path.join(RAW, "scoreboard")
 STATS_DIR = os.path.join(RAW, "stats")
 GAMES_JSONL = os.path.join(RAW, "games.jsonl")
 
 # Season window. Deliberately wider than the real season on both ends so we
 # cannot clip opening weekend or the championship; empty days cost one request.
-SEASON_START = datetime.date(2025, 8, 15)
-SEASON_END = datetime.date(2025, 12, 31)
+SEASON_START = datetime.date(SEASON, 8, 15)
+SEASON_END = datetime.date(SEASON, 12, 31)
 
 # Team stat categories (measured, see CLAUDE.md). Raw counts only.
 STAT_CATS = {

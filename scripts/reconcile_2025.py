@@ -26,7 +26,8 @@ _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
 from typing import Dict, List, Optional, Tuple
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-RAW = os.path.join(REPO, "data", "raw", "2025")
+SEASON = int(os.environ.get("WVB_SEASON", "2025"))
+RAW = os.path.join(REPO, "data", "raw", str(SEASON))
 GAMES_JSONL = os.path.join(RAW, "games.jsonl")
 RPI_JSON = os.path.join(RAW, "rpi_official.json")
 OUT = os.path.join(RAW, "reconcile_report.json")

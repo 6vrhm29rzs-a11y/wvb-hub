@@ -30,8 +30,9 @@ import collections
 from typing import Dict, List, Optional, Tuple
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-RAW = os.path.join(REPO, "data", "raw", "2025")
-OUT = os.path.join(REPO, "data", "rating_2025.json")
+SEASON = int(os.environ.get("WVB_SEASON", "2025"))
+RAW = os.path.join(REPO, "data", "raw", str(SEASON))
+OUT = os.path.join(REPO, "data", "rating_%d.json" % SEASON)
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import bakeoff_2025 as B  # noqa: E402
@@ -136,22 +137,40 @@ def main():
     print("=" * 74)
     print("VALIDATION -- chronological splits, paired bootstrap, vs RPI alone")
     print("=" * 74)
+    # Cutoffs are DERIVED from the data range, not hardcoded to 2025 dates.
+    # The dry-run caught this: with only September data, fixed Oct/Nov cutoffs
+    # leave an empty test set, incremental() returns None and the pipeline dies
+    # -- in September 2026, i.e. on day one of live operation.
+    dates = sorted(m["date"] for m in matches if m["date"])
     val = {}
-    for label, cut in (("Oct 1", datetime.date(2025, 10, 1)),
-                       ("Oct 15", datetime.date(2025, 10, 15)),
-                       ("Nov 1", datetime.date(2025, 11, 1))):
+    if len(dates) < 400:
+        print("  too few matches (%d) to validate; skipping" % len(dates))
+    cuts = []
+    if dates:
+        for frac in (0.55, 0.70, 0.85):
+            c = dates[int(frac * (len(dates) - 1))]
+            if c not in [x[1] for x in cuts]:
+                cuts.append(("%.0f%%" % (frac * 100), c))
+    for label, cut in cuts:
         fit = [m for m in matches if m["date"] and m["date"] < cut]
         test = [m for m in matches if m["date"] and m["date"] >= cut]
+        if len(fit) < 200 or len(test) < 100:
+            print("  %-7s skipped (fit %d / test %d too small)" % (
+                label, len(fit), len(test)))
+            continue
         Mc = B.build_metrics(fit, di)
         r = B.incremental(Mc, fit, test, PRIMARY)
+        if r is None:
+            print("  %-7s skipped (insufficient overlapping data)" % label)
+            continue
         wc, _, Xc, yc = fit_weights(Mc, fit)
         ins = auc_of([wc[0] + wc[1] * x[1] + wc[2] * x[2] for x in Xc], yc)
         val[label] = dict(r, in_sample_auc=ins, gap=ins - r["auc_both"],
                           w_rpi=wc[1], w_primary=wc[2])
         flag = "CI excludes 0" if (r["delta_lo"] or 0) > 0 else "CI includes 0"
-        print("  %-7s test n=%-5d  rpi %.4f -> composite %.4f   delta %+.4f "
+        print("  %-7s (%s) test n=%-5d  rpi %.4f -> composite %.4f   delta %+.4f "
               "[%+.4f, %+.4f]  %s" % (
-                  label, r["n"], r["auc_rpi"], r["auc_both"], r["delta"],
+                  label, cut.isoformat(), r["n"], r["auc_rpi"], r["auc_both"], r["delta"],
                   r["delta_lo"], r["delta_hi"], flag))
         print("           in-sample %.4f vs out-of-sample %.4f  -> overfit gap %+.4f"
               % (ins, r["auc_both"], ins - r["auc_both"]))
@@ -175,8 +194,13 @@ def main():
     # number cannot serve both -- predicting the field with a strength rating
     # would systematically over-select good-margin/bad-record teams, which is the
     # measured bias below (corr(delta, own win%) = -0.205).
-    _offrank = {norm(r["School"]): int(r["Rank"])
-                for r in json.load(open(os.path.join(RAW, "rpi_official.json")))["data"]}
+    # No official RPI table exists early in a season (RPI needs games first, and
+    # the rankings endpoint cannot be season-pinned). The resume view degrades to
+    # empty rather than crashing, and the dashboard shows blanks instead of
+    # inventing ranks.
+    from membership import from_archived_rpi as _arch
+    _a = _arch(RAW)
+    _offrank = {k: int(v["Rank"]) for k, v in (_a[1].items() if _a else [])}
     _vs = collections.defaultdict(lambda: {"t25_w": 0, "t25_l": 0,
                                            "t50_w": 0, "t50_l": 0})
     for m in matches:
@@ -192,18 +216,30 @@ def main():
         if wr and wr <= 50:
             _vs[lk]["t50_l"] += 1
 
+    # Display names: without the official table the join key (lowercased,
+    # punctuation-stripped) would leak into the UI as "nebraska". Use the name
+    # the feed itself printed.
+    _disp = {}
+    for m in matches:
+        for t in m["teams"]:
+            _disp.setdefault(t["key"], t.get("name_short") or t["key"])
+
     comp = composite_table(M_full, w, di)
-    rpi_rows = json.load(open(os.path.join(RAW, "rpi_official.json")))["data"]
-    official = {norm(r["School"]): r for r in rpi_rows}
+    official = (_a[1] if _a else {})
 
     ranked = sorted(comp.items(), key=lambda kv: -kv[1]["composite"])
     table = []
     for i, (k, v) in enumerate(ranked, 1):
         off = official.get(k, {})
+        # Official W-L only exists once the RPI table publishes. Early season,
+        # derive it from the game log rather than rendering None into a "%d".
         rec = parse_record(off.get("Record"))
+        if rec is None:
+            f = _F0.get(k)
+            rec = (f["wins"], f["losses"]) if f else (0, 0)
         table.append({
             "composite_rank": i,
-            "team": off.get("School", k),
+            "team": off.get("School") or _disp.get(k, k),
             "conference": off.get("Conf"),
             "official_rpi_rank": int(off["Rank"]) if off.get("Rank") else None,
             "delta_vs_rpi": (int(off["Rank"]) - i) if off.get("Rank") else None,
@@ -251,8 +287,10 @@ def main():
         "rank", "team", "rpi rank", "delta", "W-L", "adj net/set"))
     for r in table[:20]:
         print("  %-4d %-24s %-8s %+-7d %-8s %+.2f" % (
-            r["composite_rank"], r["team"], r["official_rpi_rank"],
-            r["delta_vs_rpi"], "%d-%d" % (r["wins"], r["losses"]),
+            r["composite_rank"], r["team"],
+            r["official_rpi_rank"] if r["official_rpi_rank"] is not None else "-",
+            r["delta_vs_rpi"] if r["delta_vs_rpi"] is not None else 0,
+            "%d-%d" % (r["wins"], r["losses"]),
             r["adj_net_points_set"]))
     print()
 
@@ -288,7 +326,8 @@ def main():
         sr = owp_rank.get(k)
         print("  %-22s %-5d %-5d %+-6d %-7s %+-8.2f %+-8.2f %s" % (
             r["team"], r["composite_rank"], r["official_rpi_rank"],
-            r["delta_vs_rpi"], "%d-%d" % (r["wins"], r["losses"]),
+            r["delta_vs_rpi"] if r["delta_vs_rpi"] is not None else 0,
+            "%d-%d" % (r["wins"], r["losses"]),
             r["adj_net_points_set"], r["raw_net_points_set"],
             sr if sr else "?"))
         if sr:
@@ -327,11 +366,18 @@ def main():
         sb = sum((y - mb) ** 2 for y in b) ** 0.5
         return cov / (sa * sb) if sa and sb else 0.0
 
-    c_sched = corr(ds, os_)
-    c_rec = corr(ds, ws)
-    print("    corr(delta, opponents' win%%  [schedule]) = %+.4f" % c_sched)
-    print("    corr(delta, own win%%)                    = %+.4f" % c_rec)
-    print()
+    if len(ds) < 30:
+        # No official ranks yet -> no delta to correlate. Say so rather than
+        # dividing by zero or, worse, printing a fabricated 0.0 correlation.
+        print("    (no official RPI table yet -- delta diagnostics unavailable)")
+        c_sched = c_rec = None
+    else:
+        c_sched = corr(ds, os_)
+        c_rec = corr(ds, ws)
+    if c_sched is not None:
+        print("    corr(delta, opponents' win%%  [schedule]) = %+.4f" % c_sched)
+        print("    corr(delta, own win%%)                    = %+.4f" % c_rec)
+        print()
     print("  READ THIS CAREFULLY. Schedule correlation is ~0, so the composite is")
     print("  NOT 'RPI plus a better schedule correction'. The real signature is the")
     print("  record correlation: relative to RPI it ranks teams with WORSE records")
@@ -368,6 +414,12 @@ def main():
                           "automatically right for resume-based bracketology.",
             "generated_at_utc": datetime.datetime.utcnow().replace(
                 microsecond=0).isoformat() + "Z",
+            # latest match actually IN the data, as distinct from when the
+            # pipeline ran -- a run that fetches nothing new is fresh but the
+            # data is not, and the dashboard must be able to say which
+            "data_through": max((m["date"].isoformat() for m in matches
+                                 if m.get("date")), default=None),
+            "matches_in_data": len(matches),
         },
         "teams": table,
     }
