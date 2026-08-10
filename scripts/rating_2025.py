@@ -158,6 +158,15 @@ def main():
     print()
 
     # ---------------- the 348-team table ----------------
+    from rpi_2025 import rpi_from_games as _rfg0
+    _g0 = []
+    for m in matches:
+        _g0.append((m["teams"][m["winner_idx"]]["key"],
+                    m["teams"][1 - m["winner_idx"]]["key"], m["game_id"]))
+    _F0 = _rfg0(_g0, sorted(di))
+    _sosrank = {k: i for i, (k, _) in enumerate(
+        sorted(_F0.items(), key=lambda kv: -kv[1]["owp"]), 1)}
+
     comp = composite_table(M_full, w, di)
     rpi_rows = json.load(open(os.path.join(RAW, "rpi_official.json")))["data"]
     official = {norm(r["School"]): r for r in rpi_rows}
@@ -179,6 +188,8 @@ def main():
             "raw_net_points_set": (round(M_full["net_points_set"][k], 4)
                                    if M_full["net_points_set"].get(k) is not None else None),
             "rpi": round(M_full["rpi"][k], 6),
+            "owp": round(_F0[k]["owp"], 6),
+            "sos_rank": _sosrank[k],
             "composite": round(v["composite"], 5),
             "source_tiers": {
                 "official_rpi_rank": "OFFICIAL",
@@ -186,6 +197,7 @@ def main():
                 "raw_net_points_set": "DERIVED",
                 "adj_net_points_set": "DERIVED",
                 "rpi": "DERIVED",
+                "owp": "DERIVED", "sos_rank": "DERIVED",
                 "composite": "DERIVED",
                 "delta_vs_rpi": "DERIVED",
             },

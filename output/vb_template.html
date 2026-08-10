@@ -296,7 +296,7 @@ footer b{color:var(--ink-2)}
         <h2 id="rk-title">Power Ratings — Your Model</h2>
         <p id="rk-desc"></p>
       </div>
-      <span class="est" title="Your formula: Adj = Z(points/set) + weight × Z(schedule). Offense only.">Your model · offense only</span>
+      <span class="est" id="modelbadge" title="">Your model · offense only</span>
     </div>
     <div class="tiles" id="tiles"></div>
     <div class="card">
@@ -307,6 +307,7 @@ footer b{color:var(--ink-2)}
           <input id="sosw" type="range" min="1" max="3" step="0.5" value="2" aria-label="SOS weight">
           <b id="soswlab">2.0×</b></label>
         <span class="sp" id="rowcount"></span>
+        <button id="toggleAll" type="button" style="display:none;margin-left:8px;font:inherit;font-size:12px;padding:3px 9px;border-radius:999px;border:1px solid var(--ink-3);background:transparent;color:var(--ink-2);cursor:pointer"></button>
       </div>
       <div class="twrap">
         <table id="rktable">
@@ -396,7 +397,12 @@ const teams=M.map(t=>{
   const zp=sP?(t.pps-mP)/sP:0, zs=sS?(mS-t.sos)/sS:0;   // tougher schedule (lower rank #) => higher Z
   return {...t,zp,zs,adj:0};
 });
-function computeAdj(){teams.forEach(t=>t.adj=t.zp+SOSW*t.zs);}
+/* When the payload carries a FITTED composite (Phase 3: RPI + opponent-adjusted
+   net points/set, weights fitted on 2025 rather than hand-picked), use it and
+   leave the SOSW dial inert. The dial recomputes Cody's hand-weighted formula,
+   which would silently overwrite the fitted rating. */
+const FITTED=(typeof MODEL!=='undefined'&&MODEL.fitted===true);
+function computeAdj(){teams.forEach(t=>t.adj=FITTED&&t.composite!=null?t.composite:t.zp+SOSW*t.zs);}
 function assignRanks(){
   [...teams].sort((a,b)=>b.adj-a.adj).forEach((t,i)=>t.rank=i+1);
   [...teams].sort((a,b)=>b.pps-a.pps).forEach((t,i)=>t.ppsRank=i+1);
@@ -420,16 +426,18 @@ const COLS=[
  {k:'team',t:'Team'},
  {k:'record',t:'Rec',num:true},
  {k:'adj',t:'Adj Score',num:true},
- {k:'pps',t:'Pts/Set',num:true},
+ {k:'pps',t:FITTED?'Adj Net/Set':'Pts/Set',num:true},
  {k:'kps',t:'K/s',num:true},
  {k:'aps',t:'A/s',num:true},
  {k:'bps',t:'B/s',num:true},
  {k:'sos',t:'SOS',num:true},
  {k:'rpi',t:'RPI',num:true},
+ {k:'delta',t:'vs RPI',num:true},
 ];
 const LOWBETTER=new Set(['rank','sos','ssf']);
 function recWL(t){if(!t.record)return null;const m=String(t.record).match(/(\d+)\D+(\d+)/);return m?[+m[1],+m[2]]:null;}
 let sortK='rank',sortDir=1,q='',confq='';
+const TOPN=25; let showAll=false;
 function buildHead(){
   const tr=document.getElementById('rkhead');tr.innerHTML='';
   COLS.forEach(c=>{const th=document.createElement('th');th.className=c.num?'num':'';
@@ -446,12 +454,22 @@ function rerender(){
   if(inited.tracker){const s=document.getElementById('tc-sel');if(s)drawTeam(s.value);}
   if(inited.bracket){initBracket();}
 }
+(function(){const b=document.getElementById('toggleAll');
+  if(b)b.addEventListener('click',()=>{showAll=!showAll;drawRows();});})();
 function drawRows(){
   const body=document.getElementById('rkbody');body.innerHTML='';
   let rows=teams.filter(t=>(!q||t.team.toLowerCase().includes(q))&&(!confq||t.conf===confq));
-  const val=t=>{const wl=recWL(t);return {rank:t.rank,team:t.team.toLowerCase(),record:wl?wl[0]/(wl[0]+wl[1]):-1,adj:t.adj,pps:t.pps,kps:t.kps,aps:t.aps,bps:t.bps,sos:t.sos,rpi:t.rpi??-1}[sortK];};
+  const val=t=>{const wl=recWL(t);return {rank:t.rank,team:t.team.toLowerCase(),record:wl?wl[0]/(wl[0]+wl[1]):-1,adj:t.adj,pps:t.pps,kps:t.kps,aps:t.aps,bps:t.bps,sos:t.sos,rpi:t.rpi??-1,delta:t.delta??0}[sortK];};
   rows.sort((a,b)=>{const x=val(a),y=val(b);return (x<y?-1:x>y?1:0)*sortDir||a.rank-b.rank;});
-  document.getElementById('rowcount').textContent=rows.length+' teams';
+  /* Compute all, show a top-N with a toggle for all (Cody's settled decision).
+     348 rows on a phone is unusable as a default. */
+  const total=rows.length;
+  if(!showAll&&!q&&!confq&&total>TOPN)rows=rows.slice(0,TOPN);
+  document.getElementById('rowcount').textContent=
+    (rows.length<total?rows.length+' of '+total:total+' teams');
+  const tb=document.getElementById('toggleAll');
+  if(tb){tb.style.display=(total>TOPN&&!q&&!confq)?'':'none';
+         tb.textContent=showAll?('Show top '+TOPN):('Show all '+total);}
   const aDom=adjDom();
   for(const t of rows){
     const tr=document.createElement('tr'); if(t.rank<=16)tr.className='seedrow';
@@ -467,14 +485,15 @@ function drawRows(){
           <span class="nm">${t.team}</span> ${t.conf?`<span class="chip">${t.conf}</span>`:''}</div></td>
       <td class="num tnum">${wl?`${wl[0]}–${wl[1]}`:'<span style="color:var(--ink-3)">—</span>'}</td>
       <td class="num"><div class="metric"><span class="val">${t.adj>=0?'+':''}${t.adj.toFixed(2)}</span>
-          <span class="bar" data-tip="Adj = Z(pts/set) ${t.zp>=0?'+':''}${t.zp.toFixed(2)} + ${SOSW}×Z(SOS) ${t.zs>=0?'+':''}${t.zs.toFixed(2)}${lift?` · schedule lifts it ${lift>0?'+':''}${lift} vs offense-only`:''}"><i style="width:${(6+adjT*94).toFixed(0)}%;background:${adjC}"></i></span></div></td>
+          <span class="bar" data-tip="${FITTED?`Composite = ${(MODEL.weights.w_rpi).toFixed(2)}×Z(RPI) + ${(MODEL.weights.w_margin).toFixed(2)}×Z(adjusted net pts/set). Weights FITTED on 2025 match outcomes, not hand-picked.`:`Adj = Z(pts/set) ${t.zp>=0?'+':''}${t.zp.toFixed(2)} + ${SOSW}×Z(SOS) ${t.zs>=0?'+':''}${t.zs.toFixed(2)}`}"><i style="width:${(6+adjT*94).toFixed(0)}%;background:${adjC}"></i></span></div></td>
       <td class="num"><div class="metric"><span class="val">${t.pps.toFixed(2)}</span>
           <span class="bar" data-tip="Points per set (kills+aces+blocks) · #${t.ppsRank} offense"><i style="width:${(6+ppsT*94).toFixed(0)}%;background:${cssvar('--court')}"></i></span></div></td>
       <td class="num tnum">${t.kps.toFixed(2)}</td>
       <td class="num tnum">${t.aps.toFixed(2)}</td>
       <td class="num tnum">${t.bps.toFixed(2)}</td>
       <td class="num"><span class="sos" style="background:${sosBg};color:${sosFg}" data-tip="Your model's schedule rank (sheet 1, thru Oct 22) — this is what drives Adj. #${t.sos} of the pool, lower = tougher">#${t.sos}</span></td>
-      <td class="num tnum" ${t.rpi!=null?`data-tip="Official NCAA RPI, final 2025 (stats.ncaa.org): ${t.rpi.toFixed(4)} · national rank #${t.rpiRank} of 348 · non-conf schedule rank #${t.ncRpiRank}"`:''}>${t.rpi!=null?`<span style="font-weight:600">${t.rpi.toFixed(3)}</span> <span style="color:var(--ink-3);font-size:11px">#${t.rpiRank}</span>`:'<span style="color:var(--ink-3)">—</span>'}</td>`;
+      <td class="num tnum" ${t.rpi!=null?`data-tip="Official NCAA RPI, final 2025 (stats.ncaa.org): ${t.rpi.toFixed(4)} · national rank #${t.rpiRank} of 348 · non-conf schedule rank #${t.ncRpiRank}"`:''}>${t.rpi!=null?`<span style="font-weight:600">${t.rpi.toFixed(3)}</span> <span style="color:var(--ink-3);font-size:11px">#${t.rpiRank}</span>`:'<span style="color:var(--ink-3)">—</span>'}</td>
+      <td class="num tnum" data-tip="Our rank minus the official NCAA RPI rank. Positive = we rate them higher than RPI does. This column is the point of the table: where the model agrees with RPI it adds nothing.">${t.delta==null?'<span style="color:var(--ink-3)">—</span>':`<span style="font-weight:600;color:${t.delta>0?'var(--rpi-hi)':t.delta<0?'var(--accent)':'var(--ink-3)'}">${t.delta>0?'+':''}${t.delta}</span>`}</td>`;
     body.appendChild(tr);
   }
   body.querySelectorAll('[data-tip]').forEach(el=>bindTip(el,el.getAttribute('data-tip')));
@@ -486,19 +505,27 @@ function buildTiles(){
   const lifter=[...teams].map(t=>({t,lift:t.ppsRank-t.rank})).sort((a,b)=>b.lift-a.lift)[0];
   const T=[
    {cls:'',k:'Top Rated',v:byAdj?byAdj.team:'—',d:byAdj?`Adj +${byAdj.adj.toFixed(2)} · ${byAdj.conf||''}`:''},
-   {cls:'court',k:'Best Offense',v:byPps?byPps.team:'—',d:byPps?`${byPps.pps.toFixed(2)} pts/set`:''},
+   {cls:'court',k:FITTED?'Best Margin':'Best Offense',v:byPps?byPps.team:'—',d:byPps?`${byPps.pps.toFixed(2)} ${FITTED?'adj net/set':'pts/set'}`:''},
    {cls:'court',k:'Toughest Slate',v:tough?tough.team:'—',d:tough?`SOS #${tough.sos} nationally`:''},
-   {cls:'',k:'Schedule Lift',v:lifter&&lifter.lift>0?`+${lifter.lift}`:'—',d:lifter&&lifter.lift>0?`${lifter.t.team} climbs vs offense-only`:'no schedule swing'},
+   {cls:'',k:FITTED?'RPI Lift':'Schedule Lift',v:lifter&&lifter.lift>0?`+${lifter.lift}`:'—',d:lifter&&lifter.lift>0?`${lifter.t.team} climbs vs margin-only`:'no schedule swing'},
   ];
   document.getElementById('tiles').innerHTML=T.map(t=>`<div class="tile ${t.cls}">
     <div class="k">${t.k}</div><div class="v">${t.v}</div><div class="d">${t.d}</div></div>`).join('');
 }
-function weightLabel(){const el=document.getElementById('soswlab');if(el)el.textContent=SOSW.toFixed(1)+'×';
+function weightLabel(){
+  if(FITTED){
+    const bd=document.getElementById('modelbadge');
+    if(bd){bd.textContent='Fitted composite · 348 teams';
+           bd.title='RPI + opponent-adjusted net points/set, weights fitted on 2025 match outcomes.';} /* the dial drives the hand-weighted formula, which the fitted
+      composite replaces -- leaving it visible implies a control that does
+      nothing */
+    const sl=document.getElementById('sosw'); if(sl&&sl.parentElement)sl.parentElement.style.display='none'; }
+  const el=document.getElementById('soswlab');if(el)el.textContent=SOSW.toFixed(1)+'×';
   const d=document.getElementById('rk-desc');
-  if(d)d.innerHTML=`<b>Adj Score = Z(points/set) + ${SOSW.toFixed(1)}× Z(schedule).</b> Your model — offense only (kills+aces+blocks per set), schedule ${SOSW==2?'double':SOSW.toFixed(1)+'×'}-weighted. ${(typeof MODEL!=='undefined'&&MODEL.asof)?MODEL.asof+'. ':''}Drag the dial to see how much schedule drives it.`;}
+  if(d)d.innerHTML=FITTED?`<b>Composite = ${MODEL.weights.w_rpi.toFixed(2)}×Z(RPI) + ${MODEL.weights.w_margin.toFixed(2)}×Z(opponent-adjusted net points/set).</b> Weights <b>fitted</b> on 2025 match outcomes, not hand-picked. Beats RPI alone out-of-sample at three chronological cutoffs (+0.025 / +0.019 / +0.016 AUC, every CI clear of zero). <b>vs RPI</b> is the column that matters — where it agrees with RPI it adds nothing. Caveat: this is a <b>strength</b> rating, not a <b>resume</b> rating; relative to RPI it favours teams with worse records, so it is not automatically the right input for at-large selection. ${MODEL.asof||''}`:`<b>Adj Score = Z(points/set) + ${SOSW.toFixed(1)}× Z(schedule).</b> Your model — offense only (kills+aces+blocks per set), schedule ${SOSW==2?'double':SOSW.toFixed(1)+'×'}-weighted. ${(typeof MODEL!=='undefined'&&MODEL.asof)?MODEL.asof+'. ':''}Drag the dial to see how much schedule drives it.`;}
 function applyWeight(w){SOSW=w;computeAdj();assignRanks();buildTiles();drawRows();weightLabel();}
 function initRankings(){
-  document.getElementById('rk-title').textContent='Power Ratings — Your Model';
+  document.getElementById('rk-title').textContent=FITTED?'Power Ratings — Fitted Composite':'Power Ratings — Your Model';
   document.getElementById('nRank').textContent=teams.length;
   const cf=document.getElementById('confFilter');
   [...new Set(teams.map(t=>t.conf).filter(Boolean))].sort().forEach(c=>{const o=document.createElement('option');o.value=o.textContent=c;cf.appendChild(o);});
@@ -732,7 +759,7 @@ document.querySelectorAll('.seasons button').forEach(b=>b.onclick=()=>{
 const os=DATA.official_sources||{};
 const A=(u,t)=>u?`<a href="${u}" target="_blank" rel="noopener">${t}</a>`:t;
 document.getElementById('foot').innerHTML=
- `<b>Ratings</b> — your Adj Score model: points/set (kills + aces + blocks) with schedule weighted${(typeof MODEL!=='undefined'&&MODEL.asof)?', '+MODEL.asof:''} · offense only. Adj = Z(points/set) + weight × Z(SOS), z-scores relative to this ${teams.length}-team pool. <b>Records + RPI are official NCAA</b> — final 2025 RPI report, ${A((typeof MODEL!=='undefined'&&MODEL.official_source)||os.rpi_site,'stats.ncaa.org')}.
+ `<b>Ratings</b> — ${FITTED?`composite = ${MODEL.weights.w_rpi.toFixed(2)}×Z(RPI) + ${MODEL.weights.w_margin.toFixed(2)}×Z(opponent-adjusted net points/set), weights fitted on 2025 match outcomes${(typeof MODEL!=='undefined'&&MODEL.asof)?', '+MODEL.asof:''}. Opponent adjustment is a ridge least-squares fit over the full ${teams.length}-team game graph. Strength rating, not a resume rating.`:`your Adj Score model: points/set (kills + aces + blocks) with schedule weighted · offense only.`} <b>Records + RPI are official NCAA</b> — final 2025 RPI report, ${A((typeof MODEL!=='undefined'&&MODEL.official_source)||os.rpi_site,'stats.ncaa.org')}.
   <br><b>Bracket &amp; champion</b> — official NCAA (${A(os.champion&&os.champion.url,'NCAA.com')}): Texas A&amp;M def. Kentucky 3–0; Final Four &amp; top‑4 seeds confirmed. Seeds 5–16 are not published on an official page — those rest on ESPN/Wikipedia.
   <br><b>Point the tracker at official NCAA data</b> for records, per‑set stats &amp; RPI: ${A(os.stats_site,'team stats')} · ${A(os.rpi_site,'RPI')} · ${A(os.bracket_site,'bracket')}. The NCAA publishes stats, RPI and the bracket — but not a Top‑25 poll (that's AVCA/AP). Built for personal use.`;
 

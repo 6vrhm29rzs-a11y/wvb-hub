@@ -3,7 +3,45 @@
 import json, pathlib
 base = pathlib.Path(__file__).resolve().parent.parent
 data = json.load(open(base/"data/vb2025.json"))              # bracket + results feed
-model = json.load(open(base/"data/vb_model.json"))            # Cody's Adj Score inputs (sheet 1)
+# Phase 3: the rankings view now runs on the real 348-team rating
+# (RPI + opponent-adjusted net points/set, weights FITTED on 2025), not the
+# 40-team hand-weighted sample. Rebuild inputs first:
+#     python3 scripts/build_dataset.py && python3 scripts/rating_2025.py
+# `fitted: True` tells the template to use the fitted composite and leave the
+# hand-weighted SOS dial inert -- otherwise the dial silently overwrites it.
+_rate = json.load(open(base/"data/rating_2025.json"))
+_ds_p = base/"data/data_2025.json"
+_tot  = {}
+if _ds_p.exists():
+    for t in json.load(open(_ds_p))["teams"]:
+        st = t.get("season_totals") or {}
+        if st.get("sets"):
+            _tot[t["name_short"]] = st
+def _per(nm, key):
+    st = _tot.get(nm)
+    if not st or not st.get("sets") or st.get(key) is None: return None
+    return round(st[key] / float(st["sets"]), 3)
+def _blocks(nm):
+    st = _tot.get(nm)
+    if not st or not st.get("sets"): return None
+    bs, ba = st.get("block_solos") or 0, st.get("block_assists") or 0
+    return round((bs + ba / 2.0) / float(st["sets"]), 3)
+model = {
+    "fitted": True,
+    "asof": "final 2025 (through Dec 21, 2025)",
+    "sos_weight": 2,
+    "weights": _rate["meta"]["weights"],
+    "teams": [{
+        "team": r["team"], "conf": r["conference"],
+        "record": ("%d-%d" % (r["wins"], r["losses"])) if r["wins"] is not None else None,
+        "composite": r["composite"], "delta": r["delta_vs_rpi"],
+        "pps": r["adj_net_points_set"],
+        "kps": _per(r["team"], "kills"), "aps": _per(r["team"], "aces"),
+        "bps": _blocks(r["team"]),
+        "sos": r["sos_rank"], "rpi": r["rpi"], "rpiRank": r["official_rpi_rank"],
+        "ncRpiRank": r["official_rpi_rank"],
+    } for r in _rate["teams"]],
+}
 
 # --- merge OFFICIAL records + RPI from stats.ncaa.org (final 2025 nitty-gritty) by team name ---
 off = json.load(open(base/"data/vb_ncaa_official.json"))["teams"]
