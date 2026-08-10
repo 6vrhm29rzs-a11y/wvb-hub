@@ -21,6 +21,8 @@ import os
 import re
 import sys
 import collections
+import sys as _sys, os as _os
+_sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
 from typing import Dict, List, Optional, Tuple
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -83,17 +85,9 @@ def parse_record(rec):
 
 def load_games():
     # type: () -> List[Dict]
-    games = []
-    with open(GAMES_JSONL) as fh:
-        for line in fh:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                games.append(json.loads(line))
-            except Exception:
-                continue
-    return games
+    """Deduped by the shared rule: final beats non-final, then last wins."""
+    from gamelog import load_games_jsonl
+    return load_games_jsonl(GAMES_JSONL)
 
 
 def main():
@@ -117,14 +111,7 @@ def main():
         by_norm[norm(r["School"])] = r
     di_names = set(by_norm)
 
-    games = load_games()
-    seen_ids = set()
-    unique = []
-    for g in games:
-        if g["game_id"] in seen_ids:
-            continue
-        seen_ids.add(g["game_id"])
-        unique.append(g)
+    unique = load_games()   # already deduped by gamelog.load_games_jsonl
 
     # Tally per team_id. Track D-I-only and non-D-I splits separately, because
     # RPI Factors I-III count only Division I opponents while the official table

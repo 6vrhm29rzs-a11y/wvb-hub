@@ -23,6 +23,9 @@ import urllib.error
 import urllib.request
 from typing import Any, Dict, List, Optional, Set
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from gamelog import final_game_ids, load_records_jsonl  # noqa: E402
+
 API = "https://ncaa-api.henrygd.me"
 
 # *** `/current/` IS BANNED IN THIS CODEBASE. Always pin the season. ***
@@ -102,6 +105,50 @@ def fetch(path):
     return None
 
 
+# ---------------------------------------------------------- freshness rules
+#
+# *** COMPLETENESS RULE. Do not "optimise" this away. ***
+# A DATE is authoritative only when BOTH hold:
+#     (1) the date is strictly in the past (not today), AND
+#     (2) every game listed on it is final.
+# A GAME is authoritative only when game_state == 'F'.
+# Anything else stays refetchable.
+#
+# The bug this prevents: on a finished season, "skip any date already on disk"
+# is correct and fast. On a LIVE season it silently destroys data -- a date
+# fetched at 3pm caches that afternoon's partial slate as complete, and the
+# evening matches are never fetched again. Silent, unrecoverable, and it
+# corrupts the game graph that every reconciliation depends on.
+
+def date_is_authoritative(payload, day, today):
+    # type: (Optional[Dict[str, Any]], datetime.date, datetime.date) -> bool
+    """True only if this stored date can never change again."""
+    if payload is None:
+        return False
+    if day >= today:
+        return False                      # today is still in progress
+    games = payload.get("games") or []
+    for wrapper in games:
+        g = wrapper.get("game", wrapper)
+        state = (g.get("gameState") or "").lower()
+        final = g.get("finalMessage") or ""
+        if state != "final" and "final" not in str(final).lower():
+            return False                  # a game on this date is unresolved
+    return True
+
+
+def date_needs_refetch(path, day, today):
+    # type: (str, datetime.date, datetime.date) -> bool
+    if not os.path.exists(path):
+        return True
+    try:
+        with open(path) as fh:
+            payload = json.load(fh)
+    except Exception:
+        return True                       # truncated write
+    return not date_is_authoritative(payload, day, today)
+
+
 def ensure_dirs():
     for d in (SCOREBOARD_DIR, STATS_DIR):
         if not os.path.isdir(d):
@@ -114,11 +161,12 @@ def crawl_schedule():
     # type: () -> None
     """One scoreboard request per date. Skips dates already on disk."""
     ensure_dirs()
+    today = datetime.date.today()
     day = SEASON_START
     fetched = skipped = 0
     while day <= SEASON_END:
         out = os.path.join(SCOREBOARD_DIR, day.isoformat() + ".json")
-        if os.path.exists(out):
+        if not date_needs_refetch(out, day, today):
             skipped += 1
             day += datetime.timedelta(days=1)
             continue
@@ -164,20 +212,13 @@ def game_ids_from_schedule():
 
 def already_have():
     # type: () -> Set[str]
-    """gameIDs already written to the JSONL. Tolerates a truncated last line."""
-    have = set()  # type: Set[str]
-    if not os.path.exists(GAMES_JSONL):
-        return have
-    with open(GAMES_JSONL) as fh:
-        for line in fh:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                have.add(json.loads(line)["game_id"])
-            except Exception:
-                continue  # partial write from an interrupt; will be refetched
-    return have
+    """gameIDs whose stored record is FINAL.
+
+    Deliberately NOT "every id present". A game stored while in progress must be
+    refetched until it finishes; treating it as done freezes a live match at
+    whatever score it had when we first looked.
+    """
+    return final_game_ids(GAMES_JSONL)
 
 
 def normalize_game(gid, payload):
@@ -319,17 +360,10 @@ def crawl_boxscores():
     time if player-level data is ever wanted.
     """
     ids = game_ids_from_schedule()
-    have = set()
-    if os.path.exists(BOX_JSONL):
-        with open(BOX_JSONL) as fh:
-            for line in fh:
-                line = line.strip()
-                if not line:
-                    continue
-                try:
-                    have.add(json.loads(line)["game_id"])
-                except Exception:
-                    continue
+    # A boxscore is only trustworthy once its game is final -- an in-progress
+    # boxscore holds partial attack lines.
+    finals = final_game_ids(GAMES_JSONL)
+    have = set(k for k in load_records_jsonl(BOX_JSONL) if k in finals)
     todo = [g for g in ids if g not in have]
     print("boxscores: %d enumerated, %d on disk, %d to fetch" % (
         len(ids), len(have), len(todo)))

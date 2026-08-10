@@ -71,21 +71,8 @@ def to_int(v):
 
 def load_games():
     # type: () -> List[Dict]
-    games, seen = [], set()
-    path = os.path.join(RAW, "games.jsonl")
-    with open(path) as fh:
-        for line in fh:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                g = json.loads(line)
-            except Exception:
-                continue
-            if g["game_id"] in seen:
-                continue
-            seen.add(g["game_id"])
-            games.append(g)
+    from gamelog import load_games_jsonl
+    games = load_games_jsonl(os.path.join(RAW, "games.jsonl"))
     games.sort(key=lambda g: (g.get("start_time_epoch") or 0, g["game_id"]))
     return games
 

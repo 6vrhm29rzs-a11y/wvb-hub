@@ -26,6 +26,7 @@ import json
 import os
 import random
 import sys
+import collections
 from typing import Dict, List, Optional, Tuple
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -37,6 +38,7 @@ import bakeoff_2025 as B  # noqa: E402
 from reconcile_2025 import norm, parse_record  # noqa: E402
 
 PRIMARY = "adj_net_points_set"
+LOW_CONF_GAMES = 10   # below this, the rating is flagged as thin-sample
 SEED = 23
 
 
@@ -167,6 +169,29 @@ def main():
     _sosrank = {k: i for i, (k, _) in enumerate(
         sorted(_F0.items(), key=lambda kv: -kv[1]["owp"]), 1)}
 
+    # RESUME-VIEW inputs. Deliberately kept SEPARATE from the composite: the
+    # composite answers "who would win a match" (strength); the committee asks
+    # "who has earned selection" (resume) and weights won-lost results. One
+    # number cannot serve both -- predicting the field with a strength rating
+    # would systematically over-select good-margin/bad-record teams, which is the
+    # measured bias below (corr(delta, own win%) = -0.205).
+    _offrank = {norm(r["School"]): int(r["Rank"])
+                for r in json.load(open(os.path.join(RAW, "rpi_official.json")))["data"]}
+    _vs = collections.defaultdict(lambda: {"t25_w": 0, "t25_l": 0,
+                                           "t50_w": 0, "t50_l": 0})
+    for m in matches:
+        wk = m["teams"][m["winner_idx"]]["key"]
+        lk = m["teams"][1 - m["winner_idx"]]["key"]
+        lr, wr = _offrank.get(lk), _offrank.get(wk)
+        if lr and lr <= 25:
+            _vs[wk]["t25_w"] += 1
+        if lr and lr <= 50:
+            _vs[wk]["t50_w"] += 1
+        if wr and wr <= 25:
+            _vs[lk]["t25_l"] += 1
+        if wr and wr <= 50:
+            _vs[lk]["t50_l"] += 1
+
     comp = composite_table(M_full, w, di)
     rpi_rows = json.load(open(os.path.join(RAW, "rpi_official.json")))["data"]
     official = {norm(r["School"]): r for r in rpi_rows}
@@ -190,6 +215,20 @@ def main():
             "rpi": round(M_full["rpi"][k], 6),
             "owp": round(_F0[k]["owp"], 6),
             "sos_rank": _sosrank[k],
+            # confidence: a team ranked 3rd on four matches must not look
+            # identical to a team ranked 3rd on thirty
+            "games_played": (rec[0] + rec[1]) if rec else 0,
+            "low_confidence": bool(rec and (rec[0] + rec[1]) < LOW_CONF_GAMES),
+            # resume view (separate from the strength composite, by design)
+            "resume": {
+                "vs_rpi_top25": "%d-%d" % (_vs[k]["t25_w"], _vs[k]["t25_l"]),
+                "vs_rpi_top50": "%d-%d" % (_vs[k]["t50_w"], _vs[k]["t50_l"]),
+                "official_rpi_rank": int(_offrank[k]) if k in _offrank else None,
+                "kpi": None,
+                "kpi_note": "KPI is PROPRIETARY and read-only from "
+                            "faktorsports.com (THIRD-PARTY tier). Do not attempt "
+                            "to reproduce it.",
+            },
             "composite": round(v["composite"], 5),
             "source_tiers": {
                 "official_rpi_rank": "OFFICIAL",
@@ -198,6 +237,8 @@ def main():
                 "adj_net_points_set": "DERIVED",
                 "rpi": "DERIVED",
                 "owp": "DERIVED", "sos_rank": "DERIVED",
+                "games_played": "OFFICIAL", "resume.vs_rpi_top25": "DERIVED",
+                "resume.vs_rpi_top50": "DERIVED", "resume.kpi": "THIRD-PARTY (unfetched)",
                 "composite": "DERIVED",
                 "delta_vs_rpi": "DERIVED",
             },

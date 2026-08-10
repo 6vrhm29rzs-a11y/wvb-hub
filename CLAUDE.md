@@ -12,6 +12,20 @@
 
    **AMENDMENT PROTOCOL (revised 2026-08-10 — the earlier version was unexecutable).** The rule "put the correction in the doc it corrects, or have the superseded doc point forward" **cannot be followed**: the Drive connector exposes create/copy/read/download/metadata/search and has **no update or edit operation**, so no existing Drive doc can be modified. Workable version, in force: **this file carries the pointer** (it is read first at boot and is writable), and a superseding doc's title must start with **"SUPERSEDES …"** so the folder listing itself signals it. Never file a bare amendment as a separate doc — it will not be read. Mailbox subfolders: Research/ · Specs_for_Builder/ · Builder_Logs/ · Data/. Write build logs to Builder_Logs/; end each session with a session-close incl. a **LOCAL ONLY** list (what's on disk but not on Drive).
 
+## Rules for the Builder (structural, not vibes)
+
+**R1 — NEVER WRITE AN INTERPRETATION BEFORE THE NUMBER EXISTS.** No output string that *characterizes* a result may be authored before the value it characterizes is computed. Interpretation strings are built from measured values at print time, or they do not exist. Verdicts must come from threshold-free statistics (AUC, permutation test, bootstrap CI) — if a verdict depends on a cutoff you chose yourself, you have tested nothing.
+Twice-burned, both in one session:
+- Phase 2 printed **"SCATTERED — investigate"** on a *correct* RPI calculation, because I scored a positions-based adjustment with a Pearson correlation against a 0.35 threshold I invented. Fixed with a permutation test: gap +1.92 positions, p=0.00005.
+- Phase 3 printed **"lands close to his 2:1"** before the fit ran. It came out **1.00:1** and the sentence printed anyway.
+**Why this rule outranks its apparent size:** Cody is the only reviewer and he reads the summaries, not the code. A confidently worded wrong interpretation is the highest-leverage error available to the Builder.
+
+**R2 — COMPLETENESS RULE FOR THE CRAWL. Do not "optimise" this away.**
+A **date** is authoritative only when (1) it is strictly in the past *and* (2) every game on it is final. A **game** is authoritative only when `game_state == 'F'`. Everything else stays refetchable.
+On a finished season "skip anything already on disk" is correct and fast. On a **live** season it silently destroys data: a date fetched at 3pm caches the afternoon's partial slate as complete and the evening matches are never fetched again — unrecoverable, and it corrupts the game graph everything reconciles against. `games.jsonl` is append-only, so dedup is **final-beats-non-final, then last-wins** (`scripts/gamelog.py`); first-wins dedup would make a stale in-progress record permanently defeat its own correction. Guarded by `scripts/test_crawl_freshness.py` — verified to FAIL against the old behaviour.
+
+**R3 — STRENGTH ≠ RESUME.** Two ratings, two jobs, never merged. The **composite** (strength) answers "who would win a match" and drives the simulator. The **resume view** (RPI, KPI, W-L, record vs top 25/50) answers "who has earned selection" and is what the projector must predict, because the committee weights won-lost results. Measured: relative to RPI the composite favours teams with *worse* records (corr −0.205), so using it to project the field would systematically over-select good-margin/bad-record teams.
+
 ## Cody's settled decisions (build against these)
 - **History:** every run commits a **timestamped data snapshot to git** (no DB).
 - **Schema:** **raw counts, never derived rates** — pull the ncaa.com superset (ids 45–51: kills, attack errors, total attacks, assists, digs, aces, block solos + block assists SEPARATE) + opponent points (box scores) + set scores + a **SOURCE-TIER** field (OFFICIAL/DERIVED/THIRD-PARTY/UNVERIFIED).

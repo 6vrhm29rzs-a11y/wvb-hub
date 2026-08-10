@@ -433,11 +433,14 @@ const COLS=[
  {k:'sos',t:'SOS',num:true},
  {k:'rpi',t:'RPI',num:true},
  {k:'delta',t:'vs RPI',num:true},
+ {k:'gp',t:'GP',num:true},
+ {k:'t25',t:'vs T25'},
+ {k:'t50',t:'vs T50'},
 ];
 const LOWBETTER=new Set(['rank','sos','ssf']);
 function recWL(t){if(!t.record)return null;const m=String(t.record).match(/(\d+)\D+(\d+)/);return m?[+m[1],+m[2]]:null;}
 let sortK='rank',sortDir=1,q='',confq='';
-const TOPN=25; let showAll=false;
+const TOPN=25; let showAll=false; const LOWCONF=10;
 function buildHead(){
   const tr=document.getElementById('rkhead');tr.innerHTML='';
   COLS.forEach(c=>{const th=document.createElement('th');th.className=c.num?'num':'';
@@ -459,7 +462,7 @@ function rerender(){
 function drawRows(){
   const body=document.getElementById('rkbody');body.innerHTML='';
   let rows=teams.filter(t=>(!q||t.team.toLowerCase().includes(q))&&(!confq||t.conf===confq));
-  const val=t=>{const wl=recWL(t);return {rank:t.rank,team:t.team.toLowerCase(),record:wl?wl[0]/(wl[0]+wl[1]):-1,adj:t.adj,pps:t.pps,kps:t.kps,aps:t.aps,bps:t.bps,sos:t.sos,rpi:t.rpi??-1,delta:t.delta??0}[sortK];};
+  const val=t=>{const wl=recWL(t);return {rank:t.rank,team:t.team.toLowerCase(),record:wl?wl[0]/(wl[0]+wl[1]):-1,adj:t.adj,pps:t.pps,kps:t.kps,aps:t.aps,bps:t.bps,sos:t.sos,rpi:t.rpi??-1,delta:t.delta??0,gp:t.gp??0,t25:t.t25||'',t50:t.t50||''}[sortK];};
   rows.sort((a,b)=>{const x=val(a),y=val(b);return (x<y?-1:x>y?1:0)*sortDir||a.rank-b.rank;});
   /* Compute all, show a top-N with a toggle for all (Cody's settled decision).
      348 rows on a phone is unusable as a default. */
@@ -473,6 +476,7 @@ function drawRows(){
   const aDom=adjDom();
   for(const t of rows){
     const tr=document.createElement('tr'); if(t.rank<=16)tr.className='seedrow';
+    if(t.lowconf){tr.style.opacity='.55';tr.title='Thin sample: fewer than '+LOWCONF+' D-I matches. Rank is provisional.';}
     const adjT=norm(t.adj,aDom), ppsT=norm(t.pps,ppsDom), sosI=1-norm(t.sos,sosDom); // sosI: tough=1
     const adjC=lerpHex(cssvar('--rpi-lo'),cssvar('--rpi-hi'),adjT);
     const sosBg=lerpHex(cssvar('--sos-lo'),cssvar('--sos-hi'),sosI);
@@ -493,7 +497,10 @@ function drawRows(){
       <td class="num tnum">${t.bps.toFixed(2)}</td>
       <td class="num"><span class="sos" style="background:${sosBg};color:${sosFg}" data-tip="Your model's schedule rank (sheet 1, thru Oct 22) — this is what drives Adj. #${t.sos} of the pool, lower = tougher">#${t.sos}</span></td>
       <td class="num tnum" ${t.rpi!=null?`data-tip="Official NCAA RPI, final 2025 (stats.ncaa.org): ${t.rpi.toFixed(4)} · national rank #${t.rpiRank} of 348 · non-conf schedule rank #${t.ncRpiRank}"`:''}>${t.rpi!=null?`<span style="font-weight:600">${t.rpi.toFixed(3)}</span> <span style="color:var(--ink-3);font-size:11px">#${t.rpiRank}</span>`:'<span style="color:var(--ink-3)">—</span>'}</td>
-      <td class="num tnum" data-tip="Our rank minus the official NCAA RPI rank. Positive = we rate them higher than RPI does. This column is the point of the table: where the model agrees with RPI it adds nothing.">${t.delta==null?'<span style="color:var(--ink-3)">—</span>':`<span style="font-weight:600;color:${t.delta>0?'var(--rpi-hi)':t.delta<0?'var(--accent)':'var(--ink-3)'}">${t.delta>0?'+':''}${t.delta}</span>`}</td>`;
+      <td class="num tnum" data-tip="Our rank minus the official NCAA RPI rank. Positive = we rate them higher than RPI does. This column is the point of the table: where the model agrees with RPI it adds nothing.">${t.delta==null?'<span style="color:var(--ink-3)">—</span>':`<span style="font-weight:600;color:${t.delta>0?'var(--rpi-hi)':t.delta<0?'var(--accent)':'var(--ink-3)'}">${t.delta>0?'+':''}${t.delta}</span>`}</td>
+      <td class="num tnum" data-tip="Division-I matches played. A rating built on few matches is a weak rating -- below ${LOWCONF} games the row is flagged.">${t.gp==null?'—':t.gp}${t.lowconf?' <span title="thin sample" style="color:var(--accent);font-weight:700">!</span>':''}</td>
+      <td class="num tnum" data-tip="RESUME view — record against teams in the official RPI top 25. The committee asks who has EARNED selection; this column and the next are resume evidence, not strength.">${t.t25||'—'}</td>
+      <td class="num tnum" data-tip="RESUME view — record against the official RPI top 50.">${t.t50||'—'}</td>`;
     body.appendChild(tr);
   }
   body.querySelectorAll('[data-tip]').forEach(el=>bindTip(el,el.getAttribute('data-tip')));

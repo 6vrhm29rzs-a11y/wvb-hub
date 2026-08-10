@@ -71,20 +71,11 @@ def load_di_games():
         }
     di = set(teams)
 
+    from gamelog import load_games_jsonl
     games = []
-    seen = set()
-    with open(os.path.join(RAW, "games.jsonl")) as fh:
-        for line in fh:
-            line = line.strip()
-            if not line:
+    for g in load_games_jsonl(os.path.join(RAW, "games.jsonl")):
+            if g.get("game_state") != "F":
                 continue
-            try:
-                g = json.loads(line)
-            except Exception:
-                continue
-            if g["game_id"] in seen or g.get("game_state") != "F":
-                continue
-            seen.add(g["game_id"])
             t = g.get("teams") or []
             if len(t) != 2:
                 continue

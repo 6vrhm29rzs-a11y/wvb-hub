@@ -39,6 +39,8 @@ model = {
         "kps": _per(r["team"], "kills"), "aps": _per(r["team"], "aces"),
         "bps": _blocks(r["team"]),
         "sos": r["sos_rank"], "rpi": r["rpi"], "rpiRank": r["official_rpi_rank"],
+        "gp": r["games_played"], "lowconf": r["low_confidence"],
+        "t25": r["resume"]["vs_rpi_top25"], "t50": r["resume"]["vs_rpi_top50"],
         "ncRpiRank": r["official_rpi_rank"],
     } for r in _rate["teams"]],
 }
