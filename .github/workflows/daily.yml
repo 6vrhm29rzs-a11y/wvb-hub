@@ -21,8 +21,6 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 concurrency:
   group: daily-pipeline
@@ -103,8 +101,18 @@ jobs:
             git push
           fi
 
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: .
-      - uses: actions/deploy-pages@v4
+      # NO deploy-pages STEP, deliberately. This repo's Pages is configured as
+      # build_type "legacy" (branch main, path /), so a push to main already
+      # triggers a Pages rebuild -- observed on commit 880ddff. actions/deploy-pages
+      # requires build_type "workflow" and would have failed every night against
+      # this configuration. Verified via `gh api repos/.../pages` before shipping.
+      # If Pages is ever switched to workflow-based deployment, re-add:
+      #   actions/configure-pages@v5, actions/upload-pages-artifact@v3, actions/deploy-pages@v4
+      # and drop the `git push` above as the deploy trigger.
+      - name: Confirm Pages picked up the commit
+        if: success()
+        run: |
+          sleep 45
+          gh api repos/${{ github.repository }}/pages/builds/latest --jq '{status,error:.error.message}' || true
+        env:
+          GH_TOKEN: ${{ github.token }}
