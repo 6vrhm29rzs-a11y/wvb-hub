@@ -101,6 +101,22 @@ def main():
         sys.stderr.write("no games.jsonl yet -- run the crawl first\n")
         return 1
 
+    # Load the official table FIRST: its membership is the Division-I flag.
+    #
+    # The per-team `division` field on /game/{id} is NOT usable for this. It
+    # reports the team's CURRENT division, not its division during the 2025
+    # season. Saint Francis (PA) played 2025 in D-I and appears in the official
+    # 2025 RPI table at 20-9, but ncaa.com now serves it as `div3` following its
+    # announced move -- so trusting that field silently dropped every Saint
+    # Francis game and left 18 teams short. Conversely West Florida is tagged
+    # `div1` while playing an all-D-II schedule and is absent from the table.
+    # Membership in the official RPI table is the only self-consistent flag.
+    rpi = json.load(open(RPI_JSON))["data"]
+    by_norm = {}
+    for r in rpi:
+        by_norm[norm(r["School"])] = r
+    di_names = set(by_norm)
+
     games = load_games()
     seen_ids = set()
     unique = []
@@ -154,7 +170,7 @@ def main():
                 e["w"] += 1
             else:
                 e["l"] += 1
-            opp_di = (other.get("division") == 1)
+            opp_di = norm(other.get("name_short")) in di_names
             if opp_di:
                 e["di_w" if won else "di_l"] += 1
             else:
@@ -170,12 +186,6 @@ def main():
             else:
                 e["pts_for"] += away_pts
                 e["pts_against"] += home_pts
-
-    # Official side
-    rpi = json.load(open(RPI_JSON))["data"]
-    by_norm = {}
-    for r in rpi:
-        by_norm[norm(r["School"])] = r
 
     derived_by_norm = {}
     for tid, e in tally.items():

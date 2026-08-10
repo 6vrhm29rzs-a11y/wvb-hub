@@ -126,6 +126,14 @@ def main():
     stats = load_stats()
     rpi_rows = json.load(open(os.path.join(RAW, "rpi_official.json")))["data"]
 
+    # Division-I membership comes from the official RPI table, NOT from the
+    # per-team `division` field on /game/{id}. That field reports the team's
+    # CURRENT division rather than its 2025 division: Saint Francis (PA) played
+    # 2025 in D-I (official record 20-9) but is now served as `div3`, while
+    # West Florida is served as `div1` on an all-D-II schedule. See
+    # scripts/reconcile_2025.py -- using the raw field leaves 18 teams short.
+    di_names = {norm(r["School"]) for r in rpi_rows}
+
     # ---- per-team aggregation from the game log (DERIVED) ----
     agg = collections.defaultdict(lambda: {
         "games": 0, "di_w": 0, "di_l": 0, "nondi_w": 0, "nondi_l": 0,
@@ -162,7 +170,7 @@ def main():
                 e["division"] = t.get("division")
             e["games"] += 1
             won = bool(t.get("is_winner"))
-            if other.get("division") == 1:
+            if norm(other.get("name_short")) in di_names:
                 e["di_w" if won else "di_l"] += 1
             else:
                 e["nondi_w" if won else "nondi_l"] += 1
