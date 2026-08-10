@@ -49,6 +49,15 @@ model = {
         "pps": r["adj_net_points_set"],
         "kps": _per(r["team"], "kills"), "aps": _per(r["team"], "aces"),
         "bps": _blocks(r["team"]),
+        # OFFENSE-ONLY points/set (kills + aces + blocks), kept SEPARATE from
+        # `pps`. `pps` now carries opponent-adjusted NET points/set, which is a
+        # differential and can be negative; the 2026 returning-production view
+        # and the team tracker both mean the offensive quantity and multiply by
+        # a returning share, so feeding them a differential produces nonsense
+        # (a real bug: "Ark.-Pine Bluff 2025 Pts/Set -14.31").
+        "opps": (lambda k, a, b: round(k + a + b, 2)
+                 if None not in (k, a, b) else None)(
+            _per(r["team"], "kills"), _per(r["team"], "aces"), _blocks(r["team"])),
         "sos": r["sos_rank"], "rpi": r["rpi"], "rpiRank": r["official_rpi_rank"],
         "gp": r["games_played"], "lowconf": r["low_confidence"],
         "t25": r["resume"]["vs_rpi_top25"], "t50": r["resume"]["vs_rpi_top50"],

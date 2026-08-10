@@ -682,7 +682,7 @@ function drawTeam(name){
   const logo=document.getElementById('tc-logo');
   {const u=logoURI(t.team); if(u){logo.className='logo lg';logo.style.cssText='';logo.innerHTML=`<img src="${u}" alt="${t.team}">`;}else{logo.className='logo';logo.style.cssText=logoStyle(t.team);logo.textContent=abbr(t.team);}}
   document.getElementById('tc-name').textContent=t.team;
-  document.getElementById('tc-meta').textContent=`${t.conf||''} · #${t.rank} in Adj · ${t.pps.toFixed(2)} pts/set · SOS #${t.sos}`;
+  document.getElementById('tc-meta').textContent=`${t.conf||''} · #${t.rank} in Adj · ${t.opps!=null?t.opps.toFixed(2):'—'} pts/set · SOS #${t.sos}`;
   const acc=cssvar('--accent'),court=cssvar('--court'),sosc=cssvar('--sos-hi');
   const maxK=Math.max(...teams.map(x=>x.kps)),maxA=Math.max(...teams.map(x=>x.aps)),maxB=Math.max(...teams.map(x=>x.bps));
   const comp=[['Kills / set',t.kps,acc,maxK],['Aces / set',t.aps,court,maxA],['Blocks / set',t.bps,sosc,maxB]];
@@ -696,7 +696,7 @@ function drawTeam(name){
      <div class="track" data-tip="${lab}: ${z>=0?'+':''}${z.toFixed(2)}"><i style="width:${zmap(z).toFixed(0)}%;background:${c};opacity:${z<0?.5:1}"></i></div>
      <div class="num">${z>=0?'+':''}${z.toFixed(2)}</div></div>`).join('');
   document.getElementById('tc-rpi').innerHTML=`
-    <div class="eyebrow" style="margin-bottom:8px">Per-set production  →  Pts/Set ${t.pps.toFixed(2)}</div>
+    <div class="eyebrow" style="margin-bottom:8px">Per-set production  →  Pts/Set ${t.opps!=null?t.opps.toFixed(2):'—'}</div>
     ${crows}
     <div class="formula" style="margin-top:14px">Adj = <b>1</b>·Z(Pts/Set) + <b>${SOSW.toFixed(1)}</b>·Z(SOS)</div>
     ${zrows}
@@ -731,7 +731,7 @@ function render2026Rankings(){
   const rows=teams.map(t=>{const real=t.ret2026!=null;
       const grad=t.ret2026, net=t.ret2026net;
       const ret=real?(net!=null?net:grad):retPct(t.team);
-      return {team:t.team,conf:t.conf,pps:t.pps,ret,grad,net,proj:t.pps*ret,real,dep1:t.dep1,dep2:t.dep2,roster:t.roster,xin:t.xin,xout:t.xout,inPts:t.inPts};})
+      return {team:t.team,conf:t.conf,pps:t.opps,ret,grad,net,proj:(t.opps!=null?t.opps*ret:null),real,dep1:t.dep1,dep2:t.dep2,roster:t.roster,xin:t.xin,xout:t.xout,inPts:t.inPts};})
     .sort((a,b)=>b.ret-a.ret);
   const anyReal=rows.some(r=>r.real);
   const anyXfer=rows.some(r=>r.net!=null);
@@ -769,9 +769,9 @@ function render2026Rankings(){
         const canX=!!r.roster;
         return `<tr class="${canX?'rrow':''}">
           <td><div class="team">${LG(r.team)}<span class="nm">${r.team}</span> ${r.conf?`<span class="chip">${r.conf}</span>`:''}${canX?`<span class="exp">▸ roster</span>`:''}</div></td>
-          <td class="num tnum">${r.pps.toFixed(2)}</td>
+          <td class="num tnum">${r.pps!=null?r.pps.toFixed(2):'—'}</td>
           <td class="num"><div class="metric"><span class="val">${(r.ret*100).toFixed(0)}%</span><span class="bar" data-tip="${tip}"><i style="width:${(clamp(r.ret)*100).toFixed(0)}%;background:${retC}"></i></span></div></td>
-          <td class="num tnum">${r.proj.toFixed(2)}</td>
+          <td class="num tnum">${r.proj!=null?r.proj.toFixed(2):'—'}</td>
           <td><span class="pill" style="color:${oc};border-color:${oc}">${ol}</span></td></tr>${canX?`<tr class="rdet" style="display:none"><td colspan="5">${rosterHtml(r)}</td></tr>`:''}`;}).join('')}
       </tbody></table></div></div>
     <p class="rpnote"><b>Method.</b> Returning % = (2025 points by players still on the roster) ÷ (team's 2025 points), points = kills + aces + block credit. Departing = class Sr/Gr ${anyXfer?'or entered the transfer portal':''}. Player stats: official <a href="${stats}" target="_blank" rel="noopener">stats.ncaa.org</a>.${anyXfer?` <b>Transfers:</b> non-official tracker${(typeof MODEL!=='undefined'&&MODEL.transfers_source)?' — '+MODEL.transfers_source:''}${tasof?' ('+tasof+')':''}; incoming shown with prior-school points where the old team is in this set. Signees (HS recruits) not counted. Portal data is incomplete — verify/edit as needed.`:` <b>Transfers not yet included.</b>`}</p>`;
