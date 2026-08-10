@@ -271,6 +271,11 @@ def marquee_profile(rows):
 
 def main():
     rows = compute()
+    # An empty or near-empty game graph is the normal state in August, not an
+    # error. Exit cleanly so the daily pipeline continues instead of failing.
+    if len(rows) < 20:
+        print("only %d teams in the graph -- too early for RPI, skipping" % len(rows))
+        return 0
     prof = marquee_profile(rows)
 
     deltas = [abs(r["delta"]) for r in rows]

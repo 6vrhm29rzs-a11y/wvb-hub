@@ -96,6 +96,16 @@ def main():
     print("D-I matches: %d" % len(matches))
     print()
 
+    # Pre-season and the first days of a season have no played matches. That is
+    # expected, not a failure: exit cleanly and leave the existing dashboard
+    # alone rather than crashing the run or publishing a rating fitted on
+    # nothing. A failed run must not overwrite good data with worse data.
+    MIN_MATCHES = 50
+    if len(matches) < MIN_MATCHES:
+        print("fewer than %d played matches -- too early to fit a rating." % MIN_MATCHES)
+        print("Leaving the previous rating and dashboard untouched.")
+        return 0
+
     # ---------------- weights fitted on the full season ----------------
     M_full = B.build_metrics(matches, di)
     w, norms, Xf, yf = fit_weights(M_full, matches)

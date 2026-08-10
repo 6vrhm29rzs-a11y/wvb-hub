@@ -37,8 +37,6 @@ OUT_DIR = os.path.join(REPO, "data")
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from reconcile_2025 import norm, parse_record  # noqa: E402
 
-SEASON = 2025
-
 # Raw count columns to keep per category. Per-set rate columns are deliberately
 # dropped -- they are derived, and we store only what they are derived from.
 CAT_FIELDS = {

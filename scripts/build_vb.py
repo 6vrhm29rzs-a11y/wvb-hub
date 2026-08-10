@@ -11,7 +11,13 @@ data = json.load(open(base/"data/vb2025.json"))              # bracket + results
 # hand-weighted SOS dial inert -- otherwise the dial silently overwrites it.
 import os as _os
 _SEASON = int(_os.environ.get("WVB_SEASON", "2025"))
-_rate = json.load(open(base/("data/rating_%d.json" % _SEASON)))
+_rate_p = base/("data/rating_%d.json" % _SEASON)
+if not _rate_p.exists():
+    # No rating yet (pre-season). Keep the last good dashboard rather than
+    # replacing it with an empty one.
+    print("no data/rating_%d.json yet -- leaving output/vb_dashboard.html untouched" % _SEASON)
+    raise SystemExit(0)
+_rate = json.load(open(_rate_p))
 _ds_p = base/("data/data_%d.json" % _SEASON)
 _tot  = {}
 if _ds_p.exists():
