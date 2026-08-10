@@ -82,6 +82,14 @@ jobs:
           python3 scripts/rating_2025.py
           python3 scripts/build_vb.py
 
+      # Semantic gate on what will actually be SERVED. The reconcile checks the
+      # data; this checks that each number is under the right heading -- the
+      # failure mode that shipped a "-14.31 points per set" to the live page
+      # while every other check was green. Blocking: a mislabelled dashboard is
+      # worse than a stale one, because it looks authoritative.
+      - name: Display invariants
+        run: python3 scripts/test_display_invariants.py
+
       - name: Reconcile (report, do not block)
         run: python3 scripts/reconcile_2025.py || true
 
