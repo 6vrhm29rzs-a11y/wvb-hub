@@ -98,6 +98,59 @@ def load_di_games():
     return games, teams
 
 
+def rpi_from_games(games, keys):
+    # type: (List[Tuple[str, str, str]], List[str]) -> Dict[str, Dict[str, float]]
+    """Factors I-III over an arbitrary game subset.
+
+    Extracted so the metric bake-off can recompute RPI on a fit window without
+    duplicating the formula -- a second copy would be free to drift from the
+    shipped one, which is exactly the sort of silent divergence this project
+    keeps getting bitten by.
+    """
+    opponents = collections.defaultdict(list)
+    wins = collections.Counter()
+    losses = collections.Counter()
+    for w, l, _ in games:
+        wins[w] += 1
+        losses[l] += 1
+        opponents[w].append(l)
+        opponents[l].append(w)
+
+    wp = {}
+    for k in keys:
+        n = wins[k] + losses[k]
+        wp[k] = (float(wins[k]) / n) if n else 0.0
+
+    h2h_w = collections.Counter()
+    for w, l, _ in games:
+        h2h_w[(w, l)] += 1
+
+    def wp_excl(opp, exclude):
+        w = wins[opp] - h2h_w[(opp, exclude)]
+        l = losses[opp] - h2h_w[(exclude, opp)]
+        n = w + l
+        return (float(w) / n) if n else 0.0
+
+    owp = {}
+    for k in keys:
+        opps = opponents[k]
+        owp[k] = (sum(wp_excl(o, k) for o in opps) / len(opps)) if opps else 0.0
+
+    oowp = {}
+    for k in keys:
+        opps = opponents[k]
+        oowp[k] = (sum(owp[o] for o in opps) / len(opps)) if opps else 0.0
+
+    out = {}
+    for k in keys:
+        out[k] = {
+            "wp": wp[k], "owp": owp[k], "oowp": oowp[k],
+            "wins": wins[k], "losses": losses[k],
+            "rpi": W_FACTOR_I * wp[k] + W_FACTOR_II * owp[k] + W_FACTOR_III * oowp[k],
+        }
+    return out
+
+
 def compute():
     games, teams = load_di_games()
 

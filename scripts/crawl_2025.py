@@ -298,6 +298,84 @@ def crawl_stats():
                 cat_id, STAT_CATS[cat_id], page, len(rows)))
 
 
+BOX_JSONL = os.path.join(RAW, "boxscores.jsonl")
+
+
+def crawl_boxscores():
+    # type: () -> None
+    """Per-match team attack lines from /game/{id}/boxscore.
+
+    This is what makes OPPONENT hitting efficiency computable: both teams'
+    attack lines arrive in one payload, so what a team allowed is directly
+    observed rather than inferred from its opponents' season averages. Being
+    per-match, it also permits a regular-season-only fit tested on the
+    tournament, which the season-total leaderboards cannot support.
+
+    SCOPE: `teamStats` is stored in full (raw counts, including the per-set
+    attack breakdown). `playerStats` is DROPPED -- it is a different grain
+    (~16 KB/game, ~82 MB across the season) that no team metric needs. Unlike
+    the rankings table, /boxscore is ID-addressed rather than season-addressed,
+    so it carries no season-rollover risk and can be re-crawled in full at any
+    time if player-level data is ever wanted.
+    """
+    ids = game_ids_from_schedule()
+    have = set()
+    if os.path.exists(BOX_JSONL):
+        with open(BOX_JSONL) as fh:
+            for line in fh:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    have.add(json.loads(line)["game_id"])
+                except Exception:
+                    continue
+    todo = [g for g in ids if g not in have]
+    print("boxscores: %d enumerated, %d on disk, %d to fetch" % (
+        len(ids), len(have), len(todo)))
+    if not todo:
+        return
+
+    failures = []
+    start = time.time()
+    with open(BOX_JSONL, "a") as out:
+        for i, gid in enumerate(todo, 1):
+            payload = fetch("/game/%s/boxscore" % gid)
+            if not payload:
+                failures.append(gid)
+            else:
+                teams = []
+                for tb in payload.get("teamBoxscore") or []:
+                    ts = tb.get("teamStats") or {}
+                    ts.pop("__typename", None)
+                    teams.append({"team_id": str(tb.get("teamId")), "team_stats": ts})
+                meta = {}
+                for t in payload.get("teams") or []:
+                    meta[str(t.get("teamId"))] = {
+                        "name_short": t.get("nameShort"),
+                        "is_home": t.get("isHome"),
+                    }
+                for t in teams:
+                    t.update(meta.get(t["team_id"], {}))
+                out.write(json.dumps({
+                    "game_id": gid,
+                    "teams": teams,
+                    "source_tier": "OFFICIAL",
+                    "source": "ncaa-api /game/%s/boxscore" % gid,
+                }) + "\n")
+                out.flush()
+                os.fsync(out.fileno())
+            if i % 250 == 0 or i == len(todo):
+                rate = i / max(time.time() - start, 1e-6)
+                print("  %d/%d  %.1f req/s  ~%.0f min left  (%d failed)" % (
+                    i, len(todo), rate, (len(todo) - i) / max(rate, 1e-6) / 60.0,
+                    len(failures)))
+    if failures:
+        with open(os.path.join(RAW, "boxscores_failed.json"), "w") as fh:
+            json.dump(failures, fh, indent=1)
+        print("boxscores: %d FAILED" % len(failures))
+
+
 def verify_season_pin():
     # type: () -> int
     """Regression test: refetch every stat page PINNED to SEASON and diff the
@@ -352,6 +430,8 @@ def main():
             crawl_games()
         elif phase == "stats":
             crawl_stats()
+        elif phase == "boxscores":
+            crawl_boxscores()
         elif phase == "verify-pin":
             rc = verify_season_pin()
             if rc:
