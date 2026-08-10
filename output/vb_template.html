@@ -295,9 +295,15 @@ footer b{color:var(--ink-2)}
    vs-RPI delta (the whole point of the table).
    Columns: 1 rank 2 team 3 rec 4 adj 5 adjnet 6 K/s 7 A/s 8 B/s 9 SOS 10 RPI
             11 vsRPI 12 GP 13 vsT25 14 vsT50 */
-/* The 2026 table has five columns and only needed the projection dropped. */
+/* 2026 table columns: 1 Team, 2 2025 Pts/Set, 3 Returning %, 4 Proj, 5 Outlook.
+   Four columns still overflow at phone width (confirmed on an iPhone: the table
+   scrolled horizontally rather than fitting). Keep only what the tab is ABOUT --
+   who is returning what -- and drop the two derived per-set numbers, which are
+   available on the rankings tab anyway. */
 @media (max-width:560px){
+  #rp2026table th:nth-child(2), #rp2026table td:nth-child(2),
   #rp2026table th:nth-child(4), #rp2026table td:nth-child(4){display:none}
+  #rp2026table th,#rp2026table td{padding-left:6px;padding-right:6px}
 }
 @media (max-width:560px){
   #rktable th:nth-child(5), #rktable td:nth-child(5),
