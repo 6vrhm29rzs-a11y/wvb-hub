@@ -263,6 +263,20 @@ footer b{color:var(--ink-2)}
 #tip{position:fixed;z-index:100;pointer-events:none;background:var(--ink);color:var(--surface);
   font-size:12px;padding:6px 9px;border-radius:7px;box-shadow:var(--shadow);opacity:0;transition:opacity .1s;max-width:240px}
 :root[data-theme="dark"] #tip,@media(prefers-color-scheme:dark){#tip{background:#0a0f18}}
+
+/* Phone readability: the rankings table carries 14 columns, which is fine on a
+   laptop and unusable at 390px. Below 700px drop the lowest-value ones --
+   per-set K/A/B and the two resume columns -- keeping rank, team, record, the
+   rating, adjusted margin, SOS, RPI, the vs-RPI delta and games played.
+   Hosting exists so Cody can read this on a phone; a table he has to scroll
+   sideways through defeats the point. */
+@media (max-width:700px){
+  #rktable th:nth-child(6), #rktable td:nth-child(6),
+  #rktable th:nth-child(7), #rktable td:nth-child(7),
+  #rktable th:nth-child(8), #rktable td:nth-child(8),
+  #rktable th:nth-child(13),#rktable td:nth-child(13),
+  #rktable th:nth-child(14),#rktable td:nth-child(14){display:none}
+}
 </style>
 
 <header>
