@@ -4,7 +4,7 @@
 **You are:** Claude Code = the **Builder** (pure builder on auto mode — build/test, post logs to Drive, do NOT make product decisions or pre-assign roles). Team: **Cody** (Principal/decider), **Gemini** (Architect — Google + math), **Claude app** (Research & Review). Seats share NO memory/session — **Google Drive is the only shared bus.**
 
 ## Read first
-1. Your **memory** (loaded automatically — see `wvb-hub-next-session-migration`, `ncaa-volleyball-tool`, `cody-collaboration-workflow`, `cody-volleyball-rating-model`).
+1. Your **memory** (loaded automatically). Only two memories live at this path: `wvb-hub-drive-bus` (Drive IDs) and `drive-large-inline-content-unreliable`. Four older memories (`wvb-hub-next-session-migration`, `ncaa-volleyball-tool`, `cody-collaboration-workflow`, `cody-volleyball-rating-model`) stayed behind at `~/.claude/projects/-Users-codyrose-Downloads-handoff/memory/` and are **deliberately not migrated** — the Drive handoff + this file supersede them. Don't go looking for them.
 2. Drive folder **"Women's College Volleyball 2026"** (`1uOBksR-O3TRPU6Ej84ymei0F4gFPqLe4`) → **Builder_Logs/ "Builder Session-Close 2026-08-09-2230 (pre-migration handoff)"** = the full handoff. Mailbox subfolders: Research/ · Specs_for_Builder/ · Builder_Logs/ · Data/. Write build logs to Builder_Logs/; end each session with a session-close incl. a **LOCAL ONLY** list (what's on disk but not on Drive).
 
 ## Cody's settled decisions (build against these)
@@ -26,8 +26,8 @@
 
 ## Git
 Repo initialized 2026-08-09 on `main`, commit `499a537` (20 files). Identity set **repo-local** (`Cody` / GitHub noreply) — global config untouched. `.gitignore` blocks credentials preventively (there are none: Drive auth is the claude.ai MCP connector's server-side OAuth, not a local `token.json`), plus `.claude/settings.local.json` and `full terminal convo.pdf` (transcript, not a build input — one line to re-include). `gh` authed as `6vrhm29rzs-a11y`.
-**Push is Cody's to run** — auto-mode blocks outward publishing:
-`gh repo create wvb-hub --public --source=. --remote=origin --push`
+**Pushed 2026-08-09 ~23:50** — live and public at `https://github.com/6vrhm29rzs-a11y/wvb-hub`, remote `main` = `a240483`.
+**Verify remote state with `git ls-remote origin` on boot** — do NOT trust the last written statement about it. (A 2345 session-close said "PUSH NOT LANDED"; the correcting amendment was filed as a *separate* Drive doc and went unread on the next boot. Corrections go in the doc they correct, or the superseded doc carries a pointer.)
 
 ## Next steps
 **Phase 1** (do not start mid-session — a paced 7 cats × 7 pages crawl, and an interrupted run leaves a partial dataset that looks complete): fetch all 348 (ids 45–51, raw counts, ~1–2 req/s); build the game-log side on `/game/{id}` linescores for points for/against per set; produce clean 2025 `data.json` in `Data/` (metric-agnostic, source-tiered, dated); reconcile vs official RPI rank ordering. **Metric still deferred by design** — measure net-points/set vs TCV vs original Adj against 2025 outcomes.
