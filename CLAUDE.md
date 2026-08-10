@@ -21,6 +21,12 @@
 
    **`Data/` and `Specs_for_Builder/` are empty and expected to stay empty.** The day-one folder structure did not survive contact with how the work actually went: datasets live in git (raw is committed, derived is rebuilt on read) and specs arrive as relayed messages. Do not treat them as a convention to follow.
 
+   **📬 SEAT-TO-SEAT MAILBOXES (adopted 2026-08-10).** Cody's copy-paste is unreliable, so seats exchange messages as **Drive files**, and he just says *"check the drive"*. Do not ask him to relay text.
+   - `Specs_for_Builder/` = `1otrJ6BCyN8aLZeCJWKIbtD2atGi4pkds` — **Claude-app → Builder.** Check it when told to.
+   - `Messages_to_Claude_App/` = `1njWwkE3Yotd7H-k5XsE8gCq_zq-wkn-1` — **Builder → Claude-app.** Write replies and handoffs here.
+   - `Builder_Logs/` = session-closes and build logs. `Research/` = Claude-app's records.
+   **Convention:** title starts `MESSAGE TO <SEAT>` + date; add `SUPERSEDES` if it replaces an earlier one. Neither seat can delete or rename in Drive (create/copy/read/download/metadata/search only), so **labelling is the only mechanism either of us has** — the same constraint that produced the unread-amendment failure.
+
    **AMENDMENT PROTOCOL (revised 2026-08-10 — the earlier version was unexecutable).** The rule "put the correction in the doc it corrects, or have the superseded doc point forward" **cannot be followed**: the Drive connector exposes create/copy/read/download/metadata/search and has **no update or edit operation**, so no existing Drive doc can be modified. Workable version, in force: **this file carries the pointer** (it is read first at boot and is writable), and a superseding doc's title must start with **"SUPERSEDES …"** so the folder listing itself signals it. Never file a bare amendment as a separate doc — it will not be read. Mailbox subfolders: Research/ · Specs_for_Builder/ · Builder_Logs/ · Data/. Write build logs to Builder_Logs/; end each session with a session-close incl. a **LOCAL ONLY** list (what's on disk but not on Drive).
 
 ## Rules for the Builder (structural, not vibes)

@@ -66,11 +66,22 @@ def main():
     for p in prod:
         by_team.setdefault(p["team_id"], []).append(p)
 
+    # CROSS-TEAM NAME INDEX -- used ONLY to CLASSIFY, never to attribute
+    # production. Three cases look identical as "upperclassman with no
+    # within-team 2025 production": a D-I transfer in (has production under a
+    # different team_id), a D-II/JUCO/international arrival (no D-I production
+    # exists), and a genuine name-match failure. Only the third is a defect.
+    # Searching the other 347 teams separates the first from the other two.
+    everywhere = {}
+    for p in prod:
+        everywhere.setdefault(nkey(p.get("first"), p.get("last")), []).append(p)
+
     print("=" * 78)
     print("JOIN — 2026 rosters x 2025 production")
     print("=" * 78)
 
-    totals = {"returning": 0, "departed": 0, "new": 0, "unresolved": 0, "loose": 0}
+    totals = {"returning": 0, "departed": 0, "new": 0, "unresolved": 0,
+              "loose": 0, "transfer_in": 0}
     report = {}
     for team, meta in sorted(rosters.items()):
         roster = meta.get("players") or []
@@ -89,6 +100,7 @@ def main():
             loose.setdefault(nkey(p.get("first"), p.get("last")), []).append(p)
 
         matched_ids, returning, new, unresolved, loose_hits = set(), [], [], [], []
+        transfers = []
         for r in roster:
             f, l = (r.get("first") or "").strip(), (r.get("last") or "").strip()
             hit = exact.get((f, l))
@@ -110,9 +122,23 @@ def main():
                 if cls.startswith(("fr", "freshman", "redshirt fr", "r-fr")):
                     new.append(r.get("name_raw"))
                 else:
-                    unresolved.append((r.get("name_raw"),
-                                       "no 2025 production, class=%s"
-                                       % (r.get("class_raw") or "?")))
+                    # upperclassman with no production HERE -- transfer or defect?
+                    elsewhere = [q for q in everywhere.get(nkey(f, l), [])
+                                 if str(q.get("team_id")) != str(tid)]
+                    if len(elsewhere) == 1:
+                        q = elsewhere[0]
+                        transfers.append({"name": r.get("name_raw"),
+                                          "class": r.get("class_raw"),
+                                          "from_team_id": q.get("team_id"),
+                                          "points_2025": q.get("points"),
+                                          "kills_2025": q.get("kills")})
+                    elif len(elsewhere) > 1:
+                        unresolved.append((r.get("name_raw"),
+                                           "ambiguous across %d teams" % len(elsewhere)))
+                    else:
+                        unresolved.append((r.get("name_raw"),
+                                           "no D-I production anywhere, class=%s"
+                                           % (r.get("class_raw") or "?")))
                 continue
             key = (hit.get("first"), hit.get("last"))
             matched_ids.add(key)
@@ -133,6 +159,7 @@ def main():
         report[team] = {
             "returning": returning, "departed": departed,
             "new_or_unplayed": new, "unresolved": unresolved,
+            "transfer_in_official": transfers,
             "resolved_by_normalisation": loose_hits,
         }
         totals["returning"] += len(returning)
@@ -140,16 +167,72 @@ def main():
         totals["new"] += len(new)
         totals["unresolved"] += len(unresolved)
         totals["loose"] += len(loose_hits)
+        totals["transfer_in"] += len(transfers)
 
-        print("  %-11s returning=%-3d departed=%-3d new=%-3d UNRESOLVED=%-3d loose=%d"
-              % (team, len(returning), len(departed), len(new), len(unresolved),
-                 len(loose_hits)))
+        print("  %-11s returning=%-3d departed=%-3d new=%-3d xfer-in=%-3d "
+              "UNRESOLVED=%-3d loose=%d"
+              % (team, len(returning), len(departed), len(new), len(transfers),
+                 len(unresolved), len(loose_hits)))
 
     print()
-    print("  TOTALS  returning=%d departed=%d new/unplayed=%d UNRESOLVED=%d"
-          % (totals["returning"], totals["departed"], totals["new"], totals["unresolved"]))
+    print("  TOTALS  returning=%d departed=%d new/unplayed=%d transfer-in=%d "
+          "UNRESOLVED=%d"
+          % (totals["returning"], totals["departed"], totals["new"],
+             totals["transfer_in"], totals["unresolved"]))
+    roster_n = totals["returning"] + totals["new"] + totals["transfer_in"] + totals["unresolved"]
+    if roster_n:
+        print("  JOIN RATE (roster players classified without defect): %.1f%%  "
+              "-- go/no-go bar is 90%%" % (100.0 * (roster_n - totals["unresolved"]) / roster_n))
     print("  resolved only by normalisation (eyeball these): %d" % totals["loose"])
     print()
+
+    # CLUSTERED vs EVEN. If unresolved upperclassmen pile up at a few schools
+    # the heuristic is catching transfer intake, not join failures; if they
+    # spread evenly it is finding real name mismatches. Those call for
+    # completely different responses, so the distinction is reported, not the
+    # bare count.
+    per = {t: len(r.get("unresolved") or []) for t, r in report.items()
+           if isinstance(r.get("unresolved"), list)}
+    if per:
+        vals = sorted(per.values(), reverse=True)
+        tot = sum(vals) or 1
+        top2 = sum(vals[:2])
+        nz = sum(1 for v in vals if v)
+        print("  DISTRIBUTION of unresolved across %d schools: %s"
+              % (len(vals), ", ".join("%s=%d" % (t, n)
+                                      for t, n in sorted(per.items(),
+                                                         key=lambda kv: -kv[1]) if n)
+                 or "none"))
+        if tot:
+            print("    top-2 schools hold %d/%d (%.0f%%); %d of %d schools have any"
+                  % (top2, tot, 100.0 * top2 / tot, nz, len(vals)))
+            print("    -> %s" % ("CLUSTERED: likely transfer intake, not join failure"
+                                 if (top2 / float(tot)) > 0.6 and nz <= max(2, len(vals) // 3)
+                                 else "SPREAD: likely genuine name mismatches"))
+        print()
+
+    # NAME-SHAPE PATTERNS in the failures -- a fixable pattern vs random churn.
+    shapes = {"hyphenated": 0, "suffix": 0, "diacritic": 0, "three_plus_parts": 0,
+              "initial": 0, "apostrophe": 0}
+    for r in report.values():
+        for nm, _why in (r.get("unresolved") or []):
+            n = nm or ""
+            if "-" in n:
+                shapes["hyphenated"] += 1
+            if SUFFIX.search(n.split(" ")[-1] if " " in n else ""):
+                shapes["suffix"] += 1
+            if any(ord(c) > 127 for c in n):
+                shapes["diacritic"] += 1
+            if len(n.split()) >= 3:
+                shapes["three_plus_parts"] += 1
+            if re.search(r"\b[A-Z]\.", n):
+                shapes["initial"] += 1
+            if "'" in n or "\u2019" in n:
+                shapes["apostrophe"] += 1
+    if any(shapes.values()):
+        print("  NAME-SHAPE PATTERNS among unresolved: %s"
+              % ", ".join("%s=%d" % (k, v) for k, v in shapes.items() if v))
+        print()
 
     print("  UNRESOLVED NAMES — the actual join failures, listed not counted:")
     any_un = False
