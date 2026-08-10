@@ -427,6 +427,120 @@ def crawl_boxscores():
         print("boxscores: %d FAILED" % len(failures))
 
 
+PLAYERBOX_JSONL = os.path.join(RAW, "playerbox.jsonl")
+PLAYERS_JSON = os.path.join(RAW, "players_%d.json" % SEASON)
+
+
+def crawl_players():
+    # type: () -> None
+    """Per-player season production, aggregated from /game/{id}/boxscore.
+
+    WHY RE-CRAWL. Phase 1 fetched these boxscores and deliberately DROPPED
+    playerStats (~82 MB, a different grain), recording at the time that
+    /boxscore is ID-addressed and therefore re-crawlable. That note is why this
+    is a one-hour job instead of a blocked one.
+
+    VERIFIED, not assumed: a 2024 game's boxscore still resolves today with full
+    playerStats, two seasons on. ID-addressed endpoints survive a season
+    rollover -- unlike the rankings table, which is current-only and whose 2025
+    snapshot is irreplaceable.
+
+    STORAGE. The per-game player rows go to a gitignored working file so the
+    crawl is resumable; only the AGGREGATE is committed. Raw-only means commit
+    what cannot be regenerated, and this raw demonstrably can be.
+
+    Names are stored EXACTLY as served. No normalisation at ingest -- the join
+    downstream needs to see what each source actually said.
+    """
+    ids = game_ids_from_schedule()
+    have = set(load_records_jsonl(PLAYERBOX_JSONL, key="game_id"))
+    todo = [g for g in ids if g not in have]
+    print("players: %d games enumerated, %d on disk, %d to fetch"
+          % (len(ids), len(have), len(todo)))
+
+    if todo:
+        failures = []
+        start = time.time()
+        with open(PLAYERBOX_JSONL, "a") as out:
+            for i, gid in enumerate(todo, 1):
+                payload = fetch("/game/%s/boxscore" % gid)
+                if not payload:
+                    failures.append(gid)
+                else:
+                    rows = []
+                    for tb in payload.get("teamBoxscore") or []:
+                        tid = str(tb.get("teamId"))
+                        for ps in tb.get("playerStats") or []:
+                            if not ps.get("participated"):
+                                continue
+                            rows.append({
+                                "team_id": tid,
+                                "first": ps.get("firstName"), "last": ps.get("lastName"),
+                                "num": ps.get("number"), "pos": ps.get("position"),
+                                "gp": ps.get("gamesPlayed"),
+                                "kills": ps.get("kills"),
+                                "errors": ps.get("attackErrors"),
+                                "atts": ps.get("attackAttempts"),
+                                "aces": ps.get("serviceAces"),
+                                "digs": ps.get("digs"),
+                                "bs": ps.get("blockSolos"), "ba": ps.get("blockAssists"),
+                                "assists": ps.get("assists"), "points": ps.get("points"),
+                            })
+                    out.write(json.dumps({"game_id": gid, "rows": rows}) + "\n")
+                    out.flush()
+                    os.fsync(out.fileno())
+                if i % 250 == 0 or i == len(todo):
+                    rate = i / max(time.time() - start, 1e-6)
+                    print("  %d/%d  %.1f req/s  ~%.0f min left  (%d failed)"
+                          % (i, len(todo), rate,
+                             (len(todo) - i) / max(rate, 1e-6) / 60.0, len(failures)))
+        if failures:
+            print("players: %d FAILED" % len(failures))
+
+    # ---- aggregate to per-player season totals ----
+    agg = {}
+    ngames = 0
+    for rec in load_records_jsonl(PLAYERBOX_JSONL, key="game_id").values():
+        ngames += 1
+        for r in rec.get("rows") or []:
+            key = (r["team_id"], (r.get("last") or "").strip(),
+                   (r.get("first") or "").strip())
+            e = agg.setdefault(key, {
+                "team_id": r["team_id"], "first": r.get("first"),
+                "last": r.get("last"), "num": r.get("num"), "pos": r.get("pos"),
+                "matches": 0, "sets": 0, "kills": 0, "errors": 0, "atts": 0,
+                "aces": 0, "digs": 0, "block_solos": 0, "block_assists": 0,
+                "assists": 0, "points": 0,
+            })
+            e["matches"] += 1
+            for src, dst in (("gp", "sets"), ("kills", "kills"), ("errors", "errors"),
+                             ("atts", "atts"), ("aces", "aces"), ("digs", "digs"),
+                             ("bs", "block_solos"), ("ba", "block_assists"),
+                             ("assists", "assists"), ("points", "points")):
+                try:
+                    e[dst] += int(str(r.get(src) or 0).strip() or 0)
+                except (TypeError, ValueError):
+                    pass
+
+    out = {
+        "meta": {
+            "season": SEASON, "source_tier": "OFFICIAL",
+            "source": "ncaa-api /game/{id}/boxscore playerStats, aggregated",
+            "games_aggregated": ngames,
+            "players": len(agg),
+            "note": "Names stored exactly as served; no normalisation at ingest. "
+                    "Per-game rows are NOT committed -- /boxscore is ID-addressed "
+                    "and re-crawlable (verified against a 2024 game).",
+        },
+        "players": sorted(agg.values(),
+                          key=lambda p: (p["team_id"], p.get("last") or "")),
+    }
+    with open(PLAYERS_JSON, "w") as fh:
+        json.dump(out, fh, indent=1)
+    print("players: %d aggregated from %d games -> %s"
+          % (len(agg), ngames, PLAYERS_JSON))
+
+
 def verify_season_pin():
     # type: () -> int
     """Regression test: refetch every stat page PINNED to SEASON and diff the
@@ -481,6 +595,8 @@ def main():
             crawl_games()
         elif phase == "stats":
             crawl_stats()
+        elif phase == "players":
+            crawl_players()
         elif phase == "boxscores":
             crawl_boxscores()
         elif phase == "verify-pin":
