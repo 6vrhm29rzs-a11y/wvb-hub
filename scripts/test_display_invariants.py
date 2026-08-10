@@ -243,6 +243,42 @@ def check_rating():
         ok("rating weights are fitted, not hand-entered")
 
 
+def check_no_fabrication():
+    """No synthesised stand-in values may reach the page.
+
+    The live site rendered a "returning production %" derived from a HASH OF THE
+    TEAM NAME for ~316 of 348 teams, beside a banner citing official player
+    stats. A generic test cannot recognise every possible fabricator, so this
+    guards the specific one and the pattern it used: deriving a displayed number
+    from characters of a label.
+    """
+    if not os.path.exists(DASH):
+        return
+    h = open(DASH, encoding="utf-8").read()
+    body = re.sub(r"/\*.*?\*/", "", h, flags=re.S)   # ignore explanatory comments
+    if re.search(r"function\s+retPct", body):
+        bad("fabrication", "the name-hash returning-% fabricator is back")
+        return
+
+    # Hashing a label is fine for DECORATION (a colour) and not for a
+    # MEASUREMENT. Distinguishing those automatically is not reliable, so known
+    # decorative hashers are allowlisted by name and anything new is flagged for
+    # a human to classify. An earlier version of this check flagged `hueFor`
+    # -- which picks a logo colour -- as a fabrication. A guard that cries wolf
+    # on correct code gets ignored, which is worse than not having it.
+    DECORATIVE = {"hueFor"}
+    hashers = set(re.findall(r"function\s+(\w+)\s*\([^)]*\)\s*\{[^}]*charCodeAt", body))
+    unknown = hashers - DECORATIVE
+    if unknown:
+        bad("fabrication", "label-hashing function(s) not known to be decorative: "
+                           "%s -- confirm they do not produce a displayed measurement"
+            % sorted(unknown))
+    else:
+        ok("no synthesised stand-in values (decorative hashers: %s)"
+           % ", ".join(sorted(DECORATIVE & hashers)) if hashers else
+           "no synthesised stand-in values in the built page")
+
+
 def main():
     print("=" * 68)
     print("DISPLAY INVARIANTS -- is each number under the right heading?")
@@ -252,6 +288,7 @@ def main():
         print("no built dashboard payload found -- skipping (pre-season is fine)")
     else:
         check_model(M)
+    check_no_fabrication()
     print()
     check_rating()
     print()

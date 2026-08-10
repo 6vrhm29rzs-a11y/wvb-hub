@@ -148,7 +148,17 @@ main{max-width:1180px;margin:0 auto;padding:26px 22px 90px}
 .pl .pn{font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pl .py{color:var(--ink-3);font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;flex:none}
 .pl .pp{font-variant-numeric:tabular-nums;color:var(--ink-2);min-width:46px;text-align:right;flex:none}
-.twrap{overflow-x:auto}
+.twrap{overflow-x:auto;position:relative;
+  /* If a table still overflows, it must LOOK scrollable. A hard clipped edge
+     reads as a rendering fault (or worse, as data). This fade is painted only
+     when there is actually more content to the right. */
+  background-image:linear-gradient(to right,transparent,transparent),
+    linear-gradient(to left,rgba(0,0,0,.10),rgba(0,0,0,0));
+  background-position:left center,right center;
+  background-size:20px 100%,20px 100%;
+  background-repeat:no-repeat;background-attachment:local,scroll}
+.twrap::-webkit-scrollbar{height:6px}
+.twrap::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:3px}
 table{border-collapse:collapse;width:100%;min-width:720px}
 thead th{position:sticky;top:0;background:var(--surface-2);text-align:left;font-family:var(--font-display);
   text-transform:uppercase;letter-spacing:.06em;font-size:12px;color:var(--ink-2);font-weight:700;
@@ -285,6 +295,10 @@ footer b{color:var(--ink-2)}
    vs-RPI delta (the whole point of the table).
    Columns: 1 rank 2 team 3 rec 4 adj 5 adjnet 6 K/s 7 A/s 8 B/s 9 SOS 10 RPI
             11 vsRPI 12 GP 13 vsT25 14 vsT50 */
+/* The 2026 table has five columns and only needed the projection dropped. */
+@media (max-width:560px){
+  #rp2026table th:nth-child(4), #rp2026table td:nth-child(4){display:none}
+}
 @media (max-width:560px){
   #rktable th:nth-child(5), #rktable td:nth-child(5),
   #rktable th:nth-child(9), #rktable td:nth-child(9),
@@ -738,8 +752,15 @@ function show(v){
 document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>show(b.dataset.view));
 
 function season2026(v){ if(v==='rankings')render2026Rankings(); else renderEmpty(v); }
-// illustrative, deterministic returning % (45–90%) until official player data is pulled
-function retPct(name){let h=0;for(const c of name)h=(h*33+c.charCodeAt(0))%1009;return 0.45+(h/1009)*0.45;}
+/* There was a `retPct(name)` here that HASHED THE TEAM NAME into a
+   deterministic 45-90% "returning production" figure for any team lacking real
+   roster data -- ~316 of 348 teams -- and rendered it beside a banner citing
+   "official 2025 player stats". A fabricated number wearing a measurement's
+   clothing, live on the site. It is deleted, not fixed: teams without player
+   data now show a dash. The 90% cluster was the hash CEILING (0.45+0.45) under
+   a descending sort; "Veteran core" everywhere was ret>=0.8 at the top of that
+   sort; New Haven scored 90% with no 2025 stats because a name hash needs no
+   data. One cause, three symptoms. NEVER SYNTHESISE A DISPLAYED VALUE. */
 function render2026Rankings(){
   const el=document.getElementById('view-rankings');
   el.querySelectorAll('.tiles,.card,.empty.season').forEach(n=>n.style.display='none');
@@ -748,15 +769,19 @@ function render2026Rankings(){
   host.style.display='';
   const rows=teams.map(t=>{const real=t.ret2026!=null;
       const grad=t.ret2026, net=t.ret2026net;
-      const ret=real?(net!=null?net:grad):retPct(t.team);
-      return {team:t.team,conf:t.conf,pps:t.opps,ret,grad,net,proj:(t.opps!=null?t.opps*ret:null),real,dep1:t.dep1,dep2:t.dep2,roster:t.roster,xin:t.xin,xout:t.xout,inPts:t.inPts};})
-    .sort((a,b)=>b.ret-a.ret);
+      const ret=real?(net!=null?net:grad):null;   // null, never a synthesised stand-in
+      return {team:t.team,conf:t.conf,pps:t.opps,ret,grad,net,proj:((t.opps!=null&&ret!=null)?t.opps*ret:null),real,dep1:t.dep1,dep2:t.dep2,roster:t.roster,xin:t.xin,xout:t.xout,inPts:t.inPts};})
+    .sort((a,b)=>{ if((a.ret==null)!==(b.ret==null)) return a.ret==null?1:-1;
+                   if(a.ret==null) return a.team.localeCompare(b.team);
+                   return b.ret-a.ret; });
   const anyReal=rows.some(r=>r.real);
   const anyXfer=rows.some(r=>r.net!=null);
   const tasof=(typeof MODEL!=='undefined'&&MODEL.transfers_asof)?MODEL.transfers_asof:'';
   const stats=(DATA.official_sources||{}).stats_site||'#';
   const clamp=x=>Math.max(0,Math.min(1,x));
-  const outlook=r=>r.ret>=.8?['Veteran core',cssvar('--good')]:r.ret>=.6?['Reload',cssvar('--warn')]:['Rebuild',cssvar('--bad')];
+  const outlook=r=>r.ret==null?['No player data',cssvar('--ink-3')]
+    :r.ret>=.8?['Veteran core',cssvar('--good')]
+    :r.ret>=.6?['Reload',cssvar('--warn')]:['Rebuild',cssvar('--bad')];
   const plLine=p=>`<div class="pl" title="${p.k} kills · ${p.a} aces · ${p.b} blocks"><span class="pn">${p.n}</span><span class="py">${p.yr}${p.pos?' · '+p.pos:''}</span>${p.xfer?'<span class="xt">transfer</span>':''}<span class="pp">${p.pts}</span></div>`;
   const inLine=x=>`<div class="pl"><span class="pn">${x.n}</span><span class="py">from ${x.from||'?'}</span><span class="pp">${x.pts!=null?x.pts:'—'}</span></div>`;
   const rosterHtml=r=>{ if(!r.roster) return '';
@@ -768,7 +793,7 @@ function render2026Rankings(){
     if(hasX) cols.push(`<div class="rcol"><h5 class="ri">Incoming transfers · ${xin.length}</h5>${xin.map(inLine).join('')||'<div class="pl muted">none tracked</div>'}</div>`);
     return `<div class="rosterwrap${hasX?' three':''}">${cols.join('')}</div>`;};
   const banner=anyReal
-    ? `<b>2026 — Returning Production.</b> Share of each team's 2025 per-set output (Pts/Set = kills + aces + blocks) coming back, from <b>official 2025 player stats</b> (stats.ncaa.org).`
+    ? `<b>2026 — Returning Production.</b> Share of each team's 2025 per-set output (Pts/Set = kills + aces + blocks) coming back, from <b>official 2025 player stats</b> (stats.ncaa.org). <b>Coverage: ${rows.filter(r=>r.real).length} of ${rows.length} teams</b> have player data; the rest show <b>—</b>, not an estimate.`
       + (anyXfer
           ? ` Graduation <b>plus transfer-portal moves</b> from a <span class="illus" title="non-official portal tracker">non-official tracker</span>${tasof?' ('+tasof+')':''} — Returning % is <b>net of transfers out</b>; incoming shown separately.`
           : ` Graduation-based (Sr/Gr depart); <b>transfers not yet included</b>.`)
@@ -776,9 +801,9 @@ function render2026Rankings(){
     : `<b>2026 preview — Returning Production.</b> How much of each team's 2025 per-set output (Pts/Set = kills + aces + blocks) comes back next season. <span class="illus">Returning % illustrative</span> until official 2025 player stats (stats.ncaa.org) are pulled — method below.`;
   host.innerHTML=`
     <div class="banner">${banner}</div>
-    <div class="card"><div class="twrap"><table>
+    <div class="card"><div class="twrap"><table id="rp2026table">
       <thead><tr><th>Team</th><th class="num">2025 Pts/Set</th><th class="num">Returning %</th><th class="num">Proj 2026 Pts/Set</th><th>Outlook</th></tr></thead>
-      <tbody>${rows.map(r=>{const[ol,oc]=outlook(r);const retC=lerpHex(cssvar('--rpi-lo'),cssvar('--rpi-hi'),clamp(r.ret));
+      <tbody>${rows.map(r=>{const[ol,oc]=outlook(r);const retC=lerpHex(cssvar('--rpi-lo'),cssvar('--rpi-hi'),r.ret!=null?clamp(r.ret):0);
         const nx=(r.xout||[]).filter(x=>x.wasRet).length, ni=(r.xin||[]).length;
         const tip=r.real?(r.net!=null
             ? `Net ${(r.net*100).toFixed(0)}% incl. transfers (grad-only ${(r.grad*100).toFixed(0)}%)${nx?` · ${nx} out`:''}${ni?` · ${ni} in`:''}`
@@ -788,7 +813,7 @@ function render2026Rankings(){
         return `<tr class="${canX?'rrow':''}">
           <td><div class="team">${LG(r.team)}<span class="nm">${r.team}</span> ${r.conf?`<span class="chip">${r.conf}</span>`:''}${canX?`<span class="exp">▸ roster</span>`:''}</div></td>
           <td class="num tnum">${r.pps!=null?r.pps.toFixed(2):'—'}</td>
-          <td class="num"><div class="metric"><span class="val">${(r.ret*100).toFixed(0)}%</span><span class="bar" data-tip="${tip}"><i style="width:${(clamp(r.ret)*100).toFixed(0)}%;background:${retC}"></i></span></div></td>
+          <td class="num"><div class="metric"><span class="val">${r.ret!=null?(r.ret*100).toFixed(0)+'%':'—'}</span><span class="bar" data-tip="${tip}"><i style="width:${r.ret!=null?(clamp(r.ret)*100).toFixed(0):0}%;background:${retC}"></i></span></div></td>
           <td class="num tnum">${r.proj!=null?r.proj.toFixed(2):'—'}</td>
           <td><span class="pill" style="color:${oc};border-color:${oc}">${ol}</span></td></tr>${canX?`<tr class="rdet" style="display:none"><td colspan="5">${rosterHtml(r)}</td></tr>`:''}`;}).join('')}
       </tbody></table></div></div>
