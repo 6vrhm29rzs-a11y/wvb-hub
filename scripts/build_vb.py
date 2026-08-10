@@ -166,3 +166,18 @@ out = tpl.replace("__DATA__", blob(data)).replace("__MODEL__", blob(model))
 assert "__DATA__" not in out and "__MODEL__" not in out
 (base/"output/vb_dashboard.html").write_text(out)
 print("wrote output/vb_dashboard.html  bytes=%d  model_teams=%d" % (len(out), len(model["teams"])))
+
+# CACHE BUSTING. GitHub Pages serves with cache-control: max-age=600 and the CDN
+# edge holds the object that long, so a freshly deployed fix keeps serving OLD
+# bytes for up to ten minutes -- long enough that a phone check tests the
+# previous build and reports the fix as broken. That is exactly what happened.
+# index.html redirects with a content hash in the query, so every new build is a
+# new URL to both the CDN and Safari.
+import hashlib, re as _re
+_ver = hashlib.sha1(out.encode("utf-8")).hexdigest()[:12]
+_idx = base / "index.html"
+_html = _idx.read_text()
+_html = _re.sub(r"output/vb_dashboard\.html(\?v=[0-9a-f]+)?",
+                "output/vb_dashboard.html?v=" + _ver, _html)
+_idx.write_text(_html)
+print("index.html -> output/vb_dashboard.html?v=%s" % _ver)
