@@ -1,0 +1,614 @@
+{
+ "meta": {
+  "season": 2025,
+  "source_tier": "DERIVED",
+  "stage": "A -- field projection (committee behaviour, NOT strength)",
+  "cutoff": "2025-11-30",
+  "config": {
+   "AQ_COUNT": 32,
+   "AQ_COUNT_FALLBACK": 31,
+   "FIELD_SIZE": 64,
+   "SEEDED": 32,
+   "AQ_MECHANISM": {
+    "Big Ten": "TOURNAMENT",
+    "Pac-12": "TOURNAMENT",
+    "SEC": "TOURNAMENT",
+    "ACC": "REGULAR_SEASON",
+    "Big 12": "REGULAR_SEASON",
+    "Mountain West": "TOURNAMENT"
+   },
+   "AQ_MECHANISM_DEFAULT": "TOURNAMENT",
+   "INELIGIBLE": []
+  },
+  "known_gaps": [
+   "KPI absent -- proprietary, read-only from faktorsports.com",
+   "AQ for tournament conferences inferred from the last intra-conference match; the feed carries no bracket structure"
+  ],
+  "backtest": {
+   "actual_field": 64,
+   "correct": 62,
+   "missed": [
+    "north carolina",
+    "toledo"
+   ],
+   "wrong": [
+    "villanova",
+    "western mich"
+   ]
+  }
+ },
+ "automatic_qualifiers": [
+  {
+   "conference": "ACC",
+   "team": "Pittsburgh",
+   "mechanism": "REGULAR_SEASON",
+   "note": "best conference win pct"
+  },
+  {
+   "conference": "ASUN",
+   "team": "Central Ark.",
+   "mechanism": "TOURNAMENT",
+   "note": "winner of the title match (2025-11-23)"
+  },
+  {
+   "conference": "America East",
+   "team": "UMBC",
+   "mechanism": "TOURNAMENT",
+   "note": "2 games on 2025-11-22 -- best of that date's winners by conference record"
+  },
+  {
+   "conference": "American",
+   "team": "Tulsa",
+   "mechanism": "TOURNAMENT",
+   "note": "winner of the title match (2025-11-23)"
+  },
+  {
+   "conference": "Atlantic 10",
+   "team": "Loyola Chicago",
+   "mechanism": "TOURNAMENT",
+   "note": "winner of the title match (2025-11-23)"
+  },
+  {
+   "conference": "Big 12",
+   "team": "Arizona St.",
+   "mechanism": "REGULAR_SEASON",
+   "note": "best conference win pct"
+  },
+  {
+   "conference": "Big East",
+   "team": "Creighton",
+   "mechanism": "TOURNAMENT",
+   "note": "winner of the title match (2025-11-23)"
+  },
+  {
+   "conference": "Big Sky",
+   "team": "Northern Colo.",
+   "mechanism": "TOURNAMENT",
+   "note": "winner of the title match (2025-11-27)"
+  },
+  {
+   "conference": "Big South",
+   "team": "High Point",
+   "mechanism": "TOURNAMENT",
+   "note": "winner of the title match (2025-11-23)"
+  },
+  {
+   "conference": "Big Ten",
+   "team": "Wisconsin",
+   "mechanism": "TOURNAMENT",
+   "note": "4 games on 2025-11-29 -- best of that date's winners by conference record"
+  },
+  {
+   "conference": "Big West",
+   "team": "Cal Poly",
+   "mechanism": "TOURNAMENT",
+   "note": "winner of the title match (2025-11-29)"
+  },
+  {
+   "conference": "CAA",
+   "team": "Campbell",
+   "mechanism": "TOURNAMENT",
+   "note": "winner of the title match (2025-11-23)"
+  },
+  {
+   "conference": "CUSA",
+   "team": "Western Ky.",
+   "mechanism": "TOURNAMENT",
+   "note": "winner of the title match (2025-11-23)"
+  },
+  {
+   "conference": "Horizon",
+   "team": "Wright St.",
+   "mechanism": "TOURNAMENT",
+   "note": "winner of the title match (2025-11-23)"
+  },
+  {
+   "conference": "Ivy League",
+   "team": "Princeton",
+   "mechanism": "TOURNAMENT",
+   "note": "winner of the title match (2025-11-22)"
+  },
+  {
+   "conference": "MAAC",
+   "team": "Fairfield",
+   "mechanism": "TOURNAMENT",
+   "note": "winner of the title match (2025-11-23)"
+  },
+  {
+   "conference": "MAC",
+   "team": "Western Mich.",
+   "mechanism": "TOURNAMENT",
+   "note": "2 games on 2025-11-23 -- best of that date's winners by conference record"
+  },
+  {
+   "conference": "MEAC",
+   "team": "Coppin St.",
+   "mechanism": "TOURNAMENT",
+   "note": "2 games on 2025-11-22 -- best of that date's winners by conference record"
+  },
+  {
+   "conference": "MVC",
+   "team": "UNI",
+   "mechanism": "TOURNAMENT",
+   "note": "winner of the title match (2025-11-26)"
+  },
+  {
+   "conference": "Mountain West",
+   "team": "Utah St.",
+   "mechanism": "TOURNAMENT",
+   "note": "2 games on 2025-11-29 -- best of that date's winners by conference record"
+  },
+  {
+   "conference": "NEC",
+   "team": "LIU",
+   "mechanism": "TOURNAMENT",
+   "note": "2 games on 2025-11-22 -- best of that date's winners by conference record"
+  },
+  {
+   "conference": "OVC",
+   "team": "Eastern Ill.",
+   "mechanism": "TOURNAMENT",
+   "note": "winner of the title match (2025-11-26)"
+  },
+  {
+   "conference": "Patriot",
+   "team": "American",
+   "mechanism": "TOURNAMENT",
+   "note": "winner of the title match (2025-11-23)"
+  },
+  {
+   "conference": "SEC",
+   "team": "Kentucky",
+   "mechanism": "TOURNAMENT",
+   "note": "winner of the title match (2025-11-26)"
+  },
+  {
+   "conference": "SWAC",
+   "team": "Florida A&M",
+   "mechanism": "TOURNAMENT",
+   "note": "winner of the title match (2025-11-23)"
+  },
+  {
+   "conference": "SoCon",
+   "team": "Wofford",
+   "mechanism": "TOURNAMENT",
+   "note": "2 games on 2025-11-23 -- best of that date's winners by conference record"
+  },
+  {
+   "conference": "Southland",
+   "team": "SFA",
+   "mechanism": "TOURNAMENT",
+   "note": "winner of the title match (2025-11-23)"
+  },
+  {
+   "conference": "Summit League",
+   "team": "St. Thomas (MN)",
+   "mechanism": "TOURNAMENT",
+   "note": "winner of the title match (2025-11-26)"
+  },
+  {
+   "conference": "Sun Belt",
+   "team": "Arkansas St.",
+   "mechanism": "TOURNAMENT",
+   "note": "winner of the title match (2025-11-23)"
+  },
+  {
+   "conference": "WAC",
+   "team": "Utah Valley",
+   "mechanism": "TOURNAMENT",
+   "note": "winner of the title match (2025-11-23)"
+  },
+  {
+   "conference": "WCC",
+   "team": "San Diego",
+   "mechanism": "TOURNAMENT",
+   "note": "6 games on 2025-11-29 -- best of that date's winners by conference record"
+  }
+ ],
+ "field": [
+  {
+   "team": "Nebraska",
+   "rpi_rank": 1,
+   "seed": 1,
+   "bid": "at-large"
+  },
+  {
+   "team": "Texas",
+   "rpi_rank": 2,
+   "seed": 2,
+   "bid": "at-large"
+  },
+  {
+   "team": "Kentucky",
+   "rpi_rank": 3,
+   "seed": 3,
+   "bid": "AQ"
+  },
+  {
+   "team": "Arizona St.",
+   "rpi_rank": 4,
+   "seed": 4,
+   "bid": "AQ"
+  },
+  {
+   "team": "Pittsburgh",
+   "rpi_rank": 5,
+   "seed": 5,
+   "bid": "AQ"
+  },
+  {
+   "team": "Creighton",
+   "rpi_rank": 6,
+   "seed": 6,
+   "bid": "AQ"
+  },
+  {
+   "team": "SMU",
+   "rpi_rank": 7,
+   "seed": 7,
+   "bid": "at-large"
+  },
+  {
+   "team": "Louisville",
+   "rpi_rank": 8,
+   "seed": 8,
+   "bid": "at-large"
+  },
+  {
+   "team": "Purdue",
+   "rpi_rank": 12,
+   "seed": 9,
+   "bid": "at-large"
+  },
+  {
+   "team": "Wisconsin",
+   "rpi_rank": 11,
+   "seed": 10,
+   "bid": "AQ"
+  },
+  {
+   "team": "Texas A&M",
+   "rpi_rank": 10,
+   "seed": 11,
+   "bid": "at-large"
+  },
+  {
+   "team": "Stanford",
+   "rpi_rank": 9,
+   "seed": 12,
+   "bid": "at-large"
+  },
+  {
+   "team": "Southern California",
+   "rpi_rank": 13,
+   "seed": 13,
+   "bid": "at-large"
+  },
+  {
+   "team": "BYU",
+   "rpi_rank": 19,
+   "seed": 14,
+   "bid": "at-large"
+  },
+  {
+   "team": "Minnesota",
+   "rpi_rank": 15,
+   "seed": 15,
+   "bid": "at-large"
+  },
+  {
+   "team": "Miami (FL)",
+   "rpi_rank": 14,
+   "seed": 16,
+   "bid": "at-large"
+  },
+  {
+   "team": "Indiana",
+   "rpi_rank": 17,
+   "seed": 17,
+   "bid": "at-large"
+  },
+  {
+   "team": "Kansas",
+   "rpi_rank": 18,
+   "seed": 18,
+   "bid": "at-large"
+  },
+  {
+   "team": "UTEP",
+   "rpi_rank": 16,
+   "seed": 19,
+   "bid": "at-large"
+  },
+  {
+   "team": "TCU",
+   "rpi_rank": 27,
+   "seed": 20,
+   "bid": "at-large"
+  },
+  {
+   "team": "Colorado",
+   "rpi_rank": 26,
+   "seed": 21,
+   "bid": "at-large"
+  },
+  {
+   "team": "Xavier",
+   "rpi_rank": 21,
+   "seed": 22,
+   "bid": "at-large"
+  },
+  {
+   "team": "Western Ky.",
+   "rpi_rank": 25,
+   "seed": 23,
+   "bid": "AQ"
+  },
+  {
+   "team": "Tennessee",
+   "rpi_rank": 22,
+   "seed": 24,
+   "bid": "at-large"
+  },
+  {
+   "team": "Rice",
+   "rpi_rank": 20,
+   "seed": 25,
+   "bid": "at-large"
+  },
+  {
+   "team": "UNI",
+   "rpi_rank": 24,
+   "seed": 26,
+   "bid": "AQ"
+  },
+  {
+   "team": "Iowa St.",
+   "rpi_rank": 28,
+   "seed": 27,
+   "bid": "at-large"
+  },
+  {
+   "team": "Baylor",
+   "rpi_rank": 31,
+   "seed": 28,
+   "bid": "at-large"
+  },
+  {
+   "team": "Penn St.",
+   "rpi_rank": 33,
+   "seed": 29,
+   "bid": "at-large"
+  },
+  {
+   "team": "Utah St.",
+   "rpi_rank": 23,
+   "seed": 30,
+   "bid": "AQ"
+  },
+  {
+   "team": "San Diego",
+   "rpi_rank": 30,
+   "seed": 31,
+   "bid": "AQ"
+  },
+  {
+   "team": "Marquette",
+   "rpi_rank": 35,
+   "seed": 32,
+   "bid": "at-large"
+  },
+  {
+   "team": "Kansas St.",
+   "rpi_rank": 34,
+   "seed": null,
+   "bid": "at-large"
+  },
+  {
+   "team": "UCLA",
+   "rpi_rank": 39,
+   "seed": null,
+   "bid": "at-large"
+  },
+  {
+   "team": "South Dakota St.",
+   "rpi_rank": 29,
+   "seed": null,
+   "bid": "at-large"
+  },
+  {
+   "team": "Florida",
+   "rpi_rank": 37,
+   "seed": null,
+   "bid": "at-large"
+  },
+  {
+   "team": "Tulsa",
+   "rpi_rank": 36,
+   "seed": null,
+   "bid": "AQ"
+  },
+  {
+   "team": "Villanova",
+   "rpi_rank": 32,
+   "seed": null,
+   "bid": "at-large"
+  },
+  {
+   "team": "Utah",
+   "rpi_rank": 44,
+   "seed": null,
+   "bid": "at-large"
+  },
+  {
+   "team": "South Fla.",
+   "rpi_rank": 38,
+   "seed": null,
+   "bid": "at-large"
+  },
+  {
+   "team": "Georgia Tech",
+   "rpi_rank": 40,
+   "seed": null,
+   "bid": "at-large"
+  },
+  {
+   "team": "Michigan",
+   "rpi_rank": 42,
+   "seed": null,
+   "bid": "at-large"
+  },
+  {
+   "team": "Arizona",
+   "rpi_rank": 46,
+   "seed": null,
+   "bid": "at-large"
+  },
+  {
+   "team": "Arkansas St.",
+   "rpi_rank": 52,
+   "seed": null,
+   "bid": "AQ"
+  },
+  {
+   "team": "American",
+   "rpi_rank": 56,
+   "seed": null,
+   "bid": "AQ"
+  },
+  {
+   "team": "SFA",
+   "rpi_rank": 58,
+   "seed": null,
+   "bid": "AQ"
+  },
+  {
+   "team": "Cal Poly",
+   "rpi_rank": 67,
+   "seed": null,
+   "bid": "AQ"
+  },
+  {
+   "team": "St. Thomas (MN)",
+   "rpi_rank": 70,
+   "seed": null,
+   "bid": "AQ"
+  },
+  {
+   "team": "High Point",
+   "rpi_rank": 83,
+   "seed": null,
+   "bid": "AQ"
+  },
+  {
+   "team": "Princeton",
+   "rpi_rank": 84,
+   "seed": null,
+   "bid": "AQ"
+  },
+  {
+   "team": "Fairfield",
+   "rpi_rank": 99,
+   "seed": null,
+   "bid": "AQ"
+  },
+  {
+   "team": "Campbell",
+   "rpi_rank": 106,
+   "seed": null,
+   "bid": "AQ"
+  },
+  {
+   "team": "Northern Colo.",
+   "rpi_rank": 107,
+   "seed": null,
+   "bid": "AQ"
+  },
+  {
+   "team": "Central Ark.",
+   "rpi_rank": 109,
+   "seed": null,
+   "bid": "AQ"
+  },
+  {
+   "team": "Eastern Ill.",
+   "rpi_rank": 110,
+   "seed": null,
+   "bid": "AQ"
+  },
+  {
+   "team": "Loyola Chicago",
+   "rpi_rank": 114,
+   "seed": null,
+   "bid": "AQ"
+  },
+  {
+   "team": "Wright St.",
+   "rpi_rank": 117,
+   "seed": null,
+   "bid": "AQ"
+  },
+  {
+   "team": "Utah Valley",
+   "rpi_rank": 122,
+   "seed": null,
+   "bid": "AQ"
+  },
+  {
+   "team": "Wofford",
+   "rpi_rank": 132,
+   "seed": null,
+   "bid": "AQ"
+  },
+  {
+   "team": "Western Mich.",
+   "rpi_rank": 141,
+   "seed": null,
+   "bid": "AQ"
+  },
+  {
+   "team": "UMBC",
+   "rpi_rank": 176,
+   "seed": null,
+   "bid": "AQ"
+  },
+  {
+   "team": "Coppin St.",
+   "rpi_rank": 201,
+   "seed": null,
+   "bid": "AQ"
+  },
+  {
+   "team": "LIU",
+   "rpi_rank": 230,
+   "seed": null,
+   "bid": "AQ"
+  },
+  {
+   "team": "Florida A&M",
+   "rpi_rank": 280,
+   "seed": null,
+   "bid": "AQ"
+  }
+ ]
+}

@@ -277,6 +277,24 @@ footer b{color:var(--ink-2)}
   #rktable th:nth-child(13),#rktable td:nth-child(13),
   #rktable th:nth-child(14),#rktable td:nth-child(14){display:none}
 }
+
+/* At real iPhone width (390px) even nine columns overflow, and because body
+   has overflow-x:hidden the surplus CLIPS rather than scrolling -- a sliced
+   number looks like data, which is worse than an absent one. So drop down to
+   the five that carry the argument: rank, team, record, the rating, and the
+   vs-RPI delta (the whole point of the table).
+   Columns: 1 rank 2 team 3 rec 4 adj 5 adjnet 6 K/s 7 A/s 8 B/s 9 SOS 10 RPI
+            11 vsRPI 12 GP 13 vsT25 14 vsT50 */
+@media (max-width:560px){
+  #rktable th:nth-child(5), #rktable td:nth-child(5),
+  #rktable th:nth-child(9), #rktable td:nth-child(9),
+  #rktable th:nth-child(10),#rktable td:nth-child(10),
+  #rktable th:nth-child(12),#rktable td:nth-child(12){display:none}
+  #rktable th,#rktable td{padding-left:6px;padding-right:6px}
+}
+/* Safari's URL bar overlaps the bottom of the viewport, occluding the last
+   row. Clear it, and respect the home-indicator inset on notched devices. */
+body{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
 </style>
 
 <header>
