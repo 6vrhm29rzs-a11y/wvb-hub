@@ -10,7 +10,9 @@ Design constraints (Cody's settled decisions):
     UNVERIFIED.
   * Metric-agnostic. This file computes NO rating. It is the substrate the
     bake-off (net points/set vs TCV vs original Adj) will run against.
-  * Dated, so a timestamped snapshot can be committed per run.
+  * Dated. But this file is a BUILD ARTIFACT, not history -- it is gitignored
+    and rebuilt on read. History lives in data/raw/, which is what gets committed
+    per run, because raw is the part that cannot be regenerated.
 
 Join key is team_id from the game log. Team NAMES are not a safe join key:
 ncaa.com renders the same school differently across endpoints (New Orleans vs
@@ -323,15 +325,15 @@ def main():
         "games": games_out,
     }
 
+    # data_2025.json is a BUILD ARTIFACT, not history. It is a pure function of
+    # data/raw/ plus this script, and git already versions the script -- so it is
+    # gitignored and rebuilt on read. What gets committed per run is data/raw/,
+    # because raw is the part that CANNOT be regenerated: the rankings endpoint
+    # has no season pin, so once the season rolls over the official RPI table for
+    # a past season is gone permanently. Store raw, derive everything else --
+    # the same principle already governing raw counts vs derived rates.
     out_path = os.path.join(OUT_DIR, "data_2025.json")
     with open(out_path, "w") as fh:
-        json.dump(payload, fh, indent=1)
-
-    snap = os.path.join(OUT_DIR, "snapshots")
-    if not os.path.isdir(snap):
-        os.makedirs(snap)
-    snap_path = os.path.join(snap, "data_2025_%s.json" % now.strftime("%Y%m%dT%H%M%SZ"))
-    with open(snap_path, "w") as fh:
         json.dump(payload, fh, indent=1)
 
     print("teams: %d  (official RPI %d / stat leaderboards %d)" % (
@@ -345,8 +347,7 @@ def main():
     if rpi_unjoined:
         print("UNJOINED official-RPI teams (%d): %s" % (
             len(rpi_unjoined), ", ".join(sorted(rpi_unjoined))))
-    print("wrote %s" % out_path)
-    print("wrote %s" % snap_path)
+    print("wrote %s  (build artifact, gitignored -- rebuilt on read)" % out_path)
     return 0
 
 

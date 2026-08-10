@@ -24,6 +24,22 @@ import urllib.request
 from typing import Any, Dict, List, Optional, Set
 
 API = "https://ncaa-api.henrygd.me"
+
+# *** `/current/` IS BANNED IN THIS CODEBASE. Always pin the season. ***
+#
+# `/current/` resolves to whatever season ncaa.com considers active, so the same
+# URL silently returns different data after a season rolls over -- no error, no
+# warning, just 2026 rows arriving where 2025 was expected. Verified 2026-08-10:
+# the year segment IS honored (2023 -> Nebraska 33-2, 2024 -> Penn St. 35-2,
+# 2025 -> Nebraska 33-1) and `/2025/` is byte-identical to what `/current/`
+# returned that day.
+#
+# EXCEPTION, and it is a real gap: the RANKINGS endpoint accepts no season
+# segment at all (every pinned variant 404s). The official RPI table is
+# therefore CURRENT-ONLY and cannot be re-fetched for a past season. The 2025
+# table captured in data/raw/2025/rpi_official.json is IRREPLACEABLE -- it is
+# also the authority for Division-I membership. Do not delete it.
+SEASON = 2025
 UA = "wvb-hub/0.1 (personal research project; contact via github.com/6vrhm29rzs-a11y/wvb-hub)"
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -264,7 +280,7 @@ def crawl_stats():
             if os.path.exists(out):
                 continue
             suffix = "" if page == 1 else "/p%d" % page
-            path = "/stats/volleyball-women/d1/current/team/%d%s" % (cat_id, suffix)
+            path = "/stats/volleyball-women/d1/%d/team/%d%s" % (SEASON, cat_id, suffix)
             data = fetch(path)
             if data is None:
                 print("  cat %d p%d: no data" % (cat_id, page))
@@ -282,6 +298,50 @@ def crawl_stats():
                 cat_id, STAT_CATS[cat_id], page, len(rows)))
 
 
+def verify_season_pin():
+    # type: () -> int
+    """Regression test: refetch every stat page PINNED to SEASON and diff the
+    rows against what is already on disk (originally pulled via `/current/`).
+
+    This is free and it is the check that proves the pin is equivalent rather
+    than merely syntactically valid -- the failure mode being guarded against is
+    silent, so an assertion that never fires is worth having.
+    """
+    import hashlib
+
+    def digest(rows):
+        return hashlib.md5(json.dumps(rows, sort_keys=True).encode()).hexdigest()
+
+    checked = same = diff = missing = 0
+    for cat_id in sorted(STAT_CATS):
+        for page in range(1, STAT_PAGES + 1):
+            on_disk = os.path.join(STATS_DIR, "cat%d_p%d.json" % (cat_id, page))
+            if not os.path.exists(on_disk):
+                missing += 1
+                continue
+            suffix = "" if page == 1 else "/p%d" % page
+            path = "/stats/volleyball-women/d1/%d/team/%d%s" % (SEASON, cat_id, suffix)
+            fresh = fetch(path)
+            checked += 1
+            if fresh is None:
+                diff += 1
+                print("  cat %d p%d: PINNED FETCH FAILED" % (cat_id, page))
+                continue
+            want = json.load(open(on_disk)).get("data", [])
+            got = fresh.get("data", [])
+            if digest(want) == digest(got):
+                same += 1
+            else:
+                diff += 1
+                print("  cat %d p%d: DIFFERS  disk=%d rows  pinned=%d rows" % (
+                    cat_id, page, len(want), len(got)))
+    print("season pin regression: %d checked, %d identical, %d differing, %d missing"
+          % (checked, same, diff, missing))
+    if diff == 0 and checked:
+        print("PASS -- /%d/ reproduces exactly what /current/ returned." % SEASON)
+    return 1 if diff else 0
+
+
 def main():
     phases = sys.argv[1:] or ["schedule", "games", "stats"]
     for phase in phases:
@@ -292,6 +352,10 @@ def main():
             crawl_games()
         elif phase == "stats":
             crawl_stats()
+        elif phase == "verify-pin":
+            rc = verify_season_pin()
+            if rc:
+                return rc
         else:
             sys.stderr.write("unknown phase: %s\n" % phase)
             return 1

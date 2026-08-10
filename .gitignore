@@ -50,3 +50,11 @@ cache/
 *.log
 *.tmp
 scratch/
+
+# --- Build artifacts: pure functions of data/raw/ plus the scripts, which git
+# already versions. Rebuild with `python3 scripts/build_dataset.py`.
+# History is data/raw/ -- that is the part that cannot be regenerated (the
+# rankings endpoint has no season pin, so a past season's official RPI table is
+# gone once the season rolls over). Store raw, derive everything else.
+data/data_2025.json
+data/snapshots/
