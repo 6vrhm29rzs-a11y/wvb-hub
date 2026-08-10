@@ -315,6 +315,39 @@ footer b{color:var(--ink-2)}
 /* Safari's URL bar overlaps the bottom of the viewport, occluding the last
    row. Clear it, and respect the home-indicator inset on notched devices. */
 body{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+
+/* WIDTH, NOT COLUMN COUNT, is what was overflowing. Dropping columns did not
+   fix it because the Team cell alone (logo + name + conference chip + "roster"
+   affordance) runs past 200px, so three columns still exceeded a 390px screen.
+   Confirmed from two phone screenshots taken at different scroll offsets: one
+   showed Team only, the other Returning %/Outlook only.
+   table-layout:fixed + width:100% makes overflow impossible -- columns share
+   the available width and long text truncates instead of pushing the table
+   wider. The chip and roster affordance are hidden on phones; tapping the row
+   still opens the roster. */
+@media (max-width:560px){
+  #rktable, #rp2026table{table-layout:fixed;width:100%}
+  #rktable .chip, #rp2026table .chip,
+  #rktable .exp,  #rp2026table .exp{display:none}
+  #rktable .nm, #rp2026table .nm{
+    display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #rktable .team, #rp2026table .team{min-width:0}
+  #rktable .team img, #rp2026table .team img{width:18px;height:18px}
+
+  /* rankings: # | Team | Rec | Adj Score | vs RPI */
+  #rktable th:nth-child(1),#rktable td:nth-child(1){width:9%}
+  #rktable th:nth-child(2),#rktable td:nth-child(2){width:44%}
+  #rktable th:nth-child(3),#rktable td:nth-child(3){width:15%}
+  #rktable th:nth-child(4),#rktable td:nth-child(4){width:20%}
+  #rktable th:nth-child(11),#rktable td:nth-child(11){width:12%}
+
+  /* 2026: Team | Returning % | Outlook */
+  #rp2026table th:nth-child(1),#rp2026table td:nth-child(1){width:46%}
+  #rp2026table th:nth-child(3),#rp2026table td:nth-child(3){width:26%}
+  #rp2026table th:nth-child(5),#rp2026table td:nth-child(5){width:28%;
+    font-size:11px;line-height:1.25}
+  .twrap{overflow-x:hidden}
+}
 </style>
 
 <header>
