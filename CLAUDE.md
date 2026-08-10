@@ -21,6 +21,10 @@
 
    **`Data/` and `Specs_for_Builder/` are empty and expected to stay empty.** The day-one folder structure did not survive contact with how the work actually went: datasets live in git (raw is committed, derived is rebuilt on read) and specs arrive as relayed messages. Do not treat them as a convention to follow.
 
+   **⚑ RUN AUTONOMOUSLY (Cody, 2026-08-10).** Work the agreed queue end to end; settled decisions stay settled. **Do not surface half-built work** — he was asked to check a phone layout five times across four failed fixes, which is the wrong use of the principal. Surface only for: something genuinely shippable, something a seat physically cannot do, a decision only he can make, or a finding that changes the plan — and **batch** those into one list. Builder cannot: `git push`, Drive delete/rename/move, anything on a physical phone, account/billing.
+
+   **📓 `Cody_Log/` = `1CHqDTgoFlUB8h-gQp0ldtWyVVCILgcoX` — READ AT SESSION START.** Cody speaks to each seat separately and **neither seat sees what he told the other**; his instructions were the only artifact with no durable record. Both seats append `CODY SAID — to <SEAT>, <DATE> (<topic>)` capturing substance and standing instructions. `SUPERSEDES` in the title if he reverses something.
+
    **📬 SEAT-TO-SEAT MAILBOXES (adopted 2026-08-10).** Cody's copy-paste is unreliable, so seats exchange messages as **Drive files**, and he just says *"check the drive"*. Do not ask him to relay text.
    - `Specs_for_Builder/` = `1otrJ6BCyN8aLZeCJWKIbtD2atGi4pkds` — **Claude-app → Builder.** Check it when told to.
    - `Messages_to_Claude_App/` = `1njWwkE3Yotd7H-k5XsE8gCq_zq-wkn-1` — **Builder → Claude-app.** Write replies and handoffs here.
