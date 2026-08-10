@@ -348,6 +348,45 @@ body{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
     font-size:11px;line-height:1.25}
   .twrap{overflow-x:hidden}
 }
+
+/* PHONE: STOP USING A TABLE LAYOUT AT ALL.
+   Four attempts at narrowing (drop columns, drop more columns, fixed layout +
+   percentage widths) each still left something clipped, because a table row is
+   a single unbreakable line -- if the contents are wider than the screen,
+   something goes off the edge. Flex with wrap cannot do that: content moves to
+   the next line instead of past the right edge. Each row becomes a small card,
+   labels come from CSS so no markup changes are needed. */
+@media (max-width:560px){
+  #rktable thead, #rp2026table thead{display:none}
+  #rktable, #rktable tbody, #rp2026table, #rp2026table tbody{display:block;width:100%}
+  #rktable tr, #rp2026table tr{
+    display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;
+    width:100%;box-sizing:border-box;
+    border:1px solid var(--line);border-radius:10px;
+    margin:6px 0;padding:8px 10px}
+  #rktable td, #rp2026table td{
+    display:block;border:none;padding:0;width:auto;text-align:left;
+    max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  #rktable .bar, #rp2026table .bar{display:none}      /* inline bars force width */
+  #rktable td:nth-child(1){flex:0 0 auto;font-weight:700;color:var(--accent)}
+  #rktable td:nth-child(2), #rp2026table td:nth-child(1){
+    flex:1 1 60%;min-width:0;font-weight:600}
+  #rktable td:nth-child(3)::before{content:"rec "}
+  #rktable td:nth-child(4)::before{content:"rating "}
+  #rktable td:nth-child(11)::before{content:"vs RPI "}
+  #rp2026table td:nth-child(3)::before{content:"returning "}
+  #rktable td:nth-child(3),#rktable td:nth-child(4),#rktable td:nth-child(11),
+  #rp2026table td:nth-child(3),#rp2026table td:nth-child(5){
+    flex:0 0 auto;font-size:12px;color:var(--ink-2)}
+  #rktable td:nth-child(3)::before,#rktable td:nth-child(4)::before,
+  #rktable td:nth-child(11)::before,#rp2026table td:nth-child(3)::before{
+    color:var(--ink-3);font-size:10px;text-transform:uppercase;letter-spacing:.04em}
+  /* everything else is off on a phone */
+  #rktable td:nth-child(5),#rktable td:nth-child(6),#rktable td:nth-child(7),
+  #rktable td:nth-child(8),#rktable td:nth-child(9),#rktable td:nth-child(10),
+  #rktable td:nth-child(12),#rktable td:nth-child(13),#rktable td:nth-child(14),
+  #rp2026table td:nth-child(2),#rp2026table td:nth-child(4){display:none}
+}
 </style>
 
 <header>
