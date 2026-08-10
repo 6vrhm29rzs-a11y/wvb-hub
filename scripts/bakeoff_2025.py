@@ -1,53 +1,56 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""The metric bake-off: which team rating actually predicts 2025 outcomes?
+"""The metric bake-off: does anything add signal on top of RPI?
 
-PRE-REGISTERED CANDIDATES (Research/ "RPI Spec ...", section 5.4). Claude-app's
-written expectation, recorded BEFORE this ran, is that hitting-efficiency
-differential and net points/set lead among box-score-computable metrics. That
-expectation is what makes this a test rather than a rationalization.
+PRE-REGISTERED EXPECTATION (Claude-app, recorded before any of this ran):
+hitting-efficiency differential and net points/set lead among box-score
+computable metrics. Recorded here so the outcome is falsifiable either way.
 
-    hit_eff_diff     own hitting efficiency - opponent hitting efficiency allowed
-    opp_hit_eff      opponent hitting efficiency allowed (negated: higher better)
-    net_points_set   (points for - points against) / sets
-    sideout_proxy    serve-receive success, 1 - receptionErrors/receptionAttempts
+DESIGN, v2. The first version had three flaws, all found in review, all fixed:
 
-Plus the incumbent and a floor, without which "good" has no scale:
+  1. OPPONENT ADJUSTMENT. v1 tested BARE net points/set against RPI, which is
+     ~75% strength-of-schedule by construction. A team running up margins on a
+     soft schedule looks elite, so "the schedule-adjusted metric beat the
+     unadjusted one" was close to circular. Every box-score candidate is now
+     ALSO reported opponent-adjusted, via a ridge least-squares model over the
+     complete game graph. Raw and adjusted are both reported; the gap between
+     them is itself informative.
 
-    rpi              Factors I-III, recomputed on the fit window
-    own_hit_eff      own hitting efficiency alone
-    win_pct          Division-I winning percentage
+  2. THE QUESTION. "Which single metric wins" is less decision-relevant than
+     "does anything add signal ON TOP OF RPI", since RPI is free, official and
+     already computed. The headline is now INCREMENTAL AUC over RPI alone, from
+     a two-variable model. A candidate worth +0.02 AUC on top of RPI beats one
+     that merely loses to RPI by 0.05 standalone.
+
+  3. LEAKAGE ASYMMETRY. v1's high-power test predicted regular-season matches
+     from full-season metrics, putting the predicted outcome inside the
+     predictor -- which hits RPI hardest, because Factor I is literally winning
+     percentage. So RPI's v1 lead was partly artifact. Replaced with
+     CHRONOLOGICAL splits: fit only on matches through a cutoff, test on
+     everything after. Multiple cutoffs, so ranking stability is visible; if the
+     order flips between cutoffs, the metrics are not separable and that is the
+     honest finding.
+
+  4. Every AUC carries a bootstrap confidence interval. Overlapping intervals
+     are reported as indistinguishable rather than ranked.
 
 *** SIDEOUT IS A PROXY, NOT SIDEOUT%. *** True sideout% = points won while
-receiving / opponent serve attempts, and it is NOT recoverable from box scores.
-Verified directly rather than assumed: the rally identities P_us = S_us - Y + X
-and P_opp = S_opp - X + Y give contradictory values for X on a real match
-(X - Y = 1 from one, Y - X = 6 from the other), because serveAttempts and
-receptionAttempts do not count aces and service errors alike. What is
-implemented here is the SERVE-RECEIVE component only; the attack-after-reception
-half -- which Palao (2018) identifies as the single most discriminating action
--- is unobservable without play-by-play. Tier: UNVERIFIED.
-
-*** LEAKAGE CONTROL. *** Every metric is computed ONLY from games in the fit
-window and tested on games outside it. Season-total leaderboards cannot support
-this (they are cumulative through Dec 21, tournament included), which is why the
-per-match boxscore crawl was necessary. Two independent tests:
-
-  TEST A  fit = regular season (non-championship), test = the 65 championship
-          games. This is the question actually asked -- does the metric predict
-          TOURNAMENT outcomes -- but n is small.
-  TEST B  fit = games before Nov 1, test = regular-season games from Nov 1 on.
-          Same leakage discipline, ~20x the sample, so it is the one with power.
-
-Scored by accuracy (sign of the metric difference) and AUC (threshold-free, so
-no cutoff is hand-picked -- a lesson from the Factor IV diagnostic).
+receiving / opponent serve attempts, and is NOT recoverable from box scores.
+Checked rather than assumed: the rally identities P_us = S_us - Y + X and
+P_opp = S_opp - X + Y give contradictory X on a real match (X-Y=1 vs Y-X=6),
+because serveAttempts and receptionAttempts treat aces and service errors
+differently. Implemented here is the SERVE-RECEIVE component only. The
+attack-after-reception half -- Palao (2018)'s single most discriminating action
+-- needs play-by-play we do not have. Tier: UNVERIFIED.
 
 Python 3.9 target.
 """
 
 import datetime
 import json
+import math
 import os
+import random
 import sys
 import collections
 from typing import Dict, List, Optional, Tuple
@@ -60,6 +63,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from reconcile_2025 import norm  # noqa: E402
 from rpi_2025 import rpi_from_games  # noqa: E402
 
+RIDGE = 3.0        # shrinkage in "pseudo-games"; ~30-game teams barely move
+CD_ITERS = 300     # coordinate-descent sweeps
+BOOTSTRAP = 600
+SEED = 11
+
 
 def to_i(v):
     try:
@@ -68,8 +76,9 @@ def to_i(v):
         return 0
 
 
+# ------------------------------------------------------------------------ load
+
 def load():
-    """Returns (matches, di_keys). Each match carries both teams' box lines."""
     rpi_rows = json.load(open(os.path.join(RAW, "rpi_official.json")))["data"]
     di = {norm(r["School"]) for r in rpi_rows}
 
@@ -108,23 +117,19 @@ def load():
             if ka not in di or kb not in di:
                 continue
             if t[0].get("is_winner"):
-                win, lose = 0, 1
+                win = 0
             elif t[1].get("is_winner"):
-                win, lose = 1, 0
+                win = 1
             else:
                 continue
 
             ep = g.get("start_time_epoch")
-            date = (datetime.datetime.utcfromtimestamp(int(ep)).date()
-                    if ep else None)
+            date = datetime.datetime.utcfromtimestamp(int(ep)).date() if ep else None
 
-            # points for/against per team from linescores
-            hp = ap = 0
-            nsets = 0
+            hp = ap = nsets = 0
             for ls in g.get("linescores") or []:
-                h, v = to_i(ls.get("home")), to_i(ls.get("visit"))
-                hp += h
-                ap += v
+                hp += to_i(ls.get("home"))
+                ap += to_i(ls.get("visit"))
                 nsets += 1
 
             bx = box.get(g["game_id"])
@@ -134,184 +139,437 @@ def load():
                     blines[str(tb.get("team_id"))] = tb.get("team_stats") or {}
 
             side = []
-            for i, tt in enumerate(t):
+            for tt in t:
                 pf, pa = (hp, ap) if tt.get("is_home") else (ap, hp)
                 side.append({
                     "key": norm(tt.get("name_short")),
-                    "team_id": str(tt.get("team_id")),
-                    "points_for": pf, "points_against": pa,
-                    "sets": nsets,
+                    "points_for": pf, "points_against": pa, "sets": nsets,
+                    "is_home": bool(tt.get("is_home")),
                     "box": blines.get(str(tt.get("team_id"))),
                 })
 
             matches.append({
-                "game_id": g["game_id"],
-                "date": date,
+                "game_id": g["game_id"], "date": date,
                 "is_championship": bool(g.get("championship")),
-                "teams": side,
-                "winner_idx": win,
+                "teams": side, "winner_idx": win,
             })
     return matches, di
 
 
+# ------------------------------------------------------- opponent adjustment
+
+def fit_off_def(obs, keys):
+    # type: (List[Tuple[str,str,float,int]], List[str]) -> Dict[str, Dict[str,float]]
+    """Ridge least squares  y(i vs j) ~ mu + off_i - def_j + h*home_sign.
+
+    `off_i` is how much of the quantity team i produces after accounting for who
+    it faced; `def_i` is how much it suppresses in opponents. Solved by
+    coordinate descent with explicit residual maintenance -- 697 parameters, so
+    a direct normal-equations solve would be needlessly cubic in pure Python.
+
+    Ridge is expressed in pseudo-games (RIDGE), so a team with ~30 games barely
+    shrinks while a team with 3 is pulled hard toward the mean. That matters:
+    without it, a 2-game sample produces a wild rating that then contaminates
+    every opponent's adjustment.
+    """
+    n = len(obs)
+    if not n:
+        return {k: {"off": 0.0, "def": 0.0} for k in keys}
+
+    idx = {k: c for c, k in enumerate(keys)}
+    T = len(keys)
+    I = [idx[o[0]] for o in obs]
+    J = [idx[o[1]] for o in obs]
+    Y = [o[2] for o in obs]
+    H = [o[3] for o in obs]
+
+    rows_i = collections.defaultdict(list)
+    rows_j = collections.defaultdict(list)
+    for r in range(n):
+        rows_i[I[r]].append(r)
+        rows_j[J[r]].append(r)
+
+    mu = sum(Y) / float(n)
+    h = 0.0
+    off = [0.0] * T
+    dff = [0.0] * T
+    resid = [Y[r] - mu for r in range(n)]
+
+    for _ in range(CD_ITERS):
+        d = sum(resid) / float(n)
+        mu += d
+        for r in range(n):
+            resid[r] -= d
+
+        num = sum(resid[r] * H[r] for r in range(n))
+        den = sum(H[r] * H[r] for r in range(n)) or 1.0
+        d = num / den
+        h += d
+        for r in range(n):
+            resid[r] -= d * H[r]
+
+        for a in range(T):
+            rr = rows_i[a]
+            if not rr:
+                continue
+            d = sum(resid[r] for r in rr) / (len(rr) + RIDGE)
+            off[a] += d
+            for r in rr:
+                resid[r] -= d
+
+        for b in range(T):
+            rr = rows_j[b]
+            if not rr:
+                continue
+            # pred contains -def_j, so d(resid)/d(def_j) = +1
+            d = -sum(resid[r] for r in rr) / (len(rr) + RIDGE)
+            dff[b] += d
+            for r in rr:
+                resid[r] += d
+
+    return {k: {"off": off[idx[k]], "def": dff[idx[k]], "_h": h, "_mu": mu}
+            for k in keys}
+
+
+# --------------------------------------------------------------- metric build
+
 def build_metrics(fit_matches, di):
-    # type: (List[dict], set) -> Dict[str, Dict[str, float]]
-    """Aggregate every candidate over the fit window. Returns metric -> key -> value."""
+    """metric name -> team key -> value. Raw and opponent-adjusted."""
+    keys = sorted(di)
     agg = collections.defaultdict(lambda: {
         "k": 0, "e": 0, "ta": 0, "ok": 0, "oe": 0, "ota": 0,
-        "pf": 0, "pa": 0, "sets": 0, "rec_err": 0, "rec_att": 0,
-        "w": 0, "l": 0, "box_games": 0,
-    })
-    games_for_rpi = []
+        "pf": 0, "pa": 0, "sets": 0, "rerr": 0, "ratt": 0, "w": 0, "l": 0})
+
+    games_rpi = []
+    obs_pts, obs_hit, obs_rec = [], [], []
+
     for m in fit_matches:
         a, b = m["teams"]
         wk = m["teams"][m["winner_idx"]]["key"]
         lk = m["teams"][1 - m["winner_idx"]]["key"]
-        games_for_rpi.append((wk, lk, m["game_id"]))
+        games_rpi.append((wk, lk, m["game_id"]))
         agg[wk]["w"] += 1
         agg[lk]["l"] += 1
+
         for me, opp in ((a, b), (b, a)):
             e = agg[me["key"]]
             e["pf"] += me["points_for"]
             e["pa"] += me["points_against"]
             e["sets"] += me["sets"]
+            sign = 1 if me["is_home"] else -1
+            if me["sets"]:
+                obs_pts.append((me["key"], opp["key"],
+                                me["points_for"] / float(me["sets"]), sign))
             if me["box"] and opp["box"]:
-                e["box_games"] += 1
-                e["k"] += to_i(me["box"].get("kills"))
-                e["e"] += to_i(me["box"].get("attackErrors"))
-                e["ta"] += to_i(me["box"].get("attackAttempts"))
+                mk, mev = to_i(me["box"].get("kills")), to_i(me["box"].get("attackErrors"))
+                mta = to_i(me["box"].get("attackAttempts"))
+                e["k"] += mk
+                e["e"] += mev
+                e["ta"] += mta
                 e["ok"] += to_i(opp["box"].get("kills"))
                 e["oe"] += to_i(opp["box"].get("attackErrors"))
                 e["ota"] += to_i(opp["box"].get("attackAttempts"))
-                e["rec_err"] += to_i(me["box"].get("receptionErrors"))
-                e["rec_att"] += to_i(me["box"].get("receptionAttempts"))
+                e["rerr"] += to_i(me["box"].get("receptionErrors"))
+                e["ratt"] += to_i(me["box"].get("receptionAttempts"))
+                if mta:
+                    obs_hit.append((me["key"], opp["key"], (mk - mev) / float(mta), sign))
+                ra = to_i(me["box"].get("receptionAttempts"))
+                if ra:
+                    obs_rec.append((me["key"], opp["key"],
+                                    1.0 - to_i(me["box"].get("receptionErrors")) / float(ra),
+                                    sign))
 
-    keys = sorted(di)
-    rpi = rpi_from_games(games_for_rpi, keys)
+    rpi = rpi_from_games(games_rpi, keys)
+    adj_pts = fit_off_def(obs_pts, keys)
+    adj_hit = fit_off_def(obs_hit, keys)
+    adj_rec = fit_off_def(obs_rec, keys)
 
     M = collections.defaultdict(dict)
     for k in keys:
         e = agg[k]
         own = ((e["k"] - e["e"]) / float(e["ta"])) if e["ta"] else None
         opp = ((e["ok"] - e["oe"]) / float(e["ota"])) if e["ota"] else None
+
+        M["rpi"][k] = rpi[k]["rpi"]
+        nw = e["w"] + e["l"]
+        M["win_pct"][k] = (e["w"] / float(nw)) if nw else None
+
         M["own_hit_eff"][k] = own
         M["opp_hit_eff"][k] = (-opp) if opp is not None else None
         M["hit_eff_diff"][k] = (own - opp) if (own is not None and opp is not None) else None
         M["net_points_set"][k] = ((e["pf"] - e["pa"]) / float(e["sets"])) if e["sets"] else None
-        M["sideout_proxy"][k] = (1.0 - e["rec_err"] / float(e["rec_att"])) if e["rec_att"] else None
-        n = e["w"] + e["l"]
-        M["win_pct"][k] = (e["w"] / float(n)) if n else None
-        M["rpi"][k] = rpi[k]["rpi"]
+        M["sideout_proxy"][k] = (1.0 - e["rerr"] / float(e["ratt"])) if e["ratt"] else None
+
+        # opponent-adjusted counterparts
+        M["adj_net_points_set"][k] = adj_pts[k]["off"] + adj_pts[k]["def"]
+        M["adj_hit_eff_diff"][k] = adj_hit[k]["off"] + adj_hit[k]["def"]
+        M["adj_own_hit_eff"][k] = adj_hit[k]["off"]
+        M["adj_opp_hit_eff"][k] = adj_hit[k]["def"]
+        M["adj_sideout_proxy"][k] = adj_rec[k]["off"]
+
+    M["_home_adv_points_per_set"] = adj_pts[keys[0]]["_h"] if keys else 0.0
     return M
 
 
-def auc(pairs):
-    # type: (List[Tuple[float, int]]) -> Optional[float]
-    """Rank-based AUC. pairs = (score, label). Threshold-free by construction."""
-    pos = [s for s, y in pairs if y == 1]
-    neg = [s for s, y in pairs if y == 0]
-    if not pos or not neg:
+# ------------------------------------------------------------------- scoring
+
+def _groups(scores):
+    uniq = sorted(set(scores))
+    gi = {v: i for i, v in enumerate(uniq)}
+    return [gi[s] for s in scores], len(uniq)
+
+
+def auc_from_counts(g, y, ng, idxs):
+    """Mann-Whitney AUC over a (possibly bootstrap-resampled) index list."""
+    cp = [0] * ng
+    cn = [0] * ng
+    np_ = nn = 0
+    for i in idxs:
+        if y[i] == 1:
+            cp[g[i]] += 1
+            np_ += 1
+        else:
+            cn[g[i]] += 1
+            nn += 1
+    if not np_ or not nn:
         return None
-    allv = sorted(s for s, _ in pairs)
-    ranks = {}
-    i = 0
-    while i < len(allv):
-        j = i
-        while j + 1 < len(allv) and allv[j + 1] == allv[i]:
-            j += 1
-        r = (i + j) / 2.0 + 1
-        ranks[allv[i]] = r
-        i = j + 1
-    rsum = sum(ranks[s] for s in pos)
-    n1, n0 = len(pos), len(neg)
-    return (rsum - n1 * (n1 + 1) / 2.0) / float(n1 * n0)
+    below = 0
+    u = 0.0
+    for k in range(ng):
+        u += cp[k] * (below + cn[k] / 2.0)
+        below += cn[k]
+    return u / float(np_ * nn)
 
 
-def evaluate(M, test_matches, name):
-    print("=" * 72)
-    print(name)
-    print("=" * 72)
-    order = ["hit_eff_diff", "net_points_set", "opp_hit_eff", "own_hit_eff",
-             "sideout_proxy", "rpi", "win_pct"]
-    results = {}
-    for metric in order:
-        table = M[metric]
-        pairs = []
-        correct = ties = skipped = 0
-        for m in test_matches:
+def score_metric(M, metric, test):
+    """Returns (scores, labels) for one metric over the test matches."""
+    tbl = M[metric]
+    s, y = [], []
+    for m in test:
+        a, b = m["teams"]
+        va, vb = tbl.get(a["key"]), tbl.get(b["key"])
+        if va is None or vb is None:
+            continue
+        s.append(va - vb)
+        y.append(1 if m["winner_idx"] == 0 else 0)
+    return s, y
+
+
+def boot_ci(s, y, rnd, b=BOOTSTRAP):
+    if not s:
+        return (None, None, None)
+    g, ng = _groups(s)
+    n = len(s)
+    base = auc_from_counts(g, y, ng, range(n))
+    vals = []
+    for _ in range(b):
+        idxs = [rnd.randrange(n) for _ in range(n)]
+        v = auc_from_counts(g, y, ng, idxs)
+        if v is not None:
+            vals.append(v)
+    vals.sort()
+    if len(vals) < 20:
+        return (base, None, None)
+    return (base, vals[int(0.025 * len(vals))], vals[int(0.975 * len(vals)) - 1])
+
+
+def logistic(X, y, iters=200, l2=1e-3):
+    """Plain IRLS-free gradient fit; few features, so this is plenty."""
+    p = len(X[0])
+    w = [0.0] * p
+    lr = 0.5
+    for _ in range(iters):
+        gr = [0.0] * p
+        for xi, yi in zip(X, y):
+            z = sum(w[k] * xi[k] for k in range(p))
+            pr = 1.0 / (1.0 + math.exp(-max(-30.0, min(30.0, z))))
+            d = pr - yi
+            for k in range(p):
+                gr[k] += d * xi[k]
+        for k in range(p):
+            gr[k] = gr[k] / len(X) + l2 * w[k]
+            w[k] -= lr * gr[k]
+    return w
+
+
+def standardize(v):
+    n = len(v)
+    mu = sum(v) / n
+    sd = (sum((x - mu) ** 2 for x in v) / n) ** 0.5 or 1.0
+    return [(x - mu) / sd for x in v], mu, sd
+
+
+def incremental(M, fit, test, cand):
+    """Out-of-sample incremental AUC of (RPI + candidate) over RPI alone.
+
+    Coefficients are trained on the FIT window and evaluated on TEST, so the
+    reported gain is genuinely out of sample. Two features, so coefficient
+    variance is negligible relative to the metric-estimation noise.
+    """
+    def feats(matches):
+        rows, ys = [], []
+        for m in matches:
             a, b = m["teams"]
-            va, vb = table.get(a["key"]), table.get(b["key"])
-            if va is None or vb is None:
-                skipped += 1
+            r = M["rpi"].get(a["key"]), M["rpi"].get(b["key"])
+            c = M[cand].get(a["key"]), M[cand].get(b["key"])
+            if None in r or None in c:
                 continue
-            # orient so the FIRST listed team is the label subject
-            label = 1 if m["winner_idx"] == 0 else 0
-            pairs.append((va - vb, label))
-            if va == vb:
-                ties += 1
-            elif (va > vb) == (label == 1):
-                correct += 1
-        n = len(pairs)
-        acc = (correct / float(n)) if n else 0.0
-        a_ = auc(pairs)
-        results[metric] = {"n": n, "accuracy": acc, "auc": a_, "skipped": skipped}
-        print("  %-16s n=%-5d acc=%.4f  auc=%s%s" % (
-            metric, n, acc,
-            ("%.4f" % a_) if a_ is not None else " n/a ",
-            ("   (%d skipped, no data)" % skipped) if skipped else ""))
+            rows.append((r[0] - r[1], c[0] - c[1]))
+            ys.append(1 if m["winner_idx"] == 0 else 0)
+        return rows, ys
+
+    ftr, fy = feats(fit)
+    ttr, ty = feats(test)
+    if len(ftr) < 50 or len(ttr) < 20:
+        return None
+
+    r_f, c_f = [x[0] for x in ftr], [x[1] for x in ftr]
+    r_s, rmu, rsd = standardize(r_f)
+    c_s, cmu, csd = standardize(c_f)
+    Xr = [[1.0, r_s[i]] for i in range(len(ftr))]
+    Xb = [[1.0, r_s[i], c_s[i]] for i in range(len(ftr))]
+    wr = logistic(Xr, fy)
+    wb = logistic(Xb, fy)
+
+    sr, sb, yy = [], [], []
+    for (rv, cv), lab in zip(ttr, ty):
+        rz = (rv - rmu) / rsd
+        cz = (cv - cmu) / csd
+        sr.append(wr[0] + wr[1] * rz)
+        sb.append(wb[0] + wb[1] * rz + wb[2] * cz)
+        yy.append(lab)
+
+    gr, ngr = _groups(sr)
+    gb, ngb = _groups(sb)
+    n = len(yy)
+    a_r = auc_from_counts(gr, yy, ngr, range(n))
+    a_b = auc_from_counts(gb, yy, ngb, range(n))
+
+    rnd = random.Random(SEED + 1)
+    diffs = []
+    for _ in range(BOOTSTRAP):
+        idxs = [rnd.randrange(n) for _ in range(n)]
+        x1 = auc_from_counts(gr, yy, ngr, idxs)
+        x2 = auc_from_counts(gb, yy, ngb, idxs)
+        if x1 is not None and x2 is not None:
+            diffs.append(x2 - x1)
+    diffs.sort()
+    lo = diffs[int(0.025 * len(diffs))] if len(diffs) > 20 else None
+    hi = diffs[int(0.975 * len(diffs)) - 1] if len(diffs) > 20 else None
+    return {"n": n, "auc_rpi": a_r, "auc_both": a_b, "delta": a_b - a_r,
+            "delta_lo": lo, "delta_hi": hi, "coef_candidate": wb[2]}
+
+
+ORDER = ["rpi", "adj_net_points_set", "net_points_set", "adj_hit_eff_diff",
+         "hit_eff_diff", "adj_own_hit_eff", "own_hit_eff", "adj_opp_hit_eff",
+         "opp_hit_eff", "adj_sideout_proxy", "sideout_proxy", "win_pct"]
+CANDIDATES = ["adj_net_points_set", "net_points_set", "adj_hit_eff_diff",
+              "hit_eff_diff", "adj_opp_hit_eff", "adj_sideout_proxy"]
+
+
+def run_split(name, fit, test, di):
+    print("=" * 78)
+    print(name)
+    print("  fit n=%d   test n=%d" % (len(fit), len(test)))
+    print("=" * 78)
+    M = build_metrics(fit, di)
+    rnd = random.Random(SEED)
+
+    print("  STANDALONE (AUC with 95%% bootstrap CI)")
+    rows = {}
+    for metric in ORDER:
+        s, y = score_metric(M, metric, test)
+        if not s:
+            print("    %-22s no data" % metric)
+            continue
+        base, lo, hi = boot_ci(s, y, rnd)
+        acc = sum(1 for v, l in zip(s, y) if (v > 0) == (l == 1)) / float(len(s))
+        rows[metric] = {"n": len(s), "acc": acc, "auc": base, "lo": lo, "hi": hi}
+        print("    %-22s n=%-5d acc=%.4f  auc=%.4f  [%.4f, %.4f]" % (
+            metric, len(s), acc, base,
+            lo if lo is not None else float("nan"),
+            hi if hi is not None else float("nan")))
     print()
-    ranked = sorted([r for r in results.items() if r[1]["auc"] is not None],
-                    key=lambda kv: -kv[1]["auc"])
-    print("  RANKED BY AUC: %s" % ", ".join(
-        "%s %.4f" % (k, v["auc"]) for k, v in ranked))
+
+    print("  INCREMENTAL over RPI (out-of-sample; positive delta = adds signal)")
+    incs = {}
+    for cand in CANDIDATES:
+        r = incremental(M, fit, test, cand)
+        if not r:
+            print("    %-22s insufficient data" % cand)
+            continue
+        incs[cand] = r
+        star = ""
+        if r["delta_lo"] is not None and r["delta_lo"] > 0:
+            star = "  *** CI excludes 0"
+        print("    %-22s auc_rpi=%.4f -> %.4f   delta=%+.4f [%+.4f, %+.4f]%s" % (
+            cand, r["auc_rpi"], r["auc_both"], r["delta"],
+            r["delta_lo"] if r["delta_lo"] is not None else float("nan"),
+            r["delta_hi"] if r["delta_hi"] is not None else float("nan"), star))
     print()
-    return results
+    hcs = M.get("_home_adv_points_per_set")
+    if hcs:
+        print("  (fitted home advantage: %+.3f points per set, half-effect)" % hcs)
+        print()
+    return {"standalone": rows, "incremental": incs,
+            "n_fit": len(fit), "n_test": len(test),
+            "home_adv_half_points_per_set": hcs}
 
 
 def main():
     matches, di = load()
-    with_box = sum(1 for m in matches
-                   if m["teams"][0]["box"] and m["teams"][1]["box"])
-    champ = [m for m in matches if m["is_championship"]]
-    reg = [m for m in matches if not m["is_championship"]]
-    print("D-I matches: %d  (championship %d, regular %d)" % (
-        len(matches), len(champ), len(reg)))
-    print("matches with both box lines: %d (%.1f%%)" % (
-        with_box, 100.0 * with_box / max(len(matches), 1)))
+    with_box = sum(1 for m in matches if m["teams"][0]["box"] and m["teams"][1]["box"])
+    print("D-I matches %d   with both box lines %d (%.1f%%)" % (
+        len(matches), with_box, 100.0 * with_box / max(len(matches), 1)))
     print()
 
-    # TEST A -- fit on regular season, predict the tournament
-    Ma = build_metrics(reg, di)
-    res_a = evaluate(Ma, champ,
-                     "TEST A  fit = regular season -> test = 65 championship games")
+    champ = [m for m in matches if m["is_championship"]]
+    reg = [m for m in matches if not m["is_championship"]]
 
-    # TEST B -- temporal holdout inside the regular season (higher power)
-    cut = datetime.date(2025, 11, 1)
-    fit_b = [m for m in reg if m["date"] and m["date"] < cut]
-    test_b = [m for m in reg if m["date"] and m["date"] >= cut]
-    Mb = build_metrics(fit_b, di)
-    res_b = evaluate(Mb, test_b,
-                     "TEST B  fit = before Nov 1 (%d) -> test = Nov 1 onward (%d)"
-                     % (len(fit_b), len(test_b)))
+    out = {}
+    out["tournament"] = run_split(
+        "TOURNAMENT  fit = regular season -> test = D-I championship matches",
+        reg, champ, di)
+
+    for label, cut in (("OCT 1", datetime.date(2025, 10, 1)),
+                       ("OCT 15", datetime.date(2025, 10, 15)),
+                       ("NOV 1", datetime.date(2025, 11, 1))):
+        fit = [m for m in matches if m["date"] and m["date"] < cut]
+        test = [m for m in matches if m["date"] and m["date"] >= cut]
+        out["cutoff_%s" % label.replace(" ", "_").lower()] = run_split(
+            "CHRONOLOGICAL  fit = before %s -> test = everything after" % label,
+            fit, test, di)
+
+    # ranking stability across cutoffs
+    print("=" * 78)
+    print("RANKING STABILITY ACROSS CUTOFFS (standalone AUC order)")
+    print("=" * 78)
+    for k in ("cutoff_oct_1", "cutoff_oct_15", "cutoff_nov_1"):
+        st = out[k]["standalone"]
+        rank = sorted(st.items(), key=lambda kv: -(kv[1]["auc"] or 0))
+        print("  %-14s %s" % (k, " > ".join(m for m, _ in rank[:5])))
+    print()
 
     payload = {
         "meta": {
-            "season": 2025,
-            "source_tier": "DERIVED",
+            "season": 2025, "source_tier": "DERIVED",
             "pre_registered_expectation": "hitting-efficiency differential and "
                                           "net points/set lead among box-score "
                                           "computable metrics (Claude-app)",
-            "leakage_control": "metrics fit only on the fit window; test games "
-                               "excluded from every aggregate",
-            "sideout_caveat": "sideout_proxy is the SERVE-RECEIVE component only "
-                              "(1 - receptionErrors/receptionAttempts). True "
-                              "sideout%% is not recoverable from box scores.",
-            "scoring": "accuracy (sign) and AUC (rank-based, threshold-free)",
-            "matches_di": len(matches),
-            "matches_with_boxscores": with_box,
+            "design_notes": [
+                "opponent adjustment via ridge least squares over the game graph",
+                "headline is incremental AUC over RPI, not standalone ranking",
+                "chronological splits only; no full-season metric predicts a "
+                "match inside its own fit window",
+                "all AUCs carry 95% bootstrap CIs; overlapping CIs mean "
+                "indistinguishable, not ranked",
+            ],
+            "sideout_caveat": "serve-receive component only; true sideout% is "
+                              "not recoverable from box scores",
+            "ridge_pseudo_games": RIDGE, "bootstrap": BOOTSTRAP,
+            "matches_di": len(matches), "matches_with_boxscores": with_box,
         },
-        "test_a_tournament": res_a,
-        "test_b_temporal_holdout": res_b,
+        "splits": out,
     }
     with open(OUT, "w") as fh:
         json.dump(payload, fh, indent=1)
