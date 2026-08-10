@@ -151,7 +151,7 @@ elif rp_path.exists():
             t["ret2026"] = r["rp"]; t["dep1"] = r.get("dep1"); t["dep2"] = r.get("dep2")
     print("merged compact returning%% (no full rosters)")
 else:
-    print("no returning data yet — 2026 board stays illustrative")
+    print("no returning data yet — 2026 board shows dashes, nothing estimated")
 # --- team logos (embedded data URIs), if downloaded ---
 lg_path = base/"data/vb_logos.json"
 if lg_path.exists():

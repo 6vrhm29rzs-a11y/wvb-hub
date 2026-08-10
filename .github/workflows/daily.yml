@@ -90,6 +90,13 @@ jobs:
       - name: Display invariants
         run: python3 scripts/test_display_invariants.py
 
+      # Coverage gate: a NEW displayed field with no declared provenance fails
+      # the run. It cannot catch a client-side expression inventing a value for
+      # a field that already has an entry -- that is what the sign/range
+      # invariants above are for. Two independent checks, stated limits.
+      - name: Provenance
+        run: python3 scripts/provenance.py --check
+
       - name: Reconcile (report, do not block)
         run: python3 scripts/reconcile_2025.py || true
 

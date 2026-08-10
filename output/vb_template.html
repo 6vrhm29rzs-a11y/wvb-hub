@@ -878,7 +878,7 @@ function render2026Rankings(){
           ? ` Graduation <b>plus transfer-portal moves</b> from a <span class="illus" title="non-official portal tracker">non-official tracker</span>${tasof?' ('+tasof+')':''} — Returning % is <b>net of transfers out</b>; incoming shown separately.`
           : ` Graduation-based (Sr/Gr depart); <b>transfers not yet included</b>.`)
       + `${rows.some(r=>r.roster)?' <b>Click any team</b> for its roster'+(anyXfer?' + transfers.':'.'):''}`
-    : `<b>2026 preview — Returning Production.</b> How much of each team's 2025 per-set output (Pts/Set = kills + aces + blocks) comes back next season. <span class="illus">Returning % illustrative</span> until official 2025 player stats (stats.ncaa.org) are pulled — method below.`;
+    : `<b>2026 preview — Returning Production.</b> How much of each team's 2025 per-set output (Pts/Set = kills + aces + blocks) comes back next season. <b>No player data pulled yet</b> — every team shows —, and no figure is estimated. Official 2025 player stats: stats.ncaa.org.`;
   host.innerHTML=`
     <div class="banner">${banner}</div>
     <div class="card"><div class="twrap"><table id="rp2026table">
@@ -888,7 +888,7 @@ function render2026Rankings(){
         const tip=r.real?(r.net!=null
             ? `Net ${(r.net*100).toFixed(0)}% incl. transfers (grad-only ${(r.grad*100).toFixed(0)}%)${nx?` · ${nx} out`:''}${ni?` · ${ni} in`:''}`
             : (r.dep1?`Top loss: ${r.dep1}${r.dep2?' · '+r.dep2:''}`:'Returns nearly all production'))
-          :'illustrative placeholder';
+          :'No official player data for this team — no estimate is shown.';
         const canX=!!r.roster;
         return `<tr class="${canX?'rrow':''}">
           <td><div class="team">${LG(r.team)}<span class="nm">${r.team}</span> ${r.conf?`<span class="chip">${r.conf}</span>`:''}${canX?`<span class="exp">▸ roster</span>`:''}</div></td>
