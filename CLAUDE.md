@@ -5,7 +5,12 @@
 
 ## Read first
 1. Your **memory** (loaded automatically). Only two memories live at this path: `wvb-hub-drive-bus` (Drive IDs) and `drive-large-inline-content-unreliable`. Four older memories (`wvb-hub-next-session-migration`, `ncaa-volleyball-tool`, `cody-collaboration-workflow`, `cody-volleyball-rating-model`) stayed behind at `~/.claude/projects/-Users-codyrose-Downloads-handoff/memory/` and are **deliberately not migrated** — the Drive handoff + this file supersede them. Don't go looking for them.
-2. Drive folder **"Women's College Volleyball 2026"** (`1uOBksR-O3TRPU6Ej84ymei0F4gFPqLe4`) → **Builder_Logs/ "Builder Session-Close 2026-08-09-2230 (pre-migration handoff)"** = the full handoff. Mailbox subfolders: Research/ · Specs_for_Builder/ · Builder_Logs/ · Data/. Write build logs to Builder_Logs/; end each session with a session-close incl. a **LOCAL ONLY** list (what's on disk but not on Drive).
+2. Drive folder **"Women's College Volleyball 2026"** (`1uOBksR-O3TRPU6Ej84ymei0F4gFPqLe4`).
+
+   **⚠ CURRENT SESSION-CLOSE = "Builder Session-Close 2026-08-10 B"** (`1-KLPOAd7PhhmnWMZg1ET_Htrfl9YZ5sqcQ4Yl2LwrFk`). Read that one.
+   **Superseded, do NOT act on their "next steps":** "Session-Close 2026-08-10 (Phase 1 COMPLETE)" (`1_6QZ_o...`); "Session-Close 2026-08-09-2230 (pre-migration handoff)"; "Session-Close 2026-08-09-2345" (its "PUSH NOT LANDED" is wrong — see Git below).
+
+   **AMENDMENT PROTOCOL (revised 2026-08-10 — the earlier version was unexecutable).** The rule "put the correction in the doc it corrects, or have the superseded doc point forward" **cannot be followed**: the Drive connector exposes create/copy/read/download/metadata/search and has **no update or edit operation**, so no existing Drive doc can be modified. Workable version, in force: **this file carries the pointer** (it is read first at boot and is writable), and a superseding doc's title must start with **"SUPERSEDES …"** so the folder listing itself signals it. Never file a bare amendment as a separate doc — it will not be read. Mailbox subfolders: Research/ · Specs_for_Builder/ · Builder_Logs/ · Data/. Write build logs to Builder_Logs/; end each session with a session-close incl. a **LOCAL ONLY** list (what's on disk but not on Drive).
 
 ## Cody's settled decisions (build against these)
 - **History:** every run commits a **timestamped data snapshot to git** (no DB).
