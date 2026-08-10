@@ -10,6 +10,17 @@
    **⚠ CURRENT SESSION-CLOSE = "Builder Session-Close 2026-08-10 E"** (`1zAS7qD_VNC1oLQGAKZcIL0Ro1JHlZQ9jM1Lu5pawGoc`). Read that one.
    **Superseded, do NOT act on their "next steps":** "Session-Close 2026-08-10 D" (`1GWt5RRZ...`); "Session-Close 2026-08-10 C" (`15K4MHf9...`); "Session-Close 2026-08-10 B" (`1-KLPOAd...`); "Session-Close 2026-08-10 (Phase 1 COMPLETE)" (`1_6QZ_o...`); "Session-Close 2026-08-09-2230 (pre-migration handoff)"; "Session-Close 2026-08-09-2345" (its "PUSH NOT LANDED" is wrong — see Git below).
 
+   **⚠ FIVE STALE DOCS SIT IN THE DRIVE ROOT WITH NEUTRAL TITLES.** They contradict current reality and nothing in their names says so, so a memory-less session told to "read the Drive" would take them as current. Do NOT act on any of them:
+   - **"Google Services Architecture Research"** (Gemini) — Cloud Run + BigQuery + Connected Sheets + Firebase + Gemini-API extraction. **Every one of those was rejected.** Also contains a fabricated premise (optimising for San Diego, which nobody specified) and claims "sub-millisecond perceived latency", which is impossible over a network.
+   - **"Builder - Capabilities & Proposed Build Structure"** — asserts real-browser automation is load-bearing for beating Akamai. **Killed by our own source test:** ncaa.com serves all 348 from a datacenter IP. Its launchd scheduling + staleness watchdog are superseded by `.github/workflows/daily.yml`.
+   - **"Research - Architecture Verdict (Aug 9)"** — superseded by that same source test.
+   - **"00 - START HERE (Roles, Workflow, Data, The Ask)"** — **most dangerous, because it is titled as the entry point.** Says TCV is the agreed metric (it *lost* the bake-off) and repeats the Akamai claim.
+   - **"Volleyball Hub - State and Build-Plan"** and **"Volleyball Hub - Project Brief"** — pre-date everything built since.
+
+   **Session-closes A–E are NOT stale** — they carry `SUPERSEDES` prefixes and are the only record of *why* things are as they are (the Saint Francis diagnosis, the bake-off inverting under opponent adjustment, the append-only dedup analysis, the AQ eligibility-gate bug). Keep them. **Principle: supersede by labelling; delete only things that were never records.**
+
+   **`Data/` and `Specs_for_Builder/` are empty and expected to stay empty.** The day-one folder structure did not survive contact with how the work actually went: datasets live in git (raw is committed, derived is rebuilt on read) and specs arrive as relayed messages. Do not treat them as a convention to follow.
+
    **AMENDMENT PROTOCOL (revised 2026-08-10 — the earlier version was unexecutable).** The rule "put the correction in the doc it corrects, or have the superseded doc point forward" **cannot be followed**: the Drive connector exposes create/copy/read/download/metadata/search and has **no update or edit operation**, so no existing Drive doc can be modified. Workable version, in force: **this file carries the pointer** (it is read first at boot and is writable), and a superseding doc's title must start with **"SUPERSEDES …"** so the folder listing itself signals it. Never file a bare amendment as a separate doc — it will not be read. Mailbox subfolders: Research/ · Specs_for_Builder/ · Builder_Logs/ · Data/. Write build logs to Builder_Logs/; end each session with a session-close incl. a **LOCAL ONLY** list (what's on disk but not on Drive).
 
 ## Rules for the Builder (structural, not vibes)
