@@ -1,0 +1,338 @@
+{
+ "meta": {
+  "season": 2025,
+  "source_tier": "DERIVED",
+  "stage": "B -- match simulation (strength, not resume)",
+  "model": "Ferrante-Fonseca; one pooled per-rally probability, set-4/5 behaviour derived not estimated",
+  "rallies_per_set": 43.44,
+  "home_advantage_half_points_per_set": 0.33302698043319484,
+  "series_length": {
+   "3-0": {
+    "predicted": 0.4210774436027674,
+    "observed": 0.4670080756352176
+   },
+   "3-1": {
+    "predicted": 0.33472601179612554,
+    "observed": 0.32735867638369115
+   },
+   "3-2": {
+    "predicted": 0.24419654460110748,
+    "observed": 0.2056332479810912
+   }
+  },
+  "calibration_regular_season": {
+   "n": 5014,
+   "brier": 0.12890288137859426,
+   "favourite_accuracy": 0.8151176705225369,
+   "buckets": {
+    "80": {
+     "n": 942,
+     "wins": 832
+    },
+    "70": {
+     "n": 849,
+     "wins": 667
+    },
+    "90": {
+     "n": 1658,
+     "wins": 1612
+    },
+    "60": {
+     "n": 790,
+     "wins": 536
+    },
+    "50": {
+     "n": 775,
+     "wins": 440
+    }
+   }
+  },
+  "calibration_tournament": {
+   "n": 63,
+   "brier": 0.12725994487754924,
+   "favourite_accuracy": 0.7936507936507936,
+   "buckets": {
+    "80": {
+     "n": 12,
+     "wins": 9
+    },
+    "70": {
+     "n": 8,
+     "wins": 6
+    },
+    "60": {
+     "n": 9,
+     "wins": 5
+    },
+    "90": {
+     "n": 27,
+     "wins": 27
+    },
+    "50": {
+     "n": 7,
+     "wins": 3
+    }
+   }
+  },
+  "actual_champion": "texas a and m",
+  "model_probability_for_actual_champion": 0.029035106615468976
+ },
+ "title_probabilities": [
+  {
+   "team": "nebraska",
+   "p": 0.49680719863668393
+  },
+  {
+   "team": "texas",
+   "p": 0.14110539431907032
+  },
+  {
+   "team": "kentucky",
+   "p": 0.09516633689237461
+  },
+  {
+   "team": "pittsburgh",
+   "p": 0.08274140744802243
+  },
+  {
+   "team": "wisconsin",
+   "p": 0.047584506031875896
+  },
+  {
+   "team": "smu",
+   "p": 0.03997640768158639
+  },
+  {
+   "team": "texas a and m",
+   "p": 0.029035106615468976
+  },
+  {
+   "team": "stanford",
+   "p": 0.02320722991743953
+  },
+  {
+   "team": "louisville",
+   "p": 0.016745671245517218
+  },
+  {
+   "team": "arizona st",
+   "p": 0.009112196821632659
+  },
+  {
+   "team": "creighton",
+   "p": 0.007540306609651312
+  },
+  {
+   "team": "tennessee",
+   "p": 0.0025379928835132836
+  },
+  {
+   "team": "minnesota",
+   "p": 0.001820924390275614
+  },
+  {
+   "team": "southern california",
+   "p": 0.0017227160374616894
+  },
+  {
+   "team": "purdue",
+   "p": 0.0016058169987903553
+  },
+  {
+   "team": "kansas",
+   "p": 0.0009182621321712407
+  },
+  {
+   "team": "indiana",
+   "p": 0.0006325383864819435
+  },
+  {
+   "team": "byu",
+   "p": 0.0005983528982641784
+  },
+  {
+   "team": "miami fl",
+   "p": 0.0004970584517575659
+  },
+  {
+   "team": "baylor",
+   "p": 0.00024594760012180614
+  },
+  {
+   "team": "florida",
+   "p": 9.874839800928732e-05
+  },
+  {
+   "team": "tcu",
+   "p": 6.051759273840296e-05
+  },
+  {
+   "team": "michigan",
+   "p": 5.7078056883788124e-05
+  },
+  {
+   "team": "colorado",
+   "p": 3.3949234600408066e-05
+  },
+  {
+   "team": "ucla",
+   "p": 3.20271404609475e-05
+  },
+  {
+   "team": "north carolina",
+   "p": 2.8495517546796683e-05
+  },
+  {
+   "team": "iowa st",
+   "p": 2.015338751176131e-05
+  },
+  {
+   "team": "penn st",
+   "p": 1.3120349460680879e-05
+  },
+  {
+   "team": "uni",
+   "p": 1.2167723284087558e-05
+  },
+  {
+   "team": "kansas st",
+   "p": 7.74968326731399e-06
+  },
+  {
+   "team": "georgia tech",
+   "p": 7.556180214225755e-06
+  },
+  {
+   "team": "san diego",
+   "p": 6.466790487186893e-06
+  },
+  {
+   "team": "arizona",
+   "p": 4.117789399742949e-06
+  },
+  {
+   "team": "arkansas st",
+   "p": 3.9525690372411015e-06
+  },
+  {
+   "team": "utah st",
+   "p": 2.8946273480970093e-06
+  },
+  {
+   "team": "rice",
+   "p": 2.3717737087717463e-06
+  },
+  {
+   "team": "utah",
+   "p": 1.8946986147571694e-06
+  },
+  {
+   "team": "cal poly",
+   "p": 1.794515458498102e-06
+  },
+  {
+   "team": "marquette",
+   "p": 1.2718064310447483e-06
+  },
+  {
+   "team": "western ky",
+   "p": 9.145036679672431e-07
+  },
+  {
+   "team": "utep",
+   "p": 8.57802319328618e-07
+  },
+  {
+   "team": "south dakota st",
+   "p": 3.378912199194357e-07
+  },
+  {
+   "team": "tulsa",
+   "p": 1.2582512640585897e-07
+  },
+  {
+   "team": "xavier",
+   "p": 2.8806733053835663e-08
+  },
+  {
+   "team": "south fla",
+   "p": 2.4016157319713256e-08
+  },
+  {
+   "team": "american",
+   "p": 7.176983617974693e-09
+  },
+  {
+   "team": "st thomas mn",
+   "p": 3.7724421323017314e-09
+  },
+  {
+   "team": "sfa",
+   "p": 2.59916908408276e-10
+  },
+  {
+   "team": "utah valley",
+   "p": 5.021550324852088e-11
+  },
+  {
+   "team": "princeton",
+   "p": 2.030346234482591e-11
+  },
+  {
+   "team": "toledo",
+   "p": 1.4766326756609013e-11
+  },
+  {
+   "team": "wright st",
+   "p": 1.0509665448798572e-11
+  },
+  {
+   "team": "northern colo",
+   "p": 9.30513664989158e-12
+  },
+  {
+   "team": "wofford",
+   "p": 2.9417871783612162e-12
+  },
+  {
+   "team": "central ark",
+   "p": 2.7262861783224993e-12
+  },
+  {
+   "team": "high point",
+   "p": 1.792367292294883e-12
+  },
+  {
+   "team": "loyola chicago",
+   "p": 1.50597519870981e-13
+  },
+  {
+   "team": "fairfield",
+   "p": 4.344918593076141e-14
+  },
+  {
+   "team": "eastern ill",
+   "p": 2.768338299880956e-14
+  },
+  {
+   "team": "campbell",
+   "p": 2.7627750426134504e-14
+  },
+  {
+   "team": "umbc",
+   "p": 1.7790355895268716e-17
+  },
+  {
+   "team": "coppin st",
+   "p": 7.530398323109403e-20
+  },
+  {
+   "team": "liu",
+   "p": 1.2450039954748458e-21
+  },
+  {
+   "team": "florida a and m",
+   "p": 6.451909526314211e-27
+  }
+ ]
+}
