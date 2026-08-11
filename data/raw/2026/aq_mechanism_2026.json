@@ -1,0 +1,258 @@
+{
+ "meta": {
+  "season": 2026,
+  "note": "Six rows CONFIRMED by Claude-app are used as given and not re-derived. Text-matched rows are UNVERIFIED: matching page prose is weaker evidence than a rules citation.",
+  "default_for_unknown": "TOURNAMENT (most mid-majors), flagged unverified",
+  "counts": {
+   "confirmed": 6,
+   "unverified": 22,
+   "not_found": 4
+  },
+  "validation": {
+   "held_out_set": [
+    "ACC",
+    "Big 12",
+    "Big Ten",
+    "Mountain West",
+    "Pac-12",
+    "SEC"
+   ],
+   "correct": 0,
+   "wrong": 1,
+   "page_not_found": 5,
+   "of": 6,
+   "usable_for_projector": false,
+   "note": "Same matcher scored against six conferences whose answer Claude-app confirmed independently. Rows below are UNVERIFIED and, at this accuracy, are NOT evidence."
+  }
+ },
+ "conferences": {
+  "Big Ten": {
+   "mechanism": "TOURNAMENT",
+   "detail": "first ever, 2026; top 15 of 18; Nov 20-25; Fishers IN",
+   "tier": "CONFIRMED (Claude-app research)",
+   "source": "Claude-app research handoff",
+   "checked": false
+  },
+  "Pac-12": {
+   "mechanism": "TOURNAMENT",
+   "detail": "new; top 4; week of Nov 23",
+   "tier": "CONFIRMED (Claude-app research)",
+   "source": "Claude-app research handoff",
+   "checked": false
+  },
+  "SEC": {
+   "mechanism": "TOURNAMENT",
+   "detail": "added 2025; Nov 20-24; Savannah GA",
+   "tier": "CONFIRMED (Claude-app research)",
+   "source": "Claude-app research handoff",
+   "checked": false
+  },
+  "ACC": {
+   "mechanism": "REGULAR_SEASON",
+   "detail": "regular-season champion takes the bid",
+   "tier": "CONFIRMED (Claude-app research)",
+   "source": "Claude-app research handoff",
+   "checked": false
+  },
+  "Big 12": {
+   "mechanism": "REGULAR_SEASON",
+   "detail": "highest conference win pct",
+   "tier": "CONFIRMED (Claude-app research)",
+   "source": "Claude-app research handoff",
+   "checked": false
+  },
+  "Mountain West": {
+   "mechanism": "TOURNAMENT",
+   "detail": "top 4",
+   "tier": "CONFIRMED (Claude-app research)",
+   "source": "Claude-app research handoff",
+   "checked": false
+  },
+  "ASUN": {
+   "mechanism": "TOURNAMENT",
+   "detail": "page mentions a championship tournament",
+   "tier": "UNVERIFIED (page text match, not a rules citation)",
+   "source": "https://www.asunsports.org/sports/wvball",
+   "checked": true
+  },
+  "America East": {
+   "mechanism": "TOURNAMENT",
+   "detail": "page mentions a championship tournament",
+   "tier": "UNVERIFIED (page text match, not a rules citation)",
+   "source": "https://www.americaeast.com/sports/wvball",
+   "checked": true
+  },
+  "American": {
+   "mechanism": "TOURNAMENT",
+   "detail": "page mentions a championship tournament",
+   "tier": "UNVERIFIED (page text match, not a rules citation)",
+   "source": "https://www.theamerican.org/sports/wvball",
+   "checked": true
+  },
+  "Atlantic 10": {
+   "mechanism": null,
+   "detail": "could not locate a volleyball championship page",
+   "tier": "UNVERIFIED \u2014 NOT FOUND",
+   "source": "https://atlantic10.com",
+   "checked": true,
+   "last_status": "http404"
+  },
+  "Big East": {
+   "mechanism": "TOURNAMENT",
+   "detail": "page mentions a championship tournament",
+   "tier": "UNVERIFIED (page text match, not a rules citation)",
+   "source": "https://www.bigeast.com/sports/wvball",
+   "checked": true
+  },
+  "Big Sky": {
+   "mechanism": null,
+   "detail": "could not locate a volleyball championship page",
+   "tier": "UNVERIFIED \u2014 NOT FOUND",
+   "source": "https://bigskyconf.com",
+   "checked": true,
+   "last_status": "http404"
+  },
+  "Big South": {
+   "mechanism": "TOURNAMENT",
+   "detail": "page mentions a championship tournament",
+   "tier": "UNVERIFIED (page text match, not a rules citation)",
+   "source": "https://www.bigsouthsports.com/sports/wvball",
+   "checked": true
+  },
+  "Big West": {
+   "mechanism": "AMBIGUOUS",
+   "detail": "page mentions BOTH -- needs a human read",
+   "tier": "UNVERIFIED (page text match, not a rules citation)",
+   "source": "https://www.bigwest.org/sports/wvball",
+   "checked": true
+  },
+  "CAA": {
+   "mechanism": "TOURNAMENT",
+   "detail": "page mentions a championship tournament",
+   "tier": "UNVERIFIED (page text match, not a rules citation)",
+   "source": "https://www.caasports.com/sports/wvball",
+   "checked": true
+  },
+  "CUSA": {
+   "mechanism": "TOURNAMENT",
+   "detail": "page mentions a championship tournament",
+   "tier": "UNVERIFIED (page text match, not a rules citation)",
+   "source": "https://www.conferenceusa.com/sports/wvball",
+   "checked": true
+  },
+  "Horizon": {
+   "mechanism": "REGULAR_SEASON",
+   "detail": "page states a regular-season champion",
+   "tier": "UNVERIFIED (page text match, not a rules citation)",
+   "source": "https://www.horizonleague.org/sports/wvball",
+   "checked": true
+  },
+  "Ivy League": {
+   "mechanism": "TOURNAMENT",
+   "detail": "page mentions a championship tournament",
+   "tier": "UNVERIFIED (page text match, not a rules citation)",
+   "source": "https://www.ivyleague.com/sports/wvball",
+   "checked": true
+  },
+  "MAAC": {
+   "mechanism": "AMBIGUOUS",
+   "detail": "page mentions BOTH -- needs a human read",
+   "tier": "UNVERIFIED (page text match, not a rules citation)",
+   "source": "https://www.maacsports.com/sports/wvball",
+   "checked": true
+  },
+  "MAC": {
+   "mechanism": "TOURNAMENT",
+   "detail": "page mentions a championship tournament",
+   "tier": "UNVERIFIED (page text match, not a rules citation)",
+   "source": "https://www.getsomemaction.com/sports/wvball",
+   "checked": true
+  },
+  "MEAC": {
+   "mechanism": "AMBIGUOUS",
+   "detail": "page mentions BOTH -- needs a human read",
+   "tier": "UNVERIFIED (page text match, not a rules citation)",
+   "source": "https://www.meacsports.com/sports/wvball",
+   "checked": true
+  },
+  "MVC": {
+   "mechanism": "TOURNAMENT",
+   "detail": "page mentions a championship tournament",
+   "tier": "UNVERIFIED (page text match, not a rules citation)",
+   "source": "https://www.mvc-sports.com/sports/wvball",
+   "checked": true
+  },
+  "NEC": {
+   "mechanism": "AMBIGUOUS",
+   "detail": "page mentions BOTH -- needs a human read",
+   "tier": "UNVERIFIED (page text match, not a rules citation)",
+   "source": "https://www.northeastconference.org/sports/wvball",
+   "checked": true
+  },
+  "OVC": {
+   "mechanism": "TOURNAMENT",
+   "detail": "page mentions a championship tournament",
+   "tier": "UNVERIFIED (page text match, not a rules citation)",
+   "source": "https://www.ovcsports.com/sports/wvball",
+   "checked": true
+  },
+  "Patriot": {
+   "mechanism": "TOURNAMENT",
+   "detail": "page mentions a championship tournament",
+   "tier": "UNVERIFIED (page text match, not a rules citation)",
+   "source": "https://www.patriotleague.org/sports/wvball",
+   "checked": true
+  },
+  "SWAC": {
+   "mechanism": "TOURNAMENT",
+   "detail": "page mentions a championship tournament",
+   "tier": "UNVERIFIED (page text match, not a rules citation)",
+   "source": "https://www.swac.org/sports/wvball",
+   "checked": true
+  },
+  "SoCon": {
+   "mechanism": null,
+   "detail": "could not locate a volleyball championship page",
+   "tier": "UNVERIFIED \u2014 NOT FOUND",
+   "source": "https://soconsports.com",
+   "checked": true,
+   "last_status": "http308"
+  },
+  "Southland": {
+   "mechanism": "TOURNAMENT",
+   "detail": "page mentions a championship tournament",
+   "tier": "UNVERIFIED (page text match, not a rules citation)",
+   "source": "https://www.southland.org/sports/wvball",
+   "checked": true
+  },
+  "Summit League": {
+   "mechanism": "TOURNAMENT",
+   "detail": "page mentions a championship tournament",
+   "tier": "UNVERIFIED (page text match, not a rules citation)",
+   "source": "https://www.thesummitleague.org/sports/wvball",
+   "checked": true
+  },
+  "Sun Belt": {
+   "mechanism": "AMBIGUOUS",
+   "detail": "page mentions BOTH -- needs a human read",
+   "tier": "UNVERIFIED (page text match, not a rules citation)",
+   "source": "https://www.sunbeltsports.org/sports/wvball",
+   "checked": true
+  },
+  "WAC": {
+   "mechanism": "TOURNAMENT",
+   "detail": "page mentions a championship tournament",
+   "tier": "UNVERIFIED (page text match, not a rules citation)",
+   "source": "https://www.wacsports.com/sports/wvball",
+   "checked": true
+  },
+  "WCC": {
+   "mechanism": null,
+   "detail": "could not locate a volleyball championship page",
+   "tier": "UNVERIFIED \u2014 NOT FOUND",
+   "source": "https://wccsports.org",
+   "checked": true,
+   "last_status": "urlerror"
+  }
+ }
+}
