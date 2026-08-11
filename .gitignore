@@ -68,3 +68,13 @@ data/rpi_2*.json
 
 # resumable working file for the player crawl; the AGGREGATE is what we commit
 data/raw/*/playerbox.jsonl
+
+# Saved VolleyTalk pages (PDF / HTML / webarchive). Kept on disk, out of the
+# PUBLIC repo on purpose: they contain forum members' posts, usernames and
+# avatars, and committing them here would republish other people's writing.
+# They are also redundant -- the anonymous live fetch is byte-identical to a
+# logged-in save (measured, docs/data_sources.md §3), so nothing is preserved
+# by keeping them under version control.
+*Volley Talk*.pdf
+*Volley Talk*.html
+*Volley Talk*.webarchive

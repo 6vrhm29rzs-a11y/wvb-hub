@@ -40,7 +40,7 @@ row can be re-checked. All web fetches used the project's self-identifying UA
 
 ## 2. Local files (all readable)
 
-In `/Users/codyrose/Womens_College_Volleyball_2026/`:
+Committed under `data/raw/avca/` (moved there from the repo root, 2026-08-11):
 
 | File | Read via | Contents |
 |---|---|---|
@@ -49,10 +49,15 @@ In `/Users/codyrose/Womens_College_Volleyball_2026/`:
 | `AVCA-DI-Womens-Poll-Records-Overview.xlsx` | openpyxl | 4,709×23 — per-school totals across **660 polls** |
 | `AVCA-DI-Womens-Poll-Records-By-Year.xlsx` | openpyxl | 1,117×53, 3 sheets |
 | `AVCA-DI-Womens-Poll-Records-Final-Polls.xlsx` | openpyxl | 207×54 |
-| `AVCA-DI-WVB-Polls-Week-by-Week-1982-2025/` | openpyxl | **44 season files**, 1982–2025, incl. COVID split (`2020-21 - Spring`, `2021 - Fall`) |
-| `Fall 2025 Match Threads … .html` | text | Identical to live fetch — see §3 |
-| `Fall 2025 Match Threads … .pdf` (and ` 2.pdf`) | Read tool | Renders fully; posts, usernames, timestamps, schedule all legible |
-| `Fall 2025 Match Threads … .webarchive` | `plistlib` | Parses; 154 KB main resource + 38 subresources |
+| `week-by-week-1982-2025/` | openpyxl | **44 season files**, 1982–2025, incl. COVID split (`2020-21 - Spring`, `2021 - Fall`) |
+| `Fall 2025 Match Threads … .html` | text | Identical to live fetch — see §3. **Gitignored** |
+| `Fall 2025 Match Threads … .pdf` (and ` 2.pdf`) | Read tool | Renders fully; posts, usernames, timestamps, schedule all legible. **Gitignored** |
+| `Fall 2025 Match Threads … .webarchive` | `plistlib` | Parses; 154 KB main resource + 38 subresources. **Gitignored** |
+
+The saved VolleyTalk pages stay on Cody's disk but are **deliberately kept out of
+this public repo** — they contain forum members' posts, usernames and avatars, and
+committing them would republish other people's writing. They are redundant anyway
+(§3).
 
 `openpyxl` 3.1.5 is present. **`pandas` is not installed** — parse with `openpyxl` directly.
 
