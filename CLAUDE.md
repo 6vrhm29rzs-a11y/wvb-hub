@@ -23,6 +23,8 @@
 
    **⚑ RUN AUTONOMOUSLY (Cody, 2026-08-10).** Work the agreed queue end to end; settled decisions stay settled. **Do not surface half-built work** — he was asked to check a phone layout five times across four failed fixes, which is the wrong use of the principal. Surface only for: something genuinely shippable, something a seat physically cannot do, a decision only he can make, or a finding that changes the plan — and **batch** those into one list. Builder cannot: `git push`, Drive delete/rename/move, anything on a physical phone, account/billing.
 
+   **👤 `For_Cody/` = `1sOiNGxcDPMDQB9dYMNGpemgvJkM5Brhj` — the human-readable summary layer.** Exec summary first, bullets not paragraphs, plain English, numbered so reading order is obvious, actions under their own heading. **It is a summary layer, NOT the record** — depth stays in `Builder_Logs/` and `Research/`; summarise and point.
+
    **📓 `Cody_Log/` = `1CHqDTgoFlUB8h-gQp0ldtWyVVCILgcoX` — READ AT SESSION START.** Cody speaks to each seat separately and **neither seat sees what he told the other**; his instructions were the only artifact with no durable record. Both seats append `CODY SAID — to <SEAT>, <DATE> (<topic>)` capturing substance and standing instructions. `SUPERSEDES` in the title if he reverses something.
 
    **📬 SEAT-TO-SEAT MAILBOXES (adopted 2026-08-10).** Cody's copy-paste is unreliable, so seats exchange messages as **Drive files**, and he just says *"check the drive"*. Do not ask him to relay text.
