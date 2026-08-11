@@ -25,6 +25,7 @@ reported SEPARATELY so it can be eyeballed. Never fuzzy-match across teams.
 Python 3.9 target.
 """
 
+import difflib
 import json
 import os
 import re
@@ -36,6 +37,7 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROSTERS = os.path.join(REPO, "data", "raw", "2026", "rosters_2026.json")
 PLAYERS = os.path.join(REPO, "data", "raw", "2025", "players_2025.json")
 OUT = os.path.join(REPO, "data", "returning_2026.json")
+NICKNAMES = os.path.join(REPO, "data", "nicknames.json")
 
 SUFFIX = re.compile(r"\b(jr|sr|ii|iii|iv|v)\.?$", re.I)
 
@@ -57,6 +59,84 @@ def fullkey(first, last):
     whole = strip_accents(("%s %s" % (first or "", last or "")).lower())
     whole = SUFFIX.sub("", whole).strip()
     return re.sub(r"[^a-z]", "", whole)
+
+
+def production(p):
+    """A player's 2025 scoring, DERIVED FROM RAW COUNTS -- never the feed's own
+    `points` column.
+
+    MEASURED, not assumed: across 4,601 players with more than 20 sets, the
+    feed's `points` is NEVER above kills + aces + solo blocks + half of block
+    assists, and is BELOW it for 3,270 of them -- median ratio 0.61. Rita
+    Benidio reads 155 kills and 106 "points". That is the signature of a
+    column the box score only carries for SOME games, so the season sum
+    silently undercounts by a different amount for every player.
+
+    Using it would have put a wrong number under a heading that says
+    "kills + aces + block credit" -- computed correctly, labelled wrongly,
+    which is the R4 failure. Nothing else in the pipeline reads the field
+    (checked by grep), so the defect stops here.
+    """
+    k = p.get("kills") or 0
+    a = p.get("aces") or 0
+    bs = p.get("block_solos") or 0
+    ba = p.get("block_assists") or 0
+    return round(k + a + bs + 0.5 * ba, 1)
+
+
+def parts(first, last):
+    """Name split into [given, surname tokens...], normalised."""
+    whole = strip_accents(("%s %s" % (first or "", last or "")).lower())
+    whole = SUFFIX.sub("", whole).strip()
+    return [t for t in re.split(r"[^a-z]+", whole) if t]
+
+
+_NICK = None
+
+
+def nickname_linked(a, b):
+    """Are these two given names a published diminutive pair?
+
+    The list is EXTERNAL and fixed before it meets the data
+    (scripts/build_nickname_map.py). A pair it does not cover does not join.
+    """
+    global _NICK
+    if _NICK is None:
+        try:
+            _NICK = json.load(open(NICKNAMES))["links"]
+        except (IOError, ValueError):
+            _NICK = {}
+    return b in _NICK.get(a, ()) or a in _NICK.get(b, ())
+
+
+def first_compatible(a, b):
+    """Is one given name a plausible rendering of the other?
+
+    Measured against the confirmed misses: the population is nicknames
+    (Madi/Madison, Katie/Kathryn), formal-to-short (Bella/Isabella -- note the
+    initial DIFFERS), and one-character typos (Cailyn/Caitlyn). No single test
+    covers all three, so this is a union of narrow ones rather than one loose
+    one.
+
+    A BARE SHARED INITIAL USED TO COUNT HERE. It no longer does. Claude-app's
+    review (2026-08-11) named the hole: one sister in the 2025 pool, the other
+    on the 2026 roster. Mutual uniqueness cannot see it -- there is only one
+    candidate -- so "Kate Smith" would absorb "Kathryn Smith"'s season. A
+    shared first letter is not evidence that two names are one person; it was
+    carrying 25 of 60 joins on its own.
+
+    The published nickname list replaces it, and only ever CONFIRMS: a pair
+    the list does not cover stays unresolved and renders as an em dash. If an
+    uncovered pair could still join, the list would be decorative and the risk
+    unchanged.
+    """
+    if not a or not b:
+        return False
+    if a == b or a in b or b in a:
+        return True
+    if nickname_linked(a, b):
+        return True
+    return difflib.SequenceMatcher(None, a, b).ratio() >= 0.72
 
 
 def nkey(first, last):
@@ -95,7 +175,7 @@ def main():
     print("=" * 78)
 
     totals = {"returning": 0, "departed": 0, "new": 0, "unresolved": 0,
-              "loose": 0, "transfer_in": 0}
+              "loose": 0, "transfer_in": 0, "surname": 0}
     report = {}
     for team, meta in sorted(rosters.items()):
         roster = meta.get("players") or []
@@ -116,6 +196,12 @@ def main():
 
         matched_ids, returning, new, unresolved, loose_hits = set(), [], [], [], []
         transfers = []
+        surname_hits = []
+        matches = []          # (roster_player, production_player, how)
+        claimed = set()       # id() of production rows already taken
+        pending = []          # roster players unmatched after pass 1
+
+        # ---- PASS 1: exact, then narrow normalisation, then whole-name key ----
         for r in roster:
             f, l = (r.get("first") or "").strip(), (r.get("last") or "").strip()
             hit = exact.get((f, l))
@@ -137,54 +223,146 @@ def main():
                                            "ambiguous on whole name: %d" % len(wc)))
                         continue
             if hit is None:
-                # genuinely absent from 2025 production: could be a true
-                # freshman/transfer (expected) OR a name we failed to resolve.
-                # Distinguishable only by class year: a returning player with
-                # 2025 production should not be a first-year.
+                pending.append(r)
+                continue
+            claimed.add(id(hit))
+            matches.append((r, hit, how))
+
+        # ---- PASS 2: SURNAME-ANCHORED, run only on what pass 1 left over ----
+        # 673 unresolved names, audited by near-name search inside each team's
+        # own pool (scripts/audit_unresolved.py): 59 had a near name, and those
+        # 59 split cleanly on surname agreement -- 54 at ratio 1.000, four at
+        # 0.20-0.60, one at 0.833. The four are the dangerous population:
+        # "Lauren Pyle" -> "Lauren Malone", same given name, entirely different
+        # surname, 316 kills. Joining those would attribute one player's season
+        # to another -- plausible output, wrong answer, the exact failure this
+        # file exists to prevent. So the anchor is an EXACT surname token and
+        # the given name is what flexes, never the reverse.
+        #
+        # FOUR GUARDS, because a lone uniqueness test is not enough when the
+        # cost of a wrong join is a wrong number on the page:
+        #   1. surname token must match EXACTLY (no fuzzy surnames, ever)
+        #   2. the production row must be UNCLAIMED by pass 1 -- one person
+        #      cannot be two roster entries
+        #   3. the pairing must be mutually unique: the roster player's only
+        #      candidate AND that row's only claimer. Computed over all pending
+        #      players before anything is accepted, so the result does not
+        #      depend on roster order.
+        #   4. true freshmen are excluded -- a first-year cannot have produced
+        #      for this team last season, so a surname match there is somebody
+        #      else (a graduated sister, a coincidence).
+        # Every join made here is reported separately and counted, never folded
+        # silently into "returning".
+        if pending:
+            by_sur = {}
+            for p in pool:
+                if id(p) in claimed:
+                    continue
+                pp = parts(p.get("first"), p.get("last"))
+                for s in pp[1:]:
+                    by_sur.setdefault(s, []).append((p, pp))
+            cand_of = {}
+            for r in pending:
                 cls = (r.get("class_raw") or "").lower()
                 if cls.startswith(("fr", "freshman", "redshirt fr", "r-fr")):
-                    new.append(r.get("name_raw"))
+                    continue
+                rp = parts(r.get("first"), r.get("last"))
+                if len(rp) < 2:
+                    continue
+                seen_c = {}
+                for s in rp[1:]:
+                    for p, pp in by_sur.get(s, []):
+                        # The given name has the same split-position problem
+                        # the surname had: "Bernardita Aguilar" on the roster
+                        # against "Maria Bernardita Aguilar Toranza" in the
+                        # feed -- a Spanish compound given name where the two
+                        # sources kept different halves. Token membership
+                        # catches it; the uniqueness guard still rejects the
+                        # sister case ("Maria Gomez" against a pool holding
+                        # both "Maria Gomez" and "Ana Maria Gomez" yields two
+                        # candidates and stays unresolved).
+                        if (first_compatible(rp[0], pp[0])
+                                or rp[0] in pp or pp[0] in rp):
+                            seen_c[id(p)] = p
+                if len(seen_c) == 1:
+                    cand_of[id(r)] = list(seen_c.values())[0]
+            claimers = {}
+            for rid, p in cand_of.items():
+                claimers.setdefault(id(p), []).append(rid)
+            still = []
+            for r in pending:
+                p = cand_of.get(id(r))
+                if p is not None and len(claimers.get(id(p), [])) == 1:
+                    claimed.add(id(p))
+                    matches.append((r, p, "surname-anchored"))
+                    surname_hits.append((r.get("name_raw"),
+                                         "%s %s" % (p.get("first"), p.get("last")),
+                                         production(p)))
                 else:
-                    # upperclassman with no production HERE -- transfer or defect?
-                    elsewhere = [q for q in everywhere.get(nkey(f, l), [])
-                                 if str(q.get("team_id")) != str(tid)]
-                    if len(elsewhere) == 1:
-                        q = elsewhere[0]
-                        transfers.append({"name": r.get("name_raw"),
-                                          "class": r.get("class_raw"),
-                                          "from_team_id": q.get("team_id"),
-                                          "points_2025": q.get("points"),
-                                          "kills_2025": q.get("kills")})
-                    elif len(elsewhere) > 1:
-                        unresolved.append((r.get("name_raw"),
-                                           "ambiguous across %d teams" % len(elsewhere)))
-                    else:
-                        unresolved.append((r.get("name_raw"),
-                                           "no D-I production anywhere, class=%s"
-                                           % (r.get("class_raw") or "?")))
+                    still.append(r)
+            pending = still
+
+        # ---- what neither pass could tie to this team's 2025 production ----
+        for r in pending:
+            f, l = (r.get("first") or "").strip(), (r.get("last") or "").strip()
+            # genuinely absent from 2025 production: could be a true
+            # freshman/transfer (expected) OR a name we failed to resolve.
+            # Distinguishable only by class year: a returning player with
+            # 2025 production should not be a first-year.
+            cls = (r.get("class_raw") or "").lower()
+            if cls.startswith(("fr", "freshman", "redshirt fr", "r-fr")):
+                new.append(r.get("name_raw"))
                 continue
-            key = (hit.get("first"), hit.get("last"))
-            matched_ids.add(key)
+            # upperclassman with no production HERE -- transfer or defect?
+            elsewhere = [q for q in everywhere.get(nkey(f, l), [])
+                         if str(q.get("team_id")) != str(tid)]
+            if len(elsewhere) == 1:
+                q = elsewhere[0]
+                transfers.append({"name": r.get("name_raw"),
+                                  "class": r.get("class_raw"),
+                                  "from_team_id": q.get("team_id"),
+                                  "points_2025": q.get("points"),
+                                  "kills_2025": q.get("kills")})
+            elif len(elsewhere) > 1:
+                unresolved.append((r.get("name_raw"),
+                                   "ambiguous across %d teams" % len(elsewhere)))
+            else:
+                unresolved.append((r.get("name_raw"),
+                                   "no D-I production anywhere, class=%s"
+                                   % (r.get("class_raw") or "?")))
+
+        # ---- record everything both passes matched ----
+        for r, hit, how in matches:
+            matched_ids.add((hit.get("first"), hit.get("last")))
             returning.append({"name": r.get("name_raw"), "class": r.get("class_raw"),
-                              "how": how,
-                              "kills": hit.get("kills"), "points": hit.get("points"),
+                              "how": how, "pos": hit.get("pos") or "",
+                              "kills": hit.get("kills"), "aces": hit.get("aces"),
+                              "blocks": round((hit.get("block_solos") or 0)
+                                              + 0.5 * (hit.get("block_assists") or 0), 1),
+                              "pts": production(hit),
                               "sets": hit.get("sets")})
             if how in ("normalised", "whole-name"):
                 loose_hits.append((r.get("name_raw"),
                                    "%s %s" % (hit.get("first"), hit.get("last"))))
 
         departed = [{"name": "%s %s" % (p.get("first"), p.get("last")),
-                     "points": p.get("points"), "kills": p.get("kills")}
+                     "pos": p.get("pos") or "",
+                     "kills": p.get("kills"), "aces": p.get("aces"),
+                     "blocks": round((p.get("block_solos") or 0)
+                                     + 0.5 * (p.get("block_assists") or 0), 1),
+                     "pts": production(p), "sets": p.get("sets")}
                     for p in pool
                     if (p.get("first"), p.get("last")) not in matched_ids
-                    and (p.get("points") or 0) > 0]
+                    and production(p) > 0]
 
         report[team] = {
             "returning": returning, "departed": departed,
             "new_or_unplayed": new, "unresolved": unresolved,
             "transfer_in_official": transfers,
             "resolved_by_normalisation": loose_hits,
+            "resolved_by_surname_anchor": surname_hits,
         }
+        totals["surname"] += len(surname_hits)
         totals["returning"] += len(returning)
         totals["departed"] += len(departed)
         totals["new"] += len(new)
@@ -207,7 +385,17 @@ def main():
         print("  JOIN RATE (roster players classified without defect): %.1f%%  "
               "-- go/no-go bar is 90%%" % (100.0 * (roster_n - totals["unresolved"]) / roster_n))
     print("  resolved only by normalisation (eyeball these): %d" % totals["loose"])
+    print("  resolved by surname anchor (nickname/compound surname): %d"
+          % totals["surname"])
     print()
+    if totals["surname"]:
+        print("  SURNAME-ANCHORED JOINS — roster name -> production name (2025 pts).")
+        print("  Exact surname, flexible given name, mutually unique, unclaimed,")
+        print("  non-freshman. Listed in full because each one is a judgement:")
+        for team, r in sorted(report.items()):
+            for a, b, pts in (r.get("resolved_by_surname_anchor") or []):
+                print("    %-16s %-26s -> %-26s pts=%s" % (team, a, b, pts))
+        print()
 
     # CLUSTERED vs EVEN. If unresolved upperclassmen pile up at a few schools
     # the heuristic is catching transfer intake, not join failures; if they

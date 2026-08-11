@@ -80,10 +80,87 @@ model["official_asof"] = "records + RPI: official NCAA final 2025 (stats.ncaa.or
 model["official_source"] = "https://stats.ncaa.org/selection_rankings/nitty_gritties/47691"
 print("merged OFFICIAL record+RPI into %d of %d model teams" % (merged, len(model["teams"])))
 
-# --- 2026 returning production + full rosters from official 2025 player stats ---
+# --- 2026 returning production: REAL 2026 rosters x 2025 production ---------
+# PREFERRED over the two paths below, and a different QUESTION from the one they
+# answered. They inferred departure from class year (Sr/Gr graduate), across a
+# 40-team sample. This reads the actual 2026 roster published by each school and
+# asks whether last season's producer is on it -- which also captures transfers
+# out, early departures and medical retirements that a class-year rule calls
+# "returning".
+#
+# R4 APPLIES: the number under "Returning %" changes meaning here, so the method
+# text on the page changes with it. `returning_method` carries that to the
+# template; do not set the number without it.
+rj_path = base/"data/returning_2026.json"
+rosters_path = base/"data/raw/2026/rosters_2026.json"
+_wired = False
+if rj_path.exists() and rosters_path.exists():
+    _join = json.load(open(rj_path))["teams"]
+    # team NAMES are not a safe join key across ncaa.com endpoints -- go via
+    # team_id, the only stable identifier (see CLAUDE.md).
+    _rmeta = json.load(open(rosters_path))["teams"]
+    _by_id = {}
+    for _tname, _m in _rmeta.items():
+        _rec = _join.get(_tname)
+        if _m.get("team_id") and _rec and _rec.get("returning") is not None:
+            _by_id[str(_m["team_id"])] = _rec
+    # Names differ BETWEEN ncaa.com endpoints for the same school -- the rating
+    # payload says "New Orleans" where the dataset says "LSU New Orleans " (a
+    # 2025 rebrand, trailing space and all). Reuse the reconciler's normaliser
+    # and alias map rather than adding a second one here; a private copy would
+    # drift from it silently, and this school would just go missing again.
+    import sys as _sys
+    _sys.path.insert(0, str(base/"scripts"))
+    from reconcile_2025 import norm as _norm
+    _name_to_id = {}
+    if _ds_p.exists():
+        for _t in json.load(open(_ds_p))["teams"]:
+            if _t.get("team_id"):
+                _name_to_id[_norm(_t["name_short"])] = str(_t["team_id"])
+    _n = 0
+    for t in model["teams"]:
+        rec = _by_id.get(_name_to_id.get(_norm(t["team"]), ""))
+        if not rec:
+            continue
+        ret_pts = sum((p.get("pts") or 0) for p in rec["returning"])
+        dep_pts = sum((p.get("pts") or 0) for p in rec["departed"])
+        total = ret_pts + dep_pts
+        if total <= 0:
+            continue          # no 2025 scoring at all -> em dash, not a zero
+        t["ret2026"] = round(ret_pts / total, 3)
+        t["teamPts"] = round(total, 1)
+        dep = sorted(rec["departed"], key=lambda p: -(p.get("pts") or 0))
+        t["dep1"] = "%s (%s)" % (dep[0]["name"], dep[0]["pts"]) if dep else None
+        t["dep2"] = "%s (%s)" % (dep[1]["name"], dep[1]["pts"]) if len(dep) > 1 else None
+        t["roster"] = (
+            [{"n": p["name"], "yr": p.get("class") or "", "pos": p.get("pos") or "",
+              "pts": p.get("pts") or 0, "k": p.get("kills") or 0,
+              "a": p.get("aces") or 0, "b": p.get("blocks") or 0, "ret": True}
+             for p in sorted(rec["returning"], key=lambda p: -(p.get("pts") or 0))]
+            + [{"n": p["name"], "yr": "", "pos": p.get("pos") or "",
+                "pts": p.get("pts") or 0, "k": p.get("kills") or 0,
+                "a": p.get("aces") or 0, "b": p.get("blocks") or 0, "ret": False}
+               for p in dep])
+        # Roster players whose 2025 production could not be resolved. Their
+        # production, if any, is NOT attributed -- so the share is conservative,
+        # never inflated. Surfaced per team rather than buried in a total.
+        t["unres2026"] = len(rec.get("unresolved") or [])
+        _n += 1
+    if _n:
+        _wired = True
+        model["returning_method"] = "roster"
+        model["returning_source"] = (
+            "2026 rosters published by each school (OFFICIAL) x 2025 per-player "
+            "production from ncaa.com box scores (OFFICIAL); the join is DERIVED")
+        print("attached ROSTER-BASED returning%% for %d of %d model teams"
+              % (_n, len(model["teams"])))
+
+# --- legacy 40-team graduation-based path (only if the real join is absent) ---
 pl_path = base/"data/vb_players_2025.json"     # full per-player rosters (preferred)
 rp_path = base/"data/vb_returning_2026.json"   # compact fallback (rp + top departers)
-if pl_path.exists():
+if _wired:
+    pass                       # real join already wired; do not overwrite it
+elif pl_path.exists():
     pdata = json.load(open(pl_path)).get("teams", {})
     n = 0
     for t in model["teams"]:

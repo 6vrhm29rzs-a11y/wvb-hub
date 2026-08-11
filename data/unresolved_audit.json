@@ -1,0 +1,5418 @@
+{
+ "meta": {
+  "source_tier": "DERIVED",
+  "note": "difflib near-name audit of join_players.py UNRESOLVED; cutoff=0.72",
+  "audited": 598,
+  "candidate_defects": 5,
+  "defects_with_production": 5,
+  "join_rate_reported": 89.31,
+  "join_rate_defects_only": 99.91,
+  "join_rate_production_defects": 99.91,
+  "stranded_points": 294,
+  "stranded_kills": 374
+ },
+ "rows": [
+  {
+   "team": "A&M-Corpus Christi",
+   "name": "Lauren Sandvold",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "A&M-Corpus Christi",
+   "name": "Madison Morrow",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 16,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "AUM",
+   "name": "Maison Turner",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "AUM",
+   "name": "Chelsea Daffin",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "AUM",
+   "name": "Ainslee Copeland",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "AUM",
+   "name": "Ava Boyll",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "AUM",
+   "name": "Jori Taylor",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "AUM",
+   "name": "Skye Letson",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 15,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "AUM",
+   "name": "Kinsley Kennedy",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 15,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Abilene Christian",
+   "name": "Maddie Finnegan",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Air Force",
+   "name": "Amelia Porisch",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Air Force",
+   "name": "Lainie Stapleton",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Air Force",
+   "name": "Anna Leahy",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Akron",
+   "name": "Jessie Musselman",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 14,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Akron",
+   "name": "Lauren Wilson",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 14,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Alabama",
+   "name": "Laney Hennessee",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Alabama",
+   "name": "Leilia Toailoa",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Alabama",
+   "name": "Kyla Dunaway",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 15,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Alabama A&M",
+   "name": "Molly Chappell",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 21,
+   "unclaimed_pool": 12,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Alabama A&M",
+   "name": "Madison Drummond",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 21,
+   "unclaimed_pool": 12,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Alabama A&M",
+   "name": "Aspen Creekmore",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 21,
+   "unclaimed_pool": 12,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Alabama St.",
+   "name": "Sharide Sykes",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 16,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Alabama St.",
+   "name": "Nadiyyah Northern",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Alabama St.",
+   "name": "Makeda Edwards",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Alabama St.",
+   "name": "Jaci Moore",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Alabama St.",
+   "name": "Ava O'Hare",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Alabama St.",
+   "name": "Mirra Riddle",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Alabama St.",
+   "name": "Alexis Williams",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Alabama St.",
+   "name": "Mikalah Davis",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Alcorn",
+   "name": "Jaylynn McNeill",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Alcorn",
+   "name": "Alexis Burton",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Alcorn",
+   "name": "Mariyah Young",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Alcorn",
+   "name": "Daylin Saiki",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "App State",
+   "name": "Caroline Greene",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 13,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Arizona",
+   "name": "Maria Olga Siapani",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Ark.-Monticello",
+   "name": "Kyonias Chambers",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 10,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Ark.-Monticello",
+   "name": "Maelie Cooke",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 10,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Ark.-Monticello",
+   "name": "Evalyn Dang",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 10,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Army West Point",
+   "name": "Ryan Leclair",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 20,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Army West Point",
+   "name": "Victoria Filippova",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 20,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Auburn",
+   "name": "Belle Patrick",
+   "why": "no D-I production anywhere, class=Junior",
+   "pool_size": 16,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Auburn",
+   "name": "Emma Moore",
+   "why": "no D-I production anywhere, class=Junior",
+   "pool_size": 16,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "BYU",
+   "name": "Kate Prior",
+   "why": "no D-I production anywhere, class=Senior",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "BYU",
+   "name": "Rachel Jepsen",
+   "why": "no D-I production anywhere, class=Sophomore",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "BYU",
+   "name": "Addie Benson",
+   "why": "no D-I production anywhere, class=Senior",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "BYU",
+   "name": "Kelli Jo Burgess",
+   "why": "no D-I production anywhere, class=Senior",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Ball St.",
+   "name": "Ava Smith",
+   "why": "ambiguous across 2 teams",
+   "pool_size": 13,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Ball St.",
+   "name": "Allie Wuestenfeld",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 13,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Baylor",
+   "name": "Harley Greek",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 18,
+   "unclaimed_pool": 9,
+   "near_any": "Harley Kreck",
+   "near_free": "Harley Kreck",
+   "ratio": 0.833,
+   "points_2025": 83,
+   "kills_2025": 55,
+   "sets_2025": 109
+  },
+  {
+   "team": "Bellarmine",
+   "name": "Emily Cook",
+   "why": "no D-I production anywhere, class=R-Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Bellarmine",
+   "name": "Addison Putt",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 14,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Bellarmine",
+   "name": "Bella Wynja",
+   "why": "no D-I production anywhere, class=R-Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Bellarmine",
+   "name": "Jess Schmidt",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 14,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Belmont",
+   "name": "Alex Fowler",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 18,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Bethune-Cookman",
+   "name": "Kylynn White",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 17,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Bethune-Cookman",
+   "name": "Isabella Pedrosa",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Bethune-Cookman",
+   "name": "Talibah Hamlett",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Bethune-Cookman",
+   "name": "Moriah Johnson",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 17,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Bethune-Cookman",
+   "name": "Gianna Mora",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 17,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Binghamton",
+   "name": "Maia Marin",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Binghamton",
+   "name": "Haiden Fuhrmann",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Binghamton",
+   "name": "Magi Milicevic",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Boise St.",
+   "name": "Reese Weinert",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 13,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Boise St.",
+   "name": "Hallee Heath",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 13,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Boston College",
+   "name": "Lucie Vesela",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 18,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Bowling Green",
+   "name": "Cecily Waynar",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 16,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Bowling Green",
+   "name": "Kate Eigner",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 16,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Brown",
+   "name": "Gracie Griffin",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Bryant",
+   "name": "Nadine Abdat",
+   "why": "no D-I production anywhere, class=R-Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Bucknell",
+   "name": "Sarah Hilliard",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Bucknell",
+   "name": "Avery Bryan",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "CSU Bakersfield",
+   "name": "Ana Benjamim",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 13,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "CSU Bakersfield",
+   "name": "Analiese Gagliano",
+   "why": "no D-I production anywhere, class=R-Jr",
+   "pool_size": 13,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "CSU Bakersfield",
+   "name": "Taly Acherboim",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 13,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "CSU Bakersfield",
+   "name": "Ema Thompson",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 13,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "CSU Bakersfield",
+   "name": "Josephine Rausch",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 13,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "CSUN",
+   "name": "Suzie Ponce",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Cal St. Fullerton",
+   "name": "Jaiden Mojica",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 17,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Cal St. Fullerton",
+   "name": "Kaieva Christensen",
+   "why": "no D-I production anywhere, class=R-Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Cal St. Fullerton",
+   "name": "Ava Pond",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 17,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "California",
+   "name": "Portia Sherman",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "California Baptist",
+   "name": "Nika Safavi",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "California Baptist",
+   "name": "Maria Contreras",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 16,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "California Baptist",
+   "name": "Jana Cetkovic",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Central Mich.",
+   "name": "Cecilia Bustamante",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 12,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Central Mich.",
+   "name": "Lilly Mullholand",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 12,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Charleston So.",
+   "name": "Braelynn Brewington",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Charleston So.",
+   "name": "Dillia Lowry",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Chattanooga",
+   "name": "Emily Geaquinto",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Chicago St.",
+   "name": "Reece Mazzier",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 11,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Chicago St.",
+   "name": "Nina Mitchell",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 11,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Chicago St.",
+   "name": "Eliza Corvig",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 11,
+   "unclaimed_pool": 9,
+   "near_any": "Eliza Covrig",
+   "near_free": "Eliza Covrig",
+   "ratio": 0.917,
+   "points_2025": 7,
+   "kills_2025": 0,
+   "sets_2025": 52
+  },
+  {
+   "team": "Christian Brothers",
+   "name": "Alexis Goodman",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 19,
+   "unclaimed_pool": 2,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Christian Brothers",
+   "name": "Jamela Glass",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 19,
+   "unclaimed_pool": 2,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Christian Brothers",
+   "name": "Mercy Osayemi",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 19,
+   "unclaimed_pool": 2,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Cincinnati",
+   "name": "Lilian Entenmann",
+   "why": "no D-I production anywhere, class=Junior",
+   "pool_size": 16,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Claflin",
+   "name": "Damia Ellis",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 13,
+   "unclaimed_pool": 0,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Claflin",
+   "name": "MeAuhre Lewis",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 13,
+   "unclaimed_pool": 0,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Clemson",
+   "name": "Bri Washington",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 15,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Clemson",
+   "name": "Lina Merz",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 15,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Col. of Charleston",
+   "name": "Rosa Bren\u010di\u010d",
+   "why": "no D-I production anywhere, class=R-Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Col. of Charleston",
+   "name": "Helena Vukovic",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Col. of Charleston",
+   "name": "Amanda Busk",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Colorado",
+   "name": "Jenna Ylivainio",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 18,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Colorado St.",
+   "name": "Jessica Lawton",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Coppin St.",
+   "name": "Pamela De Jesus Tejedor",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Coppin St.",
+   "name": "Eva Rovello",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Coppin St.",
+   "name": "Rori Gray",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 17,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Cornell",
+   "name": "Avarie Adams",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 18,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Cornell",
+   "name": "Trinidy Tien",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 18,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Dartmouth",
+   "name": "Annika Roberson",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 17,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Dartmouth",
+   "name": "Madalin Hersman",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 17,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Dartmouth",
+   "name": "Audrey Kalorin",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 17,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Dartmouth",
+   "name": "Clementine Tebbe",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 17,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Dartmouth",
+   "name": "Sloan Balsley",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 17,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Dartmouth",
+   "name": "Jaida Cekic",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 17,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Dayton",
+   "name": "Gabriela Machin Borges",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 18,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Dayton",
+   "name": "Addi Gallentine",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 18,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Dayton",
+   "name": "Isabel Simmons",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 18,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "DePaul",
+   "name": "Nora Mannion",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 16,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Delaware",
+   "name": "Avery Brown",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Delaware",
+   "name": "Emily Zgonc",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Delaware",
+   "name": "Auna Wiegand",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Delaware",
+   "name": "Sofia Guerrero-Wilson",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Delaware St.",
+   "name": "Maria Fernanda Cisneros Salas",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 21,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Denver",
+   "name": "RaeAnna Knapp",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 13,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Denver",
+   "name": "Quinlan Jones",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 13,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Denver",
+   "name": "Hailey Goebel",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 13,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Drake",
+   "name": "Shay McMillen",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "East Carolina",
+   "name": "Angeles Alderete",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 15,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "East Carolina",
+   "name": "Kanani Magee",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 15,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "East Carolina",
+   "name": "Lhogan Wright",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 15,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "East Carolina",
+   "name": "Clara Cloninger",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 15,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "East Carolina",
+   "name": "Melanie Pinales",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 15,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "East Carolina",
+   "name": "Jaci Hall",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 15,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "East Carolina",
+   "name": "Brook Watkins",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 15,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Eastern Ill.",
+   "name": "Anna McEwen",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Eastern Ill.",
+   "name": "Abana Teran",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Eastern Mich.",
+   "name": "Kaylin Richter",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 18,
+   "unclaimed_pool": 14,
+   "near_any": "Kaylin Schroeder",
+   "near_free": "Kaylin Schroeder",
+   "ratio": 0.733,
+   "points_2025": 3,
+   "kills_2025": 3,
+   "sets_2025": 9
+  },
+  {
+   "team": "Eastern Mich.",
+   "name": "Bianca Salvador",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 18,
+   "unclaimed_pool": 14,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Eastern Mich.",
+   "name": "Arynn Randle El",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 18,
+   "unclaimed_pool": 14,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Eastern Mich.",
+   "name": "Zaria Ragler",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 18,
+   "unclaimed_pool": 14,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Eastern Wash.",
+   "name": "Stephanie Groswirt",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Eastern Wash.",
+   "name": "Makena Gamby",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Eastern Wash.",
+   "name": "Mia Polloi",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Evansville",
+   "name": "Angelica Gonzalez Maltes",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 17,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "FDU",
+   "name": "Agnes Shakirova",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 18,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "FDU",
+   "name": "Nina Jasiecka",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 18,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "FDU",
+   "name": "Regan Tanner",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 18,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "FDU",
+   "name": "Szonja Csabai",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 18,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "FDU",
+   "name": "Kaylie Jensen",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 18,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "FDU",
+   "name": "Kiah Lopez",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 18,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "FDU",
+   "name": "Jelena Jevtic",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 18,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "FGCU",
+   "name": "Dinara Sabitova",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 19,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "FIU",
+   "name": "Chiara Fabbrini",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 16,
+   "unclaimed_pool": 14,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "FIU",
+   "name": "Mia Gonzalez",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 14,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Fla. Atlantic",
+   "name": "Luye Marquez-Moreno",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 13,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Fla. Atlantic",
+   "name": "Sara Gamboa",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 13,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Fla. Atlantic",
+   "name": "Maya Van Heyst",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 13,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Fla. Atlantic",
+   "name": "Natalie Depaula",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 13,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Fla. Southern",
+   "name": "Nicole Russell",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 13,
+   "unclaimed_pool": 2,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Fla. Southern",
+   "name": "Mallory Baruch",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 13,
+   "unclaimed_pool": 2,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Fla. Southern",
+   "name": "Mariana Silva",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 13,
+   "unclaimed_pool": 2,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Fla. Southern",
+   "name": "Ella Kuosmanen",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 13,
+   "unclaimed_pool": 2,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Florida St.",
+   "name": "Nicole Mauser",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Florida St.",
+   "name": "Ryan Murphy",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Florida St.",
+   "name": "Bailey Higgins",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Fordham",
+   "name": "Mikaela Brennan",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Fordham",
+   "name": "Ana Del Angel Aguilar",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Fresno St.",
+   "name": "Isabel Smart",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Fresno St.",
+   "name": "Aryam Munoz",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Furman",
+   "name": "Rebekah Buchholz",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Georgia",
+   "name": "Ceci Gooch",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 14,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Georgia",
+   "name": "Kate Yoshimoto",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 14,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Georgia St.",
+   "name": "Reagan Elizondo",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 19,
+   "unclaimed_pool": 16,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Grambling",
+   "name": "Bailey Hollis",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Grambling",
+   "name": "Chiara Mearelli",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Grambling",
+   "name": "Piper Nelson",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Grambling",
+   "name": "Jocelyn Pargas",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 17,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Grambling",
+   "name": "Asialin Powell",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Grand Canyon",
+   "name": "Ali Wiest",
+   "why": "no D-I production anywhere, class=R-Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Grand Canyon",
+   "name": "Logan Strong",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Green Bay",
+   "name": "Kendall Schara",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 15,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Hampton",
+   "name": "Ana Luiza Caminha Matos",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Hampton",
+   "name": "Nikola Jaroszewicz",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Hampton",
+   "name": "Belen Ferrufino",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Hampton",
+   "name": "Lyrique Alteus",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Hampton",
+   "name": "Aliyah Millner",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Harvard",
+   "name": "Catlin Shao",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Harvard",
+   "name": "Masina Ogbechie",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Harvard",
+   "name": "Kayla Nwabueze",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Hofstra",
+   "name": "Stella Becker",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Houston",
+   "name": "Olivia Stringer",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Houston",
+   "name": "Lily Barron",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Houston Christian",
+   "name": "Drianyeliz Cora",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Houston Christian",
+   "name": "Ensilina Savelio",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 17,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Howard",
+   "name": "Sydnei Jones",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 15,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Howard",
+   "name": "Dayion Johnson",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Howard",
+   "name": "Reese Watkins",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Idaho",
+   "name": "Alaina Armstrong",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 14,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Idaho",
+   "name": "Lucy Ryan",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 14,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Idaho",
+   "name": "Allie Ferrin",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Idaho",
+   "name": "Anika Hudson",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 14,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Illinois",
+   "name": "Devin Dzienny",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 18,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Illinois",
+   "name": "Kristina Starostenko",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 18,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Illinois St.",
+   "name": "Addisyn Pohl",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 16,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Illinois St.",
+   "name": "Sammi Bunch",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 16,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Indiana",
+   "name": "Izzy Clark",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 18,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Indiana",
+   "name": "Kiki Granberry",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 18,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Indiana St.",
+   "name": "Sydney King",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 17,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Indiana St.",
+   "name": "Kylie Miller",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Jacksonville",
+   "name": "Addison Krieger",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Jacksonville",
+   "name": "Zoey Vandel",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Jacksonville St.",
+   "name": "Lauren Buchanan",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 17,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Jacksonville St.",
+   "name": "Krista Kostoff",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Jacksonville St.",
+   "name": "Chloe Mittelstadt",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "James Madison",
+   "name": "Ella Grace Holloway",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Kansas City",
+   "name": "Ashley Nielsen",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Kansas City",
+   "name": "Coco Buschhorn",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Kennesaw St.",
+   "name": "Hannah Pearce",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "LSU New Orleans ",
+   "name": "Olivia Bartrina",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 18,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "LSU New Orleans ",
+   "name": "Vladana Ristic",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 18,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "LSU New Orleans ",
+   "name": "Nyakuak Lual",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 18,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "LSU New Orleans ",
+   "name": "Karina Barzanova",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 18,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Lafayette",
+   "name": "Paige Chmura",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 12,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Lafayette",
+   "name": "Maria Rawlek",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 12,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Lafayette",
+   "name": "Gracen Nutt",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 12,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Lafayette",
+   "name": "Olivia Brewster",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 12,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Lamar University",
+   "name": "Kiana Souza",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Lamar University",
+   "name": "Kimaya Webb",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "LeMoyne-Owen",
+   "name": "Sukiya Jones",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 12,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "LeMoyne-Owen",
+   "name": "Ca'Driane Martin",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 12,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "LeMoyne-Owen",
+   "name": "Jada Griffin",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 12,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Lee",
+   "name": "Gracie Halminski",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 13,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Lee",
+   "name": "Jessi Reece",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 13,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Lee",
+   "name": "Brynna Sands",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 13,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Lee",
+   "name": "Jolie Brockman",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 13,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Lee",
+   "name": "Kennedy Knight",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 13,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Lehigh",
+   "name": "Lauryn Allen",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Lehigh",
+   "name": "Summer Hodge",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Lehigh",
+   "name": "Makenzie Wingett",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Lehigh",
+   "name": "Lia Henderson",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Lehigh",
+   "name": "Paighton Erb",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Lehigh",
+   "name": "Natalie Unkrich",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Liberty",
+   "name": "VB Trost",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 17,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Liberty",
+   "name": "Melis Ural",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 17,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Lindenwood",
+   "name": "Kaci Johnson",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 5,
+   "near_any": "Emma Johnson",
+   "near_free": null
+  },
+  {
+   "team": "Lindenwood",
+   "name": "Susanna Beretti",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 15,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Lindenwood",
+   "name": "Tori Staples",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Lindenwood",
+   "name": "Anna Kraemer",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 15,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Little Rock",
+   "name": "Lily King",
+   "why": "no D-I production anywhere, class=Senior",
+   "pool_size": 14,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Little Rock",
+   "name": "Lovina Teel",
+   "why": "no D-I production anywhere, class=Junior",
+   "pool_size": 14,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Little Rock",
+   "name": "Polianna Hernandez",
+   "why": "no D-I production anywhere, class=Graduate",
+   "pool_size": 14,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Little Rock",
+   "name": "Alyssa Boyte",
+   "why": "no D-I production anywhere, class=Junior",
+   "pool_size": 14,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Little Rock",
+   "name": "Moe Reese",
+   "why": "no D-I production anywhere, class=Junior",
+   "pool_size": 14,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Little Rock",
+   "name": "Juliana Laguado",
+   "why": "no D-I production anywhere, class=Junior",
+   "pool_size": 14,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Long Beach St.",
+   "name": "Reagan Hope",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Louisiana",
+   "name": "Lolo Lambert",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Louisiana",
+   "name": "Emily Williams",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Louisiana",
+   "name": "Faith Williams",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Loyola Chicago",
+   "name": "Mya Ball",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 15,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Loyola Chicago",
+   "name": "Morgan Jones",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 15,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Manhattan",
+   "name": "Ori Briger",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 12,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Manhattan",
+   "name": "Mikalah Curran",
+   "why": "no D-I production anywhere, class=R-Jr",
+   "pool_size": 12,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Marist",
+   "name": "Kaitlyn Owens",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 18,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Marshall",
+   "name": "Shae Pearson",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 18,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Maryland",
+   "name": "Ellis Crawford",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 14,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Memphis",
+   "name": "Lexi Pendleton",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 17,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Memphis",
+   "name": "Tori Hill",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 17,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Memphis",
+   "name": "Tewa Woodson",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 17,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Memphis",
+   "name": "Lily Hamilton",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Mercyhurst",
+   "name": "Katherine Picozzi",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 21,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Merrimack",
+   "name": "Avry Bryant",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Merrimack",
+   "name": "Maiella Blandin",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Miami (FL)",
+   "name": "Ruth Martinez",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Miami (FL)",
+   "name": "Ella Thompson",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Miami (FL)",
+   "name": "Denitsa Angelova",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Middle Tenn.",
+   "name": "Ava Smith",
+   "why": "ambiguous across 2 teams",
+   "pool_size": 14,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Middle Tenn.",
+   "name": "Kendall Mignerey",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 14,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Middle Tenn.",
+   "name": "Danielle Lee",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Miles",
+   "name": "Neveah Bellamy",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 10,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Miles",
+   "name": "Kennedie Manning",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 10,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Milwaukee",
+   "name": "Braylin Bosetski",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Milwaukee",
+   "name": "Kami Stover",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Minnesota",
+   "name": "Mckenna Wucherer",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 15,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Mississippi Col.",
+   "name": "Isabella Reyes",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 1,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Mississippi Col.",
+   "name": "Mamie Fromdahl",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 1,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Mississippi Col.",
+   "name": "Aubrie Lay",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 14,
+   "unclaimed_pool": 1,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Mississippi St.",
+   "name": "Paloma Routaboul",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Mississippi St.",
+   "name": "Olivia Stant",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Mississippi Val.",
+   "name": "Mikayla Lee",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 16,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Mississippi Val.",
+   "name": "Kameryn Browne",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Missouri St.",
+   "name": "Ashlyn Blazer",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 18,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Missouri St.",
+   "name": "Vicky Antia",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 18,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Missouri Western",
+   "name": "Skylar Walters",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 10,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Missouri Western",
+   "name": "Tanith Roush",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 10,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Missouri Western",
+   "name": "Dakota Hendricks",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 10,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Missouri Western",
+   "name": "Anna Strohmeier",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 10,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Missouri Western",
+   "name": "Mackenzie Peters",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 10,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Missouri Western",
+   "name": "Brooklyn Gormley",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 10,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Montana St.",
+   "name": "Lauren Greeny",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Montevallo",
+   "name": "Lilly Singleton",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 14,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Montevallo",
+   "name": "Abby Nelson",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 14,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Montevallo",
+   "name": "Kate Wilkin",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 5,
+   "near_any": "Katie Wilkerson",
+   "near_free": null
+  },
+  {
+   "team": "Morgan St.",
+   "name": "Azra Arslanoglu",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Morgan St.",
+   "name": "Nathalia Ferreira Morais",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "N.C. A&T",
+   "name": "Agata Zwierzynska",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "N.C. Central",
+   "name": "Shalyn Bell",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 17,
+   "unclaimed_pool": 15,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "N.C. Central",
+   "name": "Talia Emmen",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 15,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "NC State",
+   "name": "Sophie Groom",
+   "why": "no D-I production anywhere, class=R-Sr",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "NIU",
+   "name": "Kiana Shields",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 14,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "NIU",
+   "name": "Charizma Lofton",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Navy",
+   "name": "Kinamoni Jerome",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 18,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Nevada",
+   "name": "Malia Pilimai",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "New Hampshire",
+   "name": "Evelyn Jurden",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 20,
+   "unclaimed_pool": 10,
+   "near_any": "Evelyn Brenton",
+   "near_free": null
+  },
+  {
+   "team": "New Haven",
+   "name": "Lauren Fick",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 20,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "New Haven",
+   "name": "Emma Kamau",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 20,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "New Haven",
+   "name": "Emma Logsdon",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 20,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "New Mexico",
+   "name": "Ella Joesting",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "New Mexico",
+   "name": "Angela Zhang",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "New Mexico",
+   "name": "Campbell Hollister",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "New Mexico",
+   "name": "Viena Moliis",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "New Mexico",
+   "name": "Mina Stanojevic",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "New Mexico",
+   "name": "Adriana Kostadinovic",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "New Mexico",
+   "name": "Aylin Ravell",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "New Mexico St.",
+   "name": "Ashley Herman",
+   "why": "no D-I production anywhere, class=R-Sr",
+   "pool_size": 17,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Niagara",
+   "name": "Sole Rancy",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 18,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Niagara",
+   "name": "Elyannah Renae Sonza",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 18,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Niagara",
+   "name": "Karlotta Kattai",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 18,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Norfolk St.",
+   "name": "Mikayla Middleton",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 17,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Norfolk St.",
+   "name": "Nehir Erimez",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Norfolk St.",
+   "name": "Erin Armstrong",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Norfolk St.",
+   "name": "Kailia Phillips",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Norfolk St.",
+   "name": "Brooklyn Kostoff",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "North Ala.",
+   "name": "Phoebe Reyes Fortunato",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 16,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Northeastern",
+   "name": "Erikah Buff",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 17,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Northern Ariz.",
+   "name": "Taryn Davis",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 13,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Northern Ariz.",
+   "name": "Peyton Devlin",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 13,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Northern Ariz.",
+   "name": "Hannah Pushckor",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 13,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Northern Ariz.",
+   "name": "Quincey Coyle",
+   "why": "no D-I production anywhere, class=R-Sr",
+   "pool_size": 13,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Northern Ky.",
+   "name": "Ashley Sess",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Northern Mich.",
+   "name": "Cece Huizingh",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 12,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Northern Mich.",
+   "name": "KC Fortune",
+   "why": "no D-I production anywhere, class=R-Jr",
+   "pool_size": 12,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Northern Mich.",
+   "name": "Lyvia Misegades",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 12,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Northwestern",
+   "name": "Kaitlyn Bodnar",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 15,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Northwestern",
+   "name": "Clara Schramm",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 15,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Northwestern",
+   "name": "Hayley Schaaf",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 15,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Northwestern",
+   "name": "Ellie Stiernagle",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 15,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Northwestern",
+   "name": "Ava Pratt",
+   "why": "no D-I production anywhere, class=Redshirt Sophomore",
+   "pool_size": 15,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Northwestern",
+   "name": "Maya Stillwell",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 15,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Northwestern",
+   "name": "Simone Huarte",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 15,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Notre Dame",
+   "name": "Angie Desamours",
+   "why": "no D-I production anywhere, class=Sophomore",
+   "pool_size": 16,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Notre Dame",
+   "name": "Sophia Thornburg",
+   "why": "no D-I production anywhere, class=Sophomore",
+   "pool_size": 16,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Notre Dame",
+   "name": "Mia Radeff",
+   "why": "no D-I production anywhere, class=Junior",
+   "pool_size": 16,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Notre Dame",
+   "name": "Ava Lange",
+   "why": "no D-I production anywhere, class=Senior",
+   "pool_size": 16,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Notre Dame",
+   "name": "Kailyn Greene-Gordon",
+   "why": "no D-I production anywhere, class=Junior",
+   "pool_size": 16,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Oakland",
+   "name": "Lillian Frias",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Ohio",
+   "name": "Cienna Lapsley",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 14,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Ohio",
+   "name": "Lacy Marx",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 14,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Ohio St.",
+   "name": "Naomy Govou",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Ohio St.",
+   "name": "Kalli Ravva",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Old Dominion",
+   "name": "Weronika Urbanska",
+   "why": "no D-I production anywhere, class=Junior",
+   "pool_size": 13,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Old Dominion",
+   "name": "Atlyn Proctor",
+   "why": "no D-I production anywhere, class=Junior",
+   "pool_size": 13,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Ole Miss",
+   "name": "Vivianna Samaniego",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Omaha",
+   "name": "Madi Corf",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 15,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Oregon St.",
+   "name": "Taray Tela",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Oregon St.",
+   "name": "Aly Cox",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Pacific",
+   "name": "Gwen Hansen",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Pacific",
+   "name": "Mia Alomia",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Pacific",
+   "name": "Adeline Sirbu",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Pacific",
+   "name": "Elena Hernandez",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Pacific",
+   "name": "Avery LaPlaca",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Palm Beach Atl.",
+   "name": "Simi Kapustova",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 19,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Palm Beach Atl.",
+   "name": "Juliana Imbuzeiro",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 19,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Palm Beach Atl.",
+   "name": "Jess Horn",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 19,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Penn",
+   "name": "Penn Cheer",
+   "why": "no D-I production anywhere, class=Senior",
+   "pool_size": 18,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Penn",
+   "name": "Taylor Roloff",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 18,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Point Loma",
+   "name": "Mariah Hughes",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 10,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Point Loma",
+   "name": "Samantha Claus",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 10,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Point Loma",
+   "name": "Kaitlyn Cabral",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 10,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Point Loma",
+   "name": "Hailey Clark",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 10,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Point Loma",
+   "name": "Adeline Daniel",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 10,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Point Loma",
+   "name": "Finn Higginbotham",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 10,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Providence",
+   "name": "Shea Dupuis",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 14,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Purdue Fort Wayne",
+   "name": "Kennedy McCants",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 12,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Regis (CO)",
+   "name": "Kaylin Polzin",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 11,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Regis (CO)",
+   "name": "Eduarda Silva",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 11,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Regis (CO)",
+   "name": "Callie Parker",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 11,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Regis (CO)",
+   "name": "Nicole Shaver",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 11,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Rhode Island",
+   "name": "KJ Johnson",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 16,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Robert Morris",
+   "name": "Cat Smith",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 13,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Robert Morris",
+   "name": "Addison Fowler",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 13,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Rutgers",
+   "name": "Ema Grubanov",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 15,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "SFA",
+   "name": "Izzy Orton",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "SFA",
+   "name": "Haley Peterson",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "SFA",
+   "name": "Lara Gilardi",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "SIUE",
+   "name": "Karli Mann",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "SIUE",
+   "name": "Jehireh Williams",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "SIUE",
+   "name": "Aubree Hummel",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Sacred Heart",
+   "name": "Kayla Jones",
+   "why": "ambiguous across 2 teams",
+   "pool_size": 14,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Sacred Heart",
+   "name": "Addison Murphy",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Sacred Heart",
+   "name": "Samantha Alberghini",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 14,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Sacred Heart",
+   "name": "Sofia Hechavarria",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 14,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Sacred Heart",
+   "name": "Nicole Jacobs",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 14,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Sacred Heart",
+   "name": "Audrey Schabes",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 14,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Sacred Heart",
+   "name": "Amelia Moro",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 14,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Sacred Heart",
+   "name": "Raissa Antonio",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 14,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Sacred Heart",
+   "name": "Mia Miller",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 14,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Sacred Heart",
+   "name": "Renata Montini",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 14,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Saint Mary's (CA)",
+   "name": "Hadlee Gray",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 17,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Saint Mary's (CA)",
+   "name": "Milani Billings",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 17,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Saint Mary's (CA)",
+   "name": "Amanda Prior",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 17,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Saint Peter's",
+   "name": "Meleksu Ozmen",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 23,
+   "unclaimed_pool": 15,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Saint Peter's",
+   "name": "Markela Tsagkopoulou",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 23,
+   "unclaimed_pool": 15,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Sam Houston",
+   "name": "Lauren Pyle",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 8,
+   "near_any": "Lauren Malone",
+   "near_free": "Lauren Malone",
+   "ratio": 0.75,
+   "points_2025": 201,
+   "kills_2025": 316,
+   "sets_2025": 119
+  },
+  {
+   "team": "Sam Houston",
+   "name": "Annika Brooks",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "San Francisco",
+   "name": "Andjela Sojic",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "San Jose St.",
+   "name": "Zuzana Kos\u00edkov\u00e1",
+   "why": "no D-I production anywhere, class=Graduate",
+   "pool_size": 19,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "San Jose St.",
+   "name": "Ryleeh Tuaolo",
+   "why": "no D-I production anywhere, class=Junior",
+   "pool_size": 19,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "San Jose St.",
+   "name": "Hanna Darvas",
+   "why": "no D-I production anywhere, class=Junior",
+   "pool_size": 19,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "San Jose St.",
+   "name": "Aniyah Hall",
+   "why": "no D-I production anywhere, class=Redshirt Junior",
+   "pool_size": 19,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Santa Clara",
+   "name": "Caitlin Johnson",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 14,
+   "unclaimed_pool": 2,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Santa Clara",
+   "name": "Tristen Lujan",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 14,
+   "unclaimed_pool": 2,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Santa Clara",
+   "name": "Bryn Shankle",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 2,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Seattle Pacific",
+   "name": "Stella Pollack",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Seattle U",
+   "name": "Lexi Jones",
+   "why": "no D-I production anywhere, class=Sophomore",
+   "pool_size": 14,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Seattle U",
+   "name": "Chloee Leslie",
+   "why": "no D-I production anywhere, class=Sophomore",
+   "pool_size": 14,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Seton Hall",
+   "name": "Alondra Villanueva",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 13,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Seton Hall",
+   "name": "Kennedy Horn",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 13,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Seton Hall",
+   "name": "Grace Turner",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 13,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "South Alabama",
+   "name": "Marissa Taix",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 14,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "South Alabama",
+   "name": "Halle Norvell",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 14,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "South Alabama",
+   "name": "Alivia Freeman",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "South Carolina St.",
+   "name": "Lael Valdez",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 17,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "South Dakota St.",
+   "name": "Brooklyn Meyer",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 15,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "South Dakota St.",
+   "name": "Patrycja Labucka",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "South Fla.",
+   "name": "Zeta Washington",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 18,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southern Ill.",
+   "name": "Dafne Sosa",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 12,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southern Ill.",
+   "name": "Carlota Mora",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 12,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southern Ill.",
+   "name": "Beatriz Piaia",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 15,
+   "unclaimed_pool": 12,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southern Ill.",
+   "name": "Ida Almkvist",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 12,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southern Ill.",
+   "name": "Una Stepic",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 12,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southern Ill.",
+   "name": "Valentina Zevallos",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 12,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southern Ill.",
+   "name": "Chloe Anderson",
+   "why": "no D-I production anywhere, class=R-Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 12,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southern Ind.",
+   "name": "Aspen Jankowski",
+   "why": "no D-I production anywhere, class=R-Sr",
+   "pool_size": 15,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southern Miss.",
+   "name": "Ella Ward",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 17,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southern U.",
+   "name": "Braelynn Reese",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 20,
+   "unclaimed_pool": 14,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southern U.",
+   "name": "Penina Vito",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 20,
+   "unclaimed_pool": 14,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southern U.",
+   "name": "Elizabeth Lualemaga",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 20,
+   "unclaimed_pool": 14,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southern U.",
+   "name": "Paulina Agudelo Marin",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 20,
+   "unclaimed_pool": 14,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southern U.",
+   "name": "Reagan Robinson",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 20,
+   "unclaimed_pool": 14,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southern Utah",
+   "name": "Ryen Smith",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southern Utah",
+   "name": "Audrey Atwood",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southern Utah",
+   "name": "Emilia Linden",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southern Utah",
+   "name": "Emilia Zug",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southern Utah",
+   "name": "Ava Tiessen-Roodbol",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southern Utah",
+   "name": "Zorana Stankovska",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southern Utah",
+   "name": "Natalie Moore",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southern Utah",
+   "name": "Kaitlyn Barnes",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southern Utah",
+   "name": "Celeste Uruena Jensen",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southwest Minn. St.",
+   "name": "Mollie Rupp",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 10,
+   "unclaimed_pool": 2,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southwest Minn. St.",
+   "name": "Josie Pundt",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 10,
+   "unclaimed_pool": 2,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southwest Minn. St.",
+   "name": "Maddy Range",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 10,
+   "unclaimed_pool": 2,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Southwest Minn. St.",
+   "name": "Trevyn Smith",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 10,
+   "unclaimed_pool": 2,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Spring Hill",
+   "name": "Kyla Buehner",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 11,
+   "unclaimed_pool": 0,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Spring Hill",
+   "name": "Emily Cook",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 11,
+   "unclaimed_pool": 0,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Spring Hill",
+   "name": "Irelyn Flynn",
+   "why": "no D-I production anywhere, class=R-Jr",
+   "pool_size": 11,
+   "unclaimed_pool": 0,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Spring Hill",
+   "name": "Jennifer Falk",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 11,
+   "unclaimed_pool": 0,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Spring Hill",
+   "name": "Katherine Farris",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 11,
+   "unclaimed_pool": 0,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Spring Hill",
+   "name": "Colleen Engstler",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 11,
+   "unclaimed_pool": 0,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "St. John's (NY)",
+   "name": "Angelica Rodriguez",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 13,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "St. John's (NY)",
+   "name": "Katianna Betancur",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 13,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "St. John's (NY)",
+   "name": "Lejla Hadziredzepovic",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 13,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "St. Thomas (MN)",
+   "name": "Addison Menefee",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 18,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "St. Thomas (MN)",
+   "name": "Miriam Unongo",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 18,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Stetson",
+   "name": "Larissa Hiemer",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Stetson",
+   "name": "Lelia Fitz",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Stonehill",
+   "name": "Kristi Bishop",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "TCU",
+   "name": "Blaykli Bobik",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 18,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Temple",
+   "name": "Steel Sinai",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Temple",
+   "name": "Ope Aladetimi",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Temple",
+   "name": "Sofia Vega Lopez",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Temple",
+   "name": "Makayla Batten",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Tennessee St.",
+   "name": "Mimi Harris",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 18,
+   "unclaimed_pool": 12,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Tennessee St.",
+   "name": "Sydney Robinson",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 18,
+   "unclaimed_pool": 12,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Texas",
+   "name": "Mackenzie Collins",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Texas Tech",
+   "name": "Kayla Robertson",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Texas Tech",
+   "name": "Taylor Cook",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Texas Tech",
+   "name": "Maggie Boyd",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 16,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Toledo",
+   "name": "Maddy Bach",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Trevecca Nazarene",
+   "name": "Megan Ellis",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 13,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Trevecca Nazarene",
+   "name": "Anna Lott",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 13,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Tulane",
+   "name": "Charlee Solomon",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UAB",
+   "name": "Aniya Kennedy",
+   "why": "no D-I production anywhere, class=R-Sr",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UAH",
+   "name": "Brooklyn Stiles",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 15,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UAH",
+   "name": "Elizabeth Bean",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 15,
+   "unclaimed_pool": 4,
+   "near_any": "Elizabeth Rayhle",
+   "near_free": "Elizabeth Rayhle",
+   "ratio": 0.733,
+   "points_2025": 0,
+   "kills_2025": 0,
+   "sets_2025": 1
+  },
+  {
+   "team": "UAlbany",
+   "name": "Mina Benucci",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UAlbany",
+   "name": "Sabrina Kinkaid",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UC Davis",
+   "name": "Reese Diersbock",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 15,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UC Riverside",
+   "name": "Elena Kasavica",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UC Riverside",
+   "name": "Malia Tanksley",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UC Riverside",
+   "name": "Juliette D'Eliseo",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UC Riverside",
+   "name": "Maya Barron",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UC San Diego",
+   "name": "Dillyn Griffin",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 16,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UC Santa Barbara",
+   "name": "Reilly Goueth",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 20,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UC Santa Barbara",
+   "name": "Emery Tubbs",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 20,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UCF",
+   "name": "Emma Cook",
+   "why": "no D-I production anywhere, class=Junior",
+   "pool_size": 14,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UCF",
+   "name": "Chloe Albiez",
+   "why": "no D-I production anywhere, class=Junior",
+   "pool_size": 14,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UConn",
+   "name": "Hazuna Akishige",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UConn",
+   "name": "Olivia Pasternak",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UConn",
+   "name": "Hailey Maes",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UNC Asheville",
+   "name": "Lilia Bannister",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 23,
+   "unclaimed_pool": 17,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UNC Asheville",
+   "name": "Catherine Hubiak",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 23,
+   "unclaimed_pool": 17,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UNC Asheville",
+   "name": "Madi Connelly",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 23,
+   "unclaimed_pool": 17,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UNC Greensboro",
+   "name": "Bloom Princell",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UNCW",
+   "name": "Macon Butler",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UNCW",
+   "name": "Maris Grant",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 15,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UNCW",
+   "name": "Lora Cole",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 15,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UNLV",
+   "name": "Cami Christiansen",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UNLV",
+   "name": "Kamryn Scroggins",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 17,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UT Arlington",
+   "name": "Eliana Collins",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UT Arlington",
+   "name": "Lily Hopkins",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 15,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UT Arlington",
+   "name": "Emilee Sikora",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UT Arlington",
+   "name": "Milica Peci",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UT Arlington",
+   "name": "Karisa Martin",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 9,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UT Martin",
+   "name": "Lauren Mariscal",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UT Martin",
+   "name": "Riley Rushing",
+   "why": "no D-I production anywhere, class=R-Sr",
+   "pool_size": 14,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UT Martin",
+   "name": "Mari Haas",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UTEP",
+   "name": "Lily-Rose Pichon",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 16,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UTEP",
+   "name": "Ema Uskokovic",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 16,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UTEP",
+   "name": "Mackenzi Davis",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 8,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UTRGV",
+   "name": "Jasmine Allen",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 16,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UTSA",
+   "name": "Raegan Ramirez",
+   "why": "no D-I production anywhere, class=Sophomore",
+   "pool_size": 15,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "UTSA",
+   "name": "Bailey Lechler",
+   "why": "no D-I production anywhere, class=Junior",
+   "pool_size": 15,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Union (TN)",
+   "name": "Isabella Messer",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 13,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Union (TN)",
+   "name": "Anna Edwards",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 13,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Union (TN)",
+   "name": "Carly Edwards",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 13,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Utah",
+   "name": "Levani Falatea",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Utah",
+   "name": "DyBorrah Johnson",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Utah",
+   "name": "Isabella Mogridge",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Utah",
+   "name": "Olga Musial",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Utah",
+   "name": "Briar Rose",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Utah",
+   "name": "Ashley West",
+   "why": "no D-I production anywhere, class=R-Sr",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Utah Tech",
+   "name": "Cass Klapp",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Utah Tech",
+   "name": "Annalyse Shimada",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Utah Tech",
+   "name": "Shaylee Dahle",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Utah Tech",
+   "name": "Cale Torgerson",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Utah Tech",
+   "name": "Mia Lundberg",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Utah Valley",
+   "name": "Alyvia Watkins",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Utah Valley",
+   "name": "Kambri Kuhni",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Utah Valley",
+   "name": "Lani Toutai",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 16,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Utah Valley",
+   "name": "Evalyn Medaris",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 16,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Utah Valley",
+   "name": "Myka Christensen",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "VCU",
+   "name": "Gabby LaPata",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "VCU",
+   "name": "Akire Jones",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Valdosta St.",
+   "name": "Maddie Goodwin",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Valdosta St.",
+   "name": "Kinsley Timmons",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 14,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Valdosta St.",
+   "name": "Paola Aviles Morales",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Valdosta St.",
+   "name": "Camryn Childers",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Valdosta St.",
+   "name": "Kaylie McKinney",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 14,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Virginia Tech",
+   "name": "Frances Torres-Esperanza",
+   "why": "no D-I production anywhere, class=Senior",
+   "pool_size": 16,
+   "unclaimed_pool": 16,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Virginia Tech",
+   "name": "Sara Gasparini",
+   "why": "no D-I production anywhere, class=Redshirt Junior",
+   "pool_size": 16,
+   "unclaimed_pool": 16,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Washington St.",
+   "name": "Julia Dickeson",
+   "why": "no D-I production anywhere, class=Senior",
+   "pool_size": 16,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Washington St.",
+   "name": "Kryssa Moerman",
+   "why": "no D-I production anywhere, class=Senior",
+   "pool_size": 16,
+   "unclaimed_pool": 11,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Weber St.",
+   "name": "Tennille Gonder",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 14,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Weber St.",
+   "name": "Hailee Garcia",
+   "why": "no D-I production anywhere, class=R-Sr",
+   "pool_size": 14,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "West Ala.",
+   "name": "Mia McGuire",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 12,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "West Ala.",
+   "name": "Ola Winiarek",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 12,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "West Ala.",
+   "name": "Gracie Huver",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 12,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "West Florida",
+   "name": "Karyna Werley",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 19,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "West Florida",
+   "name": "Talya Sampson",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 19,
+   "unclaimed_pool": 13,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "West Virginia",
+   "name": "Sophia Fallah",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 14,
+   "unclaimed_pool": 7,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Western Caro.",
+   "name": "Danielle Wheat",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Western Caro.",
+   "name": "Sophia Marini",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Western Ill.",
+   "name": "Georgia Haynes",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Western Ill.",
+   "name": "Drew Bridges",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Western Ill.",
+   "name": "Maria Eduarda Pereira Tonella",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Western Ill.",
+   "name": "Jacque Adair",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 5,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Western Ky.",
+   "name": "Harlie Bryant",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 14,
+   "unclaimed_pool": 4,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Wheeling",
+   "name": "Jade Jasenovsky",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Wheeling",
+   "name": "Brooklyn Brennan",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Wheeling",
+   "name": "Autumn King",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 15,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Wheeling",
+   "name": "Lainey Simmons",
+   "why": "no D-I production anywhere, class=R-So",
+   "pool_size": 15,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Wheeling",
+   "name": "Emma Manser",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 15,
+   "unclaimed_pool": 3,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Wichita St.",
+   "name": "Aliah Snider",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Wichita St.",
+   "name": "Niya Lewis",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Wichita St.",
+   "name": "Eva Krakowski",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Wichita St.",
+   "name": "Alex Watts",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 17,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Winthrop",
+   "name": "Makenzie Malloy",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Winthrop",
+   "name": "Cami Roberts",
+   "why": "no D-I production anywhere, class=So",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Wright St.",
+   "name": "Haidyn Sokoloski",
+   "why": "no D-I production anywhere, class=Gr",
+   "pool_size": 18,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Yale",
+   "name": "Jaidynn Perkins-Martin",
+   "why": "no D-I production anywhere, class=Sr",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Yale",
+   "name": "Kalyssa Taggart",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Yale",
+   "name": "Callie Funk",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Yale",
+   "name": "Skylar Jackson",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Yale",
+   "name": "Caroline Huseman",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Yale",
+   "name": "Cara Lehmitz",
+   "why": "no D-I production anywhere, class=?",
+   "pool_size": 16,
+   "unclaimed_pool": 6,
+   "near_any": null,
+   "near_free": null
+  },
+  {
+   "team": "Youngstown St.",
+   "name": "Teagan Ng",
+   "why": "no D-I production anywhere, class=Jr",
+   "pool_size": 16,
+   "unclaimed_pool": 10,
+   "near_any": null,
+   "near_free": null
+  }
+ ]
+}

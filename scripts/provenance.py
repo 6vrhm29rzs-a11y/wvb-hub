@@ -69,9 +69,25 @@ MANIFEST = {
                    "DERIVED", "yes - resume column"),
     "lowconf":    ("Thin-sample flag (<10 D-I matches)", "derived", "DERIVED",
                    "yes - row dimmed, marker, tooltip"),
-    "ret2026":    ("Returning production, graduation only", "data/vb_players_2025.json, "
-                   "40-team coverage", "OFFICIAL (partial coverage)",
-                   "yes - banner states 'Coverage: N of 348'"),
+    "ret2026":    ("Returning production. Roster-based where returning_method "
+                   "== 'roster' (2026 rosters x 2025 production, 308 of 348); "
+                   "graduation-only on the legacy 40-team path",
+                   "data/returning_2026.json (join of school rosters x ncaa.com "
+                   "box scores); legacy: data/vb_players_2025.json",
+                   "DERIVED from two OFFICIAL sources",
+                   "yes - banner states 'Coverage: N of 348' and names the method"),
+    "returning_method": ("Which question the Returning % answers: 'roster' "
+                         "(on the published 2026 roster) or class-year "
+                         "graduation. Selects the method sentence on the page "
+                         "so the number and its label cannot drift apart",
+                         "set by scripts/build_vb.py from which join was used",
+                         "DERIVED", "yes - it IS the disclosure"),
+    "unres2026": ("Roster players whose 2025 production could not be matched. "
+                  "Their production is not attributed, so the team's share is "
+                  "conservative rather than inflated",
+                  "data/returning_2026.json unresolved list; audited by "
+                  "scripts/audit_unresolved.py (defect rate 0.09%)",
+                  "DERIVED", "yes - method note states unmatched are excluded"),
     "ret2026net": ("Returning production net of transfers", "vb_transfers_2026.json, "
                    "a NON-OFFICIAL tracker dated 2026-08-09", "THIRD-PARTY",
                    "yes - orange banner names the tracker and its date"),

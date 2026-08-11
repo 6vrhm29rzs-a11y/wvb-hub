@@ -158,6 +158,15 @@ def parse_roster(html):
                    "player bio", "full profile") or \
            low.startswith(("view ", "full bio", "read ")) or "bio" == low.split()[-1]:
             continue
+        # SAME BUG CLASS, different template: WMT wraps the headshot in its own
+        # anchor whose text is "<Player Name> Photo". That is not a "Full Bio"
+        # string so the list above misses it, and because the dedup below keyed
+        # on the exact string, each player survived TWICE -- once clean, once
+        # with the trailing token. Miami (FL) shipped 30 "players" for a
+        # 15-player roster and every Photo copy landed in UNRESOLVED. Strip the
+        # media token rather than dropping the anchor: on some templates the
+        # headshot link is the ONLY anchor a player has.
+        name = re.sub(r"\s+(photo|headshot|image|picture)$", "", name, flags=re.I)
         # Look BOTH sides: some templates put the class before the name (table
         # rows), others after (cards).
         window = html[m.end():m.end() + 1800]
@@ -183,7 +192,9 @@ def parse_roster(html):
     # de-duplicate: cards and table rows both link the same player
     seen, out = set(), []
     for p in players:
-        k = (p["name_raw"] or "").lower()
+        # normalise the key: an exact-string key let "Avery Bain Photo" and
+        # "Avery Bain" both through as separate people.
+        k = re.sub(r"[^a-z]", "", (p["name_raw"] or "").lower())
         if k in seen:
             continue
         seen.add(k)

@@ -872,9 +872,18 @@ function render2026Rankings(){
       `<div class="rcol"><h5 class="rd">Departing · ${dep.length}</h5>${dep.map(plLine).join('')||'<div class="pl muted">none</div>'}</div>`];
     if(hasX) cols.push(`<div class="rcol"><h5 class="ri">Incoming transfers · ${xin.length}</h5>${xin.map(inLine).join('')||'<div class="pl muted">none tracked</div>'}</div>`);
     return `<div class="rosterwrap${hasX?' three':''}">${cols.join('')}</div>`;};
+  // METHOD-AWARE WORDING. `roster` means departure was read off the school's
+  // published 2026 roster; the older path inferred it from class year. Same
+  // column, different question -- describing one as the other is the R4 bug
+  // (a correct number under a heading that makes it wrong), so the sentence is
+  // selected by the method that actually produced the figure, never hardcoded.
+  const rmethod=(typeof MODEL!=='undefined'&&MODEL.returning_method)||'class';
+  const byRoster=rmethod==='roster';
   const banner=anyReal
     ? `<b>2026 — Returning Production.</b> Share of each team's 2025 per-set output (Pts/Set = kills + aces + blocks) coming back, from <b>official 2025 player stats</b> (stats.ncaa.org). <b>Coverage: ${rows.filter(r=>r.real).length} of ${rows.length} teams</b> have player data; the rest show <b>—</b>, not an estimate.`
-      + (anyXfer
+      + (byRoster
+          ? ` Returning = the player is on the school's <b>published 2026 roster</b>; departing = produced in 2025 and is not. That captures graduation, transfers out and early exits <b>together</b>, without inferring any of them from class year.`
+        : anyXfer
           ? ` Graduation <b>plus transfer-portal moves</b> from a <span class="illus" title="non-official portal tracker">non-official tracker</span>${tasof?' ('+tasof+')':''} — Returning % is <b>net of transfers out</b>; incoming shown separately.`
           : ` Graduation-based (Sr/Gr depart); <b>transfers not yet included</b>.`)
       + `${rows.some(r=>r.roster)?' <b>Click any team</b> for its roster'+(anyXfer?' + transfers.':'.'):''}`
@@ -897,7 +906,7 @@ function render2026Rankings(){
           <td class="num tnum">${r.proj!=null?r.proj.toFixed(2):'—'}</td>
           <td><span class="pill" style="color:${oc};border-color:${oc}">${ol}</span></td></tr>${canX?`<tr class="rdet" style="display:none"><td colspan="5">${rosterHtml(r)}</td></tr>`:''}`;}).join('')}
       </tbody></table></div></div>
-    <p class="rpnote"><b>Method.</b> Returning % = (2025 points by players still on the roster) ÷ (team's 2025 points), points = kills + aces + block credit. Departing = class Sr/Gr ${anyXfer?'or entered the transfer portal':''}. Player stats: official <a href="${stats}" target="_blank" rel="noopener">stats.ncaa.org</a>.${anyXfer?` <b>Transfers:</b> non-official tracker${(typeof MODEL!=='undefined'&&MODEL.transfers_source)?' — '+MODEL.transfers_source:''}${tasof?' ('+tasof+')':''}; incoming shown with prior-school points where the old team is in this set. Signees (HS recruits) not counted. Portal data is incomplete — verify/edit as needed.`:` <b>Transfers not yet included.</b>`}</p>`;
+    <p class="rpnote"><b>Method.</b> Returning % = (2025 points by players still on the roster) ÷ (team's 2025 points), points = kills + aces + block credit, computed from raw counts. ${byRoster?`Departing = produced in 2025 and is <b>not on the published 2026 roster</b>. Names are matched within a team only; a player whose name cannot be matched with confidence is <b>left out of the numerator</b> rather than guessed at, so a team's figure is conservative, never inflated.`:`Departing = class Sr/Gr ${anyXfer?'or entered the transfer portal':''}.`} Player stats: official <a href="${stats}" target="_blank" rel="noopener">stats.ncaa.org</a>.${anyXfer?` <b>Transfers:</b> non-official tracker${(typeof MODEL!=='undefined'&&MODEL.transfers_source)?' — '+MODEL.transfers_source:''}${tasof?' ('+tasof+')':''}; incoming shown with prior-school points where the old team is in this set. Signees (HS recruits) not counted. Portal data is incomplete — verify/edit as needed.`:` <b>Transfers not yet included.</b>`}</p>`;
   host.querySelectorAll('[data-tip]').forEach(el=>bindTip(el,el.getAttribute('data-tip')));
   host.querySelectorAll('tr.rrow').forEach(tr=>tr.addEventListener('click',()=>{
     const d=tr.nextElementSibling; if(d&&d.classList.contains('rdet')){d.style.display=d.style.display==='none'?'':'none'; tr.classList.toggle('open');}
