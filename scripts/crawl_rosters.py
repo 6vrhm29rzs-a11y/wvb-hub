@@ -139,13 +139,24 @@ def parse_roster(html):
         href, inner = m.group(1), m.group(2)
         if re.search(r"/roster/?$", href):
             continue                      # the roster index itself, not a player
+        # COACHING STAFF are linked from the same roster page and pick up a
+        # neighbouring player's class token, which made six Nebraska staff --
+        # including a male name on a women's roster -- look like seniors.
+        # Tightening the class window instead broke three other templates, so
+        # discriminate STRUCTURALLY: staff live under a different path.
+        #   player: /roster/player/harper-murray
+        #   staff:  /roster/season/2026/staff/nate-wilson
+        if re.search(r"/(staff|coach|coaches|administration|support-staff)/", href, re.I):
+            continue
         name = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", inner)).strip()
         if not NAME.match(name):
             continue
         # "Full Bio" / "View Profile" links sit inside the same card and match
         # the two-capitalised-words shape.
-        if name.lower() in ("full bio", "view profile", "view bio", "read more",
-                            "player bio", "full profile"):
+        low = name.lower()
+        if low in ("full bio", "view profile", "view bio", "read more",
+                   "player bio", "full profile") or \
+           low.startswith(("view ", "full bio", "read ")) or "bio" == low.split()[-1]:
             continue
         # Look BOTH sides: some templates put the class before the name (table
         # rows), others after (cards).

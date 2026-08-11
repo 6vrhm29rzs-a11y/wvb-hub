@@ -45,6 +45,20 @@ def strip_accents(s):
                    if not unicodedata.combining(c))
 
 
+def fullkey(first, last):
+    """All name parts, normalised and concatenated -- split-position agnostic.
+
+    Two sources can split a three-part name differently: a roster renders
+    "Anna Claire Brown" as first="Anna" last="Claire Brown", while the boxscore
+    feed has first="Anna Claire" last="Brown". Keying on the whole name matches
+    regardless of where either source put the boundary. This was a real miss --
+    an exact same-team match that the first/last key could not see.
+    """
+    whole = strip_accents(("%s %s" % (first or "", last or "")).lower())
+    whole = SUFFIX.sub("", whole).strip()
+    return re.sub(r"[^a-z]", "", whole)
+
+
 def nkey(first, last):
     """Narrow normalisation: accents, case, punctuation, suffixes."""
     f = strip_accents((first or "").lower())
@@ -94,10 +108,11 @@ def main():
             continue
 
         # index production by exact and normalised keys
-        exact, loose = {}, {}
+        exact, loose, whole = {}, {}, {}
         for p in pool:
             exact[((p.get("first") or "").strip(), (p.get("last") or "").strip())] = p
             loose.setdefault(nkey(p.get("first"), p.get("last")), []).append(p)
+            whole.setdefault(fullkey(p.get("first"), p.get("last")), []).append(p)
 
         matched_ids, returning, new, unresolved, loose_hits = set(), [], [], [], []
         transfers = []
@@ -113,6 +128,14 @@ def main():
                     unresolved.append((r.get("name_raw"), "ambiguous: %d candidates"
                                        % len(cands)))
                     continue
+                if hit is None:
+                    wc = whole.get(fullkey(f, l), [])
+                    if len(wc) == 1:
+                        hit, how = wc[0], "whole-name"
+                    elif len(wc) > 1:
+                        unresolved.append((r.get("name_raw"),
+                                           "ambiguous on whole name: %d" % len(wc)))
+                        continue
             if hit is None:
                 # genuinely absent from 2025 production: could be a true
                 # freshman/transfer (expected) OR a name we failed to resolve.
@@ -146,7 +169,7 @@ def main():
                               "how": how,
                               "kills": hit.get("kills"), "points": hit.get("points"),
                               "sets": hit.get("sets")})
-            if how == "normalised":
+            if how in ("normalised", "whole-name"):
                 loose_hits.append((r.get("name_raw"),
                                    "%s %s" % (hit.get("first"), hit.get("last"))))
 

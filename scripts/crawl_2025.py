@@ -14,8 +14,10 @@ Phases:
 Python 3.9 target: no PEP 604 unions, no builtin generics in annotations.
 """
 
+import collections
 import json
 import os
+import re
 import sys
 import time
 import datetime
@@ -498,13 +500,31 @@ def crawl_players():
             print("players: %d FAILED" % len(failures))
 
     # ---- aggregate to per-player season totals ----
+    # AGGREGATE ON A CASE- AND PUNCTUATION-INSENSITIVE WHOLE NAME.
+    # The feed spells the same player differently between games -- "LeeAnne
+    # Lowery" vs "Leeanne Lowery", "Peyton DeJardin" vs "Peyton Dejardin". A
+    # case-sensitive key split 360 players (6%) into two rows each and stranded
+    # 11,568 kills in orphaned partials, understating those players' seasons.
+    # Found because the roster join reported an "ambiguous" match on a player
+    # who appeared twice under one team.
+    import unicodedata as _ud
+
+    def _canon(first, last):
+        w = "%s %s" % (first or "", last or "")
+        w = "".join(c for c in _ud.normalize("NFKD", w.lower())
+                    if not _ud.combining(c))
+        return re.sub(r"[^a-z]", "", w)
+
     agg = {}
+    seen_names = {}
     ngames = 0
     for rec in load_records_jsonl(PLAYERBOX_JSONL, key="game_id").values():
         ngames += 1
         for r in rec.get("rows") or []:
-            key = (r["team_id"], (r.get("last") or "").strip(),
-                   (r.get("first") or "").strip())
+            key = (r["team_id"], _canon(r.get("first"), r.get("last")))
+            # keep the most frequently served spelling as the display name
+            nm = ((r.get("first") or "").strip(), (r.get("last") or "").strip())
+            seen_names.setdefault(key, collections.Counter())[nm] += 1
             e = agg.setdefault(key, {
                 "team_id": r["team_id"], "first": r.get("first"),
                 "last": r.get("last"), "num": r.get("num"), "pos": r.get("pos"),
@@ -522,12 +542,21 @@ def crawl_players():
                 except (TypeError, ValueError):
                     pass
 
+    for key, e in agg.items():
+        best = seen_names.get(key)
+        if best:
+            f, l = best.most_common(1)[0][0]
+            e["first"], e["last"] = f, l
+
     out = {
         "meta": {
             "season": SEASON, "source_tier": "OFFICIAL",
             "source": "ncaa-api /game/{id}/boxscore playerStats, aggregated",
             "games_aggregated": ngames,
             "players": len(agg),
+            "name_merge": "aggregated on a case/punctuation-insensitive whole "
+                          "name; the feed spells players inconsistently between "
+                          "games. Display name is the most frequent spelling.",
             "note": "Names stored exactly as served; no normalisation at ingest. "
                     "Per-game rows are NOT committed -- /boxscore is ID-addressed "
                     "and re-crawlable (verified against a 2024 game).",
