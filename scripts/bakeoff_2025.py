@@ -152,6 +152,23 @@ def load():
 
 # ------------------------------------------------------- opponent adjustment
 
+_SITE_CACHE = {}
+
+
+def _site_factor(game_id):
+    """1 for a normal match, 0 when the floor was neutral."""
+    if not _SITE_CACHE:
+        path = os.path.join(REPO, "data", "venues_%d.json" % SEASON)
+        _SITE_CACHE["_"] = {}
+        if os.path.exists(path):
+            try:
+                v = json.load(open(path))
+                _SITE_CACHE["_"] = {r["game_id"]: r["site"] for r in v.get("games", [])}
+            except ValueError:
+                pass
+    return 0 if _SITE_CACHE["_"].get(str(game_id)) == "neutral" else 1
+
+
 def fit_off_def(obs, keys):
     # type: (List[Tuple[str,str,float,int]], List[str]) -> Dict[str, Dict[str,float]]
     """Ridge least squares  y(i vs j) ~ mu + off_i - def_j + h*home_sign.
@@ -250,7 +267,15 @@ def build_metrics(fit_matches, di):
             e["pf"] += me["points_for"]
             e["pa"] += me["points_against"]
             e["sets"] += me["sets"]
-            sign = 1 if me["is_home"] else -1
+            # NEUTRAL FLOORS GET NO HOME TERM. `sign` feeds the home-advantage
+            # coefficient in fit_off_def; on a neutral court there is no home
+            # advantage to attribute, and crediting one is a silent systematic
+            # error. scripts/venues.py decides this from the venue itself and
+            # abstains when it cannot tell -- an unclassified match keeps the
+            # ordinary sign, which is right the overwhelming majority of the
+            # time. The 2026 season opened on a neutral floor (both AVCA First
+            # Serve matches at Fiserv Forum), so this is not a rare case.
+            sign = (1 if me["is_home"] else -1) * _site_factor(m["game_id"])
             if me["sets"]:
                 obs_pts.append((me["key"], opp["key"],
                                 me["points_for"] / float(me["sets"]), sign))

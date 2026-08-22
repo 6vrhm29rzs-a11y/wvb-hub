@@ -58,6 +58,13 @@ jobs:
           python3 scripts/crawl_2025.py schedule
           python3 scripts/crawl_2025.py games
           python3 scripts/crawl_2025.py boxscores
+          # Per-player lines, taken DAILY while the season runs. The 2024
+          # backfill proved these are not reliably re-crawlable in bulk -- the
+          # API started hanging after ~10k requests and left that season at 43%
+          # -- so the live season's rows are collected as they happen and
+          # committed. They cost a few kB a match and they are what availability
+          # and next season's returning production are built from.
+          python3 scripts/crawl_2025.py players
           python3 scripts/crawl_2025.py stats || echo "stats unavailable this early in the season; continuing"
 
       # A FAILED RUN MUST NOT OVERWRITE GOOD DATA WITH PARTIAL DATA.
@@ -77,6 +84,20 @@ jobs:
 
       - name: Rebuild derived outputs
         run: |
+          # Classify each match's floor BEFORE anything rates it -- the rating
+          # solves for a home-advantage term and must not credit one on a
+          # neutral court. Cheap, and it self-populates as the season runs.
+          python3 scripts/venues.py
+          # Who did not take the floor. Cheap, and it needs the player lines
+          # collected earlier in this same run.
+          python3 scripts/availability.py
+          # Win probability for everything still to be played. Depends on
+          # venues.py above -- a neutral floor gets no home advantage.
+          python3 scripts/predict_2026.py || echo "prediction needs a prior rating; skipping"
+          python3 scripts/simulate_season_2026.py || echo "season sim needs predictions; skipping"
+          # Score yesterday's predictions against what happened. Runs AFTER the
+          # crawl so the results are in, and reads only the pre-match log.
+          python3 scripts/score_predictions.py || true
           python3 scripts/build_dataset.py
           python3 scripts/rpi_2025.py || echo "RPI needs a game graph; skipping this early"
           python3 scripts/rating_2025.py
@@ -87,8 +108,20 @@ jobs:
       # failure mode that shipped a "-14.31 points per set" to the live page
       # while every other check was green. Blocking: a mislabelled dashboard is
       # worse than a stale one, because it looks authoritative.
-      - name: Display invariants
-        run: python3 scripts/test_display_invariants.py
+      # EVERY GUARD THAT CAN RUN HERE, RUNS HERE. Four suites were written and
+      # then enforced only on my laptop, which makes them documentation rather
+      # than guards -- the daily run would stay green while any of them broke.
+      # test_projection needs a derived artifact that is deliberately not
+      # committed, so it skips itself on a fresh checkout and still enforces
+      # locally.
+      - name: Invariant guards
+        run: |
+          python3 scripts/test_display_invariants.py
+          python3 scripts/test_roster_parser.py
+          python3 scripts/test_venues.py
+          python3 scripts/test_join_invariants.py
+          python3 scripts/test_projection.py
+          python3 scripts/test_score_predictions.py
 
       # Coverage gate: a NEW displayed field with no declared provenance fails
       # the run. It cannot catch a client-side expression inventing a value for

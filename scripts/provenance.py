@@ -120,6 +120,12 @@ CITATIONS = {
 # non-numeric / structural keys that need no provenance entry
 STRUCTURAL = {"fitted", "asof", "sos_weight", "weights", "teams", "logos",
               "generated_at", "data_through", "matches_in_data",
+              # season_opens sits with generated_at/data_through by the same
+              # rule: it describes the BUILD (which season this page covers and
+              # when that season starts), not a measured property of any team.
+              # Like those two it is read straight off the crawl and shown only
+              # in the freshness banner.
+              "season_opens",
               "transfers_asof", "official_source"}
 
 

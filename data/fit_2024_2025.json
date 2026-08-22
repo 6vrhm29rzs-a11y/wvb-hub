@@ -1,0 +1,282 @@
+{
+ "meta": {
+  "source_tier": "DERIVED",
+  "target": "2025 fitted composite (outcome), NOT any poll",
+  "min_sets": 20,
+  "seed": 20260818,
+  "caveat_aggregate": "roster membership for 2025 is stood in for by who actually played in 2025, because no 2025 published roster is held; the aggregate accuracy is therefore an upper bound",
+  "caveat_membership": "D-I membership uses the official 2025 RPI table for both seasons; for 2024 that is an approximation"
+ },
+ "transfer_experiment": {
+  "movers": {
+   "n": 369,
+   "slope": -0.5295348609304205,
+   "intercept": 0.6345518875383217,
+   "ci95": [
+    -0.6330799122763701,
+    -0.43339360339827376
+   ],
+   "mean_d_rate": 0.6385814509755918
+  },
+  "stayers": {
+   "n": 1692,
+   "slope": -0.19274578707478723,
+   "intercept": 0.5738341374143576,
+   "ci95": [
+    -0.2804548181485432,
+    -0.10734293660495484
+   ],
+   "mean_d_rate": 0.567253189172081
+  },
+  "n_movers": 369,
+  "n_stayers": 1692
+ },
+ "new_player_share_median": 0.5382978723404256,
+ "grid": [
+  {
+   "rotation": 5,
+   "alpha": 0.0,
+   "rho": 0.3136
+  },
+  {
+   "rotation": 5,
+   "alpha": 0.25,
+   "rho": 0.4735
+  },
+  {
+   "rotation": 5,
+   "alpha": 0.5,
+   "rho": 0.5727
+  },
+  {
+   "rotation": 5,
+   "alpha": 0.75,
+   "rho": 0.6359
+  },
+  {
+   "rotation": 5,
+   "alpha": 1.0,
+   "rho": 0.6833
+  },
+  {
+   "rotation": 5,
+   "alpha": 1.25,
+   "rho": 0.7246
+  },
+  {
+   "rotation": 5,
+   "alpha": 1.5,
+   "rho": 0.7486
+  },
+  {
+   "rotation": 5,
+   "alpha": 1.75,
+   "rho": 0.7641
+  },
+  {
+   "rotation": 5,
+   "alpha": 2.0,
+   "rho": 0.7756
+  },
+  {
+   "rotation": 5,
+   "alpha": 2.5,
+   "rho": 0.7946
+  },
+  {
+   "rotation": 5,
+   "alpha": 3.0,
+   "rho": 0.8073
+  },
+  {
+   "rotation": 5,
+   "alpha": 4.0,
+   "rho": 0.8118
+  },
+  {
+   "rotation": 6,
+   "alpha": 0.0,
+   "rho": 0.3119
+  },
+  {
+   "rotation": 6,
+   "alpha": 0.25,
+   "rho": 0.4695
+  },
+  {
+   "rotation": 6,
+   "alpha": 0.5,
+   "rho": 0.5719
+  },
+  {
+   "rotation": 6,
+   "alpha": 0.75,
+   "rho": 0.6328
+  },
+  {
+   "rotation": 6,
+   "alpha": 1.0,
+   "rho": 0.6791
+  },
+  {
+   "rotation": 6,
+   "alpha": 1.25,
+   "rho": 0.7219
+  },
+  {
+   "rotation": 6,
+   "alpha": 1.5,
+   "rho": 0.7462
+  },
+  {
+   "rotation": 6,
+   "alpha": 1.75,
+   "rho": 0.7616
+  },
+  {
+   "rotation": 6,
+   "alpha": 2.0,
+   "rho": 0.7743
+  },
+  {
+   "rotation": 6,
+   "alpha": 2.5,
+   "rho": 0.793
+  },
+  {
+   "rotation": 6,
+   "alpha": 3.0,
+   "rho": 0.8072
+  },
+  {
+   "rotation": 6,
+   "alpha": 4.0,
+   "rho": 0.8115
+  },
+  {
+   "rotation": 7,
+   "alpha": 0.0,
+   "rho": 0.3115
+  },
+  {
+   "rotation": 7,
+   "alpha": 0.25,
+   "rho": 0.4646
+  },
+  {
+   "rotation": 7,
+   "alpha": 0.5,
+   "rho": 0.5699
+  },
+  {
+   "rotation": 7,
+   "alpha": 0.75,
+   "rho": 0.6314
+  },
+  {
+   "rotation": 7,
+   "alpha": 1.0,
+   "rho": 0.6788
+  },
+  {
+   "rotation": 7,
+   "alpha": 1.25,
+   "rho": 0.7207
+  },
+  {
+   "rotation": 7,
+   "alpha": 1.5,
+   "rho": 0.7451
+  },
+  {
+   "rotation": 7,
+   "alpha": 1.75,
+   "rho": 0.7613
+  },
+  {
+   "rotation": 7,
+   "alpha": 2.0,
+   "rho": 0.7745
+  },
+  {
+   "rotation": 7,
+   "alpha": 2.5,
+   "rho": 0.7923
+  },
+  {
+   "rotation": 7,
+   "alpha": 3.0,
+   "rho": 0.8065
+  },
+  {
+   "rotation": 7,
+   "alpha": 4.0,
+   "rho": 0.8117
+  },
+  {
+   "rotation": 8,
+   "alpha": 0.0,
+   "rho": 0.3098
+  },
+  {
+   "rotation": 8,
+   "alpha": 0.25,
+   "rho": 0.4623
+  },
+  {
+   "rotation": 8,
+   "alpha": 0.5,
+   "rho": 0.5691
+  },
+  {
+   "rotation": 8,
+   "alpha": 0.75,
+   "rho": 0.6313
+  },
+  {
+   "rotation": 8,
+   "alpha": 1.0,
+   "rho": 0.6775
+  },
+  {
+   "rotation": 8,
+   "alpha": 1.25,
+   "rho": 0.7202
+  },
+  {
+   "rotation": 8,
+   "alpha": 1.5,
+   "rho": 0.7456
+  },
+  {
+   "rotation": 8,
+   "alpha": 1.75,
+   "rho": 0.7612
+  },
+  {
+   "rotation": 8,
+   "alpha": 2.0,
+   "rho": 0.7739
+  },
+  {
+   "rotation": 8,
+   "alpha": 2.5,
+   "rho": 0.7922
+  },
+  {
+   "rotation": 8,
+   "alpha": 3.0,
+   "rho": 0.8064
+  },
+  {
+   "rotation": 8,
+   "alpha": 4.0,
+   "rho": 0.8119
+  }
+ ],
+ "best": {
+  "rotation": 8,
+  "alpha": 4.0,
+  "rho": 0.8118973863833595
+ }
+}

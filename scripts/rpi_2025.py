@@ -227,7 +227,15 @@ def compute():
     rows.sort(key=lambda r: -r["rpi"])
     for i, r in enumerate(rows, 1):
         r["derived_rank"] = i
-        r["delta"] = r["official_rank"] - r["derived_rank"]
+        # delta is meaningless without an official table to compare against, and
+        # a season only gets one once the NCAA publishes it -- the rankings
+        # endpoint is current-only. This used to subtract an int from None and
+        # crash the whole RPI build, every morning of a young season, hidden
+        # behind the workflow's `|| echo`. A season with no official table still
+        # has a perfectly good DERIVED rank; it just has nothing to be measured
+        # against yet, which is a missing comparison, not a failure.
+        o = r.get("official_rank")
+        r["delta"] = (o - i) if o is not None else None
     return rows
 
 
@@ -269,6 +277,34 @@ def marquee_profile(rows):
     return prof
 
 
+def _write(rows, reconciliation=None):
+    """Persist the derived RPI. `reconciliation` is absent when there is no
+    official table to compare against."""
+    payload = {
+        "meta": {
+            "season": SEASON,
+            "source_tier": "DERIVED",
+            "formula": {"factor_i_wp": 0.25, "factor_ii_owp": 0.50,
+                        "factor_iii_oowp": 0.25},
+            "location_weighting": "NONE -- manual specifies no home/road/neutral "
+                                  "multipliers for women's volleyball",
+            "division_i_only": True,
+            "self_exclusion": "APPLIED in Factors II and III",
+            "factor_iv": "NOT ATTEMPTED -- expressed in approximate RPI positions, "
+                         "not reproducible",
+            "reconciliation": reconciliation,
+            "reconciliation_note": (None if reconciliation else
+                                    "no official RPI table published for this "
+                                    "season yet, so the derived ordering is "
+                                    "unchecked"),
+        },
+        "teams": rows,
+    }
+    with open(OUT, "w") as fh:
+        json.dump(payload, fh, indent=1)
+    print("wrote %s (%d teams)" % (OUT, len(rows)))
+
+
 def main():
     rows = compute()
     # An empty or near-empty game graph is the normal state in August, not an
@@ -277,6 +313,23 @@ def main():
         print("only %d teams in the graph -- too early for RPI, skipping" % len(rows))
         return 0
     prof = marquee_profile(rows)
+
+    # NO OFFICIAL TABLE, NO COMPARISON -- but still a derived RPI.
+    # Everything from here to the end of this function measures the derived
+    # ordering AGAINST the published one, and a season has no published one
+    # until the NCAA puts it out. Write the RPI we computed, say plainly what
+    # cannot be checked, and stop -- rather than subtracting an int from None
+    # and taking the whole build down inside a step the workflow swallows.
+    if any(r.get("official_rank") is None for r in rows):
+        n_missing = sum(1 for r in rows if r.get("official_rank") is None)
+        _write(rows)
+        print("RPI computed for %d teams from the game graph." % len(rows))
+        print("  NOT compared against the published ordering: %d of %d teams have "
+              "no official rank yet." % (n_missing, len(rows)))
+        print("  The rankings endpoint is current-only, so season %d gets a table "
+              "when the NCAA publishes one. The derived RPI above stands on its "
+              "own; only the accuracy check is missing." % SEASON)
+        return 0
 
     deltas = [abs(r["delta"]) for r in rows]
     n = len(rows)

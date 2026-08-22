@@ -106,6 +106,24 @@ def main():
     # Francis game and left 18 teams short. Conversely West Florida is tagged
     # `div1` while playing an all-D-II schedule and is absent from the table.
     # Membership in the official RPI table is the only self-consistent flag.
+    # NO TABLE, NO RECONCILE -- and say so out loud rather than throwing.
+    #
+    # The rankings endpoint is current-only, so a season's official RPI table
+    # simply does not exist until the NCAA publishes one, and never exists for a
+    # past season we did not capture. This used to raise straight out of
+    # json.load, every run, on every day of the young 2026 season -- and the
+    # workflow swallows it with `|| true`, so the step went red inside a green
+    # run and nobody could see it. Reconcile is the check that proved the 2025
+    # graph complete at 348/348; it going silently missing is exactly the kind
+    # of "green CI, absent verification" this project keeps getting bitten by.
+    if not os.path.exists(RPI_JSON):
+        print("reconcile SKIPPED: no official RPI table at %s" % RPI_JSON)
+        print("  The rankings endpoint cannot be season-pinned, so season %d has "
+              "no table until the NCAA publishes one." % SEASON)
+        print("  D-I membership is therefore UNVERIFIED for this season and the "
+              "game graph is NOT reconciled. This is expected early in a season; "
+              "it is a real gap the rest of the year.")
+        return 0
     rpi = json.load(open(RPI_JSON))["data"]
     by_norm = {}
     for r in rpi:

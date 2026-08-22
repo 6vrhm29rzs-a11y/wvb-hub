@@ -1,0 +1,40 @@
+{
+ "meta": {
+  "season": 2025,
+  "source_tier": "DERIVED",
+  "design": "within-player fixed effects: rate and opponent strength demeaned inside each player, so any fixed property of the player cancels",
+  "target": "measured from outcomes; no poll is an input",
+  "min_sets_in_match": 2,
+  "min_matches": 8,
+  "min_opponent_spread_sd": 0.75,
+  "seed": 20260822,
+  "caveat": "blowouts shorten matches, so a strong opponent can also mean fewer sets; the sets-weighted fit is reported alongside the unweighted one for that reason"
+ },
+ "fits": {
+  "unweighted": {
+   "slope": -0.21753304203527327,
+   "ci95": [
+    -0.23461215844953237,
+    -0.20227742816366445
+   ],
+   "players": 914,
+   "observations": 20997,
+   "weighted": false
+  },
+  "weighted": {
+   "slope": -0.21448552508616917,
+   "ci95": [
+    -0.23102219721409445,
+    -0.1995213299392232
+   ],
+   "players": 914,
+   "observations": 20997,
+   "weighted": true
+  }
+ },
+ "strength_z_spread": {
+  "z_p05": -1.666587005793654,
+  "z_p95": 1.4966727548766163
+ },
+ "recommended_slope": -0.21448552508616917
+}

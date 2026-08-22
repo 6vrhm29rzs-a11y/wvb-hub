@@ -70,7 +70,13 @@ STAT_CATS = {
 }
 STAT_PAGES = 7  # 7 x 50 = 350 slots for 348 teams
 
-MIN_INTERVAL = 0.7   # seconds between requests (~1.4 req/s; public demo caps at 5)
+# Seconds between requests. Overridable because the public API's tolerance is not
+# a constant: a 2024 backfill ran ~1.4 req/s for 10k requests and then began
+# hanging every second request -- one would return 200 in under a second and the
+# next would stall past a 30s timeout. That is throttling, not an outage, and the
+# only fix from our side is to ask for less. WVB_REQ_INTERVAL lets a bulk
+# backfill crawl politely without slowing the daily run.
+MIN_INTERVAL = float(os.environ.get("WVB_REQ_INTERVAL", "0.7"))
 MAX_RETRIES = 4
 
 _last_request = [0.0]
@@ -261,6 +267,9 @@ def normalize_game(gid, payload):
             "sets_won": t.get("score"),             # match score in SETS
             "is_winner": t.get("isWinner"),
             "record_at_time": t.get("record"),
+            # brand colour, straight from the feed. Free, and the only source
+            # we have for it -- the scoreboard endpoint does not carry it.
+            "color": t.get("color"),
             "team_rank": t.get("teamRank"),
             "seed": t.get("seed"),
         })
@@ -283,6 +292,19 @@ def normalize_game(gid, payload):
         "start_time_epoch": c.get("startTimeEpoch"),
         "winner_team_id": c.get("winner"),
         "championship": c.get("championship"),
+        # WHERE THE MATCH WAS ACTUALLY PLAYED. /game/{id} carries this and we
+        # were throwing it away, so the dashboard inferred the venue from who
+        # was listed at home -- and got it wrong the first time it mattered.
+        # Kentucky-Wisconsin and Louisville-Texas A&M were both AVCA First Serve
+        # matches at Fiserv Forum in Milwaukee: NEUTRAL SITE, no home team on
+        # the floor. Rendering "at Wisconsin" was an inference presented as a
+        # fact. It also matters to the rating, which fits a home-advantage term
+        # and would credit a home edge nobody had.
+        "location": {
+            "venue": (c.get("location") or {}).get("venue"),
+            "city": (c.get("location") or {}).get("city"),
+            "state": (c.get("location") or {}).get("stateUsps"),
+        } if c.get("location") else None,
         "teams": teams,
         "linescores": linescores,
         "has_boxscore": c.get("hasBoxscore"),
@@ -383,10 +405,26 @@ def crawl_boxscores():
     # boxscore holds partial attack lines.
     finals = final_game_ids(GAMES_JSONL)
     have = set(k for k in load_records_jsonl(BOX_JSONL) if k in finals)
-    todo = [g for g in ids if g not in have]
+    # ONLY FINAL GAMES. The line above already computed `finals` and the
+    # docstring already says a boxscore is untrustworthy until the game is --
+    # but the todo list ignored both and asked for every enumerated game,
+    # including ones that had not been played. Measured on 2026-08-22:
+    # "34 enumerated, 34 to fetch, 31 FAILED", where the 31 were simply
+    # tomorrow's fixtures. Harmless to the data (they retry once final) and
+    # corrosive to the signal: a real boxscore failure was indistinguishable
+    # from a game that had not happened yet, in a list of 31.
+    todo = [g for g in ids if g in finals and g not in have]
     print("boxscores: %d enumerated, %d on disk, %d to fetch" % (
         len(ids), len(have), len(todo)))
+    failed_path = os.path.join(RAW, "boxscores_failed.json")
     if not todo:
+        # Rewrite the failure list even when there is nothing to do, or it keeps
+        # asserting yesterday's failures forever. It was still claiming 31 after
+        # every one of them had been fetched or turned out to be an unplayed
+        # fixture -- a stale alarm is worse than no alarm, because it is the file
+        # you would look at to decide whether the crawl is healthy.
+        with open(failed_path, "w") as fh:
+            json.dump([], fh)
         return
 
     failures = []
@@ -424,7 +462,7 @@ def crawl_boxscores():
                     i, len(todo), rate, (len(todo) - i) / max(rate, 1e-6) / 60.0,
                     len(failures)))
     if failures:
-        with open(os.path.join(RAW, "boxscores_failed.json"), "w") as fh:
+        with open(failed_path, "w") as fh:
             json.dump(failures, fh, indent=1)
         print("boxscores: %d FAILED" % len(failures))
 
@@ -455,10 +493,14 @@ def crawl_players():
     downstream needs to see what each source actually said.
     """
     ids = game_ids_from_schedule()
+    # FINAL GAMES ONLY, same rule the boxscore phase needed: a match that has
+    # not been played has no player lines, and asking for them every morning
+    # buys a pile of failures that hide a real one.
+    finals = final_game_ids(GAMES_JSONL)
     have = set(load_records_jsonl(PLAYERBOX_JSONL, key="game_id"))
-    todo = [g for g in ids if g not in have]
-    print("players: %d games enumerated, %d on disk, %d to fetch"
-          % (len(ids), len(have), len(todo)))
+    todo = [g for g in ids if g in finals and g not in have]
+    print("players: %d games enumerated, %d final, %d on disk, %d to fetch"
+          % (len(ids), len(finals), len(have), len(todo)))
 
     if todo:
         failures = []

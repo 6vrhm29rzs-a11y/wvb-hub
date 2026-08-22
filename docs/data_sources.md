@@ -150,3 +150,26 @@ curl -sS -o /dev/null -w "%{http_code} %{url_effective}\n" -L --max-time 30 \
 
 Local spreadsheets: `python3 -c "import openpyxl; ..."`.
 No source here requires a login, an API key, or a paid tier.
+
+## 6. Event pages (added 2026-08-22)
+
+`avca.org/event/<slug>/` — **200, open, no login.** The organiser's own page is
+the authority for a neutral-site event: name, venue, date window and the full
+match list. Measured on `2026-avca-first-serve`: *Jeep AVCA First Serve*, Fiserv
+Forum, Milwaukee WI, August 21–24, 8 matches, 10 teams.
+
+**This closes a gap nothing else could.** ncaa.com's feed carries NO event
+name — `championship`, `championshipGame`, `bracketId` and `bracketRound` are
+all empty and `title` is just the two team names — so an event can only be
+*inferred* from the feed (several matches at one venue that is nobody's home
+floor). The organiser's page gives the name and, more usefully, the DATE WINDOW,
+which lets a match be classified neutral before it is played instead of after.
+
+Declared events live in `Cody/data/events_2026.txt` as
+`venue | name | start | end`.
+
+**It also corrected the forum TV data**, which is why that stays THIRD-PARTY:
+the VolleyTalk listing had Pittsburgh–Xavier at 5pm ET on "Sun, Aug 24" (it is
+6pm ET on a Monday) and omitted Texas–Marquette entirely.
+
+    curl -sL -A "wvb-hub/0.1" https://www.avca.org/event/2026-avca-first-serve/ | wc -c

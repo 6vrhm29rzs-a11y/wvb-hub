@@ -37,6 +37,7 @@ import json
 import os
 import re
 import sys
+from html import unescape as _unescape
 import time
 import urllib.error
 import urllib.request
@@ -115,7 +116,95 @@ def athletics_site(seo):
     return (m.group(1).rstrip("/") if m else None), ("ok" if m else "no-link")
 
 
-def parse_roster(html):
+
+# ---------------------------------------------------------------- headshots
+# URLS ONLY. The photo itself is never downloaded and never committed: this repo
+# is PUBLIC, the images belong to the schools, and storing a reference is a
+# different act from republishing the file. The page loads them from the
+# school's own server and shows initials when one is missing.
+_IMG_NEAR = re.compile(r'<img\b[^>]*?(?:data-src|src)="([^"]+)"', re.I)
+_NOT_A_HEADSHOT = re.compile(
+    r"(logo|icon|sprite|placeholder|default|blank|spacer|social|sponsor|"
+    r"facebook|twitter|instagram|tiktok|\.svg(?:\?|$))", re.I)
+
+
+def _absolutise(url, base):
+    """Repair and absolutise a photo URL.
+
+    WMT emits a doubled prefix -- "https://site.com/https://site.com/imgproxy/..."
+    -- which is not a URL and 404s if used as one. Measured on Kentucky, where
+    all 17 headshots came out that way.
+    """
+    if not url:
+        return None
+    # HTML-decode first. A SIDEARM crop URL carries its parameters as
+    # "&amp;width=100&amp;height=100", and handing that to a server verbatim
+    # gets a 400 -- measured on Tennessee, whose photos all failed until this.
+    url = _unescape(url).strip()
+    m = re.search(r"https?://.*?(https?://.*)$", url)
+    if m:                      # doubled prefix: keep the inner, real one
+        url = m.group(1)
+    if url.startswith("//"):
+        return "https:" + url
+    if url.startswith("http"):
+        return url
+    if url.startswith("/") and base:
+        return base.rstrip("/") + url
+    return None
+
+
+def _schema_photos(html, base):
+    """name -> photo, from schema.org microdata.
+
+    WMT wraps each player in an itemscope Person and states the name and image
+    as sibling <span itemprop> tags with no <img> anywhere near the player's
+    link -- so the neighbourhood search below finds nothing. Pairing the two
+    itemprops recovers all of them.
+    """
+    out = {}
+    for m in re.finditer(
+            r'itemprop="name"[^>]*content="([^"]+)"(.{0,400}?)itemprop="image"'
+            r'[^>]*content="([^"]+)"', html, re.S):
+        nm = _unescape(m.group(1)).strip()
+        url = _absolutise(_unescape(m.group(3)), base)
+        if nm and url:
+            out.setdefault(re.sub(r"[^a-z]", "", nm.lower()), url)
+    return out
+
+
+def _photo_for(html, anchor_start, anchor_end, base):
+    """The first plausible headshot in the neighbourhood of a player's link."""
+    window = html[max(0, anchor_start - 1200):anchor_end + 1200]
+    for m in _IMG_NEAR.finditer(window):
+        u = m.group(1)
+        # A base64 data: URI is a lazy-loading placeholder -- a 1x1 transparent
+        # gif -- not a headshot. UCLA's template ships only that, with the real
+        # URL fetched by JavaScript, so its photos are genuinely absent from the
+        # HTML and are reported missing rather than guessed at.
+        if u.startswith("data:") or _NOT_A_HEADSHOT.search(u):
+            continue
+        got = _absolutise(u, base)
+        if got:
+            return got
+    return None
+
+def _slug_matches(href, name):
+    """True when ANY path segment of href spells the anchor's own text.
+
+    Not just the last segment: SIDEARM appends a numeric id, so the player link
+    is /roster/victoria-harris/15501 and the name sits second from the end.
+    Checking only the tail matched nothing and left SMU's roster empty.
+    """
+    flat = re.sub(r"[^a-z]", "", (name or "").lower())
+    if not flat:
+        return False
+    for seg in (href or "").split("/"):
+        if seg and re.sub(r"[^a-z]", "", seg.lower()) == flat:
+            return True
+    return False
+
+
+def parse_roster(html, base=None):
     # type: (str) -> List[Dict[str, str]]
     """Extract players by NAME ANCHOR, then the nearest class token after it.
 
@@ -148,7 +237,17 @@ def parse_roster(html):
         #   staff:  /roster/season/2026/staff/nate-wilson
         if re.search(r"/(staff|coach|coaches|administration|support-staff)/", href, re.I):
             continue
-        name = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", inner)).strip()
+        # HTML-ENTITY DECODE BEFORE THE SHAPE TEST. Roster templates emit the
+        # apostrophe in a surname as a numeric entity -- "Kassie O&#039;Brien"
+        # -- and the NAME pattern below rejects "&", "#" and digits, so every
+        # such player was dropped from every roster ON EVERY PLATFORM, then
+        # classified DEPARTED because she was absent from her own 2026 roster.
+        # Kassie O'Brien (Kentucky, 2025 National Freshman of the Year, 114
+        # sets) was reported as departed while listed on the live page.
+        # Silent, name-shaped, and it never looked like a parse failure --
+        # the roster just came back one player short.
+        name = _unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", inner))).strip()
+        name = re.sub(r"\s+", " ", name)
         if not NAME.match(name):
             continue
         # "Full Bio" / "View Profile" links sit inside the same card and match
@@ -177,6 +276,19 @@ def parse_roster(html):
         num = re.search(r'>\s*#?\s*(\d{1,2})\s*<', window)
         pos = re.search(r'\b(OH|MB|OPP|RS|DS|L|S)\b', flat[:300])
         players.append({
+            # STRUCTURAL proof of personhood: /roster/player/<slug> is the path
+            # players get and staff never do (staff are filtered by path above).
+            # Used by the staff filter below instead of requiring a class token.
+            # Two structural signals, either one sufficient:
+            #   (a) /roster/player/<slug> -- the explicit player path.
+            #   (b) the final URL slug de-hyphenates to the anchor's own text,
+            #       e.g. /roster/victoria-harris/ linked as "Victoria Harris".
+            # (b) covers templates with no /player/ segment (SMU, Utah St.),
+            # where the class-token proxy was failing and the whole roster came
+            # back empty. A link whose slug spells the displayed name is a
+            # person's page; "Full Bio" and "Ticket Office" do not match theirs.
+            "_player_path": bool(re.search(r"/roster/player/", href, re.I))
+                            or _slug_matches(href, name),
             "first": name.split(" ")[0],
             "last": " ".join(name.split(" ")[1:]) or None,
             "name_raw": name,
@@ -184,11 +296,34 @@ def parse_roster(html):
             "pos_raw": pos.group(1) if pos else None,
             "num_raw": num.group(1) if num else None,
             "how": "roster-anchor",
+            "photo": _photo_for(html, m.start(), m.end(), base),
         })
     # Anchors under /roster/ also cover coaches and support staff, which is why
-    # raw counts came out above a real roster size. A player has a class year or
-    # a jersey number; staff have neither.
-    players = [p for p in players if p.get("class_raw") or p.get("num_raw")]
+    # raw counts came out above a real roster size.
+    #
+    # The old rule was "a player has a class year or a jersey number; staff have
+    # neither". That is a PROXY, and templates broke it: SIDEARM moved the class
+    # token out of the anchor's neighbourhood, so the proxy started deleting real
+    # players -- silently, because a short roster looks like a small roster.
+    # Measured 2026-08-18: Virginia 17 players -> 0 (every one lacked a nearby
+    # class token, so the team read as "no roster found"), UCLA 18 -> 9. Their
+    # production then counts as DEPARTED, which is the same failure Kassie
+    # O'Brien surfaced, from a different direction.
+    #
+    # Prefer the STRUCTURAL fact over the proxy: /roster/player/<slug> is a path
+    # staff do not get. Keep the class/number requirement only for templates
+    # that do not use it (e.g. /roster/nil-kayaalp/17216), where the proxy is
+    # still the only discriminator available.
+    players = [p for p in players
+               if p.get("_player_path") or p.get("class_raw") or p.get("num_raw")]
+    for p in players:
+        p.pop("_player_path", None)
+    # photos: neighbourhood <img> first, schema.org microdata as the fallback
+    schema = _schema_photos(html, base)
+    for p in players:
+        key = re.sub(r"[^a-z]", "", (p["name_raw"] or "").lower())
+        p["photo"] = p.get("photo") or schema.get(key)
+
     # de-duplicate: cards and table rows both link the same player
     seen, out = set(), []
     for p in players:
@@ -238,7 +373,12 @@ def main():
     for i, (name, meta) in enumerate(sorted(sites.items()), 1):
         if name in rosters and rosters[name].get("players"):
             continue
-        base = meta.get("url")
+        # STRIP THE URL. One cached entry was "https://utsports.com " with a
+        # trailing space; every path built from it 404'd, so Tennessee -- a
+        # top-20 team -- carried no roster at all and its whole 2025 production
+        # read as departed. A single invisible character, and nothing in the
+        # pipeline could see it. Cheap to defend against permanently.
+        base = (meta.get("url") or "").strip() or None
         if not base:
             rosters[name] = {"status": "no-athletics-site", "players": []}
             stats["no_site"] += 1
@@ -253,7 +393,7 @@ def main():
                     break        # back off, do not hammer
                 continue
             if html and CLASS_RE.search(html):
-                pl = parse_roster(html)
+                pl = parse_roster(html, base)
                 if pl:
                     hit = (path, pl, html)
                     break

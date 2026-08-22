@@ -166,6 +166,44 @@ def main():
         check("include_future=True still sees them", sorted(allids),
               ["fut1", "fut2", "past1"])
 
+        # ---------------------------------------------------------------
+        print()
+        print("VANISHED FIXTURES -- games ncaa.com removes from a past date")
+        # MEASURED 2026-08-22. We crawled 12 games for 2026-08-21 on the 18th;
+        # the live scoreboard for that date now returns 2. The other ten were
+        # PULLED -- not postponed to a new date, not played, just gone. Their
+        # non-final records are already in the append-only log and can never be
+        # superseded by a final one, because the game will never be fetched
+        # again: it is no longer enumerated.
+        #
+        # The log keeping them is correct and deliberate (append-only, and a
+        # record we once saw is a record we once saw). What must hold is that
+        # NOTHING DOWNSTREAM COUNTS THEM. A phantom fixture that leaks into a
+        # team's record inflates games played and corrupts every rate derived
+        # from it, and it would look entirely plausible while doing so.
+        vpath = os.path.join(tmp, "vanished.jsonl")
+        with open(vpath, "w") as fh:
+            # one real final, and two that were pulled from the schedule
+            fh.write(json.dumps({"game_id": "real", "game_state": "F",
+                                 "teams": [], "linescores": []}) + "\n")
+            fh.write(json.dumps({"game_id": "ghost1", "game_state": "P",
+                                 "teams": [], "linescores": []}) + "\n")
+            fh.write(json.dumps({"game_id": "ghost2", "game_state": "P",
+                                 "teams": [], "linescores": []}) + "\n")
+        recs = load_games_jsonl(vpath)
+        check("all three survive dedup (the log does not delete them)",
+              len(recs), 3)
+        check("only the played one counts as final",
+              sorted(final_game_ids(vpath)), ["real"])
+        counted = [g for g in recs if g.get("game_state") == "F"]
+        check("a consumer filtering on final sees exactly one game",
+              len(counted), 1)
+
+        # NEGATIVE CONTROL: drop the final-state filter and the phantoms walk in.
+        unfiltered = list(recs)
+        check("negative control -- without the filter, phantoms are counted",
+              len(unfiltered) > len(counted), True)
+
         print()
         if FAILED:
             print("FAILED: %d" % len(FAILED))

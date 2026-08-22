@@ -561,9 +561,24 @@ const STALE_HOURS=36;
   const when=t.toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
   const thru=through?` · matches through <b>${through}</b>`:'';
   el.style.display='';
-  if(hrs>STALE_HOURS){
+  /* An old build has TWO possible causes and they need opposite reactions:
+     the pipeline stopped, or the season has not started yet and there is
+     legitimately nothing new to build. Asserting the first for both spent the
+     entire pre-season telling the reader a healthy pipeline was broken -- a
+     false alarm that runs for months trains you to ignore the one banner that
+     exists to catch a real outage. `season_opens` is MEASURED (the first date
+     the crawled scoreboard carries a game); when it is absent we state the
+     build's age and claim no cause at all. */
+  const opens=(typeof MODEL!=='undefined')?MODEL.season_opens:null;
+  const preseason=opens?(new Date(opens+'T00:00:00')>new Date()):false;
+  if(preseason){
+    const d=new Date(opens+'T12:00:00');
+    const days=Math.ceil((d-new Date())/86400000);
+    el.style.background='var(--bg-2,#f2f4f7)';el.style.color='var(--ink-2,#555)';
+    el.innerHTML=`<b>Pre-season.</b> First matches ${d.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'})} (${days} day${days==1?'':'s'}). These are final results from the last completed season${thru.replace(' · matches',' — matches')}. The daily pipeline is running; there is simply nothing newer to show yet.`;
+  }else if(hrs>STALE_HOURS){
     el.style.background='#fde8e8';el.style.color='#8a1c1c';el.style.border='1px solid #f0b4b4';
-    el.innerHTML=`<b>⚠ STALE — last updated ${Math.floor(hrs/24)}d ${Math.floor(hrs%24)}h ago (${when}).</b> The daily pipeline has not succeeded since then, so these are old numbers being shown as if current.${thru}`;
+    el.innerHTML=`<b>⚠ STALE — this build is ${Math.floor(hrs/24)}d ${Math.floor(hrs%24)}h old (${when}).</b> ${opens?'The season is underway, so the daily pipeline has not published since then':'No newer build has been published since then'} — these are old numbers being shown as if current.${thru}`;
   }else{
     el.style.background='var(--bg-2,#f2f4f7)';el.style.color='var(--ink-2,#555)';
     el.innerHTML=`Updated <b>${when}</b> (${hrs<1?'under an hour':Math.round(hrs)+'h'} ago)${thru}.`;

@@ -330,12 +330,29 @@ def main():
         payload["meta"]["counts"]["teams_in_official_rpi"],
         payload["meta"]["counts"]["teams_in_stat_leaderboards"]))
     print("games: %d" % len(games_out))
-    if stat_unjoined:
-        print("UNJOINED stat-leaderboard teams (%d): %s" % (
-            len(stat_unjoined), ", ".join(sorted(stat_unjoined))))
-    if rpi_unjoined:
-        print("UNJOINED official-RPI teams (%d): %s" % (
-            len(rpi_unjoined), ", ".join(sorted(rpi_unjoined))))
+    # NAME THE PROBLEM, DO NOT WALLPAPER THE LOG WITH IT.
+    # Early in a season the stat leaderboards are empty, so EVERY team is
+    # unjoined -- 338 of them, dumped in full into the daily log every morning.
+    # A wall that size is not a warning, it is camouflage: the day one genuinely
+    # odd name appears, nobody will see it. Print the count, a sample, and let
+    # the ratio say whether this is "nothing has been published yet" or "the
+    # join is broken".
+    def _unjoined(label, names, total):
+        if not names:
+            return
+        n = len(names)
+        sample = ", ".join(sorted(names)[:8])
+        if total and n >= total:
+            print("UNJOINED %s: all %d -- the source has published nothing yet "
+                  "for this season, which is normal in August" % (label, n))
+        else:
+            print("UNJOINED %s: %d of %d -- %s%s"
+                  % (label, n, total, sample, ", ..." if n > 8 else ""))
+
+    _unjoined("stat-leaderboard teams", stat_unjoined,
+              payload["meta"]["counts"]["teams_in_stat_leaderboards"] or len(stat_unjoined))
+    _unjoined("official-RPI teams", rpi_unjoined,
+              payload["meta"]["counts"]["teams_in_official_rpi"] or len(rpi_unjoined))
     print("wrote %s  (build artifact, gitignored -- rebuilt on read)" % out_path)
     return 0
 

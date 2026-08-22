@@ -10,15 +10,38 @@ data = json.load(open(base/"data/vb2025.json"))              # bracket + results
 # `fitted: True` tells the template to use the fitted composite and leave the
 # hand-weighted SOS dial inert -- otherwise the dial silently overwrites it.
 import os as _os
+import re as _re
+_re_season = _re.compile(r"rating_(\d{4})\.json$")
 _SEASON = int(_os.environ.get("WVB_SEASON", "2025"))
 _rate_p = base/("data/rating_%d.json" % _SEASON)
+_display_season = _SEASON
 if not _rate_p.exists():
-    # No rating yet (pre-season). Keep the last good dashboard rather than
-    # replacing it with an empty one.
-    print("no data/rating_%d.json yet -- leaving output/vb_dashboard.html untouched" % _SEASON)
-    raise SystemExit(0)
+    # PRE-SEASON. No rating exists for the season we are configured for, because
+    # no match has been played. Fall back to the most recent season that DOES
+    # have one and rebuild from that -- the page content is identical to what
+    # was already published, but the build gets re-stamped so the freshness
+    # banner can say "pre-season, first matches <date>" instead of running a
+    # red "the pipeline has stopped" alarm for the entire off-season.
+    #
+    # It used to `raise SystemExit(0)` here. That left the last good dashboard
+    # in place, which was right about the CONTENT and wrong about the LABEL:
+    # the banner infers staleness from the build's age, so a healthy pipeline
+    # published a broken-looking page every day from December to August.
+    import glob as _glob
+    _cands = []
+    for _p in _glob.glob(str(base/"data/rating_*.json")):
+        _m = _re_season.search(_os.path.basename(_p))
+        if _m:
+            _cands.append((int(_m.group(1)), _p))
+    if not _cands:
+        print("no rating file for any season -- leaving output/vb_dashboard.html untouched")
+        raise SystemExit(0)
+    _display_season, _rate_p = max(_cands)
+    _rate_p = pathlib.Path(_rate_p)
+    print("pre-season: no rating_%d.json; rebuilding from season %d and stamping the %d opener"
+          % (_SEASON, _display_season, _SEASON))
 _rate = json.load(open(_rate_p))
-_ds_p = base/("data/data_%d.json" % _SEASON)
+_ds_p = base/("data/data_%d.json" % _display_season)
 _tot  = {}
 if _ds_p.exists():
     for t in json.load(open(_ds_p))["teams"]:
@@ -34,12 +57,37 @@ def _blocks(nm):
     if not st or not st.get("sets"): return None
     bs, ba = st.get("block_solos") or 0, st.get("block_assists") or 0
     return round((bs + ba / 2.0) / float(st["sets"]), 3)
+def _season_opens(season):
+    """First date the SEASON's scoreboard actually carries a game, MEASURED from
+    the crawl. Feeds the freshness banner so it can tell "between seasons" from
+    "the pipeline stopped" -- it used to assert the latter for both, and spent
+    the whole pre-season telling Cody a healthy pipeline was broken. Returns
+    None if we have not crawled the season yet; the banner degrades to stating
+    the build's age without claiming a cause."""
+    import glob as _glob
+    first = None
+    for p in sorted(_glob.glob(str(base / ("data/raw/%d/scoreboard/*.json" % season)))):
+        try:
+            if json.load(open(p)).get("games"):
+                first = _os.path.basename(p)[:-5]
+                break
+        except ValueError:
+            continue
+    return first
+
+
 model = {
     "fitted": True,
     "generated_at": _rate["meta"].get("generated_at_utc"),
     "data_through": _rate["meta"].get("data_through"),
+    "season_opens": _season_opens(_SEASON),
     "matches_in_data": _rate["meta"].get("matches_in_data"),
-    "asof": "final 2025 (through Dec 21, 2025)",
+    # Derived, never hardcoded: this string names the season the numbers
+    # come from, and a stale literal here is precisely the R4 failure
+    # (right number, wrong heading). It follows _display_season and the
+    # rating's own data_through.
+    "asof": ("final %d (through %s)" % (_display_season,
+             _rate["meta"].get("data_through") or "unknown")),
     "sos_weight": 2,
     "weights": _rate["meta"]["weights"],
     "teams": [{
