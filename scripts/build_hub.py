@@ -19,6 +19,7 @@ are real projections and say so; nothing is invented to fill a gap.
 Python 3.9 target.
 """
 
+import collections
 import json
 import os
 import re
@@ -36,8 +37,23 @@ except Exception:          # pragma: no cover -- no tz database
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build_rankings_board as BOARD  # noqa: E402
+# The team-name normaliser + alias map that reconcile already owns. Reused
+# rather than re-implemented so the two cannot drift apart.
+from reconcile_2025 import norm as team_norm  # noqa: E402
 
-OUT = os.path.join(REPO, "Cody", "START-HERE.html")
+# PUBLIC BUILD. Same page, same code, minus every input that is somebody
+# else's property. This repo is PUBLIC, so the public build carries only
+# official NCAA feeds, the schools' own rosters and our own model:
+#   * the TV listings are transcribed from VolleyTalk       -> dropped
+#   * the VolleyTalk Top 25 is their poll                    -> dropped
+#   * Massey Ratings are their product, hand-transcribed     -> dropped
+# Venue/event names stay: data/venues_2026.json is already a tracked file.
+# One builder, two outputs -- so the private and public pages cannot drift
+# into two different UIs, which is what made the old dashboard feel like a
+# different product.
+PUBLIC = "--public" in sys.argv
+OUT = (os.path.join(REPO, "output", "vb_dashboard.html") if PUBLIC
+       else os.path.join(REPO, "Cody", "START-HERE.html"))
 SEASON = 2026
 
 
@@ -130,6 +146,41 @@ def results() -> List[Dict]:
 
 
 # --------------------------------------------------------------- schedule
+# Programs whose local clock is far enough behind Eastern that a midnight-to-6am
+# ET tip is an ordinary evening match at home. Hawaii (UTC-10) is the only D-I
+# women's volleyball program this applies to: 1:00 AM ET is 7:00 PM in Honolulu.
+FAR_WEST_HOME = ("Hawaii",)
+
+_EARLY_AM = re.compile(r"^(12|[1-5]):\d\d\s*AM", re.I)
+
+
+def listed_time(start_time, home_team):
+    """The feed's start time, or "TBA" when that time is a placeholder.
+
+    ncaa.com fills an unannounced start with a midnight-ish sentinel that
+    renders as 12:00-3:00 AM ET. Measured 2026-08-22:
+
+      * In the COMPLETED 2025 season only 13 of 5,133 fixtures carried an
+        early-AM time, and ALL THIRTEEN were at Hawaii -- 1:00 AM ET is 7:00 PM
+        HST, a normal evening start in Honolulu.
+      * In the 2026 schedule 192 do: 16 at Hawaii, and 176 at schools like
+        Nebraska, Alabama and Wisconsin, which do not host at 1 AM. Those are
+        placeholders, replaced with a real time as the date approaches.
+
+    Printing the sentinel as an announced start is R5 -- a synthesised value
+    standing where a measurement belongs, and it looks authoritative because it
+    is formatted exactly like a real time. "TBA" is the feed's OWN
+    representation for an unknown start (83 fixtures carry it), so an unknown
+    time renders the way the page already renders unknown times.
+    """
+    st = (start_time or "").strip()
+    if not st:
+        return st
+    if _EARLY_AM.match(st) and (home_team or "") not in FAR_WEST_HOME:
+        return "TBA"
+    return st
+
+
 def schedule(limit_days: int = 21) -> List[Dict]:
     """Upcoming fixtures from today forward."""
     today = datetime.date.today().isoformat()
@@ -150,7 +201,7 @@ def schedule(limit_days: int = 21) -> List[Dict]:
                 continue
             rows.append({
                 "d": date, "a": a, "h": h,
-                "t": (g.get("startTime") or "").strip(),
+                "t": listed_time(g.get("startTime"), h),
                 "ar": (g.get("away") or {}).get("rank") or "",
                 "hr": (g.get("home") or {}).get("rank") or "",
             })
@@ -160,6 +211,8 @@ def schedule(limit_days: int = 21) -> List[Dict]:
 
 
 def tv() -> List[Dict]:
+    if PUBLIC:
+        return []
     p = os.path.join(REPO, "Cody", "data", "tv_listings_2026.txt")
     if not os.path.exists(p):
         return []
@@ -172,6 +225,200 @@ def tv() -> List[Dict]:
         out.append({"day": d, "m": m, "n": n, "t": t})
     return out
 
+
+
+# Position buckets, in the order a volleyball person reads a roster: the setter
+# first, then the players who attack, then the back-row specialists.
+POS_ORDER = ("S", "OPP", "OH", "MB", "L/DS", "")
+POS_LABEL = {"S": "Setters", "OPP": "Opposites", "OH": "Outside hitters",
+             "MB": "Middle blockers", "L/DS": "Libero / defensive specialists",
+             "": "Position not listed"}
+
+
+def pos_bucket(p):
+    """School sites and box scores spell positions a dozen ways. Anything we do
+    not recognise falls into "" and is LABELLED as unlisted -- never guessed
+    into a slot, because a player shown at the wrong position reads as fact."""
+    p = (p or "").upper().strip()
+    if not p:
+        return ""
+    if p.startswith("OPP") or p.startswith("RS"):
+        return "OPP"
+    if p.startswith("OH"):
+        return "OH"
+    if p.startswith("MB") or p.startswith("M"):
+        return "MB"
+    if p.startswith("L") or p.startswith("DS"):
+        return "L/DS"
+    if p.startswith("S"):
+        return "S"
+    return ""
+
+
+def nkey(name):
+    return re.sub(r"[^a-z]", "", (name or "").lower())
+
+
+def prior_pos_index():
+    """(team_id, name) -> position from last season's box scores.
+
+    Exists for TRANSFERS. A transfer has no 2025 line at her new school, so the
+    roster showed her with no position -- but she played D-I somewhere, and the
+    join already records which team_id she came from. Anchoring the lookup on
+    that team_id (not on the name alone) keeps it precise: 573 of 574 transfers
+    resolve, and a bare-name lookup across 6,017 players would invite exactly
+    the wrong-person match R8 exists to prevent."""
+    idx = {}
+    for r in ((load("data/raw/2025/players_2025.json") or {}).get("players") or []):
+        nm = ((r.get("first") or "") + " " + (r.get("last") or "")).strip()
+        if not nm:
+            continue
+        sets = r.get("sets") or 0
+        # Production from RAW COUNTS. The feed's own `points` column is unusable
+        # as a season total -- it is carried for only some games, so the sum
+        # undercuts by a different amount per player (measured: below the raw
+        # formula for 3,270 of 4,601 players, median ratio 0.61).
+        pts = ((r.get("kills") or 0) + (r.get("aces") or 0)
+               + (r.get("block_solos") or 0) + 0.5 * (r.get("block_assists") or 0))
+        idx.setdefault((str(r.get("team_id")), nkey(nm)),
+                       {"pos": r.get("pos"), "sets": sets, "pts": pts})
+    return idx
+
+
+def roster_rows(roster_rec, ret_rec, lu_rec, live_by_team, team_id,
+                prior_pos=None, site_pos=None, id2name=None):
+    """The full 2026 roster, each player carrying what we actually know.
+
+    Sources, and what each may and may not say:
+      * the school's own roster page  -> who is on the team, class year (OFFICIAL)
+      * 2025 box scores               -> position and production (OFFICIAL)
+      * 2025 set-1 play-by-play       -> how many matches they started
+      * 2026 box scores               -> live production, empty early in the year
+
+    A player with no D-I record -- a true freshman, a JUCO or international
+    arrival -- carries NO stats and renders as an em dash. That is the whole
+    point: 22% of a season's production comes from players like her, and
+    inventing a number for them is exactly what R5 forbids.
+    """
+    if not roster_rec:
+        return []
+    ret_rec = ret_rec or {}
+
+    prod = {}
+    for pl in (ret_rec.get("returning") or []):
+        prod[nkey(pl.get("name"))] = pl
+    # Transfers carry last season's production under DIFFERENT field names and
+    # with no set count, because it was earned at another school. Normalised
+    # here rather than at the render site, and the previous school is kept so
+    # the page can say where the number came from.
+    transfers = {}
+    for pl in (ret_rec.get("transfer_in_official") or []):
+        if not isinstance(pl, dict):
+            continue
+        # Her full line at the school she came from: position, sets AND
+        # production, so a transfer shows a real rate instead of an em dash.
+        prev = (prior_pos or {}).get(
+            (str(pl.get("from_team_id")), nkey(pl.get("name")))) or {}
+        transfers[nkey(pl.get("name"))] = {
+            "class": pl.get("class"),
+            "pts": prev.get("pts") if prev.get("sets") else None,
+            "kills": pl.get("kills_2025"),
+            "sets": prev.get("sets") or None,
+            "from_team_id": pl.get("from_team_id"),
+            "from_team": (id2name or {}).get(str(pl.get("from_team_id"))),
+            "pos": prev.get("pos"),
+        }
+
+    def _one_name(x):
+        """These lists are not uniformly shaped: new_or_unplayed holds plain
+        strings, unresolved holds [name, reason] pairs, transfer_in_official
+        holds dicts. Reading them as one type is how this crashed."""
+        if isinstance(x, str):
+            return x
+        if isinstance(x, (list, tuple)):
+            return x[0] if x else ""
+        if isinstance(x, dict):
+            return x.get("name") or ""
+        return ""
+
+    def _names(key):
+        return set(nkey(_one_name(x)) for x in (ret_rec.get(key) or []))
+
+    new_names = _names("new_or_unplayed")
+    unres_names = _names("unresolved")
+    tin_names = _names("transfer_in_official")
+
+    starts = dict((nkey(k), v) for k, v in
+                  ((lu_rec or {}).get("starts_by_player_2025") or {}).items())
+
+    live = {}
+    for r in (live_by_team.get(str(team_id)) or []):
+        live[nkey((r.get("first") or "") + (r.get("last") or ""))] = r
+
+    rows = []
+    for pl in (roster_rec.get("players") or []):
+        name = pl.get("name_raw") or ((pl.get("first") or "") + " " + (pl.get("last") or "")).strip()
+        k = nkey(name)
+        p25 = prod.get(k) or transfers.get(k)
+        lv = live.get(k)
+
+        if k in tin_names:
+            kind = "transfer"
+        elif p25:
+            kind = "returning"
+        elif k in new_names:
+            kind = "new"
+        elif k in unres_names:
+            kind = "unresolved"
+        else:
+            kind = "new"
+
+        sets25 = (p25 or {}).get("sets")
+        pts25 = (p25 or {}).get("pts")
+        # Position, best source first. The school's own listing wins; a second
+        # pass over the roster page fills some of the gap (most templates render
+        # the roster in JavaScript, so this is a real ceiling, not a bug); then
+        # last season's box score; then, for a transfer, her previous school.
+        pos_raw = (pl.get("pos_raw")
+                   or (site_pos or {}).get(name)
+                   or (p25 or {}).get("pos"))
+        if isinstance(pos_raw, dict):
+            pos_raw = pos_raw.get("pos")
+        row = {
+            "n": name,
+            "c": pl.get("class_raw") or (p25 or {}).get("class") or None,
+            # position: the school's own listing wins, box score fills the gap
+            "p": pos_bucket(pos_raw),
+            "praw": pos_raw or None,
+            "num": pl.get("num_raw"),
+            "k": kind,
+            "from": (p25 or {}).get("from_team") if kind == "transfer" else None,
+            "st": starts.get(k) or 0,
+            "sets": sets25,
+            "kills": (p25 or {}).get("kills"),
+            # points per set, the same quantity the projection uses
+            "r": (round(pts25 / sets25, 2) if (pts25 is not None and sets25) else None),
+        }
+        if lv and lv.get("sets"):
+            row["l26"] = {"m": lv.get("matches"), "sets": lv.get("sets"),
+                          "kills": lv.get("kills"), "pos": lv.get("pos"),
+                          "num": lv.get("num")}
+            if not row["praw"] and lv.get("pos"):
+                row["p"] = pos_bucket(lv.get("pos"))
+                row["praw"] = lv.get("pos")
+            if row["num"] is None:
+                # Only from THIS season's box score. Do NOT backfill a jersey
+                # number from 2025: players change numbers between seasons, and
+                # roster number vs box-score number are already known to be
+                # different fields -- on the 6 surname-anchored joins where both
+                # were known they agreed 0 times. A wrong number looks right.
+                row["num"] = lv.get("num")
+        rows.append(row)
+
+    order = dict((p, i) for i, p in enumerate(POS_ORDER))
+    rows.sort(key=lambda r: (order.get(r["p"], 99), -(r["st"] or 0),
+                             -(r["r"] or 0), r["n"]))
+    return rows
 
 
 # ------------------------------------------------------------- team index
@@ -224,7 +471,7 @@ def team_index(teams, res, pred_by_pair, sim_of):
             h = (g.get("home") or {}).get("names", {}).get("short")
             if not a or not h:
                 continue
-            t = (g.get("startTime") or "").strip()
+            t = listed_time(g.get("startTime"), h)
             fixtures.setdefault(a, []).append(
                 {"d": date, "opp": h, "home": False, "t": t})
             fixtures.setdefault(h, []).append(
@@ -243,13 +490,86 @@ def team_index(teams, res, pred_by_pair, sim_of):
             if pl.get("photo"):
                 key = re.sub(r"[^a-z]", "", (pl.get("name_raw") or "").lower())
                 photos.setdefault(tname, {})[key] = pl["photo"]
+    # Photos the roster crawl could not see, from schema.org image URLs on
+    # JS-rendered roster pages (scripts/crawl_roster_photos.py). URLS ONLY --
+    # the files are never downloaded or committed; a player without one renders
+    # her initials, never a stand-in image.
+    for _tname, _rec in ((load("data/raw/%d/roster_photos_%d.json" % (SEASON, SEASON))
+                          or {}).get("teams", {}) or {}).items():
+        for _nm, _url in (_rec.get("photos") or {}).items():
+            photos.setdefault(_tname, {}).setdefault(
+                re.sub(r"[^a-z]", "", (_nm or "").lower()), _url)
+
     ret = (load("data/returning_2026.json") or {}).get("teams", {})
+    # Who a team ACTUALLY started in 2025 (set-1 play-by-play). Distinct from
+    # "rotation" above, which is the six highest projected SCORERS -- different
+    # question, different answer. Keeping both under one name is the R4 trap.
+    lineup = (load("data/lineups_2026.json") or {}).get("teams", {})
+    rosters = ((load("data/raw/%d/rosters_%d.json" % (SEASON, SEASON)) or {})
+               .get("teams", {}) or {})
+    # ncaa.com spells the same school differently across endpoints, and one key
+    # carries a trailing space: the hub calls it "New Orleans", the roster file
+    # says "LSU New Orleans ". A missed lookup renders as "no roster", which
+    # looks like a crawl failure rather than a naming mismatch -- exactly the
+    # trap CLAUDE.md flags about joining on team NAMES.
+    roster_by_norm = {}
+    for _k, _v in rosters.items():
+        roster_by_norm.setdefault(team_norm(_k), _k)
+    # Rosters the main crawl could not find, recovered by reading the school's
+    # own home page for its roster URL (scripts/recover_missing_rosters.py).
+    # Additive: only fills teams that came back empty.
+    for _t, _r in ((load("data/raw/%d/rosters_recovered_%d.json" % (SEASON, SEASON))
+                    or {}).get("teams", {}) or {}).items():
+        if _r.get("players") and not ((rosters.get(_t) or {}).get("players")):
+            rosters.setdefault(_t, {}).update(
+                {"players": _r["players"], "url": _r.get("url"),
+                 "status": "recovered"})
+    # 2026 per-player lines as they accumulate. Empty in the opening days, which
+    # is why 2025 stays the baseline and 2026 is shown as an addition to it
+    # rather than a replacement -- three matches is not a season.
+    prior_pos = prior_pos_index()
+    # team_id -> name, so a transfer can say which school she came from rather
+    # than just "transfer in".
+    id2name = {}
+    for _t in ((load("data/data_2025.json") or {}).get("teams") or []):
+        id2name[str(_t.get("team_id"))] = _t.get("name_short") or _t.get("name_full")
+
+    # Where a departed player WENT. "Departed" lumps a graduating senior in with
+    # a transfer out, and those mean very different things for a team. Every
+    # official transfer record names the school she came FROM, so inverting that
+    # map says which of a team's losses walked to another D-I programme.
+    # Anchored on (from_team_id, name), never the name alone -- a bare-name
+    # lookup across the whole country is the wrong-person match R8 exists for.
+    transferred_out = {}
+    for _dest, _rec in ret.items():
+        for _p in (_rec.get("transfer_in_official") or []):
+            if not isinstance(_p, dict):
+                continue
+            transferred_out[(str(_p.get("from_team_id")), nkey(_p.get("name")))] = _dest
+    # Second-pass roster positions (scripts/crawl_roster_positions.py). Additive:
+    # absent file simply means no extra positions.
+    site_pos_all = ((load("data/raw/%d/roster_positions_%d.json" % (SEASON, SEASON))
+                     or {}).get("teams", {}) or {})
+    live_by_team = collections.defaultdict(list)
+    for r in ((load("data/raw/%d/players_%d.json" % (SEASON, SEASON)) or {})
+              .get("players") or []):
+        live_by_team[str(r.get("team_id"))].append(r)
 
     out = {}
     for t in teams:
         nm = t["team"]
         rec = ret.get(nm) or {}
         p = proj.get(nm) or {}
+        _rk = nm if nm in rosters else roster_by_norm.get(team_norm(nm))
+        roster = roster_rows(rosters.get(_rk), rec, lineup.get(nm), live_by_team,
+                             (lineup.get(nm) or {}).get("team_id"), prior_pos,
+                             (site_pos_all.get(nm) or {}).get("positions"), id2name)
+        # Position for the projected six, reused from the roster we just built.
+        # Showing it is a CLARITY fix: this list ranks by scoring, so it can
+        # come out as four outsides and no setter -- which makes plain, at a
+        # glance, that it is not a starting lineup (R4: the name and the meaning
+        # must not drift apart).
+        rpos = dict((nkey(r["n"]), r.get("praw")) for r in roster)
         out[nm] = {
             "conf": t["conf"],
             "rank": t["rank26"],
@@ -259,16 +579,22 @@ def team_index(teams, res, pred_by_pair, sim_of):
             "record25": ("%s-%s" % (t.get("wins"), t.get("losses"))
                          if t.get("wins") is not None else None),
             "ret": t["ret"],
-            "rotation": [dict(c, photo=(photos.get(nm) or {}).get(
-                re.sub(r"[^a-z]", "", (c.get("name") or "").lower())))
-                for c in (p.get("rotation") or [])],
+            "rotation": [dict(c, pos=rpos.get(nkey(c.get("name"))),
+                              photo=(photos.get(nm) or {}).get(
+                                  re.sub(r"[^a-z]", "", (c.get("name") or "").lower())))
+                         for c in (p.get("rotation") or [])],
             "n_ret": len(rec.get("returning") or []),
             "n_dep": len(rec.get("departed") or []),
             "n_new": len(rec.get("new_or_unplayed") or []),
             "n_tin": len(rec.get("transfer_in_official") or []),
+            "lineup": lineup.get(nm),
+            "roster": roster,
             "sim": sim_of.get(nm),
-            "top_dep": sorted((rec.get("departed") or []),
-                              key=lambda x: -(x.get("pts") or 0))[:3],
+            "top_dep": [
+                dict(d, to=transferred_out.get(
+                    (str((lineup.get(nm) or {}).get("team_id")), nkey(d.get("name")))))
+                for d in sorted((rec.get("departed") or []),
+                                key=lambda x: -(x.get("pts") or 0))[:3]],
             "played": played.get(nm, []),
             "fixtures": [dict(f, pick=_fixture_pick(pred_by_pair, f, nm))
                          for f in fixtures.get(nm, []) if f["d"] >= today][:40],
@@ -453,6 +779,16 @@ def box_and_players(res):
 
 def build():
     teams, field, unmatched, n_aq, meta = BOARD.build()
+    if PUBLIC:
+        # STRIP THE VALUES, NOT JUST THE COLUMNS. Removing the VT and Massey
+        # <th>/<td> only hid them: their actual ranks still shipped inside the
+        # TEAMS payload -- 25 VolleyTalk and 151 Massey rows, readable in
+        # devtools on a public page. Hiding third-party data is not the same as
+        # not publishing it. Dropped here, at the single point they enter the
+        # build, so no downstream consumer can reintroduce them.
+        for _t in teams:
+            _t["vt"] = None
+            _t["massey"] = None
     venues = load("data/venues_%d.json" % SEASON) or {}
     site_of = {r["game_id"]: r["site"] for r in venues.get("games", [])}
     event_of = {}
@@ -540,14 +876,16 @@ def build():
         rrows.append(
             '<tr class="row" data-r="%d"><td class="rk">%d</td>'
             '<td class="tm">%s%s</td><td class="cf">%s</td>'
-            '<td class="n hi">%s</td><td class="n">%s</td><td class="n">%s</td>'
-            '<td class="n">%s</td><td class="n">%s</td>'
-            '<td class="n sp">%s</td><td class="n">%s</td><td class="n hi">%s</td></tr>%s'
+            '<td class="n hi">%s</td><td class="n">%s</td>%s'
+            '<td class="n">%s</td>%s<td class="n">%s</td><td class="n hi">%s</td></tr>%s'
             % (t["rank26"], t["rank26"], esc(t["team"]),
                (' <b class="pl6">%s</b>' % t["rot"]) if t.get("rot") and t["rot"] < 6 else "",
                esc(t["conf"]),
-               c(t["rank25"]), c(t.get("avca")), c(t.get("vt")),
-               c(t.get("massey")), c(t.get("rpi")), spread or "&mdash;",
+               c(t["rank25"]), c(t.get("avca")),
+               "" if PUBLIC else ('<td class="n">%s</td><td class="n">%s</td>'
+                                  % (c(t.get("vt")), c(t.get("massey")))),
+               c(t.get("rpi")),
+               "" if PUBLIC else ('<td class="n sp">%s</td>' % (spread or "&mdash;")),
                "&mdash;" if t["ret"] is None else "%.0f%%" % (100 * t["ret"]),
                "&mdash;" if tourn_of.get(t["team"]) is None
                else "%.0f%%" % tourn_of[t["team"]], det))
@@ -693,7 +1031,7 @@ h1 em{font-style:normal;color:var(--amber)}
 .net{max-width:1280px;margin:16px auto 0;height:7px;
   background:repeating-linear-gradient(90deg,rgba(255,255,255,.32) 0 1px,transparent 1px 7px);
   border-top:2px solid var(--amber)}
-nav{background:var(--navy)}
+nav{background:var(--navy);position:sticky;top:0;z-index:6}
 nav .inner{max-width:1280px;margin:0 auto;display:flex;gap:2px;flex-wrap:wrap;padding:0 8px}
 nav button{appearance:none;border:0;background:transparent;color:#B9CBE4;
   font:700 12.5px/1 var(--sans);letter-spacing:.05em;padding:13px 16px;cursor:pointer;
@@ -712,7 +1050,13 @@ section[hidden]{display:none}
 table{width:100%;border-collapse:collapse}
 th{font:700 11px/1 var(--sans);letter-spacing:.06em;text-transform:uppercase;
   color:var(--ink2);text-align:right;padding:12px 10px;background:var(--alt);
-  border-bottom:2px solid var(--line2);position:sticky;top:0;z-index:2;white-space:nowrap}
+  border-bottom:2px solid var(--line2);position:sticky;top:var(--navh,0px);
+  z-index:2;white-space:nowrap}
+/* A header inside its OWN scroll box sticks to that box, not to the page, so
+   the nav offset does not apply -- adding it pushed the header 42px DOWN, on
+   top of row 1, and the #1 team vanished behind it ("Nebraska fell off the
+   rankings"). Only page-level sticky headers need to clear the nav. */
+.scroll th{top:0}
 th.l{text-align:left}
 td{padding:10px;border-bottom:1px solid var(--line);text-align:right;font-size:14px}
 tbody tr:nth-child(even of .row){background:var(--alt)}
@@ -784,6 +1128,60 @@ td.pick b{color:var(--navy)}
 .card.islive .cd{color:var(--live)}
 .set.now{border-color:var(--live)}
 .set.now span{background:#FCEDEC;color:var(--live)}
+
+/* ---- full roster ---- */
+.tsec--wide{margin-top:14px}
+/* 5-1 / 6-2: how many setters the team actually starts. Shown only when its
+   lineups agree; a team with thin position data gets no badge, not a guess. */
+.wentto{display:block;font:600 10.5px/1 var(--sans);color:var(--ink3);margin-top:3px}
+.tabhint{margin:0 0 12px;font-size:12.5px;color:var(--ink2)}
+.sysbadge{font:700 10px/1 var(--mono);color:#fff;background:var(--navy);
+  border-radius:20px;padding:4px 8px;margin-left:8px;vertical-align:2px;
+  letter-spacing:.04em}
+.tsec{scroll-margin-top:calc(var(--navh,0px) + 10px)}
+.rbody{max-height:none}
+/* Multi-column on a wide screen: a 20-player roster as one tall list wastes the
+   width and forces scrolling past it to reach anything below. Groups are kept
+   unbroken so a position never splits across columns. */
+@media(min-width:900px){
+  .rbody{column-count:2;column-gap:22px}
+}
+@media(min-width:1350px){
+  .rbody{column-count:3}
+}
+.rgrp{margin-bottom:15px;break-inside:avoid;page-break-inside:avoid}
+.rgrp:last-child{margin-bottom:0}
+.rgrp-h{display:flex;align-items:center;gap:8px;font:700 10.5px/1 var(--sans);
+  letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);
+  padding:0 0 6px;border-bottom:1px solid var(--line2);margin-bottom:2px}
+.rgrp-n{font:700 10px/1 var(--mono);color:var(--ink3);background:var(--alt);
+  border-radius:20px;padding:3px 7px}
+.rrow{display:grid;grid-template-columns:32px 1fr auto;grid-template-areas:
+  "num name stat" "num meta stat";align-items:center;gap:0 8px;
+  padding:7px 9px 7px 6px;border-left:3px solid transparent;
+  border-bottom:1px solid var(--line);transition:background .12s ease}
+.rrow:last-child{border-bottom:0}
+.rrow:hover{background:var(--alt)}
+/* A starter is marked by a bar rather than a fill: the fill was too faint to
+   read, and the legend under the table names this bar explicitly. */
+.rrow--starter{border-left-color:#12864B}
+.rrow--starter .rname{font-weight:700}
+.rnum{grid-area:num;font:700 11.5px/1 var(--mono);color:var(--ink3);text-align:right}
+.rname{grid-area:name;font-size:13.5px;font-weight:600}
+.rmeta{grid-area:meta;font-size:11.5px;color:var(--ink2);margin-top:2px}
+.rstat{grid-area:stat;font:700 14px/1 var(--mono);color:var(--navy);text-align:right;
+  white-space:nowrap;padding-left:10px}
+.rstat em{display:block;font:600 9px/1 var(--sans);letter-spacing:.05em;
+  text-transform:uppercase;color:var(--ink3);font-style:normal;margin-top:3px}
+.rstat .none{color:var(--ink3);font-weight:400}
+h3 .h3n{font:700 10px/1 var(--mono);color:var(--ink3);background:var(--alt);
+  border-radius:20px;padding:3px 7px;margin-left:7px;vertical-align:2px}
+@media (max-width:560px){
+  .rrow{grid-template-columns:26px 1fr auto;padding-right:4px}
+  .rname{font-size:13px}
+  .rmeta{font-size:11px}
+  .rstat{font-size:13px;padding-left:6px}
+}
 
 /* ---- rotation detail ---- */
 tr.det td{background:var(--alt);padding:13px 15px}
@@ -998,6 +1396,8 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <input type="search" id="tmq" list="tmlist" placeholder="Type a team&hellip;" autocomplete="off">
     <datalist id="tmlist"></datalist>
   </div>
+  <p class="tabhint">Start typing, or click any team on the Rankings, Scores or
+    Schedule tab to open it here.</p>
   <div id="teamcard"></div>
 </section>
 
@@ -1112,6 +1512,24 @@ document.querySelectorAll('nav button').forEach(b => b.addEventListener('click',
   document.querySelectorAll('nav button').forEach(x => x.setAttribute('aria-selected', x === b));
   document.querySelectorAll('main section').forEach(s => { s.hidden = true; });
   $('#v-' + b.dataset.v).hidden = false;
+  /* The Teams tab used to open COMPLETELY BLANK -- a lone "Type a team" box,
+     with no indication that anything lived here or which names it would accept.
+     Land on the top-ranked team so the tab is never empty; a real selection is
+     never overwritten. */
+  if (b.dataset.v === 'teams' && !document.querySelector('#teamcard .thead')) {
+    const first = Object.keys(TEAMS)
+      .filter(k => TEAMS[k] && TEAMS[k].rank)
+      .sort((x, y) => TEAMS[x].rank - TEAMS[y].rank)[0];
+    if (first) showTeam(first);
+  }
+  /* Back to the top of the new tab.
+     Since the nav became sticky you can switch tabs from anywhere on a very
+     long page, and the scroll position carried over -- so Rankings opened with
+     its first rows tucked under the sticky nav AND the sticky table header,
+     and the #1 team was simply not on screen. Reported as "Nebraska fell off
+     the rankings". Only scrolls up: if the user is already at the top this is
+     a no-op and does not fight them. */
+  if (window.scrollY > 0) window.scrollTo({top: 0, behavior: 'auto'});
 }));
 
 /* rankings */
@@ -1454,14 +1872,68 @@ function showTeam(name) {
                '{className:\'mug mug--none\',textContent:\'' + initials(c.name) + '\'}))">'
              : '<span class="mug mug--none">' + initials(c.name) + '</span>') +
     '<span class="nm">' + c.name + '</span>' +
-    '<span class="kd">' + c.kind + (c.kind === 'transfer' && c.from ? ' \u00b7 ' + c.from : '') +
+    '<span class="kd">' + (c.pos ? c.pos + ' \u00b7 ' : '') + c.kind +
+    (c.kind === 'transfer' && c.from ? ' \u00b7 ' + c.from : '') +
     '</span><span class="rt">' + (c.adj !== undefined ? c.adj : c.rate) + '</span></div>').join('');
+  const LU_STATUS = {returning: 'back', departed: 'gone',
+                     unknown: 'unresolved', no_roster: '\u2014'};
+  const lu = t.lineup;
+  const started = !lu ? '' : (lu.usual_six_2025 || []).map(c =>
+    '<div class="plrow"><span class="nm">' + c.name + '</span>' +
+    '<span class="kd">' + (c.pos || '') +
+      (c.num !== null && c.num !== undefined ? ' \u00b7 #' + c.num : '') +
+      ' \u00b7 ' + (LU_STATUS[c.status_2026] || c.status_2026) + '</span>' +
+    '<span class="rt">' + c.starts_2025 + '</span></div>').join('');
+  const POS_LABEL = {S:'Setters', OPP:'Opposites', OH:'Outside hitters',
+                     MB:'Middle blockers', 'L/DS':'Libero / defensive specialists',
+                     '':'Position not listed'};
+  const POS_SEQ = ['S','OPP','OH','MB','L/DS',''];
+  /* "unmatched" was internal jargon on a page a human reads. The two cases are
+     genuinely different and both must stay honest: 'new' means the roster join
+     placed her and she has no Division-I record at all; 'unresolved' means the
+     join could not confirm her against 2025 at all, so she MIGHT have played
+     and we simply cannot say. Neither gets a number. */
+  const KIND_TAG = {returning:'', transfer:'transfer in', new:'no D-I record',
+                    unresolved:'no 2025 stats matched'};
+  const rost = t.roster || [];
+  let rosterHtml = '';
+  if (rost.length) {
+    for (const grp of POS_SEQ) {
+      const inGrp = rost.filter(r => r.p === grp);
+      if (!inGrp.length) continue;
+      rosterHtml += '<div class="rgrp"><div class="rgrp-h">' + POS_LABEL[grp] +
+                    '<span class="rgrp-n">' + inGrp.length + '</span></div>';
+      for (const r of inGrp) {
+        /* Label the season on the number itself. It is a 2025 rate, and once
+           2026 results pile up an unlabelled "pts/set" reads as current-season
+           form -- the field meaning drifting away from its heading (R4). */
+        const stat = (r.r !== null && r.r !== undefined)
+          ? r.r + '<em>' + (r.k === 'transfer' ? '2025 elsewhere' : '2025 pts/set') + '</em>'
+          : '<span class="none">&mdash;</span>';
+        const sub = [];
+        if (r.c) sub.push(r.c);
+        if (r.praw) sub.push(r.praw);
+        if (r.st) sub.push('started ' + r.st +
+          (lu && lu.matches_with_lineup ? ' of ' + lu.matches_with_lineup : ''));
+        if (r.sets) sub.push(r.sets + ' sets in 2025');
+        if (KIND_TAG[r.k]) sub.push(KIND_TAG[r.k] + (r.k === 'transfer' && r.from ? ' from ' + r.from : ''));
+        if (r.l26) sub.push('<b>2026: ' + r.l26.sets + ' sets</b>');
+        rosterHtml += '<div class="rrow' + (r.st ? ' rrow--starter' : '') + '">' +
+          '<span class="rnum">' + (r.num !== null && r.num !== undefined ? '#' + r.num : '') + '</span>' +
+          '<span class="rname">' + r.n + '</span>' +
+          '<span class="rmeta">' + sub.join(' \u00b7 ') + '</span>' +
+          '<span class="rstat">' + stat + '</span></div>';
+      }
+      rosterHtml += '</div>';
+    }
+  }
   const dep = (t.top_dep || []).map(d =>
-    '<div class="plrow"><span class="nm">' + d.name + '</span>' +
+    '<div class="plrow"><span class="nm">' + d.name +
+    (d.to ? '<span class="wentto">\u2192 ' + d.to + '</span>' : '') + '</span>' +
     '<span class="kd">departed</span><span class="rt">' + (d.pts || 0) + ' pts</span></div>'
   ).join('');
   box.innerHTML =
-    '<div class="thead"><h2>' + name + '</h2>' +
+    '<div class="thead"><h2>' + logo(name, 'lg') + name + '</h2>' +
     '<div class="sub">' + (t.conf || '') +
       (t.record25 ? ' \u00b7 ' + t.record25 + ' in 2025' : '') + '</div>' +
     '<div class="chips">' +
@@ -1490,8 +1962,31 @@ function showTeam(name) {
         '<div class="tsec"><h3>Projected six</h3><div class="body">' +
           (six || '<div class="tnote">No roster on file for this team, so it is ranked on its 2025 rating alone.</div>') +
         '</div>' +
-        (six ? '<div class="tnote">Points per set, normalised to a neutral schedule.</div>' : '') +
+        (six ? '<div class="tnote">The six highest projected <b>scorers</b> \u2014 points per set, ' +
+               'normalised to a neutral schedule. This is <b>not</b> a starting lineup: it ranks by ' +
+               'scoring, so setters and defensive players drop out of it.</div>' : '') +
         '</div>' +
+        (started ? '<div class="tsec" style="margin-top:14px">' +
+             '<h3>Most-started six, 2025' +
+             (lu.offense_system_2025
+               ? '<span class="sysbadge" title="' +
+                 (lu.offense_system_2025 === '5-1'
+                   ? 'One setter on the floor: five hitters, one setter.'
+                   : 'Two setters, opposite each other: six hitters, two setters.') +
+                 '">' + lu.offense_system_2025 + '</span>' : '') +
+             '</h3><div class="body">' + started + '</div>' +
+             '<div class="tnote">Who this team actually started, from set-1 play-by-play. ' +
+             'Right-hand number is matches started of ' + (lu.matches_with_lineup || 0) + ' on file' +
+             (lu.coverage_ok === false ? ' (thin coverage \u2014 read it as partial)' : '') + '. ' +
+             (lu.roster_join_available === false
+                ? 'No 2026 roster for this team, so who is back is <b>unknown</b>, not zero.'
+                : (lu.returning_of_six !== null && lu.returning_of_six !== undefined
+                   ? '<b>' + lu.returning_of_six + ' of 6</b> are back for 2026' +
+                     (lu.vacancies ? '; ' + lu.vacancies + ' slot' + (lu.vacancies > 1 ? 's are' : ' is') +
+                      ' open \u2014 we do not guess who fills ' + (lu.vacancies > 1 ? 'them' : 'it') + '.' : '.')
+                   : '')) +
+             ' Listed by matches started. <b>Rotation order 1\u20136 is not available</b> \u2014 ' +
+             'the feed orders its six by jersey number.</div></div>' : '') +
         (dep ? '<div class="tsec" style="margin-top:14px"><h3>Biggest losses</h3>' +
                '<div class="body">' + dep + '</div></div>' : '') +
         '<div class="tsec" style="margin-top:14px"><h3>Roster turnover</h3><div class="body">' +
@@ -1501,8 +1996,27 @@ function showTeam(name) {
           '<div class="plrow"><span class="nm">New / no D-I record</span><span class="rt">' + t.n_new + '</span></div>' +
         '</div></div>' +
       '</div>' +
-    '</div>';
+    '</div>' +
+    (rosterHtml
+      ? '<div class="tsec tsec--wide"><h3>Full roster' +
+        '<span class="h3n">' + rost.length + '</span></h3>' +
+        '<div class="body rbody">' + rosterHtml + '</div>' +
+        '<div class="tnote">Roster from the school\u2019s own site; position and ' +
+        'production from official box scores. A <b>green bar</b> marks a player who ' +
+        'started at least one match in 2025. A player with no Division-I record shows ' +
+        '<b>&mdash;</b> rather than a number \u2014 about a fifth of a season\u2019s ' +
+        'production comes from players like her, and we do not invent it.</div></div>'
+      : '');
 }
+/* The sticky table headers offset themselves by the nav's real height; the tab
+   row wraps on a narrow window, so this is measured rather than hard-coded. */
+function syncNavHeight() {
+  const nav = document.querySelector('nav');
+  if (nav) document.documentElement.style.setProperty('--navh', nav.offsetHeight + 'px');
+}
+syncNavHeight();
+window.addEventListener('resize', syncNavHeight);
+
 document.getElementById('tmq').addEventListener('input', e => {
   if (TEAMS[e.target.value]) showTeam(e.target.value);
 });
@@ -1524,9 +2038,68 @@ filter('tq', 'tbody', 'tcnt', 'matches');
 </body></html>"""
 
 
+# Markers that must not survive into a PUBLIC build. Asserted after the strip,
+# so a template edit that reintroduces one fails the build instead of quietly
+# republishing somebody else's work.
+# Markers must not collide with real DATA. "Massey" alone tripped on Addison
+# Massey and Alexis Massey -- actual players on actual rosters. Match the
+# product and the markup, never a bare word that can be somebody's surname.
+PRIVATE_MARKERS = ("VolleyTalk", "Massey Ratings", "Massey Ratings, 2026",
+                   'data-v="tv"', 'id="v-tv"', "tv_listings",
+                   "chip('Massey'", "chip('VT'")
+
+
+def strip_private(html):
+    # type: (str) -> str
+    """Remove the third-party views from the public page.
+
+    Done as a post-pass on the finished HTML rather than as conditionals inside
+    a 1,000-line template: the transformation is then a single place to read,
+    and it is ASSERTED below rather than assumed.
+    """
+    # the On TV tab and its section
+    html = re.sub(r'\s*<button role="tab"[^>]*data-v="tv"[^>]*>.*?</button>', "",
+                  html, flags=re.S)
+    html = re.sub(r'<section id="v-tv".*?</section>', "", html, flags=re.S)
+    # third-party ranking columns
+    html = re.sub(r'\s*<th title="VolleyTalk[^>]*>.*?</th>', "", html, flags=re.S)
+    html = re.sub(r'\s*<th title="Massey[^>]*>.*?</th>', "", html, flags=re.S)
+    html = re.sub(r'\s*<th title="range the other systems[^>]*>.*?</th>', "", html,
+                  flags=re.S)
+    # the sentence describing the reference columns, and the VT/Massey chips
+    html = html.replace(
+        "VolleyTalk and Massey are all forecasts of 2026.",
+        "and the AVCA coaches poll are forecasts of 2026.")
+    html = re.sub(r"chip\('VT',[^)]*\)\s*\+\s*", "", html)
+    html = re.sub(r"chip\('Massey',[^)]*\)\s*\+\s*", "", html)
+    return html
+
+
 if __name__ == "__main__":
     html = build()
+    if PUBLIC:
+        html = strip_private(html)
+        leaked = [m for m in PRIVATE_MARKERS if m in html]
+        if leaked:
+            raise SystemExit(
+                "PUBLIC BUILD ABORTED: private source(s) still present: %s"
+                % ", ".join(leaked))
     if not os.path.isdir(os.path.dirname(OUT)):
         os.makedirs(os.path.dirname(OUT))
     open(OUT, "w", encoding="utf-8").write(html)
     print("wrote %s (%.0f KB)" % (OUT, os.path.getsize(OUT) / 1024.0))
+
+    if PUBLIC:
+        # Cache-bust the redirect. Fastly holds the object for ~10 minutes, so
+        # without a new URL a freshly deployed page keeps serving old bytes long
+        # enough for a phone check to test the previous build and report the fix
+        # as broken. (Inherited from build_vb.py, which this supersedes.)
+        import hashlib
+        ver = hashlib.sha1(html.encode("utf-8")).hexdigest()[:12]
+        idx = os.path.join(REPO, "index.html")
+        if os.path.exists(idx):
+            txt = open(idx, encoding="utf-8").read()
+            txt = re.sub(r"output/vb_dashboard\.html(\?v=[0-9a-f]+)?",
+                         "output/vb_dashboard.html?v=" + ver, txt)
+            open(idx, "w", encoding="utf-8").write(txt)
+            print("index.html -> output/vb_dashboard.html?v=%s" % ver)

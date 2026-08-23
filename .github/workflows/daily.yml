@@ -66,6 +66,17 @@ jobs:
           # and next season's returning production are built from.
           python3 scripts/crawl_2025.py players
           python3 scripts/crawl_2025.py stats || echo "stats unavailable this early in the season; continuing"
+          # Starting lineups from the play-by-play, taken daily for the same
+          # reason as the player lines above: collected as they happen rather
+          # than trusted to be re-crawlable later. Extracts six names a match
+          # and DISCARDS the ~58 kB payload, so this adds kilobytes, not the
+          # 296 MB a season of raw PBP would.
+          #
+          # As of 2026-08-22 the 2026 feed emits the `starters:` scaffold with
+          # ZERO names filled, so this may legitimately collect nothing for a
+          # while; `starters_lines_with_names` in the output is the counter that
+          # says when that changes. Non-fatal either way.
+          python3 scripts/crawl_pbp.py || echo "play-by-play unavailable; continuing"
 
       # A FAILED RUN MUST NOT OVERWRITE GOOD DATA WITH PARTIAL DATA.
       # The crawl is append-only and resumable, so a mid-crawl failure leaves a
@@ -101,7 +112,14 @@ jobs:
           python3 scripts/build_dataset.py
           python3 scripts/rpi_2025.py || echo "RPI needs a game graph; skipping this early"
           python3 scripts/rating_2025.py
-          python3 scripts/build_vb.py
+          # The PUBLIC dashboard is now the same builder as Cody's page, with
+          # the third-party views stripped (VolleyTalk poll, Massey, TV
+          # listings). One builder, two outputs -- the two pages used to be
+          # different products, which is how the public one fell years behind.
+          # build_vb.py is superseded and no longer run; kept on disk only as
+          # the record of the old template.
+          python3 scripts/project_lineups.py || echo "no lineups yet; continuing"
+          python3 scripts/build_hub.py --public || echo "public dashboard build failed; leaving the previous one in place"
 
       # Semantic gate on what will actually be SERVED. The reconcile checks the
       # data; this checks that each number is under the right heading -- the
@@ -122,6 +140,7 @@ jobs:
           python3 scripts/test_join_invariants.py
           python3 scripts/test_projection.py
           python3 scripts/test_score_predictions.py
+          python3 scripts/test_lineups.py
 
       # Coverage gate: a NEW displayed field with no declared provenance fails
       # the run. It cannot catch a client-side expression inventing a value for
@@ -141,7 +160,10 @@ jobs:
         run: |
           git config user.name  "wvb-hub bot"
           git config user.email "noreply@github.com"
-          git add data/raw output/vb_dashboard.html
+          # index.html carries the cache-busting hash of the dashboard. Without
+          # it the CDN keeps serving the previous bytes for ~10 minutes, which
+          # once made a deployed fix look broken on a phone check.
+          git add data/raw output/vb_dashboard.html index.html
           if git diff --cached --quiet; then
             echo "nothing changed"
           else

@@ -1,0 +1,30 @@
+{
+ "meta": {
+  "season": 2026,
+  "source_tier": "DERIVED",
+  "why": "athletics_sites.json mirrors ncaa.com's school pages, and ncaa.com carries a STALE athletics URL for these schools (it still lists suathletics.com for Syracuse, buffalobulls.com for Buffalo). Two entries were also malformed with a doubled scheme. Corrected here rather than in athletics_sites.json so the mirrored file stays a faithful record of what ncaa.com says.",
+  "verification": "A corrected domain is only accepted if the roster it yields OVERLAPS that team's own 2025 box-score names. A domain that resolves proves nothing; a roster full of the right people does."
+ },
+ "teams": {
+  "Allen": "https://auyellowjackets.com",
+  "North Dakota": "https://fightinghawks.com",
+  "Buffalo": "https://ubbulls.com",
+  "Ga. Southern": "https://gseagles.com",
+  "George Washington": "https://gwsports.com",
+  "Jackson St.": "https://gojsutigers.com",
+  "Miami (OH)": "https://miamiredhawks.com",
+  "Quinnipiac": "https://gobobcats.com",
+  "Southeast Mo. St.": "https://semoredhawks.com",
+  "Syracuse": "https://cuse.com",
+  "UMES": "https://easternshorehawks.com",
+  "McNeese": "https://mcneesesports.com",
+  "Saint Francis": "https://sfuathletics.com",
+  "UIW": "https://uiwcardinals.com",
+  "East Texas A&M": "https://lionathletics.com",
+  "Wake Forest": "https://godeacs.com",
+  "Stony Brook": "https://stonybrookathletics.com",
+  "Colgate": "https://colgateathletics.com",
+  "Oral Roberts": "https://oruathletics.com",
+  "West Ga.": "https://uwgathletics.com"
+ }
+}

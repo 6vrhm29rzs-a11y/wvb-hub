@@ -279,6 +279,286 @@ def check_no_fabrication():
            "no synthesised stand-in values in the built page")
 
 
+def check_start_times():
+    """No fixture may display an impossible start time.
+
+    ncaa.com fills an unannounced start with a midnight-ish sentinel that
+    formats exactly like a real time (12:00-3:00 AM ET). Measured: in the
+    completed 2025 season all 13 early-AM fixtures were at Hawaii, where
+    1:00 AM ET is a 7:00 PM local start; in the 2026 schedule 176 of 192 were
+    at schools like Nebraska and Alabama, which do not host at 1 AM. Printing
+    those is R5 -- a synthesised value under a real-looking label.
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping start-time check")
+        return
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from build_hub import listed_time, FAR_WEST_HOME
+
+    h = open(hub, encoding="utf-8").read()
+    early = re.compile(r"^(12|[1-5]):\d\d\s*AM", re.I)
+
+    m = re.search(r"const TEAMS = (\{.*?\});\n", h, re.S)
+    n_checked = 0
+    offenders = []
+    if m:
+        teams = json.loads(m.group(1))
+        for tname, rec in teams.items():
+            for f in rec.get("fixtures") or []:
+                t = (f.get("t") or "").strip()
+                n_checked += 1
+                if not early.match(t):
+                    continue
+                # only legitimate when THIS team hosts and is far-western
+                home_team = tname if f.get("home") else f.get("opp")
+                if home_team not in FAR_WEST_HOME:
+                    offenders.append((tname, f.get("d"), t))
+    if offenders:
+        bad("impossible start time displayed",
+            "%d fixtures, e.g. %s" % (len(offenders), offenders[:3]))
+    else:
+        ok("no fixture shows an impossible early-AM start", n_checked)
+
+    m2 = re.search(r"const SCHED = (\[.*?\]);\n", h, re.S)
+    if m2:
+        sched = json.loads(m2.group(1))
+        off2 = [r for r in sched
+                if early.match((r.get("t") or "")) and r.get("h") not in FAR_WEST_HOME]
+        if off2:
+            bad("impossible start time in schedule tab",
+                "%d rows, e.g. %s" % (len(off2), off2[:2]))
+        else:
+            ok("schedule tab shows no impossible start", len(sched))
+
+    # ---- NEGATIVE CONTROL: the checker must reject a known-bad value, and
+    # must NOT reject a genuine Hawaii night match.
+    if listed_time("1:00 AM ET", "Nebraska") != "TBA":
+        bad("negative control", "sentinel at Nebraska was not suppressed")
+    elif listed_time("1:00 AM ET", "Hawaii") != "1:00 AM ET":
+        bad("negative control", "genuine Hawaii start time was suppressed")
+    elif listed_time("7:00 PM ET", "Nebraska") != "7:00 PM ET":
+        bad("negative control", "a normal evening time was altered")
+    else:
+        ok("negative control: sentinel suppressed, Hawaii + evening kept")
+
+
+def check_roster():
+    """The full-roster block: no invented stats, no guessed positions."""
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping roster check")
+        return
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from build_hub import pos_bucket
+
+    # 'O' appears on 94 box-score rows and is genuinely AMBIGUOUS: of the 41
+    # that also carry a school-site position, 27 are OPP but 8 are OH and 5 are
+    # S. Mapping it to Opposite would misplace roughly one in three. It must
+    # stay unbucketed and render as "Position not listed".
+    if pos_bucket("O") != "":
+        bad("ambiguous position guessed", "'O' was bucketed as %r" % pos_bucket("O"))
+    else:
+        ok("ambiguous position code 'O' left unlisted, not guessed")
+    for code, want in (("OH", "OH"), ("MB", "MB"), ("S", "S"),
+                       ("OPP", "OPP"), ("RS", "OPP"), ("L/DS", "L/DS")):
+        if pos_bucket(code) != want:
+            bad("position bucket", "%s -> %s, expected %s"
+                % (code, pos_bucket(code), want))
+
+    h = open(hub, encoding="utf-8").read()
+    m = re.search(r"const TEAMS = (\{.*?\});\n", h, re.S)
+    if not m:
+        return
+    teams = json.loads(m.group(1))
+    fabricated, dupes, overstarted, n = [], [], [], 0
+    for tname, rec in teams.items():
+        roster = rec.get("roster") or []
+        n += len(roster)
+        names = [r["n"] for r in roster]
+        if len(set(names)) != len(names):
+            dupes.append(tname)
+        lu = rec.get("lineup") or {}
+        cap = lu.get("matches_with_lineup")
+        for r in roster:
+            # a player with no D-I record must carry NO production number
+            if r["k"] == "new" and r.get("r") is not None:
+                fabricated.append((tname, r["n"], r["r"]))
+            if cap and (r.get("st") or 0) > cap:
+                overstarted.append((tname, r["n"], r["st"], cap))
+    if fabricated:
+        bad("stat shown for a player with no D-I record",
+            "%d, e.g. %s" % (len(fabricated), fabricated[:3]))
+    else:
+        ok("no production number on a player with no D-I record", n)
+    if dupes:
+        bad("duplicate player in a roster", str(dupes[:3]))
+    else:
+        ok("no duplicate players within a roster")
+    if overstarted:
+        bad("more starts than matches on file", str(overstarted[:3]))
+    else:
+        ok("no player has more starts than the team has matches")
+
+
+def check_sticky_headers():
+    """A sticky header must not cover the first row.
+
+    Paid for: the nav was made sticky and table headers were offset by its
+    height so they would clear it. But the rankings and leaders tables scroll
+    inside their OWN box, where that offset pushes the header 42px DOWN -- on
+    top of row 1. The #1 team disappeared behind its own column header, which
+    read as "Nebraska fell off the rankings". Any page-level offset must be
+    cancelled for headers inside a scroll container.
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping sticky-header check")
+        return
+    css = open(hub, encoding="utf-8").read()
+    offset = re.search(r"th\s*\{[^}]*top:\s*var\(--navh", css) is not None
+    cancel = re.search(r"\.scroll\s+th\s*\{[^}]*top:\s*0", css) is not None
+    if offset and not cancel:
+        bad("sticky header offset not cancelled inside scroll boxes",
+            "th uses top:var(--navh) but there is no `.scroll th{top:0}`; "
+            "row 1 will be hidden under the header")
+    else:
+        ok("sticky header offset cancelled for internally-scrolling tables")
+
+
+def check_transfer_reconciliation():
+    """A transfer must describe the SAME player on both sides.
+
+    Her old team lists her under departures with a season point total; her new
+    team lists her with a rate and a set count taken from that same season at
+    the old school. The two are derived by different paths and must agree --
+    rate x sets == points. A mismatch means a name matched the wrong person,
+    which is the failure mode that looks entirely correct on both pages (R8).
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping transfer reconciliation")
+        return
+    h = open(hub, encoding="utf-8").read()
+    m = re.search(r"const TEAMS = (\{.*?\});\n", h, re.S)
+    if not m:
+        return
+    teams = json.loads(m.group(1))
+    pairs = {}
+    for _t, v in teams.items():
+        for d in (v.get("top_dep") or []):
+            if d.get("to"):
+                pairs[(d["name"], d["to"])] = d.get("pts")
+    checked = mismatch = 0
+    examples = []
+    for (nm, dest), pts in pairs.items():
+        rows = [r for r in (teams.get(dest, {}).get("roster") or []) if r["n"] == nm]
+        if not rows:
+            continue
+        r = rows[0]
+        if not (r.get("r") and r.get("sets")):
+            continue
+        checked += 1
+        if abs(r["r"] * r["sets"] - (pts or 0)) > 1.0:
+            mismatch += 1
+            examples.append((nm, dest, pts, r["r"], r["sets"]))
+    if mismatch:
+        bad("transfer does not reconcile across the two teams",
+            "%d of %d, e.g. %s" % (mismatch, checked, examples[:2]))
+    else:
+        ok("every transfer reconciles: rate x sets == departure points", checked)
+
+
+def check_public_build_is_clean():
+    """The PUBLIC dashboard must carry no third-party source.
+
+    This repo is public. The private page shows a VolleyTalk poll, Massey
+    Ratings and TV listings transcribed from a forum; none of those are ours to
+    republish. One builder now produces both pages, which is what keeps their
+    UI identical -- and is exactly why this guard has to exist, because a new
+    section added for the private page reaches the public one by default.
+
+    Markers must not collide with DATA: a bare "Massey" matched Addison Massey
+    and Alexis Massey, real players on real rosters.
+    """
+    pub = os.path.join(REPO, "output", "vb_dashboard.html")
+    if not os.path.exists(pub):
+        print("  no public dashboard built -- skipping")
+        return
+    h = open(pub, encoding="utf-8").read()
+    markers = ("VolleyTalk", "Massey Ratings", 'data-v="tv"', 'id="v-tv"',
+               "tv_listings", "chip('Massey'", "chip('VT'")
+    leaked = [m for m in markers if m in h]
+    if leaked:
+        bad("public dashboard leaks a private source", ", ".join(leaked))
+    else:
+        ok("public dashboard carries no third-party source", len(markers))
+
+    # ---- THE DATA, not just the words --------------------------------
+    # The first version of this guard only looked for the STRINGS "VolleyTalk"
+    # and "Massey Ratings". It passed while the payload still shipped 25
+    # VolleyTalk ranks and 151 Massey ranks inside const TEAMS -- invisible on
+    # the page, one devtools open away from anyone. Hiding third-party data is
+    # not the same as not publishing it.
+    tm = re.search(r"const TEAMS = (\{.*?\});\n", h, re.S)
+    if tm:
+        teams = json.loads(tm.group(1))
+        vt = sum(1 for v in teams.values() if v.get("vt") is not None)
+        ms = sum(1 for v in teams.values() if v.get("massey") is not None)
+        if vt or ms:
+            bad("public payload carries third-party ranks",
+                "%d VolleyTalk, %d Massey values in const TEAMS" % (vt, ms))
+        else:
+            ok("public payload carries no third-party rank values", len(teams))
+
+    # the rankings table must not be left with mismatched columns after the strip
+    m = re.search(r"<thead><tr>(.*?)</tr></thead>", h, re.S)
+    b = re.search(r'<tbody id="rbody">(.*?)</tbody>', h, re.S)
+    if m and b:
+        row = re.search(r'<tr[^>]*class="row"[^>]*>(.*?)</tr>', b.group(1), re.S)
+        if row:
+            n_th = len(re.findall(r"<th", m.group(1)))
+            n_td = len(re.findall(r"<td", row.group(1)))
+            if n_th != n_td:
+                bad("public rankings columns misaligned",
+                    "%d headers vs %d cells" % (n_th, n_td))
+            else:
+                ok("public rankings header and cells align", n_th)
+
+
+def check_photos_are_urls_only():
+    """Headshots are REFERENCES, never files.
+
+    This repo is public and the photographs belong to the schools: storing a
+    URL is a different act from republishing the image. So no photo value may
+    be an embedded image (`data:`) or a local path, and a player without one
+    must fall back to initials rather than a stand-in picture.
+    """
+    for label, path in (("private", os.path.join(REPO, "Cody", "START-HERE.html")),
+                        ("public", os.path.join(REPO, "output", "vb_dashboard.html"))):
+        if not os.path.exists(path):
+            continue
+        h = open(path, encoding="utf-8").read()
+        m = re.search(r"const TEAMS = (\{.*?\});\n", h, re.S)
+        if not m:
+            continue
+        teams = json.loads(m.group(1))
+        vals = [c.get("photo") for v in teams.values()
+                for c in (v.get("rotation") or []) if c.get("photo")]
+        embedded = [u for u in vals if str(u).startswith("data:")]
+        local = [u for u in vals if not str(u).startswith(("http://", "https://"))]
+        if embedded:
+            bad("%s: embedded image data in a photo field" % label,
+                "%d values" % len(embedded))
+        elif local:
+            bad("%s: non-URL photo value" % label, str(local[:2]))
+        else:
+            ok("%s: every headshot is a remote URL" % label, len(vals))
+        # the initials fallback must still exist
+        if "mug--none" not in h:
+            bad("%s: no initials fallback for a missing photo" % label, "")
+
+
 def main():
     print("=" * 68)
     print("DISPLAY INVARIANTS -- is each number under the right heading?")
@@ -289,6 +569,18 @@ def main():
     else:
         check_model(M)
     check_no_fabrication()
+    print()
+    check_start_times()
+    print()
+    check_roster()
+    print()
+    check_sticky_headers()
+    print()
+    check_transfer_reconciliation()
+    print()
+    check_public_build_is_clean()
+    print()
+    check_photos_are_urls_only()
     print()
     check_rating()
     print()

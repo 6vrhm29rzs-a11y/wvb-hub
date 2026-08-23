@@ -106,3 +106,10 @@ Cody/
 # the model said before each match was played, and re-deriving it afterwards from
 # data that includes the outcome would be a fit, not a forecast. Committed.
 !data/raw/2026/prediction_log.jsonl
+
+# Raw play-by-play payloads: ~58 KB/game, ~296 MB/season, and we only need six
+# names a game out of them. scripts/crawl_pbp.py extracts to lineups.jsonl and
+# discards the raw by default; --keep-raw writes this file for local debugging.
+# It must never be committed -- the daily workflow runs `git add data/raw`, so
+# without this line CI would quietly push it to a PUBLIC repo.
+data/raw/*/pbp.jsonl
