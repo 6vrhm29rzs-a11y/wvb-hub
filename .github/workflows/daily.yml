@@ -173,8 +173,14 @@ jobs:
           # ONE artifact here that cannot be rebuilt: it records what the ranking
           # said before a week's results. Re-deriving it later from data that
           # includes those results would be a fit, not a ranking.
-          git add data/raw output/vb_dashboard.html index.html \
-                  data/rankings_history_*.jsonl
+          git add data/raw output/vb_dashboard.html index.html
+          # SEPARATE, AND TOLERANT, ON PURPOSE. Under `bash -eo pipefail` an
+          # unmatched glob is passed to git literally, git exits 128, and
+          # `git add` aborts ATOMICALLY -- so data/raw and the dashboard would
+          # not be staged either and the site would silently stop updating.
+          # Verified in a scratch repo. The archive does not exist until the
+          # first Monday of a season, so this WILL be unmatched each new year.
+          git add data/rankings_history_*.jsonl 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "nothing changed"
           else

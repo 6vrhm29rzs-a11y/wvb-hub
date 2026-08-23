@@ -130,6 +130,27 @@ def load_pipe(p) -> List[List[str]]:
     return rows
 
 
+def pick_comparison(snaps, this_week, rank_source):
+    """The snapshot the movement column should measure against, or None.
+
+    Two rules, both paid for:
+      * not THIS week -- the column answers "since the last published freeze",
+        not "since this morning".
+      * SAME BASIS -- a preseason rank and a live rank are different rulers.
+        Comparing across the crossover produces arrows that are arithmetically
+        correct and factually false: a mid-major at #14 on roster projection
+        lands near #80 on a rating that punishes weak schedules, and the page
+        would say it fell 66 places when nothing about the team changed.
+
+    Returns None when there is no same-basis earlier week, which the page
+    renders as blank rather than as a dash.
+    """
+    earlier = [s for s in snaps
+               if s.get("week") != this_week
+               and s.get("source") == rank_source]
+    return earlier[-1] if earlier else None
+
+
 def build():
     rating = load_json("data/rating_2025.json")
     if not rating:
@@ -242,8 +263,7 @@ def build():
             import datetime as _dt
             iso = _dt.date.today().isocalendar()
             this_week = "%d-W%02d" % (iso[0], iso[1])
-            earlier = [s2 for s2 in snaps if s2.get("week") != this_week]
-            use = earlier[-1] if earlier else None
+            use = pick_comparison(snaps, this_week, rank_source)
             if use:
                 prev_week = use["week"]
                 prev = dict((r["team"], r["rank"]) for r in use.get("teams", []))

@@ -19,6 +19,7 @@ import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from build_hub import mover  # noqa: E402
+from build_rankings_board import pick_comparison  # noqa: E402
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FAILED = []
@@ -99,8 +100,52 @@ def test_real_archive_shape():
           "every archived week names its source")
 
 
+def test_movement_never_crosses_the_basis():
+    """Movement must compare like with like.
+
+    Found by review, and it broke the invariant this very archive documents.
+    The comparison picked the latest earlier week by DATE alone. On the
+    crossover Monday -- when the season passes 50 matches and the live
+    composite replaces the preseason projection -- every earlier row is
+    preseason while the current rank is live. Subtracting them is arithmetic on
+    two different rulers: a mid-major at #14 on a roster projection lands near
+    #80 on a rating that punishes weak schedules, and the page would report a
+    confident fall of 66 places for a team that did nothing.
+
+    Blank is the correct output there. It is also why this is a test and not a
+    comment: the original synthetic-week test passed, because both of its rows
+    happened to be preseason.
+    """
+    pre_a = {"week": "2026-W34", "source": "preseason"}
+    pre_b = {"week": "2026-W35", "source": "preseason"}
+    live_a = {"week": "2026-W36", "source": "live"}
+    snaps = [pre_a, pre_b, live_a]
+
+    # still preseason: compare against the previous PRESEASON week
+    got = pick_comparison(snaps, "2026-W35", "preseason")
+    check(got is pre_a, "preseason compares against an earlier preseason week")
+
+    # THE CROSSOVER: current basis is live, every earlier row is preseason
+    got = pick_comparison([pre_a, pre_b], "2026-W36", "live")
+    check(got is None,
+          "crossover week yields NO comparison, not a cross-basis one",
+          repr(got))
+    check(mover({"move": None}) == "",
+          "and that renders blank, not a dash")
+
+    # once a live week exists, live compares against live
+    got = pick_comparison(snaps + [{"week": "2026-W37", "source": "live"}],
+                          "2026-W37", "live")
+    check(got is live_a, "live compares against an earlier live week")
+
+    # never compares against the current week
+    got = pick_comparison([pre_b], "2026-W35", "preseason")
+    check(got is None, "this week is never its own comparison")
+
+
 def main():
-    for fn in (test_mover_direction, test_snapshot_is_weekly_and_append_only,
+    for fn in (test_mover_direction, test_movement_never_crosses_the_basis,
+               test_snapshot_is_weekly_and_append_only,
                test_real_archive_shape):
         print(fn.__name__)
         fn()
