@@ -113,3 +113,38 @@ Cody/
 # It must never be committed -- the daily workflow runs `git add data/raw`, so
 # without this line CI would quietly push it to a PUBLIC repo.
 data/raw/*/pbp.jsonl
+
+# Reference PDFs saved from ncaa.com (official bracket, AVCA rankings). Read for
+# facts, kept OUT of this PUBLIC repo: they are NCAA/AVCA publications and
+# committing them republishes someone else's document. Same reasoning as the
+# VolleyTalk saves above. The FACTS they contain (format, field size, seeding
+# rules) are written up in docs/championship_format.md, which is ours.
+*NCAA.com.pdf
+*Official Bracket*.pdf
+*AVCA Rankings*.pdf
+
+# Research briefs returned by the other seats (Claude app / Gemini). They are
+# other people's write-ups quoting beat reporters and terms-of-service text, and
+# this repo is PUBLIC. Their FINDINGS are recorded in CLAUDE.md and docs/ in our
+# own words; the documents themselves stay local.
+NCAA D-I Women's Volleyball 2026_*.md
+NCAA D-I Women's Volleyball 2026_*.pdf
+2026 NCAA Division I Women's Volleyball_*.md
+2026 NCAA Division I Women's Volleyball_*.pdf
+NCAA D-I Women's Volleyball Stats Build_*.md
+NCAA D-I Women's Volleyball Stats Build_*.pdf
+
+# Local-only source documents: research returned by other seats, official
+# NCAA/AVCA PDFs, VolleyTalk saves, superseded handoffs. None of it is ours to
+# republish and the repo is PUBLIC. Findings live in CLAUDE.md and docs/.
+reference/
+.DS_Store
+
+# Third-party play-by-play mirror (MIT, ncaavolleyballr). 739 MB per season
+# and not ours to redistribute. Derived rotations ARE ours and are committed.
+data/raw/*/pbp/
+
+# Hand-drawn player art: likenesses of named college athletes, private page
+# only. Never published.
+Cody/
+assets/digby_*_full.png

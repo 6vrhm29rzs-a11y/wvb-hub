@@ -1,14 +1,321 @@
 {
- "meta": {
-  "season": 2026,
-  "note": "Six rows CONFIRMED by Claude-app are used as given and not re-derived. Text-matched rows are UNVERIFIED: matching page prose is weaker evidence than a rules citation.",
-  "default_for_unknown": "TOURNAMENT (most mid-majors), flagged unverified",
-  "counts": {
-   "confirmed": 6,
-   "unverified": 22,
-   "not_found": 4
+ "conferences": {
+  "ACC": {
+   "bid_2025": "Stanford",
+   "checked": false,
+   "detail": "no conference tournament in 2025; the regular-season champion took the bid",
+   "evidence_season": 2025,
+   "mechanism": "REGULAR_SEASON",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
   },
+  "ASUN": {
+   "bid_2025": "Central Arkansas",
+   "checked": true,
+   "detail": "conference tournament in 2025 (Quarterfinals: Nov. 20)",
+   "evidence_season": 2025,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "America East": {
+   "bid_2025": "UMBC",
+   "checked": true,
+   "detail": "conference tournament in 2025 (Semifinals: Nov. 21)",
+   "evidence_season": 2025,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "American": {
+   "bid_2025": "Tulsa",
+   "checked": true,
+   "detail": "conference tournament in 2025 (First round: Nov. 21)",
+   "evidence_season": 2025,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "Atlantic 10": {
+   "bid_2025": "Loyola Chicago",
+   "checked": true,
+   "detail": "conference tournament in 2025 (First round: Nov. 21)",
+   "evidence_season": 2025,
+   "last_status": "http404",
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "Big 12": {
+   "bid_2025": "Arizona State",
+   "checked": false,
+   "detail": "no conference tournament in 2025; the regular-season champion took the bid",
+   "evidence_season": 2025,
+   "mechanism": "REGULAR_SEASON",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "Big East": {
+   "bid_2025": "Creighton",
+   "checked": true,
+   "detail": "conference tournament in 2025 (Semifinals: Nov. 22)",
+   "evidence_season": 2025,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "Big Sky": {
+   "bid_2025": "Northern Colorado",
+   "checked": true,
+   "detail": "conference tournament in 2025 (Quarterfinals: Nov. 24)",
+   "evidence_season": 2025,
+   "last_status": "http404",
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "Big South": {
+   "bid_2025": "High Point",
+   "checked": true,
+   "detail": "conference tournament in 2025 (First round: Nov. 21)",
+   "evidence_season": 2025,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "Big Ten": {
+   "bid_2025": "Nebraska",
+   "checked": false,
+   "detail": "first ever for 2026; 2025 had none",
+   "evidence_season": 2026,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (2026 change, corroborated)"
+  },
+  "Big West": {
+   "bid_2025": "Cal Poly",
+   "checked": true,
+   "detail": "conference tournament in 2025 (First round: Nov. 26)",
+   "evidence_season": 2025,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "CAA": {
+   "bid_2025": "Campbell",
+   "checked": true,
+   "detail": "conference tournament in 2025 (First round: Nov. 20)",
+   "evidence_season": 2025,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "CUSA": {
+   "bid_2025": "Western Kentucky",
+   "checked": true,
+   "detail": "conference tournament in 2025 (First round: Nov. 21)",
+   "evidence_season": 2025,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "Horizon": {
+   "bid_2025": "Wright State",
+   "checked": true,
+   "detail": "conference tournament in 2025 (First round: Nov. 21)",
+   "evidence_season": 2025,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "Ivy League": {
+   "bid_2025": "Princeton",
+   "checked": true,
+   "detail": "conference tournament in 2025 (Semifinals: Nov. 21)",
+   "evidence_season": 2025,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "MAAC": {
+   "bid_2025": "Fairfield",
+   "checked": true,
+   "detail": "conference tournament in 2025 (First round: Nov. 18)",
+   "evidence_season": 2025,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "MAC": {
+   "bid_2025": "Toledo",
+   "checked": true,
+   "detail": "conference tournament in 2025 (Quarterfinals: Nov. 21)",
+   "evidence_season": 2025,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "MEAC": {
+   "bid_2025": "Coppin State",
+   "checked": true,
+   "detail": "conference tournament in 2025 (Quarterfinals: Nov. 20)",
+   "evidence_season": 2025,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "MVC": {
+   "bid_2025": "UNI",
+   "checked": true,
+   "detail": "conference tournament in 2025 (Quarterfinals: Nov. 19)",
+   "evidence_season": 2025,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "Mountain West": {
+   "bid_2025": "Utah State",
+   "checked": false,
+   "detail": "conference tournament in 2025 (First round: Nov. 26)",
+   "evidence_season": 2025,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "NEC": {
+   "bid_2025": "LIU",
+   "checked": true,
+   "detail": "conference tournament in 2025 (Semifinals: Nov. 21)",
+   "evidence_season": 2025,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "OVC": {
+   "bid_2025": "Eastern Illinois",
+   "checked": true,
+   "detail": "conference tournament in 2025 (First round: Nov. 23)",
+   "evidence_season": 2025,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "Pac-12": {
+   "checked": false,
+   "detail": "rebuilt league, new for 2026; fielded none in 2025",
+   "evidence_season": 2026,
+   "mechanism": "TOURNAMENT",
+   "source": "Claude-app research handoff",
+   "tier": "CONFIRMED (2026 change, corroborated)"
+  },
+  "Patriot": {
+   "bid_2025": "American",
+   "checked": true,
+   "detail": "conference tournament in 2025 (First round: Nov. 18)",
+   "evidence_season": 2025,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "SEC": {
+   "bid_2025": "Kentucky",
+   "checked": false,
+   "detail": "conference tournament in 2025 (First round: Nov. 21)",
+   "evidence_season": 2025,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "SWAC": {
+   "bid_2025": "Florida A&amp;M",
+   "checked": true,
+   "detail": "conference tournament in 2025 (First round: Nov. 21)",
+   "evidence_season": 2025,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "SoCon": {
+   "bid_2025": "Wofford",
+   "checked": true,
+   "detail": "conference tournament in 2025 (First round: Nov. 20)",
+   "evidence_season": 2025,
+   "last_status": "http308",
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "Southland": {
+   "bid_2025": "Stephen F. Austin",
+   "checked": true,
+   "detail": "conference tournament in 2025 (First round: Nov. 21)",
+   "evidence_season": 2025,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "Summit League": {
+   "bid_2025": "St. Thomas",
+   "checked": true,
+   "detail": "conference tournament in 2025 (First round: Nov. 23)",
+   "evidence_season": 2025,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "Sun Belt": {
+   "bid_2025": "Arkansas State",
+   "checked": true,
+   "detail": "conference tournament in 2025 (First round: Nov. 20)",
+   "evidence_season": 2025,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "UAC": {
+   "bid_2025": null,
+   "checked": true,
+   "detail": "United Athletic Conference, 9 D-I members for 2026 (the WAC's volleyball successor). UAC Championship scheduled November 2026. UT Arlington's 2026 membership is DERIVED from its own schedule: 16 of 16 conference-play fixtures vs UAC teams, opening Sept 22 at Tarleton St. -- ncaa.com still labels it 'wac'.",
+   "evidence_season": 2026,
+   "mechanism": "TOURNAMENT",
+   "source": "uacsports.com; membership cross-checked against data/raw/2026/scoreboard/",
+   "tier": "CONFIRMED (2026, external research + our own schedule graph)"
+  },
+  "WAC": {
+   "bid_2025": "Utah Valley",
+   "checked": true,
+   "detail": "conference tournament in 2025 (Quarterfinals: Nov. 20) -- SUPERSEDED for 2026: the WAC no longer fields a D-I volleyball league; see the UAC row. Kept as the record of the 2025 bid.",
+   "evidence_season": 2025,
+   "mechanism": "TOURNAMENT",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "superseded_by": "UAC",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  },
+  "WCC": {
+   "bid_2025": "San Diego",
+   "checked": true,
+   "detail": "no conference tournament in 2025; the regular-season champion took the bid",
+   "evidence_season": 2025,
+   "last_status": "urlerror",
+   "mechanism": "REGULAR_SEASON",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+   "tier": "CONFIRMED (ncaa.com 2025 AQ tracker)"
+  }
+ },
+ "meta": {
+  "counts": {
+   "REGULAR_SEASON": 3,
+   "TOURNAMENT": 29
+  },
+  "default_for_unknown": "TOURNAMENT (most mid-majors), flagged unverified",
+  "mechanism_note": "Mechanism set from ncaa.com's 2025 automatic-qualifier tracker, which states each conference's tournament rounds or N/A. 2025 EVIDENCE: a league that changes format for 2026 without announcing it will be wrong here. Big Ten and Pac-12 overrides applied for known 2026 changes. Cannot be derived from our game log -- the feed carries no bracket structure.",
+  "mechanism_source": "https://www.ncaa.com/news/volleyball-women/article/2025-11-27/tracking-all-31-automatic-qualifiers-2025-ncaa-womens-volleyball-tournament",
+  "note": "Six rows CONFIRMED by Claude-app are used as given and not re-derived. Text-matched rows are UNVERIFIED: matching page prose is weaker evidence than a rules citation.",
+  "season": 2026,
   "validation": {
+   "applies_to_current_values": false,
+   "correct": 0,
+   "current_values_source": "ncaa.com 2025 automatic-qualifier tracker, which states each conference's tournament rounds or N/A explicitly. All six previously hand-confirmed rows agree with it independently. See meta.mechanism_source.",
    "held_out_set": [
     "ACC",
     "Big 12",
@@ -17,242 +324,14 @@
     "Pac-12",
     "SEC"
    ],
-   "correct": 0,
-   "wrong": 1,
-   "page_not_found": 5,
+   "note": "Same matcher scored against six conferences whose answer Claude-app confirmed independently. Rows below are UNVERIFIED and, at this accuracy, are NOT evidence.",
    "of": 6,
-   "usable_for_projector": false,
-   "note": "Same matcher scored against six conferences whose answer Claude-app confirmed independently. Rows below are UNVERIFIED and, at this accuracy, are NOT evidence."
-  }
- },
- "conferences": {
-  "Big Ten": {
-   "mechanism": "TOURNAMENT",
-   "detail": "first ever, 2026; top 15 of 18; Nov 20-25; Fishers IN",
-   "tier": "CONFIRMED (Claude-app research)",
-   "source": "Claude-app research handoff",
-   "checked": false
+   "page_not_found": 5,
+   "usable_for_projector": null,
+   "usable_for_projector_note": "Deliberately null, not False. False referred to the text-matcher. The current values ARE wired into project_field.py, and only rows tiered CONFIRMED are allowed to override its hand-verified fallback.",
+   "what_was_validated": "The SUPERSEDED text-matching crawler in crawl_aq.py, not the mechanism values now in this file. It scored 0 of 1 where it produced a verdict and found no page for 5 of 6 held-out conferences -- a real result about that matcher, and the reason it was abandoned.",
+   "wrong": 1
   },
-  "Pac-12": {
-   "mechanism": "TOURNAMENT",
-   "detail": "new; top 4; week of Nov 23",
-   "tier": "CONFIRMED (Claude-app research)",
-   "source": "Claude-app research handoff",
-   "checked": false
-  },
-  "SEC": {
-   "mechanism": "TOURNAMENT",
-   "detail": "added 2025; Nov 20-24; Savannah GA",
-   "tier": "CONFIRMED (Claude-app research)",
-   "source": "Claude-app research handoff",
-   "checked": false
-  },
-  "ACC": {
-   "mechanism": "REGULAR_SEASON",
-   "detail": "regular-season champion takes the bid",
-   "tier": "CONFIRMED (Claude-app research)",
-   "source": "Claude-app research handoff",
-   "checked": false
-  },
-  "Big 12": {
-   "mechanism": "REGULAR_SEASON",
-   "detail": "highest conference win pct",
-   "tier": "CONFIRMED (Claude-app research)",
-   "source": "Claude-app research handoff",
-   "checked": false
-  },
-  "Mountain West": {
-   "mechanism": "TOURNAMENT",
-   "detail": "top 4",
-   "tier": "CONFIRMED (Claude-app research)",
-   "source": "Claude-app research handoff",
-   "checked": false
-  },
-  "ASUN": {
-   "mechanism": "TOURNAMENT",
-   "detail": "page mentions a championship tournament",
-   "tier": "UNVERIFIED (page text match, not a rules citation)",
-   "source": "https://www.asunsports.org/sports/wvball",
-   "checked": true
-  },
-  "America East": {
-   "mechanism": "TOURNAMENT",
-   "detail": "page mentions a championship tournament",
-   "tier": "UNVERIFIED (page text match, not a rules citation)",
-   "source": "https://www.americaeast.com/sports/wvball",
-   "checked": true
-  },
-  "American": {
-   "mechanism": "TOURNAMENT",
-   "detail": "page mentions a championship tournament",
-   "tier": "UNVERIFIED (page text match, not a rules citation)",
-   "source": "https://www.theamerican.org/sports/wvball",
-   "checked": true
-  },
-  "Atlantic 10": {
-   "mechanism": null,
-   "detail": "could not locate a volleyball championship page",
-   "tier": "UNVERIFIED \u2014 NOT FOUND",
-   "source": "https://atlantic10.com",
-   "checked": true,
-   "last_status": "http404"
-  },
-  "Big East": {
-   "mechanism": "TOURNAMENT",
-   "detail": "page mentions a championship tournament",
-   "tier": "UNVERIFIED (page text match, not a rules citation)",
-   "source": "https://www.bigeast.com/sports/wvball",
-   "checked": true
-  },
-  "Big Sky": {
-   "mechanism": null,
-   "detail": "could not locate a volleyball championship page",
-   "tier": "UNVERIFIED \u2014 NOT FOUND",
-   "source": "https://bigskyconf.com",
-   "checked": true,
-   "last_status": "http404"
-  },
-  "Big South": {
-   "mechanism": "TOURNAMENT",
-   "detail": "page mentions a championship tournament",
-   "tier": "UNVERIFIED (page text match, not a rules citation)",
-   "source": "https://www.bigsouthsports.com/sports/wvball",
-   "checked": true
-  },
-  "Big West": {
-   "mechanism": "AMBIGUOUS",
-   "detail": "page mentions BOTH -- needs a human read",
-   "tier": "UNVERIFIED (page text match, not a rules citation)",
-   "source": "https://www.bigwest.org/sports/wvball",
-   "checked": true
-  },
-  "CAA": {
-   "mechanism": "TOURNAMENT",
-   "detail": "page mentions a championship tournament",
-   "tier": "UNVERIFIED (page text match, not a rules citation)",
-   "source": "https://www.caasports.com/sports/wvball",
-   "checked": true
-  },
-  "CUSA": {
-   "mechanism": "TOURNAMENT",
-   "detail": "page mentions a championship tournament",
-   "tier": "UNVERIFIED (page text match, not a rules citation)",
-   "source": "https://www.conferenceusa.com/sports/wvball",
-   "checked": true
-  },
-  "Horizon": {
-   "mechanism": "REGULAR_SEASON",
-   "detail": "page states a regular-season champion",
-   "tier": "UNVERIFIED (page text match, not a rules citation)",
-   "source": "https://www.horizonleague.org/sports/wvball",
-   "checked": true
-  },
-  "Ivy League": {
-   "mechanism": "TOURNAMENT",
-   "detail": "page mentions a championship tournament",
-   "tier": "UNVERIFIED (page text match, not a rules citation)",
-   "source": "https://www.ivyleague.com/sports/wvball",
-   "checked": true
-  },
-  "MAAC": {
-   "mechanism": "AMBIGUOUS",
-   "detail": "page mentions BOTH -- needs a human read",
-   "tier": "UNVERIFIED (page text match, not a rules citation)",
-   "source": "https://www.maacsports.com/sports/wvball",
-   "checked": true
-  },
-  "MAC": {
-   "mechanism": "TOURNAMENT",
-   "detail": "page mentions a championship tournament",
-   "tier": "UNVERIFIED (page text match, not a rules citation)",
-   "source": "https://www.getsomemaction.com/sports/wvball",
-   "checked": true
-  },
-  "MEAC": {
-   "mechanism": "AMBIGUOUS",
-   "detail": "page mentions BOTH -- needs a human read",
-   "tier": "UNVERIFIED (page text match, not a rules citation)",
-   "source": "https://www.meacsports.com/sports/wvball",
-   "checked": true
-  },
-  "MVC": {
-   "mechanism": "TOURNAMENT",
-   "detail": "page mentions a championship tournament",
-   "tier": "UNVERIFIED (page text match, not a rules citation)",
-   "source": "https://www.mvc-sports.com/sports/wvball",
-   "checked": true
-  },
-  "NEC": {
-   "mechanism": "AMBIGUOUS",
-   "detail": "page mentions BOTH -- needs a human read",
-   "tier": "UNVERIFIED (page text match, not a rules citation)",
-   "source": "https://www.northeastconference.org/sports/wvball",
-   "checked": true
-  },
-  "OVC": {
-   "mechanism": "TOURNAMENT",
-   "detail": "page mentions a championship tournament",
-   "tier": "UNVERIFIED (page text match, not a rules citation)",
-   "source": "https://www.ovcsports.com/sports/wvball",
-   "checked": true
-  },
-  "Patriot": {
-   "mechanism": "TOURNAMENT",
-   "detail": "page mentions a championship tournament",
-   "tier": "UNVERIFIED (page text match, not a rules citation)",
-   "source": "https://www.patriotleague.org/sports/wvball",
-   "checked": true
-  },
-  "SWAC": {
-   "mechanism": "TOURNAMENT",
-   "detail": "page mentions a championship tournament",
-   "tier": "UNVERIFIED (page text match, not a rules citation)",
-   "source": "https://www.swac.org/sports/wvball",
-   "checked": true
-  },
-  "SoCon": {
-   "mechanism": null,
-   "detail": "could not locate a volleyball championship page",
-   "tier": "UNVERIFIED \u2014 NOT FOUND",
-   "source": "https://soconsports.com",
-   "checked": true,
-   "last_status": "http308"
-  },
-  "Southland": {
-   "mechanism": "TOURNAMENT",
-   "detail": "page mentions a championship tournament",
-   "tier": "UNVERIFIED (page text match, not a rules citation)",
-   "source": "https://www.southland.org/sports/wvball",
-   "checked": true
-  },
-  "Summit League": {
-   "mechanism": "TOURNAMENT",
-   "detail": "page mentions a championship tournament",
-   "tier": "UNVERIFIED (page text match, not a rules citation)",
-   "source": "https://www.thesummitleague.org/sports/wvball",
-   "checked": true
-  },
-  "Sun Belt": {
-   "mechanism": "AMBIGUOUS",
-   "detail": "page mentions BOTH -- needs a human read",
-   "tier": "UNVERIFIED (page text match, not a rules citation)",
-   "source": "https://www.sunbeltsports.org/sports/wvball",
-   "checked": true
-  },
-  "WAC": {
-   "mechanism": "TOURNAMENT",
-   "detail": "page mentions a championship tournament",
-   "tier": "UNVERIFIED (page text match, not a rules citation)",
-   "source": "https://www.wacsports.com/sports/wvball",
-   "checked": true
-  },
-  "WCC": {
-   "mechanism": null,
-   "detail": "could not locate a volleyball championship page",
-   "tier": "UNVERIFIED \u2014 NOT FOUND",
-   "source": "https://wccsports.org",
-   "checked": true,
-   "last_status": "urlerror"
-  }
+  "warning_rerunning_validate_aq": "validate_aq.py re-stamps this file and evaluates the text-matcher. Running it again will re-add usable_for_projector=False, which is about that matcher and NOT about these values. Re-read this block before acting on it."
  }
 }

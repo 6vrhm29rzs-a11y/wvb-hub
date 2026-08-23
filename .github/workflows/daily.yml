@@ -124,7 +124,25 @@ jobs:
           # pre-week. The script is a no-op on other days and re-running inside
           # the same ISO week changes nothing, so calling it daily is safe.
           python3 scripts/snapshot_rankings.py || echo "snapshot skipped; continuing"
-          python3 scripts/build_hub.py --public || echo "public dashboard build failed; leaving the previous one in place"
+          # The published polls. The rankings endpoint is CURRENT-ONLY and
+          # cannot be season-pinned, so a poll not captured the day it is
+          # published is gone for good. Appends only when the poll's own
+          # "Through Games" stamp moves, so daily runs do not pile up rows.
+          python3 scripts/crawl_polls.py || echo "polls unavailable; continuing"
+          # PUBLIC BUILD DISABLED 2026-08-23, at Cody's instruction. This is his
+          # personal page; the only reason a stripped second copy existed was that
+          # output/vb_dashboard.html is TRACKED in a PUBLIC repo and served on
+          # GitHub Pages. No published copy, nothing to strip. Re-enable by
+          # restoring this line -- and re-read strip_private() first, because the
+          # things it removes are other people's (VolleyTalk, Massey, drawn
+          # likenesses of named athletes), not ours.
+          # A conference label can go stale mid-realignment (ncaa.com still
+          # served UT Arlington as WAC after it joined the UAC). This reads the
+          # team's own schedule and costs no network -- cheap insurance that a
+          # one-team 'league' never collects an automatic bid.
+          python3 scripts/conference_repair.py || echo "conference repair skipped"
+          python3 scripts/digby_top25.py || echo "top 25 needs a projection; skipping"
+          python3 scripts/build_hub.py   # private page only
 
       # Semantic gate on what will actually be SERVED. The reconcile checks the
       # data; this checks that each number is under the right heading -- the
@@ -147,6 +165,17 @@ jobs:
           python3 scripts/test_score_predictions.py
           python3 scripts/test_lineups.py
           python3 scripts/test_rankings_history.py
+          python3 scripts/test_top25.py
+          # Four suites were written today and never added here. A guard that
+          # does not run in CI protects nothing -- it only reassures whoever
+          # wrote it. None of these need network or an API key: digby's tests
+          # exercise the fidelity gate and the driver with a stubbed model,
+          # digby_chat's use a synthetic league, rotations' use synthetic
+          # lineups, and the hook test drives the hook directly.
+          python3 scripts/test_digby.py
+          python3 scripts/test_digby_chat.py
+          python3 scripts/test_rotations.py
+          python3 scripts/test_no_scrape_hook.py
 
       # Coverage gate: a NEW displayed field with no declared provenance fails
       # the run. It cannot catch a client-side expression inventing a value for
@@ -173,7 +202,10 @@ jobs:
           # ONE artifact here that cannot be rebuilt: it records what the ranking
           # said before a week's results. Re-deriving it later from data that
           # includes those results would be a fit, not a ranking.
-          git add data/raw output/vb_dashboard.html index.html
+          # output/vb_dashboard.html and index.html are no longer regenerated
+          # (the public build is off), so they are not staged either -- staging an
+          # unchanged file is harmless but it makes the diff lie about what ran.
+          git add data/raw
           # SEPARATE, AND TOLERANT, ON PURPOSE. Under `bash -eo pipefail` an
           # unmatched glob is passed to git literally, git exits 128, and
           # `git add` aborts ATOMICALLY -- so data/raw and the dashboard would

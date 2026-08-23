@@ -63,10 +63,32 @@ def existing_weeks():
 
 
 def current_ranking():
-    """Whatever the page is showing right now: live rating if one exists,
-    otherwise the preseason projection. Same precedence as the board."""
-    live = load("data/rating_%d.json" % SEASON) or {}
+    """Whatever the page is showing right now.
+
+    PRECEDENCE, and why it changed: Digby's Top 25 comes first because it is the
+    ranking that actually MOVES. The board's order is a preseason projection
+    until 50 matches are played, so archiving it weekly in August stores the
+    same numbers over and over -- a history of nothing. The Top 25 blends the
+    projection with results from the first match onward, which is what a weekly
+    poll archive is for.
+
+    The `source` field keeps the three apart, and the movement rule already
+    refuses to compare across bases -- subtracting a rank on one ruler from a
+    rank on another is arithmetic on two different things, which is the bug
+    `test_rankings_history.py` exists to prevent.
+    """
+    t25 = load("data/digby_top25_%d.json" % SEASON) or {}
     rows = []
+    for r in ((t25.get("top") or []) + (t25.get("also_receiving") or [])):
+        if r.get("rank"):
+            rows.append({"team": r["team"], "rank": r["rank"], "source": "digby",
+                         "gp": r.get("matches") or 0,
+                         "record": r.get("record")})
+    if rows:
+        rows.sort(key=lambda x: x["rank"])
+        return rows, "digby"
+
+    live = load("data/rating_%d.json" % SEASON) or {}
     for r in (live.get("teams") or []):
         if r.get("composite_rank"):
             rows.append({"team": r["team"], "rank": r["composite_rank"],

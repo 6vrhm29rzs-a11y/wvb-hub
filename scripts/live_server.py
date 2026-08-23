@@ -168,10 +168,123 @@ class Cache(object):
 CACHE = Cache()
 
 
+# ------------------------------------------------------------------ Digby
+# The chat endpoint. It exists here rather than in the page because the API key
+# must never reach the browser: the page asks this process, this process holds
+# the key, and the key comes from the environment and is never written down.
+#
+# THIS SERVER BINDS TO 127.0.0.1 AND MUST STAY THAT WAY. The moment it answers
+# on a routable address, anything on the network can spend the key. The Host
+# check below is the second lock -- it stops a DNS-rebinding page in the
+# browser from reaching an endpoint that only expects to hear from localhost.
+
+DIGBY_MAX_BODY = 4096
+DIGBY_MIN_GAP = float(os.environ.get("WVB_DIGBY_MIN_GAP", "2"))
+DIGBY_MAX_PER_RUN = int(os.environ.get("WVB_DIGBY_MAX", "200"))
+_digby = {"last": 0.0, "count": 0, "index": None, "teams": None,
+          "mtimes": {}}
+_digby_lock = threading.Lock()
+
+
+def _digby_answer(question):
+    """One question -> a dict for the page. Never raises."""
+    try:
+        sys.path.insert(0, os.path.join(REPO, "scripts"))
+        import digby_chat
+        import digby
+        from digby import teams_from_page
+        # RELOAD WHEN THE SOURCE CHANGES. This server is meant to be left
+        # running for hours, and Python caches an imported module for the life
+        # of the process -- so edits to the prompt or the retrieval had NO
+        # effect until a restart, while the page kept answering with the old
+        # behaviour and looking like the fix had failed. That cost a round of
+        # "I fixed it" / "it still does it".
+        for mod in (digby, digby_chat):
+            try:
+                src = os.path.abspath(mod.__file__)
+                mtime = os.path.getmtime(src)
+                if _digby["mtimes"].get(src) is None:
+                    _digby["mtimes"][src] = mtime
+                elif mtime > _digby["mtimes"][src]:
+                    import importlib
+                    importlib.reload(mod)
+                    _digby["mtimes"][src] = mtime
+                    _digby["index"] = None               # rebuilt below
+                    _digby["teams"] = None
+                    print("  [reloaded %s]" % os.path.basename(src))
+            except Exception:                            # noqa: BLE001
+                pass
+        import digby_chat                                # rebind after reload
+    except Exception as exc:                              # noqa: BLE001
+        return {"ok": False, "answer": "Digby is unavailable (%s)."
+                                       % type(exc).__name__}
+    with _digby_lock:
+        now = time.time()
+        if _digby["count"] >= DIGBY_MAX_PER_RUN:
+            return {"ok": False,
+                    "answer": "That is %d questions this run -- restart the "
+                              "server to keep going. The cap is here so a stuck "
+                              "page cannot spend in a loop." % DIGBY_MAX_PER_RUN}
+        if now - _digby["last"] < DIGBY_MIN_GAP:
+            return {"ok": False, "answer": "One moment -- still thinking."}
+        _digby["last"] = now
+        _digby["count"] += 1
+        if _digby["teams"] is None:
+            _digby["teams"] = teams_from_page()
+            _digby["index"] = digby_chat.build_index(_digby["teams"])
+    r = digby_chat.ask(question, teams=_digby["teams"], index=_digby["index"])
+    # The key errors are written for someone at a prompt. A reader here is in a
+    # browser, and the shell that matters is the one THIS SERVER was started
+    # from -- so say that instead of "in this shell", which points at nothing
+    # the reader can see.
+    if not r.get("ok") and "ANTHROPIC_API_KEY" in (r.get("answer") or ""):
+        r["answer"] = ("Digby has no API key. This server was started without "
+                       "one \u2014 stop it, then restart it with:\n"
+                       "    export ANTHROPIC_API_KEY=sk-ant-<your key>\n"
+                       "    python3 scripts/live_server.py\n"
+                       "Everything else on the page works without it.")
+    return r
+
+
 class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *a, **kw):
         kw["directory"] = WEBROOT
         SimpleHTTPRequestHandler.__init__(self, *a, **kw)
+
+    def _json(self, obj, code=200):
+        body = json.dumps(obj).encode("utf-8")
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(body)
+
+    def _is_local(self):
+        host = (self.headers.get("Host") or "").split(":")[0]
+        return host in ("127.0.0.1", "localhost", "[::1]", "::1")
+
+    def do_POST(self):
+        if self.path.split("?")[0] != "/api/digby":
+            self.send_error(404)
+            return
+        if not self._is_local():
+            self._json({"ok": False, "answer": "local requests only."}, 403)
+            return
+        try:
+            n = int(self.headers.get("Content-Length") or 0)
+        except ValueError:
+            n = 0
+        if n <= 0 or n > DIGBY_MAX_BODY:
+            self._json({"ok": False, "answer": "question too long."}, 413)
+            return
+        try:
+            payload = json.loads(self.rfile.read(n).decode("utf-8"))
+            question = (payload or {}).get("question") or ""
+        except Exception:                                 # noqa: BLE001
+            self._json({"ok": False, "answer": "could not read the question."}, 400)
+            return
+        self._json(_digby_answer(question))
 
     def do_GET(self):
         if self.path.split("?")[0] == "/api/live":
@@ -189,6 +302,21 @@ class Handler(SimpleHTTPRequestHandler):
         pass                                          # keep the console quiet
 
 
+def _who_has(port):
+    """Name the process holding a port, so the fix is obvious."""
+    try:
+        import subprocess
+        out = subprocess.check_output(
+            ["lsof", "-nP", "-iTCP:%d" % port, "-sTCP:LISTEN"],
+            stderr=subprocess.DEVNULL).decode("utf-8", "replace").splitlines()
+        if len(out) > 1:
+            f = out[1].split()
+            return "  (PID %s, %s -- stop it with: kill %s)" % (f[1], f[0], f[1])
+    except Exception:                                    # noqa: BLE001
+        pass
+    return ""
+
+
 def main():
     if not os.path.isdir(WEBROOT):
         print("no %s -- run scripts/build_hub.py first" % WEBROOT)
@@ -197,11 +325,40 @@ def main():
     t.daemon = True
     t.start()
 
-    srv = ThreadingHTTPServer(("127.0.0.1", PORT), Handler)
-    url = "http://127.0.0.1:%d/START-HERE.html" % PORT
+    # A LEFTOVER SERVER FROM AN EARLIER SESSION IS THE NORMAL CASE, not an
+    # exceptional one -- this thing is meant to be left running, and the old
+    # behaviour was a nine-line traceback ending in "Address already in use",
+    # which reads like the script is broken rather than like something is
+    # already working. Say what is holding the port, then move to the next one
+    # instead of refusing to start.
+    srv = None
+    for port in range(PORT, PORT + 12):
+        try:
+            srv = ThreadingHTTPServer(("127.0.0.1", port), Handler)
+            break
+        except OSError as exc:
+            if exc.errno not in (48, 98):               # EADDRINUSE (BSD, Linux)
+                raise
+            print("port %d is already in use%s" % (port, _who_has(port)))
+    if srv is None:
+        print("\nno free port in %d-%d. Stop the old server and try again:"
+              % (PORT, PORT + 11))
+        print("  pkill -f live_server.py")
+        return 1
+    PORT_IN_USE = srv.server_address[1]
+    if PORT_IN_USE != PORT:
+        print("  -> started on %d instead\n" % PORT_IN_USE)
+    url = "http://127.0.0.1:%d/START-HERE.html" % PORT_IN_USE
     print("live scoreboard running")
     print("  open: %s" % url)
     print("  refreshing every %ds -- one upstream request per cycle" % REFRESH_SECONDS)
+    # Say plainly whether the chat will work, at the moment it can still be
+    # fixed. Finding out by clicking the button and reading an error is worse.
+    if (os.environ.get("ANTHROPIC_API_KEY") or "").startswith("sk-ant-"):
+        print("  Ask Digby: ready")
+    else:
+        print("  Ask Digby: OFF -- no ANTHROPIC_API_KEY in this shell.")
+        print("             Everything else on the page works without it.")
     print("  ctrl-c to stop")
     try:
         srv.serve_forever()

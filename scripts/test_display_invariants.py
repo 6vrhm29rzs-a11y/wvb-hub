@@ -280,67 +280,56 @@ def check_no_fabrication():
 
 
 def check_start_times():
-    """No fixture may display an impossible start time.
+    """The feed's midnight PLACEHOLDER must never reach the page.
 
     ncaa.com fills an unannounced start with a midnight-ish sentinel that
-    formats exactly like a real time (12:00-3:00 AM ET). Measured: in the
-    completed 2025 season all 13 early-AM fixtures were at Hawaii, where
-    1:00 AM ET is a 7:00 PM local start; in the 2026 schedule 176 of 192 were
-    at schools like Nebraska and Alabama, which do not host at 1 AM. Printing
-    those is R5 -- a synthesised value under a real-looking label.
+    formats exactly like a real time. Measured: in the completed 2025 season
+    only 13 of 5,133 fixtures carried an early-AM Eastern time and ALL THIRTEEN
+    were at Hawaii (1:00 AM ET = 7:00 PM HST); in 2026, 176 of 192 were at
+    schools that plainly do not host at 1 AM.
+
+    ⚠ THIS TESTS THE RULE, NOT THE RENDERED STRING. The page renders PACIFIC,
+    and two attempts to judge plausibility from the displayed text both failed:
+    a genuine 10:00 AM ET tournament start shows as 7:00 AM PT (flagged nine
+    real matches), and a genuine late West-coast match shows as 9:00 PM PT,
+    which is midnight Eastern (flagged 164). Whether a time is possible depends
+    on the HOME VENUE's local zone, which we do not have -- so the guard checks
+    the decision `listed_time()` actually makes, in the Eastern terms the feed
+    publishes in, instead of inferring across timezones it cannot resolve.
     """
-    hub = os.path.join(REPO, "Cody", "START-HERE.html")
-    if not os.path.exists(hub):
-        print("  no built hub -- skipping start-time check")
-        return
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     from build_hub import listed_time, FAR_WEST_HOME
 
-    h = open(hub, encoding="utf-8").read()
-    early = re.compile(r"^(12|[1-5]):\d\d\s*AM", re.I)
-
-    m = re.search(r"const TEAMS = (\{.*?\});\n", h, re.S)
-    n_checked = 0
-    offenders = []
-    if m:
-        teams = json.loads(m.group(1))
-        for tname, rec in teams.items():
-            for f in rec.get("fixtures") or []:
-                t = (f.get("t") or "").strip()
-                n_checked += 1
-                if not early.match(t):
-                    continue
-                # only legitimate when THIS team hosts and is far-western
-                home_team = tname if f.get("home") else f.get("opp")
-                if home_team not in FAR_WEST_HOME:
-                    offenders.append((tname, f.get("d"), t))
-    if offenders:
-        bad("impossible start time displayed",
-            "%d fixtures, e.g. %s" % (len(offenders), offenders[:3]))
+    # placeholder in, TBA out
+    for t_ in ("12:00 AM ET", "1:00 AM ET", "3:00 AM ET", "6:00 AM ET", "7:30 AM ET"):
+        got = listed_time(t_, "Nebraska")
+        if got != "TBA":
+            bad("placeholder not suppressed", "%s -> %r" % (t_, got))
+            break
     else:
-        ok("no fixture shows an impossible early-AM start", n_checked)
+        ok("implausible Eastern starts render as TBA", 5)
 
-    m2 = re.search(r"const SCHED = (\[.*?\]);\n", h, re.S)
-    if m2:
-        sched = json.loads(m2.group(1))
-        off2 = [r for r in sched
-                if early.match((r.get("t") or "")) and r.get("h") not in FAR_WEST_HOME]
-        if off2:
-            bad("impossible start time in schedule tab",
-                "%d rows, e.g. %s" % (len(off2), off2[:2]))
-        else:
-            ok("schedule tab shows no impossible start", len(sched))
-
-    # ---- NEGATIVE CONTROL: the checker must reject a known-bad value, and
-    # must NOT reject a genuine Hawaii night match.
-    if listed_time("1:00 AM ET", "Nebraska") != "TBA":
-        bad("negative control", "sentinel at Nebraska was not suppressed")
-    elif listed_time("1:00 AM ET", "Hawaii") != "1:00 AM ET":
-        bad("negative control", "genuine Hawaii start time was suppressed")
-    elif listed_time("7:00 PM ET", "Nebraska") != "7:00 PM ET":
-        bad("negative control", "a normal evening time was altered")
+    # Hawaii's genuine late slate survives -- 1:00 AM ET is 7:00 PM in Honolulu
+    if listed_time("1:00 AM ET", "Hawaii") == "TBA":
+        bad("Hawaii's real start time was suppressed", "1:00 AM ET at Hawaii")
     else:
-        ok("negative control: sentinel suppressed, Hawaii + evening kept")
+        ok("Hawaii keeps its genuine late start")
+
+    # a real morning tournament start is NOT a placeholder
+    if listed_time("10:00 AM ET", "Old Dominion") == "TBA":
+        bad("a real 10:00 AM ET start was suppressed",
+            "August tournaments open in the morning")
+    else:
+        ok("genuine morning starts survive")
+
+    # ordinary evening times pass through untouched
+    if listed_time("7:00 PM ET", "Nebraska") != "7:00 PM ET":
+        bad("an ordinary evening time was altered", "7:00 PM ET")
+    else:
+        ok("ordinary evening times pass through")
+
+    if not FAR_WEST_HOME:
+        bad("FAR_WEST_HOME is empty", "Hawaii would lose its exemption")
 
 
 def check_roster():
@@ -511,6 +500,275 @@ def check_public_build_is_clean():
         else:
             ok("public payload carries no third-party rank values", len(teams))
 
+    # ---- Digby is private ------------------------------------------------
+    # Checked in the DATA, not the markup: the rendering JS ships in both
+    # builds and only the values differ, so grepping for the panel markup would
+    # false-positive. Same lesson as the Massey leak -- when the question is
+    # "did we publish X", grep what was published, not what draws it.
+    if tm:
+        withsum = [k for k, v in teams.items() if v.get("digby")]
+        if withsum:
+            bad("public build carries Digby summaries",
+                "%d teams, e.g. %s" % (len(withsum), withsum[:3]))
+        else:
+            ok("public build carries no Digby summary", len(teams))
+
+    # The chat is a different exposure from the summaries: it is an ENDPOINT,
+    # and the key that answers it lives in the local server. A static public
+    # page offering /api/digby would be a dead button at best. These markers
+    # ARE safe to grep in the markup, because the whole feature -- CSS, panel
+    # and script -- is emitted only in the private build.
+    for marker, what in (("/api/digby", "the chat endpoint"),
+                         ("asklaunch", "the Ask Digby launcher"),
+                         ("askwrap", "the Ask Digby panel"),
+                         (".askform", "the Ask Digby styles")):
+        if marker in h:
+            bad("public build exposes %s" % what, marker)
+    if not any(m in h for m in ("/api/digby", "asklaunch", "askwrap", ".askform")):
+        ok("public build carries no Ask Digby endpoint, panel, or styles")
+
+    # ---- every conference on the page must have an AQ row -----------------
+    # The UAC sat on the TOURNAMENT default for weeks because ncaa.com labelled
+    # UT Arlington "wac" and the map still carried a WAC row. The fallback was
+    # right by luck; nothing said it was unexamined. A missing row is now a
+    # failure rather than a silent default, and an undersized league means a
+    # realignment the labels have not caught up with.
+    if tm:
+        import collections as _c
+        live = set(v.get("conf") for v in teams.values() if v.get("conf"))
+        try:
+            _aq = set(json.load(open(os.path.join(
+                REPO, "data/raw/2026/aq_mechanism_2026.json"),
+                encoding="utf-8"))["conferences"])
+        except Exception:
+            _aq = None
+        if _aq is not None:
+            missing = sorted(live - _aq)
+            if missing:
+                bad("conference(s) with no AQ mechanism row", ", ".join(missing))
+            else:
+                ok("every conference on the page has an AQ mechanism row", len(live))
+        sizes = _c.Counter(v.get("conf") for v in teams.values() if v.get("conf"))
+        tiny = sorted("%s(%d)" % (k, n) for k, n in sizes.items() if n < 6)
+        if tiny:
+            bad("league(s) too small to award a bid -- stale conference label?",
+                ", ".join(tiny))
+        else:
+            ok("no conference is below six D-I members", len(sizes))
+
+    # ---- the serving rotation ---------------------------------------------
+    # It is DERIVED, and the derivation only holds if the ring has exactly six
+    # distinct slots. Five names, or a repeat, means the cycle was mis-read and
+    # the page would draw a rotation that cannot exist on a court.
+    if tm:
+        rots = [(k, v["rot25"]) for k, v in teams.items() if v.get("rot25")]
+        bad_len = [k for k, r in rots if len(r.get("rotation") or []) != 6]
+        dupes = [k for k, r in rots
+                 if len(set(r.get("rotation") or [])) != len(r.get("rotation") or [])]
+        if bad_len:
+            bad("rotation without six slots", "%d teams, e.g. %s" % (len(bad_len), bad_len[:3]))
+        elif dupes:
+            bad("a player appears twice in one rotation",
+                "%d teams, e.g. %s" % (len(dupes), dupes[:3]))
+        elif rots:
+            ok("every serving rotation has six distinct players", len(rots))
+        # A share above 1.0 would mean more agreeing sets than resolved sets.
+        weird = [k for k, r in rots
+                 if not (0 < (r.get("agreement") or 0) <= 1.0)
+                 or (r.get("sets_with_this_rotation") or 0) > (r.get("sets_resolved") or 0)]
+        if weird:
+            bad("rotation agreement out of range", str(weird[:3]))
+        elif rots:
+            ok("rotation agreement is a real share of resolved sets", len(rots))
+        # The source is MIT-licensed and must be credited wherever it renders.
+        if rots and "ncaavolleyballr" not in h:
+            bad("serving rotation shown without crediting its source", "ncaavolleyballr")
+        elif rots:
+            ok("the rotation's data source is credited on the page")
+        # The old copy asserted this was impossible. It is not, and a page that
+        # says both is worse than one that says neither.
+        if "Rotation order 1\u20136 is not available" in h or "is not available</b>" in h:
+            bad("page still claims rotation order is unavailable while showing it")
+
+    # ---- the Stats tab -----------------------------------------------------
+    _sp = os.path.join(REPO, "Cody", "START-HERE.html")
+    _sh = open(_sp, encoding="utf-8").read() if os.path.exists(_sp) else ""
+    if _sh:
+        if 'data-ls="team"' not in _sh:
+            bad("the Stats tab has no team/player toggle")
+        else:
+            ok("Stats splits players and teams")
+        # ONE MEANING PER KEY. `aps` is aces and `asps` is assists, on both the
+        # player and the team side. They were once opposite, which would have
+        # ranked teams by the wrong column with no visible error.
+        if '"aps": (round(d["aces"]' not in open(
+                os.path.join(REPO, "scripts", "build_hub.py"), encoding="utf-8").read():
+            bad("team stat keys do not match the player ones", "aps must be aces")
+        else:
+            ok("aps is aces and asps is assists on both sides")
+        # "Allowed" must sort ascending or the worst defence ranks first.
+        if "asc = side === 'opp'" not in _sh:
+            bad("the allowed view does not flip its sort")
+        else:
+            ok("the allowed view sorts so the best defence leads")
+
+    # ---- schedule counts join on the normaliser ---------------------------
+    # "LSU New Orleans" vs "New Orleans" gave that team ZERO fixtures and made
+    # its projection look like a bug. One team is legitimately zero (Saint
+    # Francis is not in a single 2026 fixture); more than that means the join
+    # has broken again.
+    # NOTE: `teams` here comes from the PUBLIC dashboard, which is no longer
+    # built -- it has no sched_n at all, so every team looked like a zero.
+    # Read the page Cody opens. Third time this has caught me.
+    _zp = os.path.join(REPO, "Cody", "START-HERE.html")
+    _zh = open(_zp, encoding="utf-8").read() if os.path.exists(_zp) else ""
+    _zt = {}
+    if _zh:
+        _m = re.search(r"const TEAMS = (\{.*?\});\n", _zh, re.S)
+        if _m:
+            try:
+                _zt = json.loads(_m.group(1))
+            except ValueError:
+                _zt = {}
+    if _zt:
+        zero = [k for k, v in _zt.items() if not v.get("sched_n")]
+        if len(zero) > 1:
+            bad("teams with no scheduled matches -- a name join has broken",
+                ", ".join(zero[:5]))
+        else:
+            ok("every team but one has a scheduled-match count", len(_zt) - len(zero))
+        # And a team with none must SAY so rather than showing blank projections.
+        if zero and _zh and "No 2026 Division-I schedule" not in _zh:
+            bad("a team with no 2026 schedule shows blank numbers with no reason")
+        elif zero and _zh:
+            ok("a team with no 2026 schedule explains itself")
+
+    # ---- team stats box ----------------------------------------------------
+    # The opponent column is the half nobody shows, and it is free: every box
+    # score carries both sides. If it ever disappears the page is showing half
+    # a team.
+    _tp = os.path.join(REPO, "Cody", "START-HERE.html")
+    _th = open(_tp, encoding="utf-8").read() if os.path.exists(_tp) else ""
+    if _th:
+        if "Team stats, 2026" not in _th:
+            bad("the team-stats box is gone from the team page")
+        elif "Opponents" not in _th:
+            bad("team stats show only the offence", "no opponent column")
+        else:
+            ok("team stats show both what a team does and what it allows")
+        # POINTS PER SET IS KILLS + BLOCKS + ACES. That is the box-score
+        # definition and the only thing the sport calls "points". An earlier
+        # version also showed rally points off the set scores and called them
+        # "points scored", which is not a volleyball stat -- Cody corrected it.
+        if "Points / set" not in _th:
+            bad("team stats have no points per set")
+        elif "kills + blocks + aces" not in _th:
+            bad("points per set is not the box-score definition")
+        else:
+            ok("points/set is kills + blocks + aces")
+        # Hitting % must come from summed counts, never a mean of percentages.
+        if "teamTotals" not in _th:
+            bad("box scores have no team totals row")
+        elif "(t.k - t.e) / t.ta" not in _th:
+            bad("team hitting % is not computed from summed raw counts")
+        else:
+            ok("box-score team totals compute hit% from summed raw counts")
+
+    # ---- the bracket is a bracket -----------------------------------------
+    # Connectors are drawn from measured positions at runtime, so the test can
+    # only check the machinery is present and wired to the right trigger. The
+    # trigger is the part that went wrong three times.
+    _hp = os.path.join(REPO, "Cody", "START-HERE.html")
+    _h2 = open(_hp, encoding="utf-8").read() if os.path.exists(_hp) else ""
+    if _h2:
+        if "function drawBracketLines" not in _h2:
+            bad("the bracket has no connector drawing")
+        elif "attributeFilter" not in _h2 or "v-bracket" not in _h2:
+            bad("connectors are not triggered by the section being revealed",
+                "a box in a hidden section measures as zero")
+        else:
+            ok("bracket connectors are drawn and triggered on reveal")
+        # Both halves must converge on the championship, or the right side
+        # flows away from the final.
+        if "mirror" not in _h2:
+            bad("the right half of the bracket is not mirrored")
+        else:
+            ok("the right half of the bracket is mirrored inward")
+
+    # ---- crests -----------------------------------------------------------
+    # Cody: "make sure the teams that are listed have the logos next to them.
+    # There are certain pages that don't have logos." They were missing from
+    # every view rendered in PYTHON, because those rows could not reach the
+    # page's JS logo() helper -- and from the live band, which is JS but was
+    # written before the helper existed. One definition now (team_logos), used
+    # by both sides.
+    _hubp = os.path.join(REPO, "Cody", "START-HERE.html")
+    _hub = open(_hubp, encoding="utf-8").read() if os.path.exists(_hubp) else ""
+    n_crest = _hub.count('class="tlogo')
+    if _hub and n_crest < 200:
+        bad("too few team crests on the page -- a view has lost them",
+            "%d found" % n_crest)
+    elif _hub:
+        ok("team crests render across the views", n_crest)
+    # The live band draws its own cards; the helper must be reachable there too.
+    for frag, what in (("logo(g.away)", "live/upcoming away side"),
+                       ("logo(g.home)", "live/upcoming home side")):
+        if _hub and frag not in _hub:
+            bad("the %s has no crest" % what, frag)
+    if _hub and "logo(g.away)" in _hub and "logo(g.home)" in _hub:
+        ok("the live band draws crests too")
+
+    # ---- roster photographs ------------------------------------------------
+    # Cody: "you got rid of the roster photos... keep the photos." They were
+    # never there -- the full roster carried no photo field at all -- but the
+    # avatars made their absence visible, which is the same thing from where he
+    # was sitting. Now they are wired, and this guard stops them going missing.
+    if tm:
+        rows = [c for t in teams.values() for c in (t.get("roster") or [])]
+        withph = [c for c in rows if c.get("ph")]
+        if rows and len(withph) < 0.5 * len(rows):
+            bad("full-roster photo coverage collapsed",
+                "%d of %d rows" % (len(withph), len(rows)))
+        elif rows:
+            ok("full roster carries photographs", len(withph))
+        # Same rule as everywhere: URLs only, never an embedded image.
+        embedded = [c for c in withph if str(c["ph"]).startswith("data:")]
+        if embedded:
+            bad("a roster photo is embedded rather than linked", str(len(embedded)))
+        elif withph:
+            ok("every roster photo is a remote URL, never a committed file",
+               len(withph))
+
+    # ---- player avatars ---------------------------------------------------
+    # They are DECORATION and are allowed to be (R5 draws the line at a
+    # measurement, and says a hashed colour is fine). What must stay true is
+    # that a real photograph always wins, and that the avatar never carries a
+    # face -- it is a kit and an action, not a claim about a person.
+    if "function avatar(" in h:
+        if "c.photo ?" not in h:
+            bad("avatar shown without a real photo taking precedence")
+        else:
+            ok("a real photograph still wins over the avatar")
+        # The poses are geometry only: circles, paths, no text, no image.
+        m = re.search(r"const AV = (\{.*?\});", h, re.S)
+        if m:
+            try:
+                av = json.loads(m.group(1))
+            except ValueError:
+                av = None
+            if av:
+                blob = json.dumps(av)
+                if "<image" in blob or "<text" in blob or "href" in blob:
+                    bad("avatar art embeds an image, text or link", "should be shapes only")
+                else:
+                    ok("avatar art is shapes only -- no image, text or link",
+                       len(av.get("poses") or {}))
+                if set(av.get("libero") or []) != {"L/DS", "L", "DS"}:
+                    bad("libero contrast rule lost its positions",
+                        str(av.get("libero")))
+                else:
+                    ok("the libero still gets a contrasting jersey")
+
     # the rankings table must not be left with mismatched columns after the strip
     m = re.search(r"<thead><tr>(.*?)</tr></thead>", h, re.S)
     b = re.search(r'<tbody id="rbody">(.*?)</tbody>', h, re.S)
@@ -579,6 +837,46 @@ def check_no_unreplaced_placeholders():
             ok("%s: no unreplaced placeholders" % label)
 
 
+def check_every_view_names_its_season():
+    """Every data view must say which SEASON it is showing.
+
+    Cody, 2026-08-23: "some of this info and rankings and stuff is 2025, not
+    2026. make sure we don't mix the two." He was right -- the RPI view was
+    serving the FINAL 2025 table under a 2026 heading, because the rankings
+    endpoint is current-only and still publishes last season until the new one
+    has enough matches. A 2025 table under a 2026 heading is the error that
+    looks completely correct, so the season is now stated on every view and a
+    previous-season fallback has to announce itself.
+    """
+    for label, path in (("private", os.path.join(REPO, "Cody", "START-HERE.html")),
+                        ("public", os.path.join(REPO, "output", "vb_dashboard.html"))):
+        if not os.path.exists(path):
+            continue
+        h = open(path, encoding="utf-8").read()
+        leads = re.findall(r'<p class="lead"[^>]*>(.*?)</p>', h, re.S)
+        unlabelled = []
+        for raw in leads:
+            txt = re.sub(r"<[^>]+>", "", raw)
+            if not re.search(r"20\d{2}", txt):
+                unlabelled.append(re.sub(r"\s+", " ", txt).strip()[:60])
+        if unlabelled:
+            bad("%s: a view does not name its season" % label, str(unlabelled[:3]))
+        else:
+            ok("%s: every view names its season" % label, len(leads))
+
+        # a previous-season poll must carry the warning, not pass as current
+        m = re.search(r"const POLLS = (\{.*?\});\n", h, re.S)
+        if m:
+            polls = json.loads(m.group(1))
+            prev = [k for k, v in polls.items() if v.get("prev")]
+            if prev and "seasonwarn" not in h:
+                bad("%s: previous-season ranking shown with no warning" % label,
+                    ", ".join(prev))
+            elif prev:
+                ok("%s: previous-season ranking carries a season warning" % label,
+                   len(prev))
+
+
 def main():
     print("=" * 68)
     print("DISPLAY INVARIANTS -- is each number under the right heading?")
@@ -603,6 +901,8 @@ def main():
     check_photos_are_urls_only()
     print()
     check_no_unreplaced_placeholders()
+    print()
+    check_every_view_names_its_season()
     print()
     check_rating()
     print()

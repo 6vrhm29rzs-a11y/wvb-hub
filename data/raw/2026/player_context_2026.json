@@ -1,0 +1,98 @@
+{
+ "meta": {
+  "season": 2026,
+  "source_tier": "THIRD-PARTY",
+  "purpose": "Health/availability context that NO feed carries. Recorded as explicit sourced entries, NEVER as an inferred adjustment: nothing here changes a rating. Its only job is to say which prior-year rates are known to be unrepresentative, so a number is not read as a clean estimate of ability.",
+  "rule": "An entry requires a named source. 'No reliable reporting found' is recorded as such rather than left blank. Never infer an injury from a drop in playing time -- playing time is already visible.",
+  "collected": "2026-08-23, external research relayed by Cody",
+  "not_applied_to": [
+   "projection_2026",
+   "rating_2026",
+   "simulate_season_2026"
+  ]
+ },
+ "players": [
+  {
+   "name": "Brooklyn DeLeye",
+   "team": "Kentucky",
+   "effect": "2025 UNDERSTATES",
+   "detail": "Played essentially all of 2025 with a torn meniscus in her left knee, injured early vs Nebraska; postponed surgery to keep playing; still 2025 AVCA First-Team All-American. Post-season surgery, ~4-week recovery.",
+   "status_2026": "returning",
+   "sources": [
+    "wibw.com",
+    "on3.com",
+    "aseaofblue.com"
+   ],
+   "confirmed_by_cody": true
+  },
+  {
+   "name": "Teraya Sigler",
+   "team": "Nebraska",
+   "effect": "2025 UNDERSTATES",
+   "detail": "Back injury in the second half of 2025 that limited her athleticism; mostly a back-row role behind Taylor Landfair. Reported fully healthy in spring 2026.",
+   "status_2026": "returning, healthy",
+   "sources": [
+    "si.com"
+   ]
+  },
+  {
+   "name": "Charlie Fuerbringer",
+   "team": "Wisconsin",
+   "effect": "2025 UNDERSTATES",
+   "detail": "Shoulder injury Oct 5 2025 vs Michigan; missed the next nine matches. Wisconsin went 6-3 without her.",
+   "status_2026": "healthy; 2026 Preseason All-Big Ten",
+   "sources": [
+    "uwbadgers.com",
+    "badgerobserver.com"
+   ]
+  },
+  {
+   "name": "Ella Swindle",
+   "team": "Texas",
+   "effect": "2025 UNDERSTATES",
+   "detail": "Lower-left-leg injury in practice, Sept 2025; walking boot, missed time.",
+   "status_2026": "healthy, but not projected first-choice in Texas's 6-2",
+   "sources": [
+    "statesman.com"
+   ]
+  },
+  {
+   "name": "Mckenna Wucherer",
+   "team": "Minnesota",
+   "effect": "ABSENT FROM 2025",
+   "detail": "Redshirted 2025 with a back injury. Her 764 career kills were the most on Minnesota's 2025 roster, so she is a returning contributor with NO 2025 production line -- the churn and roster-delta terms cannot see her.",
+   "status_2026": "expected to return",
+   "sources": [
+    "gophersports.com"
+   ]
+  },
+  {
+   "name": "Maeva Schalk",
+   "team": "Arizona St.",
+   "effect": "ABSENT FROM 2025",
+   "detail": "Did not play in 2025 due to injury; on the 2026 roster.",
+   "status_2026": "returning",
+   "sources": [
+    "thesundevils.com"
+   ]
+  }
+ ],
+ "explicitly_not_found": [
+  {
+   "category": "season-ending injuries announced for 2026",
+   "finding": "no reliable reporting found as of 2026-08-23 for any top-30 programme"
+  },
+  {
+   "category": "2026 availability genuinely in doubt from a late-2025 injury",
+   "finding": "none; both confirmed late-2025 injuries (Fuerbringer, Swindle) recovered"
+  }
+ ],
+ "unconfirmed": [
+  {
+   "name": "Kiki Granberry",
+   "team": "Indiana",
+   "detail": "reported early season-ending injury, but 2024-at-Tennessee vs 2025 is ambiguous",
+   "status": "NOT CONFIRMED -- deliberately not used"
+  }
+ ]
+}

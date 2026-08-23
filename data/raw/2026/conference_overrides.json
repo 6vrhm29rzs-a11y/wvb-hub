@@ -1,0 +1,29 @@
+{
+ "evidence": [
+  {
+   "conference": "UAC",
+   "evidence": "16 of 16 conference-play fixtures, all vs UAC",
+   "first_fixture": [
+    [
+     "2026-09-22",
+     "Tarleton St."
+    ]
+   ],
+   "from_label": "WAC",
+   "source_tier": "DERIVED",
+   "team": "UT Arlington"
+  }
+ ],
+ "meta": {
+  "candidates_examined": [
+   "UT Arlington"
+  ],
+  "note": "conferences_2026.json is NOT rewritten -- it stays a faithful record of what ncaa.com serves",
+  "rule": "a team in a league below 6 members takes the conference of its own schedule, but only when every conference-play opponent agrees and there are at least 6 of them",
+  "season": 2026,
+  "source_tier": "DERIVED"
+ },
+ "overrides": {
+  "UT Arlington": "UAC"
+ }
+}

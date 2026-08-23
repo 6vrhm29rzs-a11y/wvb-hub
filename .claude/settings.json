@@ -8,5 +8,18 @@
       "Bash(git push *)",
       "Bash(gh api *)"
     ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|WebFetch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/no_scrape.py\""
+          }
+        ]
+      }
+    ]
   }
 }

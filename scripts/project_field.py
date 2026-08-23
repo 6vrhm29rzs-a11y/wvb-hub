@@ -51,7 +51,15 @@ SEEDED = 32            # top 32 seeded nationally, pods of four
 # AQ mechanism CHANGED MATERIALLY FOR 2026. The Big Ten holds its first-ever
 # volleyball tournament (top 15 of 18, Nov 20-25) and the regular-season-champion
 # model is DEAD there. Pac-12 has a new tournament (top 4, week of Nov 23).
-AQ_MECHANISM = {
+# These six were confirmed by hand and are kept as the FALLBACK, so this file
+# still behaves correctly if the map is missing. The live values are loaded from
+# data/raw/{SEASON}/aq_mechanism_{SEASON}.json, which is now confirmed for all
+# 32 from ncaa.com's own 2025 automatic-qualifier tracker.
+#
+# This wiring MATTERS, it is not bookkeeping: the default below is TOURNAMENT,
+# so before it the WCC -- which awards its bid to the regular-season champion --
+# was being projected as a tournament it does not hold.
+AQ_MECHANISM_FALLBACK = {
     "Big Ten": "TOURNAMENT",      # NEW for 2026 (was regular-season champion)
     "Pac-12": "TOURNAMENT",       # NEW for 2026
     "SEC": "TOURNAMENT",          # continued from 2025
@@ -59,6 +67,27 @@ AQ_MECHANISM = {
     "Big 12": "REGULAR_SEASON",
     "Mountain West": "TOURNAMENT",
 }
+
+
+def _load_aq_mechanism():
+    path = os.path.join(REPO, "data", "raw", str(SEASON),
+                        "aq_mechanism_%d.json" % SEASON)
+    out = dict(AQ_MECHANISM_FALLBACK)
+    try:
+        doc = json.load(open(path))
+    except (IOError, OSError, ValueError):
+        return out
+    for conf, row in (doc.get("conferences") or {}).items():
+        mech = row.get("mechanism")
+        # Only a CONFIRMED row may override a hand-verified fallback; an
+        # unverified guess must not quietly replace something we checked.
+        if mech in ("TOURNAMENT", "REGULAR_SEASON") and \
+                "CONFIRMED" in (row.get("tier") or ""):
+            out[conf] = mech
+    return out
+
+
+AQ_MECHANISM = _load_aq_mechanism()
 AQ_MECHANISM_DEFAULT = "TOURNAMENT"   # most mid-majors; flagged unverified
 
 # Championship-INELIGIBLE reclassifying programs. Excluded from the field, but

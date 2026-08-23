@@ -165,7 +165,16 @@ def build():
     # Big Sky and Big West. Assigning automatic bids on 2025 membership handed
     # them to leagues that no longer have those teams.
     conf26 = (load_json("data/raw/2026/conferences_2026.json") or {})
-    conf26_teams = conf26.get("teams", {})
+    conf26_teams = dict(conf26.get("teams", {}))
+    # A stale label repaired from the team's OWN SCHEDULE, applied at the single
+    # point conferences enter this build (R4). ncaa.com still serves UT
+    # Arlington under "wac"; all 16 of its conference-play fixtures are against
+    # UAC teams. See scripts/conference_repair.py -- the mirrored file is left
+    # untouched, so what ncaa.com says stays recoverable.
+    _ovr = (load_json("data/raw/2026/conference_overrides.json") or {}).get("overrides") or {}
+    for _t, _c in _ovr.items():
+        if _t in conf26_teams:
+            conf26_teams[_t] = _c
 
     teams = []
     for r in rating["teams"]:
@@ -200,6 +209,30 @@ def build():
     # projection (quality-adjusted rates of each team's top-6 rotation). If it
     # has not been built, fall back to last season's order rather than inventing
     # a second, different projection here. One definition, one place.
+    # The page used to hard-code "confirmed for only 6 of 32". That number went
+    # stale the moment the map was filled in, and a stale caveat is worse than
+    # none -- it understates what we know. Computed from the file instead.
+    _aq = (load_json("data/raw/%d/aq_mechanism_%d.json" % (SEASON, SEASON)) or {})
+    _rows = (_aq.get("conferences") or {})
+    _conf_n = sum(1 for v in _rows.values() if "CONFIRMED" in (v.get("tier") or ""))
+    _reg = sorted(k for k, v in _rows.items() if v.get("mechanism") == "REGULAR_SEASON")
+    if _rows and _conf_n == len(_rows):
+        aq_mech_note = (
+            "How each league awards its bid is now confirmed for all %d "
+            "conferences, from ncaa.com's own 2025 automatic-qualifier tracker. "
+            "%d hold a tournament; %s award it to the regular-season champion. "
+            "Two caveats: that is 2025 evidence, and leagues do change format "
+            "&mdash; the Big Ten and Pac-12 both added a tournament for 2026, "
+            "which is applied here."
+            % (len(_rows), len(_rows) - len(_reg),
+               ", ".join(_reg) if _reg else "none"))
+    else:
+        aq_mech_note = (
+            "How each league awards its bid is confirmed for %d of %d "
+            "conferences; the rest default to \u201ctournament\u201d and are "
+            "flagged unverified. That is an open item, not a result."
+            % (_conf_n, len(_rows) or 32))
+
     proj = (load_json("data/projection_2026.json") or {}).get("teams", [])
     pj = {r["team"]: r for r in proj}
 
@@ -304,7 +337,27 @@ def build():
                 t[field] = rank
         unmatched[label] = miss
 
-    avca = load_json("data/raw/2026/avca_poll_2026-08-18.json") or {}
+    # LATEST capture, never a hard-coded filename. This used to point at
+    # `avca_poll_2026-08-18.json` -- a single preseason snapshot -- so the page
+    # would still have been showing the August poll in November while labelling
+    # it "AVCA". scripts/crawl_polls.py appends a dated capture whenever the
+    # poll's own "Through Games" stamp changes.
+    avca = {}
+    _pl = os.path.join(REPO, "data", "raw", str(SEASON), "polls_avca.jsonl")
+    if os.path.exists(_pl):
+        for _line in open(_pl):
+            _line = _line.strip()
+            if not _line:
+                continue
+            try:
+                _rec = json.loads(_line)
+            except ValueError:
+                continue
+            avca = {"rows": _rec.get("rows") or [],
+                    "meta": {"updated_label": _rec.get("stamp"),
+                             "captured": _rec.get("captured_utc")}}
+    if not avca:
+        avca = load_json("data/raw/2026/avca_poll_2026-08-18.json") or {}
     attach("avca", [(int(r["RANK"]), re.sub(r"\s*\(\d+\)\s*$", "", r["SCHOOL"]))
                     for r in avca.get("rows", []) if str(r.get("RANK", "")).isdigit()], "AVCA")
 
@@ -546,9 +599,7 @@ NCONF automatic bids. Three teams (Saint Francis, UT Arlington, New Orleans) get
 conference from the feed and keep their 2025 one rather than being guessed into a new league; a
 league below six D-I members cannot award a bid, which is what stops UT Arlington's defunct WAC
 from collecting one on its own.</p>
-<p><span class="k">The AQ mechanism is confirmed for only 6 of 32 conferences.</span> A crawl of the
-other 26 produced nothing usable (it scored 0-for-1 on the one conference where it gave an answer),
-so the rest default to "tournament" and are flagged unverified. That is an open item, not a result.</p>
+<p><span class="k">{{AQ_MECH}}</span></p>
 <p><span class="k">Seeding here is just our order.</span> The committee seeds on resume &mdash; RPI,
 record vs the top 25/50, head-to-head &mdash; and our field projector, which reproduced 62 of the
 actual 64 for 2025, needs played matches before it can run. It takes over once there are results.</p>
@@ -607,6 +658,7 @@ render();
 </body></html>""".replace("ROWS", "".join(rows)) \
    .replace("SEEDS", "".join(seeds)) \
    .replace("MISSNOTE", esc(miss_note) or "all sources matched") \
+   .replace("{{AQ_MECH}}", aq_mech_note) \
    .replace("NAQ", str(n_aq)).replace("NCONF", str(n_aq)) \
    .replace("CONFCHANGED", str(meta.get("conf_changed", 0))) \
    .replace("RETMISS", "Returning %% is known for %d of %d teams; the rest are not shifted at all "

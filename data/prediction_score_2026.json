@@ -2,17 +2,23 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 1,
+  "scored": 2,
   "logged_after_tipoff_excluded": 1,
   "team_mismatch_excluded": 0,
   "predictions_on_record": 4743,
-  "results_available": 5,
-  "brier": 0.5532,
+  "results_available": 6,
+  "brier": 0.4097,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
   "favourite_correct": 0,
   "favourite_correct_pct": 0.0
  },
  "calibration": [
+  {
+   "range": "50-60%",
+   "n": 1,
+   "said": 51.6,
+   "happened": 0.0
+  },
   {
    "range": "70-80%",
    "n": 1,
@@ -29,6 +35,15 @@
    "p_home": 0.7438,
    "home_won": false,
    "brier": 0.55323844
+  },
+  {
+   "game_id": "6639886",
+   "date": "2026-08-23",
+   "away": "SMU",
+   "home": "Texas A&M",
+   "p_home": 0.5159,
+   "home_won": false,
+   "brier": 0.26615281
   }
  ]
 }

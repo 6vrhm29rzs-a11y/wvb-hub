@@ -1,5 +1,56 @@
 # Rotations and starting lineups — what the feed does and does not have
 
+> ## ⚠ SUPERSEDED IN PART — 2026-08-23. ROTATIONS ARE RECOVERABLE.
+>
+> Everything below is still true **about ncaa.com's feed**, and that feed is
+> still the daily pipeline. What was wrong was the scope of the conclusion:
+> "rotations 1-6 cannot be built" was stated as a fact about the sport's data
+> when it was only a fact about **one source**.
+>
+> **StatBroadcast names the server on every rally.** A team serves in rotation
+> order by rule, so the serve sequence IS the rotation — derived, not inferred,
+> with no threshold chosen. Verified on Louisville–Wisconsin set 1 (43 rallies):
+> both teams produce a clean period-6 cycle over two full turns of the order.
+>
+>     Louisville  1 Meester · 2 Petersen · 3 Kenny · 4 Chicoine · 5 Bultema · 6 Cabello
+>     Wisconsin   1 Simon · 2 Lopez · 3 Egan · 4 Flanagan · 5 Hoppe · 6 Fuerbringer
+>
+> Three things §2b and §2c said were unavailable now are:
+> - **Setter front row vs back row, per rotation** — exact, because the
+>   setter's own slot is known. This was Cody's actual question.
+> - **Substitution pairings** — a substitute serves from the slot of the player
+>   she replaced, so the pairing is read off the cycle. Louisville's Jessica
+>   Drapp for Brooke Bultema, recovered outright. The NCAA feed managed 4%.
+> - **The 5-1 / 6-2 signature**, which scored at chance on ncaa.com's jersey
+>   ordering, now appears: Louisville's two setters sit exactly 3 apart
+>   (Kenny slot 3, Cabello slot 6) — the textbook 6-2.
+>
+> **⚠ THE LIMIT, MEASURED: the serve order gives the SERVING six, not the six on
+> the court.** A libero replaces a middle the moment that middle rotates to the
+> back row, and the back row is where the serve is — so the middle never serves
+> and never appears. **None** of Wisconsin's five middles appear in its serve
+> order, and only one of Louisville's five does, while Auguste and Tarnow both
+> recorded kills in that same set. Rotation *order* is exact; a slot whose
+> server is a libero or DS belongs to a front-row player the serve order does
+> not name, and it is flagged rather than filled in (R5).
+>
+> Built: `scripts/rotations.py`, guarded by `scripts/test_rotations.py` with a
+> positive control (a true rotation must be recovered) and a negative control
+> (a shuffled sequence must be rejected — a method that finds a rotation in
+> anything has found nothing).
+>
+> **Not yet wired to a source.** StatBroadcast 403s every non-browser client and
+> its terms grant access "through the standard StatBroadcast web interface", so
+> there is no crawler and will not be one without permission. See
+> `docs/statbroadcast.md`. The deriver is finished, so a serve list pasted or
+> read from a page becomes a full rotation immediately.
+>
+> **The lesson is the one this project keeps paying for:** the earlier finding
+> generalised from a single source, exactly as the "half the lines are
+> mislabelled" claim generalised from a single match. A negative result is about
+> the data you looked at.
+
+
 **Measured 2026-08-22.** Answers Cody's ask: *"six on the court at all times,
 but having projected lineups and rotations 1-6 vs opponent rotations 1-6 could
 help us even more."*
