@@ -110,6 +110,14 @@ jobs:
           # crawl so the results are in, and reads only the pre-match log.
           python3 scripts/score_predictions.py || true
           python3 scripts/build_dataset.py
+          # And the COMPLETED 2025 season, which the projection's one
+          # measured constant rests on. data_2025.json is a build artifact
+          # (gitignored, a pure function of the committed raw), so a fresh
+          # CI checkout has no copy and test_projection could not re-derive
+          # ROTATION -- which is the whole point of that guard. It is 0.4s
+          # and touches no network, so building it here is cheaper than
+          # letting the guard skip itself into documentation.
+          WVB_SEASON=2025 python3 scripts/build_dataset.py
           python3 scripts/rpi_2025.py || echo "RPI needs a game graph; skipping this early"
           python3 scripts/rating_2025.py
           # The PUBLIC dashboard is now the same builder as Cody's page, with
@@ -152,9 +160,13 @@ jobs:
       # EVERY GUARD THAT CAN RUN HERE, RUNS HERE. Four suites were written and
       # then enforced only on my laptop, which makes them documentation rather
       # than guards -- the daily run would stay green while any of them broke.
-      # test_projection needs a derived artifact that is deliberately not
-      # committed, so it skips itself on a fresh checkout and still enforces
-      # locally.
+      # test_projection needs data_2025.json, a derived artifact that is
+      # deliberately not committed. It is BUILT above rather than skipped:
+      # the comment here used to claim it skipped itself, but only check 2
+      # skips -- check 1 hard-failed, and turned the daily run red for a
+      # file CI was never given. A guard that cannot run in CI is
+      # documentation; a guard that fails there for a missing input is
+      # noise. Give it the input.
       - name: Invariant guards
         run: |
           python3 scripts/test_display_invariants.py
