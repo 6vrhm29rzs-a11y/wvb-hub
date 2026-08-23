@@ -590,6 +590,56 @@ def check_public_build_is_clean():
         if "Rotation order 1\u20136 is not available" in h or "is not available</b>" in h:
             bad("page still claims rotation order is unavailable while showing it")
 
+    # ---- no duplicate element ids ------------------------------------------
+    # I put id="sbody" on the scores grid without noticing the schedule tbody
+    # already had it. getElementById returns whichever comes first, so the
+    # just-finished band was querying whichever element document order handed
+    # it. Cheap to check, silent when it breaks.
+    _dp = os.path.join(REPO, "Cody", "START-HERE.html")
+    _dh = open(_dp, encoding="utf-8").read() if os.path.exists(_dp) else ""
+    if _dh:
+        ids = re.findall(r'\sid="([A-Za-z][-\w]*)"', _dh)
+        dupes = sorted(set(i for i in ids if ids.count(i) > 1))
+        if dupes:
+            bad("duplicate element ids on the page", ", ".join(dupes[:6]))
+        else:
+            ok("every element id on the page is unique", len(set(ids)))
+
+    # ---- nobody leads at 0-0 ----------------------------------------------
+    # `away > home` is false when the sets are level, so the else-branch bolded
+    # the HOME team from the first whistle: Kentucky-Pittsburgh showed Pitt as
+    # the leader at 0-0. Three states, not two.
+    _lp = os.path.join(REPO, "Cody", "START-HERE.html")
+    _lh = open(_lp, encoding="utf-8").read() if os.path.exists(_lp) else ""
+    if _lh:
+        if "const lead = +g.away_sets === +g.home_sets ? 0" not in _lh:
+            bad("the live card still has a two-state winner test",
+                "at 0-0 it will bold the home team")
+        else:
+            ok("the live card leaves both teams unhighlighted at 0-0")
+
+    # ---- AVCA honours -----------------------------------------------------
+    # R8: an All-America badge on the wrong player is the same class of error as
+    # attributing her statistics, and it is the kind that looks right. The join
+    # is school + exact full name, so the check is that recent selections all
+    # resolved to a school -- an unresolved one is silently dropped otherwise.
+    _ap = os.path.join(REPO, "data", "avca_awards.json")
+    if os.path.exists(_ap):
+        _aw = json.load(open(_ap, encoding="utf-8"))
+        recent = [x for x in (_aw.get("selections") or []) if x.get("season", 0) >= 2024]
+        unresolved = [x for x in recent if not x.get("team")]
+        if recent and unresolved:
+            bad("recent All-America selections with no school",
+                "%d of %d, e.g. %s" % (len(unresolved), len(recent),
+                                       unresolved[0].get("school_raw")))
+        elif recent:
+            ok("every recent All-America selection resolved to a school", len(recent))
+        # The honour itself must survive -- it was once overwritten by the school.
+        if recent and not any(x.get("honour") for x in recent):
+            bad("All-America rows lost which team they made")
+        elif recent:
+            ok("selections carry which All-America team they made")
+
     # ---- the Stats tab -----------------------------------------------------
     _sp = os.path.join(REPO, "Cody", "START-HERE.html")
     _sh = open(_sp, encoding="utf-8").read() if os.path.exists(_sp) else ""

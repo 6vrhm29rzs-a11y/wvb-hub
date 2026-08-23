@@ -167,6 +167,44 @@ def test_the_move_column_states_which_comparison_it_makes():
               "and it names the comparison", m.group(1))
 
 
+def test_form_marks_ranked_opponents():
+    """A W over #8 and a W over an unranked side are different evidence. The
+    rating already weighs them differently; the row must not hide it."""
+    from build_hub import form_strip
+    ranked = form_strip([{"won": True, "score": "3-0", "opp": "Texas",
+                          "opp_rank": 8, "date": "2026-08-22"}])
+    plain = form_strip([{"won": True, "score": "3-0", "opp": "Someone",
+                         "opp_rank": None, "date": "2026-08-22"}])
+    check("frk" in ranked, "a result against a ranked team is marked")
+    check("frk" not in plain, "and an unranked one is not")
+    check("#8 Texas" in ranked, "the tooltip names the ranked opponent", ranked)
+    check("no results yet" in form_strip([]),
+          "a team with no results says so rather than showing a blank cell")
+
+
+def test_form_shows_the_most_recent_last():
+    from build_hub import form_strip
+    out = form_strip([{"won": False, "score": "0-3", "opp": "A", "opp_rank": None},
+                      {"won": True, "score": "3-1", "opp": "B", "opp_rank": None}])
+    check(out.index("fl") < out.index("fw"),
+          "oldest first, newest last -- the direction a form guide reads")
+
+
+def test_the_two_rankings_explain_their_relationship():
+    """Two rankings now exist and a reader has no way to tell which answers
+    what. The one that does NOT move is the surprising one, so it points at the
+    one that does."""
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  --   no built page; skipping")
+        return
+    h = open(hub, encoding="utf-8").read()
+    check("Digby&rsquo;s Top 25</b>" in h or "Digby\u2019s Top 25</b>" in h
+          or "use Digby" in h,
+          "the preseason rankings tab points at the ranking that moves")
+    check("Biggest movers" in h, "the Top 25 names its biggest movers")
+
+
 def main():
     for fn in (test_k_uses_the_priors_error_not_the_population_spread,
                test_a_useless_prior_collapses_to_the_population,
@@ -176,7 +214,10 @@ def main():
                test_season_z_is_not_scaled_by_who_has_played,
                test_the_built_file_is_coherent,
                test_the_weekly_archive_captures_the_top_25,
-               test_the_move_column_states_which_comparison_it_makes):
+               test_the_move_column_states_which_comparison_it_makes,
+               test_form_marks_ranked_opponents,
+               test_form_shows_the_most_recent_last,
+               test_the_two_rankings_explain_their_relationship):
         print(fn.__name__)
         fn()
     print()

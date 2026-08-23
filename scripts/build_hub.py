@@ -379,7 +379,7 @@ def prior_pos_index():
 
 def roster_rows(roster_rec, ret_rec, lu_rec, live_by_team, team_id,
                 prior_pos=None, site_pos=None, id2name=None, live_floor=0,
-                photos=None, art=None):
+                photos=None, art=None, honours=None, team_name=None):
     """The full 2026 roster, each player carrying what we actually know.
 
     Sources, and what each may and may not say:
@@ -494,6 +494,8 @@ def roster_rows(roster_rec, ret_rec, lu_rec, live_by_team, team_id,
             # HER OWN PHOTOGRAPH, where her school published one. The exact URLs
             # the projected six already uses -- the full roster simply never
             # asked for them. URL only: never downloaded, never committed.
+            "aa": (honours or {}).get("%s|%s" % (
+                team_name or "", re.sub(r"[^a-z]", "", (name or "").lower()))),
             "ph": ((art or {}).get(re.sub(r"[^a-z]", "", (name or "").lower()))
                    or (photos or {}).get(re.sub(r"[^a-z]", "", (name or "").lower()))),
         }
@@ -545,7 +547,7 @@ def _fixture_pick(pred_by_pair, f, me):
 
 
 def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
-               aq_of=None, sched_n=None):
+               aq_of=None, sched_n=None, honours=None):
     """Everything about one team in one place: fixtures, results, projection.
 
     Built as a payload the page renders on demand rather than 348 pre-rendered
@@ -593,26 +595,7 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
 
     proj = {r["team"]: r for r in
             ((load("data/projection_2026.json") or {}).get("teams") or [])}
-    # headshot URLs, keyed by team then squashed name. URLS ONLY -- the images
-    # are never downloaded or committed; they load from each school's own
-    # server, and a player without one shows initials rather than a placeholder
-    # pretending to be a photo.
-    photos = {}
-    for tname, rec in ((load("data/raw/%d/rosters_%d.json" % (SEASON, SEASON)) or {})
-                       .get("teams", {}) or {}).items():
-        for pl in rec.get("players") or []:
-            if pl.get("photo"):
-                key = re.sub(r"[^a-z]", "", (pl.get("name_raw") or "").lower())
-                photos.setdefault(tname, {})[key] = pl["photo"]
-    # Photos the roster crawl could not see, from schema.org image URLs on
-    # JS-rendered roster pages (scripts/crawl_roster_photos.py). URLS ONLY --
-    # the files are never downloaded or committed; a player without one renders
-    # her initials, never a stand-in image.
-    for _tname, _rec in ((load("data/raw/%d/roster_photos_%d.json" % (SEASON, SEASON))
-                          or {}).get("teams", {}) or {}).items():
-        for _nm, _url in (_rec.get("photos") or {}).items():
-            photos.setdefault(_tname, {}).setdefault(
-                re.sub(r"[^a-z]", "", (_nm or "").lower()), _url)
+    photos = player_photos()
 
     ret = (load("data/returning_2026.json") or {}).get("teams", {})
     # Who a team ACTUALLY started in 2025 (set-1 play-by-play). Distinct from
@@ -682,6 +665,7 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
                 player_art.setdefault(_team, {})[_key] = "players/%s/%s" % (
                     _up.quote(_team), _up.quote(_fn))
 
+    honours = avca_honours()
     prior_pos = prior_pos_index()
     # team_id -> name, so a transfer can say which school she came from rather
     # than just "transfer in".
@@ -721,7 +705,8 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
                              (site_pos_all.get(nm) or {}).get("positions"), id2name,
                              live_floor,
                              photos=(photos.get(nm) or photos.get(_rk) or {}),
-                             art=(player_art.get(nm) or player_art.get(_rk) or {}))
+                             art=(player_art.get(nm) or player_art.get(_rk) or {}),
+                             honours=honours, team_name=nm)
         # Position for the projected six, reused from the roster we just built.
         # Showing it is a CLARITY fix: this list ranks by scoring, so it can
         # come out as four outsides and no setter -- which makes plain, at a
@@ -766,7 +751,7 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
 
 
 # -------------------------------------------------------------- leaders
-def leaders():
+def leaders(photos=None, honours=None):
     """Season leaders from the per-player aggregate, per set.
 
     PER SET, NOT TOTALS. Totals just rank whoever has played most, which in
@@ -804,6 +789,15 @@ def leaders():
             "name": ("%s %s" % (r.get("first") or "", r.get("last") or "")).strip(),
             "team": names.get(str(r.get("team_id"))) or str(r.get("team_id")),
             "pos": r.get("pos") or "",
+            "num": r.get("num") or r.get("number"),
+            "aa": (honours or {}).get("%s|%s" % (
+                names.get(str(r.get("team_id"))) or "",
+                re.sub(r"[^a-z]", "",
+                       ("%s%s" % (r.get("first") or "", r.get("last") or "")).lower()))),
+            "photo": ((photos or {}).get(
+                names.get(str(r.get("team_id"))) or "") or {}).get(
+                re.sub(r"[^a-z]", "",
+                       ("%s %s" % (r.get("first") or "", r.get("last") or "")).lower())),
             "sets": sets,
             "kps": round(kills / float(sets), 2),
             "pps": round(pts / float(sets), 2),
@@ -849,7 +843,7 @@ def standings(teams, res):
         by[c].sort(key=lambda x: (-(x["cw"] - x["cl"]), -(x["w"] - x["l"]), x["rank"]))
     return by
 
-def box_and_players(res):
+def box_and_players(res, photos=None, honours=None):
     """Per-match box scores, and a per-player season view with a game log.
 
     Both come from the same per-game rows (playerbox.jsonl), which the pipeline
@@ -932,6 +926,12 @@ def box_and_players(res):
             p = players.setdefault(pk, {
                 "name": nm, "team": row["team"], "pos": row["pos"],
                 "num": row["num"], "games": [],
+                # Her own headshot, so the player panel and the Players table
+                # show the same face as the roster and the stats page.
+                "photo": ((photos or {}).get(row["team"]) or {}).get(
+                    re.sub(r"[^a-z]", "", (nm or "").lower())),
+                "aa": (honours or {}).get("%s|%s" % (
+                    row["team"], re.sub(r"[^a-z]", "", (nm or "").lower()))),
                 "sets": 0.0, "k": 0.0, "e": 0.0, "ta": 0.0,
                 "aces": 0.0, "digs": 0.0, "bs": 0.0, "ba": 0.0,
                 "ast": 0.0, "pts": 0.0,
@@ -960,6 +960,36 @@ def box_and_players(res):
                              if p["ta"] >= 1 else None)))
     out.sort(key=lambda p: -p["pts"])
     return boxes, out
+
+def player_photos():
+    # type: () -> Dict[str, Dict[str, str]]
+    """team -> squashed name -> headshot URL.
+
+    ONE DEFINITION. This was inline in `team_index()`, so the leaderboard could
+    not reach it and stat rows had no photographs while roster rows did. URLS
+    ONLY -- the images are never downloaded or committed; they load from each
+    school's own server, and a player without one renders a position avatar,
+    never a stand-in photograph.
+
+    Two sources, best first: the roster crawl's own `photo`, then the
+    schema.org `image` URLs recovered from JS-rendered roster pages
+    (`crawl_roster_photos.py`), which is what took coverage from 133 teams to
+    290.
+    """
+    out = {}                                            # type: Dict[str, Dict[str, str]]
+    for tname, rec in ((load("data/raw/%d/rosters_%d.json" % (SEASON, SEASON)) or {})
+                       .get("teams", {}) or {}).items():
+        for pl in rec.get("players") or []:
+            if pl.get("photo"):
+                key = re.sub(r"[^a-z]", "", (pl.get("name_raw") or "").lower())
+                out.setdefault(tname, {})[key] = pl["photo"]
+    for tname, rec in ((load("data/raw/%d/roster_photos_%d.json" % (SEASON, SEASON))
+                        or {}).get("teams", {}) or {}).items():
+        for nm, url in (rec.get("photos") or {}).items():
+            out.setdefault(tname, {}).setdefault(
+                re.sub(r"[^a-z]", "", (nm or "").lower()), url)
+    return out
+
 
 def team_season_stats(boxes, res):
     # type: (Dict, Any) -> Dict[str, Any]
@@ -1055,6 +1085,72 @@ def team_season_stats(boxes, res):
     return out
 
 
+def avca_honours():
+    # type: () -> Dict[str, List[Dict[str, Any]]]
+    """team|squashed-name -> AVCA honours, most recent first.
+
+    R8 APPLIES. Keyed on the school AND the exact full name; a selection whose
+    school did not resolve is skipped rather than guessed. An All-America badge
+    on the wrong player is the same class of error as attributing her stats, and
+    it is the kind that looks right.
+
+    Only the last two seasons are loaded. A 2003 honour is a fact about somebody
+    who is not on a 2026 roster; the file keeps the rest for later.
+    """
+    doc = load("data/avca_awards.json") or {}
+    out = {}                                            # type: Dict[str, List[Dict]]
+    for sel in doc.get("selections") or []:
+        if sel.get("season", 0) < SEASON - 2 or not sel.get("team"):
+            continue
+        key = "%s|%s" % (sel["team"], re.sub(
+            r"[^a-z]", "", ("%s%s" % (sel.get("first"), sel.get("last"))).lower()))
+        out.setdefault(key, []).append(
+            {"season": sel["season"], "honour": sel.get("honour")})
+    for v in out.values():
+        v.sort(key=lambda x: -x["season"])
+
+    # NATIONAL AWARDS, attached to the player they belong to. Player of the Year
+    # is a different order of thing from a First-Team selection and should not
+    # be flattened into one; it is stored on the same key so her page can lead
+    # with it. Coach awards have no player to attach to and are kept separately.
+    schools = {}
+    for t in ((load("data/data_2025.json") or {}).get("teams") or []):
+        for k in (t.get("name_full"), t.get("name_short")):
+            if k:
+                schools.setdefault(re.sub(r"[^a-z0-9]", "", k.lower()),
+                                   t.get("name_short"))
+    for year, awards in (doc.get("awards") or {}).items():
+        if int(year) < SEASON - 2:
+            continue
+        for a in awards:
+            txt = (a.get("text") or "").strip()
+            label = (a.get("award") or "").strip()
+            parts = [x.strip() for x in txt.split(",")]
+            if len(parts) < 2:
+                continue
+            who, school = parts[0], parts[1]
+            if "coach" in label.lower():
+                out.setdefault("__coach_awards__", []).append(
+                    {"season": int(year), "award": label, "who": who,
+                     "school": school})
+                continue
+            short = schools.get(re.sub(r"[^a-z0-9]", "", school.lower()))
+            if not short:
+                # A national award we cannot place on a team is recorded, not
+                # dropped -- it is still true, and a silent drop hides it.
+                out.setdefault("__unplaced_awards__", []).append(
+                    {"season": int(year), "award": label, "who": who,
+                     "school": school})
+                continue
+            key = "%s|%s" % (short, re.sub(r"[^a-z]", "", who.lower()))
+            out.setdefault(key, []).append(
+                {"season": int(year), "honour": label, "national": True})
+    for v in out.values():
+        if isinstance(v, list) and v and isinstance(v[0], dict) and "season" in v[0]:
+            v.sort(key=lambda x: (-x.get("season", 0), not x.get("national")))
+    return out
+
+
 def team_logos():
     # type: () -> Dict[str, str]
     """team -> crest URL, from each school's ncaa.com seoname."""
@@ -1083,6 +1179,27 @@ def logo_img(team, logos, cls=""):
             'onerror="this.style.display=\'none\'">' % (cls, esc(u)))
 
 
+def form_strip(games, n=5):
+    # type: (List[Dict], int) -> str
+    """The last few results as W/L pills, oldest first.
+
+    A ranked opponent is named on the pill's tooltip and marked, because
+    "beat #8" and "beat an unranked team" are different evidence -- the rating
+    already weighs them differently and the row should not hide that.
+    """
+    if not games:
+        return '<span class="noform" title="no results yet">&mdash;</span>'
+    out = []
+    for g in games[-n:]:
+        cls = "fw" if g["won"] else "fl"
+        opp = ("#%d %s" % (g["opp_rank"], g["opp"])) if g.get("opp_rank") else g["opp"]
+        out.append('<span class="%s%s" title="%s %s %s">%s</span>'
+                   % (cls, " frk" if g.get("opp_rank") else "",
+                      "beat" if g["won"] else "lost to", esc(opp), g["score"],
+                      "W" if g["won"] else "L"))
+    return "".join(out)
+
+
 def top25_view():
     # type: () -> Dict[str, str]
     """Rows and copy for Digby's Top 25.
@@ -1095,6 +1212,23 @@ def top25_view():
     doc = load("data/digby_top25_%d.json" % SEASON) or {}
     colors = ((load("data/team_colors_%d.json" % SEASON) or {}).get("teams") or {})
     logos = team_logos()
+    # RECENT FORM. A ranking that moves without saying why is a number to argue
+    # with; the result that moved it is the answer. Ranked opponents are marked,
+    # because beating #8 and beating an unranked team are not the same evidence
+    # and the rating already knows that even if the row does not show it.
+    ranked = {}
+    for r in ((load("data/digby_top25_%d.json" % SEASON) or {}).get("top") or []):
+        ranked[r["team"]] = r["rank"]
+    form = {}                                           # type: Dict[str, List[Dict]]
+    for g in sorted(results() or [], key=lambda x: x.get("epoch") or 0):
+        for me, them, mine, theirs in ((g["away"], g["home"], g["away_sets"], g["home_sets"]),
+                                       (g["home"], g["away"], g["home_sets"], g["away_sets"])):
+            if mine is None or theirs is None:
+                continue
+            form.setdefault(me, []).append({
+                "won": mine > theirs, "score": "%s-%s" % (mine, theirs),
+                "opp": them, "opp_rank": ranked.get(them), "date": g.get("date"),
+            })
     top = doc.get("top") or []
     if not top:
         return {"rows": "", "also": "", "lead":
@@ -1149,11 +1283,13 @@ def top25_view():
         rows.append(
             '<tr class="row" data-team="%s" style="--tc:%s"><td class="rk">%d</td>'
             '<td class="tm">%s%s</td><td class="mvc">%s</td><td class="cf">%s</td>'
-            '<td class="rec">%s</td><td class="n">%s</td><td class="n wt">%s</td></tr>'
+            '<td class="rec">%s</td><td class="form">%s</td>'
+            '<td class="n">%s</td><td class="n wt">%s</td></tr>'
             % (esc(team), (colors.get(team) or {}).get("primary") or "var(--line)",
                r["rank"], logo_img(team, logos), esc(team), mv,
                esc(r.get("conf") or ""),
                r.get("record") or "0-0",
+               form_strip(form.get(team) or []),
                ("%+.2f" % r["net_pts_per_set"]) if r.get("net_pts_per_set") is not None
                else "&mdash;",
                ("%d%%" % round(100 * wt)) if wt else "&mdash;"))
@@ -1161,6 +1297,20 @@ def top25_view():
     also = " &middot; ".join(
         "%s <span class=\"arv\">%s</span>" % (esc(a["team"]), a.get("record") or "0-0")
         for a in (doc.get("also_receiving") or []))
+
+    movers = []
+    for r in top:
+        was = pre.get(r["team"])
+        if was and was != r["rank"]:
+            movers.append((was - r["rank"], r["team"], was, r["rank"]))
+    movers.sort(key=lambda x: -abs(x[0]))
+    mv_txt = ""
+    if movers:
+        def _one(d, team, was, now):
+            return ("%s %s%d (%d\u2192%d)"
+                    % (esc(team), "\u25b2" if d > 0 else "\u25bc", abs(d), was, now))
+        mv_txt = ("<b>Biggest movers:</b> "
+                  + " &middot; ".join(_one(*x) for x in movers[:4]) + ". ")
 
     played = m.get("matches_counted") or 0
     k = m.get("k_matches") or 0
@@ -1176,6 +1326,7 @@ def top25_view():
         % (k, k, played, sum(1 for r in top if r.get("matches")),
            round(100 * maxw)))
     foot = (
+        mv_txt +
         "<b>Why so little movement in August?</b> %.1f is not a preference "
         "&mdash; it is the per-match spread (%.2f points/set) divided by how "
         "much the projection still gets wrong (it predicts the next season at "
@@ -1229,11 +1380,11 @@ def build():
     for r in preds.get("games", []):
         pred_by_pair[(r["date"], r["away"], r["home"])] = r
     logos = team_logos()
-    boxes, plist = box_and_players(res)
+    boxes, plist = box_and_players(res, player_photos(), avca_honours())
     # Season team totals for 2026, both what a team does and what it allows.
     tstats = team_season_stats(boxes, res)
     stand = standings(teams, res)
-    ldrs, ldr_floor, ldr_pool = leaders()
+    ldrs, ldr_floor, ldr_pool = leaders(player_photos(), avca_honours())
     # How a conference awards its automatic bid, and how many matches each team
     # actually has on the schedule -- both needed to say honestly what the
     # projection covers.
@@ -1354,7 +1505,10 @@ def build():
             "<b>no</b> 2026 result, so it does not move when a team wins or "
             "loses. The live rating takes over automatically once 50 matches "
             "have been played; under that there is not enough of a schedule "
-            "graph to rate anyone honestly.")
+            "graph to rate anyone honestly. <b>For a ranking that moves with "
+            "every result today, use Digby&rsquo;s Top 25</b> \u2014 it blends "
+            "this projection with what has actually happened, weighted by how "
+            "much has been played.")
 
     # Same computed sentence as the board: a hard-coded "6 of 32" understates
     # what we know the moment the map is filled in, and a stale caveat is worse
@@ -1481,10 +1635,12 @@ def build():
     for r in sched[:600]:
         pick, cls = _pick(r)
         srows.append(
-            '<tr><td class="cd">%s</td><td class="n">%s</td><td class="tm">%s%s%s</td>'
+            '<tr%s><td class="cd">%s</td><td class="n">%s</td><td class="tm">%s%s%s</td>'
             '<td class="at">at</td><td class="tm">%s%s%s</td>'
             '<td class="n pick %s">%s</td></tr>'
-            % (r["d"], r["t"] or "&mdash;",
+            % ((' class="rkd both"' if (r["ar"] and r["hr"])
+                else (' class="rkd"' if (r["ar"] or r["hr"]) else "")),
+               r["d"], r["t"] or "&mdash;",
                ('<i class="rnk">%s</i> ' % r["ar"]) if r["ar"] else "",
                logo_img(r["a"], logos), esc(r["a"]),
                ('<i class="rnk">%s</i> ' % r["hr"]) if r["hr"] else "",
@@ -1809,6 +1965,31 @@ td.pick b{color:var(--navy)}
   font:700 14px/1 var(--mono);text-align:right}
 .tstat td.op{color:var(--ink3)}
 .tstat tr:last-child td{border-bottom:0}
+.phead{display:flex;align-items:flex-start;gap:16px}
+.phero{width:72px;height:72px;border-radius:50%;object-fit:cover;flex:none;
+  background:var(--alt);border:1px solid var(--line)}
+.phead svg{flex:none}
+.pcell{display:flex;align-items:center;gap:10px;min-width:0;max-width:100%}
+/* An All-America badge. Sized like a footnote, not a trophy -- it sits beside a
+   name, and a loud chip next to every good player is noise. */
+.aa{display:inline-block;margin-left:7px;padding:2px 5px;border-radius:2px;
+  font:700 9px/1 var(--mono);letter-spacing:.06em;vertical-align:2px;
+  background:var(--alt);color:var(--ink2);border:1px solid var(--line)}
+/* A national award is a different order of thing from a team selection. */
+.aaNat{background:var(--navy);color:#fff;border-color:var(--navy)}
+.aaFirst{background:var(--amber);color:#141210;border-color:#E0A800}
+.aaSecon{background:#E8F0FB;color:var(--navy);border-color:#BFD5F0}
+.aaThird{background:var(--alt);color:var(--ink2)}
+.pcell .pmug{border-radius:50%;object-fit:cover;flex:none;background:var(--alt)}
+.pcell svg{flex:none}
+.pinfo{display:flex;flex-direction:column;min-width:0;line-height:1.15}
+/* A long name has to wrap rather than push the cell past its box -- at
+   560px 17 roster cells were overflowing, which clips on a phone even
+   though the page itself does not scroll sideways. */
+.pnm{font:600 15px/1.2 var(--disp);letter-spacing:.01em;color:var(--ink);
+  overflow-wrap:anywhere;min-width:0}
+.pinfo{flex:1 1 auto}
+.pmeta{font:600 10.5px/1 var(--mono);color:var(--ink3);margin-top:3px;letter-spacing:.03em}
 /* SHARED TABLE TREATMENT. Applied to every data table so the site reads as one
    design -- the Top 25 was restyled first and everything else kept the old
    look, which is the worst of both. */
@@ -1822,6 +2003,20 @@ td.tm{font-size:15px}
 /* The poll's names are deliberately larger -- it is the headline view, and
    hierarchy between views is not the same thing as inconsistency. */
 .t25 td.tm{font-size:17px}
+/* A fixture with a ranked side gets a quiet edge; two ranked sides get a loud
+   one. The schedule is long and the eye needs somewhere to land. */
+#sbody tr.rkd td:first-child{box-shadow:inset 3px 0 0 var(--line2)}
+#sbody tr.both td:first-child{box-shadow:inset 3px 0 0 var(--amber)}
+#sbody tr.both .tm{font-weight:700}
+.t25 td.form{white-space:nowrap;padding-left:14px}
+.fw,.fl{display:inline-block;width:19px;height:19px;line-height:19px;text-align:center;
+  border-radius:2px;font:700 10.5px/19px var(--mono);margin-right:3px}
+.fw{background:#E4F2E9;color:#12864B;border:1px solid #BFE0CC}
+.fl{background:#FBE9E7;color:#B3261E;border:1px solid #F0CCC6}
+/* A result against a ranked side is marked -- it is stronger evidence. */
+.fw.frk{background:#12864B;color:#fff;border-color:#12864B}
+.fl.frk{background:#B3261E;color:#fff;border-color:#B3261E}
+.noform{font:400 11.5px/1 var(--sans);color:var(--ink3)}
 /* Digby's Top 25. A poll, so it reads as a list first and a table second. */
 .t25{width:100%;border-collapse:collapse}
 .t25 th{font:500 11px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
@@ -1902,8 +2097,8 @@ td.tm{font-size:15px}
   padding:0 0 6px;border-bottom:1px solid var(--line2);margin-bottom:2px}
 .rgrp-n{font:700 10px/1 var(--mono);color:var(--ink3);background:var(--alt);
   border-radius:20px;padding:3px 7px}
-.rrow{display:grid;grid-template-columns:28px 32px 1fr auto;grid-template-areas:
-  "av num name stat" "av num meta stat";align-items:center;gap:0 8px;
+.rrow{display:grid;grid-template-columns:1fr auto;grid-template-areas:
+  "av stat" "meta stat";align-items:center;gap:0 10px;
   padding:7px 9px 7px 6px;border-left:3px solid transparent;
   border-bottom:1px solid var(--line);transition:background .12s ease}
 .rrow:last-child{border-bottom:0}
@@ -1912,12 +2107,16 @@ td.tm{font-size:15px}
    read, and the legend under the table names this bar explicitly. */
 .rrow--starter{border-left-color:#12864B}
 .rrow--starter .rname{font-weight:700}
-.ravatar{grid-area:av;display:flex;align-items:center}
-.ravatar svg{display:block;width:26px;height:26px}
-.rmug{width:26px;height:26px;border-radius:50%;object-fit:cover;display:block;background:var(--alt)}
+.ravatar{grid-area:av;display:flex;align-items:center;min-width:0}
+.rrow .pnm{font-size:15px}
+.rrow--starter .pnm{font-weight:700}
+/* A player's name opens her match log -- a roster you cannot click
+   through from is a list, not a page. */
+.rrow{cursor:pointer}
+.rrow:hover .pnm{text-decoration:underline;text-underline-offset:2px}
 .rnum{grid-area:num;font:700 11.5px/1 var(--mono);color:var(--ink3);text-align:right}
 .rname{grid-area:name;font-size:13.5px;font-weight:600}
-.rmeta{grid-area:meta;font-size:11.5px;color:var(--ink2);margin-top:2px}
+.rmeta{grid-area:meta;font-size:11.5px;color:var(--ink2);margin-top:3px;padding-left:50px}
 .rstat{grid-area:stat;font:700 14px/1 var(--mono);color:var(--navy);text-align:right;
   white-space:nowrap;padding-left:10px}
 .rstat em{display:block;font:600 9px/1 var(--sans);letter-spacing:.05em;
@@ -1926,7 +2125,7 @@ td.tm{font-size:15px}
 h3 .h3n{font:700 10px/1 var(--mono);color:var(--ink3);background:var(--alt);
   border-radius:20px;padding:3px 7px;margin-left:7px;vertical-align:2px}
 @media (max-width:560px){
-  .rrow{grid-template-columns:26px 1fr auto;padding-right:4px}
+  .rrow{grid-template-columns:1fr auto;padding-right:4px}
   .rname{font-size:13px}
   .rmeta{font-size:11px}
   .rstat{font-size:13px;padding-left:6px}
@@ -2105,7 +2304,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <p class="lead"><b>2026 results.</b> Every completed match, newest first. The strip under each result is
   the <b>per-set score</b> &mdash; visitor on top, home below, the set winner lit.
   A 25&ndash;23 and a 25&ndash;12 are not the same match.</p>
-  <div class="cards" id="sbody">{{SCORE_CARDS}}</div>
+  <div class="cards" id="resultcards">{{SCORE_CARDS}}</div>
 </section>
 
 <section id="v-top25" hidden>
@@ -2114,7 +2313,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <div class="scroll"><table class="t25">
     <thead><tr>
       <th>#</th><th>Team</th><th title="how the rank changed">{{T25_MOVEHEAD}}</th>
-      <th>Conf</th><th>Record</th>
+      <th>Conf</th><th>Record</th><th class="l" title="most recent results, newest last">Form</th>
       <th class="n" title="net points per set this season">Net/set</th>
       <th class="n" title="how much of the rating is this season rather than the preseason projection">This season</th>
     </tr></thead>
@@ -2217,7 +2416,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <span class="count" id="lcnt"></span>
   </div>
   <div class="panel" id="lplayer"><div class="scroll"><table>
-    <thead><tr><th>#</th><th class="l">Player</th><th class="l">Team</th><th>Pos</th>
+    <thead><tr><th>#</th><th class="l">Player</th><th class="l">Team</th>
       <th>Sets</th><th id="lhead">Pts/set</th></tr></thead>
     <tbody id="lbody"></tbody></table></div>
     <div class="note">Hitting percentage needs at least 20 swings before it means
@@ -2288,6 +2487,11 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <p class="lead"><b>2026 schedule.</b> {{N_SCHED}} fixtures from today forward, straight from ncaa.com.</p>
   <div class="ctl">
     <input type="search" id="sq" placeholder="Search a team&hellip;">
+    <select id="srank">
+      <option value="all">Every fixture</option>
+      <option value="one">A ranked team</option>
+      <option value="both">Top 25 v Top 25</option>
+    </select>
     <span class="count" id="scnt"></span>
   </div>
   <div class="panel"><div class="scroll"><table>
@@ -2471,7 +2675,7 @@ async function pollLive() {
      it until the next one runs. Without this it falls between the two. */
   const jbox = document.getElementById('justin');
   if (jbox) {
-    const known = new Set([...document.querySelectorAll('#sbody [data-gid]')]
+    const known = new Set([...document.querySelectorAll('#resultcards [data-gid]')]
       .map(el => el.dataset.gid));
     const fresh = justEnded.filter(g => !known.has(String(g.id)));
     if (!fresh.length) { jbox.hidden = true; }
@@ -2500,13 +2704,17 @@ async function pollLive() {
   document.getElementById('livemeta').textContent =
     (d.error ? d.error + ' \u00b7 ' : '') + 'updated ' + (d.updated || '');
   document.getElementById('livecards').innerHTML = live.map(g => {
-    const aw = +g.away_sets > +g.home_sets;
+    /* AT 0-0 NOBODY IS WINNING. `away > home` is false when the sets are level,
+       so the "not away" branch bolded the HOME team from the first whistle --
+       Kentucky-Pittsburgh showed Pittsburgh as the leader at 0-0. Three states,
+       not two. */
+    const lead = +g.away_sets === +g.home_sets ? 0 : (+g.away_sets > +g.home_sets ? -1 : 1);
     const venue = g.venue || 'venue not reported';
     return '<div class="card islive"><div class="cd">' +
       (g.period || 'in progress') + '</div>' +
-      '<div class="mt"><div class="side' + (aw ? ' win' : '') + '">' +
+      '<div class="mt"><div class="side' + (lead < 0 ? ' win' : '') + '">' +
         rank(g.away_rank) + logo(g.away) + g.away + '<b>' + g.away_sets + '</b></div>' +
-      '<div class="side' + (aw ? '' : ' win') + '">' +
+      '<div class="side' + (lead > 0 ? ' win' : '') + '">' +
         rank(g.home_rank) + logo(g.home) + g.home + '<b>' + g.home_sets + '</b></div></div>' +
       setStrip(g.sets, true) +
       '<div class="venue">' + venue + '</div></div>';
@@ -2522,6 +2730,72 @@ const COLORS = {{COLORS_JSON}};
 const BOXES = {{BOXES_JSON}};
 const PLAYERS = {{PLAYERS_JSON}};
 
+/* PLAYER AVATARS. Pose = her real position, colour = her school's own logo
+ colour. Shown only where there is NO photograph -- a real picture always
+ wins. Nothing here claims anything about the person: no face, no hair, no
+ skin tone. The libero is drawn in the accent because the rules require a
+ contrasting jersey, which is the one thing the picture actually tells you.
+ Shapes are generated from scripts/avatars.py so the preview sheet and this
+ page cannot drift. */
+const AV = {"poses":{"S":{"body":"<circle cx=\"20\" cy=\"13\" r=\"3.9\"/><path d=\"M20 17.6c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M16.6 19.6 14.6 12.8M23.4 19.6l2-6.8\"/>","hands":[[14.2,11.8],[25.8,11.8]],"ball":[20,7.6,3.2]},"MB":{"body":"<circle cx=\"20\" cy=\"15\" r=\"3.9\"/><path d=\"M20 19.6c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M14.4 22.4 13.6 9.6M25.6 22.4l.8-12.8\"/>","hands":[[13.4,8.4],[26.6,8.4]],"ball":null},"OH":{"body":"<circle cx=\"21.5\" cy=\"14\" r=\"3.9\"/><path d=\"M21.5 18.6c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M25 20.4 30 13.4\"/><path d=\"M18 21.4 10.8 25.4\"/>","hands":[[30.6,12.4],[9.8,26]],"ball":[32.4,7.4,2.9]},"L/DS":{"body":"<circle cx=\"23\" cy=\"15.5\" r=\"3.9\"/><path d=\"M23 20c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M19.8 22.8 10.4 28.4M25.6 23.4 10.4 28.4\"/>","hands":[[9.4,29]],"ball":null},"OPP":{"body":"<circle cx=\"21.5\" cy=\"14\" r=\"3.9\"/><path d=\"M21.5 18.6c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M25 20.4 30 13.4\"/><path d=\"M18 21.4 10.8 25.4\"/>","hands":[[30.6,12.4],[9.8,26]],"ball":[32.4,7.4,2.9]},"RS":{"body":"<circle cx=\"21.5\" cy=\"14\" r=\"3.9\"/><path d=\"M21.5 18.6c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M25 20.4 30 13.4\"/><path d=\"M18 21.4 10.8 25.4\"/>","hands":[[30.6,12.4],[9.8,26]],"ball":[32.4,7.4,2.9]},"DS":{"body":"<circle cx=\"23\" cy=\"15.5\" r=\"3.9\"/><path d=\"M23 20c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M19.8 22.8 10.4 28.4M25.6 23.4 10.4 28.4\"/>","hands":[[9.4,29]],"ball":null},"L":{"body":"<circle cx=\"23\" cy=\"15.5\" r=\"3.9\"/><path d=\"M23 20c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M19.8 22.8 10.4 28.4M25.6 23.4 10.4 28.4\"/>","hands":[[9.4,29]],"ball":null}},"unknown":{"body":"<circle cx=\"20\" cy=\"14\" r=\"3.9\"/><path d=\"M20 18.6c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M16.4 21.6 13.4 27.4M23.6 21.6l3 5.8\"/>","hands":[],"ball":null},"libero":["L/DS","L","DS"],"neutral":"#9A8F7D","onNeutral":"#FFFFFF"};
+function avatar(pos, team, size) {
+const c = (COLORS && COLORS[team]) || {};
+let bg = c.primary || AV.neutral, ink = c.on_primary || AV.onNeutral;
+if (AV.libero.indexOf(pos) >= 0) {
+  bg = c.accent || bg; ink = c.on_accent || ink;
+}
+const p = AV.poses[pos] || AV.unknown;
+const hands = (p.hands || []).map(h =>
+  '<circle cx="' + h[0] + '" cy="' + h[1] + '" r="1.9"/>').join('');
+const ball = p.ball
+  ? '<circle cx="' + p.ball[0] + '" cy="' + p.ball[1] + '" r="' + p.ball[2] +
+    '" fill="' + bg + '" stroke="' + ink + '" stroke-width="1.6"/>' : '';
+return '<svg viewBox="0 0 40 40" width="' + size + '" height="' + size +
+  '" class="mug pav" aria-hidden="true" focusable="false">' +
+  '<circle cx="20" cy="20" r="20" fill="' + bg + '"/>' +
+  '<g fill="' + ink + '">' + p.body + hands + '</g>' +
+  '<g fill="none" stroke="' + ink + '" stroke-width="2.5" stroke-linecap="round">' +
+  p.limbs + '</g>' + ball + '</svg>';
+}
+
+/* ONE PLAYER CELL, used by the stats table, the roster and anywhere else a
+ person is named. Photo (or her position avatar), name, and number + position
+ underneath in small type -- the identity block a sports site repeats
+ everywhere. Defined once so the three places cannot drift apart. */
+function playerCell(o, size) {
+size = size || 34;
+const meta = [o.num ? '#' + o.num : '', o.pos || ''].filter(Boolean).join(' \u00b7 ');
+const face = o.photo
+  ? '<img class="pmug" src="' + o.photo + '" alt="" loading="lazy" ' +
+    'style="width:' + size + 'px;height:' + size + 'px" ' +
+    'onerror="this.replaceWith(document.createRange()' +
+    '.createContextualFragment(this.dataset.fb))" data-fb=\'' +
+    avatar(o.pos, o.team, size) + '\'>'
+  : avatar(o.pos, o.team, size);
+/* AVCA honours. First Team gets the loudest treatment, then Second and Third
+   -- the order the award itself has. Only the most recent shows inline; the
+   full history is on her own page. Sized like a footnote, not a trophy. */
+const RANKED = ['Player of the Year', 'Freshman of the Year', 'First Team',
+                'Second Team', 'Third Team', 'Honorable Mention'];
+const best = (list) => (list || []).slice().sort(
+  (x, y) => (RANKED.indexOf(x.honour) + 99 * 0) - (RANKED.indexOf(y.honour)) ||
+            y.season - x.season)[0];
+const aa = best(o.aa);
+const short = {'Player of the Year': 'POY', 'Freshman of the Year': 'FOY',
+               'First Team': 'AA1', 'Second Team': 'AA2', 'Third Team': 'AA3',
+               'Honorable Mention': 'HM'};
+const badge = aa
+  ? '<span class="aa ' + (aa.national ? 'aaNat' : 'aa' +
+      (aa.honour || '').replace(/[^A-Za-z]/g, '').slice(0, 5)) +
+    '" title="AVCA ' + aa.honour + (aa.national ? '' : ' All-American') + ', ' + aa.season +
+    (o.aa.length > 1 ? ' \u2014 ' + o.aa.length + ' selections' : '') + '">' +
+    (short[aa.honour] || 'AA') + '</span>'
+  : '';
+return '<span class="pcell">' + face +
+  '<span class="pinfo"><span class="pnm">' + o.name + badge + '</span>' +
+  (meta ? '<span class="pmeta">' + meta + '</span>' : '') +
+  '</span></span>';
+}
 function logo(team, cls) {
   const u = LOGOS[team];
   return u ? '<img class="tlogo ' + (cls || '') + '" src="' + u + '" alt="" ' +
@@ -2601,7 +2875,8 @@ function renderPlayers() {
   const rows = PLAYERS.filter(p => !q || (p.name + ' ' + p.team).toLowerCase().includes(q));
   document.getElementById('pbody').innerHTML = rows.slice(0, 300).map(p =>
     '<tr class="prow" data-k="' + p.team + '|' + p.name + '">' +
-    '<td class="tm">' + p.name + '</td><td class="cf">' + logo(p.team) + p.team + '</td>' +
+    '<td class="tm">' + playerCell(p, 32) + '</td>' +
+    '<td class="cf">' + logo(p.team) + p.team + '</td>' +
     '<td class="n">' + (p.pos || '') + '</td><td class="n">' + p.sets + '</td>' +
     '<td class="n">' + p.k + '</td><td class="n">' + pct(p.hit) + '</td>' +
     '<td class="n">' + p.digs + '</td><td class="n">' + (p.bs + p.ba * 0.5) + '</td>' +
@@ -2610,8 +2885,14 @@ function renderPlayers() {
   if (rows.length === 1) showPlayer(rows[0]);
 }
 function showPlayer(p) {
+  const face = p.photo
+    ? '<img class="phero" src="' + p.photo + '" alt="" ' +
+      'onerror="this.replaceWith(document.createRange()' +
+      '.createContextualFragment(this.dataset.fb))" data-fb=\'' +
+      avatar(p.pos, p.team, 72) + '\'>'
+    : avatar(p.pos, p.team, 72);
   document.getElementById('playercard').innerHTML =
-    '<div class="thead"><h2>' + logo(p.team, 'lg') + p.name + '</h2>' +
+    '<div class="thead phead">' + face + '<div><h2>' + logo(p.team, 'lg') + p.name + '</h2>' +
     '<div class="sub">' + p.team + (p.pos ? ' · ' + p.pos : '') +
       (p.num ? ' · #' + p.num : '') + '</div>' +
     '<div class="chips">' +
@@ -2620,7 +2901,16 @@ function showPlayer(p) {
       '<span class="chip">Hit% <b>' + pct(p.hit) + '</b></span>' +
       '<span class="chip">Digs/set <b>' + p.dps.toFixed(2) + '</b></span>' +
       '<span class="chip">Sets <b>' + p.sets + '</b></span>' +
-    '</div></div>' +
+    '</div></div></div>' +
+    (p.aa && p.aa.length
+      ? '<div class="tsec"><h3>AVCA honours</h3><div class="body">' +
+        p.aa.map(x => '<div class="plrow"><span class="nm">' + x.honour +
+          (x.national ? '<span class="wentto">national award</span>' : '') +
+          '</span><span class="rt">' + x.season + '</span></div>').join('') +
+        '</div><div class="tnote">From the AVCA\u2019s published All-America ' +
+        'workbook. Only the last two seasons are loaded \u2014 an older honour ' +
+        'belongs to somebody who may not be on a 2026 roster.</div></div>'
+      : '') +
     '<div class="tsec"><h3>Match log</h3><div class="body">' +
     p.games.map(g => '<div class="gline"><span class="dt">' + (g.d || '') + '</span>' +
       '<span class="op">' + (g.opp || '') + '</span>' +
@@ -2831,8 +3121,9 @@ function renderLeaders() {
     .filter(r => !q || (r.name + ' ' + r.team).toLowerCase().includes(q))
     .sort((a, b) => b[k] - a[k]).slice(0, 200);
   document.getElementById('lbody').innerHTML = rows.map((r, i) =>
-    '<tr><td class="rk">' + (i + 1) + '</td><td class="tm">' + r.name + '</td>' +
-    '<td class="cf">' + r.team + '</td><td class="n">' + (r.pos || '') + '</td>' +
+    '<tr class="prow" data-p="' + i + '"><td class="rk">' + (i + 1) + '</td>' +
+    '<td class="tm">' + playerCell(r, 34) + '</td>' +
+    '<td class="cf">' + logo(r.team) + r.team + '</td>' +
     '<td class="n">' + r.sets + '</td><td class="n hi">' +
     (k === 'hit' ? r.hit.toFixed(3) : r[k].toFixed(2)) + '</td></tr>').join('');
   document.getElementById('lcnt').textContent = rows.length + ' players';
@@ -2885,6 +3176,35 @@ document.querySelectorAll('#v-leaders .segb').forEach(b =>
     LSIDE = b.dataset.ls;
     renderStats();
   }));
+/* CLICK THROUGH TO A PLAYER. Both the roster and the stats table resolve the
+   same way -- name + team against the PLAYERS aggregate, which is the only
+   list carrying a match log. A player with no 2026 line yet (a true freshman)
+   has nothing to show, so the row simply does not respond rather than opening
+   an empty panel. */
+function openPlayer(name, team) {
+  const key = s => (s || '').toLowerCase().replace(/[^a-z]/g, '');
+  const p = PLAYERS.find(x => key(x.name) === key(name) && key(x.team) === key(team));
+  if (!p) return false;
+  document.querySelector('nav button[data-v="players"]').click();
+  const q = document.getElementById('pq');
+  if (q) { q.value = p.name; q.dispatchEvent(new Event('input', {bubbles: true})); }
+  showPlayer(p);
+  window.scrollTo({top: 0});
+  return true;
+}
+document.addEventListener('click', e => {
+  const row = e.target.closest('#teamcard .rrow[data-player]');
+  if (!row) return;
+  const team = (document.querySelector('#teamcard .thead h2') || {}).textContent || '';
+  openPlayer(row.dataset.player, team.trim());
+});
+document.getElementById('lbody').addEventListener('click', e => {
+  const tr = e.target.closest('tr.prow');
+  if (!tr) return;
+  const nm = tr.querySelector('.pnm'), tmc = tr.querySelector('.cf');
+  if (nm && tmc) openPlayer(nm.textContent, tmc.textContent);
+});
+
 ['lq','lstat','lside'].forEach(id =>
   document.getElementById(id).addEventListener('input', renderStats));
 renderLeaders();
@@ -2923,33 +3243,6 @@ function showTeam(name) {
         Math.round(f.pick * 100) + '%</span>' : '') +
     '</div>').join('');
 
-/* PLAYER AVATARS. Pose = her real position, colour = her school's own logo
-   colour. Shown only where there is NO photograph -- a real picture always
-   wins. Nothing here claims anything about the person: no face, no hair, no
-   skin tone. The libero is drawn in the accent because the rules require a
-   contrasting jersey, which is the one thing the picture actually tells you.
-   Shapes are generated from scripts/avatars.py so the preview sheet and this
-   page cannot drift. */
-const AV = {"poses":{"S":{"body":"<circle cx=\"20\" cy=\"13\" r=\"3.9\"/><path d=\"M20 17.6c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M16.6 19.6 14.6 12.8M23.4 19.6l2-6.8\"/>","hands":[[14.2,11.8],[25.8,11.8]],"ball":[20,7.6,3.2]},"MB":{"body":"<circle cx=\"20\" cy=\"15\" r=\"3.9\"/><path d=\"M20 19.6c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M14.4 22.4 13.6 9.6M25.6 22.4l.8-12.8\"/>","hands":[[13.4,8.4],[26.6,8.4]],"ball":null},"OH":{"body":"<circle cx=\"21.5\" cy=\"14\" r=\"3.9\"/><path d=\"M21.5 18.6c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M25 20.4 30 13.4\"/><path d=\"M18 21.4 10.8 25.4\"/>","hands":[[30.6,12.4],[9.8,26]],"ball":[32.4,7.4,2.9]},"L/DS":{"body":"<circle cx=\"23\" cy=\"15.5\" r=\"3.9\"/><path d=\"M23 20c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M19.8 22.8 10.4 28.4M25.6 23.4 10.4 28.4\"/>","hands":[[9.4,29]],"ball":null},"OPP":{"body":"<circle cx=\"21.5\" cy=\"14\" r=\"3.9\"/><path d=\"M21.5 18.6c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M25 20.4 30 13.4\"/><path d=\"M18 21.4 10.8 25.4\"/>","hands":[[30.6,12.4],[9.8,26]],"ball":[32.4,7.4,2.9]},"RS":{"body":"<circle cx=\"21.5\" cy=\"14\" r=\"3.9\"/><path d=\"M21.5 18.6c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M25 20.4 30 13.4\"/><path d=\"M18 21.4 10.8 25.4\"/>","hands":[[30.6,12.4],[9.8,26]],"ball":[32.4,7.4,2.9]},"DS":{"body":"<circle cx=\"23\" cy=\"15.5\" r=\"3.9\"/><path d=\"M23 20c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M19.8 22.8 10.4 28.4M25.6 23.4 10.4 28.4\"/>","hands":[[9.4,29]],"ball":null},"L":{"body":"<circle cx=\"23\" cy=\"15.5\" r=\"3.9\"/><path d=\"M23 20c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M19.8 22.8 10.4 28.4M25.6 23.4 10.4 28.4\"/>","hands":[[9.4,29]],"ball":null}},"unknown":{"body":"<circle cx=\"20\" cy=\"14\" r=\"3.9\"/><path d=\"M20 18.6c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M16.4 21.6 13.4 27.4M23.6 21.6l3 5.8\"/>","hands":[],"ball":null},"libero":["L/DS","L","DS"],"neutral":"#9A8F7D","onNeutral":"#FFFFFF"};
-function avatar(pos, team, size) {
-  const c = (COLORS && COLORS[team]) || {};
-  let bg = c.primary || AV.neutral, ink = c.on_primary || AV.onNeutral;
-  if (AV.libero.indexOf(pos) >= 0) {
-    bg = c.accent || bg; ink = c.on_accent || ink;
-  }
-  const p = AV.poses[pos] || AV.unknown;
-  const hands = (p.hands || []).map(h =>
-    '<circle cx="' + h[0] + '" cy="' + h[1] + '" r="1.9"/>').join('');
-  const ball = p.ball
-    ? '<circle cx="' + p.ball[0] + '" cy="' + p.ball[1] + '" r="' + p.ball[2] +
-      '" fill="' + bg + '" stroke="' + ink + '" stroke-width="1.6"/>' : '';
-  return '<svg viewBox="0 0 40 40" width="' + size + '" height="' + size +
-    '" class="mug pav" aria-hidden="true" focusable="false">' +
-    '<circle cx="20" cy="20" r="20" fill="' + bg + '"/>' +
-    '<g fill="' + ink + '">' + p.body + hands + '</g>' +
-    '<g fill="none" stroke="' + ink + '" stroke-width="2.5" stroke-linecap="round">' +
-    p.limbs + '</g>' + ball + '</svg>';
-}
   const initials = n => n.split(/\s+/).map(x => x[0]).join('').slice(0, 2).toUpperCase();
   const six = (t.rotation || []).map(c =>
     '<div class="plrow">' +
@@ -3019,15 +3312,11 @@ function avatar(pos, team, size) {
           (r.l26.sets === 1 ? '' : 's') + '</b>');
         if (live && r.r !== null && r.r !== undefined)
           sub.push('2025: ' + r.r + ' pts/set over ' + (r.sets || 0) + ' sets');
-        rosterHtml += '<div class="rrow' + (r.st ? ' rrow--starter' : '') + '">' +
-          '<span class="ravatar">' + (r.ph
-             ? '<img class="rmug" src="' + r.ph + '" alt="" loading="lazy" ' +
-               'onerror="this.replaceWith(document.createRange()' +
-               '.createContextualFragment(this.dataset.fb))" data-fb=\'' +
-               avatar(r.p, name, 26) + '\'>'
-             : avatar(r.p, name, 26)) + '</span>' +
-          '<span class="rnum">' + (r.num !== null && r.num !== undefined ? '#' + r.num : '') + '</span>' +
-          '<span class="rname">' + r.n + '</span>' +
+        rosterHtml += '<div class="rrow' + (r.st ? ' rrow--starter' : '') +
+          '" data-player="' + r.n.replace(/"/g, '&quot;') + '">' +
+          '<span class="ravatar">' +
+            playerCell({name: r.n, team: name, pos: r.p, num: r.num, photo: r.ph, aa: r.aa}, 40) +
+          '</span>' +
           '<span class="rmeta">' + sub.join(' \u00b7 ') + '</span>' +
           '<span class="rstat">' + stat + '</span></div>';
       }
@@ -3072,6 +3361,30 @@ function avatar(pos, team, size) {
       'because Division-I membership is taken from the 2025 official RPI table, ' +
       'where it went 20\u20139. Everything below is <b>2025</b>; there are no ' +
       '2026 projections because there is nothing to project.</div>';
+  }
+  /* RETURNING HONOURS. A count of the decorated players still on the roster --
+     the difference between "returns its top scorer" and "returns three
+     All-Americans", which is the thing a preseason number cannot say. */
+  const aaRoster = (t.roster || []).filter(r => r.aa && r.aa.length);
+  const aaNat = aaRoster.filter(r => r.aa.some(x => x.national));
+  let honHtml = '';
+  if (aaRoster.length) {
+    honHtml =
+      '<div class="tsec" style="margin-top:14px"><h3>Returning AVCA honours</h3>' +
+      '<div class="body">' + aaRoster.map(r => {
+        const best = r.aa.slice().sort((x, y) => y.season - x.season)[0];
+        return '<div class="plrow"><span class="nm">' + r.n +
+          '<span class="wentto">' +
+          r.aa.map(x => x.honour + ' ' + x.season).join(' \u00b7 ') +
+          '</span></span><span class="kd">' + (best.national ? 'national' : 'all-america') +
+          '</span></div>';
+      }).join('') + '</div>' +
+      '<div class="tnote"><b>' + aaRoster.length +
+      (aaRoster.length === 1 ? ' player' : ' players') + '</b> on this roster ' +
+      'carried an AVCA honour in the last two seasons' +
+      (aaNat.length ? ', including <b>' + aaNat.length + '</b> with a national award' : '') +
+      '. From the AVCA\u2019s published workbook \u2014 nothing in the game feed ' +
+      'carries this.</div></div>';
   }
   const aq = t.aq;
   let postHtml = '';
@@ -3240,6 +3553,7 @@ function avatar(pos, team, size) {
                    : '')) +
              ' Listed by matches started.</div></div>' : '') +
         statHtml +
+        honHtml +
         postHtml +
         rotHtml +
         (dep ? '<div class="tsec" style="margin-top:14px"><h3>Biggest losses</h3>' +
@@ -3368,7 +3682,29 @@ renderBracket();
   }).observe(sec, { attributes: true, attributeFilter: ['hidden'] });
 })();
 drawBracketLines();
-filter('sq', 'sbody', 'scnt', 'fixtures');
+/* Schedule filter: text AND rank together. 1,524 fixtures is a list you cannot
+   read; 39 of them are Top 25 against Top 25, which is the question actually
+   being asked when someone opens a schedule in August. */
+function filterSchedule() {
+  const q = (document.getElementById('sq').value || '').toLowerCase().trim();
+  const want = document.getElementById('srank').value;
+  let shown = 0;
+  document.querySelectorAll('#sbody tr').forEach(tr => {
+    const cls = tr.className || '';
+    const rankOk = want === 'all' ||
+                   (want === 'one' && cls.includes('rkd')) ||
+                   (want === 'both' && cls.includes('both'));
+    const textOk = !q || tr.textContent.toLowerCase().includes(q);
+    const show = rankOk && textOk;
+    tr.hidden = !show;
+    if (show) shown++;
+  });
+  document.getElementById('scnt').textContent =
+    shown + (shown === 1 ? ' fixture' : ' fixtures');
+}
+['sq', 'srank'].forEach(id =>
+  document.getElementById(id).addEventListener('input', filterSchedule));
+filterSchedule();
 filter('tq', 'tbody', 'tcnt', 'matches');
 {{ASK_JS}}
 </script>

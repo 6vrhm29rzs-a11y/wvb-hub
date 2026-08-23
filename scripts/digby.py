@@ -133,6 +133,47 @@ def fact_sheet(team, rec):
         put("started_%d_matches_started" % i, s.get("starts_2025"))
         put("started_%d_back_for_2026" % i, s.get("status_2026"))
 
+    # 2026 TEAM STATS, both sides. Added after the box scores started carrying
+    # them: Digby was answering "how are they playing" from a preseason
+    # projection because nothing else was in front of him.
+    ts = rec.get("tstats") or {}
+    own, opp = (ts.get("own") or {}), (ts.get("opp") or {})
+    put("matches_with_a_box_score_2026", own.get("matches"))
+    put("sets_played_2026", own.get("sets"))
+    put("hitting_pct_2026", own.get("hit"))
+    put("opponent_hitting_pct_2026", opp.get("hit"))
+    put("points_per_set_2026", own.get("pps"))
+    put("opponent_points_per_set_2026", opp.get("pps"))
+    put("kills_per_set_2026", own.get("kps"))
+    put("digs_per_set_2026", own.get("dps"))
+    put("blocks_per_set_2026", own.get("bps"))
+    put("aces_per_set_2026", own.get("aps"))
+
+    # THE SERVING ROTATION, which is the one thing on the page a reader is most
+    # likely to ask about and could not previously be answered.
+    rot = rec.get("rot25") or {}
+    for i, nm in enumerate(rot.get("rotation") or [], 1):
+        put("serving_rotation_2025_slot_%d" % i, nm)
+    put("rotation_sets_agreeing", rot.get("sets_with_this_rotation"))
+    put("rotation_sets_resolved", rot.get("sets_resolved"))
+
+    # How the conference awards its bid, and how much of a season is scheduled.
+    aq = rec.get("aq") or {}
+    put("conference_bid_awarded_by",
+        "conference tournament" if aq.get("mechanism") == "TOURNAMENT"
+        else ("regular-season champion" if aq.get("mechanism") else None))
+    put("matches_on_the_2026_schedule", rec.get("sched_n"))
+
+    # AVCA honours still on the roster -- the difference between returning a
+    # good scorer and returning an All-American.
+    dec = [r for r in (rec.get("roster") or []) if r.get("aa")]
+    put("players_with_an_avca_honour", len(dec) or None)
+    for i, r in enumerate(dec[:6], 1):
+        best = sorted(r["aa"], key=lambda x: -x.get("season", 0))[0]
+        put("avca_honour_%d_player" % i, r.get("n"))
+        put("avca_honour_%d_award" % i, best.get("honour"))
+        put("avca_honour_%d_season" % i, best.get("season"))
+
     for i, d in enumerate((rec.get("top_dep") or [])[:3], 1):
         put("biggest_loss_%d_name" % i, d.get("name"))
         put("biggest_loss_%d_position" % i, d.get("pos"))

@@ -199,6 +199,13 @@ def _digby_answer(question):
         # effect until a restart, while the page kept answering with the old
         # behaviour and looking like the fix had failed. That cost a round of
         # "I fixed it" / "it still does it".
+        # ⚠ RELOAD BOTH WHEN EITHER CHANGES. `digby_chat` does
+        # `from digby import fact_sheet`, so reloading `digby` alone leaves
+        # digby_chat holding the OLD function object -- the chat kept answering
+        # "that isn't in the hub's data" about fields that had just been added,
+        # because only digby.py's mtime had moved. Dependency order matters
+        # too: digby first, so digby_chat re-imports the new one.
+        changed = False
         for mod in (digby, digby_chat):
             try:
                 src = os.path.abspath(mod.__file__)
@@ -206,14 +213,20 @@ def _digby_answer(question):
                 if _digby["mtimes"].get(src) is None:
                     _digby["mtimes"][src] = mtime
                 elif mtime > _digby["mtimes"][src]:
-                    import importlib
-                    importlib.reload(mod)
                     _digby["mtimes"][src] = mtime
-                    _digby["index"] = None               # rebuilt below
-                    _digby["teams"] = None
-                    print("  [reloaded %s]" % os.path.basename(src))
+                    changed = True
             except Exception:                            # noqa: BLE001
                 pass
+        if changed:
+            import importlib
+            for mod in (digby, digby_chat):              # order is load-bearing
+                try:
+                    importlib.reload(mod)
+                except Exception:                        # noqa: BLE001
+                    pass
+            _digby["index"] = None
+            _digby["teams"] = None
+            print("  [reloaded digby + digby_chat]")
         import digby_chat                                # rebind after reload
     except Exception as exc:                              # noqa: BLE001
         return {"ok": False, "answer": "Digby is unavailable (%s)."
@@ -229,6 +242,17 @@ def _digby_answer(question):
             return {"ok": False, "answer": "One moment -- still thinking."}
         _digby["last"] = now
         _digby["count"] += 1
+        page = os.path.join(WEBROOT, "START-HERE.html")
+        try:
+            pm = os.path.getmtime(page)
+        except OSError:
+            pm = None
+        if pm and _digby.get("page_mtime") != pm:
+            # The page is the source of every fact. A rebuild means the cached
+            # team records are stale even when no code changed.
+            _digby["page_mtime"] = pm
+            _digby["teams"] = None
+            _digby["index"] = None
         if _digby["teams"] is None:
             _digby["teams"] = teams_from_page()
             _digby["index"] = digby_chat.build_index(_digby["teams"])

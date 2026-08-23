@@ -76,3 +76,19 @@ capitalised unique surname must still resolve, or the "fix" would just be
 - **The public build has none of it.** CSS, panel and script are emitted only in
   the private build, and `PRIVATE_MARKERS` aborts the public build if any of the
   three appear. Verified by reintroducing the leak: the build aborts.
+
+
+## ⚠ Reloading one module is not enough
+
+`digby_chat` does `from digby import fact_sheet`, so reloading **`digby` alone
+leaves `digby_chat` holding the old function object**. When the fact sheet
+gained team stats, rotations and AVCA honours, only `digby.py`'s mtime moved --
+so the chat kept answering *"that isn't in the hub's data"* about fields that
+were sitting right there in the context it had been handed.
+
+Both modules now reload together whenever either changes, in dependency order
+(`digby` first, so `digby_chat` re-imports the new one). The **page** is watched
+too: it is the source of every fact and the daily job rebuilds it without any
+code changing.
+
+Verified by touching one module and confirming a single combined reload.

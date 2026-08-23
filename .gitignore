@@ -148,3 +148,18 @@ data/raw/*/pbp/
 # only. Never published.
 Cody/
 assets/digby_*_full.png
+
+# Loose image/archive drops in the repo root. These arrive by AirDrop or export
+# with UUID names and got committed on 2026-08-23 -- including a drawn likeness
+# of a named college athlete, onto a PUBLIC repo. Ignore the shape, not the
+# individual files, or the next one lands the same way.
+/[0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F]-*.PNG
+/[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]-*.png
+/*.webarchive
+/NCAA Women's Volleyball 2026.*
+/Style Examples.pdf
+
+# AVCA published workbooks (All-America, all-region, players of the week).
+# Parsed into data/avca_awards.json, which IS committed; the source workbooks
+# are AVCA's to distribute.
+AVCA-*.xlsx
