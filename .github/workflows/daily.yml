@@ -119,6 +119,11 @@ jobs:
           # build_vb.py is superseded and no longer run; kept on disk only as
           # the record of the old template.
           python3 scripts/project_lineups.py || echo "no lineups yet; continuing"
+          # Freeze the ranking once a week, Monday, BEFORE any match starts.
+          # This job runs 09:15 UTC = 05:15 ET, so a Monday capture is genuinely
+          # pre-week. The script is a no-op on other days and re-running inside
+          # the same ISO week changes nothing, so calling it daily is safe.
+          python3 scripts/snapshot_rankings.py || echo "snapshot skipped; continuing"
           python3 scripts/build_hub.py --public || echo "public dashboard build failed; leaving the previous one in place"
 
       # Semantic gate on what will actually be SERVED. The reconcile checks the
@@ -141,6 +146,7 @@ jobs:
           python3 scripts/test_projection.py
           python3 scripts/test_score_predictions.py
           python3 scripts/test_lineups.py
+          python3 scripts/test_rankings_history.py
 
       # Coverage gate: a NEW displayed field with no declared provenance fails
       # the run. It cannot catch a client-side expression inventing a value for
@@ -163,7 +169,12 @@ jobs:
           # index.html carries the cache-busting hash of the dashboard. Without
           # it the CDN keeps serving the previous bytes for ~10 minutes, which
           # once made a deployed fix look broken on a phone check.
-          git add data/raw output/vb_dashboard.html index.html
+          # The weekly ranking archive lives in data/, not data/raw/, and is the
+          # ONE artifact here that cannot be rebuilt: it records what the ranking
+          # said before a week's results. Re-deriving it later from data that
+          # includes those results would be a fit, not a ranking.
+          git add data/raw output/vb_dashboard.html index.html \
+                  data/rankings_history_*.jsonl
           if git diff --cached --quiet; then
             echo "nothing changed"
           else

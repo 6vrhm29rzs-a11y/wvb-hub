@@ -235,6 +235,23 @@ POS_LABEL = {"S": "Setters", "OPP": "Opposites", "OH": "Outside hitters",
              "": "Position not listed"}
 
 
+def mover(t):
+    """Movement since the LAST WEEKLY FREEZE, the way a poll shows it.
+
+    Blank when there is no earlier snapshot to compare against -- a first week
+    has no movement, and inventing a dash that looks like "unchanged" would be
+    a claim we cannot support.
+    """
+    mv = t.get("move")
+    if mv is None:
+        return ""
+    if mv > 0:
+        return '<span class="mv up">&#9650;%d</span>' % mv
+    if mv < 0:
+        return '<span class="mv dn">&#9660;%d</span>' % abs(mv)
+    return '<span class="mv sm">&ndash;</span>'
+
+
 def pos_bucket(p):
     """School sites and box scores spell positions a dozen ways. Anything we do
     not recognise falls into "" and is LABELLED as unlisted -- never guessed
@@ -874,11 +891,11 @@ def build():
                      'normalised to a neutral schedule.</div>'
                      '<div class="pls">' + cells + '</div></td></tr>')
         rrows.append(
-            '<tr class="row" data-r="%d"><td class="rk">%d</td>'
+            '<tr class="row" data-r="%d"><td class="rk">%d%s</td>'
             '<td class="tm">%s%s</td><td class="cf">%s</td>'
             '<td class="n hi">%s</td><td class="n">%s</td>%s'
             '<td class="n">%s</td>%s<td class="n">%s</td><td class="n hi">%s</td></tr>%s'
-            % (t["rank26"], t["rank26"], esc(t["team"]),
+            % (t["rank26"], t["rank26"], mover(t), esc(t["team"]),
                (' <b class="pl6">%s</b>' % t["rot"]) if t.get("rot") and t["rot"] < 6 else "",
                esc(t["conf"]),
                c(t["rank25"]), c(t.get("avca")),
@@ -889,6 +906,29 @@ def build():
                "&mdash;" if t["ret"] is None else "%.0f%%" % (100 * t["ret"]),
                "&mdash;" if tourn_of.get(t["team"]) is None
                else "%.0f%%" % tourn_of[t["team"]], det))
+
+    # State plainly WHICH ranking this is. A preseason projection and a
+    # results-based rating are different claims, and a tab labelled "Rankings"
+    # is read as the second one -- so if we are still showing the first, the
+    # page has to say so rather than let the heading imply otherwise.
+    _live = [t for t in teams if t.get("rank_source") == "live"]
+    if _live:
+        _gp = [t.get("gp") or 0 for t in _live]
+        rank_basis = (
+            "<b>Our ranking, from 2026 results.</b> %d teams rated on matches "
+            "played this season (median %d each), using the same fitted "
+            "composite that beat RPI out of sample in 2025. Updated every "
+            "morning; frozen every Monday so the movement column has something "
+            "to measure against."
+            % (len(_live), sorted(_gp)[len(_gp) // 2]))
+    else:
+        rank_basis = (
+            "<b>Still the preseason projection &mdash; not yet a result-based "
+            "ranking.</b> It is 2026 rosters &times; 2025 production and reads "
+            "<b>no</b> 2026 result, so it does not move when a team wins or "
+            "loses. The live rating takes over automatically once 50 matches "
+            "have been played; under that there is not enough of a schedule "
+            "graph to rate anyone honestly.")
 
     # ---- score cards -----------------------------------------------------
     cards = []
@@ -971,6 +1011,7 @@ def build():
 
     slope = level.get("recommended_slope")
     return TEMPLATE \
+        .replace("{{RANK_BASIS}}", rank_basis) \
         .replace("{{RANK_ROWS}}", "".join(rrows)) \
         .replace("{{SCORE_CARDS}}", "".join(cards) or
                  '<div class="empty">No completed matches yet.</div>') \
@@ -1135,6 +1176,10 @@ td.pick b{color:var(--navy)}
    lineups agree; a team with thin position data gets no badge, not a guess. */
 .wentto{display:block;font:600 10.5px/1 var(--sans);color:var(--ink3);margin-top:3px}
 .tabhint{margin:0 0 12px;font-size:12.5px;color:var(--ink2)}
+.mv{display:inline-block;margin-left:5px;font:700 9.5px/1 var(--mono);vertical-align:1px}
+.mv.up{color:#12864B}
+.mv.dn{color:#B3261E}
+.mv.sm{color:var(--ink3)}
 .sysbadge{font:700 10px/1 var(--mono);color:#fff;background:var(--navy);
   border-radius:20px;padding:4px 8px;margin-left:8px;vertical-align:2px;
   letter-spacing:.04em}
@@ -1348,9 +1393,9 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 </section>
 
 <section id="v-rankings" hidden>
-  <p class="lead">Our 2026 projection beside everyone else&rsquo;s. The other columns are
+  <p class="lead">{{RANK_BASIS}} The other columns are
   <b>reference only</b> &mdash; nothing here feeds the model. Click a team to see the six
-  players its projection is built from.</p>
+  players the number is built from.</p>
   <div class="ctl">
     <input type="search" id="q" placeholder="Search a team&hellip;">
     <select id="conf"><option value="">All conferences</option></select>

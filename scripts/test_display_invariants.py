@@ -559,6 +559,26 @@ def check_photos_are_urls_only():
             bad("%s: no initials fallback for a missing photo" % label, "")
 
 
+def check_no_unreplaced_placeholders():
+    """No `{{TOKEN}}` may survive into a built page.
+
+    A placeholder that never got substituted renders as literal braces to the
+    reader and, worse, silently omits whatever it was going to say -- this is
+    how a caveat sentence can vanish while the page still looks finished. Cheap
+    to check, catches the whole class.
+    """
+    for label, path in (("private", os.path.join(REPO, "Cody", "START-HERE.html")),
+                        ("public", os.path.join(REPO, "output", "vb_dashboard.html"))):
+        if not os.path.exists(path):
+            continue
+        h = open(path, encoding="utf-8").read()
+        left = sorted(set(re.findall(r"\{\{[A-Z0-9_]+\}\}", h)))
+        if left:
+            bad("%s: unreplaced template placeholder" % label, ", ".join(left[:5]))
+        else:
+            ok("%s: no unreplaced placeholders" % label)
+
+
 def main():
     print("=" * 68)
     print("DISPLAY INVARIANTS -- is each number under the right heading?")
@@ -581,6 +601,8 @@ def main():
     check_public_build_is_clean()
     print()
     check_photos_are_urls_only()
+    print()
+    check_no_unreplaced_placeholders()
     print()
     check_rating()
     print()

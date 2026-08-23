@@ -36,6 +36,10 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from reconcile_2025 import norm  # noqa: E402
 
+# The season whose RESULTS drive the live rank. rating_2025.py is
+# season-parameterised and writes data/rating_{SEASON}.json.
+SEASON = int(os.environ.get("WVB_SEASON", "2026"))
+
 OUT = os.path.join(REPO, "Cody", "RANKINGS-AND-BRACKET.html")
 
 # Names differ across five independent sources. Anything not resolvable by
@@ -177,9 +181,32 @@ def build():
     # a second, different projection here. One definition, one place.
     proj = (load_json("data/projection_2026.json") or {}).get("teams", [])
     pj = {r["team"]: r for r in proj}
+
+    # ---- LIVE RANK BEATS THE PRESEASON RANK, AS SOON AS ONE EXISTS -------
+    # The preseason projection reads NO 2026 result: it is 2026 rosters x 2025
+    # production, so it cannot move when a team wins or loses. Texas lost 1-3 to
+    # Arizona St. and stayed #2. That is correct for what it IS -- a projection --
+    # and wrong for what a ranking tab is read as.
+    #
+    # rating_2025.py is season-parameterised and already computes the in-season
+    # composite (RPI + opponent-adjusted net points/set, weights FITTED on 2025).
+    # It refuses to fit under 50 played matches, which is the right call and is
+    # why this is a fallback rather than a switch: the live rating takes over
+    # automatically the moment the season has produced enough evidence.
+    live = load_json("data/rating_%d.json" % SEASON) or {}
+    live_by_team = {}
+    for r in (live.get("teams") or []):
+        if r.get("composite_rank"):
+            live_by_team[r["team"]] = r
+    rank_source = "live" if live_by_team else "preseason"
+
     for t in teams:
         r = pj.get(t["team"]) or {}
-        t["rank26"] = r.get("talent_rank")
+        lr = live_by_team.get(t["team"])
+        t["rank26"] = (lr or {}).get("composite_rank") or r.get("talent_rank")
+        t["rank_source"] = "live" if lr else "preseason"
+        t["gp"] = (lr or {}).get("games_played")
+        t["low_conf"] = bool((lr or {}).get("low_confidence"))
         t["proj_pps"] = r.get("proj_points_per_set")
         t["q25"] = r.get("q_2025")
         t["tin6"] = r.get("transfers_in_rotation")
@@ -195,6 +222,44 @@ def build():
             "pool": r.get("pool_size"),
             "unknown": r.get("incoming_unplayed"),
         }
+    # ---- movement since the last weekly freeze ---------------------------
+    # Compared against the most recent snapshot that is NOT this week's, so the
+    # column answers "since the last published poll", not "since this morning".
+    hist_path = os.path.join(REPO, "data", "rankings_history_%d.jsonl" % SEASON)
+    prev = {}
+    prev_week = None
+    if os.path.exists(hist_path):
+        snaps = []
+        for line in open(hist_path):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                snaps.append(json.loads(line))
+            except ValueError:
+                continue
+        if snaps:
+            import datetime as _dt
+            iso = _dt.date.today().isocalendar()
+            this_week = "%d-W%02d" % (iso[0], iso[1])
+            earlier = [s2 for s2 in snaps if s2.get("week") != this_week]
+            use = earlier[-1] if earlier else None
+            if use:
+                prev_week = use["week"]
+                prev = dict((r["team"], r["rank"]) for r in use.get("teams", []))
+    for t in teams:
+        pr = prev.get(t["team"])
+        t["prev_rank"] = pr
+        # positive = moved UP the table (a smaller rank number)
+        t["move"] = (pr - t["rank26"]) if (pr and t.get("rank26")) else None
+    if prev_week:
+        print("  movement vs %s (%d teams)" % (prev_week, len(prev)))
+    else:
+        print("  no earlier weekly snapshot yet -- movement column stays blank")
+
+    print("  rank source: %s%s" % (rank_source,
+          ("  (%d teams rated on 2026 results)" % len(live_by_team))
+          if live_by_team else "  (no 2026 rating yet -- under 50 played matches)"))
     unranked = [t for t in teams if t["rank26"] is None]
     nmax = max([t["rank26"] for t in teams if t["rank26"]] or [0])
     for i, t in enumerate(sorted(unranked, key=lambda x: x["rank25"]), 1):
