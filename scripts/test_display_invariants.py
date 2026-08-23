@@ -590,6 +590,23 @@ def check_public_build_is_clean():
         if "Rotation order 1\u20136 is not available" in h or "is not available</b>" in h:
             bad("page still claims rotation order is unavailable while showing it")
 
+    # ---- nothing reads TEAMS before it exists ------------------------------
+    # `const TEAMS` is declared near the END of the script, so any code above it
+    # that touches TEAMS throws "Cannot access 'TEAMS' before initialization" --
+    # and a `typeof` guard does NOT save you, because a const in the temporal
+    # dead zone throws for that too. The standings differential is computed
+    # server-side for exactly this reason.
+    _tp2 = os.path.join(REPO, "Cody", "START-HERE.html")
+    _th2 = open(_tp2, encoding="utf-8").read() if os.path.exists(_tp2) else ""
+    if _th2:
+        decl = _th2.find("const TEAMS = ")
+        rs = _th2.find("function renderStandings")
+        if decl > 0 and rs > 0 and rs < decl and "TEAMS[r.team]" in _th2:
+            bad("renderStandings reads TEAMS before it is declared",
+                "temporal dead zone -- compute it server-side instead")
+        else:
+            ok("nothing above the TEAMS declaration reads it")
+
     # ---- no duplicate element ids ------------------------------------------
     # I put id="sbody" on the scores grid without noticing the schedule tbody
     # already had it. getElementById returns whichever comes first, so the

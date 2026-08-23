@@ -41,9 +41,15 @@ OUT = os.path.join(REPO, "data", "avca_awards.json")
 
 ALL_AMERICA = os.path.join(
     REPO, "AVCA-Division-I-Womens-VB-All-America-Teams-Year-by-Year-1981-2025.xlsx")
+ALL_REGION = os.path.join(
+    REPO, "AVCA-Division-I-WVB-All-Region-Teams-Year-by-Year-1986-2025.xlsx")
 
 # Section headers as they appear in column A.
 TEAM_HEADERS = ("first team", "second team", "third team", "honorable mention")
+# The regional workbook writes them with the tier spelled out, and carries a
+# region heading of its own above each block.
+REGION_HEADERS = ("all-region first team", "all-region second team",
+                  "all-region third team", "all-region honorable mention")
 
 # University boilerplate, removed before comparing school names.
 BOILER = re.compile(
@@ -146,6 +152,38 @@ def parse_year(ws):
     return {"players": players, "awards": awards}
 
 
+
+def parse_region_year(ws):
+    # type: (Any) -> List[Dict]
+    """One year of the All-Region workbook.
+
+    Two levels of heading, not one: a REGION ("Central Region") and then a tier
+    ("All-Region First Team"). Reading only the tier loses which region she was
+    named in, which is the interesting half.
+    """
+    out = []                                            # type: List[Dict]
+    region = None
+    tier = None
+    for r in ws.iter_rows(values_only=True):
+        cells = list(r) + [None] * 6
+        a = cells[0].strip() if isinstance(cells[0], str) else ""
+        low = a.lower()
+        if low.endswith("region") and not any(low.startswith(h[:10]) for h in REGION_HEADERS):
+            region, tier = a, None
+            continue
+        if low in REGION_HEADERS:
+            tier = a.replace("All-Region ", "").strip()
+            continue
+        first, last, school = cells[0], cells[1], cells[2]
+        if (region and tier and isinstance(first, str) and isinstance(last, str)
+                and isinstance(school, str) and first.strip() and last.strip()):
+            out.append({
+                "first": first.strip(), "last": last.strip(),
+                "school_raw": school.strip(), "region": region, "honour": tier,
+                "pos": (cells[3] or "").strip() if isinstance(cells[3], str) else None,
+            })
+    return out
+
 def main():
     if not os.path.exists(ALL_AMERICA):
         print("no All-America workbook at %s" % ALL_AMERICA)
@@ -175,6 +213,25 @@ def main():
                 unmatched_schools[raw] = unmatched_schools.get(raw, 0) + 1
         seasons.setdefault(year, []).append({"sheet": name, **got})
 
+    # --- All-Region, same joins ------------------------------------------
+    regions = []
+    region_unmatched = {}
+    if os.path.exists(ALL_REGION):
+        rwb = openpyxl.load_workbook(ALL_REGION, read_only=True, data_only=True)
+        for name in rwb.sheetnames:
+            if not re.match(r"^(Fall |Spring )?\d{4}$", name.strip()):
+                continue
+            year = int(re.search(r"\d{4}", name).group(0))
+            for p in parse_region_year(rwb[name]):
+                raw = p["school_raw"]
+                short = (lookup.get(squash(raw)) or lookup.get(loose(raw))
+                         or ALIASES.get(squash(raw)))
+                p["team"] = short
+                p["season"] = year
+                if not short:
+                    region_unmatched[raw] = region_unmatched.get(raw, 0) + 1
+                regions.append(p)
+
     flat = []
     for year, blocks in seasons.items():
         for b in blocks:
@@ -192,11 +249,16 @@ def main():
             "selections": len(flat),
             "unmatched_schools": sorted(unmatched_schools.items(),
                                         key=lambda kv: -kv[1])[:25],
+            "region_selections": None,      # filled below
+            "region_unmatched": sorted(region_unmatched.items(),
+                                       key=lambda kv: -kv[1])[:15],
         },
         "selections": flat,
+        "regions": regions,
         "awards": dict((y, sum((b["awards"] for b in blocks), []))
                        for y, blocks in seasons.items()),
     }
+    doc["meta"]["region_selections"] = len(regions)
     json.dump(doc, open(OUT, "w"), indent=1, sort_keys=False)
     m = doc["meta"]
     print("seasons parsed      : %d" % len(seasons))
@@ -204,6 +266,8 @@ def main():
     print("schools unmatched   : %d distinct" % len(unmatched_schools))
     for raw, n in m["unmatched_schools"][:8]:
         print("    %-42s %d" % (raw[:42], n))
+    print("all-region selections: %d  (%d distinct schools unmatched)"
+          % (len(regions), len(region_unmatched)))
     print("wrote %s" % OUT)
     return 0
 

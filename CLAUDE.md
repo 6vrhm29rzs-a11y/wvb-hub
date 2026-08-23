@@ -114,6 +114,7 @@ Guarded by `scripts/test_join_invariants.py` — 9 checks plus a **negative cont
 - **RESOLVED 2026-08-11 — the 88.0% join rate was NOT a defect rate.** Close H's pre-registered edit-distance check (difflib, cutoff 0.72, each unresolved name vs that team's OWN pool) on all 673: **59 had a near name** (candidate defects), **614 had none** (no D-I production to attribute — walk-on, D-II/JUCO/international, never played). Reproduces the 10-school hand-verified result at scale. **Measured defect rate after fixes: 0.09%** (5 of 5,596). `scripts/audit_unresolved.py`, output `data/unresolved_audit.json`.
 
 - **POINTS PER SET IS KILLS + BLOCKS + ACES. FULL STOP (Cody, 2026-08-23).** I briefly showed two rows — rally points off the set scores as "scored", and the box-score formula as "of which earned" — on the reasoning that 18–35% of a team's scoreboard points are opponent errors. **That is true and it is not what the sport calls points.** Cody: *"i want points per set to be what that team earned. aka kills plus blocks plus aces, the rest is not important. that's how volleyball pps is measured."* Correct — PTS in every box score is exactly that, and the rest was me inventing a distinction nobody uses. One row now, computed from **raw counts** (never the box score's `points` column, which is absent from some games). ⚠ **The rating's internal `net points/set` from linescores is a DIFFERENT quantity and stays as it is** — it is a margin measure, not a displayed "PPS". Guarded in `test_display_invariants.py`. **Verified while doing it: the formula matches the feed's own team `points` column 12 of 12 exactly.**
+- **STANDINGS GAINED FORM AND A POINT DIFFERENTIAL (2026-08-23).** Both reuse work already on the page rather than defining anything twice: the W/L pills come from the same results list the Top 25's strip is built from, and `+/-` is points-per-set scored minus allowed, from the box scores. Kentucky reads `1-0 · W · +1.33`. ⚠ **`const TEAMS` is declared near the END of the script**, so the standings block — which runs earlier — threw `Cannot access 'TEAMS' before initialization` when it tried to read the differential from there. **A `typeof` guard does not help: a const in the temporal dead zone throws for that too.** Computing it server-side removes the ordering question entirely, which is the right answer rather than shuffling declarations. Guarded.
 - **A STALE MOBILE OVERRIDE SQUEEZED EVERY ROSTER NAME INTO AN AVATAR SLOT (2026-08-23).** The roster row used to be a four-column grid — `26px 32px 1fr auto` for avatar, number, name, stat. Rebuilding it around one shared player cell changed the desktop rule to `1fr auto`, but **the phone override still pinned the first column to 26px**, so all 17 cells overflowed their box at 560px. ⚠ **The page did not scroll sideways, so nothing looked broken from the outside** — the clipping is inside the cell. ⚠ **My first measurement was also wrong**: comparing a cell's `scrollWidth` to its PARENT's `clientWidth` reported 17 overflows both before and after the fix, because the parent was the 26px slot itself. Compare an element to **its own** client width. Also added: names wrap rather than push (`overflow-wrap:anywhere`). **When a grid's column template changes, grep every media query that overrides it.**
 - **TWO RANKINGS NEEDED TO EXPLAIN THEIR RELATIONSHIP.** The Rankings tab (preseason, 348 teams, cannot move) now points explicitly at Digby's Top 25 for a ranking that responds to results — said on the tab that does NOT move, because that is the surprising one. The Top 25 gained a **Biggest movers** line: `Texas A&M ▼6 (9→15) · Louisville ▼5 (6→11) · Southern California ▲3 (13→10)`.
 - **DIGBY CAN SEE TODAY'S WORK NOW — 82 FIELDS TO 112 (2026-08-23).** The fact sheet predated everything built today, so the chat was answering *"how are they playing"* from a preseason projection. It now carries **2026 team stats both ways** (hitting %, points/kills/digs/blocks/aces per set, and what they allow), the **serving rotation** slot by slot with how many sets agree, **how the conference awards its bid**, **how many matches are scheduled**, and the **AVCA honours still on the roster**.
@@ -220,30 +221,33 @@ Repo initialized 2026-08-09 on `main`, commit `499a537` (20 files). Identity set
 
 ## Next steps
 
-**⚑ 2026-08-23 (afternoon) — WHERE THIS ACTUALLY IS.** Read
-`docs/session_close_2026-08-23b.md`. Everything below the "Phases 1-3" heading is historical.
+**⚑ 2026-08-23 (evening) — WHERE THIS ACTUALLY IS.** Read
+`docs/session_close_2026-08-23b.md` first; it carries the full handoff.
 
-**Green and verified:** all **14** test suites pass · the **nightly sequence completes clean end to end**
-(dry run of the real workflow steps) · the build works from a **fresh checkout with no `Cody/`**, which is
-what CI has · `Cody/` now holds exactly one page, `START-HERE.html`, with the older two moved to
-`Cody/_superseded/`.
+**⚠⚠ THE ONE THING THAT COST REAL MONEY — read before touching `digby.fact_sheet()`.**
+A stored summary is valid only for the facts it was written from. The first 340 cited
+**projections**, and a completed match shifts every projection — **326 of 340 failed their own
+gate a day later** ("13.62 projected wins" had become 13.66). Fixing it meant regenerating
+(~$4), and the fix shipped having missed two more movers (`our_rank_2026`, which also changes
+basis at 50 matches, and `avca_preseason_rank`, a weekly poll) which would have rotted them
+again. **THE RULE: before a field may reach a stored summary, ask "would this be different
+tomorrow if nobody changed teams?"** If yes it goes in `digby.VOLATILE`. The chat gets
+everything; it answers live and is not stored. `test_digby.py` now **fails on any unclassified
+field**, and `build_hub.py` **withholds** a summary whose facts moved rather than showing a
+stale number. **And the free test that actually proves it: capture every durable hash, run the
+whole nightly sequence, compare — verified 0 of 348 moved. Do that before asking Cody to pay.**
 
-**⚠ NOTHING IS COMMITTED.** 154 modified, 41 new, 4 deleted; `origin/main` is still `e613601`. Git is
-classifier-blocked in auto mode — hand Cody the command, do not attempt it. Verify the real remote with
-`git ls-remote origin` on boot.
+**Green and verified:** 14 test suites pass · the nightly sequence completes clean end to end ·
+the build works from a fresh checkout with no `Cody/` · `Cody/` holds one page, `START-HERE.html`.
 
-**Built today (afternoon):** rotations (`rotations.py`, `build_rotations.py`) · Digby summaries + chat
-(`digby.py`, `digby_chat.py`) · Digby's Top 25 (`digby_top25.py`) · team colours (`crawl_team_colors.py`) ·
-avatars (`avatars.py`) · conference repair (`conference_repair.py`) · five new test suites, **all now
-wired into CI** — four of them were written and left out, and a guard that does not run in CI protects
-nothing.
+**⚠ Verify the remote with `git ls-remote origin` on boot.** Last push `60242c7`; there is
+uncommitted work after it. Git is classifier-blocked in auto mode — hand Cody the command.
 
-**OPEN — carried:** Cody has still not run `/code-review ultra` (Builder cannot launch it) · 8 Digby
-summaries retry free on the next run with the key · coaches are a sourced-entry job, scaffolded for the
-top 50 and not derivable from any feed we can reach · rotations are not wired to a live 2026 source ·
-Central Conn. St. and Tennessee Tech still have no 2026 roster.
-**Known-honest caveats that must keep being said out loud on the page:** the roster aggregation **never beats the prior alone** out of sample (0.806 vs 0.827) — it is a *correction* to last season's composite, not a foundation. Texas is #2 largely because it was #2 last year. Say that rather than letting the number imply more than it knows.
-
+**OPEN:** 338 Digby summaries to write (10 exist and are verified stable) · Cody has still not
+run `/code-review ultra` · coaches are a sourced-entry job (top 50 scaffolded, 2 filled from AVCA
+citations; school coaches pages are JavaScript-rendered) · rotations have no live 2026 source ·
+Central Conn. St. and Tennessee Tech have no 2026 roster · GitHub Pages no longer updates
+(public build off at Cody's instruction).
 
 **2026-08-11 — THE 2026 TAB IS WIRED AND THE JOIN QUESTION IS CLOSED.** Returning production runs on the real join (2026 school rosters × 2025 per-player production) for **309 of 348** D-I teams; the other 39 render **—**, nothing estimated. Verified: distribution smooth (median 0.570, no hash-style cluster), Nebraska reconciles by hand (1455.5/2074.0 = 0.702), display invariants + provenance both green. The method sentence on the page is now selected by `returning_method`, so the number and its label cannot drift apart (R4).
 **Fixed getting here:** Miami (FL)'s 18 unresolved were a WMT parser bug — the headshot anchor reads `"<Player Name> Photo"`, so every player survived twice (30 "players" for a 15-player roster). Parser fixed; the crawled file repaired in place by `scripts/repair_rosters_2026.py` (idempotent, no re-crawl). Miami 18 → 3.

@@ -75,6 +75,47 @@ def _num(v):
         return None
 
 
+# VOLATILE FIELDS. These change every night by design: a completed match
+# removes a fixture, which shifts every projection slightly, and records move.
+# A written summary that cites them is false by the next morning -- measured:
+# 326 of 340 stored summaries failed their own gate a day later, on numbers
+# like "13.62 projected wins" that had become 13.66.
+#
+# So a SUMMARY is written from durable facts only -- who is back, who left,
+# what they did last season, their honours. Those change when a roster changes,
+# which is rarely. The CHAT gets everything, because it is answering live and
+# its answer is not stored.
+VOLATILE = (
+    "projected_wins_2026", "projected_wins_low", "projected_wins_high",
+    "conference_title_pct", "tournament_odds_pct",
+    "record_so_far_2026", "matches_played_2026",
+    "matches_with_a_box_score_2026", "sets_played_2026",
+    "hitting_pct_2026", "opponent_hitting_pct_2026",
+    "points_per_set_2026", "opponent_points_per_set_2026",
+    "kills_per_set_2026", "digs_per_set_2026", "blocks_per_set_2026",
+    "aces_per_set_2026", "matches_on_the_2026_schedule",
+    # ⚠ THESE TWO WERE MISSED ON THE FIRST PASS AND WOULD HAVE ROTTED EVERY
+    # SUMMARY AGAIN WITHIN A WEEK -- a second wasted regeneration.
+    # `our_rank_2026` moves whenever the rating moves, and CHANGES BASIS
+    # entirely at 50 played matches. `avca_preseason_rank` is a weekly poll.
+    # Neither is a fact about a roster; both are on the page's own chips, which
+    # are rebuilt nightly and always current.
+    "our_rank_2026", "avca_preseason_rank",
+)
+
+
+# THE TEST FOR THIS LIST is not "is it a number" -- it is "would this be
+# different tomorrow if nobody changed teams?" Ranks move, polls move,
+# projections move, records move. Last season's production and who is on the
+# roster do not.
+
+
+def durable(facts):
+    # type: (Dict[str, Any]) -> Dict[str, Any]
+    """The subset a stored summary may be written from."""
+    return dict((k, v) for k, v in facts.items() if k not in VOLATILE)
+
+
 def fact_sheet(team, rec):
     # type: (str, Dict) -> Dict[str, Any]
     """A flat, citable view of one team.
@@ -516,7 +557,7 @@ def main():
         if rec is None:
             print("  %-22s not on the page" % name)
             continue
-        facts = fact_sheet(name, rec)
+        facts = durable(fact_sheet(name, rec))
         h = input_hash(facts)
         prev = cached.get(name) or {}
         if prev.get("hash") == h and not force:

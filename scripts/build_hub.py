@@ -747,6 +747,35 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
             "fixtures": [dict(f, pick=_fixture_pick(pred_by_pair, f, nm))
                          for f in fixtures.get(nm, []) if f["d"] >= today][:40],
         }
+    # ⚠ A SUMMARY IS ONLY VALID FOR THE FACTS IT WAS WRITTEN FROM.
+    # Measured: a day after they were generated, 326 of 340 stored summaries
+    # failed their own fidelity gate -- not because anything was wrong when
+    # written, but because a completed match shifts every projection slightly
+    # ("13.62 projected wins" had become 13.66). The gate exists so a displayed
+    # number is a checked number, so a summary whose facts have moved is
+    # WITHHELD rather than shown with a stale figure inside it.
+    # The durable/volatile split in digby.py stops this recurring; the stored
+    # ones were written before that split existed.
+    if digby:
+        try:
+            import digby as _DG
+            _bad = 0
+            for _nm, _rec in out.items():
+                _st = digby.get(_nm)
+                if not _st:
+                    continue
+                if _st.get("hash") != _DG.input_hash(
+                        _DG.durable(_DG.fact_sheet(_nm, _rec))):
+                    _rec["digby"] = None
+                    _bad += 1
+            if _bad:
+                print("  %d Digby summaries withheld -- their facts moved since "
+                      "they were written; rerun scripts/digby.py" % _bad)
+        except Exception as _e:                          # noqa: BLE001
+            print("  could not verify Digby summaries (%s); withholding all"
+                  % type(_e).__name__)
+            for _rec in out.values():
+                _rec["digby"] = None
     return out
 
 
@@ -1384,6 +1413,13 @@ def build():
     # Season team totals for 2026, both what a team does and what it allows.
     tstats = team_season_stats(boxes, res)
     stand = standings(teams, res)
+    for _rows in stand.values():
+        for _r in _rows:
+            _ts = tstats.get(_r["team"]) or {}
+            _o, _d = (_ts.get("own") or {}), (_ts.get("opp") or {})
+            _r["diff"] = (round(_o["pps"] - _d["pps"], 2)
+                          if _o.get("pps") is not None and _d.get("pps") is not None
+                          else None)
     ldrs, ldr_floor, ldr_pool = leaders(player_photos(), avca_honours())
     # How a conference awards its automatic bid, and how many matches each team
     # actually has on the schedule -- both needed to say honestly what the
@@ -1687,6 +1723,11 @@ def build():
         .replace("{{N_SCHED}}", "{:,}".format(len(sched))) \
         .replace("{{N_TV}}", str(len(tvrows))) \
         .replace("{{STANDINGS_JSON}}", json.dumps(stand, separators=(",", ":"))) \
+        .replace("{{RESULTS_JSON}}", blob(
+            [{"away": r["away"], "home": r["home"],
+              "away_sets": r["away_sets"], "home_sets": r["home_sets"],
+              "epoch": r.get("epoch")}
+             for r in sorted(res, key=lambda x: x.get("epoch") or 0)])) \
         .replace("{{LOGOS_JSON}}", json.dumps(logos, separators=(",", ":"))) \
         .replace("{{COLORS_JSON}}", json.dumps(team_colors, separators=(",", ":"))) \
         .replace("{{BOXES_JSON}}", json.dumps(boxes, separators=(",", ":"))) \
@@ -2005,6 +2046,9 @@ td.tm{font-size:15px}
 .t25 td.tm{font-size:17px}
 /* A fixture with a ranked side gets a quiet edge; two ranked sides get a loud
    one. The schedule is long and the eye needs somewhere to land. */
+.stgrid td.form{white-space:nowrap}
+.stgrid td.pos{color:#12864B}
+.stgrid td.neg{color:#B3261E}
 #sbody tr.rkd td:first-child{box-shadow:inset 3px 0 0 var(--line2)}
 #sbody tr.both td:first-child{box-shadow:inset 3px 0 0 var(--amber)}
 #sbody tr.both .tm{font-weight:700}
@@ -2931,6 +2975,7 @@ renderPlayers();
 
 /* ---- standings --------------------------------------------------------- */
 const STANDINGS = {{STANDINGS_JSON}};
+const RESULTS = {{RESULTS_JSON}};
 const stsel = document.getElementById('stconf');
 Object.keys(STANDINGS).sort().forEach(c => {
   const o = document.createElement('option'); o.value = o.textContent = c; stsel.appendChild(o);
@@ -2942,6 +2987,30 @@ stsel.insertBefore(optAll, stsel.firstChild);
    index 1, so the page opened on whichever conference happened to be first
    alphabetically instead of on all of them. */
 stsel.selectedIndex = 0;
+/* Form pills for the standings, built from RESULTS. The Top 25 builds the same
+   strip server-side from the same source; both read one results list, so they
+   cannot disagree. */
+const FORM = (() => {
+  const by = {};
+  (RESULTS || []).forEach(g => {
+    if (g.away_sets === null || g.home_sets === null) return;
+    [[g.away, g.home, g.away_sets, g.home_sets],
+     [g.home, g.away, g.home_sets, g.away_sets]].forEach(([me, them, mine, theirs]) => {
+      (by[me] = by[me] || []).push({won: mine > theirs, opp: them,
+                                    score: mine + '-' + theirs});
+    });
+  });
+  return by;
+})();
+function formPills(team, n) {
+  const gs = FORM[team] || [];
+  if (!gs.length) return '<span class="noform" title="no results yet">&mdash;</span>';
+  return gs.slice(-(n || 5)).map(g =>
+    '<span class="' + (g.won ? 'fw' : 'fl') + '" title="' +
+    (g.won ? 'beat ' : 'lost to ') + g.opp + ' ' + g.score + '">' +
+    (g.won ? 'W' : 'L') + '</span>').join('');
+}
+
 function renderStandings() {
   const only = stsel.value;
   const confs = only ? [only] : Object.keys(STANDINGS).sort();
@@ -2950,11 +3019,19 @@ function renderStandings() {
       const rows = STANDINGS[c];
       return '<div class="tsec"><h3>' + c + '</h3><div class="body">' +
         '<table><thead><tr><th class="l">Team</th><th>Conf</th><th>Overall</th>' +
+        '<th class="l" title="last five, oldest first">Form</th>' +
+        '<th title="points won minus points allowed, per set">+/-</th>' +
         '<th>Rk</th></tr></thead><tbody>' +
-        rows.map(r => '<tr><td class="tm">' + logo(r.team) + r.team + '</td>' +
+        rows.map(r => {
+          const diff = r.diff === undefined ? null : r.diff;
+          return '<tr><td class="tm">' + logo(r.team) + r.team + '</td>' +
           '<td class="n">' + r.cw + '-' + r.cl + '</td>' +
           '<td class="n">' + r.w + '-' + r.l + '</td>' +
-          '<td class="n hi">' + r.rank + '</td></tr>').join('') +
+          '<td class="form">' + formPills(r.team) + '</td>' +
+          '<td class="n' + (diff === null ? '' : (diff >= 0 ? ' pos' : ' neg')) + '">' +
+            (diff === null ? '&mdash;' : (diff >= 0 ? '+' : '') + diff.toFixed(2)) + '</td>' +
+          '<td class="n hi">' + r.rank + '</td></tr>';
+        }).join('') +
         '</tbody></table></div></div>';
     }).join('') + '</div>';
   document.getElementById('stcnt').textContent = confs.length + ' conferences';

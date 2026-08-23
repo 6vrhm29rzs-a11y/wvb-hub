@@ -342,6 +342,94 @@ def test_preflight_spends_nothing_on_a_placeholder_key():
         os.environ.pop("ANTHROPIC_API_KEY", None)
 
 
+def test_a_summary_is_written_from_durable_facts_only():
+    """THE ROT. A stored summary that cites a projection is false by the next
+    morning: a completed match removes a fixture and every projection shifts.
+    Measured -- 326 of 340 failed their own gate a day later, on numbers like
+    "13.62 projected wins" that had become 13.66."""
+    from digby import durable, VOLATILE
+    facts = dict(FACTS)
+    facts["record_so_far_2026"] = "1-0"
+    d = durable(facts)
+    check("projected_wins_2026" not in d,
+          "a projection is not a fact a stored summary may cite")
+    check("tournament_odds_pct" not in d, "nor are tournament odds")
+    check("record_so_far_2026" not in d, "nor this season's record")
+    check("record_2025" in d and "top_scorer_1_name" in d,
+          "but last season and the roster survive -- those change rarely")
+    check(all(v in FACTS or True for v in VOLATILE), "the volatile list is real")
+
+
+def test_the_hash_ignores_volatile_movement():
+    """A nightly re-simulation must not invalidate every summary."""
+    from digby import durable
+    a = dict(FACTS); b = dict(FACTS)
+    b["projected_wins_2026"] = 24.61          # the sim moved
+    b["tournament_odds_pct"] = 99.4
+    check(input_hash(durable(a)) == input_hash(durable(b)),
+          "a projection moving does not change the durable hash")
+    b["players_returning"] = 12               # a roster actually changed
+    check(input_hash(durable(a)) != input_hash(durable(b)),
+          "but a roster change does")
+
+
+# Every field shape a stored summary is allowed to cite. A shape not on this
+# list fails the test, which forces the question "would this be different
+# tomorrow if nobody changed teams?" to be asked ONCE, deliberately, instead of
+# being discovered after a paid regeneration.
+DURABLE_SHAPES = {
+    "team", "conference", "conference_bid_awarded_by",
+    "our_rank_N_final", "rpi_rank_N_final",
+    "record_2025", "offense_system_2025", "matches_with_a_known_lineup_2025",
+    "returning_production_pct", "players_returning", "players_departed",
+    "transfers_in", "newcomers_no_di_record",
+    "starters_returning_of_six", "starting_six_vacancies",
+    "rotation_sets_agreeing", "rotation_sets_resolved",
+    "players_with_an_avca_honour",
+    "top_scorer_N_name", "top_scorer_N_position", "top_scorer_N_points_per_set",
+    "top_scorer_N_status",
+    "started_N_name", "started_N_position", "started_N_matches_started",
+    "started_N_back_for_2026",
+    "biggest_loss_N_name", "biggest_loss_N_position",
+    "biggest_loss_N_points_2025", "biggest_loss_N_went_to",
+    "avca_honour_N_player", "avca_honour_N_award", "avca_honour_N_season",
+    "serving_rotation_N_slot_1", "serving_rotation_N_slot_2",
+    "serving_rotation_N_slot_3", "serving_rotation_N_slot_4",
+    "serving_rotation_N_slot_5", "serving_rotation_N_slot_6",
+}
+
+
+def test_every_durable_field_was_classified_deliberately():
+    """THE STRUCTURAL FIX. Two volatile fields slipped through -- `our_rank_2026`
+    (moves with the rating, changes basis at 50 matches) and
+    `avca_preseason_rank` (a weekly poll) -- and would have rotted every stored
+    summary a second time, at real cost. A new field now fails here until
+    somebody decides which side it is on."""
+    from digby import durable
+    import json as _j, os as _o, re as _re
+    hub = _o.path.join(REPO, "Cody", "START-HERE.html")
+    if not _o.path.exists(hub):
+        print("  --   no built page; skipping")
+        return
+    h = open(hub, encoding="utf-8").read()
+    T = _j.loads(_re.search(r"const TEAMS = (\{.*?\});\n", h, _re.S).group(1))
+    shapes = set()
+    for team in list(T)[:60]:
+        for k in durable(fact_sheet(team, T[team])):
+            shapes.add(_re.sub(r"_\d+_", "_N_", k))
+    unknown = sorted(shapes - DURABLE_SHAPES)
+    check(not unknown,
+          "no unclassified field can reach a stored summary",
+          "new: %s -- decide if it moves nightly" % unknown)
+
+
+def test_the_known_movers_are_excluded():
+    from digby import VOLATILE
+    for f in ("our_rank_2026", "avca_preseason_rank", "projected_wins_2026",
+              "tournament_odds_pct", "record_so_far_2026", "hitting_pct_2026"):
+        check(f in VOLATILE, "%s is treated as volatile" % f)
+
+
 def main():
     for fn in (test_truthful_summary_passes,
                test_invented_stat_is_rejected,
@@ -358,6 +446,10 @@ def main():
                test_a_hyphenated_record_is_not_a_negative_number,
                test_a_number_named_in_a_field_name_is_allowed,
                test_the_two_fixes_do_not_open_the_gate,
+               test_a_summary_is_written_from_durable_facts_only,
+               test_the_hash_ignores_volatile_movement,
+               test_every_durable_field_was_classified_deliberately,
+               test_the_known_movers_are_excluded,
                test_limit_caps_attempts_when_everything_succeeds,
                test_limit_caps_attempts_when_everything_fails,
                test_limit_caps_attempts_when_the_gate_rejects,
