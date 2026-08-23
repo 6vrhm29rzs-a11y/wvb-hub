@@ -224,6 +224,53 @@ def test_the_two_fixes_do_not_open_the_gate():
         check(not ok, "NEGATIVE CONTROL: still rejected -- %r" % text)
 
 
+def test_a_number_word_inside_a_proper_noun_is_not_a_quantity():
+    """INDIANA and IOWA were both REJECTED for naming their own conference.
+
+    "Big Ten" lowercases to a token "ten", so the gate demanded the value 10
+    among the team's facts. Illinois passed the same run only because a 10
+    happened to sit somewhere in its facts -- luck, not the gate working.
+
+    THE FIX IS THE NARROW ONE. Letting _fact_numbers() harvest word-numbers out
+    of strings would make the conference name license "ten" ANYWHERE in the
+    prose, including an invented "ten kills". The name itself is removed
+    instead, so every other "ten" stays exposed -- which the control below is
+    what actually proves.
+    """
+    facts = {"team": "Indiana", "conference_2026": "Big Ten",
+             "wins_2025": 14, "losses_2025": 16}
+    ok, problems = verify("Indiana plays in the Big Ten and went 14-16 last season.",
+                          [], facts)
+    check(ok, "REGRESSION: a team may name its own conference", str(problems))
+
+    # Derived from the facts, never a hand-list: a league nobody thought of is
+    # handled the same way.
+    invented = {"team": "Somewhere", "conference_2026": "Big Ten",
+                "wins_2025": 14}
+    ok2, _ = verify("They play in the Big Ten.", [], invented)
+    check(ok2, "and the rule comes from the facts, not a list of league names")
+
+
+def test_stripping_a_proper_noun_does_not_hide_invention():
+    """NEGATIVE CONTROL. Removing a name from the scanned text is exactly the
+    kind of widening that stops a gate working, so invention must still die --
+    including in the SAME SENTENCE as the legitimate name."""
+    facts = {"team": "Indiana", "conference_2026": "Big Ten",
+             "wins_2025": 14, "losses_2025": 16}
+    for text in ("Indiana plays in the Big Ten and returns ten starters.",
+                 "Indiana returns ten starters.",
+                 "Indiana plays in the Big Ten and went 14-17 last season.",
+                 "Indiana swept eleven opponents in the Big Ten."):
+        ok, _ = verify(text, [], facts)
+        check(not ok, "NEGATIVE CONTROL: still rejected -- %r" % text)
+
+    # A single-token value is a quantity or a code, not a proper noun, and must
+    # not be strippable -- otherwise a position field of "S" would eat letters
+    # out of the prose.
+    ok3, _ = verify("They return six starters.", [], {"team": "X", "pos": "six"})
+    check(not ok3, "NEGATIVE CONTROL: a one-word fact value is not a proper noun")
+
+
 # ---------------------------------------------------------------- the driver
 # These guard the loop, not the gate. They exist because the first real run
 # ignored --limit and made 348 doomed requests instead of 5: --limit counted
@@ -446,6 +493,8 @@ def main():
                test_a_hyphenated_record_is_not_a_negative_number,
                test_a_number_named_in_a_field_name_is_allowed,
                test_the_two_fixes_do_not_open_the_gate,
+               test_a_number_word_inside_a_proper_noun_is_not_a_quantity,
+               test_stripping_a_proper_noun_does_not_hide_invention,
                test_a_summary_is_written_from_durable_facts_only,
                test_the_hash_ignores_volatile_movement,
                test_every_durable_field_was_classified_deliberately,

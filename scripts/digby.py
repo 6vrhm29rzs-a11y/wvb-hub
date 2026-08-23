@@ -266,6 +266,27 @@ def _fact_numbers(facts):
     return out
 
 
+def _proper_noun_strings(facts):
+    # type: (Dict) -> List[str]
+    """Fact VALUES that are names containing a number-word (e.g. "Big Ten").
+
+    Derived from the facts themselves, never a hand-list, so a league or school
+    named for a number is handled without anyone remembering to add it.
+
+    Two words minimum: a single-token value ("S", "six") is a quantity or a code,
+    not a proper noun, and stripping those would eat honest prose.
+    """
+    out = []                                            # type: List[str]
+    for v in (facts or {}).values():
+        if not isinstance(v, str):
+            continue
+        toks = re.findall(r"[a-z]+", v.lower())
+        if len(toks) >= 2 and any(t != "one" and t in _WORD_NUM for t in toks):
+            out.append(v)
+    # Longest first: strip "Big Ten Conference" before "Big Ten".
+    return sorted(set(out), key=len, reverse=True)
+
+
 def verify(prose, claims, facts):
     # type: (str, List[Dict], Dict) -> Tuple[bool, List[str]]
     """Check generated text against the facts it was given.
@@ -305,7 +326,22 @@ def verify(prose, claims, facts):
     # ("one of the best", "no one"), and checking it would reject honest
     # sentences. That is a judgement about English, not a measured threshold,
     # and it is stated here rather than buried.
-    for tok in re.findall(r"[a-z]+", (prose or "").lower()):
+    # ⚠ A NUMBER-WORD INSIDE A PROPER NOUN IS NOT A QUANTITY. "Big Ten" made
+    # this gate demand the value 10 among a team's facts, so Indiana and Iowa
+    # were REJECTED for correctly naming their own conference. Illinois passed
+    # only because 10 happened to appear elsewhere in its facts -- luck, not the
+    # gate working, and the same "a number anywhere in the facts is quotable
+    # anywhere in the prose" trap that has now bitten three times.
+    #
+    # THE FIX IS DELIBERATELY THE NARROW ONE. The easy version is to let
+    # _fact_numbers() harvest word-numbers out of strings, so the conference
+    # name licenses "ten" -- but that licenses it EVERYWHERE for every Big Ten
+    # team, including an invented "ten kills". Removing the NAME instead leaves
+    # every other "ten" in the sentence exposed to the check.
+    _scan = prose or ""
+    for _nm in _proper_noun_strings(facts):
+        _scan = re.sub(re.escape(_nm), " ", _scan, flags=re.I)
+    for tok in re.findall(r"[a-z]+", _scan.lower()):
         if tok == "one" or tok not in _WORD_NUM:
             continue
         val = float(_WORD_NUM[tok])

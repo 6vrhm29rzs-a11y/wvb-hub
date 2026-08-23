@@ -231,9 +231,53 @@ def listed_time(start_time, home_team, epoch=None):
     return st
 
 
+def venue_index():
+    # type: () -> Dict[str, Dict]
+    """game_id -> where it is played and what event it belongs to.
+
+    THE SCOREBOARD FEED CARRIES NO LOCATION AT ALL -- it enumerates fixtures and
+    nothing more. Venue lives only on /game/{id}, which DOES answer for an
+    unplayed match (gameState "P" still returns a full location block). That is
+    why crawl_2025.py grew a `fixtures` phase: without it a schedule can say who
+    and when but never where, and "at <home team>" is an inference presented as
+    a fact -- the error that put Kentucky-Wisconsin in Lexington when it was
+    played on a neutral floor in Milwaukee.
+    """
+    out = {}
+    path = os.path.join(REPO, "data/raw/%d/games.jsonl" % SEASON)
+    if os.path.exists(path):
+        for line in open(path, encoding="utf-8"):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                g = json.loads(line)
+            except ValueError:
+                continue
+            gid = str(g.get("game_id") or "")
+            loc = g.get("location") or {}
+            if not gid:
+                continue
+            prev = out.get(gid)
+            # final beats non-final, then last wins -- the project's dedup rule
+            if prev and prev.get("state") == "F" and g.get("game_state") != "F":
+                continue
+            out[gid] = {"venue": loc.get("venue"), "city": loc.get("city"),
+                        "state_usps": loc.get("state"), "state": g.get("game_state")}
+    # site classification and event names, already derived by venues.py
+    vdoc = load("data/venues_%d.json" % SEASON) or {}
+    for row in (vdoc.get("games") or []):
+        gid = str(row.get("game_id") or "")
+        if gid in out:
+            out[gid]["site"] = row.get("site")
+            out[gid]["event"] = row.get("event")
+    return out
+
+
 def schedule(limit_days: int = 21) -> List[Dict]:
-    """Upcoming fixtures from today forward."""
+    """Upcoming fixtures from today forward, with WHERE and WHAT KIND."""
     today = datetime.date.today().isoformat()
+    vidx = venue_index()
     rows = []
     for path in sorted(glob.glob(os.path.join(REPO, "data/raw/%d/scoreboard/*.json" % SEASON))):
         date = os.path.basename(path)[:-5]
@@ -249,11 +293,27 @@ def schedule(limit_days: int = 21) -> List[Dict]:
             h = (g.get("home") or {}).get("names", {}).get("short")
             if not a or not h:
                 continue
+            gid = str(g.get("gameID") or g.get("id") or "")
+            v = vidx.get(gid) or {}
+            # CONFERENCE OR NOT, from the fixture's own two conference slugs.
+            # Cheap and exact: the scoreboard tags each side with its league, so
+            # this needs no join against a roster of conferences and cannot go
+            # stale the way a name-keyed lookup can.
+            ac = ((g.get("away") or {}).get("conferences") or [{}])[0].get("conferenceSeo")
+            hc = ((g.get("home") or {}).get("conferences") or [{}])[0].get("conferenceSeo")
+            kind = "conf" if (ac and hc and ac == hc) else "non"
+            if v.get("event"):
+                kind = "event"
             rows.append({
                 "d": date, "a": a, "h": h,
                 "t": listed_time(g.get("startTime"), h, g.get("startTimeEpoch")),
                 "ar": (g.get("away") or {}).get("rank") or "",
                 "hr": (g.get("home") or {}).get("rank") or "",
+                "gid": gid,
+                "venue": v.get("venue"), "city": v.get("city"),
+                "st": v.get("state_usps"),
+                "site": v.get("site"), "event": v.get("event"),
+                "kind": kind, "conf": ac if kind == "conf" else "",
             })
         if len(set(r["d"] for r in rows)) > limit_days:
             break
@@ -574,6 +634,7 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
             })
 
     fixtures = {}
+    vidx = venue_index()
     today = datetime.date.today().isoformat()
     for path in sorted(glob.glob(os.path.join(REPO, "data/raw/%d/scoreboard/*.json" % SEASON))):
         date = os.path.basename(path)[:-5]
@@ -588,10 +649,23 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
             if not a or not h:
                 continue
             t = listed_time(g.get("startTime"), h, g.get("startTimeEpoch"))
-            fixtures.setdefault(a, []).append(
-                {"d": date, "opp": h, "home": False, "t": t})
-            fixtures.setdefault(h, []).append(
-                {"d": date, "opp": a, "home": True, "t": t})
+            gid = str(g.get("gameID") or g.get("id") or "")
+            v = vidx.get(gid) or {}
+            ac = ((g.get("away") or {}).get("conferences") or [{}])[0].get("conferenceSeo")
+            hc = ((g.get("home") or {}).get("conferences") or [{}])[0].get("conferenceSeo")
+            kind = ("event" if v.get("event")
+                    else ("conf" if (ac and hc and ac == hc) else "non"))
+            # NEUTRAL IS NEITHER HOME NOR AWAY, and a team page that says
+            # "home" for a tournament in Milwaukee is wrong about the one thing
+            # a schedule is for. `home` stays a bool for existing consumers;
+            # `site` carries the third state (R4 -- new meaning, new name).
+            base = {"d": date, "t": t, "venue": v.get("venue"),
+                    "city": v.get("city"), "st": v.get("state_usps"),
+                    "site": v.get("site"), "event": v.get("event"), "kind": kind}
+            aw = dict(base); aw.update({"opp": h, "home": False})
+            hm = dict(base); hm.update({"opp": a, "home": True})
+            fixtures.setdefault(a, []).append(aw)
+            fixtures.setdefault(h, []).append(hm)
 
     proj = {r["team"]: r for r in
             ((load("data/projection_2026.json") or {}).get("teams") or [])}
@@ -1229,6 +1303,27 @@ def form_strip(games, n=5):
     return "".join(out)
 
 
+def hcell_py(v, txt, lo, hi, kind="seq"):
+    # type: (Optional[float], str, float, float, str) -> str
+    """Server-side twin of the page's hcell(): emits a cell carrying only --t.
+
+    The colour, the bar, the easing and the two ramps all live in ONE CSS rule,
+    so this function -- like its JS counterpart -- never names a colour. That is
+    the whole point: the Top 25 is rendered in Python and the Stats tables in
+    JavaScript, and a page whose two halves each hold their own opinion about
+    what "good" looks like is how the crests came to be missing from every
+    server-rendered view.
+
+    A missing value renders as an em dash with no scale at all (R5) -- an
+    absent measurement must not be painted as a neutral one.
+    """
+    if v is None:
+        return '<td class="n">&mdash;</td>'
+    t = 0.5 if hi == lo else (float(v) - lo) / (hi - lo)
+    t = max(0.0, min(1.0, t))
+    return '<td class="n hx %s" style="--t:%.3f"><b>%s</b></td>' % (kind, t, txt)
+
+
 def top25_view():
     # type: () -> Dict[str, str]
     """Rows and copy for Digby's Top 25.
@@ -1296,6 +1391,14 @@ def top25_view():
             if r.get("blend_rank"):
                 pre[r["team"]] = r["blend_rank"]
 
+    # Symmetric about zero so +4 and -4 sit the same distance from neutral, and
+    # scaled to the biggest margin actually on the board rather than a constant
+    # I picked -- in August that is a handful of matches, in November it is a
+    # season, and a fixed cap would wash the whole column out by then.
+    _nets = [abs(r["net_pts_per_set"]) for r in top
+             if r.get("net_pts_per_set") is not None]
+    nmax = max(_nets) if _nets else 1.0
+
     rows = []
     for r in top:
         team = r["team"]
@@ -1313,14 +1416,16 @@ def top25_view():
             '<tr class="row" data-team="%s" style="--tc:%s"><td class="rk">%d</td>'
             '<td class="tm">%s%s</td><td class="mvc">%s</td><td class="cf">%s</td>'
             '<td class="rec">%s</td><td class="form">%s</td>'
-            '<td class="n">%s</td><td class="n wt">%s</td></tr>'
+            '%s<td class="n wt">%s</td></tr>'
             % (esc(team), (colors.get(team) or {}).get("primary") or "var(--line)",
                r["rank"], logo_img(team, logos), esc(team), mv,
                esc(r.get("conf") or ""),
                r.get("record") or "0-0",
                form_strip(form.get(team) or []),
-               ("%+.2f" % r["net_pts_per_set"]) if r.get("net_pts_per_set") is not None
-               else "&mdash;",
+               hcell_py(r.get("net_pts_per_set"),
+                        ("%+.2f" % r["net_pts_per_set"])
+                        if r.get("net_pts_per_set") is not None else "",
+                        -nmax, nmax, "dv"),
                ("%d%%" % round(100 * wt)) if wt else "&mdash;"))
 
     also = " &middot; ".join(
@@ -1670,17 +1775,47 @@ def build():
     srows = []
     for r in sched[:600]:
         pick, cls = _pick(r)
+        # WHERE. A venue we do not have is stated as such -- never inferred
+        # from the nominal home team, which is exactly how two AVCA First Serve
+        # matches on a neutral floor in Milwaukee came to be labelled home games
+        # (R5). "at" becomes "vs" when the floor is neutral, because "Texas at
+        # Arizona St." is a false sentence about a match in Milwaukee.
+        neutral = r.get("site") == "neutral"
+        where = ""
+        if r.get("venue"):
+            city = ", ".join(x for x in (r.get("city"), r.get("st")) if x)
+            where = ('<b>%s</b>%s' % (esc(r["venue"]),
+                                      ('<span class="wc">%s</span>' % esc(city)) if city else ""))
+        else:
+            where = '<span class="wu">venue not listed</span>'
+        if r.get("event"):
+            badge = '<span class="kind ev" title="in-season tournament">%s</span>' % esc(r["event"])
+        elif neutral:
+            # WE KNOW IT IS AN EVENT; WE DO NOT KNOW ITS NAME. venues.py only
+            # attaches a name that a human supplied in Cody/data/events_2026.txt
+            # -- it never invents one from the venue. So a neutral floor with no
+            # name says exactly that much and no more, rather than being filed
+            # as an ordinary non-conference road match, which is what it is not.
+            badge = ('<span class="kind nu" title="neutral floor -- an event, '
+                     'name not supplied">neutral site</span>')
+        elif r["kind"] == "conf":
+            badge = '<span class="kind cf" title="conference match">conference</span>'
+        else:
+            badge = '<span class="kind nc" title="non-conference match">non-conf</span>'
         srows.append(
             '<tr%s><td class="cd">%s</td><td class="n">%s</td><td class="tm">%s%s%s</td>'
-            '<td class="at">at</td><td class="tm">%s%s%s</td>'
+            '<td class="at">%s</td><td class="tm">%s%s%s</td>'
+            '<td class="wh l">%s%s</td>'
             '<td class="n pick %s">%s</td></tr>'
             % ((' class="rkd both"' if (r["ar"] and r["hr"])
                 else (' class="rkd"' if (r["ar"] or r["hr"]) else "")),
                r["d"], r["t"] or "&mdash;",
                ('<i class="rnk">%s</i> ' % r["ar"]) if r["ar"] else "",
                logo_img(r["a"], logos), esc(r["a"]),
+               "vs" if neutral else "at",
                ('<i class="rnk">%s</i> ' % r["hr"]) if r["hr"] else "",
                logo_img(r["h"], logos), esc(r["h"]),
+               badge, where,
                cls, pick))
     srows = "".join(srows)
 
@@ -1779,6 +1914,12 @@ TEMPLATE = r"""<!doctype html><html lang="en"><head><meta charset="utf-8">
   --navy:#0B4F87; --blue:#1D6FD0; --amber:#FFC72C; --amber-bg:#FFF4D6;
   --sand:#EFE3CC;
   --live:#C8322B; --win:#0F7A3D;
+  /* THE GOOD -> BAD PAIR, as a scale rather than two labels. Green and red were
+     already here (--win/--live) but only ever as flat text colour on one
+     column. These are the ramp ends. Both are darkened versions of the ball's
+     own palette rather than UI-kit green/red, so they sit on the sand ground
+     instead of vibrating against it. */
+  --good:#0E7C4A; --bad:#B3261E; --mid:#CFC3AA;
   --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
   --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
   /* Display: condensed and loud, for anything that behaves like a headline or a
@@ -1829,11 +1970,72 @@ section[hidden]{display:none}
 .lead{color:var(--ink2);font-size:14px;max-width:74ch;margin:0 0 16px}
 .lead b{color:var(--ink)}
 
-.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;
-  overflow:hidden;box-shadow:0 1px 2px rgba(16,24,40,.05)}
+/* Surfaces fade rather than sit flat. Every box on this page was #FFF on
+   #F6F1E7 with a hairline, which is what made a dense stats page read as
+   sterile: nothing had a top or a bottom. The gradient is 4% of a tone -- felt,
+   not seen -- and the shadow is warm, tinted toward the sand ground rather
+   than the neutral grey every UI kit ships. */
+.panel{background:linear-gradient(176deg,#FFFFFF 0%,#FFFDF8 46%,#FBF5E9 100%);
+  border:1px solid var(--line);border-radius:10px;
+  overflow:hidden;box-shadow:0 1px 2px rgba(90,70,35,.06),0 8px 22px -14px rgba(90,70,35,.22)}
+/* ---- THE VALUE SCALE. ONE DEFINITION, BOTH RENDERERS. -----------------
+   Python and JS each emit nothing but `style="--t:.73"`. Every colour and
+   every dimension is decided here, so the server-rendered views and the
+   script-rendered views cannot drift apart -- the same failure the crest
+   helper was built to end (rankings/schedule/scores had no logos because the
+   JS helper was unreachable from Python).
+
+   t = 0 is the weakest value on screen, t = 1 the strongest. TWO RAMPS,
+   deliberately not one:
+     .seq  more is better and everything shown is already good -- a national
+           top-50 leaderboard. Ramps sand -> green. Red here would call the
+           48th-best hitter in the country "bad", which is false.
+     .dv   a real zero exists (a point differential). Ramps red -> sand ->
+           green, and only this one earns red.
+   Lightness falls monotonically as t rises, so the ramp still reads as a ramp
+   without hue -- and the number itself is always printed, so colour is never
+   the only channel carrying the value. */
+td.hx{position:relative;isolation:isolate}
+td.hx.seq{--hc:color-mix(in oklab,var(--mid),var(--good) calc(var(--t,0)*100%))}
+td.hx.dv{--hc:color-mix(in oklab,var(--bad),var(--good) calc(var(--t,.5)*100%))}
+td.hx::before{content:"";position:absolute;z-index:-1;top:3px;bottom:3px;right:3px;
+  width:calc((.08 + var(--w,var(--t,0))*.92) * 100%);
+  border-radius:1px 4px 4px 1px;
+  background:linear-gradient(90deg,
+    color-mix(in oklab,var(--hc) 9%,transparent) 0%,
+    color-mix(in oklab,var(--hc) 26%,transparent) 55%,
+    color-mix(in oklab,var(--hc) 52%,transparent) 100%);
+  /* A CRISP LEFT EDGE. The fill alone gives no precise place to compare one
+     row against the next -- a soft gradient tip is unreadable at a glance, so
+     the bar carries a hard rule where it actually ends. That edge is the
+     measurement; the wash behind it is just weight. */
+  border-left:2.5px solid color-mix(in oklab,var(--hc) 70%,transparent);
+  transform-origin:right center;
+  animation:hxin .42s cubic-bezier(.22,.9,.3,1) both}
+/* NARROW COLUMNS GET A CHIP, NOT A BAR. The standings +/- column is ~60px:
+   a proportional bar there has no room to be proportional, and its edge rule
+   landed on top of the digits. Sign and intensity are the whole message in a
+   diverging column, so the cell fills instead and length stops pretending to
+   carry information it cannot. */
+/* A DIVERGING CELL IS ALWAYS A CHIP, NEVER A BAR -- folded into .dv itself so
+   a future call site cannot forget it. A bar anchored at the right edge grows
+   LEFTWARD as the value falls, so a negative gets a short bar whose hard edge
+   lands in the middle of its own digits ("-4|25"). A proper diverging bar would
+   have to grow out from zero at the cell's centre, which is illegible in the
+   ~90px these columns get. Sign and intensity are the message; the printed
+   number is already the precise value. */
+td.hx.dv::before,td.hx.fill::before{width:auto;left:3px;right:3px;border-left:0;border-radius:4px;
+  background:linear-gradient(90deg,
+    color-mix(in oklab,var(--hc) 10%,transparent),
+    color-mix(in oklab,var(--hc) 34%,transparent))}
+td.hx b{position:relative;font-weight:700;
+  color:color-mix(in oklab,var(--hc) 96%,var(--ink))}
+@keyframes hxin{from{transform:scaleX(.04);opacity:0}to{transform:scaleX(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){td.hx::before{animation:none}}
 table{width:100%;border-collapse:collapse}
 th{font:500 12px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase;
-  color:var(--ink2);text-align:right;padding:12px 10px;background:var(--alt);
+  color:var(--ink2);text-align:right;padding:12px 10px;
+  background:linear-gradient(180deg,#FDFAF3 0%,var(--alt) 62%,#F2E9D8 100%);
   border-bottom:2px solid var(--line2);position:sticky;top:var(--navh,0px);
   z-index:2;white-space:nowrap}
 /* A header inside its OWN scroll box sticks to that box, not to the page, so
@@ -1871,9 +2073,15 @@ b.pl6{font:800 10px/1 var(--mono);color:var(--live);vertical-align:2px;margin-le
 .card.open{grid-column:1/-1}
 /* A result reads like a line on a scoresheet, not a rounded app card: squared
    corners, a court-blue rule down the left, and the winner carrying the weight. */
-.card{background:var(--card);border:1px solid var(--line);border-radius:2px;
+.card{background:linear-gradient(168deg,#FFFFFF 0%,#FFFDF7 55%,#FAF3E6 100%);
+  border:1px solid var(--line);border-radius:2px;
   border-left:3px solid var(--line2);
-  padding:14px 16px 13px;box-shadow:0 1px 0 rgba(20,18,16,.04)}
+  padding:14px 16px 13px;
+  box-shadow:0 1px 0 rgba(20,18,16,.04),0 10px 24px -18px rgba(90,70,35,.35);
+  transition:box-shadow .18s ease,transform .18s ease}
+.card:hover{box-shadow:0 1px 0 rgba(20,18,16,.05),0 14px 30px -16px rgba(90,70,35,.42);
+  transform:translateY(-1px)}
+@media (prefers-reduced-motion:reduce){.card{transition:none}.card:hover{transform:none}}
 .card.done{border-left-color:var(--navy)}
 .cd{font:700 11.5px/1 var(--mono);color:var(--ink2);letter-spacing:.06em;
   margin-bottom:11px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
@@ -1887,7 +2095,12 @@ b.pl6{font:800 10px/1 var(--mono);color:var(--live);vertical-align:2px;margin-le
   transition:color .18s ease}
 .side.win{color:var(--ink);font-weight:700}
 .side{font:400 17px/1.2 var(--disp);letter-spacing:.012em}
-.side.win b{color:var(--navy)}
+/* THE WINNER IS GREEN; THE LOSER IS NOT RED. Every match has a loser, so
+   colouring both would put red on half the page and the signal would stop
+   meaning anything -- red is kept for a number that is genuinely bad, like a
+   negative differential. The winner's score also carries a soft halo so the
+   result reads before the names do. */
+.side.win b{color:var(--good);text-shadow:0 0 22px color-mix(in oklab,var(--good) 26%,transparent)}
 /* the signature: each set is a column, visitor above, home below, winner lit */
 .sets{display:flex;gap:5px;margin-bottom:10px}
 .set{flex:0 1 64px;display:flex;flex-direction:column;border:1px solid var(--line2);
@@ -2049,6 +2262,29 @@ td.tm{font-size:15px}
 .stgrid td.form{white-space:nowrap}
 .stgrid td.pos{color:#12864B}
 .stgrid td.neg{color:#B3261E}
+/* WHERE a match is played, and what kind of match it is. Both were absent:
+   the schedule said who and when, and a reader had to assume the rest. */
+/* the second line of a team-page fixture: where, and what kind */
+.gline.gl2{flex-wrap:wrap}
+.wh2{flex-basis:100%;display:flex;align-items:center;gap:7px;margin:3px 0 0 0;
+  padding-left:2px}
+.wh2 .pl{font:11.5px/1.4 var(--mono);color:var(--ink3)}
+.wh2 .pl.u{font-style:italic}
+.va.nt{color:var(--amber);font-weight:800}
+td.wh{font-size:12.5px;line-height:1.35;color:var(--ink2);max-width:280px}
+td.wh b{display:block;font-weight:650;color:var(--ink);font-size:12.5px}
+td.wh .wc{display:block;color:var(--ink3);font:11.5px/1.3 var(--mono)}
+td.wh .wu{color:var(--ink3);font-style:italic}
+.kind{display:inline-block;margin-right:7px;padding:2px 6px;border-radius:3px;
+  font:700 9.5px/1.5 var(--mono);letter-spacing:.06em;text-transform:uppercase;
+  vertical-align:2px}
+.kind.cf{background:color-mix(in oklab,var(--navy) 12%,transparent);color:var(--navy)}
+.kind.nc{background:var(--sand);color:var(--ink2)}
+/* A named event is the one that changes what the fixture MEANS -- an August
+   tournament on a neutral floor is not a road trip -- so it gets the ball's
+   yellow and the other two stay quiet. */
+.kind.ev{background:var(--amber-bg);color:#7A5B00;border:1px solid var(--amber)}
+.kind.nu{background:color-mix(in oklab,var(--amber) 14%,transparent);color:#7A5B00}
 #sbody tr.rkd td:first-child{box-shadow:inset 3px 0 0 var(--line2)}
 #sbody tr.both td:first-child{box-shadow:inset 3px 0 0 var(--amber)}
 #sbody tr.both .tm{font-weight:700}
@@ -2244,11 +2480,17 @@ table.box td.pn{text-align:left;font-weight:600}
 .chip.ours{background:#EEF4FD;border-color:#BFD5F0;color:var(--navy)}
 .tcols{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;align-items:start}
 @media(max-width:900px){.tcols{grid-template-columns:1fr}}
-.tsec{background:var(--card);border:1px solid var(--line);border-radius:10px;
-  overflow:hidden;box-shadow:0 1px 2px rgba(16,24,40,.05)}
+.tsec{background:linear-gradient(176deg,#FFFFFF,#FBF5E9);
+  border:1px solid var(--line);border-radius:10px;
+  overflow:hidden;box-shadow:0 1px 2px rgba(90,70,35,.06),0 8px 22px -14px rgba(90,70,35,.20)}
 .tsec h3{margin:0;padding:12px 15px;font:700 11.5px/1 var(--sans);letter-spacing:.08em;
-  text-transform:uppercase;color:var(--ink2);background:var(--alt);
-  border-bottom:1px solid var(--line)}
+  text-transform:uppercase;color:var(--ink2);
+  background:linear-gradient(180deg,#FDFAF3,#F2E9D8);
+  border-bottom:1px solid var(--line);position:relative}
+/* A conference table earns a hairline of the ball's yellow at its head -- the
+   one piece of chrome that says "this is a section" without a heavier device. */
+.tsec h3::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;
+  background:linear-gradient(90deg,var(--amber),color-mix(in oklab,var(--amber) 10%,transparent))}
 .tsec .body{padding:4px 0}
 .gline{display:flex;align-items:center;gap:10px;padding:9px 15px;
   border-bottom:1px solid var(--line);font-size:14px}
@@ -2509,7 +2751,17 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 
 <section id="v-bracket" hidden>
   <p class="lead">A projected 64-team field: {{N_AQ}} conference champions plus the
-  next best at large, ordered by our 2026 projection.</p>
+  next best at large, ordered by our 2026 projection. <b>32 teams are seeded</b>
+  and placed four to a line, so the bracket carries four&nbsp;#1s down to
+  four&nbsp;#8s &mdash; the format since 2022. The number on a row is that
+  <b>seed line</b>; its national seed (1&ndash;32) is on the tooltip.</p>
+  <p class="lead"><b>What this bracket does not know: geography.</b> The
+  committee brackets to NCAA travel rules &mdash; the top 16 seeds host the
+  first two rounds, and a team inside the bus radius of its site travels by
+  road rather than by air, which moves teams between pods. We hold each venue's
+  city and state but no distances, so pairings here are the seed order alone
+  (seed <i>N</i> against the <i>N</i>th-from-last unseeded team) and will differ
+  from the real 2026 draw. Later rounds are left empty rather than projected.</p>
   <div id="brkview"></div>
   <div class="panel"><div class="scroll"><table>
     <thead><tr><th>Seed</th><th class="l">Team</th><th class="l">Conf</th>
@@ -2528,7 +2780,14 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 </section>
 
 <section id="v-schedule" hidden>
-  <p class="lead"><b>2026 schedule.</b> {{N_SCHED}} fixtures from today forward, straight from ncaa.com.</p>
+  <p class="lead"><b>2026 schedule.</b> {{N_SCHED}} fixtures from today forward,
+  straight from ncaa.com. Each row says <b>where</b> it is played and whether it
+  is a conference match, a non-conference match or part of a named event. A
+  neutral floor reads <b>vs</b> rather than <b>at</b>. A venue the feed has not
+  published yet says so rather than being guessed from the home team.
+  A tournament is named only where the name was supplied by hand &mdash; a
+  neutral floor whose event has no name says <b>neutral site</b> rather than
+  borrowing the building's name for it.</p>
   <div class="ctl">
     <input type="search" id="sq" placeholder="Search a team&hellip;">
     <select id="srank">
@@ -2541,6 +2800,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <div class="panel"><div class="scroll"><table>
     <thead><tr><th class="l">Date</th><th>Time</th><th class="l">Visitor</th>
       <th></th><th class="l">Home</th>
+      <th class="l" title="venue from the feed; conference, non-conference or a named event">Where</th>
       <th title="rally model, calibrated Brier 0.1289 on 2025">Projected</th></tr></thead>
     <tbody id="sbody">{{SCHED_ROWS}}</tbody></table></div></div>
 </section>
@@ -3014,6 +3274,15 @@ function formPills(team, n) {
 function renderStandings() {
   const only = stsel.value;
   const confs = only ? [only] : Object.keys(STANDINGS).sort();
+  /* ONE SCALE ACROSS EVERY CONFERENCE, not one per table. A per-table scale
+     would make the best team in a weak league look identical to the best team
+     in the ACC, which is the opposite of what a differential is for. Symmetric
+     about zero so +2 and -2 are the same distance from neutral. */
+  let dmax = 0;
+  Object.keys(STANDINGS).forEach(c => STANDINGS[c].forEach(r => {
+    if (r.diff !== null && r.diff !== undefined) dmax = Math.max(dmax, Math.abs(r.diff));
+  }));
+  dmax = dmax || 1;
   document.getElementById('standings').innerHTML =
     '<div class="stgrid">' + confs.map(c => {
       const rows = STANDINGS[c];
@@ -3028,8 +3297,10 @@ function renderStandings() {
           '<td class="n">' + r.cw + '-' + r.cl + '</td>' +
           '<td class="n">' + r.w + '-' + r.l + '</td>' +
           '<td class="form">' + formPills(r.team) + '</td>' +
-          '<td class="n' + (diff === null ? '' : (diff >= 0 ? ' pos' : ' neg')) + '">' +
-            (diff === null ? '&mdash;' : (diff >= 0 ? '+' : '') + diff.toFixed(2)) + '</td>' +
+          (diff === null
+            ? '<td class="n">&mdash;</td>'
+            : hcell(diff, (diff >= 0 ? '+' : '') + diff.toFixed(2),
+                    -dmax, dmax, 'high', 'dv fill')) +
           '<td class="n hi">' + r.rank + '</td></tr>';
         }).join('') +
         '</tbody></table></div></div>';
@@ -3082,15 +3353,70 @@ function renderBracket() {
      rounds, and filling them with projected matchups would be inventing
      results (R5). They populate as matches are played. */
   const seeded = seeds.slice(0, 32), rest = seeds.slice(32);
-  const games = seeded.map((s2, i) => [s2, rest[rest.length - 1 - i]].filter(Boolean));
+
+  /* ---- BRACKET ORDER, READ OFF THE OFFICIAL 2025 SHEET -------------------
+     We used to list seeds 1..32 straight down, which put all four #1s next to
+     each other -- they would have met in round two. A bracket does the
+     opposite: it keeps the best teams apart for as long as possible.
+
+     The official sheet's top-left quadrant is
+         1 Nebraska/LIU · Kansas St./8 San Diego · 5 Miami/Tulsa ·
+         High Point/4 Kansas · 3 Texas A&M/Campbell · SFA/6 TCU ·
+         7 Western Ky./Marquette · Loyola Chicago/2 Louisville
+     i.e. seed lines in the order 1,8,5,4,3,6,7,2, so round two is 1v8, 5v4,
+     3v6, 7v2. The next quadrant runs it mirrored (SMU 2 ... 1 Pittsburgh).
+     Note also which side of the pair the seed sits on: TOP at even positions,
+     BOTTOM at odd ones. That alternation is what makes the round-two lines
+     meet correctly, and it is visible on the sheet (Nebraska top, San Diego
+     bottom, Miami top, Kansas bottom).
+
+     Each seed line has four teams; they go to four different quadrants, with
+     the overall 1 and 2 placed in opposite halves. ⚠ WHICH quadrant a given
+     team lands in is the committee's call and is driven by GEOGRAPHY, which we
+     do not model -- so this is the right SHAPE with our own ordering inside it,
+     and the page says so. */
+  const LINE_ORDER = [1, 8, 5, 4, 3, 6, 7, 2];
+  const QUAD_OF_POS = [0, 3, 2, 1];        // overall 1 -> Q0, 2 -> Q3, ...
+  const byQuad = [[], [], [], []];
+  seeded.forEach(t => {
+    const line = Math.ceil(t.seed / 4);
+    const pos = (t.seed - 1) % 4;
+    byQuad[QUAD_OF_POS[pos]][line - 1] = t;   // one team per line per quadrant
+  });
+
+  const games = [];
+  byQuad.forEach((lines, q) => {
+    // the bottom half of each side mirrors, so the final converges
+    const order = (q === 1 || q === 3)
+      ? LINE_ORDER.slice().reverse() : LINE_ORDER;
+    order.forEach((line, i) => {
+      const sd = lines[line - 1];
+      if (!sd) return;
+      // weakest-seed-meets-strongest-unseeded, as before: this part is ours,
+      // not the committee's.
+      const opp = rest[rest.length - 1 - (sd.seed - 1)];
+      games.push(i % 2 === 0 ? [sd, opp] : [opp, sd]);
+    });
+  });
 
   const side = (t, cls) => {
     if (!t) return '<div class="bside empty"><span class="bsd"></span>' +
                    '<span class="bnm">&nbsp;</span><span class="bsc"></span></div>';
     return '<div class="bside ' + (cls || '') + '">' +
-      /* unseeded teams show NO number -- not a zero, not a dash, exactly as the
-         official bracket prints them */
-      '<span class="bsd">' + (t.seed && t.seed <= 32 ? t.seed : '') + '</span>' +
+      /* THE NUMBER ON AN OFFICIAL BRACKET IS THE SEED LINE, NOT THE NATIONAL
+         SEED. 32 teams are seeded nationally (1-32, the format since 2022) and
+         then placed four to a line, so the printed bracket carries FOUR #1s,
+         four #2s, down to four #8s -- on the 2025 sheet the #1s are Nebraska,
+         Texas, Pittsburgh and Kentucky, and the #2s are Louisville, SMU,
+         Stanford and Arizona St. We were printing 1,2,3...32 straight down,
+         which reads as a national ordering the bracket does not assert.
+             line = ceil(national seed / 4)
+         The national seed is kept on the tooltip rather than thrown away.
+         Unseeded teams show NO number -- not a zero, not a dash, exactly as the
+         official bracket prints them. */
+      '<span class="bsd"' + (t.seed && t.seed <= 32
+        ? ' title="national seed ' + t.seed + ' of 32"' : '') + '>' +
+      (t.seed && t.seed <= 32 ? Math.ceil(t.seed / 4) : '') + '</span>' +
       logo(t.team) + '<span class="bnm">' + t.team + '</span>' +
       '<span class="bsc">' + (t.sets === undefined ? '' : t.sets) + '</span></div>';
   };
@@ -3184,6 +3510,22 @@ function renderPoll(which) {
 document.querySelectorAll('#v-rankings .segb').forEach(b =>
   b.addEventListener('click', () => renderPoll(b.dataset.r)));
 
+/* t IN [0,1] FOR THE VALUE SCALE. The renderers compute only this number;
+   what green is, how wide the bar runs and how it eases in all live in one CSS
+   rule. Callers pass `good` = the direction that is better, which is the whole
+   reason this is a parameter: on the Stats tab "allowed to opponents" INVERTS
+   -- holding a team to a low hitting percentage is the BEST defence, and
+   painting it red would be the R4 trap with colour instead of a column name.
+   The sort already flips on the same flag, so the two cannot disagree. */
+function hscale(v, lo, hi, good) {
+  if (v === null || v === undefined || hi === lo) return 0.5;
+  const t = (v - lo) / (hi - lo);
+  return good === 'low' ? 1 - t : t;
+}
+function hcell(v, txt, lo, hi, good, kind) {
+  return '<td class="n hi hx ' + (kind || 'seq') + '" style="--t:' +
+    hscale(v, lo, hi, good).toFixed(3) + '"><b>' + txt + '</b></td>';
+}
 /* ---- leaders ---- */
 const LEADERS = {{LEADERS_JSON}};
 const TSTATS = {{TSTATS_JSON}};
@@ -3197,12 +3539,16 @@ function renderLeaders() {
     .filter(r => r[k] !== null && r[k] !== undefined)
     .filter(r => !q || (r.name + ' ' + r.team).toLowerCase().includes(q))
     .sort((a, b) => b[k] - a[k]).slice(0, 200);
+  const vs = rows.map(r => k === 'hit' ? r.hit : r[k]);
+  const lo = Math.min.apply(null, vs), hi = Math.max.apply(null, vs);
   document.getElementById('lbody').innerHTML = rows.map((r, i) =>
     '<tr class="prow" data-p="' + i + '"><td class="rk">' + (i + 1) + '</td>' +
     '<td class="tm">' + playerCell(r, 34) + '</td>' +
     '<td class="cf">' + logo(r.team) + r.team + '</td>' +
-    '<td class="n">' + r.sets + '</td><td class="n hi">' +
-    (k === 'hit' ? r.hit.toFixed(3) : r[k].toFixed(2)) + '</td></tr>').join('');
+    '<td class="n">' + r.sets + '</td>' +
+    hcell(k === 'hit' ? r.hit : r[k],
+          k === 'hit' ? r.hit.toFixed(3) : r[k].toFixed(2),
+          lo, hi, 'high', 'seq') + '</tr>').join('');
   document.getElementById('lcnt').textContent = rows.length + ' players';
 }
 /* TEAM STATS, the other half of the Stats tab. Same box scores as the player
@@ -3223,14 +3569,21 @@ function renderTeamStats() {
     .filter(r => r[side] && r[side][k] !== null && r[side][k] !== undefined)
     .filter(r => !q || (r.team + ' ' + (r.conf || '')).toLowerCase().includes(q))
     .sort((a, b) => asc ? a[side][k] - b[side][k] : b[side][k] - a[side][k]);
+  /* SAME FLAG AS THE SORT. `asc` is true for the opponent view, where a lower
+     number is the better performance -- so the scale is told 'low' is good and
+     the strongest defence is the greenest row, not the reddest. */
+  const tvs = rows.map(r => k === 'hit' ? r[side].hit : r[side][k]);
+  const tlo = Math.min.apply(null, tvs), thi = Math.max.apply(null, tvs);
+  const better = asc ? 'low' : 'high';
   document.getElementById('ltbody').innerHTML = rows.map((r, i) => {
     const d = r[side];
     return '<tr><td class="rk">' + (i + 1) + '</td>' +
       '<td class="tm">' + logo(r.team) + r.team + '</td>' +
       '<td class="cf">' + (r.conf || '') + '</td>' +
       '<td class="n">' + d.matches + '</td><td class="n">' + d.sets + '</td>' +
-      '<td class="n hi">' + (k === 'hit' ? d.hit.toFixed(3) : d[k].toFixed(2)) +
-      '</td></tr>';
+      hcell(k === 'hit' ? d.hit : d[k],
+            k === 'hit' ? d.hit.toFixed(3) : d[k].toFixed(2),
+            tlo, thi, better, 'seq') + '</tr>';
   }).join('');
   document.getElementById('lcnt').textContent = rows.length + ' teams';
 }
@@ -3245,7 +3598,17 @@ function renderStats() {
   document.getElementById('lside').hidden = !team;
   document.getElementById('lq').placeholder =
     team ? 'Search team or conference\u2026' : 'Search player or team\u2026';
-  if (team) renderTeamStats(); else renderStats();
+  /* ⚠ THIS CALLED ITSELF. renderStats is the DISPATCHER; the player table is
+     drawn by renderLeaders. `else renderStats()` recursed until the stack blew,
+     and because the hidden/visible toggle above runs FIRST, the panel appeared
+     correctly populated with whatever was rendered last -- so it looked like it
+     worked. What actually broke: 'lq' and 'lstat' are wired to this function,
+     and LSIDE is 'player' on load, so the Stats search box and the stat
+     selector silently did nothing at all. Measured in the page: selecting
+     Kills/set left the header reading Pts/set and the rows untouched, and
+     searching a team still returned all 48. An exception inside an event
+     listener never reaches the caller, which is why nothing surfaced it. */
+  if (team) renderTeamStats(); else renderLeaders();
 }
 document.querySelectorAll('#v-leaders .segb').forEach(b =>
   b.addEventListener('click', () => {
@@ -3310,15 +3673,35 @@ function showTeam(name) {
         g.mine + '-' + g.theirs + '</span>' +
       '<span class="ss">' + strip + '</span></div>';
   }).join('');
-  const upcoming = (t.fixtures || []).map(f =>
-    '<div class="gline"><span class="dt">' + f.d + '</span>' +
-    '<span class="va">' + (f.home ? 'vs' : '@') + '</span>' +
+  /* A FIXTURE LINE NOW SAYS WHERE. Three states, not two: vs (home), @ (away)
+     and N (neutral) -- an August tournament on a neutral floor is not a road
+     trip, and calling it one is the same inference-as-fact that put an AVCA
+     First Serve match in the host's gym. A venue the feed has not published is
+     left blank rather than filled from the nominal home team. */
+  const upcoming = (t.fixtures || []).map(f => {
+    const neutral = f.site === 'neutral';
+    const va = neutral ? 'N' : (f.home ? 'vs' : '@');
+    const place = f.venue
+      ? f.venue + (f.city ? ', ' + f.city + (f.st ? ' ' + f.st : '') : '')
+      : '';
+    const tag = f.event
+      ? '<span class="kind ev">' + f.event + '</span>'
+      : neutral ? '<span class="kind nu" title="neutral floor -- an event, name not supplied">neutral</span>'
+      : (f.kind === 'conf' ? '<span class="kind cf">conf</span>'
+                           : '<span class="kind nc">non-conf</span>');
+    return '<div class="gline gl2"><span class="dt">' + f.d + '</span>' +
+    '<span class="va' + (neutral ? ' nt' : '') + '"' +
+      (neutral ? ' title="neutral site"' : '') + '>' + va + '</span>' +
     '<span class="op">' + f.opp + '</span>' +
     '<span class="ss">' + (f.t || '') + '</span>' +
     (f.pick !== null && f.pick !== undefined
       ? '<span class="rs ' + (f.pick >= 0.5 ? 'w' : 'l') + '">' +
         Math.round(f.pick * 100) + '%</span>' : '') +
-    '</div>').join('');
+    '<span class="wh2">' + tag +
+      (place ? '<span class="pl">' + place + '</span>'
+             : '<span class="pl u">venue not listed</span>') +
+    '</span></div>';
+  }).join('');
 
   const initials = n => n.split(/\s+/).map(x => x[0]).join('').slice(0, 2).toUpperCase();
   const six = (t.rotation || []).map(c =>

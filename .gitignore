@@ -163,3 +163,11 @@ assets/digby_*_full.png
 # Parsed into data/avca_awards.json, which IS committed; the source workbooks
 # are AVCA's to distribute.
 AVCA-*.xlsx
+
+# EVERY PDF, not one pattern per drop. The targeted rules above (*NCAA.com.pdf,
+# *Official Bracket*.pdf, ...) each had to be added after a file appeared, and a
+# bare name like `2025.pdf` slips past all of them -- it did. These are
+# NCAA/AVCA/forum publications whose own sheets say "no commercial use without
+# written permission" and this repo is PUBLIC. Same call as the ncaavolleyballr
+# CSVs and the AVCA workbooks: read locally, commit only what we derive.
+*.pdf

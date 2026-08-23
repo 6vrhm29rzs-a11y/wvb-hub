@@ -58,6 +58,15 @@ jobs:
           python3 scripts/crawl_2025.py schedule
           python3 scripts/crawl_2025.py games
           python3 scripts/crawl_2025.py boxscores
+          # WHERE each fixture is played. The scoreboard feed that enumerates
+          # fixtures carries no location at all; only /game/{id} does, and it
+          # answers for an UNPLAYED match. Bounded on purpose: a fixture with no
+          # record is fetched once, and one inside the next 14 days is
+          # refreshed, because that is when a placeholder start time is replaced
+          # by a real one and a tournament's site firms up. Everything further
+          # out is left alone, so this never becomes the whole-season refetch
+          # that game_ids_from_schedule() warns about.
+          python3 scripts/crawl_2025.py fixtures || echo "fixture venues unavailable; continuing"
           # Per-player lines, taken DAILY while the season runs. The 2024
           # backfill proved these are not reliably re-crawlable in bulk -- the
           # API started hanging after ~10k requests and left that season at 43%

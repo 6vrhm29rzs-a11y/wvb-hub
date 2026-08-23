@@ -415,6 +415,216 @@ def check_sticky_headers():
         ok("sticky header offset cancelled for internally-scrolling tables")
 
 
+def check_stats_dispatcher_does_not_recurse():
+    """The Stats tab's dispatcher must delegate, never call itself.
+
+    PAID FOR. renderStats() is the dispatcher: it shows one of two panels and
+    then draws it. Its else-branch called renderStats() instead of
+    renderLeaders(), so it recursed until the stack blew.
+
+    It was invisible for two compounding reasons. The hidden/visible toggle runs
+    BEFORE the recursive call, so the panel appeared correctly populated with
+    whatever had been drawn last; and an exception thrown inside an event
+    listener never reaches the code that dispatched the event, so nothing
+    surfaced it. What actually broke: 'lq' and 'lstat' are wired to this
+    function and LSIDE is 'player' on load, so the Stats SEARCH BOX and the STAT
+    SELECTOR silently did nothing -- measured in the live page, selecting
+    Kills/set left the header reading Pts/set and searching a team still
+    returned all 48 rows.
+
+    Asserted on the BUILT page, because that is what runs.
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping stats-dispatcher check")
+        return
+    src = open(hub, encoding="utf-8").read()
+    m = re.search(r"function\s+renderStats\s*\([^)]*\)\s*\{", src)
+    if not m:
+        bad("renderStats not found on the page",
+            "renamed? this guard needs updating rather than deleting")
+        return
+    # Walk to the matching brace so the check reads the function, not the file.
+    i = m.end() - 1
+    depth = 0
+    for j in range(i, len(src)):
+        if src[j] == "{":
+            depth += 1
+        elif src[j] == "}":
+            depth -= 1
+            if depth == 0:
+                body = src[i + 1:j]
+                break
+    else:
+        bad("could not parse renderStats body", "unbalanced braces")
+        return
+    # ⚠ STRIP COMMENTS FIRST. The first version of this guard fired on the
+    # comment written above the fix, which necessarily quotes the bug it
+    # describes ("`else renderStats()` recursed"). A guard that reads prose
+    # about the code instead of the code is the same mistake the no-scrape hook
+    # made when it blocked the command creating its own test file.
+    code = re.sub(r"/\*.*?\*/", " ", body, flags=re.S)
+    code = re.sub(r"//[^\n]*", " ", code)
+    if re.search(r"\brenderStats\s*\(", code):
+        bad("the Stats dispatcher calls itself",
+            "renderStats() recurses -- the search box and stat selector will "
+            "throw RangeError and silently do nothing")
+    elif "renderLeaders(" not in code or "renderTeamStats(" not in code:
+        bad("the Stats dispatcher does not delegate to both renderers",
+            "expected renderLeaders() and renderTeamStats() in renderStats()")
+    else:
+        ok("Stats dispatcher delegates to both renderers and never to itself")
+
+
+def check_value_scale_polarity():
+    """The good->bad scale must invert for "allowed", and live in ONE place.
+
+    R4 WITH COLOUR INSTEAD OF A COLUMN NAME. On the Stats tab the opponent view
+    shows what a team ALLOWS, where a LOWER number is the better performance.
+    The sort already flips on `asc`; if the colour scale did not flip with it,
+    the best defence in the country would render as the reddest row and the
+    worst as the greenest -- every value correct, every colour lying about it.
+    Guarded by requiring the scale to be told the direction from the SAME flag
+    the sort uses, so the two cannot drift apart.
+
+    Also asserts the scale is defined once: both renderers may emit only `--t`,
+    and no renderer may name a colour. If a `--good`/`--bad` literal shows up in
+    the JS, the page has grown a second opinion about what green means -- the
+    exact failure the crest helper was built to end.
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping value-scale check")
+        return
+    src = open(hub, encoding="utf-8").read()
+
+    if "function hscale(" not in src or "function hcell(" not in src:
+        bad("the value scale helpers are missing",
+            "hscale()/hcell() are the single definition; renderers must not "
+            "compute colour themselves")
+        return
+    ok("the value scale is defined once, as hscale()/hcell()")
+
+    # The opponent view must pass the inverted direction, taken from `asc`.
+    m = re.search(r"function\s+renderTeamStats\s*\(\)\s*\{(.*?)\n\}", src, re.S)
+    body = m.group(1) if m else ""
+    code = re.sub(r"/\*.*?\*/", " ", body, flags=re.S)
+    if not re.search(r"asc\s*\?\s*'low'\s*:\s*'high'", code):
+        bad("the allowed view does not invert the value scale",
+            "renderTeamStats must derive the scale direction from `asc`, or "
+            "the best defence renders as the worst")
+    else:
+        ok("the allowed view inverts the scale from the same flag as the sort")
+
+    # No renderer may hard-code a scale colour.
+    scripts = re.findall(r"<script[^>]*>(.*?)</script>", src, re.S)
+    js = "\n".join(scripts)
+    js = re.sub(r"/\*.*?\*/", " ", js, flags=re.S)
+    leaked = [c for c in ("#0E7C4A", "#B3261E") if c in js]
+    if leaked:
+        bad("a scale colour is hard-coded in the page script",
+            "found %s in JS -- colour belongs only to the CSS rule" % leaked)
+    else:
+        ok("no renderer names a scale colour; only --t crosses the boundary")
+
+
+def check_bracket_seed_structure():
+    """The bracket must be shaped like a bracket, not like a ranked list.
+
+    PAID FOR. We listed seeds 1..32 straight down, so the four #1 lines sat in
+    consecutive rows and would have met in round two -- the exact opposite of
+    what a bracket is for. Read off the official 2025 sheet: 32 teams are seeded
+    nationally and placed four to a line, each quadrant carries ONE team per
+    line, and the lines run 1,8,5,4,3,6,7,2 so round two is 1v8, 5v4, 3v6, 7v2.
+    The lower half of each side mirrors that order so the halves converge on the
+    final.
+
+    Asserted on the source rather than the rendered DOM, because the render is
+    JS: the two constants and their mirroring are what encode the shape.
+    """
+    src = os.path.join(REPO, "scripts", "build_hub.py")
+    code = open(src, encoding="utf-8").read()
+    body = re.sub(r"/\*.*?\*/", " ", code, flags=re.S)
+    m = re.search(r"LINE_ORDER\s*=\s*\[([0-9,\s]+)\]", body)
+    if not m:
+        bad("the bracket has no LINE_ORDER",
+            "seed lines must be ordered 1,8,5,4,3,6,7,2, not 1..8")
+        return
+    order = [int(x) for x in m.group(1).replace(" ", "").split(",") if x]
+    if order != [1, 8, 5, 4, 3, 6, 7, 2]:
+        bad("bracket seed-line order is not the official one",
+            "got %s, expected [1, 8, 5, 4, 3, 6, 7, 2]" % order)
+    else:
+        ok("bracket seed lines run 1,8,5,4,3,6,7,2 as on the official sheet")
+
+    if not re.search(r"reverse\(\)", body):
+        bad("the lower half of the bracket does not mirror",
+            "without mirroring, both halves run 1->2 and the final does not "
+            "converge")
+    else:
+        ok("the lower half of each side mirrors, so the halves converge")
+
+    if not re.search(r"QUAD_OF_POS", body):
+        bad("seeded teams are not spread across quadrants",
+            "all four #1 seeds would sit together and meet in round two")
+    else:
+        ok("each seed line is spread one-per-quadrant")
+
+
+def check_schedule_states_where():
+    """A fixture must say WHERE it is played, and never infer it.
+
+    R5, in the place it already cost us once: two AVCA First Serve matches were
+    rendered as home games for the nominal host because the page inferred
+    "at <home team>" when the feed carried no venue. Kentucky-Wisconsin and
+    Louisville-Texas A&M were both on a NEUTRAL floor in Milwaukee.
+
+    Three things are asserted on the built page:
+      * a fixture with no published venue SAYS SO ("venue not listed") rather
+        than borrowing the home team's gym;
+      * a neutral floor reads "vs", not "at" -- "Texas at Arizona St." is a
+        false sentence about a match in Milwaukee;
+      * an unnamed neutral event is labelled "neutral site" and NOT given the
+        building's name as if it were the tournament's name. venues.py attaches
+        a name only where a human supplied one.
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping schedule-venue check")
+        return
+    src = open(hub, encoding="utf-8").read()
+    m = re.search(r'<tbody id="sbody">(.*?)</tbody>', src, re.S)
+    if not m:
+        bad("no schedule rows on the page", "#sbody is empty or renamed")
+        return
+    body = m.group(1)
+    rows = re.findall(r"<tr.*?</tr>", body, re.S)
+    if not rows:
+        bad("no schedule rows rendered", "the schedule table is empty")
+        return
+
+    unlisted = sum(1 for r in rows if "venue not listed" in r)
+    withv = sum(1 for r in rows if 'class="wh l"><' in r or "<b>" in r)
+    if unlisted == 0 and withv == 0:
+        bad("the schedule says nothing about where matches are played",
+            "every row must carry a venue or say it is not listed")
+    else:
+        ok("every schedule row states a venue or says it is not listed (%d unlisted)"
+           % unlisted)
+
+    # a neutral row must not say "at"
+    bad_at = 0
+    for r in rows:
+        if "neutral site" in r or "kind ev" in r:
+            if re.search(r'<td class="at">at</td>', r):
+                bad_at += 1
+    if bad_at:
+        bad("a neutral-floor fixture reads 'at'",
+            "%d rows call a neutral site a road game" % bad_at)
+    else:
+        ok("neutral-floor fixtures read 'vs', not 'at'")
+
+
 def check_transfer_reconciliation():
     """A transfer must describe the SAME player on both sides.
 
@@ -960,6 +1170,10 @@ def main():
     check_roster()
     print()
     check_sticky_headers()
+    check_stats_dispatcher_does_not_recurse()
+    check_value_scale_polarity()
+    check_bracket_seed_structure()
+    check_schedule_states_where()
     print()
     check_transfer_reconciliation()
     print()

@@ -246,6 +246,84 @@ def already_have():
     return final_game_ids(GAMES_JSONL)
 
 
+def crawl_fixtures(refresh_days=14):
+    # type: (int) -> None
+    """Fetch /game/{id} for UNPLAYED fixtures, to learn WHERE they are played.
+
+    WHY THIS IS NOT crawl_games(). That one deliberately skips the future,
+    because a scheduled match has no result and the "refetch anything non-final"
+    rule would re-request the whole season every night for nothing. That
+    reasoning is about RESULTS -- and it is still right. But a fixture's VENUE is
+    published well in advance: /game/{id} on an unplayed match returns
+    gameState "P" and a full location block (measured: Michigan St. at Morehead
+    St., 2026-09-12, "Johnson Arena, Morehead, KY"). The scoreboard feed that
+    enumerates fixtures carries NO location at all, so this is the only route to
+    "where is this match" for a schedule that is mostly unplayed.
+
+    Bounded two ways so it cannot become the nightly 10,000-request crawl the
+    comment above warns about:
+      * a fixture we have NO record for is fetched once;
+      * a fixture inside the next `refresh_days` is re-fetched, because that is
+        exactly when a placeholder start time is replaced by a real one and a
+        tournament's site firms up.
+    Everything further out is left alone until it comes into that window.
+    """
+    ids = game_ids_from_schedule(include_future=True)
+    past = set(game_ids_from_schedule(include_future=False))
+    have = set()
+    dates = {}                                          # type: Dict[str, str]
+    if os.path.exists(GAMES_JSONL):
+        # every id PRESENT, final or not -- unlike already_have(), because a
+        # fixture we have merely recorded already told us its venue.
+        have = set(str(k) for k in load_records_jsonl(GAMES_JSONL))
+    # date per fixture, from the scoreboard filenames we already hold
+    today = datetime.date.today()
+    horizon = today + datetime.timedelta(days=refresh_days)
+    soon = set()
+    for name in sorted(os.listdir(SCOREBOARD_DIR)):
+        if not name.endswith(".json"):
+            continue
+        try:
+            day = datetime.date(*[int(x) for x in name[:-5].split("-")])
+        except Exception:
+            continue
+        if not (today <= day <= horizon):
+            continue
+        with open(os.path.join(SCOREBOARD_DIR, name)) as fh:
+            data = json.load(fh)
+        for wrapper in data.get("games", []):
+            game = wrapper.get("game", wrapper)
+            gid = game.get("gameID") or game.get("id")
+            if gid:
+                soon.add(str(gid))
+
+    todo = [g for g in ids if g not in past and (g not in have or g in soon)]
+    print("fixtures: %d scheduled, %d already recorded, %d within %d days, "
+          "%d to fetch" % (len(ids), len(have), len(soon), refresh_days, len(todo)))
+    if not todo:
+        return
+
+    failures = []                                       # type: List[str]
+    start = time.time()
+    with open(GAMES_JSONL, "a") as out:
+        for i, gid in enumerate(todo, 1):
+            try:
+                payload = fetch("/game/%s" % gid)
+                rec = normalize_game(gid, payload)
+                if rec:
+                    out.write(json.dumps(rec) + "\n")
+                    out.flush()
+            except Exception as exc:                    # noqa: BLE001
+                failures.append("%s: %s" % (gid, exc))
+            if i % 25 == 0 or i == len(todo):
+                rate = i / max(time.time() - start, 1e-6)
+                print("  %d/%d  %.1f req/s  ~%d min left  (%d failed)"
+                      % (i, len(todo), rate,
+                         int((len(todo) - i) / max(rate, 1e-6) / 60), len(failures)))
+    if failures:
+        print("  %d failures; first: %s" % (len(failures), failures[0]))
+
+
 def normalize_game(gid, payload):
     # type: (str, Dict[str, Any]) -> Optional[Dict[str, Any]]
     """Flatten /game/{id} into one raw, source-tiered record. Raw values only."""
@@ -670,6 +748,8 @@ def main():
             crawl_players()
         elif phase == "boxscores":
             crawl_boxscores()
+        elif phase == "fixtures":
+            crawl_fixtures()
         elif phase == "verify-pin":
             rc = verify_season_pin()
             if rc:
