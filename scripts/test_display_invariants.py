@@ -520,7 +520,17 @@ def check_value_scale_polarity():
     scripts = re.findall(r"<script[^>]*>(.*?)</script>", src, re.S)
     js = "\n".join(scripts)
     js = re.sub(r"/\*.*?\*/", " ", js, flags=re.S)
-    leaked = [c for c in ("#0E7C4A", "#B3261E") if c in js]
+    # ⚠ THESE HEXES USED TO BE HARD-CODED HERE, AND THE PALETTE MOVED.
+    # When the page went dark, --good/--bad changed value and this check went on
+    # passing while testing nothing: it was looking for two colours that no
+    # longer existed anywhere. Read the CURRENT values out of :root instead, so
+    # the guard follows the design instead of a snapshot of it.
+    tok = dict(re.findall(r"--(good|bad):\s*(#[0-9A-Fa-f]{6})", src))
+    if len(tok) != 2:
+        bad("could not read --good/--bad from the page",
+            "the value scale must define both in :root")
+        return
+    leaked = [c for c in tok.values() if c in js]
     if leaked:
         bad("a scale colour is hard-coded in the page script",
             "found %s in JS -- colour belongs only to the CSS rule" % leaked)

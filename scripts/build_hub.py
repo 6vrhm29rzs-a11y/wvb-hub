@@ -1902,61 +1902,80 @@ TEMPLATE = r"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 :root{
   /* PALETTE FROM THE SPORT'S OWN MATERIALS, not a UI kit.
      The neutrals here used to be Tailwind's default grey ramp (#111827 /
-     #4B5563 / #9CA3AF / #E2E6EC), which is why the page read as generic: those
+     #4B5563 / #66748F / #1E2A42), which is why the page read as generic: those
      five values sit under a very large share of dashboards on the internet.
      Replaced with warm, sand-tinted neutrals taken from an indoor court's
      playing surface, and an accent pair taken from the Molten ball the NCAA
      actually plays with -- deep blue and a hard yellow. Warm ground under cool
      blue is the whole identity; keep it. */
-  --page:#F6F1E7; --card:#FFFFFF; --alt:#FBF7EF;
-  --ink:#141210; --ink2:#5A5347; --ink3:#9A8F7D;
-  --line:#E7DECD; --line2:#D2C5AC;
-  --navy:#0B4F87; --blue:#1D6FD0; --amber:#FFC72C; --amber-bg:#FFF4D6;
-  --sand:#EFE3CC;
-  --live:#C8322B; --win:#0F7A3D;
-  /* THE GOOD -> BAD PAIR, as a scale rather than two labels. Green and red were
-     already here (--win/--live) but only ever as flat text colour on one
-     column. These are the ramp ends. Both are darkened versions of the ball's
-     own palette rather than UI-kit green/red, so they sit on the sand ground
-     instead of vibrating against it. */
-  --good:#0E7C4A; --bad:#B3261E; --mid:#CFC3AA;
+  --page:#070B14; --card:#0E1524; --alt:#131C2E;
+  --ink:#EDF2FB; --ink2:#9CABC6; --ink3:#66748F;
+  --line:#1E2A42; --line2:#33456A;
+  --navy:#5BA8F5; --blue:#7FC1FF; --amber:#FFC72C; --amber-bg:#3A2D06;
+  --sand:#1A2436;
+  /* ⚠ --navy CHANGED MEANING when the page went dark: it used to be a dark
+     blue used BOTH as chrome and as ink. On a dark ground the ink has to be
+     light, so --navy is now the bright blue INK and the chrome that used to be
+     navy gets its own name. Renaming rather than silently repointing is the
+     whole of R4 -- the alternative is a masthead painted in a text colour. */
+  --chrome:#0A1428; --chrome2:#132743;
+  --ink-on-accent:#06101F;
+  --live:#FF5F57; --win:#2FD07A;
+  /* The good -> bad pair. Both are LIFTED for a dark ground: #0E7C4A and
+     #FF5F6E were chosen to sit on sand and go muddy on near-black, where a
+     colour needs more light than the ink around it, not less. */
+  --good:#31D07E; --bad:#FF5F6E; --mid:#8494B2;
   --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
   --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
-  /* Display: condensed and loud, for anything that behaves like a headline or a
-     scoreboard. Body copy stays in the system sans -- condensed type is fast to
-     read in three words and slow to read in three sentences. */
   --disp:"Oswald","Avenir Next Condensed","HelveticaNeue-CondensedBold",
          "Arial Narrow",var(--sans);
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--page);color:var(--ink);
-  font:15px/1.55 var(--sans);font-feature-settings:"tnum" 1}
+/* THE GROUND IS LIT, NOT FLAT. Three fixed radial washes -- one cool, one warm,
+   one deep -- sit under everything and do not scroll, so the page reads as a
+   room with lights in it rather than a sheet of paper. They are 6-14% alpha:
+   the point is that you cannot see where they start. */
+body{margin:0;color:var(--ink);font:15px/1.55 var(--sans);
+  font-feature-settings:"tnum" 1;
+  background:
+    radial-gradient(1200px 700px at 8% -8%, rgba(91,168,245,.14), transparent 62%),
+    radial-gradient(1000px 620px at 96% 4%, rgba(255,199,44,.09), transparent 58%),
+    radial-gradient(900px 900px at 50% 118%, rgba(49,208,126,.07), transparent 60%),
+    var(--page);
+  background-attachment:fixed}
 
-header{background:var(--navy);color:#fff;padding:20px 24px 0}
+header{color:var(--ink);padding:20px 24px 0;position:relative;
+  background:
+    radial-gradient(120% 180% at 12% -40%, rgba(91,168,245,.30), transparent 60%),
+    radial-gradient(90% 160% at 92% -30%, rgba(255,199,44,.20), transparent 62%),
+    linear-gradient(180deg,var(--chrome2) 0%,var(--chrome) 78%,#08101F 100%)}
 .mast{max-width:1280px;margin:0 auto;display:flex;align-items:flex-end;
   justify-content:space-between;gap:20px;flex-wrap:wrap}
 h1{margin:0;font:600 40px/.92 var(--disp);letter-spacing:.005em;
-  color:#fff;text-transform:uppercase}
+  color:var(--ink);text-transform:uppercase}
 h1 em{font-style:normal;color:var(--amber)}
 .season{font:700 10px/1 var(--mono);color:#8FB6DC;letter-spacing:.34em;
   text-transform:uppercase;margin-bottom:9px}
-.meta{font:12px/1.65 var(--mono);color:#B9CBE4;text-align:right}
-.meta b{color:#fff}
+.meta{font:12px/1.65 var(--mono);color:#9CABC6;text-align:right}
+.meta b{color:var(--ink)}
 /* The net: white mesh under a taut yellow tape. It is the one thing in the
    sport every viewer can draw from memory, so it carries the masthead. */
 .net{max-width:1280px;margin:17px auto 0;height:11px;
   background:repeating-linear-gradient(90deg,rgba(255,255,255,.30) 0 1px,transparent 1px 6px),
              repeating-linear-gradient(0deg,rgba(255,255,255,.30) 0 1px,transparent 1px 6px);
   border-top:3px solid var(--amber)}
-nav{background:var(--navy);position:sticky;top:0;z-index:6}
+nav{position:sticky;top:0;z-index:6;
+  background:linear-gradient(180deg,rgba(10,20,40,.96),rgba(8,14,28,.96));
+  backdrop-filter:saturate(1.5) blur(8px);
+  border-bottom:1px solid var(--line)}
 nav .inner{max-width:1280px;margin:0 auto;display:flex;gap:2px;flex-wrap:wrap;padding:0 8px}
-nav button{appearance:none;border:0;background:transparent;color:#B9CBE4;
+nav button{appearance:none;border:0;background:transparent;color:#9CABC6;
   font:500 14.5px/1 var(--disp);letter-spacing:.055em;padding:14px 16px;cursor:pointer;
   border-bottom:3px solid transparent;text-transform:uppercase;
   transition:color .16s ease}
-nav button:hover{color:#fff}
-nav button[aria-selected=true]{color:#fff}
+nav button:hover{color:var(--ink)}
+nav button[aria-selected=true]{color:var(--ink)}
 nav .inner{position:relative}
 nav .inner::after{content:"";position:absolute;bottom:0;left:0;height:3px;
   width:var(--barw,0px);transform:translateX(var(--barx,0px));background:var(--amber);
@@ -1970,14 +1989,15 @@ section[hidden]{display:none}
 .lead{color:var(--ink2);font-size:14px;max-width:74ch;margin:0 0 16px}
 .lead b{color:var(--ink)}
 
-/* Surfaces fade rather than sit flat. Every box on this page was #FFF on
-   #F6F1E7 with a hairline, which is what made a dense stats page read as
+/* Surfaces fade rather than sit flat. Every box on this page was #0E1524 on
+   #070B14 with a hairline, which is what made a dense stats page read as
    sterile: nothing had a top or a bottom. The gradient is 4% of a tone -- felt,
    not seen -- and the shadow is warm, tinted toward the sand ground rather
    than the neutral grey every UI kit ships. */
-.panel{background:linear-gradient(176deg,#FFFFFF 0%,#FFFDF8 46%,#FBF5E9 100%);
-  border:1px solid var(--line);border-radius:10px;
-  overflow:hidden;box-shadow:0 1px 2px rgba(90,70,35,.06),0 8px 22px -14px rgba(90,70,35,.22)}
+.panel{background:linear-gradient(176deg,rgba(23,33,54,.92) 0%,rgba(14,21,36,.92) 55%,rgba(10,16,28,.94) 100%);
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;
+  box-shadow:0 1px 0 rgba(255,255,255,.05) inset,
+             0 18px 44px -26px rgba(0,0,0,.9)}
 /* ---- THE VALUE SCALE. ONE DEFINITION, BOTH RENDERERS. -----------------
    Python and JS each emit nothing but `style="--t:.73"`. Every colour and
    every dimension is decided here, so the server-rendered views and the
@@ -2028,14 +2048,19 @@ td.hx.dv::before,td.hx.fill::before{width:auto;left:3px;right:3px;border-left:0;
   background:linear-gradient(90deg,
     color-mix(in oklab,var(--hc) 10%,transparent),
     color-mix(in oklab,var(--hc) 34%,transparent))}
+/* THE NUMERAL MUST STAY READABLE AT EVERY POINT ON THE RAMP. Mixing it 96%
+   toward the ramp colour worked on a light ground, where the ramp's weak end
+   was dark. On a dark ground that same end IS the background, and the value
+   measured 1.07 contrast. Mixing toward the page ink keeps the hue as the
+   signal and hands luminance back to the reader. */
 td.hx b{position:relative;font-weight:700;
-  color:color-mix(in oklab,var(--hc) 96%,var(--ink))}
+  color:color-mix(in oklab,var(--hc) 62%,var(--ink))}
 @keyframes hxin{from{transform:scaleX(.04);opacity:0}to{transform:scaleX(1);opacity:1}}
 @media (prefers-reduced-motion:reduce){td.hx::before{animation:none}}
 table{width:100%;border-collapse:collapse}
 th{font:500 12px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase;
   color:var(--ink2);text-align:right;padding:12px 10px;
-  background:linear-gradient(180deg,#FDFAF3 0%,var(--alt) 62%,#F2E9D8 100%);
+  background:linear-gradient(180deg,rgba(30,42,66,.95),rgba(17,25,41,.95));
   border-bottom:2px solid var(--line2);position:sticky;top:var(--navh,0px);
   z-index:2;white-space:nowrap}
 /* A header inside its OWN scroll box sticks to that box, not to the page, so
@@ -2058,7 +2083,7 @@ td.sp .spread{font-family:var(--mono);font-size:11.5px;color:var(--ink2);
   border:1px solid var(--line2);border-radius:4px;padding:2px 6px;background:var(--alt)}
 td.aq{color:var(--blue);font-weight:700;font-size:12.5px}
 td.al{color:var(--ink2);font-size:12.5px}
-tr.row:hover td{background:#EEF4FD;cursor:pointer}
+tr.row:hover td{background:#12233C;cursor:pointer}
 i.rnk{font:800 11px/1 var(--mono);color:var(--amber);font-style:normal;vertical-align:1px}
 b.pl6{font:800 10px/1 var(--mono);color:var(--live);vertical-align:2px;margin-left:5px}
 .scroll{max-height:72vh;overflow:auto}
@@ -2073,14 +2098,15 @@ b.pl6{font:800 10px/1 var(--mono);color:var(--live);vertical-align:2px;margin-le
 .card.open{grid-column:1/-1}
 /* A result reads like a line on a scoresheet, not a rounded app card: squared
    corners, a court-blue rule down the left, and the winner carrying the weight. */
-.card{background:linear-gradient(168deg,#FFFFFF 0%,#FFFDF7 55%,#FAF3E6 100%);
-  border:1px solid var(--line);border-radius:2px;
+.card{background:linear-gradient(168deg,rgba(25,36,58,.95) 0%,rgba(15,22,38,.95) 60%,rgba(11,17,30,.96) 100%);
+  border:1px solid var(--line);border-radius:3px;
   border-left:3px solid var(--line2);
   padding:14px 16px 13px;
-  box-shadow:0 1px 0 rgba(20,18,16,.04),0 10px 24px -18px rgba(90,70,35,.35);
-  transition:box-shadow .18s ease,transform .18s ease}
-.card:hover{box-shadow:0 1px 0 rgba(20,18,16,.05),0 14px 30px -16px rgba(90,70,35,.42);
-  transform:translateY(-1px)}
+  box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 14px 30px -22px rgba(0,0,0,.95);
+  transition:box-shadow .18s ease,transform .18s ease,border-color .18s ease}
+.card:hover{border-color:var(--line2);transform:translateY(-2px);
+  box-shadow:0 1px 0 rgba(255,255,255,.07) inset,0 22px 44px -22px rgba(0,0,0,1),
+             0 0 0 1px rgba(91,168,245,.10)}
 @media (prefers-reduced-motion:reduce){.card{transition:none}.card:hover{transform:none}}
 .card.done{border-left-color:var(--navy)}
 .cd{font:700 11.5px/1 var(--mono);color:var(--ink2);letter-spacing:.06em;
@@ -2109,25 +2135,31 @@ b.pl6{font:800 10px/1 var(--mono);color:var(--live);vertical-align:2px;margin-le
   color:var(--ink3);background:var(--alt)}
 /* the set winner is LIT -- the ball's yellow, the one place it appears at full
    strength, so the eye reads a 25-23 differently from a 25-12 at a glance */
-.set span.w{color:#3A2A00;background:var(--amber);font-weight:800}
+.set span.w{color:#1A1200;background:var(--amber);font-weight:800}
 .venue{font:12px/1.5 var(--mono);color:var(--ink2)}
 .card[data-gid]{cursor:pointer}
 .card[data-gid]:hover{border-color:var(--line2);box-shadow:0 2px 6px rgba(16,24,40,.09)}
 .empty{padding:30px;text-align:center;color:var(--ink2);font-size:14px}
-.tag{font:700 10px/1 var(--mono);color:#7A5A12;background:var(--amber-bg);
-  border:1px solid #E7CE96;border-radius:4px;padding:3px 5px;letter-spacing:.05em}
-.tag.neutral{color:var(--navy);background:#E8F0FB;border-color:#BFD5F0;margin-left:6px}
+/* A PILL MUST NOT BREAK ACROSS LINES. "neutral site" wrapped to "neutral" /
+   "site" with its border split across both rows -- which reads as text being
+   cut off. The LINE may wrap; the chip may not. Same for the kind badges. */
+.tag{white-space:nowrap;font:700 10px/1 var(--mono);color:#FFD97A;background:var(--amber-bg);
+  border:1px solid #6B551C;border-radius:4px;padding:3px 5px;letter-spacing:.05em}
+.tag.neutral{color:var(--navy);background:#12233C;border-color:#2A4570;margin-left:6px}
 td.pick{color:var(--navy)}
 td.pick.toss{color:var(--ink2)}
 td.pick b{color:var(--navy)}
-.tag.event{color:#5B3A00;background:#FBEFD6;border-color:#E3C68C;margin-left:6px}
+/* On the light ground this was dark amber ink on a pale amber chip. Both
+   ends went dark in the flip and it landed at a contrast ratio of 1.3 --
+   invisible. The chip keeps its amber identity; the ink is lifted. */
+.tag.event{color:#FFD97A;background:#3A2D06;border-color:#6B551C;margin-left:6px}
 
 /* ---- live ---- */
 #live{margin-bottom:26px}
 .livehead{display:flex;align-items:center;gap:9px;margin-bottom:12px}
 .livehead b{font:800 12.5px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;
   color:var(--live)}
-.livehead b.justin{color:#12864B}
+.livehead b.justin{color:#31D07E}
 .livehead b.soon{color:var(--navy)}
 #today{margin-bottom:26px}
 .card.soon:before{content:none}
@@ -2140,10 +2172,10 @@ td.pick b{color:var(--navy)}
 @keyframes pulse{70%{box-shadow:0 0 0 8px rgba(200,50,43,0)}
   100%{box-shadow:0 0 0 0 rgba(200,50,43,0)}}
 @media(prefers-reduced-motion:reduce){.dot{animation:none}}
-.card.islive{border-color:#EFC3C0;box-shadow:0 1px 3px rgba(200,50,43,.13)}
+.card.islive{border-color:#5E2229;box-shadow:0 1px 3px rgba(200,50,43,.13)}
 .card.islive .cd{color:var(--live)}
 .set.now{border-color:var(--live)}
-.set.now span{background:#FCEDEC;color:var(--live)}
+.set.now span{background:#2B1114;color:var(--live)}
 
 /* ---- bracket, drawn like the official one ---- */
 .bwrap{overflow-x:auto;padding-bottom:6px;--bgame-h:62px;--bgame-gap:8px;
@@ -2230,9 +2262,9 @@ td.pick b{color:var(--navy)}
   font:700 9px/1 var(--mono);letter-spacing:.06em;vertical-align:2px;
   background:var(--alt);color:var(--ink2);border:1px solid var(--line)}
 /* A national award is a different order of thing from a team selection. */
-.aaNat{background:var(--navy);color:#fff;border-color:var(--navy)}
-.aaFirst{background:var(--amber);color:#141210;border-color:#E0A800}
-.aaSecon{background:#E8F0FB;color:var(--navy);border-color:#BFD5F0}
+.aaNat{background:var(--navy);color:var(--ink-on-accent);border-color:var(--navy)}
+.aaFirst{background:var(--amber);color:var(--ink-on-accent);border-color:#FFC72C}
+.aaSecon{background:#12233C;color:var(--navy);border-color:#2A4570}
 .aaThird{background:var(--alt);color:var(--ink2)}
 .pcell .pmug{border-radius:50%;object-fit:cover;flex:none;background:var(--alt)}
 .pcell svg{flex:none}
@@ -2260,8 +2292,8 @@ td.tm{font-size:15px}
 /* A fixture with a ranked side gets a quiet edge; two ranked sides get a loud
    one. The schedule is long and the eye needs somewhere to land. */
 .stgrid td.form{white-space:nowrap}
-.stgrid td.pos{color:#12864B}
-.stgrid td.neg{color:#B3261E}
+.stgrid td.pos{color:#31D07E}
+.stgrid td.neg{color:#FF5F6E}
 /* WHERE a match is played, and what kind of match it is. Both were absent:
    the schedule said who and when, and a reader had to assume the rest. */
 /* the second line of a team-page fixture: where, and what kind */
@@ -2275,7 +2307,7 @@ td.wh{font-size:12.5px;line-height:1.35;color:var(--ink2);max-width:280px}
 td.wh b{display:block;font-weight:650;color:var(--ink);font-size:12.5px}
 td.wh .wc{display:block;color:var(--ink3);font:11.5px/1.3 var(--mono)}
 td.wh .wu{color:var(--ink3);font-style:italic}
-.kind{display:inline-block;margin-right:7px;padding:2px 6px;border-radius:3px;
+.kind{display:inline-block;white-space:nowrap;margin-right:7px;padding:2px 6px;border-radius:3px;
   font:700 9.5px/1.5 var(--mono);letter-spacing:.06em;text-transform:uppercase;
   vertical-align:2px}
 .kind.cf{background:color-mix(in oklab,var(--navy) 12%,transparent);color:var(--navy)}
@@ -2283,19 +2315,19 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 /* A named event is the one that changes what the fixture MEANS -- an August
    tournament on a neutral floor is not a road trip -- so it gets the ball's
    yellow and the other two stay quiet. */
-.kind.ev{background:var(--amber-bg);color:#7A5B00;border:1px solid var(--amber)}
-.kind.nu{background:color-mix(in oklab,var(--amber) 14%,transparent);color:#7A5B00}
+.kind.ev{background:var(--amber-bg);color:#FFD97A;border:1px solid var(--amber)}
+.kind.nu{background:color-mix(in oklab,var(--amber) 14%,transparent);color:#FFD97A}
 #sbody tr.rkd td:first-child{box-shadow:inset 3px 0 0 var(--line2)}
 #sbody tr.both td:first-child{box-shadow:inset 3px 0 0 var(--amber)}
 #sbody tr.both .tm{font-weight:700}
 .t25 td.form{white-space:nowrap;padding-left:14px}
 .fw,.fl{display:inline-block;width:19px;height:19px;line-height:19px;text-align:center;
   border-radius:2px;font:700 10.5px/19px var(--mono);margin-right:3px}
-.fw{background:#E4F2E9;color:#12864B;border:1px solid #BFE0CC}
-.fl{background:#FBE9E7;color:#B3261E;border:1px solid #F0CCC6}
+.fw{background:#0C2A1C;color:#31D07E;border:1px solid #1F5B3C}
+.fl{background:#2B1114;color:#FF5F6E;border:1px solid #5E2229}
 /* A result against a ranked side is marked -- it is stronger evidence. */
-.fw.frk{background:#12864B;color:#fff;border-color:#12864B}
-.fl.frk{background:#B3261E;color:#fff;border-color:#B3261E}
+.fw.frk{background:#31D07E;color:var(--ink-on-accent);border-color:#31D07E}
+.fl.frk{background:#FF5F6E;color:var(--ink-on-accent);border-color:#FF5F6E}
 .noform{font:400 11.5px/1 var(--sans);color:var(--ink3)}
 /* Digby's Top 25. A poll, so it reads as a list first and a table second. */
 .t25{width:100%;border-collapse:collapse}
@@ -2317,8 +2349,8 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 .t25 .rec{font:600 13px/1 var(--mono)}
 .t25 .n{text-align:right;font:600 13px/1 var(--mono)}
 .t25 .wt{color:var(--ink3)}
-.mv-up{color:#12864B;font:700 11px/1 var(--mono)}
-.mv-dn{color:#B3261E;font:700 11px/1 var(--mono)}
+.mv-up{color:#31D07E;font:700 11px/1 var(--mono)}
+.mv-dn{color:#FF5F6E;font:700 11px/1 var(--mono)}
 .mv-flat{color:var(--ink3);font:700 11px/1 var(--mono)}
 .t25h{font:700 10.5px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;
   color:var(--ink3);margin:18px 0 8px}
@@ -2341,8 +2373,8 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 @media (max-width:560px){.rotgrid{grid-template-columns:repeat(3,1fr)}}
 {{ASK_CSS}}/* A season mismatch is the loudest thing on the view, because a 2025 table
    under a 2026 heading is the error that looks completely correct. */
-.seasonwarn{background:var(--amber-bg);border:1px solid #E7CE96;border-left:4px solid var(--amber);
-  border-radius:2px;padding:11px 13px;margin:0 0 12px;font-size:13px;color:#3A2A00;max-width:760px}
+.seasonwarn{background:var(--amber-bg);border:1px solid #6B551C;border-left:4px solid var(--amber);
+  border-radius:2px;padding:11px 13px;margin:0 0 12px;font-size:13px;color:#1A1200;max-width:760px}
 .seg{display:inline-flex;border:1px solid var(--line2);border-radius:3px;
   overflow:hidden;margin:0 0 14px;background:var(--card)}
 .segb{appearance:none;border:0;background:transparent;font:700 11.5px/1 var(--sans);
@@ -2350,13 +2382,13 @@ td.wh .wu{color:var(--ink3);font-style:italic}
   cursor:pointer;border-right:1px solid var(--line)}
 .segb:last-child{border-right:0}
 .segb:hover{color:var(--ink)}
-.segb.on{background:var(--navy);color:#fff}
+.segb.on{background:var(--navy);color:var(--ink-on-accent)}
 .segb:focus-visible{outline:2px solid var(--amber);outline-offset:-2px}
 .mv{display:inline-block;margin-left:5px;font:700 9.5px/1 var(--mono);vertical-align:1px}
-.mv.up{color:#12864B}
-.mv.dn{color:#B3261E}
+.mv.up{color:#31D07E}
+.mv.dn{color:#FF5F6E}
 .mv.sm{color:var(--ink3)}
-.sysbadge{font:700 10px/1 var(--mono);color:#fff;background:var(--navy);
+.sysbadge{font:700 10px/1 var(--mono);color:var(--ink-on-accent);background:var(--navy);
   border-radius:20px;padding:4px 8px;margin-left:8px;vertical-align:2px;
   letter-spacing:.04em}
 .tsec{scroll-margin-top:calc(var(--navh,0px) + 10px)}
@@ -2385,7 +2417,7 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 .rrow:hover{background:var(--alt)}
 /* A starter is marked by a bar rather than a fill: the fill was too faint to
    read, and the legend under the table names this bar explicitly. */
-.rrow--starter{border-left-color:#12864B}
+.rrow--starter{border-left-color:#31D07E}
 .rrow--starter .rname{font-weight:700}
 .ravatar{grid-area:av;display:flex;align-items:center;min-width:0}
 .rrow .pnm{font-size:15px}
@@ -2429,7 +2461,7 @@ tr.det td{background:var(--alt);padding:13px 15px}
 .brkside+.brkside{border-top:1px solid var(--line)}
 .brkside .sd{font:700 10px/1 var(--mono);color:var(--ink3);width:18px}
 .brkside .nmm{flex:1;font-weight:600}
-.brkside.fav{background:#F5F9FF}
+.brkside.fav{background:#12233C}
 .brkside .pc{font:700 11.5px/1 var(--mono);color:var(--navy)}
 .tlogo{width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-right:7px}
 .tlogo.lg{width:44px;height:44px;vertical-align:-10px;margin-right:12px}
@@ -2477,15 +2509,15 @@ table.box td.pn{text-align:left;font-weight:600}
 .chip{font:700 11.5px/1 var(--mono);border:1px solid var(--line2);border-radius:99px;
   padding:6px 11px;color:var(--ink2);background:var(--alt)}
 .chip b{color:var(--navy)}
-.chip.ours{background:#EEF4FD;border-color:#BFD5F0;color:var(--navy)}
+.chip.ours{background:#12233C;border-color:#2A4570;color:var(--navy)}
 .tcols{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;align-items:start}
 @media(max-width:900px){.tcols{grid-template-columns:1fr}}
-.tsec{background:linear-gradient(176deg,#FFFFFF,#FBF5E9);
+.tsec{background:linear-gradient(176deg,rgba(23,33,54,.9),rgba(11,17,30,.92));
   border:1px solid var(--line);border-radius:10px;
   overflow:hidden;box-shadow:0 1px 2px rgba(90,70,35,.06),0 8px 22px -14px rgba(90,70,35,.20)}
 .tsec h3{margin:0;padding:12px 15px;font:700 11.5px/1 var(--sans);letter-spacing:.08em;
   text-transform:uppercase;color:var(--ink2);
-  background:linear-gradient(180deg,#FDFAF3,#F2E9D8);
+  background:linear-gradient(180deg,rgba(30,42,66,.9),rgba(16,24,40,.9));
   border-bottom:1px solid var(--line);position:relative}
 /* A conference table earns a hairline of the ball's yellow at its head -- the
    one piece of chrome that says "this is a section" without a heavier device. */
@@ -3041,7 +3073,7 @@ const PLAYERS = {{PLAYERS_JSON}};
  contrasting jersey, which is the one thing the picture actually tells you.
  Shapes are generated from scripts/avatars.py so the preview sheet and this
  page cannot drift. */
-const AV = {"poses":{"S":{"body":"<circle cx=\"20\" cy=\"13\" r=\"3.9\"/><path d=\"M20 17.6c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M16.6 19.6 14.6 12.8M23.4 19.6l2-6.8\"/>","hands":[[14.2,11.8],[25.8,11.8]],"ball":[20,7.6,3.2]},"MB":{"body":"<circle cx=\"20\" cy=\"15\" r=\"3.9\"/><path d=\"M20 19.6c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M14.4 22.4 13.6 9.6M25.6 22.4l.8-12.8\"/>","hands":[[13.4,8.4],[26.6,8.4]],"ball":null},"OH":{"body":"<circle cx=\"21.5\" cy=\"14\" r=\"3.9\"/><path d=\"M21.5 18.6c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M25 20.4 30 13.4\"/><path d=\"M18 21.4 10.8 25.4\"/>","hands":[[30.6,12.4],[9.8,26]],"ball":[32.4,7.4,2.9]},"L/DS":{"body":"<circle cx=\"23\" cy=\"15.5\" r=\"3.9\"/><path d=\"M23 20c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M19.8 22.8 10.4 28.4M25.6 23.4 10.4 28.4\"/>","hands":[[9.4,29]],"ball":null},"OPP":{"body":"<circle cx=\"21.5\" cy=\"14\" r=\"3.9\"/><path d=\"M21.5 18.6c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M25 20.4 30 13.4\"/><path d=\"M18 21.4 10.8 25.4\"/>","hands":[[30.6,12.4],[9.8,26]],"ball":[32.4,7.4,2.9]},"RS":{"body":"<circle cx=\"21.5\" cy=\"14\" r=\"3.9\"/><path d=\"M21.5 18.6c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M25 20.4 30 13.4\"/><path d=\"M18 21.4 10.8 25.4\"/>","hands":[[30.6,12.4],[9.8,26]],"ball":[32.4,7.4,2.9]},"DS":{"body":"<circle cx=\"23\" cy=\"15.5\" r=\"3.9\"/><path d=\"M23 20c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M19.8 22.8 10.4 28.4M25.6 23.4 10.4 28.4\"/>","hands":[[9.4,29]],"ball":null},"L":{"body":"<circle cx=\"23\" cy=\"15.5\" r=\"3.9\"/><path d=\"M23 20c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M19.8 22.8 10.4 28.4M25.6 23.4 10.4 28.4\"/>","hands":[[9.4,29]],"ball":null}},"unknown":{"body":"<circle cx=\"20\" cy=\"14\" r=\"3.9\"/><path d=\"M20 18.6c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M16.4 21.6 13.4 27.4M23.6 21.6l3 5.8\"/>","hands":[],"ball":null},"libero":["L/DS","L","DS"],"neutral":"#9A8F7D","onNeutral":"#FFFFFF"};
+const AV = {"poses":{"S":{"body":"<circle cx=\"20\" cy=\"13\" r=\"3.9\"/><path d=\"M20 17.6c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M16.6 19.6 14.6 12.8M23.4 19.6l2-6.8\"/>","hands":[[14.2,11.8],[25.8,11.8]],"ball":[20,7.6,3.2]},"MB":{"body":"<circle cx=\"20\" cy=\"15\" r=\"3.9\"/><path d=\"M20 19.6c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M14.4 22.4 13.6 9.6M25.6 22.4l.8-12.8\"/>","hands":[[13.4,8.4],[26.6,8.4]],"ball":null},"OH":{"body":"<circle cx=\"21.5\" cy=\"14\" r=\"3.9\"/><path d=\"M21.5 18.6c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M25 20.4 30 13.4\"/><path d=\"M18 21.4 10.8 25.4\"/>","hands":[[30.6,12.4],[9.8,26]],"ball":[32.4,7.4,2.9]},"L/DS":{"body":"<circle cx=\"23\" cy=\"15.5\" r=\"3.9\"/><path d=\"M23 20c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M19.8 22.8 10.4 28.4M25.6 23.4 10.4 28.4\"/>","hands":[[9.4,29]],"ball":null},"OPP":{"body":"<circle cx=\"21.5\" cy=\"14\" r=\"3.9\"/><path d=\"M21.5 18.6c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M25 20.4 30 13.4\"/><path d=\"M18 21.4 10.8 25.4\"/>","hands":[[30.6,12.4],[9.8,26]],"ball":[32.4,7.4,2.9]},"RS":{"body":"<circle cx=\"21.5\" cy=\"14\" r=\"3.9\"/><path d=\"M21.5 18.6c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M25 20.4 30 13.4\"/><path d=\"M18 21.4 10.8 25.4\"/>","hands":[[30.6,12.4],[9.8,26]],"ball":[32.4,7.4,2.9]},"DS":{"body":"<circle cx=\"23\" cy=\"15.5\" r=\"3.9\"/><path d=\"M23 20c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M19.8 22.8 10.4 28.4M25.6 23.4 10.4 28.4\"/>","hands":[[9.4,29]],"ball":null},"L":{"body":"<circle cx=\"23\" cy=\"15.5\" r=\"3.9\"/><path d=\"M23 20c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M19.8 22.8 10.4 28.4M25.6 23.4 10.4 28.4\"/>","hands":[[9.4,29]],"ball":null}},"unknown":{"body":"<circle cx=\"20\" cy=\"14\" r=\"3.9\"/><path d=\"M20 18.6c2.9 0 4.4 1.8 4.4 4.4v6.2h-8.8v-6.2c0-2.6 1.5-4.4 4.4-4.4z\"/>","limbs":"<path d=\"M16.4 21.6 13.4 27.4M23.6 21.6l3 5.8\"/>","hands":[],"ball":null},"libero":["L/DS","L","DS"],"neutral":"#9A8F7D","onNeutral":"#0E1524"};
 function avatar(pos, team, size) {
 const c = (COLORS && COLORS[team]) || {};
 let bg = c.primary || AV.neutral, ink = c.on_primary || AV.onNeutral;
