@@ -110,16 +110,34 @@ jobs:
           # crawl so the results are in, and reads only the pre-match log.
           python3 scripts/score_predictions.py || true
           python3 scripts/build_dataset.py
-          # And the COMPLETED 2025 season, which the projection's one
-          # measured constant rests on. data_2025.json is a build artifact
-          # (gitignored, a pure function of the committed raw), so a fresh
-          # CI checkout has no copy and test_projection could not re-derive
-          # ROTATION -- which is the whole point of that guard. It is 0.4s
-          # and touches no network, so building it here is cheaper than
-          # letting the guard skip itself into documentation.
-          WVB_SEASON=2025 python3 scripts/build_dataset.py
           python3 scripts/rpi_2025.py || echo "RPI needs a game graph; skipping this early"
           python3 scripts/rating_2025.py
+
+          # ---- THE LAST COMPLETED SEASON: THE BASE EVERYTHING STANDS ON ----
+          # These three scripts are season-parameterised and the job pins
+          # WVB_SEASON=2026, so the lines above build only the LIVE season.
+          # The 2025 artifacts are just as required and nothing was rebuilding
+          # them:
+          #   data_2025.json    test_projection re-derives ROTATION=6 from it
+          #   rating_2025.json  build_rankings_board.build() hard-requires it
+          #                     as the base; rating_2026.json is the optional
+          #                     LIVE overlay and is correctly absent until 50
+          #                     matches are played.
+          # All three are gitignored build artifacts -- pure functions of the
+          # committed raw -- so a fresh CI checkout has none of them. The daily
+          # run was failing on exactly this: rating_2025.py refused to fit the
+          # 4-match 2026 season (right), no rating_2025.json was ever built
+          # (wrong), and build_hub.py died. It broke in f94be59, when
+          # rating_2025.py was season-parameterised; the very next scheduled run
+          # hit it. It stayed INVISIBLE only because build_hub was invoked as
+          # `--public || echo ...` -- retiring the public build removed that
+          # fallback, so the same fault now fails the step outright. Which is
+          # the better behaviour, and is why this block exists.
+          # Offline and ~seconds; ordered after the 2026 build so the live
+          # season still wins where both exist.
+          WVB_SEASON=2025 python3 scripts/build_dataset.py
+          WVB_SEASON=2025 python3 scripts/rpi_2025.py
+          WVB_SEASON=2025 python3 scripts/rating_2025.py
           # The PUBLIC dashboard is now the same builder as Cody's page, with
           # the third-party views stripped (VolleyTalk poll, Massey, TV
           # listings). One builder, two outputs -- the two pages used to be
@@ -188,6 +206,13 @@ jobs:
           python3 scripts/test_digby_chat.py
           python3 scripts/test_rotations.py
           python3 scripts/test_no_scrape_hook.py
+          # Does the whole thing still work from a FRESH CHECKOUT? Both of
+          # 2026-08-23's nightly breakages were invisible on a laptop that
+          # already had the gitignored build artifacts. This re-runs the
+          # offline heart of the pipeline against tracked files only, and
+          # reads the command list out of THIS file rather than restating
+          # it. It excludes itself by name -- it is in this very list.
+          python3 scripts/test_pipeline_fresh_checkout.py
 
       # Coverage gate: a NEW displayed field with no declared provenance fails
       # the run. It cannot catch a client-side expression inventing a value for

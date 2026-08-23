@@ -1,0 +1,205 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""Guard: the daily pipeline must complete from a FRESH CHECKOUT.
+
+WHY THIS EXISTS. Twice in one day the nightly run broke the same way, and the
+shape is worth naming: a script is season-parameterised, the job pins
+WVB_SEASON=2026, and so CI quietly stops building a **2025** artifact that a
+later step hard-requires. Both artifacts are gitignored build outputs -- pure
+functions of the committed raw -- so they exist on the laptop and never in CI.
+Everything looks fine locally and the nightly run is the only thing that sees
+the fault.
+
+  data_2025.json    test_projection re-derives ROTATION=6 from it. Missing ->
+                    the guard hard-failed on its own input and the run went red.
+  rating_2025.json  build_rankings_board.build() requires it as the BASE
+                    (rating_2026.json is the optional live overlay, and is
+                    correctly absent until 50 matches are played). Missing ->
+                    build_hub.py exits 1.
+
+The second was INVISIBLE for its whole life because build_hub ran as
+`build_hub.py --public || echo ...`. A `|| echo` is a declaration that a command
+is allowed to fail; putting one on a command that is actually required converts
+a hard failure into a log line nobody reads. That is the real lesson here, and
+it is what this test encodes.
+
+WHAT IT ASSERTS. The workflow's own command list is READ FROM daily.yml -- never
+copied into this file. A guard that restates the thing it guards rots away from
+it, which is exactly how the comment above the guards step came to claim
+test_projection "skips itself on a fresh checkout" when only check 2 ever did.
+Then, in a tree containing ONLY tracked files:
+
+  every command the workflow does NOT tolerate failing must exit 0.
+
+Commands carrying a `||` fallback are allowed to fail -- that is their declared
+contract, and this test holds them to it rather than second-guessing it.
+
+NEGATIVE CONTROL. A test that cannot fail is not a test. The control strips the
+WVB_SEASON=2025 lines back out and asserts build_hub.py fails again. If it were
+to pass without them, this file would be checking nothing.
+
+Python 3.9 target. Run: python3 scripts/test_pipeline_fresh_checkout.py
+"""
+
+import os
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+WORKFLOW = os.path.join(REPO, ".github", "workflows", "daily.yml")
+
+# The steps whose commands must survive a fresh checkout. Deliberately NOT the
+# whole file: the crawl steps need the network, and the commit steps need CI
+# credentials. These two are the offline heart of the run, and both bugs were
+# here.
+STEPS = ["Rebuild derived outputs", "Invariant guards"]
+
+# ⚠ RECURSION. This file is itself listed in the "Invariant guards" step, so
+# running that step verbatim would re-enter this test forever. Excluded by name.
+SELF = os.path.basename(__file__)
+
+# The network lives in the crawl steps, but crawl_polls.py is invoked from the
+# rebuild step. A guard must not depend on a live host, so it is skipped -- and
+# it carries a `|| echo` fallback, so the pipeline already declares it optional.
+SKIP = re.compile(r"scripts/crawl_")
+
+FAILURES = []
+
+
+def check(label, ok, detail=""):
+    print("  %-58s %s" % (label, "ok" if ok else "FAIL %s" % detail))
+    if not ok:
+        FAILURES.append(label)
+
+
+def workflow_env():
+    # type: () -> str
+    """The season the job pins. Read, not assumed -- it is half of the bug."""
+    src = open(WORKFLOW).read()
+    m = re.search(r"WVB_SEASON:\s*\$\{\{[^}]*?'(\d{4})'\s*\}\}", src)
+    return m.group(1) if m else "2026"
+
+
+def step_commands(step):
+    # type: (str) -> list
+    """The shell lines of one named step, in order, from daily.yml itself."""
+    lines = open(WORKFLOW).read().splitlines()
+    out = []
+    i = 0
+    while i < len(lines) and lines[i].strip() != "- name: %s" % step:
+        i += 1
+    if i >= len(lines):
+        return []
+    while i < len(lines) and not lines[i].strip().startswith("run:"):
+        i += 1
+    i += 1
+    for ln in lines[i:]:
+        if ln.strip() and not ln.startswith("          "):
+            break                                  # dedent ends the block
+        s = ln.strip()
+        if s and not s.startswith("#"):
+            out.append(s)
+    return out
+
+
+def materialise(dest):
+    # type: (str) -> None
+    """Tracked files only -- which is precisely what CI checks out.
+
+    Everything gitignored (data_2025.json, rating_2025.json, the built page) is
+    absent by construction. That absence IS the test.
+    """
+    names = subprocess.check_output(["git", "ls-files", "-z"], cwd=REPO).split(b"\0")
+    tar = subprocess.Popen(["tar", "-cf", "-", "-T", "-"], cwd=REPO,
+                           stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    tar.stdin.write(b"\n".join(n for n in names if n))
+    tar.stdin.close()
+    subprocess.check_call(["tar", "-xf", "-"], cwd=dest, stdin=tar.stdout)
+    tar.wait()
+
+
+def run_sequence(cmds, cwd, season, stop_on_required_failure=True):
+    # type: (list, str, str, bool) -> list
+    """Run the step's commands. Returns [(cmd, tolerated, rc)]."""
+    env = dict(os.environ)
+    env["WVB_SEASON"] = season
+    env.pop("ANTHROPIC_API_KEY", None)      # never spend money from a guard
+    results = []
+    for c in cmds:
+        if SELF in c or SKIP.search(c):
+            continue
+        tolerated = "||" in c
+        rc = subprocess.call(c, shell=True, cwd=cwd, env=env,
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        results.append((c, tolerated, rc))
+        if rc != 0 and not tolerated and stop_on_required_failure:
+            break
+    return results
+
+
+def main():
+    print("FRESH-CHECKOUT PIPELINE GUARD\n")
+    season = workflow_env()
+
+    print("1. The workflow is readable and still has the steps this guards")
+    cmds = []
+    for st in STEPS:
+        c = step_commands(st)
+        check("step %r found with commands" % st, bool(c),
+              "(renamed or restructured? update STEPS)")
+        cmds.extend(c)
+    if FAILURES:
+        return 1
+    runnable = [c for c in cmds if SELF not in c and not SKIP.search(c)]
+    print("     %d commands, %d runnable, WVB_SEASON=%s"
+          % (len(cmds), len(runnable), season))
+
+    tmp = tempfile.mkdtemp(prefix="wvb-fresh-")
+    try:
+        print("\n2. Every command the workflow does not tolerate failing succeeds")
+        materialise(tmp)
+        gone = [p for p in ("data/data_2025.json", "data/rating_2025.json")
+                if not os.path.exists(os.path.join(tmp, p))]
+        check("the derived artifacts really are absent to begin with",
+              len(gone) == 2, "(found %s -- not a fresh checkout)" % (gone,))
+
+        results = run_sequence(cmds, tmp, season)
+        bad = [(c, rc) for c, tol, rc in results if rc != 0 and not tol]
+        for c, rc in bad:
+            print("       required command failed (rc=%d): %s" % (rc, c))
+        check("no required command failed", not bad,
+              "(%d failed)" % len(bad))
+        check("the page was built", os.path.exists(os.path.join(tmp, "Cody", "START-HERE.html")))
+
+        # ---- NEGATIVE CONTROL ------------------------------------------
+        # Strip the base-season lines back out. build_hub.py must fail, or
+        # this whole file is asserting nothing.
+        print("\n3. Negative control: without the 2025 base, the run must break")
+        shutil.rmtree(tmp)
+        tmp = tempfile.mkdtemp(prefix="wvb-fresh-neg-")
+        materialise(tmp)
+        stripped = [c for c in cmds if "WVB_SEASON=2025" not in c]
+        check("the control actually removed something",
+              len(stripped) < len(cmds),
+              "(no WVB_SEASON=2025 lines -- has the fix been reverted?)")
+        neg = run_sequence(stripped, tmp, season)
+        broke = [(c, rc) for c, tol, rc in neg if rc != 0 and not tol]
+        check("a required command fails without the base", bool(broke),
+              "(nothing failed -- this guard would not catch the bug)")
+        if broke:
+            print("       and it is the expected one: %s" % broke[0][0])
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+    print("\n%s" % ("ALL CHECKS PASS, negative control tripped as expected"
+                    if not FAILURES else "FAILED: %d check(s)" % len(FAILURES)))
+    for f in FAILURES:
+        print("   - %s" % f)
+    return 1 if FAILURES else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
