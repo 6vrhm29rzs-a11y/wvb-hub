@@ -1169,6 +1169,78 @@ def check_team_context_fields():
            % (n_pos, n_sos, n_h2h))
 
 
+def check_net_matches_the_rulebook():
+    """The net on the landing page is drawn to the actual specification.
+
+    It began as a flat yellow line, which is not a net. It is now drawn at the
+    same scale as the floor -- ONE UNIT = ONE DECIMETRE -- so every dimension is
+    checkable arithmetic rather than a drawing that merely suggests a net:
+
+      net height (women)  2.24 m      mesh depth   1.00 m
+      top tape            7 cm        antenna      1.80 m
+      antenna reach       80 cm above the net, putting its top at 3.04 m
+                          -- 9 ft 11.6 in, the 10 feet it is supposed to be
+
+    ⚠ THE 10 FEET IS DERIVED, NOT SET. It falls out of 2.24 + 0.80. If someone
+    "corrects" the antenna to exactly 10 ft by hand, one of the two real
+    measurements underneath it has been broken, and this check is what says so.
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping net check")
+        return
+    src = open(hub, encoding="utf-8").read()
+    m = re.search(r'<svg class="netart"[^>]*>(.*?)</svg>', src, re.S)
+    if not m:
+        bad("no net on the landing page", "the hero court should carry one")
+        return
+    net = m.group(1)
+    FLOOR = 32.0                                  # decimetres, y increases down
+
+    def attr(pattern, name):
+        mm = re.search(pattern, net, re.S)
+        if not mm:
+            return None
+        a = re.search(r'%s="([-\d.]+)"' % name, mm.group(0))
+        return float(a.group(1)) if a else None
+
+    mesh_y = attr(r'<rect[^>]*fill="url\(#mesh10\)"[^>]*>', "y")
+    mesh_h = attr(r'<rect[^>]*fill="url\(#mesh10\)"[^>]*>', "height")
+    ant_y = attr(r'<rect[^>]*height="18"[^>]*>', "y")
+    tape_h = attr(r'<rect[^>]*height="\.7"[^>]*>', "height")
+    if None in (mesh_y, mesh_h, ant_y, tape_h):
+        bad("the net drawing is missing a measured part",
+            "mesh, tape or antenna not found")
+        return
+
+    checks = [
+        # ⚠ the drawing is in DECIMETRES; compare in metres or the check reads
+        # 22.4 against 2.24 and fails a correct net
+        ("net height is 2.24 m (women's)", round((FLOOR - mesh_y) / 10.0, 2), 2.24),
+        ("the mesh is 1 m deep", round(mesh_h / 10.0, 2), 1.00),
+        ("the top tape is 7 cm", round(tape_h * 10, 1), 7.0),
+        ("the antenna reaches 80 cm above the net",
+         round((mesh_y - ant_y) * 10, 1), 80.0),
+    ]
+    fails = [(n, got, want) for n, got, want in checks if abs(got - want) > 0.051]
+    for n, got, want in fails:
+        bad(n, "measured %s, rulebook says %s" % (got, want))
+    if not fails:
+        top_ft = (FLOOR - ant_y) / 10.0 * 3.28084
+        ok("the net is drawn to the rulebook; the antenna tops out at %.2f ft"
+           % top_ft)
+        if abs(top_ft - 10.0) > 0.1:
+            bad("the antenna no longer reaches ~10 ft",
+                "measured %.2f ft -- one of the dimensions above has drifted"
+                % top_ft)
+
+    if "#D6291F" not in net:
+        bad("the antennae are not striped red",
+            "they are red and white by rule, like a candy cane")
+    else:
+        ok("the antennae carry their red and white stripes")
+
+
 def check_transfer_reconciliation():
     """A transfer must describe the SAME player on both sides.
 
@@ -1726,6 +1798,7 @@ def main():
     check_players_view_shows_every_stat()
     check_team_glance_is_populated()
     check_team_context_fields()
+    check_net_matches_the_rulebook()
     check_phantom_sets_are_harmless()
     check_aggregate_excludes_phantom_sets()
     print()

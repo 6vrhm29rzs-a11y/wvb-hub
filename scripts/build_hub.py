@@ -2799,9 +2799,15 @@ tbody tr:nth-child(1) td.rk{color:var(--amber);
    and spans 217px of a 1186px wrapper, so the net's base sits 31px up and it is
    18.3% wide. Its width IS the perspective -- a net as wide as the near
    baseline would be standing in the wrong place. */
+/* The net's WIDTH is the court's width where the centre line falls -- measured
+   from the rendered floor, 217px of an 1186px wrapper -- and its HEIGHT follows
+   from the same scale rather than being chosen: the viewBox is 98 units wide by
+   33 tall, so at 18.3% width the box is 33/98 as tall again. That keeps 2.24 m
+   of net and the antenna's 10-foot reach in true proportion to the 9 m court
+   beneath it. */
 .netart{position:absolute;left:50%;transform:translateX(-50%);
-  bottom:31px;width:18.3%;height:26px;opacity:.95;
-  filter:drop-shadow(0 1px 10px rgba(120,180,255,.35))}
+  bottom:31px;width:18.3%;aspect-ratio:98 / 33;height:auto;opacity:.95;
+  filter:drop-shadow(0 1px 10px rgba(120,180,255,.30))}
 /* the hero's own content has to sit above the floor it is standing on */
 .heroL,.heroR{position:relative;z-index:2}
 .heroL{position:relative;z-index:1;min-width:min(100%,320px);flex:1 1 340px}
@@ -3205,31 +3211,61 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <!-- the centre line the net stands on -->
       <line x1="0" y1="90" x2="90" y2="90" stroke="#dbe9ff" stroke-opacity=".5" stroke-width=".9"/>
     </svg>
-      <!-- THE NET STANDS UP. Square mesh, a white tape along the top, posts at
-           both sidelines and the two antennae that mark the crossing space.
-           Drawn separately from the floor precisely because the floor is
-           rotated flat and a net that lies down is not a net. -->
-      <svg class="netart" viewBox="0 0 240 52" preserveAspectRatio="none" aria-hidden="true">
+      <!-- ---- THE NET, TO THE ACTUAL SPECIFICATION ----------------------
+           Same scale as the floor: ONE UNIT = ONE DECIMETRE, so the 9m court is
+           90 units and everything below is the real measurement rather than a
+           drawing that merely suggests a net.
+             net height (women)  2.24 m   -> top edge 22.4 units above the floor
+             mesh depth          1.00 m   -> 10 units
+             mesh squares        10 cm    -> 1 unit
+             top tape             7 cm    -> 0.7 units, white doubled canvas
+             bottom band          5 cm    -> 0.5 units
+             antennae            1.80 m   -> 18 units, 10 cm stripes (1 unit)
+             antenna reach       80 cm above the net -> the top lands at
+                                 2.24 + 0.80 = 3.04 m, which is 9 ft 11.6 in:
+                                 the 10 feet Cody asked for, and it comes out of
+                                 the measurements rather than being set to it.
+           The antennae sit on the outer edge of the side bands, above the
+           sidelines, on opposite sides of the net -- which is why one is drawn
+           in front of the mesh and one behind. y increases downward, so the
+           floor is y=32 and the antenna tops are near y=1.6. -->
+      <svg class="netart" viewBox="-4 0 98 33" preserveAspectRatio="none" aria-hidden="true">
         <defs>
-          <pattern id="mesh" width="6" height="6" patternUnits="userSpaceOnUse">
-            <path d="M6 0H0V6" fill="none" stroke="#eaf2ff" stroke-opacity=".34"
-                  stroke-width=".7"/>
+          <pattern id="mesh10" width="1" height="1" patternUnits="userSpaceOnUse">
+            <path d="M1 0H0V1" fill="none" stroke="#eaf2ff" stroke-opacity=".38"
+                  stroke-width=".08"/>
           </pattern>
+          <linearGradient id="antw" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e8eef7"/>
+          </linearGradient>
         </defs>
-        <!-- posts -->
-        <rect x="1.5" y="2" width="3" height="50" fill="#dbe9ff" fill-opacity=".55"/>
-        <rect x="235.5" y="2" width="3" height="50" fill="#dbe9ff" fill-opacity=".55"/>
-        <!-- the net: mesh between the posts -->
-        <rect x="4.5" y="6" width="231" height="34" fill="url(#mesh)"/>
-        <!-- the tape along the top, and the thinner one at the bottom -->
-        <rect x="4.5" y="2.5" width="231" height="4" fill="#f2f7ff" fill-opacity=".82"/>
-        <rect x="4.5" y="39" width="231" height="1.6" fill="#dbe9ff" fill-opacity=".45"/>
-        <!-- antennae, on the sidelines, striped as they really are -->
+        <!-- posts, set outside the sidelines, carrying the net at 2.24 m -->
+        <rect x="-2.6" y="9.2" width="1.3" height="22.8" fill="#c9d8ee" fill-opacity=".55"/>
+        <rect x="91.3" y="9.2" width="1.3" height="22.8" fill="#c9d8ee" fill-opacity=".55"/>
+        <!-- the mesh: 1 m deep, 10 cm squares -->
+        <rect x="0" y="9.6" width="90" height="10" fill="url(#mesh10)"/>
+        <!-- 7 cm white tape along the top, 5 cm band beneath -->
+        <rect x="0" y="9.6" width="90" height=".7" fill="#f7fbff" fill-opacity=".92"/>
+        <rect x="0" y="19.1" width="90" height=".5" fill="#dce8f8" fill-opacity=".5"/>
+        <!-- side bands, 5 cm wide, on the sidelines -->
+        <rect x="0" y="9.6" width=".5" height="10" fill="#f7fbff" fill-opacity=".8"/>
+        <rect x="89.5" y="9.6" width=".5" height="10" fill="#f7fbff" fill-opacity=".8"/>
+        <!-- antennae: 1.8 m of 10 cm red/white stripes, 80 cm proud of the net -->
         <g>
-          <rect x="20" y="-6" width="2" height="26" fill="#FFC72C" fill-opacity=".9"/>
-          <rect x="20" y="1" width="2" height="6" fill="#C8322B" fill-opacity=".9"/>
-          <rect x="218" y="-6" width="2" height="26" fill="#FFC72C" fill-opacity=".9"/>
-          <rect x="218" y="1" width="2" height="6" fill="#C8322B" fill-opacity=".9"/>
+          <rect x="-.35" y="1.6" width=".7" height="18" fill="url(#antw)"/>
+          <rect x="89.65" y="1.6" width=".7" height="18" fill="url(#antw)"/>
+        </g>
+        <g fill="#D6291F">
+          <rect x="-.35" y="1.6" width=".7" height="1"/><rect x="-.35" y="3.6" width=".7" height="1"/>
+          <rect x="-.35" y="5.6" width=".7" height="1"/><rect x="-.35" y="7.6" width=".7" height="1"/>
+          <rect x="-.35" y="9.6" width=".7" height="1"/><rect x="-.35" y="11.6" width=".7" height="1"/>
+          <rect x="-.35" y="13.6" width=".7" height="1"/><rect x="-.35" y="15.6" width=".7" height="1"/>
+          <rect x="-.35" y="17.6" width=".7" height="1"/>
+          <rect x="89.65" y="1.6" width=".7" height="1"/><rect x="89.65" y="3.6" width=".7" height="1"/>
+          <rect x="89.65" y="5.6" width=".7" height="1"/><rect x="89.65" y="7.6" width=".7" height="1"/>
+          <rect x="89.65" y="9.6" width=".7" height="1"/><rect x="89.65" y="11.6" width=".7" height="1"/>
+          <rect x="89.65" y="13.6" width=".7" height="1"/><rect x="89.65" y="15.6" width=".7" height="1"/>
+          <rect x="89.65" y="17.6" width=".7" height="1"/>
         </g>
       </svg>
     </div>
