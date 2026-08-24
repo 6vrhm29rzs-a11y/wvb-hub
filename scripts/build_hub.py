@@ -2392,6 +2392,11 @@ td.tm{font-size:15px}
 .wh2 .pl{font:11.5px/1.4 var(--mono);color:var(--ink3)}
 .wh2 .pl.u{font-style:italic}
 .va.nt{color:var(--amber);font-weight:800}
+/* the bracket, in team colours */
+.bside{position:relative}
+.bside::before{content:"";position:absolute;left:0;top:3px;bottom:3px;width:3px;
+  border-radius:2px;background:var(--tc,transparent)}
+.bside.empty::before{background:transparent}
 /* ---- ON TV: the network, as a chip -----------------------------------
    ⚠ THIS CELL USED CLASS "net", WHICH IS ALSO THE MASTHEAD'S VOLLEYBALL NET --
    a repeating-linear-gradient mesh. Every network cell was being painted with
@@ -3651,7 +3656,8 @@ function renderConfStrength(confs) {
     'part worth reading: two contenders and a long tail is a different league ' +
     'from a deep one. Filled dots are inside the top 25.</p>' +
     '<div class="cstrip">' + rows.map(r =>
-      '<div class="crow"><span class="cnm">' + r.conf + '</span>' +
+      '<div class="crow"><span class="cnm" title="' + r.conf + ' \u2014 ' + r.n +
+        ' teams, median rank ' + r.median + '">' + r.conf + '</span>' +
       '<span class="ctrack">' +
         r.ranks.map(v => '<i class="cdot' + (v <= 25 ? ' t25' : '') +
           '" style="left:' + pc(v).toFixed(2) + '%" title="#' + v + '"></i>').join('') +
@@ -3759,7 +3765,14 @@ function renderBracket() {
   const side = (t, cls) => {
     if (!t) return '<div class="bside empty"><span class="bsd"></span>' +
                    '<span class="bnm">&nbsp;</span><span class="bsc"></span></div>';
-    return '<div class="bside ' + (cls || '') + '">' +
+    /* THE SCHOOL'S OWN COLOUR ON EACH SIDE. A bracket should look like it is
+       made of teams, not of generic UI chrome -- and COLORS is already on the
+       page for the avatars, so this reuses it rather than deriving a second
+       opinion. A team with no readable colour gets the neutral line, never an
+       invented hue (the same rule the avatars follow). */
+    const _tc = (COLORS[t.team] || {}).primary;
+    return '<div class="bside ' + (cls || '') + '"' +
+      (_tc ? ' style="--tc:' + _tc + '"' : '') + '>' +
       /* THE NUMBER ON AN OFFICIAL BRACKET IS THE SEED LINE, NOT THE NATIONAL
          SEED. 32 teams are seeded nationally (1-32, the format since 2022) and
          then placed four to a line, so the printed bracket carries FOUR #1s,
@@ -3774,7 +3787,12 @@ function renderBracket() {
       '<span class="bsd"' + (t.seed && t.seed <= 32
         ? ' title="national seed ' + t.seed + ' of 32"' : '') + '>' +
       (t.seed && t.seed <= 32 ? Math.ceil(t.seed / 4) : '') + '</span>' +
-      logo(t.team) + '<span class="bnm">' + t.team + '</span>' +
+      logo(t.team) +
+      /* a long name ellipses in a bracket box ("Southern Califor…"), so the
+         full one stays reachable rather than simply lost */
+      '<span class="bnm" title="' + t.team +
+        (t.seed && t.seed <= 32 ? ' \u2014 national seed ' + t.seed : '') +
+        '">' + t.team + '</span>' +
       '<span class="bsc">' + (t.sets === undefined ? '' : t.sets) + '</span></div>';
   };
   const game = g => '<div class="bgame">' + side(g && g[0]) + side(g && g[1]) + '</div>';
