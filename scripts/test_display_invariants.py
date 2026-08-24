@@ -30,7 +30,6 @@ import sys
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SEASON = int(os.environ.get("WVB_SEASON", "2025"))
 DASH = os.path.join(REPO, "output", "vb_dashboard.html")
-RATING = os.path.join(REPO, "data", "rating_%d.json" % SEASON)
 
 FAILS = []
 
@@ -201,12 +200,33 @@ def check_model(M):
 
 
 def check_rating():
-    if not os.path.exists(RATING):
-        print("rating file (season %d): absent -- skipping (normal pre-season)" % SEASON)
+    """Validate EVERY rating payload on disk, not one chosen by an env var.
+
+    ⚠ THIS CHECK RAN IN ONE ENVIRONMENT AND NOT THE OTHER. RATING was built from
+    this module's SEASON, which defaults to 2025, while build_hub.py -- and the
+    daily job, which pins WVB_SEASON=2026 -- default to 2026. So locally it
+    validated rating_2025.json, and in CI it looked for rating_2026.json, found
+    nothing (the live rating does not exist under 50 played matches) and skipped
+    silently. A guard that only runs on a laptop is the thing this project keeps
+    learning not to ship.
+
+    Nothing here is season-specific: rank uniqueness, non-negative games,
+    parseable resume records and fitted weights are true of any rating. So it
+    checks all of them and says how many it found.
+    """
+    import glob as _glob
+    paths = sorted(_glob.glob(os.path.join(REPO, "data", "rating_[0-9][0-9][0-9][0-9].json")))
+    if not paths:
+        print("no rating payload on disk -- skipping (normal pre-season)")
         return
-    R = json.load(open(RATING))
+    for path in paths:
+        _check_one_rating(path)
+
+
+def _check_one_rating(path):
+    R = json.load(open(path))
     teams = R.get("teams") or []
-    print("rating payload (%d teams)" % len(teams))
+    print("rating payload %s (%d teams)" % (os.path.basename(path), len(teams)))
 
     cr = [t.get("composite_rank") for t in teams]
     if sorted(x for x in cr if x is not None) != list(range(1, len(teams) + 1)):
