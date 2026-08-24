@@ -2356,7 +2356,10 @@ img.mug,img.pmug,img.phero{cursor:zoom-in}
   background:radial-gradient(120% 120% at 50% 0%,rgba(12,20,36,.82),rgba(4,7,14,.94));
   backdrop-filter:blur(6px)}
 #lbx.on{display:flex}
-#lbx figure{margin:0;max-width:min(92vw,460px);text-align:center;
+/* ⚠ max-width ALONE DOES NOT ESTABLISH A WIDTH. As a flex item this figure
+   collapsed to the image's intrinsic size, so a 100px thumbnail opened as a
+   100px "enlargement" -- the overlay worked and enlarged nothing. */
+#lbx figure{margin:0;width:min(92vw,460px);max-width:min(92vw,460px);text-align:center;
   animation:lbxin .22s cubic-bezier(.2,.9,.3,1) both}
 #lbx img{width:100%;height:auto;aspect-ratio:2/3;object-fit:cover;
   object-position:50% 12%;border-radius:14px;border:1px solid var(--line2);
@@ -3973,9 +3976,25 @@ function hcell(v, txt, lo, hi, good, kind) {
   let last = null;
   function close(){ box.classList.remove('on'); box.hidden = true;
                     if (last && last.focus) last.focus(); }
+  /* ASK FOR A BIGGER CROP WHERE THE HOST ALLOWS IT. Roster thumbnails come
+     through SIDEARM's /crop service with plain, unsigned width/height query
+     params, so the enlarged view can request a real size instead of upscaling
+     a 100px square into a 460px box. Only that one host is rewritten:
+     imgproxy URLs (WMT, Kentucky, Nebraska) are SIGNED, and editing their path
+     produces a 404 -- which is exactly why the 1024px size could never be
+     rewritten smaller. Anything unrecognised is passed through untouched. */
+  function bigger(src){
+    try {
+      const u = new URL(src, location.href);
+      if (u.host !== 'images.sidearmdev.com' || !u.searchParams.has('width')) return src;
+      u.searchParams.set('width', '600');
+      if (u.searchParams.has('height')) u.searchParams.set('height', '600');
+      return u.toString();
+    } catch (e) { return src; }
+  }
   function open(src, name, sub){
     last = document.activeElement;
-    img.src = src; img.alt = name || 'Player photo';
+    img.src = bigger(src); img.alt = name || 'Player photo';
     cap.innerHTML = (name || '') + (sub ? '<span class="sub">' + sub + '</span>' : '');
     box.hidden = false; box.classList.add('on');
     box.querySelector('button').focus();
@@ -3987,10 +4006,19 @@ function hcell(v, txt, lo, hi, good, kind) {
        row's own panel */
     e.stopPropagation();
     e.preventDefault();
-    const cell = el.closest('.pcell, .rrow, .plrow, .phead');
-    const nm = cell ? (cell.querySelector('.pn, .pname, .nm, b, strong') || {}).textContent : '';
+    /* ⚠ THE NAME CLASS IS .pnm IN THE SHARED PLAYER CELL, WHICH THIS MISSED.
+       The selector list guessed at .pn/.pname/.nm and none of them matched, so
+       the caption fell through to .pmeta and Morgan Gaerte's photo opened
+       labelled "#18 · OH" with no name on it at all. The classes actually in
+       the page are .pnm/.pmeta (player cell), .nm (list rows) and .pn (box
+       score), so all three are named here -- and if none match, the img's own
+       alt carries the name rather than the caption silently becoming the
+       subtitle. */
+    const cell = el.closest('.pcell, .rrow, .plrow, .phead, tr');
+    const nm = cell ? (cell.querySelector('.pnm, .pn, .nm, .pname, b, strong') || {}).textContent : '';
     const meta = cell ? (cell.querySelector('.pmeta, .psub, .sub') || {}).textContent : '';
-    open(el.src, (nm || el.alt || '').trim(), (meta || '').trim());
+    const label = (nm || el.alt || '').trim();
+    open(el.src, label, (meta || '').trim() === label ? '' : (meta || '').trim());
   }, true);
   box.addEventListener('click', e => {
     if (e.target === box || e.target.tagName === 'BUTTON') close();

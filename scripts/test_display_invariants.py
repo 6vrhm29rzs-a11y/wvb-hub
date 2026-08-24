@@ -671,6 +671,25 @@ def check_photo_crop_and_zoom():
     else:
         ok("square photo slots bias their crop upward, keeping the face")
 
+    # THE OVERLAY MUST ACTUALLY ENLARGE. max-width alone does not establish a
+    # width on a flex item, so the figure collapsed to the image's intrinsic
+    # size and a 100px thumbnail opened as a 100px "enlargement".
+    m = re.search(r"#lbx figure\{([^}]*)\}", src)
+    if m and "width:min(" not in m.group(1).replace(" ", ""):
+        bad("the enlarge overlay has no explicit width",
+            "max-width alone lets the figure collapse to the thumbnail's own "
+            "size, so nothing is enlarged")
+    elif m:
+        ok("the enlarge overlay sets an explicit width")
+
+    # and it must name the player, not fall through to her jersey/position
+    if "'.pnm" not in src and '".pnm' not in src:
+        bad("the enlarge caption does not look for the player's name class",
+            ".pnm is the name in the shared player cell; without it the caption "
+            "falls through to .pmeta and shows '#18 · OH' with no name")
+    else:
+        ok("the enlarge caption looks for the name before the meta line")
+
     if "id=\"lbx\"" not in src:
         bad("no enlarge overlay on the page", "photos cannot be opened")
     elif "img.mug, img.pmug, img.phero" not in src:
