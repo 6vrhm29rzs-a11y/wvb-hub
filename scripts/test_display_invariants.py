@@ -1241,6 +1241,68 @@ def check_net_matches_the_rulebook():
         ok("the antennae carry their red and white stripes")
 
 
+def check_di_listings_but_not_di_data():
+    """Listings are Division I. The match record is whatever happened.
+
+    Cody: "Elizabeth City St. doesn't really need to be listed in the stats page
+    ... just keep the score and stats for Norfolk St.'s purposes but keep this
+    as a D1 site." Two different things, and conflating them would be the error:
+
+      FILTERED  the Stats leaderboards and the Players directory -- a table that
+                says it ranks Division I should contain Division I
+      KEPT      the result, the box score, and the D-I team's own season totals,
+                because Norfolk St. really did earn those numbers that night
+
+    ⚠ Note what this reverses. CLAUDE.md previously recorded the opposite
+    decision -- that filtering "would change what the number means without
+    saying so", so the presence of non-D-I opponents was STATED instead. That
+    was a defensible call; this is Cody's, and it is the listings that change,
+    never the data underneath them.
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    rpi = os.path.join(REPO, "data", "raw", "2025", "rpi_official.json")
+    if not (os.path.exists(hub) and os.path.exists(rpi)):
+        print("  no built hub or D-I table -- skipping")
+        return
+    src = open(hub, encoding="utf-8").read()
+    di = set(r["School"] for r in (json.load(open(rpi)) or {}).get("data", []))
+
+    def payload(name):
+        i = src.find("const %s = " % name)
+        if i < 0:
+            return None
+        return json.loads(src[i + len("const %s = " % name):src.index(";\n", i)])
+
+    bad_rows = []
+    for name, key in (("TSTATS", "team"), ("LEADERS", "team"), ("PLAYERS", "team")):
+        rows = payload(name)
+        if rows is None:
+            continue
+        outside = sorted({r.get(key) for r in rows
+                          if r.get(key) and r[key] not in di})
+        if outside:
+            bad_rows.append((name, outside[:3]))
+    if bad_rows:
+        bad("a Division-I listing contains a team outside Division I",
+            "%s" % bad_rows)
+    else:
+        ok("the stats and player listings are Division I only")
+
+    # ...and the record of what happened is untouched
+    boxes = payload("BOXES") or {}
+    non_di_rows = sum(1 for g in boxes.values() for r in g
+                      if r.get("team") and r["team"] not in di)
+    if not boxes:
+        return
+    if non_di_rows == 0:
+        bad("the box scores lost their non-D-I players",
+            "a box score is a record of a match that happened; filtering it "
+            "makes the page disagree with the scoreboard above it")
+    else:
+        ok("box scores still carry every player who played (%d non-D-I rows)"
+           % non_di_rows)
+
+
 def check_transfer_reconciliation():
     """A transfer must describe the SAME player on both sides.
 
@@ -1799,6 +1861,7 @@ def main():
     check_team_glance_is_populated()
     check_team_context_fields()
     check_net_matches_the_rulebook()
+    check_di_listings_but_not_di_data()
     check_phantom_sets_are_harmless()
     check_aggregate_excludes_phantom_sets()
     print()

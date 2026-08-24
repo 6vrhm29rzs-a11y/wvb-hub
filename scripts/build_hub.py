@@ -941,6 +941,29 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
 
 
 # -------------------------------------------------------------- leaders
+def di_teams():
+    # type: () -> set
+    """The 348 Division-I programmes, from the archived official RPI table.
+
+    ⚠ THIS IS A LISTING FILTER, NOT A DATA FILTER, and the distinction is the
+    whole point. Cody: "Elizabeth City St. doesn't really need to be listed in
+    the stats page... just keep the score and stats for Norfolk St.'s purposes
+    but keep this as a D1 site."
+
+    So a non-D-I opponent keeps everything it contributes to a D-I team -- the
+    result stands, the box score stands, and Norfolk St.'s own totals still
+    include that match, because Norfolk St. really did earn those numbers on
+    that night. What changes is that a Division-II programme and its players
+    stop appearing in leaderboards that claim to rank Division I.
+
+    Membership comes from the archived RPI table, which CLAUDE.md establishes as
+    the only self-consistent list -- the per-game `division` flag is the team's
+    CURRENT division and is unreliable retroactively.
+    """
+    doc = load("data/raw/2025/rpi_official.json") or {}
+    return set(r["School"] for r in (doc.get("data") or []) if r.get("School"))
+
+
 def leaders(photos=None, honours=None):
     """Season leaders from the per-player aggregate, per set.
 
@@ -960,12 +983,20 @@ def leaders(photos=None, honours=None):
     ds = load("data/data_2025.json") or {}
     names = {str(t["team_id"]): t["name_short"] for t in ds.get("teams", [])
              if t.get("team_id")}
+    # THIS IS A DIVISION-I SITE. A D-II opponent's players keep everything they
+    # contributed to the D-I team they played -- the result, the box score, that
+    # team's totals -- but they do not appear in a leaderboard that says it
+    # ranks Division I.
+    _di = di_teams()
 
     max_sets = max((r.get("sets") or 0) for r in rows)
     floor = max(3, int(round(max_sets * 0.5)))
 
     out = []
     for r in rows:
+        _tm = names.get(str(r.get("team_id")))
+        if _tm and _di and _tm not in _di:
+            continue
         sets = r.get("sets") or 0
         if sets < floor:
             continue
@@ -1144,7 +1175,14 @@ def box_and_players(res, photos=None, honours=None):
             boxes[gid] = rows
 
     out = []
+    # ⚠ THE BOX SCORES KEEP EVERYONE; THIS LIST DOES NOT. `boxes` is untouched,
+    # so a D-II opponent's players still appear in the box score of the match
+    # they actually played -- that is a record of what happened. The Players TAB
+    # is a Division-I directory, so it carries Division-I players.
+    _di = di_teams()
     for p in players.values():
+        if _di and p.get("team") and p["team"] not in _di:
+            continue
         s_ = p["sets"] or 1
         p["games"].sort(key=lambda g: (g["d"] or ""), reverse=True)
         out.append(dict(p,
@@ -1290,6 +1328,13 @@ def team_season_stats(boxes, res):
                 "bpps": (round(d["board"] / n, 2) if n else None),
             }
         out[team] = row
+    # ⚠ A LISTING FILTER, NOT A DATA FILTER. The non-D-I side keeps everything
+    # it gave the D-I team it played -- those totals were built from the same
+    # box score and Norfolk St. really did earn them that night. What it does
+    # not get is a row of its own in a table that ranks Division I.
+    _di = di_teams()
+    if _di:
+        out = dict((k, v) for k, v in out.items() if k in _di)
     return out
 
 
