@@ -243,11 +243,27 @@ the build works from a fresh checkout with no `Cody/` · `Cody/` holds one page,
 **⚠ Verify the remote with `git ls-remote origin` on boot.** Last push `60242c7`; there is
 uncommitted work after it. Git is classifier-blocked in auto mode — hand Cody the command.
 
-**OPEN:** 338 Digby summaries to write (10 exist and are verified stable) · Cody has still not
-run `/code-review ultra` · coaches are a sourced-entry job (top 50 scaffolded, 2 filled from AVCA
-citations; school coaches pages are JavaScript-rendered) · rotations have no live 2026 source ·
-Central Conn. St. and Tennessee Tech have no 2026 roster · GitHub Pages no longer updates
-(public build off at Cody's instruction).
+**OPEN (updated 2026-08-24):** 338 Digby summaries to write (10 exist and are verified stable) ·
+Cody has still not run `/code-review ultra` · rotations have no live 2026 source · GitHub Pages no
+longer updates (public build off at Cody's instruction).
+
+**CLOSED since that line was written — do NOT re-open these:**
+- **Coaches are 341 of 348, not "a sourced-entry job".** The stated reason was wrong: school
+  coaches pages are *not* JavaScript-rendered — **the path does not exist**. Every `/coaches`,
+  `/staff`, `/coaching-staff` and `/staff-directory` variant 404s at the 52 schools that were
+  missing (Nebraska, Kentucky, UCLA, Penn St., Purdue…), and their staff is **a section of the
+  ROSTER page**, which we already fetch. `scripts/recover_coaches_from_roster.py` +
+  `scripts/test_coaches.py`. 25 of 47 corroborated by two independent extractions of the same
+  document; 3 hand-entered rows independently confirmed. The 7 remaining each record *why*
+  (4 rosters came from manual file drops and have no URL; Cincinnati and Stanford list no head
+  coach; Arkansas's legacy template has no structural name element).
+  ⚠ **A denylist of "words that are not names" cannot be finished and nearly deleted a real
+  coach** — denying `alma` to stop "Alma Mater" would have removed **Alma Kovaci Lee** (Army West
+  Point). The defence is structural (a name is link text or a `name`-classed element), and the
+  residual list matches **phrases**, not words.
+- **All 348 D-I teams have a 2026 roster.** Central Conn. St. (16) and Tennessee Tech (17) came in
+  via the PRESTO parser and the `/sports/wvball/2026-27/roster` path. Min 9, median 17, max 24;
+  none thin.
 
 **2026-08-11 — THE 2026 TAB IS WIRED AND THE JOIN QUESTION IS CLOSED.** Returning production runs on the real join (2026 school rosters × 2025 per-player production) for **309 of 348** D-I teams; the other 39 render **—**, nothing estimated. Verified: distribution smooth (median 0.570, no hash-style cluster), Nebraska reconciles by hand (1455.5/2074.0 = 0.702), display invariants + provenance both green. The method sentence on the page is now selected by `returning_method`, so the number and its label cannot drift apart (R4).
 **Fixed getting here:** Miami (FL)'s 18 unresolved were a WMT parser bug — the headshot anchor reads `"<Player Name> Photo"`, so every player survived twice (30 "players" for a 15-player roster). Parser fixed; the crawled file repaired in place by `scripts/repair_rosters_2026.py` (idempotent, no re-crawl). Miami 18 → 3.
