@@ -1091,6 +1091,19 @@ def player_photos():
         for nm, url in (rec.get("photos") or {}).items():
             out.setdefault(tname, {}).setdefault(
                 re.sub(r"[^a-z]", "", (nm or "").lower()), url)
+    # THIRD SOURCE, and the one that finally covers the table-style rosters.
+    # 33 teams -- Nebraska, LSU, Stanford, UCLA, Texas A&M, Virginia -- render
+    # the roster as a TABLE with no photograph anywhere in the HTML, which is
+    # why the first two paths found nothing and why this was written off as a
+    # JavaScript ceiling. Their tables link to each player, and HER page carries
+    # og:image. 26 of the 33 recovered, 0 rejected.
+    # Attribution is by construction: the photo is reached through that
+    # player's own link, so there is no name match that can go wrong (R8).
+    for tname, rec in ((load("data/raw/%d/player_page_photos_%d.json" % (SEASON, SEASON))
+                        or {}).get("teams", {}) or {}).items():
+        for nm, url in (rec.get("photos") or {}).items():
+            out.setdefault(tname, {}).setdefault(
+                re.sub(r"[^a-z]", "", (nm or "").lower()), url)
     return out
 
 
@@ -2252,7 +2265,8 @@ td.pick b{color:var(--navy)}
 .tstat td.op{color:var(--ink3)}
 .tstat tr:last-child td{border-bottom:0}
 .phead{display:flex;align-items:flex-start;gap:16px}
-.phero{width:72px;height:72px;border-radius:50%;object-fit:cover;flex:none;
+.phero{width:72px;height:72px;border-radius:50%;object-fit:cover;
+  object-position:50% 18%;flex:none;
   background:var(--alt);border:1px solid var(--line)}
 .phead svg{flex:none}
 .pcell{display:flex;align-items:center;gap:10px;min-width:0;max-width:100%}
@@ -2266,8 +2280,30 @@ td.pick b{color:var(--navy)}
 .aaFirst{background:var(--amber);color:var(--ink-on-accent);border-color:#FFC72C}
 .aaSecon{background:#12233C;color:var(--navy);border-color:#2A4570}
 .aaThird{background:var(--alt);color:var(--ink2)}
-.pcell .pmug{border-radius:50%;object-fit:cover;flex:none;background:var(--alt)}
+.pcell .pmug{border-radius:50%;object-fit:cover;object-position:50% 18%;flex:none;background:var(--alt)}
 .pcell svg{flex:none}
+/* CLICK TO ENLARGE. The photo is hotlinked, never downloaded (the images belong
+   to the schools and this repo is public), so the overlay simply asks for the
+   same URL at a size that does it justice -- 2:3, uncropped, nothing cut. */
+img.mug,img.pmug,img.phero{cursor:zoom-in}
+#lbx{position:fixed;inset:0;z-index:60;display:none;align-items:center;
+  justify-content:center;padding:28px;
+  background:radial-gradient(120% 120% at 50% 0%,rgba(12,20,36,.82),rgba(4,7,14,.94));
+  backdrop-filter:blur(6px)}
+#lbx.on{display:flex}
+#lbx figure{margin:0;max-width:min(92vw,460px);text-align:center;
+  animation:lbxin .22s cubic-bezier(.2,.9,.3,1) both}
+#lbx img{width:100%;height:auto;aspect-ratio:2/3;object-fit:cover;
+  object-position:50% 12%;border-radius:14px;border:1px solid var(--line2);
+  box-shadow:0 30px 70px -20px rgba(0,0,0,.95)}
+#lbx figcaption{margin-top:12px;font:600 17px/1.3 var(--disp);color:var(--ink);
+  letter-spacing:.01em}
+#lbx .sub{display:block;margin-top:3px;font:12px/1.4 var(--mono);color:var(--ink3)}
+#lbx button{position:absolute;top:18px;right:20px;appearance:none;border:0;
+  background:transparent;color:var(--ink2);font:300 30px/1 var(--sans);cursor:pointer}
+#lbx button:hover{color:var(--ink)}
+@keyframes lbxin{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){#lbx figure{animation:none}}
 .pinfo{display:flex;flex-direction:column;min-width:0;line-height:1.15}
 /* A long name has to wrap rather than push the cell past its box -- at
    560px 17 roster cells were overflowing, which clips on a phone even
@@ -2541,7 +2577,17 @@ table.box td.pn{text-align:left;font-weight:600}
    circles while a 1024px source came down for a 34px avatar. The school's
    imgproxy URLs are signed, so the size cannot be rewritten to something
    smaller without breaking them. */
-.mug{width:34px;height:34px;border-radius:50%;object-fit:cover;flex:none;
+/* ⚠ HEADS WERE BEING CROPPED OFF. Every roster photo the feed serves is a 2:3
+   portrait (measured: 1332x2000 on every one loaded, aspect 0.666 across the
+   board). Covering a 2:3 image into a SQUARE hides a third of its height, and
+   the default `object-position: 50% 50%` splits that evenly top and bottom --
+   so the visible window runs from ~17% to ~83% of the frame and takes the top
+   of the head with it. Biasing the window upward keeps the face: at 18% the
+   window starts around 6% of the frame instead of 17%.
+   One value is safe here precisely BECAUSE the shape is uniform; if mixed
+   aspect ratios ever arrive this needs revisiting rather than re-tuning. */
+.mug{width:34px;height:34px;border-radius:50%;object-fit:cover;
+  object-position:50% 18%;flex:none;
   background:var(--alt);border:1px solid var(--line)}
 img.mug{color:transparent}
 .mug--none{display:flex;align-items:center;justify-content:center;
@@ -2851,6 +2897,10 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 </section>
 
 </main>
+<div id="lbx" role="dialog" aria-modal="true" aria-label="Player photo" hidden>
+  <button type="button" aria-label="Close">&times;</button>
+  <figure><img alt=""><figcaption></figcaption></figure>
+</div>
 {{ASK_HTML}}
 <script>
 const CONFS = {{CONF_JSON}};
@@ -3558,6 +3608,44 @@ function hcell(v, txt, lo, hi, good, kind) {
   return '<td class="n hi hx ' + (kind || 'seq') + '" style="--t:' +
     hscale(v, lo, hi, good).toFixed(3) + '"><b>' + txt + '</b></td>';
 }
+/* CLICK A PHOTO TO ENLARGE IT. One delegated listener on the document, so it
+   covers the roster, the Stats table, the Players table and anything rendered
+   after load -- binding per render would quietly miss the views that redraw.
+   Only real photographs open: the drawn avatar is an SVG and has nothing more
+   to show at a larger size. The image is hotlinked, never downloaded. */
+(function(){
+  const box = document.getElementById('lbx');
+  if (!box) return;
+  const img = box.querySelector('img'), cap = box.querySelector('figcaption');
+  let last = null;
+  function close(){ box.classList.remove('on'); box.hidden = true;
+                    if (last && last.focus) last.focus(); }
+  function open(src, name, sub){
+    last = document.activeElement;
+    img.src = src; img.alt = name || 'Player photo';
+    cap.innerHTML = (name || '') + (sub ? '<span class="sub">' + sub + '</span>' : '');
+    box.hidden = false; box.classList.add('on');
+    box.querySelector('button').focus();
+  }
+  document.addEventListener('click', e => {
+    const el = e.target.closest('img.mug, img.pmug, img.phero');
+    if (!el || !el.getAttribute('src')) return;
+    /* a photo sits inside a clickable row; the click opens the PHOTO, not the
+       row's own panel */
+    e.stopPropagation();
+    e.preventDefault();
+    const cell = el.closest('.pcell, .rrow, .plrow, .phead');
+    const nm = cell ? (cell.querySelector('.pn, .pname, .nm, b, strong') || {}).textContent : '';
+    const meta = cell ? (cell.querySelector('.pmeta, .psub, .sub') || {}).textContent : '';
+    open(el.src, (nm || el.alt || '').trim(), (meta || '').trim());
+  }, true);
+  box.addEventListener('click', e => {
+    if (e.target === box || e.target.tagName === 'BUTTON') close();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && box.classList.contains('on')) close();
+  });
+})();
 /* ---- leaders ---- */
 const LEADERS = {{LEADERS_JSON}};
 const TSTATS = {{TSTATS_JSON}};

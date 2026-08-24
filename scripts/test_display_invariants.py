@@ -635,6 +635,58 @@ def check_schedule_states_where():
         ok("neutral-floor fixtures read 'vs', not 'at'")
 
 
+def check_photo_crop_and_zoom():
+    """Roster photos must show the face, and open at a size worth looking at.
+
+    PAID FOR. Every photo the schools publish is a 2:3 portrait (measured:
+    1332x2000 on every one sampled, aspect 0.666 with no spread). Covering a 2:3
+    image into a SQUARE hides a third of its height, and the browser default
+    `object-position: 50% 50%` splits that evenly -- so the visible window ran
+    from ~17% to ~83% of the frame and took the top of the head with it. Every
+    square photo slot must therefore bias its crop upward.
+
+    Also asserts the enlarge path exists, and -- the part that matters for R5 --
+    that only REAL photographs are clickable. The drawn avatar is an SVG and has
+    nothing more to show at a larger size; opening one would present an
+    illustration as though it were a picture of a person.
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping photo-crop check")
+        return
+    src = open(hub, encoding="utf-8").read()
+
+    missing = []
+    for sel in (".mug{", ".phero{", ".pcell .pmug{"):
+        i = src.find(sel)
+        if i < 0:
+            continue
+        rule = src[i:src.find("}", i)]
+        if "object-fit:cover" in rule.replace(" ", "") and "object-position" not in rule:
+            missing.append(sel)
+    if missing:
+        bad("a square photo slot crops from the centre",
+            "%s cover a 2:3 portrait with no object-position, which cuts the "
+            "top of the head off" % missing)
+    else:
+        ok("square photo slots bias their crop upward, keeping the face")
+
+    if "id=\"lbx\"" not in src:
+        bad("no enlarge overlay on the page", "photos cannot be opened")
+    elif "img.mug, img.pmug, img.phero" not in src:
+        bad("the enlarge handler does not target photographs",
+            "it must match the photo classes, and only those")
+    else:
+        ok("photos open in an enlarge overlay")
+
+    # the drawn avatar must not be clickable as if it were a photograph
+    if re.search(r"closest\(\s*['\"][^'\"]*svg", src):
+        bad("a drawn avatar is clickable to enlarge",
+            "an illustration must not open as though it were a photograph")
+    else:
+        ok("only real photographs open; drawn avatars do not")
+
+
 def check_transfer_reconciliation():
     """A transfer must describe the SAME player on both sides.
 
@@ -1184,6 +1236,7 @@ def main():
     check_value_scale_polarity()
     check_bracket_seed_structure()
     check_schedule_states_where()
+    check_photo_crop_and_zoom()
     print()
     check_transfer_reconciliation()
     print()
