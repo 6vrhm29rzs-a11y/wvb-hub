@@ -1,6 +1,7 @@
 # Phantom set counts: 3.4% of 2025 box scores credit every player with the full match
 
-**Measured 2026-08-23. Not corrected — the fix changes published numbers, so it is Cody's call.**
+**Measured 2026-08-23. APPLIED 2026-08-23 on Cody's instruction.** The rule below
+is live in `crawl_2025.py`; the results of applying it are at the bottom.
 
 ## What the feed does
 
@@ -59,8 +60,7 @@ That is a judgement about the FIELD's validity in one record, not about who
 played. It is defensible and it is still a change to published numbers, which is
 why it is written up rather than applied.
 
-**Open question for Cody:** apply that rule, or leave the numbers as the feed
-gives them and state the limitation on the page?
+**Cody's call, 2026-08-23: apply it.** Done — see Results below.
 
 ## Guarded meanwhile
 
@@ -70,3 +70,39 @@ produced elsewhere. Today that count is 0 of 13, so the distortion is real and
 inert. ⚠ The guard is explicitly scoped to the live season: this module defaults
 SEASON to 2025 while `build_hub.py` defaults to 2026, which is how the check
 first reported 331 failures for a live-season question.
+
+
+## Results of applying it
+
+Applied in `crawl_2025.py`'s player aggregation, narrower than "drop the game":
+a line with no production at all, in a game whose `gp` is identical for every
+player, contributes **no sets**. A player with production in that same game
+keeps hers, because her line IS evidence she was on court. Games where `gp`
+varies are untouched — there an empty line with `gp=1` is an ordinary substitute
+who did nothing measurable, and that set is real.
+
+| | 2025 | 2026 |
+|---|---|---|
+| phantom lines skipped | **760** | 13 |
+| players in the aggregate | 6,017 → **5,923** | 127 → **114** |
+
+The 94 players who disappear from 2025 had *only* phantom lines — they never
+recorded anything in any match. They remain on their team's roster, which comes
+from the roster crawl, not the box aggregate.
+
+**Effect on rates:** 303 players' set counts changed and their points/set rose by
+a **median +17.6%** (p90 +133%, max +667%), against the 16.7% predicted before
+the change. **Zero went down**, which is the invariant: removing sets from a
+denominator cannot lower a rate.
+
+**Cost:** 72 of 348 Digby summaries were withheld because their durable facts
+moved — they cite `returning_production_pct`, `top_scorer_*_points_per_set` and
+`biggest_loss_*_points_2025`, which are exactly the fields this corrects. They
+need regenerating. Verified first, per the standing rule, that the NEW hashes are
+stable: a second full nightly rebuild moved **0 of 348**.
+
+**Guarded** in `test_display_invariants.py`:
+`check_phantom_sets_are_harmless()` watches the raw feed, and
+`check_aggregate_excludes_phantom_sets()` recomputes every set count from the box
+scores and fails if the aggregate credits one the box scores do not justify —
+verified with a negative control.

@@ -627,6 +627,19 @@ def crawl_players():
     # 11,568 kills in orphaned partials, understating those players' seasons.
     # Found because the roster join reported an "ambiguous" match on a player
     # who appeared twice under one team.
+    _COUNTS = ("kills", "errors", "atts", "aces", "digs",
+               "bs", "ba", "assists", "points")
+
+    def _has_production(row):
+        """Did this line record anything at all? Not 'did she play well'."""
+        for k in _COUNTS:
+            try:
+                if int(str(row.get(k) or 0).strip() or 0):
+                    return True
+            except (TypeError, ValueError):
+                continue
+        return False
+
     import unicodedata as _ud
 
     def _canon(first, last):
@@ -635,12 +648,45 @@ def crawl_players():
                     if not _ud.combining(c))
         return re.sub(r"[^a-z]", "", w)
 
+    # ---- PHANTOM SET LINES ------------------------------------------------
+    # `gamesPlayed` is normally the PLAYER's sets and varies correctly between
+    # starters and substitutes. In a minority of box scores it does not: every
+    # listed player reports the same value -- the match's set count -- including
+    # players whose line is entirely empty. Measured on the completed 2025
+    # season: 173 of 5,131 games (3.4%), 444 such lines, 331 of those players
+    # producing in other matches. Because `sets` is the denominator of every
+    # per-set rate, those phantom sets understated their rates by a MEDIAN
+    # 16.7% (p90 66.7%; 120 players by more than 25%).
+    #
+    # THE RULE, and it is narrower than "drop the game". We do not decide that a
+    # player did not play because her line is empty -- that is an inference
+    # about a person. We decline to CREDIT sets where there is no evidence of
+    # participation: in a game whose gp is demonstrably not per-player, an empty
+    # line is not evidence. A player with production in the same game keeps her
+    # sets, because her line IS evidence she was on court.
+    #
+    # ⚠ Deliberately NOT applied to games where gp varies. There an empty line
+    # with gp=1 is an ordinary substitute who did nothing measurable, and that
+    # set is real. This only touches records where the field itself is broken.
+    def _uniform_gp_game(rows):
+        if not rows:
+            return False
+        if len(set(str(x.get("gp")) for x in rows)) != 1:
+            return False
+        return any(not _has_production(x) for x in rows)
+
     agg = {}
     seen_names = {}
     ngames = 0
+    dropped_lines = 0
     for rec in load_records_jsonl(PLAYERBOX_JSONL, key="game_id").values():
         ngames += 1
-        for r in rec.get("rows") or []:
+        _rows = rec.get("rows") or []
+        _broken = _uniform_gp_game(_rows)
+        for r in _rows:
+            if _broken and not _has_production(r):
+                dropped_lines += 1
+                continue
             key = (r["team_id"], _canon(r.get("first"), r.get("last")))
             # keep the most frequently served spelling as the display name
             nm = ((r.get("first") or "").strip(), (r.get("last") or "").strip())
@@ -661,6 +707,10 @@ def crawl_players():
                     e[dst] += int(str(r.get(src) or 0).strip() or 0)
                 except (TypeError, ValueError):
                     pass
+
+    if dropped_lines:
+        print("  phantom set lines skipped: %d "
+              "(empty lines in games whose gp is not per-player)" % dropped_lines)
 
     for key, e in agg.items():
         best = seen_names.get(key)

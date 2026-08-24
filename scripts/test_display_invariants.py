@@ -884,6 +884,72 @@ def check_phantom_sets_are_harmless():
         ok("phantom set lines exist but distort nothing (%d watched)" % len(phantom))
 
 
+def check_aggregate_excludes_phantom_sets():
+    """The season aggregate must not carry sets from a phantom line.
+
+    The watch above looks at the raw feed; this checks the thing the site
+    actually reads. Recomputes every player's set count straight from the box
+    scores under the same rule the crawler applies -- a line with no production
+    at all, in a game whose `gp` is identical for every player, contributes no
+    sets -- and asserts the aggregate agrees.
+
+    THE INVARIANT THAT MAKES THIS WORTH HAVING: removing sets from a denominator
+    can only raise a rate. When the rule was first applied, 303 players' set
+    counts changed and their points/set rose by a median 17.6% with ZERO going
+    down. A regression that re-credited phantom sets would show up here as an
+    aggregate with MORE sets than the box scores justify.
+    """
+    live = int(os.environ.get("WVB_SEASON", "2026"))
+    pb = os.path.join(REPO, "data", "raw", str(live), "playerbox.jsonl")
+    agg = os.path.join(REPO, "data", "raw", str(live), "players_%d.json" % live)
+    if not (os.path.exists(pb) and os.path.exists(agg)):
+        print("  no aggregate yet -- skipping phantom-aggregate check")
+        return
+
+    COUNTS = ("kills", "errors", "atts", "aces", "digs", "bs", "ba",
+              "assists", "points")
+
+    def n(v):
+        try:
+            return int(str(v or 0).strip() or 0)
+        except (TypeError, ValueError):
+            return 0
+
+    def produced(r):
+        return any(n(r.get(k)) for k in COUNTS)
+
+    want = {}
+    for line in open(pb, encoding="utf-8"):
+        if not line.strip():
+            continue
+        rows = (json.loads(line).get("rows") or [])
+        if not rows:
+            continue
+        broken = (len(set(str(x.get("gp")) for x in rows)) == 1
+                  and any(not produced(x) for x in rows))
+        for r in rows:
+            if broken and not produced(r):
+                continue
+            key = (str(r.get("team_id")),
+                   re.sub(r"[^a-z]", "",
+                          ((r.get("first") or "") + (r.get("last") or "")).lower()))
+            want[key] = want.get(key, 0) + n(r.get("gp"))
+
+    over = []
+    for p in (json.load(open(agg)) or {}).get("players", []):
+        key = (str(p.get("team_id")),
+               re.sub(r"[^a-z]", "",
+                      ((p.get("first") or "") + (p.get("last") or "")).lower()))
+        expect = want.get(key)
+        if expect is not None and p.get("sets", 0) > expect:
+            over.append((p.get("last"), p.get("sets"), expect))
+    if over:
+        bad("the aggregate credits sets the box scores do not justify",
+            "%d player(s) carry phantom sets, e.g. %s" % (len(over), over[:3]))
+    else:
+        ok("no aggregated player carries a phantom set (%d checked)" % len(want))
+
+
 def check_transfer_reconciliation():
     """A transfer must describe the SAME player on both sides.
 
@@ -1438,6 +1504,7 @@ def main():
     check_no_class_name_collisions()
     check_today_is_pacific()
     check_phantom_sets_are_harmless()
+    check_aggregate_excludes_phantom_sets()
     print()
     check_transfer_reconciliation()
     print()
