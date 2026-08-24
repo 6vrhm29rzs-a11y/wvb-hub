@@ -1570,6 +1570,7 @@ def build():
     played = len(res)
 
     # ---- rankings rows ---------------------------------------------------
+    _bcolors = ((load("data/team_colors_%d.json" % SEASON) or {}).get("teams") or {})
     rrows = []
     for t in sorted(teams, key=lambda x: x["rank26"]):
         def c(v):
@@ -1621,11 +1622,15 @@ def build():
                      'normalised to a neutral schedule.</div>'
                      '<div class="pls">' + cells + '</div></td></tr>')
         rrows.append(
-            '<tr class="row" data-r="%d"><td class="rk">%d%s</td>'
+            '<tr class="row" data-r="%d" style="--tc:%s"><td class="rk">%d%s</td>'
             '<td class="tm">%s%s%s</td><td class="cf">%s</td>'
             '<td class="n hi">%s</td><td class="n">%s</td>%s'
             '<td class="n">%s</td>%s<td class="n">%s</td><td class="n hi">%s</td></tr>%s'
-            % (t["rank26"], t["rank26"], mover(t),
+            % (t["rank26"],
+               # the school's own colour, same source the Top 25 uses -- the two
+               # tables of the same teams should not look like different sites
+               (_bcolors.get(t["team"]) or {}).get("primary") or "var(--line2)",
+               t["rank26"], mover(t),
                logo_img(t["team"], logos), esc(t["team"]),
                (' <b class="pl6">%s</b>' % t["rot"]) if t.get("rot") and t["rot"] < 6 else "",
                esc(t["conf"]),
@@ -1834,7 +1839,7 @@ def build():
 
     trows = "".join(
         '<tr><td class="cd">%s</td><td class="tm">%s</td>'
-        '<td class="net">%s</td><td class="n">%s</td></tr>'
+        '<td class="tvnet"><span class="netchip">%s</span></td><td class="n">%s</td></tr>'
         % (esc(r["day"]), esc(r["m"]), esc(r["n"]), esc(r["t"]))
         for r in tvrows)
 
@@ -2387,6 +2392,25 @@ td.tm{font-size:15px}
 .wh2 .pl{font:11.5px/1.4 var(--mono);color:var(--ink3)}
 .wh2 .pl.u{font-style:italic}
 .va.nt{color:var(--amber);font-weight:800}
+/* ---- ON TV: the network, as a chip -----------------------------------
+   ⚠ THIS CELL USED CLASS "net", WHICH IS ALSO THE MASTHEAD'S VOLLEYBALL NET --
+   a repeating-linear-gradient mesh. Every network cell was being painted with
+   it, so the column rendered as a striped block and looked broken. One class
+   name, two meanings, exactly the duplicate-id bug one layer down. Renamed to
+   .tvnet, and the network now reads as a chip. */
+td.tvnet{text-align:left}
+.netchip{display:inline-block;white-space:nowrap;padding:3px 8px;border-radius:4px;
+  font:700 10.5px/1.4 var(--mono);letter-spacing:.04em;
+  color:var(--blue);background:color-mix(in oklab,var(--navy) 16%,transparent);
+  border:1px solid color-mix(in oklab,var(--navy) 34%,transparent)}
+/* ---- RANKINGS: the school's colour on the row edge --------------------
+   Matches the Top 25, so the two tables of the same teams stop looking like
+   two different products. */
+#rbody tr.row td:first-child{position:relative}
+#rbody tr.row td:first-child::before{content:"";position:absolute;left:0;
+  top:50%;transform:translateY(-50%);width:3px;height:22px;border-radius:2px;
+  background:var(--tc,var(--line2))}
+#rbody tr.row:hover td{background:rgba(91,168,245,.06)}
 /* ---- CONFERENCE STRENGTH STRIP ---------------------------------------
    One dot per team at its real rank. Dots overlap on purpose where a league is
    tightly packed -- that overlap IS the reading. A 2px ring in the surface
@@ -3386,7 +3410,12 @@ function logo(team, cls) {
              'onerror="this.style.display=\'none\'">' : '';
 }
 const n1 = v => (v === null || v === undefined) ? '—' : v;
-const pct = v => (v === null || v === undefined) ? '—' : v.toFixed(3);
+/* HITTING PERCENTAGE IS WRITTEN WITHOUT ITS LEADING ZERO -- .358, the way
+   every box score in the sport prints it. The Players tab was the one
+   place still showing 0.358, which reads as a different quantity from the
+   .358 three tabs over. A negative keeps its sign in front of the dot. */
+const pct = v => (v === null || v === undefined) ? '\u2014'
+  : (v < 0 ? '-' : '') + Math.abs(v).toFixed(3).replace(/^0/, '');
 
 /* a completed match opens its own box score */
 function boxHTML(gid) {
@@ -3457,6 +3486,11 @@ PLAYERS.forEach(p => { const o = document.createElement('option');
 function renderPlayers() {
   const q = document.getElementById('pq').value.toLowerCase().split('·')[0].trim();
   const rows = PLAYERS.filter(p => !q || (p.name + ' ' + p.team).toLowerCase().includes(q));
+  /* The column the table is sorted by carries the value scale, exactly as the
+     Stats tab does -- 4.50 and 2.86 should not look alike in a list of 129. */
+  const pv = rows.slice(0, 300).map(p => p.pps);
+  const plo = pv.length ? Math.min.apply(null, pv) : 0;
+  const phi = pv.length ? Math.max.apply(null, pv) : 1;
   document.getElementById('pbody').innerHTML = rows.slice(0, 300).map(p =>
     '<tr class="prow" data-k="' + p.team + '|' + p.name + '">' +
     '<td class="tm">' + playerCell(p, 32) + '</td>' +
@@ -3464,7 +3498,7 @@ function renderPlayers() {
     '<td class="n">' + (p.pos || '') + '</td><td class="n">' + p.sets + '</td>' +
     '<td class="n">' + p.k + '</td><td class="n">' + pct(p.hit) + '</td>' +
     '<td class="n">' + p.digs + '</td><td class="n">' + (p.bs + p.ba * 0.5) + '</td>' +
-    '<td class="n hi">' + p.pps.toFixed(2) + '</td></tr>').join('');
+    hcell(p.pps, p.pps.toFixed(2), plo, phi, 'high', 'seq') + '</tr>').join('');
   document.getElementById('pcnt').textContent = rows.length + ' players';
   if (rows.length === 1) showPlayer(rows[0]);
 }

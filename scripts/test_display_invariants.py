@@ -729,6 +729,43 @@ def check_hero_podium_signs():
         ok("hero podium values are coloured by sign (%d checked)" % len(pods))
 
 
+def check_no_class_name_collisions():
+    """A class name must mean one thing on the page.
+
+    PAID FOR. The On TV table's network cell used class "net" -- which is also
+    the MASTHEAD'S VOLLEYBALL NET, a repeating-linear-gradient mesh. Every
+    network cell was painted with that texture, so the whole column rendered as
+    a striped block and read as a broken page. Same shape as the duplicate
+    element id (`sbody` twice), one layer down: silent, because CSS does not
+    complain when two unrelated things answer to the same name.
+
+    Checked for the specific pair that bit, plus the general shape: a class
+    whose rule sets a repeating-linear-gradient background must not also be used
+    on a table cell, because that is what decorative-texture-meets-data looks
+    like.
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping class-collision check")
+        return
+    src = open(hub, encoding="utf-8").read()
+    if re.search(r'<td[^>]*class="[^"]*\bnet\b', src):
+        bad("a table cell wears the masthead's net class",
+            'td class="net" collides with the .net mesh graphic; the network '
+            "column renders as stripes")
+    else:
+        ok("no table cell wears the masthead's net class")
+
+    # the texture rules themselves should stay on layout elements only
+    tex = re.findall(r"\.([a-zA-Z][\w-]*)\s*\{[^}]*repeating-linear-gradient", src)
+    hit = [c for c in set(tex)
+           if re.search(r'<t[dh][^>]*class="[^"]*\b%s\b' % re.escape(c), src)]
+    if hit:
+        bad("a texture class is applied to table cells", str(hit[:3]))
+    else:
+        ok("texture classes stay off table cells (%d checked)" % len(set(tex)))
+
+
 def check_transfer_reconciliation():
     """A transfer must describe the SAME player on both sides.
 
@@ -1280,6 +1317,7 @@ def main():
     check_schedule_states_where()
     check_photo_crop_and_zoom()
     check_hero_podium_signs()
+    check_no_class_name_collisions()
     print()
     check_transfer_reconciliation()
     print()
