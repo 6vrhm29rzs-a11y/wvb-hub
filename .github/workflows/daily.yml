@@ -41,6 +41,15 @@ jobs:
       # Guard the invariants BEFORE touching the network. If the freshness
       # semantics ever regress, a daily run would silently re-freeze partial
       # days -- the exact bug this test was written for.
+      # ⚠ CI INSTALLED NOTHING, AND THE SIMULATOR NEEDS NUMPY. Every daily run
+      # since the simulator was written has skipped it with
+      # "season sim needs predictions" -- a message about a missing input, when
+      # the actual cause was ModuleNotFoundError. The projections it produces
+      # are not committed, so nothing published was wrong; what was lost is that
+      # the simulator has never once been exercised by the nightly run.
+      - name: Install dependencies
+        run: python3 -m pip install --quiet -r requirements.txt
+
       - name: Freshness regression test
         run: python3 scripts/test_crawl_freshness.py
 
@@ -114,7 +123,11 @@ jobs:
           # Win probability for everything still to be played. Depends on
           # venues.py above -- a neutral floor gets no home advantage.
           python3 scripts/predict_2026.py || echo "prediction needs a prior rating; skipping"
-          python3 scripts/simulate_season_2026.py || echo "season sim needs predictions; skipping"
+          # If this skips, say WHICH of the two reasons it was: an honest
+          # message here would have surfaced the missing dependency a long time
+          # ago instead of reading as an ordinary pre-season no-op.
+          python3 scripts/simulate_season_2026.py \
+            || echo "season sim did not run -- check for a missing dependency or an absent prior rating"
           # Score yesterday's predictions against what happened. Runs AFTER the
           # crawl so the results are in, and reads only the pre-match log.
           python3 scripts/score_predictions.py || true

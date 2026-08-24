@@ -62,6 +62,16 @@ def existing_weeks():
     return weeks
 
 
+# THE SOURCES THIS ARCHIVE CAN CARRY, declared once so the guard can import
+# them instead of restating them. They drifted apart exactly once: "digby" was
+# added here when the weekly freeze moved to the Top 25, the test kept
+# whitelisting ("live", "preseason"), and because the snapshot only runs on
+# MONDAYS the mismatch lay dormant for a week and then failed the first real
+# Monday of the season -- taking the commit step with it, so the one artifact
+# that cannot be rebuilt was never archived.
+SOURCES = ("digby", "live", "preseason")
+
+
 def current_ranking():
     """Whatever the page is showing right now.
 

@@ -1,0 +1,15 @@
+# The ONLY third-party dependency in this project, and it is deliberately one.
+# Everything else runs on the standard library against Python 3.9 (the system
+# interpreter on Cody's machine), which is why there was no requirements file
+# for so long.
+#
+# numpy is imported by simulate_season_2026.py, fit_projection.py and
+# measure_level_effect.py. Only the first runs daily -- and it had NEVER run in
+# CI, because the workflow installed nothing and its failure was swallowed by a
+# `|| echo "season sim needs predictions; skipping"` that blamed the wrong
+# thing entirely.
+#
+# Pinned to the 2.x line rather than a single version: the uses here are dot
+# products, percentiles and RNG draws, none of which are version-sensitive, and
+# a hard pin would rot silently on a runner image update.
+numpy>=1.24,<3

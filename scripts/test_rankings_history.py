@@ -96,8 +96,18 @@ def test_real_archive_shape():
     check(len(weeks) == len(set(weeks)), "real archive has no duplicate weeks",
           str(weeks))
     check(all(r.get("teams") for r in rows), "every archived week has teams")
-    check(all(r.get("source") in ("live", "preseason") for r in rows),
-          "every archived week names its source")
+    # ⚠ IMPORTED, NOT RESTATED. This line used to whitelist ("live",
+    # "preseason") while snapshot_rankings.py had grown a third source,
+    # "digby", when the weekly freeze moved to the Top 25. The snapshot runs on
+    # MONDAYS ONLY, so the two sat out of step for a week and then failed on the
+    # first real Monday -- and because the guards step gates the commit, the
+    # week's ranking was never archived. The archive is the one artifact in this
+    # project that cannot be rebuilt, so a guard that blocks it must not be able
+    # to disagree with the writer about what a valid row looks like.
+    import snapshot_rankings as SNAP
+    unknown = sorted(set(r.get("source") for r in rows) - set(SNAP.SOURCES))
+    check(not unknown, "every archived week names a source the writer can emit",
+          "unknown source(s): %s (writer emits %s)" % (unknown, list(SNAP.SOURCES)))
 
 
 def test_movement_never_crosses_the_basis():

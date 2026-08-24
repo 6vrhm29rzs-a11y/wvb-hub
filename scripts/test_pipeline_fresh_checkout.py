@@ -102,7 +102,20 @@ def step_commands(step):
         s = ln.strip()
         if s and not s.startswith("#"):
             out.append(s)
-    return out
+    # ⚠ JOIN SHELL LINE CONTINUATIONS. A command split across lines with a
+    # trailing backslash arrived here as two entries: the first looked like a
+    # REQUIRED command (its `||` was on the next line) and, run alone, ended in
+    # a dangling backslash and exited non-zero. So reformatting a workflow line
+    # for readability failed this guard while changing nothing about the
+    # pipeline -- a guard that objects to whitespace is a guard people learn to
+    # ignore.
+    joined = []
+    for cmd in out:
+        if joined and joined[-1].endswith("\\"):
+            joined[-1] = joined[-1][:-1].rstrip() + " " + cmd
+        else:
+            joined.append(cmd)
+    return joined
 
 
 def materialise(dest):
