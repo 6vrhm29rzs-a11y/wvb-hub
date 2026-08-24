@@ -489,6 +489,16 @@ def check_stats_dispatcher_does_not_recurse():
         bad("the Stats dispatcher calls itself",
             "renderStats() recurses -- the search box and stat selector will "
             "throw RangeError and silently do nothing")
+    # ⚠ THE FIRST VERSION OF THIS CHECK PASSED WHILE THE DISPATCHER WAS BROKEN.
+    # An edit replaced the else-branch with a different function and left
+    # renderLeaders() on the following line, so "renderLeaders appears in the
+    # body" was still true and the guard said nothing. Assert the BRANCH, not
+    # the presence of a name.
+    elif not re.search(r"if\s*\(\s*team\s*\)\s*renderTeamStats\(\)\s*;\s*"
+                       r"else\s+renderLeaders\(\)", code):
+        bad("the Stats dispatcher's else-branch is not renderLeaders",
+            "team -> renderTeamStats, otherwise renderLeaders; anything else "
+            "leaves the players table stale or renders the wrong view")
     elif "renderLeaders(" not in code or "renderTeamStats(" not in code:
         bad("the Stats dispatcher does not delegate to both renderers",
             "expected renderLeaders() and renderTeamStats() in renderStats()")
@@ -1894,6 +1904,197 @@ def check_every_view_names_its_season():
                    len(prev))
 
 
+def check_live_times_are_pacific():
+    """THE LIVE SLATE MUST USE THE SAME CLOCK AS THE REST OF THE PAGE.
+
+    live_server.py formatted start times in EASTERN and appended the literal
+    "ET", so tonight's slate read "6:00 PM ET" on a page whose every other time
+    was Pacific -- two clocks on one screen, three hours apart, with nothing
+    telling a reader which was which.
+
+    ⚠ TWO USES OF EASTERN THAT MUST NOT BE MERGED. The server still thinks in
+    Eastern to decide which DATES to ask the scoreboard for -- the feed is keyed
+    by the Eastern calendar day. Only the DISPLAY is Pacific. And the
+    plausibility test stays Eastern too: the feed's unannounced-start sentinel
+    is 1:00 AM ET, which converts to a completely ordinary-looking 10:00 PM PT,
+    so converting before judging would launder a non-time into a plausible one.
+
+    That is why the server defers to build_hub.listed_time() instead of
+    converting for itself -- one definition of how a time is shown (R4).
+    """
+    sys.path.insert(0, os.path.join(REPO, "scripts"))
+    try:
+        import live_server
+    except Exception as e:                       # noqa: BLE001 - report, not crash
+        bad("live_server.py does not import", str(e)[:120])
+        return
+
+    # An ordinary evening start must render Pacific.
+    got = live_server._fmt_time(1756602000, None, "Texas")
+    if not got.endswith("PT"):
+        bad("the live slate does not render in Pacific",
+            "got %r -- the rest of the page is Pacific" % got)
+    else:
+        ok("the live slate renders start times in Pacific")
+
+    # The midnight sentinel must still be suppressed, judged in Eastern.
+    if live_server._fmt_time(None, "1:00 AM ET", "Nebraska") != "TBA":
+        bad("the live slate prints the unannounced-start sentinel",
+            "1:00 AM ET at Nebraska is a placeholder, not a start time (R5)")
+    else:
+        ok("an unannounced start still renders as TBA, not as 10:00 PM")
+
+    # ...and Hawaii's genuinely late Eastern times must survive it.
+    if live_server._fmt_time(None, "1:00 AM ET", "Hawaii") == "TBA":
+        bad("Hawaii's real start times are being suppressed",
+            "1:00 AM ET is 7:00 PM in Honolulu -- an ordinary evening match")
+    else:
+        ok("Hawaii's genuine late-Eastern starts survive")
+
+
+def check_week_names_whose_ranking():
+    """THIS WEEK'S MATCHES, AND WHOSE RANK IS ON THEM.
+
+    The page carries TWO rankings and they disagree -- the AVCA coaches poll
+    (the official one, and what the feed's inline rank IS: verified against the
+    published poll, BYU 24, Kansas 15, Indiana 16, all three differing from
+    ours) and our own Top 25. Showing an unlabelled numeral next to a team name
+    lets a reader take it for whichever they had in mind, and this page spent a
+    while doing exactly that.
+
+    So: the AVCA number leads and is labelled as AVCA; our number appears only
+    where it disagrees, and is labelled as ours. This asserts both labels
+    survive, that the payload carries a human day label rather than a raw ISO
+    date, and that the two rank fields never swap meaning (R4).
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping week-ranking check")
+        return
+    src = open(hub, encoding="utf-8").read()
+    m = re.search(r"const WEEK = (\[.*?\]);", src, re.S)
+    if not m:
+        bad("the week payload is missing", "renderWeek has nothing to render")
+        return
+    rows = json.loads(m.group(1))
+    if not rows:
+        # Legitimately empty out of season -- not a failure, but say so.
+        print("  %-58s %s" % ("this week's matches (no fixtures in range)", "skip"))
+        return
+
+    # NO CARD PRINTS A RAW ISO DATE. Cards are read at a glance; a table is
+    # scanned, and its ISO column stays ISO on purpose (searchable, sortable,
+    # carries the year). This checks the cards only.
+    iso_cards = re.findall(r'<div class="cd">\s*(\d{4}-\d{2}-\d{2})', src)
+    if iso_cards:
+        bad("%d cards print a raw ISO date" % len(iso_cards),
+            "e.g. %s -- the week box says 'Today' beside them, so the page "
+            "shows two date formats at once" % iso_cards[0])
+    else:
+        ok("no card prints a raw ISO date")
+
+    missing = [r for r in rows if not r.get("dl")]
+    if missing:
+        bad("a week fixture has no day label",
+            "%d of %d rows would print a raw ISO date" % (len(missing), len(rows)))
+    else:
+        ok("every week fixture carries a day label", len(rows))
+
+    # comments are stripped: this file has three times written a guard that
+    # matched its own explanatory prose instead of the code.
+    scripts = re.findall(r"<script[^>]*>(.*?)</script>", src, re.S)
+    js = re.sub(r"/\*.*?\*/", " ", "\n".join(scripts), flags=re.S)
+    # EVERY rank badge on the page, not just the week box. Four call sites
+    # emitted one unlabelled; they now share a single definition per side, and
+    # this is what stops a fifth from appearing.
+    bare = re.findall(r'<i class="rnk"(?! title=)', src)
+    labelled = re.findall(r'<i class="rnk" title="AVCA coaches poll rank"', src)
+    if bare:
+        bad("%d rank badges do not say whose ranking they are" % len(bare),
+            "a bare numeral beside a team name is read as whichever ranking "
+            "the reader had in mind, and this page carries two that disagree")
+    elif not labelled:
+        bad("no rank badge is labelled", "either the markup or this guard is "
+                                         "wrong -- it is checking nothing")
+    else:
+        ok("every rank badge names the AVCA coaches poll", len(labelled))
+
+    if "our Top 25: " not in js:
+        bad("our own ranking is never shown beside the official one",
+            "the page holds two rankings that disagree and showed only one")
+    else:
+        ok("our Top 25 is shown where it disagrees, and labelled as ours")
+
+    # R4: ar/hr are AVCA, ao/ho are ours. If they ever swap, every number on
+    # the card is still correct and every label is wrong -- the exact failure
+    # mode R4 exists for, and invisible without a check.
+    both = [r for r in rows if r.get("ar") and r.get("ao")]
+    if both:
+        same = sum(1 for r in both if str(r["ar"]) == str(r["ao"]))
+        if same == len(both):
+            bad("the AVCA rank and our rank are identical on every fixture",
+                "two independent rankings agreeing on all %d is the signature "
+                "of one field being copied into both" % len(both))
+        else:
+            ok("the two rank fields are independent", len(both))
+
+
+def check_page_script_parses():
+    """EVERY <script> ON THE PAGE MUST PARSE. The cheapest guard here, and it
+    did not exist.
+
+    ⚠ WHAT IT CATCHES, AND WHY NOTHING ELSE DID. A JavaScript SyntaxError is not
+    local: the browser discards the WHOLE <script> element before running a line
+    of it, so one bad character kills every renderer in that block. The Python
+    build still prints "wrote START-HERE.html", every data guard in this file
+    still passes -- because the data is fine -- and the page is dead.
+
+    Paid for while wiring "this week's top matches": a newline written into a
+    JS template as the two characters \\ and n landed in code position. The
+    symptom was a box rendering EMPTY, which reads like a data problem and sent
+    me looking in the wrong place entirely.
+
+    Reports SKIP without node rather than passing -- a check that could not run
+    must never look like one that did.
+    """
+    import shutil
+    import subprocess
+    import tempfile
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping script-parse check")
+        return
+    if not shutil.which("node"):
+        print("  %-58s %s" % ("all page scripts parse (node not installed)", "skip"))
+        return
+    html = open(hub, encoding="utf-8").read()
+    scripts = re.findall(r"<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>", html, re.S)
+    checked = 0
+    for i, body in enumerate(scripts):
+        if not body.strip():
+            continue
+        checked += 1
+        fh = tempfile.NamedTemporaryFile("w", suffix=".js", delete=False,
+                                         encoding="utf-8")
+        fh.write(body)          # --check parses without executing; no DOM needed
+        fh.close()
+        try:
+            r = subprocess.run(["node", "--check", fh.name],
+                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            if r.returncode != 0:
+                msg = r.stdout.decode("utf-8", "replace").strip().split("\n")
+                bad("page script #%d does not parse" % (i + 1),
+                    " / ".join(x.strip() for x in msg[:3]))
+                return
+        finally:
+            os.unlink(fh.name)
+    if checked:
+        ok("all page scripts parse", checked)
+    else:
+        bad("no page scripts found", "the extraction regex is wrong, so this "
+                                     "guard was checking nothing")
+
+
 def main():
     print("=" * 68)
     print("DISPLAY INVARIANTS -- is each number under the right heading?")
@@ -1917,6 +2118,9 @@ def main():
     check_photo_crop_and_zoom()
     check_hero_podium_signs()
     check_no_class_name_collisions()
+    check_live_times_are_pacific()
+    check_week_names_whose_ranking()
+    check_page_script_parses()
     check_today_is_pacific()
     check_decor_never_covers_content()
     check_players_view_shows_every_stat()

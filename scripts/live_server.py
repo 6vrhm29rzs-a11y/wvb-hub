@@ -64,10 +64,48 @@ def _et_now():
     return datetime.datetime.now(ET) if ET else datetime.datetime.utcnow()
 
 
-def _fmt_time(epoch):
-    if not epoch or not ET:
+_HUB = [None]
+
+
+def _hub():
+    """build_hub, imported lazily. It owns the one rule for displaying a time."""
+    if _HUB[0] is None:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import build_hub
+        _HUB[0] = build_hub
+    return _HUB[0]
+
+
+def _fmt_time(epoch, start_time=None, home_team=None):
+    """A start time, rendered the way the rest of the page renders one.
+
+    TWO THINGS THAT MUST NOT BE MERGED. `ET` above decides which DATES to ask
+    the scoreboard for -- the feed is keyed by the Eastern calendar day and
+    that stays Eastern. What a reader SEES is Pacific, because Cody is.
+
+    This used to format the epoch in Eastern and append the literal "ET", so
+    tonight's slate read "6:00 PM ET" on a page whose every other time was
+    Pacific -- two clocks on one screen, three hours apart, with nothing saying
+    which was which.
+
+    It defers to build_hub.listed_time() rather than converting here, so the
+    midnight sentinel is judged in EASTERN terms before any conversion (a 1:00
+    AM ET placeholder becomes a perfectly ordinary-looking 10:00 PM PT, so
+    converting first would launder a non-time into a plausible one) and Hawaii's
+    genuine late starts survive. One definition of "how a time is shown" (R4).
+    """
+    st = (start_time or "").strip()
+    if not st and epoch and ET:
+        try:
+            st = datetime.datetime.fromtimestamp(int(epoch), ET).strftime("%-I:%M %p ET")
+        except (TypeError, ValueError, OSError):
+            return ""
+    if not st:
         return ""
-    return datetime.datetime.fromtimestamp(int(epoch), ET).strftime("%-I:%M %p ET")
+    try:
+        return _hub().listed_time(st, home_team, epoch)
+    except Exception:
+        return st
 
 
 class Cache(object):
@@ -104,7 +142,8 @@ class Cache(object):
                     "id": g.get("gameID"),
                     "state": state,
                     "date": d.isoformat(),
-                    "time": _fmt_time(g.get("startTimeEpoch")),
+                    "time": _fmt_time(g.get("startTimeEpoch"), g.get("startTime"),
+                                     (h.get("names") or {}).get("short")),
                     "period": g.get("currentPeriod") or "",
                     "away": (a.get("names") or {}).get("short"),
                     "home": (h.get("names") or {}).get("short"),

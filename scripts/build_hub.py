@@ -196,6 +196,53 @@ FAR_WEST_HOME = ("Hawaii",)
 _EARLY_AM = re.compile(r"^(12|[1-7]):\d\d\s*AM", re.I)
 
 
+def day_label(iso, today=None):
+    """"Sun Aug 30" -- a calendar date the way a reader reads one.
+
+    A bare ISO date on a scoreboard is a formatting failure: "2026-08-30" is
+    unambiguous and makes the reader do arithmetic to learn it is a Sunday.
+
+    ⚠ IT LIVES AT MODULE LEVEL BECAUSE TWO RENDERERS NEED IT and they run at
+    different points in build(). The first version was nested inside build(),
+    defined AFTER the score cards were assembled -- so the cards kept printing
+    raw ISO dates while the week box directly below them said "Today", one page
+    showing two date formats at once. Mirrored in the page script as
+    dayLabel(); no timezone is involved, an ISO calendar date is already a day.
+    """
+    today = today or datetime.date.today()
+    try:
+        d = datetime.date(*[int(x) for x in (iso or "").split("-")])
+    except (TypeError, ValueError):
+        return iso or ""
+    if d == today:
+        return "Today"
+    if d == today + datetime.timedelta(days=1):
+        return "Tomorrow"
+    if d == today - datetime.timedelta(days=1):
+        return "Yesterday"
+    return d.strftime("%a %b %-d")
+
+
+RANK_TITLE = "AVCA coaches poll rank"
+
+
+def rank_badge(v):
+    """The little numeral beside a team name -- and whose ranking it is.
+
+    ⚠ IT IS THE AVCA COACHES POLL, NOT OURS. The rank travels with the fixture
+    in ncaa.com's own feed, and it was checked against the published poll
+    rather than assumed: BYU 24, Kansas 15, Indiana 16 -- all three match the
+    AVCA and all three differ from our rating (16, 21, 24). So the number is
+    right and the page was simply not saying whose it was, which lets a reader
+    take it for whichever ranking they had in mind.
+
+    Four separate call sites emitted this badge with no label. One function now
+    does, so a fifth cannot ship unlabelled (R4: the reason a field's meaning
+    lives in one place is that every consumer then agrees by construction).
+    """
+    return ('<i class="rnk" title="%s">%s</i> ' % (RANK_TITLE, v)) if v else ""
+
+
 def listed_time(start_time, home_team, epoch=None):
     """The feed's start time, or "TBA" when that time is a placeholder.
 
@@ -1919,7 +1966,7 @@ def build():
                       % (i, av, hv, _m, "" if _m == 1 else "s",
                          "w" if aw else "", av, "" if aw else "w", hv, _w))
         awin = (r["away_sets"] or 0) > (r["home_sets"] or 0)
-        rank = lambda v: ('<i class="rnk">%s</i> ' % v) if v else ""
+        rank = rank_badge
         nond1 = "" if (r["away_d1"] and r["home_d1"]) else \
             ' <span class="tag">non&#8209;D&#8209;I</span>'
         # THE VENUE IS REPORTED, NOT INFERRED. The first version printed
@@ -1944,7 +1991,7 @@ def build():
             '<div class="side %s">%s%s%s<b>%s</b></div></div>'
             '<div class="sets">%s</div>'
             '<div class="venue">%s</div></div>'
-            % (esc(r.get("gid") or ""), esc(r["date"] or ""), esc(r["time"]), nond1,
+            % (esc(r.get("gid") or ""), esc(day_label(r["date"])), esc(r["time"]), nond1,
                "win" if awin else "", rank(r["away_rank"]),
                logo_img(r["away"], logos), esc(r["away"]), r["away_sets"],
                "" if awin else "win", rank(r["home_rank"]),
@@ -1970,6 +2017,38 @@ def build():
         # a coin flip is information; dressing 51% as a pick is not
         cls = "toss" if pct < 0.58 else ""
         return "%s <b>%.0f%%</b>" % (esc(fav), 100 * pct), cls
+
+    # THE COMING WEEK, as data. Today's slate and the week's headline matches
+    # both need fixtures the client can read; the schedule itself is rendered
+    # server-side as HTML, so eight days are emitted as JSON rather than the
+    # whole 1,524-fixture season -- enough for both jobs, a fraction of the size.
+    _today = datetime.date.today()
+    _horizon = (_today + datetime.timedelta(days=7)).isoformat()
+    _today_s = _today.isoformat()
+    # TWO RANKINGS, NAMED. `ar`/`hr` come from the feed and ARE the AVCA coaches
+    # poll -- verified against the published poll (BYU 24, Kansas 15, Indiana
+    # 16 all agree, and all three differ from ours). That is the official
+    # ranking and it leads. `ao`/`ho` are OUR Top 25, carried alongside so the
+    # page can show where we disagree instead of quietly presenting one number
+    # as "the" ranking. Rendering an unlabelled rank was the real problem: the
+    # page showed AVCA numbers with nothing saying whose they were.
+    #
+    # ⚠ COMPUTED HERE, NOT IN THE PAGE SCRIPT. `TEAMS` is declared near the end
+    # of the script and a const in the temporal dead zone THROWS on access --
+    # including from typeof -- so a renderer that runs earlier cannot read it.
+    # That has already cost this project the standings differential once.
+    _ourrank = {}
+    for _r in ((load("data/digby_top25_%d.json" % SEASON) or {}).get("top") or []):
+        if _r.get("team") and _r.get("rank"):
+            _ourrank[_r["team"]] = int(_r["rank"])
+
+    _week_rows = [
+        {"d": r["d"], "dl": day_label(r["d"], _today), "a": r["a"], "h": r["h"], "t": r["t"],
+         "ar": r.get("ar") or "", "hr": r.get("hr") or "",
+         "ao": _ourrank.get(r["a"]) or "", "ho": _ourrank.get(r["h"]) or "",
+         "venue": r.get("venue"), "city": r.get("city"), "st": r.get("st"),
+         "site": r.get("site"), "event": r.get("event"), "kind": r.get("kind")}
+        for r in sched if _today_s <= r["d"] <= _horizon]
 
     srows = []
     for r in sched[:600]:
@@ -2009,10 +2088,10 @@ def build():
             % ((' class="rkd both"' if (r["ar"] and r["hr"])
                 else (' class="rkd"' if (r["ar"] or r["hr"]) else "")),
                r["d"], r["t"] or "&mdash;",
-               ('<i class="rnk">%s</i> ' % r["ar"]) if r["ar"] else "",
+               rank_badge(r["ar"]),
                logo_img(r["a"], logos), esc(r["a"]),
                "vs" if neutral else "at",
-               ('<i class="rnk">%s</i> ' % r["hr"]) if r["hr"] else "",
+               rank_badge(r["hr"]),
                logo_img(r["h"], logos), esc(r["h"]),
                badge, where,
                cls, pick))
@@ -2093,6 +2172,7 @@ def build():
         .replace("{{SCORE_CARDS}}", "".join(cards) or
                  '<div class="empty">No completed matches yet.</div>') \
         .replace("{{SEED_ROWS}}", "".join(seeds)) \
+        .replace("{{WEEK_JSON}}", json.dumps(_week_rows, separators=(",", ":"))) \
         .replace("{{SCHED_ROWS}}", srows) \
         .replace("{{TV_ROWS}}", trows) \
         .replace("{{N_PLAYED}}", str(played)) \
@@ -2470,6 +2550,11 @@ td.pick b{color:var(--navy)}
 .card.soon:before{content:none}
 .card.soon{border-style:dashed}
 .card.soon .cd{color:var(--navy)}
+/* OUR RANKING, WHERE IT DISAGREES. Deliberately quiet -- the AVCA number is the
+   official one and keeps the prominent slot; this is the second opinion, and it
+   should read as a footnote rather than compete with the matchup. */
+.ourrk{font:600 11px/1.3 var(--mono);color:var(--ink2);letter-spacing:.02em;
+  margin-top:6px;padding-top:6px;border-top:1px dotted var(--line)}
 .tipoff{font:700 15px/1 var(--mono);color:var(--navy);margin-left:auto}
 .livehead #livemeta{font:12px/1 var(--mono);color:var(--ink2);margin-left:auto}
 .dot{width:9px;height:9px;border-radius:50%;background:var(--live);
@@ -2741,6 +2826,10 @@ td.tvnet{text-align:left}
   text-transform:uppercase;color:var(--ink3)}
 .coachline b{font:600 16px/1.2 var(--disp);color:var(--ink);letter-spacing:.01em}
 .coachline .ct{font:11.5px/1.3 var(--mono);color:var(--ink3)}
+/* the week's headline matches: a ranked-v-ranked card earns the ball's yellow */
+.card.marquee{border-left:3px solid var(--amber)}
+.card.marquee .cd .tag{margin-left:8px}
+#weekcards .card{border-style:solid}
 .glance{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0 18px}
 .gl{padding:13px 15px;border-radius:12px;border:1px solid transparent;
   background-origin:border-box;background-clip:padding-box,border-box;
@@ -3371,6 +3460,10 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <div class="livehead"><b class="soon">Later today</b><span id="todaymeta"></span></div>
     <div class="cards" id="todaycards"></div>
   </div>
+  <div id="weekbox" hidden>
+    <div class="livehead"><b class="soon">This week</b><span id="weekmeta"></span></div>
+    <div class="cards" id="weekcards"></div>
+  </div>
   <div class="ctl">
     <label class="dlab" for="sdate">Jump to a date</label>
     <input type="date" id="sdate" min="2026-08-21" max="2026-12-31">
@@ -3732,15 +3825,122 @@ function setStrip(sets, live) {
       '<span class="' + (!now && !aw ? 'w' : '') + '">' + hv + '</span></div>';
   }).join('') + '</div>';
 }
-function rank(v) { return v ? '<i class="rnk">' + v + '</i> ' : ''; }
+/* A CALENDAR DATE, THE WAY A READER READS ONE. "2026-08-30" is unambiguous and
+   makes the reader do arithmetic to find out it is a Sunday. Mirror of
+   build_hub.day_label(); a bare ISO date on a scoreboard is a formatting
+   failure, not a data one, and the page was printing both formats at once --
+   the week cards said "Today" while the slate directly above said "2026-08-24".
+   No timezone is involved: an ISO calendar date is already a day. */
+function dayLabel(iso) {
+  if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso || '';
+  const today = new Intl.DateTimeFormat('en-CA',
+    { timeZone: 'America/Los_Angeles' }).format(new Date());
+  if (iso === today) return 'Today';
+  const p = iso.split('-').map(Number);
+  const d = new Date(Date.UTC(p[0], p[1] - 1, p[2]));
+  const t = new Date(today + 'T00:00:00Z');
+  const days = Math.round((d - t) / 86400000);
+  if (days === 1) return 'Tomorrow';
+  if (days === -1) return 'Yesterday';
+  return new Intl.DateTimeFormat('en-US',
+    { timeZone: 'UTC', weekday: 'short', month: 'short', day: 'numeric' }).format(d);
+}
+
+/* The AVCA coaches poll rank, labelled. Mirror of build_hub.rank_badge();
+   both say whose ranking it is, so no view can show a bare numeral. */
+function rank(v) {
+  return v ? '<i class="rnk" title="AVCA coaches poll rank">' + v + '</i> ' : '';
+}
+/* ---- THE WEEK'S HEADLINE MATCHES -------------------------------------
+   What a scoreboard puts at the top: not every fixture, the ones worth
+   watching. Ranked-versus-ranked first, ordered by how good the pair is
+   (the two ranks added -- #2 v #7 beats #11 v #12), then the best
+   single-ranked games if there are not five of those.
+
+   ⚠ THE RANKS ARE THE AVCA COACHES POLL, not ours, and that is deliberate:
+   an official poll is the shared language a reader already speaks, so it is
+   what sits next to a team name. Our own order lives on the Rankings and
+   Digby's Top 25 tabs, where it is labelled as ours. Verified rather than
+   assumed -- ncaa.com's scoreboard rank matches the AVCA poll on every team
+   where the two orders differ (BYU 24 to our 16, Kansas 15 to our 21,
+   Indiana 16 to our 24). */
+function renderWeek() {
+  const box = document.getElementById('weekbox');
+  if (!box || typeof WEEK === 'undefined') return;
+  const today = new Intl.DateTimeFormat('en-CA',
+    { timeZone: 'America/Los_Angeles' }).format(new Date());
+  const up = WEEK.filter(r => r.d >= today);
+  const score = r => {
+    const a = +r.ar || 0, h = +r.hr || 0;
+    if (a && h) return a + h;              // both ranked: lower is better
+    if (a || h) return 100 + (a || h);     // one ranked: after every pairing
+    return 9999;
+  };
+  const top = up.filter(r => r.ar || r.hr)
+                .sort((x, y) => score(x) - score(y) || x.d.localeCompare(y.d))
+                .slice(0, 5);
+  if (!top.length) { box.hidden = true; return; }
+  box.hidden = false;
+  const both = top.filter(r => r.ar && r.hr).length;
+  document.getElementById('weekmeta').textContent =
+    (both ? (both + ' ranked v ranked') : 'best of the next seven days')
+    + ' \u00b7 ranks are the AVCA coaches poll';
+  /* WHOSE NUMBER IS THAT? The inline rank is the AVCA coaches poll -- the
+     official one -- and it now says so on hover instead of appearing as a bare
+     numeral. Where our own Top 25 disagrees, the disagreement is printed rather
+     than hidden: a reader who sees "24 BYU" on a page that ranks BYU 16th is
+     owed the second number, and a page that shows only one of them is claiming
+     more agreement than exists. Both ranks are computed server-side (see the
+     TEAMS temporal-dead-zone note in build()). */
+  const rk = rank;
+  const ours = r => {
+    const bits = [];
+    if (r.ao && r.ao != r.ar) bits.push(r.a + ' ' + r.ao);
+    if (r.ho && r.ho != r.hr) bits.push(r.h + ' ' + r.ho);
+    return bits.length
+      ? '<div class="ourrk" title="our rating disagrees with the coaches poll">'
+        + 'our Top 25: ' + bits.join(' \u00b7 ') + '</div>'
+      : '';
+  };
+  document.getElementById('weekcards').innerHTML = top.map(r =>
+    '<div class="card soon' + (r.ar && r.hr ? ' marquee' : '') + '">' +
+    '<div class="cd">' + (r.dl || r.d) + (r.t ? ' \u00b7 ' + r.t : '') +
+      (r.ar && r.hr ? '<span class="tag">ranked v ranked</span>' : '') + '</div>' +
+    '<div class="mt"><div class="side">' + rk(r.ar) + logo(r.a) + r.a + '</div>' +
+    '<div class="side">' + rk(r.hr) + logo(r.h) + r.h + '</div></div>' +
+    ours(r) +
+    '<div class="venue">' + (r.venue
+        ? r.venue + (r.city ? ', ' + r.city + (r.st ? ' ' + r.st : '') : '')
+        : 'venue not listed') + '</div></div>').join('');
+}
+
+/* TODAY'S FIXTURES WITHOUT A SERVER. The live band and the slate were both fed
+   by /api/live, which only exists behind live_server.py -- so on the PUBLISHED
+   page the fetch failed and the whole block stayed hidden. The published page is
+   the one being read on a phone, and "what is on today" is the first thing a
+   scoreboard owes anyone.
+   In-progress SCORES genuinely cannot work on a static host; the slate can,
+   because the schedule is already embedded in the page. So the fixtures come
+   from SCHED and the live scores are an upgrade applied when a server is there,
+   rather than the whole block depending on one. */
+const WEEK = {{WEEK_JSON}};
+function slateFromSchedule() {
+  const today = new Intl.DateTimeFormat('en-CA',
+    { timeZone: 'America/Los_Angeles' }).format(new Date());
+  return WEEK
+    .filter(r => r.d === today)
+    .map(r => ({ date: r.d, away: r.a, home: r.h, time: r.t,
+                 away_rank: r.ar, home_rank: r.hr, state: 'pre' }));
+}
+
 async function pollLive() {
-  let d;
+  let d = null;
   try {
     const r = await fetch('/api/live', { cache: 'no-store' });
-    if (!r.ok) throw 0;
-    d = await r.json();
-  } catch (e) { return; }
-  const all = d.games || [];
+    if (r.ok) d = await r.json();
+  } catch (e) { d = null; }
+  /* no server: fall back to the schedule that is already on the page */
+  const all = (d && d.games && d.games.length) ? d.games : slateFromSchedule();
   /* A match that has ENDED must leave the live band even while the feed still
      reports it in progress. The scoreboard flips `period` to FINAL before the
      state field catches up, so for a few minutes the band showed a card headed
@@ -3779,9 +3979,9 @@ async function pollLive() {
     document.querySelector('#today .soon').textContent =
       todays.length ? 'Later today' : 'Next up';
     document.getElementById('todaymeta').textContent =
-      soon.length + ' scheduled' + (todays.length ? '' : ' \u00b7 ' + soon[0].date);
+      soon.length + ' scheduled' + (todays.length ? '' : ' \u00b7 ' + dayLabel(soon[0].date));
     document.getElementById('todaycards').innerHTML = soon.map(g =>
-      '<div class="card soon"><div class="cd">' + g.date + '</div>' +
+      '<div class="card soon"><div class="cd">' + dayLabel(g.date) + '</div>' +
       '<div class="mt"><div class="side">' + rank(g.away_rank) + logo(g.away) + g.away + '</div>' +
       '<div class="side">' + rank(g.home_rank) + logo(g.home) + g.home + '</div></div>' +
       '<div class="venue"><span class="tipoff">' + (g.time || 'time TBA') + '</span></div>' +
@@ -4187,6 +4387,7 @@ function renderConfStrength(confs) {
 }
 stsel.addEventListener('change', renderStandings);
 renderStandings();
+renderWeek();
 
 /* ---- date navigation on the scores tab --------------------------------- */
 const sdate = document.getElementById('sdate');
