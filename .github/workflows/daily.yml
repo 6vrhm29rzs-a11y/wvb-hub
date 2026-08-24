@@ -199,7 +199,15 @@ jobs:
           # one-team 'league' never collects an automatic bid.
           python3 scripts/conference_repair.py || echo "conference repair skipped"
           python3 scripts/digby_top25.py || echo "top 25 needs a projection; skipping"
-          python3 scripts/build_hub.py   # private page only
+          python3 scripts/build_hub.py   # Cody's page, everything on it
+          # PUBLIC BUILD RE-ENABLED 2026-08-24 at Cody's request, so he can see
+          # the hub from a phone. Same code, same page, minus every input that
+          # is somebody else's: the VolleyTalk poll, Massey Ratings, the
+          # transcribed TV listings and Digby. strip_private() removes them and
+          # the build ABORTS if a marker survives; the VALUES are dropped where
+          # they enter BOARD.build(), because hiding a column while shipping its
+          # data in the payload is not the same as not publishing it.
+          python3 scripts/build_hub.py --public
 
       # Semantic gate on what will actually be SERVED. The reconcile checks the
       # data; this checks that each number is under the right heading -- the
@@ -274,6 +282,11 @@ jobs:
           # (the public build is off), so they are not staged either -- staging an
           # unchanged file is harmless but it makes the diff lie about what ran.
           git add data/raw
+          # The published page and its cache-busting redirect. index.html
+          # carries a content hash: Fastly holds the object ~10 minutes, so
+          # without a new URL a deployed fix keeps serving old bytes for long
+          # enough that a phone check calls it broken.
+          git add output/vb_dashboard.html index.html
           # SEPARATE, AND TOLERANT, ON PURPOSE. Under `bash -eo pipefail` an
           # unmatched glob is passed to git literally, git exits 128, and
           # `git add` aborts ATOMICALLY -- so data/raw and the dashboard would

@@ -134,7 +134,14 @@ def main():
         missing = [p for p in players if not p.get("pos_raw")]
         if not missing:
             continue
-        if team in have:
+        # ⚠ A ZERO-POSITION RECORD IS ONLY AS GOOD AS THE FETCH THAT WROTE IT.
+        # 150 of 254 teams here were stored with an empty positions map and no
+        # status at all, under a fetch() that reported an empty HTTP 200 as
+        # "ok" -- so a page nobody ever saw is indistinguishable from a page
+        # that lists no positions. Records WITH positions are trusted and
+        # skipped; empty ones are retried once now that an empty body is
+        # reported as a failure.
+        if team in have and (have[team] or {}).get("positions"):
             continue
         todo.append(team)
 
@@ -154,7 +161,10 @@ def main():
             fail += 1
             have[team] = {"error": "parse: %s" % str(exc)[:100], "positions": {}}
             continue
-        have[team] = {"positions": pos, "url": url}
+        have[team] = {"positions": pos, "url": url,
+                      # say WHY an empty result is empty, so the next run does
+                      # not have to guess whether the page was ever seen
+                      "why": None if pos else "page fetched, no position field"}
         found_total += len(pos)
         ok += 1
         if n % 25 == 0:
