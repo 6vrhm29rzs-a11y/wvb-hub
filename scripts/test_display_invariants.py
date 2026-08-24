@@ -1112,6 +1112,63 @@ def check_team_glance_is_populated():
     ok("the glance carries record, form, last result and next")
 
 
+def check_team_context_fields():
+    """Conference position, schedule strength and head-to-head must be sound.
+
+    All three are derived from data already on the page -- a sort, a mean, and a
+    read of the completed 2025 game log -- so the checks are arithmetic rather
+    than taste:
+
+      * a team's position in its conference lies in 1..size
+      * schedule strength counts ONLY opponents we actually rate, and carries
+        that count, so the page can say what the mean rests on. An unranked or
+        non-D-I opponent contributes nothing rather than a guessed rank, which
+        would quietly flatter anyone playing a soft non-conference schedule.
+      * every head-to-head result is a real 2025 match: both set counts present,
+        not equal (a volleyball match has a winner), and a date on it.
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping team-context check")
+        return
+    src = open(hub, encoding="utf-8").read()
+    i = src.find("const TEAMS = ")
+    if i < 0:
+        print("  no TEAMS payload -- skipping")
+        return
+    teams = json.loads(src[i + len("const TEAMS = "):src.index(";\n", i)])
+
+    bad_pos = [k for k, v in teams.items()
+               if v.get("conf_pos") and v.get("conf_size")
+               and not (1 <= v["conf_pos"] <= v["conf_size"])]
+    check_ok = True
+    if bad_pos:
+        bad("a conference position is outside its own league",
+            "%s" % bad_pos[:3]); check_ok = False
+    bad_sos = [k for k, v in teams.items()
+               if v.get("sos") and (v["sos"]["rated"] > v["sos"]["fixtures"]
+                                    or v["sos"]["rated"] < 1)]
+    if bad_sos:
+        bad("schedule strength counts more opponents than there are fixtures",
+            "%s" % bad_sos[:3]); check_ok = False
+    bad_h2h = []
+    for k, v in teams.items():
+        for opp, h in (v.get("h2h") or {}).items():
+            if h.get("mine") is None or h.get("theirs") is None \
+                    or h["mine"] == h["theirs"] or not h.get("d"):
+                bad_h2h.append((k, opp))
+    if bad_h2h:
+        bad("a head-to-head record is not a real result",
+            "%s -- a volleyball match has a winner and a date" % bad_h2h[:3])
+        check_ok = False
+    if check_ok:
+        n_pos = sum(1 for v in teams.values() if v.get("conf_pos"))
+        n_sos = sum(1 for v in teams.values() if v.get("sos"))
+        n_h2h = sum(len(v.get("h2h") or {}) for v in teams.values())
+        ok("team context is sound (%d positions, %d schedules, %d meetings)"
+           % (n_pos, n_sos, n_h2h))
+
+
 def check_transfer_reconciliation():
     """A transfer must describe the SAME player on both sides.
 
@@ -1668,6 +1725,7 @@ def main():
     check_decor_never_covers_content()
     check_players_view_shows_every_stat()
     check_team_glance_is_populated()
+    check_team_context_fields()
     check_phantom_sets_are_harmless()
     check_aggregate_excludes_phantom_sets()
     print()

@@ -667,6 +667,80 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
             fixtures.setdefault(a, []).append(aw)
             fixtures.setdefault(h, []).append(hm)
 
+    # ---- CONFERENCE POSITION, SCHEDULE STRENGTH, HEAD-TO-HEAD ------------
+    # All three are derived from data already on the page. Nothing here is an
+    # estimate: the position is a sort, the schedule strength is a mean of
+    # opponents' own ranks, and the head-to-head is read out of the completed
+    # 2025 game log.
+    _rank_of = dict((t["team"], t["rank26"]) for t in teams if t.get("rank26"))
+    _conf_of = dict((t["team"], t.get("conf")) for t in teams)
+    _conf_pos, _conf_size = {}, {}
+    _by_conf = {}
+    for _t in teams:
+        if _t.get("conf") and _t.get("rank26"):
+            _by_conf.setdefault(_t["conf"], []).append(_t)
+    for _c, _rows in _by_conf.items():
+        _rows.sort(key=lambda x: x["rank26"])
+        _conf_size[_c] = len(_rows)
+        for _i, _r in enumerate(_rows, 1):
+            _conf_pos[_r["team"]] = _i
+
+    # HEAD-TO-HEAD, from the completed 2025 season. Keyed both ways so either
+    # team's page can find the meeting.
+    _h2h = {}
+    for _g in ((load("data/data_2025.json") or {}).get("games") or []):
+        _ts = _g.get("teams") or []
+        if len(_ts) != 2:
+            continue
+        _a, _b = _ts[0], _ts[1]
+        _an = _a.get("name_short") or _a.get("name_full")
+        _bn = _b.get("name_short") or _b.get("name_full")
+        if not (_an and _bn):
+            continue
+        _asets, _bsets = _a.get("sets_won"), _b.get("sets_won")
+        if _asets is None or _bsets is None:
+            continue
+        _date = None
+        _ep = _g.get("start_time_epoch")
+        if _ep:
+            try:
+                _date = datetime.datetime.utcfromtimestamp(int(_ep)).strftime("%Y-%m-%d")
+            except Exception:                              # noqa: BLE001
+                _date = None
+        _h2h.setdefault((_an, _bn), []).append(
+            {"d": _date, "mine": _asets, "theirs": _bsets, "opp": _bn})
+        _h2h.setdefault((_bn, _an), []).append(
+            {"d": _date, "mine": _bsets, "theirs": _asets, "opp": _an})
+
+    # ---- SCHEDULE STRENGTH, from the fixtures each team actually has -------
+    # The mean of the opponents' OWN ranks, plus how many are inside the top 25.
+    # An opponent we do not rate -- an unranked or non-D-I side -- contributes
+    # nothing rather than a guess, and the count of rated opponents rides along
+    # so the page can state what the mean rests on. Early in a season a short
+    # schedule is a small sample and saying so is the point.
+    _sos_of, _h2h_for = {}, {}
+    for _team, _fx in fixtures.items():
+        _ranks = [_rank_of[f["opp"]] for f in _fx if f.get("opp") in _rank_of]
+        if _ranks:
+            _sos_of[_team] = {
+                "mean_rank": round(sum(_ranks) / float(len(_ranks)), 1),
+                "rated": len(_ranks),
+                "fixtures": len(_fx),
+                "top25": sum(1 for r in _ranks if r <= 25),
+            }
+        # the previous meeting with each opponent this team is due to play
+        _seen = {}
+        for f in _fx:
+            _o = f.get("opp")
+            if not _o or _o in _seen:
+                continue
+            _prev = _h2h.get((_team, _o))
+            if _prev:
+                _prev = sorted(_prev, key=lambda x: x.get("d") or "")[-1]
+                _seen[_o] = _prev
+        if _seen:
+            _h2h_for[_team] = _seen
+
     proj = {r["team"]: r for r in
             ((load("data/projection_2026.json") or {}).get("teams") or [])}
     photos = player_photos()
@@ -810,6 +884,19 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
             "tstats": (tstats or {}).get(nm),
             "aq": (aq_of or {}).get(t["conf"]),
             "sched_n": (sched_n or {}).get(team_norm(nm), 0),
+            # position within its own conference on our 2026 order -- a sort of
+            # data already on the page, not a new opinion
+            "conf_pos": _conf_pos.get(nm),
+            "conf_size": _conf_size.get(t.get("conf")),
+            # SCHEDULE STRENGTH: the mean rank of the opponents this team
+            # actually plays, and how many of them are inside the top 25. A
+            # fixture against an unranked or non-D-I side contributes nothing
+            # rather than a guess, and the count of rated opponents is carried
+            # so the page can say what the mean rests on.
+            "sos": _sos_of.get(nm),
+            # the last meeting with each opponent, from the completed 2025
+            # season -- read, never inferred
+            "h2h": _h2h_for.get(nm),
             "roster": roster,
             "sim": sim_of.get(nm),
             "top_dep": [
@@ -1549,6 +1636,7 @@ def build():
     # projection covers.
     aq_of = ((load("data/raw/%d/aq_mechanism_%d.json" % (SEASON, SEASON)) or {})
              .get("conferences") or {})
+
     sched_n = {}
     for _p in sorted(glob.glob(os.path.join(REPO, "data/raw/%d/scoreboard/*.json" % SEASON))):
         try:
@@ -2562,6 +2650,11 @@ td.tvnet{text-align:left}
    Four cards that answer what a team page is opened for: how they are going,
    how they have been going, what just happened, what is next. Sits directly
    under the name, above everything else. */
+/* the previous meeting, on a fixture line */
+.h2h{margin-left:auto;padding:2px 7px;border-radius:4px;white-space:nowrap;
+  font:700 10px/1.5 var(--mono);letter-spacing:.03em}
+.h2h.w{background:rgba(49,208,126,.14);color:var(--good)}
+.h2h.l{background:rgba(255,95,110,.14);color:var(--bad)}
 .glance{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0 18px}
 .gl{padding:13px 15px;border-radius:12px;border:1px solid transparent;
   background-origin:border-box;background-clip:padding-box,border-box;
@@ -4222,6 +4315,10 @@ function hcell(v, txt, lo, hi, good, kind) {
     requestAnimationFrame(step);
   });
 })();
+function ordinal(n){
+  const s = ['th','st','nd','rd'], v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
 /* SHOW-ALL on a collapsed list. Delegated, because the team panel is rebuilt
    every time a different team is picked and a bound handler would go with it. */
 document.addEventListener('click', e => {
@@ -4504,6 +4601,15 @@ function showTeam(name) {
       : neutral ? '<span class="kind nu" title="neutral floor -- an event, name not supplied">neutral</span>'
       : (f.kind === 'conf' ? '<span class="kind cf">conf</span>'
                            : '<span class="kind nc">non-conf</span>');
+    /* THE LAST TIME THESE TWO MET, from the completed 2025 season. A fixture
+       line that says only "vs Wisconsin" is missing the thing a fan already
+       knows about it. Absent where they did not meet -- never inferred. */
+    const h = (t.h2h || {})[f.opp];
+    const hstr = h
+      ? '<span class="h2h ' + (h.mine > h.theirs ? 'w' : 'l') + '" title="' +
+        'last meeting, ' + h.d + '">' + (h.mine > h.theirs ? 'W' : 'L') + ' ' +
+        h.mine + '&ndash;' + h.theirs + ' in ' + (h.d || '').slice(0, 4) + '</span>'
+      : '';
     return '<div class="gline gl2"><span class="dt">' + f.d + '</span>' +
     '<span class="va' + (neutral ? ' nt' : '') + '"' +
       (neutral ? ' title="neutral site"' : '') + '>' + va + '</span>' +
@@ -4515,6 +4621,7 @@ function showTeam(name) {
     '<span class="wh2">' + tag +
       (place ? '<span class="pl">' + place + '</span>'
              : '<span class="pl u">venue not listed</span>') +
+      hstr +
     '</span></div>';
   }).join('');
 
@@ -4848,6 +4955,14 @@ function showTeam(name) {
           chip('Conf title', t.sim.conf_title_pct + '%') +
           chip('Tournament', t.sim.tournament_pct + '%')
         : '') +
+    /* where they sit in their own league, and how hard the schedule is. Both
+       are sorts and means over numbers already on this page -- no new model. */
+    (t.conf_pos && t.conf_size
+      ? chip('In the ' + (t.conf || 'conference'),
+             ordinal(t.conf_pos) + ' of ' + t.conf_size) : '') +
+    (t.sos
+      ? chip('Opp rank', t.sos.mean_rank + ' avg' +
+             (t.sos.top25 ? ' \u00b7 ' + t.sos.top25 + ' top-25' : '')) : '') +
     '</div></div>' +
     /* ---- AT A GLANCE -------------------------------------------------
        ⚠ MEASURED BEFORE CHANGING ANYTHING: the team page ran to 3,648px and
