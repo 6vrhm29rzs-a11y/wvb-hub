@@ -76,9 +76,28 @@ def og_image(html):
     return None
 
 
+RECOVERED = os.path.join(RAW, "rosters_recovered_%d.json" % SEASON)
+
+
 def teams_without_photos():
     # type: () -> Dict[str, Dict]
-    rosters = (json.load(open(ROSTERS)) or {}).get("teams", {})
+    """⚠ THE RECOVERED ROSTERS COUNT TOO, AND THIS MISSED THEM.
+
+    30 teams have no players in rosters_2026.json because their athletics URL
+    was wrong on ncaa.com; recover_missing_rosters.py found them and wrote them
+    to a SEPARATE file, deliberately, so the mirrored one stays a faithful record
+    of what ncaa.com says. crawl_roster_photos.py reads both. This did not -- it
+    read only the primary file, saw an empty player list and skipped, so
+    Arkansas, Buffalo, LSU, Syracuse, Vanderbilt and Wake Forest were never
+    even considered for a photo. They were not failures; they were never tried.
+    """
+    rosters = dict((json.load(open(ROSTERS)) or {}).get("teams", {}))
+    if os.path.exists(RECOVERED):
+        for team, rec in ((json.load(open(RECOVERED)) or {})
+                          .get("teams", {}) or {}).items():
+            if rec.get("players") and rec.get("url") and not (
+                    rosters.get(team, {}).get("players")):
+                rosters[team] = {"players": rec["players"], "url": rec["url"]}
     have = {}
     if os.path.exists(PHOTOS):
         have = (json.load(open(PHOTOS)) or {}).get("teams", {})
@@ -100,6 +119,17 @@ def main():
     done = {}
     if os.path.exists(OUT):
         done = (json.load(open(OUT)) or {}).get("teams", {})
+    # ⚠ A "DONE, ZERO PHOTOS" RECORD IS ONLY AS GOOD AS THE FETCH THAT WROTE IT.
+    # These were recorded while fetch() reported an empty HTTP 200 as "ok", so a
+    # team that was never actually seen looks identical to one that publishes no
+    # photographs. Entries with photos are trusted and skipped; empty ones are
+    # retried once now that an empty body is reported as a failure.
+    retry = sorted(k for k, v in done.items() if not (v or {}).get("photos"))
+    for k in retry:
+        done.pop(k, None)
+    if retry:
+        print("retrying %d team(s) recorded as done-with-zero under the old fetch"
+              % len(retry))
     todo = dict((k, v) for k, v in todo.items() if k not in done)
     print("teams still without a photo: %d" % len(todo))
 
