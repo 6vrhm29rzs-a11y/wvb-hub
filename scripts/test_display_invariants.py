@@ -821,6 +821,69 @@ def check_today_is_pacific():
         ok("today is derived in America/Los_Angeles")
 
 
+def check_phantom_sets_are_harmless():
+    """A box score that credits EVERY player with the full match is watched.
+
+    MEASURED 2026-08-23, and deliberately not "fixed". The feed's per-player
+    `gamesPlayed` is the player's own sets and varies correctly in 6 of our 7
+    games. In one -- Kentucky-Pittsburgh, 6639888 -- all 32 players report the
+    full 4 sets, including 13 with an entirely empty line. A player who never
+    took the floor cannot have played four sets, so that record is wrong at
+    source. It is the same shape as the 2024 seasons CLAUDE.md records, where
+    bench players were marked as having participated.
+
+    WE DO NOT CORRECT IT. Deciding a player did not play because her line is
+    empty is an inference, and inferring a correction to the source is how a
+    dataset stops being the dataset. What we can do is refuse to let it matter
+    silently: `sets` is the denominator of every per-set rate, so a phantom line
+    dilutes a player's season rate -- but only if she produced somewhere else.
+    Right now that count is ZERO, so the distortion is real and inert.
+
+    This check fails the moment it stops being inert.
+    """
+    import collections
+    # ⚠ SCOPED TO THE SEASON THE PAGE SHOWS, NOT THIS FILE'S DEFAULT. This
+    # module defaults SEASON to 2025 while build_hub.py defaults to 2026, so
+    # reading str(SEASON) here audited the COMPLETED season and reported 331
+    # failures for a live-season guard. The distortion in 2025 is real and is
+    # written up separately; this check is about what the page is serving now.
+    live = int(os.environ.get("WVB_SEASON", "2026"))
+    pb = os.path.join(REPO, "data", "raw", str(live), "playerbox.jsonl")
+    if not os.path.exists(pb):
+        print("  no player box scores yet -- skipping phantom-set check")
+        return
+
+    def num(v):
+        try:
+            return float(v)
+        except (TypeError, ValueError):
+            return 0.0
+    COUNTS = ("kills", "atts", "digs", "aces", "assists", "bs", "ba", "errors")
+    recs = [json.loads(l) for l in open(pb) if l.strip()]
+    phantom, real = set(), {}
+    for rec in recs:
+        rows = rec.get("rows") or []
+        if not rows:
+            continue
+        uniform = len(set(str(r.get("gp")) for r in rows)) == 1
+        for r in rows:
+            key = (str(r.get("team_id")), (r.get("first") or "") + " " + (r.get("last") or ""))
+            produced = any(num(r.get(k)) for k in COUNTS)
+            if uniform and not produced:
+                phantom.add(key)
+            elif produced:
+                real[key] = real.get(key, 0) + 1
+    bitten = sorted(k for k in phantom if real.get(k))
+    if bitten:
+        bad("a phantom set line now dilutes a real player's rate",
+            "%d player(s) carry sets from a box score that credited every "
+            "player with the full match AND have production elsewhere, so "
+            "their per-set rates are understated: %s"
+            % (len(bitten), [k[1] for k in bitten[:4]]))
+    else:
+        ok("phantom set lines exist but distort nothing (%d watched)" % len(phantom))
+
+
 def check_transfer_reconciliation():
     """A transfer must describe the SAME player on both sides.
 
@@ -1374,6 +1437,7 @@ def main():
     check_hero_podium_signs()
     check_no_class_name_collisions()
     check_today_is_pacific()
+    check_phantom_sets_are_harmless()
     print()
     check_transfer_reconciliation()
     print()
