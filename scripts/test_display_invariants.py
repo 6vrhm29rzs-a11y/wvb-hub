@@ -1303,6 +1303,68 @@ def check_di_listings_but_not_di_data():
            % non_di_rows)
 
 
+def check_head_coaches_are_head_coaches():
+    """No deputy may be published as the head coach.
+
+    ⚠ THE TRAP THIS GUARDS. "Head Coach" is a SUBSTRING of "Associate Head
+    Coach" and "Assistant Head Coach", and on some staff pages the associate is
+    listed FIRST -- Texas is one. A substring match returns the wrong person
+    with complete confidence and nothing downstream can tell. Meanwhile an
+    EXACT match on "head coach" rejects the real thing, because Texas titles
+    Jerritt Elliott "Director of Volleyball & Head Volleyball Coach". Five title
+    forms appear across 323 schools.
+
+    So the rule is: names a head coach, and is not a deputy. This asserts the
+    published result rather than the parser -- what actually reached the page.
+
+    ⚠ ALSO NOT DERIVABLE FROM A STAFF DIRECTORY. A school's /staff-directory
+    lists the head coach of every sport in the building; taking "the first head
+    coach on the page" from there gives volleyball the football coach. Only the
+    sport's own page is read, and the source URL is recorded so that is
+    checkable after the fact.
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping coach check")
+        return
+    src = open(hub, encoding="utf-8").read()
+    i = src.find("const TEAMS = ")
+    if i < 0:
+        return
+    teams = json.loads(src[i + len("const TEAMS = "):src.index(";\n", i)])
+    coaches = {k: v["coach"] for k, v in teams.items() if (v.get("coach") or {}).get("name")}
+    if not coaches:
+        print("  no coaches on the page yet -- skipping")
+        return
+
+    deputies = [(k, c["title"]) for k, c in coaches.items()
+                if c.get("title")
+                and re.search(r"\bassociate\b|\bassistant\b|\basst\b", c["title"], re.I)]
+    if deputies:
+        bad("a deputy is published as the head coach", "%s" % deputies[:3])
+    else:
+        ok("no associate or assistant is published as a head coach (%d coaches)"
+           % len(coaches))
+
+    odd = [(k, c["name"]) for k, c in coaches.items()
+           if not c["name"] or " " not in c["name"] or len(c["name"]) > 48
+           or re.search(r"\d|\bcoach\b|^(?:Dr|Mr|Mrs|Ms)\.", c["name"], re.I)]
+    if odd:
+        bad("a coach name is not a name",
+            "%s -- an honorific or a job title has leaked into the name" % odd[:3])
+    else:
+        ok("every published coach name reads as a person")
+
+    # a staff-directory URL would mean the name could belong to any sport
+    from_dir = [(k, c.get("source")) for k, c in coaches.items()
+                if c.get("source") and "staff-director" in (c["source"] or "")]
+    if from_dir:
+        bad("a coach was taken from a building-wide staff directory",
+            "%s -- that page lists every sport" % from_dir[:2])
+    else:
+        ok("every crawled coach came from the sport's own page")
+
+
 def check_transfer_reconciliation():
     """A transfer must describe the SAME player on both sides.
 
@@ -1862,6 +1924,7 @@ def main():
     check_team_context_fields()
     check_net_matches_the_rulebook()
     check_di_listings_but_not_di_data()
+    check_head_coaches_are_head_coaches()
     check_phantom_sets_are_harmless()
     check_aggregate_excludes_phantom_sets()
     print()

@@ -718,6 +718,7 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
     # nothing rather than a guess, and the count of rated opponents rides along
     # so the page can state what the mean rests on. Early in a season a short
     # schedule is a small sample and saying so is the point.
+    _coaches = head_coaches()
     _sos_of, _h2h_for = {}, {}
     for _team, _fx in fixtures.items():
         _ranks = [_rank_of[f["opp"]] for f in _fx if f.get("opp") in _rank_of]
@@ -886,6 +887,7 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
             "sched_n": (sched_n or {}).get(team_norm(nm), 0),
             # position within its own conference on our 2026 order -- a sort of
             # data already on the page, not a new opinion
+            "coach": _coaches.get(nm),
             "conf_pos": _conf_pos.get(nm),
             "conf_size": _conf_size.get(t.get("conf")),
             # SCHEDULE STRENGTH: the mean rank of the opponents this team
@@ -941,6 +943,35 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
 
 
 # -------------------------------------------------------------- leaders
+def head_coaches():
+    # type: () -> Dict[str, Dict]
+    """team -> head coach, from the school's own staff page.
+
+    TWO SOURCES, hand-verified first. coaches_2026.json holds names taken from
+    AVCA award citations, entered by hand with the citation recorded; those win.
+    coaches_found_2026.json is the crawl of each school's coaches page.
+
+    ⚠ The two agree where they overlap: the crawl returned Dan Fisher for
+    Pittsburgh, which is what the 2024 AVCA Coach of the Year citation already
+    said. That is two unrelated sources concurring, which is the corroboration
+    this project prefers over any single scrape.
+
+    A team with no coach on either renders nothing -- never a guess (R5).
+    """
+    out = {}
+    for team, rec in (((load("data/raw/%d/coaches_found_%d.json" % (SEASON, SEASON))
+                        or {}).get("teams")) or {}).items():
+        if (rec or {}).get("name"):
+            out[team] = {"name": rec["name"], "title": rec.get("title"),
+                         "source": rec.get("source")}
+    for team, rec in (((load("data/raw/%d/coaches_%d.json" % (SEASON, SEASON))
+                        or {}).get("coaches")) or {}).items():
+        if (rec or {}).get("name"):
+            out[team] = {"name": rec["name"], "title": rec.get("title"),
+                         "source": rec.get("source"), "note": rec.get("note")}
+    return out
+
+
 def di_teams():
     # type: () -> set
     """The 348 Division-I programmes, from the archived official RPI table.
@@ -2700,6 +2731,16 @@ td.tvnet{text-align:left}
   font:700 10px/1.5 var(--mono);letter-spacing:.03em}
 .h2h.w{background:rgba(49,208,126,.14);color:var(--good)}
 .h2h.l{background:rgba(255,95,110,.14);color:var(--bad)}
+/* the head coach, directly under the programme's name -- where a team's
+   identity lives, not buried in a table at the bottom */
+.coachline{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+  margin:12px 0 0;padding:9px 14px;border-radius:10px;
+  background:linear-gradient(90deg,rgba(120,180,255,.10),rgba(120,180,255,.02));
+  border-left:3px solid var(--amber)}
+.coachline .cl{font:700 9.5px/1 var(--mono);letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink3)}
+.coachline b{font:600 16px/1.2 var(--disp);color:var(--ink);letter-spacing:.01em}
+.coachline .ct{font:11.5px/1.3 var(--mono);color:var(--ink3)}
 .glance{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0 18px}
 .gl{padding:13px 15px;border-radius:12px;border:1px solid transparent;
   background-origin:border-box;background-clip:padding-box,border-box;
@@ -5053,6 +5094,16 @@ function showTeam(name) {
        far below the fold or not on the page at all.
        Everything here is read from data already in the payload; nothing new is
        computed and nothing is estimated. */
+    (t.coach
+      ? '<div class="coachline" title="' +
+        (t.coach.source ? 'from ' + t.coach.source : '') + '">' +
+        '<span class="cl">Head coach</span>' +
+        '<b>' + t.coach.name + '</b>' +
+        (t.coach.title && !/^head coach$/i.test(t.coach.title)
+          ? '<span class="ct">' + t.coach.title + '</span>' : '') +
+        (t.coach.note ? '<span class="ct">' + t.coach.note + '</span>' : '') +
+        '</div>'
+      : '') +
     glanceHtml +
     '<div class="tcols">' +
       '<div>' +
