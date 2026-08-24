@@ -26,6 +26,7 @@ process and asserts the check then fails. A test that cannot fail is not a test.
 Python 3.9 target. Run: python3 scripts/test_roster_parser.py
 """
 
+import json
 import os
 import re
 import sys
@@ -103,6 +104,51 @@ def names(html):
     return sorted(p["name_raw"] for p in cr.parse_roster(html))
 
 
+def test_every_di_team_has_a_roster():
+    """All 348 D-I teams have a 2026 roster. It took four templates to get here.
+
+    The last two -- Central Conn. St. and Tennessee Tech -- were not a stale-URL
+    problem like Syracuse or Buffalo. Their domains were right; they serve only
+    /sports/wvball/2026-27/roster, a path nothing had tried, and the page is a
+    table tagged with data-field attributes rather than SIDEARM markup, so all
+    three existing strategies returned nothing and both were recorded as having
+    no roster at all.
+
+    ⚠ CHECKED THROUGH norm(). The hub says "New Orleans" and the roster file
+    says "LSU New Orleans " WITH A TRAILING SPACE, so a raw-name check reports
+    it missing -- which it did, and which is the fourth time this exact alias has
+    bitten. D-I membership comes from the archived RPI table, the only
+    self-consistent list.
+
+    The roster crawl is deliberately NOT daily (348 school sites; rosters barely
+    move in-season), so this data changes only when someone re-crawls -- which
+    is exactly when losing a team would otherwise go unnoticed.
+    """
+    import sys as _sys
+    _sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from reconcile_2025 import norm
+    repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    rpi = os.path.join(repo, "data", "raw", "2025", "rpi_official.json")
+    if not os.path.exists(rpi):
+        print("  skip (no D-I membership table)")
+        return
+    di = set(r["School"] for r in json.load(open(rpi))["data"])
+    counts = {}
+    for fn in ("rosters_2026.json", "rosters_recovered_2026.json"):
+        path = os.path.join(repo, "data", "raw", "2026", fn)
+        if not os.path.exists(path):
+            continue
+        for team, rec in (json.load(open(path)) or {}).get("teams", {}).items():
+            n = len((rec or {}).get("players") or [])
+            if n:
+                k = norm(team)
+                counts[k] = max(counts.get(k, 0), n)
+    missing = sorted(t for t in di if not counts.get(norm(t)))
+    check("every D-I team has a 2026 roster (%d of %d)"
+          % (len(di) - len(missing), len(di)),
+          missing[:5], [])
+
+
 def main():
     print("ROSTER PARSER GUARDS\n")
 
@@ -168,6 +214,9 @@ def main():
 
     # --- negative controls -------------------------------------------------
     # Re-introduce each old behaviour in process and assert the guard trips.
+    print("\nD-I ROSTER COVERAGE")
+    test_every_di_team_has_a_roster()
+
     print("\nNEGATIVE CONTROLS -- re-introduce each bug and confirm the guard fails")
 
     src = open(os.path.join(os.path.dirname(os.path.abspath(__file__)),

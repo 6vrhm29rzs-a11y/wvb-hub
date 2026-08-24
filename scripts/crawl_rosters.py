@@ -66,6 +66,13 @@ ROSTER_PATHS = [
     "/sports/wvb/roster",
     "/sports/womens-volleyball/roster/2026-27",
     "/sports/womens-volleyball/roster/2026",
+    # The season-scoped WMT shape. Central Conn. St. and Tennessee Tech -- the
+    # last two D-I teams with no roster on file -- serve ONLY this path: every
+    # other candidate 404s on both. Their base domains were right all along, so
+    # this was never a stale-URL problem like Syracuse or Buffalo; it was a path
+    # convention nothing had tried.
+    "/sports/wvball/2026-27/roster",
+    "/sports/wvball/roster/2026-27",
 ]
 
 CLASS_RE = re.compile(
@@ -82,18 +89,41 @@ def throttle():
     _last[0] = time.time()
 
 
-def fetch(url):
-    # type: (str) -> Tuple[Optional[str], str]
-    """Returns (html, status). Never retries hard -- see POLITENESS above."""
+# A 200 with (almost) no body is a failed fetch, not an empty page. Measured on
+# ttusports.com: the same URL returned 3,000,262 bytes and then 0 bytes minutes
+# later, both as HTTP 200. Any athletics roster page is tens of kilobytes.
+MIN_BODY = 2000
+
+
+def fetch(url, _retry=True):
+    # type: (str, bool) -> Tuple[Optional[str], str]
+    """Returns (html, status). Never retries hard -- see POLITENESS above.
+
+    ⚠ AN EMPTY 200 USED TO COME BACK AS "ok". Every caller reads that status as
+    "the fetch worked", and then reads the empty body as "this school publishes
+    no roster / no photographs" -- a fetch failure wearing the shape of an
+    answer. That is how a team ends up recorded as `status: ok, photos: {}` when
+    nobody ever saw its page. A short body is now reported as "empty".
+
+    ONE retry, and only for this case: an empty 200 is a server hiccup rather
+    than a refusal, and it was observed to be intermittent on the very same URL.
+    A 403, a 404 or a timeout still gets no retry -- those are answers.
+    """
     throttle()
     try:
         req = urllib.request.Request(url, headers={"User-Agent": UA})
         with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
-            return r.read().decode("utf-8", "replace"), "ok"
+            body = r.read().decode("utf-8", "replace")
     except urllib.error.HTTPError as e:
         return None, "http%d" % e.code
     except Exception as e:
         return None, type(e).__name__.lower()
+    if len(body) < MIN_BODY:
+        if _retry:
+            time.sleep(2.0)
+            return fetch(url, _retry=False)
+        return None, "empty"
+    return body, "ok"
 
 
 def seonames():
@@ -202,6 +232,68 @@ def _slug_matches(href, name):
         if seg and re.sub(r"[^a-z]", "", seg.lower()) == flat:
             return True
     return False
+
+
+_DF_ROW = re.compile(r"<tr\b.*?</tr>", re.S)
+_DF_CELL = re.compile(r'data-field="([^"]+)"[^>]*>(.*?)</(?:td|th)>', re.S)
+
+
+def _clean_cell(v):
+    # type: (str) -> str
+    """Strip tags, collapse whitespace, drop the mobile label prefix.
+
+    These cells carry a visually-hidden label for narrow screens -- "Pos.: OH",
+    "Cl.: Sr." -- so the value has to be taken from AFTER the colon or every
+    position reads "Pos.:".
+    """
+    t = re.sub(r"<[^>]+>", " ", v or "")
+    t = _unescape(t)                       # "Denomm&eacute;" -> "Denommé"
+    t = re.sub(r"\s+", " ", t).strip()
+    if ":" in t[:28]:
+        t = t.split(":", 1)[1].strip()
+    # ⚠ THE NAME CELL RENDERS TWICE -- once for wide screens and once for
+    # narrow -- so it reads "Annabelle Denommé Annabelle Denommé". Exactly the
+    # doubling that gave Miami (FL) 30 "players" for a 15-player roster, in a
+    # different template. Collapse an exact repeat rather than letting a
+    # duplicate surname reach the R8 join.
+    words = t.split()
+    if len(words) % 2 == 0 and words[:len(words) // 2] == words[len(words) // 2:]:
+        t = " ".join(words[:len(words) // 2])
+    return t
+
+
+def _parse_datafield_table(html):
+    # type: (str) -> List[Dict[str, str]]
+    """A fourth roster template: a table whose cells are tagged data-field=...
+
+    Central Conn. St. and Tennessee Tech -- the last two D-I teams without a
+    roster -- publish this way. It is not SIDEARM (no /roster/player links, no
+    schema.org Person, no sidearm-roster classes), so all three existing
+    strategies returned nothing and the pages were recorded as having no roster
+    at all. The markup is actually the most structured of the four: every cell
+    names its own field.
+    """
+    out = []
+    for row in _DF_ROW.findall(html or ""):
+        cells = dict((f, _clean_cell(v)) for f, v in _DF_CELL.findall(row))
+        name = ""
+        for f, v in cells.items():
+            if "first_name" in f and "last_name" in f:
+                name = v
+                break
+        if not name or len(name.split()) < 2:
+            continue
+        out.append({
+            "name_raw": name,
+            "first": name.split()[0],
+            "last": name.split()[-1],
+            "class_raw": cells.get("year") or None,
+            "pos_raw": cells.get("position") or None,
+            "num_raw": cells.get("number") or None,
+            "how": "data-field-table",
+            "photo": None,
+        })
+    return out
 
 
 def parse_roster(html, base=None):
@@ -324,6 +416,13 @@ def parse_roster(html, base=None):
         key = re.sub(r"[^a-z]", "", (p["name_raw"] or "").lower())
         p["photo"] = p.get("photo") or schema.get(key)
 
+    # FOURTH STRATEGY, only when the other three found nothing. It is last
+    # because it is the narrowest: a table tagged with data-field attributes.
+    # Running it first would risk mis-reading a stats table on a SIDEARM page as
+    # a roster.
+    if not players:
+        players = _parse_datafield_table(html)
+
     # de-duplicate: cards and table rows both link the same player
     seen, out = set(), []
     for p in players:
@@ -441,8 +540,18 @@ def main():
     }
     json.dump(payload, open(OUT, "w"), indent=1)
     print()
-    print("COVERAGE: %d/%d teams with players (%.0f%%)"
-          % (stats["ok"], len(rosters), 100.0 * stats["ok"] / max(len(rosters), 1)))
+    # ⚠ REPORT THE SCOPE OF *THIS RUN*, NOT A RATIO OVER THE WHOLE FILE.
+    # Crawling two named teams printed "COVERAGE: 3/377 teams with players
+    # (1%)" -- true of the run, and it reads exactly like the file has just been
+    # destroyed. It has not: the payload MERGES into what is already on disk.
+    # A message that makes a safe operation look catastrophic costs someone a
+    # frantic five minutes and, worse, teaches them to distrust the output.
+    have = sum(1 for v in rosters.values() if (v or {}).get("players"))
+    print("COVERAGE (whole file): %d/%d teams with players (%.0f%%)"
+          % (have, len(rosters), 100.0 * have / max(len(rosters), 1)))
+    if only:
+        print("  this run touched %d team(s): %d with players"
+              % (len(only), stats["ok"]))
     print("  no athletics site %d · no roster found %d · blocked %d"
           % (stats["no_site"], stats["no_roster"], stats["blocked"]))
     print("wrote %s" % OUT)

@@ -3,16 +3,15 @@
   "season": 2026,
   "source_tier": "OFFICIAL",
   "source": "school athletics sites, one request each, ~1.5 req/s",
-  "fetched_utc": "2026-08-19T04:08:54Z",
+  "fetched_utc": "2026-08-24T15:28:50Z",
   "coverage": {
    "teams": 377,
-   "with_players": 1,
+   "with_players": 0,
    "no_athletics_site": 4,
-   "no_roster_found": 30,
+   "no_roster_found": 23,
    "blocked_403_429": 0
   },
-  "note": "Class years stored EXACTLY as served. No normalisation at ingest. Teams without a usable roster carry an empty list, never an estimate.",
-  "manual_imports": 4
+  "note": "Class years stored EXACTLY as served. No normalisation at ingest. Teams without a usable roster carry an empty list, never an estimate."
  },
  "teams": {
   "A&M-Corpus Christi": {
@@ -7309,9 +7308,174 @@
    ]
   },
   "Central Conn. St.": {
-   "status": "http404",
-   "players": [],
-   "team_id": "46039"
+   "status": "ok",
+   "url": "https://ccsubluedevils.com/sports/wvball/2026-27/roster",
+   "platform": "PRESTO",
+   "fetched_utc": "2026-08-24T15:15:20Z",
+   "source_tier": "OFFICIAL",
+   "team_id": "46039",
+   "players": [
+    {
+     "name_raw": "Annabelle Denomm\u00e9",
+     "first": "Annabelle",
+     "last": "Denomm\u00e9",
+     "class_raw": "Jr.",
+     "pos_raw": "L",
+     "num_raw": "1",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Breanna Ginley",
+     "first": "Breanna",
+     "last": "Ginley",
+     "class_raw": "Sr",
+     "pos_raw": "MB",
+     "num_raw": "2",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Gabriella Burdier",
+     "first": "Gabriella",
+     "last": "Burdier",
+     "class_raw": "So",
+     "pos_raw": "L",
+     "num_raw": "4",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Olivia Keckler",
+     "first": "Olivia",
+     "last": "Keckler",
+     "class_raw": "Jr.",
+     "pos_raw": "PIN",
+     "num_raw": "5",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Meg Berkland",
+     "first": "Meg",
+     "last": "Berkland",
+     "class_raw": "Jr.",
+     "pos_raw": "L",
+     "num_raw": "6",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Aubrey Stitcher",
+     "first": "Aubrey",
+     "last": "Stitcher",
+     "class_raw": "Jr",
+     "pos_raw": "OH",
+     "num_raw": "7",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Hanley Schmidt",
+     "first": "Hanley",
+     "last": "Schmidt",
+     "class_raw": "Fr.",
+     "pos_raw": "OH",
+     "num_raw": "9",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Anja Milosevic",
+     "first": "Anja",
+     "last": "Milosevic",
+     "class_raw": "Sr",
+     "pos_raw": "S",
+     "num_raw": "10",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Cullen Winter",
+     "first": "Cullen",
+     "last": "Winter",
+     "class_raw": "So",
+     "pos_raw": "MB",
+     "num_raw": "11",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Valeria Torres",
+     "first": "Valeria",
+     "last": "Torres",
+     "class_raw": "So.",
+     "pos_raw": "MB",
+     "num_raw": "12",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Allyson Voight",
+     "first": "Allyson",
+     "last": "Voight",
+     "class_raw": "Sr.",
+     "pos_raw": "MB",
+     "num_raw": "14",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Madison Fulgencio",
+     "first": "Madison",
+     "last": "Fulgencio",
+     "class_raw": "Fr.",
+     "pos_raw": "OH",
+     "num_raw": "15",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Danielle Caligiuri",
+     "first": "Danielle",
+     "last": "Caligiuri",
+     "class_raw": "Jr.",
+     "pos_raw": "S",
+     "num_raw": "17",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Adele Macer",
+     "first": "Adele",
+     "last": "Macer",
+     "class_raw": "Fr.",
+     "pos_raw": "MB",
+     "num_raw": "18",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Victoria Sanabria",
+     "first": "Victoria",
+     "last": "Sanabria",
+     "class_raw": "Sr.",
+     "pos_raw": "PIN",
+     "num_raw": "19",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Isabella Aviles Martinez",
+     "first": "Isabella",
+     "last": "Martinez",
+     "class_raw": "So",
+     "pos_raw": "S",
+     "num_raw": "21",
+     "how": "data-field-table",
+     "photo": null
+    }
+   ]
   },
   "Central Mich.": {
    "status": "ok",
@@ -46035,9 +46199,174 @@
    ]
   },
   "Tampa": {
-   "status": "http404",
-   "players": [],
-   "team_id": "46367"
+   "status": "ok",
+   "url": "https://tampaspartans.com/sports/wvball/2026-27/roster",
+   "platform": "PRESTO",
+   "fetched_utc": "2026-08-24T15:17:12Z",
+   "source_tier": "OFFICIAL",
+   "team_id": "46367",
+   "players": [
+    {
+     "name_raw": "Kayla Dondero",
+     "first": "Kayla",
+     "last": "Dondero",
+     "class_raw": "Jr.",
+     "pos_raw": "S",
+     "num_raw": "1",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Connor Rahn",
+     "first": "Connor",
+     "last": "Rahn",
+     "class_raw": "Jr.",
+     "pos_raw": "OH",
+     "num_raw": "2",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Ana Rivera",
+     "first": "Ana",
+     "last": "Rivera",
+     "class_raw": "Sr.",
+     "pos_raw": "DS/L",
+     "num_raw": "3",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Camden Rahn",
+     "first": "Camden",
+     "last": "Rahn",
+     "class_raw": "Fr.",
+     "pos_raw": "OH",
+     "num_raw": "4",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Ari Lopez",
+     "first": "Ari",
+     "last": "Lopez",
+     "class_raw": "So.",
+     "pos_raw": "S",
+     "num_raw": "5",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Katelynn Lowery",
+     "first": "Katelynn",
+     "last": "Lowery",
+     "class_raw": "Fr.",
+     "pos_raw": "RH/OH",
+     "num_raw": "6",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Maddie Sofarelli",
+     "first": "Maddie",
+     "last": "Sofarelli",
+     "class_raw": "Jr.",
+     "pos_raw": "MB",
+     "num_raw": "7",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Ainhoa Molleja",
+     "first": "Ainhoa",
+     "last": "Molleja",
+     "class_raw": "Fr.",
+     "pos_raw": "OH",
+     "num_raw": "9",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Zoe Richardson",
+     "first": "Zoe",
+     "last": "Richardson",
+     "class_raw": "So.",
+     "pos_raw": "L/DS",
+     "num_raw": "12",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Olivia Guzman",
+     "first": "Olivia",
+     "last": "Guzman",
+     "class_raw": "So.",
+     "pos_raw": "Pin/MH",
+     "num_raw": "13",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Logan Milan",
+     "first": "Logan",
+     "last": "Milan",
+     "class_raw": "Fr.",
+     "pos_raw": "L",
+     "num_raw": "14",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Laney Perdue",
+     "first": "Laney",
+     "last": "Perdue",
+     "class_raw": "Jr.",
+     "pos_raw": "OH",
+     "num_raw": "16",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Jenna Glaudel",
+     "first": "Jenna",
+     "last": "Glaudel",
+     "class_raw": "So.",
+     "pos_raw": "S",
+     "num_raw": "17",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Julianna Baskin",
+     "first": "Julianna",
+     "last": "Baskin",
+     "class_raw": "Fr.",
+     "pos_raw": "MB",
+     "num_raw": "18",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Ryan Connelly",
+     "first": "Ryan",
+     "last": "Connelly",
+     "class_raw": "Fr.",
+     "pos_raw": "MB",
+     "num_raw": "26",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Mak Carter",
+     "first": "Mak",
+     "last": "Carter",
+     "class_raw": "Sr.",
+     "pos_raw": "MB",
+     "num_raw": "33",
+     "how": "data-field-table",
+     "photo": null
+    }
+   ]
   },
   "Tarleton St.": {
    "status": "ok",
@@ -46549,9 +46878,184 @@
    ]
   },
   "Tennessee Tech": {
-   "status": "http404",
-   "players": [],
-   "team_id": "46504"
+   "status": "ok",
+   "url": "https://ttusports.com/sports/wvball/2026-27/roster",
+   "platform": "PRESTO",
+   "fetched_utc": "2026-08-24T15:17:18Z",
+   "source_tier": "OFFICIAL",
+   "team_id": "46504",
+   "players": [
+    {
+     "name_raw": "Ava Schubert",
+     "first": "Ava",
+     "last": "Schubert",
+     "class_raw": "Sr.",
+     "pos_raw": "RS",
+     "num_raw": "1",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Brooklyn Rapp",
+     "first": "Brooklyn",
+     "last": "Rapp",
+     "class_raw": "So.",
+     "pos_raw": "L",
+     "num_raw": "3",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Bella Potempa",
+     "first": "Bella",
+     "last": "Potempa",
+     "class_raw": "Fr.",
+     "pos_raw": "OH",
+     "num_raw": "4",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Kamya Mahorn",
+     "first": "Kamya",
+     "last": "Mahorn",
+     "class_raw": "Fr.",
+     "pos_raw": "Pin",
+     "num_raw": "5",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Ella Watford",
+     "first": "Ella",
+     "last": "Watford",
+     "class_raw": "So.",
+     "pos_raw": "L",
+     "num_raw": "6",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Audrey Berkebile",
+     "first": "Audrey",
+     "last": "Berkebile",
+     "class_raw": "Jr.",
+     "pos_raw": "OH",
+     "num_raw": "7",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Mallory Jenkins",
+     "first": "Mallory",
+     "last": "Jenkins",
+     "class_raw": "Jr.",
+     "pos_raw": "MB",
+     "num_raw": "8",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Sarah Noto",
+     "first": "Sarah",
+     "last": "Noto",
+     "class_raw": "So.",
+     "pos_raw": "RS",
+     "num_raw": "9",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Bella Lineberger",
+     "first": "Bella",
+     "last": "Lineberger",
+     "class_raw": "Jr.",
+     "pos_raw": "S",
+     "num_raw": "10",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Morgan Petelin",
+     "first": "Morgan",
+     "last": "Petelin",
+     "class_raw": "Fr.",
+     "pos_raw": "S",
+     "num_raw": "11",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Jordyn Milhouse",
+     "first": "Jordyn",
+     "last": "Milhouse",
+     "class_raw": "So.",
+     "pos_raw": "MB",
+     "num_raw": "12",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Caroline Fruge",
+     "first": "Caroline",
+     "last": "Fruge",
+     "class_raw": "So.",
+     "pos_raw": "L",
+     "num_raw": "13",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Ashlyn Gamble",
+     "first": "Ashlyn",
+     "last": "Gamble",
+     "class_raw": "R-Jr.",
+     "pos_raw": "RS",
+     "num_raw": "14",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Amani Agoot",
+     "first": "Amani",
+     "last": "Agoot",
+     "class_raw": "Fr.",
+     "pos_raw": "MB",
+     "num_raw": "18",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Tuva Falk",
+     "first": "Tuva",
+     "last": "Falk",
+     "class_raw": "So.",
+     "pos_raw": "MB",
+     "num_raw": "21",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Shelby Hannah",
+     "first": "Shelby",
+     "last": "Hannah",
+     "class_raw": "So.",
+     "pos_raw": "Libero",
+     "num_raw": "22",
+     "how": "data-field-table",
+     "photo": null
+    },
+    {
+     "name_raw": "Alayna Pierce",
+     "first": "Alayna",
+     "last": "Pierce",
+     "class_raw": "Jr.",
+     "pos_raw": "OH",
+     "num_raw": "24",
+     "how": "data-field-table",
+     "photo": null
+    }
+   ]
   },
   "Texas": {
    "status": "ok",
