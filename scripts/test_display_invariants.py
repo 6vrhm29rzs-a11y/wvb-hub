@@ -1796,9 +1796,27 @@ def check_public_build_is_clean():
                 else:
                     ok("the libero still gets a contrasting jersey")
 
-    # the rankings table must not be left with mismatched columns after the strip
-    m = re.search(r"<thead><tr>(.*?)</tr></thead>", h, re.S)
+    # THE RANKINGS TABLE MUST NOT BE LEFT WITH MISMATCHED COLUMNS AFTER THE
+    # STRIP -- the public build removes the VolleyTalk and Massey columns, and a
+    # header removed without its cells (or the reverse) shifts every value one
+    # column left under the wrong heading.
+    #
+    # ⚠ THIS GUARD WAS ANCHORED ON THE WRONG TABLE. It took the FIRST
+    # <thead><tr> on the page and compared it against #rbody's cells -- two
+    # different tables. It happened to agree, so it read as passing; adding a
+    # column to the Top 25 (a table that appears earlier in the document) made
+    # it report a confident, precise, entirely false failure about the rankings.
+    # A guard that matches the wrong element is not a weak guard, it is a guard
+    # pointed somewhere else. Anchor on the table that OWNS the tbody.
     b = re.search(r'<tbody id="rbody">(.*?)</tbody>', h, re.S)
+    m = None
+    if b:
+        # walk back from the tbody to the nearest preceding thead -- that is
+        # this table's own header, whatever else the page contains.
+        before = h[:b.start()]
+        heads = list(re.finditer(r"<thead>(.*?)</thead>", before, re.S))
+        if heads:
+            m = heads[-1]
     if m and b:
         row = re.search(r'<tr[^>]*class="row"[^>]*>(.*?)</tr>', b.group(1), re.S)
         if row:
@@ -1809,6 +1827,9 @@ def check_public_build_is_clean():
                     "%d headers vs %d cells" % (n_th, n_td))
             else:
                 ok("public rankings header and cells align", n_th)
+    else:
+        bad("the public rankings table could not be located",
+            "this guard was checking nothing")
 
 
 def check_photos_are_urls_only():
@@ -1902,6 +1923,70 @@ def check_every_view_names_its_season():
             elif prev:
                 ok("%s: previous-season ranking carries a season warning" % label,
                    len(prev))
+
+
+def check_poll_column_polarity():
+    """THE TOP 25's AVCA COLUMN: is the gap pointing the right way?
+
+    ⚠ THIS IS THE FAILURE MODE R4 EXISTS FOR. If the subtraction is reversed,
+    every number in the column is still a true number and every colour is still
+    a real colour -- the page just says we are more sceptical about Nebraska
+    than the coaches when in fact we are less. Nothing looks broken. There is no
+    exception, no gap in the data, no visual clue at all.
+
+    So this re-derives the sign from the two ranks the row itself carries: a
+    team we rank BETTER (a smaller number) than the poll does must render as a
+    green "+", and a team we rank worse as a red "-". A team the poll does not
+    rank at all must render NR with no gap -- the poll is 25 deep and treating
+    unranked as 26 would invent a precise disagreement out of an absent number
+    (R5).
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping poll-column check")
+        return
+    src = open(hub, encoding="utf-8").read()
+    rows = re.findall(
+        r'<tr class="row" data-team="([^"]+)".*?<td class="rk">(\d+)</td>'
+        r'.*?<td class="n poll"[^>]*>(.*?)</td>', src, re.S)
+    if not rows:
+        bad("the Top 25 has no AVCA column",
+            "the page carries two rankings and would be showing only one")
+        return
+    wrong, nr, checked = [], 0, 0
+    for team, ourrank, cell in rows:
+        m = re.search(r"<b>(\d+)</b>", cell)
+        if not m:
+            nr += 1
+            if "pgup" in cell or "pgdn" in cell:
+                wrong.append("%s: NR but shows a gap" % team)
+            continue
+        a, ours = int(m.group(1)), int(ourrank)
+        checked += 1
+        if ours == a:
+            want = "pg0"
+        elif ours < a:
+            want = "pgup"          # we rate them BETTER than the coaches do
+        else:
+            want = "pgdn"
+        if want not in cell:
+            wrong.append("%s: ours #%d vs poll #%d wants %s" % (team, ours, a, want))
+        # and the magnitude must be the actual difference
+        g = re.search(r"[\u2212+](\d+)", cell)
+        if g and int(g.group(1)) != abs(ours - a):
+            wrong.append("%s: prints %s, the gap is %d"
+                         % (team, g.group(1), abs(ours - a)))
+    if wrong:
+        bad("the AVCA gap column is wrong on %d rows" % len(wrong),
+            "; ".join(wrong[:3]))
+    elif not checked:
+        bad("no Top 25 team is ranked by the poll",
+            "either the join broke or this guard is checking nothing")
+    else:
+        ok("the AVCA gap points the right way and matches the ranks", checked)
+        if nr:
+            print("     (%d of %d not in the coaches poll -- rendered NR)"
+                  % (nr, len(rows)))
 
 
 def check_live_times_are_pacific():
@@ -2118,6 +2203,7 @@ def main():
     check_photo_crop_and_zoom()
     check_hero_podium_signs()
     check_no_class_name_collisions()
+    check_poll_column_polarity()
     check_live_times_are_pacific()
     check_week_names_whose_ranking()
     check_page_script_parses()

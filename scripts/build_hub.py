@@ -1552,8 +1552,8 @@ def hcell_py(v, txt, lo, hi, kind="seq"):
     return '<td class="n hx %s" style="--t:%.3f"><b>%s</b></td>' % (kind, t, txt)
 
 
-def top25_view():
-    # type: () -> Dict[str, str]
+def top25_view(avca=None):
+    # type: (Optional[Dict[str, int]]) -> Dict[str, str]
     """Rows and copy for Digby's Top 25.
 
     EVERY SENTENCE HERE IS BUILT FROM A MEASURED VALUE (R1). The lead states
@@ -1627,6 +1627,35 @@ def top25_view():
              if r.get("net_pts_per_set") is not None]
     nmax = max(_nets) if _nets else 1.0
 
+    # THE COACHES POLL, BESIDE OURS. This page carries two rankings and they
+    # disagree; showing only one of them is a claim of consensus that does not
+    # exist. The AVCA number is the OFFICIAL one, so it gets the plain numeral,
+    # and the gap is stated from OUR side -- a team we rate lower than the poll
+    # reads as a positive gap, because the sentence being made is "we are N
+    # places more sceptical than the coaches", not the reverse.
+    #
+    # ⚠ A TEAM THE POLL DOES NOT RANK IS "NR", NOT A BIG GAP. The poll is 25
+    # deep; treating unranked as rank 26 would invent a precise disagreement out
+    # of an absent number (R5). No gap is shown at all in that case.
+    avca = avca or {}
+
+    def _pollcell(team, ours):
+        a = avca.get(team)
+        if not a:
+            return ('<td class="n poll"><span class="nr" title="not in the '
+                    'AVCA top 25">NR</span></td>')
+        d = ours - a
+        if d == 0:
+            return ('<td class="n poll" title="the coaches poll agrees">'
+                    '<b>%d</b> <i class="pg0">=</i></td>' % a)
+        return ('<td class="n poll" title="AVCA coaches poll #%d; our rating '
+                'has them %d place%s %s">'
+                '<b>%d</b> <i class="%s">%s%d</i></td>'
+                % (a, abs(d), "" if abs(d) == 1 else "s",
+                   "lower" if d > 0 else "higher", a,
+                   "pgdn" if d > 0 else "pgup",
+                   "\u2212" if d > 0 else "+", abs(d)))
+
     rows = []
     for r in top:
         team = r["team"]
@@ -1642,11 +1671,12 @@ def top25_view():
         wt = r.get("weight_on_season") or 0
         rows.append(
             '<tr class="row" data-team="%s" style="--tc:%s"><td class="rk">%d</td>'
-            '<td class="tm">%s%s</td><td class="mvc">%s</td><td class="cf">%s</td>'
+            '<td class="tm">%s%s</td><td class="mvc">%s</td>%s<td class="cf">%s</td>'
             '<td class="rec">%s</td><td class="form">%s</td>'
             '%s<td class="n wt">%s</td></tr>'
             % (esc(team), (colors.get(team) or {}).get("primary") or "var(--line)",
                r["rank"], logo_img(team, logos), esc(team), mv,
+               _pollcell(team, r["rank"]),
                esc(r.get("conf") or ""),
                r.get("record") or "0-0",
                form_strip(form.get(team) or []),
@@ -1674,6 +1704,24 @@ def top25_view():
         mv_txt = ("<b>Biggest movers:</b> "
                   + " &middot; ".join(_one(*x) for x in movers[:4]) + ". ")
 
+    # WHERE WE DISAGREE WITH THE COACHES, stated from the numbers rather than
+    # characterised in advance (R1). Every value in this sentence is computed
+    # from the two rankings; nothing here is a phrase written before the data.
+    _gaps = [(r["rank"] - avca[r["team"]], r["team"], avca[r["team"]], r["rank"])
+             for r in top if avca.get(r["team"])]
+    poll_txt = ""
+    if _gaps:
+        _agree = sum(1 for g in _gaps if g[0] == 0)
+        _big = max(_gaps, key=lambda g: abs(g[0]))
+        _nr = sum(1 for r in top if not avca.get(r["team"]))
+        poll_txt = (
+            "<b>Against the coaches poll:</b> we agree exactly on %d of the %d "
+            "teams both rankings carry%s. The widest gap is <b>%s</b> &mdash; "
+            "we have them <b>#%d</b>, the poll has them <b>#%d</b>. "
+            % (_agree, len(_gaps),
+               (", and %d of our 25 are unranked by the poll" % _nr) if _nr else "",
+               esc(_big[1]), _big[3], _big[2]))
+
     played = m.get("matches_counted") or 0
     k = m.get("k_matches") or 0
     withres = m.get("teams_with_a_result") or 0
@@ -1688,7 +1736,7 @@ def top25_view():
         % (k, k, played, sum(1 for r in top if r.get("matches")),
            round(100 * maxw)))
     foot = (
-        mv_txt +
+        mv_txt + poll_txt +
         "<b>Why so little movement in August?</b> %.1f is not a preference "
         "&mdash; it is the per-match spread (%.2f points/set) divided by how "
         "much the projection still gets wrong (it predicts the next season at "
@@ -1731,7 +1779,8 @@ def build():
     # back to a neutral rather than to an invented hue.
     team_colors = ((load("data/team_colors_%d.json" % SEASON) or {})
                    .get("teams") or {})
-    _t25 = top25_view()
+    _t25 = top25_view(dict((t["team"], t["avca"]) for t in teams
+                           if t.get("avca")))
     sched = schedule()
     tvrows = tv()
     sim = load("data/season_sim_%d.json" % SEASON) or {}
@@ -2555,6 +2604,17 @@ td.pick b{color:var(--navy)}
    should read as a footnote rather than compete with the matchup. */
 .ourrk{font:600 11px/1.3 var(--mono);color:var(--ink2);letter-spacing:.02em;
   margin-top:6px;padding-top:6px;border-top:1px dotted var(--line)}
+/* THE POLL COLUMN. Green where we are higher on a team than the coaches are,
+   red where we are lower -- the same good/bad reading the rest of the page
+   uses. The gap is deliberately smaller and quieter than the poll rank itself:
+   the rank is the fact, the gap is the commentary. */
+.t25 td.poll b{font:700 14px/1 var(--disp);color:var(--ink)}
+.t25 td.poll i{font:700 10.5px/1 var(--mono);font-style:normal;margin-left:4px;
+  padding:1px 3px;border-radius:3px}
+.t25 td.poll .pgup{color:#31D07E;background:color-mix(in oklab,#31D07E 14%,transparent)}
+.t25 td.poll .pgdn{color:#FF6B6B;background:color-mix(in oklab,#FF6B6B 14%,transparent)}
+.t25 td.poll .pg0{color:var(--ink2)}
+.t25 td.poll .nr{font:600 11px/1 var(--mono);color:var(--ink3,var(--ink2));opacity:.65}
 .tipoff{font:700 15px/1 var(--mono);color:var(--navy);margin-left:auto}
 .livehead #livemeta{font:12px/1 var(--mono);color:var(--ink2);margin-left:auto}
 .dot{width:9px;height:9px;border-radius:50%;background:var(--live);
@@ -3482,6 +3542,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <div class="scroll"><table class="t25">
     <thead><tr>
       <th>#</th><th>Team</th><th title="how the rank changed">{{T25_MOVEHEAD}}</th>
+      <th class="n" title="the AVCA coaches poll rank, and how far our rating differs from it">AVCA</th>
       <th>Conf</th><th>Record</th><th class="l" title="most recent results, newest last">Form</th>
       <th class="n" title="net points per set this season">Net/set</th>
       <th class="n" title="how much of the rating is this season rather than the preseason projection">This season</th>
