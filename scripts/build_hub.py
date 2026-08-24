@@ -2553,6 +2553,32 @@ td.tvnet{text-align:left}
 .bandkey b{color:var(--ink2)}
 .bandkey i.wonkey{display:inline-block;width:8px;height:8px;border-radius:2px;
   background:var(--amber);margin-right:5px;vertical-align:0}
+/* ---- TABLE ROWS: A SIGNAL, NOT A STRIPE ------------------------------
+   Hovering swapped the row's background, which reads as "this is a striped
+   table" rather than "this row is selected". A lit edge slides in from the
+   left instead -- the same language the team-colour bars already use -- and
+   the row lifts a shade. Applies to every scrolling table on the page from one
+   definition. */
+tbody tr{position:relative;transition:background .14s ease}
+tbody tr td:first-child{position:relative}
+tbody tr td:first-child::after{content:"";position:absolute;left:0;top:0;bottom:0;
+  width:2px;background:var(--amber);box-shadow:0 0 14px rgba(255,199,44,.85);
+  transform:scaleY(0);transform-origin:center;transition:transform .16s ease}
+tbody tr:hover td{background:rgba(120,180,255,.055)}
+tbody tr:hover td:first-child::after{transform:scaleY(1)}
+@media (prefers-reduced-motion:reduce){
+  tbody tr td:first-child::after{transition:none}}
+
+/* ---- THE TOP THREE LOOK LIKE THE TOP THREE ---------------------------
+   A rank column where #1 and #180 are the same 13px monospace is a spreadsheet.
+   The podium places get scale and light; everything below stays quiet, so the
+   contrast does the work rather than colour everywhere. */
+td.rk{font:700 14px/1 var(--mono);color:var(--ink3)}
+tbody tr:nth-child(1) td.rk,
+tbody tr:nth-child(2) td.rk,
+tbody tr:nth-child(3) td.rk{font-size:19px;color:var(--ink)}
+tbody tr:nth-child(1) td.rk{color:var(--amber);
+  text-shadow:0 0 18px rgba(255,199,44,.55)}
 /* ---- SECTION LABELS AS RIBBON, NOT AS SENTENCES -----------------------
    "Later today" and the lead paragraphs were plain text in the flow, so every
    band on the page began the same anonymous way. A scoreboard names its
@@ -2601,12 +2627,38 @@ td.tvnet{text-align:left}
     linear-gradient(160deg, rgba(26,39,64,.97), rgba(10,16,29,.98)),
     linear-gradient(140deg,rgba(140,195,255,.55),rgba(255,199,44,.22) 40%,rgba(255,255,255,.04) 72%)}
 /* the court: attack line + net, drawn once, sitting under everything */
-.hero::after{content:"";position:absolute;right:-40px;bottom:-70px;width:420px;
-  height:260px;pointer-events:none;opacity:.07;
-  background:
-    linear-gradient(90deg,transparent 49.6%,#fff 49.6%,#fff 50.4%,transparent 50.4%),
-    linear-gradient(0deg,transparent 68%,#fff 68%,#fff 68.7%,transparent 68.7%);
-  border:2px solid #fff;border-radius:2px;transform:perspective(420px) rotateX(52deg)}
+/* ---- THE COURT ---------------------------------------------------------
+   The previous one was two CSS gradients inside a rotated box: a rectangle with
+   an off-centre cross through it, which is not a volleyball court and did not
+   read as one. This is drawn to the REAL dimensions -- 18m x 9m, the net on the
+   centre line, attack lines 3m either side of it -- as an SVG in a 180x90
+   viewBox where one unit is a decimetre, then laid back in perspective.
+   Everything on it is a line that exists on a court and nothing else is. */
+/* THE COURT IS THE HERO'S SUBJECT, not a texture hidden behind the cards.
+   Laid across the whole width at the bottom, seen from behind one baseline so
+   the net runs across the middle distance -- the view from the stands. It is
+   masked only at the far edge, where a real court would fall out of the light. */
+/* ⚠ THE COURT GETS ITS OWN ROW. Twice I laid it behind the hero content and
+   twice the net line drew straight through "THE 2026 SEASON" -- because to show
+   any depth the far baseline has to rise, and that is exactly where the type
+   is. Masks only hid the symptom. The hero is a grid now: the headline and
+   podium on the top row, the floor on its own row beneath, so the court has
+   room to recede and nothing has to be faded out of its way. */
+.hero{display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;
+  gap:22px 28px;align-items:center;min-height:0}
+.heroL{grid-column:1;grid-row:1}
+.heroR{grid-column:2;grid-row:1}
+.courtwrap{grid-column:1 / -1;grid-row:2;position:relative;height:104px;
+  overflow:hidden;pointer-events:none;
+  border-radius:10px;
+  background:linear-gradient(180deg,rgba(8,14,28,0),rgba(91,168,245,.07));
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent);
+  mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent)}
+.courtart{position:absolute;left:50%;bottom:-52%;width:150%;
+  transform:translateX(-50%) perspective(520px) rotateX(66deg);
+  transform-origin:bottom center;opacity:1}
+/* the hero's own content has to sit above the floor it is standing on */
+.heroL,.heroR{position:relative;z-index:2}
 .heroL{position:relative;z-index:1;min-width:min(100%,320px);flex:1 1 340px}
 .eyebrow{display:flex;align-items:center;gap:8px;font:700 10.5px/1 var(--mono);
   letter-spacing:.22em;text-transform:uppercase;color:var(--ink3)}
@@ -2986,6 +3038,29 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <p class="herosub">{{HERO_SUB}}</p>
     </div>
     <div class="heroR">{{HERO_PODIUM}}</div>
+    <div class="courtwrap"><svg class="courtart" viewBox="-6 -6 192 102" aria-hidden="true">
+      <defs>
+        <linearGradient id="ctf" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#5BA8F5" stop-opacity=".30"/>
+          <stop offset="1" stop-color="#5BA8F5" stop-opacity=".08"/>
+        </linearGradient>
+      </defs>
+      <!-- the playing surface, 18m x 9m -->
+      <rect x="0" y="0" width="180" height="90" fill="url(#ctf)"/>
+      <rect x="0" y="0" width="180" height="90" fill="none"
+            stroke="#dbe9ff" stroke-opacity=".85" stroke-width="1.3"/>
+      <!-- attack lines, 3m either side of the net -->
+      <line x1="0" y1="30" x2="180" y2="30" stroke="#dbe9ff" stroke-opacity=".62" stroke-width="1"/>
+      <line x1="0" y1="60" x2="180" y2="60" stroke="#dbe9ff" stroke-opacity=".62" stroke-width="1"/>
+      <!-- the net, on the centre line, with its posts and tape -->
+      <rect x="-5" y="43.5" width="190" height="3" fill="#FFC72C" fill-opacity=".13"/>
+      <line x1="-5" y1="45" x2="185" y2="45" stroke="#FFC72C" stroke-opacity=".9" stroke-width="1.5"/>
+      <g stroke="#FFC72C" stroke-opacity=".34" stroke-width=".45">
+        <line x1="-5" y1="43.5" x2="185" y2="43.5"/><line x1="-5" y1="46.5" x2="185" y2="46.5"/>
+      </g>
+      <circle cx="-5" cy="45" r="2.2" fill="#FFC72C" fill-opacity=".85"/>
+      <circle cx="185" cy="45" r="2.2" fill="#FFC72C" fill-opacity=".85"/>
+    </svg></div>
   </div>
   <div id="live" hidden>
     <div class="livehead">
