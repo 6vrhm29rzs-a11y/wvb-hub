@@ -5094,14 +5094,18 @@ function showTeam(name) {
        far below the fold or not on the page at all.
        Everything here is read from data already in the payload; nothing new is
        computed and nothing is estimated. */
+    /* ⚠ THE PROVENANCE NOTE IS BOOKKEEPING, NOT COPY. Nebraska's row records in
+       full why it was entered by hand and how it was verified -- which belongs
+       in the data file and on the tooltip, not printed across the team page. A
+       reader wants the coach's name; the audit trail is one hover away. */
     (t.coach
       ? '<div class="coachline" title="' +
-        (t.coach.source ? 'from ' + t.coach.source : '') + '">' +
+        [t.coach.source ? 'Source: ' + t.coach.source : '', t.coach.note || '']
+          .filter(Boolean).join(' \u2014 ').replace(/"/g, '&quot;') + '">' +
         '<span class="cl">Head coach</span>' +
         '<b>' + t.coach.name + '</b>' +
         (t.coach.title && !/^head coach$/i.test(t.coach.title)
           ? '<span class="ct">' + t.coach.title + '</span>' : '') +
-        (t.coach.note ? '<span class="ct">' + t.coach.note + '</span>' : '') +
         '</div>'
       : '') +
     glanceHtml +
