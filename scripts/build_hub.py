@@ -1731,12 +1731,24 @@ def build():
     # ---- score cards -----------------------------------------------------
     cards = []
     for r in res:
+        # HOW CLOSE EACH SET WAS, SHOWN RATHER THAN ONLY SAID. The copy above
+        # the results already tells the reader that a 25-23 and a 25-12 are not
+        # the same match; the strip did not show it. Each set gains a bar whose
+        # width is the MARGIN -- 2 points is a sliver, a 13-point rout fills the
+        # cell. Scaled against 13, which is the margin of a 25-12: past that the
+        # bar is full and the numbers carry the rest, because a scale stretched
+        # to the rare 25-3 would squash every ordinary set into nothing.
         strip = ""
         for i, (av, hv) in enumerate(r["sets"], 1):
             aw = av > hv
-            strip += ('<div class="set"><span class="%s">%d</span>'
-                      '<span class="%s">%d</span></div>'
-                      % ("w" if aw else "", av, "" if aw else "w", hv))
+            _m = abs((av or 0) - (hv or 0))
+            _w = min(100.0, _m / 13.0 * 100.0)
+            strip += ('<div class="set" title="set %d: %d-%d, %d point%s">'
+                      '<span class="%s">%d</span>'
+                      '<span class="%s">%d</span>'
+                      '<i class="mg" style="width:%.0f%%"></i></div>'
+                      % (i, av, hv, _m, "" if _m == 1 else "s",
+                         "w" if aw else "", av, "" if aw else "w", hv, _w))
         awin = (r["away_sets"] or 0) > (r["home_sets"] or 0)
         rank = lambda v: ('<i class="rnk">%s</i> ' % v) if v else ""
         nond1 = "" if (r["away_d1"] and r["home_d1"]) else \
@@ -2392,6 +2404,15 @@ td.tm{font-size:15px}
 .wh2 .pl{font:11.5px/1.4 var(--mono);color:var(--ink3)}
 .wh2 .pl.u{font-style:italic}
 .va.nt{color:var(--amber);font-weight:800}
+/* THE MARGIN OF EACH SET, under its own column. Amber because it belongs to
+   the set-winner language already established by the lit cell, and thin because
+   the numbers remain the measurement -- this only makes a rout distinguishable
+   from a scrap at a glance. */
+.set{position:relative}
+.set .mg{position:absolute;left:0;bottom:0;height:2px;background:var(--amber);
+  opacity:.85;border-radius:0 1px 1px 0;
+  transform-origin:left center;animation:cbin .45s cubic-bezier(.22,.9,.3,1) both}
+@media (prefers-reduced-motion:reduce){.set .mg{animation:none}}
 /* the bracket, in team colours */
 .bside{position:relative}
 .bside::before{content:"";position:absolute;left:0;top:3px;bottom:3px;width:3px;
@@ -3266,14 +3287,32 @@ async function pollLive() {
   /* Tonight's slate, shown as soon as the page loads rather than only once a
      match tips off -- the question "what is on later" is the other half of a
      scoreboard, and the data is already in this response. */
-  const todayISO = new Date().toISOString().slice(0, 10);
-  const soon = all.filter(g => g.state === 'pre' && g.date >= todayISO)
-                  .sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+  /* ⚠ toISOString() IS UTC, AND THIS PAGE IS PACIFIC. At 9pm Pacific it is
+     already tomorrow in UTC, so this band labelled the NEXT day's fixtures
+     "Later today" -- caught on screen at 9:13pm PT showing 2026-08-24 matches
+     under a heading that said today. Everything else on the page converts from
+     the epoch into America/Los_Angeles; this was the one clock that did not.
+     en-CA gives YYYY-MM-DD directly, so there is no re-parsing to drift. */
+  const todayISO = new Intl.DateTimeFormat('en-CA',
+    { timeZone: 'America/Los_Angeles' }).format(new Date());
+  /* ⚠ AND THE HEADING HAS TO MATCH WHAT IS SHOWN. The filter was `>= today`,
+     so the band held every future fixture in the window under the words "Later
+     today". Today's matches are today's; if there are none, the next date that
+     HAS fixtures is shown and the heading says which day it is rather than
+     claiming it is this one. */
+  const pre = all.filter(g => g.state === 'pre' && g.date >= todayISO)
+                 .sort((a, b) => (a.date + (a.time || '')).localeCompare(b.date + (b.time || '')));
+  const todays = pre.filter(g => g.date === todayISO);
+  const soon = todays.length ? todays
+                            : pre.filter(g => pre.length && g.date === pre[0].date);
   const tbox = document.getElementById('today');
   if (!soon.length) { tbox.hidden = true; }
   else {
     tbox.hidden = false;
-    document.getElementById('todaymeta').textContent = soon.length + ' scheduled';
+    document.querySelector('#today .soon').textContent =
+      todays.length ? 'Later today' : 'Next up';
+    document.getElementById('todaymeta').textContent =
+      soon.length + ' scheduled' + (todays.length ? '' : ' \u00b7 ' + soon[0].date);
     document.getElementById('todaycards').innerHTML = soon.map(g =>
       '<div class="card soon"><div class="cd">' + g.date + '</div>' +
       '<div class="mt"><div class="side">' + rank(g.away_rank) + logo(g.away) + g.away + '</div>' +

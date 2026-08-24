@@ -766,6 +766,42 @@ def check_no_class_name_collisions():
         ok("texture classes stay off table cells (%d checked)" % len(set(tex)))
 
 
+def check_today_is_pacific():
+    """"Today" on this page means today in PACIFIC, not in UTC.
+
+    PAID FOR, and caught on screen rather than by a test. The slate band derived
+    the current date with `new Date().toISOString().slice(0,10)` -- which is UTC.
+    Between 5pm and midnight Pacific that is already tomorrow, so at 9:13pm PT
+    the band listed 2026-08-24 fixtures under a heading that said "Later today".
+    Everything else on this page converts from the epoch into
+    America/Los_Angeles; this was the one clock that did not, and the window in
+    which it is wrong is precisely the evening, which is when volleyball is on.
+
+    The bug is invisible for most of the day, which is what makes it worth a
+    guard rather than a memory.
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping pacific-today check")
+        return
+    src = open(hub, encoding="utf-8").read()
+    scripts = re.findall(r"<script[^>]*>(.*?)</script>", src, re.S)
+    js = re.sub(r"/\*.*?\*/", " ", "\n".join(scripts), flags=re.S)
+    if re.search(r"toISOString\(\)\s*\.\s*slice\(\s*0\s*,\s*10\s*\)", js):
+        bad("a display date is derived from UTC",
+            "toISOString().slice(0,10) is UTC; after 5pm Pacific it names "
+            "tomorrow. Use Intl.DateTimeFormat with "
+            "timeZone:'America/Los_Angeles'")
+    else:
+        ok("no display date is derived from UTC")
+
+    if "America/Los_Angeles" not in js:
+        bad("the page never names the Pacific zone in script",
+            "the slate must derive today in America/Los_Angeles")
+    else:
+        ok("today is derived in America/Los_Angeles")
+
+
 def check_transfer_reconciliation():
     """A transfer must describe the SAME player on both sides.
 
@@ -1318,6 +1354,7 @@ def main():
     check_photo_crop_and_zoom()
     check_hero_podium_signs()
     check_no_class_name_collisions()
+    check_today_is_pacific()
     print()
     check_transfer_reconciliation()
     print()
