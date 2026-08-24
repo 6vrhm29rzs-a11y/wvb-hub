@@ -1011,6 +1011,18 @@ def head_coaches():
         if (rec or {}).get("name"):
             out[team] = {"name": rec["name"], "title": rec.get("title"),
                          "source": rec.get("source")}
+    # THIRD SOURCE, AND IT IS THE ONE THAT COVERED THE BIG PROGRAMMES. 52 schools
+    # -- Nebraska, Kentucky, UCLA, Penn St. among them -- have no /coaches path
+    # at all; every variant 404s, and their staff is a section of the ROSTER
+    # page. recover_coaches_from_roster.py reads it there. It goes ABOVE the
+    # hand-entered rows and below nothing else, because it is a crawl: where a
+    # sourced hand entry exists, that still wins.
+    for team, rec in (((load("data/raw/%d/coaches_from_roster_%d.json" % (SEASON, SEASON))
+                        or {}).get("teams")) or {}).items():
+        if (rec or {}).get("name"):
+            out[team] = {"name": rec["name"], "title": rec.get("title"),
+                         "source": rec.get("url"),
+                         "corroborated": rec.get("corroborated")}
     for team, rec in (((load("data/raw/%d/coaches_%d.json" % (SEASON, SEASON))
                         or {}).get("coaches")) or {}).items():
         if (rec or {}).get("name"):

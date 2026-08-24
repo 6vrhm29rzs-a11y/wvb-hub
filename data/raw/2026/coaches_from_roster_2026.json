@@ -1,0 +1,420 @@
+{
+ "meta": {
+  "season": 2026,
+  "source_tier": "OFFICIAL",
+  "source": "each school's own volleyball ROSTER page, staff section",
+  "why": "the 52 schools missing from coaches_found have no /coaches path at all -- every variant 404s -- and carry their staff on the roster page instead",
+  "title_rule": "imported from crawl_coaches: names a head coach and is not a deputy. NOT an exact string -- Purdue's head coach carries an endowed title, and Stanford's page carries an endowed ASSOCIATE title that ends in the same two words",
+  "never_rewrites": [
+   "/Users/codyrose/Womens_College_Volleyball_2026/data/raw/2026/rosters_2026.json",
+   "/Users/codyrose/Womens_College_Volleyball_2026/data/raw/2026/coaches_found_2026.json",
+   "data/raw/2026/coaches_2026.json"
+  ],
+  "photo": "not collected here"
+ },
+ "teams": {
+  "Nebraska": {
+   "name": "Dani Busboom Kelly",
+   "title": "Head Coach",
+   "url": "https://huskers.com/sports/volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  },
+  "Kentucky": {
+   "name": "Craig Skinner",
+   "title": "Head Coach",
+   "url": "https://ukathletics.com/sports/wvball/roster",
+   "how": "roster page staff section",
+   "corroborated": false,
+   "source_tier": "OFFICIAL"
+  },
+  "Stanford": {
+   "name": null,
+   "why": "no head-coach title on the roster page",
+   "url": "https://gostanford.com/sports/womens-volleyball/roster"
+  },
+  "UCLA": {
+   "name": "Matt Werle",
+   "title": "Head Coach",
+   "url": "https://uclabruins.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  },
+  "Penn St.": {
+   "name": "Katie Schumacher-Cawley",
+   "title": "Head Coach",
+   "url": "https://gopsusports.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  },
+  "Purdue": {
+   "name": "Dave Shondell",
+   "title": "Art and Connie Euler Women's Volleyball Head Coach",
+   "url": "https://purduesports.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  },
+  "Minnesota": {
+   "name": "Keegan Cook",
+   "title": "Head Coach",
+   "url": "https://gophersports.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": false,
+   "source_tier": "OFFICIAL"
+  },
+  "Texas A&M": {
+   "name": "Jamie Morrison",
+   "title": "Head Coach",
+   "url": "https://12thman.com/sports/volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  },
+  "Arizona St.": {
+   "name": "JJ Van Niel",
+   "title": "Head Coach",
+   "url": "https://thesundevils.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  },
+  "Auburn": {
+   "name": "Brent Crouch",
+   "title": "Head Coach",
+   "url": "https://auburntigers.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  },
+  "BYU": {
+   "name": "Rob Neilson",
+   "title": "Head Coach",
+   "url": "https://BYUcougars.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  },
+  "CSU Bakersfield": {
+   "name": "Kristen Wright",
+   "title": "Head Coach",
+   "url": "https://gorunners.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": false,
+   "source_tier": "OFFICIAL"
+  },
+  "California": {
+   "name": "Jen Malcom",
+   "title": "Head Coach",
+   "url": "https://calbears.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": false,
+   "source_tier": "OFFICIAL"
+  },
+  "Central Conn. St.": {
+   "name": "Alyssa Broccoli",
+   "title": "Head Coach",
+   "url": "https://ccsubluedevils.com/sports/wvball/2026-27/roster",
+   "how": "roster page staff section",
+   "corroborated": false,
+   "source_tier": "OFFICIAL"
+  },
+  "Cincinnati": {
+   "name": null,
+   "why": "no head-coach title on the roster page",
+   "url": "https://gobearcats.com/sports/womens-volleyball/roster"
+  },
+  "Clemson": {
+   "name": "Jackie Simpson Kirr",
+   "title": "Head Coach \u2022 Offensive Coordinator \u2022 Sixth Season",
+   "url": "https://clemsontigers.com/sports/volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  },
+  "Fresno St.": {
+   "name": "Leisa Rosen",
+   "title": "Head Coach",
+   "url": "https://gobulldogs.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": false,
+   "source_tier": "OFFICIAL"
+  },
+  "Georgia St.": {
+   "name": "Jorge Martinez",
+   "title": "Head Coach",
+   "url": "https://georgiastatesports.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": false,
+   "source_tier": "OFFICIAL"
+  },
+  "Georgia Tech": {
+   "name": null,
+   "url": "manual drop: Georgia Tech.txt",
+   "why": "the roster came from a manual file drop, not a URL -- there is no page to read a coach from"
+  },
+  "Iona": {
+   "name": "Alyssa Kaufman",
+   "title": "Head Coach",
+   "url": "https://icgaels.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": false,
+   "source_tier": "OFFICIAL"
+  },
+  "Iowa": {
+   "name": "Jim Barnes",
+   "title": "Head Coach",
+   "url": "https://hawkeyesports.com/sports/wvball/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  },
+  "Kansas St.": {
+   "name": null,
+   "url": "manual drop: Kansas State University Athletics.webarchive",
+   "why": "the roster came from a manual file drop, not a URL -- there is no page to read a coach from"
+  },
+  "Little Rock": {
+   "name": "Aubrey Becker",
+   "title": "Head Coach",
+   "url": "https://LRTrojans.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  },
+  "Loyola Chicago": {
+   "name": "Amanda Berkley",
+   "title": "Head Coach",
+   "url": "https://loyolaramblers.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": false,
+   "source_tier": "OFFICIAL"
+  },
+  "Maryland": {
+   "name": "Adam Hughes",
+   "title": "Head Coach",
+   "url": "https://umterps.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": false,
+   "source_tier": "OFFICIAL"
+  },
+  "Miami (FL)": {
+   "name": "Cinthia Angus",
+   "title": "Head Coach",
+   "url": "https://hurricanesports.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": false,
+   "source_tier": "OFFICIAL"
+  },
+  "Missouri": {
+   "name": "Dawn Sullivan",
+   "title": "Head Coach",
+   "url": "https://mutigers.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  },
+  "NIU": {
+   "name": "Sondra D'Amore",
+   "title": "Head Coach",
+   "url": "https://niuhuskies.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": false,
+   "source_tier": "OFFICIAL"
+  },
+  "Navy": {
+   "name": "Paco Labrador",
+   "title": "Head Coach",
+   "url": "https://navysports.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": false,
+   "source_tier": "OFFICIAL"
+  },
+  "New Mexico": {
+   "name": "Brian Hosfeld",
+   "title": "Head Coach",
+   "url": "https://golobos.com/sports/wvball/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  },
+  "Northwestern": {
+   "name": "Tim Nollan",
+   "title": "Head Coach",
+   "url": "https://nusports.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  },
+  "Notre Dame": {
+   "name": "Salima Rockwell",
+   "title": "Head Coach",
+   "url": "https://und.com/sports/wvball/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  },
+  "Oklahoma": {
+   "name": "Aaron Mansfield",
+   "title": "Head Coach",
+   "url": "https://soonersports.com/sports/volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": false,
+   "source_tier": "OFFICIAL"
+  },
+  "Old Dominion": {
+   "name": "Fred Chao",
+   "title": "Head Coach",
+   "url": "https://odusports.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  },
+  "San Diego St.": {
+   "name": "Brent Hilliard",
+   "title": "Head Coach",
+   "url": "https://goaztecs.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  },
+  "San Jose St.": {
+   "name": "Todd Kress",
+   "title": "Head Coach",
+   "url": "https://sjsuspartans.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  },
+  "Seattle U": {
+   "name": "Dan Behnke",
+   "title": "Head Coach",
+   "url": "https://goseattleu.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  },
+  "South Carolina": {
+   "name": "Sarah Rumely Noble",
+   "title": "Head Coach",
+   "url": "https://gamecocksonline.com/sports/wvball/roster",
+   "how": "roster page staff section",
+   "corroborated": false,
+   "source_tier": "OFFICIAL"
+  },
+  "Southern California": {
+   "name": null,
+   "url": "manual drop: USC Athletics.webarchive",
+   "why": "the roster came from a manual file drop, not a URL -- there is no page to read a coach from"
+  },
+  "Tampa": {
+   "name": "Brian Imperiale",
+   "title": "Head Coach",
+   "url": "https://tampaspartans.com/sports/wvball/2026-27/roster",
+   "how": "roster page staff section",
+   "corroborated": false,
+   "source_tier": "OFFICIAL"
+  },
+  "Tennessee Tech": {
+   "name": "Jeannette Phillips",
+   "title": "Head Coach:",
+   "url": "https://ttusports.com/sports/wvball/2026-27/roster",
+   "how": "roster page staff section",
+   "corroborated": false,
+   "source_tier": "OFFICIAL"
+  },
+  "Tulane": {
+   "name": "Derek Schroeder",
+   "title": "Head Coach",
+   "url": "https://tulanegreenwave.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": false,
+   "source_tier": "OFFICIAL"
+  },
+  "UAB": {
+   "name": "Betsy Freeburg",
+   "title": "Head Coach",
+   "url": "https://uabsports.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": false,
+   "source_tier": "OFFICIAL"
+  },
+  "UCF": {
+   "name": "Matt Botsford",
+   "title": "Head Coach",
+   "url": "https://ucfknights.com/sports/volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  },
+  "UTSA": {
+   "name": "Carol Price-Torok",
+   "title": "Head Coach",
+   "url": "https://goutsa.com/sports/volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  },
+  "Utah St.": {
+   "name": null,
+   "url": "manual drop: 2026 Women's Volleyball Roster - Utah State University Athletics.webarchive",
+   "why": "the roster came from a manual file drop, not a URL -- there is no page to read a coach from"
+  },
+  "Virginia": {
+   "name": "Shannon Wells",
+   "title": "Head Coach",
+   "url": "https://virginiasports.com/sports/wvball/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  },
+  "Virginia Tech": {
+   "name": "William Tatge",
+   "title": "Head Coach",
+   "url": "https://hokiesports.com/sports/volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": false,
+   "source_tier": "OFFICIAL"
+  },
+  "Washington St.": {
+   "name": "Korey Schroeder",
+   "title": "Head Coach",
+   "url": "https://wsucougars.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  },
+  "Wright St.": {
+   "name": "Travers Green",
+   "title": "Head Coach",
+   "url": "https://wsuraiders.com/sports/womens-volleyball/roster",
+   "how": "roster page staff section",
+   "corroborated": false,
+   "source_tier": "OFFICIAL"
+  },
+  "Arkansas": {
+   "name": null,
+   "why": "no head-coach title on the roster page",
+   "url": "https://arkansasrazorbacks.com/sport/w-volley/roster/"
+  },
+  "LSU": {
+   "name": "Tonya Johnson",
+   "title": "Head Coach",
+   "url": "https://lsusports.net/sports/vb/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  },
+  "Vanderbilt": {
+   "name": "Anders Nelson",
+   "title": "Head Coach",
+   "url": "https://vucommodores.com/sports/wvolley/roster",
+   "how": "roster page staff section",
+   "corroborated": true,
+   "source_tier": "OFFICIAL"
+  }
+ }
+}
