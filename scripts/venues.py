@@ -41,7 +41,22 @@ SEASON = int(os.environ.get("WVB_SEASON", "2026"))
 GAMES = os.path.join(REPO, "data", "raw", str(SEASON), "games.jsonl")
 OUT = os.path.join(REPO, "data", "venues_%d.json" % SEASON)
 
-MIN_HOME_GAMES = 3      # below this, a "modal" venue is one data point wearing a hat
+MIN_HOME_GAMES = 3
+# Matches at one venue more than this many days apart are different occasions,
+# not one tournament. A college event runs over a weekend, sometimes a week.
+EVENT_GAP_DAYS = 7
+
+
+def _days_between(a, b):
+    # type: (str, str) -> int
+    """Whole days between two YYYY-MM-DD strings."""
+    import datetime as _dt
+    try:
+        da = _dt.date(*[int(x) for x in a.split("-")])
+        db = _dt.date(*[int(x) for x in b.split("-")])
+    except Exception:                                   # noqa: BLE001
+        return 0
+    return abs((db - da).days)      # below this, a "modal" venue is one data point wearing a hat
 
 
 def venue_key(loc) -> Optional[str]:
@@ -233,21 +248,52 @@ def build():
     for r in rows:
         if r["venue"] and (r["site"] == "neutral" or r["venue"] in declared_venues):
             byvenue[r["venue"]].append(r)
+    # ⚠ A VENUE IS NOT AN EVENT. Grouping every neutral match at a building into
+    # one candidate produced "9 matches at Fiserv Forum, 2026-08-21 to
+    # 2026-11-13" -- the eight of the AVCA First Serve plus one unrelated match
+    # in November, reported as a single tournament spanning three months. The
+    # candidate list exists for a human to NAME events in
+    # Cody/data/events_2026.txt, and a cluster that is not one event cannot be
+    # given one name.
+    #
+    # A college tournament runs over a weekend, occasionally a week. Matches at
+    # the same venue separated by more than EVENT_GAP_DAYS are different
+    # occasions, so the run is split there. This only shapes the CANDIDATE list;
+    # nothing is named automatically and no match's site classification changes.
     events = []
     for v, rs in byvenue.items():
-        if len(rs) < 2:
-            continue
-        dates = sorted(set(d for d in (game_date.get(r["game_id"]) for r in rs) if d))
+        dated = [(game_date.get(r["game_id"]), r) for r in rs]
+        # sort on the DATE only: two matches share a date constantly, and
+        # falling through to compare the row dicts raises TypeError
+        dated = sorted(((d, r) for d, r in dated if d), key=lambda x: x[0])
+        undated = [r for r in rs if not game_date.get(r["game_id"])]
+        runs, cur = [], []
+        for d, r in dated:
+            if cur and _days_between(cur[-1][0], d) > EVENT_GAP_DAYS:
+                runs.append(cur)
+                cur = []
+            cur.append((d, r))
+        if cur:
+            runs.append(cur)
+        # matches with no date cannot be placed in time; they ride with the
+        # largest run rather than inventing a cluster of their own.
+        if undated and runs:
+            biggest = max(range(len(runs)), key=lambda i: len(runs[i]))
+            runs[biggest].extend((None, r) for r in undated)
         nm = next((e["name"] for e in declared if e["venue"] == v), None)
-        events.append({
-            "venue": v,
-            "matches": len(rs),
-            "first_date": dates[0] if dates else None,
-            "last_date": dates[-1] if dates else None,
-            "game_ids": [r["game_id"] for r in rs],
-            "name": nm,
-        })
-    events.sort(key=lambda e: -e["matches"])
+        for run in runs:
+            if len(run) < 2:
+                continue
+            ds = sorted(d for d, _ in run if d)
+            events.append({
+                "venue": v,
+                "matches": len(run),
+                "first_date": ds[0] if ds else None,
+                "last_date": ds[-1] if ds else None,
+                "game_ids": [r["game_id"] for _, r in run],
+                "name": nm,
+            })
+    events.sort(key=lambda e: (-e["matches"], e.get("first_date") or ""))
 
     return {
         "meta": {

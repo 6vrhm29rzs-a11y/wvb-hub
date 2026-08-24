@@ -34,6 +34,47 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 FAILED = []
 
 
+def test_event_candidates_are_one_occasion():
+    """An event candidate must be a run of dates, not a whole venue's season.
+
+    PAID FOR. The detector grouped every neutral match at a building into one
+    candidate, so Fiserv Forum reported "9 matches, 2026-08-21 to 2026-11-13" --
+    the eight of the AVCA First Serve plus one unrelated November match, offered
+    as a single tournament spanning three months. The candidate list exists so a
+    human can NAME events in Cody/data/events_2026.txt, and a cluster that is not
+    one occasion cannot be given one name.
+
+    The invariant: inside a candidate, consecutive dates never differ by more
+    than EVENT_GAP_DAYS. A college tournament runs over a weekend, sometimes a
+    week; a longer gap is a different occasion.
+    """
+    import json as _json
+    import venues as V
+    p = os.path.join(REPO, "data", "venues_%d.json" % V.SEASON)
+    if not os.path.exists(p):
+        print("  skip (no venue classification yet)")
+        return
+    doc = _json.load(open(p))
+    worst = None
+    bad_n = 0
+    for e in (doc.get("events") or []):
+        a, b = e.get("first_date"), e.get("last_date")
+        if not (a and b):
+            continue
+        span = V._days_between(a, b)
+        # a run of N matches can legitimately be longer than one gap, so the
+        # span is bounded by gap * (matches - 1) at the very worst
+        limit = V.EVENT_GAP_DAYS * max(1, e.get("matches", 1) - 1)
+        if span > limit:
+            bad_n += 1
+            if worst is None or span > worst[1]:
+                worst = (e.get("venue"), span, e.get("matches"))
+    check("no event candidate spans longer than its own match count allows",
+          bad_n, 0)
+    if worst:
+        print("     worst: %s spans %d days over %d matches" % worst)
+
+
 def check(name, got, want):
     ok = got == want
     print("  %-60s %s" % (name, "ok" if ok else "FAIL (got %r, want %r)" % (got, want)))
@@ -78,6 +119,9 @@ def run(games, season=2026):
 
 def main():
     print("NEUTRAL-SITE GUARDS\n")
+
+    print("0. Event candidates are a single occasion, not a venue's season")
+    test_event_candidates_are_one_occasion()
 
     print("1. Multi-host venue with no dominant team is neutral (the Fiserv case)")
     sites = run([
