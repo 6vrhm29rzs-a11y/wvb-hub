@@ -116,25 +116,14 @@ jobs:
           # Classify each match's floor BEFORE anything rates it -- the rating
           # solves for a home-advantage term and must not credit one on a
           # neutral court. Cheap, and it self-populates as the season runs.
-          python3 scripts/venues.py
-          # Who did not take the floor. Cheap, and it needs the player lines
-          # collected earlier in this same run.
-          python3 scripts/availability.py
-          # Win probability for everything still to be played. Depends on
-          # venues.py above -- a neutral floor gets no home advantage.
-          python3 scripts/predict_2026.py || echo "prediction needs a prior rating; skipping"
-          # If this skips, say WHICH of the two reasons it was: an honest
-          # message here would have surfaced the missing dependency a long time
-          # ago instead of reading as an ordinary pre-season no-op.
-          python3 scripts/simulate_season_2026.py \
-            || echo "season sim did not run -- check for a missing dependency or an absent prior rating"
-          # Score yesterday's predictions against what happened. Runs AFTER the
-          # crawl so the results are in, and reads only the pre-match log.
-          python3 scripts/score_predictions.py || true
-          python3 scripts/build_dataset.py
-          python3 scripts/rpi_2025.py || echo "RPI needs a game graph; skipping this early"
-          python3 scripts/rating_2025.py
-
+          # ⚠ THE BASE IS BUILT FIRST, AND THE ORDER IS THE WHOLE POINT.
+          # predict_2026.py and simulate_season_2026.py both read
+          # data/rating_2025.json. When this block sat further down, they ran
+          # BEFORE it existed on a fresh checkout: the simulator exited 1 (and
+          # its `||` hid that), while predict_2026 read `or {}` and quietly
+          # produced predictions with no prior rating at all -- degraded output
+          # that looked like success. Anything reading the completed season must
+          # come after it is built.
           # ---- THE LAST COMPLETED SEASON: THE BASE EVERYTHING STANDS ON ----
           # These three scripts are season-parameterised and the job pins
           # WVB_SEASON=2026, so the lines above build only the LIVE season.
@@ -160,6 +149,26 @@ jobs:
           WVB_SEASON=2025 python3 scripts/build_dataset.py
           WVB_SEASON=2025 python3 scripts/rpi_2025.py
           WVB_SEASON=2025 python3 scripts/rating_2025.py
+
+          python3 scripts/venues.py
+          # Who did not take the floor. Cheap, and it needs the player lines
+          # collected earlier in this same run.
+          python3 scripts/availability.py
+          # Win probability for everything still to be played. Depends on
+          # venues.py above -- a neutral floor gets no home advantage.
+          python3 scripts/predict_2026.py || echo "prediction needs a prior rating; skipping"
+          # If this skips, say WHICH of the two reasons it was: an honest
+          # message here would have surfaced the missing dependency a long time
+          # ago instead of reading as an ordinary pre-season no-op.
+          python3 scripts/simulate_season_2026.py \
+            || echo "season sim did not run -- check for a missing dependency or an absent prior rating"
+          # Score yesterday's predictions against what happened. Runs AFTER the
+          # crawl so the results are in, and reads only the pre-match log.
+          python3 scripts/score_predictions.py || true
+          python3 scripts/build_dataset.py
+          python3 scripts/rpi_2025.py || echo "RPI needs a game graph; skipping this early"
+          python3 scripts/rating_2025.py
+
           # The PUBLIC dashboard is now the same builder as Cody's page, with
           # the third-party views stripped (VolleyTalk poll, Massey, TV
           # listings). One builder, two outputs -- the two pages used to be

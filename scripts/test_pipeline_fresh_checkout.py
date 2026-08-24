@@ -185,6 +185,23 @@ def main():
             print("       required command failed (rc=%d): %s" % (rc, c))
         check("no required command failed", not bad,
               "(%d failed)" % len(bad))
+
+        # ⚠ TOLERATED IS NOT THE SAME AS EXPECTED, AND THIS GUARD USED TO TREAT
+        # THEM ALIKE. simulate_season_2026.py carries a `||`, so when it exited
+        # 1 on a fresh checkout -- because it reads data/rating_2025.json and
+        # that was built LATER in the same step -- this test stayed green and
+        # said nothing. A real nightly run then failed for a whole different
+        # reason and only the log revealed it. A command allowed to fail is
+        # still worth reporting; a nightly that quietly skips its season
+        # simulation every night is not a nightly that runs.
+        tolerated = [(c, rc) for c, tol, rc in results if rc != 0 and tol]
+        if tolerated:
+            print("     %d tolerated command(s) did not run -- allowed, but "
+                  "look at them:" % len(tolerated))
+            for c, rc in tolerated:
+                print("       (rc=%d) %s" % (rc, c.split("||")[0].strip()))
+        else:
+            print("     every tolerated command also succeeded")
         check("the page was built", os.path.exists(os.path.join(tmp, "Cody", "START-HERE.html")))
 
         # ---- NEGATIVE CONTROL ------------------------------------------
