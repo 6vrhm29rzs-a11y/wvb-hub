@@ -1062,6 +1062,56 @@ def check_players_view_shows_every_stat():
         ok("the match log carries assists, aces and digs")
 
 
+def check_team_glance_is_populated():
+    """The team page must answer four questions before anyone scrolls.
+
+    PAID FOR BY MEASUREMENT: the team page ran to 3,648px and the Upcoming
+    fixture list alone was 2,416px of it -- two thirds of the page was a list
+    you had to scroll past to learn anything. Record, form, last result and next
+    match now sit directly under the name.
+
+    ⚠ AND THE FORM CARD WAS BLANK ON EVERY TEAM. It called formPills(t.team),
+    but TEAMS is keyed BY NAME and the object carries no `team` field -- so it
+    was formPills(undefined), which returns the "no results yet" dash. The
+    identical call in the standings, which has the name in hand, rendered
+    correctly, so the bug looked like missing DATA rather than a missing
+    argument. An undefined property is not an error in JavaScript; it is a
+    dash.
+
+    Asserted on the source: the glance must pass the name, never a field that
+    does not exist on the object.
+    """
+    src_path = os.path.join(REPO, "scripts", "build_hub.py")
+    code = open(src_path, encoding="utf-8").read()
+    m = re.search(r"const glanceHtml = .*?';\n", code, re.S)
+    if not m:
+        bad("the team page has no at-a-glance block",
+            "record / form / last result / next must render above the fold")
+        return
+    # ⚠ STRIP COMMENTS FIRST -- the third time this exact trap has appeared
+    # today. The comment above the fix necessarily QUOTES the bug it describes,
+    # so a guard that greps the raw source finds the thing it is looking for in
+    # the prose explaining that it was fixed.
+    block = re.sub(r"/\*.*?\*/", " ", m.group(0), flags=re.S)
+    if "formPills(t.team)" in block:
+        bad("the glance calls formPills with a field that does not exist",
+            "TEAMS is keyed by name; t.team is undefined and renders as a dash")
+    elif "formPills(name)" not in block:
+        bad("the glance does not render form", "expected formPills(name)")
+    else:
+        ok("the glance passes the team NAME to formPills")
+
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        return
+    page = open(hub, encoding="utf-8").read()
+    for label in ("Record 2026", "Form", "Last result", "Next"):
+        if label not in page:
+            bad("the glance is missing a card", "no %r card" % label)
+            return
+    ok("the glance carries record, form, last result and next")
+
+
 def check_transfer_reconciliation():
     """A transfer must describe the SAME player on both sides.
 
@@ -1617,6 +1667,7 @@ def main():
     check_today_is_pacific()
     check_decor_never_covers_content()
     check_players_view_shows_every_stat()
+    check_team_glance_is_populated()
     check_phantom_sets_are_harmless()
     check_aggregate_excludes_phantom_sets()
     print()

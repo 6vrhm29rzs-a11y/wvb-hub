@@ -2558,6 +2558,41 @@ td.tvnet{text-align:left}
 .bandkey b{color:var(--ink2)}
 .bandkey i.wonkey{display:inline-block;width:8px;height:8px;border-radius:2px;
   background:var(--amber);margin-right:5px;vertical-align:0}
+/* ---- AT A GLANCE ------------------------------------------------------
+   Four cards that answer what a team page is opened for: how they are going,
+   how they have been going, what just happened, what is next. Sits directly
+   under the name, above everything else. */
+.glance{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0 18px}
+.gl{padding:13px 15px;border-radius:12px;border:1px solid transparent;
+  background-origin:border-box;background-clip:padding-box,border-box;
+  background-image:
+    linear-gradient(170deg,rgba(26,38,62,.94),rgba(12,19,33,.95)),
+    linear-gradient(150deg,rgba(120,180,255,.36),rgba(255,199,44,.12) 48%,rgba(255,255,255,.03) 76%);
+  display:flex;flex-direction:column;gap:5px;min-width:0}
+.gll{font:700 9.5px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink3)}
+.glbig{font:600 27px/1 var(--disp);color:var(--ink);letter-spacing:.01em}
+.glbig.glw{color:var(--good)}
+.glbig.gll2{color:var(--bad)}
+.glbig.glmuted{color:var(--ink3)}
+.glnext{font:600 18px/1.15 var(--disp);color:var(--ink);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gls{font:11.5px/1.35 var(--mono);color:var(--ink3);
+  overflow:hidden;text-overflow:ellipsis}
+.glpick{font-style:normal;color:var(--good);font-weight:700}
+.glform{display:flex;gap:3px;align-items:center;min-height:22px}
+@media (max-width:760px){.glance{grid-template-columns:repeat(2,1fr)}}
+
+/* a long list stops owning the page; the count says what is hidden */
+.upc.clipped .gline:nth-of-type(n+7){display:none}
+h3 .cnt{margin-left:8px;padding:2px 7px;border-radius:20px;
+  background:rgba(120,180,255,.14);color:var(--ink2);
+  font:700 10px/1.5 var(--mono)}
+.moreb{display:block;width:calc(100% - 30px);margin:2px 15px 12px;padding:9px;
+  border-radius:9px;border:1px solid var(--line2);cursor:pointer;
+  background:rgba(120,180,255,.07);color:var(--ink2);
+  font:600 12px/1 var(--sans);transition:background .15s ease,color .15s ease}
+.moreb:hover{background:rgba(120,180,255,.14);color:var(--ink)}
 /* ---- TABLE ROWS: A SIGNAL, NOT A STRIPE ------------------------------
    Hovering swapped the row's background, which reads as "this is a striped
    table" rather than "this row is selected". A lit edge slides in from the
@@ -4187,6 +4222,16 @@ function hcell(v, txt, lo, hi, good, kind) {
     requestAnimationFrame(step);
   });
 })();
+/* SHOW-ALL on a collapsed list. Delegated, because the team panel is rebuilt
+   every time a different team is picked and a bound handler would go with it. */
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-more]');
+  if (!b) return;
+  const box = b.parentElement.querySelector('.upc');
+  if (!box) return;
+  const open = box.classList.toggle('clipped');
+  b.textContent = open ? ('Show all ' + b.dataset.n + ' fixtures') : 'Show fewer';
+});
 /* CLICK A PHOTO TO ENLARGE IT. One delegated listener on the document, so it
    covers the roster, the Stats table, the Players table and anything rendered
    after load -- binding per render would quietly miss the views that redraw.
@@ -4402,6 +4447,52 @@ function showTeam(name) {
      trip, and calling it one is the same inference-as-fact that put an AVCA
      First Serve match in the host's gym. A venue the feed has not published is
      left blank rather than filled from the nominal home team. */
+  /* NEXT MATCH, LAST RESULT, FORM, RECORD -- the four answers a team page owes
+     you before you scroll. `played` is newest-first and `fixtures` is
+     oldest-first, which is why one is [0] and the other is [0] of its own
+     order; getting that backwards would show the season opener as "next". */
+  const _played = t.played || [];
+  const _fix = t.fixtures || [];
+  const _last = _played[0] || null;
+  const _next = _fix[0] || null;
+  const _w = _played.filter(g => g.mine > g.theirs).length;
+  const _l = _played.length - _w;
+  const glanceCard = (label, body, cls) =>
+    '<div class="gl ' + (cls || '') + '"><span class="gll">' + label + '</span>' +
+    body + '</div>';
+  const glanceHtml = '<div class="glance">' +
+    glanceCard('Record 2026',
+      _played.length
+        ? '<b class="glbig">' + _w + '&ndash;' + _l + '</b>' +
+          '<span class="gls">' + _played.length + ' played</span>'
+        : '<b class="glbig glmuted">0&ndash;0</b><span class="gls">not started</span>') +
+    glanceCard('Form',
+      _played.length
+        /* ⚠ TEAMS is keyed BY NAME and the object carries no `team` field, so
+                   formPills(t.team) was formPills(undefined) and every team's
+                   form read as a dash -- while the identical call in the
+                   standings, which has the name in hand, rendered correctly. */
+        ? '<span class="glform">' + formPills(name) + '</span>' +
+          '<span class="gls">last five, oldest first</span>'
+        : '<b class="glbig glmuted">&mdash;</b><span class="gls">no results yet</span>') +
+    glanceCard('Last result',
+      _last
+        ? '<b class="glbig ' + (_last.mine > _last.theirs ? 'glw' : 'gll2') + '">' +
+          _last.mine + '&ndash;' + _last.theirs + '</b>' +
+          '<span class="gls">' + (_last.mine > _last.theirs ? 'beat ' : 'lost to ') +
+          _last.opp + ' &middot; ' + _last.d + '</span>'
+        : '<b class="glbig glmuted">&mdash;</b><span class="gls">first match to come</span>') +
+    glanceCard('Next',
+      _next
+        ? '<b class="glnext">' + (_next.site === 'neutral' ? 'vs ' : (_next.home ? 'vs ' : 'at ')) +
+          _next.opp + '</b>' +
+          '<span class="gls">' + _next.d + (_next.t ? ' &middot; ' + _next.t : '') +
+          (_next.pick !== null && _next.pick !== undefined
+            ? ' &middot; <i class="glpick">' + Math.round(_next.pick * 100) + '%</i>' : '') +
+          '</span>'
+        : '<b class="glbig glmuted">&mdash;</b><span class="gls">no fixtures on file</span>') +
+    '</div>';
+
   const upcoming = (t.fixtures || []).map(f => {
     const neutral = f.site === 'neutral';
     const va = neutral ? 'N' : (f.home ? 'vs' : '@');
@@ -4758,14 +4849,30 @@ function showTeam(name) {
           chip('Tournament', t.sim.tournament_pct + '%')
         : '') +
     '</div></div>' +
+    /* ---- AT A GLANCE -------------------------------------------------
+       ⚠ MEASURED BEFORE CHANGING ANYTHING: the team page ran to 3,648px and
+       "Upcoming" alone was 2,416px of it. Two thirds of a team page was a
+       fixture list, and the three things anyone actually opens a team page for
+       -- what just happened, what is next, how are they going -- were either
+       far below the fold or not on the page at all.
+       Everything here is read from data already in the payload; nothing new is
+       computed and nothing is estimated. */
+    glanceHtml +
     '<div class="tcols">' +
       '<div>' +
         (results ? '<div class="tsec"><h3>Results</h3><div class="body">' + results +
                    '</div></div>' : '') +
         '<div class="tsec"' + (results ? ' style="margin-top:14px"' : '') +
-          '><h3>Upcoming</h3><div class="body">' +
+          '><h3>Upcoming<span class="cnt">' + (t.fixtures || []).length +
+          '</span></h3><div class="body upc' +
+          ((t.fixtures || []).length > 6 ? ' clipped' : '') + '">' +
           (upcoming || '<div class="tnote">No remaining fixtures on file.</div>') +
-        '</div></div>' +
+        '</div>' +
+        ((t.fixtures || []).length > 6
+          ? '<button type="button" class="moreb" data-more data-n="' +
+            (t.fixtures || []).length + '">Show all ' +
+            (t.fixtures || []).length + ' fixtures</button>' : '') +
+        '</div>' +
       '</div>' +
       '<div>' +
         '<div class="tsec"><h3>Projected six</h3><div class="body">' +
@@ -4776,7 +4883,10 @@ function showTeam(name) {
                'scoring, so setters and defensive players drop out of it.</div>' : '') +
         '</div>' +
         (started ? '<div class="tsec" style="margin-top:14px">' +
-             '<h3>Most-started six, 2025' +
+             /* the badge needs a space before it or the heading reads
+                "Most-started six, 20255-1" -- the year running straight into
+                the 5-1 */
+             '<h3>Most-started six, 2025 ' +
              (lu.offense_system_2025
                ? '<span class="sysbadge" title="' +
                  (lu.offense_system_2025 === '5-1'
