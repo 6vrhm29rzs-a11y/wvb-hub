@@ -970,6 +970,46 @@ def check_aggregate_excludes_phantom_sets():
         ok("no aggregated player carries a phantom set (%d checked)" % len(want))
 
 
+def check_decor_never_covers_content():
+    """A full-viewport decorative layer must not swallow the page.
+
+    The ground is built from two fixed, full-viewport pseudo-elements on body --
+    a grain overlay and a perspective court floor. Both stretch edge to edge and
+    sit above the background. If either takes pointer events or climbs above the
+    content's stacking context, the entire page stops responding to clicks while
+    continuing to LOOK completely correct -- which is the worst kind of bug this
+    project has: invisible in a screenshot, total in use.
+
+    Asserted on the built CSS: each must declare pointer-events:none, and the
+    content wrappers must sit above them.
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping decor check")
+        return
+    src = open(hub, encoding="utf-8").read()
+    bad_layers = []
+    for sel in ("body::before", "body::after"):
+        m = re.search(re.escape(sel) + r"\{([^}]*)\}", src)
+        if not m:
+            continue
+        rule = m.group(1).replace(" ", "")
+        if "pointer-events:none" not in rule:
+            bad_layers.append(sel)
+    if bad_layers:
+        bad("a full-viewport decorative layer takes pointer events",
+            "%s must declare pointer-events:none or the page stops responding "
+            "to clicks while looking perfectly normal" % bad_layers)
+    else:
+        ok("decorative ground layers do not take pointer events")
+
+    if not re.search(r"header,nav,main\{position:relative;z-index:1\}", src.replace(" ", "")):
+        bad("content is not lifted above the decorative ground",
+            "header/nav/main need a stacking context above body::before")
+    else:
+        ok("content sits above the decorative ground")
+
+
 def check_transfer_reconciliation():
     """A transfer must describe the SAME player on both sides.
 
@@ -1523,6 +1563,7 @@ def main():
     check_hero_podium_signs()
     check_no_class_name_collisions()
     check_today_is_pacific()
+    check_decor_never_covers_content()
     check_phantom_sets_are_harmless()
     check_aggregate_excludes_phantom_sets()
     print()

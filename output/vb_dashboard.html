@@ -51,14 +51,48 @@ html{-webkit-text-size-adjust:100%}
    one deep -- sit under everything and do not scroll, so the page reads as a
    room with lights in it rather than a sheet of paper. They are 6-14% alpha:
    the point is that you cannot see where they start. */
+/* ---- THE GROUND IS BUILT, NOT WASHED ---------------------------------
+   Four layers, all fixed so the page moves over a room that does not:
+     1. a COURT floor in perspective along the bottom -- the sport's own
+        geometry, at 3% so you read it as texture rather than as a picture;
+     2. a fine grain, because a flat gradient on a large dark surface bands
+        visibly on an ordinary monitor and grain is what breaks the banding;
+     3. two arena washes, cool from the left and the ball's yellow from the
+        right, as if two lighting rigs were up;
+     4. the base.
+   Deliberately NOT the near-black-plus-one-acid-accent look: that is the
+   default every dark dashboard reaches for. The accents here are the sport's
+   own -- Molten blue and the hard yellow off the ball. */
 body{margin:0;color:var(--ink);font:15px/1.55 var(--sans);
   font-feature-settings:"tnum" 1;
   background:
-    radial-gradient(1200px 700px at 8% -8%, rgba(91,168,245,.14), transparent 62%),
-    radial-gradient(1000px 620px at 96% 4%, rgba(255,199,44,.09), transparent 58%),
-    radial-gradient(900px 900px at 50% 118%, rgba(49,208,126,.07), transparent 60%),
+    radial-gradient(1400px 520px at 50% 128%, rgba(91,168,245,.16), transparent 70%),
+    radial-gradient(1100px 700px at 4% -10%, rgba(91,168,245,.13), transparent 62%),
+    radial-gradient(900px 640px at 98% 2%, rgba(255,199,44,.10), transparent 58%),
     var(--page);
-  background-attachment:fixed}
+  background-attachment:fixed;
+  background-repeat:no-repeat}
+/* THE FLOOR. Flat vertical stripes read as stripes; a court reads as a court
+   only in perspective, so this is a grid rotated back in X and faded out as it
+   recedes. 4% opacity: the eye should register that the page is standing on
+   something without ever being asked to look at it. */
+body::after{content:"";position:fixed;left:-25%;right:-25%;bottom:-14vh;height:62vh;
+  z-index:0;pointer-events:none;opacity:.055;
+  transform:perspective(80vh) rotateX(62deg);transform-origin:bottom center;
+  background:
+    repeating-linear-gradient(90deg,#cfe4ff 0 2px,transparent 2px 132px),
+    repeating-linear-gradient(0deg,#cfe4ff 0 2px,transparent 2px 132px);
+  -webkit-mask-image:linear-gradient(to top,#000 0%,rgba(0,0,0,.55) 42%,transparent 82%);
+  mask-image:linear-gradient(to top,#000 0%,rgba(0,0,0,.55) 42%,transparent 82%)}
+/* the grain sits above the ground and below everything else */
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  opacity:.5;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'>\
+<filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/>\
+<feColorMatrix type='saturate' values='0'/></filter>\
+<rect width='140' height='140' filter='url(%23n)' opacity='.32'/></svg>")}
+header,nav,main{position:relative;z-index:1}
 
 header{color:var(--ink);padding:20px 24px 0;position:relative;
   background:
@@ -79,11 +113,18 @@ h1 em{font-style:normal;color:var(--amber)}
 .net{max-width:1280px;margin:17px auto 0;height:11px;
   background:repeating-linear-gradient(90deg,rgba(255,255,255,.30) 0 1px,transparent 1px 6px),
              repeating-linear-gradient(0deg,rgba(255,255,255,.30) 0 1px,transparent 1px 6px);
-  border-top:3px solid var(--amber)}
+  border-top:3px solid var(--amber);
+  box-shadow:0 -1px 22px -2px rgba(255,199,44,.55),0 6px 30px -14px rgba(255,199,44,.35)}
 nav{position:sticky;top:0;z-index:6;
-  background:linear-gradient(180deg,rgba(10,20,40,.96),rgba(8,14,28,.96));
-  backdrop-filter:saturate(1.5) blur(8px);
-  border-bottom:1px solid var(--line)}
+  background:linear-gradient(180deg,rgba(12,23,45,.88),rgba(8,14,28,.92));
+  backdrop-filter:saturate(1.6) blur(14px);
+  border-bottom:1px solid transparent;
+  border-image:linear-gradient(90deg,transparent,rgba(120,180,255,.5) 18%,
+    rgba(255,199,44,.55) 52%,rgba(120,180,255,.5) 84%,transparent) 1}
+/* the active tab sits in a lit slot rather than merely being white text */
+nav button[aria-selected=true]{background:linear-gradient(180deg,
+  rgba(120,180,255,.14),rgba(120,180,255,.04));
+  box-shadow:inset 0 -2px 0 rgba(255,199,44,.9),0 0 26px -8px rgba(255,199,44,.5)}
 nav .inner{max-width:1280px;margin:0 auto;display:flex;gap:2px;flex-wrap:wrap;padding:0 8px}
 nav button{appearance:none;border:0;background:transparent;color:#9CABC6;
   font:500 14.5px/1 var(--disp);letter-spacing:.055em;padding:14px 16px;cursor:pointer;
@@ -109,10 +150,22 @@ section[hidden]{display:none}
    sterile: nothing had a top or a bottom. The gradient is 4% of a tone -- felt,
    not seen -- and the shadow is warm, tinted toward the sand ground rather
    than the neutral grey every UI kit ships. */
-.panel{background:linear-gradient(176deg,rgba(23,33,54,.92) 0%,rgba(14,21,36,.92) 55%,rgba(10,16,28,.94) 100%);
-  border:1px solid var(--line);border-radius:12px;overflow:hidden;
-  box-shadow:0 1px 0 rgba(255,255,255,.05) inset,
-             0 18px 44px -26px rgba(0,0,0,.9)}
+/* ---- A GRADIENT HAIRLINE, NOT A FLAT GREY BOX -------------------------
+   Every surface on the page wore the same 1px #1E2A42 border, which is what
+   made a dark page still read as a dark BOOTSTRAP page. The border is now a
+   gradient -- brighter where the light is, fading as it falls away -- drawn as
+   a padded background layer so the fill underneath stays independent. One
+   definition, applied to every surface, so they belong to each other. */
+.panel,.tsec,.hero,.card{
+  border:1px solid transparent;border-radius:14px;
+  background-origin:border-box;
+  background-clip:padding-box,border-box}
+.panel{background-image:
+    linear-gradient(176deg,rgba(26,38,62,.94) 0%,rgba(14,21,36,.94) 55%,rgba(10,16,28,.96) 100%),
+    linear-gradient(150deg,rgba(120,180,255,.42),rgba(255,199,44,.16) 42%,rgba(255,255,255,.04) 70%);
+  overflow:hidden;
+  box-shadow:0 1px 0 rgba(255,255,255,.06) inset,
+             0 24px 60px -32px rgba(0,0,0,.95)}
 /* ---- THE VALUE SCALE. ONE DEFINITION, BOTH RENDERERS. -----------------
    Python and JS each emit nothing but `style="--t:.73"`. Every colour and
    every dimension is decided here, so the server-rendered views and the
@@ -213,8 +266,10 @@ b.pl6{font:800 10px/1 var(--mono);color:var(--live);vertical-align:2px;margin-le
 .card.open{grid-column:1/-1}
 /* A result reads like a line on a scoresheet, not a rounded app card: squared
    corners, a court-blue rule down the left, and the winner carrying the weight. */
-.card{background:linear-gradient(168deg,rgba(25,36,58,.95) 0%,rgba(15,22,38,.95) 60%,rgba(11,17,30,.96) 100%);
-  border:1px solid var(--line);border-radius:3px;
+.card{background-image:
+    linear-gradient(168deg,rgba(27,40,64,.96) 0%,rgba(15,22,38,.96) 60%,rgba(11,17,30,.97) 100%),
+    linear-gradient(155deg,rgba(120,180,255,.40),rgba(255,199,44,.14) 44%,rgba(255,255,255,.03) 74%);
+  border-radius:10px;
   border-left:3px solid var(--line2);
   padding:14px 16px 13px;
   box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 14px 30px -22px rgba(0,0,0,.95);
@@ -241,7 +296,10 @@ b.pl6{font:800 10px/1 var(--mono);color:var(--live);vertical-align:2px;margin-le
    meaning anything -- red is kept for a number that is genuinely bad, like a
    negative differential. The winner's score also carries a soft halo so the
    result reads before the names do. */
-.side.win b{color:var(--good);text-shadow:0 0 22px color-mix(in oklab,var(--good) 26%,transparent)}
+.side b{font-size:38px}
+.side.win b{color:var(--good);
+  text-shadow:0 0 4px rgba(49,208,126,.55),0 0 26px rgba(49,208,126,.42),
+              0 0 54px rgba(49,208,126,.22)}
 /* the signature: each set is a column, visitor above, home below, winner lit */
 .sets{display:flex;gap:5px;margin-bottom:10px}
 .set{flex:0 1 64px;display:flex;flex-direction:column;border:1px solid var(--line2);
@@ -532,20 +590,53 @@ td.tvnet{text-align:left}
 .bandkey b{color:var(--ink2)}
 .bandkey i.wonkey{display:inline-block;width:8px;height:8px;border-radius:2px;
   background:var(--amber);margin-right:5px;vertical-align:0}
+/* ---- SECTION LABELS AS RIBBON, NOT AS SENTENCES -----------------------
+   "Later today" and the lead paragraphs were plain text in the flow, so every
+   band on the page began the same anonymous way. A scoreboard names its
+   sections; this is that, in the ball's yellow, with a rule that runs out to
+   the edge so the eye can find where one band stops and the next starts. */
+.livehead{display:flex;align-items:center;gap:10px;margin:0 0 12px;
+  font:700 11px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink2)}
+.livehead::after{content:"";flex:1;height:1px;
+  background:linear-gradient(90deg,rgba(255,199,44,.5),transparent)}
+.livehead b,.livehead .soon{position:relative;padding-left:13px;color:var(--ink)}
+.livehead b::before,.livehead .soon::before{content:"";position:absolute;left:0;
+  top:50%;transform:translateY(-50%);width:5px;height:5px;border-radius:1px;
+  background:var(--amber);box-shadow:0 0 12px rgba(255,199,44,.9)}
+.lead{position:relative;padding-left:14px}
+.lead::before{content:"";position:absolute;left:0;top:3px;bottom:3px;width:2px;
+  border-radius:1px;
+  background:linear-gradient(180deg,var(--amber),rgba(91,168,245,.55),transparent)}
+
+/* ---- THINGS ARRIVE, THEY DO NOT BLINK INTO EXISTENCE -------------------
+   A short, staggered rise on the cards in a band. Capped at ten so a 600-row
+   schedule does not spend six seconds animating, and off entirely under
+   reduced-motion. */
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.cards .card{animation:rise .34s cubic-bezier(.22,.9,.3,1) both}
+.cards .card:nth-child(1){animation-delay:.02s}
+.cards .card:nth-child(2){animation-delay:.06s}
+.cards .card:nth-child(3){animation-delay:.10s}
+.cards .card:nth-child(4){animation-delay:.14s}
+.cards .card:nth-child(5){animation-delay:.18s}
+.cards .card:nth-child(6){animation-delay:.22s}
+.cards .card:nth-child(n+7){animation-delay:.26s}
+@media (prefers-reduced-motion:reduce){.cards .card{animation:none}}
 /* ---- THE HERO --------------------------------------------------------
    Ambient light, a court motif at 5% and a podium of the current top three in
    their own school colours. The motion is deliberately small: one pulsing dot
    that means "this is live data", and a count-up on the three numbers on first
    paint. Nothing here animates on a loop -- a page you read every day should
    not have something moving in the corner of your eye forever. */
-.hero{position:relative;overflow:hidden;border-radius:16px;margin:0 0 20px;
-  padding:26px 28px;display:flex;gap:28px;align-items:center;
+.hero{position:relative;overflow:hidden;border-radius:18px;margin:0 0 20px;
+  padding:30px 30px;display:flex;gap:28px;align-items:center;
   justify-content:space-between;flex-wrap:wrap;
-  border:1px solid var(--line);
-  background:
-    radial-gradient(70% 140% at 8% 0%, rgba(91,168,245,.20), transparent 62%),
-    radial-gradient(60% 130% at 92% 100%, rgba(255,199,44,.14), transparent 60%),
-    linear-gradient(160deg, rgba(24,36,60,.96), rgba(10,16,29,.97))}
+  background-image:
+    radial-gradient(70% 140% at 8% 0%, rgba(91,168,245,.24), transparent 62%),
+    radial-gradient(60% 130% at 92% 100%, rgba(255,199,44,.17), transparent 60%),
+    linear-gradient(160deg, rgba(26,39,64,.97), rgba(10,16,29,.98)),
+    linear-gradient(140deg,rgba(140,195,255,.55),rgba(255,199,44,.22) 40%,rgba(255,255,255,.04) 72%)}
 /* the court: attack line + net, drawn once, sitting under everything */
 .hero::after{content:"";position:absolute;right:-40px;bottom:-70px;width:420px;
   height:260px;pointer-events:none;opacity:.07;
@@ -822,9 +913,11 @@ table.box td.pn{text-align:left;font-weight:600}
 .chip.ours{background:#12233C;border-color:#2A4570;color:var(--navy)}
 .tcols{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;align-items:start}
 @media(max-width:900px){.tcols{grid-template-columns:1fr}}
-.tsec{background:linear-gradient(176deg,rgba(23,33,54,.9),rgba(11,17,30,.92));
-  border:1px solid var(--line);border-radius:10px;
-  overflow:hidden;box-shadow:0 1px 2px rgba(90,70,35,.06),0 8px 22px -14px rgba(90,70,35,.20)}
+.tsec{background-image:
+    linear-gradient(176deg,rgba(26,38,62,.92),rgba(11,17,30,.94)),
+    linear-gradient(150deg,rgba(120,180,255,.34),rgba(255,199,44,.12) 46%,rgba(255,255,255,.03) 72%);
+  overflow:hidden;
+  box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 18px 40px -28px rgba(0,0,0,.9)}
 .tsec h3{margin:0;padding:12px 15px;font:700 11.5px/1 var(--sans);letter-spacing:.08em;
   text-transform:uppercase;color:var(--ink2);
   background:linear-gradient(180deg,rgba(30,42,66,.9),rgba(16,24,40,.9));
@@ -897,7 +990,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     </div>
     <div class="meta">
       <b>7</b> matches played &middot; <b>348</b> teams rated<br>
-      last result <b>2026-08-23</b> &middot; built 2026-08-24 9:05 AM PT
+      last result <b>2026-08-23</b> &middot; built 2026-08-24 9:42 AM PT
     </div>
   </div>
   <div class="net"></div>
