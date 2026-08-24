@@ -2142,13 +2142,17 @@ def build():
         else:
             badge = '<span class="kind nc" title="non-conference match">non-conf</span>'
         srows.append(
-            '<tr%s><td class="cd">%s</td><td class="n">%s</td><td class="tm">%s%s%s</td>'
+            '<tr%s><td class="cd" data-d="%s">%s</td><td class="n">%s</td><td class="tm">%s%s%s</td>'
             '<td class="at">%s</td><td class="tm">%s%s%s</td>'
             '<td class="wh l">%s%s</td>'
             '<td class="n pick %s">%s</td></tr>'
             % ((' class="rkd both"' if (r["ar"] and r["hr"])
                 else (' class="rkd"' if (r["ar"] or r["hr"]) else "")),
-               r["d"], r["t"] or "&mdash;",
+               # ONE DATE FORMAT ON THE PAGE. The ISO string stays in data-d
+               # so any future sort or filter still has a sortable key -- the
+               # reason the table kept ISO in the first place -- while the cell
+               # a person reads says "Fri Aug 28" like every other date here.
+               r["d"], day_label(r["d"]), r["t"] or "&mdash;",
                rank_badge(r["ar"]),
                logo_img(r["a"], logos), esc(r["a"]),
                "vs" if neutral else "at",
@@ -2180,7 +2184,8 @@ def build():
         "title": "The 2026 season, measured",
         "sub": ("%s teams rated &middot; %d matches played across %d teams &middot; "
                 "last result %s" % ("{:,}".format(len(teams)), _played,
-                                    _teams_seen, esc(_last or "&mdash;")))
+                                    _teams_seen,
+                                    esc(day_label(_last) if _last else "&mdash;")))
                if _played else
                ("%s teams rated &middot; no matches played yet"
                 % "{:,}".format(len(teams))),
@@ -2265,7 +2270,7 @@ def build():
         .replace("{{TEAMS_JSON}}", blob(tindex)) \
         .replace("{{CONF_JSON}}", json.dumps(sorted(set(t["conf"] for t in teams if t["conf"])))) \
         .replace("{{SLOPE}}", ("%.3f" % slope) if slope else "&mdash;") \
-        .replace("{{LAST}}", esc(first_played or "not yet")) \
+        .replace("{{LAST}}", esc(day_label(first_played) if first_played else "not yet")) \
         .replace("{{BUILT}}", (
             datetime.datetime.now(PT).strftime("%Y-%m-%d %-I:%M %p PT") if PT
             else datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%MZ")))
@@ -3915,8 +3920,15 @@ function dayLabel(iso) {
   const days = Math.round((d - t) / 86400000);
   if (days === 1) return 'Tomorrow';
   if (days === -1) return 'Yesterday';
-  return new Intl.DateTimeFormat('en-US',
-    { timeZone: 'UTC', weekday: 'short', month: 'short', day: 'numeric' }).format(d);
+  // formatToParts, not format(): en-US renders "Sat, Aug 29" with a comma while
+  // build_hub.day_label() renders "Sat Aug 29" without one. Two mirrors of the
+  // same rule that disagree on punctuation put both spellings on one page --
+  // the schedule table is server-rendered and the fixture list is not, and they
+  // sit two inches apart. Assembled from parts so the two cannot drift.
+  const p2 = new Intl.DateTimeFormat('en-US',
+    { timeZone: 'UTC', weekday: 'short', month: 'short', day: 'numeric' })
+    .formatToParts(d).reduce((a, x) => (a[x.type] = x.value, a), {});
+  return p2.weekday + ' ' + p2.month + ' ' + p2.day;
 }
 
 /* The AVCA coaches poll rank, labelled. Mirror of build_hub.rank_badge();
@@ -4316,7 +4328,7 @@ function showPlayer(p) {
         'belongs to somebody who may not be on a 2026 roster.</div></div>'
       : '') +
     '<div class="tsec"><h3>Match log</h3><div class="body">' +
-    p.games.map(g => '<div class="gline"><span class="dt">' + (g.d || '') + '</span>' +
+    p.games.map(g => '<div class="gline"><span class="dt">' + dayLabel(g.d || '') + '</span>' +
       '<span class="op">' + (g.opp || '') + '</span>' +
       /* assists only appear when there are any, so a hitter's line is not
          padded with "0s" -- but a setter's night is no longer invisible */
@@ -4928,7 +4940,7 @@ function showTeam(name) {
   const results = (t.played || []).map(g => {
     const won = g.mine > g.theirs;
     const strip = (g.sets || []).map(s => s[0] + '-' + s[1]).join(', ');
-    return '<div class="gline"><span class="dt">' + g.d + '</span>' +
+    return '<div class="gline"><span class="dt">' + dayLabel(g.d) + '</span>' +
       '<span class="va">' + (g.home ? 'vs' : '@') + '</span>' +
       '<span class="op">' + g.opp + '</span>' +
       '<span class="rs ' + (won ? 'w' : 'l') + '">' + (won ? 'W' : 'L') + ' ' +
@@ -4979,7 +4991,7 @@ function showTeam(name) {
       _next
         ? '<b class="glnext">' + (_next.site === 'neutral' ? 'vs ' : (_next.home ? 'vs ' : 'at ')) +
           _next.opp + '</b>' +
-          '<span class="gls">' + _next.d + (_next.t ? ' &middot; ' + _next.t : '') +
+          '<span class="gls">' + dayLabel(_next.d) + (_next.t ? ' &middot; ' + _next.t : '') +
           (_next.pick !== null && _next.pick !== undefined
             ? ' &middot; <i class="glpick">' + Math.round(_next.pick * 100) + '%</i>' : '') +
           '</span>'
@@ -5006,7 +5018,7 @@ function showTeam(name) {
         'last meeting, ' + h.d + '">' + (h.mine > h.theirs ? 'W' : 'L') + ' ' +
         h.mine + '&ndash;' + h.theirs + ' in ' + (h.d || '').slice(0, 4) + '</span>'
       : '';
-    return '<div class="gline gl2"><span class="dt">' + f.d + '</span>' +
+    return '<div class="gline gl2"><span class="dt">' + dayLabel(f.d) + '</span>' +
     '<span class="va' + (neutral ? ' nt' : '') + '"' +
       (neutral ? ' title="neutral site"' : '') + '>' + va + '</span>' +
     '<span class="op">' + f.opp + '</span>' +

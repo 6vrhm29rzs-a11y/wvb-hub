@@ -2067,16 +2067,98 @@ def check_week_names_whose_ranking():
         print("  %-58s %s" % ("this week's matches (no fixtures in range)", "skip"))
         return
 
-    # NO CARD PRINTS A RAW ISO DATE. Cards are read at a glance; a table is
-    # scanned, and its ISO column stays ISO on purpose (searchable, sortable,
-    # carries the year). This checks the cards only.
-    iso_cards = re.findall(r'<div class="cd">\s*(\d{4}-\d{2}-\d{2})', src)
-    if iso_cards:
-        bad("%d cards print a raw ISO date" % len(iso_cards),
-            "e.g. %s -- the week box says 'Today' beside them, so the page "
-            "shows two date formats at once" % iso_cards[0])
+    # ONE DATE FORMAT ON THE WHOLE PAGE. "2026-08-30" is unambiguous and makes
+    # a reader do arithmetic to learn it is a Sunday.
+    #
+    # ⚠ THIS GUARD USED TO CHECK ONLY CARDS, AND THAT IS WHY IT PASSED WHILE
+    # NINE ISO DATES WERE ON SCREEN -- the team page's NEXT box, six upcoming
+    # fixtures, the masthead's "last result" and the schedule table. Narrowing a
+    # guard to the case that prompted it leaves every other case unwatched, and
+    # a reader looking at a team page saw both formats within one screen.
+    #
+    # Only ELEMENT TEXT is scanned (between a > and a <), never the JSON
+    # payloads, which carry ISO dates on purpose and should. The schedule table
+    # keeps its ISO in data-d for sorting -- an attribute, so it is not text.
+    #
+    # ONE STATED EXCEPTION: the build stamp. It is a machine timestamp about the
+    # page rather than a date in the sport, and ISO is the right format for it.
+    iso_text = [m.group(1).strip() for m in
+                re.finditer(r">([^<>]{0,60}?\b20\d\d-\d\d-\d\d\b[^<>]{0,40}?)<", src)]
+    iso_text = [t for t in iso_text if t and "built" not in t]
+    if iso_text:
+        bad("%d visible ISO dates on the page" % len(iso_text),
+            "e.g. %r -- every other date reads 'Sun Aug 30', so the page shows "
+            "two formats at once" % iso_text[0])
     else:
-        ok("no card prints a raw ISO date")
+        ok("no visible ISO dates (the build stamp is the one exception)")
+
+    # ⚠ THE SCAN ABOVE CANNOT SEE CLIENT-RENDERED DATES, and writing its
+    # negative control is what exposed that: swapping a JS-rendered date for an
+    # ISO one changed nothing in the file, because the file holds
+    # `dayLabel(g.d)`, not a date. Four of the nine ISO dates that were on
+    # screen came from renderers like that -- so a text scan alone would have
+    # reported a clean page while a reader was looking at "2026-08-29".
+    #
+    # So the JS side is checked at the SOURCE: any renderer emitting a date
+    # field into an element must pass it through dayLabel first.
+    scripts_js = re.findall(r"<script[^>]*>(.*?)</script>", src, re.S)
+    js_nc = re.sub(r"/\*.*?\*/", " ", "\n".join(scripts_js), flags=re.S)
+    raw_emit = re.findall(
+        r'class="(?:dt|gls|cd)"[^>]*>\'\s*\+\s*(?!dayLabel)([A-Za-z_$][\w.$]*\.d\b)',
+        js_nc)
+    if raw_emit:
+        bad("%d page renderers print a date field without dayLabel" % len(raw_emit),
+            "e.g. %s -- a text scan of the built file cannot see this, because "
+            "the file holds the expression, not the date" % raw_emit[0])
+    else:
+        ok("every client-side date renderer goes through dayLabel")
+
+    # ⚠ TWO IMPLEMENTATIONS OF ONE RULE, ACTUALLY COMPARED. day_label() renders
+    # the schedule table in Python; dayLabel() renders the fixture list in
+    # JavaScript, two inches below it. They were producing "Sat Aug 29" and
+    # "Sat, Aug 29" -- same rule, different punctuation, both on screen at once.
+    #
+    # Asserting that a mirror "looks right" is how mirrors drift. This RUNS the
+    # page's own function under node and compares it to Python's, date by date,
+    # so the two cannot disagree without failing here.
+    import shutil
+    import subprocess
+    import tempfile
+    if not shutil.which("node"):
+        print("  %-58s %s" % ("the two day-label implementations agree", "skip"))
+    else:
+        fn = re.search(r"function dayLabel\(iso\)\s*\{.*?\n\}", js_nc, re.S)
+        if not fn:
+            bad("dayLabel() could not be found in the page",
+                "this cross-implementation check is testing nothing")
+        else:
+            import build_hub as _BH
+            today = datetime.date.today()
+            days = [-2, -1, 0, 1, 2, 5, 13, 40, 120]
+            dates = [(today + datetime.timedelta(days=d)).isoformat() for d in days]
+            prog = (fn.group(0) + "\nconsole.log(JSON.stringify("
+                    + json.dumps(dates) + ".map(dayLabel)));")
+            fh = tempfile.NamedTemporaryFile("w", suffix=".mjs", delete=False,
+                                             encoding="utf-8")
+            fh.write(prog)
+            fh.close()
+            try:
+                r = subprocess.run(["node", fh.name], stdout=subprocess.PIPE,
+                                   stderr=subprocess.STDOUT)
+                if r.returncode != 0:
+                    bad("dayLabel() would not run under node",
+                        r.stdout.decode("utf-8", "replace").strip()[:160])
+                else:
+                    js_out = json.loads(r.stdout.decode("utf-8").strip())
+                    py_out = [_BH.day_label(d, today) for d in dates]
+                    diff = [(d, a, b) for d, a, b in zip(dates, js_out, py_out) if a != b]
+                    if diff:
+                        bad("the two day-label implementations disagree",
+                            "; ".join("%s: js=%r py=%r" % x for x in diff[:3]))
+                    else:
+                        ok("the two day-label implementations agree", len(dates))
+            finally:
+                os.unlink(fh.name)
 
     missing = [r for r in rows if not r.get("dl")]
     if missing:
