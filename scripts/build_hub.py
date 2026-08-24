@@ -1046,6 +1046,11 @@ def box_and_players(res, photos=None, honours=None):
                 "opp": opp_of.get((gid, row["team"])),
                 "k": k, "e": e, "ta": a, "hit": row["hit"],
                 "digs": row["digs"], "bs": bs, "ba": ba,
+                # ⚠ ASSISTS BELONG ON A MATCH LINE. Without them a setter's
+                # game log reads as if she did nothing: Izzy Starck's 41-assist
+                # night showed "2k · 0e · 3ta · 13d" and no sign of the number
+                # that was actually her match.
+                "ast": row["ast"],
                 "aces": row["aces"], "sets": sets, "pts": row["pts"],
             })
         if rows:
@@ -2654,9 +2659,21 @@ tbody tr:nth-child(1) td.rk{color:var(--amber);
   background:linear-gradient(180deg,rgba(8,14,28,0),rgba(91,168,245,.07));
   -webkit-mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent);
   mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent)}
-.courtart{position:absolute;left:50%;bottom:-52%;width:150%;
-  transform:translateX(-50%) perspective(520px) rotateX(66deg);
+.courtart{position:absolute;left:50%;bottom:-84px;width:60%;
+  transform:translateX(-50%) perspective(300px) rotateX(60deg);
   transform-origin:bottom center;opacity:1}
+/* The net sits at the depth the centre line reaches, so it is narrower than
+   the near baseline -- that width IS the perspective. Tuned against the
+   rendered floor rather than computed, because the floor's own projection
+   depends on the wrapper's height. */
+/* Placed on the centre line the floor actually draws, measured from the
+   rendered court rather than guessed: that line lands 73px down a 104px band
+   and spans 217px of a 1186px wrapper, so the net's base sits 31px up and it is
+   18.3% wide. Its width IS the perspective -- a net as wide as the near
+   baseline would be standing in the wrong place. */
+.netart{position:absolute;left:50%;transform:translateX(-50%);
+  bottom:31px;width:18.3%;height:26px;opacity:.95;
+  filter:drop-shadow(0 1px 10px rgba(120,180,255,.35))}
 /* the hero's own content has to sit above the floor it is standing on */
 .heroL,.heroR{position:relative;z-index:2}
 .heroL{position:relative;z-index:1;min-width:min(100%,320px);flex:1 1 340px}
@@ -3038,29 +3055,56 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <p class="herosub">{{HERO_SUB}}</p>
     </div>
     <div class="heroR">{{HERO_PODIUM}}</div>
-    <div class="courtwrap"><svg class="courtart" viewBox="-6 -6 192 102" aria-hidden="true">
+    <div class="courtwrap"><svg class="courtart" viewBox="-5 -5 100 190" aria-hidden="true">
       <defs>
         <linearGradient id="ctf" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#5BA8F5" stop-opacity=".30"/>
-          <stop offset="1" stop-color="#5BA8F5" stop-opacity=".08"/>
+          <stop offset="0" stop-color="#5BA8F5" stop-opacity=".08"/>
+          <stop offset="1" stop-color="#5BA8F5" stop-opacity=".30"/>
         </linearGradient>
       </defs>
-      <!-- the playing surface, 18m x 9m -->
-      <rect x="0" y="0" width="180" height="90" fill="url(#ctf)"/>
-      <rect x="0" y="0" width="180" height="90" fill="none"
+      <!-- ⚠ ORIENTATION IS THE WHOLE GEOMETRY. We are looking DOWN the court
+           from behind one baseline, so the 9m width runs left-to-right and the
+           18m length recedes: 90 wide by 180 deep, one unit per decimetre. The
+           first version had these swapped -- 18m across and 9m deep, a view
+           from the SIDE -- and then ran the net along the length, which is why
+           it read as a stray line rather than a net. -->
+      <rect x="0" y="0" width="90" height="180" fill="url(#ctf)"/>
+      <rect x="0" y="0" width="90" height="180" fill="none"
             stroke="#dbe9ff" stroke-opacity=".85" stroke-width="1.3"/>
       <!-- attack lines, 3m either side of the net -->
-      <line x1="0" y1="30" x2="180" y2="30" stroke="#dbe9ff" stroke-opacity=".62" stroke-width="1"/>
-      <line x1="0" y1="60" x2="180" y2="60" stroke="#dbe9ff" stroke-opacity=".62" stroke-width="1"/>
-      <!-- the net, on the centre line, with its posts and tape -->
-      <rect x="-5" y="43.5" width="190" height="3" fill="#FFC72C" fill-opacity=".13"/>
-      <line x1="-5" y1="45" x2="185" y2="45" stroke="#FFC72C" stroke-opacity=".9" stroke-width="1.5"/>
-      <g stroke="#FFC72C" stroke-opacity=".34" stroke-width=".45">
-        <line x1="-5" y1="43.5" x2="185" y2="43.5"/><line x1="-5" y1="46.5" x2="185" y2="46.5"/>
-      </g>
-      <circle cx="-5" cy="45" r="2.2" fill="#FFC72C" fill-opacity=".85"/>
-      <circle cx="185" cy="45" r="2.2" fill="#FFC72C" fill-opacity=".85"/>
-    </svg></div>
+      <line x1="0" y1="60" x2="90" y2="60" stroke="#dbe9ff" stroke-opacity=".62" stroke-width="1"/>
+      <line x1="0" y1="120" x2="90" y2="120" stroke="#dbe9ff" stroke-opacity=".62" stroke-width="1"/>
+      <!-- the centre line the net stands on -->
+      <line x1="0" y1="90" x2="90" y2="90" stroke="#dbe9ff" stroke-opacity=".5" stroke-width=".9"/>
+    </svg>
+      <!-- THE NET STANDS UP. Square mesh, a white tape along the top, posts at
+           both sidelines and the two antennae that mark the crossing space.
+           Drawn separately from the floor precisely because the floor is
+           rotated flat and a net that lies down is not a net. -->
+      <svg class="netart" viewBox="0 0 240 52" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <pattern id="mesh" width="6" height="6" patternUnits="userSpaceOnUse">
+            <path d="M6 0H0V6" fill="none" stroke="#eaf2ff" stroke-opacity=".34"
+                  stroke-width=".7"/>
+          </pattern>
+        </defs>
+        <!-- posts -->
+        <rect x="1.5" y="2" width="3" height="50" fill="#dbe9ff" fill-opacity=".55"/>
+        <rect x="235.5" y="2" width="3" height="50" fill="#dbe9ff" fill-opacity=".55"/>
+        <!-- the net: mesh between the posts -->
+        <rect x="4.5" y="6" width="231" height="34" fill="url(#mesh)"/>
+        <!-- the tape along the top, and the thinner one at the bottom -->
+        <rect x="4.5" y="2.5" width="231" height="4" fill="#f2f7ff" fill-opacity=".82"/>
+        <rect x="4.5" y="39" width="231" height="1.6" fill="#dbe9ff" fill-opacity=".45"/>
+        <!-- antennae, on the sidelines, striped as they really are -->
+        <g>
+          <rect x="20" y="-6" width="2" height="26" fill="#FFC72C" fill-opacity=".9"/>
+          <rect x="20" y="1" width="2" height="6" fill="#C8322B" fill-opacity=".9"/>
+          <rect x="218" y="-6" width="2" height="26" fill="#FFC72C" fill-opacity=".9"/>
+          <rect x="218" y="1" width="2" height="6" fill="#C8322B" fill-opacity=".9"/>
+        </g>
+      </svg>
+    </div>
   </div>
   <div id="live" hidden>
     <div class="livehead">
@@ -3241,7 +3285,9 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <div id="playercard"></div>
   <div class="panel" id="ptable"><div class="scroll"><table>
     <thead><tr><th class="l">Player</th><th class="l">Team</th><th>Pos</th>
-      <th>Sets</th><th>Kills</th><th>Hit%</th><th>Digs</th><th>Blk</th>
+      <th>Sets</th><th>Kills</th><th>Hit%</th>
+      <th title="assists -- the setter's number, and the one this table used to omit">Ast</th>
+      <th>Digs</th><th>Blk</th><th>Aces</th>
       <th>Pts/set</th></tr></thead>
     <tbody id="pbody"></tbody></table></div></div>
 </section>
@@ -3712,7 +3758,9 @@ function renderPlayers() {
     '<td class="cf">' + logo(p.team) + p.team + '</td>' +
     '<td class="n">' + (p.pos || '') + '</td><td class="n">' + p.sets + '</td>' +
     '<td class="n">' + p.k + '</td><td class="n">' + pct(p.hit) + '</td>' +
+    '<td class="n">' + (p.ast || 0) + '</td>' +
     '<td class="n">' + p.digs + '</td><td class="n">' + (p.bs + p.ba * 0.5) + '</td>' +
+    '<td class="n">' + (p.aces || 0) + '</td>' +
     hcell(p.pps, p.pps.toFixed(2), plo, phi, 'high', 'seq') + '</tr>').join('');
   document.getElementById('pcnt').textContent = rows.length + ' players';
   if (rows.length === 1) showPlayer(rows[0]);
@@ -3747,8 +3795,15 @@ function showPlayer(p) {
     '<div class="tsec"><h3>Match log</h3><div class="body">' +
     p.games.map(g => '<div class="gline"><span class="dt">' + (g.d || '') + '</span>' +
       '<span class="op">' + (g.opp || '') + '</span>' +
+      /* assists only appear when there are any, so a hitter's line is not
+         padded with "0s" -- but a setter's night is no longer invisible */
       '<span class="ss pgl">' + g.k + 'k · ' + g.e + 'e · ' + g.ta + 'ta · ' +
-      pct(g.hit) + ' · ' + g.digs + 'd · ' + g.aces + 'a</span>' +
+      pct(g.hit) + ' · ' + g.digs + 'd · ' + g.aces + 'a' +
+      /* blocks by the NCAA convention -- a solo counts one, an assist a half --
+         the same arithmetic the team totals and Pts/set already use, so a
+         middle's night is not the one line on the page that omits her work */
+      ((g.bs + g.ba * 0.5) ? ' · ' + (g.bs + g.ba * 0.5) + 'b' : '') +
+      (g.ast ? ' · ' + g.ast + ' ast' : '') + '</span>' +
       '<span class="rs">' + g.pts + ' pts</span></div>').join('') +
     '</div></div>';
 }

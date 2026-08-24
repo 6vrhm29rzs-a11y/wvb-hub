@@ -1010,6 +1010,58 @@ def check_decor_never_covers_content():
         ok("content sits above the decorative ground")
 
 
+def check_players_view_shows_every_stat():
+    """Every stat the box score carries must be reachable in the Players view.
+
+    PAID FOR, and reported by Cody: Izzy Starck is a setter with 41 assists in
+    her only match, and the Players table showed Kills, Hit%, Digs, Blk and
+    Pts/set -- no assists column at all. Her match log said
+    "2k · 0e · 3ta · .667 · 13d · 0a" and gave no hint that the night had
+    happened. The number was in the payload the whole time; the table simply had
+    nowhere to put it.
+
+    A stats page that silently omits the setter's stat is not a stats page for
+    setters, and the same held for aces and blocks in the match log. So the
+    check is on COLUMNS, not on data: the payload having a field proves nothing
+    if nothing renders it.
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping players-stat check")
+        return
+    src = open(hub, encoding="utf-8").read()
+    m = re.search(r'<tbody id="pbody">', src)
+    if not m:
+        print("  no players table -- skipping")
+        return
+    head = src[max(0, m.start() - 900):m.start()]
+    want = {"Kills": "kills", "Hit%": "hitting percentage", "Ast": "assists",
+            "Digs": "digs", "Blk": "blocks", "Aces": "aces",
+            "Pts/set": "points per set"}
+    missing = [label for label in want if not re.search(r">\s*%s\s*<" % re.escape(label), head)]
+    if missing:
+        bad("the Players table omits a stat the box score carries",
+            "no column for %s -- a setter's or a middle's night is invisible"
+            % [want[k] for k in missing])
+    else:
+        ok("the Players table has a column for every box-score stat (%d)" % len(want))
+
+    # ⚠ AND THE PER-MATCH LINE MUST CARRY THEM TOO. The first version of this
+    # matched from "Match log" to the first </span>, which stops long before the
+    # stat tokens -- so it reported the page as missing assists that were right
+    # there. Take the game-line template by its own class instead.
+    mlog = re.search(r"p\.games\.map\(g =>.*?\)\.join\(''\)", src, re.S)
+    body = mlog.group(0) if mlog else ""
+    for token, what in (("g.ast", "assists"), ("g.aces", "aces"), ("g.digs", "digs")):
+        if token not in body:
+            bad("the match log omits %s" % what,
+                "a per-match line without %s hides the thing that defined the "
+                "match for some players" % what)
+            break
+    else:
+        ok("the match log carries assists, aces and digs")
+
+
 def check_transfer_reconciliation():
     """A transfer must describe the SAME player on both sides.
 
@@ -1564,6 +1616,7 @@ def main():
     check_no_class_name_collisions()
     check_today_is_pacific()
     check_decor_never_covers_content()
+    check_players_view_shows_every_stat()
     check_phantom_sets_are_harmless()
     check_aggregate_excludes_phantom_sets()
     print()
