@@ -2387,6 +2387,61 @@ td.tm{font-size:15px}
 .wh2 .pl{font:11.5px/1.4 var(--mono);color:var(--ink3)}
 .wh2 .pl.u{font-style:italic}
 .va.nt{color:var(--amber);font-weight:800}
+/* ---- CONFERENCE STRENGTH STRIP ---------------------------------------
+   One dot per team at its real rank. Dots overlap on purpose where a league is
+   tightly packed -- that overlap IS the reading. A 2px ring in the surface
+   colour keeps overlapping marks separable rather than merging into a blob. */
+.csec{margin-bottom:18px}
+.cnote{margin:0;padding:10px 15px 4px;font:12.5px/1.55 var(--sans);
+  color:var(--ink2);max-width:80ch}
+.cstrip{padding:6px 15px 4px}
+.crow{display:grid;grid-template-columns:118px 1fr 34px 26px;gap:10px;
+  align-items:center;padding:5px 0;border-bottom:1px solid var(--line)}
+.crow:last-child{border-bottom:0}
+.cnm{font:600 11.5px/1.2 var(--sans);color:var(--ink2);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ctrack{position:relative;height:14px;border-radius:7px;
+  background:linear-gradient(90deg,rgba(63,146,222,.16),rgba(63,146,222,.03))}
+.cdot{position:absolute;top:4px;width:6px;height:6px;border-radius:50%;
+  background:var(--ink3);box-shadow:0 0 0 2px var(--card);
+  transform:translateX(-3px)}
+.cdot.t25{background:#3F92DE;width:7px;height:7px;top:3.5px}
+.cmed{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--amber);
+  border-radius:1px;transform:translateX(-1px)}
+.cmd{font:700 11.5px/1 var(--mono);color:var(--ink);text-align:right}
+.ccount{font:11px/1 var(--mono);color:var(--ink3);text-align:right}
+.cfoot{display:flex;justify-content:space-between;padding:8px 15px 12px;
+  font:11px/1 var(--mono);color:var(--ink3)}
+@media (max-width:560px){.crow{grid-template-columns:82px 1fr 30px 22px}}
+/* ---- PROJECTED-WINS BAND ---------------------------------------------
+   An interval, drawn as one. The band is the 80% range, the bright tick is the
+   median, and the amber tick is what has ALREADY been won -- a fact rather than
+   a projection, so it is a different colour and says so in the key. One axis:
+   this team's own fixture count. */
+.bandwrap{padding:12px 15px 10px;border-bottom:1px solid var(--line)}
+.bandhd{display:flex;align-items:baseline;gap:8px;margin-bottom:9px}
+.bandhd span{font:600 12px/1 var(--sans);color:var(--ink2)}
+.bandhd b{font:700 20px/1 var(--mono);color:var(--ink)}
+.bandhd i{font:11px/1 var(--mono);color:var(--ink3);font-style:normal}
+.band{position:relative;height:14px;border-radius:7px;
+  background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));
+  border:1px solid var(--line)}
+.bandfill{position:absolute;top:1px;bottom:1px;border-radius:6px;
+  background:linear-gradient(90deg,
+    color-mix(in oklab,#3F92DE 45%,transparent),
+    color-mix(in oklab,#3F92DE 85%,transparent));
+  transform-origin:left center;animation:cbin .55s cubic-bezier(.22,.9,.3,1) both}
+.bandmed{position:absolute;top:-3px;bottom:-3px;width:3px;border-radius:2px;
+  background:var(--ink);box-shadow:0 0 10px rgba(255,255,255,.45);
+  transform:translateX(-1.5px)}
+.bandwon{position:absolute;top:-3px;bottom:-3px;width:3px;border-radius:2px;
+  background:var(--amber);transform:translateX(-1.5px)}
+.bandft{display:flex;justify-content:space-between;align-items:center;gap:10px;
+  margin-top:7px;font:11px/1.4 var(--mono);color:var(--ink3)}
+.bandkey{text-align:center;flex:1}
+.bandkey b{color:var(--ink2)}
+.bandkey i.wonkey{display:inline-block;width:8px;height:8px;border-radius:2px;
+  background:var(--amber);margin-right:5px;vertical-align:0}
 /* ---- THE HERO --------------------------------------------------------
    Ambient light, a court motif at 5% and a podium of the current top three in
    their own school colours. The motion is deliberately small: one pulsing dot
@@ -2950,6 +3005,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <select id="stconf"></select>
     <span class="count" id="stcnt"></span>
   </div>
+  <div id="confstrength"></div>
   <div id="standings"></div>
 </section>
 
@@ -3530,6 +3586,49 @@ function renderStandings() {
         '</tbody></table></div></div>';
     }).join('') + '</div>';
   document.getElementById('stcnt').textContent = confs.length + ' conferences';
+  renderConfStrength(confs);
+}
+
+/* ---- HOW STRONG IS EACH CONFERENCE -----------------------------------------
+   A strip of every member's national rank, one row per league, sorted by the
+   league's MEDIAN. A single bar of the median would hide the thing worth
+   seeing: whether a conference is top-heavy (two contenders and a long tail) or
+   genuinely deep. Every dot is one real team at its real rank -- no smoothing,
+   no bucketing, nothing modelled here that is not already on the Rankings tab.
+   One axis, 1 on the left, and it is stated. Teams inside the top 25 are marked
+   so the eye can find them without colour carrying the whole message. */
+function renderConfStrength(confs) {
+  const host = document.getElementById('confstrength');
+  if (!host) return;
+  const rows = confs.map(c => {
+    const rk = (STANDINGS[c] || []).map(r => r.rank).filter(v => v).sort((a, b) => a - b);
+    if (!rk.length) return null;
+    const mid = rk.length % 2 ? rk[(rk.length - 1) / 2]
+                              : (rk[rk.length / 2 - 1] + rk[rk.length / 2]) / 2;
+    return { conf: c, ranks: rk, median: mid, n: rk.length, best: rk[0] };
+  }).filter(Boolean).sort((a, b) => a.median - b.median);
+  if (!rows.length) { host.innerHTML = ''; return; }
+  const MAX = Math.max.apply(null, rows.map(r => r.ranks[r.ranks.length - 1]));
+  const pc = v => ((v - 1) / Math.max(1, MAX - 1) * 100);
+  host.innerHTML =
+    '<div class="tsec csec"><h3>Conference strength</h3>' +
+    '<p class="cnote">Every member at its national rank, best on the left. ' +
+    'Leagues are ordered by their <b>median</b> &mdash; the dot spread is the ' +
+    'part worth reading: two contenders and a long tail is a different league ' +
+    'from a deep one. Filled dots are inside the top 25.</p>' +
+    '<div class="cstrip">' + rows.map(r =>
+      '<div class="crow"><span class="cnm">' + r.conf + '</span>' +
+      '<span class="ctrack">' +
+        r.ranks.map(v => '<i class="cdot' + (v <= 25 ? ' t25' : '') +
+          '" style="left:' + pc(v).toFixed(2) + '%" title="#' + v + '"></i>').join('') +
+        '<i class="cmed" style="left:' + pc(r.median).toFixed(2) + '%" title="median #' +
+          r.median + '"></i>' +
+      '</span>' +
+      '<span class="cmd">' + r.median + '</span>' +
+      '<span class="ccount">' + r.n + '</span></div>').join('') +
+    '</div>' +
+    '<div class="cfoot"><span>#1</span><span>median rank &middot; teams</span>' +
+      '<span>#' + MAX + '</span></div></div>';
 }
 stsel.addEventListener('change', renderStandings);
 renderStandings();
@@ -4136,6 +4235,39 @@ function showTeam(name) {
     const sim = t.sim || {};
     postHtml =
       '<div class="tsec" style="margin-top:14px"><h3>Postseason</h3>' +
+      /* ---- THE PROJECTED-WINS BAND, AS AN INTERVAL --------------------
+         The simulator plays every remaining fixture 4,000 times and returns
+         p10 / p50 / p90. Printing only the median throws away the half of the
+         answer that matters -- how WIDE the outcome is -- so the band is drawn
+         and the median marked inside it. The axis is the team's own schedule,
+         0 to the number of fixtures it actually has, which is why a short
+         schedule reads as a short track rather than a weak team.
+         Wins already banked are marked separately: they are a fact, not a
+         projection, and the two must not look alike. */
+      (sim.proj_wins_p50 !== undefined && sim.proj_wins_p50 !== null && sim.fixtures
+        ? (function(){
+            const N = sim.fixtures;
+            const pc = v => Math.max(0, Math.min(100, v / N * 100));
+            const won = (sim.record_so_far || '0-0').split('-')[0] * 1;
+            return '<div class="bandwrap">' +
+              '<div class="bandhd"><span>Projected wins</span>' +
+                '<b>' + sim.proj_wins_p50 + '</b>' +
+                '<i>of ' + N + ' scheduled</i></div>' +
+              '<div class="band">' +
+                '<span class="bandfill" style="left:' + pc(sim.proj_wins_p10).toFixed(1) +
+                  '%;width:' + (pc(sim.proj_wins_p90) - pc(sim.proj_wins_p10)).toFixed(1) + '%"></span>' +
+                '<span class="bandmed" style="left:' + pc(sim.proj_wins_p50).toFixed(1) + '%"></span>' +
+                (won ? '<span class="bandwon" style="left:' + pc(won).toFixed(1) +
+                       '%" title="' + won + ' already won"></span>' : '') +
+              '</div>' +
+              '<div class="bandft"><span>0</span>' +
+                '<span class="bandkey">80% of simulations land between <b>' +
+                  sim.proj_wins_p10 + '</b> and <b>' + sim.proj_wins_p90 + '</b>' +
+                  (won ? ' &middot; <i class="wonkey"></i>' + won + ' won so far' : '') +
+                '</span><span>' + N + '</span></div>' +
+            '</div>';
+          })()
+        : '') +
       '<div class="body">' +
       '<div class="plrow"><span class="nm">' + (t.conf || 'Conference') +
         ' automatic bid<span class="wentto">' +
