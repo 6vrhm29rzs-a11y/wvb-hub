@@ -1838,6 +1838,50 @@ def build():
         % (esc(r["day"]), esc(r["m"]), esc(r["n"]), esc(r["t"]))
         for r in tvrows)
 
+    # ---- HERO -----------------------------------------------------------
+    # EVERY STRING HERE IS BUILT FROM A MEASURED VALUE AT PRINT TIME (R1).
+    # There is no sentence written in advance about how the season is going;
+    # the counts are read from the same results and Top 25 the tabs render.
+    _hero_top = (load("data/digby_top25_%d.json" % SEASON) or {}).get("top") or []
+    _colors = ((load("data/team_colors_%d.json" % SEASON) or {}).get("teams") or {})
+    _logos = team_logos()
+    _played = len(res)
+    _teams_seen = len(set([r["home"] for r in res] + [r["away"] for r in res]))
+    _last = max([r["date"] for r in res], default=None)
+    _hero = {
+        "eyebrow": ("%d matches in" % _played) if _played
+                   else "Season opens soon",
+        "title": "The 2026 season, measured",
+        "sub": ("%s teams rated &middot; %d matches played across %d teams &middot; "
+                "last result %s" % ("{:,}".format(len(teams)), _played,
+                                    _teams_seen, esc(_last or "&mdash;")))
+               if _played else
+               ("%s teams rated &middot; no matches played yet"
+                % "{:,}".format(len(teams))),
+        "podium": "",
+    }
+    _pod = []
+    for _r in _hero_top[:3]:
+        _nm = _r["team"]
+        _c = (_colors.get(_nm) or {}).get("primary") or "var(--line2)"
+        # net points/set is absent until a team has played -- say so rather
+        # than printing a zero (R5).
+        _net = _r.get("net_pts_per_set")
+        _pod.append(
+            '<div class="pod" style="--tc:%s"><span class="podrk">%d</span>'
+            '%s<span class="podnm">%s</span>'
+            '<span class="podv %s"%s>%s</span>'
+            '<span class="podl">%s</span></div>'
+            % (_c, _r["rank"], logo_img(_nm, _logos), esc(_nm),
+               # ⚠ COLOUR BY SIGN, NOT BY RANK. #3 on the podium was rendering
+               # its -4.25 in the "good" green purely for being third-best --
+               # a colour asserting the opposite of the number beside it.
+               ("pos" if _net > 0 else "neg") if _net is not None else "nil",
+               (' data-count="%.2f"' % _net) if _net is not None else "",
+               ("%+.2f" % _net) if _net is not None else "&mdash;",
+               "net pts/set" if _net is not None else "not played"))
+    _hero["podium"] = "".join(_pod)
+
     slope = level.get("recommended_slope")
     return TEMPLATE \
         .replace("{{POLLS_JSON}}", json.dumps(polls, separators=(",", ":"))) \
@@ -1868,6 +1912,10 @@ def build():
         .replace("{{N_PLAYED}}", str(played)) \
         .replace("{{N_AQ}}", str(n_aq)) \
         .replace("{{N_TEAMS}}", str(len(teams))) \
+        .replace("{{HERO_EYEBROW}}", _hero["eyebrow"]) \
+        .replace("{{HERO_TITLE}}", _hero["title"]) \
+        .replace("{{HERO_SUB}}", _hero["sub"]) \
+        .replace("{{HERO_PODIUM}}", _hero["podium"]) \
         .replace("{{N_SCHED}}", "{:,}".format(len(sched))) \
         .replace("{{N_TV}}", str(len(tvrows))) \
         .replace("{{STANDINGS_JSON}}", json.dumps(stand, separators=(",", ":"))) \
@@ -2339,6 +2387,87 @@ td.tm{font-size:15px}
 .wh2 .pl{font:11.5px/1.4 var(--mono);color:var(--ink3)}
 .wh2 .pl.u{font-style:italic}
 .va.nt{color:var(--amber);font-weight:800}
+/* ---- THE HERO --------------------------------------------------------
+   Ambient light, a court motif at 5% and a podium of the current top three in
+   their own school colours. The motion is deliberately small: one pulsing dot
+   that means "this is live data", and a count-up on the three numbers on first
+   paint. Nothing here animates on a loop -- a page you read every day should
+   not have something moving in the corner of your eye forever. */
+.hero{position:relative;overflow:hidden;border-radius:16px;margin:0 0 20px;
+  padding:26px 28px;display:flex;gap:28px;align-items:center;
+  justify-content:space-between;flex-wrap:wrap;
+  border:1px solid var(--line);
+  background:
+    radial-gradient(70% 140% at 8% 0%, rgba(91,168,245,.20), transparent 62%),
+    radial-gradient(60% 130% at 92% 100%, rgba(255,199,44,.14), transparent 60%),
+    linear-gradient(160deg, rgba(24,36,60,.96), rgba(10,16,29,.97))}
+/* the court: attack line + net, drawn once, sitting under everything */
+.hero::after{content:"";position:absolute;right:-40px;bottom:-70px;width:420px;
+  height:260px;pointer-events:none;opacity:.07;
+  background:
+    linear-gradient(90deg,transparent 49.6%,#fff 49.6%,#fff 50.4%,transparent 50.4%),
+    linear-gradient(0deg,transparent 68%,#fff 68%,#fff 68.7%,transparent 68.7%);
+  border:2px solid #fff;border-radius:2px;transform:perspective(420px) rotateX(52deg)}
+.heroL{position:relative;z-index:1;min-width:min(100%,320px);flex:1 1 340px}
+.eyebrow{display:flex;align-items:center;gap:8px;font:700 10.5px/1 var(--mono);
+  letter-spacing:.22em;text-transform:uppercase;color:var(--ink3)}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--good);
+  box-shadow:0 0 0 0 rgba(49,208,126,.6);animation:pl 1.8s ease-in-out infinite}
+@keyframes pl{0%{box-shadow:0 0 0 0 rgba(49,208,126,.55)}
+  70%{box-shadow:0 0 0 9px rgba(49,208,126,0)}100%{box-shadow:0 0 0 0 rgba(49,208,126,0)}}
+.herotitle{margin:11px 0 7px;font:600 clamp(28px,4.2vw,44px)/1 var(--disp);
+  letter-spacing:.004em;color:var(--ink);text-transform:uppercase}
+.herosub{margin:0;font:13px/1.6 var(--mono);color:var(--ink2);max-width:56ch}
+.heroR{position:relative;z-index:1;display:flex;gap:12px;flex-wrap:wrap}
+.pod{position:relative;display:flex;flex-direction:column;align-items:center;
+  gap:3px;min-width:116px;padding:14px 14px 12px;border-radius:12px;
+  background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));
+  border:1px solid var(--line2);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+  transition:transform .2s ease,box-shadow .2s ease}
+/* the school's own colour, as an edge -- carries identity without tinting text */
+.pod::before{content:"";position:absolute;left:14px;right:14px;top:0;height:3px;
+  border-radius:0 0 3px 3px;background:var(--tc)}
+.pod:hover{transform:translateY(-2px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 14px 30px -18px var(--tc)}
+.pod .tlogo{width:26px;height:26px;margin:2px 0 1px}
+.podrk{font:600 11px/1 var(--mono);color:var(--ink3)}
+.podnm{font:600 14px/1.1 var(--disp);color:var(--ink);text-align:center;
+  letter-spacing:.01em}
+.podv{font:700 19px/1 var(--mono)}
+.podv.pos{color:var(--good)}
+.podv.neg{color:var(--bad)}
+.podv.nil{color:var(--ink3)}
+.podl{font:600 9px/1 var(--mono);color:var(--ink3);letter-spacing:.1em;
+  text-transform:uppercase}
+@media (prefers-reduced-motion:reduce){.pulse{animation:none}}
+@media (max-width:560px){.hero{padding:20px 18px}.heroR{width:100%}
+  .pod{flex:1 1 30%;min-width:0}}
+/* ---- PAIRED BARS: what a team does vs what it allows ------------------
+   Validated pair (see the render comment): both inside the dark lightness
+   band, both above the chroma floor, dE 22.6 at worst under CVD, both over
+   3:1 on this surface. Data-ends are rounded and anchored to the baseline;
+   the two fills are separated by a surface gap so they never read as one bar. */
+.cwrap{padding:4px 15px 12px}
+.ckey{display:flex;gap:16px;padding:10px 15px 4px;font:600 11px/1 var(--sans);
+  color:var(--ink2);letter-spacing:.03em}
+.ckey i.sw{display:inline-block;width:10px;height:10px;border-radius:2px;
+  margin-right:6px;vertical-align:-1px}
+i.sw.own,i.cbf.own{background:#3F92DE}
+i.sw.opp,i.cbf.opp{background:#C4763F}
+.cbar{display:grid;grid-template-columns:112px 1fr;gap:12px;align-items:center;
+  padding:7px 0;border-bottom:1px solid var(--line)}
+.cbar:last-child{border-bottom:0}
+.cbl{font:12.5px/1.25 var(--sans);color:var(--ink2)}
+.cbt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.cbrow{display:grid;grid-template-columns:1fr 54px;gap:10px;align-items:center}
+.cbtk{display:block;height:9px;min-width:0}
+.cbf{display:block;height:9px;border-radius:2px 4px 4px 2px;
+  transform-origin:left center;animation:cbin .5s cubic-bezier(.22,.9,.3,1) both}
+.cbrow b{font:700 12px/1 var(--mono);color:var(--ink);text-align:right;
+  white-space:nowrap}
+@keyframes cbin{from{transform:scaleX(.02);opacity:.2}to{transform:scaleX(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){.cbf{animation:none}}
 td.wh{font-size:12.5px;line-height:1.35;color:var(--ink2);max-width:280px}
 td.wh b{display:block;font-weight:650;color:var(--ink);font-size:12.5px}
 td.wh .wc{display:block;color:var(--ink3);font:11.5px/1.3 var(--mono)}
@@ -2644,6 +2773,19 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 <main>
 
 <section id="v-scores">
+  <!-- THE HERO. The page used to open straight into a date picker. This is the
+       first thing seen, so it carries the three things worth knowing on arrival:
+       what the season is, who is on top, and where tonight stands. Every figure
+       is read from the same payload the tabs use -- nothing here is written in
+       advance (R1) and nothing is invented (R5). -->
+  <div class="hero">
+    <div class="heroL">
+      <div class="eyebrow"><span class="pulse"></span>{{HERO_EYEBROW}}</div>
+      <h2 class="herotitle">{{HERO_TITLE}}</h2>
+      <p class="herosub">{{HERO_SUB}}</p>
+    </div>
+    <div class="heroR">{{HERO_PODIUM}}</div>
+  </div>
   <div id="live" hidden>
     <div class="livehead">
       <span class="dot"></span><b>Live</b>
@@ -3608,6 +3750,27 @@ function hcell(v, txt, lo, hi, good, kind) {
   return '<td class="n hi hx ' + (kind || 'seq') + '" style="--t:' +
     hscale(v, lo, hi, good).toFixed(3) + '"><b>' + txt + '</b></td>';
 }
+/* COUNT-UP ON THE PODIUM, ONCE. The number is already correct in the HTML --
+   this only animates toward it, and it restores the exact printed text at the
+   end rather than a re-rounded value, so what settles on screen is the figure
+   the build produced. Skipped entirely under reduced-motion. */
+(function(){
+  const els = document.querySelectorAll('.podv[data-count]');
+  if (!els.length) return;
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  els.forEach(el => {
+    const target = parseFloat(el.dataset.count);
+    const final = el.textContent;
+    const t0 = performance.now(), dur = 850;
+    function step(now){
+      const k = Math.min(1, (now - t0) / dur);
+      const e = 1 - Math.pow(1 - k, 3);
+      el.textContent = (target >= 0 ? '+' : '') + (target * e).toFixed(2);
+      if (k < 1) requestAnimationFrame(step); else el.textContent = final;
+    }
+    requestAnimationFrame(step);
+  });
+})();
 /* CLICK A PHOTO TO ENLARGE IT. One delegated listener on the document, so it
    covers the roster, the Stats table, the Players table and anything rendered
    after load -- binding per render would quietly miss the views that redraw.
@@ -4016,15 +4179,41 @@ function showTeam(name) {
     const f = (v, kind) => v === null || v === undefined ? '&mdash;'
       : (kind === 'pct' ? (v < 0 ? '-' : '') + Math.abs(v).toFixed(3).replace(/^0/, '')
                         : v.toFixed(2));
+    /* ---- THE SAME NUMBERS, AS A CHART ------------------------------------
+       Each row is its OWN scale: a hitting percentage and a digs-per-set count
+       do not share an axis, and putting them on one would be the dual-axis
+       mistake wearing a different hat. Within a row the two bars DO share a
+       scale, which is the only comparison the chart is making -- what this team
+       does against what it allows.
+       Every bar keeps its number as a direct label, so the chart never has to
+       be trusted on its own, and the sample it rests on is printed underneath.
+       Two series, so a legend is always present. The pair was validated rather
+       than eyeballed: #3F92DE / #C4763F pass lightness band, chroma floor, CVD
+       separation (dE 22.6 protan) and 3:1 contrast on this surface. */
+    const barRow = r => {
+      const a = r[1], b = r[2];
+      if (a === null || a === undefined) return '';
+      const hi = Math.max(Math.abs(a), Math.abs(b || 0)) || 1;
+      const w = v => Math.max(1.5, Math.abs(v || 0) / hi * 100).toFixed(1);
+      /* ⚠ THE LABEL GETS ITS OWN COLUMN. First version let the bar be a % of
+         the whole row with the number after it, so a 100% bar pushed its own
+         label off the edge and "15.86" rendered as "15.8" -- the same clipping
+         that was reported on the pills. The bar is a % of a TRACK; the value
+         sits in a fixed column beside it and can never be squeezed. */
+      return '<div class="cbar"' + (r[4] ? ' title="' + r[4] + '"' : '') + '>' +
+        '<div class="cbl">' + r[0] + '</div>' +
+        '<div class="cbt">' +
+          '<div class="cbrow"><span class="cbtk"><i class="cbf own" style="width:' +
+            w(a) + '%"></i></span><b>' + f(a, r[3]) + '</b></div>' +
+          '<div class="cbrow"><span class="cbtk"><i class="cbf opp" style="width:' +
+            w(b) + '%"></i></span><b>' + f(b, r[3]) + '</b></div>' +
+        '</div></div>';
+    };
     statHtml =
       '<div class="tsec" style="margin-top:14px"><h3>Team stats, 2026</h3>' +
-      '<table class="tstat"><thead><tr><th class="l"></th>' +
-      '<th>' + name + '</th><th>Opponents</th></tr></thead><tbody>' +
-      rowsOf.map(r => '<tr' + (r[4] ? ' title="' + r[4] + '"' : '') + '>' +
-        '<td class="l">' + r[0] + '</td>' +
-        '<td class="n">' + f(r[1], r[3]) + '</td>' +
-        '<td class="n op">' + f(r[2], r[3]) + '</td></tr>').join('') +
-      '</tbody></table>' +
+      '<div class="ckey"><span><i class="sw own"></i>' + name + '</span>' +
+      '<span><i class="sw opp"></i>Opponents</span></div>' +
+      '<div class="cwrap">' + rowsOf.map(barRow).join('') + '</div>' +
       '<div class="tnote"><b>Points</b> are kills + blocks + aces, the ' +
       'box-score definition &mdash; ' + O.earned + ' of them here. ' +
       'From the box scores of <b>' + O.matches +

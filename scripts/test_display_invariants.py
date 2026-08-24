@@ -687,6 +687,48 @@ def check_photo_crop_and_zoom():
         ok("only real photographs open; drawn avatars do not")
 
 
+def check_hero_podium_signs():
+    """A podium value must be coloured by its SIGN, not by its rank.
+
+    PAID FOR. The hero's three numbers were all painted with the "good" green
+    because they belong to the top three teams -- so Texas, sitting third on a
+    net of -4.25, showed a red number's worth of bad news in green. A colour
+    that contradicts the number beside it is worse than no colour: the reader
+    trusts the faster channel.
+
+    Also asserts the absent case stays absent. A team that has not played has no
+    net points per set, and the podium must show an em dash in a muted class
+    rather than a zero dressed as a measurement (R5).
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping hero-podium check")
+        return
+    src = open(hub, encoding="utf-8").read()
+    pods = re.findall(r'<span class="podv ([a-z]+)"[^>]*>([^<]+)</span>', src)
+    if not pods:
+        print("  no hero podium rendered -- skipping")
+        return
+    wrong = []
+    for cls, val in pods:
+        v = val.strip().replace("\u2212", "-")
+        if v in ("&mdash;", "\u2014", "-", ""):
+            if cls != "nil":
+                wrong.append((cls, val, "absent value not muted"))
+            continue
+        try:
+            num = float(v.replace("+", ""))
+        except ValueError:
+            continue
+        want = "pos" if num > 0 else "neg"
+        if cls != want:
+            wrong.append((cls, val, "should be %s" % want))
+    if wrong:
+        bad("a podium value is coloured against its own sign", str(wrong[:3]))
+    else:
+        ok("hero podium values are coloured by sign (%d checked)" % len(pods))
+
+
 def check_transfer_reconciliation():
     """A transfer must describe the SAME player on both sides.
 
@@ -1237,6 +1279,7 @@ def main():
     check_bracket_seed_structure()
     check_schedule_states_where()
     check_photo_crop_and_zoom()
+    check_hero_podium_signs()
     print()
     check_transfer_reconciliation()
     print()
