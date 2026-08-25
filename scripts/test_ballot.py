@@ -205,16 +205,32 @@ def main():
     print("\n7. The ballot feeds no rating, and is not published")
     # ⚠ THE INVARIANT THAT MATTERS MOST. Reasons are words; if any rating input
     # ever read this file, a subjective trait would have become a coefficient.
+    # ⚠ THE SCAN IS OVER MODEL CODE, NOT OVER GUARDS -- and the first version
+    # was not, which its own run exposed: test_display_invariants.py contains
+    # the literal string "data/ballots_2026.jsonl" as a NEGATIVE CONTROL for
+    # the publishing gate. It does not read the file; it injects the string to
+    # prove the gate catches it. Flagging that would have pushed me to weaken
+    # a real guard to satisfy this one.
+    #
+    # A test naming the path is fine. A RATING script naming it is not, and
+    # that is the invariant: no model input may ever read a ballot, or a
+    # subjective trait would have become a coefficient.
     hits = []
     for fn in sorted(os.listdir(os.path.join(REPO, "scripts"))):
-        if not fn.endswith(".py") or fn in ("ballot.py", "test_ballot.py",
-                                            "live_server.py", "build_hub.py"):
+        if not fn.endswith(".py"):
+            continue
+        if fn.startswith("test_") or fn in ("ballot.py", "live_server.py",
+                                            "build_hub.py"):
             continue
         src = open(os.path.join(REPO, "scripts", fn), encoding="utf-8").read()
-        if "ballots_" in src or "import ballot" in src:
+        if "ballots_" in src or re.search(r"^\s*import ballot\b", src, re.M):
             hits.append(fn)
     check("no rating, projection or simulator script reads the ballot file",
           not hits, str(hits))
+    # POSITIVE CONTROL: the scan can see a real reader, or it proves nothing.
+    check("...and the scan would notice one that did",
+          "ballots_" in open(os.path.join(REPO, "scripts", "ballot.py"),
+                             encoding="utf-8").read())
 
     pub = os.path.join(REPO, "output", "vb_dashboard.html")
     if os.path.exists(pub):

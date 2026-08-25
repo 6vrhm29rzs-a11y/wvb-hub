@@ -6936,7 +6936,33 @@ PRIVATE_MARKERS = ("VolleyTalk", "Massey Ratings", "Massey Ratings, 2026",
                    # inline SVG when the gate was written and slipped straight
                    # through when it became an image -- caught by grepping the
                    # built page, not by reading the code.
-                   "digby-face", "digby-coach")
+                   "digby-face", "digby-coach",
+                   # ── BALLOT WORKSHOP ──────────────────────────────────────
+                   # Cody's own ballot, his private notes, and his reasons for
+                   # disagreeing with the model. The strip removes the section,
+                   # the script AND the init; these markers make that a checked
+                   # fact rather than three regexes nobody re-reads.
+                   'data-v="ballot"', 'id="v-ballot"', "Ballot Workshop",
+                   "renderBallot", "bwWire", "BW_KEY", "bwText", "ballots_",
+                   "BALLOT-WORKSHOP-BEGIN", "BALLOT-CONST-BEGIN",
+                   "BALLOT-INIT-BEGIN",
+                   # ── ENDPOINTS THAT ONLY EXIST BEHIND THE LOCAL SERVER ────
+                   # ⚠ /api/live IS DELIBERATELY ABSENT FROM THIS LIST. The
+                   # live band fetches it and FAILS SOFT on a static host --
+                   # slateFromSchedule() renders today's fixtures from the
+                   # embedded schedule instead. Adding it here would abort
+                   # every public build for a feature that is working as
+                   # designed. Checked before writing this: the published file
+                   # contains it twice, on purpose.
+                   "/api/ballot",
+                   # ── CREDENTIALS AND LOCAL PATHS ──────────────────────────
+                   # None of these has ever appeared in a build. They are here
+                   # because this is a PUBLIC repo and the cost of the check is
+                   # nil, while the cost of one leak is not recoverable -- a
+                   # published secret is published even if the commit is later
+                   # removed.
+                   "ANTHROPIC_API_KEY", "sk-ant-", "ghp_", "github_pat_",
+                   "/Users/", "127.0.0.1", "localhost:")
 
 
 def strip_private(html):
@@ -7004,14 +7030,48 @@ def strip_private(html):
     return html
 
 
+def public_leaks(html):
+    # type: (str) -> List[str]
+    """Everything private still present in a page about to be published.
+
+    ⚠ IT CHECKS THE DATA, NOT ONLY THE MARKUP. The first version of this gate
+    searched for the strings "VolleyTalk" and "Massey Ratings", passed, and the
+    build shipped 25 VolleyTalk ranks and 151 Massey ranks INSIDE `const TEAMS`
+    -- invisible on the page, one devtools open away on a public site. Removing
+    a column is not the same as not publishing its values, so the payload is
+    parsed and inspected.
+
+    Returns a list of findings. Empty means publishable.
+    """
+    found = [m for m in PRIVATE_MARKERS if m in html]
+
+    # the payload itself
+    m = re.search(r"const TEAMS = (\{.*?\});\n", html, re.S)
+    if m:
+        try:
+            teams = json.loads(m.group(1).replace("<\\/", "</"))
+        except ValueError:
+            teams = {}
+        for field, label in (("vt", "VolleyTalk"), ("massey", "Massey")):
+            n = sum(1 for t in teams.values()
+                    if isinstance(t, dict) and t.get(field) is not None)
+            if n:
+                found.append("%d %s ranks inside const TEAMS" % (n, label))
+    return found
+
+
 if __name__ == "__main__":
     html = build()
     if PUBLIC:
         html = strip_private(html)
-        leaked = [m for m in PRIVATE_MARKERS if m in html]
+        leaked = public_leaks(html)
         if leaked:
+            # ⚠ ABORTS BEFORE WRITING. The previous output/vb_dashboard.html is
+            # left untouched on disk, so a failed gate cannot replace a clean
+            # published page with a leaking one -- and because the workflow step
+            # has no `||`, the job stops before the commit step ever runs.
             raise SystemExit(
-                "PUBLIC BUILD ABORTED: private source(s) still present: %s"
+                "PUBLIC BUILD ABORTED: private content still present: %s"
                 % ", ".join(leaked))
     if not os.path.isdir(os.path.dirname(OUT)):
         os.makedirs(os.path.dirname(OUT))

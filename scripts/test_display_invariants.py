@@ -1428,6 +1428,84 @@ def check_transfer_reconciliation():
         ok("every transfer reconciles: rate x sets == departure points", checked)
 
 
+def check_public_gate_catches_leaks():
+    """THE PUBLISHING GATE MUST ACTUALLY CATCH THINGS.
+
+    A gate that has never been shown to fail is not a gate. This injects one
+    example of every class of private content into a copy of the published page
+    and requires each to be caught -- markup, script, file reference, endpoint,
+    third-party source, credential, local path, and the one that has actually
+    bitten this repo: VALUES hidden in the payload behind removed columns.
+
+    ⚠ /api/live IS DELIBERATELY PUBLISHABLE and is asserted as such. The live
+    band fetches it and fails soft on a static host, falling back to the
+    embedded schedule. If it ever joins the forbidden list, every public build
+    aborts for a feature working as designed.
+    """
+    pub = os.path.join(REPO, "output", "vb_dashboard.html")
+    if not os.path.exists(pub):
+        print("  no public dashboard built -- skipping the gate check")
+        return
+    sys.path.insert(0, os.path.join(REPO, "scripts"))
+    import build_hub as BH
+    clean = open(pub, encoding="utf-8").read()
+
+    # POSITIVE CONTROL: the real published file must pass.
+    leaks = BH.public_leaks(clean)
+    if leaks:
+        bad("the published page itself contains private content", ", ".join(leaks))
+        return
+    ok("the published page passes its own gate")
+
+    cases = [
+        ("ballot markup", '<section id="v-ballot" hidden></section>'),
+        ("ballot script", "function renderBallot(){}"),
+        ("ballot file reference", '"data/ballots_2026.jsonl"'),
+        ("ballot endpoint", "fetch('/api/ballot')"),
+        ("a VolleyTalk column", '<th title="VolleyTalk Top 25">VT</th>'),
+        ("Massey Ratings named", "<span>Massey Ratings</span>"),
+        ("the TV listings payload", '<div data-v="tv"></div>'),
+        ("an API key", 'const k="sk-ant-abc123";'),
+        ("a GitHub token", "ghp_0123456789abcdef"),
+        ("a local absolute path", "/Users/somebody/repo"),
+        ("a localhost URL", "http://127.0.0.1:8799/x"),
+    ]
+    missed = [label for label, inject in cases
+              if not BH.public_leaks(clean + inject)]
+    if missed:
+        bad("the gate misses %d kind(s) of private content" % len(missed),
+            ", ".join(missed))
+    else:
+        ok("the gate catches every class of private content", len(cases))
+
+    # ⚠ THE ONE THAT ACTUALLY HAPPENED: values in the payload, columns removed.
+    m = re.search(r"const TEAMS = (\{.*?\});\n", clean, re.S)
+    if m:
+        try:
+            teams = json.loads(m.group(1).replace("<\\/", "</"))
+        except ValueError:
+            teams = None
+        if teams:
+            for t in list(teams)[:5]:
+                teams[t]["massey"] = 1
+                teams[t]["vt"] = 1
+            tampered = clean[:m.start(1)] + json.dumps(teams) + clean[m.end(1):]
+            if not BH.public_leaks(tampered):
+                bad("ranks hidden inside const TEAMS are not caught",
+                    "this exact leak shipped once: 151 Massey and 25 VolleyTalk "
+                    "ranks behind removed columns")
+            else:
+                ok("ranks hidden inside the payload are caught")
+
+    # and the deliberate exception
+    if BH.public_leaks(clean + "fetch('/api/live')"):
+        bad("/api/live is treated as private",
+            "the live band fetches it and fails soft on a static host; "
+            "forbidding it aborts every public build")
+    else:
+        ok("/api/live stays publishable, as designed")
+
+
 def check_public_build_is_clean():
     """The PUBLIC dashboard must carry no third-party source.
 
@@ -2594,6 +2672,7 @@ def main():
     print()
     check_transfer_reconciliation()
     print()
+    check_public_gate_catches_leaks()
     check_public_build_is_clean()
     print()
     check_photos_are_urls_only()

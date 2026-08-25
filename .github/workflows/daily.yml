@@ -186,13 +186,6 @@ jobs:
           # published is gone for good. Appends only when the poll's own
           # "Through Games" stamp moves, so daily runs do not pile up rows.
           python3 scripts/crawl_polls.py || echo "polls unavailable; continuing"
-          # PUBLIC BUILD DISABLED 2026-08-23, at Cody's instruction. This is his
-          # personal page; the only reason a stripped second copy existed was that
-          # output/vb_dashboard.html is TRACKED in a PUBLIC repo and served on
-          # GitHub Pages. No published copy, nothing to strip. Re-enable by
-          # restoring this line -- and re-read strip_private() first, because the
-          # things it removes are other people's (VolleyTalk, Massey, drawn
-          # likenesses of named athletes), not ours.
           # A conference label can go stale mid-realignment (ncaa.com still
           # served UT Arlington as WAC after it joined the UAC). This reads the
           # team's own schedule and costs no network -- cheap insurance that a
@@ -256,6 +249,16 @@ jobs:
           # offline heart of the pipeline against tracked files only, and
           # reads the command list out of THIS file rather than restating
           # it. It excludes itself by name -- it is in this very list.
+          # ⚠ FIVE MORE SUITES THAT EXISTED AND DID NOT RUN HERE. The comment
+          # above says a guard that does not run in CI protects nothing, and
+          # then five were added without being listed. test_ballot matters most
+          # for a PUBLISHING change: it is the check that the Ballot Workshop --
+          # Cody's own ballot, his notes, his reasons for overruling the model --
+          # is absent from the published file.
+          python3 scripts/test_resume.py
+          python3 scripts/test_coaches.py
+          python3 scripts/test_rating_factors.py
+          python3 scripts/test_ballot.py
           python3 scripts/test_pipeline_fresh_checkout.py
 
       # Coverage gate: a NEW displayed field with no declared provenance fails
