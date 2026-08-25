@@ -12,6 +12,14 @@ name: daily pipeline
 on:
   schedule:
     - cron: "15 9 * * *"
+    # ⚠ A SECOND, MONDAY-ONLY RUN AT 20:15 UTC (= 4:15pm ET / 1:15pm PT).
+    # The AVCA poll publishes on Mondays, usually early afternoon Eastern. The
+    # 09:15 run happens BEFORE that, so a Monday poll would sit uncaptured
+    # until Tuesday morning -- and the rankings endpoint is CURRENT-ONLY, so a
+    # poll not captured on its publication day is not merely late, it can be
+    # gone. This run also gives the weekly Digby freeze a second chance once
+    # late Sunday finals have landed.
+    - cron: "15 20 * * 1"
   workflow_dispatch:
     inputs:
       season:
@@ -176,10 +184,18 @@ jobs:
           # build_vb.py is superseded and no longer run; kept on disk only as
           # the record of the old template.
           python3 scripts/project_lineups.py || echo "no lineups yet; continuing"
-          # Freeze the ranking once a week, Monday, BEFORE any match starts.
-          # This job runs 09:15 UTC = 05:15 ET, so a Monday capture is genuinely
-          # pre-week. The script is a no-op on other days and re-running inside
-          # the same ISO week changes nothing, so calling it daily is safe.
+          # ⚠ THE WEEKLY FREEZE, AND WHY IT SITS HERE AND NOT EARLIER.
+          # A Digby Weekly covers every match through the PRIOR SUNDAY in
+          # Eastern, and it is written only when all of them are final. So it
+          # must run after this job's own crawl steps above -- which it does --
+          # and after the in-season refresh has had the overnight hours to
+          # collect late Sunday finals. refresh.yml polls 22:00-11:00 UTC, so a
+          # 9pm-Pacific Sunday match (04:00 UTC Monday) has been picked up
+          # several times over before this 09:15 UTC step runs.
+          # If anything through the cutoff is still live, unresolved or stale,
+          # the script writes NOTHING and the calendar shows a waiting state
+          # naming what it is waiting for. The Monday 20:15 UTC run above is
+          # the second chance; a partial freeze is never the fallback.
           python3 scripts/snapshot_rankings.py || echo "snapshot skipped; continuing"
           # The published polls. The rankings endpoint is CURRENT-ONLY and
           # cannot be season-pinned, so a poll not captured the day it is
@@ -264,6 +280,7 @@ jobs:
           python3 scripts/test_player_identity.py
           python3 scripts/test_player_aggregation.py
           python3 scripts/test_rankings_board.py
+          python3 scripts/test_weekly_calendar.py
           python3 scripts/test_freshness_refresh.py
           python3 scripts/test_pipeline_fresh_checkout.py
 

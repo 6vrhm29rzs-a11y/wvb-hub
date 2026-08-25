@@ -1837,6 +1837,127 @@ def hcell_py(v, txt, lo, hi, kind="seq"):
     return '<td class="n hx %s" style="--t:%.3f"><b>%s</b></td>' % (kind, t, txt)
 
 
+def calendar_tracks():
+    """The weekly ranking calendar: three tracks, kept apart on purpose.
+
+    ⚠ THREE RULERS, THREE CADENCES, AND MOVEMENT NEVER CROSSES THEM. Digby
+    Weekly is DERIVED (ours, from results through a stated Sunday cutoff); the
+    AVCA poll is OFFICIAL (coaches vote, we only capture it); VolleyTalk is
+    COMMUNITY and arrives by hand. Subtracting a rank on one from a rank on
+    another is arithmetic on two different things -- the mistake
+    test_rankings_history.py already exists to prevent -- so each track's
+    movement is computed only against its own previous entry.
+
+    ⚠ AND VOLLEYTALK IS DISPLAY-ONLY. It is read here, rendered, and reaches
+    nothing else: no rating, no projection, no ballot. Guarded.
+    """
+    import weekly as WK
+
+    out = {"digby": [], "avca": [], "vt": [], "waiting": None}
+
+    # ---- Digby Weekly (DERIVED) -------------------------------------------
+    hist = os.path.join(REPO, "data", "rankings_history_%d.jsonl" % SEASON)
+    if os.path.exists(hist):
+        for line in open(hist, encoding="utf-8"):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                r = json.loads(line)
+            except ValueError:
+                continue
+            # ⚠ THE LEGACY ROWS STAY EXACTLY AS WRITTEN and are shown for what
+            # they are. The first blended week archived only 35 teams, so it
+            # cannot support movement for team 36 onward; saying "35 of 348"
+            # is the honest label. Nothing is backfilled.
+            n = len(r.get("teams") or [])
+            legacy = r.get("track") != "digby_weekly"
+            out["digby"].append({
+                "week": r.get("week"),
+                "label": r.get("label") or ("Week of %s" % (r.get("date") or "?")),
+                "cutoff": r.get("cutoff"),
+                "captured": r.get("captured_utc") or r.get("date"),
+                "n": n,
+                "finals": r.get("finals_included"),
+                "completeness": r.get("completeness") or ("legacy" if legacy else None),
+                "source": r.get("source"),
+                "partial": n < 300,
+                "legacy": legacy,
+            })
+    out["digby"].sort(key=lambda x: (x.get("cutoff") or "", x.get("week") or ""))
+
+    # ---- what the NEXT freeze is waiting for -------------------------------
+    try:
+        st = WK.status(SEASON)
+        by = {}
+        for b in st["blocking"]:
+            by[b["why"]] = by.get(b["why"], 0) + 1
+        out["waiting"] = {
+            "label": st["label"], "cutoff": st["cutoff"], "state": st["state"],
+            "finals": st["finals"], "blocking": len(st["blocking"]),
+            "why": by,
+            "frozen": any(d.get("cutoff") == st["cutoff"] for d in out["digby"]),
+        }
+    except Exception:                                    # noqa: BLE001
+        out["waiting"] = None
+
+    # ---- AVCA (OFFICIAL) ---------------------------------------------------
+    avca = os.path.join(REPO, "data", "raw", str(SEASON), "polls_avca.jsonl")
+    if os.path.exists(avca):
+        for line in open(avca, encoding="utf-8"):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                r = json.loads(line)
+            except ValueError:
+                continue
+            out["avca"].append({
+                # BOTH TIMES. The poll's own "Through Games" stamp is what it
+                # claims to cover; captured_utc is when this hub saw it. They
+                # are different facts and a reader needs both.
+                "stamp": r.get("stamp"),
+                "captured": r.get("captured_utc"),
+                "n": len(r.get("rows") or []),
+                "prev_season": bool(r.get("is_previous_season")),
+            })
+    out["avca"].sort(key=lambda x: x.get("captured") or "")
+
+    # ---- the community track (manual import) -------------------------------
+    # ⚠ PRIVATE ONLY, AND THE GATE CAUGHT ME TWICE. This is somebody else's
+    # community poll; the build already refuses to republish it. The first
+    # version shipped the track to the public page and the gate ABORTED --
+    # correctly. The second version gated only the RENDER, and the gate aborted
+    # again on the literal name still sitting in the page script and in two of
+    # my own comments. Comments are bytes on a public page like any other.
+    # The track is not BUILT for the public page rather than hidden in it:
+    # hiding third-party data still ships it, which this project already
+    # learned once with the rank VALUES inside const TEAMS.
+    if PUBLIC:
+        for k in [k for k in list(out) if k == "vt" or k.startswith("vt_")]:
+            out.pop(k, None)
+        return out
+    vt = load("data/volleytalk_polls.json") or {}
+    for r in (vt.get("polls") or []):
+        out["vt"].append({
+            "published": r.get("published"), "through": r.get("through"),
+            "url": r.get("url"), "n": len(r.get("rows") or []),
+        })
+    out["vt"].sort(key=lambda x: x.get("published") or "")
+    out["vt_home"] = vt.get("source_home") or ""
+    # ⚠ THE TRACK'S NAME AND COPY LIVE IN THE PAYLOAD, NOT IN THE PAGE SCRIPT.
+    # Gating the RENDER on `CAL.vt` was not enough: the source still carried
+    # the literal name, and the public gate aborted on it -- correctly. With
+    # the name here, the public build's JavaScript contains nothing to strip.
+    out["vt_name"] = vt.get("source_name") or "Community poll"
+    out["vt_tag"] = "Community \u00b7 manual"
+    out["vt_empty"] = (
+        "Not imported yet. This is a community poll and is never scraped, "
+        "logged into, or posted to from here \u2014 an entry appears only when "
+        "one is added by hand. It informs nothing else on this site.")
+    return out
+
+
 def powercell(t):
     """POWER, with the scale carried in its own tooltip.
 
@@ -2982,6 +3103,8 @@ def build():
               "away_sets": r["away_sets"], "home_sets": r["home_sets"],
               "epoch": r.get("epoch")}
              for r in sorted(res, key=lambda x: x.get("epoch") or 0)])) \
+        .replace("{{CALENDAR_JSON}}",
+                 json.dumps(calendar_tracks(), separators=(",", ":"))) \
         .replace("{{NONDI_JSON}}", json.dumps(
             sorted(set(
                 nm for r in res for nm in (r["home"], r["away"])
@@ -5091,6 +5214,66 @@ td.wh .wu{color:var(--ink3);font-style:italic}
   .fndt{font-size:8px;margin-left:2px}}
 
 
+
+/* ---- WEEKLY RANKING CALENDAR ----------------------------------------------
+   Three tracks that must never look like one table. Each carries a tag saying
+   what KIND of ranking it is -- Derived (ours), Official (the coaches poll),
+   Community (a forum poll, entered by hand) -- because the cadence and the
+   authority are
+   different for each and a reader deciding a ballot needs to know which is
+   which before reading a single number. */
+.calwrap{max-width:960px}
+.calnow{border:1px solid var(--line2);border-left:3px solid var(--slate);
+  border-radius:4px;padding:13px 15px;margin:0 0 20px;background:var(--alt)}
+.calnow.wait{border-left-color:#F2B441}
+.calnow.ok{border-left-color:#31D07E}
+.calnowhead{display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+  margin-bottom:7px}
+.calnowhead b{font:700 17px/1.2 var(--disp);color:var(--chalk)}
+.calnow p{margin:0 0 6px;font-size:13px;color:var(--ink2);line-height:1.55}
+.calnow p:last-child{margin-bottom:0}
+.calfine{font-size:12px;color:var(--ink3)}
+.caltag{font:700 8.5px/1.5 var(--disp);letter-spacing:.1em;text-transform:uppercase;
+  padding:3px 7px;border-radius:3px;white-space:nowrap}
+.caltag.derived{color:#8FD3FF;background:rgba(91,168,245,.14)}
+.caltag.official{color:#FFD98A;background:rgba(242,180,65,.14)}
+.caltag.community{color:var(--ink3);background:var(--line)}
+.caltrack{margin:0 0 24px}
+.calhead{display:flex;align-items:center;gap:10px;margin:0 0 9px}
+.calhead h3{margin:0;font:700 13px/1 var(--disp);letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink2)}
+.caltbl th{font:700 9px/1.4 var(--disp);letter-spacing:.08em;
+  text-transform:uppercase;color:var(--slate);text-align:left;white-space:nowrap}
+.caltbl td{font-size:13px;vertical-align:top}
+.caltbl td:first-child{font-weight:600;color:var(--chalk)}
+.calstate{font:700 9px/1.5 var(--mono);letter-spacing:.03em;padding:2px 6px;
+  border-radius:3px;white-space:nowrap;background:var(--line);color:var(--ink3)}
+.calstate.complete{color:#31D07E;background:rgba(49,208,126,.12)}
+.calstate.forced{color:#F2B441;background:rgba(242,180,65,.12)}
+.calwarn{font:700 8.5px/1.4 var(--mono);letter-spacing:.03em;color:#F2B441;
+  background:rgba(242,180,65,.12);padding:1px 5px;border-radius:3px;
+  margin-left:5px}
+.caltbl .dim{color:var(--ink3)}
+
+/* ⚠ PHONE: the calendar is the surface a voter checks ON A PHONE on a Monday,
+   so it becomes a stack of labelled rows rather than four columns squeezed
+   into 390px. The header row is dropped and each cell names itself. */
+@media (max-width:560px){
+  .calnowhead b{font-size:15px}
+  .caltbl thead{display:none}
+  .caltbl,.caltbl tbody,.caltbl tr{display:block;width:100%}
+  .caltbl tr{padding:9px 0;border-bottom:1px solid var(--line)}
+  .caltbl td{display:block;border:0;padding:1px 0;font-size:12.5px;
+    text-align:left}
+  .caltbl td:first-child{font-size:14px;margin-bottom:3px}
+  /* the column name in front of the value -- without it a stacked cell is a
+     bare "-" with nothing saying which column it came from */
+  .caltbl td[data-l]:not(:first-child)::before{content:attr(data-l) " ";
+    font:700 8.5px/1 var(--disp);letter-spacing:.08em;color:var(--slate);
+    text-transform:uppercase;margin-right:4px}
+  .caltrack .panel,.caltrack .scroll{overflow:visible}
+}
+
 /* ---- RANKINGS: RULER BAR, COMPARISON, AND THE PHONE RANK-STRIP ------------
    ⚠ THE PROBLEM THIS SOLVES. The tab was thirteen equal columns, five of them
    bare ranks from five different organisations -- a row could read
@@ -5605,6 +5788,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <button class="segb" data-r="avca">AVCA coaches poll</button>
       <button class="segb" data-r="digby">Digby&rsquo;s Top 25</button>
       <button class="segb" data-r="gap">POWER vs AVCA</button>
+      <button class="segb" data-r="cal">Weekly calendar</button>
     </div>
     <label class="refsel"><span>Reference</span>
       <select id="refpick" aria-label="Reference ranking">
@@ -9440,6 +9624,10 @@ const RULER_WHAT = {
          'and it is not anybody\u2019s ballot.',
   gap: '<b>POWER vs AVCA</b> lists where our order and the coaches poll ' +
        'currently differ most. It is a statement of difference, nothing more.',
+  cal: '<b>Weekly calendar</b> is the archive: what each ranking said, and ' +
+       'when. Separate tracks \u2014 our own weekly freeze, the official ' +
+       'coaches poll, and any community poll entered by hand \u2014 kept ' +
+       'apart because they are different rulers on different cadences.',
   top16: '<b>DI Committee top 16</b> is the selection committee\u2019s own ' +
          'in-season reveal \u2014 the closest published thing to what the ' +
          'field projector is trying to predict.',
@@ -9530,6 +9718,122 @@ function renderGap() {
   });
 }
 
+/* ---- THE WEEKLY CALENDAR ---------------------------------------------------
+   ⚠ THREE TRACKS, NEVER BLENDED. Digby Weekly is DERIVED and frozen on our own
+   Sunday cutoff; AVCA is OFFICIAL and we only capture it; the third track is
+   COMMUNITY and arrives by hand. Movement is computed only inside a track --
+   the archive already refuses to compare across bases and this view must not
+   reintroduce that through the back door. Nothing here is combined into a
+   consensus, because a consensus of three different questions is not an
+   answer to any of them. */
+const CAL = {{CALENDAR_JSON}};
+
+/* ⚠ EACH CELL CARRIES ITS COLUMN NAME. On a phone the header row is dropped
+   and the row becomes a stack, so an unlabelled cell reads as a bare "-" or a
+   bare "not stated" with nothing saying which column it came from. Same fix as
+   the rank strip: the label rides in front of the value via data-l. */
+function calRow(cells, cols, cls) {
+  return '<tr' + (cls ? ' class="' + cls + '"' : '') + '>' +
+    cells.map((c, i) => '<td data-l="' + esc((cols && cols[i]) || '') + '">' +
+                        c + '</td>').join('') + '</tr>';
+}
+
+function renderCalendar() {
+  const host = document.getElementById('pollview');
+  const w = CAL.waiting;
+  /* THE ACTIVE WEEK, said first and said plainly. */
+  let head = '';
+  if (w) {
+    const done = w.frozen;
+    head =
+      '<div class="calnow ' + (done ? 'ok' : 'wait') + '">' +
+      '<div class="calnowhead"><span class="caltag derived">Derived</span>' +
+      '<b>' + esc(w.label) + '</b></div>' +
+      (done
+        ? '<p>Frozen. ' + w.finals + ' final' + (w.finals === 1 ? '' : 's') +
+          ' counted through this cutoff.</p>'
+        : '<p><b>Waiting.</b> ' + w.finals + ' match' +
+          (w.finals === 1 ? '' : 'es') + ' through this cutoff ' +
+          (w.finals === 1 ? 'is' : 'are') + ' final, and <b>' + w.blocking +
+          '</b> ' + (w.blocking === 1 ? 'is' : 'are') + ' not: ' +
+          Object.keys(w.why).map(k => w.why[k] + ' ' + k).join(', ') +
+          '. Nothing partial is saved \u2014 a weekly freeze is written only ' +
+          'once every match through the cutoff is final.</p>' +
+          '<p class="calfine">A <b>stale</b> match cannot resolve on its own: ' +
+          'ncaa.com removes fixtures from past dates, so those records can ' +
+          'never be refetched. Clearing them is a deliberate act, not an ' +
+          'automatic decision to ignore missing results.</p>') +
+      '</div>';
+  }
+
+  const track = (key, name, tag, tagcls, cols, rows, empty) =>
+    '<div class="caltrack"><div class="calhead">' +
+    '<span class="caltag ' + tagcls + '">' + tag + '</span><h3>' + name +
+    '</h3></div>' +
+    (rows.length
+      ? '<div class="panel"><div class="scroll"><table class="caltbl">' +
+        '<thead><tr>' + cols.map(c => '<th>' + c + '</th>').join('') +
+        '</tr></thead><tbody>' + rows.join('') + '</tbody></table></div></div>'
+      : '<div class="tnote">' + empty + '</div>') +
+    '</div>';
+
+  /* DIGBY WEEKLY -- ours, derived. */
+  const DG_COLS = ['Week', 'Through', 'Teams', 'Finals', 'State'];
+  const dg = (CAL.digby || []).slice().reverse().map(r => calRow([
+    esc(r.label),
+    r.cutoff ? esc(r.cutoff) : '<span class="dim">not stated</span>',
+    r.n + ' team' + (r.n === 1 ? '' : 's') +
+      (r.partial ? ' <b class="calwarn" title="This early archive stored only ' +
+        'the displayed Top 25 plus also-receiving, so movement cannot be ' +
+        'computed for the rest of the field. It is kept exactly as written.">' +
+        'partial</b>' : ''),
+    r.finals === null || r.finals === undefined
+      ? '<span class="dim">&ndash;</span>' : r.finals,
+    r.legacy
+      ? '<span class="calstate legacy" title="Written before the weekly ' +
+        'cutoff rule existed. Kept exactly as archived.">archived</span>'
+      : '<span class="calstate ' + esc(r.completeness || '') + '">' +
+        esc(r.completeness || '') + '</span>',
+  ], DG_COLS));
+
+  /* AVCA -- official, theirs. Both dates, because they are different facts. */
+  const AV_COLS = ['Through games', 'Captured by this hub', 'Size', 'Season'];
+  const av = (CAL.avca || []).slice().reverse().map(r => calRow([
+    esc(r.stamp || 'no stamp'),
+    r.captured ? esc(String(r.captured).replace('T', ' ').replace('Z', ' UTC'))
+               : '<span class="dim">&ndash;</span>',
+    r.n + ' ranked',
+    r.prev_season
+      ? '<span class="calstate legacy">previous season</span>'
+      : '<span class="calstate complete">this season</span>',
+  ], AV_COLS));
+
+  /* VOLLEYTALK -- community, by hand, and honest about being empty. */
+  const VT_COLS = ['Published', 'Through', 'Size', 'Source'];
+  const vt = (CAL.vt || []).map(r => calRow([
+    esc(r.published || '?'),
+    esc(r.through || '?'),
+    r.n + ' ranked',
+    r.url ? '<a href="' + esc(r.url) + '" rel="noopener noreferrer" ' +
+            'target="_blank">thread</a>' : '<span class="dim">&ndash;</span>',
+  ], VT_COLS));
+
+  host.innerHTML = '<div class="calwrap">' + head +
+    track('digby', 'Digby Weekly', 'Derived', 'derived',
+          DG_COLS, dg,
+          'No weekly freeze yet.') +
+    track('avca', 'AVCA coaches poll', 'Official', 'official',
+          AV_COLS, av,
+          'No AVCA capture yet. The rankings endpoint is current-only, so a ' +
+          'poll is captured on the day it publishes or not at all.') +
+    (CAL.vt
+      ? track('vt', esc(CAL.vt_name), esc(CAL.vt_tag), 'community',
+              VT_COLS, vt,
+              esc(CAL.vt_empty))
+      : '') +
+    '</div>';
+}
+
 function renderPoll(which) {
   const host = document.getElementById('pollview');
   const main = document.getElementById('rankpanel');
@@ -9561,6 +9865,10 @@ function renderPoll(which) {
   if (which === 'gap') {
     main.hidden = true; lead.hidden = true; host.hidden = false;
     renderGap(); return;
+  }
+  if (which === 'cal') {
+    main.hidden = true; lead.hidden = true; host.hidden = false;
+    renderCalendar(); return;
   }
   const p = POLLS[which];
   main.hidden = true; lead.hidden = true; host.hidden = false;

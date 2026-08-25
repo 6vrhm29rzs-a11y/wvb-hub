@@ -1,0 +1,20 @@
+{
+  "_what": "VolleyTalk community poll -- MANUALLY IMPORTED, never scraped.",
+  "_policy": [
+    "VolleyTalk is a community/committee reference and a THIRD-PARTY source.",
+    "Nothing here is fetched, logged into, posted to, or automated in any way.",
+    "scripts/.claude hook no_scrape.py blocks volleyballmag and the other named",
+    "hosts; VolleyTalk is not crawled by any script in this repo and there is no",
+    "code path that reads this file into a rating, a projection, POWER, Resume,",
+    "Digby, or the private ballot. It is display-only, and a guard asserts that.",
+    "To import a poll: add an object to `polls` by hand, with the thread URL, the",
+    "date it was published, the date it says it covers, and the ranked teams.",
+    "Team names must match the hub's own spelling (reconcile_2025.norm handles",
+    "the usual variants)."
+  ],
+  "source_name": "VolleyTalk",
+  "source_tier": "THIRD-PARTY",
+  "source_home": "https://volleytalk.net/",
+  "season": 2026,
+  "polls": []
+}

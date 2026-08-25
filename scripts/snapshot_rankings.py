@@ -31,9 +31,19 @@ import json
 import os
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import weekly  # noqa: E402
+
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SEASON = int(os.environ.get("WVB_SEASON", "2026"))
-OUT = os.path.join(REPO, "data", "rankings_history_%d.jsonl" % SEASON)
+# ⚠ REDIRECTABLE FOR TESTS, AND THAT IS NOT A CONVENIENCE. This archive is the
+# one artifact in the repo that cannot be rebuilt, and it is append-only -- so a
+# test (or a careless --force while developing) that writes a row into the real
+# file has damaged the record. I did exactly that once and had to restore it
+# from git. Tests point WVB_HISTORY_OUT at a temp file.
+OUT = os.environ.get(
+    "WVB_HISTORY_OUT",
+    os.path.join(REPO, "data", "rankings_history_%d.jsonl" % SEASON))
 
 
 # ⚠ ONE NAME PER RULER. This archive already contains a week written as
@@ -141,20 +151,71 @@ def current_ranking():
     return rows, "preseason"
 
 
+def existing_cutoffs():
+    """Cutoffs already frozen on the digby_weekly track.
+
+    ⚠ KEYED BY CUTOFF, NOT BY THE DAY WE RAN. The legacy rows key on the ISO
+    week of their CAPTURE date; a weekly freeze keys on the Sunday it covers,
+    which is the thing that is actually unique. Those two can collide -- the
+    preseason row sits at 2026-W34 and the first real cutoff (Aug 23) is also
+    W34 -- so a week-only check would refuse to ever write the first Digby
+    Weekly. Legacy rows carry no `track` and are never touched.
+    """
+    seen = set()
+    if not os.path.exists(OUT):
+        return seen
+    with open(OUT) as fh:
+        for line in fh:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                r = json.loads(line)
+            except ValueError:
+                continue
+            if r.get("track") == "digby_weekly" and r.get("cutoff"):
+                seen.add(r["cutoff"])
+    return seen
+
+
 def main():
     argv = sys.argv[1:]
     force = "--force" in argv
 
     today = datetime.date.today()
-    iso = today.isocalendar()
-    week = "%d-W%02d" % (iso[0], iso[1])
+    cutoff = weekly.prior_sunday(today)
+    label = weekly.week_label(cutoff)
 
     if today.weekday() != 0 and not force:
         print("not Monday (%s) -- no snapshot. Use --force to capture anyway."
               % today.isoformat())
         return 0
-    if week in existing_weeks():
-        print("%s already captured -- nothing to do." % week)
+    if cutoff.isoformat() in existing_cutoffs():
+        print("%s already frozen -- nothing to do." % label)
+        return 0
+
+    # ⚠ THE GATE. A weekly freeze may only be written once every match dated on
+    # or before the cutoff is FINAL. A poll published while games are still
+    # being played is not a poll, and a partial one would be indistinguishable
+    # from a complete one a week later.
+    st = weekly.status(SEASON, today=today)
+    if st["state"] != "complete" and not force:
+        blocking = st["blocking"]
+        why = {}
+        for b in blocking:
+            why[b["why"]] = why.get(b["why"], 0) + 1
+        print("%s NOT frozen -- %d match(es) through the cutoff are not final: %s"
+              % (label, len(blocking),
+                 ", ".join("%d %s" % (v, k) for k, v in sorted(why.items()))))
+        for b in blocking[:5]:
+            print("    %s  %s  %s" % (b["date"], b["why"],
+                                      " vs ".join(x or "?" for x in b["teams"])))
+        if len(blocking) > 5:
+            print("    ... and %d more" % (len(blocking) - 5))
+        print("  The calendar shows this as WAITING. Nothing partial is saved.")
+        print("  A stale match can never resolve on its own (ncaa.com removes "
+              "fixtures from past dates); clearing it is a deliberate act: "
+              "snapshot_rankings.py --force")
         return 0
 
     rows, source = current_ranking()
@@ -163,19 +224,33 @@ def main():
         return 0
 
     rec = {
-        "week": week,
+        # the ISO week OF THE CUTOFF, so a week means the games it covers
+        "week": weekly.iso_week(cutoff),
+        "track": "digby_weekly",
+        "label": label,
+        "cutoff": cutoff.isoformat(),
+        "cutoff_tz": st["cutoff_tz"],
+        "captured_utc": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
         "date": today.isoformat(),
         "season": SEASON,
         "source": source,
         "source_tier": "DERIVED",
-        "note": ("Frozen before the week's matches. Append-only: a past week is "
-                 "never rewritten, so this records what we actually said at the "
-                 "time, not what the current model would say about the past."),
+        "finals_included": st["finals"],
+        # "complete" means every match through the cutoff was final when this
+        # was written. "forced" means a human overrode the gate, and the count
+        # it overrode is kept so the two can never be confused later.
+        "completeness": ("complete" if st["state"] == "complete" else "forced"),
+        "blocking_at_capture": len(st["blocking"]),
+        "note": ("Frozen after every match through the cutoff went final. "
+                 "Append-only: a past week is never rewritten, so this records "
+                 "what we actually said at the time, not what the current model "
+                 "would say about the past."),
         "teams": rows,
     }
     with open(OUT, "a") as fh:
         fh.write(json.dumps(rec) + "\n")
-    print("captured %s (%s): %d teams -> %s" % (week, source, len(rows), OUT))
+    print("captured %s (%s): %d teams, %d finals -> %s"
+          % (label, source, len(rows), st["finals"], OUT))
     return 0
 
 

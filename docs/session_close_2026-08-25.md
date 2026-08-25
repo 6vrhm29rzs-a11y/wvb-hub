@@ -516,6 +516,72 @@ until two same-basis weekly snapshots exist -- that is the honest state, not a
 gap. Resume stays inactive until 200 D-I matches. No consensus/blend ranking
 was added.
 
-**State at close:** 25 suites pass with `Cody/` present and 24 with it moved
+## 11. WEEKLY RANKINGS CALENDAR
+
+**THE CUTOFF POLICY, IN ONE PLACE (`scripts/weekly.py`).** A **Digby Weekly**
+covers every completed match dated **on or before the prior Sunday, EASTERN**,
+and nothing after it.
+
+- **Eastern, not Pacific.** The sport schedules in Eastern and the AVCA's own
+  "Through Games" stamp is an Eastern date. The hub still DISPLAYS Pacific for
+  Cody; that is presentation and does not move the cutoff.
+- **Monday is excluded even when finished.** It belongs to the next freeze.
+  That is what makes the archive comparable to a poll.
+- ⚠ **A HAWAII MATCH AT 7pm HST SUNDAY IS 1:00am EASTERN MONDAY and is
+  therefore next week's.** Same for a 9pm-Pacific Sunday match. A real
+  consequence of one zone rather than per-venue local dates, which we do not
+  have and will not guess. Tested explicitly.
+- **Non-D-I fixtures cannot hold the poll open.**
+
+**WHAT HAPPENS WHEN LATE RESULTS ARE UNRESOLVED.** Nothing is written. The
+calendar shows a waiting state naming the count and the reason: `live`,
+`unresolved`, or `stale`. **It is live right now** -- the Aug 23 cutoff has 7
+finals and **39 stale**, which is the known phenomenon where ncaa.com removes
+fixtures from a past date (10 of the 12 crawled for Aug 21, 29 more on Aug 22).
+Those records can never resolve, so **that week will not freeze on its own.**
+Clearing it is a deliberate act (`snapshot_rankings.py --force`), and a forced
+row is stamped `completeness: "forced"` with the count it overrode, so it can
+never be mistaken for a complete one.
+
+**Ordering.** The freeze runs after this job's own crawl and after
+`refresh.yml` (22:00-11:00 UTC) has had the overnight hours to collect late
+Sunday finals; a **new Monday 20:15 UTC run** is the second chance and also
+catches the AVCA poll, which publishes Monday afternoon Eastern -- after the
+09:15 run, and the endpoint is current-only, so a missed poll can be gone.
+
+**Three tracks, never blended:** Digby Weekly `Derived`, AVCA `Official`,
+community poll `Community / manual`. Movement stays inside a track.
+
+**VolleyTalk is manual-import only** (`data/volleytalk_polls.json`, empty).
+Nothing scrapes, logs into, or posts to it, and a guard proves no rating,
+projection, board or ballot module reads the file.
+
+⚠ **THE PUBLIC GATE CAUGHT ME THREE TIMES ON THAT TRACK** and was right every
+time: first shipping it, then gating only the RENDER while the literal name sat
+in the page script, then on **two of my own comments**. Comments are bytes on a
+public page. The track is not BUILT for the public page, and its name and copy
+live in the private-only payload so the public JavaScript has nothing to strip.
+
+⚠ **I BROKE MY OWN RULE FROM SECTION 10 AND SPLICED BY INDEX AGAIN**, leaving a
+duplicated `: '')` that took the whole page down with `Unexpected token ':'`.
+`node --check` on the extracted script catches this in one second and is now
+part of the routine after every build.
+
+⚠ **AND I WROTE A ROW INTO THE REAL ARCHIVE** while testing `--force`. Restored
+from git, verified byte-identical. `snapshot_rankings.py` now honours
+`WVB_HISTORY_OUT` so tests can never touch the one artifact that cannot be
+rebuilt.
+
+**Week 35 is preserved exactly** -- 35 teams, no cutoff back-filled -- and the
+calendar labels it `partial` / `archived` rather than pretending otherwise.
+
+**Guards:** `scripts/test_weekly_calendar.py` (26th suite) -- Sunday final
+included, live/unresolved/stale each block, Monday excluded, the Hawaii case,
+non-D-I cannot block, visible cutoff label, 348-team snapshot with every field,
+no duplicate cutoff, W35 intact, AVCA once-per-stamp, Monday cron present, and
+the community poll reaching nothing. **Four negative controls, all verified to
+trip.**
+
+**State at close:** 26 suites pass with `Cody/` present and 24 with it moved
 aside. Tree is clean apart from the three fixes above. Nothing here changes
 data, ratings, or the crawl -- all three are display-layer only.

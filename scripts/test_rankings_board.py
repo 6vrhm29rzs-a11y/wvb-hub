@@ -51,8 +51,10 @@ def main():
     print("1. EVERY RULER SAYS WHAT IT IS")
     # A rank is meaningless without knowing whose ruler produced it.
     rulers = re.findall(r'<button class="segb[^"]*" data-r="([a-z0-9]+)"', h)
-    check("the primary rulers are the three a voter works in, plus compare",
-          rulers == ["ours", "avca", "digby", "gap"], str(rulers))
+    # Three rulers a voter works in, plus the comparison, plus the archive.
+    # The Reference select stays separate and is checked below.
+    check("the primary rulers are the three a voter works in, plus the tools",
+          rulers == ["ours", "avca", "digby", "gap", "cal"], str(rulers))
     m = re.search(r"const RULER_WHAT = \{(.*?)\n\};", h, re.S)
     check("a purpose map exists", bool(m))
     keys = re.findall(r"^\s*([a-z0-9]+):", m.group(1), re.M) if m else []
