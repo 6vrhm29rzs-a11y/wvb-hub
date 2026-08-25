@@ -2088,13 +2088,55 @@ def check_public_build_can_actually_render():
         bad("the public build is missing a shared renderer", str(missing))
     else:
         ok("every shared renderer survives the public strip")
-    # and the helpers those renderers CALL
-    HELPERS = ("esc", "logo", "dayLabel", "deskPct", "routeFor", "rank")
-    gone = [f for f in HELPERS if ("function %s(" % f) not in ph]
-    if gone:
-        bad("a helper the public renderers call was stripped", str(gone))
+    # ⚠ A HAND-WRITTEN LIST ONLY PROTECTS WHAT I THOUGHT OF. The esc() breakage
+    # was found by opening the page, not by a test, and listing six helpers by
+    # name would not have caught the seventh. This reads the CALL GRAPH instead:
+    # for every function the public build defines, any function it calls that
+    # exists in the PRIVATE build but not the public one is a stripped
+    # dependency -- which is exactly what esc() was.
+    priv_p = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(priv_p):
+        print("  %-58s %s" % ("(no private page -- call-graph check skipped)",
+                              "skip"))
+        return
+
+    def _script(path):
+        doc = open(path, encoding="utf-8").read()
+        blocks = re.findall(r"<script>(.*?)</script>", doc, re.S)
+        return max(blocks, key=len) if blocks else ""
+
+    def _defined(js):
+        n = set(re.findall(r"\bfunction\s+([A-Za-z_$][\w$]*)\s*\(", js))
+        n |= set(re.findall(r"\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=", js))
+        return n
+
+    pjs, ujs = _script(priv_p), _script(pub)
+    ours, pub_def = _defined(pjs), _defined(ujs)
+    # a call the author deliberately guarded is not a missing dependency
+    guarded = set(re.findall(
+        r"typeof\s+([A-Za-z_$][\w$]*)\s*===?\s*['\"]function['\"]", ujs))
+    broken = {}
+    for fn in set(re.findall(r"\bfunction\s+([A-Za-z_$][\w$]*)\s*\(", ujs)):
+        body = ujs[ujs.index("function %s(" % fn):][:6000]
+        # a CALL, not a method: an identifier not preceded by a dot
+        called = set(re.findall(r"(?<![.\w$])([A-Za-z_$][\w$]*)\s*\(", body))
+        gap = sorted(c for c in called
+                     if c in ours and c not in pub_def and c not in guarded)
+        if gap:
+            broken[fn] = gap
+    if broken:
+        first = list(broken.items())[:3]
+        bad("the public build calls a function the strip removed",
+            "; ".join("%s -> %s" % (k, v) for k, v in first))
     else:
-        ok("every helper those renderers call survives too")
+        ok("no public function calls a stripped dependency (%d checked)"
+           % len(pub_def))
+    # POSITIVE CONTROL: the analysis must be able to see a gap at all.
+    if "esc" in ours and "esc" in pub_def:
+        ok("[+] ...and esc(), the one that broke, is present in both")
+    else:
+        bad("esc() is missing from a build", "private=%s public=%s"
+            % ("esc" in ours, "esc" in pub_def))
     # POSITIVE CONTROL: the scan must notice a genuinely absent name.
     if "function definitelyNotAFunction(" in ph:
         bad("the missing-function scan cannot detect an absence", "")
