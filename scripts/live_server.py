@@ -248,6 +248,87 @@ class Cache(object):
 CACHE = Cache()
 
 
+# ------------------------------------------------- one open match's detail
+# ⚠ SEPARATE FROM /api/live ON PURPOSE. The scoreboard poller runs on a timer
+# for every match of the night; this runs ONLY when Cody opens a card, only for
+# that card, and at most once per DETAIL_TTL. A busy Friday costs the upstream
+# exactly what a quiet Monday does.
+def _detail_fetch(gid):
+    return _get("/game/%s/boxscore" % gid)
+
+
+_DETAIL = [None]
+
+
+def _detail_cache():
+    if _DETAIL[0] is None:
+        import live_detail
+        _DETAIL[0] = live_detail.DetailCache(_detail_fetch)
+    return _DETAIL[0]
+
+
+def _live_state(gid):
+    """What the scoreboard poller currently says about this id."""
+    for g in (CACHE.snapshot().get("games") or []):
+        if str(g.get("id")) == str(gid):
+            return g
+    return None
+
+
+def match_detail(gid):
+    """The payload behind /api/match. Never raises; never fabricates."""
+    import live_detail
+
+    row = _live_state(gid)
+    if row is None:
+        # Not on today's or yesterday's scoreboard. We will not go fishing for
+        # arbitrary ids -- that is how a detail endpoint becomes a crawler.
+        return {"ok": False, "id": str(gid), "state": "unknown",
+                "reason": "that match is not on the current scoreboard"}
+
+    state = (row.get("state") or "").lower()
+    base = {
+        "ok": True, "id": str(gid), "state": state,
+        "away": row.get("away"), "home": row.get("home"),
+        "away_sets": row.get("away_sets"), "home_sets": row.get("home_sets"),
+        "period": row.get("period") or "", "sets": row.get("sets") or [],
+        "venue": row.get("venue") or "",
+        "scoreboard_updated": CACHE.snapshot().get("updated"),
+        "source": "official NCAA feed",
+        "stats_available": False, "stats_reason": "", "teams": [],
+        "leaders": [], "stale": False, "age_seconds": 0,
+    }
+
+    # ⚠ A FINAL IS HANDED BACK TO THE VERIFIED PIPELINE, NOT SCRAPED HERE. The
+    # inset says "final" and stops; the result reaches the site through the
+    # existing crawl/refresh path, which is the only thing allowed to write it.
+    if state in ("final", "f", "completed"):
+        base["stats_reason"] = ("final -- the verified result enters the site "
+                                "through the normal refresh, not from here")
+        return base
+
+    if state not in ("live", "in progress", "i"):
+        base["stats_reason"] = "not under way yet"
+        return base
+
+    payload, age, stale, err = _detail_cache().get(gid)
+    base["stale"] = bool(stale)
+    base["age_seconds"] = int(age)
+    if payload is None:
+        base["stats_reason"] = err or "the official box score is not available"
+        return base
+
+    expect = len(row.get("sets") or []) or None
+    teams, leaders, why = live_detail.validate(payload, expect_sets=expect)
+    if teams is None:
+        base["stats_reason"] = why or "the official box score is not usable yet"
+        return base
+    base["stats_available"] = True
+    base["teams"] = teams
+    base["leaders"] = leaders
+    return base
+
+
 # ------------------------------------------------------------------ Digby
 # The chat endpoint. It exists here rather than in the page because the API key
 # must never reach the browser: the page asks this process, this process holds
@@ -454,6 +535,29 @@ class Handler(SimpleHTTPRequestHandler):
                 self._json({"ok": False, "error": str(e)}, 500)
                 return
             self._json({"ok": True, "ballots": rows})
+            return
+        if self.path.split("?")[0] == "/api/match":
+            if not self._is_local():
+                self._json({"ok": False, "reason": "local requests only."}, 403)
+                return
+            try:
+                from urllib.parse import parse_qs, urlparse
+                gid = (parse_qs(urlparse(self.path).query).get("id")
+                       or [""])[0].strip()
+            except Exception:                             # noqa: BLE001
+                gid = ""
+            # An id is digits. Anything else is not a game and is not looked up.
+            if not gid or not gid.isdigit() or len(gid) > 12:
+                self._json({"ok": False, "state": "unknown",
+                            "reason": "a numeric game id is required"}, 400)
+                return
+            try:
+                self._json(match_detail(gid))
+            except Exception as e:                        # noqa: BLE001
+                # Fail soft: the inset shows the live score and says detail is
+                # unavailable. It never shows a traceback or a zero.
+                self._json({"ok": False, "id": gid, "state": "error",
+                            "reason": "detail unavailable: %s" % str(e)[:120]})
             return
         if self.path.split("?")[0] == "/api/live":
             body = json.dumps(CACHE.snapshot()).encode("utf-8")

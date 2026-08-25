@@ -3401,6 +3401,32 @@ b.kres{color:#F2B441}
 .dfcs{font:11px/1 var(--mono);color:var(--ink3,var(--ink2));opacity:.75}
 .dfc.none{color:var(--ink2);font-style:italic}
 .dlive{margin-top:11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.dopen{margin-left:auto;font:600 10px/1 var(--disp);letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink2);background:transparent;
+  border:1px solid var(--line);border-radius:3px;padding:5px 9px;cursor:pointer}
+.dopen:hover{color:var(--ink);border-color:var(--ink2)}
+.lmc{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+.lmc .lhd{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;
+  font:600 10px/1.3 var(--disp);letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink2)}
+.lmc .lhd .ldot{width:6px;height:6px;border-radius:50%;background:#e0553f;
+  display:inline-block}
+.lmc .lnote{margin:7px 0 0;font-size:12.5px;color:var(--ink2);line-height:1.5}
+.lmc table{width:100%;max-width:520px;border-collapse:collapse;margin-top:9px}
+.lmc th,.lmc td{padding-left:10px}
+.lmc th{font:600 9.5px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink3);text-align:right;padding:0 0 6px}
+.lmc th:first-child{text-align:left}
+.lmc td{padding:5px 0;font-size:13px;text-align:right;
+  border-top:1px solid var(--line)}
+.lmc td:first-child{text-align:left;font:600 14px/1.2 var(--disp)}
+.lmc .lmcldr{margin-top:9px;font-size:12.5px;color:var(--ink2);line-height:1.6}
+.lmc .lmcldr b{color:var(--ink);font-weight:600}
+@media (max-width:560px){
+  .lmc th,.lmc td{font-size:12px}
+  .lmc td:first-child{font-size:13px}
+  .dopen{margin-left:0;margin-top:6px}
+}
 .dlv{font:700 9px/1 var(--sans);letter-spacing:.13em;color:#fff;background:var(--live);
   padding:4px 6px;border-radius:3px}
 .dlive b{font:700 16px/1 var(--disp)}
@@ -6127,13 +6153,125 @@ function deskCard(m, live, full) {
       '<span class="dper">' + esc(live.period || '') + '</span>' +
       (sets ? '<div class="dsets">' + sets + '</div>' : '') +
       '<span class="dsrc">scoreboard feed, ' + esc(LIVE_STAMP || 'just now') +
-      ' &mdash; not yet in any rating</span></div>';
+      ' &mdash; not yet in any rating</span>' +
+      '<button class="dopen" data-lmc="' + esc(m.gid) + '">' +
+      (LMC_OPEN[m.gid] ? 'Hide detail' : 'Live detail') + '</button></div>' +
+      (LMC_OPEN[m.gid]
+        ? '<div class="lmc" id="lmc-' + esc(m.gid) + '">' +
+          '<p class="lnote">Loading the official box score&hellip;</p></div>'
+        : '');
   }
 
   return '<article class="' + cls + '">' + head + body +
     (livebox || (isFinal ? deskStory(m) : deskForecast(m))) +
     '<div class="dwhere">' + deskWhere(m) + '</div>' +
     (full ? deskWhy(m) : '') + '</article>';
+}
+
+/* ---- Live Match Center: detail for the ONE card you opened -------------
+   ⚠ LOCAL ONLY, AND HONEST ON A STATIC HOST. /api/match exists only behind
+   live_server.py. On the published page the fetch fails, and the inset says
+   so rather than spinning forever or implying it works.
+   Nothing here reaches POWER, RESUME, records, forecasts or rankings -- it is
+   read, shown, and thrown away. */
+const LMC_OPEN = {};
+const LMC_DATA = {};
+let LMC_TIMER = null;
+
+function lmcNum(v, d) {
+  return (v === null || v === undefined || v === '') ? '&mdash;'
+    : (typeof v === 'number' ? (d === 3 ? v.toFixed(3).replace(/^0/, '')
+                                        : (Math.round(v * 10) / 10)) : esc(v));
+}
+
+function lmcBody(d) {
+  if (!d) {
+    return '<p class="lnote">Loading the official box score&hellip;</p>';
+  }
+  if (d.unreachable) {
+    return '<p class="lnote">Live detail needs the local server ' +
+      '(<code>scripts/live_server.py</code>). This published copy can show the ' +
+      'schedule and finished results, but not live box scores.</p>';
+  }
+  if (!d.ok) {
+    return '<p class="lnote">' + esc(d.reason || 'Detail unavailable.') + '</p>';
+  }
+  /* NB: the set line is NOT repeated here -- the live band directly above the
+     inset already carries it, and printing it twice reads as two sources. */
+  let out = '';
+  if (!d.stats_available) {
+    /* THE EXPECTED PATH until a live match proves otherwise. Say what we have
+       and what we do not; never a zero, never a placeholder. */
+    out += '<p class="lnote">' +
+      (d.state === 'final'
+        ? 'This match is <b>final</b>. '
+        : 'Live score above is from the official scoreboard. ') +
+      'Box-score detail is <b>not available from the official feed</b>' +
+      (d.stats_reason ? ' &mdash; ' + esc(d.stats_reason) : '') + '.</p>';
+    return out;
+  }
+  const t = d.teams || [];
+  out += '<table><thead><tr><th>Team</th><th>K</th><th>E</th><th>TA</th>' +
+    '<th>Hit%</th><th>Digs</th><th>Blk</th><th>Aces</th></tr></thead><tbody>' +
+    t.map(x => '<tr><td>' + esc(x.team || x.team_id) + '</td>' +
+      '<td>' + lmcNum(x.kills) + '</td><td>' + lmcNum(x.attackErrors) + '</td>' +
+      '<td>' + lmcNum(x.attackAttempts) + '</td>' +
+      '<td>' + lmcNum(x.hitpct, 3) + '</td><td>' + lmcNum(x.digs) + '</td>' +
+      '<td>' + lmcNum(x.blocks) + '</td><td>' + lmcNum(x.serviceAces) + '</td>' +
+      '</tr>').join('') + '</tbody></table>';
+  if (d.leaders && d.leaders.length) {
+    out += '<p class="lmcldr">' + d.leaders.map(p =>
+      '<b>' + esc(p.name) + '</b> ' + esc(p.team) + ' &middot; ' +
+      p.kills + 'k' + (p.aces ? ', ' + p.aces + ' ace' + (p.aces > 1 ? 's' : '') : '') +
+      (p.digs ? ', ' + p.digs + ' digs' : '')).join('<br>') + '</p>';
+  }
+  return out;
+}
+
+function lmcRender(gid) {
+  const host = document.getElementById('lmc-' + gid);
+  if (!host) return;
+  const d = LMC_DATA[gid];
+  const stamp = d && d.scoreboard_updated ? d.scoreboard_updated : '';
+  const stale = d && d.stale;
+  host.innerHTML =
+    '<div class="lhd"><span class="ldot"></span>' +
+    (d && d.state === 'final' ? 'Final' : 'Live') +
+    ' &mdash; official NCAA feed' +
+    (stamp ? ' &mdash; refreshed ' + esc(stamp) : '') +
+    (stale ? ' &mdash; <b>stale, retrying</b>' : '') +
+    '<span style="color:var(--ink3)">Not used in ratings until final</span>' +
+    '</div>' + lmcBody(d);
+}
+
+async function lmcFetch(gid) {
+  let d = null;
+  try {
+    const r = await fetch('/api/match?id=' + encodeURIComponent(gid),
+                          { cache: 'no-store' });
+    d = await r.json();
+  } catch (e) {
+    d = { unreachable: true };                 /* static host: say so plainly */
+  }
+  LMC_DATA[gid] = d;
+  lmcRender(gid);
+}
+
+function lmcToggle(gid) {
+  if (LMC_OPEN[gid]) {
+    delete LMC_OPEN[gid];
+    delete LMC_DATA[gid];
+  } else {
+    LMC_OPEN[gid] = true;
+  }
+  renderDesk();
+  if (LMC_OPEN[gid]) lmcFetch(gid);
+  if (!LMC_TIMER) {
+    /* one timer, and it only refreshes cards that are actually open */
+    LMC_TIMER = setInterval(() => {
+      Object.keys(LMC_OPEN).forEach(id => lmcFetch(id));
+    }, 20000);
+  }
 }
 
 let LIVE_STAMP = '';
@@ -6178,7 +6316,21 @@ function renderDesk() {
     soon.length > shown.length
       ? (soon.length - shown.length) + ' more in the next week — the Schedule tab has all of them.'
       : '';
+
+  /* An open inset survives a re-render: renderDesk() rebuilds the cards from
+     scratch every poll, so without this the detail would blink back to
+     "Loading" once a minute while you were reading it. */
+  Object.keys(LMC_OPEN).forEach(id => { if (LMC_DATA[id]) lmcRender(id); });
 }
+
+/* One delegated listener rather than one per card -- the cards are replaced on
+   every poll, and per-card handlers would be re-bound (and leak) each time. */
+document.addEventListener('click', ev => {
+  const b = ev.target.closest ? ev.target.closest('[data-lmc]') : null;
+  if (!b) return;
+  ev.preventDefault();
+  lmcToggle(b.getAttribute('data-lmc'));
+});
 
 /* Live is an UPGRADE, never a requirement. On a static host the fetch fails and
    the desk stays a pregame board rather than an error. */
