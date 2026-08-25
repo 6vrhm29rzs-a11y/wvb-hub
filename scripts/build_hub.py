@@ -1210,6 +1210,51 @@ def standings(teams, res):
         by[c].sort(key=lambda x: (-(x["cw"] - x["cl"]), -(x["w"] - x["l"]), x["rank"]))
     return by
 
+def roster_identity_index():
+    """(team_norm, nkey(name)) -> official identity, from the 2026 rosters.
+
+    ⚠ THE ROSTER IS THE AUTHORITY ON HOW A NAME IS SPELLED AND WHAT YEAR SHE
+    IS. The box-score feed spells the same player differently between matches
+    ("DeLeye" one night, "Deleye" the next); the school's own roster does not.
+    So display spelling and class year come from here, and the FEED only ever
+    supplies counts.
+
+    Returns (index, ambiguous). `ambiguous` holds any team where two DIFFERENT
+    roster players normalise to one key -- two real people the canonical key
+    cannot tell apart. They are deliberately NOT merged and NOT joined; a guard
+    asserts the list is empty so the day it stops being empty is the day
+    somebody looks, rather than the day two players quietly become one.
+    """
+    rosters = ((load("data/raw/%d/rosters_%d.json" % (SEASON, SEASON)) or {})
+               .get("teams", {}) or {})
+    for _t, _r in ((load("data/raw/%d/rosters_recovered_%d.json" % (SEASON, SEASON))
+                    or {}).get("teams", {}) or {}).items():
+        if _r.get("players") and not ((rosters.get(_t) or {}).get("players")):
+            rosters[_t] = _r
+    idx, ambiguous = {}, []
+    for team, rec in rosters.items():
+        tn = team_norm(team)
+        seen = {}
+        for pl in (rec.get("players") or []):
+            nm = (pl.get("name_raw")
+                  or ("%s %s" % (pl.get("first") or "", pl.get("last") or "")).strip())
+            k = nkey(nm)
+            if not k:
+                continue
+            if k in seen and seen[k] != nm:
+                ambiguous.append({"team": team, "key": k,
+                                  "names": sorted({seen[k], nm})})
+                continue
+            seen[k] = nm
+            idx[(tn, k)] = {
+                "display": nm,
+                "class": (pl.get("class_raw") or "").strip() or None,
+                "pos": (pl.get("pos_raw") or "").strip() or None,
+                "num": pl.get("num_raw"),
+            }
+    return idx, ambiguous
+
+
 def box_and_players(res, photos=None, honours=None):
     """Per-match box scores, and a per-player season view with a game log.
 
@@ -1260,6 +1305,8 @@ def box_and_players(res, photos=None, honours=None):
         except (TypeError, ValueError):
             return 0.0
 
+    _roster_ident, _roster_ambiguous = roster_identity_index()
+
     boxes = {}
     players = {}
     for line in open(path):
@@ -1289,16 +1336,28 @@ def box_and_players(res, photos=None, honours=None):
                 "pts": k + num(r.get("aces")) + bs + 0.5 * ba,
             }
             rows.append(row)
-            pk = row["team"] + "|" + nm
+            # ⚠ THE DEFECT THIS REPLACES. The key was the team plus the name AS
+            # THE FEED SPELLED IT, so "Brooklyn DeLeye" and "Brooklyn Deleye"
+            # were two players with one match each -- and the same for Kassie
+            # O'Brien/O'brien and Abby Vander Wal/Vander wal. Measured: 3
+            # duplicate identities across 152 rows. The canonical key is the
+            # team plus nkey(), the lowercase-letters-only convention already
+            # used for photos, honours and the transfer join.
+            _nk = nkey(nm)
+            _ident = _roster_ident.get((team_norm(row["team"]), _nk)) or {}
+            pk = row["team"] + "|" + _nk
             p = players.setdefault(pk, {
-                "name": nm, "team": row["team"], "pos": row["pos"],
+                # official roster spelling wins; the feed only supplies counts
+                "name": _ident.get("display") or nm,
+                "nkey": _nk,
+                "class": _ident.get("class"),
+                "team": row["team"],
+                "pos": row["pos"] or _ident.get("pos") or "",
                 "num": row["num"], "games": [],
                 # Her own headshot, so the player panel and the Players table
                 # show the same face as the roster and the stats page.
-                "photo": ((photos or {}).get(row["team"]) or {}).get(
-                    re.sub(r"[^a-z]", "", (nm or "").lower())),
-                "aa": (honours or {}).get("%s|%s" % (
-                    row["team"], re.sub(r"[^a-z]", "", (nm or "").lower()))),
+                "photo": ((photos or {}).get(row["team"]) or {}).get(_nk),
+                "aa": (honours or {}).get("%s|%s" % (row["team"], _nk)),
                 "sets": 0.0, "k": 0.0, "e": 0.0, "ta": 0.0,
                 "aces": 0.0, "digs": 0.0, "bs": 0.0, "ba": 0.0,
                 "ast": 0.0, "pts": 0.0,
@@ -1330,7 +1389,16 @@ def box_and_players(res, photos=None, honours=None):
         if _di and p.get("team") and p["team"] not in _di:
             continue
         s_ = p["sets"] or 1
-        p["games"].sort(key=lambda g: (g["d"] or ""), reverse=True)
+        # ⚠ ONE ROW PER GAME. Two spellings of one player in the SAME match
+        # would otherwise contribute the same game id twice; keeping the richer
+        # line (more sets) rather than whichever arrived last.
+        _byg = {}
+        for _g in p["games"]:
+            _prev = _byg.get(_g["gid"])
+            if _prev is None or (_g.get("sets") or 0) > (_prev.get("sets") or 0):
+                _byg[_g["gid"]] = _g
+        p["games"] = sorted(_byg.values(), key=lambda g: (g["d"] or ""),
+                            reverse=True)
         out.append(dict(p,
                         kps=round(p["k"] / s_, 2),
                         pps=round(p["pts"] / s_, 2),
@@ -2440,9 +2508,22 @@ def build():
     # ONE BASIS; the 2026 archive holds a preseason week and a digby week, so
     # 0 of 348 are drawable. That is the correct answer rather than a gap, and
     # it turns itself on with no code change once the archive earns it.
+    # ⚠ THE FRAMEWORK STAYS; THE 348 IDENTICAL "UNAVAILABLE" BLOCKS DO NOT.
+    # Refusing to draw a misleading chart was right. Printing that refusal on
+    # every team page was not: it added a module-sized block of copy to 348
+    # pages to say nothing, which is decoration made of an apology. A team gets
+    # the component only when it has a real same-basis series; the fact that
+    # none do yet is stated ONCE, on the Rankings tab, where a reader is
+    # already thinking about ranking history.
     _trends = {}
+    _trend_ready = 0
     for _t in teams:
-        _trends[_t["team"]] = TREND.trend_html(SEASON, _t["team"], "POWER")
+        _pts, _why = TREND.usable(TREND.series(TREND.load_history(SEASON),
+                                               _t["team"]))
+        if _pts:
+            _trends[_t["team"]] = TREND.trend_html(SEASON, _t["team"], "POWER")
+            _trend_ready += 1
+    _trend_note = TREND.history_note(SEASON)
 
     _pr = dict((t["team"], t["rank26"]) for t in teams if t.get("rank26"))
     _av = dict((t["team"], t.get("avca")) for t in teams if t.get("avca"))
@@ -2662,6 +2743,7 @@ def build():
         .replace("{{ICON_UNAVAIL}}", ICONS.icon("unavailable")) \
         .replace("{{TREND_CSS}}", TREND.CSS) \
         .replace("{{TREND_JSON}}", json.dumps(_trends)) \
+        .replace("{{TREND_NOTE}}", _trend_note) \
         .replace("{{DIGBY_BRIEF}}", DIGBY_ART.digby_svg("briefing", 76)) \
         .replace("{{DIGBY_CLIP}}", "" if PUBLIC
                  else DIGBY_ART.digby_svg("clipboard", 76)) \
@@ -3137,7 +3219,10 @@ td.pick b{color:var(--navy)}
 @media (max-width:560px){
   /* NAV: one scrolling row. Wrapping to three rows pushes every page's content
      below the fold before it has said anything. */
-  nav .inner{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;
+  /* ⚠ NO HORIZONTAL TAB STRIP ON A PHONE. Twelve tabs had to scroll sideways,
+     which hid destinations behind a gesture with no affordance. Five plus More
+     wrap onto two short rows and every destination is visible at once. */
+  nav .inner{flex-wrap:wrap;overflow-x:visible;scrollbar-width:none;
     -webkit-overflow-scrolling:touch;padding:0 6px}
   nav .inner::-webkit-scrollbar{display:none}
   nav button{flex:0 0 auto;white-space:nowrap}
@@ -3549,8 +3634,10 @@ b.kres{color:#F2B441}
 /* the panel itself is the page, not a card sitting on it */
 #teamcard>div{border-radius:0}
 #teamcard .tcols{border-top:1px solid var(--line);padding-top:4px}
-#teamcard .thead .lg{font:700 42px/.94 var(--disp);letter-spacing:-.012em;
-  color:var(--chalk);text-transform:uppercase}
+#teamcard .thead h2{font:700 42px/.94 var(--disp);letter-spacing:-.012em;
+  color:var(--chalk);text-transform:uppercase;display:flex;align-items:center;
+  gap:12px;margin:0}
+#teamcard .thead h2 .lg{width:44px;height:44px;flex:none}
 #teamcard .thead .sub{font:12.5px/1.6 var(--sans);color:var(--slate)}
 /* the three rulers sit on one quiet line; the tier labels name them */
 #teamcard .chiptiers{margin-top:12px}
@@ -3623,6 +3710,70 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
   border:1px solid var(--line2);border-radius:2px;padding:4px 6px}
 @media (max-width:560px){.mstory{gap:9px 16px}.mstory .msv{font-size:13.5px}}
 {{ICON_CSS}}{{TREND_CSS}}
+/* ⚠ A DETAIL IS A PAGE, NOT A HIGHLIGHTED ROW ABOVE THE WHOLE DIRECTORY. The
+   full 149-row table used to sit directly under an exact player profile,
+   competing with it and repeating it. */
+#v-players.detail-open #ptable{display:none}
+#v-players.detail-open .pdirhint{display:block}
+.pdirhint{display:none;margin:16px 0 0;font-size:12.5px;color:var(--slate)}
+.linkbtn{appearance:none;border:0;background:none;color:var(--navy);
+  cursor:pointer;font:inherit;padding:0;text-decoration:underline}
+.statline{display:flex;flex-wrap:wrap;align-items:baseline;gap:7px;
+  font:var(--mono);margin:2px 0 6px}
+.statline .sv{font:600 15px/1 var(--mono);color:var(--chalk)}
+.statline .sl{font:600 9.5px/1 var(--disp);letter-spacing:.12em;color:var(--slate)}
+.statline .sd{color:var(--line2);font-style:normal;margin:0 3px}
+@media (max-width:560px){.statline .sv{font-size:14px}}
+
+/* ⚠ THE MATCH LOG RAN OFF A 390px PHONE. .gline is a flex row of date,
+   opponent, a long stat string and the result; with nothing allowed to wrap it
+   measured 431-570px inside a 370px column and clipped, with no scrollbar to
+   say so. The stat string wraps now and the row reflows. */
+@media (max-width:560px){
+  .gline{flex-wrap:wrap;row-gap:3px}
+  .gline .ss{flex:1 1 100%;min-width:0;white-space:normal}
+  .gline .dt{min-width:0}
+}
+
+/* ── THE MORE MENU ────────────────────────────────────────────────────────
+   Everything the twelve-tab strip could reach, one keystroke away. It is a
+   real menu: Escape closes it, arrow keys move through it, focus returns to
+   the button, and it is reachable by keyboard on a phone. */
+.moreWrap{position:relative;display:inline-block}
+.morebtn{appearance:none;background:transparent;border:0;color:var(--slate);
+  font:600 12px/1 var(--disp);letter-spacing:.12em;text-transform:uppercase;
+  padding:15px 13px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;
+  border-bottom:3px solid transparent}
+.morebtn:hover,.morebtn[aria-expanded=true]{color:var(--ink)}
+.moremenu{position:absolute;top:100%;right:0;z-index:20;min-width:206px;
+  background:var(--chrome2);border:1px solid var(--line2);border-radius:4px;
+  padding:5px;box-shadow:0 18px 40px -18px rgba(0,0,0,.85)}
+.moremenu button{display:block;width:100%;text-align:left;appearance:none;
+  background:transparent;border:0;color:var(--ink2);font:600 13px/1 var(--sans);
+  padding:10px 11px;border-radius:3px;cursor:pointer}
+.moremenu button:hover,.moremenu button:focus-visible{background:var(--sheet2);
+  color:var(--chalk)}
+.moremenu button[aria-current=page]{color:var(--gold)}
+@media (max-width:560px){
+  .moremenu{right:auto;left:0;min-width:min(74vw,240px)}
+}
+/* ── BREADCRUMB AND RETURN PATH ───────────────────────────────────────────
+   ⚠ THE ONLY ESCAPE USED TO BE "CLICK A TOP TAB AND HOPE". A detail page now
+   says where it came from and offers the way back. */
+.crumb{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 12px;
+  font:12px/1.4 var(--sans);color:var(--slate)}
+.crumb a{color:var(--ink2);text-decoration:none;border-bottom:1px solid var(--line2)}
+.crumb a:hover{color:var(--chalk);border-bottom-color:var(--navy)}
+.crumb .sep{opacity:.5}
+.crumb b{color:var(--chalk);font-weight:600}
+.backlink{display:inline-flex;align-items:center;gap:6px;appearance:none;
+  background:transparent;border:1px solid var(--line2);border-radius:3px;
+  color:var(--ink2);font:600 11.5px/1 var(--sans);padding:7px 10px;cursor:pointer;
+  margin-bottom:14px}
+.backlink:hover{color:var(--chalk);border-color:var(--navy)}
+.parentlink{color:inherit;text-decoration:none;border-bottom:1px solid transparent}
+.parentlink:hover{border-bottom-color:var(--navy)}
+
 /* ── THE RALLY LINE ───────────────────────────────────────────────────────
    The single signature: a 1px court line that marks THE ACTIVE THING. It is a
    connection cue, never decoration, so it appears on exactly three surfaces --
@@ -4608,25 +4759,30 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <div class="net"></div>
   </header>
   <nav role="tablist"><div class="inner">
-    <!-- ⚠ ORDER IS THE HIERARCHY. The brief's question is "what deserves my
-         attention, what evidence, what do I think" -- so the desk, the two
-         rankings and the ballot lead, and the archive sits after a rule. A row
-         of twelve equal tabs answers none of those. -->
+    <!-- ⚠ FIVE DESTINATIONS, NOT TWELVE. A flat strip of twelve makes every
+         page a sibling of every other, which is why the hub read as a pile of
+         pages. These five are the daily job -- follow the day, check a
+         ranking, research a team, keep the ballot. The reference tools keep
+         every capability they had; they move behind More. -->
     <button role="tab" aria-selected="true" data-v="desk" class="pri">Match Desk</button>
     <button role="tab" aria-selected="false" data-v="scores" class="pri">Scores</button>
-    <button role="tab" aria-selected="false" data-v="top25" class="pri">Digby&rsquo;s Top 25</button>
     <button role="tab" aria-selected="false" data-v="rankings" class="pri">Rankings</button>
+    <button role="tab" aria-selected="false" data-v="teams" class="pri">Teams</button>
     <!-- PRIVATE. Cody's own weekly VolleyTalk ballot, not a ranking this site
          publishes. Stripped from the public build. -->
-    <button role="tab" aria-selected="false" data-v="ballot" class="pri">Ballot Workshop</button>
-    <span class="navdiv" aria-hidden="true"></span>
-    <button role="tab" aria-selected="false" data-v="teams">Teams</button>
-    <button role="tab" aria-selected="false" data-v="leaders">Stats</button>
-    <button role="tab" aria-selected="false" data-v="players">Players</button>
-    <button role="tab" aria-selected="false" data-v="standings">Standings</button>
-    <button role="tab" aria-selected="false" data-v="bracket">Projected bracket</button>
-    <button role="tab" aria-selected="false" data-v="schedule">Schedule</button>
-    <button role="tab" aria-selected="false" data-v="tv">On TV</button>
+    <button role="tab" aria-selected="false" data-v="ballot" class="pri">My Ballot</button>
+    <div class="moreWrap">
+      <button type="button" class="morebtn" id="morebtn" aria-haspopup="true"
+        aria-expanded="false" aria-controls="moremenu">More<span aria-hidden="true">&#9662;</span></button>
+      <div class="moremenu" id="moremenu" role="menu" aria-labelledby="morebtn" hidden>
+        <button role="menuitem" data-v="leaders">Stats</button>
+        <button role="menuitem" data-v="players">Players</button>
+        <button role="menuitem" data-v="standings">Standings</button>
+        <button role="menuitem" data-v="bracket">Projected bracket</button>
+        <button role="menuitem" data-v="schedule">Schedule</button>
+        <button role="menuitem" data-v="tv">On TV</button>
+      </div>
+    </div>
   </div></nav>
 
 <main>
@@ -4826,7 +4982,8 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 
 <section id="v-rankings" hidden>
   <div class="seg" role="tablist" aria-label="Which ranking">
-    <button class="segb on" data-r="ours">Our 2026</button>
+    <button class="segb on" data-r="ours">POWER</button>
+    <button class="segb" data-r="digby">Digby&rsquo;s Top 25</button>
     <button class="segb" data-r="avca">AVCA poll</button>
     <button class="segb" data-r="top16">Committee top 16</button>
     <button class="segb" data-r="rpi">NCAA RPI</button>
@@ -4836,6 +4993,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
        this tab -- in the group header above the columns, in RANK_BASIS, and
        again here. Repeating a caveat does not make it more believed; it makes
        the page read as anxious. The group row carries it now. -->
+  <p class="histnote">{{TREND_NOTE}}</p>
   <p class="lead" id="ranklead">{{RANK_BASIS}}
   <span class="leadhint">Click a team to see the six players the number is built
   from.</span></p>
@@ -5118,6 +5276,8 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <th>Digs</th><th>Blk</th><th>Aces</th>
       <th>Pts/set</th></tr></thead>
     <tbody id="pbody"></tbody></table></div></div>
+  <p class="pdirhint">Showing one player. <button type="button" class="linkbtn"
+    id="pbackdir">Back to the full directory</button></p>
 </section>
 
 <section id="v-bracket" hidden>
@@ -5215,33 +5375,195 @@ addEventListener('resize', moveNavBar);
 addEventListener('load', moveNavBar);
 document.fonts && document.fonts.ready.then(moveNavBar);   /* the face changes the widths */
 
-document.querySelectorAll('nav button').forEach(b => b.addEventListener('click', () => {
-  document.querySelectorAll('nav button').forEach(x => x.setAttribute('aria-selected', x === b));
+/* ── THE MORE MENU ────────────────────────────────────────────────────────
+   A real menu, not a hover popover: Escape closes it and returns focus, the
+   arrow keys walk it, and a click anywhere else dismisses it. */
+function closeMore() {
+  const m = document.getElementById('moremenu'), b = document.getElementById('morebtn');
+  if (!m || m.hidden) return;
+  m.hidden = true; b.setAttribute('aria-expanded', 'false');
+}
+function openMore() {
+  const m = document.getElementById('moremenu'), b = document.getElementById('morebtn');
+  if (!m) return;
+  m.hidden = false; b.setAttribute('aria-expanded', 'true');
+  const f = m.querySelector('button'); if (f) f.focus();
+}
+(function wireMore() {
+  const m = document.getElementById('moremenu'), b = document.getElementById('morebtn');
+  if (!m || !b) return;
+  b.addEventListener('click', e => {
+    e.stopPropagation();
+    m.hidden ? openMore() : closeMore();
+  });
+  m.addEventListener('keydown', e => {
+    const items = [...m.querySelectorAll('button')];
+    const i = items.indexOf(document.activeElement);
+    if (e.key === 'Escape') { e.preventDefault(); closeMore(); b.focus(); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+    else if (e.key === 'Home') { e.preventDefault(); items[0].focus(); }
+    else if (e.key === 'End') { e.preventDefault(); items[items.length - 1].focus(); }
+  });
+  b.addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); openMore(); }
+  });
+  document.addEventListener('click', e => {
+    if (!m.hidden && !m.contains(e.target) && e.target !== b) closeMore();
+  });
+})();
+
+/* ── THE ROUTER ───────────────────────────────────────────────────────────
+   A hash router, because this page is served from a file:// path, a localhost
+   static server AND GitHub Pages, none of which can be asked to rewrite URLs.
+   ⚠ ONE HANDLER FOR EVERY NAVIGATION. Primary nav, the More menu, a ranking
+   row, a roster row, a stats row and the player search all call go(); nothing
+   flips a section's hidden attribute on its own any more. That is what makes
+   Back, Forward and a direct refresh land in the same place as a click.  */
+const ROUTE_OF_VIEW = { desk:'match-desk', scores:'scores', rankings:'rankings',
+  teams:'teams', ballot:'ballot', leaders:'stats', players:'players',
+  standings:'standings', bracket:'bracket', schedule:'schedule', tv:'tv' };
+const VIEW_OF_ROUTE = Object.keys(ROUTE_OF_VIEW)
+  .reduce((a,k)=>{a[ROUTE_OF_VIEW[k]]=k;return a;},{});
+
+function slug(s) {
+  return (s || '').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+}
+function unslugTeam(sl) {
+  return Object.keys(TEAMS).find(t => slug(t) === sl) || null;
+}
+function playerBySlug(teamSlug, personSlug) {
+  return PLAYERS.find(p => slug(p.team) === teamSlug && slug(p.name) === personSlug) || null;
+}
+function routeFor(view, rest) {
+  return '#/' + (ROUTE_OF_VIEW[view] || 'match-desk') + (rest ? '/' + rest : '');
+}
+/* navigate: push a hash and let the single handler do the work */
+function go(hash, replace) {
+  if (('#' + (location.hash || '').replace(/^#/,'')) === hash) { route(); return; }
+  if (replace) location.replace(hash); else location.hash = hash;
+}
+
+let ROUTE_ORIGIN = null;   // where a detail page was opened from
+
+function showView(view) {
+  document.querySelectorAll('nav button[role=tab]').forEach(x =>
+    x.setAttribute('aria-selected', x.dataset.v === view));
+  document.querySelectorAll('#moremenu button').forEach(x =>
+    x.setAttribute('aria-current', x.dataset.v === view ? 'page' : 'false'));
+  /* the More button reads as active when one of its own is showing */
+  const mb = document.getElementById('morebtn');
+  if (mb) mb.classList.toggle('on', !!document.querySelector(
+    '#moremenu button[aria-current=page]'));
   moveNavBar();
   document.querySelectorAll('main section').forEach(s => { s.hidden = true; });
-  $('#v-' + b.dataset.v).hidden = false;
-  /* The bracket redraws itself when it becomes visible -- see the observer
-     below. Hooking the tab click was a proxy for that and kept missing. */
-  /* The Teams tab used to open COMPLETELY BLANK -- a lone "Type a team" box,
-     with no indication that anything lived here or which names it would accept.
-     Land on the top-ranked team so the tab is never empty; a real selection is
-     never overwritten. */
-  if (b.dataset.v === 'teams' && !document.querySelector('#teamcard .thead')) {
-    const first = Object.keys(TEAMS)
-      .filter(k => TEAMS[k] && TEAMS[k].rank)
-      .sort((x, y) => TEAMS[x].rank - TEAMS[y].rank)[0];
-    if (first) showTeam(first);
-  }
-  /* Back to the top of the new tab.
-     Since the nav became sticky you can switch tabs from anywhere on a very
-     long page, and the scroll position carried over -- so Rankings opened with
-     its first rows tucked under the sticky nav AND the sticky table header,
-     and the #1 team was simply not on screen. Reported as "Nebraska fell off
-     the rankings". Only scrolls up: if the user is already at the top this is
-     a no-op and does not fight them. */
-  if (window.scrollY > 0) window.scrollTo({top: 0, behavior: 'auto'});
-}));
+  const el = $('#v-' + view);
+  if (el) el.hidden = false;
+  return el;
+}
 
+function route() {
+  const raw = (location.hash || '').replace(/^#\/?/, '');
+  const q = raw.split('?');
+  const parts = q[0].split('/').filter(Boolean);
+  const params = new URLSearchParams(q[1] || '');
+  const view = VIEW_OF_ROUTE[parts[0]] || 'desk';
+  ROUTE_ORIGIN = params.get('from') || null;
+  showView(view);
+
+  if (view === 'rankings') {
+    const want = parts[1] === 'power' ? 'ours' : (parts[1] || 'ours');
+    const b = document.querySelector('#v-rankings .segb[data-r="' +
+      CSS.escape(want) + '"]');
+    if (b) renderPoll(want);
+  }
+  if (view === 'teams') {
+    const t = parts[1] ? unslugTeam(parts[1]) : null;
+    if (t) {
+      showTeam(t);
+    } else if (!document.querySelector('#teamcard .thead')) {
+      /* The Teams tab used to open COMPLETELY BLANK -- a lone "Type a team"
+         box with no sign of what lived here. Land on the top-ranked team; a
+         real selection is never overwritten. Moved off the tab-click handler
+         so a direct #/teams load and a Back both get it too. */
+      const first = Object.keys(TEAMS).filter(k => TEAMS[k] && TEAMS[k].rank)
+        .sort((x, y) => TEAMS[x].rank - TEAMS[y].rank)[0];
+      if (first) showTeam(first);
+    }
+  }
+  if (view === 'leaders' && parts[1]) {
+    const b = document.querySelector('#v-leaders .segb[data-ls="' +
+      (parts[1] === 'teams' ? 'team' : 'player') + '"]');
+    if (b) b.click();
+  }
+  if (view === 'players' && parts[1] && parts[2]) {
+    const pl = playerBySlug(parts[1], parts[2]);
+    if (pl) { renderPlayerDetail(pl); }
+  } else if (view === 'players') {
+    const card = document.getElementById('playercard');
+    if (card) card.innerHTML = '';
+    const sec = document.getElementById('v-players');
+    if (sec) sec.classList.remove('detail-open');
+  }
+  renderCrumbs(view, parts);
+  /* a NEW destination starts at the top; Back is left to the browser, which
+     restores the scroll position it recorded for that entry */
+  if (!ROUTE_POP) window.scrollTo({ top: 0 });
+  ROUTE_POP = false;
+}
+let ROUTE_POP = false;
+addEventListener('hashchange', () => { route(); });
+addEventListener('popstate', () => { ROUTE_POP = true; });
+
+function renderCrumbs(view, parts) {
+  document.querySelectorAll('.crumb,.backlink').forEach(n => n.remove());
+  if (view === 'players' && parts[1] && parts[2]) {
+    const pl = playerBySlug(parts[1], parts[2]);
+    if (!pl) return;
+    const host = document.getElementById('playercard');
+    if (!host) return;
+    let trail, back;
+    if (ROUTE_ORIGIN === 'teams') {
+      trail = '<a href="' + routeFor('teams') + '">Teams</a><span class="sep">&rsaquo;</span>' +
+        '<a href="' + routeFor('teams', slug(pl.team)) + '">' + esc(pl.team) + '</a>' +
+        '<span class="sep">&rsaquo;</span><b>' + esc(pl.name) + '</b>';
+      back = ['&larr; Back to ' + esc(pl.team), routeFor('teams', slug(pl.team))];
+    } else if (ROUTE_ORIGIN === 'stats') {
+      trail = '<a href="' + routeFor('leaders', 'players') + '">Stats</a>' +
+        '<span class="sep">&rsaquo;</span><b>' + esc(pl.name) + '</b>';
+      back = ['&larr; Back to Stats', routeFor('leaders', 'players')];
+    } else {
+      trail = '<a href="' + routeFor('players') + '">Players</a>' +
+        '<span class="sep">&rsaquo;</span><b>' + esc(pl.name) + '</b>';
+      back = ['&larr; Back to Players', routeFor('players')];
+    }
+    const bar = document.createElement('div');
+    bar.className = 'crumb';
+    bar.innerHTML = trail;
+    host.parentNode.insertBefore(bar, host);
+    const bb = document.createElement('button');
+    bb.type = 'button'; bb.className = 'backlink'; bb.innerHTML = back[0];
+    bb.addEventListener('click', () => go(back[1]));
+    host.parentNode.insertBefore(bb, host);
+  }
+  if (view === 'teams' && parts[1]) {
+    const t = unslugTeam(parts[1]);
+    const host = document.getElementById('teamcard');
+    if (!t || !host) return;
+    const bar = document.createElement('div');
+    bar.className = 'crumb';
+    bar.innerHTML = '<a href="' + routeFor('teams') + '">Teams</a>' +
+      '<span class="sep">&rsaquo;</span><b>' + esc(t) + '</b>';
+    host.parentNode.insertBefore(bar, host);
+  }
+}
+
+document.querySelectorAll('nav button[role=tab], #moremenu button').forEach(b =>
+  b.addEventListener('click', () => {
+  closeMore();
+  go(routeFor(b.dataset.v));
+  return;
+}));
 /* rankings */
 const cs = $('#conf');
 CONFS.forEach(c => { const o = document.createElement('option'); o.value = o.textContent = c; cs.appendChild(o); });
@@ -5273,9 +5595,8 @@ if (t25body) t25body.addEventListener('click', e => {
   const tr = e.target.closest('tr[data-team]'); if (!tr) return;
   const nm = tr.dataset.team;
   if (!TEAMS[nm]) return;
-  document.querySelector('nav button[data-v="teams"]').click();
   const q = document.getElementById('tmq'); if (q) q.value = nm;
-  showTeam(nm);
+  go(routeFor('teams', slug(nm)));
 });
 ['q', 'conf', 'top'].forEach(id => $('#' + id).addEventListener('input', renderRank));
 renderRank();
@@ -5733,9 +6054,43 @@ function renderPlayers() {
     '<td class="n">' + p.digs + '</td><td class="n">' + (p.bs + p.ba * 0.5) + '</td>' +
     '<td class="n">' + (p.aces || 0) + '</td>' +
     hcell(p.pps, p.pps.toFixed(2), plo, phi, 'high', 'seq') + '</tr>').join('');
-  document.getElementById('pcnt').textContent = rows.length + ' players';
+  document.getElementById('pcnt').textContent =
+    rows.length + (rows.length === 1 ? ' matching player' : ' matching players');
   if (rows.length === 1) showPlayer(rows[0]);
 }
+/* The router's entry point for a player. showPlayer() paints the card; this
+   also makes the DIRECTORY TABLE stop competing with an exact selection --
+   a detail page is a page, not a highlighted row above the full list. */
+/* 13 K · 11 E · 42 ATT · .048 HIT · 6 DIG · 3 ACE · 16.0 PTS
+   Abbreviations a box score already uses, so nothing has to be learned. A
+   value we do not have renders as an em dash and keeps its label. */
+function statLine(p) {
+  const n = v => (v === null || v === undefined) ? '&mdash;'
+    : (Math.round(v * 10) % 10 === 0 ? String(Math.round(v)) : v.toFixed(1));
+  const bits = [
+    [n(p.k), 'K'], [n(p.e), 'E'], [n(p.ta), 'ATT'],
+    [p.hit === null || p.hit === undefined ? '&mdash;' : pct(p.hit), 'HIT'],
+    [n(p.digs), 'DIG'], [n(p.aces), 'ACE'],
+    [(p.pts === null || p.pts === undefined) ? '&mdash;' : p.pts.toFixed(1), 'PTS']
+  ];
+  return bits.map(b => '<span class="sv">' + b[0] +
+    '</span><span class="sl">' + b[1] + '</span>').join('<i class="sd">·</i>');
+}
+
+(function wirePlayerDir() {
+  const b = document.getElementById('pbackdir');
+  if (b) b.addEventListener('click', () => go(routeFor('players')));
+})();
+
+function renderPlayerDetail(p) {
+  showPlayer(p);
+  const sec = document.getElementById('v-players');
+  if (sec) sec.classList.add('detail-open');
+  const q = document.getElementById('pq');
+  if (q && q.value.trim() === '') { q.value = p.name; }
+  renderPlayers && renderPlayers();
+}
+
 function showPlayer(p) {
   const face = p.photo
     ? '<img class="phero" src="' + p.photo + '" alt="" ' +
@@ -5743,10 +6098,24 @@ function showPlayer(p) {
       '.createContextualFragment(this.dataset.fb))" data-fb=\'' +
       avatar(p.pos, p.team, 72) + '\'>'
     : avatar(p.pos, p.team, 72);
+  /* ⚠ THE TEAM IS A LINK, NOT A LABEL. A player belongs to a team and the
+     crest is the obvious way back to it -- the page used to print the team as
+     dead text and leave the top nav as the only escape.
+     Subtitle order is team, official class, position, number: the class year
+     comes from the school's own roster, so it is stated before anything the
+     box-score feed supplied. A field we do not have is omitted, never zeroed. */
+  const teamHref = routeFor('teams', slug(p.team));
+  const sub = [
+    '<a class="parentlink" href="' + teamHref + '">' + esc(p.team) + '</a>',
+    p['class'] ? esc(p['class']) : null,
+    p.pos ? esc(p.pos) : null,
+    p.num ? '#' + esc(String(p.num)) : null
+  ].filter(Boolean).join(' · ');
   document.getElementById('playercard').innerHTML =
-    '<div class="thead phead">' + face + '<div><h2>' + logo(p.team, 'lg') + p.name + '</h2>' +
-    '<div class="sub">' + p.team + (p.pos ? ' · ' + p.pos : '') +
-      (p.num ? ' · #' + p.num : '') + '</div>' +
+    '<div class="thead phead">' + face + '<div><h2>' +
+      '<a class="parentlink" href="' + teamHref + '" aria-label="Back to ' +
+      esc(p.team) + '">' + logo(p.team, 'lg') + '</a>' + esc(p.name) + '</h2>' +
+    '<div class="sub">' + sub + '</div>' +
     '<div class="chips">' +
       '<span class="chip ours">Pts/set <b>' + p.pps.toFixed(2) + '</b></span>' +
       '<span class="chip">Kills/set <b>' + p.kps.toFixed(2) + '</b></span>' +
@@ -5754,6 +6123,14 @@ function showPlayer(p) {
       '<span class="chip">Digs/set <b>' + p.dps.toFixed(2) + '</b></span>' +
       '<span class="chip">Sets <b>' + p.sets + '</b></span>' +
     '</div></div></div>' +
+    /* ⚠ TOTALS AND THE MATCH LOG ARE DIFFERENT THINGS AND NOW SAY SO. The
+       card ran season rates straight into a per-match table with no heading
+       between them, so a reader could take either row for the other. */
+    '<div class="tsec"><h3>2026 season</h3><div class="body">' +
+      '<div class="statline">' + statLine(p) + '</div>' +
+      '<div class="tnote">Totals across ' + p.games.length +
+      (p.games.length === 1 ? ' match' : ' matches') + ' this season.</div>' +
+    '</div></div>' +
     (p.aa && p.aa.length
       ? '<div class="tsec"><h3>AVCA honours</h3><div class="body">' +
         p.aa.map(x => '<div class="plrow"><span class="nm">' + x.honour +
@@ -5779,10 +6156,10 @@ function showPlayer(p) {
     '</div></div>';
 }
 document.getElementById('pbody').addEventListener('click', e => {
-  const tr = e.target.closest('.prow'); if (!tr) return;
-  const [team, name] = tr.dataset.k.split('|');
-  const p = PLAYERS.find(x => x.team === team && x.name === name);
-  if (p) { showPlayer(p); document.getElementById('playercard').scrollIntoView({block:'start'}); }
+  const tr = e.target.closest('.prow'); if (!tr || !tr.dataset.k) return;
+  const parts = tr.dataset.k.split('|');
+  /* routed, so Back returns to the directory and a refresh keeps the player */
+  openPlayer(parts[1], parts[0], 'players');
 });
 document.getElementById('pq').addEventListener('input', renderPlayers);
 renderPlayers();
@@ -7113,6 +7490,10 @@ async function deskLive() {
 
 renderStandings();
 renderWeek();
+/* ⚠ BOOT THROUGH THE ROUTER, so a direct #/teams/kentucky load lands exactly
+   where a click would. An empty hash normalises to the desk. */
+if (!location.hash) { history.replaceState(null, '', routeFor('desk')); }
+route();
 
 /* ---- date navigation on the scores tab --------------------------------- */
 const sdate = document.getElementById('sdate');
@@ -7281,6 +7662,18 @@ function renderPoll(which) {
   const lead = document.getElementById('ranklead');
   document.querySelectorAll('#v-rankings .segb').forEach(b =>
     b.classList.toggle('on', b.dataset.r === which));
+  /* ⚠ DIGBY'S TOP 25 IS A RANKING, SO IT LIVES WITH THE RANKINGS. As a
+     top-level tab it competed with Rankings for the same job and a reader had
+     to know which of two destinations answered "who is best". The section is
+     moved into this tab at load and shown as one of its views. */
+  const t25 = document.getElementById('v-top25');
+  if (t25 && t25.parentNode !== document.getElementById('v-rankings')) {
+    document.getElementById('v-rankings').appendChild(t25);
+  }
+  if (t25) t25.hidden = (which !== 'digby');
+  if (which === 'digby') {
+    host.hidden = true; main.hidden = true; lead.hidden = true; return;
+  }
   if (which === 'ours') {
     host.hidden = true; main.hidden = false; lead.hidden = false; return;
   }
@@ -7324,7 +7717,12 @@ function renderPoll(which) {
     'This is a reference ranking &mdash; nothing here feeds our model.</p></div></div>';
 }
 document.querySelectorAll('#v-rankings .segb').forEach(b =>
-  b.addEventListener('click', () => renderPoll(b.dataset.r)));
+  b.addEventListener('click', () => {
+    renderPoll(b.dataset.r);
+    const want = routeFor('rankings', b.dataset.r === 'ours' ? 'power'
+                                                        : b.dataset.r);
+    if (location.hash !== want) history.replaceState(null, '', want);
+  }));
 
 /* t IN [0,1] FOR THE VALUE SCALE. The renderers compute only this number;
    what green is, how wide the bar runs and how it eases in all live in one CSS
@@ -7456,14 +7854,16 @@ function renderLeaders() {
   const vs = rows.map(r => k === 'hit' ? r.hit : r[k]);
   const lo = Math.min.apply(null, vs), hi = Math.max.apply(null, vs);
   document.getElementById('lbody').innerHTML = rows.map((r, i) =>
-    '<tr class="prow" data-p="' + i + '"><td class="rk">' + (i + 1) + '</td>' +
+    '<tr class="prow" data-p="' + i + '" data-k="' +
+      esc(r.team + '|' + r.name) + '"><td class="rk">' + (i + 1) + '</td>' +
     '<td class="tm">' + playerCell(r, 34) + '</td>' +
     '<td class="cf">' + logo(r.team) + r.team + '</td>' +
     '<td class="n">' + r.sets + '</td>' +
     hcell(k === 'hit' ? r.hit : r[k],
           k === 'hit' ? r.hit.toFixed(3) : r[k].toFixed(2),
           lo, hi, 'high', 'seq') + '</tr>').join('');
-  document.getElementById('lcnt').textContent = rows.length + ' players';
+  document.getElementById('lcnt').textContent =
+    rows.length + (rows.length === 1 ? ' player' : ' players');
 }
 /* TEAM STATS, the other half of the Stats tab. Same box scores as the player
    numbers, so the two agree by construction. "Allowed" is the identical count
@@ -7535,28 +7935,28 @@ document.querySelectorAll('#v-leaders .segb').forEach(b =>
    list carrying a match log. A player with no 2026 line yet (a true freshman)
    has nothing to show, so the row simply does not respond rather than opening
    an empty panel. */
-function openPlayer(name, team) {
+function openPlayer(name, team, from) {
   const key = s => (s || '').toLowerCase().replace(/[^a-z]/g, '');
   const p = PLAYERS.find(x => key(x.name) === key(name) && key(x.team) === key(team));
   if (!p) return false;
-  document.querySelector('nav button[data-v="players"]').click();
-  const q = document.getElementById('pq');
-  if (q) { q.value = p.name; q.dispatchEvent(new Event('input', {bubbles: true})); }
-  showPlayer(p);
-  window.scrollTo({top: 0});
+  /* ⚠ ROUTED, NOT TOGGLED. It used to click the Players tab and paint the
+     card, which left no history entry -- Back went to whatever came before the
+     whole tab, and a refresh lost the player entirely. */
+  go(routeFor('players', slug(p.team) + '/' + slug(p.name)) +
+     (from ? '?from=' + from : ''));
   return true;
 }
 document.addEventListener('click', e => {
   const row = e.target.closest('#teamcard .rrow[data-player]');
   if (!row) return;
   const team = (document.querySelector('#teamcard .thead h2') || {}).textContent || '';
-  openPlayer(row.dataset.player, team.trim());
+  openPlayer(row.dataset.player, team.trim(), 'teams');
 });
 document.getElementById('lbody').addEventListener('click', e => {
   const tr = e.target.closest('tr.prow');
-  if (!tr) return;
-  const nm = tr.querySelector('.pnm'), tmc = tr.querySelector('.cf');
-  if (nm && tmc) openPlayer(nm.textContent, tmc.textContent);
+  if (!tr || !tr.dataset.k) return;
+  const parts = tr.dataset.k.split('|');
+  openPlayer(parts[1], parts[0], 'stats');
 });
 
 ['lq','lstat','lside'].forEach(id =>
@@ -8155,9 +8555,8 @@ document.getElementById('rbody').addEventListener('click', e => {
   const nm = cell.textContent.trim().replace(/\s+\d+$/, '');
   if (!TEAMS[nm]) return;
   e.stopPropagation();
-  document.querySelector('nav button[data-v="teams"]').click();
   document.getElementById('tmq').value = nm;
-  showTeam(nm);
+  go(routeFor('teams', slug(nm)));
 });
 
 
@@ -8416,6 +8815,22 @@ ASK_JS = r"""
       body: JSON.stringify({ question: text })
     }).then(function (r) { return r.json(); }).then(function (d) {
       pending.remove();
+      /* ⚠ AN UNAVAILABLE SERVICE DISABLES ITS COMPOSER. Leaving the box live
+         invites the same question again and answers it the same way; and the
+         old reply pasted a shell command naming a key variable into the
+         conversation, which is a terminal recipe in a reading surface. */
+      if (d.unavailable) {
+        say('askmeta', d.answer ||
+          'Digby chat is not connected on this local build. ' +
+          'Hub data remains available.');
+        q.value = '';
+        q.disabled = true;
+        q.placeholder = 'Chat unavailable on this build';
+        var sb = form.querySelector('button[type=submit]');
+        if (sb) sb.disabled = true;
+        busy = false;
+        return;
+      }
       say('', d.answer || 'No answer came back.');
       if (d.ok && d.teams && d.teams.length) {
         say('askmeta', 'Read from: ' + d.teams.join(', ') + '.');
@@ -8485,6 +8900,11 @@ def strip_private(html):
     and it is ASSERTED below rather than assumed.
     """
     # the On TV tab and its section
+    # ⚠ THE NAV BECAME A MENU AND THIS REGEX DID NOT KNOW. It matched
+    # role="tab" only, so the More menu's own On TV item survived and the
+    # public build ABORTED on its marker -- the gate doing exactly its job.
+    html = re.sub(r'\s*<button role="menuitem"[^>]*data-v="tv"[^>]*>.*?</button>',
+                  "", html, flags=re.S)
     html = re.sub(r'\s*<button role="tab"[^>]*data-v="tv"[^>]*>.*?</button>', "",
                   html, flags=re.S)
     html = re.sub(r'<section id="v-tv".*?</section>', "", html, flags=re.S)

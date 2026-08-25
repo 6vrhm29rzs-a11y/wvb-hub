@@ -2144,11 +2144,26 @@ def check_mobile_rankings_are_a_list_not_a_clipped_table():
     else:
         ok("the 560px block restyles the rankings, the Top 25 and the nav")
 
-    if "overflow-x:auto" not in mob.replace(" ", ""):
-        bad("the mobile nav does not scroll",
-            "without it the tabs wrap to three rows before any content")
+    # ⚠ THIS GUARD USED TO ASSERT THE OPPOSITE, AND WAS RIGHT AT THE TIME. With
+    # twelve flat tabs, wrapping produced three rows before any content, so the
+    # nav was made a horizontal scroller. The shell is now five destinations
+    # plus a More menu, which wraps to two short rows -- and a sideways strip
+    # would now HIDE destinations behind a gesture with no affordance, which is
+    # the thing the information-architecture work set out to remove.
+    # The invariant is the intent, not the mechanism: no destination may sit
+    # off-screen behind a horizontal scroll.
+    flatmob = mob.replace(" ", "")
+    if "flex-wrap:wrap" not in flatmob or "overflow-x:auto" in flatmob:
+        bad("the mobile nav hides destinations behind a horizontal scroll",
+            "five items plus More wrap to two rows; a scroller conceals them")
     else:
-        ok("the mobile nav scrolls in one row instead of wrapping")
+        ok("the mobile nav wraps so every destination is visible at once")
+    prim = re.findall(r'<button role="tab"[^>]*data-v="[a-z0-9]+"', src)
+    if len(prim) > 6:
+        bad("the primary nav has grown back into a tab maze",
+            "%d primary tabs; the reference tools belong in More" % len(prim))
+    else:
+        ok("the primary nav stays at %d destinations" % len(prim))
 
     # ⚠ position:static on the label pseudo-elements is load-bearing: they reuse
     # td.hx::before, which the desktop rule declares position:absolute, so

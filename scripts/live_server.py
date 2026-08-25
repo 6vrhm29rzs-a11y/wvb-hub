@@ -423,11 +423,14 @@ def _digby_answer(question):
     # from -- so say that instead of "in this shell", which points at nothing
     # the reader can see.
     if not r.get("ok") and "ANTHROPIC_API_KEY" in (r.get("answer") or ""):
-        r["answer"] = ("Digby has no API key. This server was started without "
-                       "one \u2014 stop it, then restart it with:\n"
-                       "    export ANTHROPIC_API_KEY=sk-ant-<your key>\n"
-                       "    python3 scripts/live_server.py\n"
-                       "Everything else on the page works without it.")
+        # ⚠ NO SHELL COMMANDS IN A CHAT BUBBLE. This printed an export line
+        # naming a key variable inside the conversation -- a terminal recipe
+        # in a reading surface, and one that puts the shape of a secret on
+        # screen. The page states availability; how to change it is not the
+        # chat's business.
+        r["answer"] = ("Digby chat is not connected on this local build. "
+                       "Hub data remains available.")
+        r["unavailable"] = True
     return r
 
 

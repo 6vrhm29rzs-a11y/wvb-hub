@@ -119,13 +119,48 @@ def trend_html(season, team, label="POWER"):
             % (head, spark(ok), len(ok), src))
 
 
+def history_note(season):
+    """One sentence for the Rankings tab: what the archive can and cannot draw.
+
+    ⚠ SAID ONCE, IN THE RIGHT PLACE. The same fact used to render as a
+    component on all 348 team pages. It is a fact about the ARCHIVE, not about
+    any one team, so it belongs where the archive is the subject.
+    """
+    rows = load_history(season)
+    if not rows:
+        return ("No weekly ranking snapshot has been archived yet. "
+                "History begins with the first Monday capture.")
+    names = set()
+    for r in rows:
+        for t in (r.get("teams") or []):
+            names.add(t.get("team"))
+    ready = 0
+    for n in names:
+        pts, _why = usable(series(rows, n))
+        if pts:
+            ready += 1
+    bases = sorted({(r.get("source") or "?") for r in rows})
+    if ready:
+        return ("%d of %d teams now have %d or more weekly snapshots on one "
+                "basis, so their POWER history is drawn on the team page."
+                % (ready, len(names), MIN_POINTS))
+    return ("%d weekly snapshot%s archived so far (%s). A POWER history line "
+            "needs %d on the SAME basis, so none is drawn yet -- a line across "
+            "a preseason projection and an in-season rating would compare two "
+            "different rankings."
+            % (len(rows), "" if len(rows) == 1 else "s",
+               " and ".join(bases), MIN_POINTS))
+
+
 CSS = (".trend{margin:12px 0 4px}\n"
        ".trhd i{font:600 9.5px/1 var(--disp);letter-spacing:.15em;"
        "text-transform:uppercase;color:var(--slate);font-style:normal}\n"
        ".trend .spark{color:var(--navy);display:block;margin:7px 0 3px}\n"
        ".trend p{margin:4px 0 0;font-size:11.5px;color:var(--ink3);"
        "line-height:1.55}\n"
-       ".trend.none p{color:var(--slate)}\n")
+       ".trend.none p{color:var(--slate)}\n"
+       ".histnote{margin:10px 0 2px;font-size:12px;color:var(--slate);"
+       "line-height:1.6;max-width:78ch}\n")
 
 
 if __name__ == "__main__":
