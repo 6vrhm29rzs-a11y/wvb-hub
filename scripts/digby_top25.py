@@ -91,6 +91,54 @@ def per_match_margins(doc):
     return out
 
 
+def per_match_detail(doc):
+    # type: (Dict) -> Dict[str, List[Dict]]
+    """team_id -> one record per completed D-I match, with WHO it was against.
+
+    per_match_margins() throws the opponent away, which is what forced the
+    season term to be scored as if every match were against an average team.
+    """
+    out = collections.defaultdict(list)
+    for g in (doc or {}).get("games") or []:
+        if g.get("state") != "F":
+            continue
+        ts = g.get("teams") or []
+        ls = [l for l in (g.get("linescores") or []) if l.get("home") is not None]
+        if len(ts) != 2 or not ls:
+            continue
+        home = [t for t in ts if t.get("is_home")]
+        away = [t for t in ts if not t.get("is_home")]
+        if not home or not away:
+            continue
+        home, away = home[0], away[0]
+        if home.get("division") != 1 or away.get("division") != 1:
+            continue
+        hp = sum(l["home"] for l in ls)
+        ap = sum(l["visit"] for l in ls)
+        n = float(len(ls))
+        out[str(home["team_id"])].append(
+            {"margin": (hp - ap) / n, "opp": str(away["team_id"]), "is_home": True})
+        out[str(away["team_id"])].append(
+            {"margin": (ap - hp) / n, "opp": str(home["team_id"]), "is_home": False})
+    return out
+
+
+def home_advantage(doc):
+    # type: (Dict) -> float
+    """Mean per-set margin from the home side, measured on a full season.
+
+    Measured on 2025 rather than on the handful of 2026 matches played so far:
+    with seven results the estimate would be noise, and a home-court term that
+    swings week to week would move teams for reasons that are not about them.
+    """
+    vals = []
+    for tid, recs in per_match_detail(doc).items():
+        for r in recs:
+            if r["is_home"]:
+                vals.append(r["margin"])
+    return st.mean(vals) if vals else 0.0
+
+
 def variance_components(margins):
     # type: (Dict[str, List[float]]) -> Tuple[float, float]
     """(sigma^2 per match, tau^2 between teams). Measured, not chosen.
@@ -167,6 +215,8 @@ def main():
     id2name = dict((str(t.get("team_id")), t.get("name_short") or t.get("name_full"))
                    for t in (live.get("teams") or []))
     played = per_match_margins(live)
+    detail = per_match_detail(live)
+    home_adv = home_advantage(hist)
 
     prior = {}
     record = {}
@@ -203,7 +253,49 @@ def main():
     # already "how many team-strength SDs above average", on exactly the scale
     # the prior uses, whether two teams have played or three hundred.
     tau = tau2 ** 0.5
-    zobs = dict((nm, v / tau) for nm, v in obs.items())
+
+    # ⚠ OPPONENT-ADJUSTED. The raw margin over tau scores a result as if it had
+    # come against an average Division-I team, and it is the single largest
+    # error the early-season ranking was making: Texas losing 4.25 points a set
+    # to the SEVENTH-BEST TEAM IN THE COUNTRY was recorded as -1.74 z, the same
+    # as losing it to anybody. The page used to admit this ("the schedule is
+    # barely adjusted for early") rather than fix it.
+    #
+    # What a result actually implies about a team is:
+    #
+    #     implied strength = opponent's strength + how far you beat them
+    #                        (in the same units, home advantage removed)
+    #
+    # which is precisely what the ridge computes once a schedule graph exists.
+    # Before then the preseason projection stands in for the opponent. That is
+    # a real assumption and it is the best available one -- the projection
+    # predicts the following season at rho 0.84 out of sample.
+    #
+    # MEASURED, not argued: scripts/measure_blend_k.py walks 2025, blends prior
+    # with results at a checkpoint and scores every match AFTER it. The
+    # adjustment helps at EVERY reaction speed tested, with the CI clear of zero
+    # at all of them -- +0.021 AUC at the shipped k (0.7998 -> 0.8205), and
+    # +0.086 at k=0.5 where results dominate. It is four times larger than any
+    # other change measured this session.
+    zobs = {}
+    for tid, recs in detail.items():
+        nm = id2name.get(tid)
+        if not nm:
+            continue
+        vals = []
+        for r in recs:
+            opp_nm = id2name.get(r["opp"])
+            zopp = zprior.get(opp_nm) if opp_nm else None
+            if zopp is None:
+                continue
+            vals.append(zopp + (r["margin"] - home_adv * (1.0 if r["is_home"] else -1.0)) / tau)
+        if vals:
+            zobs[nm] = st.mean(vals)
+    # A team whose opponents we cannot place falls back to the raw margin --
+    # worse, but better than dropping the result entirely.
+    for nm, v in obs.items():
+        if nm not in zobs:
+            zobs[nm] = v / tau
 
     # W-L from the live dataset, so the poll can show a record beside the rank.
     wl = collections.defaultdict(lambda: [0, 0])
@@ -264,6 +356,33 @@ def main():
                                "six teams as if it were the best of 348"
                                % (tau2 ** 0.5)),
             "k_matches": round(k, 2),
+            "opponent_adjusted": True,
+            "home_advantage_pts_per_set": None,   # filled below
+            # ⚠ STEP 3 OF THE AUDIT: RE-FIT k, OR STATE WHY NOT. Stating why
+            # not. With the opponent adjustment in place the measured optimum
+            # moves from 25 to 10 (measure_blend_k.py, 2025, seven checkpoints)
+            # -- but k=10 against the derived 13.52 is +0.00071 AUC with a CI of
+            # [-0.00064, +0.00206], which includes zero. Seven of seven
+            # checkpoints prefer something below 13.5, which is suggestive, and
+            # the checkpoints share data so that is not seven independent votes.
+            #
+            # A derived constant that updates itself from the season's own
+            # variances is worth more than a hand-pasted 10 that happened to win
+            # a comparison it could not win significantly. This project has been
+            # explicit about that since the roster term (0.15/0.30/0.50/1.00 all
+            # hand-set, all worse; fitted value 0.09). So k stays derived, and
+            # the measurement is recorded here so the decision is re-checkable
+            # rather than remembered.
+            "k_measured_optimum_2025": 10,
+            "k_measured_vs_derived": {
+                "auc_delta": 0.00071,
+                "ci95": [-0.00064, 0.00206],
+                "clear_of_zero": False,
+                "checkpoints_preferring_faster": [7, 7],
+                "decision": ("keep the derived value -- the difference is not "
+                             "distinguishable from zero, and the derivation "
+                             "tracks the data while a pasted constant does not"),
+            },
             "k_note": ("matches at which this season and the preseason weigh "
                        "equally; k = per-match variance / the PROJECTION'S OWN "
                        "error variance, not the between-team variance -- the "
@@ -273,9 +392,12 @@ def main():
             "prior_error_variance": round(prior_err, 3),
             "per_match_variance": round(sigma2, 3),
             "between_team_variance": round(tau2, 3),
-            "caveat_schedule": ("early in the season the opponent is barely "
-                                "adjusted for -- there is no schedule graph yet, "
-                                "so beating nobody looks like beating somebody"),
+            "caveat_schedule": ("the opponent IS adjusted for from match one: "
+                                "a result is scored as the strength it implies "
+                                "(opponent's rating + margin, home court "
+                                "removed). What is still thin early is the "
+                                "opponent's own rating, which is the preseason "
+                                "projection until a schedule graph exists"),
             "teams_with_a_result": len(nmatch),
             "matches_counted": sum(nmatch.values()) // 2,
             "score_mean": round(_smu, 5),
@@ -297,6 +419,7 @@ def main():
                  "matches": r["matches"],
                  "weight_on_season": r["weight_on_season"]} for r in rows],
     }
+    doc["meta"]["home_advantage_pts_per_set"] = round(home_adv, 4)
     json.dump(doc, open(OUT, "w"), indent=1, sort_keys=False)
     m = doc["meta"]
     print("k = %.2f matches  (sigma^2 %.2f / tau^2 %.2f)"

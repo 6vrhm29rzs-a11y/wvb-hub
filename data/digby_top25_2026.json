@@ -6,16 +6,32 @@
   "blend": "score = (1-w)*preseason_z + w*season_z,  w = n/(n+k)",
   "season_z_scale": "observed net pts/set divided by the between-team SD (2.44), NOT z-scored against whoever happens to have played -- that would score the best of six teams as if it were the best of 348",
   "k_matches": 13.52,
+  "opponent_adjusted": true,
+  "home_advantage_pts_per_set": 1.0878,
+  "k_measured_optimum_2025": 10,
+  "k_measured_vs_derived": {
+   "auc_delta": 0.00071,
+   "ci95": [
+    -0.00064,
+    0.00206
+   ],
+   "clear_of_zero": false,
+   "checkpoints_preferring_faster": [
+    7,
+    7
+   ],
+   "decision": "keep the derived value -- the difference is not distinguishable from zero, and the derivation tracks the data while a pasted constant does not"
+  },
   "k_note": "matches at which this season and the preseason weigh equally; k = per-match variance / the PROJECTION'S OWN error variance, not the between-team variance -- the projection is far better than an average team and is weighted accordingly",
   "prior_rho_out_of_sample": 0.8379,
   "prior_error_variance": 1.77,
   "per_match_variance": 23.929,
   "between_team_variance": 5.941,
-  "caveat_schedule": "early in the season the opponent is barely adjusted for -- there is no schedule graph yet, so beating nobody looks like beating somebody",
+  "caveat_schedule": "the opponent IS adjusted for from match one: a result is scored as the strength it implies (opponent's rating + margin, home court removed). What is still thin early is the opponent's own rating, which is the preseason projection until a schedule graph exists",
   "teams_with_a_result": 8,
   "matches_counted": 6,
-  "score_mean": -0.00506,
-  "score_sd": 0.98916,
+  "score_mean": 5e-05,
+  "score_sd": 1.00011,
   "score_scale_note": "mean and SD across ALL 348 teams, not just the ones shown -- a scale computed from the top 25 would measure the spread among the best",
   "shown": 25,
   "also_receiving": 10
@@ -35,9 +51,9 @@
   },
   {
    "team": "Pittsburgh",
-   "score": 2.4179,
+   "score": 2.5619,
    "preseason_z": 2.422,
-   "season_z": 2.359,
+   "season_z": 4.45,
    "matches": 1,
    "weight_on_season": 0.069,
    "record": "1-0",
@@ -46,16 +62,52 @@
    "rank": 2
   },
   {
+   "team": "Kentucky",
+   "score": 2.5222,
+   "preseason_z": 2.538,
+   "season_z": 2.419,
+   "matches": 2,
+   "weight_on_season": 0.129,
+   "record": "1-1",
+   "net_pts_per_set": -0.54,
+   "conf": "SEC",
+   "rank": 3
+  },
+  {
    "team": "Texas",
-   "score": 2.3838,
+   "score": 2.4978,
    "preseason_z": 2.689,
-   "season_z": -1.744,
+   "season_z": -0.089,
    "matches": 1,
    "weight_on_season": 0.069,
    "record": "0-1",
    "net_pts_per_set": -4.25,
    "conf": "SEC",
-   "rank": 3
+   "rank": 4
+  },
+  {
+   "team": "Arizona St.",
+   "score": 2.2925,
+   "preseason_z": 2.101,
+   "season_z": 4.879,
+   "matches": 1,
+   "weight_on_season": 0.069,
+   "record": "1-0",
+   "net_pts_per_set": 4.25,
+   "conf": "Big 12",
+   "rank": 5
+  },
+  {
+   "team": "SMU",
+   "score": 2.2839,
+   "preseason_z": 2.135,
+   "season_z": 4.3,
+   "matches": 1,
+   "weight_on_season": 0.069,
+   "record": "1-0",
+   "net_pts_per_set": 4.33,
+   "conf": "ACC",
+   "rank": 6
   },
   {
    "team": "Stanford",
@@ -67,43 +119,19 @@
    "record": "0-0",
    "net_pts_per_set": null,
    "conf": "ACC",
-   "rank": 4
+   "rank": 7
   },
   {
-   "team": "Kentucky",
-   "score": 2.1819,
-   "preseason_z": 2.538,
-   "season_z": -0.222,
+   "team": "Louisville",
+   "score": 2.1348,
+   "preseason_z": 2.232,
+   "season_z": 1.476,
    "matches": 2,
    "weight_on_season": 0.129,
    "record": "1-1",
-   "net_pts_per_set": -0.54,
-   "conf": "SEC",
-   "rank": 5
-  },
-  {
-   "team": "SMU",
-   "score": 2.1102,
-   "preseason_z": 2.135,
-   "season_z": 1.778,
-   "matches": 1,
-   "weight_on_season": 0.069,
-   "record": "1-0",
-   "net_pts_per_set": 4.33,
+   "net_pts_per_set": -2.42,
    "conf": "ACC",
-   "rank": 6
-  },
-  {
-   "team": "Arizona St.",
-   "score": 2.0765,
-   "preseason_z": 2.101,
-   "season_z": 1.744,
-   "matches": 1,
-   "weight_on_season": 0.069,
-   "record": "1-0",
-   "net_pts_per_set": 4.25,
-   "conf": "Big 12",
-   "rank": 7
+   "rank": 8
   },
   {
    "team": "Purdue",
@@ -115,7 +143,19 @@
    "record": "0-0",
    "net_pts_per_set": null,
    "conf": "Big Ten",
-   "rank": 8
+   "rank": 9
+  },
+  {
+   "team": "Wisconsin",
+   "score": 2.0074,
+   "preseason_z": 1.967,
+   "season_z": 2.28,
+   "matches": 2,
+   "weight_on_season": 0.129,
+   "record": "1-1",
+   "net_pts_per_set": 0.83,
+   "conf": "Big Ten",
+   "rank": 10
   },
   {
    "team": "Creighton",
@@ -127,7 +167,7 @@
    "record": "0-0",
    "net_pts_per_set": null,
    "conf": "Big East",
-   "rank": 9
+   "rank": 11
   },
   {
    "team": "Southern California",
@@ -139,19 +179,19 @@
    "record": "0-0",
    "net_pts_per_set": null,
    "conf": "Big Ten",
-   "rank": 10
+   "rank": 12
   },
   {
-   "team": "Louisville",
-   "score": 1.8167,
-   "preseason_z": 2.232,
-   "season_z": -0.991,
+   "team": "Texas A&M",
+   "score": 1.8783,
+   "preseason_z": 2.076,
+   "season_z": 0.541,
    "matches": 2,
    "weight_on_season": 0.129,
-   "record": "1-1",
-   "net_pts_per_set": -2.42,
-   "conf": "ACC",
-   "rank": 11
+   "record": "0-2",
+   "net_pts_per_set": -2.92,
+   "conf": "SEC",
+   "rank": 13
   },
   {
    "team": "Minnesota",
@@ -163,19 +203,7 @@
    "record": "0-0",
    "net_pts_per_set": null,
    "conf": "Big Ten",
-   "rank": 12
-  },
-  {
-   "team": "Wisconsin",
-   "score": 1.7576,
-   "preseason_z": 1.967,
-   "season_z": 0.342,
-   "matches": 2,
-   "weight_on_season": 0.129,
-   "record": "1-1",
-   "net_pts_per_set": 0.83,
-   "conf": "Big Ten",
-   "rank": 13
+   "rank": 14
   },
   {
    "team": "Colorado",
@@ -187,18 +215,6 @@
    "record": "0-0",
    "net_pts_per_set": null,
    "conf": "Big 12",
-   "rank": 14
-  },
-  {
-   "team": "Texas A&M",
-   "score": 1.6544,
-   "preseason_z": 2.076,
-   "season_z": -1.197,
-   "matches": 2,
-   "weight_on_season": 0.129,
-   "record": "0-2",
-   "net_pts_per_set": -2.92,
-   "conf": "SEC",
    "rank": 15
   },
   {
@@ -455,100 +471,100 @@
   {
    "team": "Pittsburgh",
    "rank": 2,
-   "score": 2.4179,
+   "score": 2.5619,
    "matches": 1,
    "weight_on_season": 0.069
-  },
-  {
-   "team": "Texas",
-   "rank": 3,
-   "score": 2.3838,
-   "matches": 1,
-   "weight_on_season": 0.069
-  },
-  {
-   "team": "Stanford",
-   "rank": 4,
-   "score": 2.2498,
-   "matches": 0,
-   "weight_on_season": 0.0
   },
   {
    "team": "Kentucky",
-   "rank": 5,
-   "score": 2.1819,
+   "rank": 3,
+   "score": 2.5222,
    "matches": 2,
    "weight_on_season": 0.129
   },
   {
-   "team": "SMU",
-   "rank": 6,
-   "score": 2.1102,
+   "team": "Texas",
+   "rank": 4,
+   "score": 2.4978,
    "matches": 1,
    "weight_on_season": 0.069
   },
   {
    "team": "Arizona St.",
-   "rank": 7,
-   "score": 2.0765,
+   "rank": 5,
+   "score": 2.2925,
    "matches": 1,
    "weight_on_season": 0.069
   },
   {
-   "team": "Purdue",
+   "team": "SMU",
+   "rank": 6,
+   "score": 2.2839,
+   "matches": 1,
+   "weight_on_season": 0.069
+  },
+  {
+   "team": "Stanford",
+   "rank": 7,
+   "score": 2.2498,
+   "matches": 0,
+   "weight_on_season": 0.0
+  },
+  {
+   "team": "Louisville",
    "rank": 8,
+   "score": 2.1348,
+   "matches": 2,
+   "weight_on_season": 0.129
+  },
+  {
+   "team": "Purdue",
+   "rank": 9,
    "score": 2.0177,
    "matches": 0,
    "weight_on_season": 0.0
   },
   {
+   "team": "Wisconsin",
+   "rank": 10,
+   "score": 2.0074,
+   "matches": 2,
+   "weight_on_season": 0.129
+  },
+  {
    "team": "Creighton",
-   "rank": 9,
+   "rank": 11,
    "score": 1.9713,
    "matches": 0,
    "weight_on_season": 0.0
   },
   {
    "team": "Southern California",
-   "rank": 10,
+   "rank": 12,
    "score": 1.9471,
    "matches": 0,
    "weight_on_season": 0.0
   },
   {
-   "team": "Louisville",
-   "rank": 11,
-   "score": 1.8167,
+   "team": "Texas A&M",
+   "rank": 13,
+   "score": 1.8783,
    "matches": 2,
    "weight_on_season": 0.129
   },
   {
    "team": "Minnesota",
-   "rank": 12,
+   "rank": 14,
    "score": 1.7652,
    "matches": 0,
    "weight_on_season": 0.0
   },
   {
-   "team": "Wisconsin",
-   "rank": 13,
-   "score": 1.7576,
-   "matches": 2,
-   "weight_on_season": 0.129
-  },
-  {
    "team": "Colorado",
-   "rank": 14,
+   "rank": 15,
    "score": 1.6664,
    "matches": 0,
    "weight_on_season": 0.0
-  },
-  {
-   "team": "Texas A&M",
-   "rank": 15,
-   "score": 1.6544,
-   "matches": 2,
-   "weight_on_season": 0.129
   },
   {
    "team": "BYU",

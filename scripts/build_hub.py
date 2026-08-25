@@ -1806,12 +1806,18 @@ def top25_view(avca=None):
         "rho %.2f out of sample). One Friday night genuinely is that little "
         "evidence. &nbsp;<b>This is not a resume ranking:</b> it answers who "
         "would win a match, not who has earned a bid &mdash; the bracket tab is "
-        "the second question. &nbsp;<b>And the schedule is barely adjusted for "
-        "yet</b>: with %d matches played there is no schedule graph, so beating "
-        "nobody still looks like beating somebody. That corrects itself as the "
-        "season fills in."
+        "the second question. &nbsp;<b>Who you played is accounted for.</b> "
+        "A result is scored as the strength it <i>implies</i> &mdash; the "
+        "opponent&rsquo;s own rating plus how far you beat them, with home "
+        "court (%+.2f points/set, measured on 2025) taken out &mdash; so losing "
+        "narrowly to a top-five team and losing to nobody are not the same "
+        "evidence. Tested on 2025 by predicting matches the model had not seen: "
+        "it is worth <b>+0.021 AUC</b> at this blend weight, the largest single "
+        "improvement measured, with the confidence interval clear of zero at "
+        "every reaction speed tried."
         % (k, (m.get("per_match_variance") or 0) ** 0.5,
-           m.get("prior_rho_out_of_sample") or 0, played))
+           m.get("prior_rho_out_of_sample") or 0,
+           m.get("home_advantage_pts_per_set") or 0.0))
     return {"rows": "".join(rows), "also": also, "lead": lead, "foot": foot,
             "season": str(SEASON),
             "movehead": ("vs last week" if basis == "week" else "vs preseason")}

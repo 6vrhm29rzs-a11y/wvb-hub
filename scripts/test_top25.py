@@ -231,8 +231,78 @@ def test_the_two_rankings_explain_their_relationship():
     check("Biggest movers" in h, "the Top 25 names its biggest movers")
 
 
+def test_the_season_term_is_opponent_adjusted():
+    """The same margin against different opponents must NOT score the same.
+
+    This is the largest error the early-season ranking was making. Texas lost
+    4.25 points a set to Arizona St. -- the 5th-best team in the country by this
+    same ranking -- and the season term recorded it as if the opponent had been
+    average. Measured on 2025 by predicting unseen matches, fixing it is worth
+    +0.021 AUC at the shipped blend weight, four times any other change tested.
+
+    POSITIVE CONTROL: an identical loss to a strong team must imply MORE
+    strength than to a weak one. NEGATIVE CONTROL: if the opponent term were
+    dropped, the two would collapse to the same number -- which is exactly what
+    the old code did, so the control reproduces the bug rather than something
+    shaped like it.
+    """
+    import digby_top25 as D
+    tau = 2.437
+    home_adv = 1.088
+
+    def implied(z_opp, margin, is_home):
+        return z_opp + (margin - home_adv * (1.0 if is_home else -1.0)) / tau
+
+    strong = implied(2.2, -4.25, True)      # lost by 4.25 at home to a top team
+    weak = implied(-1.5, -4.25, True)       # same loss, to a poor team
+    check(strong > weak,
+          "the same loss implies more strength against a stronger opponent",
+          "(strong %.3f vs weak %.3f)" % (strong, weak))
+    check(abs((strong - weak) - 3.7) < 1e-6,
+          "the gap is exactly the gap between the two opponents",
+          "(%.4f)" % (strong - weak))
+
+    # NEGATIVE CONTROL: the old rule, margin/tau with no opponent term.
+    old_strong = -4.25 / tau
+    old_weak = -4.25 / tau
+    check(old_strong == old_weak,
+          "the control reproduces the old behaviour: identical, opponent ignored")
+
+    # home court must be removed, and in the right direction
+    at_home = implied(0.0, 0.0, True)
+    on_road = implied(0.0, 0.0, False)
+    check(on_road > at_home,
+          "drawing level ON THE ROAD implies more than drawing level at home",
+          "(road %.3f vs home %.3f)" % (on_road, at_home))
+
+    # and the shipped payload must actually be using it
+    p = os.path.join(REPO, "data", "digby_top25_2026.json")
+    if not os.path.exists(p):
+        print("  --   no Top 25 built; skipping payload checks")
+        return
+    doc = json.load(open(p, encoding="utf-8"))
+    meta = doc.get("meta") or {}
+    check(meta.get("opponent_adjusted") is True,
+          "the shipped ranking says it is opponent-adjusted")
+    check(isinstance(meta.get("home_advantage_pts_per_set"), float)
+          and 0.2 < meta["home_advantage_pts_per_set"] < 2.5,
+          "a measured home advantage is recorded and is physically plausible",
+          str(meta.get("home_advantage_pts_per_set")))
+
+    # A team that LOST but whose net/set is negative should still be able to
+    # carry a season_z above its raw margin, because of who it lost to.
+    rows = [r for r in (doc.get("top") or [])
+            if r.get("season_z") is not None and r.get("net_pts_per_set") is not None]
+    if rows:
+        lifted = [r for r in rows
+                  if r["season_z"] > r["net_pts_per_set"] / 2.437 + 1e-9]
+        check(bool(lifted),
+              "at least one team's result is scored above its raw margin",
+              "(none -- the opponent term is not reaching the payload)")
+
+
 def main():
-    for fn in (test_k_uses_the_priors_error_not_the_population_spread,
+    for fn in (test_the_season_term_is_opponent_adjusted, test_k_uses_the_priors_error_not_the_population_spread,
                test_a_useless_prior_collapses_to_the_population,
                test_a_perfect_prior_is_never_overturned,
                test_weight_grows_with_matches_and_never_exceeds_one,

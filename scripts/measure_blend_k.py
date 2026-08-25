@@ -88,20 +88,45 @@ def main():
         import digby_top25 as D
         sigma2, tau2 = D.variance_components(dict((k, v) for k, v in margins.items()))
     tau = tau2 ** 0.5
-    print("prior teams matched: %d   tau (between-team SD) = %.2f pts/set\n"
-          % (len(prior_z), tau))
+    global HOME_ADV
+    HOME_ADV = sum(m["margin"] for m in matches) / float(len(matches))
+    print("prior teams matched: %d   tau (between-team SD) = %.2f pts/set   "
+          "home advantage = %+.3f pts/set\n" % (len(prior_z), tau, HOME_ADV))
 
     results = {}
     early = {}
     paired = {}
+    adj_results = {}
+    adj_paired = {}
+    adj_early = {}
+    adj_meta = {}
     for frac in CHECKPOINTS:
         cut = int(len(matches) * frac)
-        seen, obs = {}, {}
+        seen, obs, adj = {}, {}, {}
         for m in matches[:cut]:
             for side, sign in (("home", 1.0), ("away", -1.0)):
                 t = m[side]
+                opp = m["away"] if side == "home" else m["home"]
                 seen[t] = seen.get(t, 0) + 1
                 obs.setdefault(t, []).append(sign * m["margin"])
+                # OPPONENT-ADJUSTED: what strength does this result IMPLY?
+                # A team that loses by 4.25 a set to the 7th-best team in the
+                # country is not a bad team; a team that loses by 4.25 to the
+                # 200th is. The raw margin cannot tell those apart -- it scores
+                # both as if the opponent were average, which is what the Top 25
+                # currently does and what the page admits when it says the
+                # schedule is barely adjusted for early.
+                #
+                #   implied strength = opponent's strength + how far you beat
+                #                      them, in the same units
+                #
+                # This is exactly what the ridge computes once a schedule graph
+                # exists; before then the prior stands in for the opponent.
+                zo = prior_z.get(opp)
+                if zo is not None:
+                    hs = sign if side == "home" else -sign
+                    adj.setdefault(t, []).append(
+                        zo + (sign * m["margin"] - HOME_ADV * (1.0 if side == "home" else -1.0)) / tau)
         future = matches[cut:]
         if len(future) < 300:
             continue
@@ -114,6 +139,18 @@ def main():
                 if zh is None or za is None:
                     continue
                 scored.append((zh - za, m["home_win"]))
+            # the same k, but with the opponent-adjusted season term
+            scored_adj = []
+            for m in future:
+                zh = blended(m["home"], k, prior_z, seen, adj, tau, raw=False)
+                za = blended(m["away"], k, prior_z, seen, adj, tau, raw=False)
+                if zh is None or za is None:
+                    continue
+                scored_adj.append((zh - za, m["home_win"]))
+            if len(scored_adj) >= 200:
+                adj_results.setdefault(k, []).append(RF.auc(scored_adj))
+                adj_paired.setdefault(frac, {})[k] = scored_adj
+                adj_early.setdefault(frac, {})[k] = RF.auc(scored_adj)
             if len(scored) < 200:
                 continue
             a = RF.auc(scored)
@@ -170,6 +207,66 @@ def main():
               % (100 * frac, "%g" % bk if bk < 1e8 else "inf", row[bk],
                  row.get(13.5, float("nan"))))
 
+    if adj_results:
+        print("\n  OPPONENT-ADJUSTED SEASON TERM vs raw margin, same k:")
+        import random as _r
+        rng2 = _r.Random(99)
+        for k in sorted(adj_results):
+            if k not in results:
+                continue
+            a_raw = sum(results[k]) / len(results[k])
+            a_adj = sum(adj_results[k]) / len(adj_results[k])
+            los, his = [], []
+            for frac in paired:
+                if k in paired[frac] and k in adj_paired.get(frac, {}):
+                    lo, hi = RF.boot_delta(paired[frac][k], adj_paired[frac][k], rng2)
+                    los.append(lo)
+                    his.append(hi)
+            lo = sum(los) / len(los) if los else 0.0
+            hi = sum(his) / len(his) if his else 0.0
+            mark = "  <-- shipped k" if abs(k - 13.5) < 1e-9 else ""
+            print("    k=%-6s raw %.5f  adj %.5f  %+0.5f  CI [%+0.5f, %+0.5f]  %s%s"
+                  % ("%g" % k if k < 1e8 else "inf", a_raw, a_adj, a_adj - a_raw,
+                     lo, hi, "HELPS" if lo > 0 else "not distinguishable", mark))
+
+    if adj_early:
+        print("\n  WITH the opponent adjustment, best k at each checkpoint:")
+        for frac in sorted(adj_early):
+            row = adj_early[frac]
+            bk = max(row, key=lambda x: row[x])
+            print("    %4.0f%% of season: best k = %-6s (AUC %.4f)   k=13.5 -> %.4f"
+                  % (100 * frac, "%g" % bk if bk < 1e8 else "inf", row[bk],
+                     row.get(13.5, float("nan"))))
+        pooled = dict((k, sum(v) / len(v)) for k, v in adj_results.items())
+        bk = max(pooled, key=lambda x: pooled[x])
+        print("    pooled best k = %g (AUC %.5f)" % (bk, pooled[bk]))
+        # ⚠ AND IS IT DISTINGUISHABLE FROM THE SHIPPED VALUE? The adjustment is
+        # worth +0.021; moving k from 13.5 to 10 is worth a fraction of that,
+        # and a point estimate is not a reason to change a constant.
+        import random as _r3
+        rng3 = _r3.Random(1234)
+        los, his = [], []
+        for frac in adj_paired:
+            if bk in adj_paired[frac] and 13.5 in adj_paired[frac]:
+                lo, hi = RF.boot_delta(adj_paired[frac][13.5], adj_paired[frac][bk], rng3)
+                los.append(lo)
+                his.append(hi)
+        if los:
+            lo, hi = sum(los) / len(los), sum(his) / len(his)
+            print("    k=%g vs k=13.5 (both adjusted): %+0.5f  CI [%+0.5f, %+0.5f]  %s"
+                  % (bk, pooled[bk] - pooled.get(13.5, 0.0), lo, hi,
+                     "CLEAR OF ZERO" if lo > 0 else "not distinguishable"))
+            _favour = sum(1 for f in adj_early
+                          if max(adj_early[f], key=lambda x: adj_early[f][x]) < 13.5)
+            print("    checkpoints whose best k is BELOW 13.5: %d of %d"
+                  % (_favour, len(adj_early)))
+            adj_meta["best_k"] = bk
+            adj_meta["best_k_ci_vs_13_5"] = [round(lo, 5), round(hi, 5)]
+            adj_meta["best_k_clear_of_zero"] = bool(lo > 0)
+            adj_meta["checkpoints_favouring_faster"] = [_favour, len(adj_early)]
+            adj_meta["auc_at_best_k"] = round(pooled[bk], 5)
+            adj_meta["auc_at_13_5"] = round(pooled.get(13.5, 0.0), 5)
+
     best = rows[0]
     ship = [r for r in rows if abs(r[0] - 13.5) < 1e-9]
     doc_out = {
@@ -188,6 +285,7 @@ def main():
             "shipped_k": 13.5,
             "shipped_auc": round(ship[0][1], 5) if ship else None,
         },
+        "opponent_adjusted": adj_meta,
         "grid": [{"k": (k if k < 1e8 else None), "auc": round(a, 5)} for k, a, _ in
                  sorted(rows, key=lambda r: r[0])],
     }
@@ -196,17 +294,31 @@ def main():
     return 0
 
 
-def blended(team, k, prior_z, seen, obs, tau):
-    # type: (str, float, Dict, Dict, Dict, float) -> Optional[float]
+HOME_ADV = 0.0          # measured in main() from the season itself
+
+
+def blended(team, k, prior_z, seen, obs, tau, raw=True):
+    # type: (str, float, Dict, Dict, Dict, float, bool) -> Optional[float]
+    """Prior blended with what has been seen.
+
+    `raw=True`  -- obs holds margins; divide by tau to reach z units.
+    `raw=False` -- obs already holds implied strengths in z units, because the
+                   opponent's own strength has been added in. Dividing again
+                   would be a units error, and a silent one: the numbers would
+                   still be plausible and every team would look average.
+    """
     zp = prior_z.get(team)
-    n = seen.get(team, 0)
+    vals = obs.get(team) or []
+    n = len(vals) if not raw else seen.get(team, 0)
     if zp is None and not n:
         return None
     if zp is None:
         zp = 0.0
-    if not n:
+    if not n or not vals:
         return zp
-    zo = (sum(obs[team]) / float(n)) / tau
+    zo = (sum(vals) / float(len(vals)))
+    if raw:
+        zo = zo / tau
     w = n / float(n + k) if k < 1e8 else 0.0
     return (1 - w) * zp + w * zo
 
