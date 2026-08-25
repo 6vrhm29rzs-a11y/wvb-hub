@@ -209,7 +209,16 @@ def day_label(iso, today=None):
     showing two date formats at once. Mirrored in the page script as
     dayLabel(); no timezone is involved, an ISO calendar date is already a day.
     """
-    today = today or datetime.date.today()
+    # ⚠ "TODAY" IS PACIFIC, NOT THE MACHINE'S. datetime.date.today() is the
+    # BUILDER's date -- Pacific on Cody's Mac, UTC on a GitHub runner. The daily
+    # job runs at 09:15 UTC, which is 2:15am Pacific, so UTC is already the next
+    # day: every published page built overnight labelled the current day
+    # "Yesterday" while the page's own JavaScript, which correctly uses
+    # America/Los_Angeles, called it "Today". Invisible on a laptop where both
+    # clocks agree; caught only because the two implementations are compared
+    # against each other, and only when that comparison ran in CI.
+    today = today or ((datetime.datetime.now(PT).date() if PT
+                       else datetime.datetime.utcnow().date()))
     try:
         d = datetime.date(*[int(x) for x in (iso or "").split("-")])
     except (TypeError, ValueError):

@@ -2549,7 +2549,13 @@ def check_week_names_whose_ranking():
                 "this cross-implementation check is testing nothing")
         else:
             import build_hub as _BH
-            today = datetime.date.today()
+            # ⚠ ANCHOR THE FIXTURE DATES TO PACIFIC TOO. The page renders in
+            # Pacific and both implementations now agree on that; a test that
+            # generates its dates from the MACHINE clock reintroduces the very
+            # skew it is checking for, and would fail on a UTC runner however
+            # correct the code is.
+            today = (datetime.datetime.now(_BH.PT).date() if _BH.PT
+                     else datetime.datetime.utcnow().date())
             days = [-2, -1, 0, 1, 2, 5, 13, 40, 120]
             dates = [(today + datetime.timedelta(days=d)).isoformat() for d in days]
             prog = (fn.group(0) + "\nconsole.log(JSON.stringify("
@@ -2566,7 +2572,7 @@ def check_week_names_whose_ranking():
                         r.stdout.decode("utf-8", "replace").strip()[:160])
                 else:
                     js_out = json.loads(r.stdout.decode("utf-8").strip())
-                    py_out = [_BH.day_label(d, today) for d in dates]
+                    py_out = [_BH.day_label(d) for d in dates]
                     diff = [(d, a, b) for d, a, b in zip(dates, js_out, py_out) if a != b]
                     if diff:
                         bad("the two day-label implementations disagree",
