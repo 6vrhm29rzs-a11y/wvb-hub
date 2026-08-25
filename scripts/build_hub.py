@@ -268,7 +268,8 @@ def rank_badge(v):
     # ⚠ VISIBLY, not just in title=. The JS twin (rank()) does the same, and
     # the two must stay identical or the same fixture reads differently
     # depending on which side of the build rendered it.
-    return (('<i class="rnk" title="%s"><s>AVCA</s>#%s</i> '
+    return (('<i class="rnk" title="%s">'
+             '<span class="rank-label">AVCA</span>#%s</i> '
              % (RANK_TITLE, v)) if v else "")
 
 
@@ -3237,6 +3238,12 @@ b.kres{color:#F2B441}
    The ballot is the object, so the SLOT is the loudest thing in a row and the
    evidence sits under it in one quiet line. No cards-in-cards, no charts: this
    is a list a person edits, and it should look like one. */
+/* BALLOT-CSS-BEGIN -- everything to BALLOT-CSS-END is ballot-only and is
+   stripped from the published build. VERIFIED BALLOT-ONLY BEFORE FENCING:
+   every selector in the region is .bw*, #bw*, or .privtag, and .privtag has
+   exactly one use in the whole file -- the Ballot Workshop heading. Adding a
+   SHARED rule inside this fence would silently delete it from the public
+   page, so put shared styles outside it. */
 .privtag{font:700 9px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;
   color:#F2B441;background:color-mix(in oklab,#F2B441 14%,transparent);
   border:1px solid color-mix(in oklab,#F2B441 32%,transparent);
@@ -3391,6 +3398,12 @@ b.kres{color:#F2B441}
 .bwhrow:last-child{border-bottom:0}
 .bwlatest{font:700 8.5px/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;
   color:#31D07E;margin-left:auto}
+/* ⚠ A GRID ITEM'S DEFAULT min-width IS auto, NOT 0, so collapsing to one
+   column is not enough: the column still cannot shrink below its content's
+   min-content width, and the workshop sat 26px wider than a 390px phone
+   with no sideways scrollbar to show for it. Measured, not guessed:
+   .bwmain reported min-width:auto while every descendant read 0. */
+.bwmain,.bwside{min-width:0}
 @media (max-width:900px){ .bwgrid{grid-template-columns:1fr} .bwside{position:static} }
 @media (max-width:560px){
   /* a deliberate ranked list: slot and team on one line, evidence under it,
@@ -3414,6 +3427,7 @@ b.kres{color:#F2B441}
   .bwaskrow{flex-direction:column}
   .bwask select{width:100%}
 }
+/* BALLOT-CSS-END */
 
 .leadhint{color:var(--ink2);opacity:.8}
 /* ══ MATCH DESK ═══════════════════════════════════════════════════════════
@@ -3421,6 +3435,7 @@ b.kres{color:#F2B441}
    score badges, no gauges, no card-inside-a-card. The team names are the
    loudest thing, because that is what a reader is looking for. */
 #v-desk .livehead{margin-top:6px}
+.dsoonrest{font:12.5px/1.5 var(--sans);color:var(--ink2);margin:0 0 8px}
 .dcard{border-bottom:1px solid var(--line2);padding:15px 2px 16px}
 .dcard:last-child{border-bottom:0}
 .dcard.islive{border-left:3px solid var(--live);padding-left:13px;
@@ -3453,7 +3468,7 @@ b.kres{color:#F2B441}
   color:var(--ink3,var(--ink2))}
 .dfcs{font:11px/1 var(--mono);color:var(--ink3,var(--ink2));opacity:.75}
 .dfc.none{color:var(--ink2);font-style:italic}
-.rnk>s,.dpow>s{text-decoration:none;font-size:.72em;letter-spacing:.06em;opacity:.72;margin-right:2px}
+.rank-label{font-size:.72em;letter-spacing:.06em;opacity:.72;margin-right:2px}
 .dlive{margin-top:11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
 .dopen{margin-left:auto;font:600 10px/1 var(--disp);letter-spacing:.09em;
   text-transform:uppercase;color:var(--ink2);background:transparent;
@@ -4518,7 +4533,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <div id="desksoon">
     <div class="livehead"><b class="soon">Next few days</b><span id="desksoonmeta"></span></div>
     <div id="desksooncards"></div>
-    <p class="bwsub" id="desksoonrest"></p>
+    <p class="dsoonrest" id="desksoonrest"></p>
   </div>
 
   <details class="method">
@@ -5085,8 +5100,8 @@ function rank(v) {
   /* ⚠ THE LABEL IS VISIBLE, NOT A TOOLTIP. This used to render a bare numeral
      whose only clue was title=, so a reader could take it for POWER, for our
      rank, or for a seed. It is the AVCA coaches poll and it now says so. */
-  return v ? '<i class="rnk" title="AVCA coaches poll rank"><s>AVCA</s>#' +
-    v + '</i> ' : '';
+  return v ? '<i class="rnk" title="AVCA coaches poll rank">' +
+    '<span class="rank-label">AVCA</span>#' + v + '</i> ' : '';
 }
 /* ---- THE WEEK'S HEADLINE MATCHES -------------------------------------
    What a scoreboard puts at the top: not every fixture, the ones worth
@@ -5668,6 +5683,10 @@ const BW_MOVE_REASONS = ['tournament projection', 'matchup concern',
 /* how far off POWER a slot has to be before the workshop asks why. Not a
    scoring threshold -- it decides when a QUESTION is shown, nothing else. */
 const BW_ASK_AT = 4;
+/* and how far a team must move against YOUR OWN previous ballot before the
+   workshop says a reason is missing. Three slots, as specified -- it gates a
+   QUESTION, never a score, and entering or dropping always counts. */
+const BW_MOVE_AT = 3;
 
 let BW = { teams: [], summary: '' };
 let BW_HIST = [];
@@ -5777,10 +5796,13 @@ function bwCase(name, driver) {
   }
   /* ⚠ MARKED UNEXPLAINED, NEVER FILLED IN. The workshop says a big move has no
      reason yet; it does not write one, and it does not stop the save. */
-  const ms = slot ? bwMoveState(name, slot) : null;
   const ent = bwEntry(name) || {};
-  if (ms && !(ent.reason || '').trim()) {
-    bits.push('<span class="bwwhy">no reason written yet</span>');
+  const un = bwUnexplained(name, slot);
+  if (un) {
+    bits.push('<span class="bwwhy">no reason written yet' +
+      (un.personal && un.power ? ' (moved, and far from POWER)'
+        : (un.personal ? ' (you moved them)' : ' (far from POWER)')) +
+      '</span>');
   }
   bits.push('<button type="button" class="bwpin' + (ent.pinned ? ' on' : '') +
     '" data-pin="' + esc(name) + '">' + (ent.pinned ? 'pinned' : 'pin') +
@@ -5878,14 +5900,27 @@ function bwPreReview() {
     (base.teams || []).forEach(t => { if (t.rank) pr[t.team] = t.rank; });
     const now = {};
     ranked.forEach(t => { now[t.team] = t.rank; });
+    /* ⚠ THE FLAG HERE IS ABOUT YOUR OWN MOVEMENT ONLY. Section 2 is the
+       separate POWER comparison; a team can appear in one, the other, or
+       both, and conflating them would make "unexplained" ambiguous. */
+    const flag = n => {
+      const e = bwEntry(n) || {};
+      return (e.reason || '').trim() ? ''
+        : ' <span class="bwwhy">(no reason written)</span>';
+    };
     ranked.forEach(t => {
-      if (pr[t.team] == null) changed.push(esc(t.team) + ' entered at ' + t.rank);
-      else if (pr[t.team] !== t.rank) {
-        changed.push(esc(t.team) + ' ' + pr[t.team] + '→' + t.rank);
+      if (pr[t.team] == null) {
+        changed.push(esc(t.team) + ' entered at ' + t.rank + flag(t.team));
+      } else if (pr[t.team] !== t.rank) {
+        const d = Math.abs(pr[t.team] - t.rank);
+        changed.push(esc(t.team) + ' ' + pr[t.team] + '→' + t.rank +
+          (d >= BW_MOVE_AT ? flag(t.team) : ''));
       }
     });
     Object.keys(pr).forEach(n => {
-      if (now[n] == null) changed.push(esc(n) + ' dropped out (was ' + pr[n] + ')');
+      if (now[n] == null) {
+        changed.push(esc(n) + ' dropped out (was ' + pr[n] + ')' + flag(n));
+      }
     });
   }
   cols.push(['1 · Versus your last saved ballot',
@@ -6002,6 +6037,34 @@ function bwMoveState(name, slot) {
   return { delta: d, power: p };
 }
 
+/* ⚠ A MOVE AGAINST YOUR OWN LAST BALLOT IS A DIFFERENT EVENT FROM A GAP TO
+   POWER, and it was invisible. Moving a team from 6 to 20 while POWER also had
+   them ~20 changed your mind by fourteen slots and asked nothing, because the
+   only test was distance from POWER. These two are independent: either one on
+   its own is worth a sentence, and neither implies the other. */
+function bwPersonalMove(name, slot) {
+  const base = bwPrev();
+  if (!base) return null;                   // nothing saved: nothing to move from
+  const prev = bwPrevRank(name);
+  if (prev == null && slot) return { kind: 'entered', size: null, from: null };
+  if (prev != null && !slot) return { kind: 'dropped', size: null, from: prev };
+  if (prev == null || !slot) return null;
+  const d = prev - slot;                    // positive = you moved them UP
+  if (Math.abs(d) < BW_MOVE_AT) return null;
+  return { kind: 'moved', size: d, from: prev };
+}
+
+/* True when a move deserves a note and none has been written. It NEVER writes
+   one and NEVER blocks the save -- it only decides whether to say so. */
+function bwUnexplained(name, slot) {
+  const ent = bwEntry(name) || {};
+  if ((ent.reason || '').trim()) return null;
+  const pm = bwPersonalMove(name, slot);
+  const ps = slot ? bwMoveState(name, slot) : null;
+  if (!pm && !ps) return null;
+  return { personal: pm, power: ps };
+}
+
 function renderBallot() {
   const list = document.getElementById('bwlist');
   if (!list) return;
@@ -6023,9 +6086,33 @@ function renderBallot() {
           ? '<span class="bwmv up">▲' + (prev - t.rank) + '</span>'
           : '<span class="bwmv dn">▼' + (t.rank - prev) + '</span>')));
     const ms = bwMoveState(t.team, t.rank);
-    const ask = ms ? '<div class="bwask' + (t.reason ? ' done' : '') + '">' +
-        '<label>You have ' + esc(t.team) + ' <b>' + Math.abs(ms.delta) + ' ' +
-        (ms.delta > 0 ? 'higher' : 'lower') + '</b> than POWER (#' + ms.power + '). Why?</label>' +
+    const pm = bwPersonalMove(t.team, t.rank);
+    /* Two independent prompts, one input. The wording says WHICH move is being
+       asked about, because "why?" against POWER and "why?" against your own
+       last ballot are different questions with different answers. */
+    let asklbl = '';
+    if (ms && pm && pm.kind === 'moved') {
+      asklbl = 'You moved ' + esc(t.team) + ' <b>' + Math.abs(pm.size) +
+        ' slot' + (Math.abs(pm.size) === 1 ? '' : 's') + ' ' +
+        (pm.size > 0 ? 'up' : 'down') + '</b> from your last ballot (#' +
+        pm.from + '), and have them <b>' + Math.abs(ms.delta) + ' ' +
+        (ms.delta > 0 ? 'higher' : 'lower') + '</b> than POWER (#' +
+        ms.power + '). Why?';
+    } else if (pm && pm.kind === 'moved') {
+      asklbl = 'You moved ' + esc(t.team) + ' <b>' + Math.abs(pm.size) +
+        ' slot' + (Math.abs(pm.size) === 1 ? '' : 's') + ' ' +
+        (pm.size > 0 ? 'up' : 'down') + '</b> from your last ballot (#' +
+        pm.from + '). Why?';
+    } else if (pm && pm.kind === 'entered') {
+      asklbl = 'You added ' + esc(t.team) + ', who was <b>not on your last ' +
+        'ballot</b>. Why?';
+    } else if (ms) {
+      asklbl = 'You have ' + esc(t.team) + ' <b>' + Math.abs(ms.delta) + ' ' +
+        (ms.delta > 0 ? 'higher' : 'lower') + '</b> than POWER (#' + ms.power +
+        '). Why?';
+    }
+    const ask = asklbl ? '<div class="bwask' + (t.reason ? ' done' : '') + '">' +
+        '<label>' + asklbl + '</label>' +
         '<div class="bwaskrow">' +
         '<select data-reasonkind="' + esc(t.team) + '">' +
           '<option value="">choose…</option>' +
@@ -6399,7 +6486,7 @@ function deskSide(name, avca, power, cls) {
   return '<div class="dside ' + (cls || '') + '">' + bits.join('') +
     logo(name) + '<b>' + esc(name) + '</b>' +
     (power ? '<span class="dpow" title="our POWER rank -- how strong a team is">' +
-      '<s>POWER</s>#' + power + '</span>' : '') +
+      '<span class="rank-label">POWER</span>#' + power + '</span>' : '') +
     '</div>';
 }
 
@@ -8096,6 +8183,13 @@ def strip_private(html):
     # correctly: a private feature should not ship its code either. Sentinels
     # rather than a regex guessing where a block ends.
     html = re.sub(r"/\* BALLOT-WORKSHOP-BEGIN \*/.*?/\* BALLOT-WORKSHOP-END \*/",
+                  "", html, flags=re.S)
+    # ⚠ AND ITS STYLESHEET. The markup, the script, the payload and the endpoint
+    # were all being removed while ~150 lines of .bw* rules stayed behind --
+    # dead weight in the published file, and the selector names alone enumerate
+    # a private feature (.bwreview, .bwpre, .bwpin, .bwcase). No ballot content
+    # was ever in them, which is exactly why this survived four review passes.
+    html = re.sub(r"/\* BALLOT-CSS-BEGIN.*?/\* BALLOT-CSS-END \*/",
                   "", html, flags=re.S)
     html = re.sub(r"/\* BALLOT-CONST-BEGIN \*/.*?/\* BALLOT-CONST-END \*/",
                   "", html, flags=re.S)

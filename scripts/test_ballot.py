@@ -378,9 +378,9 @@ def main():
         check("%s: no external rank renders as a bare numeral" % label,
               not bare, "%d bare badge(s), e.g. %s" % (len(bare), bare[:1]))
         check("%s: the AVCA badge says AVCA on the page" % label,
-              "<s>AVCA</s>#" in h)
+              '<span class="rank-label">AVCA</span>#' in h)
         check("%s: the POWER badge says POWER on the page" % label,
-              "<s>POWER</s>#" in h)
+              '<span class="rank-label">POWER</span>#' in h)
         # RESUME is inactive: it must SAY so, and must not show a number.
         check("%s: an inactive resume says so rather than showing a rank" % label,
               "not active yet" in h)
@@ -463,6 +463,187 @@ def main():
           ".bwprecols{grid-template-columns:1fr}" in src)
     check("a case row wraps rather than overflowing",
           ".bwcase{display:flex" in src and "flex-wrap:wrap" in src)
+
+    print("\n15. CLOSEOUT A -- BALLOT CSS IS STRIPPED FROM THE PUBLIC BUILD")
+    # ⚠ .bwrap IS NOT BALLOT. It is the bracket wrapper (#brkview .bwrap), and
+    # a naive "anything starting .bw" guard fails on it -- which is exactly the
+    # false positive that would get this test disabled.
+    BALLOT_SELECTORS = (
+        ".privtag", ".bwbar", ".bwbtn", ".bwstate", ".bwgrid", ".bwh", ".bwsub",
+        ".bwlist", ".bwrow", ".bwtop", ".bwslot", ".bwmv", ".bwteam", ".bwctl",
+        ".bwjump", ".bwev", ".bwe", ".bwrulers", ".bwr", ".bwreview", ".bwrn",
+        ".bwgrp", ".bwcase", ".bwwhy", ".bwpin", ".bwpre", ".bwprehd",
+        ".bwprecols", ".bwcmp", ".bwcmprow", "#bwcmpout", ".bwask", ".bwaskrow",
+        ".bwnote", ".bwpool", ".bwchip", ".bwnone", ".bwempty", ".bwlink",
+        ".bwadd", ".bwside", ".bwcard", ".bwdl", ".bwdrow", ".bwhrow",
+        ".bwlatest", ".bwh4")
+    src = open(os.path.join(REPO, "scripts", "build_hub.py"),
+               encoding="utf-8").read()
+    check("the ballot CSS region is fenced by sentinels",
+          "BALLOT-CSS-BEGIN" in src and "/* BALLOT-CSS-END */" in src)
+    region = re.search(r"BALLOT-CSS-BEGIN.*?/\* BALLOT-CSS-END \*/", src, re.S)
+    check("the fence encloses a real region", region is not None)
+    if region:
+        body = region.group(0)
+        # ⚠ NOTHING SHARED MAY LIVE INSIDE THE FENCE -- it would be deleted from
+        # the public page silently. Every selector must be ballot-only.
+        sels = re.findall(r"^\s*([.#][A-Za-z][^{,\n]*)(?:,|\{)", body, re.M)
+        stray = [x.strip() for x in sels
+                 if not (x.strip().startswith((".bw", "#bw", ".privtag")))]
+        check("the fence contains no shared selector", not stray, str(stray[:4]))
+        check("...and it is substantial, not an empty fence",
+              body.count("{") > 40, str(body.count("{")))
+    pub = os.path.join(REPO, "output", "vb_dashboard.html")
+    priv = os.path.join(REPO, "Cody", "START-HERE.html")
+    if os.path.exists(pub):
+        ph = open(pub, encoding="utf-8").read()
+        def present(sel, doc):
+            # a selector ends where a CSS name can no longer continue
+            return re.search(re.escape(sel) + r"(?![A-Za-z0-9_-])", doc) is not None
+        left = [x for x in BALLOT_SELECTORS if present(x, ph)]
+        check("NO ballot selector survives in the published HTML", not left,
+              str(left[:6]))
+        # ⚠ CONTROL THE CHECK, NOT THE BUILD. Disabling the strip does not make
+        # this test red: the public build ABORTS instead (the fence comment
+        # names the Workshop, which is a private marker), so the old good file
+        # stays on disk and the test reads that. Fail-closed is the stronger
+        # behaviour -- but it means the only way to show this check can fail is
+        # to feed it a document that really does carry the CSS.
+        doctored = ph + "\n.bwreview{margin:8px}\n.privtag{color:red}\n"
+        caught = [x for x in BALLOT_SELECTORS if present(x, doctored)]
+        check("[+] ...and the check FIRES when it is there (control)",
+              ".bwreview" in caught and ".privtag" in caught, str(caught[:4]))
+        check("[-] the token match does not confuse .bwr with .bwrap",
+              not present(".bwr", ".bwrap{display:block}"))
+        check("[+] ...but does find .bwr when it is a real rule",
+              present(".bwr", ".bwr i{color:red}"))
+        check("...and neither does the fence itself",
+              "BALLOT-CSS-BEGIN" not in ph)
+        # .bwrap must SURVIVE: it belongs to the bracket, not the ballot.
+        check("[+] the bracket's own .bwrap is NOT collateral damage",
+              ".bwrap" in ph)
+        # ⚠ THE LEAK THE FENCE CANNOT SEE FROM THE INSIDE. A class defined
+        # inside the fence but USED by public markup would ship unstyled --
+        # found exactly this: the Match Desk had borrowed .bwsub. The check is
+        # on the consumer side, where the damage would actually appear.
+        fenced = set(re.findall(r"[.#](bw[A-Za-z0-9_-]*|privtag)", region.group(0)))
+        used = set()
+        for attr in re.findall(r'class="([^"]+)"', ph):
+            for cl in attr.split():
+                used.add(cl)
+        orphan = sorted(c for c in used if c in fenced)
+        check("no PUBLIC markup uses a class whose CSS was stripped",
+              not orphan, str(orphan))
+    if os.path.exists(priv):
+        vh = open(priv, encoding="utf-8").read()
+        # POSITIVE CONTROL: the private page must still be styled, or "stripped
+        # from public" would be satisfied by deleting the CSS everywhere.
+        kept = [x for x in BALLOT_SELECTORS
+                if re.search(re.escape(x) + r"(?![A-Za-z0-9_-])", vh)]
+        check("[+] the PRIVATE page keeps its ballot CSS",
+              len(kept) > 30, "only %d of %d" % (len(kept), len(BALLOT_SELECTORS)))
+
+    print("\n16. CLOSEOUT B -- RANK LABELS ARE SEMANTIC, AND STILL VISIBLE")
+    # ⚠ <s> MEANS "no longer accurate". It was being used to make a label small,
+    # which says the opposite of what the label is for -- and a screen reader
+    # announces struck-through text as deleted.
+    for label, path in (("private", priv), ("public", pub)):
+        if not os.path.exists(path):
+            continue
+        h = open(path, encoding="utf-8").read()
+        check("%s: no <s> wraps a rank label" % label,
+              "<s>AVCA</s>" not in h and "<s>POWER</s>" not in h)
+        check("%s: the label uses a neutral element" % label,
+              '<span class="rank-label">' in h)
+        check("%s: AVCA is still VISIBLE beside its number" % label,
+              '<span class="rank-label">AVCA</span>#' in h)
+        check("%s: POWER is still VISIBLE beside its number" % label,
+              '<span class="rank-label">POWER</span>#' in h)
+        bare = re.findall(r'<i class="rnk"[^>]*>\s*\d+\s*</i>', h)
+        check("%s: still no bare external numeral" % label, not bare,
+              str(bare[:1]))
+    check("both renderers emit the same element (python)",
+          '<span class="rank-label">AVCA</span>#%s' in src)
+    check("...and javascript",
+          "'<span class=\"rank-label\">AVCA</span>#'" in src)
+    check("the label no longer has to cancel a line-through",
+          ".rank-label{" in src and ".rnk>s" not in src)
+
+    print("\n17. CLOSEOUT C -- A MOVE AGAINST MY OWN BALLOT IS UNEXPLAINED TOO")
+    check("there is a separate threshold for a personal move",
+          "const BW_MOVE_AT = 3;" in src)
+    check("...and it is independent of the POWER one",
+          "const BW_ASK_AT = 4;" in src)
+    check("a personal-move detector exists", "function bwPersonalMove" in src)
+    check("...and one place decides whether a note is missing",
+          "function bwUnexplained" in src)
+    check("the pre-save 'vs last ballot' column flags them",
+          "no reason written" in src and "bwwhy" in src)
+    # Run the real functions under node with the page's own state stubbed out.
+    node = shutil.which("node")
+    if not node:
+        print("  (no node on PATH -- skipping the behavioural check)")
+    else:
+        fns = []
+        for fn in ("bwPersonalMove", "bwUnexplained"):
+            m = re.search(r"function %s\(.*?\n\}" % fn, src, re.S)
+            if m:
+                fns.append(m.group(0))
+        harness = """
+const BW_MOVE_AT = 3, BW_ASK_AT = 4;
+let PREV = null, POWER = {}, REASON = {};
+function bwPrev() { return PREV; }
+function bwPrevRank(n) { return PREV && PREV[n] != null ? PREV[n] : null; }
+function bwEntry(n) { return { reason: REASON[n] || '' }; }
+function bwMoveState(n, slot) {
+  const p = POWER[n]; if (!p) return null;
+  const d = p - slot; if (Math.abs(d) < BW_ASK_AT) return null;
+  return { delta: d, power: p };
+}
+""" + "\n".join(fns) + """
+const out = [];
+function t(label, prev, power, reason, name, slot) {
+  PREV = prev; POWER = power; REASON = reason;
+  const pm = bwPersonalMove(name, slot);
+  const un = bwUnexplained(name, slot);
+  out.push([label, pm ? pm.kind : null, pm && pm.size, !!un,
+            un && !!un.personal, un && !!un.power]);
+}
+// close to POWER, but moved 3 against my own ballot -- the case that was blind
+t('moved 3, near POWER', {A:22}, {A:20}, {}, 'A', 19);
+t('moved 2, near POWER', {A:21}, {A:20}, {}, 'A', 19);
+t('entered', {B:1}, {A:20}, {}, 'A', 19);
+t('dropped', {A:5}, {A:20}, {}, 'A', null);
+t('moved 3 but explained', {A:22}, {A:20}, {A:'my reason'}, 'A', 19);
+t('far from POWER only', {A:19}, {A:30}, {}, 'A', 19);
+t('no previous ballot', null, {A:20}, {}, 'A', 19);
+console.log(JSON.stringify(out));
+"""
+        got = json.loads(subprocess.check_output(
+            [node, "-e", harness], universal_newlines=True).strip())
+        by = dict((r[0], r) for r in got)
+        check("[+] moved 3 slots near POWER is now unexplained",
+              by['moved 3, near POWER'][3] is True
+              and by['moved 3, near POWER'][4] is True
+              and by['moved 3, near POWER'][5] is False, str(by['moved 3, near POWER']))
+        check("[-] moved 2 slots is NOT flagged (threshold is 3)",
+              by['moved 2, near POWER'][3] is False, str(by['moved 2, near POWER']))
+        check("[+] entering the ballot counts", by['entered'][1] == 'entered'
+              and by['entered'][3] is True, str(by['entered']))
+        check("[+] dropping out counts", by['dropped'][1] == 'dropped'
+              and by['dropped'][3] is True, str(by['dropped']))
+        check("[-] a written reason clears it",
+              by['moved 3 but explained'][3] is False,
+              str(by['moved 3 but explained']))
+        check("[+] the POWER marker still works on its own",
+              by['far from POWER only'][3] is True
+              and by['far from POWER only'][4] is False
+              and by['far from POWER only'][5] is True,
+              str(by['far from POWER only']))
+        check("[-] with nothing saved there is no personal move to report",
+              by['no previous ballot'][1] is None
+              and by['no previous ballot'][3] is False,
+              str(by['no previous ballot']))
 
     print()
     if FAILS:
