@@ -428,8 +428,23 @@ class Handler(SimpleHTTPRequestHandler):
         except Exception as e:                            # noqa: BLE001
             self._json({"ok": False, "error": "could not save: %s" % e}, 500)
             return
+        # ⚠ THE SAVE IS ALREADY DONE AND IS NOT CONDITIONAL ON THE BACKUP.
+        # The ballot is on disk before this line; the mirror to the private repo
+        # is attempted afterwards and reported honestly. A network failure, a
+        # missing backup repo or a rejected push all come back as "pending" --
+        # never as a green tick over a backup that did not happen, and never as
+        # a failed save.
+        backup = {"state": "pending", "detail": "not attempted"}
+        try:
+            import importlib
+            import ballot_backup
+            importlib.reload(ballot_backup)
+            backup = ballot_backup.sync()
+        except Exception as e:                            # noqa: BLE001
+            backup = {"state": "pending",
+                      "detail": "backup unavailable: %s" % str(e)[:100]}
         self._json({"ok": True, "saved_utc": row.get("saved_utc"),
-                    "count": len(B.load())})
+                    "count": len(B.load()), "backup": backup})
 
     def do_GET(self):
         if self.path.split("?")[0] == "/api/ballot":

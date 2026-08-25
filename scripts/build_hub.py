@@ -5482,8 +5482,23 @@ async function bwSave() {
     const r = await fetch('/api/ballot', { method: 'POST',
       headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
     const j = await r.json();
-    if (j.ok) { ok = true; BW_DURABLE = true; bwSay('Saved to data/ballots_' + SEASON_YEAR +
-        '.jsonl · ' + j.count + ' on file', 'good'); }
+    if (j.ok) {
+      ok = true; BW_DURABLE = true;
+      /* ⚠ TWO SEPARATE FACTS, REPORTED SEPARATELY. The save happened -- that is
+         settled the moment the server answers ok. Whether the private backup
+         also went through is a different question, and a green tick that
+         covers both would be claiming something nobody checked. A pending
+         backup is stated, with its reason. */
+      const b = j.backup || {};
+      if (b.state === 'synced') {
+        bwSay('Saved · ' + j.count + ' on file · backed up', 'good');
+      } else if (b.state === 'nothing-to-back-up') {
+        bwSay('Saved · ' + j.count + ' on file', 'good');
+      } else {
+        bwSay('Saved · ' + j.count + ' on file · BACKUP PENDING — ' +
+              (b.detail || 'not synced'), 'warn');
+      }
+    }
     else bwSay('Not saved: ' + j.error, 'warn');
   } catch (e) {
     BW_DURABLE = false;

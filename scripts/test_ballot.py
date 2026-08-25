@@ -248,7 +248,52 @@ def main():
         check("the daily job never force-adds an ignored file", not forced, str(forced))
         check("...and never adds data/ or . wholesale", not broad, str(broad))
 
-    print("\n8. The ballot feeds no rating, and is not published")
+    print("\n8. The private backup leaks nothing into the public repo")
+    bb = os.path.join(REPO, "scripts", "ballot_backup.py")
+    if not os.path.exists(bb):
+        print("  (no backup script -- skipping)")
+    else:
+        src = open(bb, encoding="utf-8").read()
+        # ⚠ THIS FILE IS COMMITTED TO A PUBLIC REPOSITORY. It must not name the
+        # private destination -- not the repo, not a token, not even an
+        # absolute local path. The remote is discovered from the backup
+        # directory's own .git/config, outside this project.
+        leaks = []
+        if re.search(r'https?://\S*github', src, re.I):
+            leaks.append("a github URL")
+        if re.search(r"ghp_|github_pat_|sk-ant-|ANTHROPIC_API_KEY", src):
+            leaks.append("a credential")
+        if re.search(r"/Users/", src):
+            leaks.append("an absolute home path")
+        if "wvb-hub-private" in src:
+            leaks.append("the private repo name")
+        check("the backup script names no URL, credential or absolute path",
+              not leaks, ", ".join(leaks))
+        # POSITIVE CONTROL: the scan can see such a string when one is present.
+        check("...and the scan would catch one (positive control)",
+              bool(re.search(r'https?://\S*github', src + 'https://github.com/x')))
+        # it must never be wired into CI
+        wf2 = os.path.join(REPO, ".github", "workflows", "daily.yml")
+        if os.path.exists(wf2):
+            check("the daily job never runs the backup",
+                  "ballot_backup" not in open(wf2, encoding="utf-8").read(),
+                  "CI has no credentials for a private repo and no business "
+                  "touching one")
+
+    # a failed backup must never be reported as a success
+    hub3 = os.path.join(REPO, "Cody", "START-HERE.html")
+    if os.path.exists(hub3):
+        h3 = open(hub3, encoding="utf-8").read()
+        check("the workshop can say BACKUP PENDING", "BACKUP PENDING" in h3,
+              "a failed sync would be indistinguishable from a good one")
+        check("...and it is styled as a warning, not a success",
+              re.search(r"BACKUP PENDING[^;]*?'warn'", h3, re.S) is not None)
+    pub3 = os.path.join(REPO, "output", "vb_dashboard.html")
+    if os.path.exists(pub3):
+        check("no backup wording reaches the published page",
+              "BACKUP PENDING" not in open(pub3, encoding="utf-8").read())
+
+    print("\n9. The ballot feeds no rating, and is not published")
     # ⚠ THE INVARIANT THAT MATTERS MOST. Reasons are words; if any rating input
     # ever read this file, a subjective trait would have become a coefficient.
     # ⚠ THE SCAN IS OVER MODEL CODE, NOT OVER GUARDS -- and the first version
@@ -265,14 +310,30 @@ def main():
     for fn in sorted(os.listdir(os.path.join(REPO, "scripts"))):
         if not fn.endswith(".py"):
             continue
-        if fn.startswith("test_") or fn in ("ballot.py", "live_server.py",
-                                            "build_hub.py"):
+        # Excluded on purpose, each for a different reason:
+        #   test_*        guards may NAME the path as a control fixture
+        #   ballot.py     owns the file
+        #   ballot_backup.py  copies it -- that IS its job, and it is not a
+        #                 model input; it computes nothing and returns nothing
+        #                 to any rating
+        #   live_server / build_hub  serve and render, they do not rate
+        if fn.startswith("test_") or fn in ("ballot.py", "ballot_backup.py",
+                                            "live_server.py", "build_hub.py"):
             continue
         src = open(os.path.join(REPO, "scripts", fn), encoding="utf-8").read()
         if "ballots_" in src or re.search(r"^\s*import ballot\b", src, re.M):
             hits.append(fn)
     check("no rating, projection or simulator script reads the ballot file",
           not hits, str(hits))
+    # ⚠ AND THE BACKUP MUST STAY INERT. It may read the ballot -- that is what a
+    # backup does -- but it must never compute from it or hand it to anything.
+    bbp = os.path.join(REPO, "scripts", "ballot_backup.py")
+    if os.path.exists(bbp):
+        bsrc = open(bbp, encoding="utf-8").read()
+        modelish = [t for t in ("rating", "projection", "simulate", "digby_top25",
+                                "composite", "resume_") if t in bsrc]
+        check("the backup script imports and computes nothing model-related",
+              not modelish, str(modelish))
     # POSITIVE CONTROL: the scan can see a real reader, or it proves nothing.
     check("...and the scan would notice one that did",
           "ballots_" in open(os.path.join(REPO, "scripts", "ballot.py"),
