@@ -122,14 +122,23 @@ jobs:
           sys.exit(1 if n == 0 else 0)
           PY
 
-      # The SAME rebuild sequence the daily job runs, minus two things:
-      #   snapshot_rankings -- the weekly freeze belongs to the daily run, and
-      #     writing a history row from a mid-day poll would put the archive on a
-      #     cadence nobody asked for;
-      #   the 2025 base -- it is committed and does not change in-season.
+      # The SAME rebuild sequence the daily job runs, minus ONE thing:
+      # snapshot_rankings. The weekly freeze belongs to the daily run; writing a
+      # history row from a mid-day poll would put the archive on a cadence
+      # nobody asked for.
       - name: Rebuild derived outputs
         if: steps.after.outputs.changed == 'yes' || github.event.inputs.force == 'true'
         run: |
+          # ⚠ THE 2025 BASE IS REBUILT HERE, AND OMITTING IT BROKE THE FIRST RUN.
+          # I had reasoned it was "committed and does not change in-season" --
+          # true of data/raw/2025/, false of these three, which are gitignored
+          # DERIVED artifacts. CI checks out a clean tree every run, so
+          # build_hub.py exited 1 with "no data/rating_2025.json". Measured at
+          # 19.8s, which a 30-minute cadence can afford; predict, simulate and
+          # build_hub all read rating_2025.json.
+          WVB_SEASON=2025 python3 scripts/build_dataset.py
+          WVB_SEASON=2025 python3 scripts/rpi_2025.py
+          WVB_SEASON=2025 python3 scripts/rating_2025.py
           python3 scripts/venues.py
           python3 scripts/availability.py || echo "availability skipped"
           python3 scripts/build_dataset.py

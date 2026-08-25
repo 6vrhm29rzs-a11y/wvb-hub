@@ -183,15 +183,17 @@ def check_refresh_runs_from_a_fresh_checkout(season):
     tmp = tempfile.mkdtemp(prefix="wvb-refresh-")
     try:
         materialise(tmp)
-        # the refresh assumes the daily job has produced the 2025 base at least
-        # once; on a fresh checkout that is exactly what is missing, so build it
-        # here rather than pretending the refresh is standalone.
-        env = dict(os.environ)
-        env["WVB_SEASON"] = "2025"
-        for c in ("python3 scripts/build_dataset.py", "python3 scripts/rpi_2025.py",
-                  "python3 scripts/rating_2025.py"):
-            subprocess.call(c, shell=True, cwd=tmp, env=env,
-                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        # ⚠ THE FIRST VERSION OF THIS TEST BUILT THE 2025 BASE HERE FIRST, AND
+        # THAT IS WHY IT PASSED WHILE THE REAL JOB FAILED. I had written in
+        # refresh.yml that "the 2025 base is committed and does not change
+        # in-season" -- true of the RAW DATA and false of the derived artifacts,
+        # which are gitignored and must be rebuilt on every checkout. CI starts
+        # from a clean tree every run, so build_hub exited 1 with "no
+        # data/rating_2025.json". A test that pre-supplies the missing input is
+        # not testing the sequence, it is accommodating its bug.
+        #
+        # Nothing is pre-built now. The refresh workflow must stand on its own,
+        # exactly as CI runs it.
         results = run_sequence(cmds, tmp, season)
         bad = [(c, rc) for c, tol, rc in results if rc != 0 and not tol]
         for c, rc in bad:
