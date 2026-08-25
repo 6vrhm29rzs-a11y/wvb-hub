@@ -347,6 +347,102 @@ helper removed the literal sentences the guard was matching ("Her only match on
 file"), so four checks failed on a correct page. **Assert the pieces and the
 branches, not one implementation's literals.**
 
+**8. A TEAM'S RECORD HAD TWO DEFINITIONS, AND A COMMENT SAYING IT COULDN'T.**
+The biggest of today's findings, and it came from following the same thread one
+view further. `standings()` has always dropped non-D-I opponents -- **correct,
+and the NCAA's own convention**: the official RPI `Record` column excludes them
+and breaks them out as `Non-Div I`. But `record26` counted every match. So:
+
+| surface | Norfolk St. showed |
+|---|---|
+| team header chip | `2026 1-0` |
+| team page glance | `1-0, 1 played` |
+| standings row | `Overall 0-0` |
+| standings Form | `W` |
+
+**A win with no matches, and a chip contradicting a row on the same site.** The
+comment above `_w26` claimed all of it came from "one source, so the four
+cannot disagree". They shared an **input**, not a **definition** -- which is R4
+in its purest form, and the comment made it harder to see, not easier.
+
+Now: the record is Division-I-only everywhere, and the non-D-I result is
+**shown beside it** rather than dropped in silence -- `0-0 +1-0 nD1` in the
+standings, `0-0 · 1-0 vs non-D-I` on the team page, `2026 0-0 +1-0 nD1` in the
+header chip, and the form pill's tooltip names the division for the W the
+record does not count. `record26_nondi` is its own field so no consumer has to
+re-derive it and none can fold it back in.
+
+⚠ **All five consumers of `record26` were audited before changing it** (R4),
+not after: the header chip, the glance card, the ballot comparison row, the
+ballot brief line, and the Digby-facing bits line.
+
+**Guarded** in `test_player_aggregation.py` 5c: every team's record must equal
+its own standings row, and the non-D-I split must agree on both surfaces.
+**Negative control**: restoring the all-matches count makes it fail with
+`Norfolk St. chip=1-0 standings=0-0` -- the exact bug, named.
+
+⚠ **AND THE POSITIVE CONTROL EARNED ITS PLACE ON THE FIRST RUN.** `TEAMS` is
+keyed by name and its values carry **no `team` field**, so my cross-check
+compared **zero teams** and reported "every team's record matches its standings
+row -- ok". Only `[+] ...and teams were actually compared` caught it. **Every
+cross-check needs a check that it compared anything at all**; without one, the
+emptier the comparison the greener it looks.
+
+**9. TWO CLARITY SEAMS CLOSED, AND BOTH WERE DECISIONS RATHER THAN BUGS.**
+
+**(a) A hover title is not a label.** The non-D-I form pill explained itself
+only in a `title`, which does not exist on a phone, is not announced while
+scanning a column, and cannot be seen in a screenshot. The marker is now TEXT
+on the face of the pill -- `W nD1` -- and the pill is **outlined rather than
+filled**, so a result the record excludes separates from one it counts before
+you read either. The long sentence stays in the title for anyone who does hover.
+⚠ **`.fw`/`.fl` IS A FIXED 19x19 BOX**, so the suffix overflowed it -- measured
+at a 358px phone width, `scrollWidth` past `clientWidth`. The marked pill gets
+`width:auto` with height and line-height held at 19px, so it still shares a
+baseline with the pills beside it. Both facts are guarded.
+
+**(b) THE `+/-` BASIS IS NOW DECIDED AND STATED: DIVISION-I ONLY.** It was
+built from `team_season_stats()`'s `own`/`opp`, which count **every** opponent,
+and sat beside a Division-I-only record -- so Norfolk St. read
+**`Overall 0-0 ... +9.67`**, a differential earned in the very match the record
+on that row excludes. Two bases in one row.
+The differential now comes from `own_di`/`opp_di`, **accumulated in the same
+pass** as the all-opponent totals so the two cannot drift, and the column header
+carries a visible `D-I` stamp rather than hiding the basis in a tooltip. A team
+with no Division-I match yet shows **an em dash**, not a borrowed number --
+which is what Norfolk St. correctly shows today.
+**The team page's "Team stats, 2026" box deliberately keeps every opponent** --
+a different view with a different job -- and says so in its own note. The two
+are not in conflict; each states its basis.
+
+⚠ **THERE ARE TWO FORM BUILDERS AND I ONLY FIXED ONE AT FIRST.** A Python one
+(server-rendered) and a JS one built from `RESULTS`. `formPills()` uses the JS
+one, so the first patch changed nothing visible. The JS side cannot ask
+`TEAMS` whether an opponent is Division I -- `TEAMS` is declared near the END of
+the script and reading it from a `const` initialiser throws
+`Cannot access 'TEAMS' before initialization`, the same dead zone that has
+already broken routing and My Board here. It is fed an explicit
+`NONDI_OPP` set instead: no ordering hazard, and it is one name today.
+
+⚠ **KEEP A USER-VISIBLE SENTENCE IN ONE STRING LITERAL.** The pill's
+explanation was written as `'...it is not ' + 'counted in the...'`, so the
+phrase never appeared contiguously in the built page and the guard looking for
+it failed against correct output. Joined.
+
+⚠ **AND `elementFromPoint` ONLY WORKS INSIDE THE VIEWPORT.** It reported the
+marker as unpainted at both widths; the row was at y=5440. Scrolled into view,
+it returns `I.fndt` "nD1". **Third time this session that a geometry read
+disagreed with the pixels and the pixels were right.** Screenshot confirms it.
+
+**Guards** (`test_display_invariants.py`): the marker must be rendered text and
+must be conditional; the pill must be widened if `.fw/.fl` is a fixed box; a
+phone-breakpoint rule must exist for it; `+/-` must read `own_di`/`opp_di` and
+must NOT read `own`/`opp`; the header must carry the visible stamp; a
+split-record team must exist to test; such a team must not carry a D-I
+differential with no D-I match; and no row's `diff_n` may exceed its own
+`w + l`. **Three negative controls, all verified to trip**: reverting the
+basis, removing the visible text, and removing the width override.
+
 **State at close:** 24 suites pass with `Cody/` present and 24 with it moved
 aside. Tree is clean apart from the three fixes above. Nothing here changes
 data, ratings, or the crawl -- all three are display-layer only.

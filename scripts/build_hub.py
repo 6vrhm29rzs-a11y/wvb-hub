@@ -722,13 +722,25 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
             })
 
     # THIS season's W-L, from the very same `played` list the fixtures, the form
-    # pills and the standings all come from. One source, so the four cannot
-    # disagree -- and a team with no completed match is ABSENT rather than
-    # "0-0", which would read as a played-and-drawn record.
+    # pills and the standings all come from -- and a team with no completed
+    # match is ABSENT rather than "0-0", which would read as played-and-drawn.
+    #
+    # ⚠ DIVISION-I ONLY, and the comment here used to claim "one source, so the
+    # four cannot disagree". That was FALSE. `standings()` has always dropped
+    # non-D-I opponents (correctly -- it is the NCAA's own convention, the
+    # official RPI `Record` column excludes them and breaks them out as
+    # `Non-Div I`), while this counted every match. So Norfolk St. carried a
+    # "2026 1-0" chip in its team header directly above a standings row reading
+    # "Overall 0-0". Sharing an input is not the same as sharing a DEFINITION
+    # (R4). The non-D-I split rides along so a consumer can show it rather than
+    # silently lose the result.
     _w26 = {}
     for _nm, _gs in played.items():
-        _w = sum(1 for g in _gs if (g["mine"] or 0) > (g["theirs"] or 0))
-        _w26[_nm] = (_w, len(_gs) - _w)
+        _di_g = [g for g in _gs if not g.get("nondi")]
+        _nd_g = [g for g in _gs if g.get("nondi")]
+        _w = sum(1 for g in _di_g if (g["mine"] or 0) > (g["theirs"] or 0))
+        _nw = sum(1 for g in _nd_g if (g["mine"] or 0) > (g["theirs"] or 0))
+        _w26[_nm] = (_w, len(_di_g) - _w, _nw, len(_nd_g) - _nw)
 
     fixtures = {}
     vidx = venue_index()
@@ -977,8 +989,13 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
             # and the form pills are built from -- one source, so the three
             # cannot disagree. None until a team has played, never "0-0" for a
             # team with no fixtures on file.
-            "record26": (("%d-%d" % (_w26.get(nm, (0, 0))[0], _w26.get(nm, (0, 0))[1]))
+            "record26": (("%d-%d" % (_w26[nm][0], _w26[nm][1]))
                          if nm in _w26 else None),
+            # The non-D-I record, as its own field so no consumer has to
+            # re-derive it and none can accidentally fold it into the record.
+            "record26_nondi": (("%d-%d" % (_w26[nm][2], _w26[nm][3]))
+                               if nm in _w26 and
+                               (_w26[nm][2] or _w26[nm][3]) else None),
             "ret": t["ret"],
             "rotation": [dict(c, pos=rpos.get(nkey(c.get("name"))),
                               photo=(photos.get(nm) or {}).get(
@@ -1197,12 +1214,32 @@ def standings(teams, res):
     rec = {}
     for t in teams:
         rec[t["team"]] = {"team": t["team"], "conf": t["conf"], "w": 0, "l": 0,
-                          "cw": 0, "cl": 0, "rank": t["rank26"]}
+                          "cw": 0, "cl": 0,
+                          # ⚠ NON-D-I RESULTS ARE COUNTED SEPARATELY, NOT
+                          # DROPPED IN SILENCE. The record here is
+                          # Division-I-only, which is CORRECT and is the NCAA's
+                          # own convention -- the official RPI table's `Record`
+                          # column excludes non-D-I opponents and breaks them
+                          # out as `Non-Div I`. What was wrong was saying
+                          # nothing: Norfolk St. beat a Division-II side and
+                          # its row read "Overall 0-0" next to a Form of "W"
+                          # and a differential of "+9.67" -- a win with no
+                          # matches, because Form and +/- are built from a
+                          # source that keeps every opponent. One event, three
+                          # consumers, two answers (R4).
+                          "nw": 0, "nl": 0,
+                          "rank": t["rank26"]}
     for r in res:
         h, a = r["home"], r["away"]
-        if h not in rec or a not in rec:
-            continue
         hw = (r["home_sets"] or 0) > (r["away_sets"] or 0)
+        # A match with a non-D-I side still HAPPENED to the D-I team in it.
+        if (h in rec) != (a in rec):
+            for nm, won in ((h, hw), (a, not hw)):
+                if nm in rec:
+                    rec[nm]["nw" if won else "nl"] += 1
+            continue
+        if h not in rec or a not in rec:
+            continue                                # neither side is D-I
         same = conf_of.get(h) and conf_of.get(h) == conf_of.get(a)
         for nm, won in ((h, hw), (a, not hw)):
             rec[nm]["w" if won else "l"] += 1
@@ -1576,9 +1613,27 @@ def team_season_stats(boxes, res):
         names = list(by_team)
         for i, team in enumerate(names):
             opp = names[1 - i]
-            mine = acc.setdefault(team, {"own": blank(), "opp": blank()})
-            for src, dst in ((by_team[team], mine["own"]),
-                             (by_team[opp], mine["opp"])):
+            mine = acc.setdefault(team, {"own": blank(), "opp": blank(),
+                                         # ⚠ THE SAME TOTALS, DIVISION-I
+                                         # OPPONENTS ONLY. The standings row
+                                         # shows a Division-I-only record and
+                                         # was showing a +/- built from EVERY
+                                         # opponent beside it -- Norfolk St.
+                                         # read "Overall 0-0 ... +9.67", a
+                                         # differential earned in a match the
+                                         # record on the same row does not
+                                         # count. Two bases in one row, which
+                                         # is the mix R4 exists to stop.
+                                         # Accumulated in the same pass so the
+                                         # two can never drift.
+                                         "own_di": blank(),
+                                         "opp_di": blank()})
+            _opp_is_di = not (_di_ms and opp not in _di_ms)
+            _pairs = [(by_team[team], mine["own"]), (by_team[opp], mine["opp"])]
+            if _opp_is_di:
+                _pairs += [(by_team[team], mine["own_di"]),
+                           (by_team[opp], mine["opp_di"])]
+            for src, dst in _pairs:
                 sets = 0.0
                 for r in src:
                     for f in ("k", "e", "ta", "ast", "digs", "bs", "ba", "aces"):
@@ -1592,11 +1647,14 @@ def team_season_stats(boxes, res):
                     dst["nondi"] += 1
             mine["own"]["board"] += (board.get(str(gid)) or {}).get(team, 0.0)
             mine["opp"]["board"] += (board.get(str(gid)) or {}).get(opp, 0.0)
+            if _opp_is_di:
+                mine["own_di"]["board"] += (board.get(str(gid)) or {}).get(team, 0.0)
+                mine["opp_di"]["board"] += (board.get(str(gid)) or {}).get(opp, 0.0)
 
     out = {}
     for team, sides in acc.items():
         row = {}
-        for key in ("own", "opp"):
+        for key in ("own", "opp", "own_di", "opp_di"):
             d = sides[key]
             n = d["sets"] or 0
             row[key] = {
@@ -1860,6 +1918,11 @@ def top25_view(avca=None):
     for r in ((load("data/digby_top25_%d.json" % SEASON) or {}).get("top") or []):
         ranked[r["team"]] = r["rank"]
     form = {}                                           # type: Dict[str, List[Dict]]
+    # The form strip keeps EVERY result, including non-D-I ones -- a match that
+    # was played is form. The record beside it counts D-I only, so the pill
+    # names the division rather than leaving a "W" that the record does not
+    # explain.
+    _di_form = di_teams()
     for g in sorted(results() or [], key=lambda x: x.get("epoch") or 0):
         for me, them, mine, theirs in ((g["away"], g["home"], g["away_sets"], g["home_sets"]),
                                        (g["home"], g["away"], g["home_sets"], g["away_sets"])):
@@ -1868,6 +1931,7 @@ def top25_view(avca=None):
             form.setdefault(me, []).append({
                 "won": mine > theirs, "score": "%s-%s" % (mine, theirs),
                 "opp": them, "opp_rank": ranked.get(them), "date": g.get("date"),
+                "nondi": bool(_di_form) and them not in _di_form,
             })
     top = doc.get("top") or []
     if not top:
@@ -2188,6 +2252,9 @@ def build():
     for r in preds.get("games", []):
         pred_by_pair[(r["date"], r["away"], r["home"])] = r
     logos = team_logos()
+    # Division-I membership, once, for everything in this function that needs
+    # to say whether an opponent qualifies.
+    _di_all = di_teams()
     boxes, plist = box_and_players(res, player_photos(), avca_honours())
     # Season team totals for 2026, both what a team does and what it allows.
     tstats = team_season_stats(boxes, res)
@@ -2195,10 +2262,17 @@ def build():
     for _rows in stand.values():
         for _r in _rows:
             _ts = tstats.get(_r["team"]) or {}
-            _o, _d = (_ts.get("own") or {}), (_ts.get("opp") or {})
+            # ⚠ DIVISION-I ONLY, THE SAME MATCH SET AS THE RECORD BESIDE IT.
+            # This used to read `own`/`opp`, which count every opponent, so a
+            # row could show "Overall 0-0" and "+9.67" together -- a
+            # differential from a match the record excludes. A team with no
+            # D-I match yet has no D-I differential and renders "--" rather
+            # than borrowing a number from a match that does not qualify.
+            _o, _d = (_ts.get("own_di") or {}), (_ts.get("opp_di") or {})
             _r["diff"] = (round(_o["pps"] - _d["pps"], 2)
                           if _o.get("pps") is not None and _d.get("pps") is not None
                           else None)
+            _r["diff_n"] = _o.get("matches") or 0
     ldrs, ldr_floor, ldr_pool = leaders(player_photos(), avca_honours())
     # How a conference awards its automatic bid, and how many matches each team
     # actually has on the schedule -- both needed to say honestly what the
@@ -2889,6 +2963,11 @@ def build():
               "away_sets": r["away_sets"], "home_sets": r["home_sets"],
               "epoch": r.get("epoch")}
              for r in sorted(res, key=lambda x: x.get("epoch") or 0)])) \
+        .replace("{{NONDI_JSON}}", json.dumps(
+            sorted(set(
+                nm for r in res for nm in (r["home"], r["away"])
+                if _di_all and nm not in _di_all)),
+            separators=(",", ":"))) \
         .replace("{{LOGOS_JSON}}", json.dumps(logos, separators=(",", ":"))) \
         .replace("{{COLORS_JSON}}", json.dumps(team_colors, separators=(",", ":"))) \
         .replace("{{BOXES_JSON}}", json.dumps(boxes, separators=(",", ":"))) \
@@ -4975,6 +5054,33 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 .rstat em{display:block;font:600 9px/1 var(--sans);letter-spacing:.05em;
   text-transform:uppercase;color:var(--ink3);font-style:normal;margin-top:3px}
 .rstat .none{color:var(--ink3);font-weight:400}
+/* A form pill for a result the Division-I record excludes. Outlined, not
+   filled, and carrying its own two-and-a-bit characters of text -- so it reads
+   as "this happened but is not counted" at a glance and on a phone, where no
+   hover exists. The suffix is deliberately not an icon: an icon would need the
+   very tooltip this replaces. */
+/* ⚠ .fw/.fl IS A FIXED 19x19 BOX. Appending the suffix inside it overflowed
+   the pill -- measured at a 358px phone width, scrollWidth beyond clientWidth
+   -- so the marked pill is given its own auto width. Height and line-height
+   are kept at 19px so it still sits on the same baseline as the pills beside
+   it; only the width grows. */
+.fw.fnd,.fl.fnd{width:auto;min-width:19px;padding:0 4px;
+  background:transparent;border:1px dashed currentColor}
+.fndt{font-style:normal;font-weight:700;font-size:8.5px;letter-spacing:.03em;
+  margin-left:3px;opacity:.9}
+@media (max-width:560px){.fw.fnd,.fl.fnd{padding:0 3px}
+  .fndt{font-size:8px;margin-left:2px}}
+
+/* The basis, stamped on the column header itself so the number cannot be
+   read as something wider than it is. */
+.thb{display:block;font:700 8px/1.4 var(--mono);letter-spacing:.06em;
+  color:var(--ink3);font-weight:700}
+
+/* The non-D-I record, shown beside the record it is excluded from. Quiet:
+   it is a footnote to the number, not a competing number. */
+.nvd{display:block;font:600 9px/1.4 var(--mono);color:var(--ink3);
+  font-style:normal;letter-spacing:.02em;white-space:nowrap}
+
 /* The division caveat, wherever a rate is read. Emphatic but not an error
    state: this is a fact about the schedule, not a fault. */
 .dicaveat{color:var(--chalk);font-weight:700}
@@ -6669,6 +6775,13 @@ renderPlayers();
 /* ---- standings --------------------------------------------------------- */
 const STANDINGS = {{STANDINGS_JSON}};
 const RESULTS = {{RESULTS_JSON}};
+/* ⚠ THE NON-DIVISION-I OPPONENTS THAT APPEAR IN THESE RESULTS, as an explicit
+   list rather than "not in TEAMS". TEAMS is declared near the END of this
+   script, so reading it from a const initialiser up here throws
+   `Cannot access 'TEAMS' before initialization` -- the temporal dead zone that
+   has already broken routing and My Board in this file. An explicit set has no
+   ordering hazard and is a handful of names. */
+const NONDI_OPP = new Set({{NONDI_JSON}});
 const stsel = document.getElementById('stconf');
 Object.keys(STANDINGS).sort().forEach(c => {
   const o = document.createElement('option'); o.value = o.textContent = c; stsel.appendChild(o);
@@ -6690,7 +6803,8 @@ const FORM = (() => {
     [[g.away, g.home, g.away_sets, g.home_sets],
      [g.home, g.away, g.home_sets, g.away_sets]].forEach(([me, them, mine, theirs]) => {
       (by[me] = by[me] || []).push({won: mine > theirs, opp: them,
-                                    score: mine + '-' + theirs});
+                                    score: mine + '-' + theirs,
+                                    nondi: NONDI_OPP.has(them)});
     });
   });
   return by;
@@ -6699,9 +6813,24 @@ function formPills(team, n) {
   const gs = FORM[team] || [];
   if (!gs.length) return '<span class="noform" title="no results yet">&mdash;</span>';
   return gs.slice(-(n || 5)).map(g =>
-    '<span class="' + (g.won ? 'fw' : 'fl') + '" title="' +
-    (g.won ? 'beat ' : 'lost to ') + g.opp + ' ' + g.score + '">' +
-    (g.won ? 'W' : 'L') + '</span>').join('');
+    /* ⚠ A "W" THE RECORD DOES NOT COUNT MUST SAY SO ON THE FACE OF THE PILL.
+       A hover title is not a label: it does not exist on a phone, it is not
+       read out, and it cannot be seen while scanning a column. The marker is
+       therefore TEXT in the pill -- "W nD1" -- and the pill is outlined
+       rather than filled so the eye separates it from a counted result even
+       before reading it. The title stays as the long form. */
+    '<span class="' + (g.won ? 'fw' : 'fl') + (g.nondi ? ' fnd' : '') +
+    '" title="' +
+    (g.won ? 'beat ' : 'lost to ') + g.opp + ' ' + g.score +
+    /* ⚠ ONE UNBROKEN STRING. Split as '...it is not ' + 'counted in the...'
+       the sentence never appears contiguously in the built page, so a guard
+       searching for the phrase cannot find it -- which is exactly what
+       happened. Keep a user-visible sentence in one literal. */
+    (g.nondi
+      ? ' \u2014 a non-Division-I opponent. It happened, and it is not counted in the Division-I record.'
+      : '') + '">' +
+    (g.won ? 'W' : 'L') +
+    (g.nondi ? '<i class="fndt">nD1</i>' : '') + '</span>').join('');
 }
 
 function renderStandings() {
@@ -6720,15 +6849,32 @@ function renderStandings() {
     '<div class="stgrid">' + confs.map(c => {
       const rows = STANDINGS[c];
       return '<div class="tsec"><h3>' + c + '</h3><div class="body">' +
-        '<table><thead><tr><th class="l">Team</th><th>Conf</th><th>Overall</th>' +
+        '<table><thead><tr><th class="l">Team</th><th>Conf</th>' +
+        '<th title="Division-I opponents only, the NCAA\u2019s own convention ' +
+        '\u2014 the official RPI table excludes non-Division-I results from a ' +
+        'record and breaks them out separately. A team with such a result ' +
+        'shows it beside this column.">Overall</th>' +
         '<th class="l" title="last five, oldest first">Form</th>' +
-        '<th title="points won minus points allowed, per set">+/-</th>' +
+        '<th title="Points scored minus points allowed, per set, against ' +
+        'DIVISION-I OPPONENTS ONLY \u2014 the same matches the record beside ' +
+        'it counts. A team with no Division-I match yet shows a dash.">' +
+        '+/-<span class="thb">D-I</span></th>' +
         '<th>Rk</th></tr></thead><tbody>' +
         rows.map(r => {
           const diff = r.diff === undefined ? null : r.diff;
           return '<tr><td class="tm">' + logo(r.team) + r.team + '</td>' +
           '<td class="n">' + r.cw + '-' + r.cl + '</td>' +
-          '<td class="n">' + r.w + '-' + r.l + '</td>' +
+          /* ⚠ THE D-I RECORD, PLUS ANY NON-D-I RESULT BESIDE IT. Dropping
+             those matches from the record is right and is what the NCAA does;
+             dropping them SILENTLY is what produced "Overall 0-0" on a row
+             whose own Form column said "W". */
+          '<td class="n">' + r.w + '-' + r.l +
+          ((r.nw || r.nl)
+            ? '<i class="nvd" title="' + r.nw + '-' + r.nl + ' against ' +
+              'non-Division-I opponents. Not counted in the record above, ' +
+              'which follows the NCAA convention of Division-I results only.">' +
+              '+' + r.nw + '-' + r.nl + ' nD1</i>'
+            : '') + '</td>' +
           '<td class="form">' + formPills(r.team) + '</td>' +
           (diff === null
             ? '<td class="n">&mdash;</td>'
@@ -9488,8 +9634,18 @@ function showTeam(name) {
   const _fix = t.fixtures || [];
   const _last = _played[0] || null;
   const _next = _fix[0] || null;
-  const _w = _played.filter(g => g.mine > g.theirs).length;
-  const _l = _played.length - _w;
+  /* ⚠ THE RECORD IS DIVISION-I-ONLY, THE SAME AS THE STANDINGS AND THE SAME
+     AS THE NCAA'S OWN. This card counted every match, so Norfolk St. read
+     "1-0, 1 played" here while its standings row read "Overall 0-0" -- one
+     event, two views, two answers (R4). The non-D-I result is not thrown
+     away; it is shown beside the record, which is exactly what the official
+     RPI table does with its `Non-Div I` column. */
+  const _di = _played.filter(g => !g.nondi);
+  const _nd = _played.filter(g => g.nondi);
+  const _w = _di.filter(g => g.mine > g.theirs).length;
+  const _l = _di.length - _w;
+  const _nw = _nd.filter(g => g.mine > g.theirs).length;
+  const _nl = _nd.length - _nw;
   const glanceCard = (label, body, cls) =>
     '<div class="gl ' + (cls || '') + '"><span class="gll">' + label + '</span>' +
     body + '</div>';
@@ -9497,7 +9653,11 @@ function showTeam(name) {
     glanceCard('Record 2026',
       _played.length
         ? '<b class="glbig">' + _w + '&ndash;' + _l + '</b>' +
-          '<span class="gls">' + _played.length + ' played</span>'
+          '<span class="gls">' + _di.length +
+          (_di.length === 1 ? ' played' : ' played') +
+          (_nd.length
+            ? ' \u00b7 ' + _nw + '\u2013' + _nl + ' vs non-D-I'
+            : '') + '</span>'
         : '<b class="glbig glmuted">0&ndash;0</b><span class="gls">not started</span>') +
     glanceCard('Form',
       _played.length
@@ -9909,7 +10069,12 @@ function showTeam(name) {
       '<div class="chips tier1">' +
         chip('POWER', '#' + t.rank + (t.power != null ? ' \u00b7 ' + t.power : ''), 'ours pow') +
         chip('R\u00c9SUM\u00c9', t.resume_rank ? '#' + t.resume_rank : '\u2014', 'ours res') +
-        (t.record26 ? chip('2026', t.record26, 'ours') : '') +
+        (t.record26
+          ? chip('2026', t.record26 +
+                 (t.record26_nondi
+                   ? ' <i class="nvd">+' + t.record26_nondi + ' nD1</i>' : ''),
+                 'ours')
+          : '') +
       '</div>' +
       (t.sim && t.sim.proj_wins_mean !== null
         ? '<div class="chips tier2">' +

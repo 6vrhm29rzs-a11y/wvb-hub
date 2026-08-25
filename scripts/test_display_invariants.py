@@ -435,6 +435,158 @@ def check_sticky_headers():
         ok("sticky header offset cancelled for internally-scrolling tables")
 
 
+def check_nondi_form_marker_is_visible():
+    """A form result the Division-I record excludes must SAY SO in the pill.
+
+    ⚠ A HOVER TITLE IS NOT A LABEL. It does not exist on a phone, it is not
+    announced while scanning, and it cannot be seen at all in a screenshot.
+    Norfolk St. beat a Division-II side, so its standings row shows a Form of
+    "W" beside a record of 0-0; the pill therefore has to carry the reason on
+    its face, not behind a pointer.
+
+    ⚠ AND THE PILL IS A FIXED 19x19 BOX. Appending the suffix without widening
+    it overflowed -- measured, at a 358px phone width, scrollWidth past
+    clientWidth -- so the width override is part of the invariant, not
+    decoration.
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping non-D-I form marker check")
+        return
+    h = open(hub, encoding="utf-8").read()
+
+    if "'<i class=\"fndt\">nD1</i>'" not in h:
+        bad("the non-D-I form marker is not rendered as text",
+            "the pill must emit visible text, not only a title attribute")
+    else:
+        ok("a non-D-I form pill carries VISIBLE text, not just a title")
+
+    # It must be conditional, or every pill would wear it.
+    if "g.nondi ? '<i class=\"fndt\">nD1</i>'" not in h:
+        bad("the non-D-I form marker is not conditional",
+            "every result would be marked, which marks nothing")
+    else:
+        ok("...and only when the result really is non-Division-I")
+
+    # THE FIXED-BOX OVERFLOW. .fw/.fl is width:19px;height:19px.
+    fixed = re.search(r"\.fw,\.fl\{[^}]*width:\s*19px", h) is not None
+    widened = re.search(r"\.fw\.fnd,\.fl\.fnd\{[^}]*width:\s*auto", h) is not None
+    if fixed and not widened:
+        bad("the marked pill will overflow its own box",
+            ".fw/.fl is a fixed 19px square and .fnd does not widen it")
+    else:
+        ok("the marked pill is widened so the suffix fits inside it")
+
+    # PHONE. The marker must have a rule at the phone breakpoint -- if it is
+    # only ever sized for desktop it is not a phone-visible label.
+    phone = False
+    for m in re.finditer(r"@media\s*\(max-width:\s*560px\)\s*\{", h):
+        tail = h[m.end():m.end() + 400]
+        if ".fndt" in tail:
+            phone = True
+            break
+    if not phone:
+        bad("the non-D-I marker has no phone rule",
+            "no @media (max-width:560px) block mentions .fndt")
+    else:
+        ok("...and it is sized deliberately at the phone breakpoint")
+
+    # The long form still exists for anyone who does hover.
+    if "not counted in the Division-I record" not in h:
+        bad("the non-D-I pill lost its explanation", "no title text found")
+    else:
+        ok("the hover still carries the long explanation")
+
+
+def check_standings_diff_shares_the_record_basis():
+    """+/- must be built from the SAME matches the record beside it counts.
+
+    ⚠ THE SEAM THIS CLOSES. The standings row shows a Division-I-only record
+    (the NCAA's own convention) and used to show a differential built from
+    team_season_stats()'s `own`/`opp`, which count EVERY opponent. Norfolk St.
+    read "Overall 0-0 ... +9.67" -- a differential earned in a match the record
+    on that same row excludes. Two bases in one row is exactly the silent mix
+    R4 exists to prevent.
+
+    The decision is recorded here: standings +/- is DIVISION-I ONLY, derived
+    from `own_di`/`opp_di`, and the column header says so. The team page's
+    "Team stats" box keeps every opponent on purpose -- a different view with a
+    different job -- and states that in its own note.
+    """
+    src = os.path.join(REPO, "scripts", "build_hub.py")
+    b = open(src, encoding="utf-8").read()
+
+    m = re.search(r'_r\["diff"\]\s*=\s*\(round\(_o\["pps"\]', b)
+    if not m:
+        bad("could not find the standings differential", "derivation moved")
+        return
+    ctx = b[max(0, m.start() - 700):m.start()]
+    if '_ts.get("own_di")' not in ctx or '_ts.get("opp_di")' not in ctx:
+        bad("standings +/- is not on the Division-I basis",
+            "it must read own_di/opp_di, the same matches as the record")
+    else:
+        ok("standings +/- is derived from Division-I matches only")
+
+    if re.search(r'_o,\s*_d\s*=\s*\(_ts\.get\("own"\)', ctx):
+        bad("standings +/- still reads the all-opponent totals",
+            'it must use own_di/opp_di, not own/opp')
+    else:
+        ok("[-] ...and not from the all-opponent totals")
+
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping the rendered half")
+        return
+    h = open(hub, encoding="utf-8").read()
+
+    if '+/-<span class="thb">D-I</span>' not in h:
+        bad("the +/- column does not state its basis",
+            "the header must carry a visible D-I stamp, not only a tooltip")
+    else:
+        ok("the +/- column header states its basis visibly")
+
+    if "DIVISION-I OPPONENTS ONLY" not in h:
+        bad("the +/- tooltip does not state its basis", "no explanation found")
+    else:
+        ok("...and the long form explains it")
+
+    # THE NORFOLK STATE CASE, from the built payload: a team whose only match
+    # is non-D-I must show a SPLIT record and NO Division-I differential.
+    m2 = re.search(r"const STANDINGS = (\{.*?\});\n", h, re.S)
+    if not m2:
+        bad("could not read the standings payload", "regex missed")
+        return
+    ST = json.loads(m2.group(1))
+    rows = [r for rs in ST.values() for r in rs]
+    split = [r for r in rows if (r.get("nw") or r.get("nl"))]
+    if not split:
+        bad("no split-record team to check",
+            "the guard proves nothing without one")
+        return
+    ok("[+] a split-record team exists to test", len(split))
+
+    for r in split:
+        # A team with non-D-I results and NO D-I match yet must not borrow a
+        # differential from the match its record excludes.
+        if not (r["w"] or r["l"]) and r.get("diff") is not None:
+            bad("a team with no Division-I match has a Division-I +/-",
+                "%s: record %d-%d but diff %s"
+                % (r["team"], r["w"], r["l"], r["diff"]))
+            break
+    else:
+        ok("...and none of them borrows a +/- from an excluded match")
+
+    # The differential's own match count may never exceed the record's.
+    over = [r["team"] for r in rows
+            if r.get("diff_n") is not None
+            and r["diff_n"] > (r["w"] + r["l"])]
+    if over:
+        bad("the +/- rests on more matches than the record counts",
+            ", ".join(over[:3]))
+    else:
+        ok("[-] the +/- never rests on more matches than the record", len(rows))
+
+
 def check_stats_dispatcher_does_not_recurse():
     """The Stats tab's dispatcher must delegate, never call itself.
 
@@ -2907,6 +3059,9 @@ def main():
     check_public_build_can_actually_render()
     check_phone_columns_fit_their_values()
     check_every_view_names_its_season()
+    print()
+    check_nondi_form_marker_is_visible()
+    check_standings_diff_shares_the_record_basis()
     print()
     check_rating()
     print()

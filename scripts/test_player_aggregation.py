@@ -303,7 +303,13 @@ def main():
                   "regex did not match -- the checks below would be skipped")
             if m4:
                 _T = json.loads(m4.group(1))
-                TT = list(_T.values()) if isinstance(_T, dict) else _T
+                # ⚠ TEAMS IS KEYED BY NAME AND ITS VALUES CARRY NO `team`
+                # FIELD. Taking .values() dropped the only copy of the name, so
+                # a cross-check keyed on t["team"] compared ZERO teams and
+                # reported success. The positive control below is what caught
+                # it. Put the key back on the row.
+                TT = ([dict(v, team=k) for k, v in _T.items()]
+                      if isinstance(_T, dict) else _T)
                 pl = [g for t2 in TT for g in (t2.get("played") or [])]
                 nd = [g for g in pl if g.get("nondi")]
                 check("[+] some played rows are flagged", len(nd) > 0,
@@ -320,6 +326,63 @@ def main():
                 check("[-] the count never exceeds the sample",
                       all((o.get("nondi") or 0) <= (o.get("matches") or 0)
                           for o in own))
+
+                print("\n5c. ONE DEFINITION OF A TEAM'S RECORD")
+                # ⚠ THE INVARIANT THAT WAS SILENTLY FALSE. A comment in
+                # build_hub claimed the record, the form pills and the
+                # standings came from "one source, so the four cannot
+                # disagree". They shared an INPUT, not a definition:
+                # standings() has always excluded non-D-I opponents (correct --
+                # the NCAA's own convention) while record26 counted every
+                # match. Norfolk St. carried a "2026 1-0" chip directly above a
+                # standings row reading "Overall 0-0".
+                m5 = re.search(r"const STANDINGS = (\{.*?\});\n", hp, re.S)
+                check("[+] the STANDINGS payload was found", bool(m5),
+                      "regex missed -- checks below would be skipped")
+                if m5:
+                    ST = json.loads(m5.group(1))
+                    srec = {}
+                    for _c, _rows in ST.items():
+                        for _r in _rows:
+                            srec[_r["team"]] = _r
+                    bad, checked = [], 0
+                    for t2 in TT:
+                        nm2, r26 = t2.get("team"), t2.get("record26")
+                        if not nm2 or not r26 or nm2 not in srec:
+                            continue
+                        checked += 1
+                        want = "%d-%d" % (srec[nm2]["w"], srec[nm2]["l"])
+                        if want != r26:
+                            bad.append("%s chip=%s standings=%s"
+                                       % (nm2, r26, want))
+                    check("every team's record matches its standings row",
+                          not bad, "; ".join(bad[:3]))
+                    check("[+] ...and teams were actually compared",
+                          checked > 0, "%d compared" % checked)
+                    print("     (%d teams cross-checked)" % checked)
+                    # And the non-D-I split must agree between the two too.
+                    nbad = []
+                    for t2 in TT:
+                        nm2 = t2.get("team")
+                        if not nm2 or nm2 not in srec:
+                            continue
+                        sr = srec[nm2]
+                        want = ("%d-%d" % (sr.get("nw", 0), sr.get("nl", 0))
+                                if (sr.get("nw") or sr.get("nl")) else None)
+                        if want != t2.get("record26_nondi"):
+                            nbad.append("%s %s vs %s"
+                                        % (nm2, t2.get("record26_nondi"), want))
+                    check("the non-D-I split agrees on both surfaces",
+                          not nbad, "; ".join(nbad[:3]))
+                    marked = [n for n, r in srec.items()
+                              if (r.get("nw") or r.get("nl"))]
+                    check("[+] at least one team has a non-D-I result",
+                          len(marked) > 0, "none -- the guard proves nothing")
+                    check("[-] ...and not every team does",
+                          len(marked) < len(srec),
+                          "%d of %d" % (len(marked), len(srec)))
+                    print("     (%d of %d teams have a non-D-I result)"
+                          % (len(marked), len(srec)))
 
         print("\n6. CLASS YEARS ARE SPELLED OUT, UNKNOWNS PRESERVED")
         sys.path.insert(0, SCRIPTS)
