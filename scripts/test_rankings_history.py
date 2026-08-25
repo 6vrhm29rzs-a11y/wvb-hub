@@ -153,8 +153,63 @@ def test_movement_never_crosses_the_basis():
     check(got is None, "this week is never its own comparison")
 
 
+def check_basis_aliases():
+    """ONE RULER MUST NOT HAVE TWO NAMES.
+
+    The archive contains a week written as "digby"; the rankings board calls
+    the same ordering "blend". They are the same thing -- digby_top25.py's
+    blended projection-plus-results. The movement rule compares only within a
+    basis, so two names for one ruler does not error, it silently blanks the
+    entire movement column, which is indistinguishable from "no history yet".
+
+    ⚠ THE ARCHIVE IS APPEND-ONLY and the "digby" week must stay exactly as
+    written -- normalisation happens on READ. This asserts both halves: the
+    alias resolves, and a genuinely different ruler is still refused.
+    """
+    sys.path.insert(0, os.path.join(REPO, "scripts"))
+    from snapshot_rankings import basis
+    import build_rankings_board as BB
+
+    check(basis("digby") == basis("blend") == "blend", "the two names for the blended ruler resolve to one",
+          "(digby -> %r, blend -> %r)" % (basis("digby"), basis("blend")))
+    check(basis("live") == "live" and basis("preseason") == "preseason", "a different ruler keeps its own name")
+
+    p = os.path.join(REPO, "data", "rankings_history_%d.jsonl" % int(os.environ.get("WVB_SEASON","2026")))
+    if not os.path.exists(p):
+        print("  (no archive yet -- skipping the comparison checks)")
+        return
+    snaps = []
+    for line in open(p, encoding="utf-8"):
+        line = line.strip()
+        if line:
+            snaps.append(json.loads(line))
+    weeks = sorted(set(s.get("week") for s in snaps if s.get("week")))
+    if len(weeks) < 2:
+        print("  (fewer than two archived weeks -- skipping)")
+        return
+    future = "2099-W52"
+    got = BB.pick_comparison(snaps, future, "blend")
+    have_blend = [s for s in snaps if basis(s.get("source")) == "blend"]
+    if have_blend:
+        check(got is not None and basis(got.get("source")) == "blend", "a blended week IS found when the basis name differs",
+              "(picked %r)" % ((got or {}).get("source"),))
+        # NEGATIVE CONTROL: exact string matching -- the old behaviour -- must
+        # fail to find it, or this guard is testing nothing.
+        exact = [s for s in snaps
+                 if s.get("week") != future and s.get("source") == "blend"]
+        stored_as_alias = any(s.get("source") == "digby" for s in snaps)
+        if stored_as_alias:
+            check(not exact, "...and exact-string matching would NOT have found it",
+                  "(the archive already stores the canonical name, so this "
+                  "control cannot fire)")
+    # cross-ruler must still be refused
+    check(BB.pick_comparison(snaps, future, "live") is None
+          or basis(BB.pick_comparison(snaps, future, "live").get("source")) == "live", "a preseason week is never offered to a blended ranking")
+
+
 def main():
     for fn in (test_mover_direction, test_movement_never_crosses_the_basis,
+               check_basis_aliases,
                test_snapshot_is_weekly_and_append_only,
                test_real_archive_shape):
         print(fn.__name__)

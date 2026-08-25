@@ -289,6 +289,13 @@ def main():
         },
         "top": rows[:SHOWN],
         "also_receiving": rows[SHOWN:SHOWN + ALSO],
+        # ⚠ ALL 348, NOT JUST THE 25 SHOWN. The Rankings tab needs the same
+        # blend for every team, and the alternative -- recomputing it there --
+        # would be a second definition of the ranking that could drift from
+        # this one (R4). Kept compact: the Top 25 rows above carry the detail.
+        "all": [{"team": r["team"], "rank": r["rank"], "score": r["score"],
+                 "matches": r["matches"],
+                 "weight_on_season": r["weight_on_season"]} for r in rows],
     }
     json.dump(doc, open(OUT, "w"), indent=1, sort_keys=False)
     m = doc["meta"]

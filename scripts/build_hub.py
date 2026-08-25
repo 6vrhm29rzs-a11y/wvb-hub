@@ -1988,16 +1988,38 @@ def build():
             "to measure against."
             % (len(_live), sorted(_gp)[len(_gp) // 2]))
     else:
-        rank_basis = (
-            "<b>Still the preseason projection &mdash; not yet a result-based "
-            "ranking.</b> It is 2026 rosters &times; 2025 production and reads "
-            "<b>no</b> 2026 result, so it does not move when a team wins or "
-            "loses. The live rating takes over automatically once 50 matches "
-            "have been played; under that there is not enough of a schedule "
-            "graph to rate anyone honestly. <b>For a ranking that moves with "
-            "every result today, use Digby&rsquo;s Top 25</b> \u2014 it blends "
-            "this projection with what has actually happened, weighted by how "
-            "much has been played.")
+        _blend = [t for t in teams if t.get("rank_source") == "blend"]
+        if _blend:
+            _played = [t for t in _blend if (t.get("blend_matches") or 0)]
+            _w = max([t.get("blend_season_weight") or 0 for t in _blend] or [0])
+            rank_basis = (
+                "<b>This ranking moves with every result.</b> It starts from "
+                "the preseason projection and lets 2026 pull it, weighted "
+                "<code>n/(n+k)</code> with <b>k measured, not chosen</b> "
+                "&mdash; so a team needs about k matches before this season "
+                "counts as much as the projection does. <b>%d of %d teams have "
+                "played</b>, and the most any team is being judged on this "
+                "season so far is <b>%d%%</b>. "
+                "<b>Why so little movement in August?</b> Reacting harder was "
+                "tested against 2025 and it predicts <i>worse</i>: blending at "
+                "every speed from k=0.5 to k=50, the best value was 25 and "
+                "every faster setting was worse than the one above it &mdash; "
+                "reacting hard to each result scored below ignoring results "
+                "altogether. One Friday night genuinely is that little "
+                "evidence. The fitted composite takes over automatically once "
+                "50 matches are in. "
+                "<b>This is a strength ranking, not a r&eacute;sum&eacute;</b> "
+                "&mdash; it answers who would win tomorrow, not who has earned "
+                "a bid."
+                % (len(_played), len(_blend), round(100 * _w)))
+        else:
+            rank_basis = (
+                "<b>Still the preseason projection &mdash; not yet a "
+                "result-based ranking.</b> It is 2026 rosters &times; 2025 "
+                "production and reads <b>no</b> 2026 result, so it does not "
+                "move when a team wins or loses. Run "
+                "<code>scripts/digby_top25.py</code> to blend it with what has "
+                "actually happened.")
 
     # Same computed sentence as the board: a hard-coded "6 of 32" understates
     # what we know the moment the map is filled in, and a stale caveat is worse

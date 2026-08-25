@@ -144,10 +144,18 @@ def pick_comparison(snaps, this_week, rank_source):
 
     Returns None when there is no same-basis earlier week, which the page
     renders as blank rather than as a dash.
+
+    ⚠ NORMALISE THE NAME BEFORE COMPARING. The archive holds a week written as
+    "digby" and the board now calls that same ordering "blend"; one ruler, two
+    words. An exact string match would find no earlier same-basis week and
+    blank the whole movement column -- a silent failure that looks exactly like
+    "there is no history yet". snapshot_rankings.basis() is the one definition.
     """
+    from snapshot_rankings import basis
+    want = basis(rank_source)
     earlier = [s for s in snaps
                if s.get("week") != this_week
-               and s.get("source") == rank_source]
+               and basis(s.get("source")) == want]
     return earlier[-1] if earlier else None
 
 
@@ -252,13 +260,40 @@ def build():
     for r in (live.get("teams") or []):
         if r.get("composite_rank"):
             live_by_team[r["team"]] = r
-    rank_source = "live" if live_by_team else "preseason"
+
+    # ⚠ THE TAB CALLED "RANKINGS" USED TO BE UNABLE TO MOVE, AND THAT WAS THE
+    # WHOLE OF Cody's objection ("texas looks a hot mess and is too high").
+    # rating_2025.py refuses to fit under 50 played matches -- correctly, there
+    # is no schedule graph before then -- so with 7 matches on the board this
+    # fell straight through to project_2026.py, a projection that reads NO 2026
+    # result at all. Texas sat 2nd on a number computed in July, three days
+    # after losing 3-1 at home.
+    #
+    # digby_top25.py already solved this for 25 teams: blend the projection with
+    # this season's margin, weight n/(n+k), k MEASURED. It now emits all 348, so
+    # the board can use the same ordering rather than compute a second one.
+    #
+    # Precedence, most evidence first:
+    #   live   -- the fitted composite, once the season can support it
+    #   blend  -- projection + results so far, so the tab moves from match one
+    #   preseason -- projection alone, only if the blend is missing
+    blend_by_team = {}
+    for r in ((load_json("data/digby_top25_%d.json" % SEASON) or {}).get("all") or []):
+        if r.get("rank"):
+            blend_by_team[r["team"]] = r
+    rank_source = ("live" if live_by_team
+                   else ("blend" if blend_by_team else "preseason"))
 
     for t in teams:
         r = pj.get(t["team"]) or {}
         lr = live_by_team.get(t["team"])
-        t["rank26"] = (lr or {}).get("composite_rank") or r.get("talent_rank")
-        t["rank_source"] = "live" if lr else "preseason"
+        br = blend_by_team.get(t["team"])
+        t["rank26"] = ((lr or {}).get("composite_rank")
+                       or (br or {}).get("rank")
+                       or r.get("talent_rank"))
+        t["rank_source"] = "live" if lr else ("blend" if br else "preseason")
+        t["blend_matches"] = (br or {}).get("matches")
+        t["blend_season_weight"] = (br or {}).get("weight_on_season")
         t["gp"] = (lr or {}).get("games_played")
         t["low_conf"] = bool((lr or {}).get("low_confidence"))
         t["proj_pps"] = r.get("proj_points_per_set")
@@ -311,8 +346,14 @@ def build():
     # projection's own blend until then. Asserted monotone below.
     for t in teams:
         lr = live_by_team.get(t["team"])
+        br = blend_by_team.get(t["team"])
         r = pj.get(t["team"]) or {}
+        # SAME PRECEDENCE AS rank26 ABOVE, and it has to be: scoring one
+        # quantity next to a rank built from another is exactly how #7 came to
+        # sit above #6 earlier today. Guarded on the built page.
         t["_pv"] = (lr or {}).get("composite")
+        if t["_pv"] is None and br is not None:
+            t["_pv"] = br.get("score")
         if t["_pv"] is None:
             t["_pv"] = r.get("blend")
         if t["_pv"] is None:

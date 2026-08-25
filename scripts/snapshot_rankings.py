@@ -36,6 +36,22 @@ SEASON = int(os.environ.get("WVB_SEASON", "2026"))
 OUT = os.path.join(REPO, "data", "rankings_history_%d.jsonl" % SEASON)
 
 
+# ⚠ ONE NAME PER RULER. This archive already contains a week written as
+# "digby" and the rankings board now calls the same ordering "blend" -- the
+# blended projection-plus-results from digby_top25.py, one ruler, two words.
+# The movement rule compares only within a basis, so two names for one thing
+# silently blanks the movement column instead of erroring. The archive is
+# APPEND-ONLY and the "digby" week stays exactly as written; it is normalised
+# on READ.
+BASIS_ALIASES = {"digby": "blend"}
+
+
+def basis(name):
+    # type: (str) -> str
+    """Canonical name for a ranking basis. Never rewrites the archive."""
+    return BASIS_ALIASES.get(name or "", name or "")
+
+
 def load(path):
     p = os.path.join(REPO, path)
     if not os.path.exists(p):
@@ -89,14 +105,21 @@ def current_ranking():
     """
     t25 = load("data/digby_top25_%d.json" % SEASON) or {}
     rows = []
-    for r in ((t25.get("top") or []) + (t25.get("also_receiving") or [])):
+    # ALL 348, not the 35 that are displayed. The first blended week archived
+    # only the Top 25 plus also-receiving, so movement could never be computed
+    # for team 36 onward -- a ranking board of 348 rows with 313 permanently
+    # blank movement cells. digby_top25.py now emits the full ordering.
+    _rec = dict((r["team"], r.get("record"))
+                for r in ((t25.get("top") or []) + (t25.get("also_receiving") or []))
+                if r.get("team"))
+    for r in (t25.get("all") or []):
         if r.get("rank"):
-            rows.append({"team": r["team"], "rank": r["rank"], "source": "digby",
+            rows.append({"team": r["team"], "rank": r["rank"], "source": "blend",
                          "gp": r.get("matches") or 0,
-                         "record": r.get("record")})
+                         "record": _rec.get(r["team"])})
     if rows:
         rows.sort(key=lambda x: x["rank"])
-        return rows, "digby"
+        return rows, "blend"
 
     live = load("data/rating_%d.json" % SEASON) or {}
     for r in (live.get("teams") or []):

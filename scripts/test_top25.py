@@ -144,11 +144,20 @@ def test_the_weekly_archive_captures_the_top_25():
     if not os.path.exists(p):
         print("  --   no Top 25 built; skipping")
         return
-    check(source == "digby",
-          "the weekly snapshot archives Digby's Top 25", source)
-    check(rows and all(r.get("source") == "digby" for r in rows),
+    # ⚠ THE BASIS IS NOW CALLED "blend", NOT "digby". One ruler, one name --
+    # the Rankings tab uses the same blended ordering for all 348 teams, and
+    # two words for one ruler silently blanks the movement column instead of
+    # erroring. The archive's existing "digby" week is never rewritten; it is
+    # normalised on read by snapshot_rankings.basis().
+    check(SNAP.basis(source) == "blend",
+          "the weekly snapshot archives the blended ranking", source)
+    check(rows and all(SNAP.basis(r.get("source")) == "blend" for r in rows),
           "every archived row carries its basis, so movement cannot mix rulers")
-    check(len(rows) >= 25, "the poll and the receiving-votes teams are both kept",
+    # ⚠ ALL 348, NOT 35. The first blended week stored only the Top 25 plus
+    # also-receiving, so movement could never be computed for team 36 onward --
+    # 313 permanently blank cells on a 348-row board.
+    check(len(rows) >= 300,
+          "the whole board is archived, not just the teams on display",
           str(len(rows)))
 
 
@@ -191,17 +200,34 @@ def test_form_shows_the_most_recent_last():
 
 
 def test_the_two_rankings_explain_their_relationship():
-    """Two rankings now exist and a reader has no way to tell which answers
-    what. The one that does NOT move is the surprising one, so it points at the
-    one that does."""
+    """Every ranking on the page must say what it is.
+
+    ⚠ THIS GUARD USED TO ASSERT THE OPPOSITE OF WHAT IS NOW TRUE. It required
+    the Rankings tab to point AT the Top 25 "for a ranking that moves", because
+    the tab itself was a frozen preseason projection -- which was the whole of
+    Cody's complaint that Texas sat 2nd three days after losing at home. The
+    Rankings tab now uses the same blended ordering for all 348 teams, so
+    telling a reader to go elsewhere for a moving ranking would be false.
+
+    What has to stay true is the thing underneath: a ranking states its basis,
+    and a strength ranking says it is not a resume.
+    """
     hub = os.path.join(REPO, "Cody", "START-HERE.html")
     if not os.path.exists(hub):
         print("  --   no built page; skipping")
         return
     h = open(hub, encoding="utf-8").read()
-    check("Digby&rsquo;s Top 25</b>" in h or "Digby\u2019s Top 25</b>" in h
-          or "use Digby" in h,
-          "the preseason rankings tab points at the ranking that moves")
+    moving = ("This ranking moves with every result" in h
+              or "Our ranking, from 2026 results" in h)
+    frozen = "Still the preseason projection" in h
+    check(moving or frozen,
+          "the rankings tab states which basis it is on")
+    if moving:
+        check(not frozen,
+              "it does not claim to be frozen and moving at the same time")
+        check("strength ranking, not a r&eacute;sum&eacute;" in h
+              or "strength</b> ranking" in h,
+              "a moving strength ranking still says it is not a resume (R3)")
     check("Biggest movers" in h, "the Top 25 names its biggest movers")
 
 
