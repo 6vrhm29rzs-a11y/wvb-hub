@@ -788,6 +788,9 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
 .lane.final .lanehd b{color:var(--ink2)}
 .lane.up .lanehd b{color:var(--navy)}
 .lanehd span{font:11.5px/1 var(--mono);color:var(--slate)}
+.lanemore{margin:9px 0 0;font-size:12.5px;color:var(--slate);line-height:1.6}
+.lanemore a{color:var(--navy);text-decoration:none;border-bottom:1px solid var(--line2)}
+.lanemore a:hover{border-bottom-color:var(--navy)}
 /* a compact, scannable row -- deliberately NOT a miniature card */
 .mrow{display:grid;grid-template-columns:74px 1fr auto;align-items:center;
   gap:12px;padding:10px 2px;border-bottom:1px solid var(--line);cursor:pointer;
@@ -1874,7 +1877,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     </div>
     <div class="meta">
       <b>9</b> matches played &middot; <b>348</b> teams rated<br>
-      last result <b>Yesterday</b> &middot; built 2026-08-25 7:48 AM PT
+      last result <b>Yesterday</b> &middot; built 2026-08-25 8:11 AM PT
     </div>
   </div>
   <div class="net"></div>
@@ -4046,11 +4049,32 @@ function renderDesk() {
     html += ribbonHTML(feat.m, liveOf(feat.m),
       '<b>Featured:</b> ' + feat.why);
   }
-  const lane = (key, cls, label, rows) => rows.length
-    ? '<div class="lane ' + cls + '"><div class="lanehd"><b>' + label +
+  /* ⚠ A FULL MATCH DAY IS 195 FIXTURES, AND THE BOARD WAS PRINTING ALL OF
+     THEM. Measured on a stubbed Friday: 206 rows, a 13,593px page -- about ten
+     screens, and the "Coming up" lane alone was 155 undifferentiated rows.
+     That is precisely the wall the Scores ledger exists to absorb, reappearing
+     on the rundown. Each lane now shows the ones that sort first and says
+     exactly how many it is not showing, with the way to see them.
+     The payload is ordered ranked-v-ranked, then any ranked side, then how
+     close the forecast is -- so the cap keeps the matches a reader came for,
+     and the line below it makes the omission visible rather than silent.
+     LIVE IS NEVER CAPPED: if six matches are in progress, all six are on. */
+  const LANE_CAP = { live: 0, final: 8, up: 10 };
+  const lane = (key, cls, label, rows) => {
+    if (!rows.length) return '';
+    const cap = LANE_CAP[key] || 0;
+    const shownRows = cap ? rows.slice(0, cap) : rows;
+    const hidden = rows.length - shownRows.length;
+    return '<div class="lane ' + cls + '"><div class="lanehd"><b>' + label +
       '</b><span>' + rows.length + '</span></div>' +
-      rows.map(m => matchRow(m, liveOf(m), 'desk')).join('') + '</div>'
-    : '';
+      shownRows.map(m => matchRow(m, liveOf(m), 'desk')).join('') +
+      (hidden
+        ? '<p class="lanemore">' + hidden + ' more ' +
+          (key === 'final' ? 'finished' : 'scheduled') + ' today &mdash; ' +
+          '<a href="' + routeFor('scores') + '">the Scores ledger has ' +
+          'every one</a>.</p>'
+        : '') + '</div>';
+  };
   /* the featured match is not repeated in its own lane -- the ribbon already
      carries its scoreline, and printing it twice is the thing the old board
      did that made everything look equally important */

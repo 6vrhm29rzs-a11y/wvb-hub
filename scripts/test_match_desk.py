@@ -387,6 +387,30 @@ def main():
     check("...and invents nothing to watch",
           "things to watch" not in src.lower())
 
+    print("\n8b. A FULL MATCH DAY IS CAPPED, AND THE CAP SAYS SO")
+    # ⚠ MEASURED ON A STUBBED FRIDAY (195 fixtures): the board printed 206 rows
+    # and a 13,593px page -- about ten screens -- with 155 undifferentiated
+    # rows in "Coming up". That is the wall the Scores ledger exists to absorb,
+    # reappearing on the rundown. Capped to 30 rows / 2,743px.
+    check("each lane has a declared cap", "const LANE_CAP =" in src)
+    check("[-] live is NEVER capped", "live: 0" in src,
+          "every match in progress must be on the board")
+    # ⚠ NO SILENT TRUNCATION. A board that quietly shows 10 of 155 reads as
+    # "that is all there is", which is a false statement made by omission.
+    check("the omission is stated", "more ' +" in src and "lanemore" in src)
+    check("...with the count of what is not shown",
+          "rows.length - shownRows.length" in src)
+    # anchor on the lane renderer itself rather than slicing around braces --
+    # the first version split on "};" and landed in unrelated code.
+    lane_fn = src[src.index("const lane = (key, cls, label, rows)"):]
+    lane_fn = lane_fn[:lane_fn.index("\n  };") + 5]
+    check("...and a route to the rest", "routeFor('scores')" in lane_fn)
+    check("the lane header still shows the TRUE total",
+          "rows.length + '</span>" in lane_fn,
+          "the header must count all of them, not the shown subset")
+    check("[+] ...and the shown subset is a different variable",
+          "shownRows" in lane_fn and "shownRows.length + '</span>" not in lane_fn)
+
     print("\n9. ONE SCORE HEADER, ONE DEFINITION")
     # ⚠ THE RIBBON IS THE ONLY SCORE HEADER. The featured match and the match
     # detail call the SAME function, so a scoreline cannot be phrased two ways
