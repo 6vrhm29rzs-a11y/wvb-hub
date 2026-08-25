@@ -126,8 +126,9 @@ def main():
     print("\n5. THE APP SHELL")
     # ⚠ THE PUBLIC BUILD HAS FOUR, AND THAT IS CORRECT. My Ballot is private and
     # the strip removes its tab, so asserting five against the published page
-    # failed a build that was behaving exactly as designed -- and CI, which has
-    # no Cody/, reads that page. The expected set depends on which page this is.
+    # fails a build behaving exactly as designed. The expected set depends on
+    # which page this is. (See the correction above: CI does read the private
+    # page, so this was robustness rather than the nightly rescue I claimed.)
     prim = re.findall(r'<button role="tab"[^>]*data-v="([a-z0-9]+)"', h)
     private = "START-HERE" in (which or "")
     want = (["desk", "scores", "rankings", "teams", "ballot"] if private
@@ -182,12 +183,20 @@ def main():
     print("\n7. NO SHELL RECIPE RENDERS IN THE PAGE")
     for bad_s in ("export ANTHROPIC", "sk-ant-", "ANTHROPIC_API_KEY"):
         check("the page never prints %r" % bad_s, bad_s not in h)
-    # ⚠ ASK DIGBY IS PRIVATE, AND CI HAS NO PRIVATE PAGE. These two assert the
-    # chat's honest unavailable state, which only exists in the private build;
-    # with Cody/ absent this file falls back to the published page, where the
-    # whole feature is correctly stripped. Asserting it there turned a CORRECT
-    # public build into a failing nightly. The negative side is checked on the
-    # public page instead, which is the part that matters there.
+    # ⚠ THESE ARE PRIVATE-ONLY FACTS, so they are asserted only against the
+    # private page. Ask Digby's honest unavailable state exists there; on the
+    # published page the whole feature is correctly stripped, and asserting it
+    # there would fail a build that is behaving exactly as designed.
+    #
+    # ⚠ CORRECTION, AND I HAD THIS WRONG. I first wrote that CI has no private
+    # page and that these checks "would have turned the nightly red". They
+    # would not have. daily.yml runs `python3 scripts/build_hub.py` -- which
+    # writes Cody/START-HERE.html -- BEFORE the Invariant guards step, so CI
+    # reads the private page like any other run. Verified by deleting Cody/,
+    # running the build, and watching it come back.
+    # What this scoping actually buys is robustness when the suite is pointed
+    # at the PUBLIC page, which page() falls back to whenever Cody/ is absent.
+    # That is a condition I create locally, not one CI produces.
     if "START-HERE" in (which or ""):
         check("an unavailable chat states it plainly",
               "not connected on this local build" in h)

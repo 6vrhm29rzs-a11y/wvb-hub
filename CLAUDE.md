@@ -7,7 +7,7 @@
 1. Your **memory** (loaded automatically). Four memories live at this path: `wvb-hub-drive-bus` (Drive IDs), `drive-large-inline-content-unreliable`, `git-actions-need-codys-explicit-command`, and `codys-mid-build-observations-are-signal`. Four older memories (`wvb-hub-next-session-migration`, `ncaa-volleyball-tool`, `cody-collaboration-workflow`, `cody-volleyball-rating-model`) stayed behind at `~/.claude/projects/-Users-codyrose-Downloads-handoff/memory/` and are **deliberately not migrated** — the Drive handoff + this file supersede them. Don't go looking for them.
 2. Drive folder **"Women's College Volleyball 2026"** (`1uOBksR-O3TRPU6Ej84ymei0F4gFPqLe4`).
 
-   **⚠⚠ RESUME HERE — AND IT IS NOT ON DRIVE. READ `docs/session_close_2026-08-23b.md` FIRST** (it supersedes `session_close_2026-08-23.md`, which is still accurate for the morning's poll/Pacific-time work, which in turn supersedes `session_close_2026-08-22.md`).
+   **⚠⚠ RESUME HERE — AND IT IS NOT ON DRIVE. READ `docs/session_close_2026-08-25.md` FIRST.** It supersedes `session_close_2026-08-23b.md`, which is still the right record of **why** the rating, crawl and poll work are as they are but is out of date on the **product**: the site is now five routed destinations with a More menu, a Match Desk rundown, a Scores ledger, one score-header component, a private Ballot Command Center and a private My Board. `23b` supersedes `session_close_2026-08-23.md` (still accurate for the poll/Pacific-time work), which supersedes `session_close_2026-08-22.md`.
    It is in this repo, it supersedes every Drive session-close including I, and it is the only
    record of the live season. **The Drive close I (2026-08-11) is now STALE on all three of its
    headline claims** — it says everything is pushed, the tree is clean, and no decision is
@@ -221,8 +221,22 @@ Repo initialized 2026-08-09 on `main`, commit `499a537` (20 files). Identity set
 
 ## Next steps
 
-**⚑ 2026-08-23 (evening) — WHERE THIS ACTUALLY IS.** Read
-`docs/session_close_2026-08-23b.md` first; it carries the full handoff.
+**⚑ 2026-08-25 — WHERE THIS ACTUALLY IS.** Read
+`docs/session_close_2026-08-25.md` first; it carries the full handoff, the six
+class/id collisions this file keeps producing, the `const TEAMS` dead-zone
+trap, and the one bug that actually shipped (`esc()` stripped out of the public
+build, which rendered the published Scores ledger empty and passed every test,
+because the public checks only asserted what must be ABSENT).
+
+**⚑ NEXT ACTION IS DATED: FRIDAY 2026-08-28**, the season's first real match
+day. Run `python3 scripts/probe_live_boxscore.py` during a live match — it is
+the measurement that settles whether the box-score endpoint carries usable
+stats mid-match, and **nothing here may claim live stats are available until it
+has run.** The refresh publish path and the Match Desk under a genuine slate
+also get their first real test that day.
+
+The 2026-08-23 handoff below is superseded on the product and kept for its
+reasoning.
 
 **⚠⚠ THE ONE THING THAT COST REAL MONEY — read before touching `digby.fact_sheet()`.**
 A stored summary is valid only for the facts it was written from. The first 340 cited
