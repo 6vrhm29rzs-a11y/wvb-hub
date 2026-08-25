@@ -1,0 +1,80 @@
+{
+ "meta": {
+  "season": 2025,
+  "question": "how fast should a ranking react to a result? w = n/(n+k); smaller k reacts faster",
+  "prior": "data/strength_2024.json -- cannot contain 2025 information",
+  "method": "blend prior with observed margin at a checkpoint, score every match AFTER it; the k that predicts the rest of the season best wins",
+  "tau_between_team_sd": 2.4375,
+  "checkpoints": [
+   0.03,
+   0.06,
+   0.12,
+   0.2,
+   0.35,
+   0.5,
+   0.65
+  ],
+  "best_k": 25,
+  "best_auc": 0.80525,
+  "shipped_k": 13.5,
+  "shipped_auc": 0.79977
+ },
+ "grid": [
+  {
+   "k": 0.5,
+   "auc": 0.69401
+  },
+  {
+   "k": 1,
+   "auc": 0.70759
+  },
+  {
+   "k": 2,
+   "auc": 0.72938
+  },
+  {
+   "k": 3,
+   "auc": 0.74563
+  },
+  {
+   "k": 4,
+   "auc": 0.75792
+  },
+  {
+   "k": 6,
+   "auc": 0.775
+  },
+  {
+   "k": 8,
+   "auc": 0.78574
+  },
+  {
+   "k": 10,
+   "auc": 0.79267
+  },
+  {
+   "k": 13.5,
+   "auc": 0.79977
+  },
+  {
+   "k": 18,
+   "auc": 0.80388
+  },
+  {
+   "k": 25,
+   "auc": 0.80525
+  },
+  {
+   "k": 35,
+   "auc": 0.80386
+  },
+  {
+   "k": 50,
+   "auc": 0.80056
+  },
+  {
+   "k": null,
+   "auc": 0.77887
+  }
+ ]
+}
