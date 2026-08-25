@@ -149,6 +149,28 @@ def main():
     check("scroll is reset on a NEW destination only",
           "ROUTE_POP" in h and "scrollTo({ top: 0 })" in h)
 
+    print("\n6b. THE ROUTE WINS OVER THE SEARCH BOX")
+    # ⚠ A LIVE DEFECT, FOUND BY LOOKING RATHER THAN BY A FAILING TEST.
+    # renderPlayers() ends with `if (rows.length === 1) showPlayer(rows[0])`.
+    # renderPlayerDetail() called it AFTER painting the routed player, so
+    # arriving at #/players/kentucky/kassie-o-brien while the search box still
+    # held "Brooklyn DeLeye" showed Kassie's URL and breadcrumb above
+    # Brooklyn's card. Nothing threw; each half looked right on its own.
+    m2 = re.search(r"function renderPlayerDetail\(p\) \{(.*?)\n\}", h, re.S)
+    body = m2.group(1) if m2 else ""
+    check("renderPlayerDetail exists", bool(body))
+    if body:
+        i_render = body.find("renderPlayers")
+        i_show = body.rfind("showPlayer(p)")
+        check("the routed player is painted AFTER the directory re-renders",
+              i_show > i_render >= 0,
+              "showPlayer at %d, renderPlayers at %d" % (i_show, i_render))
+        check("...and the search box is made to agree with the route",
+              "q.value = p.name" in body)
+    check("[+] the auto-open convenience still exists to be raced",
+          "if (rows.length === 1) showPlayer(rows[0]);" in h,
+          "the guard above is pointless if this was simply deleted")
+
     print("\n7. NO SHELL RECIPE RENDERS IN THE PAGE")
     for bad_s in ("export ANTHROPIC", "sk-ant-", "ANTHROPIC_API_KEY"):
         check("the page never prints %r" % bad_s, bad_s not in h)

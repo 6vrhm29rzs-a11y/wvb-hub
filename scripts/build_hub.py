@@ -6083,12 +6083,22 @@ function statLine(p) {
 })();
 
 function renderPlayerDetail(p) {
-  showPlayer(p);
   const sec = document.getElementById('v-players');
   if (sec) sec.classList.add('detail-open');
+  /* ⚠ THE ROUTE IS THE TRUTH, AND IT USED TO LOSE A RACE TO THE SEARCH BOX.
+     renderPlayers() ends with `if (rows.length === 1) showPlayer(rows[0])` --
+     a convenience from before routing existed. So arriving at
+     #/players/kentucky/kassie-o-brien while the box still held "Brooklyn
+     DeLeye" painted Kassie, then immediately repainted Brooklyn over her: the
+     URL said one player, the breadcrumb said one player, and the card showed
+     another. Nothing errored and both halves looked right on their own.
+     Two fixes, and both are needed. The box is made to AGREE with the route
+     rather than left holding a stale name, and the routed player is painted
+     LAST so no later auto-open can win. */
   const q = document.getElementById('pq');
-  if (q && q.value.trim() === '') { q.value = p.name; }
+  if (q && q.value.trim() !== p.name) { q.value = p.name; }
   renderPlayers && renderPlayers();
+  showPlayer(p);
 }
 
 function showPlayer(p) {
