@@ -124,10 +124,18 @@ def main():
           "%d of %d" % (len(withclass), len(P)))
 
     print("\n5. THE APP SHELL")
+    # ⚠ THE PUBLIC BUILD HAS FOUR, AND THAT IS CORRECT. My Ballot is private and
+    # the strip removes its tab, so asserting five against the published page
+    # failed a build that was behaving exactly as designed -- and CI, which has
+    # no Cody/, reads that page. The expected set depends on which page this is.
     prim = re.findall(r'<button role="tab"[^>]*data-v="([a-z0-9]+)"', h)
-    check("exactly five primary destinations", len(prim) == 5, str(prim))
-    check("...and they are the daily five",
-          prim == ["desk", "scores", "rankings", "teams", "ballot"], str(prim))
+    private = "START-HERE" in (which or "")
+    want = (["desk", "scores", "rankings", "teams", "ballot"] if private
+            else ["desk", "scores", "rankings", "teams"])
+    check("the primary destinations are the daily %d" % len(want),
+          prim == want, "%s (expected %s)" % (prim, want))
+    check("[-] the nav has not grown back into a tab maze", len(prim) <= 5,
+          str(prim))
     more = re.findall(r'<button role="menuitem"[^>]*data-v="([a-z0-9]+)"', h)
     check("the reference tools moved to More, none lost",
           set(more) >= {"leaders", "players", "standings", "bracket", "schedule"},
@@ -174,9 +182,19 @@ def main():
     print("\n7. NO SHELL RECIPE RENDERS IN THE PAGE")
     for bad_s in ("export ANTHROPIC", "sk-ant-", "ANTHROPIC_API_KEY"):
         check("the page never prints %r" % bad_s, bad_s not in h)
-    check("an unavailable chat states it plainly",
-          "not connected on this local build" in h)
-    check("...and disables its composer", "q.disabled = true" in h)
+    # ⚠ ASK DIGBY IS PRIVATE, AND CI HAS NO PRIVATE PAGE. These two assert the
+    # chat's honest unavailable state, which only exists in the private build;
+    # with Cody/ absent this file falls back to the published page, where the
+    # whole feature is correctly stripped. Asserting it there turned a CORRECT
+    # public build into a failing nightly. The negative side is checked on the
+    # public page instead, which is the part that matters there.
+    if "START-HERE" in (which or ""):
+        check("an unavailable chat states it plainly",
+              "not connected on this local build" in h)
+        check("...and disables its composer", "q.disabled = true" in h)
+    else:
+        check("[+] the private chat is absent from the published page",
+              "askform" not in h and "/api/digby" not in h)
 
     print("\n8. DEAD UI REMOVED")
     check("no per-team 'trend unavailable' block renders",
