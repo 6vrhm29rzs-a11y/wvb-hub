@@ -361,6 +361,109 @@ def main():
         check("it says the responsibility is his",
               "is yours" in body or "responsib" in body.lower())
 
+    # ---------------------------------------------------------------- #
+    print("\n10. THE THREE RULERS ARE NEVER CONFLATED")
+    # ⚠ A TOOLTIP IS NOT A LABEL. Both rank badges used to render a bare
+    # numeral whose only identification was title=, so on the page they were
+    # interchangeable and a reader assigned them to whichever ranking they had
+    # in mind. My ballot / POWER / AVCA answer three different questions and
+    # RESUME answers a fourth it cannot answer yet.
+    for label, path in (("private", os.path.join(REPO, "Cody", "START-HERE.html")),
+                        ("public", os.path.join(REPO, "output",
+                                                "vb_dashboard.html"))):
+        if not os.path.exists(path):
+            continue
+        h = open(path, encoding="utf-8").read()
+        bare = re.findall(r'<i class="rnk"[^>]*>\s*\d+\s*</i>', h)
+        check("%s: no external rank renders as a bare numeral" % label,
+              not bare, "%d bare badge(s), e.g. %s" % (len(bare), bare[:1]))
+        check("%s: the AVCA badge says AVCA on the page" % label,
+              "<s>AVCA</s>#" in h)
+        check("%s: the POWER badge says POWER on the page" % label,
+              "<s>POWER</s>#" in h)
+        # RESUME is inactive: it must SAY so, and must not show a number.
+        check("%s: an inactive resume says so rather than showing a rank" % label,
+              "not active yet" in h)
+    hp = os.path.join(REPO, "Cody", "START-HERE.html")
+    if os.path.exists(hp):
+        h = open(hp, encoding="utf-8").read()
+        for ruler in ("My ballot", "POWER", "AVCA"):
+            check("the legend names %r as its own ruler" % ruler,
+                  ruler in h)
+        check("the legend says RESUME is inactive",
+              "inactive until enough games are played" in h)
+        # Each is described as a DIFFERENT question, not three views of one.
+        check("the legend distinguishes ours from the external poll",
+              "the coaches poll" in h and "how strong a team is" in h)
+
+    print("\n11. NO RATIONALE IS EVER INVENTED")
+    src = open(os.path.join(REPO, "scripts", "build_hub.py"),
+               encoding="utf-8").read()
+    # A default would look like assigning a non-empty literal to a reason field.
+    bad = re.findall(r"\breason(?:_kind)?\s*[:=]\s*['\"][^'\"]+['\"]", src)
+    check("no default text is ever assigned to a reason field", not bad,
+          str(bad[:3]))
+    planted = 'ent.reason = "moved on recent form"'
+    check("...and the scan would catch one (positive control)",
+          bool(re.findall(r"\breason(?:_kind)?\s*[:=]\s*['\"][^'\"]+['\"]",
+                          planted)))
+    check("the workshop MARKS a missing reason instead of writing one",
+          "no reason written yet" in src)
+    check("...and never blocks the save for it",
+          "bwPreReview" in src and "bwpresave" in src)
+    # The stored note/reason are only ever read from the author's own input.
+    check("reason and note come from input elements the author types into",
+          'data-reason="' in src and 'data-note="' in src)
+
+    print("\n12. A BALLOT CANNOT REACH ANY RATING OR PROJECTION")
+    # ⚠ STRUCTURAL, NOT PROMISED. Every script that produces a rating, a
+    # projection, a forecast or a simulation is read and must contain no
+    # reference to the ballot module or its file.
+    pipeline = ["rating_2025.py", "project_2026.py", "predict_2026.py",
+                "simulate_season_2026.py", "project_field.py",
+                "digby_top25.py", "build_rankings_board.py", "resume_2025.py",
+                "snapshot_rankings.py", "build_dataset.py", "score_predictions.py"]
+    for fn in pipeline:
+        fp = os.path.join(REPO, "scripts", fn)
+        if not os.path.exists(fp):
+            continue
+        body = open(fp, encoding="utf-8").read()
+        hit = [w for w in ("import ballot", "ballots_", "ballot.load",
+                           "ballot.py", "BW_") if w in body]
+        check("%s never reads a ballot" % fn, not hit, str(hit))
+
+    print("\n13. OLD BALLOT HISTORY STILL LOADS")
+    # A row written before pinning existed carries none of the new fields.
+    legacy = {"teams": [{"team": "Nebraska", "rank": 1},
+                        {"team": "Texas", "rank": 2, "note": "old note"},
+                        {"team": "Pittsburgh", "rank": None}],
+              "summary": "written last week"}
+    check("a ballot with no new fields still validates",
+          B.validate(legacy) is None, str(B.validate(legacy)))
+    check("...and still ranks", [t for _r, t in B.ranked(legacy)]
+          == ["Nebraska", "Texas"])
+    check("...and still formats", B.as_text(legacy).startswith("1. Nebraska"))
+    check("a team with no slot survives as also-considered",
+          any(t["team"] == "Pittsburgh" for t in legacy["teams"]))
+    # And the new optional field is genuinely optional in BOTH directions.
+    pinned = json.loads(json.dumps(legacy))
+    pinned["teams"][2]["pinned"] = True
+    check("an unknown/optional field does not break validation",
+          B.validate(pinned) is None, str(B.validate(pinned)))
+    check("...and does not change the text output",
+          B.as_text(pinned) == B.as_text(legacy))
+    check("...and does not change the ranked order",
+          B.ranked(pinned) == B.ranked(legacy))
+
+    print("\n14. THE PHONE LAYOUT IS DECLARED, NOT HOPED FOR")
+    check("the two-column workshop collapses on a narrow screen",
+          re.search(r"@media \(max-width:900px\)\{[^}]*\.bwgrid\{"
+                    r"grid-template-columns:1fr\}", src) is not None)
+    check("the pre-submit's three columns stack on a phone",
+          ".bwprecols{grid-template-columns:1fr}" in src)
+    check("a case row wraps rather than overflowing",
+          ".bwcase{display:flex" in src and "flex-wrap:wrap" in src)
+
     print()
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))

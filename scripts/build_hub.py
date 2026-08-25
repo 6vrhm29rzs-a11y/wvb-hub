@@ -265,7 +265,11 @@ def rank_badge(v):
     does, so a fifth cannot ship unlabelled (R4: the reason a field's meaning
     lives in one place is that every consumer then agrees by construction).
     """
-    return ('<i class="rnk" title="%s">%s</i> ' % (RANK_TITLE, v)) if v else ""
+    # ⚠ VISIBLY, not just in title=. The JS twin (rank()) does the same, and
+    # the two must stay identical or the same fixture reads differently
+    # depending on which side of the build rendered it.
+    return (('<i class="rnk" title="%s"><s>AVCA</s>#%s</i> '
+             % (RANK_TITLE, v)) if v else "")
 
 
 def listed_time(start_time, home_team, epoch=None):
@@ -3292,6 +3296,55 @@ b.kres{color:#F2B441}
   text-align:center;border-radius:3px;font:700 9px/14px var(--sans);margin-right:2px}
 .bwe.form i.fw{color:#31D07E;background:color-mix(in oklab,#31D07E 16%,transparent)}
 .bwe.form i.fl{color:#FF6B6B;background:color-mix(in oklab,#FF6B6B 16%,transparent)}
+/* ---- Ballot review: evidence is SECONDARY, the slots stay dominant ------ */
+.bwrulers{display:flex;flex-wrap:wrap;gap:6px 14px;margin:10px 0 4px;
+  font-size:11.5px;color:var(--ink2)}
+.bwr i{font:600 10px/1 var(--disp);letter-spacing:.07em;text-transform:uppercase;
+  margin-right:5px;font-style:normal}
+.bwr.mine i{color:#e8b13a}.bwr.pow i{color:#31D07E}.bwr.av i{color:#7aa7ff}
+.bwr.off i{color:var(--ink3)}.bwr.off{color:var(--ink3)}
+.bwreview{margin:8px 0 14px;border:1px solid var(--line);border-radius:4px;
+  background:rgba(255,255,255,.012)}
+.bwreview>summary{cursor:pointer;padding:9px 12px;font-size:13px}
+.bwreview .bwsub{padding:0 12px}
+.bwrn{color:var(--ink3);font-size:11.5px;margin-left:6px}
+.bwgrp{border-top:1px solid var(--line);padding:8px 12px 10px}
+.bwgrp>h4{margin:0 0 2px;font:600 10px/1.3 var(--disp);letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink2)}
+.bwgrp>p{margin:0 0 7px;font-size:11.5px;color:var(--ink3)}
+.bwcase{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;padding:5px 0;
+  border-top:1px dotted rgba(255,255,255,.06);font-size:12.5px}
+.bwcase:first-of-type{border-top:0}
+.bwcase .bwcn{font:700 13px/1 var(--disp);min-width:118px}
+.bwcase .bwcd{font:700 12px/1 var(--disp);color:#e8b13a}
+.bwcase em{font-style:normal;color:var(--ink3)}
+.bwcase .bwwhy,.bwprecols .bwwhy{color:#e0553f;font-size:11.5px}
+.bwpin{background:none;border:1px solid var(--line);color:var(--ink2);
+  border-radius:3px;font-size:10.5px;padding:2px 6px;cursor:pointer}
+.bwpin.on{color:#e8b13a;border-color:#e8b13a}
+.bwpre{margin:10px 0 14px;border:1px solid #e8b13a;border-radius:4px;
+  background:rgba(232,177,58,.05)}
+.bwprehd{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:10px 12px;border-bottom:1px solid var(--line)}
+.bwprehd b{font:700 14px/1 var(--disp)}
+.bwprecols{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+.bwprecols>div{padding:10px 12px;border-right:1px solid var(--line)}
+.bwprecols>div:last-child{border-right:0}
+.bwprecols h4{margin:0 0 6px;font:600 10px/1.3 var(--disp);letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink2)}
+.bwprecols ul{margin:0;padding-left:15px;font-size:12.5px;line-height:1.7}
+.bwprecols .none{color:var(--ink3);font-size:12.5px}
+.bwcmp{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+.bwh4{margin:0 0 6px;font:600 10px/1.3 var(--disp);letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink2)}
+.bwcmprow{display:flex;align-items:center;gap:6px;font-size:11.5px}
+.bwcmprow select{flex:1;min-width:0}
+#bwcmpout{margin-top:8px;font-size:12.5px;line-height:1.65}
+@media (max-width:560px){
+  .bwprecols{grid-template-columns:1fr}
+  .bwprecols>div{border-right:0;border-bottom:1px solid var(--line)}
+  .bwcase .bwcn{min-width:0}
+}
 /* the human-judgment prompt: appears only when a slot is far from POWER */
 .bwask{margin:8px 0 0 40px;padding:8px 10px;border-radius:6px;
   border:1px solid color-mix(in oklab,#F2B441 30%,var(--line2));
@@ -3400,6 +3453,7 @@ b.kres{color:#F2B441}
   color:var(--ink3,var(--ink2))}
 .dfcs{font:11px/1 var(--mono);color:var(--ink3,var(--ink2));opacity:.75}
 .dfc.none{color:var(--ink2);font-style:italic}
+.rnk>s,.dpow>s{text-decoration:none;font-size:.72em;letter-spacing:.06em;opacity:.72;margin-right:2px}
 .dlive{margin-top:11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
 .dopen{margin-left:auto;font:600 10px/1 var(--disp);letter-spacing:.09em;
   text-transform:uppercase;color:var(--ink2);background:transparent;
@@ -4620,6 +4674,34 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <span class="bwstate" id="bwstate"></span>
   </div>
 
+  <!-- ⚠ NONE OF THESE THREE IS A RECOMMENDATION. Each is a difference between
+       two orderings, stated so it can be looked at before saving. -->
+  <div class="bwpre" id="bwpre" hidden>
+    <div class="bwprehd">
+      <b>Before you save</b>
+      <button type="button" class="bwbtn primary" id="bwpresave">Save ballot</button>
+      <button type="button" class="bwbtn" id="bwpreback">Keep editing</button>
+    </div>
+    <div class="bwprecols" id="bwprebody"></div>
+  </div>
+
+  <!-- THREE RULERS, NAMED. The whole point of the workshop is that these are
+       different questions; a reader who cannot tell them apart cannot use it. -->
+  <div class="bwrulers">
+    <span class="bwr mine"><i>My ballot</i> your opinion, the thing being written</span>
+    <span class="bwr pow"><i>POWER</i> how strong a team is &mdash; ours</span>
+    <span class="bwr av"><i>AVCA</i> the coaches poll &mdash; external</span>
+    <span class="bwr off"><i>R&Eacute;SUM&Eacute;</i> inactive until enough games are played</span>
+  </div>
+
+  <details class="bwreview" id="bwreview">
+    <summary><b>Ballot review</b> <span class="bwrn" id="bwrevn"></span></summary>
+    <p class="bwsub">Four separate questions, each sorted by one named number you
+      can check. Not a queue, not a score, not a recommendation &mdash; the order
+      within a group is the size of that one difference and nothing else.</p>
+    <div id="bwqueue"></div>
+  </details>
+
   <div class="bwgrid">
     <div class="bwmain">
       <ol class="bwlist" id="bwlist"></ol>
@@ -4646,6 +4728,15 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <div class="bwcard">
         <h3 class="bwh">Saved ballots</h3>
         <div id="bwhistory"></div>
+        <div class="bwcmp">
+          <h4 class="bwh4">Compare two saves</h4>
+          <div class="bwcmprow">
+            <select id="bwcmpa" aria-label="Earlier ballot"></select>
+            <span>vs</span>
+            <select id="bwcmpb" aria-label="Later ballot"></select>
+          </div>
+          <div id="bwcmpout"></div>
+        </div>
       </div>
     </aside>
   </div>
@@ -4991,7 +5082,11 @@ function dayLabel(iso) {
 /* The AVCA coaches poll rank, labelled. Mirror of build_hub.rank_badge();
    both say whose ranking it is, so no view can show a bare numeral. */
 function rank(v) {
-  return v ? '<i class="rnk" title="AVCA coaches poll rank">' + v + '</i> ' : '';
+  /* ⚠ THE LABEL IS VISIBLE, NOT A TOOLTIP. This used to render a bare numeral
+     whose only clue was title=, so a reader could take it for POWER, for our
+     rank, or for a seed. It is the AVCA coaches poll and it now says so. */
+  return v ? '<i class="rnk" title="AVCA coaches poll rank"><s>AVCA</s>#' +
+    v + '</i> ' : '';
 }
 /* ---- THE WEEK'S HEADLINE MATCHES -------------------------------------
    What a scoreboard puts at the top: not every fixture, the ones worth
@@ -5600,6 +5695,13 @@ function bwRanked() {
   return BW.teams.filter(t => t.rank).sort((a, b) => a.rank - b.rank);
 }
 function bwPool() { return BW.teams.filter(t => !t.rank); }
+function bwEntry(name) {
+  for (let i = 0; i < BW.teams.length; i++) {
+    if (BW.teams[i].team === name) return BW.teams[i];
+  }
+  return null;
+}
+function bwSlot(name) { const e = bwEntry(name); return e ? e.rank : null; }
 function bwRenumber() {
   bwRanked().forEach((t, i) => { t.rank = i + 1; });
 }
@@ -5630,15 +5732,250 @@ function bwPrevRank(team) {
    ⚠ EVERY VALUE HERE IS READ FROM THE PAGE'S OWN DATA. A team with no result
    shows "no result yet", never a zero; RÉSUMÉ says it is not active
    rather than printing a rank it does not have. */
+/* ---- the case row: ONLY facts already on this page --------------------
+   Nothing here is scouting, importance, momentum or consensus. Every value is
+   copied from a field that exists elsewhere in the build, and each says which
+   ruler it belongs to. A team we have nothing for shows nothing, not a zero. */
+function bwNextFixture(name) {
+  const t = TEAMS[name] || {};
+  const today = new Intl.DateTimeFormat('en-CA',
+    { timeZone: 'America/Los_Angeles' }).format(new Date());
+  const up = (t.fixtures || []).filter(f => f.d >= today)
+    .sort((a, b) => (a.d < b.d ? -1 : 1));
+  return up.length ? up[0] : null;
+}
+
+function bwCase(name, driver) {
+  const t = TEAMS[name] || {};
+  const slot = bwSlot(name);
+  const prev = bwPrevRank(name);
+  const base = bwPrev();
+  const bits = [];
+  bits.push('<span class="bwcn">' + logo(name) + esc(name) + '</span>');
+  if (driver) bits.push('<span class="bwcd">' + driver + '</span>');
+  bits.push(slot ? '<em>my ballot</em> #' + slot
+                 : '<em>my ballot</em> not slotted');
+  if (base) {
+    bits.push(prev == null ? '<em>vs last save</em> new'
+      : (prev === slot ? '<em>vs last save</em> –'
+        : '<em>vs last save</em> ' + (prev > slot ? '▲' : '▼') +
+          Math.abs(prev - (slot || prev))));
+  }
+  if (t.rank) bits.push('<em>POWER</em> #' + t.rank);
+  bits.push('<em>AVCA</em> ' + (t.avca ? '#' + t.avca : 'NR'));
+  if (t.record26) bits.push('<em>record</em> ' + esc(t.record26));
+  const played = (t.played || []).slice().sort((a, b) => (a.d < b.d ? 1 : -1));
+  if (played.length) {
+    const L = played[0];
+    bits.push('<em>last</em> ' + (L.mine > L.theirs ? 'beat ' : 'lost to ') +
+      esc(L.opp) + ' ' + L.mine + '–' + L.theirs);
+  }
+  const nx = bwNextFixture(name);
+  if (nx) {
+    bits.push('<em>next</em> ' + (nx.home ? 'v ' : 'at ') + esc(nx.opp) +
+      ' ' + esc(dayLabel(nx.d)));
+  }
+  /* ⚠ MARKED UNEXPLAINED, NEVER FILLED IN. The workshop says a big move has no
+     reason yet; it does not write one, and it does not stop the save. */
+  const ms = slot ? bwMoveState(name, slot) : null;
+  const ent = bwEntry(name) || {};
+  if (ms && !(ent.reason || '').trim()) {
+    bits.push('<span class="bwwhy">no reason written yet</span>');
+  }
+  bits.push('<button type="button" class="bwpin' + (ent.pinned ? ' on' : '') +
+    '" data-pin="' + esc(name) + '">' + (ent.pinned ? 'pinned' : 'pin') +
+    '</button>');
+  return '<div class="bwcase">' + bits.join('') + '</div>';
+}
+
+/* Four groups. Each is ONE named difference, sorted by its own size -- no
+   blending, so every position in every list can be checked by hand. */
+function bwQueue() {
+  const out = [];
+  const ranked = bwRanked();
+
+  const vsPower = ranked.map(t => {
+    const p = (TEAMS[t.team] || {}).rank;
+    return p ? { team: t.team, d: p - t.rank } : null;
+  }).filter(Boolean).filter(x => Math.abs(x.d) >= 3)
+    .sort((a, b) => Math.abs(b.d) - Math.abs(a.d)).slice(0, 8);
+  out.push(['Furthest from POWER',
+    'Your slot minus its POWER rank. A positive number means you have them higher than POWER does.',
+    vsPower.map(x => bwCase(x.team,
+      (x.d > 0 ? '+' : '') + x.d + ' vs POWER'))]);
+
+  const seen = {};
+  const disagree = Object.keys(TEAMS).map(n => {
+    const t = TEAMS[n];
+    return (t.avca && t.rank) ? { team: n, d: t.avca - t.rank } : null;
+  }).filter(Boolean).filter(x => Math.abs(x.d) >= 4)
+    .sort((a, b) => Math.abs(b.d) - Math.abs(a.d)).slice(0, 8);
+  out.push(['AVCA and POWER disagree most',
+    'AVCA rank minus POWER rank, across every team — nothing to do with your ballot.',
+    disagree.map(x => bwCase(x.team,
+      (x.d > 0 ? '+' : '') + x.d + ' AVCA vs POWER'))]);
+
+  const pinned = BW.teams.filter(t => t.pinned || t.rank == null);
+  out.push(['Pinned and also considered',
+    'Teams you set aside or marked for another look. Nothing here is removed unless you remove it.',
+    pinned.map(t => bwCase(t.team, t.pinned ? 'pinned' : 'considered'))]);
+
+  const base = bwPrev();
+  let moved = [];
+  if (base) {
+    const prevRanks = {};
+    (base.teams || []).forEach(t => { if (t.rank) prevRanks[t.team] = t.rank; });
+    ranked.forEach(t => {
+      const p = prevRanks[t.team];
+      if (p == null) moved.push({ team: t.team, label: 'entered' });
+      else if (Math.abs(p - t.rank) >= 3) {
+        moved.push({ team: t.team,
+          label: (p > t.rank ? '▲' : '▼') + Math.abs(p - t.rank) +
+                 ' (' + p + '→' + t.rank + ')',
+          size: Math.abs(p - t.rank) });
+      }
+    });
+    const now = {};
+    ranked.forEach(t => { now[t.team] = 1; });
+    Object.keys(prevRanks).forEach(n => {
+      if (!now[n]) moved.push({ team: n, label: 'dropped out' });
+    });
+    moved.sort((a, b) => (b.size || 99) - (a.size || 99));
+  }
+  out.push(['Changed since your last save',
+    base ? 'Movement against your own previous saved ballot — not against POWER.'
+         : 'Nothing saved yet, so there is no earlier ballot to compare against.',
+    moved.slice(0, 10).map(x => bwCase(x.team, x.label))]);
+  return out;
+}
+
+function renderBallotReview() {
+  const host = document.getElementById('bwqueue');
+  if (!host) return;
+  const groups = bwQueue();
+  host.innerHTML = groups.map(g =>
+    '<div class="bwgrp"><h4>' + g[0] + ' <span class="bwrn">' +
+    g[2].length + '</span></h4><p>' + g[1] + '</p>' +
+    (g[2].length ? g[2].join('')
+                 : '<p class="bwnone">Nothing in this group.</p>') +
+    '</div>').join('');
+  const n = document.getElementById('bwrevn');
+  if (n) n.textContent = groups.reduce((a, g) => a + g[2].length, 0) +
+    ' teams across 4 groups';
+}
+
+/* ---- pre-submit: three DIFFERENCES, named, none of them advice --------- */
+function bwPreReview() {
+  const base = bwPrev();
+  const ranked = bwRanked();
+  const cols = [];
+
+  let changed = [];
+  if (!base) {
+    changed = null;
+  } else {
+    const pr = {};
+    (base.teams || []).forEach(t => { if (t.rank) pr[t.team] = t.rank; });
+    const now = {};
+    ranked.forEach(t => { now[t.team] = t.rank; });
+    ranked.forEach(t => {
+      if (pr[t.team] == null) changed.push(esc(t.team) + ' entered at ' + t.rank);
+      else if (pr[t.team] !== t.rank) {
+        changed.push(esc(t.team) + ' ' + pr[t.team] + '→' + t.rank);
+      }
+    });
+    Object.keys(pr).forEach(n => {
+      if (now[n] == null) changed.push(esc(n) + ' dropped out (was ' + pr[n] + ')');
+    });
+  }
+  cols.push(['1 · Versus your last saved ballot',
+    changed === null
+      ? '<p class="none">This is your first saved ballot, so there is nothing to compare it against.</p>'
+      : (changed.length ? '<ul><li>' + changed.join('</li><li>') + '</li></ul>'
+                        : '<p class="none">Identical to your last save.</p>')]);
+
+  const vp = ranked.map(t => {
+    const p = (TEAMS[t.team] || {}).rank;
+    return p ? { team: t.team, d: p - t.rank } : null;
+  }).filter(Boolean).filter(x => Math.abs(x.d) >= 3)
+    .sort((a, b) => Math.abs(b.d) - Math.abs(a.d)).slice(0, 10);
+  cols.push(['2 · Where your ballot differs from POWER',
+    vp.length ? '<ul><li>' + vp.map(x => esc(x.team) + ' — you #' +
+        bwSlot(x.team) + ', POWER #' + (TEAMS[x.team] || {}).rank +
+        (bwEntry(x.team) && (bwEntry(x.team).reason || '').trim()
+          ? '' : ' <span class="bwwhy">(no reason written)</span>')
+      ).join('</li><li>') + '</li></ul>'
+      : '<p class="none">Nothing three or more slots away from POWER.</p>']);
+
+  const ap = Object.keys(TEAMS).map(n => {
+    const t = TEAMS[n];
+    return (t.avca && t.rank) ? { team: n, d: t.avca - t.rank } : null;
+  }).filter(Boolean).filter(x => Math.abs(x.d) >= 5)
+    .sort((a, b) => Math.abs(b.d) - Math.abs(a.d)).slice(0, 10);
+  cols.push(['3 · Where AVCA and POWER differ',
+    ap.length ? '<ul><li>' + ap.map(x => esc(x.team) + ' — AVCA #' +
+        TEAMS[x.team].avca + ', POWER #' + TEAMS[x.team].rank
+      ).join('</li><li>') + '</li></ul>'
+      : '<p class="none">No large gaps between the two.</p>']);
+
+  document.getElementById('bwprebody').innerHTML = cols.map(c =>
+    '<div><h4>' + c[0] + '</h4>' + c[1] + '</div>').join('');
+  document.getElementById('bwpre').hidden = false;
+  document.getElementById('bwpre').scrollIntoView({ block: 'start' });
+}
+
+/* ---- compare any two SAVED ballots ------------------------------------- */
+function bwHistoryOptions() {
+  const a = document.getElementById('bwcmpa');
+  const b = document.getElementById('bwcmpb');
+  if (!a || !b) return;
+  const rows = BW_HIST || [];
+  const opts = rows.map((r, i) =>
+    '<option value="' + i + '">' + esc((r.saved_utc || '').slice(0, 16)
+      .replace('T', ' ')) + '</option>').join('');
+  const keepA = a.value, keepB = b.value;
+  a.innerHTML = opts; b.innerHTML = opts;
+  a.value = keepA || (rows.length > 1 ? rows.length - 2 : 0);
+  b.value = keepB || (rows.length ? rows.length - 1 : 0);
+}
+
+function bwCompareSaved() {
+  const out = document.getElementById('bwcmpout');
+  if (!out) return;
+  const rows = BW_HIST || [];
+  const A = rows[+document.getElementById('bwcmpa').value];
+  const B = rows[+document.getElementById('bwcmpb').value];
+  if (!A || !B) {
+    out.innerHTML = '<p class="bwnone">Save two ballots to compare them.</p>';
+    return;
+  }
+  const ra = {}, rb = {};
+  (A.teams || []).forEach(t => { if (t.rank) ra[t.team] = t.rank; });
+  (B.teams || []).forEach(t => { if (t.rank) rb[t.team] = t.rank; });
+  const lines = [];
+  Object.keys(rb).forEach(n => {
+    if (ra[n] == null) lines.push(esc(n) + ' entered at ' + rb[n]);
+    else if (ra[n] !== rb[n]) lines.push(esc(n) + ' ' + ra[n] + '→' + rb[n] +
+      ' (' + (ra[n] > rb[n] ? '▲' : '▼') + Math.abs(ra[n] - rb[n]) + ')');
+  });
+  Object.keys(ra).forEach(n => {
+    if (rb[n] == null) lines.push(esc(n) + ' dropped out (was ' + ra[n] + ')');
+  });
+  out.innerHTML = lines.length
+    ? '<ul style="margin:0;padding-left:15px">' +
+      lines.map(l => '<li>' + l + '</li>').join('') + '</ul>'
+    : '<p class="bwnone">No difference between these two saves.</p>';
+}
+
 function bwEvidence(name) {
   const t = TEAMS[name] || {};
   const bits = [];
   if (t.rank) {
-    bits.push('<span class="bwe pw"><i>POWER</i> ' + t.rank +
+    bits.push('<span class="bwe pw"><i>POWER</i> #' + t.rank +
       (t.power != null ? ' · ' + t.power : '') + '</span>');
   }
   bits.push(RESUME_ACTIVE && t.resume_rank
-    ? '<span class="bwe rs"><i>RÉSUMÉ</i> ' + t.resume_rank + '</span>'
+    ? '<span class="bwe rs"><i>RÉSUMÉ</i> #' + t.resume_rank + '</span>'
     : '<span class="bwe rs off" title="A résumé measures what a team has earned against the schedule it has played. Not enough of the season has been played yet."><i>RÉSUMÉ</i> not active yet</span>');
   bits.push('<span class="bwe ref"><i>AVCA</i> ' +
     (t.avca ? '#' + t.avca : 'unranked') + '</span>');
@@ -5727,6 +6064,7 @@ function renderBallot() {
 
   renderBallotDiff();
   renderBallotHistory();
+  renderBallotReview();
   const lead = document.getElementById('ballotlead');
   if (lead) {
     lead.innerHTML = '<b>Your ' + SEASON_YEAR + ' VolleyTalk ballot.</b> ' +
@@ -5780,6 +6118,8 @@ function renderBallotDiff() {
 function renderBallotHistory() {
   const box = document.getElementById('bwhistory');
   if (!box) return;
+  bwHistoryOptions();
+  bwCompareSaved();
   if (!BW_HIST.length) {
     box.innerHTML = '<p class="bwsub">Nothing saved yet. Your first save becomes ' +
       'the baseline every later week is measured against.</p>';
@@ -5941,6 +6281,12 @@ function bwWire() {
     else if (b.dataset.drop) {
       const t = BW.teams.find(x => x.team === b.dataset.drop);
       if (t) { t.rank = null; bwRenumber(); bwLocalSave(); renderBallot(); }
+    } else if (e.target.dataset && e.target.dataset.pin) {
+      /* ⚠ PIN NEVER CHANGES THE BALLOT. It marks a team for another look and
+         nothing else -- no slot moves, nothing is dropped, and an unpin does
+         not remove the team from the pool either. */
+      const ent = bwEntry(e.target.dataset.pin);
+      if (ent) { ent.pinned = !ent.pinned; bwLocalSave(); renderBallot(); }
     } else if (b.dataset.promote) {
       const t = BW.teams.find(x => x.team === b.dataset.promote);
       if (t) { t.rank = bwRanked().length + 1; bwRenumber(); bwLocalSave(); renderBallot(); }
@@ -5950,7 +6296,13 @@ function bwWire() {
     } else if (b.id === 'bwseed' || b.id === 'bwseed2') {
       bwSeed(); bwLocalSave(); renderBallot();
       bwSay('Reset to the POWER order — your notes were kept.', '');
-    } else if (b.id === 'bwsave') { bwSave(); }
+    } else if (b.id === 'bwsave') { bwPreReview(); }
+    else if (b.id === 'bwpresave') {
+      document.getElementById('bwpre').hidden = true;
+      bwSave();
+    } else if (b.id === 'bwpreback') {
+      document.getElementById('bwpre').hidden = true;
+    }
     else if (b.id === 'bwcopy') {
       const txt = bwText();
       const done = () => bwSay('Copied ' + bwRanked().length + ' lines — read it before you post.', 'good');
@@ -5965,6 +6317,10 @@ function bwWire() {
     }
   });
 
+  ['bwcmpa', 'bwcmpb'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', bwCompareSaved);
+  });
   document.getElementById('v-ballot').addEventListener('change', e => {
     const el = e.target;
     const find = n => BW.teams.find(x => x.team === n);
@@ -6039,10 +6395,11 @@ function deskSide(name, avca, power, cls) {
   /* AVCA is the external poll and is labelled; POWER is ours. Both only when
      present -- a team with neither shows neither, never a placeholder rank. */
   const bits = [];
-  if (avca) bits.push('<i class="rnk" title="AVCA coaches poll rank">' + avca + '</i>');
+  if (avca) bits.push(rank(avca));
   return '<div class="dside ' + (cls || '') + '">' + bits.join('') +
     logo(name) + '<b>' + esc(name) + '</b>' +
-    (power ? '<span class="dpow" title="our POWER rank">POWER ' + power + '</span>' : '') +
+    (power ? '<span class="dpow" title="our POWER rank -- how strong a team is">' +
+      '<s>POWER</s>#' + power + '</span>' : '') +
     '</div>';
 }
 
