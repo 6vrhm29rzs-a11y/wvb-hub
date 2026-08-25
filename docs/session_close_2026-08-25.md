@@ -267,6 +267,37 @@ renderer; the page-side phrasings are asserted separately as strings. The
 end-to-end proof was the browser run above, done once by hand. If that branch
 is edited, re-run it the same way.
 
+**6. THE SAME DEFECT SAT ONE VIEW OVER, AND I ONLY FOUND IT BY ASKING.**
+Having fixed the player card, I checked whether the team page had it too. It
+did, and worse: Norfolk St. read **`Hitting % .390`** against opponents'
+**`.037`**, and **`Points / set 19.00`** against `9.33` -- every number true,
+every number from one Division-II match. The sample was printed ("1 match, 3
+sets"); the division was not. The `Results` row named the opponent with no
+marker, so a 3-0 win over a D-II side rendered identically to a 3-0 win over an
+SEC side.
+
+Both surfaces now carry it. `team_season_stats()` counts non-D-I matches
+alongside the ones it already counts, and the played row carries the flag from
+the same membership set -- **one answer to "who is Division I"**, reused, not a
+second copy.
+
+⚠ **I NEARLY WORE A FENCED BALLOT CLASS.** The caveat was first written as
+`<b class="warn">`. `.warn` is only ever defined as **`.bwstate.warn`** --
+inside the region the public build strips -- so it would have styled nothing on
+either page and would have been collision number eight, the same shape as Match
+Desk borrowing `.bwsub`. Caught by grepping the definition before trusting the
+name. It is `.dicaveat` now, defined in the open, and the guard asserts both
+that the caveat does not use `class="warn"` and that `.dicaveat{` really
+exists.
+
+⚠ **A GUARD I WROTE COULD NOT FAIL, AND IT PRINTED ALL-OK.** The team-payload
+block matched `const TEAMS = (\[...\])`. `TEAMS` is an **object**, so the
+regex matched nothing, `if m4:` was false, and six assertions were skipped in
+silence while the section still reported success. Fixed, and the missing
+payload is now itself a **failure** rather than a skip. **Verified by negative
+control**: forcing the flag to `False` makes the guard fail `0 of 17`, and the
+restore brings it back green.
+
 **State at close:** 24 suites pass with `Cody/` present and 24 with it moved
 aside. Tree is clean apart from the three fixes above. Nothing here changes
 data, ratings, or the crawl -- all three are display-layer only.

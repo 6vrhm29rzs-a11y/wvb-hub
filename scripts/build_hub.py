@@ -697,12 +697,18 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
     as markup would quadruple the file for content nobody looks at at once.
     """
     played = {}
+    _di_pl = di_teams()
     for r in res:
         for side, opp, mine, theirs, home in (
                 ("away", r["home"], r["away_sets"], r["home_sets"], False),
                 ("home", r["away"], r["home_sets"], r["away_sets"], True)):
             played.setdefault(r[side], []).append({
                 "d": r["date"], "opp": opp, "home": home,
+                # Same caveat as the player match log: the RESULT row names the
+                # opponent, so it is where the division belongs. A 3-0 win over
+                # a Division-II side and a 3-0 win over an SEC side rendered
+                # identically.
+                "nondi": bool(_di_pl) and opp not in _di_pl,
                 "mine": mine, "theirs": theirs,
                 # sets are stored (visitor, home). On a team's own page the
                 # scores must read from THAT team's side, so the home team's
@@ -1531,10 +1537,18 @@ def team_season_stats(boxes, res):
     the players' percentages.
     """
     acc = {}                                            # type: Dict[str, Any]
+    _di_ms = di_teams()
 
     def blank():
         return {"k": 0.0, "e": 0.0, "ta": 0.0, "ast": 0.0, "digs": 0.0,
                 "bs": 0.0, "ba": 0.0, "aces": 0.0, "sets": 0.0, "matches": 0,
+                # ⚠ HOW MANY OF THOSE MATCHES WERE AGAINST A NON-D-I SIDE.
+                # Norfolk St.'s 2026 page read "Hitting % .390" against
+                # opponents' ".037" -- both true, both from ONE Division-II
+                # match. The sample size was already printed; the DIVISION of
+                # the opponent was not, and that is the part that makes .390
+                # mean something other than what it looks like.
+                "nondi": 0,
                 "board": 0.0}                           # points on the scoreboard
 
     # SCOREBOARD POINTS, from the linescores, keyed by game. A team's points are
@@ -1572,6 +1586,10 @@ def team_season_stats(boxes, res):
                     sets = max(sets, float(r.get("sets") or 0))
                 dst["sets"] += sets
                 dst["matches"] += 1
+                # The opponent's division, from the same membership set the
+                # listing filter below uses -- one answer to "who is D-I".
+                if _di_ms and opp not in _di_ms:
+                    dst["nondi"] += 1
             mine["own"]["board"] += (board.get(str(gid)) or {}).get(team, 0.0)
             mine["opp"]["board"] += (board.get(str(gid)) or {}).get(opp, 0.0)
 
@@ -1582,7 +1600,8 @@ def team_season_stats(boxes, res):
             d = sides[key]
             n = d["sets"] or 0
             row[key] = {
-                "matches": d["matches"], "sets": round(n, 1),
+                "matches": d["matches"], "nondi": d["nondi"],
+                "sets": round(n, 1),
                 "kills": d["k"], "errors": d["e"], "attacks": d["ta"],
                 "assists": d["ast"], "digs": d["digs"], "aces": d["aces"],
                 "blocks": d["bs"] + d["ba"] * 0.5,
@@ -1607,7 +1626,7 @@ def team_season_stats(boxes, res):
     # it gave the D-I team it played -- those totals were built from the same
     # box score and Norfolk St. really did earn them that night. What it does
     # not get is a row of its own in a table that ranks Division I.
-    _di = di_teams()
+    _di = _di_ms
     if _di:
         out = dict((k, v) for k, v in out.items() if k in _di)
     return out
@@ -4956,6 +4975,9 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 .rstat em{display:block;font:600 9px/1 var(--sans);letter-spacing:.05em;
   text-transform:uppercase;color:var(--ink3);font-style:normal;margin-top:3px}
 .rstat .none{color:var(--ink3);font-weight:400}
+/* The division caveat, wherever a rate is read. Emphatic but not an error
+   state: this is a fact about the schedule, not a fault. */
+.dicaveat{color:var(--chalk);font-weight:700}
 .gline .nondi{margin-left:6px;padding:1px 5px;border-radius:3px;
   font:700 9px/1.5 var(--mono);letter-spacing:.04em;text-transform:uppercase;
   color:var(--ink3);background:var(--alt);vertical-align:middle;}
@@ -9424,7 +9446,11 @@ function showTeam(name) {
     const strip = (g.sets || []).map(s => s[0] + '-' + s[1]).join(', ');
     return '<div class="gline"><span class="dt">' + dayLabel(g.d) + '</span>' +
       '<span class="va">' + (g.home ? 'vs' : '@') + '</span>' +
-      '<span class="op">' + g.opp + '</span>' +
+      '<span class="op">' + esc(g.opp) +
+      (g.nondi ? '<b class="nondi" title="Not a Division-I opponent. This ' +
+        'site does not filter these matches out -- filtering would change ' +
+        'what every rate means without saying so -- so it is marked ' +
+        'instead.">non-D-I</b>' : '') + '</span>' +
       '<span class="rs ' + (won ? 'w' : 'l') + '">' + (won ? 'W' : 'L') + ' ' +
         g.mine + '-' + g.theirs + '</span>' +
       '<span class="ss">' + strip + '</span></div>';
@@ -9790,7 +9816,23 @@ function showTeam(name) {
       (O.matches === 1 ? ' match' : ' matches') + '</b> (' + O.sets +
       ' sets). Totals: ' + O.kills + ' kills on ' + O.attacks + ' attacks with ' +
       O.errors + ' errors. <b>Opponents</b> is what this team allowed &mdash; ' +
-      'the same counts from the other side of the same box scores.</div></div>';
+      'the same counts from the other side of the same box scores.' +
+      /* ⚠ THE DIVISION OF THE OPPONENT, said where the rate is read. Stated
+         only when it applies, and it names how much of the sample it is --
+         "the only match" and "1 of 4" are different facts. */
+      ((O.nondi || 0) > 0
+        ? ' <b class="dicaveat">' + (O.nondi === O.matches
+            ? (O.matches === 1
+                ? 'The only match here is against a non-Division-I opponent'
+                : 'Every match here is against a non-Division-I opponent')
+            : O.nondi + ' of these ' + O.matches + ' matches ' +
+              (O.nondi === 1 ? 'is against a non-Division-I opponent'
+                             : 'are against non-Division-I opponents')) +
+          '</b>, so these rates are not measured against Division-I ' +
+          'competition. Nothing is filtered out \u2014 filtering would change ' +
+          'what the numbers mean without saying so.'
+        : '') +
+      '</div></div>';
   }
   const rt = t.rot25;
   let rotHtml = '';

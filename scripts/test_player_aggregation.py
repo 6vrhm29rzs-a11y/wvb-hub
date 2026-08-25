@@ -245,6 +245,56 @@ def main():
             print("     (%d of %d game rows face non-D-I opponents)"
                   % (flagged, total))
 
+            # THE SAME CAVEAT ON THE TEAM PAGE. It was fixed on the player
+            # card first; the identical defect sat one view over, where
+            # Norfolk St. read "Hitting % .390" against opponents' ".037" --
+            # both true, both from one Division-II match.
+            for frag in ("The only match here is against a non-Division-I",
+                         "Every match here is against a non-Division-I",
+                         "dicaveat"):
+                check("the team page can say %r" % frag, frag in hp)
+            # ⚠ THE CAVEAT MUST NOT WEAR A FENCED BALLOT CLASS. `.warn` is
+            # only ever defined as `.bwstate.warn`, inside the region the
+            # public build strips -- borrowing it would style nothing and
+            # would repeat the Match-Desk-borrows-.bwsub mistake. Assert the
+            # caveat carries its own class and that the class is really
+            # styled somewhere.
+            check("[-] the caveat does not borrow a fenced ballot class",
+                  'class="warn"' not in hp)
+            check("...and its own class is actually defined",
+                  ".dicaveat{" in hp)
+            # The result row must carry the marker too, not just the note.
+            check("a played row can carry the marker",
+                  'g.nondi ?' in hp and hp.count('">non-D-I</b>') >= 2,
+                  "%d marker sites" % hp.count('">non-D-I</b>'))
+            # ⚠ TEAMS IS AN OBJECT, NOT AN ARRAY. The first version of this
+            # block matched `const TEAMS = (\[...\])` and therefore matched
+            # nothing, so every assertion below it was skipped in silence and
+            # the section still printed all-ok. A guard that cannot run is not
+            # a guard -- so a missing payload is now a FAILURE, not a skip.
+            m4 = re.search(r"const TEAMS = (\{.*?\});\n", hp, re.S)
+            check("[+] the TEAMS payload was found and parsed", bool(m4),
+                  "regex did not match -- the checks below would be skipped")
+            if m4:
+                _T = json.loads(m4.group(1))
+                TT = list(_T.values()) if isinstance(_T, dict) else _T
+                pl = [g for t2 in TT for g in (t2.get("played") or [])]
+                nd = [g for g in pl if g.get("nondi")]
+                check("[+] some played rows are flagged", len(nd) > 0,
+                      "%d of %d" % (len(nd), len(pl)))
+                check("[-] ...and not all of them", len(nd) < len(pl),
+                      "%d of %d" % (len(nd), len(pl)))
+                ts = [t2.get("tstats") for t2 in TT if t2.get("tstats")]
+                own = [x["own"] for x in ts if x.get("own")]
+                check("team totals carry a non-D-I match count",
+                      all("nondi" in o for o in own),
+                      "%d of %d" % (sum(1 for o in own if "nondi" in o),
+                                    len(own)))
+                # It must never exceed the matches it counts.
+                check("[-] the count never exceeds the sample",
+                      all((o.get("nondi") or 0) <= (o.get("matches") or 0)
+                          for o in own))
+
         print("\n6. CLASS YEARS ARE SPELLED OUT, UNKNOWNS PRESERVED")
         sys.path.insert(0, SCRIPTS)
         import build_hub as BH
