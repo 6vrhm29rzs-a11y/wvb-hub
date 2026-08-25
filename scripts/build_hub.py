@@ -2087,7 +2087,10 @@ def build():
     rrows = []
     for t in sorted(teams, key=lambda x: x["rank26"]):
         def c(v):
-            return "&mdash;" if v is None else str(v)
+            # ⚠ A RANK CARRIES ITS HASH. Every reference column here holds a
+            # POSITION, not a score, and a bare "4" beside POWER's "83.6" reads
+            # as another measurement. One helper, so all five columns agree.
+            return "&mdash;" if v is None else ("#%s" % v)
 
         # consensus spread: where the other systems put this team
         others = [v for v in (t.get("avca"), t.get("vt"), t.get("massey")) if v]
@@ -2705,7 +2708,7 @@ TEMPLATE = r"""<!doctype html><html lang="en"><head><meta charset="utf-8">
      degrades to something narrow rather than to a wide system sans. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <title>NCAA Women's Volleyball 2026</title>
 <style>
 /* Legibility first. Cody asked for something that reads like a scores site --
@@ -2721,11 +2724,25 @@ TEMPLATE = r"""<!doctype html><html lang="en"><head><meta charset="utf-8">
      playing surface, and an accent pair taken from the Molten ball the NCAA
      actually plays with -- deep blue and a hard yellow. Warm ground under cool
      blue is the whole identity; keep it. */
-  --page:#070B14; --card:#0E1524; --alt:#131C2E;
-  --ink:#EDF2FB; --ink2:#9CABC6; --ink3:#66748F;
-  --line:#1E2A42; --line2:#33456A;
-  --navy:#5BA8F5; --blue:#7FC1FF; --amber:#FFC72C; --amber-bg:#3A2D06;
-  --sand:#1A2436;
+  /* ── THE FILM ROOM ────────────────────────────────────────────────────
+     Named from the brief, so a value here can be checked against it rather
+     than argued about. Court Navy is the ground; Chalk is the reading ink
+     and the wash under a sheet you are meant to READ rather than scan.
+     ⚠ RALLY BLUE IS A SURFACE COLOUR, NOT AN INK. #1F66D1 on Court Navy is
+     about 3:1 -- fine as a fill or a 3px rule, not as body text. So it gets
+     its own name and a separate lighter token for anything a reader has to
+     read. Repointing one token to serve both is how a page ends up with
+     text nobody can see (R4). */
+  --court:#07172B; --chalk:#F5F1E8; --rally:#1F66D1;
+  --gold:#D99A29; --coral:#E55E4F; --slate:#8390A1;
+
+  --page:#07172B; --card:#0C1F36; --alt:#112741;
+  --ink:#F5F1E8; --ink2:#B7C2D2; --ink3:#8390A1;
+  --line:#1B3050; --line2:#2C4A72;
+  --navy:#5BA8F5; --blue:#7FC1FF; --amber:#D99A29; --amber-bg:#33280A;
+  --sand:#12283F;
+  /* the chalk sheet: a reading surface, not another card */
+  --sheet:rgba(245,241,232,.035); --sheet2:rgba(245,241,232,.055);
   /* ⚠ --navy CHANGED MEANING when the page went dark: it used to be a dark
      blue used BOTH as chrome and as ink. On a dark ground the ink has to be
      light, so --navy is now the bright blue INK and the chrome that used to be
@@ -2738,10 +2755,15 @@ TEMPLATE = r"""<!doctype html><html lang="en"><head><meta charset="utf-8">
      #FF5F6E were chosen to sit on sand and go muddy on near-black, where a
      colour needs more light than the ink around it, not less. */
   --good:#31D07E; --bad:#FF5F6E; --mid:#8494B2;
-  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
-  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
-  --disp:"Oswald","Avenir Next Condensed","HelveticaNeue-CondensedBold",
-         "Arial Narrow",var(--sans);
+  /* THREE ROLES, NAMED BY JOB. Display is for scores, ranks and short
+     labels -- condensed type is fast in three words and slow in three
+     sentences. Editorial is for anything anyone actually reads. Utility is
+     for stamps, records and set lines, where the digits must line up. */
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+  --sans:"Source Sans 3",-apple-system,BlinkMacSystemFont,"SF Pro Text",
+         "Segoe UI",Roboto,sans-serif;
+  --disp:"Barlow Condensed","Oswald","Avenir Next Condensed",
+         "HelveticaNeue-CondensedBold","Arial Narrow",var(--sans);
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -2815,13 +2837,18 @@ header{color:var(--ink);padding:20px 24px 0;position:relative;
     linear-gradient(180deg,var(--chrome2) 0%,var(--chrome) 78%,#08101F 100%)}
 .mast{max-width:1280px;margin:0 auto;display:flex;align-items:flex-end;
   justify-content:space-between;gap:20px;flex-wrap:wrap}
-h1{margin:0;font:600 40px/.92 var(--disp);letter-spacing:.005em;
-  color:var(--ink);text-transform:uppercase}
-h1 em{font-style:normal;color:var(--amber)}
-.season{font:700 10px/1 var(--mono);color:#8FB6DC;letter-spacing:.34em;
-  text-transform:uppercase;margin-bottom:9px}
-.meta{font:12px/1.65 var(--mono);color:#9CABC6;text-align:right}
-.meta b{color:var(--ink)}
+/* ⚠ THE WORDMARK IS A LOCKUP, NOT A HEADING THAT HAPPENS TO BE BIG. A rule
+   under the season line and a tighter, heavier condensed face make it read as
+   a masthead; the previous 40px/.92 sat at the same weight as a section
+   title, which is why the page opened like a dashboard. */
+h1{margin:0;font:700 52px/.86 var(--disp);letter-spacing:-.005em;
+  color:var(--chalk);text-transform:uppercase}
+h1 em{font-style:normal;color:var(--gold)}
+.season{font:600 10px/1 var(--mono);color:var(--slate);letter-spacing:.36em;
+  text-transform:uppercase;margin-bottom:10px;padding-bottom:9px;
+  border-bottom:1px solid var(--line);display:inline-block}
+.meta{font:11.5px/1.7 var(--mono);color:var(--slate);text-align:right}
+.meta b{color:var(--chalk);font-weight:600}
 /* The net: white mesh under a taut yellow tape. It is the one thing in the
    sport every viewer can draw from memory, so it carries the masthead. */
 .net{max-width:1280px;margin:17px auto 0;height:11px;
@@ -2835,15 +2862,19 @@ nav{position:sticky;top:0;z-index:6;
   border-bottom:1px solid transparent;
   border-image:linear-gradient(90deg,transparent,rgba(120,180,255,.5) 18%,
     rgba(255,199,44,.55) 52%,rgba(120,180,255,.5) 84%,transparent) 1}
-/* the active tab sits in a lit slot rather than merely being white text */
-nav button[aria-selected=true]{background:linear-gradient(180deg,
-  rgba(120,180,255,.14),rgba(120,180,255,.04));
-  box-shadow:inset 0 -2px 0 rgba(255,199,44,.9),0 0 26px -8px rgba(255,199,44,.5)}
-nav .inner{max-width:1280px;margin:0 auto;display:flex;gap:2px;flex-wrap:wrap;padding:0 8px}
-nav button{appearance:none;border:0;background:transparent;color:#9CABC6;
-  font:500 14.5px/1 var(--disp);letter-spacing:.055em;padding:14px 16px;cursor:pointer;
+/* ⚠ THE LIT SLOT IS GONE. A filled, glowing tab is the generic dashboard
+   move and it made twelve tabs shout equally. The active item is now marked by
+   the gold rule alone, and RANK is carried by type size instead. */
+nav .inner{max-width:1280px;margin:0 auto;display:flex;gap:0;flex-wrap:wrap;
+  padding:0 8px;align-items:center}
+nav button{appearance:none;border:0;background:transparent;color:var(--slate);
+  font:600 12px/1 var(--disp);letter-spacing:.12em;padding:15px 13px;cursor:pointer;
   border-bottom:3px solid transparent;text-transform:uppercase;
   transition:color .16s ease}
+/* the four that answer the brief's questions read a size larger */
+nav button.pri{font-size:15px;letter-spacing:.07em;color:var(--ink2);padding:15px 15px}
+nav .navdiv{width:1px;height:17px;background:var(--line2);margin:0 12px;
+  flex:0 0 auto}
 nav button:hover{color:var(--ink)}
 nav button[aria-selected=true]{color:var(--ink)}
 nav .inner{position:relative}
@@ -2871,7 +2902,7 @@ section[hidden]{display:none}
    a padded background layer so the fill underneath stays independent. One
    definition, applied to every surface, so they belong to each other. */
 .panel,.tsec,.hero,.card{
-  border:1px solid transparent;border-radius:14px;
+  border:1px solid transparent;border-radius:4px;
   background-origin:border-box;
   background-clip:padding-box,border-box}
 .panel{background-image:
@@ -2983,7 +3014,7 @@ b.pl6{font:800 10px/1 var(--mono);color:var(--live);vertical-align:2px;margin-le
 .card{background-image:
     linear-gradient(168deg,rgba(27,40,64,.96) 0%,rgba(15,22,38,.96) 60%,rgba(11,17,30,.97) 100%),
     linear-gradient(155deg,rgba(120,180,255,.40),rgba(255,199,44,.14) 44%,rgba(255,255,255,.03) 74%);
-  border-radius:10px;
+  border-radius:4px;
   border-left:3px solid var(--line2);
   padding:14px 16px 13px;
   box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 14px 30px -22px rgba(0,0,0,.95);
@@ -3251,7 +3282,7 @@ b.kres{color:#F2B441}
 .bwbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:12px 0 16px;
   padding-bottom:13px;border-bottom:1px solid var(--line2)}
 .bwbtn{appearance:none;border:1px solid var(--line);background:var(--card);
-  color:var(--ink);font:600 13px/1 var(--sans);padding:9px 14px;border-radius:6px;
+  color:var(--ink);font:600 13px/1 var(--sans);padding:9px 14px;border-radius:4px;
   cursor:pointer}
 .bwbtn:hover{border-color:var(--navy);color:#fff}
 .bwbtn.primary{border-color:color-mix(in oklab,#31D07E 45%,var(--line));
@@ -3266,7 +3297,28 @@ b.kres{color:#F2B441}
 .bwlist{list-style:none;margin:0;padding:0;counter-reset:none}
 .bwrow{border-bottom:1px solid var(--line2);padding:10px 0 11px}
 .bwtop{display:flex;align-items:center;gap:10px}
-.bwslot{font:700 21px/1 var(--disp);color:var(--ink);min-width:30px;text-align:right}
+/* ⚠ THE 1-25 LIST IS THE LOUDEST THING ON THIS PAGE. It was competing with
+   its own evidence line and its own review panel; the slot numeral now reads
+   as a scoreboard number and everything else steps back a size. */
+.bwslot{font:700 30px/1 var(--disp);color:var(--chalk);min-width:40px;
+  text-align:right;font-variant-numeric:tabular-nums}
+.bwteam{letter-spacing:-.005em}
+/* evidence recedes by SCALE and COLOUR, never by being faded to unreadable */
+.bwev{font-size:11.5px;opacity:.92}
+/* a note should feel like writing in a margin, not filling in a form */
+.bwnote{border:0!important;border-bottom:1px dashed var(--line2)!important;
+  border-radius:0!important;padding-left:0!important;font-style:italic;
+  font-size:13.5px}
+.bwnote:focus{border-bottom-color:var(--gold)!important;font-style:normal}
+.bwnote::placeholder{font-style:italic;opacity:.55}
+/* the review and pre-save areas are WORK SURFACES, not headline panels */
+.bwreview{background:var(--sheet);border-color:var(--line)}
+.bwpre{border-width:1px;background:var(--sheet)}
+.bwprehd b{font-size:13px;letter-spacing:.05em;text-transform:uppercase}
+/* the active ballot row carries the rally line -- the third and last place it
+   is allowed to appear */
+.bwrow:focus-within{background:var(--sheet)}
+.bwrow:focus-within .bwslot{color:var(--gold)}
 .bwmv{font:700 10px/1 var(--mono);padding:2px 4px;border-radius:3px}
 .bwmv.up{color:#31D07E;background:color-mix(in oklab,#31D07E 14%,transparent)}
 .bwmv.dn{color:#FF6B6B;background:color-mix(in oklab,#FF6B6B 14%,transparent)}
@@ -3276,7 +3328,7 @@ b.kres{color:#F2B441}
   min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bwctl{display:flex;align-items:center;gap:3px}
 .bwctl button{appearance:none;border:1px solid var(--line2);background:transparent;
-  color:var(--ink2);width:26px;height:26px;border-radius:5px;cursor:pointer;
+  color:var(--ink2);width:26px;height:26px;border-radius:4px;cursor:pointer;
   font-size:11px;line-height:1}
 .bwctl button:hover{color:var(--ink);border-color:var(--navy)}
 .bwctl .bwx:hover{color:#FF6B6B;border-color:#FF6B6B}
@@ -3286,7 +3338,7 @@ b.kres{color:#F2B441}
    the control that sets it. The spinner is hidden for the same reason: it is
    half the width of the field and this is a type-a-number box. */
 .bwjump{width:44px;height:26px;border:1px solid var(--line2);background:transparent;
-  color:var(--ink);border-radius:5px;font:600 12px/1 var(--mono);text-align:center;
+  color:var(--ink);border-radius:4px;font:600 12px/1 var(--mono);text-align:center;
   padding:0 2px;box-sizing:border-box;-moz-appearance:textfield}
 .bwjump::-webkit-outer-spin-button,.bwjump::-webkit-inner-spin-button{
   -webkit-appearance:none;margin:0}
@@ -3353,7 +3405,7 @@ b.kres{color:#F2B441}
   .bwcase .bwcn{min-width:0}
 }
 /* the human-judgment prompt: appears only when a slot is far from POWER */
-.bwask{margin:8px 0 0 40px;padding:8px 10px;border-radius:6px;
+.bwask{margin:8px 0 0 40px;padding:8px 10px;border-radius:4px;
   border:1px solid color-mix(in oklab,#F2B441 30%,var(--line2));
   background:color-mix(in oklab,#F2B441 6%,transparent)}
 .bwask.done{border-color:var(--line2);background:transparent}
@@ -3361,16 +3413,16 @@ b.kres{color:#F2B441}
 .bwask label b{color:#F2B441}
 .bwaskrow{display:flex;gap:7px}
 .bwask select{flex:0 0 auto;background:var(--card);color:var(--ink);
-  border:1px solid var(--line2);border-radius:5px;padding:5px 7px;font:12px var(--sans)}
+  border:1px solid var(--line2);border-radius:4px;padding:5px 7px;font:12px var(--sans)}
 .bwask input{flex:1;min-width:0}
 .bwask input,.bwnote{background:transparent;border:1px solid var(--line2);
-  border-radius:5px;padding:6px 8px;color:var(--ink);font:12.5px var(--sans)}
+  border-radius:4px;padding:6px 8px;color:var(--ink);font:12.5px var(--sans)}
 .bwnote{display:block;width:100%;margin:7px 0 0 40px;max-width:calc(100% - 40px);
   box-sizing:border-box}
 .bwnote:focus,.bwask input:focus{outline:none;border-color:var(--navy)}
 .bwpool{display:flex;flex-wrap:wrap;gap:6px}
 .bwchip{display:inline-flex;align-items:center;gap:6px;padding:5px 8px;
-  border:1px solid var(--line2);border-radius:20px;font:12.5px var(--sans);
+  border:1px solid var(--line2);border-radius:4px;font:12.5px var(--sans);
   color:var(--ink)}
 .bwchip button{appearance:none;border:0;background:transparent;cursor:pointer;
   color:var(--ink2);font:700 10px var(--sans)}
@@ -3380,13 +3432,13 @@ b.kres{color:#F2B441}
   font:13px var(--sans);text-decoration:underline;padding:0}
 .bwadd{margin-top:12px}
 .bwadd input{width:100%;max-width:340px;background:transparent;color:var(--ink);
-  border:1px solid var(--line2);border-radius:6px;padding:9px 11px;font:13px var(--sans)}
+  border:1px solid var(--line2);border-radius:4px;padding:9px 11px;font:13px var(--sans)}
 .bwside{display:flex;flex-direction:column;gap:14px;position:sticky;top:64px}
-.bwcard{border:1px solid var(--line2);border-radius:8px;padding:12px 14px;
+.bwcard{border:1px solid var(--line2);border-radius:4px;padding:12px 14px;
   background:var(--card)}
 .bwcard .bwh{margin-top:0}
 .bwcard textarea{width:100%;box-sizing:border-box;background:transparent;
-  color:var(--ink);border:1px solid var(--line2);border-radius:6px;padding:8px;
+  color:var(--ink);border:1px solid var(--line2);border-radius:4px;padding:8px;
   font:12.5px/1.5 var(--sans);resize:vertical}
 .bwdl{display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
 .bwdrow{font:12.5px var(--sans);color:var(--ink)}
@@ -3430,12 +3482,131 @@ b.kres{color:#F2B441}
 /* BALLOT-CSS-END */
 
 .leadhint{color:var(--ink2);opacity:.8}
+/* ── THE RANKING SHEET ────────────────────────────────────────────────────
+   The table IS the page here, so it gets a reading surface of its own -- a
+   chalk wash rather than another bordered card -- and the group header is the
+   loudest thing above it. The three rulers are separated by a RULE, not by
+   three different background colours, so no group looks more official than
+   another. */
+#v-rankings .panel{background:var(--sheet);border:0;border-top:2px solid var(--line2);
+  border-radius:0}
+#v-rankings .rk3{border-collapse:collapse}
+.rk3 thead tr.grp th{font:600 9.5px/1 var(--disp);letter-spacing:.16em;
+  text-transform:uppercase;padding:11px 10px 7px;color:var(--slate);
+  border-bottom:1px solid var(--line)}
+.rk3 thead tr.grp th.g-ours{color:var(--good);
+  box-shadow:inset 2px 0 0 color-mix(in oklab,var(--good) 55%,transparent)}
+.rk3 thead tr.grp th.g-ref{color:var(--gold);
+  box-shadow:inset 2px 0 0 color-mix(in oklab,var(--gold) 55%,transparent)}
+.rk3 thead tr.grp th.g-proj{color:var(--navy);
+  box-shadow:inset 2px 0 0 color-mix(in oklab,var(--navy) 55%,transparent)}
+/* the rank numeral is the anchor of the row */
+.rk3 tbody td.rk{font:700 19px/1 var(--disp);color:var(--chalk)}
+/* zebra by READING GROUP, five rows at a time, so the eye can track across
+   thirteen columns without a border round every cell */
+.rk3 tbody tr:nth-child(10n+1) td,.rk3 tbody tr:nth-child(10n+2) td,
+.rk3 tbody tr:nth-child(10n+3) td,.rk3 tbody tr:nth-child(10n+4) td,
+.rk3 tbody tr:nth-child(10n+5) td{background:var(--sheet)}
+.rk3 tbody tr:hover td{background:var(--sheet2)}
+
+/* ── THE TEAM PAGE LOCKUP ─────────────────────────────────────────────────
+   ⚠ WRITTEN AGAINST THE REAL MARKUP. My first pass styled .thd/.trulers/.tbox,
+   none of which exist -- dead rules that would have shipped looking like work.
+   The panel actually emits .thead, .chiptiers, .glance and .tsec, read off the
+   rendered DOM rather than assumed.
+   Crest, name, record and three NAMED rulers, then the evidence. The identity
+   is a lockup with a rule under it, not a field of equally loud badges. */
+#teamcard>.thead{border-bottom:2px solid var(--line2);padding-bottom:15px}
+/* the panel itself is the page, not a card sitting on it */
+#teamcard>div{border-radius:0}
+#teamcard .tcols{border-top:1px solid var(--line);padding-top:4px}
+#teamcard .thead .lg{font:700 42px/.94 var(--disp);letter-spacing:-.012em;
+  color:var(--chalk);text-transform:uppercase}
+#teamcard .thead .sub{font:12.5px/1.6 var(--sans);color:var(--slate)}
+/* the three rulers sit on one quiet line; the tier labels name them */
+#teamcard .chiptiers{margin-top:12px}
+#teamcard .tierlab{font:600 9px/1 var(--disp);letter-spacing:.16em;
+  text-transform:uppercase;color:var(--slate)}
+#teamcard .chip{border-radius:3px}
+#teamcard .chip.ours{border-color:color-mix(in oklab,var(--good) 45%,transparent)}
+/* "at a glance" is the first evidence a reader wants, so it gets air and the
+   headline number gets scale */
+/* ⚠ FOUR EQUAL BOXES SAY ALL FOUR MATTER THE SAME. They are four facts on one
+   surface, so they get column gutters and a single rule instead of a border
+   each -- and FORM gets the room, because "how are they playing" is the
+   question a team page is opened to answer, ahead of a season stat. */
+#teamcard .glance{border-top:0;padding:14px 0 4px;gap:0}
+#teamcard .gl{border:0!important;background:transparent!important;
+  border-radius:0;padding:2px 18px;border-left:1px solid var(--line)!important}
+#teamcard .gl:first-child{padding-left:0;border-left:0!important}
+#teamcard .glance .gl:nth-child(2){flex:1.3}
+#teamcard .glbig{font:700 26px/1 var(--disp);color:var(--chalk)}
+#teamcard .gll{font:600 9px/1 var(--disp);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--slate)}
+/* every later section is a SECTION on one working surface -- a rule and a
+   label, not a box inside a box */
+#teamcard .tsec{background:transparent;border:0;border-top:1px solid var(--line);
+  border-radius:0;padding:15px 0 6px}
+#teamcard .tsec h4,#teamcard .tsec .wh2{font:600 10px/1 var(--disp);
+  letter-spacing:.15em;text-transform:uppercase;color:var(--slate)}
+
+/* ── FOCUS AND MOTION ─────────────────────────────────────────────────────
+   ⚠ ONE FOCUS TREATMENT FOR THE WHOLE SITE. Buttons had a gold ring, links and
+   inputs had whatever the browser supplies -- and a keyboard user needs the
+   same signal everywhere, on both the navy ground and the chalk sheet. */
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:2px}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,
+textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
+  outline:2px solid var(--gold);outline-offset:2px}
+/* a global stop, so a future animation cannot opt itself out of the promise */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;
+    animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+
+/* ── THE RALLY LINE ───────────────────────────────────────────────────────
+   The single signature: a 1px court line that marks THE ACTIVE THING. It is a
+   connection cue, never decoration, so it appears on exactly three surfaces --
+   the featured match, a rank that moved, and the ballot row being edited.
+   ⚠ IT NEVER GOES IN A TABLE AS TEXTURE. If it appeared on every row it would
+   stop meaning "this one" and become a background. */
+.rally{position:relative}
+.rally::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;
+  background:linear-gradient(90deg,var(--navy) 0%,transparent 62%);
+  opacity:.9}
+.rally.gold::before{background:linear-gradient(90deg,var(--gold) 0%,transparent 62%)}
+.rally.hot::before{background:linear-gradient(90deg,var(--coral) 0%,transparent 62%)}
+/* one 350ms flash on a live score change, then it settles and stays still */
+@keyframes rallyflash{0%{opacity:.25}35%{opacity:1}100%{opacity:.85}}
+.rally.hot::before{animation:rallyflash 350ms ease-out 1}
+@media (prefers-reduced-motion:reduce){
+  .rally.hot::before{animation:none}
+  *{scroll-behavior:auto!important}
+}
+/* a directional tick beside a rank change -- same ranking's prior state only */
+.tick{font:600 10px/1 var(--disp);letter-spacing:.04em}
+.tick.up{color:var(--good)} .tick.dn{color:var(--bad)} .tick.flat{color:var(--ink3)}
+
 /* ══ MATCH DESK ═══════════════════════════════════════════════════════════
    Editorial, not a dashboard: a match is a headline with facts under it. No
    score badges, no gauges, no card-inside-a-card. The team names are the
    loudest thing, because that is what a reader is looking for. */
 #v-desk .livehead{margin-top:6px}
 .dsoonrest{font:12.5px/1.5 var(--sans);color:var(--ink2);margin:0 0 8px}
+/* ── THE RUNDOWN ──────────────────────────────────────────────────────────
+   One lead, then a board. The difference is carried by SCALE and RULE, not by
+   a border round each item -- a card has to earn its box by being separately
+   actionable, and a fixture on a list is not. */
+.dlead{padding-top:14px;margin-bottom:6px}
+.dlead .dcard{border-bottom:0;padding:4px 0 14px}
+.dlead .dside b{font-size:34px;line-height:1.02}
+.dlead .dwhen{font-size:13px;color:var(--ink2)}
+.dlead .dfinal b{font-size:26px}
+.dboard{border-top:1px solid var(--line)}
+.dboard .dcard{padding:11px 2px 12px}
+.dboard .dside b{font-size:18px}
+.dboard .dtag{font-size:8.5px;padding:3px 6px}
+.dboard .dwhy{display:none}          /* context is one line on a board row */
 .dcard{border-bottom:1px solid var(--line2);padding:15px 2px 16px}
 .dcard:last-child{border-bottom:0}
 .dcard.islive{border-left:3px solid var(--live);padding-left:13px;
@@ -3541,7 +3712,7 @@ b.kres{color:#F2B441}
 .livehead b.chg{color:#F2B441}
 .chgrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
 .chgc{display:flex;align-items:center;gap:9px;padding:9px 13px;
-  border:1px solid var(--line2);border-radius:7px;background:var(--card);
+  border:1px solid var(--line2);border-radius:4px;background:var(--card);
   font:14px/1 var(--sans)}
 .chgc.mk{border-color:color-mix(in oklab,#F2B441 45%,var(--line2));
   background:linear-gradient(180deg,color-mix(in oklab,#F2B441 7%,var(--card)),var(--card))}
@@ -3601,7 +3772,7 @@ b.kres{color:#F2B441}
   height:calc(16 * (var(--bgame-h) + var(--bgame-gap)))}
 .bhd{font:700 9.5px/1 var(--sans);letter-spacing:.09em;text-transform:uppercase;
   color:var(--ink2);padding:0 0 7px 2px}
-.bgame{background:var(--card);border:1px solid var(--line);border-radius:7px;
+.bgame{background:var(--card);border:1px solid var(--line);border-radius:4px;
   overflow:hidden;height:var(--bgame-h);box-sizing:border-box}
 .bside{display:flex;align-items:center;gap:6px;padding:6px 8px;font-size:12.5px}
 .bside+.bside{border-top:1px solid var(--line)}
@@ -3620,7 +3791,7 @@ b.kres{color:#F2B441}
 .bfinal .bhd{text-align:center;padding-left:0}
 .bchamp{font:700 9.5px/1 var(--sans);letter-spacing:.09em;text-transform:uppercase;
   color:var(--ink2);margin:14px 0 7px}
-.bcbox{background:var(--card);border:1px solid var(--line2);border-radius:7px;
+.bcbox{background:var(--card);border:1px solid var(--line2);border-radius:4px;
   padding:14px 10px;font:700 14px/1 var(--sans);color:var(--ink3)}
 @media(max-width:900px){.bhalf{min-width:820px}.bcol{min-width:150px}}
 
@@ -3688,7 +3859,7 @@ img.mug,img.pmug,img.phero{cursor:zoom-in}
 #lbx figure{margin:0;width:min(92vw,460px);max-width:min(92vw,460px);text-align:center;
   animation:lbxin .22s cubic-bezier(.2,.9,.3,1) both}
 #lbx img{width:100%;height:auto;aspect-ratio:2/3;object-fit:cover;
-  object-position:50% 12%;border-radius:14px;border:1px solid var(--line2);
+  object-position:50% 12%;border-radius:4px;border:1px solid var(--line2);
   box-shadow:0 30px 70px -20px rgba(0,0,0,.95)}
 #lbx figcaption{margin-top:12px;font:600 17px/1.3 var(--disp);color:var(--ink);
   letter-spacing:.01em}
@@ -3779,7 +3950,7 @@ td.tvnet{text-align:left}
 .crow:last-child{border-bottom:0}
 .cnm{font:600 11.5px/1.2 var(--sans);color:var(--ink2);
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ctrack{position:relative;height:14px;border-radius:7px;
+.ctrack{position:relative;height:14px;border-radius:4px;
   background:linear-gradient(90deg,rgba(63,146,222,.16),rgba(63,146,222,.03))}
 .cdot{position:absolute;top:4px;width:6px;height:6px;border-radius:50%;
   background:var(--ink3);box-shadow:0 0 0 2px var(--card);
@@ -3802,10 +3973,10 @@ td.tvnet{text-align:left}
 .bandhd span{font:600 12px/1 var(--sans);color:var(--ink2)}
 .bandhd b{font:700 20px/1 var(--mono);color:var(--ink)}
 .bandhd i{font:11px/1 var(--mono);color:var(--ink3);font-style:normal}
-.band{position:relative;height:14px;border-radius:7px;
+.band{position:relative;height:14px;border-radius:4px;
   background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));
   border:1px solid var(--line)}
-.bandfill{position:absolute;top:1px;bottom:1px;border-radius:6px;
+.bandfill{position:absolute;top:1px;bottom:1px;border-radius:4px;
   background:linear-gradient(90deg,
     color-mix(in oklab,#3F92DE 45%,transparent),
     color-mix(in oklab,#3F92DE 85%,transparent));
@@ -3833,7 +4004,7 @@ td.tvnet{text-align:left}
 /* the head coach, directly under the programme's name -- where a team's
    identity lives, not buried in a table at the bottom */
 .coachline{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
-  margin:12px 0 0;padding:9px 14px;border-radius:10px;
+  margin:12px 0 0;padding:9px 14px;border-radius:4px;
   background:linear-gradient(90deg,rgba(120,180,255,.10),rgba(120,180,255,.02));
   border-left:3px solid var(--amber)}
 .coachline .cl{font:700 9.5px/1 var(--mono);letter-spacing:.18em;
@@ -3845,7 +4016,7 @@ td.tvnet{text-align:left}
 .card.marquee .cd .tag{margin-left:8px}
 #weekcards .card{border-style:solid}
 .glance{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0 18px}
-.gl{padding:13px 15px;border-radius:12px;border:1px solid transparent;
+.gl{padding:13px 15px;border-radius:4px;border:1px solid transparent;
   background-origin:border-box;background-clip:padding-box,border-box;
   background-image:
     linear-gradient(170deg,rgba(26,38,62,.94),rgba(12,19,33,.95)),
@@ -3867,11 +4038,11 @@ td.tvnet{text-align:left}
 
 /* a long list stops owning the page; the count says what is hidden */
 .upc.clipped .gline:nth-of-type(n+7){display:none}
-h3 .cnt{margin-left:8px;padding:2px 7px;border-radius:20px;
+h3 .cnt{margin-left:8px;padding:2px 7px;border-radius:4px;
   background:rgba(120,180,255,.14);color:var(--ink2);
   font:700 10px/1.5 var(--mono)}
 .moreb{display:block;width:calc(100% - 30px);margin:2px 15px 12px;padding:9px;
-  border-radius:9px;border:1px solid var(--line2);cursor:pointer;
+  border-radius:4px;border:1px solid var(--line2);cursor:pointer;
   background:rgba(120,180,255,.07);color:var(--ink2);
   font:600 12px/1 var(--sans);transition:background .15s ease,color .15s ease}
 .moreb:hover{background:rgba(120,180,255,.14);color:var(--ink)}
@@ -3940,7 +4111,7 @@ tbody tr:nth-child(1) td.rk{color:var(--amber);
    that means "this is live data", and a count-up on the three numbers on first
    paint. Nothing here animates on a loop -- a page you read every day should
    not have something moving in the corner of your eye forever. */
-.hero{position:relative;overflow:hidden;border-radius:18px;margin:0 0 20px;
+.hero{position:relative;overflow:hidden;border-radius:4px;margin:0 0 20px;
   padding:30px 30px;display:flex;gap:28px;align-items:center;
   justify-content:space-between;flex-wrap:wrap;
   background-image:
@@ -3972,7 +4143,7 @@ tbody tr:nth-child(1) td.rk{color:var(--amber);
 .heroR{grid-column:2;grid-row:1}
 .courtwrap{grid-column:1 / -1;grid-row:2;position:relative;height:104px;
   overflow:hidden;pointer-events:none;
-  border-radius:10px;
+  border-radius:4px;
   background:linear-gradient(180deg,rgba(8,14,28,0),rgba(91,168,245,.07));
   -webkit-mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent);
   mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent)}
@@ -4011,7 +4182,7 @@ tbody tr:nth-child(1) td.rk{color:var(--amber);
 .herosub{margin:0;font:13px/1.6 var(--mono);color:var(--ink2);max-width:56ch}
 .heroR{position:relative;z-index:1;display:flex;gap:12px;flex-wrap:wrap}
 .pod{position:relative;display:flex;flex-direction:column;align-items:center;
-  gap:3px;min-width:116px;padding:14px 14px 12px;border-radius:12px;
+  gap:3px;min-width:116px;padding:14px 14px 12px;border-radius:4px;
   background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));
   border:1px solid var(--line2);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
@@ -4163,7 +4334,7 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 .mv.dn{color:#FF5F6E}
 .mv.sm{color:var(--ink3)}
 .sysbadge{font:700 10px/1 var(--mono);color:var(--ink-on-accent);background:var(--navy);
-  border-radius:20px;padding:4px 8px;margin-left:8px;vertical-align:2px;
+  border-radius:4px;padding:4px 8px;margin-left:8px;vertical-align:2px;
   letter-spacing:.04em}
 .tsec{scroll-margin-top:calc(var(--navh,0px) + 10px)}
 .rbody{max-height:none}
@@ -4182,12 +4353,21 @@ td.wh .wu{color:var(--ink3);font-style:italic}
   letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);
   padding:0 0 6px;border-bottom:1px solid var(--line2);margin-bottom:2px}
 .rgrp-n{font:700 10px/1 var(--mono);color:var(--ink3);background:var(--alt);
-  border-radius:20px;padding:3px 7px}
+  border-radius:4px;padding:3px 7px}
 .rrow{display:grid;grid-template-columns:1fr auto;grid-template-areas:
   "av stat" "meta stat";align-items:center;gap:0 10px;
   padding:7px 9px 7px 6px;border-left:3px solid transparent;
   border-bottom:1px solid var(--line);transition:background .12s ease}
 .rrow:last-child{border-bottom:0}
+/* ⚠ THE SAME min-width:auto FLOOR AS THE BALLOT'S TWO-COLUMN GRID, on a
+   different grid. A 1fr
+   column cannot shrink below its content unless told it may, so a long
+   player name held the roster 96px wider than a 390px phone -- clipped inside
+   the cell, with no sideways scrollbar to reveal it. Pre-existing; measured at
+   466/368 before this pass and fixed here because the team page is one of the
+   surfaces this visual system has to carry. */
+.rrow>*{min-width:0}
+.rrow .nm,.rrow .meta{overflow-wrap:anywhere}
 .rrow:hover{background:var(--alt)}
 /* A starter is marked by a bar rather than a fill: the fill was too faint to
    read, and the legend under the table names this bar explicitly. */
@@ -4209,7 +4389,7 @@ td.wh .wu{color:var(--ink3);font-style:italic}
   text-transform:uppercase;color:var(--ink3);font-style:normal;margin-top:3px}
 .rstat .none{color:var(--ink3);font-weight:400}
 h3 .h3n{font:700 10px/1 var(--mono);color:var(--ink3);background:var(--alt);
-  border-radius:20px;padding:3px 7px;margin-left:7px;vertical-align:2px}
+  border-radius:4px;padding:3px 7px;margin-left:7px;vertical-align:2px}
 @media (max-width:560px){
   .rrow{grid-template-columns:1fr auto;padding-right:4px}
   .rname{font-size:13px}
@@ -4221,7 +4401,7 @@ h3 .h3n{font:700 10px/1 var(--mono);color:var(--ink3);background:var(--alt);
 tr.det td{background:var(--alt);padding:13px 15px}
 .dh{font-size:12.5px;color:var(--ink2);margin-bottom:10px}
 .dlab{font-size:13px;color:var(--ink2)}
-.dbtn{font:inherit;font-size:13px;padding:8px 12px;border-radius:8px;
+.dbtn{font:inherit;font-size:13px;padding:8px 12px;border-radius:4px;
   border:1px solid var(--line2);background:var(--card);color:var(--ink);cursor:pointer}
 .dbtn:hover{border-color:var(--navy);color:var(--navy)}
 .stgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px}
@@ -4229,7 +4409,7 @@ tr.det td{background:var(--alt);padding:13px 15px}
 .brkcol{flex:none;min-width:210px}
 .brkhead{font:700 11px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;
   color:var(--ink2);margin-bottom:9px}
-.brkgame{background:var(--card);border:1px solid var(--line);border-radius:8px;
+.brkgame{background:var(--card);border:1px solid var(--line);border-radius:4px;
   margin-bottom:8px;overflow:hidden}
 .brkside{display:flex;align-items:center;gap:7px;padding:7px 10px;font-size:13px}
 .brkside+.brkside{border-top:1px solid var(--line)}
@@ -4255,7 +4435,7 @@ table.box th{position:static;background:transparent;border-bottom:1px solid var(
 table.box td{padding:5px 6px;border-bottom:1px solid var(--line);font-size:12.5px}
 table.box td.pn{text-align:left;font-weight:600}
 .pgl{font-size:12.5px}
-.why{background:var(--card);border:1px solid var(--line);border-radius:8px;
+.why{background:var(--card);border:1px solid var(--line);border-radius:4px;
   padding:12px 14px;margin-bottom:12px;max-width:640px}
 .whyline{display:flex;align-items:baseline;gap:10px;font-size:13px;padding:4px 0}
 .whyline span{flex:1;color:var(--ink2)}
@@ -4267,7 +4447,7 @@ table.box td.pn{text-align:left;font-weight:600}
 .whynote{font-size:12px;color:var(--ink2);line-height:1.55;margin-top:9px;
   border-top:1px dashed var(--line);padding-top:9px}
 .pls{display:grid;grid-template-columns:repeat(auto-fit,minmax(225px,1fr));gap:8px}
-.pl{background:var(--card);border:1px solid var(--line);border-radius:7px;
+.pl{background:var(--card);border:1px solid var(--line);border-radius:4px;
   padding:8px 11px;text-align:left}
 .pl b{display:block;font-size:13.5px}
 .pl span{display:block;font-size:11.5px;color:var(--ink2);text-transform:capitalize}
@@ -4275,12 +4455,12 @@ table.box td.pn{text-align:left;font-weight:600}
 .pl i em{font-style:normal;color:var(--ink3);font-size:10px;margin:0 4px 0 2px}
 
 /* ---- team page ---- */
-.thead{background:var(--card);border:1px solid var(--line);border-radius:10px;
+.thead{background:var(--card);border:1px solid var(--line);border-radius:4px;
   padding:18px 20px;margin-bottom:14px;box-shadow:0 1px 2px rgba(16,24,40,.05)}
 .thead h2{margin:0 0 4px;font:600 34px/1 var(--disp);letter-spacing:.005em}
 .thead .sub{color:var(--ink2);font-size:13.5px}
 .chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
-.chip{font:700 11.5px/1 var(--mono);border:1px solid var(--line2);border-radius:99px;
+.chip{font:700 11.5px/1 var(--mono);border:1px solid var(--line2);border-radius:4px;
   padding:6px 11px;color:var(--ink2);background:var(--alt)}
 .chip b{color:var(--navy)}
 .chip.ours{background:#12233C;border-color:#2A4570;color:var(--navy)}
@@ -4340,7 +4520,7 @@ img.mug{color:transparent}
 
 /* ---- controls ---- */
 .ctl{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:13px;align-items:center}
-input,select{font:inherit;font-size:14px;padding:8px 12px;border-radius:8px;
+input,select{font:inherit;font-size:14px;padding:8px 12px;border-radius:4px;
   border:1px solid var(--line2);background:var(--card);color:var(--ink)}
 input[type=search]{flex:1 1 220px}
 input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
@@ -4369,13 +4549,18 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <div class="net"></div>
   </header>
   <nav role="tablist"><div class="inner">
-    <button role="tab" aria-selected="true" data-v="scores">Scores</button>
-    <button role="tab" aria-selected="false" data-v="desk">Match Desk</button>
-    <button role="tab" aria-selected="false" data-v="top25">Digby&rsquo;s Top 25</button>
-    <button role="tab" aria-selected="false" data-v="rankings">Rankings</button>
+    <!-- ⚠ ORDER IS THE HIERARCHY. The brief's question is "what deserves my
+         attention, what evidence, what do I think" -- so the desk, the two
+         rankings and the ballot lead, and the archive sits after a rule. A row
+         of twelve equal tabs answers none of those. -->
+    <button role="tab" aria-selected="true" data-v="desk" class="pri">Match Desk</button>
+    <button role="tab" aria-selected="false" data-v="scores" class="pri">Scores</button>
+    <button role="tab" aria-selected="false" data-v="top25" class="pri">Digby&rsquo;s Top 25</button>
+    <button role="tab" aria-selected="false" data-v="rankings" class="pri">Rankings</button>
     <!-- PRIVATE. Cody's own weekly VolleyTalk ballot, not a ranking this site
          publishes. Stripped from the public build. -->
-    <button role="tab" aria-selected="false" data-v="ballot">Ballot Workshop</button>
+    <button role="tab" aria-selected="false" data-v="ballot" class="pri">Ballot Workshop</button>
+    <span class="navdiv" aria-hidden="true"></span>
     <button role="tab" aria-selected="false" data-v="teams">Teams</button>
     <button role="tab" aria-selected="false" data-v="leaders">Stats</button>
     <button role="tab" aria-selected="false" data-v="players">Players</button>
@@ -4387,7 +4572,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 
 <main>
 
-<section id="v-scores">
+<section id="v-scores" hidden>
   <!-- THE HERO. The page used to open straight into a date picker. This is the
        first thing seen, so it carries the three things worth knowing on arrival:
        what the season is, who is on top, and where tonight stands. Every figure
@@ -4521,7 +4706,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <div class="cards" id="resultcards">{{SCORE_CARDS}}</div>
 </section>
 
-<section id="v-desk" hidden>
+<section id="v-desk">
   <h2 class="vh">Match Desk &mdash; {{SEASON_YEAR}}</h2>
   <p class="tabhint" id="desklead"></p>
 
@@ -4614,9 +4799,9 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <thead>
     <tr class="grp">
       <th colspan="3"></th>
-      <th class="g-ours" colspan="2">Our two rankings</th>
-      <th class="g-ref" colspan="6">Reference &mdash; none of this feeds our model</th>
-      <th class="g-proj" colspan="2">Projected</th>
+      <th class="g-ours" colspan="2">Our system</th>
+      <th class="g-ref" colspan="6">Reference &mdash; none of it feeds our model</th>
+      <th class="g-proj" colspan="2">Outlook</th>
     </tr>
     <tr>
       <th>#</th><th class="l">Team</th><th class="l">Conf</th>
@@ -6747,12 +6932,27 @@ function renderDesk() {
       mine.length + (mine.length === 1 ? ' match' : ' matches') +
       (liveN ? ' · ' + liveN + ' live' : '') +
       (finalN ? ' · ' + finalN + ' final' : '');
-    todayBox.innerHTML = mine.map(m => deskCard(m, LIVE_BY_ID[m.gid], true)).join('');
+    /* ⚠ ONE FEATURED MATCH, THEN A BOARD. A stack of equally weighted cards
+       tells a reader that everything matters the same amount, which is the
+       opposite of what a rundown is for. The lead is chosen by a STATED rule
+       -- live first, then the best ranked-v-ranked, then the first of the day
+       -- never by a score we invented. */
+    const liveOne = mine.find(m => LIVE_BY_ID[m.gid] &&
+      !/final/i.test((LIVE_BY_ID[m.gid].state || '')));
+    const lead = liveOne || mine[0];
+    const rest = mine.filter(m => m !== lead);
+    todayBox.innerHTML =
+      '<div class="dlead rally' + (liveOne ? ' hot' : '') + '">' +
+      deskCard(lead, LIVE_BY_ID[lead.gid], true) + '</div>' +
+      (rest.length ? '<div class="dboard">' +
+        rest.map(m => deskCard(m, LIVE_BY_ID[m.gid], false)).join('') +
+        '</div>' : '');
   }
 
   const shown = soon.slice(0, DESK_SOON_SHOWN);
   document.getElementById('desksooncards').innerHTML =
-    shown.length ? shown.map(m => deskCard(m, null, false)).join('')
+    shown.length ? '<div class="dboard">' +
+                   shown.map(m => deskCard(m, null, false)).join('') + '</div>'
                  : '<p class="dempty">Nothing scheduled in the next few days.</p>';
   document.getElementById('desksoonmeta').textContent =
     soon.length ? soon.length + ' scheduled' : '';
