@@ -259,6 +259,7 @@ jobs:
           python3 scripts/test_coaches.py
           python3 scripts/test_rating_factors.py
           python3 scripts/test_ballot.py
+          python3 scripts/test_match_desk.py
           python3 scripts/test_pipeline_fresh_checkout.py
 
       # Coverage gate: a NEW displayed field with no declared provenance fails

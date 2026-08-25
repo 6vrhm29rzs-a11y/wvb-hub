@@ -196,6 +196,23 @@ FAR_WEST_HOME = ("Hawaii",)
 _EARLY_AM = re.compile(r"^(12|[1-7]):\d\d\s*AM", re.I)
 
 
+def today_pt():
+    # type: () -> datetime.date
+    """Today, in the zone this page renders in.
+
+    ⚠ NOT datetime.date.today(). That is the BUILDER's clock -- Pacific on
+    Cody's Mac, UTC on a GitHub runner. The daily job runs at 09:15 UTC, which
+    is 2:15am Pacific, so on every published build UTC was already the next day.
+    Measured: schedule() under a UTC clock dropped TODAY'S FIXTURES ENTIRELY --
+    the earliest date it returned jumped from 2026-08-24 to 2026-08-28 -- so the
+    published Schedule tab and the week band have been missing the current day.
+    Same root cause as the day-label bug fixed earlier today; this is the rest
+    of it.
+    """
+    return (datetime.datetime.now(PT).date() if PT
+            else datetime.datetime.utcnow().date())
+
+
 def day_label(iso, today=None):
     """"Sun Aug 30" -- a calendar date the way a reader reads one.
 
@@ -217,8 +234,7 @@ def day_label(iso, today=None):
     # America/Los_Angeles, called it "Today". Invisible on a laptop where both
     # clocks agree; caught only because the two implementations are compared
     # against each other, and only when that comparison ran in CI.
-    today = today or ((datetime.datetime.now(PT).date() if PT
-                       else datetime.datetime.utcnow().date()))
+    today = today or today_pt()
     try:
         d = datetime.date(*[int(x) for x in (iso or "").split("-")])
     except (TypeError, ValueError):
@@ -332,7 +348,7 @@ def venue_index():
 
 def schedule(limit_days: int = 21) -> List[Dict]:
     """Upcoming fixtures from today forward, with WHERE and WHAT KIND."""
-    today = datetime.date.today().isoformat()
+    today = today_pt().isoformat()
     vidx = venue_index()
     rows = []
     for path in sorted(glob.glob(os.path.join(REPO, "data/raw/%d/scoreboard/*.json" % SEASON))):
@@ -700,7 +716,7 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
 
     fixtures = {}
     vidx = venue_index()
-    today = datetime.date.today().isoformat()
+    today = today_pt().isoformat()
     for path in sorted(glob.glob(os.path.join(REPO, "data/raw/%d/scoreboard/*.json" % SEASON))):
         date = os.path.basename(path)[:-5]
         try:
@@ -1893,6 +1909,39 @@ def top25_view(avca=None):
             "movehead": ("vs last week" if basis == "week" else "vs preseason")}
 
 
+
+def played_forecast(row, epoch):
+    """What a FINISHED match may quote as "what we expected" -- (home_win, source).
+
+    ⚠ THE WHOLE POINT. data/predictions_2026.json is rebuilt every night from
+    everything known at the time, so for a match already played it has SEEN the
+    result. Reading a forecast out of it after the fact would print a number
+    that looks exactly like a real prediction and is not one -- invisible, and
+    the most dishonest thing this page could do.
+
+    So a finished match may quote ONE thing: the earliest row in the append-only
+    prediction log, and only if that row was written before first serve. Anything
+    else returns (None, reason) and the card says "forecast unavailable".
+    """
+    if not row:
+        return None, "no forecast was logged before this match"
+    lu = row.get("logged_utc")
+    if epoch and lu:
+        try:
+            t = datetime.datetime.strptime(
+                lu, "%Y-%m-%dT%H:%M:%SZ").replace(
+                tzinfo=datetime.timezone.utc).timestamp()
+            if t > float(epoch):
+                return None, "the only logged forecast postdates tipoff"
+        except (ValueError, TypeError):
+            # An unparseable stamp cannot be shown to predate tipoff, and a
+            # forecast we cannot date is not one we can vouch for.
+            return None, "the logged forecast carries no usable timestamp"
+    if row.get("home_win") is None:
+        return None, "no forecast was logged before this match"
+    return row.get("home_win"), "logged %s" % (lu or "before tipoff")
+
+
 def build():
     teams, field, unmatched, n_aq, meta = BOARD.build()
     if PUBLIC:
@@ -2242,7 +2291,7 @@ def build():
     # both need fixtures the client can read; the schedule itself is rendered
     # server-side as HTML, so eight days are emitted as JSON rather than the
     # whole 1,524-fixture season -- enough for both jobs, a fraction of the size.
-    _today = datetime.date.today()
+    _today = today_pt()
     _horizon = (_today + datetime.timedelta(days=7)).isoformat()
     _today_s = _today.isoformat()
     # TWO RANKINGS, NAMED. `ar`/`hr` come from the feed and ARE the AVCA coaches
@@ -2261,6 +2310,115 @@ def build():
     for _r in ((load("data/digby_top25_%d.json" % SEASON) or {}).get("top") or []):
         if _r.get("team") and _r.get("rank"):
             _ourrank[_r["team"]] = int(_r["rank"])
+
+    # ---- MATCH DESK ------------------------------------------------------
+    # "What should I watch today, why does it matter, and what did it mean
+    # after final?" Presentation only: every field below already exists and is
+    # copied, never derived. No new rating, no composite score.
+    #
+    # ⚠ THE FORECAST FOR A FINISHED MATCH COMES FROM THE APPEND-ONLY LOG, AND
+    # ONLY FROM A ROW LOGGED BEFORE TIPOFF. data/predictions_2026.json is
+    # regenerated nightly from whatever is known NOW -- for a match that has
+    # been played, that includes the result, so quoting it as "what we expected"
+    # would be inventing a prediction after the fact. score_predictions.py
+    # already applies exactly this rule (logged_utc < start_time_epoch); the
+    # same rule is applied here rather than a second, looser one.
+    _plog = {}
+    _plog_path = os.path.join(REPO, "data", "raw", str(SEASON),
+                              "prediction_log.jsonl")
+    if os.path.exists(_plog_path):
+        for _line in open(_plog_path, encoding="utf-8"):
+            _line = _line.strip()
+            if not _line:
+                continue
+            try:
+                _r = json.loads(_line)
+            except ValueError:
+                continue
+            _gid = str(_r.get("game_id") or "")
+            if not _gid or _r.get("home_win") is None:
+                continue
+            # append-only: keep the EARLIEST logged row, which is the one least
+            # able to have seen anything
+            cur = _plog.get(_gid)
+            if cur is None or (_r.get("logged_utc") or "") < (cur.get("logged_utc") or ""):
+                _plog[_gid] = _r
+
+    _fwd = {}
+    for _r in ((load("data/predictions_%d.json" % SEASON) or {}).get("games") or []):
+        _fwd[str(_r.get("game_id"))] = _r
+
+    _epoch_of = {}
+    _final_of = {}
+    for _g in ((load("data/data_%d.json" % SEASON) or {}).get("games") or []):
+        _gid = str(_g.get("game_id"))
+        _epoch_of[_gid] = _g.get("start_time_epoch")
+        if _g.get("state") == "F":
+            _final_of[_gid] = _g
+
+    def _desk_forecast(gid, is_final):
+        """(home_win, source) or (None, why). Never a post-hoc forecast."""
+        gid = str(gid)
+        if is_final:
+            return played_forecast(_plog.get(gid), _epoch_of.get(gid))
+        row = _fwd.get(gid) or _plog.get(gid)
+        if not row or row.get("home_win") is None:
+            return None, "no forecast on record"
+        return row.get("home_win"), "current forecast"
+
+    _pr = dict((t["team"], t["rank26"]) for t in teams if t.get("rank26"))
+    _av = dict((t["team"], t.get("avca")) for t in teams if t.get("avca"))
+    _tourn = dict((r["team"], r.get("tournament_pct"))
+                  for r in (sim.get("teams") or []))
+    _desk_today = _today.isoformat()
+    _desk_end = (_today + datetime.timedelta(days=6)).isoformat()
+
+    _desk = []
+    for r in sched:
+        if not (_desk_today <= r["d"] <= _desk_end):
+            continue
+        gid = str(r.get("gid") or "")
+        fin = _final_of.get(gid)
+        hw, src = _desk_forecast(gid, bool(fin))
+        row = {
+            "gid": gid, "d": r["d"], "dl": day_label(r["d"], _today),
+            "t": r["t"], "a": r["a"], "h": r["h"],
+            # AVCA and OUR rank only. VolleyTalk and Massey are other people's
+            # and the public gate forbids them; the desk never carries them.
+            "ar": r.get("ar") or "", "hr": r.get("hr") or "",
+            "ao": _av.get(r["a"]) or "", "ho": _av.get(r["h"]) or "",
+            "ap": _pr.get(r["a"]), "hp": _pr.get(r["h"]),
+            "venue": r.get("venue"), "city": r.get("city"), "st": r.get("st"),
+            "site": r.get("site"), "event": r.get("event"), "kind": r.get("kind"),
+            "hw": hw, "fsrc": src,
+            "at": _tourn.get(r["a"]), "ht": _tourn.get(r["h"]),
+        }
+        if fin:
+            ts = fin.get("teams") or []
+            home = next((t for t in ts if t.get("is_home")), None)
+            away = next((t for t in ts if not t.get("is_home")), None)
+            ls = [l for l in (fin.get("linescores") or [])
+                  if l.get("home") is not None]
+            row["final"] = {
+                "hs": (home or {}).get("sets_won"),
+                "as": (away or {}).get("sets_won"),
+                "sets": [[l["visit"], l["home"]] for l in ls],
+            }
+        _desk.append(row)
+
+    # ⚠ A STATED ORDERING, NOT A SCORE. The brief forbids inventing a composite
+    # "watch score", and it is right to: a single number would hide which fact
+    # moved it. This is a documented sort -- ranked-vs-ranked, then any ranked
+    # side, then how close the forecast is -- and the page says so in those
+    # words, so a reader can see the reason rather than a rating.
+    def _desk_order(x):
+        both = 1 if (x["ar"] and x["hr"]) else 0
+        one = 1 if (x["ar"] or x["hr"]) else 0
+        close = -abs((x["hw"] if x["hw"] is not None else 0.5) - 0.5)
+        return (-both, -one, close, x["d"], x["t"] or "")
+
+    _desk.sort(key=lambda x: (x["d"],) + _desk_order(x)[:3])
+    _desk_json = json.dumps(_desk, separators=(",", ":"))
 
     # ---- WHAT CHANGED: completed matches, ranked ones first --------------
     # Ranks shown are OUR power rank AS OF NOW, not as of the match -- we do not
@@ -2433,6 +2591,7 @@ def build():
         .replace("{{SCORE_CARDS}}", "".join(cards) or
                  '<div class="empty">No completed matches yet.</div>') \
         .replace("{{SEED_ROWS}}", "".join(seeds)) \
+        .replace("{{DESK_JSON}}", _desk_json) \
         .replace("{{CHANGED_ROWS}}", _chg_html) \
         .replace("{{CHANGED_META}}", esc(_chg_meta)) \
         .replace("{{CHANGED_HIDDEN}}", "" if _chg else "hidden") \
@@ -3148,6 +3307,81 @@ b.kres{color:#F2B441}
 }
 
 .leadhint{color:var(--ink2);opacity:.8}
+/* ══ MATCH DESK ═══════════════════════════════════════════════════════════
+   Editorial, not a dashboard: a match is a headline with facts under it. No
+   score badges, no gauges, no card-inside-a-card. The team names are the
+   loudest thing, because that is what a reader is looking for. */
+#v-desk .livehead{margin-top:6px}
+.dcard{border-bottom:1px solid var(--line2);padding:15px 2px 16px}
+.dcard:last-child{border-bottom:0}
+.dcard.islive{border-left:3px solid var(--live);padding-left:13px;
+  background:linear-gradient(90deg,color-mix(in oklab,var(--live) 5%,transparent),transparent 55%)}
+.dcard.isfinal{border-left:3px solid var(--line);padding-left:13px}
+.dhead{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:9px}
+.dwhen{font:600 12px/1 var(--mono);color:var(--ink2);letter-spacing:.02em}
+.dtag{font:700 9.5px/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;
+  padding:4px 7px;border-radius:3px;border:1px solid var(--line2);color:var(--ink2)}
+.dtag.rv{color:#F2B441;border-color:color-mix(in oklab,#F2B441 40%,transparent);
+  background:color-mix(in oklab,#F2B441 10%,transparent)}
+.dtag.rk{color:var(--navy);border-color:color-mix(in oklab,var(--navy) 40%,transparent)}
+.dtag.cl{color:#31D07E;border-color:color-mix(in oklab,#31D07E 38%,transparent)}
+.dtag.lv{color:#fff;background:var(--live);border-color:var(--live)}
+.dtag.ev{text-transform:none;letter-spacing:.02em;font-size:10.5px}
+.dteams{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.dside{display:flex;align-items:center;gap:7px;font:600 19px/1.15 var(--disp)}
+.dside b{font-weight:600}
+.dside.won b{color:var(--ink)}
+.dside:not(.won) b{color:var(--ink)}
+.dcard.isfinal .dside:not(.won) b{color:var(--ink2);font-weight:500}
+.dat{font:600 11px/1 var(--sans);color:var(--ink3,var(--ink2));text-transform:uppercase;
+  letter-spacing:.12em}
+.dpow{font:700 9.5px/1 var(--mono);color:#31D07E;
+  background:color-mix(in oklab,#31D07E 12%,transparent);padding:3px 5px;border-radius:3px}
+.dfc{display:flex;align-items:baseline;gap:8px;margin-top:11px;
+  font:13.5px/1 var(--sans);color:var(--ink)}
+.dfc b{font:700 15px/1 var(--disp)}
+.dfcl{font:700 9px/1 var(--sans);letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink3,var(--ink2))}
+.dfcs{font:11px/1 var(--mono);color:var(--ink3,var(--ink2));opacity:.75}
+.dfc.none{color:var(--ink2);font-style:italic}
+.dlive{margin-top:11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.dlv{font:700 9px/1 var(--sans);letter-spacing:.13em;color:#fff;background:var(--live);
+  padding:4px 6px;border-radius:3px}
+.dlive b{font:700 16px/1 var(--disp)}
+.dper{font:11px/1 var(--mono);color:var(--ink2)}
+.dsrc{flex:1 1 100%;font:11px/1.4 var(--mono);color:var(--ink3,var(--ink2));opacity:.8}
+.dsets{display:flex;gap:5px;flex:1 1 100%;margin-top:6px}
+.dsets span{font:600 11.5px/1 var(--mono);color:var(--ink2);
+  border:1px solid var(--line2);border-radius:3px;padding:3px 6px}
+.dstory{margin-top:11px}
+.dfinal{display:flex;align-items:baseline;gap:8px;font:15px/1 var(--sans)}
+.dfl{font:700 9px/1 var(--sans);letter-spacing:.13em;color:var(--ink3,var(--ink2))}
+.dfinal b{font:700 17px/1 var(--disp);color:var(--ink)}
+.dsaid{margin:8px 0 0;font:13px/1.55 var(--sans);color:var(--ink2)}
+.dsaid b{color:#F2B441}
+.dsaid.none{font-style:italic}
+.dwhere{margin-top:9px;font:12px/1.4 var(--mono);color:var(--ink2)}
+.dwhere .wc{margin-left:6px;opacity:.75}
+.dwhere .wu{font-style:italic;opacity:.7}
+.dwhy{margin:11px 0 0;padding-left:16px}
+.dwhy li{font:12.5px/1.6 var(--sans);color:var(--ink2);margin-bottom:2px}
+.dempty{font:13px/1.6 var(--sans);color:var(--ink2);padding:10px 0}
+#desksoon{margin-top:26px}
+@media (max-width:560px){
+  /* deliberate cards, not a squeezed table: the matchup stacks and every
+     supporting fact sits under it at a readable size */
+  .dcard{padding:13px 0 14px}
+  .dcard.islive,.dcard.isfinal{padding-left:11px}
+  .dteams{flex-direction:column;align-items:flex-start;gap:4px}
+  .dside{font-size:18px}
+  .dat{margin-left:2px}
+  .dhead{gap:6px}
+  .dfc{flex-wrap:wrap;gap:6px}
+  .dfcs{flex:1 1 100%}
+  .dsets{flex-wrap:wrap}
+  .dwhy{padding-left:15px}
+}
+
 
 
 /* ── WHAT CHANGED ────────────────────────────────────────────────────────
@@ -3985,6 +4219,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   </header>
   <nav role="tablist"><div class="inner">
     <button role="tab" aria-selected="true" data-v="scores">Scores</button>
+    <button role="tab" aria-selected="false" data-v="desk">Match Desk</button>
     <button role="tab" aria-selected="false" data-v="top25">Digby&rsquo;s Top 25</button>
     <button role="tab" aria-selected="false" data-v="rankings">Rankings</button>
     <!-- PRIVATE. Cody's own weekly VolleyTalk ballot, not a ranking this site
@@ -4133,6 +4368,46 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   the <b>per-set score</b> &mdash; visitor on top, home below, the set winner lit.
   A 25&ndash;23 and a 25&ndash;12 are not the same match.</p>
   <div class="cards" id="resultcards">{{SCORE_CARDS}}</div>
+</section>
+
+<section id="v-desk" hidden>
+  <h2 class="vh">Match Desk &mdash; {{SEASON_YEAR}}</h2>
+  <p class="tabhint" id="desklead"></p>
+
+  <div id="desktoday">
+    <div class="livehead"><b class="soon">Today</b><span id="desktodaymeta"></span></div>
+    <div id="desktodaycards"></div>
+  </div>
+
+  <div id="desksoon">
+    <div class="livehead"><b class="soon">Next few days</b><span id="desksoonmeta"></span></div>
+    <div id="desksooncards"></div>
+    <p class="bwsub" id="desksoonrest"></p>
+  </div>
+
+  <details class="method">
+    <summary><b>How this page chooses and what the forecast is</b></summary>
+    <div class="note">
+      <p><b>The order is a stated sort, not a score.</b> Ranked-vs-ranked first,
+      then any ranked side, then how close the forecast is. There is deliberately
+      no single &ldquo;watch rating&rdquo;: one number would hide which fact
+      moved it, and every tag on a card names the fact it came from.</p>
+      <p><b>The forecast is a probability, not a pick.</b> It is the rally model
+      backtested on 2025 at a Brier score of 0.1289. It says how often a match
+      like this goes each way &mdash; a 70% side loses three times in ten, and
+      those three are not mistakes.</p>
+      <p><b>After a match is final the forecast comes from the append-only log,
+      and only from a row written BEFORE tipoff.</b> The forward-looking file is
+      regenerated nightly from everything known at the time, which for a played
+      match includes the result &mdash; quoting it afterwards would be inventing
+      a prediction after the fact. Where no pre-tipoff row exists the card says
+      <i>forecast unavailable</i> rather than showing one.</p>
+      <p><b>Live scores never reach the ratings.</b> An in-progress card is read
+      straight from the scoreboard feed and is labelled as such; POWER,
+      R&eacute;sum&eacute;, records, player leaders and the rankings all wait
+      for the official final and the next verified refresh.</p>
+    </div>
+  </details>
 </section>
 
 <section id="v-top25" hidden>
@@ -5638,6 +5913,232 @@ function bwWire() {
 }
 /* BALLOT-WORKSHOP-END */
 
+
+/* ══ MATCH DESK ═══════════════════════════════════════════════════════════
+   "What should I watch today, why does it matter, and what did it mean after
+   final?" Presentation and decision support: every value shown is copied from
+   a field that already exists. Nothing here rates anything.
+
+   ⚠ NO COMPOSITE WATCH SCORE. The order is a stated sort and every tag names
+   the fact behind it, so a reader can disagree with the reason rather than
+   with a number whose ingredients are hidden.
+
+   ⚠ AND NOTHING HERE REACHES A RATING. Live scores upgrade a card and stop
+   there; POWER, RESUME, records, leaders and the rankings all wait for the
+   official final and the next verified refresh. */
+const DESK = {{DESK_JSON}};
+const DESK_SOON_SHOWN = 12;
+/* |p - 0.5| at or under this is called "close". A stated cutoff for a WORD, not
+   a threshold that changes any number. */
+const DESK_CLOSE = 0.10;
+
+function deskPct(p) { return Math.round(p * 100) + '%'; }
+
+function deskTags(m, live) {
+  /* Facts only. Each tag is a thing that is true of this match, named. */
+  const t = [];
+  if (m.ar && m.hr) t.push(['rv', 'ranked vs ranked']);
+  else if (m.ar || m.hr) t.push(['rk', 'ranked team']);
+  if (m.hw != null && Math.abs(m.hw - 0.5) <= DESK_CLOSE) t.push(['cl', 'close forecast']);
+  if (m.site === 'neutral') t.push(['nu', 'neutral site']);
+  if (m.kind === 'conf') t.push(['cf', 'conference match']);
+  if (m.event) t.push(['ev', m.event]);
+  if (live) t.push(['lv', 'live']);
+  return t.map(x => '<span class="dtag ' + x[0] + '">' + esc(x[1]) + '</span>').join('');
+}
+
+function deskWhere(m) {
+  if (!m.venue) return '<span class="wu">venue not listed</span>';
+  const city = [m.city, m.st].filter(Boolean).join(' ');
+  return esc(m.venue) + (city ? '<span class="wc">' + esc(city) + '</span>' : '');
+}
+
+function deskSide(name, avca, power, cls) {
+  /* AVCA is the external poll and is labelled; POWER is ours. Both only when
+     present -- a team with neither shows neither, never a placeholder rank. */
+  const bits = [];
+  if (avca) bits.push('<i class="rnk" title="AVCA coaches poll rank">' + avca + '</i>');
+  return '<div class="dside ' + (cls || '') + '">' + bits.join('') +
+    logo(name) + '<b>' + esc(name) + '</b>' +
+    (power ? '<span class="dpow" title="our POWER rank">POWER ' + power + '</span>' : '') +
+    '</div>';
+}
+
+function deskForecast(m) {
+  if (m.hw == null) {
+    return '<div class="dfc none" title="' + esc(m.fsrc || '') +
+      '">forecast unavailable</div>';
+  }
+  const homeFav = m.hw >= 0.5;
+  const fav = homeFav ? m.h : m.a;
+  const p = homeFav ? m.hw : 1 - m.hw;
+  return '<div class="dfc"><span class="dfcl">forecast</span>' +
+    '<b>' + esc(fav) + ' ' + deskPct(p) + '</b>' +
+    '<span class="dfcs">' + esc(m.fsrc || '') + '</span></div>';
+}
+
+/* ---- why it matters: measured facts, nothing else --------------------- */
+function deskWhy(m) {
+  const out = [];
+  if (m.ar && m.hr) {
+    out.push('Both sides are ranked in the AVCA poll (#' + m.ar + ' and #' + m.hr + ').');
+  } else if (m.ar || m.hr) {
+    out.push('A ranked side: #' + (m.ar || m.hr) + ' ' + esc(m.ar ? m.a : m.h) + '.');
+  }
+  if (m.hw != null && Math.abs(m.hw - 0.5) <= DESK_CLOSE) {
+    out.push('The forecast is close &mdash; ' + deskPct(Math.max(m.hw, 1 - m.hw)) +
+      ' for the favourite, which is about as even as this model gets.');
+  }
+  if (m.event) out.push('Part of ' + esc(m.event) + '.');
+  else if (m.site === 'neutral') out.push('A neutral floor: neither side is at home.');
+  if (m.kind === 'conf') out.push('A conference match, so it counts toward the league table.');
+  const tp = [];
+  if (m.at != null) tp.push(esc(m.a) + ' ' + Math.round(m.at) + '%');
+  if (m.ht != null) tp.push(esc(m.h) + ' ' + Math.round(m.ht) + '%');
+  if (tp.length) {
+    out.push('Simulated tournament odds: ' + tp.join(' · ') + '.');
+  }
+  /* ⚠ RESUME IS NAMED AS INACTIVE RATHER THAN OMITTED. Leaving it out would
+     read as though it had been considered. */
+  if (!RESUME_ACTIVE) {
+    out.push('R&eacute;sum&eacute; is not active yet, so nothing here reflects ' +
+      'what either team has earned.');
+  }
+  if (!out.length) return '';
+  return '<ul class="dwhy">' + out.map(x => '<li>' + x + '</li>').join('') + '</ul>';
+}
+
+/* ---- the story after final: logged forecast vs what happened ---------- */
+function deskHow(f) {
+  const w = Math.max(+f.hs, +f.as), l = Math.min(+f.hs, +f.as);
+  if (!w && !l) return '';
+  if (l === 0) return ' in a sweep';
+  if (w + l === 5) return ', but it went five';
+  return ', dropping ' + (l === 1 ? 'a set' : l + ' sets');
+}
+
+function deskStory(m) {
+  const f = m.final;
+  if (!f) return '';
+  const awayWon = (+f.as) > (+f.hs);
+  const winner = awayWon ? m.a : m.h;
+  const line = f.sets && f.sets.length
+    ? '<div class="dsets">' + f.sets.map(s =>
+        '<span>' + s[0] + '&ndash;' + s[1] + '</span>').join('') + '</div>'
+    : '';
+  let said = '';
+  if (m.hw == null) {
+    said = '<p class="dsaid none">No pre-match forecast was logged, so there is ' +
+      'nothing to compare this against. ' + esc(m.fsrc || '') + '.</p>';
+  } else {
+    const pWinner = awayWon ? (1 - m.hw) : m.hw;
+    const called = pWinner >= 0.5;
+    said = '<p class="dsaid">Beforehand the model gave ' + esc(winner) + ' ' +
+      deskPct(pWinner) + '. ' +
+      (called
+        ? 'The favourite won' + deskHow(f) + '.'
+        : '<b>The underdog won</b>' + deskHow(f) + ' &mdash; which a forecast of ' +
+          'that size expects to happen about ' + deskPct(pWinner) + ' of the time.') +
+      '</p>';
+  }
+  return '<div class="dstory"><div class="dfinal"><span class="dfl">FINAL</span>' +
+    '<b>' + esc(winner) + '</b> ' + (awayWon ? f.as + '&ndash;' + f.hs
+                                             : f.hs + '&ndash;' + f.as) + '</div>' +
+    line + said + '</div>';
+}
+
+function deskCard(m, live, full) {
+  const isFinal = !!m.final || (live && /final/i.test(live.state || ''));
+  const cls = 'dcard' + (live && !isFinal ? ' islive' : '') + (isFinal ? ' isfinal' : '');
+  let head = '<div class="dhead"><span class="dwhen">' +
+    esc(m.dl || m.d) + (m.t ? ' · ' + esc(m.t) : '') + '</span>' +
+    deskTags(m, live && !isFinal) + '</div>';
+  let body = '<div class="dteams">' +
+    deskSide(m.a, m.ao, m.ap, isFinal && m.final && +m.final.as > +m.final.hs ? 'won' : '') +
+    '<span class="dat">' + (m.site === 'neutral' ? 'vs' : 'at') + '</span>' +
+    deskSide(m.h, m.ho, m.hp, isFinal && m.final && +m.final.hs > +m.final.as ? 'won' : '') +
+    '</div>';
+
+  /* LIVE: read straight from the scoreboard feed, labelled, and never mixed
+     into anything derived. */
+  let livebox = '';
+  if (live && !isFinal) {
+    const sets = (live.sets || []).map(s =>
+      '<span>' + s[0] + '&ndash;' + s[1] + '</span>').join('');
+    livebox = '<div class="dlive"><span class="dlv">LIVE</span>' +
+      '<b>' + esc(live.away) + ' ' + live.away_sets + ' &ndash; ' +
+      live.home_sets + ' ' + esc(live.home) + '</b>' +
+      '<span class="dper">' + esc(live.period || '') + '</span>' +
+      (sets ? '<div class="dsets">' + sets + '</div>' : '') +
+      '<span class="dsrc">scoreboard feed, ' + esc(LIVE_STAMP || 'just now') +
+      ' &mdash; not yet in any rating</span></div>';
+  }
+
+  return '<article class="' + cls + '">' + head + body +
+    (livebox || (isFinal ? deskStory(m) : deskForecast(m))) +
+    '<div class="dwhere">' + deskWhere(m) + '</div>' +
+    (full ? deskWhy(m) : '') + '</article>';
+}
+
+let LIVE_STAMP = '';
+let LIVE_BY_ID = {};
+
+function renderDesk() {
+  const todayBox = document.getElementById('desktodaycards');
+  if (!todayBox) return;
+  const today = new Intl.DateTimeFormat('en-CA',
+    { timeZone: 'America/Los_Angeles' }).format(new Date());
+  const mine = DESK.filter(m => m.d === today);
+  const soon = DESK.filter(m => m.d > today);
+
+  document.getElementById('desklead').innerHTML =
+    '<b>What is on, why it matters, and what it meant.</b> ' +
+    'Ordered ranked-v-ranked first, then any ranked side, then how close the ' +
+    'forecast is &mdash; a stated sort, not a rating. The forecast is a ' +
+    'probability from the rally model, not a pick.';
+
+  if (!mine.length) {
+    todayBox.innerHTML = '<p class="dempty">No Division-I matches scheduled ' +
+      'today. The next few days are below.</p>';
+    document.getElementById('desktodaymeta').textContent = '';
+  } else {
+    const liveN = mine.filter(m => LIVE_BY_ID[m.gid] &&
+      !/final/i.test((LIVE_BY_ID[m.gid].state || ''))).length;
+    const finalN = mine.filter(m => m.final).length;
+    document.getElementById('desktodaymeta').textContent =
+      mine.length + (mine.length === 1 ? ' match' : ' matches') +
+      (liveN ? ' · ' + liveN + ' live' : '') +
+      (finalN ? ' · ' + finalN + ' final' : '');
+    todayBox.innerHTML = mine.map(m => deskCard(m, LIVE_BY_ID[m.gid], true)).join('');
+  }
+
+  const shown = soon.slice(0, DESK_SOON_SHOWN);
+  document.getElementById('desksooncards').innerHTML =
+    shown.length ? shown.map(m => deskCard(m, null, false)).join('')
+                 : '<p class="dempty">Nothing scheduled in the next few days.</p>';
+  document.getElementById('desksoonmeta').textContent =
+    soon.length ? soon.length + ' scheduled' : '';
+  document.getElementById('desksoonrest').textContent =
+    soon.length > shown.length
+      ? (soon.length - shown.length) + ' more in the next week — the Schedule tab has all of them.'
+      : '';
+}
+
+/* Live is an UPGRADE, never a requirement. On a static host the fetch fails and
+   the desk stays a pregame board rather than an error. */
+async function deskLive() {
+  try {
+    const r = await fetch('/api/live');
+    const j = await r.json();
+    LIVE_STAMP = j.updated || '';
+    LIVE_BY_ID = {};
+    (j.games || []).forEach(g => { LIVE_BY_ID[String(g.id)] = g; });
+  } catch (e) {
+    LIVE_BY_ID = {};
+  }
+  renderDesk();
+}
+
 renderStandings();
 renderWeek();
 
@@ -6096,6 +6597,8 @@ const TEAMS = {{TEAMS_JSON}};
 /* the workshop reads TEAMS, so it is started here rather than at its
    definition -- see the temporal-dead-zone note on bwWire() */
 if (typeof bwWire === 'function') bwWire();
+/* the desk reads DESK and TEAMS; both are initialised by here */
+if (typeof deskLive === 'function') deskLive();
 /* BALLOT-INIT-END */
 const dl = document.getElementById('tmlist');
 Object.keys(TEAMS).sort().forEach(n => {
