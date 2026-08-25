@@ -781,6 +781,93 @@ console.log(JSON.stringify(out));
                                            "our model")))
     check("it carries the author's own summary", "summary" in t)
 
+    print("\n24. MY BOARD IS PRIVATE, LOCAL, AND NEVER FILLS ITSELF")
+    MB_MARKS = ("MYBOARD-HTML-BEGIN", "MYBOARD-CSS-BEGIN", "MYBOARD-JS-BEGIN",
+                "wvb.myboard", "MB_KEY", "mbToggle", "mbRenderPanel",
+                "mbControl", "mbClear", "mbpanel", "mbrow", "mbbtn",
+                "data-mb", "mbFindMatch", "mbSyncControls")
+    if os.path.exists(pub):
+        ph3 = open(pub, encoding="utf-8").read()
+        # ⚠ SUBSTRING MATCHING HITS REAL DATA. "mbrow" is inside the player
+        # surname "Stambrowska", exactly as ".bwr" was inside ".bwrap". Match
+        # each marker as a whole token.
+        def tok(x, doc):
+            return re.search(r"(?<![A-Za-z0-9_.-])" + re.escape(x) +
+                             r"(?![A-Za-z0-9_-])", doc) is not None
+        left = [x for x in MB_MARKS if tok(x, ph3)]
+        check("no My Board code, markup, css or storage key is published",
+              not left, str(left[:5]))
+        check("...and the panel host is gone too", 'id="mbpanel"' not in ph3)
+        # the guarded call is allowed: it is how the public build stays quiet
+        check("[+] the public build only carries a typeof guard",
+              ph3.count("typeof mbRenderAll === 'function'") >= 1)
+    if os.path.exists(priv):
+        vh3 = open(priv, encoding="utf-8").read()
+        missing = [x for x in MB_MARKS if not tok(x, vh3)]
+        check("[+] ...and the PRIVATE page has all of it", not missing,
+              str(missing[:4]))
+
+    print("\n25. THE WATCHLIST REACHES NOTHING ELSE")
+    # ⚠ STRUCTURAL. The board lives in localStorage and nowhere else -- no file,
+    # no endpoint, no backup, no payload, no model input.
+    mb = src[src.index("/* MYBOARD-JS-BEGIN */"):]
+    mb = mb[:mb.index("/* MYBOARD-JS-END */")]
+    for bad_s in ("fetch(", "/api/", "XMLHttpRequest", "ballots_", "ballot.py",
+                  "BW.teams", "bwSave", "bwLocalSave", "PLAYERS", "rating",
+                  "projection"):
+        check("[-] My Board never touches %r" % bad_s, bad_s not in mb)
+    check("it stores in localStorage only",
+          "localStorage" in mb and mb.count("localStorage") <= 4)
+    for fn in ("scripts/ballot.py", "scripts/ballot_backup.py",
+               "scripts/digby.py", "scripts/rating_2025.py",
+               "scripts/project_2026.py", "scripts/predict_2026.py",
+               "scripts/simulate_season_2026.py", "scripts/digby_top25.py"):
+        fp = os.path.join(REPO, fn)
+        if not os.path.exists(fp):
+            continue
+        body = open(fp, encoding="utf-8").read()
+        hit = [w for w in ("myboard", "MY_BOARD", "watchlist") if w in body]
+        check("%s knows nothing of a watchlist" % os.path.basename(fn),
+              not hit, str(hit))
+
+    print("\n26. NOTHING IS EVER ADDED FOR HIM")
+    check("the board starts empty", "let MB = [];" in mb)
+    check("[-] it is never seeded from the ballot",
+          "BW_HIST" not in mb and "bwRanked" not in mb)
+    check("[-] ...nor from a ranking", "rank26" not in mb and "avca" not in
+          mb.split("function mbRow")[0])
+    check("adding is an explicit press", "mbToggle(b.dataset.mb)" in mb)
+    check("clearing asks first", "window.confirm(" in mb)
+    check("...and says what it will do", "removes all" in mb)
+
+    print("\n27. IT FAILS SOFT AND STAYS HONEST")
+    check("storage failure is caught", "catch (e)" in mb and "MB_OK = false" in mb)
+    check("...and is explained rather than looking broken",
+          "not letting the page" in mb)
+    check("a watched team with no match says so",
+          "No match in the current window" in mb)
+    # strip comments first: the block explains that it never fabricates a
+    # scoreline, and the explanation must not read as the violation.
+    mb_code = re.sub(r"/\*.*?\*/", "", mb, flags=re.S)
+    mb_code = re.sub(r"//.*", "", mb_code)
+    check("[-] never invents a fabricated scoreline or placeholder time",
+          all(x not in mb_code for x in ("'0-0'", '"0-0"', "'TBD'", '"TBD"')))
+    check("[+] ...and the control-stripping actually removed something",
+          len(mb_code) < len(mb))
+    check("state comes from the shared matchState()", "matchState(" in mb)
+    check("rank context is labelled POWER or AVCA",
+          "POWER #" in mb and "AVCA #" in mb)
+    check("every row routes to a match or a team",
+          "'#/match-desk/'" in mb and "routeFor('teams'" in mb)
+
+    print("\n28. STILL FIVE PRIMARY DESTINATIONS")
+    if os.path.exists(priv):
+        prim2 = re.findall(r'<button role="tab"[^>]*data-v="([a-z0-9]+)"',
+                           open(priv, encoding="utf-8").read())
+        check("no sixth primary tab was added", len(prim2) == 5, str(prim2))
+        check("...and My Board is not a route",
+              "'myboard'" not in src.split("ROUTE_OF_VIEW")[1][:400])
+
     print()
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))

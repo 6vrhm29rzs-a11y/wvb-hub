@@ -3891,6 +3891,60 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
 #v-scores .datejump{display:flex;align-items:center;gap:8px;margin-left:auto;
   font:11.5px/1 var(--mono);color:var(--slate)}
 
+/* MYBOARD-CSS-BEGIN */
+/* ── MY BOARD ─────────────────────────────────────────────────────────────
+   A pinned film strip inside the Match Desk, not a second dashboard. Compact
+   ruled rows, one small private label, and it only exists when Cody has put
+   something on it. */
+.mbpanel{border-top:2px solid var(--gold);border-bottom:1px solid var(--line);
+  padding:12px 0 10px;margin:6px 0 2px}
+.mbhd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.mbhd b{font:700 11px/1 var(--disp);letter-spacing:.18em;text-transform:uppercase;
+  color:var(--gold)}
+.mbhd .mbpriv{font:600 8.5px/1 var(--disp);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--slate);border:1px solid var(--line2);
+  border-radius:2px;padding:3px 5px}
+.mbhd .mbn{font:11.5px/1 var(--mono);color:var(--slate)}
+.mbhd .mbclear{margin-left:auto}
+.mblane{margin-top:9px}
+.mblane>i{display:block;font:600 9px/1 var(--disp);letter-spacing:.15em;
+  text-transform:uppercase;color:var(--slate);font-style:normal;
+  padding-bottom:5px;border-bottom:1px solid var(--line)}
+.mbrow{display:grid;grid-template-columns:118px 1fr auto;align-items:center;
+  gap:12px;padding:8px 2px;border-bottom:1px solid var(--line);width:100%;
+  background:none;border-left:0;border-right:0;border-top:0;text-align:left;
+  color:inherit;font:inherit;cursor:pointer}
+.mbrow:hover{background:var(--sheet)}
+.mbrow:last-child{border-bottom:0}
+.mbrow .mbteam{display:flex;align-items:center;gap:7px;min-width:0}
+.mbrow .mbteam img{width:20px;height:20px;flex:none;object-fit:contain}
+.mbrow .mbteam b{font:600 14px/1.2 var(--disp);color:var(--chalk);
+  overflow-wrap:anywhere}
+.mbrow .mbwhat{font-size:12.5px;color:var(--ink2);min-width:0;line-height:1.5}
+.mbrow .mbwhat em{font-style:normal;color:var(--slate)}
+.mbrow .mbwhen{font:11px/1.5 var(--mono);color:var(--ink3);text-align:right}
+.mbrow .mbsc{font:700 15px/1 var(--mono);color:var(--chalk)}
+.mbrow .mbnone{color:var(--slate);font-style:italic}
+/* the add/remove control, wherever a team is already named */
+.mbbtn{appearance:none;background:transparent;border:1px solid var(--line2);
+  border-radius:3px;color:var(--slate);font:600 9.5px/1 var(--disp);
+  letter-spacing:.1em;text-transform:uppercase;padding:4px 7px;cursor:pointer;
+  white-space:nowrap}
+.mbbtn:hover{color:var(--chalk);border-color:var(--navy)}
+.mbbtn[aria-pressed=true]{color:var(--gold);border-color:var(--gold)}
+.mbwarn{font-size:12px;color:var(--slate);line-height:1.6;margin:6px 0 0}
+@media (max-width:560px){
+  .mbrow{grid-template-columns:1fr auto;gap:6px 10px}
+  .mbrow .mbwhat{grid-column:1 / -1}
+  .mbhd .mbclear{margin-left:0}
+  /* ⚠ ADDING A BUTTON TO A BALLOT ROW WIDENED IT PAST THE PHONE. .bwctl is a
+     fixed row of small controls; one more pushed the whole two-column grid to
+     419px inside a 370px column. The control wraps to its own line there
+     rather than the slot list scrolling sideways. */
+  .bwctl{flex-wrap:wrap;row-gap:5px}
+  .bwctl .mbbtn{flex:1 0 100%;text-align:center}
+}
+/* MYBOARD-CSS-END */
 /* ══ THE MATCH BOARD ══════════════════════════════════════════════════════
    ONE signature surface: a broadcast scoreboard ribbon, used for the featured
    match and reused verbatim as the match-detail header so a score header has
@@ -5202,6 +5256,9 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <h2 class="vh">Match Desk &mdash; {{SEASON_YEAR}}</h2>
   <p class="tabhint" id="desklead"></p>
 
+  <!-- MYBOARD-HTML-BEGIN -->
+  <div class="mbpanel" id="mbpanel" role="region" aria-label="My Board" hidden></div>
+  <!-- MYBOARD-HTML-END -->
   <div id="desktoday">
     <span id="desktodaymeta" hidden></span>
     <div id="desktodaycards"></div>
@@ -7360,6 +7417,7 @@ function renderBallot() {
   renderBallotReview();
   renderBriefing();
   renderCompare();
+  if (typeof mbRenderAll === 'function') mbRenderAll();
   const lead = document.getElementById('ballotlead');
   if (lead) {
     lead.innerHTML = '<b>Your ' + SEASON_YEAR + ' VolleyTalk ballot.</b> ' +
@@ -8023,6 +8081,257 @@ const DIGBY_WATCH = `{{DIGBY_WATCH}}`;
 let LIVE_STAMP = '';
 let LIVE_BY_ID = {};
 
+/* MYBOARD-JS-BEGIN */
+/* ══ MY BOARD ═════════════════════════════════════════════════════════════
+   Cody's private watchlist. It lives in ONE place -- localStorage in his own
+   browser -- and nowhere else: no file, no endpoint, no backup, no payload, no
+   model input. The whole feature is inside this sentinel so the published
+   build carries none of it, not even the storage key.
+
+   ⚠ NOTHING IS EVER ADDED FOR HIM. Not a highly ranked team, not a team from
+   his ballot, not a team he looked at twice. An empty board stays empty until
+   he presses a button, because a watchlist that fills itself is a
+   recommendation wearing a preference's clothes. */
+const MB_KEY = 'wvb.myboard.v1';
+let MB_OK = true;            // does this browser actually give us storage?
+let MB = [];
+
+function mbLoad() {
+  try {
+    const raw = window.localStorage.getItem(MB_KEY);
+    MB = raw ? (JSON.parse(raw) || []) : [];
+    if (!Array.isArray(MB)) MB = [];
+    MB_OK = true;
+    /* ⚠ TEAMS IS NOT READY YET. `const TEAMS` is declared near the END of this
+       script, so touching it here throws "Cannot access 'TEAMS' before
+       initialization" -- and because this block is a try/catch, that throw was
+       being SWALLOWED and reported as "this browser is not letting the page
+       store anything". A real storage failure and a load-order mistake would
+       have looked identical. Names are checked at render time instead, when
+       TEAMS exists. */
+  } catch (e) {
+    /* ⚠ FAIL SOFT AND SAY SO. Private mode, blocked site data or a full quota
+       all throw here. The board simply does not persist; the rest of the hub
+       is untouched and the panel explains itself rather than looking broken. */
+    MB = [];
+    MB_OK = false;
+  }
+}
+function mbSave() {
+  try {
+    window.localStorage.setItem(MB_KEY, JSON.stringify(MB));
+    MB_OK = true;
+  } catch (e) { MB_OK = false; }
+}
+function mbHas(team) { return MB.indexOf(team) >= 0; }
+/* safe before TEAMS exists: a name is "known" only once the payload is there */
+function mbKnown(team) {
+  try { return !!(TEAMS && TEAMS[team]); } catch (e) { return false; }
+}
+function mbToggle(team) {
+  if (!mbKnown(team)) return;
+  const i = MB.indexOf(team);
+  if (i >= 0) MB.splice(i, 1); else MB.push(team);
+  mbSave();
+  mbRenderAll();
+}
+function mbClear() {
+  if (!MB.length) return;
+  if (!window.confirm('Clear My Board? This removes all ' + MB.length +
+      ' team' + (MB.length === 1 ? '' : 's') + ' you have added. ' +
+      'Nothing else is affected.')) return;
+  MB = [];
+  mbSave();
+  mbRenderAll();
+}
+
+/* the control, used wherever a team is already named by its own markup */
+function mbControl(team, size) {
+  if (!mbKnown(team)) return '';
+  const on = mbHas(team);
+  return '<button type="button" class="mbbtn" data-mb="' + esc(team) + '"' +
+    ' aria-pressed="' + (on ? 'true' : 'false') + '"' +
+    ' aria-label="' + (on ? 'Remove ' : 'Add ') + esc(team) +
+    (on ? ' from' : ' to') + ' My Board">' +
+    (on ? 'On My Board' : '+ My Board') + '</button>';
+}
+
+/* ── THE PANEL ────────────────────────────────────────────────────────────
+   Watched teams by TRUE state, using the same matchState() the general board
+   uses. A team with nothing on is said to have nothing on -- never a
+   fabricated scoreline and never a placeholder standing in for a time. */
+function mbFindMatch(team) {
+  const today = new Intl.DateTimeFormat('en-CA',
+    { timeZone: 'America/Los_Angeles' }).format(new Date());
+  const mine = DESK.filter(m => m.a === team || m.h === team);
+  const todays = mine.filter(m => m.d === today);
+  for (let i = 0; i < todays.length; i++) {
+    if (matchState(todays[i], LIVE_BY_ID[todays[i].gid]) === 'live') {
+      return { m: todays[i], st: 'live' };
+    }
+  }
+  for (let i = 0; i < todays.length; i++) {
+    if (matchState(todays[i], LIVE_BY_ID[todays[i].gid]) === 'final') {
+      return { m: todays[i], st: 'final' };
+    }
+  }
+  const ahead = mine.filter(m => m.d >= today)
+    .sort((a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : 0));
+  if (ahead.length) return { m: ahead[0], st: 'upcoming' };
+  return null;
+}
+
+function mbRow(team) {
+  const hit = mbFindMatch(team);
+  const t = TEAMS[team] || {};
+  const ranks = [];
+  if (t.rank) ranks.push('<span class="bwv pw">POWER #' + t.rank + '</span>');
+  if (t.avca) ranks.push('<span class="bwv av">AVCA #' + t.avca + '</span>');
+  const head = '<span class="mbteam">' + logo(team) + '<b>' + esc(team) +
+    '</b></span>';
+  if (!hit) {
+    return '<button type="button" class="mbrow" data-mbteam="' + esc(team) + '">' +
+      head + '<span class="mbwhat mbnone">No match in the current window.' +
+      '</span><span class="mbwhen">' + ranks.join(' ') + '</span></button>';
+  }
+  const m = hit.m, live = LIVE_BY_ID[m.gid];
+  const opp = m.a === team ? m.h : m.a;
+  const where = m.site === 'neutral' ? 'neutral'
+    : (m.h === team ? 'home' : 'away');
+  const sc = matchScore(m, live);
+  const mineIdx = m.a === team ? 0 : 1;
+  let what;
+  if (hit.st === 'live') {
+    what = '<em>' + esc((live && live.period) || 'live') + '</em> v ' + esc(opp) +
+      ' &middot; <span class="mbsc">' + sc[mineIdx] + '&ndash;' +
+      sc[1 - mineIdx] + '</span>';
+  } else if (hit.st === 'final') {
+    const won = +sc[mineIdx] > +sc[1 - mineIdx];
+    what = '<em>Final</em> ' + (won ? 'beat ' : 'lost to ') + esc(opp) +
+      ' <span class="mbsc">' + sc[mineIdx] + '&ndash;' + sc[1 - mineIdx] +
+      '</span>';
+  } else {
+    what = '<em>' + esc(m.dl || m.d) + '</em> ' +
+      (where === 'neutral' ? 'v ' : where === 'home' ? 'v ' : 'at ') + esc(opp) +
+      (m.t ? ' &middot; ' + esc(m.t) : '');
+  }
+  const tvl = (typeof TV !== 'undefined' && TV) ? (TV[m.gid] || null) : null;
+  const meta = [where, tvl].filter(Boolean).map(esc).join(' &middot; ');
+  return '<button type="button" class="mbrow" data-mbmatch="' + esc(m.gid) +
+    '">' + head + '<span class="mbwhat">' + what + '</span>' +
+    '<span class="mbwhen">' + (meta ? meta + '<br>' : '') + ranks.join(' ') +
+    '</span></button>';
+}
+
+function mbRenderPanel() {
+  const host = document.getElementById('mbpanel');
+  if (!host) return;
+  if (!MB.length) { host.hidden = true; host.innerHTML = ''; return; }
+  const lanes = { live: [], final: [], upcoming: [], none: [] };
+  MB.slice().sort().forEach(n => {
+    const hit = mbFindMatch(n);
+    lanes[hit ? hit.st : 'none'].push(n);
+  });
+  const lane = (key, label) => lanes[key].length
+    ? '<div class="mblane"><i>' + label + '</i>' +
+      lanes[key].map(mbRow).join('') + '</div>' : '';
+  host.hidden = false;
+  host.innerHTML =
+    '<div class="mbhd"><b>My Board</b>' +
+      '<span class="mbpriv">private</span>' +
+      '<span class="mbn">' + MB.length + ' team' +
+        (MB.length === 1 ? '' : 's') + ' you added</span>' +
+      '<button type="button" class="mbbtn mbclear" id="mbclear">Clear My Board</button>' +
+    '</div>' +
+    lane('live', 'Live now') + lane('final', 'Just finished') +
+    lane('upcoming', 'Coming up') +
+    lane('none', 'No match in the current window') +
+    (MB_OK ? '' : '<p class="mbwarn">This browser is not letting the page ' +
+      'store anything, so My Board will empty when you reload. Everything ' +
+      'else on the hub works normally.</p>');
+}
+
+/* ⚠ THE BUTTON IS INJECTED, NOT BAKED IN. The team panel and the ballot rows
+   are SHARED markup that the public build also renders, so putting the control
+   in their templates would ship it. Private code adds it after those views
+   render, which keeps every trace of My Board inside this sentinel. */
+function mbInject() {
+  const th = document.querySelector('#teamcard .thead');
+  if (th && !th.querySelector('[data-mb]')) {
+    const nm = (th.querySelector('h2') || {}).textContent || '';
+    if (nm && mbKnown(nm.trim())) {
+      const holder = document.createElement('div');
+      holder.style.marginTop = '10px';
+      holder.innerHTML = mbControl(nm.trim());
+      th.appendChild(holder);
+    }
+  }
+  document.querySelectorAll('#deskdetail .ribbon .rbnm,' +
+                            '#scoredetail .ribbon .rbnm').forEach(a => {
+    const nm = (a.textContent || '').trim();
+    if (!mbKnown(nm) || a.parentNode.querySelector('[data-mb]')) return;
+    const sp = document.createElement('span');
+    sp.style.marginLeft = '10px';
+    sp.innerHTML = mbControl(nm);
+    a.parentNode.appendChild(sp);
+  });
+  /* inside the private ballot: review queue, comparison, and each slot */
+  document.querySelectorAll('#bwqueue .bwcase').forEach(c => {
+    if (c.querySelector('[data-mb]')) return;
+    const nm = (c.querySelector('.bwcn') || {}).textContent || '';
+    if (mbKnown(nm.trim())) c.insertAdjacentHTML('beforeend', mbControl(nm.trim()));
+  });
+  document.querySelectorAll('#bwteamcmp .bwcmptbl th.tm').forEach(th2 => {
+    if (th2.querySelector('[data-mb]')) return;
+    const nm = (th2.textContent || '').trim();
+    if (mbKnown(nm)) th2.insertAdjacentHTML('beforeend', ' ' + mbControl(nm));
+  });
+  document.querySelectorAll('.bwrow[data-team]').forEach(r => {
+    if (r.querySelector('[data-mb]')) return;
+    const ctl = r.querySelector('.bwctl');
+    if (ctl && mbKnown(r.dataset.team)) {
+      ctl.insertAdjacentHTML('beforeend', mbControl(r.dataset.team));
+    }
+  });
+}
+
+/* ⚠ EVERY EXISTING CONTROL IS REFRESHED, NOT JUST NEW ONES. mbInject() adds a
+   button only where there is none, so after a toggle the button that was
+   pressed still read "+ My Board" while storage already held the team -- the
+   control and the truth disagreed on screen. */
+function mbSyncControls() {
+  document.querySelectorAll('[data-mb]').forEach(b => {
+    const on = mbHas(b.dataset.mb);
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    b.setAttribute('aria-label', (on ? 'Remove ' : 'Add ') + b.dataset.mb +
+      (on ? ' from' : ' to') + ' My Board');
+    b.textContent = on ? 'On My Board' : '+ My Board';
+  });
+}
+
+function mbRenderAll() {
+  /* names this build no longer knows are dropped here, where TEAMS exists */
+  const keep = MB.filter(mbKnown);
+  if (keep.length !== MB.length) { MB = keep; mbSave(); }
+  mbRenderPanel();
+  mbInject();
+  mbSyncControls();
+}
+
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('[data-mb]');
+  if (b) { e.preventDefault(); e.stopPropagation(); mbToggle(b.dataset.mb); return; }
+  if (e.target.closest && e.target.closest('#mbclear')) { mbClear(); return; }
+  const row = e.target.closest && e.target.closest('.mbrow');
+  if (row) {
+    if (row.dataset.mbmatch) go('#/match-desk/' + encodeURIComponent(row.dataset.mbmatch));
+    else if (row.dataset.mbteam) go(routeFor('teams', slug(row.dataset.mbteam)));
+  }
+});
+addEventListener('hashchange', () => setTimeout(mbInject, 60));
+mbLoad();
+/* MYBOARD-JS-END */
+
 /* ══ SHARED MATCH COMPONENTS ══════════════════════════════════════════════
    ⚠ ONE DEFINITION OF A MATCH HEADER AND A MATCH ROW, used by the Match Desk,
    the Scores ledger and the match detail. Three renderers for the same object
@@ -8380,6 +8689,7 @@ function renderDesk() {
       : '';
 
   Object.keys(LMC_OPEN).forEach(id => { if (LMC_DATA[id]) lmcRender(id); });
+  if (typeof mbRenderAll === 'function') mbRenderAll();
 }
 
 /* One delegated listener rather than one per card -- the cards are replaced on
@@ -8408,10 +8718,7 @@ async function deskLive() {
 
 renderStandings();
 renderWeek();
-/* ⚠ BOOT THROUGH THE ROUTER, so a direct #/teams/kentucky load lands exactly
-   where a click would. An empty hash normalises to the desk. */
-if (!location.hash) { history.replaceState(null, '', routeFor('desk')); }
-route();
+/* the router is booted after TEAMS exists -- see the note at that call */
 
 /* ---- date navigation on the scores tab --------------------------------- */
 const sdate = document.getElementById('sdate');
@@ -8890,6 +9197,19 @@ if (typeof bwWire === 'function') bwWire();
 /* the desk reads DESK and TEAMS; both are initialised by here */
 if (typeof deskLive === 'function') deskLive();
 /* BALLOT-INIT-END */
+/* ⚠ THE ROUTER BOOTS HERE, NOT AT ITS DEFINITION, AND THIS WAS A LIVE BUG.
+   route() reads TEAMS (unslugTeam) and `const TEAMS` is declared near the end
+   of this script, so booting earlier threw "Cannot access 'TEAMS' before
+   initialization" -- which aborted the rest of boot. A direct load or refresh
+   of #/teams/<slug> therefore left the team panel EMPTY, while the same route
+   reached by clicking worked, because TEAMS existed by then. I saw a symptom
+   of this in the routing phase (an empty team header on direct load) and
+   wrongly blamed the crest element.
+   ⚠ AND IT MUST STAY OUTSIDE THE BALLOT SENTINEL ABOVE: that block is stripped
+   from the public build, and routing is not private. */
+if (!location.hash) { history.replaceState(null, '', routeFor('desk')); }
+route();
+if (typeof mbRenderAll === 'function') mbRenderAll();
 const dl = document.getElementById('tmlist');
 Object.keys(TEAMS).sort().forEach(n => {
   const o = document.createElement('option'); o.value = n; dl.appendChild(o);
@@ -9790,6 +10110,14 @@ PRIVATE_MARKERS = ("VolleyTalk", "Massey Ratings", "Massey Ratings, 2026",
                    "renderBallot", "bwWire", "BW_KEY", "bwText", "ballots_",
                    "BALLOT-WORKSHOP-BEGIN", "BALLOT-CONST-BEGIN",
                    "BALLOT-INIT-BEGIN",
+                   # ── MY BOARD ─────────────────────────────────────────────
+                   # Cody's private watchlist. It lives only in HIS browser --
+                   # there is no file, no endpoint and no payload -- but the
+                   # CODE that reads it, the storage key it reads, and the
+                   # panel it draws are all private too, so the published file
+                   # must contain none of them.
+                   "MYBOARD-HTML-BEGIN", "MYBOARD-CSS-BEGIN",
+                   "MYBOARD-JS-BEGIN", "wvb.myboard",
                    # ── ENDPOINTS THAT ONLY EXIST BEHIND THE LOCAL SERVER ────
                    # ⚠ /api/live IS DELIBERATELY ABSENT FROM THIS LIST. The
                    # live band fetches it and FAILS SOFT on a static host --
@@ -9856,6 +10184,12 @@ def strip_private(html):
     html = re.sub(r"/\* BALLOT-CSS-BEGIN.*?/\* BALLOT-CSS-END \*/",
                   "", html, flags=re.S)
     html = re.sub(r"/\* BALLOT-CONST-BEGIN \*/.*?/\* BALLOT-CONST-END \*/",
+                  "", html, flags=re.S)
+    html = re.sub(r"<!-- MYBOARD-HTML-BEGIN -->.*?<!-- MYBOARD-HTML-END -->",
+                  "", html, flags=re.S)
+    html = re.sub(r"/\* MYBOARD-CSS-BEGIN \*/.*?/\* MYBOARD-CSS-END \*/",
+                  "", html, flags=re.S)
+    html = re.sub(r"/\* MYBOARD-JS-BEGIN \*/.*?/\* MYBOARD-JS-END \*/",
                   "", html, flags=re.S)
     html = re.sub(r"/\* BALLOT-INIT-BEGIN \*/.*?/\* BALLOT-INIT-END \*/",
                   "", html, flags=re.S)
