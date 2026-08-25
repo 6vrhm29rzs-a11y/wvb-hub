@@ -27,6 +27,7 @@ import json
 import os
 import re
 import shutil
+import subprocess
 import sys
 import tempfile
 
@@ -202,7 +203,52 @@ def main():
                         page2) is not None,
               "with no baseline every row asserted NEW -- a change nobody measured")
 
-    print("\n7. The ballot feeds no rating, and is not published")
+    print("\n7. Ballot history stays off this machine")
+    # ⚠ THIS REPOSITORY IS PUBLIC. A tracked ballot file would be world-readable
+    # the moment the daily job committed it -- the ranking, the private per-team
+    # notes, and the written reasons for overruling the model.
+    ig = os.path.join(REPO, ".gitignore")
+    rules = open(ig, encoding="utf-8").read() if os.path.exists(ig) else ""
+    check("data/ballots_*.jsonl is gitignored",
+          "data/ballots_*.jsonl" in rules,
+          "a ballot saved locally would be committed to a public repo")
+    # ⚠ EVERY SEASON, not just this one. A rule naming 2026 protects nothing on
+    # 1 January, and the file is created automatically on first save.
+    check("...by a glob, so a future season is covered too",
+          "ballots_2026.jsonl" not in rules.replace("data/ballots_*.jsonl", ""),
+          "a season-specific rule leaves next season exposed")
+    # ⚠ ASK GIT ONLY WHERE THERE IS A GIT REPO. The fresh-checkout guard runs
+    # this suite in a temp directory holding tracked FILES and no .git, where
+    # `git check-ignore` exits 128 for "not a repository" -- which the first
+    # version read as "not ignored" and turned the whole nightly run red for a
+    # condition that was fine. Exit 1 means not ignored; 128 means there is
+    # nothing to ask. The .gitignore content check above is the real invariant
+    # and runs everywhere.
+    inrepo = subprocess.run(["git", "rev-parse", "--is-inside-work-tree"],
+                            cwd=REPO, capture_output=True, text=True)
+    if inrepo.returncode != 0 or inrepo.stdout.strip() != "true":
+        print("  (not a git work tree here -- skipping the git-level checks)")
+    else:
+        tracked = subprocess.run(["git", "ls-files", "data/ballots_*"],
+                                 cwd=REPO, capture_output=True, text=True).stdout.strip()
+        check("no ballot file is tracked by git", not tracked, repr(tracked))
+        # git must actually refuse the path: the rule could be shadowed by a
+        # later negation, which reading .gitignore would not reveal
+        r = subprocess.run(["git", "check-ignore", "-q", "data/ballots_2099.jsonl"],
+                           cwd=REPO)
+        check("git itself refuses a ballot path", r.returncode == 0,
+              "check-ignore exit %d (1 = not ignored)" % r.returncode)
+
+    # the daily job must not force past the ignore
+    wf = os.path.join(REPO, ".github", "workflows", "daily.yml")
+    if os.path.exists(wf):
+        y = open(wf, encoding="utf-8").read()
+        forced = re.findall(r"git add[^\n]*-f\b[^\n]*", y)
+        broad = re.findall(r"git add\s+(?:-A|\.|data/)\s*$", y, re.M)
+        check("the daily job never force-adds an ignored file", not forced, str(forced))
+        check("...and never adds data/ or . wholesale", not broad, str(broad))
+
+    print("\n8. The ballot feeds no rating, and is not published")
     # ⚠ THE INVARIANT THAT MATTERS MOST. Reasons are words; if any rating input
     # ever read this file, a subjective trait would have become a coefficient.
     # ⚠ THE SCAN IS OVER MODEL CODE, NOT OVER GUARDS -- and the first version

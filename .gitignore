@@ -66,6 +66,23 @@ data/rating_*.json
 data/bakeoff_*.json
 data/rpi_2*.json
 
+# ── BALLOT HISTORY IS PRIVATE ────────────────────────────────────────────
+# Cody's own weekly VolleyTalk ballots: his ranking, his private per-team
+# notes, and his written reasons for overruling the model. This repository is
+# PUBLIC, so a tracked ballot file would be world-readable the moment the
+# daily job committed it.
+#
+# ⚠ EVERY SEASON, not just this one -- the glob is the point. An ignore rule
+# naming 2026 protects nothing on 1 January.
+#
+# It stays DURABLE where it matters: scripts/ballot.py appends to this file on
+# local disk and never rewrites it, so history survives here in full. What
+# changes is only that git stops carrying it off this machine.
+#
+# ⚠ NOT gitignored as a way of hiding a leak: checked before writing this rule
+# and no ballot file has ever been committed, at any path, on any ref.
+data/ballots_*.jsonl
+
 # Per-game player lines. For FINISHED seasons this is a resumable working file
 # and only the aggregate is committed -- /boxscore is ID-addressed, so it can be
 # re-crawled at will.
