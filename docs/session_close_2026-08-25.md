@@ -298,6 +298,55 @@ payload is now itself a **failure** rather than a skip. **Verified by negative
 control**: forcing the flag to `False` makes the guard fail `0 of 17`, and the
 restore brings it back green.
 
+**7. THE CAVEAT HAS A THIRD HOME, AND NOW ONE DEFINITION.** The Stats ->
+Teams table had the same problem as the other two views: **Norfolk St. ranks
+2nd in points/set and 1st in fewest points allowed, both off one Division-II
+match**, and the panel note underneath warned about non-D-I opponents in
+general without saying which row it meant. A blanket sentence under a sorted
+table does not qualify a row; the row is what a reader compares. Marked per
+row.
+
+Writing it a third time is how copy drifts, and it already had: the table
+tooltip read **"1 of these 1 matches is"**. All four surfaces now call one
+`nonDiPhrase(n, total, where)` -- `where` is "on file" / "here" / "in this
+sample" so one sentence reads naturally in each. Guarded: exactly one
+definition, at least three call sites, and no call site rebuilding the wording
+by hand.
+
+## ⚠ THE MISTAKE I MADE DOING IT -- READ THIS BEFORE EDITING build_hub.py
+
+Consolidating those call sites, I replaced one block using **`s.index()`
+arithmetic** instead of an exact-string replace: `s[:start] + new + s[end:]`,
+where `end` was found by searching for a short, NON-UNIQUE fragment
+(`'</div>'\n      : '') +`). It matched a much later occurrence and the splice
+**deleted 1,787 lines** -- all of My Board, all of Live Match Center, and more.
+
+**Nothing about it looked wrong.** The build completed. `node --check` on the
+extracted script **passed**, because what was left was still valid JavaScript.
+The page loaded. It failed only at runtime, as `mbLoad is not defined` and
+`lmcStop is not defined` in the console.
+
+**Rules that follow, and they are cheap:**
+- **Never splice this file by index.** Anchor every edit on an exact string and
+  `assert s.count(old) == 1` before replacing. A fragment that is not unique is
+  not an anchor.
+- **Print the net size change after a scripted edit.** `+340 chars` is a patch;
+  `-1,787 lines` is a catastrophe, and the number says which instantly.
+- **A syntax check is not a completeness check.** Deleting whole functions
+  leaves valid syntax.
+
+⚠ **AND THE PART I HAD TO MEASURE RATHER THAN ASSUME:** would the suites have
+caught it? **Yes -- 3 of 24** (`test_ballot`, `test_pipeline_fresh_checkout`,
+`test_player_aggregation`), verified by reproducing the deletion and running
+them. Unlike the `esc()` breakage above, this damage class **is** covered. I
+had simply looked at the page before running them. Run the suites first; they
+are faster than a browser round-trip.
+
+⚠ **A guard can fail against a page that is working.** Consolidating onto the
+helper removed the literal sentences the guard was matching ("Her only match on
+file"), so four checks failed on a correct page. **Assert the pieces and the
+branches, not one implementation's literals.**
+
 **State at close:** 24 suites pass with `Cody/` present and 24 with it moved
 aside. Tree is clean apart from the three fixes above. Nothing here changes
 data, ratings, or the crawl -- all three are display-layer only.

@@ -220,10 +220,20 @@ def main():
                 hp = io.open(fp, encoding="utf-8").read()
                 break
         if hp:
-            for frag in ("Her only match on file", "Every match on file",
+            # ⚠ ASSERT THE PIECES, NOT AN OLD IMPLEMENTATION'S LITERALS.
+            # These checks used to look for whole sentences ("Her only match
+            # on file"). Consolidating the four surfaces onto one helper meant
+            # the sentence is now assembled, so those literals vanished and
+            # the guard failed against a page that was working correctly. What
+            # matters is that every branch and every subject still exists.
+            for frag in ("The only match ", "Every match ",
+                         " is against a non-Division-I opponent",
                          "of these ", "non-Division-I",
-                         "is against a non-Division-I opponent"):
-                check("the card can say %r" % frag, frag in hp)
+                         "are against non-Division-I opponents"):
+                check("the caveat can say %r" % frag, frag in hp)
+            # One subject per surface, so the sentence reads naturally in each.
+            for where in ("'on file'", "'here'", "'in this sample'"):
+                check("...with the subject %s" % where, where in hp)
             # NEGATIVE CONTROL ON THE CLASS NAME ITSELF. `ndi` was rejected
             # because it matches 53 substrings in this page (sta-ndi-ngs,
             # I-ndi-ana) -- the trap that made `.bwr` match `.bwrap` and
@@ -249,10 +259,7 @@ def main():
             # card first; the identical defect sat one view over, where
             # Norfolk St. read "Hitting % .390" against opponents' ".037" --
             # both true, both from one Division-II match.
-            for frag in ("The only match here is against a non-Division-I",
-                         "Every match here is against a non-Division-I",
-                         "dicaveat"):
-                check("the team page can say %r" % frag, frag in hp)
+            check("the team page renders the caveat", "dicaveat" in hp)
             # ⚠ THE CAVEAT MUST NOT WEAR A FENCED BALLOT CLASS. `.warn` is
             # only ever defined as `.bwstate.warn`, inside the region the
             # public build strips -- borrowing it would style nothing and
@@ -261,6 +268,25 @@ def main():
             # styled somewhere.
             check("[-] the caveat does not borrow a fenced ballot class",
                   'class="warn"' not in hp)
+            # ⚠ ONE DEFINITION OF THE SENTENCE, or the four surfaces drift.
+            # They already had: the table tooltip read "1 of these 1 matches
+            # is". Assert the helper exists and that no call site rebuilds the
+            # phrasing by hand.
+            check("the caveat has ONE definition",
+                  hp.count("function nonDiPhrase") == 1,
+                  "%d definitions" % hp.count("function nonDiPhrase"))
+            check("...used by every surface that shows it",
+                  hp.count("nonDiPhrase(") >= 3,
+                  "%d call sites" % hp.count("nonDiPhrase("))
+            check("[-] no call site spells the sentence out again",
+                  "of these ' + t + ' matches" not in hp
+                  and "' matches ' + (d.nondi" not in hp)
+            # The stats TABLE marks the row, not only the panel note. Norfolk
+            # St. ranks 1st in fewest points allowed off one D-II match.
+            check("the team stats table can mark a row",
+                  "'in this sample'" in hp or '"in this sample"' in hp)
+            check("...and the badge is styled inside a table cell too",
+                  ".tm .nondi" in hp)
             check("...and its own class is actually defined",
                   ".dicaveat{" in hp)
             # The result row must carry the marker too, not just the note.

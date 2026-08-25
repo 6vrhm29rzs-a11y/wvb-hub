@@ -1730,6 +1730,7 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 /* The division caveat, wherever a rate is read. Emphatic but not an error
    state: this is a fact about the schedule, not a fault. */
 .dicaveat{color:var(--chalk);font-weight:700}
+.tm .nondi,
 .gline .nondi{margin-left:6px;padding:1px 5px;border-radius:3px;
   font:700 9px/1.5 var(--mono);letter-spacing:.04em;text-transform:uppercase;
   color:var(--ink3);background:var(--alt);vertical-align:middle;}
@@ -1888,7 +1889,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     </div>
     <div class="meta">
       <b>9</b> matches played &middot; <b>348</b> teams rated<br>
-      last result <b>Yesterday</b> &middot; built 2026-08-25 9:55 AM PT
+      last result <b>Yesterday</b> &middot; built 2026-08-25 10:26 AM PT
     </div>
   </div>
   <div class="net"></div>
@@ -2996,6 +2997,25 @@ return '<span class="pcell">' + face +
    and opening a match did nothing. Every test passed, because the public
    checks only ever asserted what must be ABSENT -- nothing asserted the page
    still worked. It lives outside the fence now. */
+/* ⚠ ONE DEFINITION OF THE DIVISION CAVEAT. It is rendered in four places --
+   the player match log, the team page's Results row and its stats note, and
+   the team stats table's row tooltip. Written out separately they drift, and
+   the first draft already had: the table tooltip read "1 of these 1 matches
+   is", which nobody would write on purpose. `where` names the subject so one
+   sentence reads naturally in each spot. */
+function nonDiPhrase(n, total, where) {
+  if (!n) return '';
+  if (n === total) {
+    return (total === 1 ? 'The only match ' : 'Every match ') + where +
+           ' is against a non-Division-I opponent';
+  }
+  return n + ' of these ' + total + ' matches ' +
+    (n === 1 ? 'is against a non-Division-I opponent'
+             : 'are against non-Division-I opponents');
+}
+const NONDI_WHY = 'Nothing is filtered out \u2014 filtering would change what ' +
+  'the numbers mean without saying so.';
+
 /* points per set, rendered the one way this site renders it */
 function ppsFmt(v) {
   const n = Number(v);
@@ -3223,22 +3243,11 @@ function showPlayer(p) {
        "one of her two matches" and "her only match" are different facts and
        the reader needs the second one loudly. */
     ((p.games || []).some(g => g.nondi)
-      ? '<div class="tnote">' + (() => {
-          const n = p.games.filter(g => g.nondi).length, t = p.games.length;
-          return n === t
-            ? (t === 1
-                ? 'Her only match on file is against a non-Division-I opponent, '
-                : 'Every match on file is against a non-Division-I opponent, ')
-            /* "1 of these 2 matches ARE" -- the subject is the count, so
-               a single flagged match takes a singular verb. Found by
-               exercising this branch against a synthetic mixed record;
-               real data cannot reach it two days into a season. */
-            : n + ' of these ' + t + ' matches ' +
-              (n === 1 ? 'is against a non-Division-I opponent, '
-                       : 'are against non-Division-I opponents, ');
-        })() + 'so the rates above are not measured against Division-I ' +
-        'competition. Nothing is filtered out: filtering would change what ' +
-        'the numbers mean without saying so.</div>'
+      ? '<div class="tnote"><b class="dicaveat">' +
+        nonDiPhrase(p.games.filter(g => g.nondi).length, p.games.length,
+                    'on file') +
+        '</b>, so the rates above are not measured against Division-I ' +
+        'competition. ' + NONDI_WHY + '</div>'
       : '') +
     '</div></div>';
 }
@@ -4579,7 +4588,18 @@ function renderTeamStats() {
   document.getElementById('ltbody').innerHTML = rows.map((r, i) => {
     const d = r[side];
     return '<tr><td class="rk">' + (i + 1) + '</td>' +
-      '<td class="tm">' + logo(r.team) + r.team + '</td>' +
+      /* ⚠ THE ROW SAYS IT, NOT ONLY THE NOTE UNDERNEATH. Norfolk St. ranks
+         2nd in points/set and 1st in fewest points allowed -- both off ONE
+         Division-II match. The panel note already warned that non-D-I
+         opponents are not filtered out, but a blanket sentence under a sorted
+         table does not say WHICH row it means, and the row is what a reader
+         compares. */
+      '<td class="tm">' + logo(r.team) + esc(r.team) +
+      ((d.nondi || 0) > 0
+        ? '<b class="nondi" title="' +
+          nonDiPhrase(d.nondi, d.matches, 'in this sample') + '. ' +
+          NONDI_WHY + '">non-D-I</b>'
+        : '') + '</td>' +
       '<td class="cf">' + (r.conf || '') + '</td>' +
       '<td class="n">' + d.matches + '</td><td class="n">' + d.sets + '</td>' +
       hcell(k === 'hit' ? d.hit : d[k],
@@ -5058,16 +5078,9 @@ function showTeam(name) {
          only when it applies, and it names how much of the sample it is --
          "the only match" and "1 of 4" are different facts. */
       ((O.nondi || 0) > 0
-        ? ' <b class="dicaveat">' + (O.nondi === O.matches
-            ? (O.matches === 1
-                ? 'The only match here is against a non-Division-I opponent'
-                : 'Every match here is against a non-Division-I opponent')
-            : O.nondi + ' of these ' + O.matches + ' matches ' +
-              (O.nondi === 1 ? 'is against a non-Division-I opponent'
-                             : 'are against non-Division-I opponents')) +
+        ? ' <b class="dicaveat">' + nonDiPhrase(O.nondi, O.matches, 'here') +
           '</b>, so these rates are not measured against Division-I ' +
-          'competition. Nothing is filtered out \u2014 filtering would change ' +
-          'what the numbers mean without saying so.'
+          'competition. ' + NONDI_WHY
         : '') +
       '</div></div>';
   }
