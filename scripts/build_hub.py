@@ -251,6 +251,11 @@ def day_label(iso, today=None):
 RANK_TITLE = "AVCA coaches poll rank"
 
 
+import digby_art as DIGBY_ART            # noqa: E402
+import icons as ICONS                    # noqa: E402
+import trend as TREND                    # noqa: E402
+
+
 def rank_badge(v):
     """The little numeral beside a team name -- and whose ranking it is.
 
@@ -2430,6 +2435,15 @@ def build():
             return None, "no forecast on record"
         return row.get("home_win"), "current forecast"
 
+    # ⚠ COMPUTED FOR EVERY TEAM, AND TODAY EVERY ONE IS THE UNAVAILABLE STATE.
+    # trend.usable() refuses a line unless there are 3+ dated observations ON
+    # ONE BASIS; the 2026 archive holds a preseason week and a digby week, so
+    # 0 of 348 are drawable. That is the correct answer rather than a gap, and
+    # it turns itself on with no code change once the archive earns it.
+    _trends = {}
+    for _t in teams:
+        _trends[_t["team"]] = TREND.trend_html(SEASON, _t["team"], "POWER")
+
     _pr = dict((t["team"], t["rank26"]) for t in teams if t.get("rank26"))
     _av = dict((t["team"], t.get("avca")) for t in teams if t.get("avca"))
     _tourn = dict((r["team"], r.get("tournament_pct"))
@@ -2639,6 +2653,21 @@ def build():
         .replace("{{ASK_HTML}}", "" if PUBLIC else ASK_HTML) \
         .replace("{{ASK_JS}}", "" if PUBLIC else ASK_JS) \
         .replace("{{DIGBY_CSS}}", "" if PUBLIC else DIGBY_CSS) \
+        .replace("{{ICON_CSS}}", ICONS.CSS) \
+        .replace("{{ICON_FINAL}}", ICONS.icon("final")) \
+        .replace("{{ICON_LIVE}}", ICONS.icon("live")) \
+        .replace("{{ICON_NEUTRAL}}", ICONS.icon("neutral")) \
+        .replace("{{ICON_TV}}", ICONS.icon("tv")) \
+        .replace("{{ICON_ROAD}}", ICONS.icon("road")) \
+        .replace("{{ICON_UNAVAIL}}", ICONS.icon("unavailable")) \
+        .replace("{{TREND_CSS}}", TREND.CSS) \
+        .replace("{{TREND_JSON}}", json.dumps(_trends)) \
+        .replace("{{DIGBY_BRIEF}}", DIGBY_ART.digby_svg("briefing", 76)) \
+        .replace("{{DIGBY_CLIP}}", "" if PUBLIC
+                 else DIGBY_ART.digby_svg("clipboard", 76)) \
+        .replace("{{DIGBY_WATCH}}", DIGBY_ART.digby_svg("watching", 76)) \
+        .replace("{{DIGBY_CHEER}}", "" if PUBLIC
+                 else DIGBY_ART.digby_svg("celebrate", 76)) \
         .replace("{{DIGBY_SVG}}", "" if PUBLIC else DIGBY_SVG) \
         .replace("{{DIGBY_COACH}}",
                  ('<img class="digby-coach" src="%s" alt="">' % DIGBY_COACH)
@@ -3564,6 +3593,36 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
     animation-iteration-count:1!important;transition-duration:.001ms!important}
 }
 
+/* ── DIGBY, THE ICON LANGUAGE AND THE TREND ───────────────────────────────
+   ⚠ DIGBY IS SUBORDINATE TO DATA, AND THE CSS IS WHERE THAT IS ENFORCED. He
+   is capped at 76px, sits at 88% opacity, and appears only in an empty state
+   or an earned moment -- never in a row, never over a score. */
+.digbox{display:flex;align-items:flex-start;gap:16px;padding:18px 0 6px}
+.digbox .digby-art{flex:none;width:76px;height:76px;opacity:.88}
+.digbox .dsay{font:15px/1.6 var(--sans);color:var(--ink2);max-width:52ch}
+.digbox .dsay b{color:var(--chalk);font-weight:600}
+.digbox .dwho{font:600 9.5px/1 var(--disp);letter-spacing:.16em;
+  text-transform:uppercase;color:var(--gold);margin-bottom:7px}
+@media (max-width:560px){
+  .digbox{gap:12px}
+  .digbox .digby-art{width:54px;height:54px}
+  .digbox .dsay{font-size:14px}
+}
+/* ── THE MATCH STORY STRIP ────────────────────────────────────────────────
+   A broadcast graphic made of facts that already exist: the set line, what was
+   forecast BEFORE first serve, and what the result was. No invented metric. */
+.mstory{border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  margin:12px 0 4px;padding:11px 0;display:flex;flex-wrap:wrap;
+  align-items:center;gap:10px 22px}
+.mstory .msl{font:600 9px/1 var(--disp);letter-spacing:.15em;
+  text-transform:uppercase;color:var(--slate);display:block;margin-bottom:5px}
+.mstory .msv{font:600 15px/1 var(--mono);color:var(--chalk)}
+.mstory .msv small{font-size:11.5px;color:var(--ink3);font-weight:400}
+.mstory .msets{display:flex;gap:5px}
+.mstory .msets span{font:600 12px/1 var(--mono);color:var(--ink2);
+  border:1px solid var(--line2);border-radius:2px;padding:4px 6px}
+@media (max-width:560px){.mstory{gap:9px 16px}.mstory .msv{font-size:13.5px}}
+{{ICON_CSS}}{{TREND_CSS}}
 /* ── THE RALLY LINE ───────────────────────────────────────────────────────
    The single signature: a 1px court line that marks THE ACTIVE THING. It is a
    connection cue, never decoration, so it appears on exactly three surfaces --
@@ -5862,6 +5921,7 @@ stsel.addEventListener('change', renderStandings);
 
    ⚠ AND IT PUBLISHES NOTHING. One button puts text on the clipboard. */
 const BW_KEY = 'wvb_ballot_' + SEASON_YEAR;
+const DIGBY_CLIP = `{{DIGBY_CLIP}}`;
 const BW_MOVE_REASONS = ['tournament projection', 'matchup concern',
   'returning experience', 'injury / availability', 'late-set composure',
   'schedule context', 'head-to-head', 'other'];
@@ -6393,8 +6453,13 @@ function renderBallotHistory() {
   bwHistoryOptions();
   bwCompareSaved();
   if (!BW_HIST.length) {
-    box.innerHTML = '<p class="bwsub">Nothing saved yet. Your first save becomes ' +
-      'the baseline every later week is measured against.</p>';
+    /* first ballot of the season: an empty list is a moment, not a gap */
+    box.innerHTML = '<div class="digbox">' + DIGBY_CLIP +
+      '<div><div class="dwho">Digby</div><div class="dsay">' +
+      '<b>Nothing saved yet.</b> Your first save becomes the baseline every ' +
+      'later week is measured against &mdash; movement, entries and drops are ' +
+      'all counted from it.</div></div></div>';
+    bwHistoryOptions();
     return;
   }
   box.innerHTML = BW_HIST.slice().reverse().slice(0, 8).map((b, i) => {
@@ -6654,7 +6719,12 @@ function deskTags(m, live) {
   if (m.kind === 'conf') t.push(['cf', 'conference match']);
   if (m.event) t.push(['ev', m.event]);
   if (live) t.push(['lv', 'live']);
-  return t.map(x => '<span class="dtag ' + x[0] + '">' + esc(x[1]) + '</span>').join('');
+  /* An icon only where it adds a second channel to the word -- neutral floor
+     and live. "ranked vs ranked" and "close forecast" are already words that
+     say exactly what they mean, and a glyph beside them would be noise. */
+  const ic = { nu: ICON_NEUTRAL, lv: ICON_LIVE };
+  return t.map(x => '<span class="dtag ' + x[0] + '">' +
+    (ic[x[0]] ? ic[x[0]] + ' ' : '') + esc(x[1]) + '</span>').join('');
 }
 
 function deskWhere(m) {
@@ -6728,7 +6798,37 @@ function deskHow(f) {
   return ', dropping ' + (l === 1 ? 'a set' : l + ' sets');
 }
 
-function deskStory(m) {
+/* ── THE MATCH STORY STRIP ────────────────────────────────────────────────
+   Every value is one that already exists: the set line from the box score,
+   what the append-only log forecast BEFORE first serve, and the result. If the
+   forecast cannot be proved pre-tipoff it says so, exactly as the card does --
+   a broadcast graphic is still not allowed to invent a number. */
+function matchStrip(m) {
+  const f = m.final;
+  if (!f) return '';
+  const awayWon = (+f.as) > (+f.hs);
+  const winner = awayWon ? m.a : m.h;
+  const sets = (f.sets || []).map(x =>
+    '<span>' + x[0] + '&ndash;' + x[1] + '</span>').join('');
+  const bits = [];
+  bits.push('<div><span class="msl">' + ICON_FINAL + ' Final</span>' +
+    '<span class="msv">' + esc(winner) + ' ' +
+    (awayWon ? f.as + '&ndash;' + f.hs : f.hs + '&ndash;' + f.as) + '</span></div>');
+  if (sets) {
+    bits.push('<div><span class="msl">Set by set</span>' +
+      '<div class="msets">' + sets + '</div></div>');
+  }
+  bits.push('<div><span class="msl">Forecast before first serve</span>' +
+    '<span class="msv">' +
+    (m.hw == null
+      ? '<small>' + esc(m.fsrc || 'not available') + '</small>'
+      : deskPct(awayWon ? (1 - m.hw) : m.hw) + ' ' + esc(winner) +
+        ' <small>' + esc(m.fsrc || '') + '</small>') +
+    '</span></div>');
+  return '<div class="mstory">' + bits.join('') + '</div>';
+}
+
+function deskStory(m, proseOnly) {
   const f = m.final;
   if (!f) return '';
   const awayWon = (+f.as) > (+f.hs);
@@ -6752,6 +6852,7 @@ function deskStory(m) {
           'that size expects to happen about ' + deskPct(pWinner) + ' of the time.') +
       '</p>';
   }
+  if (proseOnly) return '<div class="dstory">' + said + '</div>';
   return '<div class="dstory"><div class="dfinal"><span class="dfl">FINAL</span>' +
     '<b>' + esc(winner) + '</b> ' + (awayWon ? f.as + '&ndash;' + f.hs
                                              : f.hs + '&ndash;' + f.as) + '</div>' +
@@ -6776,7 +6877,7 @@ function deskCard(m, live, full) {
   if (live && !isFinal) {
     const sets = (live.sets || []).map(s =>
       '<span>' + s[0] + '&ndash;' + s[1] + '</span>').join('');
-    livebox = '<div class="dlive"><span class="dlv">LIVE</span>' +
+    livebox = '<div class="dlive"><span class="dlv">' + ICON_LIVE + ' LIVE</span>' +
       '<b>' + esc(live.away) + ' ' + live.away_sets + ' &ndash; ' +
       live.home_sets + ' ' + esc(live.home) + '</b>' +
       '<span class="dper">' + esc(live.period || '') + '</span>' +
@@ -6792,7 +6893,10 @@ function deskCard(m, live, full) {
   }
 
   return '<article class="' + cls + '">' + head + body +
-    (livebox || (isFinal ? deskStory(m) : deskForecast(m))) +
+    /* the strip is the FEATURED treatment only -- on a board row it would be
+       the same facts twice, at the same weight as the lead */
+    (full && isFinal ? matchStrip(m) : '') +
+    (livebox || (isFinal ? deskStory(m, full) : deskForecast(m))) +
     '<div class="dwhere">' + deskWhere(m) + '</div>' +
     (full ? deskWhy(m) : '') + '</article>';
 }
@@ -6903,6 +7007,18 @@ function lmcToggle(gid) {
   }
 }
 
+/* Digby's poses, inlined once. The public build gets the two that carry no
+   private context and an empty string for the two that do. */
+const ICON_FINAL = `{{ICON_FINAL}}`;
+const ICON_LIVE = `{{ICON_LIVE}}`;
+const ICON_NEUTRAL = `{{ICON_NEUTRAL}}`;
+const ICON_TV = `{{ICON_TV}}`;
+const ICON_ROAD = `{{ICON_ROAD}}`;
+const ICON_UNAVAIL = `{{ICON_UNAVAIL}}`;
+const TRENDS = {{TREND_JSON}};
+const DIGBY_BRIEF = `{{DIGBY_BRIEF}}`;
+const DIGBY_WATCH = `{{DIGBY_WATCH}}`;
+
 let LIVE_STAMP = '';
 let LIVE_BY_ID = {};
 
@@ -6921,8 +7037,12 @@ function renderDesk() {
     'probability from the rally model, not a pick.';
 
   if (!mine.length) {
-    todayBox.innerHTML = '<p class="dempty">No Division-I matches scheduled ' +
-      'today. The next few days are below.</p>';
+    /* ⚠ THE EMPTY STATE IS THE ONE PLACE AN ILLUSTRATION EARNS ITS SPACE.
+       There is no data to be subordinate to, so Digby carries the moment. */
+    todayBox.innerHTML = '<div class="digbox">' + DIGBY_BRIEF +
+      '<div><div class="dwho">Digby</div><div class="dsay">' +
+      '<b>No Division-I matches today.</b> The next few days are below, ' +
+      'and the board fills again as soon as one is scheduled.</div></div></div>';
     document.getElementById('desktodaymeta').textContent = '';
   } else {
     const liveN = mine.filter(m => LIVE_BY_ID[m.gid] &&
@@ -7516,7 +7636,9 @@ function showTeam(name) {
         : '<b class="glbig glmuted">&mdash;</b><span class="gls">first match to come</span>') +
     glanceCard('Next',
       _next
-        ? '<b class="glnext">' + (_next.site === 'neutral' ? 'vs ' : (_next.home ? 'vs ' : 'at ')) +
+        ? '<b class="glnext">' +
+          (_next.site === 'neutral' ? ICON_NEUTRAL + ' vs '
+            : (_next.home ? 'vs ' : ICON_ROAD + ' at ')) +
           _next.opp + '</b>' +
           '<span class="gls">' + dayLabel(_next.d) + (_next.t ? ' &middot; ' + _next.t : '') +
           (_next.pick !== null && _next.pick !== undefined
@@ -7939,6 +8061,10 @@ function showTeam(name) {
         '</div>'
       : '') +
     glanceHtml +
+    /* the POWER history, or an honest sentence saying why there is not one.
+       Rendered server-side by trend.py so the rule about a same-basis series
+       lives in exactly one place. */
+    (TRENDS[name] || '') +
     '<div class="tcols">' +
       '<div>' +
         (results ? '<div class="tsec"><h3>Results</h3><div class="body">' + results +
