@@ -29,6 +29,8 @@ import datetime
 import json
 import os
 import re
+import subprocess
+import shutil
 import sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -370,6 +372,102 @@ def main():
           "loses three times in ten" in src or "expects" in src)
     check("Résumé is named as inactive rather than omitted",
           "not active yet" in src)
+
+    print("\n8. THE MATCH BOARD: LANES, ONE FEATURED, NO INVENTED HEADLINE")
+    check("the three lanes exist by name",
+          "Live now" in src and "Just finished" in src and "Coming up" in src)
+    check("a featured match states WHY it is featured", "Featured:" in src)
+    check("...and the reason is a stated precedence, not a score",
+          "function pickFeatured" in src and "score" not in
+          src.split("function pickFeatured")[1].split("\n}")[0].split("rank =")[0])
+    check("the featured match is not repeated in its own lane",
+          "notFeat" in src)
+    check("a no-games day names the next real window",
+          "No Division-I matches today" in src and "Next match window" in src)
+    check("...and invents nothing to watch",
+          "things to watch" not in src.lower())
+
+    print("\n9. ONE SCORE HEADER, ONE DEFINITION")
+    # ⚠ THE RIBBON IS THE ONLY SCORE HEADER. The featured match and the match
+    # detail call the SAME function, so a scoreline cannot be phrased two ways
+    # and drift apart (R4).
+    check("the ribbon is defined once", src.count("function ribbonHTML") == 1)
+    check("the featured match uses it", "ribbonHTML(feat.m" in src)
+    check("the match detail uses the same one", "ribbonHTML(m, live, null)" in src)
+    check("the detail emits exactly one ribbon",
+          src.split("function renderMatchDetail")[1].split("\nfunction ")[0]
+          .count("ribbonHTML(") == 1)
+
+    print("\n10. THE LEDGER AND ITS STATE CONTROL")
+    m3 = re.search(r"const LEDGER = (\[.*?\]);\n", src, re.S)
+    L = json.loads(m3.group(1)) if m3 else []
+    check("the ledger payload is present", m3 is not None)
+    print("     (%d finished matches on record)" % len(L))
+    if L:
+        need = ("gid", "d", "a", "h", "as", "hs", "sets", "state")
+        missing = [f for f in need if f not in L[0]]
+        check("every ledger row carries what a row needs", not missing,
+              str(missing))
+        check("...and each is marked final (res is the FINAL-only crawl)",
+              all(r.get("state") == "final" for r in L))
+        check("...with a game id to route to",
+              all(r.get("gid") for r in L))
+    for st in ("all", "live", "final", "upcoming"):
+        check("the state control offers %r" % st, 'data-ls2="%s"' % st in src)
+    check("matches are grouped by the day they were played",
+          "daygrp" in src and "dayhd" in src)
+
+    print("\n11. MATCH ROUTES ARE REAL DESTINATIONS")
+    check("a match opens on a route, never in place",
+          "go('#/' + dest + '/' + encodeURIComponent(row.dataset.match))" in src)
+    check("both parents can own a match",
+          "renderMatchDetail(decodeURIComponent(parts[1])" in src)
+    check("...and the detail names its parent",
+          "'Scores', routeFor('scores')" in src
+          and "'Match Desk', routeFor('desk')" in src)
+    check("leaving a match restores its parent list", "closeMatchDetail" in src)
+    # ⚠ THE CRUMB SWEEP USED TO DELETE THE DETAIL'S OWN WAY OUT. renderCrumbs()
+    # removes every .crumb/.backlink and runs after the detail has painted, so
+    # the match page rendered and then lost its breadcrumb and back button.
+    check("the crumb sweep spares a detail's own crumb",
+          "closest('#deskdetail,#scoredetail')" in src)
+    check("an unknown game id says so rather than blanking",
+          "not in this season" in src)
+
+    print("\n12. STATE IS TRUE, AND SAID HONESTLY")
+    check("state comes from the feed and the result, not a guess",
+          "function matchState" in src)
+    check("a missing box score is stated", "No verified " in src
+          or "No box score" in src)
+    check("a missing venue is stated", "not reported" in src)
+    check("the forecast heading follows the state",
+          "'Forecast before first serve' : 'Forecast'" in src)
+    node = shutil.which("node")
+    if not node:
+        print("  (no node -- skipping the behavioural state checks)")
+    else:
+        fn = re.search(r"function matchState\(m, live\) \{.*?\n\}", src, re.S)
+        check("matchState is liftable", fn is not None)
+        if fn:
+            js = fn.group(0) + """
+const cases = [
+  ['live now',      {}, {state:'I', period:'2ND SET'}],
+  ['feed says final',{}, {state:'F', period:'FINAL'}],
+  ['period FINAL',  {}, {state:'I', period:'FINAL'}],
+  ['has a result',  {final:{as:3,hs:0}}, null],
+  ['ledger row',    {as:3, hs:1}, null],
+  ['not started',   {}, null]
+];
+console.log(JSON.stringify(cases.map(c => [c[0], matchState(c[1], c[2])])));
+"""
+            got = dict(json.loads(subprocess.check_output(
+                [node, "-e", js], universal_newlines=True).strip()))
+            for label, want in (("live now", "live"), ("feed says final", "final"),
+                                ("period FINAL", "final"), ("has a result", "final"),
+                                ("ledger row", "final"), ("not started", "upcoming")):
+                check("[%s] %-16s -> %s" % ("+" if want != "upcoming" else "-",
+                                            label, want),
+                      got.get(label) == want, "got %r" % got.get(label))
 
     print()
     if FAILS:

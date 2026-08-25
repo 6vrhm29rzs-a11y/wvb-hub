@@ -2388,6 +2388,11 @@ def build():
                          "season": _r.get("_season"), "prev": _r.get("_is_prev")}
 
     # ---- score cards -----------------------------------------------------
+    # ⚠ ONE STRUCTURED SOURCE FOR THE LEDGER. The Scores tab was a wall of
+    # pre-rendered HTML strings, which is why it could not be filtered by state
+    # or grouped by day without re-rendering on the server. The same rows are
+    # emitted as data; the page decides how to show them.
+    ledger = []
     cards = []
     for r in res:
         # HOW CLOSE EACH SET WAS, SHOWN RATHER THAN ONLY SAID. The copy above
@@ -2440,6 +2445,19 @@ def build():
                "" if awin else "win", rank(r["home_rank"]),
                logo_img(r["home"], logos), esc(r["home"]), r["home_sets"],
                strip, venue))
+
+        ledger.append({
+            "gid": str(r.get("gid") or ""),
+            "d": r["date"], "t": r["time"],
+            "a": r["away"], "h": r["home"],
+            "as": r["away_sets"], "hs": r["home_sets"],
+            "ar": r.get("away_rank"), "hr": r.get("home_rank"),
+            "sets": r["sets"],
+            "venue": (loc.get("venue") or None),
+            "city": (loc.get("city") or None), "st": (loc.get("state") or None),
+            "site": site, "event": ev,
+            "state": "final",          # `res` is the FINAL-only crawl (R2)
+        })
 
     # ---- bracket ---------------------------------------------------------
     seeds = []
@@ -2805,6 +2823,7 @@ def build():
         .replace("{{RANK_BASIS}}", rank_basis) \
         .replace("{{AQ_MECH}}", aq_mech) \
         .replace("{{RANK_ROWS}}", "".join(rrows)) \
+        .replace("{{LEDGER_JSON}}", json.dumps(ledger)) \
         .replace("{{SCORE_CARDS}}", "".join(cards) or
                  '<div class="empty">No completed matches yet.</div>') \
         .replace("{{SEED_ROWS}}", "".join(seeds)) \
@@ -3775,6 +3794,129 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
   .gline{flex-wrap:wrap;row-gap:3px}
   .gline .ss{flex:1 1 100%;min-width:0;white-space:normal}
   .gline .dt{min-width:0}
+}
+
+/* ⚠ `hidden` LOSES TO A `display` RULE. .cards{display:flex} beat the UA's
+   [hidden]{display:none}, so a band marked hidden in the markup rendered
+   anyway -- which is how the old result cards were still on screen under the
+   new ledger. One global rule settles it for every future case. */
+[hidden]{display:none!important}
+/* ⚠ THE LEDGER OWNS MATCH ROWS ON SCORES. The Live / Just finished / Later
+   today bands were full cards for CLOSED matches, which is exactly what the
+   ledger replaces -- and showing both meant the same match twice, once as a
+   card and once as a row. The nodes stay in the DOM on purpose: the live
+   poller writes to them and the just-finished seam logic reads #resultcards to
+   know what the crawl has already caught. They are data plumbing now, not a
+   surface. "What changed" stays -- it is a one-line digest, not a card list. */
+#v-scores #live,#v-scores #justin,#v-scores #today,
+#v-scores #weekbox,#v-scores #resultcards{display:none!important}
+/* the date jump moves INTO the ledger's control row, where its target is */
+#v-scores .datejump{display:flex;align-items:center;gap:8px;margin-left:auto;
+  font:11.5px/1 var(--mono);color:var(--slate)}
+
+/* ══ THE MATCH BOARD ══════════════════════════════════════════════════════
+   ONE signature surface: a broadcast scoreboard ribbon, used for the featured
+   match and reused verbatim as the match-detail header so a score header has
+   exactly one definition. Everything else on the board is a RULED ROW, not a
+   card -- a fixture on a list is not independently actionable, so it does not
+   get a box. No gradients, no pills, no glow: state is carried by weight,
+   colour and a rule. */
+.ribbon{border-top:2px solid var(--line2);border-bottom:1px solid var(--line);
+  padding:16px 0 14px;margin:2px 0 6px}
+.ribbon.live{border-top-color:var(--coral)}
+.ribbon.final{border-top-color:var(--line2)}
+.ribbon.upcoming{border-top-color:var(--navy)}
+.rbtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.rbstate{font:700 9.5px/1 var(--disp);letter-spacing:.16em;text-transform:uppercase;
+  padding:4px 8px;border:1px solid currentColor;border-radius:2px}
+.rbstate.live{color:var(--coral)} .rbstate.final{color:var(--ink2)}
+.rbstate.upcoming{color:var(--navy)}
+.rbwhen{font:600 12px/1 var(--mono);color:var(--slate)}
+.rbwhy{flex:1 1 100%;font:12.5px/1.5 var(--sans);color:var(--ink2);margin-top:2px}
+.rbwhy b{color:var(--chalk);font-weight:600}
+.rbside{display:grid;grid-template-columns:26px 34px 1fr auto;align-items:center;
+  gap:12px;padding:7px 0}
+.rbside+.rbside{border-top:1px solid var(--line)}
+.rbside .rbrk{font:600 10px/1 var(--disp);color:var(--gold);text-align:right}
+.rbside .rbnm{font:700 30px/1 var(--disp);letter-spacing:-.01em;color:var(--ink2);
+  text-transform:uppercase}
+.rbside.won .rbnm{color:var(--chalk)}
+.rbside .rbsc{font:700 34px/1 var(--mono);color:var(--ink3);
+  font-variant-numeric:tabular-nums}
+.rbside.won .rbsc{color:var(--chalk)}
+.ribbon.live .rbside .rbsc{color:var(--chalk)}
+.rbside img{width:34px;height:34px;object-fit:contain}
+/* the rally ledger: one cell per completed set */
+.rledger{display:flex;gap:5px;margin-top:12px;flex-wrap:wrap}
+.rledger .rl{min-width:46px;border:1px solid var(--line2);border-radius:2px;
+  padding:5px 7px;text-align:center;font:600 12px/1.35 var(--mono);color:var(--ink2)}
+.rledger .rl i{display:block;font:600 8.5px/1 var(--disp);letter-spacing:.12em;
+  color:var(--slate);font-style:normal;margin-bottom:3px}
+.rledger .rl.aw{color:var(--chalk)}
+/* ── LANES ──────────────────────────────────────────────────────────────── */
+.lane{margin:22px 0 0}
+.lanehd{display:flex;align-items:baseline;gap:10px;padding-bottom:7px;
+  border-bottom:2px solid var(--line2)}
+.lanehd b{font:700 11px/1 var(--disp);letter-spacing:.18em;text-transform:uppercase}
+.lane.live .lanehd b{color:var(--coral)}
+.lane.final .lanehd b{color:var(--ink2)}
+.lane.up .lanehd b{color:var(--navy)}
+.lanehd span{font:11.5px/1 var(--mono);color:var(--slate)}
+/* a compact, scannable row -- deliberately NOT a miniature card */
+.mrow{display:grid;grid-template-columns:74px 1fr auto;align-items:center;
+  gap:12px;padding:10px 2px;border-bottom:1px solid var(--line);cursor:pointer;
+  background:none;border-left:0;border-right:0;border-top:0;width:100%;
+  text-align:left;color:inherit;font:inherit}
+.mrow:hover{background:var(--sheet)}
+.mrow:last-child{border-bottom:0}
+.mrow .mwhen{font:600 11px/1.4 var(--mono);color:var(--slate)}
+.mrow .mteams{display:flex;flex-direction:column;gap:3px;min-width:0}
+.mrow .mrt{display:flex;align-items:center;gap:7px;min-width:0}
+.mrow .mrt img{width:19px;height:19px;flex:none;object-fit:contain}
+.mrow .mrt b{font:600 15px/1.15 var(--disp);color:var(--ink2);overflow-wrap:anywhere}
+.mrow .mrt.won b{color:var(--chalk)}
+.mrow .mrt .mrk{font:600 9.5px/1 var(--disp);color:var(--gold);flex:none}
+.mrow .msc{font:700 17px/1.2 var(--mono);color:var(--ink3);text-align:right;
+  font-variant-numeric:tabular-nums}
+.mrow .mrt.won .msc,.mrow.islive .msc{color:var(--chalk)}
+.mrow .mmeta{font:10.5px/1.5 var(--mono);color:var(--ink3);text-align:right}
+.mrow .mtags{display:flex;gap:5px;justify-content:flex-end;flex-wrap:wrap;
+  margin-top:3px}
+.mrow .mtg{font:600 8.5px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
+  color:var(--slate);border:1px solid var(--line);border-radius:2px;padding:3px 5px}
+.mrow .mtg.rv{color:var(--gold);border-color:color-mix(in oklab,var(--gold) 40%,transparent)}
+.mrow .mtg.lv{color:var(--coral);border-color:color-mix(in oklab,var(--coral) 45%,transparent)}
+/* ── THE STATE CONTROL AND DAY GROUPS ON SCORES ─────────────────────────── */
+.daygrp{margin:20px 0 0}
+.dayhd{font:700 10.5px/1 var(--disp);letter-spacing:.17em;text-transform:uppercase;
+  color:var(--slate);padding-bottom:6px;border-bottom:1px solid var(--line2)}
+.emptylane{font:13px/1.6 var(--sans);color:var(--slate);padding:14px 0 2px;
+  max-width:70ch}
+/* ── MATCH DETAIL ───────────────────────────────────────────────────────── */
+.mdet{margin-top:4px}
+.mdet .msec{border-top:1px solid var(--line);padding:15px 0 6px;margin-top:14px}
+.mdet .msec h3{margin:0 0 9px;font:600 10px/1 var(--disp);letter-spacing:.16em;
+  text-transform:uppercase;color:var(--slate)}
+.mdet .mfact{display:flex;flex-wrap:wrap;gap:8px 26px;font-size:13px;
+  color:var(--ink2);line-height:1.65}
+.mdet .mfact em{font-style:normal;color:var(--slate);margin-right:6px;
+  font:600 9.5px/1 var(--disp);letter-spacing:.12em;text-transform:uppercase}
+.mdet .munk{color:var(--slate);font-style:italic}
+@media (max-width:560px){
+  /* ⚠ THE CONTROL ROW COULD NOT WRAP. .seg is nowrap by design elsewhere, and
+     four state buttons plus a count plus a date picker measured 535px inside a
+     370px column -- clipped, with no scrollbar to reveal it. The date jump
+     drops to its own line rather than the states scrolling out of reach. */
+  #v-scores #ledgerwrap .seg{flex-wrap:wrap;row-gap:8px}
+  #v-scores .datejump{margin-left:0;flex:1 1 100%}
+  .rbside{grid-template-columns:22px 26px 1fr auto;gap:8px}
+  .rbside .rbnm{font-size:21px}
+  .rbside .rbsc{font-size:26px}
+  .rbside img{width:26px;height:26px}
+  .mrow{grid-template-columns:60px 1fr auto;gap:8px}
+  .mrow .mrt b{font-size:14px}
+  .mrow .msc{font-size:15px}
+  .mdet .mfact{gap:6px 16px}
 }
 
 /* ── THE MORE MENU ────────────────────────────────────────────────────────
@@ -4960,20 +5102,36 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <p class="lead"><b>2026 results.</b> Every completed match, newest first. The strip under each result is
   the <b>per-set score</b> &mdash; visitor on top, home below, the set winner lit.
   A 25&ndash;23 and a 25&ndash;12 are not the same match.</p>
-  <div class="cards" id="resultcards">{{SCORE_CARDS}}</div>
+  <div id="scoredetail" hidden></div>
+  <div id="ledgerwrap">
+    <div class="seg" role="tablist" aria-label="Match state">
+      <button class="segb on" data-ls2="all">All</button>
+      <button class="segb" data-ls2="live">Live</button>
+      <button class="segb" data-ls2="final">Final</button>
+      <button class="segb" data-ls2="upcoming">Upcoming</button>
+      <span class="count" id="ledgercnt"></span>
+      <span class="datejump"><label for="ldate">Jump to a date</label>
+        <input type="date" id="ldate">
+        <button type="button" class="linkbtn" id="lclear">clear</button></span>
+    </div>
+    <div id="ledgerbody"></div>
+  </div>
+  <div class="cards" id="resultcards" hidden>{{SCORE_CARDS}}</div>
 </section>
 
 <section id="v-desk">
+  <div id="deskdetail" hidden></div>
+  <div id="deskboard">
   <h2 class="vh">Match Desk &mdash; {{SEASON_YEAR}}</h2>
   <p class="tabhint" id="desklead"></p>
 
   <div id="desktoday">
-    <div class="livehead"><b class="soon">Today</b><span id="desktodaymeta"></span></div>
+    <span id="desktodaymeta" hidden></span>
     <div id="desktodaycards"></div>
   </div>
 
   <div id="desksoon">
-    <div class="livehead"><b class="soon">Next few days</b><span id="desksoonmeta"></span></div>
+    <span id="desksoonmeta" hidden></span>
     <div id="desksooncards"></div>
     <p class="dsoonrest" id="desksoonrest"></p>
   </div>
@@ -5001,6 +5159,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       for the official final and the next verified refresh.</p>
     </div>
   </details>
+  </div>
 </section>
 
 <section id="v-top25" hidden>
@@ -5519,6 +5678,14 @@ function route() {
       CSS.escape(want) + '"]');
     if (b) renderPoll(want);
   }
+  /* a match is a destination on either parent, and the parent is the route */
+  closeMatchDetail();
+  if ((view === 'desk' || view === 'scores') && parts[1]) {
+    renderMatchDetail(decodeURIComponent(parts[1]),
+                      view === 'scores' ? 'scores' : 'desk');
+  } else if (view === 'scores') {
+    renderLedger();
+  }
   if (view === 'teams') {
     const t = parts[1] ? unslugTeam(parts[1]) : null;
     if (t) {
@@ -5558,7 +5725,14 @@ addEventListener('hashchange', () => { route(); });
 addEventListener('popstate', () => { ROUTE_POP = true; });
 
 function renderCrumbs(view, parts) {
-  document.querySelectorAll('.crumb,.backlink').forEach(n => n.remove());
+  /* ⚠ A MATCH DETAIL OWNS ITS OWN CRUMB, and this used to delete it. The
+     sweep ran after renderMatchDetail() had painted, so the breadcrumb and the
+     back button vanished from every match page -- the detail rendered, then
+     lost its way out. Nodes inside a detail host are that host's business. */
+  document.querySelectorAll('.crumb,.backlink').forEach(n => {
+    if (n.closest('#deskdetail,#scoredetail')) return;
+    n.remove();
+  });
   if (view === 'players' && parts[1] && parts[2]) {
     const pl = playerBySlug(parts[1], parts[2]);
     if (!pl) return;
@@ -7451,68 +7625,362 @@ const DIGBY_WATCH = `{{DIGBY_WATCH}}`;
 let LIVE_STAMP = '';
 let LIVE_BY_ID = {};
 
+/* ══ SHARED MATCH COMPONENTS ══════════════════════════════════════════════
+   ⚠ ONE DEFINITION OF A MATCH HEADER AND A MATCH ROW, used by the Match Desk,
+   the Scores ledger and the match detail. Three renderers for the same object
+   is how a scoreline ends up phrased three ways and drifts (R4). */
+const LEDGER = {{LEDGER_JSON}};
+
+/* TRUE STATE, never a guess. `live` is the scoreboard feed; a match with a
+   final result is final; everything else has not started. */
+function matchState(m, live) {
+  /* ⚠ A FEED THAT SAYS FINAL MEANS FINAL, even before the crawl catches up.
+     The first version only ever returned 'final' from a stored result, so a
+     match that had just ended on the scoreboard -- but was not yet in the
+     archive -- fell through to 'upcoming' and sat in "Coming up" with its
+     score showing. That is the live-band/archive seam this project has already
+     been bitten by once, arriving in a new place. */
+  const over = live && (/final|complete/i.test(live.state || '') ||
+                        /final|complete/i.test(live.period || ''));
+  if (live && !over) return 'live';
+  if (over) return 'final';
+  if (m.final || (m.as !== undefined && m.as !== null)) return 'final';
+  return 'upcoming';
+}
+function matchSets(m, live) {
+  if (live && live.sets && live.sets.length) return live.sets;
+  if (m.final && m.final.sets) return m.final.sets;
+  return m.sets || [];
+}
+function matchScore(m, live) {
+  if (live) return [live.away_sets, live.home_sets];
+  if (m.final) return [m.final.as, m.final.hs];
+  if (m.as !== undefined && m.as !== null) return [m.as, m.hs];
+  return [null, null];
+}
+function mAway(m) { return m.a; }
+function mHome(m) { return m.h; }
+
+/* THE RIBBON. The featured match, and the detail header -- the same bar. */
+function ribbonHTML(m, live, why) {
+  const st = matchState(m, live);
+  const sc = matchScore(m, live);
+  const sets = matchSets(m, live);
+  const aw = (sc[0] !== null && sc[1] !== null) ? +sc[0] > +sc[1] : false;
+  const hw = (sc[0] !== null && sc[1] !== null) ? +sc[1] > +sc[0] : false;
+  const when = st === 'live'
+      ? esc((live && live.period) || 'in progress')
+      : esc((m.dl || m.d || '') + (m.t ? ' · ' + m.t : ''));
+  const side = (name, rk, won, score) =>
+    '<div class="rbside ' + (won ? 'won' : '') + '">' +
+      '<span class="rbrk">' + (rk ? '#' + esc(String(rk)) : '') + '</span>' +
+      logo(name) +
+      '<a class="rbnm parentlink" href="' + routeFor('teams', slug(name)) + '">' +
+        esc(name) + '</a>' +
+      '<span class="rbsc">' + (score === null || score === undefined ? '&mdash;' : score) +
+      '</span></div>';
+  const ledger = sets.length
+    ? '<div class="rledger">' + sets.map((x, i) =>
+        '<span class="rl ' + (+x[0] > +x[1] ? 'aw' : '') + '"><i>Set ' + (i + 1) +
+        '</i>' + x[0] + '&ndash;' + x[1] + '</span>').join('') + '</div>'
+    : '';
+  return '<div class="ribbon ' + st + '">' +
+    '<div class="rbtop"><span class="rbstate ' + st + '">' +
+      (st === 'live' ? ICON_LIVE + ' Live' : st === 'final' ? 'Final' : 'Upcoming') +
+      '</span><span class="rbwhen">' + when + '</span>' +
+      (why ? '<span class="rbwhy">' + why + '</span>' : '') + '</div>' +
+    side(mAway(m), m.ar, aw, sc[0]) + side(mHome(m), m.hr, hw, sc[1]) +
+    ledger + '</div>';
+}
+
+/* A COMPACT ROW. Scannable, ruled, not a miniature card. */
+function matchRow(m, live, dest) {
+  const st = matchState(m, live);
+  const sc = matchScore(m, live);
+  const done = sc[0] !== null && sc[0] !== undefined;
+  const aw = done && +sc[0] > +sc[1], hw = done && +sc[1] > +sc[0];
+  const tags = [];
+  if (m.ar && m.hr) tags.push(['rv', 'ranked v ranked']);
+  if (st === 'live') tags.push(['lv', 'live']);
+  if (m.site === 'neutral') tags.push(['', 'neutral']);
+  const t = (name, rk, won, score) =>
+    '<div class="mrt ' + (won ? 'won' : '') + '">' +
+      (rk ? '<span class="mrk">#' + esc(String(rk)) + '</span>' : '') +
+      logo(name) + '<b>' + esc(name) + '</b></div>';
+  return '<button type="button" class="mrow ' + (st === 'live' ? 'islive' : '') +
+    '" data-match="' + esc(m.gid) + '" data-dest="' + dest + '">' +
+    '<span class="mwhen">' + esc(st === 'live'
+        ? ((live && live.period) || 'live')
+        : (m.t || m.dl || '')) + '</span>' +
+    '<span class="mteams">' + t(mAway(m), m.ar, aw) + t(mHome(m), m.hr, hw) + '</span>' +
+    '<span class="mmeta">' +
+      (done ? '<span class="msc">' + sc[0] + '&ndash;' + sc[1] + '</span>' : '') +
+      (tags.length ? '<span class="mtags">' + tags.map(x =>
+        '<span class="mtg ' + x[0] + '">' + x[1] + '</span>').join('') + '</span>' : '') +
+    '</span></button>';
+}
+
+/* ⚠ WHY A MATCH IS FEATURED IS A STATED RULE, NOT A SCORE. Precedence only,
+   from signals already in the payload, and the reason is printed. If nothing
+   clears the bar there is NO featured match -- an ordinary Tuesday does not
+   get a headline invented for it. */
+function pickFeatured(today, liveOf) {
+  const rank = m => {
+    const live = liveOf(m), st = matchState(m, live);
+    if (st === 'live' && m.ar && m.hr) return [0, 'Both sides ranked, and it is on now.'];
+    if (st === 'live') return [1, 'It is the match in progress.'];
+    if (st === 'final' && m.ar && m.hr) return [2, 'Both sides ranked, and it is settled.'];
+    if (st === 'upcoming' && m.ar && m.hr) return [3, 'Both sides ranked.'];
+    return [99, null];
+  };
+  let best = null;
+  today.forEach(m => {
+    const r = rank(m);
+    if (r[1] && (!best || r[0] < best.score)) best = { m: m, score: r[0], why: r[1] };
+  });
+  return best;
+}
+
+/* ══ THE LEDGER AND THE MATCH DETAIL ══════════════════════════════════════ */
+let LEDGER_STATE = 'all';
+
+function allMatches() {
+  /* the two sources, keyed by gid: the crawled FINALS and the schedule. A
+     final is authoritative where both exist -- it has the result. */
+  const by = {};
+  DESK.forEach(m => { by[m.gid] = Object.assign({}, m); });
+  LEDGER.forEach(r => { by[r.gid] = Object.assign({}, by[r.gid] || {}, r); });
+  return by;
+}
+function matchByGid(gid) { return allMatches()[String(gid)] || null; }
+
+function renderLedger() {
+  const host = document.getElementById('ledgerbody');
+  if (!host) return;
+  const by = allMatches();
+  const day = (document.getElementById('ldate') || {}).value || '';
+  const rows = Object.keys(by).map(k => by[k]).filter(m => {
+    const st = matchState(m, LIVE_BY_ID[m.gid]);
+    if (day && m.d !== day) return false;
+    return LEDGER_STATE === 'all' || st === LEDGER_STATE;
+  });
+  rows.sort((a, b) => (a.d || '') < (b.d || '') ? 1 : (a.d || '') > (b.d || '') ? -1 : 0);
+  document.getElementById('ledgercnt').textContent =
+    rows.length + (rows.length === 1 ? ' match' : ' matches');
+  if (!rows.length) {
+    host.innerHTML = '<p class="emptylane">No ' +
+      (LEDGER_STATE === 'all' ? '' : esc(LEDGER_STATE) + ' ') +
+      'matches on record. Results appear here once the crawl confirms them ' +
+      'final; nothing is shown before that.</p>';
+    return;
+  }
+  /* GROUPED BY THE DAY IT WAS PLAYED, not one undifferentiated wall. */
+  const days = [];
+  const seen = {};
+  rows.forEach(m => {
+    const d = m.d || 'undated';
+    if (!seen[d]) { seen[d] = []; days.push(d); }
+    seen[d].push(m);
+  });
+  host.innerHTML = days.map(d =>
+    '<div class="daygrp"><div class="dayhd">' +
+      esc(d === 'undated' ? 'Date not recorded' : dayLabel(d)) +
+      '</div>' + seen[d].map(m =>
+        matchRow(m, LIVE_BY_ID[m.gid], 'scores')).join('') + '</div>').join('');
+}
+
+/* ONE match, as its own destination. The ribbon above is the SAME component
+   the featured match uses -- there is one score header on this page and one
+   definition of it. */
+function renderMatchDetail(gid, dest) {
+  const host = document.getElementById(dest === 'scores' ? 'scoredetail' : 'deskdetail');
+  const board = document.getElementById(dest === 'scores' ? 'ledgerwrap' : 'deskboard');
+  if (!host) return false;
+  const m = matchByGid(gid);
+  if (!m) {
+    host.hidden = false; if (board) board.hidden = true;
+    host.innerHTML = '<p class="emptylane">That match is not in this season\'s ' +
+      'records. It may not have been crawled yet.</p>' +
+      '<button type="button" class="backlink" data-back="' + dest + '">&larr; Back</button>';
+    return true;
+  }
+  const live = LIVE_BY_ID[m.gid];
+  const st = matchState(m, live);
+  const parent = dest === 'scores'
+      ? ['Scores', routeFor('scores')] : ['Match Desk', routeFor('desk')];
+  const bits = [];
+  const where = [m.venue, m.city, m.st].filter(Boolean).join(', ');
+  bits.push('<span><em>Venue</em>' + (where ? esc(where)
+      : '<span class="munk">not reported</span>') + '</span>');
+  if (m.site === 'neutral') bits.push('<span><em>Floor</em>neutral site</span>');
+  if (m.event) bits.push('<span><em>Event</em>' + esc(m.event) + '</span>');
+  const tvl = (typeof TV !== 'undefined' && TV) ? (TV[m.gid] || null) : null;
+  if (tvl) bits.push('<span><em>Watch</em>' + esc(tvl) + '</span>');
+
+  /* the forecast, and only one that can be proved to predate first serve */
+  let fc = '';
+  if (st === 'final') {
+    fc = m.hw === null || m.hw === undefined
+      ? '<span class="munk">forecast unavailable' +
+        (m.fsrc ? ' &mdash; ' + esc(m.fsrc) : '') + '</span>'
+      : deskPct(m.hw) + ' ' + esc(mHome(m)) +
+        ' <span class="munk">' + esc(m.fsrc || '') + '</span>';
+  } else if (m.hw !== null && m.hw !== undefined) {
+    fc = deskPct(m.hw) + ' ' + esc(mHome(m)) +
+      ' <span class="munk">current forecast</span>';
+  }
+
+  const box = (typeof boxHTML === 'function') ? boxHTML(m.gid) : '';
+  host.hidden = false;
+  if (board) board.hidden = true;
+  host.innerHTML =
+    '<div class="crumb"><a href="' + parent[1] + '">' + parent[0] + '</a>' +
+      '<span class="sep">&rsaquo;</span><b>' + esc(mAway(m)) + ' at ' +
+      esc(mHome(m)) + '</b></div>' +
+    '<button type="button" class="backlink" data-back="' + dest + '">&larr; Back to ' +
+      parent[0] + '</button>' +
+    '<div class="mdet">' + ribbonHTML(m, live, null) +
+      '<div class="msec"><h3>Match facts</h3><div class="mfact">' +
+        bits.join('') + '</div></div>' +
+      /* ⚠ THE HEADING FOLLOWS THE STATE. "Forecast before first serve" is a
+         claim about a match that HAS started; on an upcoming match it is
+         simply the current forecast, and the two must not be labelled alike. */
+      (fc ? '<div class="msec"><h3>' + (st === 'final'
+              ? 'Forecast before first serve' : 'Forecast') + '</h3>' +
+            '<div class="mfact"><span>' + fc + '</span></div></div>' : '') +
+      (box ? '<div class="msec"><h3>Box score</h3>' + box + '</div>'
+           : '<div class="msec"><h3>Box score</h3><p class="munk">No verified ' +
+             'box score is on record for this match yet.</p></div>') +
+    '</div>';
+  return true;
+}
+
+function closeMatchDetail() {
+  ['deskdetail', 'scoredetail'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.hidden = true; el.innerHTML = ''; }
+  });
+  ['deskboard', 'ledgerwrap'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.hidden = false;
+  });
+}
+
+/* every row routes; nothing opens a match by painting it in place */
+document.addEventListener('click', e => {
+  const row = e.target.closest && e.target.closest('.mrow[data-match]');
+  if (row) {
+    const dest = row.dataset.dest === 'scores' ? 'scores' : 'match-desk';
+    go('#/' + dest + '/' + encodeURIComponent(row.dataset.match));
+    return;
+  }
+  const back = e.target.closest && e.target.closest('[data-back]');
+  if (back) {
+    go(back.dataset.back === 'scores' ? routeFor('scores') : routeFor('desk'));
+  }
+});
+(function wireLedgerDate() {
+  const d = document.getElementById('ldate'), c = document.getElementById('lclear');
+  if (d) d.addEventListener('input', renderLedger);
+  if (c) c.addEventListener('click', () => {
+    if (d) d.value = '';
+    renderLedger();
+  });
+})();
+document.querySelectorAll('[data-ls2]').forEach(b =>
+  b.addEventListener('click', () => {
+    LEDGER_STATE = b.dataset.ls2;
+    document.querySelectorAll('[data-ls2]').forEach(x =>
+      x.classList.toggle('on', x === b));
+    renderLedger();
+  }));
+
 function renderDesk() {
   const todayBox = document.getElementById('desktodaycards');
   if (!todayBox) return;
   const today = new Intl.DateTimeFormat('en-CA',
     { timeZone: 'America/Los_Angeles' }).format(new Date());
+  const liveOf = m => LIVE_BY_ID[m.gid];
   const mine = DESK.filter(m => m.d === today);
   const soon = DESK.filter(m => m.d > today);
 
+  /* THE DATE AND STATE HEADER: what day it is, and what is actually on it. */
+  const lanes = { live: [], final: [], up: [] };
+  mine.forEach(m => {
+    const st = matchState(m, liveOf(m));
+    lanes[st === 'live' ? 'live' : st === 'final' ? 'final' : 'up'].push(m);
+  });
+  const parts = [];
+  if (lanes.live.length) parts.push(lanes.live.length + ' live');
+  if (lanes.final.length) parts.push(lanes.final.length + ' final');
+  if (lanes.up.length) parts.push(lanes.up.length + ' to come');
   document.getElementById('desklead').innerHTML =
-    '<b>What is on, why it matters, and what it meant.</b> ' +
-    'Ordered ranked-v-ranked first, then any ranked side, then how close the ' +
-    'forecast is &mdash; a stated sort, not a rating. The forecast is a ' +
+    '<b>' + esc(dayLabel(today)) + '</b> &mdash; ' +
+    (parts.length ? parts.join(' · ') : 'no Division-I matches scheduled') +
+    '. Live scores come from the official scoreboard feed; a forecast is a ' +
     'probability from the rally model, not a pick.';
+  document.getElementById('desktodaymeta').textContent = '';
 
+  /* ⚠ A NO-GAMES DAY IS A REAL ANSWER, and it is answered with the schedule
+     that already exists rather than with invented filler. */
   if (!mine.length) {
-    /* ⚠ THE EMPTY STATE IS THE ONE PLACE AN ILLUSTRATION EARNS ITS SPACE.
-       There is no data to be subordinate to, so Digby carries the moment. */
+    const nextDay = soon.length ? soon[0].d : null;
+    const nextOn = soon.filter(m => m.d === nextDay);
+    const ranked = nextOn.filter(m => m.ar && m.hr).length;
     todayBox.innerHTML = '<div class="digbox">' + DIGBY_BRIEF +
       '<div><div class="dwho">Digby</div><div class="dsay">' +
-      '<b>No Division-I matches today.</b> The next few days are below, ' +
-      'and the board fills again as soon as one is scheduled.</div></div></div>';
-    document.getElementById('desktodaymeta').textContent = '';
-  } else {
-    const liveN = mine.filter(m => LIVE_BY_ID[m.gid] &&
-      !/final/i.test((LIVE_BY_ID[m.gid].state || ''))).length;
-    const finalN = mine.filter(m => m.final).length;
-    document.getElementById('desktodaymeta').textContent =
-      mine.length + (mine.length === 1 ? ' match' : ' matches') +
-      (liveN ? ' · ' + liveN + ' live' : '') +
-      (finalN ? ' · ' + finalN + ' final' : '');
-    /* ⚠ ONE FEATURED MATCH, THEN A BOARD. A stack of equally weighted cards
-       tells a reader that everything matters the same amount, which is the
-       opposite of what a rundown is for. The lead is chosen by a STATED rule
-       -- live first, then the best ranked-v-ranked, then the first of the day
-       -- never by a score we invented. */
-    const liveOne = mine.find(m => LIVE_BY_ID[m.gid] &&
-      !/final/i.test((LIVE_BY_ID[m.gid].state || '')));
-    const lead = liveOne || mine[0];
-    const rest = mine.filter(m => m !== lead);
-    todayBox.innerHTML =
-      '<div class="dlead rally' + (liveOne ? ' hot' : '') + '">' +
-      deskCard(lead, LIVE_BY_ID[lead.gid], true) + '</div>' +
-      (rest.length ? '<div class="dboard">' +
-        rest.map(m => deskCard(m, LIVE_BY_ID[m.gid], false)).join('') +
-        '</div>' : '');
+      '<b>No Division-I matches today.</b> ' +
+      (nextDay
+        ? 'The next are <b>' + esc(dayLabel(nextDay)) + '</b> &mdash; ' +
+          nextOn.length + (nextOn.length === 1 ? ' match' : ' matches') +
+          (ranked ? ', ' + ranked + ' of them ranked against ranked' : '') + '.'
+        : 'Nothing further is on the schedule yet.') +
+      '</div></div></div>' +
+      (nextOn.length
+        ? '<div class="lane up"><div class="lanehd"><b>Next match window</b>' +
+          '<span>' + esc(dayLabel(nextDay)) + '</span></div>' +
+          nextOn.slice(0, 8).map(m => matchRow(m, null, 'desk')).join('') +
+          '</div>'
+        : '');
+    document.getElementById('desksooncards').innerHTML = '';
+    document.getElementById('desksoonmeta').textContent = '';
+    document.getElementById('desksoonrest').textContent = '';
+    return;
   }
+
+  /* ONE FEATURED MATCH AT MOST, and only if it earns it. */
+  const feat = pickFeatured(mine, liveOf);
+  let html = '';
+  if (feat) {
+    html += ribbonHTML(feat.m, liveOf(feat.m),
+      '<b>Featured:</b> ' + feat.why);
+  }
+  const lane = (key, cls, label, rows) => rows.length
+    ? '<div class="lane ' + cls + '"><div class="lanehd"><b>' + label +
+      '</b><span>' + rows.length + '</span></div>' +
+      rows.map(m => matchRow(m, liveOf(m), 'desk')).join('') + '</div>'
+    : '';
+  /* the featured match is not repeated in its own lane -- the ribbon already
+     carries its scoreline, and printing it twice is the thing the old board
+     did that made everything look equally important */
+  const notFeat = r => r.filter(m => !feat || m.gid !== feat.m.gid);
+  html += lane('live', 'live', 'Live now', notFeat(lanes.live));
+  html += lane('final', 'final', 'Just finished', notFeat(lanes.final));
+  html += lane('up', 'up', 'Coming up', notFeat(lanes.up));
+  todayBox.innerHTML = html;
 
   const shown = soon.slice(0, DESK_SOON_SHOWN);
   document.getElementById('desksooncards').innerHTML =
-    shown.length ? '<div class="dboard">' +
-                   shown.map(m => deskCard(m, null, false)).join('') + '</div>'
-                 : '<p class="dempty">Nothing scheduled in the next few days.</p>';
-  document.getElementById('desksoonmeta').textContent =
-    soon.length ? soon.length + ' scheduled' : '';
+    shown.length ? '<div class="lane up"><div class="lanehd"><b>Next few days</b>' +
+      '<span>' + soon.length + ' scheduled</span></div>' +
+      shown.map(m => matchRow(m, null, 'desk')).join('') + '</div>'
+    : '<p class="emptylane">Nothing scheduled in the next few days.</p>';
+  document.getElementById('desksoonmeta').textContent = '';
   document.getElementById('desksoonrest').textContent =
     soon.length > shown.length
       ? (soon.length - shown.length) + ' more in the next week — the Schedule tab has all of them.'
       : '';
 
-  /* An open inset survives a re-render: renderDesk() rebuilds the cards from
-     scratch every poll, so without this the detail would blink back to
-     "Loading" once a minute while you were reading it. */
   Object.keys(LMC_OPEN).forEach(id => { if (LMC_DATA[id]) lmcRender(id); });
 }
 

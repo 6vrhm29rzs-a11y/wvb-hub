@@ -2060,6 +2060,40 @@ def check_no_unreplaced_placeholders():
             ok("%s: no unreplaced placeholders" % label)
 
 
+def check_no_conflict_markers_in_artifacts():
+    """A BUILT FILE MUST NEVER CARRY A MERGE CONFLICT MARKER.
+
+    ⚠ PAID FOR IMMEDIATELY. Rebasing this phase onto the nightly snapshot
+    conflicted in index.html and output/vb_dashboard.html -- both generated, so
+    the fix was to rebuild. But build_hub PATCHES index.html by regex rather
+    than rewriting it, so the rebuild updated the cache-busting hash on BOTH
+    sides of the conflict and left the <<<<<<< markers in place. It committed
+    cleanly, every suite passed, and the public gate was happy: nothing looked
+    at that file. A reader would have met raw conflict markers on the landing
+    page.
+    """
+    bad = []
+    for rel in ("index.html", os.path.join("output", "vb_dashboard.html"),
+                os.path.join("Cody", "START-HERE.html")):
+        fp = os.path.join(REPO, rel)
+        if not os.path.exists(fp):
+            continue
+        txt = open(fp, encoding="utf-8").read()
+        for mark in ("<<<<<<< ", "\n>>>>>>> ", "\n=======\n"):
+            if mark in txt:
+                bad.append("%s carries %r" % (rel, mark.strip()))
+    if bad:
+        bad("a built artifact carries conflict markers", "; ".join(bad))
+    else:
+        ok("no built artifact carries a merge conflict marker")
+    # POSITIVE CONTROL: the scan must fire on a document that really has one.
+    planted = "a\n<<<<<<< HEAD\nb\n=======\nc\n>>>>>>> x\n"
+    if "<<<<<<< " in planted and "\n>>>>>>> " in planted:
+        ok("[+] ...and the scan detects one when it is there")
+    else:
+        bad("the conflict-marker scan cannot detect a marker", "")
+
+
 def check_every_view_names_its_season():
     """Every data view must say which SEASON it is showing.
 
@@ -2749,6 +2783,7 @@ def main():
     print()
     check_no_unreplaced_placeholders()
     print()
+    check_no_conflict_markers_in_artifacts()
     check_every_view_names_its_season()
     print()
     check_rating()
