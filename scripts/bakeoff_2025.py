@@ -169,8 +169,8 @@ def _site_factor(game_id):
     return 0 if _SITE_CACHE["_"].get(str(game_id)) == "neutral" else 1
 
 
-def fit_off_def(obs, keys):
-    # type: (List[Tuple[str,str,float,int]], List[str]) -> Dict[str, Dict[str,float]]
+def fit_off_def(obs, keys, w=None):
+    # type: (List[Tuple[str,str,float,int]], List[str], Optional[List[float]]) -> Dict[str, Dict[str,float]]
     """Ridge least squares  y(i vs j) ~ mu + off_i - def_j + h*home_sign.
 
     `off_i` is how much of the quantity team i produces after accounting for who
@@ -182,6 +182,19 @@ def fit_off_def(obs, keys):
     shrinks while a team with 3 is pulled hard toward the mean. That matters:
     without it, a 2-game sample produces a wild rating that then contaminates
     every opponent's adjustment.
+
+    `w` gives each observation a weight -- used by rating_factors.py to ask
+    whether weighting matches differently (by recency, by margin shape, by
+    anything) predicts future results better. It is OPTIONAL and defaults to
+    equal weights, so every existing caller is untouched: with w=None the
+    arithmetic below reduces to exactly what it was, which is asserted rather
+    than assumed (test_rating_factors.py compares the two paths on real data
+    and requires bit-identical output).
+
+    In the weighted form the ridge denominator becomes the SUM OF WEIGHTS
+    rather than the count, which is the point: a team whose matches are
+    down-weighted for being old should shrink toward the mean like a team with
+    fewer matches, because that is what it now has -- less evidence.
     """
     n = len(obs)
     if not n:
@@ -193,6 +206,10 @@ def fit_off_def(obs, keys):
     J = [idx[o[1]] for o in obs]
     Y = [o[2] for o in obs]
     H = [o[3] for o in obs]
+    W = [1.0] * n if w is None else [float(x) for x in w]
+    if len(W) != n:
+        raise ValueError("weights: %d for %d observations" % (len(W), n))
+    WSUM = sum(W) or 1.0
 
     rows_i = collections.defaultdict(list)
     rows_j = collections.defaultdict(list)
@@ -200,20 +217,20 @@ def fit_off_def(obs, keys):
         rows_i[I[r]].append(r)
         rows_j[J[r]].append(r)
 
-    mu = sum(Y) / float(n)
+    mu = sum(W[r] * Y[r] for r in range(n)) / WSUM
     h = 0.0
     off = [0.0] * T
     dff = [0.0] * T
     resid = [Y[r] - mu for r in range(n)]
 
     for _ in range(CD_ITERS):
-        d = sum(resid) / float(n)
+        d = sum(W[r] * resid[r] for r in range(n)) / WSUM
         mu += d
         for r in range(n):
             resid[r] -= d
 
-        num = sum(resid[r] * H[r] for r in range(n))
-        den = sum(H[r] * H[r] for r in range(n)) or 1.0
+        num = sum(W[r] * resid[r] * H[r] for r in range(n))
+        den = sum(W[r] * H[r] * H[r] for r in range(n)) or 1.0
         d = num / den
         h += d
         for r in range(n):
@@ -223,7 +240,8 @@ def fit_off_def(obs, keys):
             rr = rows_i[a]
             if not rr:
                 continue
-            d = sum(resid[r] for r in rr) / (len(rr) + RIDGE)
+            d = (sum(W[r] * resid[r] for r in rr)
+                 / (sum(W[r] for r in rr) + RIDGE))
             off[a] += d
             for r in rr:
                 resid[r] -= d
@@ -233,7 +251,8 @@ def fit_off_def(obs, keys):
             if not rr:
                 continue
             # pred contains -def_j, so d(resid)/d(def_j) = +1
-            d = -sum(resid[r] for r in rr) / (len(rr) + RIDGE)
+            d = -(sum(W[r] * resid[r] for r in rr)
+                  / (sum(W[r] for r in rr) + RIDGE))
             dff[b] += d
             for r in rr:
                 resid[r] += d
