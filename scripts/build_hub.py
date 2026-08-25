@@ -1210,6 +1210,33 @@ def standings(teams, res):
         by[c].sort(key=lambda x: (-(x["cw"] - x["cl"]), -(x["w"] - x["l"]), x["rank"]))
     return by
 
+# ⚠ A NORMALISATION, NOT AN INFERENCE. These nine are the standard published
+# abbreviations for the same nine words; expanding "So" to "Sophomore" adds no
+# information and removes none. Anything NOT on this list is preserved exactly
+# as the school published it -- a value we cannot expand without guessing is
+# left alone rather than mapped to the nearest thing that looks similar.
+CLASS_FULL = {
+    "FR": "Freshman", "R-FR": "Redshirt Freshman",
+    "SO": "Sophomore", "R-SO": "Redshirt Sophomore",
+    "JR": "Junior", "R-JR": "Redshirt Junior",
+    "SR": "Senior", "R-SR": "Redshirt Senior",
+    "GR": "Graduate",
+}
+
+
+def class_full(raw):
+    """The published class year, spelled out when it is a known abbreviation.
+
+    Case and full stops vary between schools ("So.", "so", "R-Fr."), so the
+    lookup is normalised. An unknown value comes back UNCHANGED -- including
+    one already spelled out, which simply is not in the map.
+    """
+    if not raw:
+        return raw
+    key = re.sub(r"[.\s]", "", str(raw)).upper()
+    return CLASS_FULL.get(key, raw)
+
+
 def roster_identity_index():
     """(team_norm, nkey(name)) -> official identity, from the 2026 rosters.
 
@@ -1248,7 +1275,7 @@ def roster_identity_index():
             seen[k] = nm
             idx[(tn, k)] = {
                 "display": nm,
-                "class": (pl.get("class_raw") or "").strip() or None,
+                "class": class_full((pl.get("class_raw") or "").strip()) or None,
                 "pos": (pl.get("pos_raw") or "").strip() or None,
                 "num": pl.get("num_raw"),
             }
@@ -1298,6 +1325,17 @@ def box_and_players(res, photos=None, honours=None):
     for r in res:
         opp_of[(r["gid"], r["home"])] = r["away"]
         opp_of[(r["gid"], r["away"])] = r["home"]
+
+    def _richer(a, b):
+        """Is game record `a` a fuller line than `b`? Deterministic, so the
+        surviving row never depends on which arrived first."""
+        ka = ((a.get("sets") or 0),
+              (a.get("ta") or 0) + (a.get("k") or 0) + (a.get("digs") or 0)
+              + (a.get("ast") or 0))
+        kb = ((b.get("sets") or 0),
+              (b.get("ta") or 0) + (b.get("k") or 0) + (b.get("digs") or 0)
+              + (b.get("ast") or 0))
+        return ka > kb
 
     def num(v):
         try:
@@ -1353,18 +1391,20 @@ def box_and_players(res, photos=None, honours=None):
                 "class": _ident.get("class"),
                 "team": row["team"],
                 "pos": row["pos"] or _ident.get("pos") or "",
-                "num": row["num"], "games": [],
+                "num": row["num"], "games": {},
                 # Her own headshot, so the player panel and the Players table
                 # show the same face as the roster and the stats page.
                 "photo": ((photos or {}).get(row["team"]) or {}).get(_nk),
                 "aa": (honours or {}).get("%s|%s" % (row["team"], _nk)),
-                "sets": 0.0, "k": 0.0, "e": 0.0, "ta": 0.0,
-                "aces": 0.0, "digs": 0.0, "bs": 0.0, "ba": 0.0,
-                "ast": 0.0, "pts": 0.0,
             })
-            for f in ("sets", "k", "e", "ta", "aces", "digs", "bs", "ba", "ast", "pts"):
-                p[f] += row[f]
-            p["games"].append({
+            # ⚠ NOTHING IS ACCUMULATED HERE ANY MORE. Totals used to be summed
+            # as rows arrived and the match log deduped afterwards, so a second
+            # row for the SAME player in the SAME match showed one line in the
+            # log and counted twice in the season totals -- a log and a total
+            # that disagree, with nothing on the page to show which was wrong.
+            # The unique game record is chosen first; every total and rate is
+            # derived from those records below.
+            _game = {
                 "d": date_of.get(gid), "gid": gid,
                 "opp": opp_of.get((gid, row["team"])),
                 "k": k, "e": e, "ta": a, "hit": row["hit"],
@@ -1375,7 +1415,13 @@ def box_and_players(res, photos=None, honours=None):
                 # that was actually her match.
                 "ast": row["ast"],
                 "aces": row["aces"], "sets": sets, "pts": row["pts"],
-            })
+            }
+            # Same canonical player, same game: keep the RICHER valid row --
+            # more sets, then more counted volume as a deterministic tiebreak,
+            # so the choice never depends on file order.
+            _prev = p["games"].get(gid)
+            if _prev is None or _richer(_game, _prev):
+                p["games"][gid] = _game
         if rows:
             boxes[gid] = rows
 
@@ -1388,17 +1434,13 @@ def box_and_players(res, photos=None, honours=None):
     for p in players.values():
         if _di and p.get("team") and p["team"] not in _di:
             continue
-        s_ = p["sets"] or 1
-        # ⚠ ONE ROW PER GAME. Two spellings of one player in the SAME match
-        # would otherwise contribute the same game id twice; keeping the richer
-        # line (more sets) rather than whichever arrived last.
-        _byg = {}
-        for _g in p["games"]:
-            _prev = _byg.get(_g["gid"])
-            if _prev is None or (_g.get("sets") or 0) > (_prev.get("sets") or 0):
-                _byg[_g["gid"]] = _g
-        p["games"] = sorted(_byg.values(), key=lambda g: (g["d"] or ""),
+        # THE SEASON IS THE SUM OF THE UNIQUE GAMES, by construction.
+        p["games"] = sorted(p["games"].values(), key=lambda g: (g["d"] or ""),
                             reverse=True)
+        for f in ("sets", "k", "e", "ta", "aces", "digs", "bs", "ba", "ast",
+                  "pts"):
+            p[f] = float(sum(g.get(f) or 0 for g in p["games"]))
+        s_ = p["sets"] or 1
         out.append(dict(p,
                         kps=round(p["k"] / s_, 2),
                         pps=round(p["pts"] / s_, 2),
