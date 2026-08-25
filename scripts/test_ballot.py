@@ -868,6 +868,25 @@ console.log(JSON.stringify(out));
         check("...and My Board is not a route",
               "'myboard'" not in src.split("ROUTE_OF_VIEW")[1][:400])
 
+    print("\n29. AN UNKNOWN WATCHED TEAM STAYS UNTIL HE REMOVES IT")
+    # ⚠ IT USED TO VANISH. mbRenderAll() filtered unknown names out of MB and
+    # saved, so a school that was renamed or reclassified silently disappeared
+    # from his board -- a saved preference deleting itself with nothing said.
+    check("[-] the render no longer drops unknown names",
+          "MB = keep" not in mb and "MB.filter(mbKnown)" not in mb)
+    check("an unknown name gets its own lane",
+          "Not in the current directory" in mb)
+    check("...and says why",
+          "This saved team is not in " in mb and "the current directory." in mb)
+    check("...with an explicit Remove control", "data-mbdrop" in mb)
+    check("removing works without the directory knowing the team",
+          "function mbRemove" in mb and "mbKnown" not in
+          mb.split("function mbRemove")[1].split("\n}")[0])
+    check("[-] no replacement is guessed",
+          all(x not in mb.lower() for x in ("did you mean", "similar", "fuzzy")))
+    check("valid teams are unaffected", "lanes[hit ? hit.st : 'none']" in mb)
+    check("storage stays fail-soft", "MB_OK" in mb)
+
     print()
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))

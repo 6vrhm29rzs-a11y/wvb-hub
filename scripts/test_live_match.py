@@ -17,6 +17,7 @@ Python 3.9 target. Run: python3 scripts/test_live_match.py
 import copy
 import json
 import os
+import re
 import sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -214,6 +215,82 @@ def main():
     for bad in ("open", "json.dump", "data/raw", "commit", "write"):
         check("[-] live_detail.py never calls %s" % bad,
               bad not in ld, "found %r" % bad)
+
+    print("\n6b. LIVE STATS BELONG TO THE OPENED ROUTE")
+    # the client code lives in the built page; `src` above is live_server.py
+    _hp = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(_hp):
+        _hp = os.path.join(REPO, "output", "vb_dashboard.html")
+    h = open(_hp, encoding="utf-8").read() if os.path.exists(_hp) else ""
+    check("a built page is available for the route checks", bool(h))
+    # ⚠ PHASE 1 POLLED EVERY CARD THAT HAD BEEN EXPANDED. Leaving one open and
+    # navigating away kept it fetching. The timer now knows the single game id
+    # it exists for and stops on a route change, a switch, or final.
+    check("live stats live in the routed detail", "function lmcSection" in h)
+    check("...and are rendered only for a live match",
+          "(st === 'live' ? lmcSection(m.gid) : '')" in h)
+    check("exactly one match polls", "LMC_ROUTE_GID" in h)
+    check("the timer starts only on a live route",
+          "if (st === 'live') { lmcStart(m.gid); } else { lmcStop(); }" in h)
+    check("...and stops when the detail closes",
+          "function closeMatchDetail() {\n  lmcStop();" in h)
+    check("...and stops itself the moment the feed says final",
+          "if (d && d.state === 'final') { lmcStop();" in h)
+    check("...and stops if the route moved to another match",
+          "if (LMC_ROUTE_GID !== gid) { lmcStop(); return; }" in h)
+    check("a manual refresh exists", "id=\"lmcrefresh\"" in h
+          or "id='lmcrefresh'" in h)
+    check("...and refreshes the open match only",
+          "if (LMC_ROUTE_GID) lmcFetch(LMC_ROUTE_GID);" in h)
+    check("the cadence is no faster than phase 1",
+          "const LMC_EVERY_MS = 20000;" in h)
+    # ⚠ THE VALIDATION IS NOT DUPLICATED. Rendering a validated field is not
+    # re-validating it -- my first version banned "attackAttempts" from the
+    # renderer, which would have meant the panel could not DISPLAY the number
+    # the server had already cleared. What matters is that the client makes no
+    # judgement of its own: it branches on the server's verdict and applies no
+    # threshold, no comparison and no fallback number.
+    body_fn = h.split("function lmcBody")[1].split("\nfunction ")[0]
+    check("the client defers to the server's verdict",
+          "d.stats_available" in body_fn)
+    # ⚠ AND "NO COMPARISON AT ALL" WAS TOO BLUNT: the renderer says
+    # `p.aces > 1 ? 's' : ''` to pluralise a word, which is English, not a
+    # threshold. What must be absent is the client DERIVING a stat or deciding
+    # availability -- both of which live in live_detail.validate().
+    derived = re.search(r"\(\s*\w+\.k(?:ills)?\s*-\s*\w+\.(?:e|attackErrors)",
+                        body_fn)
+    check("[-] ...and derives no statistic of its own", derived is None,
+          "hitting % or similar computed client-side")
+    check("[-] ...and never sets the availability verdict",
+          "stats_available =" not in body_fn and "stats_available=" not in body_fn)
+    check("[-] ...and substitutes no value when one is missing",
+          "|| 0" not in body_fn and "|| '0'" not in body_fn)
+    check("the freshness line names the last successful refresh",
+          "id=\"lmcstamp\"" in h and "stale, retrying" in h)
+    check("a final says refreshing has stopped",
+          "final \\u2014 refreshing has stopped" in h)
+    # ⚠ AND A DENIAL IS NOT A BREACH. The source says the panel carries no
+    # momentum or consensus; a bare substring search cannot tell that promise
+    # from a violation, so each hit must sit in a negating sentence.
+    NEGW = ("nothing", "never", "not ", "no ", "cannot", "n't")
+    for word in ("point-by-point", "momentum", "keys to win", "win probability"):
+        bad_hits = []
+        low = h.lower()
+        i = low.find(word)
+        while i >= 0:
+            a = max(0, low.rfind(".", 0, i) + 1)
+            b = low.find(".", i)
+            sent = re.sub(r"\s+", " ", h[a:(b if b > 0 else len(h))]).lower()
+            if not any(n in sent for n in NEGW):
+                bad_hits.append(sent[:90])
+            i = low.find(word, i + 1)
+        check("[-] %r only ever appears in a denial" % word, not bad_hits,
+              repr(bad_hits[:1]))
+    check("the score ribbon stays the only score header",
+          h.split("function renderMatchDetail")[1]
+             .split("\nfunction ")[0].count("ribbonHTML(") == 1)
+    check("live stats reach no rating or projection",
+          "LIVE_BY_ID" not in h.split("function lmcBody")[1].split("\n}")[0])
 
     print("\n7. The page states its source and never claims more")
     for label, path in (("private", os.path.join(REPO, "Cody", "START-HERE.html")),

@@ -2060,6 +2060,48 @@ def check_no_unreplaced_placeholders():
             ok("%s: no unreplaced placeholders" % label)
 
 
+def check_public_build_can_actually_render():
+    """THE PUBLIC PAGE MUST STILL WORK, NOT MERELY LACK PRIVATE THINGS.
+
+    ⚠ A SHIPPED REGRESSION THIS WOULD HAVE CAUGHT. esc() was written for the
+    ballot and lived inside the region the public build strips. A later phase
+    made it a dependency of matchRow(), ribbonHTML(), renderLedger() and
+    renderMatchDetail() -- all of which run on the PUBLIC page. The published
+    Scores ledger threw "esc is not defined" and rendered ZERO rows, and every
+    suite stayed green, because the public checks only asserted what must be
+    ABSENT. Absence of private things is not presence of a working page.
+
+    So: every function the SHARED renderers call must survive the strip.
+    """
+    pub = os.path.join(REPO, "output", "vb_dashboard.html")
+    if not os.path.exists(pub):
+        print("  %-58s %s" % ("(no public build -- skipping)", "skip"))
+        return
+    ph = open(pub, encoding="utf-8").read()
+    SHARED = ("renderLedger", "renderMatchDetail", "matchRow", "ribbonHTML",
+              "matchState", "matchScore", "matchSets", "allMatches",
+              "matchByGid", "deskCard", "renderDesk", "route", "go", "slug")
+    missing = [f for f in SHARED
+               if ("function %s(" % f) not in ph and
+                  ("const %s = " % f) not in ph]
+    if missing:
+        bad("the public build is missing a shared renderer", str(missing))
+    else:
+        ok("every shared renderer survives the public strip")
+    # and the helpers those renderers CALL
+    HELPERS = ("esc", "logo", "dayLabel", "deskPct", "routeFor", "rank")
+    gone = [f for f in HELPERS if ("function %s(" % f) not in ph]
+    if gone:
+        bad("a helper the public renderers call was stripped", str(gone))
+    else:
+        ok("every helper those renderers call survives too")
+    # POSITIVE CONTROL: the scan must notice a genuinely absent name.
+    if "function definitelyNotAFunction(" in ph:
+        bad("the missing-function scan cannot detect an absence", "")
+    else:
+        ok("[+] ...and the scan detects an absent one (control)")
+
+
 def check_no_conflict_markers_in_artifacts():
     """A BUILT FILE MUST NEVER CARRY A MERGE CONFLICT MARKER.
 
@@ -2784,6 +2826,7 @@ def main():
     check_no_unreplaced_placeholders()
     print()
     check_no_conflict_markers_in_artifacts()
+    check_public_build_can_actually_render()
     check_every_view_names_its_season()
     print()
     check_rating()

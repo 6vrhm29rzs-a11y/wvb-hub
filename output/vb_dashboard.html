@@ -820,6 +820,10 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
   max-width:70ch}
 /* ── MATCH DETAIL ───────────────────────────────────────────────────────── */
 .mdet{margin-top:4px}
+#v-scores.detailopen .hero,#v-scores.detailopen #changed,
+#v-scores.detailopen .lead,#v-scores.detailopen .tabhint,
+#v-desk.detailopen .vh,#v-desk.detailopen #desklead,
+#v-desk.detailopen .livehead,#v-desk.detailopen #desksoon{display:none}
 .mdet .msec{border-top:1px solid var(--line);padding:15px 0 6px;margin-top:14px}
 .mdet .msec h3{margin:0 0 9px;font:600 10px/1 var(--disp);letter-spacing:.16em;
   text-transform:uppercase;color:var(--slate)}
@@ -828,6 +832,13 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
 .mdet .mfact em{font-style:normal;color:var(--slate);margin-right:6px;
   font:600 9.5px/1 var(--disp);letter-spacing:.12em;text-transform:uppercase}
 .mdet .munk{color:var(--slate);font-style:italic}
+.lmcbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+.lmcbtn{appearance:none;background:transparent;border:1px solid var(--line2);
+  border-radius:3px;color:var(--ink2);font:600 10.5px/1 var(--disp);
+  letter-spacing:.1em;text-transform:uppercase;padding:7px 10px;cursor:pointer}
+.lmcbtn:hover{color:var(--chalk);border-color:var(--navy)}
+.lmcnote{font:11.5px/1.5 var(--mono);color:var(--slate)}
+@media (max-width:560px){.lmcbar{gap:8px}.lmcnote{flex:1 1 100%}}
 @media (max-width:560px){
   /* ⚠ THE CONTROL ROW COULD NOT WRAP. .seg is nowrap by design elsewhere, and
      four state buttons plus a count plus a date picker measured 535px inside a
@@ -1863,7 +1874,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     </div>
     <div class="meta">
       <b>9</b> matches played &middot; <b>348</b> teams rated<br>
-      last result <b>Yesterday</b> &middot; built 2026-08-25 7:11 AM PT
+      last result <b>Yesterday</b> &middot; built 2026-08-25 7:48 AM PT
     </div>
   </div>
   <div class="net"></div>
@@ -2015,7 +2026,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <div class="livehead"><b class="soon">This week</b><span id="weekmeta"></span></div>
     <div class="cards" id="weekcards"></div>
   </div>
-  <div class="ctl">
+  <div class="ctl" id="legacydate" hidden>
     <label class="dlab" for="sdate">Jump to a date</label>
     <input type="date" id="sdate" min="2026-08-21" max="2026-12-31">
     <button class="dbtn" id="sclear" type="button">All results</button>
@@ -2962,6 +2973,21 @@ return '<span class="pcell">' + face +
 }
 
 
+/* ⚠ SHARED, AND IT USED TO BE PRIVATE. esc() was written for the ballot -- the
+   only place that echoed free text the user typed -- so it lived inside the
+   BALLOT-CONST region that the public build strips. The Matchday phase then
+   made it a dependency of matchRow(), ribbonHTML(), renderLedger() and
+   renderMatchDetail(), all of which run on the PUBLIC page. Result: the
+   published Scores ledger threw "esc is not defined" and rendered ZERO rows,
+   and opening a match did nothing. Every test passed, because the public
+   checks only ever asserted what must be ABSENT -- nothing asserted the page
+   still worked. It lives outside the fence now. */
+function esc(v) {
+  return String(v == null ? '' : v)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
 function logo(team, cls) {
   const u = LOGOS[team];
   return u ? '<img class="tlogo ' + (cls || '') + '" src="' + u + '" alt="" ' +
@@ -3498,12 +3524,10 @@ function deskCard(m, live, full) {
       (sets ? '<div class="dsets">' + sets + '</div>' : '') +
       '<span class="dsrc">scoreboard feed, ' + esc(LIVE_STAMP || 'just now') +
       ' &mdash; not yet in any rating</span>' +
-      '<button class="dopen" data-lmc="' + esc(m.gid) + '">' +
-      (LMC_OPEN[m.gid] ? 'Hide detail' : 'Live detail') + '</button></div>' +
-      (LMC_OPEN[m.gid]
-        ? '<div class="lmc" id="lmc-' + esc(m.gid) + '">' +
-          '<p class="lnote">Loading the official box score&hellip;</p></div>'
-        : '');
+      /* ⚠ THE ROUTED DETAIL OWNS LIVE STATS NOW. A card-level inset meant the
+         same match could be open in two places with two copies of the same
+         panel; the route is the single destination. */
+      '</div>';
   }
 
   return '<article class="' + cls + '">' + head + body +
@@ -3589,6 +3613,17 @@ function lmcRender(gid) {
     (stale ? ' &mdash; <b>stale, retrying</b>' : '') +
     '<span style="color:var(--ink3)">Not used in ratings until final</span>' +
     '</div>' + lmcBody(d);
+  /* the freshness line beside the manual control, so the reader can see when
+     the last SUCCESSFUL refresh was without reading the panel */
+  const sp = document.getElementById('lmcstamp');
+  if (sp) {
+    sp.textContent = !d ? 'contacting the local server\u2026'
+      : d.unreachable ? 'live stats need the local server'
+      : d.state === 'final' ? 'final \u2014 refreshing has stopped'
+      : (d.stale ? 'stale, retrying \u2014 last good ' : 'refreshed ') +
+        (d.scoreboard_updated || 'just now') +
+        (d.age_seconds ? ' (' + d.age_seconds + 's ago)' : '');
+  }
 }
 
 async function lmcFetch(gid) {
@@ -3604,21 +3639,44 @@ async function lmcFetch(gid) {
   lmcRender(gid);
 }
 
-function lmcToggle(gid) {
-  if (LMC_OPEN[gid]) {
-    delete LMC_OPEN[gid];
-    delete LMC_DATA[gid];
-  } else {
-    LMC_OPEN[gid] = true;
-  }
-  renderDesk();
-  if (LMC_OPEN[gid]) lmcFetch(gid);
-  if (!LMC_TIMER) {
-    /* one timer, and it only refreshes cards that are actually open */
-    LMC_TIMER = setInterval(() => {
-      Object.keys(LMC_OPEN).forEach(id => lmcFetch(id));
-    }, 20000);
-  }
+/* ── LIVE STATS, SCOPED TO THE OPEN ROUTE ─────────────────────────────────
+   ⚠ EXACTLY ONE MATCH POLLS, AND ONLY WHILE ITS ROUTE IS OPEN. The phase-1
+   timer walked every card that had been expanded, so leaving a card open and
+   navigating away kept it polling. This one knows the single game id it is
+   for and stops itself on a route change, on a switch to another match, and
+   the moment the feed says final -- a finished match has nothing left to
+   refresh, and the verified result comes through the normal pipeline. */
+let LMC_ROUTE_GID = null;
+
+function lmcStop() {
+  if (LMC_TIMER) { clearInterval(LMC_TIMER); LMC_TIMER = null; }
+  LMC_ROUTE_GID = null;
+}
+
+function lmcStart(gid) {
+  if (LMC_ROUTE_GID === gid && LMC_TIMER) return;   /* already on this one */
+  lmcStop();
+  LMC_ROUTE_GID = gid;
+  lmcFetch(gid);
+  LMC_TIMER = setInterval(() => {
+    if (LMC_ROUTE_GID !== gid) { lmcStop(); return; }
+    const d = LMC_DATA[gid];
+    if (d && d.state === 'final') { lmcStop(); lmcRender(gid); return; }
+    lmcFetch(gid);
+  }, LMC_EVERY_MS);
+}
+
+const LMC_EVERY_MS = 20000;
+
+/* the section the routed detail hosts */
+function lmcSection(gid) {
+  return '<div class="msec"><h3>Live stats</h3>' +
+    '<div class="lmcbar">' +
+      '<button type="button" class="lmcbtn" id="lmcrefresh">Refresh live stats</button>' +
+      '<span class="lmcnote" id="lmcstamp"></span>' +
+    '</div>' +
+    '<div class="lmc" id="lmc-' + esc(gid) + '">' +
+      '<p class="lnote">Loading the official box score&hellip;</p></div></div>';
 }
 
 /* Digby's poses, inlined once. The public build gets the two that carry no
@@ -3812,6 +3870,8 @@ function renderMatchDetail(gid, dest) {
   const m = matchByGid(gid);
   if (!m) {
     host.hidden = false; if (board) board.hidden = true;
+    const s0 = document.getElementById(dest === 'scores' ? 'v-scores' : 'v-desk');
+    if (s0) s0.classList.add('detailopen');
     host.innerHTML = '<p class="emptylane">That match is not in this season\'s ' +
       'records. It may not have been crawled yet.</p>' +
       '<button type="button" class="backlink" data-back="' + dest + '">&larr; Back</button>';
@@ -3846,6 +3906,8 @@ function renderMatchDetail(gid, dest) {
   const box = (typeof boxHTML === 'function') ? boxHTML(m.gid) : '';
   host.hidden = false;
   if (board) board.hidden = true;
+  const sec = document.getElementById(dest === 'scores' ? 'v-scores' : 'v-desk');
+  if (sec) sec.classList.add('detailopen');
   host.innerHTML =
     '<div class="crumb"><a href="' + parent[1] + '">' + parent[0] + '</a>' +
       '<span class="sep">&rsaquo;</span><b>' + esc(mAway(m)) + ' at ' +
@@ -3861,14 +3923,26 @@ function renderMatchDetail(gid, dest) {
       (fc ? '<div class="msec"><h3>' + (st === 'final'
               ? 'Forecast before first serve' : 'Forecast') + '</h3>' +
             '<div class="mfact"><span>' + fc + '</span></div></div>' : '') +
+      /* live stats sit UNDER the single score ribbon, and only while this
+         match is actually live on this route */
+      (st === 'live' ? lmcSection(m.gid) : '') +
       (box ? '<div class="msec"><h3>Box score</h3>' + box + '</div>'
-           : '<div class="msec"><h3>Box score</h3><p class="munk">No verified ' +
-             'box score is on record for this match yet.</p></div>') +
+           : '<div class="msec"><h3>Box score</h3><p class="munk">' +
+             (st === 'live'
+               ? 'The verified box score is written after the match is final.'
+               : 'No verified box score is on record for this match yet.') +
+             '</p></div>') +
     '</div>';
+  if (st === 'live') { lmcStart(m.gid); } else { lmcStop(); }
   return true;
 }
 
 function closeMatchDetail() {
+  lmcStop();
+  ['v-desk', 'v-scores'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('detailopen');
+  });
   ['deskdetail', 'scoredetail'].forEach(id => {
     const el = document.getElementById(id);
     if (el) { el.hidden = true; el.innerHTML = ''; }
@@ -3881,6 +3955,10 @@ function closeMatchDetail() {
 
 /* every row routes; nothing opens a match by painting it in place */
 document.addEventListener('click', e => {
+  if (e.target.closest && e.target.closest('#lmcrefresh')) {
+    if (LMC_ROUTE_GID) lmcFetch(LMC_ROUTE_GID);
+    return;
+  }
   const row = e.target.closest && e.target.closest('.mrow[data-match]');
   if (row) {
     const dest = row.dataset.dest === 'scores' ? 'scores' : 'match-desk';
@@ -4020,6 +4098,17 @@ async function deskLive() {
     LIVE_BY_ID = {};
   }
   renderDesk();
+  /* ⚠ THE DETAIL MUST RE-EVALUATE WHEN LIVE DATA LANDS. deskLive() is async and
+     resolves AFTER the router has already painted, so a match that is live on
+     the feed rendered as "upcoming" -- no Live stats section, no timer -- and
+     nothing ever asked again. Re-render the open match, and only that one. */
+  const open = (location.hash || '').replace(/^#\/?/, '').split('?')[0]
+    .split('/').filter(Boolean);
+  const view = VIEW_OF_ROUTE[open[0]];
+  if ((view === 'desk' || view === 'scores') && open[1]) {
+    renderMatchDetail(decodeURIComponent(open[1]),
+                      view === 'scores' ? 'scores' : 'desk');
+  }
 }
 
 renderStandings();
