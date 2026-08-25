@@ -83,77 +83,190 @@ def main():
             except ValueError:
                 continue
             gid = str(r.get("game_id"))
-            cur = log.get(gid)
-            if cur is None or (r.get("logged_utc") or "") < (cur.get("logged_utc") or ""):
-                log[gid] = r
+            log.setdefault(gid, []).append(r)
     epoch = {}
     dp = os.path.join(REPO, "data", "data_%d.json" % SEASON)
     if os.path.exists(dp):
         for g in (json.load(open(dp, encoding="utf-8")).get("games") or []):
             epoch[str(g.get("game_id"))] = g.get("start_time_epoch")
 
+    import build_hub as BH
+    def verify_final(m, log, epoch):
+        """Problems with ONE final card's forecast provenance. [] means proved."""
+        bad = []
+        if m.get("hw") is None:
+            if not (m.get("fsrc") or ""):
+                bad.append("%s: no forecast and no reason given" % m["gid"])
+            return bad
+        if not str(m.get("fsrc", "")).startswith("logged "):
+            bad.append("%s: fsrc=%r" % (m["gid"], m.get("fsrc")))
+            return bad
+        row = None
+        for r in (log.get(m["gid"]) or []):
+            if str(r.get("logged_utc") or "") == str(m["fsrc"])[len("logged "):]:
+                row = r
+        if not row:
+            bad.append("%s: names a logged row that is not in the log" % m["gid"])
+            return bad
+        if abs(float(row["home_win"]) - float(m["hw"])) > 1e-9:
+            bad.append("%s: shows %s, log says %s"
+                       % (m["gid"], m["hw"], row["home_win"]))
+        # ⚠ NO EPOCH MEANS NO PROOF, AND THAT IS A FAILURE, NOT A PASS. This
+        # used to read `if ep and lu:` -- so a card missing either one skipped
+        # the check entirely and its forecast was accepted unexamined.
+        ep = epoch.get(m["gid"])
+        t = BH.parse_logged_utc(row.get("logged_utc"))
+        try:
+            ep = float(ep) if ep is not None else None
+        except (TypeError, ValueError):
+            ep = None
+        if ep is None or ep <= 0:
+            bad.append("%s: shows a forecast with no usable tipoff" % m["gid"])
+        elif t is None:
+            bad.append("%s: shows a forecast with no usable stamp (%r)"
+                       % (m["gid"], row.get("logged_utc")))
+        elif not t < ep:
+            bad.append("%s: logged %s, tipoff %s -- not strictly earlier"
+                       % (m["gid"], row.get("logged_utc"), ep))
+        return bad
+
+    import build_hub as BH
     finals = [m for m in desk if m.get("final")]
     print("     (%d final in the window)" % len(finals))
-    bad_src, bad_time, unavailable = [], [], 0
+    bad_time, unavailable = [], 0
     for m in finals:
         if m.get("hw") is None:
             unavailable += 1
-            check_reason = (m.get("fsrc") or "")
-            if not check_reason:
-                bad_src.append("%s: no forecast and no reason given" % m["gid"])
-            continue
-        # it must name the log, not the forward file
-        if not str(m.get("fsrc", "")).startswith("logged "):
-            bad_src.append("%s: fsrc=%r" % (m["gid"], m.get("fsrc")))
-            continue
-        row = log.get(m["gid"])
-        if not row:
-            bad_src.append("%s: claims a logged forecast with no log row" % m["gid"])
-            continue
-        if abs(float(row["home_win"]) - float(m["hw"])) > 1e-9:
-            bad_src.append("%s: shows %s, log says %s"
-                           % (m["gid"], m["hw"], row["home_win"]))
-        ep, lu = epoch.get(m["gid"]), row.get("logged_utc")
-        if ep and lu:
-            t = datetime.datetime.strptime(lu, "%Y-%m-%dT%H:%M:%SZ").replace(
-                tzinfo=datetime.timezone.utc).timestamp()
-            if t > float(ep):
-                bad_time.append("%s: logged %s, tipoff %s" % (m["gid"], lu, ep))
+        bad_time.extend(verify_final(m, log, epoch))
     check("every final's forecast is the append-only log's value",
-          not bad_src, "; ".join(bad_src[:3]))
-    check("...and every one of them predates tipoff", not bad_time,
+          not [b for b in bad_time if "log says" in b or "not in the log" in b],
           "; ".join(bad_time[:3]))
+    check("...and every one is PROVED strictly earlier than first serve",
+          not bad_time, "; ".join(bad_time[:3]))
+    if unavailable:
+        print("     (%d final(s) show 'forecast unavailable', each with a reason)"
+              % unavailable)
+
+    # ⚠ NEGATIVE CONTROL ON THE PAGE GUARD ITSELF. Live data may contain no
+    # unproven card at all, so the guard would pass without ever exercising the
+    # thing it exists to catch. Push doctored cards through the same function.
+    # ⚠ DERIVED, NOT TYPED. I first hard-coded this and was two hours out,
+    # so the "equal to first serve" control was really two hours BEFORE it
+    # and passed -- the control was wrong, not the guard it accused.
+    TIPE = BH.parse_logged_utc("2026-08-24T22:00:00Z")
+    LOGX = {"g": [{"home_win": 0.7, "logged_utc": "2026-08-22T21:35:38Z"}]}
+    good = {"gid": "g", "hw": 0.7, "fsrc": "logged 2026-08-22T21:35:38Z"}
+    check("[+] a properly proved card passes the page guard",
+          not verify_final(good, LOGX, {"g": TIPE}))
+    for label, card, log2, ep2 in (
+            ("a card whose tipoff is unknown", good, LOGX, {}),
+            ("a card whose tipoff is malformed", good, LOGX, {"g": "soon"}),
+            ("a card claiming a row the log does not have",
+             {"gid": "g", "hw": 0.7, "fsrc": "logged 2026-08-23T00:00:00Z"},
+             LOGX, {"g": TIPE}),
+            ("a card whose number disagrees with the log",
+             {"gid": "g", "hw": 0.42, "fsrc": "logged 2026-08-22T21:35:38Z"},
+             LOGX, {"g": TIPE}),
+            ("a card sourced from the forward file",
+             {"gid": "g", "hw": 0.7, "fsrc": "current forecast"}, LOGX,
+             {"g": TIPE}),
+            ("a card logged exactly at first serve",
+             {"gid": "g", "hw": 0.7, "fsrc": "logged 2026-08-24T22:00:00Z"},
+             {"g": [{"home_win": 0.7, "logged_utc": "2026-08-24T22:00:00Z"}]},
+             {"g": TIPE}),
+            ("a card with no reason for having no forecast",
+             {"gid": "g", "hw": None, "fsrc": ""}, LOGX, {"g": TIPE})):
+        check("[-] the page guard rejects %s" % label,
+              bool(verify_final(card, log2, ep2)))
     if unavailable:
         print("     (%d final(s) show 'forecast unavailable', each with a reason)"
               % unavailable)
 
     # The live data may contain no post-tipoff row at all, so the case the whole
     # rule exists for would never be exercised. Drive the rule directly.
-    import build_hub as BH
     check("the rule is a callable, not buried in the builder",
           hasattr(BH, "played_forecast"))
     if hasattr(BH, "played_forecast"):
         import calendar
         import time as _t
-        tip = calendar.timegm(_t.strptime("2026-08-24T22:00:00Z",
+        TIP = calendar.timegm(_t.strptime("2026-08-24T22:00:00Z",
                                           "%Y-%m-%dT%H:%M:%SZ"))
-        # POSITIVE CONTROL -- a genuine pre-tipoff forecast must survive. Without
-        # this, "refuse everything" would pass every check below.
-        hw, why = BH.played_forecast(
-            {"home_win": 0.7, "logged_utc": "2026-08-22T21:35:38Z"}, tip)
-        check("[+] a forecast logged 2 days early is shown", hw == 0.7, why)
-        # NEGATIVE CONTROLS -- each must refuse, and say why.
-        for label, row in (
-                ("logged AFTER first serve",
-                 {"home_win": 0.7, "logged_utc": "2026-08-25T03:00:00Z"}),
-                ("no logged row at all", None),
-                ("a stamp we cannot date",
-                 {"home_win": 0.7, "logged_utc": "garbage"}),
+        EARLY = {"home_win": 0.7, "logged_utc": "2026-08-22T21:35:38Z"}
+        EARLIER = {"home_win": 0.61, "logged_utc": "2026-08-21T09:00:00Z"}
+
+        # POSITIVE CONTROLS. Without these, "refuse everything" passes the
+        # whole negative block below and the feature silently shows nothing.
+        for label, rows, ep, want in (
+                ("a forecast logged 2 days early", [EARLY], TIP, 0.7),
+                ("an undated row does NOT suppress a valid one",
+                 [{"home_win": 0.9, "logged_utc": None}, EARLY], TIP, 0.7),
+                ("a post-tipoff row does NOT suppress a valid one",
+                 [{"home_win": 0.9, "logged_utc": "2026-08-25T03:00:00Z"},
+                  EARLY], TIP, 0.7),
+                ("the EARLIEST valid row wins", [EARLY, EARLIER], TIP, 0.61),
+                ("...whatever order the log is read in",
+                 [EARLIER, EARLY], TIP, 0.61),
+                ("one second before first serve still counts",
+                 [{"home_win": 0.55, "logged_utc": "2026-08-24T21:59:59Z"}],
+                 TIP, 0.55)):
+            hw, why = BH.played_forecast(rows, ep)
+            check("[+] %s" % label, hw == want, "got %r (%s)" % (hw, why))
+
+        # NEGATIVE CONTROLS -- each must refuse, and say which proof is missing.
+        for label, rows, ep in (
+                ("a missing start-time epoch", [EARLY], None),
+                ("a malformed start-time epoch", [EARLY], "not-a-number"),
+                ("an epoch of 0 (1970, not a match)", [EARLY], 0),
+                ("a missing log timestamp",
+                 [{"home_win": 0.7, "logged_utc": None}], TIP),
+                ("a malformed log timestamp",
+                 [{"home_win": 0.7, "logged_utc": "24/08/2026 10pm"}], TIP),
+                ("a timestamp EQUAL to first serve",
+                 [{"home_win": 0.7, "logged_utc": "2026-08-24T22:00:00Z"}], TIP),
+                ("a timestamp after first serve",
+                 [{"home_win": 0.7, "logged_utc": "2026-08-25T03:00:00Z"}], TIP),
+                ("no logged row at all", None, TIP),
+                ("an empty log", [], TIP),
                 ("a row carrying no probability",
-                 {"home_win": None, "logged_utc": "2026-08-22T21:35:38Z"})):
-            hw, why = BH.played_forecast(row, tip)
+                 [{"home_win": None, "logged_utc": "2026-08-22T21:35:38Z"}],
+                 TIP),
+                ("every row invalid in a different way",
+                 [{"home_win": 0.7, "logged_utc": None},
+                  {"home_win": 0.7, "logged_utc": "2026-08-25T03:00:00Z"}],
+                 TIP)):
+            hw, why = BH.played_forecast(rows, ep)
             check("[-] %s is refused" % label, hw is None, "got %r" % (hw,))
-            check("    ...and the card is told why", bool(why))
+            check("    ...and it says which proof is missing",
+                  bool(why) and "logged" not in (why or "").split()[:1],
+                  repr(why))
+
+        # ⚠ THE CLAIM ITSELF. "logged <stamp>" is a statement that we CHECKED
+        # the stamp against first serve. It may never appear otherwise.
+        for label, rows, ep in (
+                ("a missing epoch", [EARLY], None),
+                ("an undated row", [{"home_win": 0.7, "logged_utc": None}], TIP),
+                ("a tipoff-equal row",
+                 [{"home_win": 0.7, "logged_utc": "2026-08-24T22:00:00Z"}],
+                 TIP)):
+            _hw, why = BH.played_forecast(rows, ep)
+            check("[-] %s never claims 'logged ...'" % label,
+                  not (why or "").startswith("logged "), repr(why))
+
+        # An undated row must never be the DISPLAYED one even when it is alone
+        # in being the earliest -- skipped, not selected.
+        hw, why = BH.played_forecast(
+            [{"home_win": 0.99, "logged_utc": None}, EARLY], TIP)
+        check("[-] the undated row's own value is never displayed",
+              hw != 0.99, "got %r" % (hw,))
+
+    print("\n1a. Timestamp parsing refuses what it cannot read")
+    if hasattr(BH, "parse_logged_utc"):
+        check("[+] a well-formed stamp parses",
+              BH.parse_logged_utc("2026-08-22T21:35:38Z") is not None)
+        for bad in (None, "", "garbage", "2026-08-22", "2026-08-22 21:35:38",
+                    "2026-13-45T99:99:99Z", 1755900000, {}):
+            check("[-] %r does not parse" % (bad,),
+                  BH.parse_logged_utc(bad) is None)
 
     print("\n1b. The result sentence describes the scoreline it was given")
     # deskHow() turns two set totals into words. It is pure and it is JS, so

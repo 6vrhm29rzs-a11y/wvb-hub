@@ -1910,8 +1910,20 @@ def top25_view(avca=None):
 
 
 
-def played_forecast(row, epoch):
-    """What a FINISHED match may quote as "what we expected" -- (home_win, source).
+def parse_logged_utc(text):
+    """Epoch seconds for a prediction-log stamp, or None if it cannot be read."""
+    if not text or not isinstance(text, str):
+        return None
+    try:
+        return datetime.datetime.strptime(
+            text, "%Y-%m-%dT%H:%M:%SZ").replace(
+            tzinfo=datetime.timezone.utc).timestamp()
+    except (ValueError, TypeError):
+        return None
+
+
+def played_forecast(rows, epoch):
+    """What a FINISHED match may quote as "what we expected" -- (home_win, why).
 
     ⚠ THE WHOLE POINT. data/predictions_2026.json is rebuilt every night from
     everything known at the time, so for a match already played it has SEEN the
@@ -1919,28 +1931,67 @@ def played_forecast(row, epoch):
     that looks exactly like a real prediction and is not one -- invisible, and
     the most dishonest thing this page could do.
 
-    So a finished match may quote ONE thing: the earliest row in the append-only
-    prediction log, and only if that row was written before first serve. Anything
-    else returns (None, reason) and the card says "forecast unavailable".
-    """
-    if not row:
-        return None, "no forecast was logged before this match"
-    lu = row.get("logged_utc")
-    if epoch and lu:
-        try:
-            t = datetime.datetime.strptime(
-                lu, "%Y-%m-%dT%H:%M:%SZ").replace(
-                tzinfo=datetime.timezone.utc).timestamp()
-            if t > float(epoch):
-                return None, "the only logged forecast postdates tipoff"
-        except (ValueError, TypeError):
-            # An unparseable stamp cannot be shown to predate tipoff, and a
-            # forecast we cannot date is not one we can vouch for.
-            return None, "the logged forecast carries no usable timestamp"
-    if row.get("home_win") is None:
-        return None, "no forecast was logged before this match"
-    return row.get("home_win"), "logged %s" % (lu or "before tipoff")
+    So a number is shown ONLY on positive proof, all four parts required:
+      1. the official start-time epoch exists and parses;
+      2. the log row's timestamp exists and parses;
+      3. that timestamp is STRICTLY earlier than first serve -- equal is not
+         earlier, and a stamp equal to tipoff proves nothing about what was
+         known beforehand;
+      4. among the rows that satisfy 2 and 3, the EARLIEST one is shown.
+    Anything else renders "forecast unavailable" and says which proof is
+    missing. Absence of evidence is not evidence: we do not know that an
+    undateable row saw the result, and that is exactly why it cannot be shown.
 
+    ⚠ AN UNDATED ROW MUST NOT SUPPRESS A GOOD ONE EITHER. It is skipped, not
+    treated as the answer -- the earlier version collapsed the log to one row
+    before asking any of this, and a missing stamp sorts first.
+    """
+    if rows is None:
+        rows = []
+    elif isinstance(rows, dict):
+        rows = [rows]
+
+    # (1) the start time must exist and parse. Epoch 0 is 1970, not a volleyball
+    # match, so it counts as absent rather than as a tipoff everything postdates.
+    tip = None
+    if epoch is not None and not isinstance(epoch, bool):
+        try:
+            tip = float(epoch)
+        except (TypeError, ValueError):
+            tip = None
+        if tip is not None and tip <= 0:
+            tip = None
+    if tip is None:
+        return (None, "no official start time is on record, so no forecast can "
+                      "be shown to predate first serve")
+
+    best = None
+    saw_any = saw_undated = saw_late = False
+    for r in rows:
+        if not isinstance(r, dict):
+            continue
+        saw_any = True
+        if r.get("home_win") is None:
+            continue
+        t = parse_logged_utc(r.get("logged_utc"))          # (2)
+        if t is None:
+            saw_undated = True
+            continue
+        if not t < tip:                                     # (3) STRICTLY before
+            saw_late = True
+            continue
+        if best is None or t < best[0]:                     # (4) earliest valid
+            best = (t, r)
+
+    if best is not None:
+        return best[1].get("home_win"), "logged %s" % best[1].get("logged_utc")
+    if saw_late:
+        return None, "the only logged forecast is not earlier than first serve"
+    if saw_undated:
+        return None, "the logged forecast carries no usable timestamp"
+    if saw_any:
+        return None, "no forecast was logged before this match"
+    return None, "no forecast was logged before this match"
 
 def build():
     teams, field, unmatched, n_aq, meta = BOARD.build()
@@ -2338,11 +2389,12 @@ def build():
             _gid = str(_r.get("game_id") or "")
             if not _gid or _r.get("home_win") is None:
                 continue
-            # append-only: keep the EARLIEST logged row, which is the one least
-            # able to have seen anything
-            cur = _plog.get(_gid)
-            if cur is None or (_r.get("logged_utc") or "") < (cur.get("logged_utc") or ""):
-                _plog[_gid] = _r
+            # ⚠ KEEP EVERY ROW. This used to collapse to the lexicographically
+            # earliest logged_utc -- and a MISSING timestamp sorts before every
+            # real one, so an undated row won the slot and suppressed a
+            # perfectly good pre-tipoff row behind it. Which row may be shown
+            # is a question about proof, so played_forecast() decides it.
+            _plog.setdefault(_gid, []).append(_r)
 
     _fwd = {}
     for _r in ((load("data/predictions_%d.json" % SEASON) or {}).get("games") or []):
@@ -2361,7 +2413,11 @@ def build():
         gid = str(gid)
         if is_final:
             return played_forecast(_plog.get(gid), _epoch_of.get(gid))
-        row = _fwd.get(gid) or _plog.get(gid)
+        row = _fwd.get(gid)
+        if not row:
+            rows = sorted(_plog.get(gid) or [],
+                          key=lambda r: r.get("logged_utc") or "")
+            row = rows[0] if rows else None
         if not row or row.get("home_win") is None:
             return None, "no forecast on record"
         return row.get("home_win"), "current forecast"
