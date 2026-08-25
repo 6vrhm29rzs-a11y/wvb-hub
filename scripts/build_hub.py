@@ -2364,12 +2364,28 @@ def build():
                      '&mdash; each player&rsquo;s 2025 points per set, then '
                      'normalised to a neutral schedule.</div>'
                      '<div class="pls">' + cells + '</div></td></tr>')
+        # ⚠ EVERY CELL CARRIES THE NAME OF ITS RULER. Five reference columns
+        # rendered as bare "#1 #1 #1 #1 #1" in one row: identical-looking
+        # numbers from five different organisations. `data-l` is the label the
+        # phone layout prints in front of the value, so a rank is never read
+        # without knowing whose it is -- on any width.
+        _ti = tindex.get(t["team"]) or {}
+        _rec = _ti.get("record26")
+        _recn = _ti.get("record26_nondi")
+        rec_cell = ('<td class="n rec" data-l="Record">'
+                    + (esc(_rec) if _rec else '<span class="dim">&ndash;</span>')
+                    + (('<i class="nvd">+%s nD1</i>' % esc(_recn)) if _recn else '')
+                    + '</td>')
         rrows.append(
-            '<tr class="row" data-r="%d" style="--tc:%s"><td class="rk">%d%s</td>'
-            '<td class="tm">%s%s%s</td><td class="cf">%s</td>'
-            '%s%s<td class="n hi c-ref">%s</td><td class="n c-ref c-avca">%s</td>%s'
-            '<td class="n c-ref">%s</td>%s<td class="n">%s</td><td class="n hi">%s</td></tr>%s'
-            % (t["rank26"],
+            '<tr class="row" data-r="%d" data-team="%s" tabindex="0" role="link" '
+            'style="--tc:%s"><td class="rk">%d%s</td>'
+            '<td class="tm">%s%s%s</td><td class="cf" data-l="Conf">%s</td>'
+            '%s%s%s<td class="n c-avca" data-l="AVCA">%s</td>'
+            '<td class="n hi c-ref" data-l="2025">%s</td>%s'
+            '<td class="n c-ref" data-l="RPI">%s</td>%s'
+            '<td class="n c-ref" data-l="Ret">%s</td>'
+            '<td class="n hi c-ref" data-l="Tourn">%s</td></tr>'
+            % (t["rank26"], esc(t["team"]),
                # the school's own colour, same source the Top 25 uses -- the two
                # tables of the same teams should not look like different sites
                (_bcolors.get(t["team"]) or {}).get("primary") or "var(--line2)",
@@ -2379,15 +2395,18 @@ def build():
                esc(t["conf"]),
                powercell(t),
                resumecell(t, _resume_active),
-               c(t["rank25"]), c(t.get("avca")),
-               "" if PUBLIC else ('<td class="n c-ref">%s</td>'
-                                  '<td class="n c-ref">%s</td>'
+               rec_cell,
+               c(t.get("avca")),
+               c(t["rank25"]),
+               "" if PUBLIC else ('<td class="n c-ref" data-l="VT">%s</td>'
+                                  '<td class="n c-ref" data-l="Massey">%s</td>'
                                   % (c(t.get("vt")), c(t.get("massey")))),
                c(t.get("rpi")),
-               "" if PUBLIC else ('<td class="n sp c-ref">%s</td>' % (spread or "&mdash;")),
+               "" if PUBLIC else ('<td class="n sp c-ref" data-l="Others">%s</td>'
+                                  % (spread or "&mdash;")),
                "&mdash;" if t["ret"] is None else "%.0f%%" % (100 * t["ret"]),
                "&mdash;" if tourn_of.get(t["team"]) is None
-               else "%.0f%%" % tourn_of[t["team"]], det))
+               else "%.0f%%" % tourn_of[t["team"]]))
 
     # State plainly WHICH ranking this is. A preseason projection and a
     # results-based rating are different claims, and a tab labelled "Rankings"
@@ -5071,6 +5090,90 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 @media (max-width:560px){.fw.fnd,.fl.fnd{padding:0 3px}
   .fndt{font-size:8px;margin-left:2px}}
 
+
+/* ---- RANKINGS: RULER BAR, COMPARISON, AND THE PHONE RANK-STRIP ------------
+   ⚠ THE PROBLEM THIS SOLVES. The tab was thirteen equal columns, five of them
+   bare ranks from five different organisations -- a row could read
+   "#1 #1 #1 #1 #1" and nothing on screen said whose was whose. The fix is
+   hierarchy, not deletion: the five fields a voter reads are the default, the
+   reference columns are one checkbox away, and every rank carries its label
+   the moment the table stops being a table. */
+.rulerbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:0 0 10px}
+.refsel{display:flex;align-items:center;gap:7px;font:600 10px/1 var(--disp);
+  letter-spacing:.1em;text-transform:uppercase;color:var(--slate)}
+.refsel select{font:inherit;letter-spacing:0;text-transform:none;
+  font-size:12px;padding:5px 8px}
+.rulerwhat{margin:0 0 14px;max-width:66ch;font-size:13px;color:var(--ink2);
+  line-height:1.5}
+.rulerwhat b{color:var(--chalk)}
+.refcols{display:flex;align-items:center;gap:6px;font-size:12px;
+  color:var(--ink2);white-space:nowrap;cursor:pointer}
+/* ⚠ THE GROUP ROW SPANS THE COLUMNS IT LABELS, so hiding columns without
+   hiding their group leaves the remaining group headings sitting over the
+   wrong columns -- 9 spans across 7 columns, measured. Ret and Tourn are ours
+   (group "Our outlook") but they are reference-depth detail, so they hide with
+   the rest and their group header hides with them. */
+.rk3.hideref .c-ref,
+.rk3.hideref th.g-ref,
+.rk3.hideref th.g-proj{display:none}
+.rk3 tr.row{cursor:pointer}
+.rk3 tr.row:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.rk3 td.rec .nvd{display:inline;margin-left:5px}
+.rk3 td.rec .dim{color:var(--ink3)}
+
+/* the comparison surface */
+.gaptbl td.tm{font-size:15px}
+.gaptbl tr[data-team]{cursor:pointer}
+.gaptbl tr[data-team]:hover td{background:rgba(91,168,245,.06)}
+.gaptbl tr[data-team]:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.gaptbl .rl{display:block;font:700 8.5px/1.4 var(--disp);letter-spacing:.09em;
+  color:var(--slate);font-style:normal}
+.gaptbl .gapn{font:700 17px/1 var(--disp);color:var(--chalk)}
+.nrtag{font:700 9px/1.5 var(--mono);letter-spacing:.04em;color:var(--ink3);
+  background:var(--alt);padding:2px 5px;border-radius:3px}
+.gapwrap .tsec{margin-top:18px}
+
+/* ⚠ PHONE: A RANK-STRIP, NOT A SIDEWAYS SPREADSHEET. Fourteen columns cannot
+   fit 390px and must not force the essential fields into a horizontal scroll.
+   Each row becomes a compact strip -- rank, crest and team, then the labelled
+   values -- and the reference columns are simply not shown, because they are
+   reference. `data-l` supplies the label so a rank is never bare. */
+@media (max-width:560px){
+  .rk3 thead{display:none}
+  .rk3,.rk3 tbody,.rk3 tr.row{display:block;width:100%}
+  /* ⚠ EVERY CELL GETS ITS OWN GRID SLOT. The first version put conference,
+     resume, record and AVCA all in one named area -- and grid STACKS items
+     that share an area, so the four printed on top of each other and the row
+     read as garbled overlapping text. Nothing measured caught it: the row did
+     not overflow, the cells were visible, the labels were present. A
+     screenshot caught it in one look. Explicit row/column placement cannot
+     overlap. */
+  .rk3 tr.row{position:relative;display:grid;
+    grid-template-columns:32px auto auto minmax(0,1fr) auto;
+    column-gap:10px;row-gap:3px;padding:9px 10px 9px 6px;
+    border-bottom:1px solid var(--line);align-items:baseline}
+  .rk3 tr.row td{display:block;border:0;padding:0;font-size:12.5px;
+    white-space:nowrap}
+  .rk3 tr.row td.rk{grid-row:1/3;grid-column:1;align-self:center;
+    font:700 18px/1 var(--disp);text-align:right}
+  .rk3 tr.row td.tm{grid-row:1;grid-column:2/5;font-size:15px;min-width:0;
+    white-space:normal;overflow-wrap:anywhere}
+  .rk3 tr.row td.pw{grid-row:1;grid-column:5;font:700 16px/1 var(--disp);
+    text-align:right}
+  .rk3 tr.row td.cf{grid-row:2;grid-column:2}
+  .rk3 tr.row td.rec{grid-row:2;grid-column:3}
+  .rk3 tr.row td.c-avca{grid-row:2;grid-column:4}
+  .rk3 tr.row td.rs{grid-row:2;grid-column:5;text-align:right}
+  .rk3 tr.row td.c-ref{display:none}
+  /* the label rides in front of the value, so no number is anonymous */
+  .rk3 tr.row td[data-l]::before{content:attr(data-l) " ";
+    font:700 8.5px/1 var(--disp);letter-spacing:.08em;color:var(--slate);
+    text-transform:uppercase;margin-right:3px}
+  .rulerbar{gap:10px}
+  .refcols{display:none}
+  .gaptbl .gapn{font-size:15px}
+}
+
 /* The basis, stamped on the column header itself so the number cannot be
    read as something wider than it is. */
 .thb{display:block;font:700 8px/1.4 var(--mono);letter-spacing:.06em;
@@ -5491,13 +5594,30 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 </section>
 
 <section id="v-rankings" hidden>
-  <div class="seg" role="tablist" aria-label="Which ranking">
-    <button class="segb on" data-r="ours">POWER</button>
-    <button class="segb" data-r="digby">Digby&rsquo;s Top 25</button>
-    <button class="segb" data-r="avca">AVCA poll</button>
-    <button class="segb" data-r="top16">Committee top 16</button>
-    <button class="segb" data-r="rpi">NCAA RPI</button>
+  <!-- ⚠ THREE RULERS AT FULL WEIGHT, THE REST BEHIND A SECONDARY CONTROL.
+       Five equal buttons said that the committee's top 16 and the NCAA's RPI
+       are the same kind of thing as our own order and the coaches poll. They
+       are reference. The three a voter actually works in lead; the rest sit in
+       a select that does not compete for attention. -->
+  <div class="rulerbar">
+    <div class="seg" role="tablist" aria-label="Which ranking">
+      <button class="segb on" data-r="ours">POWER</button>
+      <button class="segb" data-r="avca">AVCA coaches poll</button>
+      <button class="segb" data-r="digby">Digby&rsquo;s Top 25</button>
+      <button class="segb" data-r="gap">POWER vs AVCA</button>
+    </div>
+    <label class="refsel"><span>Reference</span>
+      <select id="refpick" aria-label="Reference ranking">
+        <option value="">Choose&hellip;</option>
+        <option value="top16">DI Committee top 16</option>
+        <option value="rpi">NCAA RPI</option>
+      </select>
+    </label>
   </div>
+  <!-- ⚠ ONE SENTENCE PER RULER, FROM ONE MAP. A rank means nothing without
+       knowing whose ruler it is; this is the line that says so, and it is
+       keyed by view so a new view cannot ship without one. -->
+  <p class="rulerwhat" id="rulerwhat"></p>
   <div id="pollview" hidden></div>
   <!-- ⚠ SAID ONCE. "nothing here feeds the model" was appearing three times on
        this tab -- in the group header above the columns, in RANK_BASIS, and
@@ -5505,8 +5625,13 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
        the page read as anxious. The group row carries it now. -->
   <p class="histnote">{{TREND_NOTE}}</p>
   <p class="lead" id="ranklead">{{RANK_BASIS}}
-  <span class="leadhint">Click a team to see the six players the number is built
-  from.</span></p>
+  <!-- ⚠ THE HINT MUST DESCRIBE WHAT THE ROW ACTUALLY DOES. It said "click a
+       team to see the six players the number is built from", which described
+       the in-place expansion this view no longer has -- the projected six
+       lives on the team page, which is where a row now goes. An instruction
+       that no longer works is worse than none. -->
+  <span class="leadhint">Open a team for its full dossier &mdash; including the
+  six players this projection is built from.</span></p>
   <div class="ctl">
     <input type="search" id="q" placeholder="Search a team&hellip;">
     <select id="conf"><option value="">All conferences</option></select>
@@ -5514,9 +5639,18 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <option value="50">Top 50</option><option value="64">Top 64</option>
       <option value="100">Top 100</option><option value="0">All</option>
     </select>
+    <label class="refcols"><input type="checkbox" id="refcols">
+      <span>Reference columns</span></label>
     <span class="count" id="cnt"></span>
   </div>
-  <div class="panel"><div class="scroll"><table class="rk3">
+  <!-- ⚠ ADDRESSED BY ID, NOT BY ".panel". renderPoll() used to reach for
+       `#v-rankings .panel`, which was unique until the comparison view began
+       injecting its own panels into #pollview -- a node that sits EARLIER in
+       this section, so the selector silently started returning the wrong
+       element and switching back to POWER toggled the comparison surface
+       instead. Same shape as the duplicate-id bug that made the just-finished
+       band query the schedule tbody. -->
+  <div class="panel" id="rankpanel"><div class="scroll"><table class="rk3">
     <!-- ⚠ A GROUPED HEADER, BECAUSE THIRTEEN EQUAL COLUMNS SAY NOTHING ABOUT
          WHAT IS OURS AND WHAT IS SOMEBODY ELSE'S. POWER and R&eacute;sum&eacute;
          are two different questions this site answers; everything to their
@@ -5526,22 +5660,27 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <thead>
     <tr class="grp">
       <th colspan="3"></th>
-      <th class="g-ours" colspan="2">Our system</th>
-      <th class="g-ref" colspan="6">Reference &mdash; none of it feeds our model</th>
-      <th class="g-proj" colspan="2">Outlook</th>
+      <th class="g-ours" colspan="3">Our system</th>
+      <th class="g-poll" colspan="1">Coaches poll</th>
+      <!-- ⚠ Ret and Tourn are OURS and stay out of the reference group. Sweeping
+           them under "none of it feeds our model" would be a false label on two
+           columns this site computes itself. -->
+      <th class="g-ref" colspan="5">Reference &mdash; none of it feeds our model</th>
+      <th class="g-proj" colspan="2">Our outlook</th>
     </tr>
     <tr>
       <th>#</th><th class="l">Team</th><th class="l">Conf</th>
       <th class="n c-pow" title="POWER &mdash; how strong a team is; who would win tomorrow. 50 is an average Division-I team and every 12.5 points is one standard deviation. A monotone rescaling of the rating that produces the rank beside it, not a blend of hand-picked components.">Power</th>
       <th class="n c-res" title="R&Eacute;SUM&Eacute; &mdash; what a team has EARNED. Ranked by RPI, which beat every alternative against the 64 teams the committee actually selected in 2025. Margin is ignored on purpose: a win is a win. A different question from Power, and the two are meant to disagree.">R&eacute;sum&eacute;</th>
+      <th class="n rec" title="Won-lost against DIVISION-I opponents this season, the NCAA&rsquo;s own convention. A non-Division-I result is shown beside it and is not counted in the record.">Record</th>
+      <th class="n c-avca" title="AVCA coaches poll &mdash; the official poll, published by the American Volleyball Coaches Association. External reference: it does not feed our model.">AVCA&nbsp;Poll</th>
       <th class="c-ref" title="our fitted composite, final 2025">2025</th>
-      <th class="c-ref c-avca" title="AVCA coaches poll &mdash; the official poll, published by the American Volleyball Coaches Association. External reference: it does not feed our model.">AVCA&nbsp;Poll</th>
       <th class="c-ref" title="VolleyTalk Top 25, preseason &mdash; external reference">VT</th>
       <th class="c-ref" title="Massey Ratings, 2026 preseason &mdash; external reference">Massey</th>
       <th class="c-ref" title="official NCAA RPI rank, final 2025">RPI</th>
       <th class="c-ref" title="range the other systems put this team in">Others</th>
-      <th title="share of 2025 production on the 2026 roster">Ret</th>
-      <th title="simulated NCAA tournament odds; backtested at 42 of the real 64 from a preseason prior">Tourn</th>
+      <th class="c-ref" title="share of 2025 production on the 2026 roster">Ret</th>
+      <th class="c-ref" title="simulated NCAA tournament odds; backtested at 42 of the real 64 from a preseason prior">Tourn</th>
     </tr></thead>
     <tbody id="rbody">{{RANK_ROWS}}</tbody></table></div>
     <!-- ⚠ PROGRESSIVE DISCLOSURE, NOT DELETION. This methodology is the most
@@ -6008,9 +6147,10 @@ function route() {
 
   if (view === 'rankings') {
     const want = parts[1] === 'power' ? 'ours' : (parts[1] || 'ours');
-    const b = document.querySelector('#v-rankings .segb[data-r="' +
-      CSS.escape(want) + '"]');
-    if (b) renderPoll(want);
+    /* ⚠ THE REFERENCE VIEWS HAVE NO BUTTON ANY MORE, so gating the render on
+       finding one would make #/rankings/rpi land on a blank panel. Render any
+       ruler this tab knows about; fall back to POWER for anything else. */
+    renderPoll(RULER_WHAT[want] ? want : 'ours');
   }
   /* a match is a destination on either parent, and the parent is the route */
   closeMatchDetail();
@@ -6133,10 +6273,23 @@ function renderRank() {
   }
   $('#cnt').textContent = n + ' teams';
 }
+/* ⚠ A RANK ROW OPENS THE TEAM, IT DOES NOT UNFOLD IN PLACE. The row used to
+   expand a pseudo-detail describing the projection; that same content already
+   exists on the team page as "Projected six", so the expansion was a second
+   half-answer competing with the real one. Keyboard reachable, because a row
+   that only responds to a mouse is not a link. */
+function openRankRow(tr) {
+  const nm = tr && tr.dataset.team;
+  if (!nm || !TEAMS[nm]) return;
+  go(routeFor('teams', slug(nm)));
+}
 $('#rbody').addEventListener('click', e => {
+  const tr = e.target.closest('tr.row'); if (tr) openRankRow(tr);
+});
+$('#rbody').addEventListener('keydown', e => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
   const tr = e.target.closest('tr.row'); if (!tr) return;
-  const d = document.querySelector('tr.det[data-for="' + tr.dataset.r + '"]');
-  if (d) d.hidden = !d.hidden;
+  e.preventDefault(); openRankRow(tr);
 });
 /* A row in the Top 25 opens that team, the same as clicking it anywhere else --
    a ranking you cannot click through from is a dead end. */
@@ -6149,6 +6302,22 @@ if (t25body) t25body.addEventListener('click', e => {
   go(routeFor('teams', slug(nm)));
 });
 ['q', 'conf', 'top'].forEach(id => $('#' + id).addEventListener('input', renderRank));
+/* The secondary control is a route like any other, so Back works from it. */
+const refpick = document.getElementById('refpick');
+if (refpick) refpick.addEventListener('change', () => {
+  if (refpick.value) go(routeFor('rankings', refpick.value));
+});
+/* Reference columns are available, not compulsory. Thirteen columns wide is a
+   spreadsheet; the five a voter reads are the default and the rest are one
+   click away. */
+const refcols = document.getElementById('refcols');
+if (refcols) {
+  const applyRef = () => {
+    document.querySelector('#v-rankings table.rk3')
+      .classList.toggle('hideref', !refcols.checked);
+  };
+  refcols.addEventListener('change', applyRef); applyRef();
+}
 renderRank();
 
 /* simple text filters */
@@ -9255,12 +9424,125 @@ function renderBracket() {
 /* ---- published polls: the AVCA coaches poll and the NCAA RPI, as published,
    so the page answers the question without sending anyone to another site ---- */
 const POLLS = {{POLLS_JSON}};
+/* ⚠ ONE SENTENCE PER RULER, AND A VIEW CANNOT SHIP WITHOUT ONE. The tab
+   showed five rank tables whose numbers looked identical -- a row could read
+   "#1 #1 #1 #1 #1" -- with nothing on screen saying whose ruler each was.
+   Keyed by view id, asserted by a guard. */
+const RULER_WHAT = {
+  ours: '<b>POWER</b> is our own predictive order: how strong a team is, ' +
+        'who would win tomorrow. Margin drives it. It is not a poll and ' +
+        'nobody votes in it.',
+  avca: '<b>AVCA coaches poll</b> is the external poll voted by coaches and ' +
+        'published by the American Volleyball Coaches Association. It is ' +
+        'shown for reference and does not feed anything here.',
+  digby: '<b>Digby\u2019s Top 25</b> is this site\u2019s own Top 25, blending ' +
+         'the preseason projection with 2026 results. It is not the AVCA poll ' +
+         'and it is not anybody\u2019s ballot.',
+  gap: '<b>POWER vs AVCA</b> lists where our order and the coaches poll ' +
+       'currently differ most. It is a statement of difference, nothing more.',
+  top16: '<b>DI Committee top 16</b> is the selection committee\u2019s own ' +
+         'in-season reveal \u2014 the closest published thing to what the ' +
+         'field projector is trying to predict.',
+  rpi: '<b>NCAA RPI</b> is the NCAA\u2019s published Rating Percentage Index. ' +
+       'External reference.'
+};
+
+/* ---- POWER vs AVCA ---------------------------------------------------------
+   ⚠ A DIFFERENCE, NOT A VERDICT. This surface says only how far apart two
+   published orders are for the same team. It does not say either is wrong, it
+   ranks nobody as overrated or underrated, and it recommends no movement --
+   the two rulers answer different questions and are MEANT to disagree (R3).
+   ⚠ AND A TEAM THE POLL DOES NOT RANK HAS NO GAP. The poll is 25 deep; a team
+   outside it has no position, and subtracting an absent number from a real one
+   would invent a difference. Those teams are listed separately as AVCA NR with
+   no number attached. */
+function gapRows() {
+  const rated = [], nr = [];
+  Object.keys(TEAMS).forEach(nm => {
+    const t = TEAMS[nm];
+    if (!t || !t.rank) return;
+    if (t.avca === null || t.avca === undefined) {
+      if (t.rank <= 25) nr.push({ team: nm, rank: t.rank });
+    } else {
+      rated.push({ team: nm, rank: t.rank, avca: t.avca,
+                   gap: Math.abs(t.rank - t.avca) });
+    }
+  });
+  rated.sort((a, b) => b.gap - a.gap || a.rank - b.rank);
+  nr.sort((a, b) => a.rank - b.rank);
+  return { rated: rated, nr: nr };
+}
+
+function renderGap() {
+  const host = document.getElementById('pollview');
+  const g = gapRows();
+  const q = (document.getElementById('gapq') || {}).value || '';
+  const ql = q.toLowerCase().trim();
+  const keep = r => !ql || r.team.toLowerCase().includes(ql);
+  const rated = g.rated.filter(keep), nr = g.nr.filter(keep);
+  const row = r =>
+    '<tr data-team="' + esc(r.team) + '" tabindex="0" role="link">' +
+    '<td class="tm">' + logo(r.team) + esc(r.team) + '</td>' +
+    '<td class="n"><i class="rl">POWER</i>#' + r.rank + '</td>' +
+    '<td class="n"><i class="rl">AVCA</i>#' + r.avca + '</td>' +
+    '<td class="n gapn">' + r.gap + '</td></tr>';
+  const nrRow = r =>
+    '<tr data-team="' + esc(r.team) + '" tabindex="0" role="link">' +
+    '<td class="tm">' + logo(r.team) + esc(r.team) + '</td>' +
+    '<td class="n"><i class="rl">POWER</i>#' + r.rank + '</td>' +
+    '<td class="n"><span class="nrtag">AVCA NR</span></td>' +
+    '<td class="n dim">no gap</td></tr>';
+  host.innerHTML =
+    '<div class="gapwrap">' +
+    '<div class="ctl"><input type="search" id="gapq" placeholder="Search a team\u2026" ' +
+      'value="' + esc(q) + '"><span class="count">' + rated.length +
+      (rated.length === 1 ? ' team' : ' teams') + ' ranked by both</span></div>' +
+    '<div class="panel"><div class="scroll"><table class="gaptbl">' +
+    '<thead><tr><th class="l">Team</th><th>POWER</th><th>AVCA</th>' +
+    '<th title="how many places apart the two orders put this team">Differs by</th>' +
+    '</tr></thead><tbody id="gapbody">' +
+    (rated.length ? rated.slice(0, 30).map(row).join('')
+                  : '<tr><td colspan="4" class="tnote">No team is ranked by ' +
+                    'both right now.</td></tr>') +
+    '</tbody></table></div></div>' +
+    (nr.length
+      ? '<div class="tsec"><h3>In our top 25, not in the coaches poll</h3>' +
+        '<div class="body"><div class="panel"><div class="scroll">' +
+        '<table class="gaptbl"><tbody>' + nr.map(nrRow).join('') +
+        '</tbody></table></div></div>' +
+        /* one literal: a sentence split across a concatenation never appears
+           contiguously in the built page, so a guard cannot find it */
+        '<div class="tnote">The coaches poll is 25 deep. A team outside it has no position there, so no difference is calculated for these \u2014 an absent rank is not a low one.</div></div></div>'
+      : '') +
+    '</div>';
+  const gq = document.getElementById('gapq');
+  if (gq) gq.addEventListener('input', () => {
+    const v = gq.value; renderGap();
+    const n = document.getElementById('gapq');
+    if (n) { n.focus(); n.setSelectionRange(v.length, v.length); }
+  });
+  host.querySelectorAll('tr[data-team]').forEach(tr => {
+    const open = () => { if (TEAMS[tr.dataset.team]) go(routeFor('teams', slug(tr.dataset.team))); };
+    tr.addEventListener('click', open);
+    tr.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+    });
+  });
+}
+
 function renderPoll(which) {
   const host = document.getElementById('pollview');
-  const main = document.querySelector('#v-rankings .panel');
+  const main = document.getElementById('rankpanel');
   const lead = document.getElementById('ranklead');
   document.querySelectorAll('#v-rankings .segb').forEach(b =>
     b.classList.toggle('on', b.dataset.r === which));
+  /* The reference select shows a choice only while one of ITS views is up, so
+     it never looks like the active ruler when POWER is. */
+  const rp = document.getElementById('refpick');
+  if (rp) rp.value = (which === 'top16' || which === 'rpi') ? which : '';
+  /* Say which ruler this is, always. */
+  const rw = document.getElementById('rulerwhat');
+  if (rw) { rw.innerHTML = RULER_WHAT[which] || ''; rw.hidden = !RULER_WHAT[which]; }
   /* ⚠ DIGBY'S TOP 25 IS A RANKING, SO IT LIVES WITH THE RANKINGS. As a
      top-level tab it competed with Rankings for the same job and a reader had
      to know which of two destinations answered "who is best". The section is
@@ -9275,6 +9557,10 @@ function renderPoll(which) {
   }
   if (which === 'ours') {
     host.hidden = true; main.hidden = false; lead.hidden = false; return;
+  }
+  if (which === 'gap') {
+    main.hidden = true; lead.hidden = true; host.hidden = false;
+    renderGap(); return;
   }
   const p = POLLS[which];
   main.hidden = true; lead.hidden = true; host.hidden = false;

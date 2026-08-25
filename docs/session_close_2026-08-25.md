@@ -443,6 +443,79 @@ differential with no D-I match; and no row's `diff_n` may exceed its own
 `w + l`. **Three negative controls, all verified to trip**: reverting the
 basis, removing the visible text, and removing the width override.
 
-**State at close:** 24 suites pass with `Cody/` present and 24 with it moved
+## 10. RANKINGS INTELLIGENCE BOARD
+
+**What was wrong.** Thirteen equal columns, five of them bare ranks from five
+different organisations, so one row read **`#1 #1 #1 #1 #1`** with nothing on
+screen saying whose ruler each number was. Five equal buttons implied the
+committee's Top 16 and the NCAA's RPI were the same kind of thing as our own
+order and the coaches poll.
+
+**Decisions.**
+1. **Three rulers at full weight** -- POWER, AVCA coaches poll, Digby's Top 25
+   -- plus a **POWER vs AVCA** comparison. The committee Top 16 and NCAA RPI
+   moved behind a restrained `Reference` select. Every selectable ruler has a
+   one-line purpose sentence from **one map**, so a view cannot ship without
+   one; Digby's explicitly disclaims being the poll or anybody's ballot.
+2. **The POWER board defaults to seven columns** -- rank, team, conference,
+   POWER, Resume, Record, AVCA -- with the seven reference/outlook columns
+   behind a `Reference columns` checkbox. **Record is Division-I only** with
+   the non-D-I split beside it, reusing the rules finished earlier today.
+3. **Rows route.** The in-place expansion is gone; a row opens the team page,
+   where the projected six already lives. Keyboard reachable.
+4. **The comparison surface states a difference and nothing else.** No
+   "overrated", no recommendation, no verdict. A team the poll does not rank is
+   listed as **AVCA NR with no number** -- an absent rank is not a low one.
+5. **Movement unchanged**: still nothing drawn, because there are only two
+   snapshots and they are on different bases.
+
+**⚠ THE BUG A SCREENSHOT CAUGHT AND MEASUREMENT DID NOT.** The first phone
+layout put conference, resume, record and AVCA in ONE named grid area. **CSS
+grid stacks items that share an area**, so all four painted on top of each
+other and the row was unreadable. Every measurement passed: the row did not
+overflow, the cells were "visible", the labels were present, `data-l` resolved.
+One look at the pixels showed it instantly. **Fourth time this session that a
+geometry read disagreed with the screen and the screen was right.** Each cell
+now has an explicit row/column and a guard asserts no two share a slot.
+
+**⚠ A SELECTOR THAT WAS UNIQUE UNTIL IT WASN'T.** `renderPoll()` reached for
+`#v-rankings .panel`. That was unique until the comparison view began injecting
+panels into `#pollview`, which sits EARLIER in the section -- so the selector
+silently returned the wrong element and switching back to POWER toggled the
+comparison surface. Addressed by id now (`#rankpanel`). Same shape as the
+duplicate-id bug that made the just-finished band query the schedule tbody.
+
+**⚠ THE GROUP HEADER MUST HIDE WITH ITS COLUMNS.** Hiding the reference columns
+left 9 group spans over 7 columns. Ret and Tourn are *ours* and keep their own
+"Our outlook" group rather than being swept under "none of it feeds our
+model" -- that would be a false label -- but they hide together.
+
+**⚠ TWO MORE OF THE RECURRING TRAPS, BOTH CAUGHT BY POSITIVE CONTROLS.** The
+phone-CSS regex matched the FIRST of several `max-width:560px` blocks, so every
+placement check failed against correct CSS while "no two cells share a slot"
+passed **vacuously on zero slots**. And the ruler-purpose check swept EVERY
+`<option>` on the page -- conferences, Top-50, stat pickers -- demanding a
+purpose sentence for each. **A cross-check needs a check that it compared
+anything at all**, now for the third time today.
+
+**⚠ AND A GUARD FOUND MY OWN COMMENT AGAIN.** `public: no "My Board"` failed on
+a source comment written hours earlier explaining the temporal dead zone.
+Structural markers (markup, storage keys, functions) are asserted against the
+raw page; human-facing names are scanned with comments stripped.
+
+**Guards:** `scripts/test_rankings_board.py`, 25th suite, wired into both
+workflows -- every ruler labelled; gap arithmetic recomputed independently and
+never assigned to an NR team; ten recommendation words banned; inactive Resume
+explicitly off; phone cells cannot share a slot; reference columns hidden at
+560px; every row routes to its own team at its own rank; no fabricated
+movement; public build free of ballot/My Board material and its header still
+aligned. **Five negative controls, all verified to trip.**
+
+**Deliberately deferred:** rank movement and any trend line stay unavailable
+until two same-basis weekly snapshots exist -- that is the honest state, not a
+gap. Resume stays inactive until 200 D-I matches. No consensus/blend ranking
+was added.
+
+**State at close:** 25 suites pass with `Cody/` present and 24 with it moved
 aside. Tree is clean apart from the three fixes above. Nothing here changes
 data, ratings, or the crawl -- all three are display-layer only.
