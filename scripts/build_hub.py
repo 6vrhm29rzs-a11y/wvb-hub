@@ -2394,6 +2394,22 @@ html{-webkit-text-size-adjust:100%}
    Deliberately NOT the near-black-plus-one-acid-accent look: that is the
    default every dark dashboard reaches for. The accents here are the sport's
    own -- Molten blue and the hard yellow off the ball. */
+/* ── TABULAR NUMERALS: TESTED, AND NOT NEEDED HERE ───────────────────────
+   Do not re-add this. It is standard advice for a data product and it is a
+   NO-OP on this page, which was established by measuring GLYPH WIDTHS rather
+   than by reading a CSS property.
+
+   Every numeric column already renders in ui-monospace: "11111" and "77777"
+   both measure 40.64px in td.pw, td.rk and td.n, so there is no jitter to fix.
+   The only column whose digits differ in width is td.tm -- the TEAM NAME
+   column, set in Oswald (29.52 vs 32.84px), where a tabular figure is neither
+   wanted nor supported by the face.
+
+   ⚠ HOW THIS ALMOST SHIPPED. The first check counted tables whose computed
+   `font-variant-numeric` contained "tabular" and reported 0 of 40 -- a real
+   property reading, and a useless one. The property says what was ASKED FOR;
+   the widths say whether it changed anything. Same lesson as the phantom nav
+   underline: measure the pixels, not the declaration.  */
 body{margin:0;color:var(--ink);font:15px/1.55 var(--sans);
   font-feature-settings:"tnum" 1;
   background:
