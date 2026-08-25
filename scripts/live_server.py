@@ -439,12 +439,24 @@ class Handler(SimpleHTTPRequestHandler):
         kw["directory"] = WEBROOT
         SimpleHTTPRequestHandler.__init__(self, *a, **kw)
 
+    # ⚠ THE PAGE IS REBUILT MANY TIMES AN HOUR AND THE BROWSER WAS KEEPING
+    # THE OLD COPY. The JSON endpoints already sent "no-store"; static files
+    # went out with only a Last-Modified, so Chrome served a heuristically
+    # cached START-HERE.html and a rebuilt fix simply did not appear. That
+    # reads exactly like a fix that did not work -- verified today, where the
+    # file on disk carried a patch the loaded document did not.
+    # This is the same failure the PUBLIC build solves with a content hash in
+    # index.html; the local server has no such indirection, so it says plainly
+    # that nothing here may be reused.
+    def end_headers(self):
+        self.send_header("Cache-Control", "no-store, must-revalidate")
+        SimpleHTTPRequestHandler.end_headers(self)
+
     def _json(self, obj, code=200):
         body = json.dumps(obj).encode("utf-8")
         self.send_response(code)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
-        self.send_header("Cache-Control", "no-store")
         self.end_headers()
         self.wfile.write(body)
 
@@ -567,7 +579,6 @@ class Handler(SimpleHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self.send_header("Content-Length", str(len(body)))
-            self.send_header("Cache-Control", "no-store")
             self.end_headers()
             self.wfile.write(body)
             return

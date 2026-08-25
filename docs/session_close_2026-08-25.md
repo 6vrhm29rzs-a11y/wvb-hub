@@ -5,8 +5,10 @@ work are as they are. Everything it says about the **product** — tabs, Match
 Desk, Scores, the ballot — is out of date. Nine commits landed today and the
 shape of the site changed.
 
-**Remote is `1eec0db`. Verify with `git ls-remote origin` rather than trusting
-this line.** Git is classifier-blocked in auto mode: hand Cody the command.
+**Remote is `59d433e` (was `1eec0db` when this was first written -- the
+line went stale within the day, which is exactly why it says this). Verify with
+`git ls-remote origin` rather than trusting it.** Git is classifier-blocked in
+auto mode: hand Cody the command.
 
 ---
 
@@ -163,3 +165,68 @@ not by a failing test. The suites are good at holding ground already taken.
 They did not catch what went wrong on the way in. The call-graph guard closes
 one of those three; realistic-volume rendering is still only checked when
 someone remembers to stub a busy day.
+
+---
+
+## Addendum -- the team-page sweep (same day)
+
+Three defects, all found by reading the page rather than by a failing test.
+That is now the fourth session running in which looking beat the suites, and it
+is the honest summary of what they are for.
+
+**1. PROJECTED POINTS PER SET PRINTED RAW.** The projected-six list emitted
+`(c.adj !== undefined ? c.adj : c.rate)` with no formatting, so whatever
+precision the JSON happened to carry reached the page: Kentucky read `5.572`,
+`5.188`, `3.04`, `2.185` in one column. Two problems in one -- precision that
+changes row to row, and a **third decimal on a projected quantity**, which
+claims a resolution the fit does not have. Every other points-per-set on the
+site is `toFixed(2)`. Now routed through one `ppsFmt()` helper: same measure,
+same rendering, everywhere (R4). A null renders an em dash rather than `NaN`.
+
+⚠ **The other two `.rt` call sites were audited and deliberately left alone** --
+one is a start count (`33`) and one is `"N pts"`. They share a CLASS, not a
+measure. Formatting them would have been the R4 error in the opposite
+direction.
+
+**2. TWO COUNT PILLS WERE UNLABELLED IN THE TEXT LAYER.** `<h3>Upcoming<span
+class="cnt">22</span></h3>` renders with an 8px gap and a tinted pill, so it is
+correct **to the eye**. Its `textContent` is `Upcoming22`, which is what a
+screen reader and a copy-paste get -- a bare number beside a word, saying 22 of
+what. Both pills (`.cnt` on Upcoming, `.h3n` on Full roster) now carry an
+`aria-label` naming the unit, singular and plural. **The visible pill is
+unchanged**; this was never a layout bug.
+
+⚠ **Worth noticing: the two pills use different classes for the same job** --
+`.cnt` and `.h3n`. They were found separately because a grep for one did not
+find the other. If a third count heading is ever added, unify them first.
+
+**3. A rendering that looks right can still be wrong in the layer you did not
+look at.** That is the general form of both findings above, and it is the same
+lesson as the sticky-header bug (the number was right and the page lied) and
+the public `esc()` breakage (the tests asserted absence, not function). Check
+the pixels, then check the text, then check the published copy.
+
+**4. THE LOCAL SERVER WAS SERVING A STALE PAGE, AND IT LOOKS EXACTLY LIKE A
+FIX THAT DID NOT WORK.** Found while verifying fix 2: the file on disk carried
+the patch and the loaded document did not. `live_server.py` sent
+`Cache-Control: no-store` on its **JSON** endpoints only; static files went out
+with nothing but a `Last-Modified`, so Chrome cached `START-HERE.html`
+heuristically and a rebuild simply did not appear -- through a hash change, and
+through re-assigning `location.href` to the same URL, neither of which reloads.
+
+This is the same problem the **public** build solves with a content hash in
+`index.html`. The local server has no such indirection, so it now says plainly
+that nothing may be reused: an `end_headers()` override on the handler, which
+covers every response including 404s.
+
+⚠ **The override made the two existing explicit sends redundant** -- left in,
+they would have emitted `Cache-Control` twice. Both removed, and verified on
+the wire: static HTML, `/api/live` and `/api/ballot` each carry the header
+**exactly once**, with their bodies intact.
+
+⚠ **`curl -I` sends HEAD and never reaches `do_GET`**, so it 404s every JSON
+route here and proves nothing about them. Use `curl -s -D -`.
+
+**State at close:** 24 suites pass with `Cody/` present and 24 with it moved
+aside. Tree is clean apart from the three fixes above. Nothing here changes
+data, ratings, or the crawl -- all three are display-layer only.

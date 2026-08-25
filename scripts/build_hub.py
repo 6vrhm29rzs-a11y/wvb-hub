@@ -6357,6 +6357,12 @@ const RESUME_ACTIVE = {{RESUME_ACTIVE_JS}};
    and opening a match did nothing. Every test passed, because the public
    checks only ever asserted what must be ABSENT -- nothing asserted the page
    still worked. It lives outside the fence now. */
+/* points per set, rendered the one way this site renders it */
+function ppsFmt(v) {
+  const n = Number(v);
+  return (v === null || v === undefined || !isFinite(n)) ? '\u2014' : n.toFixed(2);
+}
+
 function esc(v) {
   return String(v == null ? '' : v)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -9473,7 +9479,13 @@ function showTeam(name) {
     '<span class="nm">' + c.name + '</span>' +
     '<span class="kd">' + (c.pos ? c.pos + ' \u00b7 ' : '') + c.kind +
     (c.kind === 'transfer' && c.from ? ' \u00b7 ' + c.from : '') +
-    '</span><span class="rt">' + (c.adj !== undefined ? c.adj : c.rate) + '</span></div>').join('');
+    /* ⚠ TWO DECIMALS, LIKE EVERY OTHER POINTS-PER-SET ON THIS SITE. The value
+       was printed raw, so a projection rendered as "5.572" beside "3.04" --
+       inconsistent precision, and a third decimal on a PROJECTED quantity
+       claims a resolution the fit does not have. Same measure, same
+       rendering, everywhere (R4). */
+    '</span><span class="rt">' + ppsFmt(c.adj !== undefined ? c.adj : c.rate) +
+    '</span></div>').join('');
   const DIGBY_FACE = {{DIGBY_FACE_JS}};
   const LU_STATUS = {returning: 'back', departed: 'gone',
                      unknown: 'unresolved', no_roster: '\u2014'};
@@ -9851,7 +9863,16 @@ function showTeam(name) {
         (results ? '<div class="tsec"><h3>Results</h3><div class="body">' + results +
                    '</div></div>' : '') +
         '<div class="tsec"' + (results ? ' style="margin-top:14px"' : '') +
-          '><h3>Upcoming<span class="cnt">' + (t.fixtures || []).length +
+          /* ⚠ THE PILL IS 8px CLEAR OF THE HEADING ON SCREEN, so this
+             reads correctly to the eye. In the TEXT layer it did not: the
+             heading's textContent was "Upcoming22", and a bare 22 beside a
+             word does not say 22 of what. The count now names its own unit
+             for a screen reader and for copied text, while the visible pill
+             is unchanged. */
+          '><h3>Upcoming<span class="cnt" role="text" aria-label="' +
+          (t.fixtures || []).length + ' scheduled ' +
+          ((t.fixtures || []).length === 1 ? 'fixture' : 'fixtures') + '">' +
+          (t.fixtures || []).length +
           '</span></h3><div class="body upc' +
           ((t.fixtures || []).length > 6 ? ' clipped' : '') + '">' +
           (upcoming || '<div class="tnote">No remaining fixtures on file.</div>') +
@@ -9909,7 +9930,11 @@ function showTeam(name) {
     '</div>' +
     (rosterHtml
       ? '<div class="tsec tsec--wide"><h3>Full roster' +
-        '<span class="h3n">' + rost.length + '</span></h3>' +
+        /* same unlabelled-count fix as the Upcoming pill: "Full roster17"
+           in the text layer, 17 of what. Visible pill unchanged. */
+        '<span class="h3n" role="text" aria-label="' + rost.length +
+        (rost.length === 1 ? ' player' : ' players') + '">' +
+        rost.length + '</span></h3>' +
         '<div class="body rbody">' + rosterHtml + '</div>' +
         '<div class="tnote">Roster from the school\u2019s own site; position and ' +
         'production from official box scores. A <b>green bar</b> marks a player who ' +
