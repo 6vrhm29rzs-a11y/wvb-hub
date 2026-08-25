@@ -1935,6 +1935,101 @@ def check_every_view_names_its_season():
                    len(prev))
 
 
+def check_power_score_agrees_with_the_rank():
+    """THE POWER SCORE MUST NEVER CONTRADICT THE RANK PRINTED BESIDE IT.
+
+    ⚠ THE FIRST VERSION DID. It scored the 2025 composite while the rank came
+    from the preseason projection -- two different quantities -- so #7 SMU
+    (76.7) sat above #6 Louisville (76.1), and #348 above #347. Both numbers
+    were individually true and the row was a contradiction. That is worse than
+    showing no score at all, because a reader has no way to tell which of the
+    two authoritative-looking numbers to believe.
+
+    The fix is structural: POWER is a monotone rescaling of the very quantity
+    that produces the rank, so they cannot disagree. This asserts it on the
+    BUILT page rather than in the builder, because that is where a reader meets
+    it -- and asserts the scale is stated, since a number out of 100 that does
+    not say what 100 means is decoration.
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping power-score check")
+        return
+    src = open(hub, encoding="utf-8").read()
+    b = re.search(r'<tbody id="rbody">(.*?)</tbody>', src, re.S)
+    if not b:
+        bad("the rankings table could not be located", "this guard checks nothing")
+        return
+    ranks = re.findall(r'<tr class="row" data-r="(\d+)".*?</tr>', b.group(1), re.S)
+    rows = re.findall(r'<tr class="row" data-r=.*?</tr>', b.group(1), re.S)
+    vals = []
+    for rk, row in zip(ranks, rows):
+        cells = re.findall(r"<td[^>]*>(.*?)</td>", row, re.S)
+        if len(cells) < 4:
+            continue
+        txt = re.sub(r"<[^>]+>", "", cells[3]).strip()
+        if txt and txt not in ("&mdash;", "\u2014"):
+            try:
+                vals.append((int(rk), float(txt)))
+            except ValueError:
+                pass
+    if len(vals) < 50:
+        bad("almost no team carries a power score",
+            "%d of %d rows" % (len(vals), len(rows)))
+        return
+    vals.sort()
+    inv = [(a, c) for a, c in zip(vals, vals[1:]) if c[1] > a[1] + 1e-9]
+    if inv:
+        bad("%d rows score higher than the team ranked above them" % len(inv),
+            "e.g. #%d scores %.1f but #%d scores %.1f -- the score and the rank "
+            "are built from different quantities"
+            % (inv[0][1][0], inv[0][1][1], inv[0][0][0], inv[0][0][1]))
+    else:
+        ok("the power score never contradicts the rank beside it", len(vals))
+
+    # THE TOP 25 CARRIES THE SAME COLUMN, ON THE SAME SCALE, FROM ITS OWN SCORE.
+    # The two tables order teams differently, so this one has to be monotone
+    # with ITS rank -- borrowing the rankings board's number would reproduce the
+    # very contradiction this guard exists for.
+    t25 = re.search(r'<table class="t25">(.*?)</table>', src, re.S)
+    if t25:
+        rows25 = re.findall(r'<tr class="row" data-team=.*?</tr>', t25.group(1), re.S)
+        tv = []
+        for row in rows25:
+            c = re.findall(r"<td[^>]*>(.*?)</td>", row, re.S)
+            if len(c) < 4:
+                continue
+            try:
+                tv.append((int(re.sub(r"<[^>]+>", "", c[0]).strip()),
+                           float(re.sub(r"<[^>]+>", "", c[3]).strip())))
+            except ValueError:
+                pass
+        tv.sort()
+        binv = [(a, b) for a, b in zip(tv, tv[1:]) if b[1] > a[1] + 1e-9]
+        if not tv:
+            bad("the Top 25 carries no power score", "the column is missing or empty")
+        elif binv:
+            bad("the Top 25 power score contradicts its own rank",
+                "#%d scores %.1f but #%d scores %.1f"
+                % (binv[0][1][0], binv[0][1][1], binv[0][0][0], binv[0][0][1]))
+        else:
+            ok("the Top 25 power score agrees with its own rank", len(tv))
+
+    if "every 12.5 points is one standard deviation" not in src:
+        bad("the power scale is never stated",
+            "a number out of 100 that does not say what 100 means is decoration")
+    else:
+        ok("the page states what the power scale means")
+
+    # ...and it must not be presented as a blend of components we never fitted.
+    if re.search(r"25%\s*(?:strength|power)|weighted\s+blend\s+of\s+components", src, re.I):
+        bad("the page describes power as a hand-weighted blend",
+            "fifteen schemes and nine profile metrics were tested and none beat "
+            "the fitted composite; an invented blend must not be shipped as one")
+    else:
+        ok("power is not presented as a hand-weighted blend")
+
+
 def check_poll_column_polarity():
     """THE TOP 25's AVCA COLUMN: is the gap pointing the right way?
 
@@ -2295,6 +2390,7 @@ def main():
     check_photo_crop_and_zoom()
     check_hero_podium_signs()
     check_no_class_name_collisions()
+    check_power_score_agrees_with_the_rank()
     check_poll_column_polarity()
     check_live_times_are_pacific()
     check_week_names_whose_ranking()

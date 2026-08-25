@@ -1564,6 +1564,38 @@ def hcell_py(v, txt, lo, hi, kind="seq"):
     return '<td class="n hx %s" style="--t:%.3f"><b>%s</b></td>' % (kind, t, txt)
 
 
+def powercell(t):
+    """POWER, with the scale carried in its own tooltip.
+
+    A number out of 100 that does not say what 100 means is decoration, and
+    this one has a specific meaning: 50 is an average Division-I team, and
+    every 12.5 points is one standard deviation of team strength.
+
+    ⚠ IT IS A MONOTONE RESCALING OF THE RATING THAT PRODUCES THE RANK BESIDE
+    IT, so the two can never disagree. The first version scored last season's
+    composite next to a rank taken from the preseason projection -- two
+    different quantities -- and put #7 SMU above #6 Louisville, and #348 above
+    #347. A score that contradicts the rank printed next to it is worse than no
+    score, because both look authoritative.
+
+    ⚠ AND IT IS NOT A BLEND OF HAND-PICKED COMPONENTS. Both AI proposals Cody
+    relayed specify a 100-point mix (25 strength / 20 resume / 15 SOS / ...).
+    rating_factors.py has now tested fifteen weighting schemes and nine profile
+    metrics against held-out matches: nothing beat the fitted composite and nine
+    ideas measurably hurt. A nine-way blend would replace a validated ordering
+    with an invented one and hide it behind a confident number out of 100.
+    """
+    v = t.get("power")
+    if v is None:
+        return '<td class="n pw">&mdash;</td>'
+    basis = ("this season's results" if t.get("power_basis") == "live"
+             else "the preseason projection, which reads no 2026 result yet")
+    return ('<td class="n pw hx seq" style="--t:%.3f" title="Power %.1f. '
+            '50 is an average D-I team; every 12.5 points is one standard '
+            'deviation. Built from %s."><b>%.1f</b></td>'
+            % (max(0.0, min(1.0, (v - 10.0) / 80.0)), v, basis, v))
+
+
 def top25_view(avca=None):
     # type: (Optional[Dict[str, int]]) -> Dict[str, str]
     """Rows and copy for Digby's Top 25.
@@ -1635,6 +1667,24 @@ def top25_view(avca=None):
     # scaled to the biggest margin actually on the board rather than a constant
     # I picked -- in August that is a handful of matches, in November it is a
     # season, and a fixed cap would wash the whole column out by then.
+    # POWER FOR THE TOP 25, FROM ITS OWN SCORE. Same scale as the Rankings tab
+    # (50 = average D-I, 12.5 = one SD) so the two numbers are comparable, but
+    # derived from THIS table's blended score rather than the rankings board's
+    # composite -- the two tables order teams differently, and a score borrowed
+    # from the other one would contradict the rank beside it. That mistake was
+    # made once already this session and is guarded.
+    _smu = m.get("score_mean")
+    _ssd = m.get("score_sd") or 1.0
+
+    def _t25power(r):
+        if _smu is None or r.get("score") is None:
+            return '<td class="n pw">&mdash;</td>'
+        v = max(0.0, min(100.0, 50.0 + 12.5 * (r["score"] - _smu) / _ssd))
+        return ('<td class="n pw hx seq" style="--t:%.3f" title="Power %.1f. '
+                '50 is an average D-I team; every 12.5 points is one standard '
+                'deviation. From this ranking\u2019s own blended score."><b>%.1f</b>'
+                '</td>' % (max(0.0, min(1.0, (v - 10.0) / 80.0)), v, v))
+
     _nets = [abs(r["net_pts_per_set"]) for r in top
              if r.get("net_pts_per_set") is not None]
     nmax = max(_nets) if _nets else 1.0
@@ -1683,11 +1733,12 @@ def top25_view(avca=None):
         wt = r.get("weight_on_season") or 0
         rows.append(
             '<tr class="row" data-team="%s" style="--tc:%s"><td class="rk">%d</td>'
-            '<td class="tm">%s%s</td><td class="mvc">%s</td>%s<td class="cf">%s</td>'
+            '<td class="tm">%s%s</td><td class="mvc">%s</td>%s%s<td class="cf">%s</td>'
             '<td class="rec">%s</td><td class="form">%s</td>'
             '%s<td class="n wt">%s</td></tr>'
             % (esc(team), (colors.get(team) or {}).get("primary") or "var(--line)",
                r["rank"], logo_img(team, logos), esc(team), mv,
+               _t25power(r),
                _pollcell(team, r["rank"]),
                esc(r.get("conf") or ""),
                r.get("record") or "0-0",
@@ -1848,6 +1899,7 @@ def build():
 
     # ---- rankings rows ---------------------------------------------------
     _bcolors = ((load("data/team_colors_%d.json" % SEASON) or {}).get("teams") or {})
+
     rrows = []
     for t in sorted(teams, key=lambda x: x["rank26"]):
         def c(v):
@@ -1893,7 +1945,7 @@ def build():
             # literal "9%" and mixing the two silently turned that into a
             # format placeholder.
             det = ('<tr class="det" data-for="' + str(t["rank26"]) + '" hidden>'
-                   '<td></td><td colspan="10">' + why_html
+                   '<td></td><td colspan="11">' + why_html
                    + '<div class="dh">The six this projection is built from '
                      '&mdash; each player&rsquo;s 2025 points per set, then '
                      'normalised to a neutral schedule.</div>'
@@ -1901,7 +1953,7 @@ def build():
         rrows.append(
             '<tr class="row" data-r="%d" style="--tc:%s"><td class="rk">%d%s</td>'
             '<td class="tm">%s%s%s</td><td class="cf">%s</td>'
-            '<td class="n hi">%s</td><td class="n">%s</td>%s'
+            '%s<td class="n hi">%s</td><td class="n">%s</td>%s'
             '<td class="n">%s</td>%s<td class="n">%s</td><td class="n hi">%s</td></tr>%s'
             % (t["rank26"],
                # the school's own colour, same source the Top 25 uses -- the two
@@ -1911,6 +1963,7 @@ def build():
                logo_img(t["team"], logos), esc(t["team"]),
                (' <b class="pl6">%s</b>' % t["rot"]) if t.get("rot") and t["rot"] < 6 else "",
                esc(t["conf"]),
+               powercell(t),
                c(t["rank25"]), c(t.get("avca")),
                "" if PUBLIC else ('<td class="n">%s</td><td class="n">%s</td>'
                                   % (c(t.get("vt")), c(t.get("massey")))),
@@ -3559,6 +3612,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <div class="scroll"><table class="t25">
     <thead><tr>
       <th>#</th><th>Team</th><th title="how the rank changed">{{T25_MOVEHEAD}}</th>
+      <th class="n" title="POWER: 50 is an average Division-I team and every 12.5 points is one standard deviation. Same scale as the Rankings tab.">Power</th>
       <th class="n" title="the AVCA coaches poll rank, and how far our rating differs from it">AVCA</th>
       <th>Conf</th><th>Record</th><th class="l" title="most recent results, newest last">Form</th>
       <th class="n" title="net points per set this season">Net/set</th>
@@ -3594,6 +3648,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <div class="panel"><div class="scroll"><table>
     <thead><tr>
       <th>#</th><th class="l">Team</th><th class="l">Conf</th>
+      <th class="n" title="POWER: one number for how strong a team is. 50 is an average Division-I team and every 12.5 points is one standard deviation. It is a monotone rescaling of the rating that produces the rank beside it -- not a blend of hand-picked components.">Power</th>
       <th title="our fitted composite, final 2025">2025</th>
       <th title="AVCA coaches poll, preseason">AVCA</th>
       <th title="VolleyTalk Top 25, preseason">VT</th>

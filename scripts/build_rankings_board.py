@@ -276,6 +276,65 @@ def build():
             "pool": r.get("pool_size"),
             "unknown": r.get("incoming_unplayed"),
         }
+    # ---- POWER: one number, on a stated scale ----------------------------
+    # Cody: "there needs to be some power ranking score or something for me to
+    # quantify it all."
+    #
+    # ⚠ WHAT THIS DELIBERATELY IS NOT. Both AI proposals he relayed specify a
+    # 100-point blend with hand-picked component weights (25 strength / 20
+    # resume / 15 SOS / 12 match performance / ...). This project has paid for
+    # that mistake precisely: the roster term was hand-set at 0.15, 0.30, 0.50
+    # and 1.00, every one of which made the ordering WORSE, and the fitted value
+    # was 0.09. And rating_factors.py has now tested fifteen weighting schemes
+    # and nine profile metrics against held-out matches -- nothing beat the
+    # fitted composite, and nine ideas measurably hurt. Inventing a nine-way
+    # blend on top of that would replace a validated ordering with an unvalidated
+    # one and hide it behind a confident-looking number out of 100.
+    #
+    # So POWER is a MONOTONE RESCALING of the composite this project already
+    # validated -- the ordering is exactly the rating's, and the number just
+    # makes the GAPS legible, which is what a rank alone cannot do.
+    #
+    #     power = 50 + 12.5 * z        (z = the composite's z-score, clipped 0-100)
+    #
+    # 50 is an average D-I team and every 12.5 points is one standard deviation.
+    # The scale is FIXED rather than stretched to put the leader at 100: a
+    # week-to-week comparison has to mean something, and "best team this week"
+    # is a moving target. The page states the scale, because a number out of 100
+    # that does not say what 100 means is decoration.
+    # ⚠ IT MUST BE THE QUANTITY THE RANK IS BUILT FROM, AND THE FIRST VERSION
+    # WAS NOT. Scoring the 2025 `composite` while `rank26` comes from the
+    # preseason PROJECTION put #7 SMU (76.7) above #6 Louisville (76.1) and
+    # #348 above #347 -- a score that contradicts the rank printed beside it,
+    # which is worse than no score at all because both look authoritative. Read
+    # the value behind rank26: the live composite once the rating fits, the
+    # projection's own blend until then. Asserted monotone below.
+    for t in teams:
+        lr = live_by_team.get(t["team"])
+        r = pj.get(t["team"]) or {}
+        t["_pv"] = (lr or {}).get("composite")
+        if t["_pv"] is None:
+            t["_pv"] = r.get("blend")
+        if t["_pv"] is None:
+            t["_pv"] = r.get("talent")
+    _cvals = [t["_pv"] for t in teams if t.get("_pv") is not None]
+    if len(_cvals) > 30:
+        _mu = sum(_cvals) / float(len(_cvals))
+        _sd = (sum((v - _mu) ** 2 for v in _cvals) / len(_cvals)) ** 0.5 or 1.0
+    else:
+        _mu = _sd = None
+    for t in teams:
+        c = t.get("_pv")
+        if _mu is None or c is None:
+            t["power"] = None
+            continue
+        z = (c - _mu) / _sd
+        t["power"] = round(max(0.0, min(100.0, 50.0 + 12.5 * z)), 1)
+        t["power_z"] = round(z, 3)
+        t["power_basis"] = t.get("rank_source") or "preseason"
+    for t in teams:
+        t.pop("_pv", None)
+
     # ---- movement since the last weekly freeze ---------------------------
     # Compared against the most recent snapshot that is NOT this week's, so the
     # column answers "since the last published poll", not "since this morning".

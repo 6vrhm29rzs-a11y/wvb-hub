@@ -236,6 +236,16 @@ def main():
             "net_pts_per_set": (round(obs[name], 2) if name in obs else None),
             "conf": conf.get(name),
         })
+    # The spread of the blended score across ALL 348 teams, so a consumer can
+    # put it on a stated scale. Only the top 35 rows are stored, so the mean and
+    # SD have to be recorded here or they are gone -- and a power score computed
+    # from the 25 rows that survive would be measuring "spread among the best",
+    # which is the same error as z-scoring season margin against whoever had
+    # played (fixed in this file's own history).
+    _sv = [r["score"] for r in rows]
+    _smu = st.mean(_sv) if _sv else 0.0
+    _ssd = (st.pstdev(_sv) or 1.0) if _sv else 1.0
+
     rows.sort(key=lambda r: -r["score"])
     for i, r in enumerate(rows, 1):
         r["rank"] = i
@@ -268,6 +278,12 @@ def main():
                                 "so beating nobody looks like beating somebody"),
             "teams_with_a_result": len(nmatch),
             "matches_counted": sum(nmatch.values()) // 2,
+            "score_mean": round(_smu, 5),
+            "score_sd": round(_ssd, 5),
+            "score_scale_note": ("mean and SD across ALL %d teams, not just the "
+                                 "ones shown -- a scale computed from the top 25 "
+                                 "would measure the spread among the best"
+                                 % len(rows)),
             "shown": SHOWN,
             "also_receiving": ALSO,
         },
