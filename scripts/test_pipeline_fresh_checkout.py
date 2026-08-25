@@ -83,10 +83,15 @@ def workflow_env():
     return m.group(1) if m else "2026"
 
 
-def step_commands(step):
-    # type: (str) -> list
-    """The shell lines of one named step, in order, from daily.yml itself."""
-    lines = open(WORKFLOW).read().splitlines()
+def step_commands(step, workflow=None):
+    # type: (str, str) -> list
+    """The shell lines of one named step, in order, read from the workflow itself.
+
+    ⚠ READ, NEVER RESTATED. If this file listed the commands, it would drift
+    from the job it claims to verify and go on passing while the real pipeline
+    broke.
+    """
+    lines = open(workflow or WORKFLOW).read().splitlines()
     out = []
     i = 0
     while i < len(lines) and lines[i].strip() != "- name: %s" % step:
@@ -151,6 +156,52 @@ def run_sequence(cmds, cwd, season, stop_on_required_failure=True):
         if rc != 0 and not tolerated and stop_on_required_failure:
             break
     return results
+
+
+REFRESH = os.path.join(REPO, ".github", "workflows", "refresh.yml")
+REFRESH_STEPS = ["Rebuild derived outputs", "Invariant guards"]
+
+
+def check_refresh_runs_from_a_fresh_checkout(season):
+    # type: (str) -> None
+    """The in-season refresh must work on a tree with only tracked files.
+
+    ⚠ IT IS A DIFFERENT SEQUENCE FROM THE DAILY JOB and therefore needs its own
+    pass. It deliberately omits the 2025 base build, on the reasoning that the
+    completed season is committed and does not change in-season -- which is true
+    of the DATA and was very nearly not true of the derived artifacts. Both of
+    2026-08-23's nightly breakages were invisible on a laptop that already had
+    the gitignored files; this is the check that would have caught them.
+    """
+    if not os.path.exists(REFRESH):
+        print("  (no refresh workflow -- skipping)")
+        return
+    cmds = []
+    for st in REFRESH_STEPS:
+        cmds += step_commands(st, REFRESH)
+    cmds = [c for c in cmds if SELF not in c and not SKIP.search(c)]
+    tmp = tempfile.mkdtemp(prefix="wvb-refresh-")
+    try:
+        materialise(tmp)
+        # the refresh assumes the daily job has produced the 2025 base at least
+        # once; on a fresh checkout that is exactly what is missing, so build it
+        # here rather than pretending the refresh is standalone.
+        env = dict(os.environ)
+        env["WVB_SEASON"] = "2025"
+        for c in ("python3 scripts/build_dataset.py", "python3 scripts/rpi_2025.py",
+                  "python3 scripts/rating_2025.py"):
+            subprocess.call(c, shell=True, cwd=tmp, env=env,
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        results = run_sequence(cmds, tmp, season)
+        bad = [(c, rc) for c, tol, rc in results if rc != 0 and not tol]
+        for c, rc in bad:
+            print("       refresh command failed (rc=%d): %s" % (rc, c))
+        check("the refresh sequence runs from a fresh checkout", not bad,
+              "(%d failed)" % len(bad))
+        check("the refresh built a page",
+              os.path.exists(os.path.join(tmp, "Cody", "START-HERE.html")))
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
 
 
 def main():
@@ -223,6 +274,9 @@ def main():
             print("       and it is the expected one: %s" % broke[0][0])
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
+
+    print("\n4. The in-season refresh, also from a fresh checkout")
+    check_refresh_runs_from_a_fresh_checkout(season)
 
     print("\n%s" % ("ALL CHECKS PASS, negative control tripped as expected"
                     if not FAILURES else "FAILED: %d check(s)" % len(FAILURES)))

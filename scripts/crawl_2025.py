@@ -165,6 +165,76 @@ def ensure_dirs():
 
 # ---------------------------------------------------------------- phase: schedule
 
+def eastern_today():
+    # type: () -> datetime.date
+    """Today's date on the NCAA's calendar, which is EASTERN.
+
+    ⚠ NOT the local date. The scoreboard is keyed by the Eastern calendar day,
+    and this machine is Pacific: between 9pm and midnight PT it is already
+    tomorrow in New York, so a Pacific "today" would look at the wrong date
+    exactly while the late West-coast matches are finishing -- the window this
+    whole feature exists to cover.
+    """
+    try:
+        from zoneinfo import ZoneInfo
+        return datetime.datetime.now(ZoneInfo("America/New_York")).date()
+    except Exception:                                     # noqa: BLE001
+        # UTC is within an hour of Eastern's date boundary either way; a
+        # neighbouring date is covered by the window below regardless.
+        return datetime.datetime.utcnow().date()
+
+
+def crawl_recent(back_days=2):
+    # type: (int) -> None
+    """Refetch only the dates that could contain a NEW final.
+
+    ⚠ THIS IS NARROWER THAN crawl_schedule(), NEVER WEAKER, AND THE DISTINCTION
+    IS THE WHOLE SAFETY ARGUMENT. R2 says a date stays refetchable until it is
+    strictly in the past AND all its games are final; that rule is UNCHANGED and
+    the daily run still applies it across the entire season. This phase exists
+    for a poll that runs every half hour, whose only question is "did something
+    finish just now" -- and a match can only finish on today's or a recent
+    Eastern date.
+    
+    Measured, which is why the narrowing matters: a full schedule pass is 132
+    requests (~1.6 min) and 130 of them are FUTURE dates that cannot contain a
+    final. This pass is a handful of requests and a few seconds.
+    
+    Nothing is skipped permanently: the crawl is append-only, the daily full
+    pass re-checks every date under the original rule, and this phase still
+    honours date_needs_refetch -- it only narrows WHICH dates it offers.
+    """
+    ensure_dirs()
+    today = datetime.date.today()
+    east = eastern_today()
+    # Eastern today, the days behind it, and tomorrow -- tomorrow because a
+    # match late on the Eastern evening can already belong to the next date in
+    # UTC terms, and one extra request is cheaper than a missed final.
+    days = [east + datetime.timedelta(days=1)]
+    days += [east - datetime.timedelta(days=i) for i in range(0, back_days + 1)]
+    days = [d for d in sorted(set(days)) if SEASON_START <= d <= SEASON_END]
+    fetched = skipped = 0
+    for day in days:
+        out = os.path.join(SCOREBOARD_DIR, day.isoformat() + ".json")
+        if not date_needs_refetch(out, day, today):
+            skipped += 1
+            continue
+        path = "/scoreboard/volleyball-women/d1/%04d/%02d/%02d/all-conf" % (
+            day.year, day.month, day.day)
+        data = fetch(path)
+        if data is None:
+            data = {"games": [], "_wvb_fetch": "no-data"}
+        tmp = out + ".tmp"
+        with open(tmp, "w") as fh:
+            json.dump(data, fh)
+        os.replace(tmp, out)
+        fetched += 1
+        # no sleep here: fetch() already enforces MIN_INTERVAL between requests,
+        # and a second delay would be a rate limit nobody declared.
+    print("recent: %d date(s) considered, %d fetched, %d already authoritative"
+          % (len(days), fetched, skipped))
+
+
 def crawl_schedule():
     # type: () -> None
     """One scoreboard request per date. Skips dates already on disk."""
@@ -800,6 +870,8 @@ def main():
             crawl_boxscores()
         elif phase == "fixtures":
             crawl_fixtures()
+        elif phase == "recent":
+            crawl_recent()
         elif phase == "verify-pin":
             rc = verify_season_pin()
             if rc:

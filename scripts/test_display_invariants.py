@@ -903,6 +903,23 @@ def check_phantom_sets_are_harmless():
                 phantom.add(key)
             elif produced:
                 real[key] = real.get(key, 0) + 1
+    # ⚠ THE PREMISE OF THE ORIGINAL CHECK EXPIRED, AND THE CHECK OUTLIVED IT.
+    # It was written when the aggregator still counted phantom lines, and it
+    # asserted the distortion was INERT -- that no player had both a phantom
+    # line and production elsewhere. crawl_2025.py now DROPS phantom lines when
+    # it aggregates, so that coexistence is no longer a defect: it is the normal
+    # state the moment a team plays twice, once in a game whose box score
+    # credits everyone with the full match.
+    #
+    # Verified on live 2026 data before changing anything: Abbey Emch has a
+    # phantom gp=4 line in game 6639888 and a real gp=3 line in 6639891, and
+    # her AGGREGATE reads sets=3 -- the phantom is excluded and her rate is
+    # correct. The old check would have failed the nightly run for a system
+    # working exactly as designed.
+    #
+    # So the assertion moves to the thing that matters: a phantom line must
+    # never reach the aggregate. That is strictly stronger -- it checks the
+    # number a rate is computed from, not a proxy for it.
     bitten = sorted(k for k in phantom if real.get(k))
     # ⚠ IF YOU ARE READING THIS BECAUSE THE SUITE WENT RED AT WVB_SEASON=2025:
     # that is expected and is not a regression. This guard audits the LIVE
@@ -911,17 +928,49 @@ def check_phantom_sets_are_harmless():
     # applied when the season is AGGREGATED, and re-running that aggregation
     # changes nothing (verified: 5,923 players, 0 set counts moved). The 2025
     # distortion is written up in docs/phantom_sets_2025.md. Do not re-crawl.
+    # Does any phantom line actually reach the aggregate?
+    leaked = []
     if bitten:
-        bad("a phantom set line now dilutes a real player's rate"
+        aggp = os.path.join(REPO, "data", "raw", str(live), "players_%d.json" % live)
+        if os.path.exists(aggp):
+            agg = {}
+            for pl in (json.load(open(aggp, encoding="utf-8")).get("players") or []):
+                key = (str(pl.get("team_id")),
+                       ((pl.get("first") or "") + " " + (pl.get("last") or "")))
+                agg[key] = pl
+            # recompute each bitten player's justified sets from the raw lines
+            justified = {}
+            for rec in recs:
+                rows = rec.get("rows") or []
+                if not rows:
+                    continue
+                uniform = len(set(str(r.get("gp")) for r in rows)) == 1
+                for r in rows:
+                    key = (str(r.get("team_id")),
+                           (r.get("first") or "") + " " + (r.get("last") or ""))
+                    if key not in bitten:
+                        continue
+                    if uniform and not any(num(r.get(k)) for k in COUNTS):
+                        continue                      # phantom: contributes none
+                    justified[key] = justified.get(key, 0) + int(num(r.get("gp")))
+            for key in bitten:
+                pl = agg.get(key)
+                if pl and justified.get(key) is not None:
+                    if int(pl.get("sets") or 0) != justified[key]:
+                        leaked.append("%s: aggregate %s sets vs %d justified"
+                                      % (key[1].strip(), pl.get("sets"),
+                                         justified[key]))
+    if leaked:
+        bad("a phantom set line reached the aggregate"
             + (" [auditing %d, a COMPLETED season -- see "
                "docs/phantom_sets_2025.md; the live-season path is fixed]" % live
                if live < 2026 else ""),
-            "%d player(s) carry sets from a box score that credited every "
-            "player with the full match AND have production elsewhere, so "
-            "their per-set rates are understated: %s"
-            % (len(bitten), [k[1] for k in bitten[:4]]))
+            "%d player(s) have an aggregate set count the box scores do not "
+            "justify, so their per-set rates are understated: %s"
+            % (len(leaked), leaked[:3]))
     else:
-        ok("phantom set lines exist but distort nothing (%d watched)" % len(phantom))
+        ok("phantom lines are excluded from the aggregate (%d watched, %d "
+           "coexist with real production)" % (len(phantom), len(bitten)))
 
 
 def check_aggregate_excludes_phantom_sets():

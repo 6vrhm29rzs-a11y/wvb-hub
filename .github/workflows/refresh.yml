@@ -1,0 +1,179 @@
+name: in-season refresh
+
+# WHAT THIS IS FOR. The daily job runs once at 09:15 UTC, so a match finishing
+# at 9pm Pacific waited until the next morning to reach POWER, the team pages,
+# the player stats and the rankings. This polls during the hours finals land
+# and publishes within about half an hour of one.
+#
+# ⚠ IT IS A NARROWER RUN OF THE SAME PIPELINE, NEVER A SECOND ONE. Same crawl,
+# same rebuild sequence, same guards, same build. What it does NOT do is the
+# whole-season schedule pass, the Monday ranking freeze, or the fresh-checkout
+# test -- those belong to the daily run, which still happens and is still the
+# completeness guarantee. Nothing here weakens R2: this phase only narrows
+# WHICH dates are offered to the same date_needs_refetch rule.
+#
+# ── THE SCHEDULE, AND WHY THESE HOURS ────────────────────────────────────
+# Cron is UTC and does not shift for daylight saving; the NCAA's calendar is
+# EASTERN. Both facts are handled by choosing a UTC window wide enough to cover
+# the match day under either offset:
+#
+#   22:00-11:00 UTC  =  6pm-7am ET while EDT is in force (Aug - 1 Nov)
+#                    =  5pm-6am ET after the switch to EST
+#
+# A Division-I evening slate starts around 6-7pm local and the latest West-coast
+# matches finish near 1am ET (10pm PT); Hawaii, the one programme far enough
+# west to matter, can run past that, which is why the window extends to 11:00
+# UTC rather than stopping at the last mainland final. Every 30 minutes inside
+# the window, hourly outside it so a correction posted at noon is still picked
+# up the same day.
+#
+# LATENCY TARGET: a final is published within ~35 minutes -- at most 30 minutes
+# of polling gap plus a run of about 3 minutes. MEASURED COST: the bounded
+# `recent` crawl is 2 requests and under a second, against 132 requests and
+# ~1.6 minutes for the full schedule pass it replaces.
+
+on:
+  schedule:
+    - cron: "0,30 22-23 * * *"
+    - cron: "0,30 0-11 * * *"
+    - cron: "0 12-21 * * *"
+  workflow_dispatch:
+    inputs:
+      season:
+        description: "Season to refresh (e.g. 2026)"
+        required: false
+        default: "2026"
+      force:
+        description: "Publish even if no new final was found"
+        required: false
+        default: "false"
+
+permissions:
+  contents: write
+
+# Never overlap the daily run or another refresh: two jobs appending to the same
+# game log and pushing the same branch is how a race becomes a corrupted file.
+concurrency:
+  group: daily-pipeline
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    env:
+      WVB_SEASON: ${{ github.event.inputs.season || '2026' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: pip install --quiet numpy
+
+      # The freshness semantics are what make a frequent poll safe. If they ever
+      # regress, this job would cache a partial day as complete -- so the guard
+      # runs BEFORE any network call, exactly as it does in the daily job.
+      - name: Freshness regression test
+        run: python3 scripts/test_crawl_freshness.py
+
+      - name: Fingerprint before
+        id: before
+        run: echo "fp=$(python3 scripts/freshness.py)" >> $GITHUB_OUTPUT
+
+      # Bounded on purpose: only the dates that could contain a NEW final, plus
+      # any game not yet final. See crawl_recent() for why this is narrower and
+      # not weaker.
+      - name: Poll for finals
+        run: |
+          python3 scripts/crawl_2025.py recent
+          python3 scripts/crawl_2025.py games
+          python3 scripts/crawl_2025.py boxscores
+          python3 scripts/crawl_2025.py players
+          python3 scripts/crawl_pbp.py || echo "play-by-play unavailable; continuing"
+
+      - name: Fingerprint after
+        id: after
+        run: |
+          fp=$(python3 scripts/freshness.py)
+          echo "fp=$fp" >> $GITHUB_OUTPUT
+          echo "changed=$([ "$fp" = "${{ steps.before.outputs.fp }}" ] && echo no || echo yes)" >> $GITHUB_OUTPUT
+          python3 scripts/freshness.py explain
+
+      # ⚠ NO NEW FINAL, NO PUBLISH. Not a rebuild, not a commit, and therefore
+      # not a Pages deploy. The page embeds a build timestamp, so rebuilding
+      # would produce different bytes on every run and commit ~48 times a day
+      # carrying nothing. The fingerprint counts FINALS ONLY, so a live match
+      # whose score moves every poll cannot trigger this either.
+      - name: Nothing new
+        if: steps.after.outputs.changed == 'no' && github.event.inputs.force != 'true'
+        run: echo "no new final since the last run -- nothing to publish"
+
+      # A FAILED CRAWL MUST NOT PUBLISH. Same rule as the daily job: the game
+      # log must never shrink.
+      - name: Sanity gate
+        if: steps.after.outputs.changed == 'yes' || github.event.inputs.force == 'true'
+        run: |
+          python3 - <<'PY'
+          import os, sys
+          p = "data/raw/%s/games.jsonl" % os.environ["WVB_SEASON"]
+          n = sum(1 for l in open(p, encoding="utf-8") if l.strip()) if os.path.exists(p) else 0
+          print("game log lines:", n)
+          sys.exit(1 if n == 0 else 0)
+          PY
+
+      # The SAME rebuild sequence the daily job runs, minus two things:
+      #   snapshot_rankings -- the weekly freeze belongs to the daily run, and
+      #     writing a history row from a mid-day poll would put the archive on a
+      #     cadence nobody asked for;
+      #   the 2025 base -- it is committed and does not change in-season.
+      - name: Rebuild derived outputs
+        if: steps.after.outputs.changed == 'yes' || github.event.inputs.force == 'true'
+        run: |
+          python3 scripts/venues.py
+          python3 scripts/availability.py || echo "availability skipped"
+          python3 scripts/build_dataset.py
+          python3 scripts/rpi_2025.py || echo "RPI needs a game graph; skipping this early"
+          python3 scripts/rating_2025.py || echo "rating needs 50 matches; skipping"
+          python3 scripts/predict_2026.py || echo "prediction needs a prior rating; skipping"
+          python3 scripts/simulate_season_2026.py || echo "season sim skipped"
+          python3 scripts/score_predictions.py || true
+          python3 scripts/project_lineups.py || echo "no lineups yet; continuing"
+          python3 scripts/conference_repair.py || echo "conference repair skipped"
+          python3 scripts/digby_top25.py || echo "top 25 needs a projection; skipping"
+          python3 scripts/resume_2025.py || echo "resume not active yet; skipping"
+          python3 scripts/build_hub.py
+          python3 scripts/build_hub.py --public
+
+      # Every guard that can run in the time budget. The fresh-checkout test is
+      # deliberately absent: it re-runs the entire pipeline and takes 41 of the
+      # suite's 46 seconds, which is a daily cost, not a half-hourly one.
+      - name: Invariant guards
+        if: steps.after.outputs.changed == 'yes' || github.event.inputs.force == 'true'
+        run: |
+          python3 scripts/test_display_invariants.py
+          python3 scripts/test_join_invariants.py
+          python3 scripts/test_rankings_history.py
+          python3 scripts/test_top25.py
+          python3 scripts/test_resume.py
+          python3 scripts/test_ballot.py
+          python3 scripts/test_lineups.py
+          python3 scripts/test_venues.py
+          python3 scripts/test_score_predictions.py
+          python3 scripts/provenance.py --check
+
+      - name: Commit and publish
+        if: steps.after.outputs.changed == 'yes' || github.event.inputs.force == 'true'
+        run: |
+          git config user.name  "wvb-hub bot"
+          git config user.email "noreply@github.com"
+          git add data/raw
+          git add output/vb_dashboard.html index.html
+          # ⚠ NO data/rankings_history_*.jsonl HERE. The weekly freeze is the
+          # daily job's business; a mid-day poll must not add a row.
+          if git diff --cached --quiet; then
+            echo "fingerprint moved but nothing staged -- not committing"
+          else
+            git commit -m "refresh: new final(s) $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push
+          fi

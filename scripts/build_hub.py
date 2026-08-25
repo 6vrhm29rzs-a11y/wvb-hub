@@ -4778,9 +4778,15 @@ async function pollLive() {
     if (!fresh.length) { jbox.hidden = true; }
     else {
       jbox.hidden = false;
+      /* ⚠ SAY WHAT IS ACTUALLY HAPPENING. "not yet in the archive below" reads
+         as if the result is missing or the site is broken. It is neither: the
+         match IS final, and the ratings, records and player stats that depend
+         on it are recomputed by the next verified refresh rather than the
+         instant the scoreboard flips. Naming that is the difference between a
+         site that looks stale and one that is honest about its own pipeline. */
       document.getElementById('justinmeta').textContent =
         fresh.length + (fresh.length === 1 ? ' result' : ' results') +
-        ' \u2014 not yet in the archive below';
+        ' \u2014 final, awaiting the next rating refresh';
       document.getElementById('justincards').innerHTML = fresh.map(g => {
         const aw = +g.away_sets > +g.home_sets;
         return '<div class="card done"><div class="cd">' + dayLabel(g.date || '') +
