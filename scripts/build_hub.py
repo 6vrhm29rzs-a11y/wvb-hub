@@ -3530,6 +3530,83 @@ b.kres{color:#F2B441}
   text-align:center;border-radius:3px;font:700 9px/14px var(--sans);margin-right:2px}
 .bwe.form i.fw{color:#31D07E;background:color-mix(in oklab,#31D07E 16%,transparent)}
 .bwe.form i.fl{color:#FF6B6B;background:color-mix(in oklab,#FF6B6B 16%,transparent)}
+/* ── THE WEEKLY BRIEFING ──────────────────────────────────────────────────
+   Facts about YOUR ballot, in one calm block. Not a card grid, not metrics:
+   a labelled line per fact, with the ruler named wherever a rank appears. */
+.bwbrief{border-top:2px solid var(--line2);border-bottom:1px solid var(--line);
+  padding:14px 0 13px;margin:12px 0 4px}
+.bwbrief h3{margin:0 0 3px;font:700 11px/1 var(--disp);letter-spacing:.18em;
+  text-transform:uppercase;color:var(--gold)}
+.bwbrief .bwbsub{margin:0 0 11px;font:12px/1.55 var(--sans);color:var(--slate)}
+.bwbfacts{display:flex;flex-wrap:wrap;gap:10px 30px}
+.bwbf{min-width:0}
+.bwbf em{display:block;font:600 9px/1 var(--disp);letter-spacing:.15em;
+  text-transform:uppercase;color:var(--slate);font-style:normal;margin-bottom:5px}
+.bwbf b{font:700 21px/1 var(--disp);color:var(--chalk)}
+.bwbf span{font:12.5px/1.5 var(--sans);color:var(--ink2);display:block;
+  margin-top:3px;max-width:42ch}
+.bwbf .none{color:var(--slate);font-style:italic}
+.bwbf .bwrulerline{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 2px}
+.bwbf .bwrulerline i{color:var(--line2);font-style:normal;margin:0 4px}
+/* ── THE REVIEW QUEUE: one trigger per item, named ───────────────────────── */
+.bwtrig{font:600 9.5px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase;
+  border:1px solid var(--line2);border-radius:2px;padding:3px 6px;color:var(--slate)}
+.bwtrig.pw{color:var(--good);border-color:color-mix(in oklab,var(--good) 40%,transparent)}
+.bwtrig.av{color:#7aa7ff;border-color:color-mix(in oklab,#7aa7ff 40%,transparent)}
+.bwtrig.res{color:var(--chalk);border-color:var(--line2)}
+.bwtrig.mine{color:#e8b13a;border-color:color-mix(in oklab,#e8b13a 45%,transparent)}
+/* ⚠ ONE COLOUR PER RULER, EVERYWHERE. My ballot is amber, POWER is green, AVCA
+   is blue. Movement uses ARROWS and never borrows a ruler's colour, so a green
+   number is always POWER and never "went up". */
+.bwv{font:600 12px/1 var(--mono)}
+.bwv.mine{color:#e8b13a} .bwv.pw{color:var(--good)} .bwv.av{color:#7aa7ff}
+.bwv.off{color:var(--slate);font-style:italic}
+/* ── COMPARISON WORKSPACE ────────────────────────────────────────────────── */
+.bwcompare{margin:8px 0 14px;border:1px solid var(--line);border-radius:4px;
+  background:rgba(255,255,255,.012)}
+.bwcompare>summary{cursor:pointer;padding:9px 12px;font-size:13px}
+.bwcompare .bwsub{padding:0 12px}
+.bwcmppick{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:0 12px 10px}
+.bwcmppick label{font:600 9.5px/1 var(--disp);letter-spacing:.13em;
+  text-transform:uppercase;color:var(--slate)}
+.bwcmppick input{flex:1 1 190px;min-width:0;background:transparent;
+  border:1px solid var(--line2);border-radius:3px;color:var(--ink);
+  padding:7px 9px;font:13px var(--sans)}
+#bwteamcmp{padding:0 12px 12px}
+.bwcmptbl{width:100%;border-collapse:collapse}
+.bwcmptbl th{text-align:left;font:600 9.5px/1 var(--disp);letter-spacing:.13em;
+  text-transform:uppercase;color:var(--slate);padding:8px 10px 8px 0;
+  border-bottom:1px solid var(--line2);vertical-align:bottom}
+.bwcmptbl th.tm{font:700 17px/1.1 var(--disp);letter-spacing:-.005em;
+  color:var(--chalk);text-transform:none}
+.bwcmptbl td{padding:8px 10px 8px 0;border-bottom:1px solid var(--line);
+  font-size:13px;color:var(--ink2);vertical-align:top}
+.bwcmptbl td.lab{font:600 9.5px/1.4 var(--disp);letter-spacing:.12em;
+  text-transform:uppercase;color:var(--slate);width:118px}
+.bwcmptbl .un{color:var(--slate);font-style:italic}
+/* ── HISTORY AS AN EDITORIAL RECORD ──────────────────────────────────────── */
+.bwweek{border-top:1px solid var(--line);padding:9px 0}
+.bwweek:first-child{border-top:0}
+.bwweek .wkhd{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.bwweek .wkhd b{font:700 12px/1 var(--disp);color:var(--chalk)}
+.bwweek .wkhd span{font:11px/1 var(--mono);color:var(--slate)}
+.bwweek .wkline{margin-top:5px;font-size:12px;color:var(--ink2);line-height:1.6}
+.bwweek button{margin-top:6px}
+.bwro{border:1px solid var(--gold);border-radius:4px;padding:11px 12px;
+  margin:10px 0;background:rgba(217,154,41,.05)}
+.bwro .rohd{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  font:700 11px/1 var(--disp);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:8px}
+.bwro ol{margin:0;padding-left:22px;font-size:13px;line-height:1.75;
+  color:var(--ink2);columns:2;column-gap:26px}
+.bwro .ronote{margin:8px 0 0;font-size:12px;color:var(--slate);line-height:1.6}
+@media (max-width:560px){
+  .bwbfacts{gap:9px 18px}
+  .bwbf b{font-size:18px}
+  .bwcmppick input{flex:1 1 100%}
+  .bwcmptbl td.lab{width:88px}
+  .bwro ol{columns:1}
+}
 /* ---- Ballot review: evidence is SECONDARY, the slots stay dominant ------ */
 .bwrulers{display:flex;flex-wrap:wrap;gap:6px 14px;margin:10px 0 4px;
   font-size:11.5px;color:var(--ink2)}
@@ -5312,12 +5389,37 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <span class="bwr off"><i>R&Eacute;SUM&Eacute;</i> inactive until enough games are played</span>
   </div>
 
+  <!-- WEEKLY BRIEFING. Facts about YOUR ballot and the week since you saved
+       it. Never a recommended Top 25, and never a verb telling you what to do. -->
+  <div class="bwbrief" id="bwbrief" role="region" aria-label="Weekly briefing"></div>
+  <div class="bwro" id="bwro" hidden></div>
+
   <details class="bwreview" id="bwreview">
-    <summary><b>Ballot review</b> <span class="bwrn" id="bwrevn"></span></summary>
-    <p class="bwsub">Four separate questions, each sorted by one named number you
-      can check. Not a queue, not a score, not a recommendation &mdash; the order
-      within a group is the size of that one difference and nothing else.</p>
+    <summary><b>Review</b> <span class="bwrn" id="bwrevn"></span></summary>
+    <p class="bwsub">Teams where something OBSERVABLE changed. Each item names
+      the exact trigger and shows the ranks it came from. There is no urgency
+      score, no ordering by importance, and nothing here says what to do about
+      it &mdash; that is the part only you can write.</p>
     <div id="bwqueue"></div>
+  </details>
+
+  <!-- COMPARISON WORKSPACE. You pick both teams. Nothing is auto-selected and
+       no "debate" is proposed. -->
+  <details class="bwcompare" id="bwcompare">
+    <summary><b>Compare two teams</b> <span class="bwrn">you choose both</span></summary>
+    <p class="bwsub">Only fields that already exist on this site, each labelled
+      with which ruler it comes from. No case for or against, no scouting
+      language, no sentiment.</p>
+    <div class="bwcmppick">
+      <label for="bwcA">Team A</label>
+      <input type="search" id="bwcA" list="bwlist-teams" autocomplete="off"
+        placeholder="Type a team&hellip;">
+      <label for="bwcB">Team B</label>
+      <input type="search" id="bwcB" list="bwlist-teams" autocomplete="off"
+        placeholder="Type a team&hellip;">
+      <button type="button" class="bwbtn" id="bwcclear">Clear</button>
+    </div>
+    <div id="bwteamcmp"></div>
   </details>
 
   <div class="bwgrid">
@@ -6658,64 +6760,320 @@ function bwCase(name, driver) {
   return '<div class="bwcase">' + bits.join('') + '</div>';
 }
 
-/* Four groups. Each is ONE named difference, sorted by its own size -- no
-   blending, so every position in every list can be checked by hand. */
-function bwQueue() {
+/* ── THE WEEKLY BRIEFING ──────────────────────────────────────────────────
+   ⚠ EVERY COMPARISON HERE IS AGAINST CODY'S OWN LAST SAVED BALLOT, never
+   against POWER. "What changed" means what HE changed his mind about; the
+   model's opinion is a separate column and is labelled as one. */
+function bwLastSaved() {
+  if (!BW_HIST || !BW_HIST.length) return null;
+  return BW_HIST[BW_HIST.length - 1];
+}
+function bwIsoWeek(d) {
+  const t = new Date(d.getTime());
+  t.setUTCHours(0, 0, 0, 0);
+  t.setUTCDate(t.getUTCDate() + 4 - (t.getUTCDay() || 7));
+  const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+  return t.getUTCFullYear() + '-W' +
+    String(Math.ceil((((t - y0) / 86400000) + 1) / 7)).padStart(2, '0');
+}
+
+/* results finished SINCE the last save -- only when a date proves it */
+function bwResultsSince(iso) {
+  if (!iso) return [];
+  const day = iso.slice(0, 10);
   const out = [];
-  const ranked = bwRanked();
-
-  const vsPower = ranked.map(t => {
-    const p = (TEAMS[t.team] || {}).rank;
-    return p ? { team: t.team, d: p - t.rank } : null;
-  }).filter(Boolean).filter(x => Math.abs(x.d) >= 3)
-    .sort((a, b) => Math.abs(b.d) - Math.abs(a.d)).slice(0, 8);
-  out.push(['Furthest from POWER',
-    'Your slot minus its POWER rank. A positive number means you have them higher than POWER does.',
-    vsPower.map(x => bwCase(x.team,
-      (x.d > 0 ? '+' : '') + x.d + ' vs POWER'))]);
-
-  const seen = {};
-  const disagree = Object.keys(TEAMS).map(n => {
-    const t = TEAMS[n];
-    return (t.avca && t.rank) ? { team: n, d: t.avca - t.rank } : null;
-  }).filter(Boolean).filter(x => Math.abs(x.d) >= 4)
-    .sort((a, b) => Math.abs(b.d) - Math.abs(a.d)).slice(0, 8);
-  out.push(['AVCA and POWER disagree most',
-    'AVCA rank minus POWER rank, across every team — nothing to do with your ballot.',
-    disagree.map(x => bwCase(x.team,
-      (x.d > 0 ? '+' : '') + x.d + ' AVCA vs POWER'))]);
-
-  const pinned = BW.teams.filter(t => t.pinned || t.rank == null);
-  out.push(['Pinned and also considered',
-    'Teams you set aside or marked for another look. Nothing here is removed unless you remove it.',
-    pinned.map(t => bwCase(t.team, t.pinned ? 'pinned' : 'considered'))]);
-
-  const base = bwPrev();
-  let moved = [];
-  if (base) {
-    const prevRanks = {};
-    (base.teams || []).forEach(t => { if (t.rank) prevRanks[t.team] = t.rank; });
-    ranked.forEach(t => {
-      const p = prevRanks[t.team];
-      if (p == null) moved.push({ team: t.team, label: 'entered' });
-      else if (Math.abs(p - t.rank) >= 3) {
-        moved.push({ team: t.team,
-          label: (p > t.rank ? '▲' : '▼') + Math.abs(p - t.rank) +
-                 ' (' + p + '→' + t.rank + ')',
-          size: Math.abs(p - t.rank) });
+  Object.keys(TEAMS).forEach(n => {
+    (TEAMS[n].played || []).forEach(g => {
+      if (g.d && g.d >= day) {
+        const key = [n, g.opp].sort().join('|') + g.d;
+        out.push({ key: key, team: n, g: g });
       }
     });
+  });
+  const seen = {};
+  return out.filter(r => (seen[r.key] ? false : (seen[r.key] = true)));
+}
+
+/* Opening an archived ballot. It renders into its OWN container, carries no
+   input, and offers only a close button -- there is no path from here back
+   into the working ballot, which is what makes overwriting impossible. */
+function bwOpenArchived(i) {
+  const b = BW_HIST[i];
+  const host = document.getElementById('bwro');
+  if (!b || !host) return;
+  const r = (b.teams || []).filter(x => x.rank).sort((a, c) => a.rank - c.rank);
+  const notes = (b.summary || '').trim();
+  host.hidden = false;
+  host.innerHTML = '<div class="rohd">Saved ballot &mdash; ' +
+      esc((b.saved_utc || '').slice(0, 10)) +
+      '<span style="color:var(--slate)">read-only</span>' +
+      '<button type="button" class="linkbtn" id="bwroclose">Close</button></div>' +
+    '<ol>' + r.map(t => '<li>' + esc(t.team) + '</li>').join('') + '</ol>' +
+    (notes ? '<p class="ronote"><b>Your notes:</b> ' + esc(notes) + '</p>' : '') +
+    '<p class="ronote">This is the archive. Nothing here can be edited and ' +
+    'nothing here writes back &mdash; your working ballot below is untouched.</p>';
+  host.scrollIntoView({ block: 'nearest' });
+  const c = document.getElementById('bwroclose');
+  if (c) c.addEventListener('click', () => { host.hidden = true; host.innerHTML = ''; });
+}
+
+function renderBriefing() {
+  const host = document.getElementById('bwbrief');
+  if (!host) return;
+  const prev = bwLastSaved();
+  const ranked = bwRanked();
+  const f = [];
+
+  if (!prev) {
+    f.push('<div class="bwbf"><em>Last saved ballot</em>' +
+      '<b class="none">None yet</b><span>This will be your first. Once saved it ' +
+      'becomes the baseline every later week is measured against.</span></div>');
+  } else {
+    const when = (prev.saved_utc || '').slice(0, 10);
+    f.push('<div class="bwbf"><em>Last saved ballot</em><b>' + esc(when) +
+      '</b><span>' + esc(bwIsoWeek(new Date(prev.saved_utc))) + ' &middot; ' +
+      (prev.teams || []).filter(t => t.rank).length + ' ranked</span></div>');
+
+    const pr = {};
+    (prev.teams || []).forEach(t => { if (t.rank) pr[t.team] = t.rank; });
     const now = {};
-    ranked.forEach(t => { now[t.team] = 1; });
-    Object.keys(prevRanks).forEach(n => {
-      if (!now[n]) moved.push({ team: n, label: 'dropped out' });
+    ranked.forEach(t => { now[t.team] = t.rank; });
+    let moved = 0;
+    ranked.forEach(t => {
+      if (pr[t.team] != null && pr[t.team] !== t.rank) moved++;
     });
-    moved.sort((a, b) => (b.size || 99) - (a.size || 99));
+    const entered = ranked.filter(t => pr[t.team] == null).map(t => t.team);
+    const dropped = Object.keys(pr).filter(n => now[n] == null);
+    f.push('<div class="bwbf"><em>Moved in your ballot</em><b>' + moved +
+      '</b><span>' + (moved
+        ? 'teams sit at a different slot than you saved them at'
+        : 'nothing has moved since you saved') + '</span></div>');
+    f.push('<div class="bwbf"><em>Entered your ballot</em><b>' + entered.length +
+      '</b><span>' + (entered.length
+        ? esc(entered.slice(0, 4).join(', ')) + (entered.length > 4 ? '…' : '')
+        : '<span class="none">none</span>') + '</span></div>');
+    f.push('<div class="bwbf"><em>Left your ballot</em><b>' + dropped.length +
+      '</b><span>' + (dropped.length
+        ? esc(dropped.slice(0, 4).join(', ')) + (dropped.length > 4 ? '…' : '')
+        : '<span class="none">none</span>') + '</span></div>');
+
+    /* ⚠ ONLY WHEN A DATE PROVES IT. A result counts as "since your last
+       ballot" only if its own date is on or after the save; if we cannot date
+       it, it is not claimed. */
+    const res = bwResultsSince(prev.saved_utc);
+    f.push('<div class="bwbf"><em>Results since then</em><b>' + res.length +
+      '</b><span>' + (res.length
+        ? 'completed matches dated on or after your save'
+        : 'no completed match is dated after your save') + '</span></div>');
   }
-  out.push(['Changed since your last save',
-    base ? 'Movement against your own previous saved ballot — not against POWER.'
-         : 'Nothing saved yet, so there is no earlier ballot to compare against.',
-    moved.slice(0, 10).map(x => bwCase(x.team, x.label))]);
+
+  /* the two external rulers, stated as positions and named */
+  const top = ranked.length ? ranked[0].team : null;
+  if (top) {
+    const t = TEAMS[top] || {};
+    const rulers = [
+      '<span class="bwv pw">POWER ' + (t.rank ? '#' + t.rank : '\u2014') + '</span>',
+      '<span class="bwv av">AVCA ' + (t.avca ? '#' + t.avca : 'NR') + '</span>',
+      (RESUME_ACTIVE && t.resume_rank
+        ? '<span class="bwv">R\u00c9SUM\u00c9 #' + t.resume_rank + '</span>'
+        : '<span class="bwv off">R\u00c9SUM\u00c9 not active yet</span>')
+    ];
+    f.push('<div class="bwbf"><em>Your #1</em><b>' + esc(top) + '</b>' +
+      '<span class="bwrulerline">' + rulers.join('<i> &middot; </i>') +
+      '</span></div>');
+  }
+
+  host.innerHTML = '<h3>This week</h3>' +
+    '<p class="bwbsub">Facts about <b>your</b> ballot and what has happened ' +
+    'since you saved it. Nothing here is a recommended Top 25, and nothing ' +
+    'here tells you to move a team.</p>' +
+    '<div class="bwbfacts">' + f.join('') + '</div>';
+}
+
+/* ── THE COMPARISON WORKSPACE ─────────────────────────────────────────────
+   Both teams are chosen by Cody. Only fields that already exist, each labelled
+   with the ruler it belongs to. */
+function bwCmpRow(label, a, b, cls) {
+  const v = x => (x === null || x === undefined || x === '')
+    ? '<span class="un">not available</span>' : x;
+  return '<tr><td class="lab">' + label + '</td><td>' + v(a) + '</td><td>' +
+    v(b) + '</td></tr>';
+}
+function renderCompare() {
+  const host = document.getElementById('bwteamcmp');
+  if (!host) return;
+  const A = (document.getElementById('bwcA') || {}).value || '';
+  const B = (document.getElementById('bwcB') || {}).value || '';
+  const ta = TEAMS[A], tb = TEAMS[B];
+  if (!ta || !tb) {
+    host.innerHTML = '<p class="bwsub">Choose two teams to compare. Nothing is ' +
+      'selected for you.</p>';
+    return;
+  }
+  const slot = n => { const e = bwEntry(n); return e && e.rank ? '#' + e.rank : null; };
+  const prevRank = n => { const r = bwPrevRank(n); return r ? '#' + r : null; };
+  const mine = n => {
+    const v = slot(n);
+    return v ? '<span class="bwv mine">' + v + '</span>' : null;
+  };
+  const pw = n => (TEAMS[n].rank
+    ? '<span class="bwv pw">#' + TEAMS[n].rank + '</span>' : null);
+  const av = n => (TEAMS[n].avca
+    ? '<span class="bwv av">#' + TEAMS[n].avca + '</span>'
+    : '<span class="bwv av">NR</span>');
+  const last = n => {
+    const p = (TEAMS[n].played || []).slice().sort((x, y) => x.d < y.d ? 1 : -1)[0];
+    return p ? (p.mine > p.theirs ? 'beat ' : 'lost to ') + esc(p.opp) + ' ' +
+      p.mine + '\u2013' + p.theirs + ' (' + esc(dayLabel(p.d)) + ')' : null;
+  };
+  const next = n => {
+    const today = new Intl.DateTimeFormat('en-CA',
+      { timeZone: 'America/Los_Angeles' }).format(new Date());
+    const u = (TEAMS[n].fixtures || []).filter(x => x.d >= today)
+      .sort((x, y) => x.d < y.d ? -1 : 1)[0];
+    return u ? (u.home ? 'v ' : 'at ') + esc(u.opp) + ' ' + esc(dayLabel(u.d)) : null;
+  };
+  const proj = n => {
+    const sm = TEAMS[n].sim;
+    return sm && sm.proj_wins_mean != null
+      ? sm.proj_wins_mean.toFixed(1) + ' projected wins' : null;
+  };
+  /* ⚠ HEAD-TO-HEAD IS DATED, AND MOST OF IT IS LAST SEASON. Presenting a 2025
+     meeting as evidence about 2026 without saying so would be the single most
+     misleading thing this table could do. */
+  const h = (TEAMS[A].h2h || {})[B];
+  let h2h = null;
+  if (h) {
+    const yr = (h.d || '').slice(0, 4);
+    h2h = esc(A) + ' ' + h.mine + '\u2013' + h.theirs + ' ' + esc(B) +
+      ', ' + esc(h.d) + (yr && yr !== String(SEASON_YEAR)
+        ? ' <span class="un">(' + yr + ' season, not this one)</span>' : '');
+  }
+
+  host.innerHTML =
+    '<table class="bwcmptbl"><thead><tr><th></th>' +
+      '<th class="tm">' + logo(A) + esc(A) + '</th>' +
+      '<th class="tm">' + logo(B) + esc(B) + '</th></tr></thead><tbody>' +
+      bwCmpRow('My ballot', mine(A), mine(B)) +
+      bwCmpRow('My last saved', prevRank(A), prevRank(B)) +
+      bwCmpRow('POWER', pw(A), pw(B)) +
+      bwCmpRow('AVCA poll', av(A), av(B)) +
+      bwCmpRow('R\u00c9SUM\u00c9',
+        RESUME_ACTIVE ? null : '<span class="un">not active yet</span>',
+        RESUME_ACTIVE ? null : '<span class="un">not active yet</span>') +
+      bwCmpRow('Record 2026', esc(TEAMS[A].record26 || ''), esc(TEAMS[B].record26 || '')) +
+      bwCmpRow('Last result', last(A), last(B)) +
+      bwCmpRow('Next match', next(A), next(B)) +
+      bwCmpRow('Projection', proj(A), proj(B)) +
+    '</tbody></table>' +
+    '<p class="bwsub" style="margin-top:10px">Head to head: ' +
+      (h2h || '<span class="un">these two have not met in the records held here</span>') +
+      '</p>' +
+    '<p class="bwsub"><a class="parentlink" href="' + routeFor('teams', slug(A)) +
+      '">Open ' + esc(A) + '</a> &middot; <a class="parentlink" href="' +
+      routeFor('teams', slug(B)) + '">Open ' + esc(B) + '</a></p>';
+}
+
+/* Four groups. Each is ONE named difference, sorted by its own size -- no
+   blending, so every position in every list can be checked by hand. */
+/* ⚠ FIVE TRIGGERS, EACH A STATED FACT. An item is here because something
+   OBSERVABLE changed -- never because a score decided it deserves attention.
+   Every entry carries the exact trigger and the ranks it came from, and no
+   list is ordered by "importance": each is sorted by the size of its own
+   named difference, which is a number the reader can check. */
+function bwQueue() {
+  const prev = bwPrev();
+  const prevRank = {};
+  if (prev) (prev.teams || []).forEach(t => { if (t.rank) prevRank[t.team] = t.rank; });
+  const ranked = bwRanked();
+  const nowRank = {};
+  ranked.forEach(t => { nowRank[t.team] = t.rank; });
+  const out = [];
+
+  /* 1. my PRIOR ballot slot differs from current POWER */
+  const vsPower = Object.keys(prevRank).map(n => {
+    const p = (TEAMS[n] || {}).rank;
+    return p ? { team: n, d: p - prevRank[n], mine: prevRank[n], pw: p } : null;
+  }).filter(Boolean).filter(x => Math.abs(x.d) >= 3)
+    .sort((a, b) => Math.abs(b.d) - Math.abs(a.d)).slice(0, 10);
+  out.push(['Your last ballot differs from POWER',
+    'Your saved slot against the current POWER rank. Positive means you had ' +
+    'them higher than POWER does.',
+    vsPower.map(x => bwCase(x.team,
+      '<span class="bwtrig mine">my #' + x.mine + '</span>' +
+      '<span class="bwtrig pw">POWER #' + x.pw + '</span>' +
+      '<span class="bwtrig">' + (x.d > 0 ? '+' : '') + x.d + '</span>'))]);
+
+  /* 2. AVCA differs from my PRIOR ballot */
+  const vsAvca = Object.keys(prevRank).map(n => {
+    const a = (TEAMS[n] || {}).avca;
+    return a ? { team: n, d: a - prevRank[n], mine: prevRank[n], av: a } : null;
+  }).filter(Boolean).filter(x => Math.abs(x.d) >= 3)
+    .sort((a, b) => Math.abs(b.d) - Math.abs(a.d)).slice(0, 10);
+  out.push(['The AVCA poll differs from your last ballot',
+    'The coaches poll against your saved slot. An external opinion, not ours.',
+    vsAvca.map(x => bwCase(x.team,
+      '<span class="bwtrig mine">my #' + x.mine + '</span>' +
+      '<span class="bwtrig av">AVCA #' + x.av + '</span>' +
+      '<span class="bwtrig">' + (x.d > 0 ? '+' : '') + x.d + '</span>'))]);
+
+  /* 3. a verified result dated since the prior save */
+  let played = [];
+  if (prev) {
+    const day = (prev.saved_utc || '').slice(0, 10);
+    Object.keys(prevRank).concat(Object.keys(nowRank)).forEach(n => {
+      if (played.some(x => x.team === n)) return;
+      const g = (TEAMS[n] || {}).played || [];
+      const since = g.filter(x => x.d && x.d >= day);
+      if (since.length) {
+        const L = since.sort((a, b) => a.d < b.d ? 1 : -1)[0];
+        played.push({ team: n, g: L, n: since.length });
+      }
+    });
+  }
+  out.push(['Played since your last ballot',
+    prev ? 'A completed match dated on or after the day you saved. Only ' +
+           'results the data can date are counted.'
+         : 'Nothing saved yet, so there is no date to count results from.',
+    played.slice(0, 12).map(x => bwCase(x.team,
+      '<span class="bwtrig res">' +
+        (x.g.mine > x.g.theirs ? 'beat ' : 'lost to ') + esc(x.g.opp) + ' ' +
+        x.g.mine + '\u2013' + x.g.theirs + '</span>' +
+      (x.n > 1 ? '<span class="bwtrig">' + x.n + ' since</span>' : '')))]);
+
+  /* 4. entered or dropped my ballot */
+  const inout = [];
+  ranked.forEach(t => {
+    if (prev && prevRank[t.team] == null) {
+      inout.push({ team: t.team,
+        tag: '<span class="bwtrig mine">entered at #' + t.rank + '</span>' });
+    }
+  });
+  Object.keys(prevRank).forEach(n => {
+    if (nowRank[n] == null) {
+      inout.push({ team: n,
+        tag: '<span class="bwtrig mine">dropped, was #' + prevRank[n] + '</span>' });
+    }
+  });
+  out.push(['Entered or left your ballot',
+    'Movement in and out is a different decision from moving a team a few ' +
+    'slots, so it is counted separately.',
+    inout.map(x => bwCase(x.team, x.tag))]);
+
+  /* 5. in the comparison universe with no personal rank at all */
+  const universe = Object.keys(TEAMS).filter(n =>
+    (TEAMS[n].rank && TEAMS[n].rank <= 30) || TEAMS[n].avca);
+  const unranked = universe.filter(n => prevRank[n] == null && nowRank[n] == null)
+    .sort((a, b) => ((TEAMS[a].rank || 99) - (TEAMS[b].rank || 99))).slice(0, 12);
+  out.push(['In the picture, but never on your ballot',
+    'Teams inside the current comparison universe \u2014 POWER top 30 or ' +
+    'AVCA-ranked \u2014 that you have neither saved nor slotted.',
+    unranked.map(n => bwCase(n,
+      '<span class="bwtrig pw">POWER ' +
+        (TEAMS[n].rank ? '#' + TEAMS[n].rank : '\u2014') + '</span>' +
+      '<span class="bwtrig av">AVCA ' +
+        (TEAMS[n].avca ? '#' + TEAMS[n].avca : 'NR') + '</span>'))]);
+
   return out;
 }
 
@@ -6731,7 +7089,7 @@ function renderBallotReview() {
     '</div>').join('');
   const n = document.getElementById('bwrevn');
   if (n) n.textContent = groups.reduce((a, g) => a + g[2].length, 0) +
-    ' teams across 4 groups';
+    ' teams across ' + groups.length + ' triggers';
 }
 
 /* ---- pre-submit: three DIFFERENCES, named, none of them advice --------- */
@@ -7000,6 +7358,8 @@ function renderBallot() {
   renderBallotDiff();
   renderBallotHistory();
   renderBallotReview();
+  renderBriefing();
+  renderCompare();
   const lead = document.getElementById('ballotlead');
   if (lead) {
     lead.innerHTML = '<b>Your ' + SEASON_YEAR + ' VolleyTalk ballot.</b> ' +
@@ -7065,13 +7425,36 @@ function renderBallotHistory() {
     bwHistoryOptions();
     return;
   }
-  box.innerHTML = BW_HIST.slice().reverse().slice(0, 8).map((b, i) => {
+  /* ⚠ A WEEK-BY-WEEK RECORD, AND REOPENING ONE IS READ-ONLY. A saved ballot
+     is history; opening it must never become a way to overwrite it, so the
+     view has no editing controls and no save path at all -- it renders from
+     the archived row and nothing writes back. */
+  const rows = BW_HIST.slice().reverse();
+  box.innerHTML = rows.slice(0, 10).map((b, i) => {
     const r = (b.teams || []).filter(x => x.rank).sort((a, c) => a.rank - c.rank);
-    const when = (b.saved_utc || '').replace('T', ' ').replace('Z', '');
-    return '<div class="bwhrow"><b>' + esc(when) + '</b>' +
-      '<span class="bwsub">' + r.length + ' ranked' +
-      (r.length ? ' · #1 ' + esc(r[0].team) : '') + '</span>' +
-      (i === 0 ? '<span class="bwlatest">latest</span>' : '') + '</div>';
+    const when = (b.saved_utc || '').slice(0, 10);
+    const idx = BW_HIST.length - 1 - i;
+    let line = r.length ? '#1 ' + esc(r[0].team) : 'no ranked teams';
+    const older = rows[i + 1];
+    if (older) {
+      const pr = {};
+      (older.teams || []).forEach(t => { if (t.rank) pr[t.team] = t.rank; });
+      let mv = 0, ent = 0;
+      r.forEach(t => {
+        if (pr[t.team] == null) ent++;
+        else if (pr[t.team] !== t.rank) mv++;
+      });
+      line += ' &middot; ' + mv + ' moved, ' + ent + ' entered vs the week before';
+    } else {
+      line += ' &middot; first saved ballot';
+    }
+    return '<div class="bwweek"><div class="wkhd"><b>' + esc(when) + '</b>' +
+      '<span>' + esc(bwIsoWeek(new Date(b.saved_utc))) + ' &middot; ' +
+      r.length + ' ranked</span>' +
+      (i === 0 ? '<span class="bwlatest">latest</span>' : '') + '</div>' +
+      '<div class="wkline">' + line + '</div>' +
+      '<button type="button" class="linkbtn" data-openballot="' + idx +
+      '">Open read-only</button></div>';
   }).join('');
 }
 
@@ -7257,6 +7640,21 @@ function bwWire() {
     }
   });
 
+  document.addEventListener('click', e => {
+    const o = e.target.closest && e.target.closest('[data-openballot]');
+    if (o) bwOpenArchived(+o.dataset.openballot);
+  });
+  ['bwcA', 'bwcB'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', renderCompare);
+  });
+  const cclr = document.getElementById('bwcclear');
+  if (cclr) cclr.addEventListener('click', () => {
+    ['bwcA', 'bwcB'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    renderCompare();
+  });
   ['bwcmpa', 'bwcmpb'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('change', bwCompareSaved);

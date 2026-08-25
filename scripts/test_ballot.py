@@ -645,6 +645,142 @@ console.log(JSON.stringify(out));
               and by['no previous ballot'][3] is False,
               str(by['no previous ballot']))
 
+    print("\n18. THE BALLOT COMMAND CENTER IS PRIVATE, ENTIRELY")
+    NEW_PRIVATE = ("bwbrief", "bwqueue", "bwcompare", "bwteamcmp", "bwcA", "bwcB",
+                   "bwro", "renderBriefing", "renderCompare", "bwOpenArchived",
+                   "bwResultsSince", "data-openballot", "bwtrig", "bwcmptbl",
+                   "bwweek", "bwrulerline")
+    if os.path.exists(pub):
+        ph2 = open(pub, encoding="utf-8").read()
+        left = [x for x in NEW_PRIVATE if x in ph2]
+        check("no briefing/queue/compare markup, css or code is published",
+              not left, str(left[:5]))
+        # ⚠ A NESTED <section> TRUNCATED THE STRIP AND SHIPPED THE WORKSHOP.
+        # strip_private removes <section id="v-ballot".*?</section> NON-GREEDILY,
+        # so an inner </section> ends the match early. The build aborted on its
+        # own marker, which is the gate working -- this keeps it from recurring.
+        bsec = re.search(r'<section id="v-ballot".*?</section>', src, re.S)
+        check("the workshop contains no nested <section>",
+              bsec is not None and "<section" not in bsec.group(0)[len('<section'):],
+              "a nested section truncates the public strip")
+    if os.path.exists(priv):
+        vh2 = open(priv, encoding="utf-8").read()
+        have = [x for x in NEW_PRIVATE if x in vh2]
+        check("[+] ...and the PRIVATE page has all of it",
+              len(have) == len(NEW_PRIVATE),
+              "missing %s" % [x for x in NEW_PRIVATE if x not in vh2])
+
+    print("\n19. REVIEW TRIGGERS STATE A FACT, NEVER AN INSTRUCTION")
+    q = src[src.index("function bwQueue()"):]
+    q = q[:q.index("\nfunction ")]
+    for label in ("Your last ballot differs from POWER",
+                  "The AVCA poll differs from your last ballot",
+                  "Played since your last ballot",
+                  "Entered or left your ballot",
+                  "In the picture, but never on your ballot"):
+        check("trigger present: %s" % label[:44], label in q)
+    # ⚠ NO IMPERATIVE MAY REACH THIS SCREEN. A review queue that says "move
+    # this team up" has stopped organising evidence and started voting.
+    # ⚠ AND THE FIRST VERSION OF THIS CHECK FAILED ON ITS OWN DENIALS: the page
+    # says "Nothing here is a recommended Top 25" and the source says "never
+    # ordered by importance", and a bare substring search cannot tell a promise
+    # from a violation. Every occurrence must sit in a sentence that NEGATES
+    # it -- which is a statement about meaning, not about spelling.
+    NEG = ("nothing", "never", "not ", "no ", "cannot", "n't")
+    def sentences_with(phrase, text):
+        out = []
+        low = text.lower()
+        i = low.find(phrase.lower())
+        while i >= 0:
+            a = max(0, low.rfind(".", 0, i) + 1)
+            b = low.find(".", i)
+            out.append(text[a:(b if b > 0 else len(text))])
+            i = low.find(phrase.lower(), i + 1)
+        return out
+    for verb in ("Move this team", "should be ranked", "we recommend",
+                 "recommended Top 25", "deserves to be", "move up", "move down"):
+        hits = sentences_with(verb, src)
+        # ⚠ NORMALISE FIRST. A negation split across a line break ("and no\n
+        # list is ordered by...") is still a negation; matching raw text made
+        # the checker blind to it and it accused a promise of being a breach.
+        bare = [h for h in hits
+                if not any(n in re.sub(r"\s+", " ", h).lower() for n in NEG)]
+        check("[-] %r appears only inside a denial" % verb, not bare,
+              repr(bare[:1]))
+    for word in ("urgency", "importance"):
+        hits = sentences_with(word, src)
+        bare = [h for h in hits
+                if not any(n in re.sub(r"\s+", " ", h).lower() for n in NEG)]
+        check("[-] no unqualified %r anywhere" % word, not bare, repr(bare[:1]))
+    check("[+] ...and the scan can tell the two apart (control)",
+          not [h for h in sentences_with("x", "we recommend x.")
+               if any(n in h.lower() for n in NEG)]
+          and bool(sentences_with("recommend", "we recommend x.")))
+    check("each item shows the ranks its trigger came from",
+          "bwtrig mine" in q and "bwtrig pw" in q and "bwtrig av" in q)
+
+    print("\n20. COMPARISON RENDERS ONLY SUPPORTED FIELDS")
+    c = src[src.index("function renderCompare()"):]
+    c = c[:c.index("\nfunction ")]
+    check("both teams are chosen by the user, none auto-selected",
+          "bwcA" in c and "bwcB" in c and "auto" not in c.lower())
+    check("nothing is compared until both are chosen", "if (!ta || !tb)" in c)
+    for lab in ("My ballot", "My last saved", "POWER", "AVCA poll",
+                "Record 2026", "Last result", "Next match", "Projection"):
+        check("compares %r" % lab, "'" + lab + "'" in c)
+    # bwCmpRow is where a value is rendered, so that is where the honest
+    # fallback lives -- not in renderCompare, which only assembles rows.
+    row_fn = src[src.index("function bwCmpRow"):]
+    row_fn = row_fn[:row_fn.index("\nfunction ")]
+    check("a missing value says so rather than showing a zero",
+          "not available" in row_fn, "checked bwCmpRow")
+    check("a missing head-to-head is stated",
+          "have not met in the records" in c)
+    # ⚠ MOST HEAD-TO-HEAD ON FILE IS LAST SEASON. Presenting a 2025 meeting as
+    # evidence about 2026 without saying so would be the worst thing here.
+    check("a prior-season head-to-head names its season",
+          "season, not this one" in c)
+    check("[-] no generated scouting language",
+          all(x not in c.lower() for x in ("case for", "case against",
+                                           "momentum", "should win")))
+    check("both teams link into the routed team pages",
+          c.count("routeFor('teams'") == 2)
+
+    print("\n21. COMPARISON IS AGAINST CODY'S SAVED BALLOT, NOT POWER")
+    b = src[src.index("function renderBriefing()"):]
+    b = b[:b.index("\nfunction ")]
+    check("the briefing reads the last SAVED ballot", "bwLastSaved()" in b)
+    check("...and movement is measured from it, not from POWER",
+          "prev.teams" in b and "TEAMS[n].rank" not in b.split("Moved in your")[0][-400:])
+    check("an honest first-ballot state exists", "None yet" in b)
+    check("results are only counted when a DATE proves it",
+          "function bwResultsSince" in src and "g.d >= day" in src)
+    check("...and the copy says so",
+          "no completed match is dated after your save" in b)
+
+    print("\n22. HISTORY IS APPEND-ONLY AND REOPENING IS READ-ONLY")
+    ro = src[src.index("function bwOpenArchived"):]
+    ro = ro[:ro.index("\nfunction ")]
+    check("the archive view renders into its own container", "'bwro'" in ro)
+    check("[-] it contains no input, textarea or save control",
+          all(x not in ro for x in ("<input", "<textarea", "bwSave(", "bwLocalSave")))
+    check("[-] ...and never writes to the working ballot",
+          "BW.teams" not in ro and "bwRenumber" not in ro)
+    check("it says plainly that nothing writes back",
+          "nothing here writes back" in ro)
+    check("the working ballot still saves by append only",
+          "bwSave" in src)
+
+    print("\n23. THE EXPORT IS STILL ONLY HIS BALLOT AND HIS NOTES")
+    t = src[src.index("function bwText()"):]
+    t = t[:t.index("\nfunction ")]
+    check("[-] the copy adds no branding", "wvb" not in t.lower()
+          and "hub" not in t.lower())
+    check("[-] ...and no generated commentary",
+          all(x not in t.lower() for x in ("power", "avca", "because",
+                                           "our model")))
+    check("it carries the author's own summary", "summary" in t)
+
     print()
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))
