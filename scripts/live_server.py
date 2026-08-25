@@ -76,6 +76,15 @@ def _hub():
     return _HUB[0]
 
 
+def _now_pt():
+    """Now, in the zone the page renders in."""
+    try:
+        from zoneinfo import ZoneInfo
+        return datetime.datetime.now(ZoneInfo("America/Los_Angeles"))
+    except Exception:
+        return datetime.datetime.now()
+
+
 def _fmt_time(epoch, start_time=None, home_team=None):
     """A start time, rendered the way the rest of the page renders one.
 
@@ -188,7 +197,13 @@ class Cache(object):
             if games or not self.payload.get("games"):
                 self.payload = {
                     "games": games,
-                    "updated": _et_now().strftime("%-I:%M:%S %p ET"),
+                    # ⚠ THE PAGE IS PACIFIC. _et_now() stays Eastern because
+                    # the scoreboard is keyed by the Eastern calendar day, but
+                    # the stamp a reader SEES must match every other time on
+                    # the page -- it was printing "9:33 PM ET" directly above
+                    # fixtures listed in PT, which is the same two-clocks bug
+                    # already fixed for start times.
+                    "updated": _now_pt().strftime("%-I:%M:%S %p PT"),
                     "error": err,
                 }
             else:

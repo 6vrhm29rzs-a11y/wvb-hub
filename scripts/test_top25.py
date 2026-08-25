@@ -217,8 +217,11 @@ def test_the_two_rankings_explain_their_relationship():
         print("  --   no built page; skipping")
         return
     h = open(hub, encoding="utf-8").read()
-    moving = ("This ranking moves with every result" in h
-              or "Our ranking, from 2026 results" in h)
+    # ⚠ MATCH THE INVARIANT, NOT THE SENTENCE. This asserted the literal string
+    # "This ranking moves with every result", so rewording the lead -- which is
+    # a UI change with no meaning behind it -- failed the test. A guard pinned
+    # to prose blocks editing; a guard pinned to the CLAIM does not.
+    moving = bool(re.search(r"moves with every result|from 20\d\d results", h))
     frozen = "Still the preseason projection" in h
     check(moving or frozen,
           "the rankings tab states which basis it is on")

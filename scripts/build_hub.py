@@ -680,6 +680,15 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
                                                (r.get("loc") or {}).get("city")) if x),
             })
 
+    # THIS season's W-L, from the very same `played` list the fixtures, the form
+    # pills and the standings all come from. One source, so the four cannot
+    # disagree -- and a team with no completed match is ABSENT rather than
+    # "0-0", which would read as a played-and-drawn record.
+    _w26 = {}
+    for _nm, _gs in played.items():
+        _w = sum(1 for g in _gs if (g["mine"] or 0) > (g["theirs"] or 0))
+        _w26[_nm] = (_w, len(_gs) - _w)
+
     fixtures = {}
     vidx = venue_index()
     today = datetime.date.today().isoformat()
@@ -912,11 +921,23 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
         out[nm] = {
             "conf": t["conf"],
             "rank": t["rank26"],
+            # POWER and R\u00c9SUM\u00c9 travel with the team so the header can
+            # lead with our two rankings instead of burying them among five of
+            # other people's.
+            "power": t.get("power"),
+            "resume_rank": t.get("resume_rank"),
+            "wab": t.get("wab"),
             "rank25": t["rank25"],
             "avca": t.get("avca"), "vt": t.get("vt"),
             "massey": t.get("massey"), "rpi": t.get("rpi"),
             "record25": ("%s-%s" % (t.get("wins"), t.get("losses"))
                          if t.get("wins") is not None else None),
+            # THIS season's record, from the same results list the standings
+            # and the form pills are built from -- one source, so the three
+            # cannot disagree. None until a team has played, never "0-0" for a
+            # team with no fixtures on file.
+            "record26": (("%d-%d" % (_w26.get(nm, (0, 0))[0], _w26.get(nm, (0, 0))[1]))
+                         if nm in _w26 else None),
             "ret": t["ret"],
             "rotation": [dict(c, pos=rpos.get(nkey(c.get("name"))),
                               photo=(photos.get(nm) or {}).get(
@@ -1557,8 +1578,19 @@ def hcell_py(v, txt, lo, hi, kind="seq"):
     A missing value renders as an em dash with no scale at all (R5) -- an
     absent measurement must not be painted as a neutral one.
     """
+    # ⚠ THE COLUMN KEEPS ITS IDENTITY EVEN WHEN THE VALUE IS MISSING. The first
+    # version emitted `class="n"` for an absent value and `class="n hx dv"` for
+    # a present one -- so the SAME logical column had two different class sets
+    # depending on its contents, and any rule that targets it (a mobile hide, a
+    # width, a colour) silently applied to some rows and not others. That is how
+    # a column meant to be hidden at 390px reappeared for exactly the teams with
+    # no data.
+    #
+    # `hx` is deliberately NOT added here: it is what paints the gradient, and
+    # an absent measurement must never be painted as a neutral one (R5). The
+    # column class is identity; `hx` is "there is a value".
     if v is None:
-        return '<td class="n">&mdash;</td>'
+        return '<td class="n %s">&mdash;</td>' % kind
     t = 0.5 if hi == lo else (float(v) - lo) / (hi - lo)
     t = max(0.0, min(1.0, t))
     return '<td class="n hx %s" style="--t:%.3f"><b>%s</b></td>' % (kind, t, txt)
@@ -1991,8 +2023,8 @@ def build():
         rrows.append(
             '<tr class="row" data-r="%d" style="--tc:%s"><td class="rk">%d%s</td>'
             '<td class="tm">%s%s%s</td><td class="cf">%s</td>'
-            '%s%s<td class="n hi">%s</td><td class="n">%s</td>%s'
-            '<td class="n">%s</td>%s<td class="n">%s</td><td class="n hi">%s</td></tr>%s'
+            '%s%s<td class="n hi c-ref">%s</td><td class="n c-ref c-avca">%s</td>%s'
+            '<td class="n c-ref">%s</td>%s<td class="n">%s</td><td class="n hi">%s</td></tr>%s'
             % (t["rank26"],
                # the school's own colour, same source the Top 25 uses -- the two
                # tables of the same teams should not look like different sites
@@ -2004,10 +2036,11 @@ def build():
                powercell(t),
                resumecell(t, _resume_active),
                c(t["rank25"]), c(t.get("avca")),
-               "" if PUBLIC else ('<td class="n">%s</td><td class="n">%s</td>'
+               "" if PUBLIC else ('<td class="n c-ref">%s</td>'
+                                  '<td class="n c-ref">%s</td>'
                                   % (c(t.get("vt")), c(t.get("massey")))),
                c(t.get("rpi")),
-               "" if PUBLIC else ('<td class="n sp">%s</td>' % (spread or "&mdash;")),
+               "" if PUBLIC else ('<td class="n sp c-ref">%s</td>' % (spread or "&mdash;")),
                "&mdash;" if t["ret"] is None else "%.0f%%" % (100 * t["ret"]),
                "&mdash;" if tourn_of.get(t["team"]) is None
                else "%.0f%%" % tourn_of[t["team"]], det))
@@ -2031,39 +2064,29 @@ def build():
         if _blend:
             _played = [t for t in _blend if (t.get("blend_matches") or 0)]
             _w = max([t.get("blend_season_weight") or 0 for t in _blend] or [0])
+            # ⚠ THREE FACTS, NOT TWELVE LINES. The lead had grown to a
+            # twelve-line essay standing between a reader and the table -- the
+            # methodology was collapsed and the intro absorbed it, which is the
+            # opposite of progressive disclosure. What a reader needs before
+            # looking at the rankings is: it moves, how much of it is this
+            # season, and that the two columns answer different questions.
+            # Everything else is in the Methodology panel below the table.
+            # ⚠ THE SEASON IS NAMED IN THE LEAD. A standing invariant here --
+            # this page carries 2025 context beside 2026 numbers, and a view
+            # that does not say which year it is describing is how a finished
+            # season leaked into a live one once already.
             rank_basis = (
-                "<b>This ranking moves with every result.</b> It starts from "
-                "the preseason projection and lets 2026 pull it, weighted "
-                "<code>n/(n+k)</code> with <b>k measured, not chosen</b> "
-                "&mdash; so a team needs about k matches before this season "
-                "counts as much as the projection does. <b>%d of %d teams have "
-                "played</b>, and the most any team is being judged on this "
-                "season so far is <b>%d%%</b>. "
-                "<b>Why so little movement in August?</b> Reacting harder was "
-                "tested against 2025 and it predicts <i>worse</i>: blending at "
-                "every speed from k=0.5 to k=50, the best value was 25 and "
-                "every faster setting was worse than the one above it &mdash; "
-                "reacting hard to each result scored below ignoring results "
-                "altogether. One Friday night genuinely is that little "
-                "evidence. The fitted composite takes over automatically once "
-                "50 matches are in. "
-                "<b>Two columns, two questions, and they are meant to "
-                "disagree.</b> <b>POWER</b> is how strong a team is &mdash; who "
-                "would win tomorrow &mdash; and margin drives it. "
-                "<b>R&eacute;sum&eacute;</b> is what a team has <i>earned</i>, "
-                "ranked by RPI because that beat every alternative against the "
-                "64 teams the committee actually selected in 2025; margin is "
-                "ignored there on purpose, because a win is a win. A very good "
-                "team that has not played anybody yet is correctly high on one "
-                "and nowhere on the other. %s"
-                % (len(_played), len(_blend), round(100 * _w),
-                   ("R&eacute;sum&eacute; is live." if _resume_active else
-                    "<b>R&eacute;sum&eacute; is not live yet</b> &mdash; it "
-                    "measures what a team has earned against the schedule it "
-                    "has played, and %d D-I matches into the season nobody has "
-                    "earned anything. It switches on at %d."
-                    % ((meta.get("resume") or {}).get("matches") or 0,
-                       (meta.get("resume") or {}).get("min_matches") or 200))))
+                "<b>Our %d ranking, and it moves with every result.</b> "
+                "<b>%d of %d teams have played</b>; the most any team is judged "
+                "on this season so far is <b>%d%%</b>. "
+                "<b class=\"kpow\">POWER</b> is how strong a team is. "
+                "<b class=\"kres\">R&Eacute;SUM&Eacute;</b> is what it has "
+                "earned &mdash; %s."
+                % (SEASON, len(_played), len(_blend), round(100 * _w),
+                   ("live" if _resume_active else
+                    "not live until %d D-I matches have been played (%d so far)"
+                    % ((meta.get("resume") or {}).get("min_matches") or 200,
+                       (meta.get("resume") or {}).get("matches") or 0))))
         else:
             rank_basis = (
                 "<b>Still the preseason projection &mdash; not yet a "
@@ -2230,6 +2253,42 @@ def build():
         if _r.get("team") and _r.get("rank"):
             _ourrank[_r["team"]] = int(_r["rank"])
 
+    # ---- WHAT CHANGED: completed matches, ranked ones first --------------
+    # Ranks shown are OUR power rank AS OF NOW, not as of the match -- we do not
+    # store a rank history per match, and implying we did would be a fabricated
+    # provenance. The tooltip says so.
+    _pr = dict((t["team"], t["rank26"]) for t in teams if t.get("rank26"))
+    _chg = []
+    for r in sorted(res, key=lambda x: -(x.get("epoch") or 0)):
+        aw = (r.get("away_sets") or 0) > (r.get("home_sets") or 0)
+        win, lose = (r["away"], r["home"]) if aw else (r["home"], r["away"])
+        ws, ls = ((r["away_sets"], r["home_sets"]) if aw
+                  else (r["home_sets"], r["away_sets"]))
+        wr, lr = _pr.get(win), _pr.get(lose)
+        if wr is None and lr is None:
+            continue                      # neither side is one of the 348
+        _chg.append({"win": win, "lose": lose, "ws": ws, "ls": ls,
+                     "wr": wr, "lr": lr,
+                     "both": bool(wr and lr and wr <= 25 and lr <= 25),
+                     "epoch": r.get("epoch") or 0})
+    _chg.sort(key=lambda x: (not x["both"], -x["epoch"]))
+    _chg = _chg[:4]
+
+    def _chgcard(c):
+        def side(nm, rk, cls):
+            badge = ('<i class="pwr" title="our POWER rank as of now, not as of '
+                     'the match">%d</i> ' % rk) if rk else ""
+            return ('<span class="%s">%s%s%s</span>'
+                    % (cls, badge, logo_img(nm, logos), esc(nm)))
+        return ('<div class="chgc%s">%s<b class="sc">%s&ndash;%s</b>%s</div>'
+                % (" mk" if c["both"] else "",
+                   side(c["win"], c["wr"], "w"), c["ws"], c["ls"],
+                   side(c["lose"], c["lr"], "l")))
+
+    _chg_html = "".join(_chgcard(c) for c in _chg)
+    _chg_meta = ("%d ranked v ranked" % sum(1 for c in _chg if c["both"])
+                 if any(c["both"] for c in _chg) else "latest results")
+
     _week_rows = [
         {"d": r["d"], "dl": day_label(r["d"], _today), "a": r["a"], "h": r["h"], "t": r["t"],
          "ar": r.get("ar") or "", "hr": r.get("hr") or "",
@@ -2365,6 +2424,9 @@ def build():
         .replace("{{SCORE_CARDS}}", "".join(cards) or
                  '<div class="empty">No completed matches yet.</div>') \
         .replace("{{SEED_ROWS}}", "".join(seeds)) \
+        .replace("{{CHANGED_ROWS}}", _chg_html) \
+        .replace("{{CHANGED_META}}", esc(_chg_meta)) \
+        .replace("{{CHANGED_HIDDEN}}", "" if _chg else "hidden") \
         .replace("{{WEEK_JSON}}", json.dumps(_week_rows, separators=(",", ":"))) \
         .replace("{{SCHED_ROWS}}", srows) \
         .replace("{{TV_ROWS}}", trows) \
@@ -2769,6 +2831,209 @@ td.pick b{color:var(--navy)}
    uses. The gap is deliberately smaller and quieter than the poll rank itself:
    the rank is the fact, the gap is the commentary. */
 .t25 td.poll b{font:700 14px/1 var(--disp);color:var(--ink)}
+/* ══ MOBILE: A PURPOSE-BUILT LIST, NOT A CLIPPED TABLE ═══════════════════
+   MEASURED BEFORE WRITING ANY OF THIS: the page had 19 mobile rules and NOT
+   ONE of them touched the rankings table or the nav. So at 390px a reader met
+   a thirteen-column desktop table cut off at the edge with no cue that it
+   scrolled, under a primary navigation that wrapped onto three rows before the
+   content started. That is not a table that needs tuning; it is a layout that
+   was never designed for the width.
+
+   ⚠ VERIFIED BY LIFTING THIS BLOCK AND ASSERTING ON THE RESULT (R6).
+   resize_window reports success and does NOT change the rendering viewport --
+   window.innerWidth stays ~1512 and this media query never matches -- which
+   once cost five review cycles on four fixes that were never tested.  */
+@media (max-width:560px){
+  /* NAV: one scrolling row. Wrapping to three rows pushes every page's content
+     below the fold before it has said anything. */
+  nav .inner{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;padding:0 6px}
+  nav .inner::-webkit-scrollbar{display:none}
+  nav button{flex:0 0 auto;white-space:nowrap}
+
+  /* RANKINGS + TOP 25 become a two-line row per team.
+     Line 1: rank, crest, team, movement.
+     Line 2: the four numbers worth carrying -- POWER, RESUME, record, AVCA.
+     Everything else stays in the DOM for search and for the desktop view; it
+     is hidden here rather than removed, so nothing is lost and no second
+     renderer can drift from the first. */
+  .rk3 tr.grp,
+  .rk3 thead th.c-ref:not(.c-avca),.rk3 tbody td.c-ref:not(.c-avca),
+  .rk3 thead th:nth-child(3),.rk3 tbody td.cf,
+  .rk3 thead th:nth-last-child(-n+2),.rk3 tbody td:nth-last-child(-n+2){display:none}
+  .rk3,.rk3 tbody,.rk3 thead,.rk3 tr{display:block;width:100%}
+  .rk3 thead{display:none}
+  /* ⚠ EXPLICIT COLUMNS, NOT STACKED CELLS NUDGED WITH margin-left. The first
+     version put POWER, R\00c9SUM\00c9 and AVCA in ONE grid area and pushed them
+     apart with fixed left margins -- which is a guess about how wide a number
+     is, and it was wrong: "85.4" printed straight through the rank digit. Give
+     each cell a real column and the browser does the arithmetic. */
+  .rk3 tbody tr.row{display:grid;
+    grid-template-columns:32px auto auto 1fr;
+    align-items:center;gap:3px 12px;padding:9px 11px 10px;
+    border-bottom:1px solid var(--line2)}
+  .rk3 tbody tr.row td{border:0;padding:0;background:none}
+  /* ⚠ width:48px FROM THE DESKTOP RULE SURVIVES INTO THE GRID. A grid TRACK
+     does not clamp a cell that sets its own width, so the 48px rank box ran
+     16px into the team name's column and the two overlapped. Found by
+     measuring the rects, not by reading the CSS -- the computed padding was
+     already 0, which made it look handled. */
+  .rk3 tbody td.rk{grid-column:1;grid-row:1;width:auto;min-width:0;
+    font:700 17px/1 var(--disp)}
+  .rk3 tbody td.tm{grid-column:2 / -1;grid-row:1;font-size:15px;min-width:0;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .rk3 tbody td.pw{grid-column:2;grid-row:2;justify-self:start}
+  .rk3 tbody td.rs{grid-column:3;grid-row:2;justify-self:start}
+  .rk3 tbody td.c-avca{grid-column:4;grid-row:2;justify-self:start;
+    opacity:1;color:var(--ink2)}
+  .rk3 tbody tr.det{display:none}
+  /* ⚠ THE GRADIENT BAR IS A COLUMN DEVICE AND THERE IS NO COLUMN HERE. On
+     desktop td.hx::before draws a bar whose WIDTH encodes the value, which
+     works because the eye compares it down a column of identical cells. In a
+     card list each row stands alone, so the bar has nothing to be read
+     against -- it just prints a green block behind the number and the whole
+     figure reads as a smudge. Drop the bar, keep the colour on the digits. */
+  .rk3 tbody td.hx::before,.t25 tbody td.hx::before{content:none}
+  .rk3 tbody td.pw b{color:#31D07E}
+
+  /* The header row is gone on mobile, so each number carries its own label.
+     ⚠ position:static IS LOAD-BEARING. These labels re-use ::before, the SAME
+     pseudo-element td.hx::before already declared as position:absolute for the
+     gradient bar. Setting content:none above removed the bar but NOT the
+     positioning, so every label was absolutely positioned on top of its own
+     value -- "POWER" printed through "85.4". A pseudo-element is one element:
+     re-purposing it inherits whatever the earlier rule said about it. */
+  .rk3 tbody td.pw::before,.rk3 tbody td.rs::before,.rk3 tbody td.c-avca::before,
+  .t25 tbody td.pw::before,.t25 tbody td.poll::before{
+    position:static;display:inline;width:auto;height:auto;
+    top:auto;right:auto;bottom:auto;left:auto;background:none;border:0;
+    animation:none;font:700 9px/1 var(--sans);letter-spacing:.1em;
+    margin-right:4px;vertical-align:baseline}
+  .rk3 tbody td.pw::before{content:"POWER ";color:#31D07E;opacity:.9}
+  .rk3 tbody td.rs::before{content:"R\00c9SUM\00c9 ";color:#F2B441;opacity:.9}
+  .rk3 tbody td.c-avca::before{content:"AVCA ";color:var(--ink3,var(--ink2));opacity:.8}
+  /* the numbers sit left in their own cells, not right-aligned as in a table */
+  .rk3 tbody td.pw,.rk3 tbody td.rs,.rk3 tbody td.c-avca,
+  .t25 tbody td.pw,.t25 tbody td.poll{text-align:left;width:auto}
+
+  /* TOP 25 -- same idea, different columns. It carries a record and a form
+     guide, which are the two things a poll reader looks at after the rank, so
+     those survive and conference / net-per-set / season-weight do not. */
+  .t25 thead{display:none}
+  .t25,.t25 tbody,.t25 tr{display:block;width:100%}
+  .t25 tbody tr.row{display:grid;
+    grid-template-columns:30px auto auto 1fr;
+    align-items:center;gap:4px 12px;padding:10px 11px 11px;
+    border-bottom:1px solid var(--line2)}
+  .t25 tbody tr.row td{border:0;padding:0;background:none}
+  .t25 td.rk{grid-column:1;grid-row:1;width:auto;min-width:0;
+    font:700 18px/1 var(--disp)}
+  .t25 td.tm{grid-column:2 / 4;grid-row:1;font-size:16px;min-width:0;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .t25 td.mvc{grid-column:4;grid-row:1;justify-self:end}
+  .t25 td.pw{grid-column:2;grid-row:2;justify-self:start}
+  .t25 td.poll{grid-column:3;grid-row:2;justify-self:start}
+  .t25 td.rec{grid-column:4;grid-row:2;justify-self:end;
+    font:600 13px/1 var(--mono);color:var(--ink2)}
+  .t25 td.form{grid-column:2 / -1;grid-row:3;justify-self:start}
+  .t25 td.cf,.t25 td.wt,.t25 td.dv{display:none}
+  .t25 tbody td.pw::before{content:"POWER ";color:#31D07E;opacity:.9}
+  .t25 tbody td.poll::before{content:"AVCA ";color:var(--ink3,var(--ink2));opacity:.8}
+
+  /* Long prose becomes readable rather than a wall */
+  .tabhint,.note{font-size:13px;line-height:1.5}
+}
+
+/* ── THREE RANKINGS, THREE IDENTITIES ────────────────────────────────────
+   POWER, R\00c9SUM\00c9 and the AVCA poll answer different questions and were
+   rendering as thirteen identical numeric columns. Colour carries the
+   distinction so it survives a glance: OURS is the green/amber pair, REFERENCE
+   is deliberately recessed, and the group row above the header says which is
+   which without a reader having to find the prose.  */
+.rk3 tr.grp th{font:700 9.5px/1 var(--sans);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink3,var(--ink2));padding:9px 10px 3px;
+  border-bottom:0;background:transparent;text-align:center}
+.rk3 tr.grp th.g-ours{color:#31D07E;
+  box-shadow:inset 0 -2px 0 color-mix(in oklab,#31D07E 55%,transparent)}
+.rk3 tr.grp th.g-ref{color:var(--ink2);opacity:.72;
+  box-shadow:inset 0 -2px 0 color-mix(in oklab,var(--line2) 90%,transparent)}
+.rk3 tr.grp th.g-proj{color:var(--navy);
+  box-shadow:inset 0 -2px 0 color-mix(in oklab,var(--navy) 45%,transparent)}
+.rk3 th.c-pow{color:#31D07E}
+.rk3 th.c-res{color:#F2B441}
+/* the reference block recedes -- present, checkable, and visibly not ours */
+.rk3 th.c-ref{color:var(--ink2);opacity:.7;font-weight:600}
+.rk3 td.c-ref,.rk3 tbody tr td.c-ref{color:var(--ink2);opacity:.78}
+.rk3 th.c-avca{color:var(--ink2)}
+/* R\00c9SUM\00c9 gets its own ramp -- amber, so it can never be mistaken for the
+   green POWER column at a glance, which is the whole point of having two. */
+.rs b{font:700 14px/1 var(--disp);color:#F2B441}
+.rs .rsoff{color:var(--ink3,var(--ink2));opacity:.55}
+/* ── TEAM HEADER: THREE TIERS, NOT TWELVE EQUAL CHIPS ────────────────────
+   Our two rankings lead at full weight, the projection sits under them, and
+   everything external or historical recedes behind a "Context" label. The old
+   header opened with five other organisations' rankings styled identically to
+   ours.  */
+.chiptiers{display:flex;flex-direction:column;gap:7px;margin-top:10px}
+.chips.tier1{gap:8px}
+.chips.tier1 .chip{font-size:13.5px;padding:7px 12px;border-width:1px}
+.chips.tier1 .chip b{font:700 17px/1 var(--disp)}
+.chip.pow b{color:#31D07E}
+.chip.res b{color:#F2B441}
+.chips.tier2 .chip{font-size:12px;padding:5px 9px}
+.chips.tier3{align-items:center;gap:5px;opacity:.72}
+.chips.tier3 .chip{font-size:11.5px;padding:3px 8px;border-color:var(--line2);
+  background:transparent}
+.chips.tier3 .chip b{font-weight:600;color:var(--ink2)}
+.tierlab{font:700 9px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink3,var(--ink2));opacity:.8;margin-right:2px}
+/* ── COLLAPSIBLE METHODOLOGY ─────────────────────────────────────────────
+   The reasoning stays on the page in full; it stops being the first thing a
+   reader has to get past. */
+details.method{margin-top:14px;border-top:1px solid var(--line2);padding-top:10px}
+details.method>summary{cursor:pointer;list-style:none;
+  font:13px/1.5 var(--sans);color:var(--ink2);padding:4px 0;
+  display:flex;align-items:baseline;gap:7px}
+details.method>summary::-webkit-details-marker{display:none}
+details.method>summary::before{content:"\25B8";color:var(--navy);
+  font-size:11px;transition:transform .15s ease;display:inline-block}
+details.method[open]>summary::before{transform:rotate(90deg)}
+details.method>summary:hover{color:var(--ink)}
+details.method .note{margin-top:6px}
+/* the two rankings keep their colours wherever they are named in prose */
+b.kpow{color:#31D07E}
+b.kres{color:#F2B441}
+.leadhint{color:var(--ink2);opacity:.8}
+
+
+/* ── WHAT CHANGED ────────────────────────────────────────────────────────
+   Editorial rather than another row of cards: a result reads as a sentence --
+   winner, score, loser -- with the ranked ones marked. */
+.livehead b.chg{color:#F2B441}
+.chgrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+.chgc{display:flex;align-items:center;gap:9px;padding:9px 13px;
+  border:1px solid var(--line2);border-radius:7px;background:var(--card);
+  font:14px/1 var(--sans)}
+.chgc.mk{border-color:color-mix(in oklab,#F2B441 45%,var(--line2));
+  background:linear-gradient(180deg,color-mix(in oklab,#F2B441 7%,var(--card)),var(--card))}
+.chgc .w{font-weight:700;color:var(--ink);display:flex;align-items:center;gap:5px}
+.chgc .l{color:var(--ink2);display:flex;align-items:center;gap:5px}
+.chgc .sc{font:700 15px/1 var(--disp);color:var(--ink);letter-spacing:.02em}
+.chgc .pwr{font:700 10px/1 var(--mono);font-style:normal;color:#31D07E;
+  padding:2px 4px;border-radius:3px;
+  background:color-mix(in oklab,#31D07E 14%,transparent)}
+@media (max-width:560px){
+  .chgrow{flex-direction:column;gap:6px}
+  .chgc{width:100%;justify-content:space-between}
+}
+
+
+@media (max-width:560px){
+  .chips.tier1 .chip{font-size:12.5px;padding:6px 10px}
+  .chips.tier1 .chip b{font-size:15px}
+}
+
+
 .t25 td.poll i{font:700 10.5px/1 var(--mono);font-style:normal;margin-left:4px;
   padding:1px 3px;border-radius:3px}
 .t25 td.poll .pgup{color:#31D07E;background:color-mix(in oklab,#31D07E 14%,transparent)}
@@ -3238,8 +3503,26 @@ tbody tr:nth-child(1) td.rk{color:var(--amber);
 .podl{font:600 9px/1 var(--mono);color:var(--ink3);letter-spacing:.1em;
   text-transform:uppercase}
 @media (prefers-reduced-motion:reduce){.pulse{animation:none}}
-@media (max-width:560px){.hero{padding:20px 18px}.heroR{width:100%}
-  .pod{flex:1 1 30%;min-width:0}}
+/* ⚠ THE HERO WAS BROKEN AT 390px AND THIS RULE WAS WHY IT LOOKED HANDLED.
+   It set .heroR to full width but never touched grid-template-columns, so the
+   grid stayed `1fr auto` -- and with the podium demanding its natural width in
+   a 358px box the LEFT column collapsed to ZERO. Measured: `0px 292px`. The
+   masthead then wrapped to one word per line and printed straight through the
+   podium cards.
+   A two-column grid cannot become one column by resizing a child; the template
+   itself has to change. Stack it. */
+@media (max-width:560px){
+  .hero{grid-template-columns:1fr;grid-template-rows:auto auto auto;
+    padding:20px 18px;gap:16px}
+  .heroL{grid-column:1;grid-row:1;min-width:0}
+  .heroR{grid-column:1;grid-row:2;width:100%}
+  /* the decorative court is clipped to a floating net fragment at this width
+     and costs vertical space the live scores need -- drop it, keep the type */
+  .courtwrap{display:none}
+  .hero h1,.hero .htitle{font-size:30px;line-height:1.02}
+  .pod{flex:1 1 0;min-width:0}
+  .pod b,.pod .podv{font-size:15px}
+}
 /* ---- PAIRED BARS: what a team does vs what it allows ------------------
    Validated pair (see the render comment): both inside the dark lightness
    band, both above the chroma floor, dE 22.6 at worst under CVD, both over
@@ -3676,6 +3959,15 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <div class="livehead"><b class="justin">Just finished</b><span id="justinmeta"></span></div>
     <div class="cards" id="justincards"></div>
   </div>
+  <!-- ⚠ WHAT CHANGED. A scoreboard that opens with "here is a list of
+       fixtures" makes a returning reader do the work of finding out what
+       happened while they were away. This band answers that in one line, and
+       it is built ONLY from completed matches -- no movers are invented, and
+       when nothing has been played it does not render at all. -->
+  <div id="changed" {{CHANGED_HIDDEN}}>
+    <div class="livehead"><b class="chg">What changed</b><span id="chgmeta">{{CHANGED_META}}</span></div>
+    <div class="chgrow">{{CHANGED_ROWS}}</div>
+  </div>
   <div id="today" hidden>
     <div class="livehead"><b class="soon">Later today</b><span id="todaymeta"></span></div>
     <div class="cards" id="todaycards"></div>
@@ -3723,9 +4015,13 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <button class="segb" data-r="rpi">NCAA RPI</button>
   </div>
   <div id="pollview" hidden></div>
-  <p class="lead" id="ranklead">{{RANK_BASIS}} The other columns are
-  <b>reference only</b> &mdash; nothing here feeds the model. Click a team to see the six
-  players the number is built from.</p>
+  <!-- ⚠ SAID ONCE. "nothing here feeds the model" was appearing three times on
+       this tab -- in the group header above the columns, in RANK_BASIS, and
+       again here. Repeating a caveat does not make it more believed; it makes
+       the page read as anxious. The group row carries it now. -->
+  <p class="lead" id="ranklead">{{RANK_BASIS}}
+  <span class="leadhint">Click a team to see the six players the number is built
+  from.</span></p>
   <div class="ctl">
     <input type="search" id="q" placeholder="Search a team&hellip;">
     <select id="conf"><option value="">All conferences</option></select>
@@ -3735,22 +4031,59 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     </select>
     <span class="count" id="cnt"></span>
   </div>
-  <div class="panel"><div class="scroll"><table>
-    <thead><tr>
+  <div class="panel"><div class="scroll"><table class="rk3">
+    <!-- ⚠ A GROUPED HEADER, BECAUSE THIRTEEN EQUAL COLUMNS SAY NOTHING ABOUT
+         WHAT IS OURS AND WHAT IS SOMEBODY ELSE'S. POWER and R&eacute;sum&eacute;
+         are two different questions this site answers; everything to their
+         right is either last season or another organisation's opinion, and the
+         page said so only in prose a reader had to find. The group row says it
+         above the columns themselves. -->
+    <thead>
+    <tr class="grp">
+      <th colspan="3"></th>
+      <th class="g-ours" colspan="2">Our two rankings</th>
+      <th class="g-ref" colspan="6">Reference &mdash; none of this feeds our model</th>
+      <th class="g-proj" colspan="2">Projected</th>
+    </tr>
+    <tr>
       <th>#</th><th class="l">Team</th><th class="l">Conf</th>
-      <th class="n" title="POWER: one number for how strong a team is. 50 is an average Division-I team and every 12.5 points is one standard deviation. It is a monotone rescaling of the rating that produces the rank beside it -- not a blend of hand-picked components.">Power</th>
-      <th class="n" title="R&eacute;sum&eacute;: who has EARNED a bid, ranked by RPI -- which beat every alternative against the 64 teams the committee actually selected in 2025. Margin is ignored here on purpose: a win is a win. This is a different question from Power and the two are meant to disagree.">R&eacute;sum&eacute;</th>
-      <th title="our fitted composite, final 2025">2025</th>
-      <th title="AVCA coaches poll, preseason">AVCA</th>
-      <th title="VolleyTalk Top 25, preseason">VT</th>
-      <th title="Massey Ratings, 2026 preseason">Massey</th>
-      <th title="official NCAA RPI rank, final 2025">RPI</th>
-      <th title="range the other systems put this team in">Others</th>
+      <th class="n c-pow" title="POWER &mdash; how strong a team is; who would win tomorrow. 50 is an average Division-I team and every 12.5 points is one standard deviation. A monotone rescaling of the rating that produces the rank beside it, not a blend of hand-picked components.">Power</th>
+      <th class="n c-res" title="R&Eacute;SUM&Eacute; &mdash; what a team has EARNED. Ranked by RPI, which beat every alternative against the 64 teams the committee actually selected in 2025. Margin is ignored on purpose: a win is a win. A different question from Power, and the two are meant to disagree.">R&eacute;sum&eacute;</th>
+      <th class="c-ref" title="our fitted composite, final 2025">2025</th>
+      <th class="c-ref c-avca" title="AVCA coaches poll &mdash; the official poll, published by the American Volleyball Coaches Association. External reference: it does not feed our model.">AVCA&nbsp;Poll</th>
+      <th class="c-ref" title="VolleyTalk Top 25, preseason &mdash; external reference">VT</th>
+      <th class="c-ref" title="Massey Ratings, 2026 preseason &mdash; external reference">Massey</th>
+      <th class="c-ref" title="official NCAA RPI rank, final 2025">RPI</th>
+      <th class="c-ref" title="range the other systems put this team in">Others</th>
       <th title="share of 2025 production on the 2026 roster">Ret</th>
       <th title="simulated NCAA tournament odds; backtested at 42 of the real 64 from a preseason prior">Tourn</th>
     </tr></thead>
     <tbody id="rbody">{{RANK_ROWS}}</tbody></table></div>
+    <!-- ⚠ PROGRESSIVE DISCLOSURE, NOT DELETION. This methodology is the most
+         valuable thing on the tab and it was also 1,250 characters of essay
+         standing between a reader and the rankings. Collapsed, never cut: the
+         summary carries the three facts that change how the table should be
+         read, and the derivation is one click away. -->
+    <details class="method">
+      <summary><b>Methodology</b> &mdash; how this ranking is built, what it
+        cannot see, and why it barely moves in August</summary>
     <div class="note">
+      <p><b>Why it barely moves in August.</b> A result is weighted
+      <code>n/(n+k)</code> with <b>k measured, not chosen</b>, so a team needs
+      about k matches before this season counts as much as the projection does.
+      Reacting harder was tested against 2025 and it predicts <i>worse</i>:
+      blending at every speed from k=0.5 to k=50, the best value was 25, and
+      every faster setting was worse than the one above it &mdash; reacting hard
+      to each result scored below ignoring results altogether. One Friday night
+      genuinely is that little evidence. The fitted composite takes over
+      automatically once 50 matches are in.</p>
+      <p><b>Two rankings, and they are meant to disagree.</b> POWER answers who
+      would win tomorrow and margin drives it. R&eacute;sum&eacute; answers who
+      has earned a bid, ranked by RPI because that beat every alternative
+      against the 64 teams the committee actually selected in 2025; margin is
+      ignored there on purpose, because a win is a win. A very good team that
+      has not played anybody is correctly high on one and nowhere on the
+      other.</p>
       <p><b>How the preseason half works.</b> The ranking above is this
       projection <i>blended with 2026 results</i>; what follows describes the
       projection, which is where a team starts before it has played.
@@ -3768,6 +4101,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       class is under-rated here by roughly that much. A red number beside a team name means
       we know fewer than six of its players.</p>
     </div>
+    </details>
   </div>
 </section>
 
@@ -4138,7 +4472,9 @@ function renderWeek() {
   };
   document.getElementById('weekcards').innerHTML = top.map(r =>
     '<div class="card soon' + (r.ar && r.hr ? ' marquee' : '') + '">' +
-    '<div class="cd">' + (r.dl || r.d) + (r.t ? ' \u00b7 ' + r.t : '') +
+    /* the server label if present, otherwise format it here -- never the raw
+       ISO string, which is what this fallback used to be */
+    '<div class="cd">' + (r.dl || dayLabel(r.d)) + (r.t ? ' \u00b7 ' + r.t : '') +
       (r.ar && r.hr ? '<span class="tag">ranked v ranked</span>' : '') + '</div>' +
     '<div class="mt"><div class="side">' + rk(r.ar) + logo(r.a) + r.a + '</div>' +
     '<div class="side">' + rk(r.hr) + logo(r.h) + r.h + '</div></div>' +
@@ -4239,7 +4575,7 @@ async function pollLive() {
         ' \u2014 not yet in the archive below';
       document.getElementById('justincards').innerHTML = fresh.map(g => {
         const aw = +g.away_sets > +g.home_sets;
-        return '<div class="card done"><div class="cd">' + (g.date || '') +
+        return '<div class="card done"><div class="cd">' + dayLabel(g.date || '') +
           ' \u00b7 final</div><div class="mt">' +
           '<div class="side' + (aw ? ' win' : '') + '">' + rank(g.away_rank) +
             logo(g.away) + g.away + '<b>' + g.away_sets + '</b></div>' +
@@ -5134,7 +5470,7 @@ function showTeam(name) {
         ? '<b class="glbig ' + (_last.mine > _last.theirs ? 'glw' : 'gll2') + '">' +
           _last.mine + '&ndash;' + _last.theirs + '</b>' +
           '<span class="gls">' + (_last.mine > _last.theirs ? 'beat ' : 'lost to ') +
-          _last.opp + ' &middot; ' + _last.d + '</span>'
+          _last.opp + ' &middot; ' + dayLabel(_last.d) + '</span>'
         : '<b class="glbig glmuted">&mdash;</b><span class="gls">first match to come</span>') +
     glanceCard('Next',
       _next
@@ -5500,26 +5836,43 @@ function showTeam(name) {
     '<div class="thead"><h2>' + logo(name, 'lg') + name + '</h2>' +
     '<div class="sub">' + (t.conf || '') +
       (t.record25 ? ' \u00b7 ' + t.record25 + ' in 2025' : '') + '</div>' +
-    '<div class="chips">' +
-      chip('Our 2026', '#' + t.rank, 'ours') + chip('2025', '#' + t.rank25) +
-      chip('AVCA', t.avca ? '#' + t.avca : '') + chip('VT', t.vt ? '#' + t.vt : '') +
-      chip('Massey', t.massey ? '#' + t.massey : '') +
-      chip('RPI', t.rpi ? '#' + t.rpi : '') +
-      chip('Returning', t.ret !== null ? Math.round(t.ret * 100) + '%' : '') +
+    /* ⚠ TWELVE CHIPS AT EQUAL WEIGHT SAY NOTHING ABOUT WHAT MATTERS. The
+       header used to open with "Our 2026 #1, 2025 #1, AVCA #1, VT #1, Massey
+       #1, RPI #1, Returning 70%, Proj wins..., Conf title..., Tournament...,
+       In the Big Ten 1st of 18, Opp rank 68.1" -- five of the first six were
+       OTHER PEOPLE'S RANKINGS, rendered identically to ours. A reader scanning
+       it has to read all twelve to find the two that answer "how good are they"
+       and "what have they earned".
+       Three tiers now: our two rankings lead, the projection follows, and
+       everything external or historical recedes into a labelled Context row. */
+    '<div class="chiptiers">' +
+      '<div class="chips tier1">' +
+        chip('POWER', '#' + t.rank + (t.power != null ? ' \u00b7 ' + t.power : ''), 'ours pow') +
+        chip('R\u00c9SUM\u00c9', t.resume_rank ? '#' + t.resume_rank : '\u2014', 'ours res') +
+        (t.record26 ? chip('2026', t.record26, 'ours') : '') +
+      '</div>' +
       (t.sim && t.sim.proj_wins_mean !== null
-        ? chip('Proj wins', t.sim.proj_wins_mean.toFixed(1) + ' (' +
-               t.sim.proj_wins_p10 + '\u2013' + t.sim.proj_wins_p90 + ')') +
-          chip('Conf title', t.sim.conf_title_pct + '%') +
-          chip('Tournament', t.sim.tournament_pct + '%')
+        ? '<div class="chips tier2">' +
+            chip('Proj wins', t.sim.proj_wins_mean.toFixed(1) + ' (' +
+                 t.sim.proj_wins_p10 + '\u2013' + t.sim.proj_wins_p90 + ')') +
+            chip('Conf title', t.sim.conf_title_pct + '%') +
+            chip('Tournament', t.sim.tournament_pct + '%') +
+          '</div>'
         : '') +
-    /* where they sit in their own league, and how hard the schedule is. Both
-       are sorts and means over numbers already on this page -- no new model. */
-    (t.conf_pos && t.conf_size
-      ? chip('In the ' + (t.conf || 'conference'),
-             ordinal(t.conf_pos) + ' of ' + t.conf_size) : '') +
-    (t.sos
-      ? chip('Opp rank', t.sos.mean_rank + ' avg' +
-             (t.sos.top25 ? ' \u00b7 ' + t.sos.top25 + ' top-25' : '')) : '') +
+      '<div class="chips tier3"><span class="tierlab">Context</span>' +
+        chip('2025', '#' + t.rank25) +
+        chip('AVCA poll', t.avca ? '#' + t.avca : '') +
+        chip('VT', t.vt ? '#' + t.vt : '') +
+        chip('Massey', t.massey ? '#' + t.massey : '') +
+        chip('RPI', t.rpi ? '#' + t.rpi : '') +
+        chip('Returning', t.ret !== null ? Math.round(t.ret * 100) + '%' : '') +
+        (t.conf_pos && t.conf_size
+          ? chip('In the ' + (t.conf || 'conference'),
+                 ordinal(t.conf_pos) + ' of ' + t.conf_size) : '') +
+        (t.sos
+          ? chip('Opp rank', t.sos.mean_rank + ' avg' +
+                 (t.sos.top25 ? ' \u00b7 ' + t.sos.top25 + ' top-25' : '')) : '') +
+      '</div>' +
     '</div></div>' +
     /* ---- AT A GLANCE -------------------------------------------------
        ⚠ MEASURED BEFORE CHANGING ANYTHING: the team page ran to 3,648px and
@@ -5942,10 +6295,23 @@ def strip_private(html):
                   html, flags=re.S)
     html = re.sub(r'<section id="v-tv".*?</section>', "", html, flags=re.S)
     # third-party ranking columns
-    html = re.sub(r'\s*<th title="VolleyTalk[^>]*>.*?</th>', "", html, flags=re.S)
-    html = re.sub(r'\s*<th title="Massey[^>]*>.*?</th>', "", html, flags=re.S)
-    html = re.sub(r'\s*<th title="range the other systems[^>]*>.*?</th>', "", html,
+    # ⚠ TOLERANT OF ATTRIBUTES BEFORE title=. These patterns used to require
+    # `title` to follow `<th` immediately, so the moment the header gained a
+    # class the strip silently stopped matching -- and the build aborted on its
+    # own marker check, which is the guard doing exactly its job. Anchoring a
+    # removal on attribute ORDER is brittle; match the attribute wherever it is.
+    html = re.sub(r'\s*<th[^>]*\btitle="VolleyTalk[^>]*>.*?</th>', "", html, flags=re.S)
+    html = re.sub(r'\s*<th[^>]*\btitle="Massey[^>]*>.*?</th>', "", html, flags=re.S)
+    html = re.sub(r'\s*<th[^>]*\btitle="range the other systems[^>]*>.*?</th>', "", html,
                   flags=re.S)
+    # ⚠ AND THE GROUP HEADER'S COLSPAN MUST SHRINK WITH IT. The reference group
+    # spans the columns it labels; removing three of them without adjusting the
+    # span pushes every heading after it out of line -- the exact misalignment
+    # the column-count guard exists to catch, arriving through the back door.
+    def _shrink(m):
+        return '<th class="g-ref" colspan="%d">' % max(1, int(m.group(1)) - 3)
+    html = re.sub(r'<th class="g-ref" colspan="(\d+)">', _shrink, html)
+
     # the sentence describing the reference columns, and the VT/Massey chips
     html = html.replace(
         "VolleyTalk and Massey are all forecasts of 2026.",

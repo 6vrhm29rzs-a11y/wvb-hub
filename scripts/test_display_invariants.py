@@ -1825,8 +1825,23 @@ def check_public_build_is_clean():
         # this table's own header, whatever else the page contains.
         before = h[:b.start()]
         heads = list(re.finditer(r"<thead>(.*?)</thead>", before, re.S))
+        head_full = heads[-1].group(1) if heads else ""
         if heads:
             m = heads[-1]
+            # ⚠ COUNT THE LAST HEADER ROW, NOT THE WHOLE <thead>. The rankings
+            # table now carries a GROUP row above the columns ("Our two
+            # rankings" / "Reference" / "Projected"), whose cells are colspans.
+            # Counting every <th> in the thead sums both rows and reports a
+            # misalignment that does not exist. The row that has to line up
+            # with the cells is the LAST one.
+            _rows = re.findall(r"<tr\b[^>]*>(.*?)</tr>", m.group(1), re.S)
+            if _rows:
+                class _M(object):
+                    def __init__(self, txt):
+                        self._t = txt
+                    def group(self, _i):
+                        return self._t
+                m = _M(_rows[-1])
     if m and b:
         row = re.search(r'<tr[^>]*class="row"[^>]*>(.*?)</tr>', b.group(1), re.S)
         if row:
@@ -1837,6 +1852,29 @@ def check_public_build_is_clean():
                     "%d headers vs %d cells" % (n_th, n_td))
             else:
                 ok("public rankings header and cells align", n_th)
+
+            # ⚠ AND THE GROUP ROW'S SPANS MUST STILL COVER EXACTLY THOSE
+            # COLUMNS. The rankings header carries a group row above the columns
+            # ("Our two rankings" / "Reference" / "Projected"), and the public
+            # build REMOVES three reference columns. A span that is not shrunk
+            # with them slides every group label sideways -- the labels then sit
+            # over the wrong columns while every individual heading is still
+            # correct, so the table looks fine and says the wrong thing.
+            grp = re.search(r'<tr class="grp">(.*?)</tr>', head_full, re.S)
+            if not grp:
+                bad("the rankings header lost its group row",
+                    "the row naming which columns are ours and which are "
+                    "reference is gone, so thirteen columns read as equals")
+            if grp:
+                spans = [int(x) for x in re.findall(r'colspan="(\d+)"', grp.group(1))]
+                plain = len(re.findall(r"<th(?![^>]*colspan)", grp.group(1)))
+                total = sum(spans) + plain
+                if total != n_td:
+                    bad("the grouped header no longer covers its columns",
+                        "group spans total %d against %d columns -- the labels "
+                        "sit over the wrong columns" % (total, n_td))
+                else:
+                    ok("the grouped header spans exactly its columns", total)
     else:
         bad("the public rankings table could not be located",
             "this guard was checking nothing")
@@ -1933,6 +1971,119 @@ def check_every_view_names_its_season():
             elif prev:
                 ok("%s: previous-season ranking carries a season warning" % label,
                    len(prev))
+
+
+def check_mobile_rankings_are_a_list_not_a_clipped_table():
+    """AT 390px THE RANKINGS MUST BE A PURPOSE-BUILT LIST.
+
+    ⚠ MEASURED BEFORE ANY OF THIS WAS WRITTEN: the page carried 19 mobile rules
+    and NOT ONE touched the rankings table or the nav. A reader on a phone met a
+    thirteen-column desktop table cut off at the edge with no cue that it
+    scrolled, under a nav that wrapped onto three rows before the content began.
+
+    This is a SOURCE-level check on purpose. The real geometry can only be
+    verified by lifting the media block and asserting on it in a browser (R6 --
+    resize_window reports success and does not change the rendering viewport),
+    which a Python suite cannot do. What it CAN do is make sure the rules still
+    exist, so the layout cannot quietly revert to a clipped table.
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping mobile-rankings check")
+        return
+    src = open(hub, encoding="utf-8").read()
+    css = "\n".join(re.findall(r"<style[^>]*>(.*?)</style>", src, re.S))
+    blocks = re.findall(r"@media\s*\(max-width:\s*560px\)\s*\{(.*?)\n\}", css, re.S)
+    mob = "\n".join(blocks)
+    if not mob:
+        bad("there is no 560px mobile block at all", "the phone gets the desktop layout")
+        return
+
+    # ⚠ CHECK THE DECLARATION, NOT THE SELECTOR. The first version looked for
+    # ".rk3 tbody tr.row" anywhere in the block -- and that selector appears in
+    # several rules, so deleting the one that actually creates the layout
+    # (display:grid) left the check passing. The negative control is what
+    # exposed it: renaming the grid rule changed nothing.
+    flat = re.sub(r"\s+", "", mob)
+    checks = [
+        (".rk3tbodytr.row{display:grid", "the rankings rows become a grid/list layout"),
+        (".t25tbodytr.row{display:grid", "the Top 25 rows become a grid/list layout"),
+        ("nav.inner{", "the nav is given a mobile treatment rather than wrapping"),
+    ]
+    missing = [why for sel, why in checks if sel not in flat]
+    if missing:
+        bad("the mobile layout lost %d of its pieces" % len(missing),
+            "; ".join(missing))
+    else:
+        ok("the 560px block restyles the rankings, the Top 25 and the nav")
+
+    if "overflow-x:auto" not in mob.replace(" ", ""):
+        bad("the mobile nav does not scroll",
+            "without it the tabs wrap to three rows before any content")
+    else:
+        ok("the mobile nav scrolls in one row instead of wrapping")
+
+    # ⚠ position:static on the label pseudo-elements is load-bearing: they reuse
+    # td.hx::before, which the desktop rule declares position:absolute, so
+    # without the reset every label prints on top of its own value.
+    if "position:static" not in mob.replace(" ", ""):
+        bad("the mobile number labels have no position reset",
+            "they reuse td.hx::before (position:absolute), so POWER prints "
+            "through the value it labels")
+    else:
+        ok("the mobile labels reset the inherited absolute positioning")
+
+
+def check_column_identity_survives_a_missing_value():
+    """A COLUMN MUST KEEP ITS CLASS WHEN IT HAS NOTHING TO SHOW.
+
+    hcell_py() emitted `class="n"` for an absent value and `class="n hx dv"`
+    for a present one, so the SAME logical column carried two different class
+    sets depending on its contents. Every rule that targets that column -- a
+    width, a colour, a mobile hide -- then applied to some rows and not others,
+    silently. It surfaced as a column that was supposed to disappear at 390px
+    reappearing for exactly the teams with no data, which is the worst possible
+    subset: the rows where the layout has least excuse to break.
+
+    ⚠ `hx` must still be absent when there is no value. That class paints the
+    gradient, and an absent measurement must never be rendered as a neutral one
+    (R5). Identity and has-a-value are two different things and this asserts
+    both.
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping column-identity check")
+        return
+    src = open(hub, encoding="utf-8").read()
+    t25 = re.search(r'<table class="t25">(.*?)</table>', src, re.S)
+    if not t25:
+        print("  no Top 25 table -- skipping")
+        return
+    rows = re.findall(r'<tr class="row" data-team=.*?</tr>', t25.group(1), re.S)
+    if not rows:
+        bad("the Top 25 has no rows", "this guard is checking nothing")
+        return
+    with_id, painted, bare = 0, 0, 0
+    for row in rows:
+        classes = re.findall(r'<td class="([^"]*)"', row)
+        if any(re.search(r"\bdv\b", c) for c in classes):
+            with_id += 1
+        if any(re.search(r"\bhx\b", c) and re.search(r"\bdv\b", c) for c in classes):
+            painted += 1
+        # a numeric cell with no column identity at all
+        if any(c.strip() == "n" for c in classes):
+            bare += 1
+    if with_id != len(rows):
+        bad("the net/set column loses its class when empty",
+            "%d of %d rows carry it -- a rule targeting this column applies to "
+            "some rows and not others" % (with_id, len(rows)))
+    else:
+        ok("every row's net/set cell keeps its column class", len(rows))
+    if painted >= len(rows):
+        bad("an absent measurement is being painted",
+            "hx marks 'there is a value' and must not appear on an em dash (R5)")
+    else:
+        ok("only rows WITH a value are painted", painted)
 
 
 def check_power_score_agrees_with_the_rank():
@@ -2134,6 +2285,17 @@ def check_live_times_are_pacific():
     else:
         ok("an unannounced start still renders as TBA, not as 10:00 PM")
 
+    # The "updated" stamp is a time a reader sees, so it obeys the same clock.
+    # It printed "9:33 PM ET" directly above fixtures listed in PT.
+    import inspect
+    ls_src = inspect.getsource(live_server)
+    if re.search(r'"updated":\s*_et_now\(\)', ls_src):
+        bad("the live band stamps its update time in Eastern",
+            "every other time on the page is Pacific; two clocks three hours "
+            "apart with nothing saying which is which")
+    else:
+        ok("the live band's update stamp uses the page's clock")
+
     # ...and Hawaii's genuinely late Eastern times must survive it.
     if live_server._fmt_time(None, "1:00 AM ET", "Hawaii") == "TBA":
         bad("Hawaii's real start times are being suppressed",
@@ -2208,9 +2370,31 @@ def check_week_names_whose_ranking():
     # field into an element must pass it through dayLabel first.
     scripts_js = re.findall(r"<script[^>]*>(.*?)</script>", src, re.S)
     js_nc = re.sub(r"/\*.*?\*/", " ", "\n".join(scripts_js), flags=re.S)
-    raw_emit = re.findall(
-        r'class="(?:dt|gls|cd)"[^>]*>\'\s*\+\s*(?!dayLabel)([A-Za-z_$][\w.$]*\.d\b)',
-        js_nc)
+    # ⚠ WIDENED: the first pattern only looked for a field literally named `.d`,
+    # so the "just finished" band -- which calls its field `.date` -- printed a
+    # raw ISO date straight through a guard written to prevent exactly that.
+    # Caught by looking at the screen, not by the test. Match either name.
+    # ⚠ WIDENED THREE TIMES, EVERY TIME AFTER LOOKING AT THE SCREEN RATHER
+    # THAN AT THE TEST.
+    #   1. It matched only a field named `.d`, so the just-finished band's
+    #      `.date` printed a raw ISO date straight past it.
+    #   2. It matched only a date IMMEDIATELY after the opening quote, so the
+    #      team page's `... + ' &middot; ' + _last.d` slipped through.
+    #   3. Chunking the expression up to the next ";" broke on `&middot;` --
+    #      an HTML entity ENDS IN A SEMICOLON, so the scan stopped before
+    #      reaching the date it was looking for. The negative control caught
+    #      that one; nothing else would have.
+    # Scan a fixed window after each emitting class instead, and let dayLabel
+    # anywhere in it count as handled.
+    raw_emit = []
+    for m0 in re.finditer(r'class="(?:dt|gls|cd)"[^>]*>', js_nc):
+        win = js_nc[m0.end():m0.end() + 320]
+        win = win.split("</div>")[0]
+        for m in re.finditer(r"([A-Za-z_$][\w.$]*\.(?:d|date))\b", win):
+            head = win[max(0, m.start() - 14):m.start()]
+            if "dayLabel(" in head:
+                continue
+            raw_emit.append(m.group(1))
     if raw_emit:
         bad("%d page renderers print a date field without dayLabel" % len(raw_emit),
             "e.g. %s -- a text scan of the built file cannot see this, because "
@@ -2390,6 +2574,8 @@ def main():
     check_photo_crop_and_zoom()
     check_hero_podium_signs()
     check_no_class_name_collisions()
+    check_mobile_rankings_are_a_list_not_a_clipped_table()
+    check_column_identity_survives_a_missing_value()
     check_power_score_agrees_with_the_rank()
     check_poll_column_polarity()
     check_live_times_are_pacific()
