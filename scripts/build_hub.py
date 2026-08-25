@@ -1596,6 +1596,35 @@ def powercell(t):
             % (max(0.0, min(1.0, (v - 10.0) / 80.0)), v, basis, v))
 
 
+def resumecell(t, active):
+    """RESUME rank -- what a team has EARNED, beside how good it is.
+
+    Two questions, two numbers, and keeping them apart is R3. POWER answers
+    "who would win tomorrow" and is driven by margin; this answers "who has
+    earned a bid" and ignores margin entirely -- a win is a win.
+
+    ⚠ WHEN IT DOES NOT EXIST YET IT SAYS SO. A resume off one match is not a
+    thin resume, it is not a resume: the measure is what a team has earned
+    against the schedule it has played, and in August nobody has earned
+    anything. Printing a precise-looking rank there would be exactly the kind
+    of authoritative-looking non-measurement R5 exists to stop.
+    """
+    if not active:
+        return ('<td class="n rs"><span class="rsoff" title="A r&eacute;sum&eacute; '
+                'measures what a team has earned against the schedule it has '
+                'played. Too little of the season has been played for anyone to '
+                'have earned anything yet.">&mdash;</span></td>')
+    v = t.get("resume_rank")
+    if v is None:
+        return '<td class="n rs">&mdash;</td>'
+    wab = t.get("wab")
+    tip = "R&eacute;sum&eacute; #%d" % v
+    if wab is not None:
+        tip += (" &mdash; %+.1f wins above what a bubble team would have taken "
+                "from this schedule" % wab)
+    return '<td class="n rs" title="%s"><b>%d</b></td>' % (tip, v)
+
+
 def top25_view(avca=None):
     # type: (Optional[Dict[str, int]]) -> Dict[str, str]
     """Rows and copy for Digby's Top 25.
@@ -1906,6 +1935,9 @@ def build():
     # ---- rankings rows ---------------------------------------------------
     _bcolors = ((load("data/team_colors_%d.json" % SEASON) or {}).get("teams") or {})
 
+    # Whether the resume exists yet at all -- see resumecell().
+    _resume_active = bool((meta or {}).get("resume_active"))
+
     rrows = []
     for t in sorted(teams, key=lambda x: x["rank26"]):
         def c(v):
@@ -1951,7 +1983,7 @@ def build():
             # literal "9%" and mixing the two silently turned that into a
             # format placeholder.
             det = ('<tr class="det" data-for="' + str(t["rank26"]) + '" hidden>'
-                   '<td></td><td colspan="11">' + why_html
+                   '<td></td><td colspan="12">' + why_html
                    + '<div class="dh">The six this projection is built from '
                      '&mdash; each player&rsquo;s 2025 points per set, then '
                      'normalised to a neutral schedule.</div>'
@@ -1959,7 +1991,7 @@ def build():
         rrows.append(
             '<tr class="row" data-r="%d" style="--tc:%s"><td class="rk">%d%s</td>'
             '<td class="tm">%s%s%s</td><td class="cf">%s</td>'
-            '%s<td class="n hi">%s</td><td class="n">%s</td>%s'
+            '%s%s<td class="n hi">%s</td><td class="n">%s</td>%s'
             '<td class="n">%s</td>%s<td class="n">%s</td><td class="n hi">%s</td></tr>%s'
             % (t["rank26"],
                # the school's own colour, same source the Top 25 uses -- the two
@@ -1970,6 +2002,7 @@ def build():
                (' <b class="pl6">%s</b>' % t["rot"]) if t.get("rot") and t["rot"] < 6 else "",
                esc(t["conf"]),
                powercell(t),
+               resumecell(t, _resume_active),
                c(t["rank25"]), c(t.get("avca")),
                "" if PUBLIC else ('<td class="n">%s</td><td class="n">%s</td>'
                                   % (c(t.get("vt")), c(t.get("massey")))),
@@ -2014,10 +2047,23 @@ def build():
                 "altogether. One Friday night genuinely is that little "
                 "evidence. The fitted composite takes over automatically once "
                 "50 matches are in. "
-                "<b>This is a strength ranking, not a r&eacute;sum&eacute;</b> "
-                "&mdash; it answers who would win tomorrow, not who has earned "
-                "a bid."
-                % (len(_played), len(_blend), round(100 * _w)))
+                "<b>Two columns, two questions, and they are meant to "
+                "disagree.</b> <b>POWER</b> is how strong a team is &mdash; who "
+                "would win tomorrow &mdash; and margin drives it. "
+                "<b>R&eacute;sum&eacute;</b> is what a team has <i>earned</i>, "
+                "ranked by RPI because that beat every alternative against the "
+                "64 teams the committee actually selected in 2025; margin is "
+                "ignored there on purpose, because a win is a win. A very good "
+                "team that has not played anybody yet is correctly high on one "
+                "and nowhere on the other. %s"
+                % (len(_played), len(_blend), round(100 * _w),
+                   ("R&eacute;sum&eacute; is live." if _resume_active else
+                    "<b>R&eacute;sum&eacute; is not live yet</b> &mdash; it "
+                    "measures what a team has earned against the schedule it "
+                    "has played, and %d D-I matches into the season nobody has "
+                    "earned anything. It switches on at %d."
+                    % ((meta.get("resume") or {}).get("matches") or 0,
+                       (meta.get("resume") or {}).get("min_matches") or 200))))
         else:
             rank_basis = (
                 "<b>Still the preseason projection &mdash; not yet a "
@@ -3693,6 +3739,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <thead><tr>
       <th>#</th><th class="l">Team</th><th class="l">Conf</th>
       <th class="n" title="POWER: one number for how strong a team is. 50 is an average Division-I team and every 12.5 points is one standard deviation. It is a monotone rescaling of the rating that produces the rank beside it -- not a blend of hand-picked components.">Power</th>
+      <th class="n" title="R&eacute;sum&eacute;: who has EARNED a bid, ranked by RPI -- which beat every alternative against the 64 teams the committee actually selected in 2025. Margin is ignored here on purpose: a win is a win. This is a different question from Power and the two are meant to disagree.">R&eacute;sum&eacute;</th>
       <th title="our fitted composite, final 2025">2025</th>
       <th title="AVCA coaches poll, preseason">AVCA</th>
       <th title="VolleyTalk Top 25, preseason">VT</th>
@@ -3704,7 +3751,10 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     </tr></thead>
     <tbody id="rbody">{{RANK_ROWS}}</tbody></table></div>
     <div class="note">
-      <p><b>How the projection works.</b> Each returning player and incoming transfer
+      <p><b>How the preseason half works.</b> The ranking above is this
+      projection <i>blended with 2026 results</i>; what follows describes the
+      projection, which is where a team starts before it has played.
+      Each returning player and incoming transfer
       carries the points per set she actually produced in 2025, normalised to a neutral
       schedule using a measured level effect ({{SLOPE}} points per set per standard
       deviation of opponent strength, from 20,997 player-matches). A team&rsquo;s six best

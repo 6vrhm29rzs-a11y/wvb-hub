@@ -376,6 +376,27 @@ def build():
     for t in teams:
         t.pop("_pv", None)
 
+    # ---- RESUME: what a team has EARNED, beside how good it is -----------
+    # R3 has said since Phase 3 that strength is not resume, and measured it:
+    # relative to RPI our composite favours teams with WORSE records. The site
+    # shipped only the strength side, which is the whole of the objection that
+    # a 0-1 team sat near the top -- POWER correctly says "still a very good
+    # roster" while the reader is asking "what have they actually done?"
+    #
+    # Ranked by RPI, because that beat every alternative against the 64 teams
+    # the committee ACTUALLY selected in 2025 (5-fold CV: RPI 0.9215, WAB
+    # 0.9107, POWER 0.9071, and every blend worse than RPI alone). `wab` rides
+    # along as the readable form -- "+19.2 wins more than a bubble team would
+    # have taken from this schedule".
+    _res = load_json("data/resume_%d.json" % SEASON) or {}
+    resume_active = bool((_res.get("meta") or {}).get("active"))
+    resume_meta = _res.get("meta") or {}
+    _rmap = dict((r["team"], r) for r in (_res.get("teams") or []))
+    for t in teams:
+        rr = _rmap.get(t["team"]) or {}
+        t["resume_rank"] = rr.get("rank")
+        t["wab"] = rr.get("wab")
+
     # ---- movement since the last weekly freeze ---------------------------
     # Compared against the most recent snapshot that is NOT this week's, so the
     # column answers "since the last published poll", not "since this morning".
@@ -499,6 +520,9 @@ def build():
         "avca": avca.get("meta", {}).get("updated_label"),
         "ret_known": sum(1 for t in teams if t["ret"] is not None),
         "projected": sum(1 for t in teams if not t.get("unranked")),
+        "rank_source": rank_source,
+        "resume_active": resume_active,
+        "resume": resume_meta,
     }
 
 

@@ -199,6 +199,11 @@ jobs:
           # one-team 'league' never collects an automatic bid.
           python3 scripts/conference_repair.py || echo "conference repair skipped"
           python3 scripts/digby_top25.py || echo "top 25 needs a projection; skipping"
+          # RESUME -- what a team has EARNED, beside POWER. Writes its own
+          # refusal (active:false) when too little of the season has been
+          # played, so the page can state that rather than guess; it switches
+          # itself on once the season is big enough.
+          python3 scripts/resume_2025.py || echo "resume needs a rating or a blend; skipping"
           python3 scripts/build_hub.py   # Cody's page, everything on it
           # PUBLIC BUILD RE-ENABLED 2026-08-24 at Cody's request, so he can see
           # the hub from a phone. Same code, same page, minus every input that
