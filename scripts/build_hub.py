@@ -4495,7 +4495,7 @@ td.tvnet{text-align:left}
 .cnm{font:600 11.5px/1.2 var(--sans);color:var(--ink2);
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ctrack{position:relative;height:14px;border-radius:4px;
-  background:linear-gradient(90deg,rgba(63,146,222,.16),rgba(63,146,222,.03))}
+  background:linear-gradient(90deg,rgba(63,146,222,.16),rgba(63,146,222,.03));min-width:0}
 .cdot{position:absolute;top:4px;width:6px;height:6px;border-radius:50%;
   background:var(--ink3);box-shadow:0 0 0 2px var(--card);
   transform:translateX(-3px)}
@@ -4506,7 +4506,12 @@ td.tvnet{text-align:left}
 .ccount{font:11px/1 var(--mono);color:var(--ink3);text-align:right}
 .cfoot{display:flex;justify-content:space-between;padding:8px 15px 12px;
   font:11px/1 var(--mono);color:var(--ink3)}
-@media (max-width:560px){.crow{grid-template-columns:82px 1fr 30px 22px}}
+/* ⚠ A FIXED 30px COLUMN CLIPPED THE VALUE IT EXISTS TO SHOW. The median rank
+   runs to five characters once a conference sits past 100 -- "149.5", "176.5",
+   "192.5" -- and at 11.5px mono that needs 35px. Seven conferences rendered a
+   TRUNCATED number on a phone: correct data, displayed as something else.
+   Sized to its content now, so a wider value can never be cut again. */
+@media (max-width:560px){.crow{grid-template-columns:82px 1fr auto 22px}}
 /* ---- PROJECTED-WINS BAND ---------------------------------------------
    An interval, drawn as one. The band is the 80% range, the bright tick is the
    median, and the amber tick is what has ALREADY been won -- a fact rather than

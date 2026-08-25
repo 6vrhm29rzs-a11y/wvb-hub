@@ -2060,6 +2060,42 @@ def check_no_unreplaced_placeholders():
             ok("%s: no unreplaced placeholders" % label)
 
 
+def check_phone_columns_fit_their_values():
+    """A FIXED-WIDTH PHONE COLUMN MUST NOT CLIP THE VALUE IT EXISTS TO SHOW.
+
+    ⚠ FOUND BY LOOKING, at 390px. The conference-strength row pinned its median
+    column to 30px. The median runs to five characters once a conference sits
+    past 100 -- "149.5", "176.5", "192.5" -- which needs 35px at 11.5px mono.
+    SEVEN conferences rendered a truncated number on a phone: the data was
+    right and the display said something else, which is R5's cousin.
+
+    The column is sized to its content now. This guard keeps it that way,
+    because a fixed width is a guess about the widest value that will ever
+    appear -- and that guess was already wrong once.
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  %-58s %s" % ("(no private page -- phone column check skipped)",
+                              "skip"))
+        return
+    src = open(hub, encoding="utf-8").read()
+    m = re.search(r"@media \(max-width:560px\)\{\.crow\{"
+                  r"grid-template-columns:([^}]*)\}", src)
+    if not m:
+        bad("the conference row has no phone column rule", "")
+        return
+    cols = m.group(1).strip()
+    # the third column holds the median; it must not be a fixed pixel width
+    parts = cols.split()
+    if len(parts) < 3:
+        bad("the conference row lost a column", cols)
+    elif parts[2].endswith("px"):
+        bad("the median column is a fixed width again",
+            "%s -- a five-character median will clip" % parts[2])
+    else:
+        ok("the phone median column is sized to its content (%s)" % cols)
+
+
 def check_public_build_can_actually_render():
     """THE PUBLIC PAGE MUST STILL WORK, NOT MERELY LACK PRIVATE THINGS.
 
@@ -2869,6 +2905,7 @@ def main():
     print()
     check_no_conflict_markers_in_artifacts()
     check_public_build_can_actually_render()
+    check_phone_columns_fit_their_values()
     check_every_view_names_its_season()
     print()
     check_rating()
