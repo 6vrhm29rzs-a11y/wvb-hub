@@ -76,6 +76,32 @@ def _hub():
     return _HUB[0]
 
 
+BALLOT_MAX_BODY = 256 * 1024          # a 25-team ballot with notes is ~4 KB
+
+_BALLOT = [None]
+
+
+def _ballot_mod():
+    """scripts/ballot.py, imported lazily and hot-reloaded like digby.
+
+    Same reason as digby: this server is meant to be left running for hours, and
+    Python caches an imported module for the life of the process -- so without
+    this an edit to ballot.py would have no effect and would look like a failed
+    fix.
+    """
+    import importlib
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    if _BALLOT[0] is None:
+        import ballot
+        _BALLOT[0] = ballot
+    else:
+        try:
+            importlib.reload(_BALLOT[0])
+        except Exception:                                 # noqa: BLE001
+            pass
+    return _BALLOT[0]
+
+
 def _now_pt():
     """Now, in the zone the page renders in."""
     try:
@@ -343,7 +369,11 @@ class Handler(SimpleHTTPRequestHandler):
         return host in ("127.0.0.1", "localhost", "[::1]", "::1")
 
     def do_POST(self):
-        if self.path.split("?")[0] != "/api/digby":
+        path = self.path.split("?")[0]
+        if path == "/api/ballot":
+            self._save_ballot()
+            return
+        if path != "/api/digby":
             self.send_error(404)
             return
         if not self._is_local():
@@ -364,7 +394,52 @@ class Handler(SimpleHTTPRequestHandler):
             return
         self._json(_digby_answer(question))
 
+    def _save_ballot(self):
+        """Append one ballot to data/ballots_{SEASON}.jsonl.
+
+        ⚠ APPEND-ONLY AND LOCAL-ONLY, both structural rather than promised.
+        The file is opened for append and never rewritten, so "a past ballot is
+        never overwritten" is a property of the storage rather than of the code
+        remembering to be careful. The local check is the same one /api/digby
+        uses -- this writes to Cody's disk, and nothing off this machine should
+        be able to.
+        """
+        if not self._is_local():
+            self._json({"ok": False, "error": "local requests only."}, 403)
+            return
+        try:
+            n = int(self.headers.get("Content-Length") or 0)
+        except ValueError:
+            n = 0
+        if n <= 0 or n > BALLOT_MAX_BODY:
+            self._json({"ok": False, "error": "ballot too large."}, 413)
+            return
+        try:
+            payload = json.loads(self.rfile.read(n).decode("utf-8"))
+        except Exception:                                 # noqa: BLE001
+            self._json({"ok": False, "error": "could not read the ballot."}, 400)
+            return
+        try:
+            B = _ballot_mod()
+            row = B.append(payload)
+        except ValueError as e:                           # validation, not a crash
+            self._json({"ok": False, "error": str(e)}, 400)
+            return
+        except Exception as e:                            # noqa: BLE001
+            self._json({"ok": False, "error": "could not save: %s" % e}, 500)
+            return
+        self._json({"ok": True, "saved_utc": row.get("saved_utc"),
+                    "count": len(B.load())})
+
     def do_GET(self):
+        if self.path.split("?")[0] == "/api/ballot":
+            try:
+                rows = _ballot_mod().load()
+            except Exception as e:                        # noqa: BLE001
+                self._json({"ok": False, "error": str(e)}, 500)
+                return
+            self._json({"ok": True, "ballots": rows})
+            return
         if self.path.split("?")[0] == "/api/live":
             body = json.dumps(CACHE.snapshot()).encode("utf-8")
             self.send_response(200)

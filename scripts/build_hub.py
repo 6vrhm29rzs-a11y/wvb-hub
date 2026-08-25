@@ -2427,6 +2427,8 @@ def build():
         .replace("{{CHANGED_ROWS}}", _chg_html) \
         .replace("{{CHANGED_META}}", esc(_chg_meta)) \
         .replace("{{CHANGED_HIDDEN}}", "" if _chg else "hidden") \
+        .replace("{{SEASON_YEAR}}", str(SEASON)) \
+        .replace("{{RESUME_ACTIVE_JS}}", "true" if _resume_active else "false") \
         .replace("{{WEEK_JSON}}", json.dumps(_week_rows, separators=(",", ":"))) \
         .replace("{{SCHED_ROWS}}", srows) \
         .replace("{{TV_ROWS}}", trows) \
@@ -3003,6 +3005,139 @@ details.method .note{margin-top:6px}
 /* the two rankings keep their colours wherever they are named in prose */
 b.kpow{color:#31D07E}
 b.kres{color:#F2B441}
+/* ══ BALLOT WORKSHOP ══════════════════════════════════════════════════════
+   The ballot is the object, so the SLOT is the loudest thing in a row and the
+   evidence sits under it in one quiet line. No cards-in-cards, no charts: this
+   is a list a person edits, and it should look like one. */
+.privtag{font:700 9px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;
+  color:#F2B441;background:color-mix(in oklab,#F2B441 14%,transparent);
+  border:1px solid color-mix(in oklab,#F2B441 32%,transparent);
+  border-radius:3px;padding:3px 6px;vertical-align:middle;margin-left:9px}
+.bwbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:12px 0 16px;
+  padding-bottom:13px;border-bottom:1px solid var(--line2)}
+.bwbtn{appearance:none;border:1px solid var(--line);background:var(--card);
+  color:var(--ink);font:600 13px/1 var(--sans);padding:9px 14px;border-radius:6px;
+  cursor:pointer}
+.bwbtn:hover{border-color:var(--navy);color:#fff}
+.bwbtn.primary{border-color:color-mix(in oklab,#31D07E 45%,var(--line));
+  background:color-mix(in oklab,#31D07E 12%,var(--card))}
+.bwstate{font:12px/1.4 var(--mono);color:var(--ink2);margin-left:auto}
+.bwstate.good{color:#31D07E}
+.bwstate.warn{color:#F2B441}
+.bwgrid{display:grid;grid-template-columns:1fr 320px;gap:22px;align-items:start}
+.bwh{font:700 11px/1 var(--sans);letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink2);margin:20px 0 6px}
+.bwsub{font:12.5px/1.5 var(--sans);color:var(--ink2);margin:0 0 8px}
+.bwlist{list-style:none;margin:0;padding:0;counter-reset:none}
+.bwrow{border-bottom:1px solid var(--line2);padding:10px 0 11px}
+.bwtop{display:flex;align-items:center;gap:10px}
+.bwslot{font:700 21px/1 var(--disp);color:var(--ink);min-width:30px;text-align:right}
+.bwmv{font:700 10px/1 var(--mono);padding:2px 4px;border-radius:3px}
+.bwmv.up{color:#31D07E;background:color-mix(in oklab,#31D07E 14%,transparent)}
+.bwmv.dn{color:#FF6B6B;background:color-mix(in oklab,#FF6B6B 14%,transparent)}
+.bwmv.flat{color:var(--ink2)}
+.bwmv.new{color:#F2B441;background:color-mix(in oklab,#F2B441 14%,transparent)}
+.bwteam{font:600 16px/1 var(--disp);display:flex;align-items:center;gap:7px;flex:1;
+  min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bwctl{display:flex;align-items:center;gap:3px}
+.bwctl button{appearance:none;border:1px solid var(--line2);background:transparent;
+  color:var(--ink2);width:26px;height:26px;border-radius:5px;cursor:pointer;
+  font-size:11px;line-height:1}
+.bwctl button:hover{color:var(--ink);border-color:var(--navy)}
+.bwctl .bwx:hover{color:#FF6B6B;border-color:#FF6B6B}
+/* ⚠ THE PADDING HAD TO BE STATED. A generic input rule supplies 8px 12px, which
+   on a 42px box leaves 18px of content area and CLIPS THE DIGIT -- measured
+   scrollWidth 46 against clientWidth 40, so the slot number was invisible in
+   the control that sets it. The spinner is hidden for the same reason: it is
+   half the width of the field and this is a type-a-number box. */
+.bwjump{width:44px;height:26px;border:1px solid var(--line2);background:transparent;
+  color:var(--ink);border-radius:5px;font:600 12px/1 var(--mono);text-align:center;
+  padding:0 2px;box-sizing:border-box;-moz-appearance:textfield}
+.bwjump::-webkit-outer-spin-button,.bwjump::-webkit-inner-spin-button{
+  -webkit-appearance:none;margin:0}
+/* the evidence: one quiet line, never competing with the slot */
+.bwev{display:flex;flex-wrap:wrap;gap:5px 12px;margin:7px 0 0 40px;
+  font:12px/1.4 var(--mono);color:var(--ink2)}
+.bwe i{font-style:normal;font:700 8.5px/1 var(--sans);letter-spacing:.11em;
+  margin-right:4px;opacity:.85}
+.bwe.pw i{color:#31D07E}
+.bwe.rs i{color:#F2B441}
+.bwe.rs.off{opacity:.62}
+.bwe.ref i{color:var(--ink3,var(--ink2))}
+.bwe.form i{display:inline-block;width:14px;height:14px;line-height:14px;
+  text-align:center;border-radius:3px;font:700 9px/14px var(--sans);margin-right:2px}
+.bwe.form i.fw{color:#31D07E;background:color-mix(in oklab,#31D07E 16%,transparent)}
+.bwe.form i.fl{color:#FF6B6B;background:color-mix(in oklab,#FF6B6B 16%,transparent)}
+/* the human-judgment prompt: appears only when a slot is far from POWER */
+.bwask{margin:8px 0 0 40px;padding:8px 10px;border-radius:6px;
+  border:1px solid color-mix(in oklab,#F2B441 30%,var(--line2));
+  background:color-mix(in oklab,#F2B441 6%,transparent)}
+.bwask.done{border-color:var(--line2);background:transparent}
+.bwask label{display:block;font:12px/1.45 var(--sans);color:var(--ink2);margin-bottom:6px}
+.bwask label b{color:#F2B441}
+.bwaskrow{display:flex;gap:7px}
+.bwask select{flex:0 0 auto;background:var(--card);color:var(--ink);
+  border:1px solid var(--line2);border-radius:5px;padding:5px 7px;font:12px var(--sans)}
+.bwask input{flex:1;min-width:0}
+.bwask input,.bwnote{background:transparent;border:1px solid var(--line2);
+  border-radius:5px;padding:6px 8px;color:var(--ink);font:12.5px var(--sans)}
+.bwnote{display:block;width:100%;margin:7px 0 0 40px;max-width:calc(100% - 40px);
+  box-sizing:border-box}
+.bwnote:focus,.bwask input:focus{outline:none;border-color:var(--navy)}
+.bwpool{display:flex;flex-wrap:wrap;gap:6px}
+.bwchip{display:inline-flex;align-items:center;gap:6px;padding:5px 8px;
+  border:1px solid var(--line2);border-radius:20px;font:12.5px var(--sans);
+  color:var(--ink)}
+.bwchip button{appearance:none;border:0;background:transparent;cursor:pointer;
+  color:var(--ink2);font:700 10px var(--sans)}
+.bwchip button:hover{color:#31D07E}
+.bwnone,.bwempty{color:var(--ink2);font:13px var(--sans)}
+.bwlink{appearance:none;border:0;background:none;color:var(--navy);cursor:pointer;
+  font:13px var(--sans);text-decoration:underline;padding:0}
+.bwadd{margin-top:12px}
+.bwadd input{width:100%;max-width:340px;background:transparent;color:var(--ink);
+  border:1px solid var(--line2);border-radius:6px;padding:9px 11px;font:13px var(--sans)}
+.bwside{display:flex;flex-direction:column;gap:14px;position:sticky;top:64px}
+.bwcard{border:1px solid var(--line2);border-radius:8px;padding:12px 14px;
+  background:var(--card)}
+.bwcard .bwh{margin-top:0}
+.bwcard textarea{width:100%;box-sizing:border-box;background:transparent;
+  color:var(--ink);border:1px solid var(--line2);border-radius:6px;padding:8px;
+  font:12.5px/1.5 var(--sans);resize:vertical}
+.bwdl{display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
+.bwdrow{font:12.5px var(--sans);color:var(--ink)}
+.bwdrow i{font-style:normal;font:700 10px var(--mono)}
+.bwdrow i.up{color:#31D07E}
+.bwdrow i.dn{color:#FF6B6B}
+.bwhrow{display:flex;align-items:baseline;gap:8px;padding:5px 0;
+  border-bottom:1px solid var(--line2);font:12px var(--mono);color:var(--ink)}
+.bwhrow:last-child{border-bottom:0}
+.bwlatest{font:700 8.5px/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;
+  color:#31D07E;margin-left:auto}
+@media (max-width:900px){ .bwgrid{grid-template-columns:1fr} .bwside{position:static} }
+@media (max-width:560px){
+  /* a deliberate ranked list: slot and team on one line, evidence under it,
+     controls big enough for a thumb -- never a squeezed desktop row */
+  .bwev,.bwnote,.bwask{margin-left:0;max-width:100%}
+  /* ⚠ SLOT AND TEAM BELONG ON THE SAME LINE. The first version put the team
+     name on its own row BELOW the controls, so a ranked list read as "1 ▲▼✕"
+     then "Nebraska" -- the number and the thing it ranks separated by the
+     buttons. A ranked list is "1 Nebraska"; the controls are secondary and go
+     underneath. */
+  .bwtop{flex-wrap:wrap;gap:6px 8px}
+  .bwslot{font-size:24px;min-width:26px;text-align:left;order:1}
+  .bwmv{order:2}
+  .bwteam{flex:1 1 auto;order:3;font-size:17px}
+  .bwctl{order:4;flex:1 1 100%;justify-content:flex-end;margin-left:0}
+  .bwctl button{width:34px;height:34px;font-size:13px}
+  .bwjump{width:46px;height:34px}
+  .bwbar{gap:7px}
+  .bwbtn{flex:1 1 auto;text-align:center}
+  .bwstate{margin-left:0;flex:1 1 100%}
+  .bwaskrow{flex-direction:column}
+  .bwask select{width:100%}
+}
+
 .leadhint{color:var(--ink2);opacity:.8}
 
 
@@ -3843,6 +3978,9 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <button role="tab" aria-selected="true" data-v="scores">Scores</button>
     <button role="tab" aria-selected="false" data-v="top25">Digby&rsquo;s Top 25</button>
     <button role="tab" aria-selected="false" data-v="rankings">Rankings</button>
+    <!-- PRIVATE. Cody's own weekly VolleyTalk ballot, not a ranking this site
+         publishes. Stripped from the public build. -->
+    <button role="tab" aria-selected="false" data-v="ballot">Ballot Workshop</button>
     <button role="tab" aria-selected="false" data-v="teams">Teams</button>
     <button role="tab" aria-selected="false" data-v="leaders">Stats</button>
     <button role="tab" aria-selected="false" data-v="players">Players</button>
@@ -4103,6 +4241,76 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     </div>
     </details>
   </div>
+</section>
+
+<section id="v-ballot" hidden>
+  <h2 class="vh">Ballot Workshop <span class="privtag" title="Your own ballot. It is not published here, it feeds no model, and nothing is posted anywhere.">private</span></h2>
+  <p class="tabhint" id="ballotlead"></p>
+
+  <div class="bwbar">
+    <button class="bwbtn primary" id="bwsave" type="button">Save this ballot</button>
+    <button class="bwbtn" id="bwcopy" type="button">Copy for VolleyTalk</button>
+    <button class="bwbtn" id="bwseed" type="button" title="Replace the 25 slots with Digby&rsquo;s current POWER order. Your notes and reasons are kept.">Reset to POWER order</button>
+    <span class="bwstate" id="bwstate"></span>
+  </div>
+
+  <div class="bwgrid">
+    <div class="bwmain">
+      <ol class="bwlist" id="bwlist"></ol>
+      <h3 class="bwh">Also considered</h3>
+      <p class="bwsub">Teams you are weighing but have not slotted. Adding one from
+        here pushes everything below it down; nobody leaves your ballot silently.</p>
+      <div class="bwpool" id="bwpool"></div>
+      <div class="bwadd">
+        <input type="search" id="bwq" list="bwlist-teams" placeholder="Add a team to consider&hellip;" autocomplete="off">
+        <datalist id="bwlist-teams"></datalist>
+      </div>
+    </div>
+
+    <aside class="bwside">
+      <div class="bwcard">
+        <h3 class="bwh">Since your last ballot</h3>
+        <div id="bwdiff"></div>
+      </div>
+      <div class="bwcard">
+        <h3 class="bwh">Notes / biggest moves</h3>
+        <p class="bwsub">Appended to the copied text. Yours, in your words.</p>
+        <textarea id="bwsummary" rows="4" placeholder="Optional. e.g. why your #1 is not the POWER #1."></textarea>
+      </div>
+      <div class="bwcard">
+        <h3 class="bwh">Saved ballots</h3>
+        <div id="bwhistory"></div>
+      </div>
+    </aside>
+  </div>
+
+  <details class="method">
+    <summary><b>How this works</b> &mdash; what is stored, and what this is not</summary>
+    <div class="note">
+      <p><b>It is your ballot.</b> The list starts from Digby&rsquo;s POWER order
+      because a blank twenty-five is a bad starting point, not because POWER is
+      the answer. Every slot is editable and your order is what gets saved and
+      copied.</p>
+      <p><b>Two kinds of movement.</b> The arrow beside a team is movement
+      against <i>your previous saved ballot</i> &mdash; what you changed your
+      mind about. The POWER column beside it is a different comparison, and the
+      two are meant to differ.</p>
+      <p><b>Reasons are words, never numbers.</b> When you place a team well
+      away from its POWER rank the workshop asks why, and stores what you write.
+      It is not scored, weighted, or fed into POWER, R&eacute;sum&eacute;, the
+      simulator or the projector. Ideas like composure and late-set nerve were
+      measured against 2025 and made the rating <i>worse</i>; the honest place
+      for them is a person&rsquo;s judgment, labelled as such.</p>
+      <p><b>Storage.</b> Each save appends a timestamped line to
+      <code>data/ballots_{{SEASON_YEAR}}.jsonl</code>. Nothing is ever rewritten, so
+      a past ballot cannot be lost by saving a new one. Without the local server
+      running, saves fall back to this browser only &mdash; the bar above says
+      which is in force.</p>
+      <p><b>It posts nowhere.</b> &ldquo;Copy for VolleyTalk&rdquo; puts text on
+      your clipboard for you to read and paste. What gets submitted, and whether
+      it is right, is yours.</p>
+    </div>
+  </details>
 </section>
 
 <section id="v-teams" hidden>
@@ -4685,6 +4893,23 @@ return '<span class="pcell">' + face +
   (meta ? '<span class="pmeta">' + meta + '</span>' : '') +
   '</span></span>';
 }
+/* BALLOT-CONST-BEGIN */
+/* ---- BALLOT WORKSHOP CONSTANTS AND HELPERS ---------------------------- */
+const SEASON_YEAR = {{SEASON_YEAR}};
+/* whether a RESUME rank exists yet at all -- the workshop must say "not active"
+   rather than print a rank it does not have (R5) */
+const RESUME_ACTIVE = {{RESUME_ACTIVE_JS}};
+
+/* The page had no JS escaper: every renderer either used textContent or built
+   markup from values it controlled. The ballot stores FREE TEXT the user types
+   and echoes it back into markup, so it needs one. */
+function esc(v) {
+  return String(v == null ? '' : v)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+/* BALLOT-CONST-END */
+
 function logo(team, cls) {
   const u = LOGOS[team];
   return u ? '<img class="tlogo ' + (cls || '') + '" src="' + u + '" alt="" ' +
@@ -4956,6 +5181,433 @@ function renderConfStrength(confs) {
       '<span>#' + MAX + '</span></div></div>';
 }
 stsel.addEventListener('change', renderStandings);
+
+/* BALLOT-WORKSHOP-BEGIN */
+/* ══ BALLOT WORKSHOP ══════════════════════════════════════════════════════
+   Cody's own weekly VolleyTalk Top 25. His ranking is the object; POWER is a
+   starting point he can overrule; his reasons are recorded as words.
+
+   ⚠ NOTHING HERE FEEDS A MODEL. Move reasons are stored text. The rating
+   engine was measured on exactly the ideas people put in these boxes --
+   composure, five-set nerve, clutch -- and every one made it predict WORSE
+   (docs/rating_factors_2025.md). That is precisely why they belong to a human
+   with a name on the ballot rather than to a coefficient.
+
+   ⚠ AND IT PUBLISHES NOTHING. One button puts text on the clipboard. */
+const BW_KEY = 'wvb_ballot_' + SEASON_YEAR;
+const BW_MOVE_REASONS = ['tournament projection', 'matchup concern',
+  'returning experience', 'injury / availability', 'late-set composure',
+  'schedule context', 'head-to-head', 'other'];
+/* how far off POWER a slot has to be before the workshop asks why. Not a
+   scoring threshold -- it decides when a QUESTION is shown, nothing else. */
+const BW_ASK_AT = 4;
+
+let BW = { teams: [], summary: '' };
+let BW_HIST = [];
+let BW_DURABLE = null;          // null = unknown, true = server, false = browser
+
+function bwPower() {
+  /* Digby's POWER order, top 25 first. The seed, never the answer. */
+  return Object.keys(TEAMS)
+    .filter(t => TEAMS[t] && TEAMS[t].rank)
+    .sort((a, b) => TEAMS[a].rank - TEAMS[b].rank);
+}
+function bwSeed() {
+  const keep = {};
+  (BW.teams || []).forEach(t => { keep[t.team] = t; });
+  const order = bwPower().slice(0, 25);
+  BW.teams = order.map((t, i) => Object.assign({}, keep[t] || {},
+    { team: t, rank: i + 1 }));
+  /* anyone previously on the ballot who is no longer in the POWER 25 keeps a
+     place in "also considered" rather than vanishing */
+  Object.keys(keep).forEach(t => {
+    if (order.indexOf(t) < 0) BW.teams.push(Object.assign({}, keep[t], { team: t, rank: null }));
+  });
+}
+function bwRanked() {
+  return BW.teams.filter(t => t.rank).sort((a, b) => a.rank - b.rank);
+}
+function bwPool() { return BW.teams.filter(t => !t.rank); }
+function bwRenumber() {
+  bwRanked().forEach((t, i) => { t.rank = i + 1; });
+}
+function bwSig(b) {
+  return (b.teams || []).filter(t => t.rank).sort((a, c) => a.rank - c.rank)
+    .map(t => t.rank + ':' + t.team).join('|');
+}
+/* WHAT THE ARROWS COMPARE AGAINST.
+   Normally the latest saved ballot. But the instant you save, the draft IS the
+   latest save -- so every arrow would collapse to "–" and the panel would read
+   "identical to your last saved ballot", which is true and useless. When the
+   draft matches the latest save, step back one: the useful question then is
+   what changed between your last two ballots. */
+function bwPrev() {
+  if (!BW_HIST.length) return null;
+  const latest = BW_HIST[BW_HIST.length - 1];
+  if (BW_HIST.length > 1 && bwSig(latest) === bwSig(BW)) return BW_HIST[BW_HIST.length - 2];
+  return latest;
+}
+function bwPrevRank(team) {
+  const p = bwPrev();
+  if (!p) return null;
+  const hit = (p.teams || []).find(x => x.team === team && x.rank);
+  return hit ? hit.rank : null;
+}
+
+/* ---- one row of evidence, deliberately secondary to the slot -------------
+   ⚠ EVERY VALUE HERE IS READ FROM THE PAGE'S OWN DATA. A team with no result
+   shows "no result yet", never a zero; RÉSUMÉ says it is not active
+   rather than printing a rank it does not have. */
+function bwEvidence(name) {
+  const t = TEAMS[name] || {};
+  const bits = [];
+  if (t.rank) {
+    bits.push('<span class="bwe pw"><i>POWER</i> ' + t.rank +
+      (t.power != null ? ' · ' + t.power : '') + '</span>');
+  }
+  bits.push(RESUME_ACTIVE && t.resume_rank
+    ? '<span class="bwe rs"><i>RÉSUMÉ</i> ' + t.resume_rank + '</span>'
+    : '<span class="bwe rs off" title="A résumé measures what a team has earned against the schedule it has played. Not enough of the season has been played yet."><i>RÉSUMÉ</i> not active yet</span>');
+  bits.push('<span class="bwe ref"><i>AVCA</i> ' +
+    (t.avca ? '#' + t.avca : 'unranked') + '</span>');
+  bits.push('<span class="bwe">' + (t.record26 || 'no result yet') + '</span>');
+  const played = (t.played || []).slice().sort((a, b) => (a.d < b.d ? 1 : -1));
+  if (played.length) {
+    const f = played.slice(0, 5).reverse().map(g =>
+      '<i class="' + (g.mine > g.theirs ? 'fw' : 'fl') + '" title="' +
+      (g.mine > g.theirs ? 'beat ' : 'lost to ') + esc(g.opp) + ' ' +
+      g.mine + '-' + g.theirs + '">' + (g.mine > g.theirs ? 'W' : 'L') + '</i>').join('');
+    bits.push('<span class="bwe form">' + f + '</span>');
+    const L = played[0];
+    bits.push('<span class="bwe last">' + (L.mine > L.theirs ? 'beat' : 'lost to') +
+      ' ' + esc(L.opp) + ' ' + L.mine + '–' + L.theirs + '</span>');
+  }
+  return bits.join('');
+}
+
+function bwMoveState(name, slot) {
+  const p = (TEAMS[name] || {}).rank;
+  if (!p) return null;
+  const d = p - slot;                       // positive = you have them HIGHER
+  if (Math.abs(d) < BW_ASK_AT) return null;
+  return { delta: d, power: p };
+}
+
+function renderBallot() {
+  const list = document.getElementById('bwlist');
+  if (!list) return;
+  bwRenumber();
+  const rows = bwRanked();
+  list.innerHTML = rows.map(t => {
+    /* ⚠ BLANK AND "–" MEAN DIFFERENT THINGS, and so does NEW. With no saved
+       ballot at all there is nothing to compare against, so every row rendered
+       NEW -- twenty-five badges asserting a change that was never measured.
+       Blank = no comparison exists. "–" = compared, did not move. NEW = this
+       team was genuinely not on your last ballot. Same rule the rankings
+       movement column already follows. */
+    const prev = bwPrevRank(t.team);
+    const base = bwPrev();
+    const mv = !base ? ''
+      : (prev == null ? '<span class="bwmv new" title="not on your last ballot">NEW</span>'
+      : (prev === t.rank ? '<span class="bwmv flat" title="same slot as your last ballot">–</span>'
+        : (prev > t.rank
+          ? '<span class="bwmv up">▲' + (prev - t.rank) + '</span>'
+          : '<span class="bwmv dn">▼' + (t.rank - prev) + '</span>')));
+    const ms = bwMoveState(t.team, t.rank);
+    const ask = ms ? '<div class="bwask' + (t.reason ? ' done' : '') + '">' +
+        '<label>You have ' + esc(t.team) + ' <b>' + Math.abs(ms.delta) + ' ' +
+        (ms.delta > 0 ? 'higher' : 'lower') + '</b> than POWER (#' + ms.power + '). Why?</label>' +
+        '<div class="bwaskrow">' +
+        '<select data-reasonkind="' + esc(t.team) + '">' +
+          '<option value="">choose…</option>' +
+          BW_MOVE_REASONS.map(r => '<option' +
+            (t.reason_kind === r ? ' selected' : '') + '>' + r + '</option>').join('') +
+        '</select>' +
+        '<input type="text" data-reason="' + esc(t.team) + '" value="' +
+          esc(t.reason || '') + '" placeholder="in your words — stored, never scored">' +
+        '</div></div>' : '';
+    return '<li class="bwrow" data-team="' + esc(t.team) + '">' +
+      '<div class="bwtop">' +
+        '<span class="bwslot">' + t.rank + '</span>' + mv +
+        '<span class="bwteam">' + logo(t.team) + esc(t.team) + '</span>' +
+        '<span class="bwctl">' +
+          '<button type="button" data-up="' + esc(t.team) + '" title="up one slot" aria-label="Move ' + esc(t.team) + ' up">▲</button>' +
+          '<button type="button" data-dn="' + esc(t.team) + '" title="down one slot" aria-label="Move ' + esc(t.team) + ' down">▼</button>' +
+          '<input class="bwjump" type="number" min="1" max="25" value="' + t.rank +
+            '" data-jump="' + esc(t.team) + '" title="type a slot" aria-label="Slot for ' + esc(t.team) + '">' +
+          '<button type="button" class="bwx" data-drop="' + esc(t.team) + '" title="move to also considered" aria-label="Remove ' + esc(t.team) + ' from the ballot">✕</button>' +
+        '</span>' +
+      '</div>' +
+      '<div class="bwev">' + bwEvidence(t.team) + '</div>' +
+      ask +
+      '<input class="bwnote" type="text" data-note="' + esc(t.team) + '" value="' +
+        esc(t.note || '') + '" placeholder="private note on ' + esc(t.team) + '…">' +
+      '</li>';
+  }).join('') || '<li class="bwempty">No teams on the ballot yet. ' +
+      '<button type="button" class="bwlink" id="bwseed2">Start from the POWER order</button>.</li>';
+
+  const pool = document.getElementById('bwpool');
+  pool.innerHTML = bwPool().map(t =>
+    '<span class="bwchip">' + logo(t.team) + esc(t.team) +
+    '<button type="button" data-promote="' + esc(t.team) + '" title="add to the ballot at 25">add</button>' +
+    '<button type="button" data-forget="' + esc(t.team) + '" title="stop considering">✕</button>' +
+    '</span>').join('') || '<span class="bwnone">Nothing set aside.</span>';
+
+  renderBallotDiff();
+  renderBallotHistory();
+  const lead = document.getElementById('ballotlead');
+  if (lead) {
+    lead.innerHTML = '<b>Your ' + SEASON_YEAR + ' VolleyTalk ballot.</b> ' +
+      'It starts from Digby’s POWER order and is yours to change. ' +
+      'The arrow beside a team is movement against <b>your last saved ballot</b>, ' +
+      'not against POWER. Nothing here is published or fed into any rating.';
+  }
+}
+
+
+/* ---- comparison against the PREVIOUS SAVED BALLOT ---------------------- */
+function renderBallotDiff() {
+  const box = document.getElementById('bwdiff');
+  if (!box) return;
+  const prev = bwPrev();
+  if (!prev) {
+    box.innerHTML = '<p class="bwsub">No saved ballot yet. Save one and this ' +
+      'fills with what you changed — additions, drops, the biggest moves, and ' +
+      'what you left alone.</p>';
+    return;
+  }
+  const cur = {}; bwRanked().forEach(t => { cur[t.team] = t.rank; });
+  const old = {}; (prev.teams || []).filter(t => t.rank).forEach(t => { old[t.team] = t.rank; });
+  const entered = Object.keys(cur).filter(t => !(t in old)).sort((a,b)=>cur[a]-cur[b]);
+  const dropped = Object.keys(old).filter(t => !(t in cur)).sort((a,b)=>old[a]-old[b]);
+  const moved = Object.keys(cur).filter(t => t in old && old[t] !== cur[t])
+    .map(t => ({ t, from: old[t], to: cur[t], d: old[t] - cur[t] }))
+    .sort((a, b) => Math.abs(b.d) - Math.abs(a.d));
+  const same = Object.keys(cur).filter(t => t in old && old[t] === cur[t]).length;
+  const when = (prev.saved_utc || '').replace('T', ' ').replace('Z', ' UTC');
+  const justSaved = BW_HIST.length > 1 &&
+    bwSig(BW_HIST[BW_HIST.length - 1]) === bwSig(BW);
+  let h = '<p class="bwsub">' + (justSaved
+    ? 'your last two saved ballots' : 'vs your ballot saved ' + esc(when)) + '</p>';
+  if (moved.length) {
+    h += '<div class="bwdl">' + moved.slice(0, 6).map(m =>
+      '<span class="bwdrow"><b>' + esc(m.t) + '</b> ' +
+      (m.d > 0 ? '<i class="up">▲' + m.d + '</i>' : '<i class="dn">▼' + (-m.d) + '</i>') +
+      ' <span class="bwsub">' + m.from + '→' + m.to + '</span></span>').join('') + '</div>';
+  }
+  if (entered.length) h += '<p class="bwsub"><b>In:</b> ' + entered.map(esc).join(', ') + '</p>';
+  if (dropped.length) h += '<p class="bwsub"><b>Out:</b> ' + dropped.map(esc).join(', ') + '</p>';
+  if (!moved.length && !entered.length && !dropped.length) {
+    h += '<p class="bwsub">Identical to your last saved ballot.</p>';
+  } else {
+    h += '<p class="bwsub">' + same + ' unchanged.</p>';
+  }
+  box.innerHTML = h;
+}
+
+function renderBallotHistory() {
+  const box = document.getElementById('bwhistory');
+  if (!box) return;
+  if (!BW_HIST.length) {
+    box.innerHTML = '<p class="bwsub">Nothing saved yet. Your first save becomes ' +
+      'the baseline every later week is measured against.</p>';
+    return;
+  }
+  box.innerHTML = BW_HIST.slice().reverse().slice(0, 8).map((b, i) => {
+    const r = (b.teams || []).filter(x => x.rank).sort((a, c) => a.rank - c.rank);
+    const when = (b.saved_utc || '').replace('T', ' ').replace('Z', '');
+    return '<div class="bwhrow"><b>' + esc(when) + '</b>' +
+      '<span class="bwsub">' + r.length + ' ranked' +
+      (r.length ? ' · #1 ' + esc(r[0].team) : '') + '</span>' +
+      (i === 0 ? '<span class="bwlatest">latest</span>' : '') + '</div>';
+  }).join('');
+}
+
+/* ---- the plain text, mirroring scripts/ballot.py:as_text() -------------- */
+function bwText() {
+  const rows = bwRanked();
+  const lines = rows.map(t => t.rank + '. ' + t.team);
+  const extra = [];
+  const sum = (document.getElementById('bwsummary').value || '').trim();
+  if (sum) extra.push(sum);
+  const prev = bwPrev();
+  if (prev) {
+    const cur = {}; rows.forEach(t => { cur[t.team] = t.rank; });
+    const old = {}; (prev.teams || []).filter(t => t.rank).forEach(t => { old[t.team] = t.rank; });
+    const bits = [];
+    Object.keys(cur).filter(t => t in old && Math.abs(old[t] - cur[t]) >= 3)
+      .map(t => ({ t, from: old[t], to: cur[t], d: old[t] - cur[t] }))
+      .sort((a, b) => Math.abs(b.d) - Math.abs(a.d)).slice(0, 4)
+      .forEach(m => bits.push(m.t + ' ' + (m.d > 0 ? 'up ' : 'down ') +
+        Math.abs(m.d) + ' (' + m.from + '→' + m.to + ')'));
+    const ins = Object.keys(cur).filter(t => !(t in old));
+    const outs = Object.keys(old).filter(t => !(t in cur));
+    if (ins.length) bits.push('in: ' + ins.slice(0, 4).join(', '));
+    if (outs.length) bits.push('out: ' + outs.slice(0, 4).join(', '));
+    if (bits.length) extra.push('Biggest moves: ' + bits.join(' | '));
+  }
+  if (extra.length) { lines.push(''); lines.push('Notes / biggest moves'); extra.forEach(e => lines.push(e)); }
+  return lines.join('\n');
+}
+
+function bwSay(msg, kind) {
+  const el = document.getElementById('bwstate');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'bwstate' + (kind ? ' ' + kind : '');
+}
+
+/* ---- persistence -------------------------------------------------------
+   The server appends to data/ballots_YYYY.jsonl. Without it, the browser is
+   the only store -- and the bar SAYS SO, because a save that silently went
+   nowhere durable is worse than a refused one. */
+function bwLocalSave() {
+  try { localStorage.setItem(BW_KEY, JSON.stringify({ draft: BW, hist: BW_HIST })); }
+  catch (e) { /* private window / storage off: the page still works, nothing persists */ }
+}
+function bwLocalLoad() {
+  try {
+    const raw = localStorage.getItem(BW_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) { return null; }
+}
+
+async function bwSave() {
+  bwRenumber();
+  const payload = { teams: BW.teams, summary: document.getElementById('bwsummary').value || '' };
+  if (!bwRanked().length) { bwSay('Nothing to save — the ballot is empty.', 'warn'); return; }
+  let ok = false;
+  try {
+    const r = await fetch('/api/ballot', { method: 'POST',
+      headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    const j = await r.json();
+    if (j.ok) { ok = true; BW_DURABLE = true; bwSay('Saved to data/ballots_' + SEASON_YEAR +
+        '.jsonl · ' + j.count + ' on file', 'good'); }
+    else bwSay('Not saved: ' + j.error, 'warn');
+  } catch (e) {
+    BW_DURABLE = false;
+    ok = true;
+    bwSay('Saved in this browser only — the local server is not running, so ' +
+      'this is not in data/ballots_' + SEASON_YEAR + '.jsonl', 'warn');
+  }
+  if (ok) {
+    const row = Object.assign({}, payload, { saved_utc: new Date().toISOString().replace(/\.\d+Z$/, 'Z') });
+    BW_HIST.push(JSON.parse(JSON.stringify(row)));
+    bwLocalSave();
+    renderBallot();
+  }
+}
+
+async function bwLoadHistory() {
+  const local = bwLocalLoad();
+  try {
+    const r = await fetch('/api/ballot');
+    const j = await r.json();
+    if (j.ok) {
+      BW_HIST = j.ballots || [];
+      BW_DURABLE = true;
+      bwSay('Saving to data/ballots_' + SEASON_YEAR + '.jsonl', 'good');
+    }
+  } catch (e) {
+    BW_DURABLE = false;
+    BW_HIST = (local && local.hist) || [];
+    bwSay('Local server not running — saves stay in this browser only', 'warn');
+  }
+  /* an unsaved draft outlives a reload; the saved history is the record */
+  if (local && local.draft && (local.draft.teams || []).length) BW = local.draft;
+  else bwSeed();
+  const sum = document.getElementById('bwsummary');
+  if (sum) sum.value = BW.summary || '';
+  renderBallot();
+}
+
+/* ---- wiring ------------------------------------------------------------
+   ⚠ NOT SELF-INVOKING, AND THAT IS LOAD-BEARING. This reads TEAMS, which is a
+   `const` declared near the END of the page script -- so an IIFE here throws
+   "Cannot access 'TEAMS' before initialization" and the whole tab renders
+   nothing, silently. A `typeof` guard does not help: a const in the temporal
+   dead zone throws for that too. Called after TEAMS instead. Third time this
+   project has hit this; the fix is always ordering, never a guard. */
+function bwWire() {
+  const list = document.getElementById('bwlist');
+  if (!list) return;
+
+  function move(team, to) {
+    const rows = bwRanked();
+    const i = rows.findIndex(t => t.team === team);
+    if (i < 0) return;
+    const dest = Math.max(0, Math.min(rows.length - 1, to));
+    if (dest === i) return;
+    rows.splice(dest, 0, rows.splice(i, 1)[0]);
+    rows.forEach((t, k) => { t.rank = k + 1; });
+    bwLocalSave(); renderBallot();
+  }
+
+  document.getElementById('v-ballot').addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    const rows = bwRanked();
+    const idx = t => rows.findIndex(x => x.team === t);
+    if (b.dataset.up) move(b.dataset.up, idx(b.dataset.up) - 1);
+    else if (b.dataset.dn) move(b.dataset.dn, idx(b.dataset.dn) + 1);
+    else if (b.dataset.drop) {
+      const t = BW.teams.find(x => x.team === b.dataset.drop);
+      if (t) { t.rank = null; bwRenumber(); bwLocalSave(); renderBallot(); }
+    } else if (b.dataset.promote) {
+      const t = BW.teams.find(x => x.team === b.dataset.promote);
+      if (t) { t.rank = bwRanked().length + 1; bwRenumber(); bwLocalSave(); renderBallot(); }
+    } else if (b.dataset.forget) {
+      BW.teams = BW.teams.filter(x => x.team !== b.dataset.forget);
+      bwLocalSave(); renderBallot();
+    } else if (b.id === 'bwseed' || b.id === 'bwseed2') {
+      bwSeed(); bwLocalSave(); renderBallot();
+      bwSay('Reset to the POWER order — your notes were kept.', '');
+    } else if (b.id === 'bwsave') { bwSave(); }
+    else if (b.id === 'bwcopy') {
+      const txt = bwText();
+      const done = () => bwSay('Copied ' + bwRanked().length + ' lines — read it before you post.', 'good');
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(txt).then(done, () => bwSay('Could not copy.', 'warn'));
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = txt; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); done(); } catch (err) { bwSay('Could not copy.', 'warn'); }
+        ta.remove();
+      }
+    }
+  });
+
+  document.getElementById('v-ballot').addEventListener('change', e => {
+    const el = e.target;
+    const find = n => BW.teams.find(x => x.team === n);
+    if (el.dataset.jump) {
+      const n = parseInt(el.value, 10);
+      if (n >= 1 && n <= 25) move(el.dataset.jump, n - 1); else renderBallot();
+    } else if (el.dataset.note) { const t = find(el.dataset.note); if (t) { t.note = el.value; bwLocalSave(); } }
+    else if (el.dataset.reason) { const t = find(el.dataset.reason); if (t) { t.reason = el.value; bwLocalSave(); } }
+    else if (el.dataset.reasonkind) { const t = find(el.dataset.reasonkind); if (t) { t.reason_kind = el.value; bwLocalSave(); } }
+    else if (el.id === 'bwsummary') { BW.summary = el.value; bwLocalSave(); }
+  });
+
+  const q = document.getElementById('bwq');
+  if (q) {
+    const dl = document.getElementById('bwlist-teams');
+    Object.keys(TEAMS).sort().forEach(t => {
+      const o = document.createElement('option'); o.value = t; dl.appendChild(o);
+    });
+    q.addEventListener('change', () => {
+      const nm = q.value.trim();
+      if (!nm || !TEAMS[nm]) return;
+      if (!BW.teams.find(x => x.team === nm)) BW.teams.push({ team: nm, rank: null });
+      q.value = ''; bwLocalSave(); renderBallot();
+    });
+  }
+
+  bwLoadHistory();
+}
+/* BALLOT-WORKSHOP-END */
+
 renderStandings();
 renderWeek();
 
@@ -5410,6 +6062,11 @@ renderLeaders();
 
 /* ---- team page ---- */
 const TEAMS = {{TEAMS_JSON}};
+/* BALLOT-INIT-BEGIN */
+/* the workshop reads TEAMS, so it is started here rather than at its
+   definition -- see the temporal-dead-zone note on bwWire() */
+if (typeof bwWire === 'function') bwWire();
+/* BALLOT-INIT-END */
 const dl = document.getElementById('tmlist');
 Object.keys(TEAMS).sort().forEach(n => {
   const o = document.createElement('option'); o.value = n; dl.appendChild(o);
@@ -6294,6 +6951,32 @@ def strip_private(html):
     html = re.sub(r'\s*<button role="tab"[^>]*data-v="tv"[^>]*>.*?</button>', "",
                   html, flags=re.S)
     html = re.sub(r'<section id="v-tv".*?</section>', "", html, flags=re.S)
+    # ⚠ THE BALLOT WORKSHOP IS PRIVATE. It is Cody's own ballot, his private
+    # notes, and his reasons for disagreeing with the model -- none of which is
+    # ours to publish. Removed wholesale from the public build rather than
+    # hidden, because hiding a section still ships its contents (this project
+    # already shipped 151 Massey ranks inside a payload behind removed columns).
+    # The nav entry, WITH the comment above it -- that comment explains the
+    # privacy of the feature and names the forum, so leaving it behind both
+    # documents a section that is no longer there and trips the marker check.
+    html = re.sub(r'\s*<!--\s*PRIVATE\..*?-->\s*'
+                  r'<button role="tab"[^>]*data-v="ballot"[^>]*>.*?</button>', "",
+                  html, flags=re.S)
+    html = re.sub(r'\s*<button role="tab"[^>]*data-v="ballot"[^>]*>.*?</button>', "",
+                  html, flags=re.S)
+    html = re.sub(r'<section id="v-ballot".*?</section>', "", html, flags=re.S)
+    # ⚠ AND ITS SCRIPT, NOT JUST ITS MARKUP. Removing the section alone left the
+    # workshop's JavaScript in the published file -- dead code for a private
+    # feature, and it names the forum Cody posts to, which tripped the marker
+    # assertion and ABORTED the build. That abort was the guard working
+    # correctly: a private feature should not ship its code either. Sentinels
+    # rather than a regex guessing where a block ends.
+    html = re.sub(r"/\* BALLOT-WORKSHOP-BEGIN \*/.*?/\* BALLOT-WORKSHOP-END \*/",
+                  "", html, flags=re.S)
+    html = re.sub(r"/\* BALLOT-CONST-BEGIN \*/.*?/\* BALLOT-CONST-END \*/",
+                  "", html, flags=re.S)
+    html = re.sub(r"/\* BALLOT-INIT-BEGIN \*/.*?/\* BALLOT-INIT-END \*/",
+                  "", html, flags=re.S)
     # third-party ranking columns
     # ⚠ TOLERANT OF ATTRIBUTES BEFORE title=. These patterns used to require
     # `title` to follow `<th` immediately, so the moment the header gained a
