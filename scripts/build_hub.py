@@ -1337,6 +1337,12 @@ def box_and_players(res, photos=None, honours=None):
               + (b.get("ast") or 0))
         return ka > kb
 
+    # Hoisted: the membership set is needed while building each game record,
+    # not only when the Division-I directory is filtered further down. Same
+    # call, one place, so the flag on a match and the filter on the list can
+    # never disagree about who is Division I.
+    _di_now = di_teams()
+
     def num(v):
         try:
             return float(v)
@@ -1407,6 +1413,19 @@ def box_and_players(res, photos=None, honours=None):
             _game = {
                 "d": date_of.get(gid), "gid": gid,
                 "opp": opp_of.get((gid, row["team"])),
+                # ⚠ WHETHER THE OPPONENT IS DIVISION I TRAVELS WITH THE MATCH.
+                # The site deliberately does NOT filter non-D-I opponents --
+                # filtering would change what every number means without saying
+                # so -- and it states that on the Stats table. It did not state
+                # it on the PLAYER card, which is where a reader actually meets
+                # the number: Catori Crawford's whole 2026 line is one match
+                # against Elizabeth City St. (Division II) and rendered ".500
+                # HIT" in the same type as an SEC hitter's .164 over 73 swings.
+                # The caveat has to sit on the row, not one view away.
+                # "not Division I" is what we can actually show: the team is
+                # absent from the D-I membership set. It does not say D-II.
+                "nondi": bool(_di_now) and
+                         (opp_of.get((gid, row["team"])) or "") not in _di_now,
                 "k": k, "e": e, "ta": a, "hit": row["hit"],
                 "digs": row["digs"], "bs": bs, "ba": ba,
                 # ⚠ ASSISTS BELONG ON A MATCH LINE. Without them a setter's
@@ -1430,7 +1449,7 @@ def box_and_players(res, photos=None, honours=None):
     # so a D-II opponent's players still appear in the box score of the match
     # they actually played -- that is a record of what happened. The Players TAB
     # is a Division-I directory, so it carries Division-I players.
-    _di = di_teams()
+    _di = _di_now
     for p in players.values():
         if _di and p.get("team") and p["team"] not in _di:
             continue
@@ -4937,6 +4956,9 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 .rstat em{display:block;font:600 9px/1 var(--sans);letter-spacing:.05em;
   text-transform:uppercase;color:var(--ink3);font-style:normal;margin-top:3px}
 .rstat .none{color:var(--ink3);font-weight:400}
+.gline .nondi{margin-left:6px;padding:1px 5px;border-radius:3px;
+  font:700 9px/1.5 var(--mono);letter-spacing:.04em;text-transform:uppercase;
+  color:var(--ink3);background:var(--alt);vertical-align:middle;}
 h3 .h3n{font:700 10px/1 var(--mono);color:var(--ink3);background:var(--alt);
   border-radius:4px;padding:3px 7px;margin-left:7px;vertical-align:2px}
 @media (max-width:560px){
@@ -6564,7 +6586,12 @@ function showPlayer(p) {
       : '') +
     '<div class="tsec"><h3>Match log</h3><div class="body">' +
     p.games.map(g => '<div class="gline"><span class="dt">' + dayLabel(g.d || '') + '</span>' +
-      '<span class="op">' + (g.opp || '') + '</span>' +
+      '<span class="op">' + esc(g.opp || '') +
+      /* the caveat sits on the row, beside the number it qualifies */
+      (g.nondi ? '<b class="nondi" title="Not a Division-I opponent. This ' +
+        'site does not filter these matches out -- filtering would change ' +
+        'what every rate means without saying so -- so it is marked ' +
+        'instead.">non-D-I</b>' : '') + '</span>' +
       /* assists only appear when there are any, so a hitter's line is not
          padded with "0s" -- but a setter's night is no longer invisible */
       '<span class="ss pgl">' + g.k + 'k · ' + g.e + 'e · ' + g.ta + 'ta · ' +
@@ -6575,6 +6602,27 @@ function showPlayer(p) {
       ((g.bs + g.ba * 0.5) ? ' · ' + (g.bs + g.ba * 0.5) + 'b' : '') +
       (g.ast ? ' · ' + g.ast + ' ast' : '') + '</span>' +
       '<span class="rs">' + g.pts + ' pts</span></div>').join('') +
+    /* ⚠ SAID ONLY WHEN IT IS TRUE, and it says how much of the season it is.
+       "one of her two matches" and "her only match" are different facts and
+       the reader needs the second one loudly. */
+    ((p.games || []).some(g => g.nondi)
+      ? '<div class="tnote">' + (() => {
+          const n = p.games.filter(g => g.nondi).length, t = p.games.length;
+          return n === t
+            ? (t === 1
+                ? 'Her only match on file is against a non-Division-I opponent, '
+                : 'Every match on file is against a non-Division-I opponent, ')
+            /* "1 of these 2 matches ARE" -- the subject is the count, so
+               a single flagged match takes a singular verb. Found by
+               exercising this branch against a synthetic mixed record;
+               real data cannot reach it two days into a season. */
+            : n + ' of these ' + t + ' matches ' +
+              (n === 1 ? 'is against a non-Division-I opponent, '
+                       : 'are against non-Division-I opponents, ');
+        })() + 'so the rates above are not measured against Division-I ' +
+        'competition. Nothing is filtered out: filtering would change what ' +
+        'the numbers mean without saying so.</div>'
+      : '') +
     '</div></div>';
 }
 document.getElementById('pbody').addEventListener('click', e => {

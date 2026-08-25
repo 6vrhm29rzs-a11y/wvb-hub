@@ -23,8 +23,10 @@ can never touch real data.
 Python 3.9 target. Run: python3 scripts/test_player_aggregation.py
 """
 
+import io
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -174,6 +176,74 @@ def main():
             check("total %-5s equals the log" % f,
                   abs(s - (p.get(f) or 0)) < 1e-9,
                   "total %s, log %s" % (p.get(f), s))
+
+        print("\n5b. A NON-DIVISION-I OPPONENT IS MARKED ON THE ROW")
+        # WHY THIS IS SYNTHETIC. The site deliberately does not filter non-D-I
+        # opponents; it states them instead. That caveat lived only in the
+        # Stats table's note -- one view away from the player card, which is
+        # where a reader actually meets the number. Catori Crawford's ".500
+        # HIT" is one match against a Division-II side and read exactly like
+        # an SEC hitter's line.
+        # Real data has only two of the three cases: every-match and
+        # no-match. The MIXED case ("2 of these 3") cannot occur two days into
+        # a season, so it is constructed here rather than left to be found
+        # later by a reader.
+        def note_for(flags):
+            n, t = sum(1 for f in flags if f), len(flags)
+            if n == 0:
+                return ""
+            if n == t:
+                return "her only match" if t == 1 else "every match"
+            # verb agrees with the count: "1 ... is", "2 ... are"
+            return ("%d of these %d matches is against a non-Division-I "
+                    "opponent" % (n, t)) if n == 1 else (
+                   "%d of these %d matches are against non-Division-I "
+                   "opponents" % (n, t))
+
+        for flags, want in (([True], "her only match"),
+                            ([True, True], "every match"),
+                            ([True, False, False],
+                             "1 of these 3 matches is against a "
+                             "non-Division-I opponent"),
+                            ([True, True, False],
+                             "2 of these 3 matches are against "
+                             "non-Division-I opponents"),
+                            ([False], ""),
+                            ([False, False], "")):
+            got = note_for(flags)
+            check("%-22s -> %r" % (flags, want), got == want, repr(got))
+
+        hp, _which = None, None
+        for cand in ("Cody/START-HERE.html", "output/vb_dashboard.html"):
+            fp = os.path.join(REPO, cand)
+            if os.path.exists(fp):
+                hp = io.open(fp, encoding="utf-8").read()
+                break
+        if hp:
+            for frag in ("Her only match on file", "Every match on file",
+                         "of these ", "non-Division-I",
+                         "is against a non-Division-I opponent"):
+                check("the card can say %r" % frag, frag in hp)
+            # NEGATIVE CONTROL ON THE CLASS NAME ITSELF. `ndi` was rejected
+            # because it matches 53 substrings in this page (sta-ndi-ngs,
+            # I-ndi-ana) -- the trap that made `.bwr` match `.bwrap` and
+            # `mbrow` match the surname Stambrowska.
+            check("[-] the marker class is not a substring of common words",
+                  all("nondi" not in w
+                      for w in ("standings", "indiana", "ending", "sondheim")))
+            check("the marker renders at least once", 'class="nondi"' in hp)
+            m3 = re.search(r"const PLAYERS = (\[.*?\]);\n", hp, re.S)
+            PP = json.loads(m3.group(1)) if m3 else []
+            flagged = sum(1 for pl in PP for g in pl.get("games", [])
+                          if g.get("nondi"))
+            total = sum(len(pl.get("games", [])) for pl in PP)
+            check("[+] some game rows carry the flag", flagged > 0,
+                  "%d of %d" % (flagged, total))
+            # A FLAG THAT IS ALWAYS TRUE MARKS NOTHING.
+            check("[-] ...and not every row does", flagged < total,
+                  "%d of %d" % (flagged, total))
+            print("     (%d of %d game rows face non-D-I opponents)"
+                  % (flagged, total))
 
         print("\n6. CLASS YEARS ARE SPELLED OUT, UNKNOWNS PRESERVED")
         sys.path.insert(0, SCRIPTS)

@@ -5,10 +5,15 @@ work are as they are. Everything it says about the **product** — tabs, Match
 Desk, Scores, the ballot — is out of date. Nine commits landed today and the
 shape of the site changed.
 
-**Remote is `59d433e` (was `1eec0db` when this was first written -- the
-line went stale within the day, which is exactly why it says this). Verify with
-`git ls-remote origin` rather than trusting it.** Git is classifier-blocked in
-auto mode: hand Cody the command.
+**This line deliberately does NOT name a commit.** It used to. It said
+`1eec0db`, then `59d433e`, and each correction was itself a commit that made
+the new value wrong the moment it was pushed -- an unwinnable line. The only
+statement here that stays true is the instruction:
+
+    git ls-remote origin main
+
+**Run that.** Git is classifier-blocked in auto mode, so the Builder cannot
+commit or push: hand Cody the command.
 
 ---
 
@@ -226,6 +231,41 @@ the wire: static HTML, `/api/live` and `/api/ballot` each carry the header
 
 ⚠ **`curl -I` sends HEAD and never reaches `do_GET`**, so it 404s every JSON
 route here and proves nothing about them. Use `curl -s -D -`.
+
+**5. A NON-DIVISION-I OPPONENT WAS UNMARKED ON THE PLAYER CARD.** The site
+deliberately does not filter non-D-I opponents out -- filtering would change
+what every rate means without saying so -- and it **states** that. But it
+stated it only in the Stats -> Teams panel note, one view away from where a
+reader meets the number. Catori Crawford's card read **`Hit% .500`** in the
+same type as an SEC hitter's `.164`; her entire 2026 line is one match against
+Elizabeth City St., a Division-II side.
+
+The caveat now sits on the row it qualifies: a quiet `non-D-I` marker beside
+the opponent, plus a note under the log that says **how much** of the season it
+covers -- "her only match", "every match", or "2 of these 3". 15 of 209 game
+rows carry it.
+
+⚠ **It says "not Division I", never "Division II".** What we actually know is
+that the team is absent from the D-I membership set. The stronger claim is not
+ours to make.
+
+⚠ **The class name `ndi` was rejected before it was written**: it matches 53
+substrings in this page (sta*ndi*ngs, I*ndi*ana). `nondi` is clean. That is
+collision number seven, caught by checking first for once rather than after.
+
+⚠ **THE MIXED CASE CANNOT HAPPEN IN REAL DATA YET** -- two days into a season
+every player is all-D-I or all-non-D-I. I exercised it anyway, by flagging one
+of Olivia Babcock's two real matches in the live payload and reverting it.
+**That is the only reason two grammar defects were found:** the branch rendered
+"1 of these 2 matches **are** against non-Division-I **opponents**" -- wrong
+verb and wrong noun for a singular count. A guard covering all four states now
+sits in `test_player_aggregation.py`.
+
+⚠ **Be honest about what that guard is.** Its `note_for()` is a
+**reimplementation** of the page's branch, so it tests the arithmetic, not the
+renderer; the page-side phrasings are asserted separately as strings. The
+end-to-end proof was the browser run above, done once by hand. If that branch
+is edited, re-run it the same way.
 
 **State at close:** 24 suites pass with `Cody/` present and 24 with it moved
 aside. Tree is clean apart from the three fixes above. Nothing here changes
