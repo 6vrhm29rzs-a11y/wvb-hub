@@ -658,17 +658,44 @@ def main():
               "<s>AVCA</s>" not in h and "<s>POWER</s>" not in h)
         check("%s: the label uses a neutral element" % label,
               '<span class="rank-label">' in h)
-        check("%s: AVCA is still VISIBLE beside its number" % label,
-              '<span class="rank-label">AVCA</span>#' in h)
-        check("%s: POWER is still VISIBLE beside its number" % label,
-              '<span class="rank-label">POWER</span>#' in h)
+        # ⚠ THE VISIBLE LABEL IS NOT ALWAYS THE FULL WORD. Tight rows ask the
+        # rank component for its COMPACT label, so POWER renders as "PWR" --
+        # shorter, never absent. Pinning the long form made this fail on markup
+        # that is doing exactly what it should. What matters is that SOME
+        # ruler name sits beside the number, and that it is one we recognise.
+        import build_hub as _BH
+        names = set()
+        for v in _BH.RULERS.values():
+            names.add(v[0]); names.add(v[1])
+        # ⚠ MATCH RENDERED LABELS, NOT THE RENDERER. [^<]+ also captured the
+        # JS template line -- `>' + esc(compact ? r[1] : r[0]) + '<` -- which is
+        # the source of the labels, not one of them, and it failed the
+        # membership test it should never have been in. Labels are short
+        # upper-case tokens.
+        shown = set(re.findall(
+            r'<span class="rank-label">([A-Z0-9\u00c9 ]{1,10})</span>#', h))
+        check("%s: every rank shows a ruler name beside it" % label,
+              bool(shown) and shown <= names,
+              "unknown: %s" % sorted(shown - names))
+        check("%s: POWER's ruler is named in some form" % label,
+              bool(shown & {"POWER", "PWR"}), str(sorted(shown)))
         bare = re.findall(r'<i class="rnk"[^>]*>\s*\d+\s*</i>', h)
         check("%s: still no bare external numeral" % label, not bare,
               str(bare[:1]))
-    check("both renderers emit the same element (python)",
-          '<span class="rank-label">AVCA</span>#%s' in src)
-    check("...and javascript",
-          "'<span class=\"rank-label\">AVCA</span>#'" in src)
+    # ⚠ THIS PAIR USED TO PIN THE LITERAL "AVCA" IN BOTH RENDERERS, which was
+    # the only way to check parity when each side hard-coded its own label. It
+    # is now enforced at the root instead: there is ONE table, defined in
+    # Python, and the JS copy is emitted from it -- so the two cannot disagree
+    # about what any ruler is called. Assert that arrangement rather than a
+    # string that happened to appear on both sides.
+    check("both renderers read ONE ruler table (python defines it)",
+          "RULERS = {" in src and "def rank_badge(basis, v" in src)
+    check("...and javascript receives it, rather than declaring its own",
+          "const RULERS = {{RULERS_JSON}}" in src and
+          '.replace("{{RULERS_JSON}}"' in src)
+    check("[-] ...so no ruler label is written twice in the source",
+          src.count('"AVCA coaches poll"') == 1,
+          "a second literal is a second opinion waiting to drift")
     check("the label no longer has to cancel a line-through",
           ".rank-label{" in src and ".rnk>s" not in src)
 

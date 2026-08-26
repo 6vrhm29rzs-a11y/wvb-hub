@@ -250,32 +250,92 @@ def day_label(iso, today=None):
 
 RANK_TITLE = "AVCA coaches poll rank"
 
+# ══ THE RULERS ════════════════════════════════════════════════════════════
+# ⚠ A RANK WITHOUT ITS RULER IS NOT A FACT, IT IS A NUMBER. This page carries
+# at least nine different orderings of the same 348 teams, and a bare "#21"
+# silently means whichever one the reader had in mind. It was measured in the
+# Court Signal phase: the Rally Tape showed Kansas at #15 (AVCA, from the
+# scoreboard feed) four inches above a readiness panel showing the same match
+# with Kansas at #21 (Digby's Top 25). Both correct. Neither labelled. The only
+# reason that pair was caught is that they happened to land on one screen --
+# everywhere else the two rulers are far enough apart that nothing LOOKS wrong,
+# which is worse.
+#
+# So: one table, here, and both render paths read it. Each entry is
+#   key: (visible label, compact label, what it actually is)
+# The compact label is SHORTER, never ABSENT -- "space is tight" is not a
+# reason to publish an ambiguous number.
+RULERS = {
+    "avca":      ("AVCA", "AVCA", "AVCA coaches poll"),
+    "power":     ("POWER", "PWR", "our POWER rating -- how strong a team is"),
+    "digby":     ("DIGBY", "DGB", "Digby's Top 25 -- this site's own "
+                                  "in-season ranking"),
+    "resume":    ("R\u00c9SUM\u00c9", "RES", "our r\u00e9sum\u00e9 rank -- "
+                                           "what a team has earned"),
+    "rpi":       ("RPI", "RPI", "official NCAA RPI"),
+    "ballot":    ("MY BALLOT", "MINE", "your own saved ballot"),
+    "vt":        ("VT", "VT", "VolleyTalk community poll"),
+    "massey":    ("MASSEY", "MSY", "Massey Ratings"),
+    "power25":   ("2025", "2025", "final 2025 POWER rank"),
+    "committee": ("TOP 16", "T16", "the DI Committee's in-season Top 16 "
+                                   "reveal"),
+    "seed":      ("SEED", "SEED", "projected tournament seed"),
+}
+
+
+# ⚠ TWO OF THESE RULERS NAME SOMEBODY ELSE'S PRODUCT, and this table is
+# SERIALISED INTO THE PAGE. Adding them shipped the strings "VolleyTalk" and
+# "Massey Ratings" straight into the public build -- and the fail-closed gate
+# stopped the build, which is exactly what it is for. The values were already
+# dropped at BOARD.build(); it was the LABELS that leaked, through a data
+# structure nobody would think of as markup.
+# The general lesson this project keeps relearning: when the question is "did
+# we publish X", grep the DATA. A table is data.
+PRIVATE_RULERS = ("vt", "massey")
+
+
+def public_rulers():
+    """The ruler table as the built page should carry it."""
+    return {k: list(v) for k, v in RULERS.items()
+            if not (PUBLIC and k in PRIVATE_RULERS)}
+
+
+def rank_badge(basis, v, compact=False, text=False):
+    """The one way a rank is rendered. BASIS IS REQUIRED.
+
+    ⚠ THERE IS DELIBERATELY NO DEFAULT. A default basis is how the previous
+    version of this function -- which hard-coded AVCA -- ended up being the
+    right answer at four call sites and the wrong answer at none only by luck.
+    An unknown or missing basis renders a LOUD marker rather than a bare
+    number, and test_rulers.py asserts that marker never reaches a built page.
+    A silent fallback would put the failure back where it started.
+    """
+    if not v:
+        return ""
+    r = RULERS.get(basis)
+    if r is None:
+        # visible, ugly, and guarded -- never a bare numeral
+        if text:
+            return "rank basis? "
+        return '<i class="rnk rnkbad" title="no ruler named">rank basis?</i> '
+    label = r[1] if compact else r[0]
+    if text:
+        # ⚠ NOT EVERY CONSUMER RENDERS HTML. The game-day readiness panel's
+        # `matchup` is a TEXT field, and returning markup for it printed the
+        # whole tag on screen: `<i class="rnk" title="Digby's Top 25...`. The
+        # component owns both renderings rather than a second one existing
+        # somewhere with its own idea of the labels (R4).
+        return "%s #%s " % (label, v)
+    # ⚠ AND THE TITLE SAID "ranking rank". The descriptions are already noun
+    # phrases naming the ruler, so appending the word doubled it.
+    return ('<i class="rnk" title="%s"><span class="rank-label">%s</span>'
+            '#%s</i> ' % (r[2], label, v))
+
+
 
 import digby_art as DIGBY_ART            # noqa: E402
 import icons as ICONS                    # noqa: E402
 import trend as TREND                    # noqa: E402
-
-
-def rank_badge(v):
-    """The little numeral beside a team name -- and whose ranking it is.
-
-    ⚠ IT IS THE AVCA COACHES POLL, NOT OURS. The rank travels with the fixture
-    in ncaa.com's own feed, and it was checked against the published poll
-    rather than assumed: BYU 24, Kansas 15, Indiana 16 -- all three match the
-    AVCA and all three differ from our rating (16, 21, 24). So the number is
-    right and the page was simply not saying whose it was, which lets a reader
-    take it for whichever ranking they had in mind.
-
-    Four separate call sites emitted this badge with no label. One function now
-    does, so a fifth cannot ship unlabelled (R4: the reason a field's meaning
-    lives in one place is that every consumer then agrees by construction).
-    """
-    # ⚠ VISIBLY, not just in title=. The JS twin (rank()) does the same, and
-    # the two must stay identical or the same fixture reads differently
-    # depending on which side of the build rendered it.
-    return (('<i class="rnk" title="%s">'
-             '<span class="rank-label">AVCA</span>#%s</i> '
-             % (RANK_TITLE, v)) if v else "")
 
 
 def listed_time(start_time, home_team, epoch=None):
@@ -1875,9 +1935,15 @@ def gameday_readiness():
     return {
         "none": False,
         "game_id": c["game_id"],
+        # ⚠ THESE RANKS ARE DIGBY'S TOP 25, NOT THE AVCA POLL -- preflight_live
+        # reads data/digby_top25_*.json. This panel printed a bare "#21 Kansas"
+        # directly beneath a Rally Tape printing "#15 Kansas" from the AVCA
+        # feed. Both numbers were right; the screen was not.
         "matchup": "%s%s at %s%s" % (
-            ("#%d " % c["away_rank"]) if c["away_rank"] else "", c["away"],
-            ("#%d " % c["home_rank"]) if c["home_rank"] else "", c["home"]),
+            rank_badge("digby", c["away_rank"], compact=True, text=True),
+            c["away"],
+            rank_badge("digby", c["home_rank"], compact=True, text=True),
+            c["home"]),
         "when_pt": c["when_pt"],
         "link": c["link"],
         "steps": [("pre", "Before first serve"), ("live", "During play"),
@@ -2744,6 +2810,11 @@ def build():
                       % (i, av, hv, _m, "" if _m == 1 else "s",
                          "w" if aw else "", av, "" if aw else "w", hv, _w))
         awin = (r["away_sets"] or 0) > (r["home_sets"] or 0)
+        # ⚠ AN ALIAS HID TWO MORE CONSUMERS OF THIS FUNCTION. `rank = rank_badge`
+        # meant a grep for "rank_badge(" found four call sites when there were
+        # six, and the build only revealed the other two by throwing. Kept --
+        # it reads well locally -- but the basis is now named at each call, so
+        # the alias can no longer carry a hidden default.
         rank = rank_badge
         nond1 = "" if (r["away_d1"] and r["home_d1"]) else \
             ' <span class="tag">non&#8209;D&#8209;I</span>'
@@ -2770,9 +2841,9 @@ def build():
             '<div class="sets">%s</div>'
             '<div class="venue">%s</div></div>'
             % (esc(r.get("gid") or ""), esc(day_label(r["date"])), esc(r["time"]), nond1,
-               "win" if awin else "", rank(r["away_rank"]),
+               "win" if awin else "", rank("avca", r["away_rank"]),
                logo_img(r["away"], logos), esc(r["away"]), r["away_sets"],
-               "" if awin else "win", rank(r["home_rank"]),
+               "" if awin else "win", rank("avca", r["home_rank"]),
                logo_img(r["home"], logos), esc(r["home"]), r["home_sets"],
                strip, venue))
 
@@ -3055,10 +3126,10 @@ def build():
                # reason the table kept ISO in the first place -- while the cell
                # a person reads says "Fri Aug 28" like every other date here.
                r["d"], day_label(r["d"]), r["t"] or "&mdash;",
-               rank_badge(r["ar"]),
+               rank_badge("avca", r["ar"]),
                logo_img(r["a"], logos), esc(r["a"]),
                "vs" if neutral else "at",
-               rank_badge(r["hr"]),
+               rank_badge("avca", r["hr"]),
                logo_img(r["h"], logos), esc(r["h"]),
                badge, where,
                cls, pick))
@@ -3144,6 +3215,8 @@ def build():
         .replace("{{DIGBY_COACH}}",
                  ('<img class="digby-coach" src="%s" alt="">' % DIGBY_COACH)
                  if (DIGBY_COACH and not PUBLIC) else "") \
+        .replace("{{RULERS_JSON}}",
+                 json.dumps(public_rulers(), separators=(",", ":"))) \
         .replace("{{T25_ROWS}}", _t25["rows"]) \
         .replace("{{T25_ALSO}}", _t25["also"]) \
         .replace("{{T25_LEAD}}", _t25["lead"]) \
@@ -3487,7 +3560,14 @@ h1 em{font-style:normal;color:var(--gold)}
 /* --- the two sides ------------------------------------------------------ */
 .cs-teams{grid-row:1;display:flex;flex-direction:column;justify-content:center;
   padding:7px 16px;min-width:0;gap:1px}
-.cs-side{display:grid;grid-template-columns:30px 26px minmax(0,1fr) 34px;
+/* ⚠ THE RANK TRACK IS max-content, NOT A FIXED WIDTH. It held a bare "#15" at
+   30px; a labelled "AVCA#15" needs 39, so the number ran out of its own cell
+   and under the crest -- measured, not guessed: scrollWidth 39 against
+   clientWidth 26 on the phone. Adding a label to a number changes how much
+   room the number needs, and every fixed track that held the old one has to be
+   revisited. There are four of them. */
+.cs-side{display:grid;
+  grid-template-columns:max-content 26px minmax(0,1fr) 34px;
   align-items:center;gap:9px;padding:4px 0;min-width:0}
 .cs-trk{font:700 12px/1 var(--mono);color:var(--cs-gold);text-align:right;
   font-variant-numeric:tabular-nums}
@@ -3542,12 +3622,12 @@ h1 em{font-style:normal;color:var(--gold)}
 /* --- the quiet band ----------------------------------------------------- */
 .cs-quiet .cs-nm{color:var(--ink2)}
 .cs-quiet .cs-sets{display:none}
-.cs-quiet .cs-side{grid-template-columns:30px 26px minmax(0,1fr)}
+.cs-quiet .cs-side{grid-template-columns:max-content 26px minmax(0,1fr)}
 /* the ranks label and any other stated-provenance aside in the context line */
 .cs-ctx .cs-unk{font-style:normal;font:11px/1.5 var(--mono);
   letter-spacing:.04em}
 .cs-at{font:600 10px/1 var(--mono);letter-spacing:.18em;color:var(--ink3);
-  text-transform:uppercase;padding:1px 0 1px 65px}
+  text-transform:uppercase;padding:1px 0 1px 74px}
 /* nothing at all on the card: still the tape's geometry, honestly empty */
 .cs-none{grid-column:1/-1;grid-row:1;padding:16px;
   font:14px/1.5 var(--sans);color:var(--ink2);display:flex;gap:10px;
@@ -3621,8 +3701,8 @@ h1 em{font-style:normal;color:var(--gold)}
     border-top:2px dashed rgba(245,241,232,.3);
     padding:9px 12px;overflow-x:auto;-webkit-overflow-scrolling:touch}
   .cs-ctx{grid-row:4;padding:8px 12px;font-size:12px}
-  .cs-side{grid-template-columns:26px 22px minmax(0,1fr) 28px;gap:7px}
-  .cs-quiet .cs-side{grid-template-columns:26px 22px minmax(0,1fr)}
+  .cs-side{grid-template-columns:max-content 22px minmax(0,1fr) 28px;gap:7px}
+  .cs-quiet .cs-side{grid-template-columns:max-content 22px minmax(0,1fr)}
   .cs-side img,.cs-nologo{width:20px;height:20px}
   .cs-nm{font-size:17px}
   .cs-sets{font-size:21px}
@@ -3708,7 +3788,21 @@ nav .inner::after{content:"";position:absolute;bottom:0;left:0;height:3px;
   transition:transform .26s cubic-bezier(.4,0,.2,1),width .26s cubic-bezier(.4,0,.2,1);
   pointer-events:none}
 @media (prefers-reduced-motion:reduce){nav .inner::after{transition:none}}
-nav button:focus-visible{outline:2px solid var(--amber);outline-offset:-3px}
+/* ⚠ THE FOCUS RING WAS THE SAME GOLD AS THE SELECTED UNDERLINE, which is the
+   whole of the "double active state". Click Rankings, then open a team: the
+   route is right, Teams carries the gold underline -- and Rankings still wears
+   a gold box, in the identical colour the page uses to mean "you are here".
+   Two golds, two claims, one of them false.
+   Selection is GOLD and it is an underline. Focus is SERVE CYAN and it is a
+   ring. Different colour, different shape, different job. */
+nav button:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:-3px}
+#moremenu button:focus-visible,.morebtn:focus-visible{
+  outline:2px solid var(--cs-cyan);outline-offset:-2px}
+/* the routed region, when focus is moved to it -- visible only to a keyboard
+   user, because :focus-visible does not match a programmatic focus that
+   followed a mouse click */
+main section:focus{outline:none}
+main section:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:4px}
 
 main{max-width:1280px;margin:0 auto;padding:22px 16px 70px}
 section[hidden]{display:none}
@@ -4937,6 +5031,31 @@ label.fr-btn{cursor:pointer;display:inline-block}
 .ribbon.live .rbside .rbsc{color:var(--chalk)}
 .rbside img{width:34px;height:34px;object-fit:contain}
 /* the rally ledger: one cell per completed set */
+/* the day view's lane heading carries which day it is about, quietly */
+.dayhn{font:500 11px/1 var(--mono);color:var(--slate);letter-spacing:.05em;
+  text-transform:none;margin-left:9px}
+.dayhc{margin-left:auto;font:600 10px/1 var(--mono);color:var(--ink3)}
+/* the scouting note, now BELOW the identity and compressed */
+#teamcard .scoutread{margin:4px 0 18px}
+#teamcard .scoutread p{margin:0 0 8px}
+.scoutmore summary{cursor:pointer;font:600 11px/1 var(--disp);
+  letter-spacing:.12em;text-transform:uppercase;color:var(--navy);
+  padding:6px 0;list-style:none}
+.scoutmore summary::-webkit-details-marker{display:none}
+.scoutmore summary::before{content:"\25B8";display:inline-block;
+  margin-right:6px;transition:transform .15s ease}
+.scoutmore[open] summary::before{content:"\25BE"}
+.scoutmore summary:hover{color:var(--chalk)}
+.scoutmore summary:focus-visible{outline:2px solid var(--cs-cyan);
+  outline-offset:2px}
+.scoutmore p{margin:2px 0 0}
+@media (prefers-reduced-motion:reduce){.scoutmore summary::before{transition:none}}
+.daygrp .dayhd{display:flex;align-items:baseline;gap:0}
+.lanemore{appearance:none;background:transparent;border:0;
+  border-top:1px solid var(--line);width:100%;text-align:left;padding:9px 2px;
+  color:var(--navy);font:600 12px/1 var(--sans);cursor:pointer}
+.lanemore:hover{color:var(--chalk)}
+.lanemore:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:-2px}
 .rledger{display:flex;gap:5px;margin-top:12px;flex-wrap:wrap}
 .rledger .rl{min-width:46px;border:1px solid var(--line2);border-radius:2px;
   padding:5px 7px;text-align:center;font:600 12px/1.35 var(--mono);color:var(--ink2)}
@@ -5012,6 +5131,9 @@ label.fr-btn{cursor:pointer;display:inline-block}
      370px column -- clipped, with no scrollbar to reveal it. The date jump
      drops to its own line rather than the states scrolling out of reach. */
   #v-scores #ledgerwrap .seg{flex-wrap:wrap;row-gap:8px}
+  /* the count reads "today - none - showing either side" and was clipped at
+     the seg's right edge once the buttons wrapped; give it its own line */
+  #v-scores #ledgercnt{flex:1 0 100%;margin:0;padding-top:2px}
   #v-scores .datejump{margin-left:0;flex:1 1 100%}
   .rbside{grid-template-columns:22px 26px 1fr auto;gap:8px}
   .rbside .rbnm{font-size:21px}
@@ -5138,6 +5260,19 @@ label.fr-btn{cursor:pointer;display:inline-block}
 .dfcs{font:11px/1 var(--mono);color:var(--ink3,var(--ink2));opacity:.75}
 .dfc.none{color:var(--ink2);font-style:italic}
 .rank-label{font-size:.72em;letter-spacing:.06em;opacity:.72;margin-right:2px}
+/* ⚠ THE RULER LABEL IS NEVER DECORATION AND MAY NEVER BE HIDDEN. It is the
+   difference between a fact and a number. Anything that shrinks it has a floor
+   of 9px; nothing may set it to display:none. Guarded in test_rulers.py. */
+.rank-label{font-weight:700;text-transform:uppercase;white-space:nowrap}
+.rnk{font-style:normal;white-space:nowrap}
+/* the loud marker for a rank rendered with no ruler named -- it must be
+   impossible to mistake for a real badge, and it must never reach a build */
+.rnkbad{color:var(--bad);border:1px dashed var(--bad);padding:0 4px;
+  font:700 10px/1.5 var(--mono);text-transform:uppercase}
+/* the tape and the ribbon carry the label at their own scale */
+.cs-trk .rank-label,.rbrk .rank-label,.mrk .rank-label{font-size:.62em;
+  opacity:.8;margin-right:1px;display:inline}
+.cs-trk .rnk,.rbrk .rnk,.mrk .rnk{color:inherit}
 .dlive{margin-top:11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
 .dopen{margin-left:auto;font:600 10px/1 var(--disp);letter-spacing:.09em;
   text-transform:uppercase;color:var(--ink2);background:transparent;
@@ -6666,10 +6801,18 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <div id="scoredetail" hidden></div>
   <div id="ledgerwrap">
     <div class="seg" role="tablist" aria-label="Match state">
-      <button class="segb on" data-ls2="all">All</button>
+      <!-- ⚠ THIS TAB USED TO OPEN ON "ALL": 472 matches, newest first, and
+           because "newest first" includes DECEMBER, the first screen of a
+           volleyball results page was a wall of fixtures that have not been
+           played. The daily question -- what is on, what just finished, what
+           is next -- was somewhere below the fold.
+           Today is the default. The full ledger is not removed, it is named
+           and one click away. -->
+      <button class="segb on" data-ls2="today">Today</button>
       <button class="segb" data-ls2="live">Live</button>
       <button class="segb" data-ls2="final">Final</button>
       <button class="segb" data-ls2="upcoming">Upcoming</button>
+      <button class="segb" data-ls2="all">Full ledger</button>
       <span class="count" id="ledgercnt"></span>
       <span class="datejump"><label for="ldate">Jump to a date</label>
         <input type="date" id="ldate">
@@ -7409,6 +7552,25 @@ function showView(view) {
   document.querySelectorAll('main section').forEach(s => { s.hidden = true; });
   const el = $('#v-' + view);
   if (el) el.hidden = false;
+  /* ⚠ A STALE NAV CONTROL KEPT BOTH DOM FOCUS AND ITS RING. Setting
+     aria-selected is not enough: the button the reader last pressed is still
+     the focused element, so the screen shows the new destination underlined
+     AND the old one ringed. Blurring would be the quick fix and is the wrong
+     one -- a keyboard reader who pressed Enter on a tab would be dropped to
+     the top of the document with nothing focused.
+     Focus moves to the region that just appeared, which is the standard answer
+     for a routed view: the stale ring goes, and a keyboard reader lands
+     exactly where the thing they asked for now is. Only when focus was ON a
+     nav control -- never while someone is typing in a filter box. */
+  if (el) {
+    const a = document.activeElement;
+    const stale = a && a.closest && a.closest('nav') &&
+      !(a.getAttribute && a.getAttribute('aria-selected') === 'true');
+    if (stale) {
+      if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1');
+      try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+    }
+  }
   return el;
 }
 
@@ -7660,15 +7822,40 @@ function dayLabel(iso) {
   return p2.weekday + ' ' + p2.month + ' ' + p2.day;
 }
 
-/* The AVCA coaches poll rank, labelled. Mirror of build_hub.rank_badge();
-   both say whose ranking it is, so no view can show a bare numeral. */
-function rank(v) {
-  /* ⚠ THE LABEL IS VISIBLE, NOT A TOOLTIP. This used to render a bare numeral
-     whose only clue was title=, so a reader could take it for POWER, for our
-     rank, or for a seed. It is the AVCA coaches poll and it now says so. */
-  return v ? '<i class="rnk" title="AVCA coaches poll rank">' +
-    '<span class="rank-label">AVCA</span>#' + v + '</i> ' : '';
+/* ══ THE RULERS ═══════════════════════════════════════════════════════════
+   ⚠ THIS TABLE IS NOT WRITTEN HERE. It is emitted from build_hub.RULERS, so
+   the Python render path and this one cannot say different things about the
+   same ranking -- which they previously could, and did: the same fixture read
+   #15 in one view and #21 in another with nothing on screen to tell a reader
+   the two numbers were measuring different things.
+   Each entry is [visible label, compact label, what it actually is]. */
+const RULERS = {{RULERS_JSON}};
+
+/* THE ONE WAY A RANK IS RENDERED. Mirror of build_hub.rank_badge().
+   ⚠ BASIS IS REQUIRED AND THERE IS NO DEFAULT. The previous version of this
+   function took only a number and hard-coded AVCA, which was correct at every
+   call site it had and would have been silently wrong at the next one. An
+   unknown basis renders a loud marker; test_rulers.py asserts that marker
+   never reaches a built page. A quiet fallback would restore the bug. */
+/* The plain-text twin, for the handful of consumers that render text rather
+   than markup. Same table, same labels. */
+function rankText(basis, v, compact) {
+  if (!v) return '';
+  const r = RULERS[basis];
+  if (!r) return 'rank basis? ';
+  return (compact ? r[1] : r[0]) + ' #' + v + ' ';
 }
+function rankHTML(basis, v, compact) {
+  if (v === null || v === undefined || v === '' || !v) return '';
+  const r = RULERS[basis];
+  if (!r) return '<i class="rnk rnkbad" title="no ruler named">rank basis?</i> ';
+  return '<i class="rnk" title="' + esc(r[2]) + '">' +
+    '<span class="rank-label">' + esc(compact ? r[1] : r[0]) + '</span>#' +
+    esc(String(v)) + '</i> ';
+}
+/* Kept as the AVCA shorthand the scoreboard-feed views already read well with.
+   It is a NAMED call through the component, not a second implementation. */
+function rank(v) { return rankHTML('avca', v); }
 /* ---- THE WEEK'S HEADLINE MATCHES -------------------------------------
    What a scoreboard puts at the top: not every fixture, the ones worth
    watching. Ranked-versus-ranked first, ordered by how good the pair is
@@ -8680,16 +8867,24 @@ function renderCompare() {
       'selected for you.</p>';
     return;
   }
-  const slot = n => { const e = bwEntry(n); return e && e.rank ? '#' + e.rank : null; };
-  const prevRank = n => { const r = bwPrevRank(n); return r ? '#' + r : null; };
+  /* ⚠ THESE THREE READ AS BARE NUMERALS SEPARATED ONLY BY COLOUR. `.bwv.pw`
+     and `.bwv.av` set a hue and nothing else, so "my #4  #6  #9" was three
+     different rankings distinguished by hue alone -- ambiguous to read and
+     invisible to anyone who does not separate those hues. */
+  const slot = n => { const e = bwEntry(n);
+    return e && e.rank ? rankHTML('ballot', e.rank, true) : null; };
+  const prevRank = n => { const r = bwPrevRank(n);
+    return r ? rankHTML('ballot', r, true) : null; };
   const mine = n => {
     const v = slot(n);
     return v ? '<span class="bwv mine">' + v + '</span>' : null;
   };
   const pw = n => (TEAMS[n].rank
-    ? '<span class="bwv pw">#' + TEAMS[n].rank + '</span>' : null);
+    ? '<span class="bwv pw">' + rankHTML('power', TEAMS[n].rank, true) +
+      '</span>' : null);
   const av = n => (TEAMS[n].avca
-    ? '<span class="bwv av">#' + TEAMS[n].avca + '</span>'
+    ? '<span class="bwv av">' + rankHTML('avca', TEAMS[n].avca, true) +
+      '</span>'
     : '<span class="bwv av">NR</span>');
   const last = n => {
     const p = (TEAMS[n].played || []).slice().sort((x, y) => x.d < y.d ? 1 : -1)[0];
@@ -8840,9 +9035,11 @@ function bwQueue() {
     'AVCA-ranked \u2014 that you have neither saved nor slotted.',
     unranked.map(n => bwCase(n,
       '<span class="bwtrig pw">POWER ' +
-        (TEAMS[n].rank ? '#' + TEAMS[n].rank : '\u2014') + '</span>' +
+        (TEAMS[n].rank ? rankHTML('power', TEAMS[n].rank, true)
+                       : '\u2014') + '</span>' +
       '<span class="bwtrig av">AVCA ' +
-        (TEAMS[n].avca ? '#' + TEAMS[n].avca : 'NR') + '</span>'))]);
+        (TEAMS[n].avca ? rankHTML('avca', TEAMS[n].avca, true)
+                       : 'NR') + '</span>'))]);
 
   return out;
 }
@@ -11395,7 +11592,7 @@ function ribbonHTML(m, live, why) {
       : esc((m.dl || m.d || '') + (m.t ? ' · ' + m.t : ''));
   const side = (name, rk, won, score) =>
     '<div class="rbside ' + (won ? 'won' : '') + '">' +
-      '<span class="rbrk">' + (rk ? '#' + esc(String(rk)) : '') + '</span>' +
+      '<span class="rbrk">' + rankHTML('avca', rk, true) + '</span>' +
       /* ⚠ THE CREST SLOT IS ALWAYS EMITTED, EVEN WHEN THERE IS NO CREST.
          `.rbside` is a FOUR-column grid and logo() returns an empty string for
          a team we hold no crest for -- so the row had three children, every
@@ -11436,7 +11633,7 @@ function matchRow(m, live, dest) {
   if (m.site === 'neutral') tags.push(['', 'neutral']);
   const t = (name, rk, won, score) =>
     '<div class="mrt ' + (won ? 'won' : '') + '">' +
-      (rk ? '<span class="mrk">#' + esc(String(rk)) + '</span>' : '') +
+      (rk ? '<span class="mrk">' + rankHTML('avca', rk, true) + '</span>' : '') +
       logo(name) + '<b>' + esc(name) + '</b></div>';
   return '<button type="button" class="mrow ' + (st === 'live' ? 'islive' : '') +
     '" data-match="' + esc(m.gid) + '" data-dest="' + dest + '">' +
@@ -11473,7 +11670,7 @@ function pickFeatured(today, liveOf) {
 }
 
 /* ══ THE LEDGER AND THE MATCH DETAIL ══════════════════════════════════════ */
-let LEDGER_STATE = 'all';
+let LEDGER_STATE = 'today';
 
 function allMatches() {
   /* the two sources, keyed by gid: the crawled FINALS and the schedule. A
@@ -11485,11 +11682,126 @@ function allMatches() {
 }
 function matchByGid(gid) { return allMatches()[String(gid)] || null; }
 
+/* ══ THE DAY VIEW ═════════════════════════════════════════════════════════
+   What a daily sports product opens with: what is happening now, what just
+   happened, what is next. Three lanes off ONE date, and the date defaults to
+   today -- so the date jump is not a special case, it just moves which day
+   this is about.
+
+   ⚠ EVERY LANE IS A FILTER OVER THE SAME PAYLOAD THE FULL LEDGER READS, via
+   the same matchState(). There is no second source and no second idea of what
+   "final" means. A lane with nothing in it is ABSENT, not empty-with-a-zero.
+
+   ⚠ AND A DAY WITH NO MATCHES IS ANSWERED WITH REAL FIXTURES, never filler:
+   the next date that actually has matches, and the most recent day that
+   actually has finals. If the schedule holds neither, it says so. */
+let LEDGER_OPEN = {};       /* which lanes the reader has expanded */
+const LANE_CAP = 8;         /* a stated cap, always with the remainder named */
+
+function ledgerDayView(host, all, day, isToday) {
+  const liveOf = m => LIVE_BY_ID[m.gid];
+  const onDay = all.filter(m => m.d === day);
+  const lane = st => onDay.filter(m => matchState(m, liveOf(m)) === st);
+  /* ⚠ SORTED BY START TIME, and this was wrong first time round: the lane
+     rendered in payload order, so a Friday read 4:00 PM, 11:00 AM, 12:00 PM,
+     4:00 PM, 10:00 AM. A day view whose times do not ascend is not a day
+     view. Ranked pairings lift to the top of their lane -- a stated sort, not
+     a score -- and everything else follows the clock. */
+  const order = (a, b) => {
+    const ra = (a.ar && a.hr) ? 0 : (a.ar || a.hr) ? 1 : 2;
+    const rb = (b.ar && b.hr) ? 0 : (b.ar || b.hr) ? 1 : 2;
+    if (ra !== rb) return ra - rb;
+    return (a.ep || 0) - (b.ep || 0) || String(a.t || '').localeCompare(b.t || '');
+  };
+  const live = lane('live').sort(order);
+  const fin = lane('final').sort(order);
+  const up = lane('upcoming').sort(order);
+
+  /* ⚠ A CAPPED LANE MUST NAME WHAT IT IS NOT SHOWING. The first version put
+     all 195 matches of the next Friday under one heading -- the same wall this
+     phase exists to remove, with a nicer label on it. Eight, then the
+     remainder, counted and one click from being shown. */
+  const block = (key, title, note, rows) => {
+    if (!rows.length) return '';
+    const open = LEDGER_OPEN[key];
+    const show = open ? rows : rows.slice(0, LANE_CAP);
+    const rest = rows.length - show.length;
+    return '<div class="daygrp"><div class="dayhd">' + title +
+      (note ? '<span class="dayhn">' + note + '</span>' : '') +
+      '<span class="dayhc">' + rows.length + '</span></div>' +
+      show.map(m => matchRow(m, liveOf(m), 'scores')).join('') +
+      (rest > 0
+        ? '<button type="button" class="lanemore" data-lane="' + esc(key) +
+          '">Show ' + rest + ' more</button>'
+        : (open && rows.length > LANE_CAP
+            ? '<button type="button" class="lanemore" data-lane="' + esc(key) +
+              '">Show fewer</button>' : '')) +
+      '</div>';
+  };
+
+  let html = block('live', 'Live now', '', live) +
+             block('final', 'Final today', '', fin) +
+             block('up', 'Still to come', '', up);
+  let shown = live.length + fin.length + up.length;
+  let label = (isToday ? 'today' : dayLabel(day)) + ' \u00b7 ' + shown +
+              (shown === 1 ? ' match' : ' matches');
+
+  if (!shown) {
+    const later = all.filter(m => (m.d || '') > day)
+      .sort((a, b) => (a.d || '') < (b.d || '') ? -1 : 1);
+    const nextDay = later.length ? later[0].d : null;
+    const nextOn = nextDay ? later.filter(m => m.d === nextDay).sort(order) : [];
+    const done = all.filter(m => (m.d || '') < day &&
+                                 matchState(m, liveOf(m)) === 'final')
+      .sort((a, b) => (a.d || '') < (b.d || '') ? 1 : -1);
+    const lastDay = done.length ? done[0].d : null;
+    const lastOn = lastDay ? done.filter(m => m.d === lastDay).sort(order) : [];
+    /* ⚠ "No Division-I matches on Today." -- dayLabel() returns the word
+       "Today", so the sentence built around it read as broken English on the
+       one day it matters most. A relative label needs a different sentence,
+       not the same sentence with a different noun in it. */
+    html = '<p class="emptylane"><b>' + (isToday
+        ? 'No Division-I matches today.'
+        : 'No Division-I matches on ' + esc(dayLabel(day)) + '.') + '</b></p>' +
+      block('next', 'Next match window',
+            esc(nextDay ? dayLabel(nextDay) : ''), nextOn) +
+      block('recent', 'Most recent finals',
+            esc(lastDay ? dayLabel(lastDay) : ''), lastOn);
+    /* ⚠ AND THE COUNT SAID "today - 197 matches" ON A DAY WITH NONE, because
+       it counted the fallback. The count describes the day it names. */
+    label = (isToday ? 'today' : dayLabel(day)) + ' \u00b7 none' +
+      (nextOn.length || lastOn.length ? ' \u00b7 showing either side' : '');
+    if (!nextOn.length && !lastOn.length) {
+      html = '<p class="emptylane">' + (isToday
+        ? 'No matches today, and the schedule holds nothing either side of it.'
+        : 'No matches on ' + esc(dayLabel(day)) +
+          ', and the schedule holds nothing either side of it.') + '</p>';
+    }
+  }
+  host.innerHTML = html;
+  document.getElementById('ledgercnt').textContent = label;
+}
+
+/* expand or re-collapse one lane, in place */
+document.addEventListener('click', ev => {
+  const b = ev.target.closest ? ev.target.closest('.lanemore') : null;
+  if (!b) return;
+  ev.preventDefault();
+  const k = b.getAttribute('data-lane');
+  LEDGER_OPEN[k] = !LEDGER_OPEN[k];
+  renderLedger();
+});
+
 function renderLedger() {
   const host = document.getElementById('ledgerbody');
   if (!host) return;
   const by = allMatches();
   const day = (document.getElementById('ldate') || {}).value || '';
+  if (LEDGER_STATE === 'today') {
+    /* the picked date if there is one, otherwise actually today (Pacific) */
+    return ledgerDayView(host, Object.keys(by).map(k => by[k]),
+                         day || todayPT(), !day);
+  }
   const rows = Object.keys(by).map(k => by[k]).filter(m => {
     const st = matchState(m, LIVE_BY_ID[m.gid]);
     if (day && m.d !== day) return false;
@@ -11702,8 +12014,11 @@ function todaysRead(mine, soon, liveOf) {
   const rows = [];
   const link = (gid, html) =>
     '<a class="vx-readv" href="' + matchRoute(gid, 'desk') + '">' + html + '</a>';
-  const nm = m => (m.ar ? '#' + m.ar + ' ' : '') + esc(mAway(m)) + ' at ' +
-                  (m.hr ? '#' + m.hr + ' ' : '') + esc(mHome(m));
+  /* ⚠ THIS IS THE LINE CODY NAMED. It read "#21 Kansas at #2 Pittsburgh"
+     while the Rally Tape above it read "#15 Kansas" -- two valid rulers, one
+     screen, and nothing on it saying which was which. */
+  const nm = m => rankHTML('avca', m.ar, true) + esc(mAway(m)) + ' at ' +
+                  rankHTML('avca', m.hr, true) + esc(mHome(m));
 
   /* 1. what is live right now */
   const live = mine.filter(m => matchState(m, liveOf(m)) === 'live');
@@ -11825,7 +12140,11 @@ function csSide(name, rk, sets, won, serving, quiet) {
      paid for this exact defect once already. */
   return '<div class="cs-side' + (won ? ' cs-won' : '') +
     (serving ? ' cs-serve' : '') + '">' +
-    '<span class="cs-trk">' + (rk ? '#' + esc(String(rk)) : '') + '</span>' +
+    /* ⚠ COMPACT, BUT NEVER BARE. The tape said "ranks: AVCA poll" once in its
+       context line, which is a footnote, not a label at the point of use --
+       and the readiness panel four inches below it ranks the same match by
+       Digby. The label travels with the number now. */
+    '<span class="cs-trk">' + rankHTML('avca', rk, true) + '</span>' +
     (logo(name) || '<span class="cs-nologo"></span>') +
     '<a class="cs-nm" href="' + routeFor('teams', slug(name)) + '">' +
       esc(name) + '</a>' +
@@ -12961,6 +13280,94 @@ function chip(label, val, cls) {
   if (val === null || val === undefined || val === '') return '';
   return '<span class="chip ' + (cls || '') + '">' + label + ' <b>' + val + '</b></span>';
 }
+/* ══ SCOUT'S READ ═════════════════════════════════════════════════════════
+   The same sentences Digby wrote, in two parts: the first two up front, the
+   rest behind a disclosure.
+
+   ⚠ NOTHING HERE IS REWRITTEN, SUMMARISED OR RE-RANKED. It is a SPLIT, at a
+   sentence boundary, of text that was already checked figure by figure against
+   the source before it was stored. Compressing prose by generating new prose
+   would mean a fresh set of claims that no gate has ever seen -- and the gate
+   is the whole reason this text is trustworthy. If a shorter note is wanted,
+   it has to come from digby.py, through the gate, not from here.
+
+   ⚠ AND THE PROVENANCE LINE STAYS VISIBLE, not tucked inside the disclosure.
+   It is the sentence that says what the note is and how it was checked; a
+   reader who never opens the full note still needs it. */
+/* ══ SPLIT A NOTE INTO SENTENCES ══════════════════════════════════════════
+   ⚠ A PERIOD BETWEEN DIGITS IS A DECIMAL POINT, NOT A FULL STOP, and the first
+   version of this did not know that. Nebraska's note says "Murray led the team
+   at 4.215 points per set and Jackson added 3.472, and both are returning" --
+   split naively, the lead ended mid-number and the remainder opened with
+   "472, and both are returning". A number that never existed, in the same
+   confident voice as the real ones, on the summary most likely to be the only
+   thing a reader reads.
+   Exactly the shape of the Digby gate reading the hyphen in a 23-7 record as a
+   minus sign: one punctuation mark doing two jobs, and the pattern knowing
+   about only one of them.
+   A scanner rather than a regex, because the condition is contextual: a
+   terminator counts only when it is not between digits AND what follows it is
+   whitespace or the end of the note. */
+function csSentences(text) {
+  const out = [];
+  let start = 0, i = 0;
+  const isD = c => c >= '0' && c <= '9';
+  const CLOSERS = '.!?")]\u201d\u2019';
+  while (i < text.length) {
+    const c = text[i];
+    if (c !== '.' && c !== '!' && c !== '?') { i++; continue; }
+    if (c === '.' && isD(text[i - 1] || '') && isD(text[i + 1] || '')) {
+      i++; continue;                      /* 4.215 -- a decimal point */
+    }
+    let j = i + 1;
+    while (j < text.length && CLOSERS.indexOf(text[j]) >= 0) j++;
+    if (j >= text.length) { out.push(text.slice(start)); start = text.length; break; }
+    if (!/\s/.test(text[j])) { i++; continue; }
+    out.push(text.slice(start, j));
+    start = j;
+    while (start < text.length && /\s/.test(text[start])) start++;
+    i = start;
+  }
+  if (start < text.length) out.push(text.slice(start));
+  return out.filter(x => x.trim());
+}
+
+function scoutRead(t) {
+  if (!t.digby) return '';
+  const parts = csSentences(String(t.digby));
+  let lead = '', i = 0;
+  /* two sentences, or three if the first two are very short -- a stated rule,
+     and the remainder is never dropped either way */
+  /* ⚠ REJOIN WITH A SPACE. The scanner skips the whitespace BETWEEN sentences
+     rather than carrying it, so concatenating the parts directly produced
+     "...all on the roster.Murray led the team..." -- correct text, unreadable
+     rendering. The separator has to be put back explicitly. */
+  while (i < parts.length && (i < 2 || (i === 2 && lead.length < 190))) {
+    lead += (lead ? ' ' : '') + parts[i]; i++;
+  }
+  const rest = parts.slice(i).join(' ').trim();
+  /* ⚠ NOT DIGBY_FACE. That const is block-scoped to the region showTeam()
+     lives in, so calling it from here threw `ReferenceError: DIGBY_FACE is not
+     defined` -- and because the throw happened inside showTeam's assembly, the
+     team card rendered COMPLETELY EMPTY on a direct route. Nothing on screen
+     said why. Same family as the `const TEAMS` temporal-dead-zone bug this
+     project already paid for: a scoping error that presents as a blank panel,
+     not as an error.
+     CS_DIGBY is the page-level constant, and it is correctly the empty string
+     in the public build by the same substitution. */
+  return '<div class="digby scoutread"><div class="digby-tag">' +
+    (typeof CS_DIGBY === 'string' ? CS_DIGBY : '') + 'Scout\u2019s read</div>' +
+    '<p>' + lead.trim() + '</p>' +
+    (rest
+      ? '<details class="scoutmore"><summary>Full scouting note</summary>' +
+        '<p>' + rest + '</p></details>'
+      : '') +
+    '<div class="digby-note">Written from this team\u2019s own numbers on ' +
+    'this page. Every figure in it was checked against the source before it ' +
+    'was saved \u2014 anything that did not match was thrown away rather ' +
+    'than shown.</div></div>';
+}
+
 function showTeam(name) {
   const t = TEAMS[name];
   const box = document.getElementById('teamcard');
@@ -13410,14 +13817,11 @@ function showTeam(name) {
   }
   box.innerHTML =
     goneHtml +
-    (t.digby
-      ? '<div class="digby"><div class="digby-tag">' + DIGBY_FACE + 'Digby</div>' +
-        '<p>' + t.digby + '</p>' +
-        '<div class="digby-note">Written from this team\u2019s own numbers on ' +
-        'this page. Every figure in it was checked against the source before it ' +
-        'was saved \u2014 anything that did not match was thrown away rather ' +
-        'than shown.</div></div>'
-      : '') +
+    /* ⚠ THE LONG PROSE USED TO SIT HERE, ABOVE THE CREST. Opening a team page
+       meant reading a paragraph before finding out whose page it was. Identity,
+       ranks, record, form and next match come first; the scouting note follows
+       them, compressed, with the full text one disclosure away. Moved, not
+       cut -- see scoutRead(). */
     /* COURTSIGNAL-THEAD-BEGIN */
     /* PROGRAMME IDENTITY, from the school's own logo colour rather than a
        palette I chose. COLORS is the extracted map (373 of 384 teams); a team
@@ -13515,6 +13919,7 @@ function showTeam(name) {
         '</div>'
       : '') +
     glanceHtml +
+    scoutRead(t) +
     /* the POWER history, or an honest sentence saying why there is not one.
        Rendered server-side by trend.py so the rule about a same-basis series
        lives in exactly one place. */

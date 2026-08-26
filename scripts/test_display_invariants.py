@@ -2990,8 +2990,16 @@ def check_week_names_whose_ranking():
     # EVERY rank badge on the page, not just the week box. Four call sites
     # emitted one unlabelled; they now share a single definition per side, and
     # this is what stops a fifth from appearing.
+    # ⚠ THIS GUARD USED TO HARD-CODE "AVCA coaches poll rank", because when it
+    # was written AVCA was the only ruler on the page. There are now eleven,
+    # emitted from build_hub.RULERS, and a badge may legitimately say POWER,
+    # DIGBY or R\u00c9SUM\u00c9. Pinning the literal made the guard fail on
+    # correct markup -- and, worse, it would have PASSED a page whose every
+    # badge said AVCA when half of them were something else.
+    # The invariant is: a rank badge carries a title AND a visible label.
     bare = re.findall(r'<i class="rnk"(?! title=)', src)
-    labelled = re.findall(r'<i class="rnk" title="AVCA coaches poll rank"', src)
+    labelled = re.findall(r'<i class="rnk" title="[^"]+"><span class="rank-label">'
+                          r'[^<]+</span>#', src)
     if bare:
         bad("%d rank badges do not say whose ranking they are" % len(bare),
             "a bare numeral beside a team name is read as whichever ranking "

@@ -58,6 +58,28 @@ def code_only(s):
     return s
 
 
+def _rules(text):
+    """(selector, body) pairs. Linear brace scan, comments stripped first."""
+    text = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
+    out, buf, depth, sel = [], [], 0, None
+    for c in text:
+        if c == "{":
+            depth += 1
+            if depth == 1:
+                sel = "".join(buf).strip(); buf = []
+            else:
+                buf.append(c)
+        elif c == "}":
+            depth -= 1
+            if depth == 0:
+                out.append((sel, "".join(buf))); buf, sel = [], None
+            else:
+                buf.append(c)
+        else:
+            buf.append(c)
+    return out
+
+
 def main():
     print("COURT SIGNAL GUARDS\n")
     h, which = page()
@@ -200,10 +222,34 @@ def main():
     fake_defined = defined | {"cs-fake"}
     check("[NEG] ...and that check catches a planted duplicate",
           bool(sorted(n for n in fake if n in (fake_defined - used))))
-    # serve cyan is rationed -- a bright cyan used generally IS the terminal look
-    cyan = len(re.findall(r"var\(--cs-cyan\)", h))
-    check("serve cyan stays rationed (<=6 uses)", cyan <= 6, "%d uses" % cyan)
-    check("[+] ...and is actually used somewhere", cyan >= 1)
+    # ⚠ A RAW COUNT WAS THE WRONG SHAPE FOR THIS RULE, and the wayfinding phase
+    # proved it: adding keyboard focus rings -- a SANCTIONED use, and one that
+    # exists precisely so focus is distinguishable from selection -- pushed the
+    # count past six and failed a build that was getting more correct, not
+    # less. The rule was never "at most six"; it is "cyan means serve state,
+    # set-in-progress, or focus, and nothing else". Check the role.
+    cyan_rules = []
+    for sel, body in _rules(h):
+        # :root DEFINES the token; it does not use it. Excluding the definition
+        # is not a loophole -- a rule that only declares --cs-cyan paints
+        # nothing. Anything that READS it via var() is a use.
+        if sel.strip() == ":root":
+            continue
+        if "var(--cs-cyan" in body:
+            cyan_rules.append(sel.strip())
+    check("serve cyan is used somewhere", bool(cyan_rules))
+    SANCTIONED = ("focus-visible", "cs-serve", "cs-now")
+    stray = [r for r in cyan_rules
+             if not any(k in r for k in SANCTIONED)]
+    check("[-] serve cyan appears ONLY as serve, set-in-progress, or focus",
+          not stray, str(stray[:3]))
+    check("[+] ...and each sanctioned role actually uses it",
+          all(any(k in r for r in cyan_rules) for k in SANCTIONED),
+          str(cyan_rules))
+    # NEGATIVE CONTROL: a decorative use must be caught.
+    planted = cyan_rules + [".someDecoration"]
+    check("[NEG] ...and a decorative use would be caught",
+          bool([r for r in planted if not any(k in r for k in SANCTIONED)]))
 
     # ── 7. THE TEXTURE IS TEXTURE ───────────────────────────────────────
     print("\n7. THE COURT TEXTURE SITS BEHIND, AND IS A COURT")

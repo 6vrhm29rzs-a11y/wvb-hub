@@ -1235,3 +1235,138 @@ AI likenesses of named players or coaches, real headshots and crests stay the
 primary people imagery, and any preview image must be *source-supplied and
 permitted* — `docs/intel_sources.md` is the record, and the NCAA-only allowlist
 is not to be widened without an audit that clears its own gate.
+
+---
+
+## 20. WAYFINDING + DAILY-USE TRUTH
+
+Four fixes, and what unites them is that **every one was wrong while the data
+underneath it was right** — which is why no existing suite caught any of them.
+
+### 1. One location, one active state
+**The root cause was a colour, not a state.** `aria-selected` was correct the
+whole time; the focus ring and the selected underline were both
+`var(--amber)`, so a tab you had clicked earlier wore the identical gold the
+page uses to mean *you are here*. Two golds, two claims, one false.
+
+- Selection stays **gold, and an underline**. Focus is now **serve cyan, and a
+  ring** — different colour, different shape, different job.
+- Focus **moves to the routed region** rather than being blurred. Blurring is
+  the quick fix and the wrong one: a keyboard reader who presses Enter on a tab
+  would be dropped to nowhere. `:focus-visible` does not match a programmatic
+  focus that followed a click, so a mouse user sees no ring and a keyboard user
+  does.
+- Only fires when focus was **on a nav control**, so it cannot steal focus from
+  a filter box mid-typing.
+- **Verified by driving a real click and reading pixels**, not `aria-selected`:
+  after `click(Rankings) → #/teams/kentucky`, every tab reports
+  `outlineStyle:none` and exactly one `aria-selected=true`. Direct load, click
+  nav, Back ×2, and a routed player page all give exactly one location
+  indicator (a player/Intel route lights **More** + the menu item + crumbs,
+  which is correct — those live under More).
+
+### 2. Never a rank without its ruler — the contract
+`build_hub.RULERS` is the single table: `key → (label, compact label, what it
+is)`. Eleven rulers. **The JS copy is emitted from it** (`{{RULERS_JSON}}`), so
+the two render paths cannot disagree about what a ranking is called.
+
+- `rank_badge(basis, v, compact=False, text=False)` / `rankHTML(basis, v,
+  compact)` — **basis is required and there is no default.** The previous
+  function took only a number and hard-coded AVCA: correct at every call site
+  it had, and silently wrong at the next one.
+- An unknown basis renders a **loud marker**, never a bare number, and a guard
+  asserts that marker never reaches a build.
+- Compact means a **shorter** label (`PWR`, `DGB`), never an absent one.
+- ⚠ **An alias hid two consumers.** `rank = rank_badge` meant a grep for
+  `rank_badge(` found four call sites when there were six; the build revealed
+  the other two by throwing.
+- ⚠ **Not every consumer renders HTML.** The readiness panel's `matchup` is a
+  *text* field, and returning markup printed the whole `<i class="rnk" …>` tag
+  on screen. The component owns both renderings.
+- ⚠ **The title read "…ranking rank"** — the descriptions are already noun
+  phrases naming the ruler.
+
+**The Kansas/Pittsburgh case, both sides:** the Rally Tape now reads
+`AVCA #15 Kansas`, and the readiness panel four inches below reads
+`DGB #21 Kansas at DGB #2 Pittsburgh`. Both numbers were always right. Now the
+screen says which is which.
+
+### 3. Scores opens on the day
+Default is **Today**; the 472-match ledger is kept and named **Full ledger**.
+Lanes: *Live now · Final today · Still to come*; when the day is empty, **Next
+match window** and **Most recent finals** — real fixtures, never filler. Every
+prior state filter and the date jump survive; picking a date just moves which
+day the view is about.
+
+⚠ Four defects found by looking at it: **"No Division-I matches on Today."**
+(`dayLabel()` returns a relative word and needs its own sentence); the count
+read **"today · 197 matches" on a day with none** because it counted the
+fallback; the fallback dumped **all 195** matches of the next Friday under a
+nicer heading — the same wall this phase exists to remove, now capped at 8 with
+the remainder counted and one click away; and lanes rendered in payload order,
+so times ran 4:00, 11:00, 12:00, 4:00, 10:00.
+
+**Tested against a fixture** that put real matches on today in mixed states —
+2 live, 2 final, 2 upcoming — which also gave the Rally Tape its first live
+exercise before Friday: gold LIVE, "3RD SET", the in-progress set outlined in
+serve cyan, unplayed sets as dots.
+
+### 4. Scout's Read
+Team pages now lead with **identity → ranks → record/form/next → note**. The
+note is a **split** of Digby's stored text at a sentence boundary, never new
+prose: compressing by generating would mean fresh claims no gate has seen, and
+the gate is the only reason that text is trustworthy. The provenance line stays
+*outside* the disclosure.
+
+⚠ **Two defects, and one of them printed a number that does not exist.** The
+first splitter treated the period in **3.472** as a full stop, so the note read
+"…and Jackson added 3.**472, and both are returning**" — a fabricated figure in
+the same confident voice as the real ones, on the summary most likely to be the
+only thing read. Same shape as the Digby gate reading the hyphen in a 23-7
+record as a minus sign: one punctuation mark doing two jobs. Replaced by a
+scanner that knows a period between digits is a decimal point; then the scanner
+dropped the whitespace *between* sentences ("…roster.Murray led…") and the
+separator had to be put back explicitly.
+
+⚠ And `scoutRead()` first threw **`ReferenceError: DIGBY_FACE is not defined`**
+— that const is block-scoped to the region `showTeam()` lives in — so the team
+card rendered **completely empty** on a direct route with nothing on screen
+saying why. Same family as the `const TEAMS` temporal-dead-zone bug.
+
+### ⚠ AND A LEAK THE FAIL-CLOSED GATE CAUGHT
+Two rulers name somebody else's product, and **the table is serialised into the
+page**, so the strings "VolleyTalk" and "Massey Ratings" shipped into the public
+build and aborted it. The *values* were already dropped at `BOARD.build()`; it
+was the **labels** that leaked, through a structure nobody thinks of as markup.
+`public_rulers()` drops those keys when `PUBLIC`. General lesson, relearned:
+**when the question is "did we publish X", grep the DATA. A table is data.**
+
+### ⚠ FOUR GUARDS WERE WRONG, THREE OF THEM MINE
+- `test_display_invariants` and `test_ballot` **hard-coded AVCA-era literals** —
+  written when AVCA was the only ruler. They failed on correct markup and,
+  worse, would have **passed a page whose every badge said AVCA when half of
+  them were something else.** Both now check the invariant (a badge carries a
+  title and a visible label from the known set) rather than a string. The
+  renderer-parity pair is replaced by asserting the arrangement that makes
+  parity structural: one table, emitted.
+- `test_court_signal`'s **serve-cyan budget was a raw count** (`≤6`). Adding
+  keyboard focus rings — a sanctioned use that exists precisely so focus is
+  distinguishable from selection — pushed it past six and failed a build that
+  was getting *more* correct. The rule was never "at most six"; it is "cyan
+  means serve, set-in-progress, or focus". Now role-based, with a negative
+  control.
+- Three of my own new checks were wrong and are documented in place: one
+  scanned a **line** for a ruler label that sat on the line above (and missed
+  `É` escapes), one anchored on a **sentinel inside a comment** that
+  `code_only()` strips, and one anchored on a function **definition** instead
+  of its call site.
+
+⚠ **A grid track sized for the old content.** The rank cell held a bare `#15`
+at 30px; a labelled `AVCA#15` needs 39, so the number ran out of its own box
+and under the crest — measured (`scrollWidth 39` vs `clientWidth 26`), not
+guessed. **Four** templates define that column.
+
+### Verified
+34 suites · both builds · public gate · fresh-checkout guard (negative control
+tripped) · desktop and 390px for Match Desk, Scores, Rankings, a direct team
+route, a player route and My Ballot · no self-overflow, no sideways body scroll.
