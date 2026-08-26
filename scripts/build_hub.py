@@ -4345,6 +4345,20 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
   .fr-state{margin-left:0;flex:1 1 100%}
   .fr-entry{padding-left:11px}
 }
+.fr-export{margin:26px 0 0;padding:16px 0 0;border-top:1px solid var(--vx-rule)}
+.fr-exwhy{margin:0 0 10px;font-size:12.5px;color:var(--ink3);max-width:60ch}
+.fr-exrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.fr-state.good{color:var(--vx-power)}
+.fr-state.warn{color:#F2B441}
+.fr-rawwhy{margin:12px 0 6px;font-size:12.5px;color:var(--ink2)}
+.fr-raw{width:100%;font:11.5px/1.5 var(--mono);color:var(--ink2);
+  background:var(--alt);border:1px solid var(--line2);border-radius:3px;
+  padding:9px 10px;resize:vertical}
+@media (max-width:560px){
+  .fr-exrow{gap:8px}
+  .fr-exrow .fr-btn{flex:1 1 auto}
+  .fr-state{flex:1 1 100%;margin-left:0}
+}
 /* FILMROOM-CSS-END */
 
 /* MYBOARD-CSS-BEGIN */
@@ -6376,6 +6390,21 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   </div>
 
   <div id="frbody"></div>
+
+  <!-- ⚠ EXPORT IS A LOCAL ACT. Both buttons end at this device: a file the
+       browser saves, or the clipboard. Nothing is sent anywhere, and the
+       status line says which of the two actually happened. -->
+  <div class="fr-export">
+    <div class="vx-label"><b>Export</b></div>
+    <p class="fr-exwhy">Your notebook as JSON, on this device only. Nothing is
+      uploaded, posted, or written to the repository.</p>
+    <div class="fr-exrow">
+      <button type="button" class="fr-btn" id="frexdl">Download JSON</button>
+      <button type="button" class="fr-btn" id="frexcopy">Copy JSON</button>
+      <span class="fr-state" id="frexstate"></span>
+    </div>
+    <div id="frout" hidden></div>
+  </div>
 </section>
 <!-- FILMROOM-HTML-END -->
 
@@ -9628,6 +9657,11 @@ function frWire() {
     }
   });
 
+  const dl = document.getElementById('frexdl');
+  if (dl) dl.addEventListener('click', () => frExport('download'));
+  const cp = document.getElementById('frexcopy');
+  if (cp) cp.addEventListener('click', () => frExport('copy'));
+
   ['frq', 'frfctx', 'frfsrc'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('input', () => {
@@ -9683,6 +9717,160 @@ function frInject() {
     if (nm) c.insertAdjacentHTML('beforeend', ' ' + frLink('team', nm));
   });
   frSyncCounts();
+}
+
+
+/* ---- export: this device, and nowhere else ----------------------------- */
+/* ⚠ THERE IS NO NETWORK PATH HERE, AND THERE MUST NOT BE. Export produces a
+   string from data already in this browser and hands it to the browser. It
+   does not POST, it does not fetch, it does not touch git, and it names no
+   host. The only two destinations are a local file and the clipboard.
+
+   ⚠ AND A DOWNLOAD THAT SILENTLY DOES NOTHING IS THE FAILURE MODE TO PLAN
+   FOR. A page-initiated download can be refused by a sandbox or a policy with
+   no error and no event -- the click simply achieves nothing. So the flow is:
+   try the download, then VERIFY NOTHING ABOUT IT (because nothing can be
+   verified), and always offer the clipboard beside it. If both routes are
+   unavailable the JSON is put on screen, selected, and the reader is told to
+   copy it by hand. Every outcome is stated. */
+
+const FR_FORMAT = 'wvb.filmroom';
+const FR_VERSION = 1;
+
+function frExportDoc() {
+  frLoad();
+  return {
+    format: FR_FORMAT,
+    version: FR_VERSION,
+    exported: new Date().toISOString(),
+    count: FR.length,
+    /* ⚠ THE WHOLE NOTE, FIELD FOR FIELD. An export that quietly dropped a
+       field would be a backup that loses work without saying so. */
+    notes: FR.map(n => ({
+      id: n.id, created: n.created, ctx: n.ctx, title: n.title, body: n.body,
+      teams: n.teams || [], players: n.players || [], gid: n.gid || '',
+      src: n.src || '', url: n.url || '', facts: n.facts || []
+    }))
+  };
+}
+
+function frExportText() {
+  return JSON.stringify(frExportDoc(), null, 2);
+}
+
+function frExportName() {
+  const t = new Date();
+  const p = n => (n < 10 ? '0' : '') + n;
+  return 'filmroom-' + t.getFullYear() + '-' + p(t.getMonth() + 1) + '-' +
+         p(t.getDate()) + '.json';
+}
+
+function frSay(msg, kind) {
+  const el = document.getElementById('frexstate');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'fr-state' + (kind ? ' ' + kind : '');
+}
+
+/* Put the JSON on screen, selected, as the last honest resort. */
+function frShowRaw(text, why) {
+  const host = document.getElementById('frout');
+  if (!host) return;
+  host.hidden = false;
+  host.innerHTML = '<p class="fr-rawwhy">' + esc(why) + ' The notebook is ' +
+    'below \u2014 select all and copy it wherever you want it.</p>' +
+    '<textarea class="fr-raw" id="frraw" rows="8" readonly></textarea>';
+  const ta = document.getElementById('frraw');
+  if (ta) { ta.value = text; ta.focus(); ta.select(); }
+}
+
+function frCopy(text) {
+  /* modern API first; it is the one that can be denied */
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).then(
+        () => true, () => frCopyLegacy(text));
+    }
+  } catch (e) { /* fall through */ }
+  return Promise.resolve(frCopyLegacy(text));
+}
+
+function frCopyLegacy(text) {
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand && document.execCommand('copy');
+    document.body.removeChild(ta);
+    return !!ok;
+  } catch (e) { return false; }
+}
+
+function frDownload(text, name) {
+  /* ⚠ RETURNS WHETHER THE ATTEMPT WAS MADE, NOT WHETHER IT LANDED. The
+     browser gives no signal either way, and claiming success we cannot see
+     would be exactly the kind of confident wrong statement this project
+     refuses elsewhere. The wording downstream says "started", not "saved". */
+  try {
+    if (typeof Blob === 'undefined' || !window.URL || !URL.createObjectURL) {
+      return false;
+    }
+    const a = document.createElement('a');
+    if (!('download' in a)) return false;
+    const blob = new Blob([text], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    a.href = url;
+    a.download = name;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      try { document.body.removeChild(a); URL.revokeObjectURL(url); }
+      catch (e) { /* already gone */ }
+    }, 0);
+    return true;
+  } catch (e) { return false; }
+}
+
+function frExport(mode) {
+  frLoad();
+  if (!FR.length) {
+    frSay('There is nothing to export yet.', 'warn');
+    return;
+  }
+  const text = frExportText();
+  const out = document.getElementById('frout');
+  if (out) { out.hidden = true; out.innerHTML = ''; }
+
+  if (mode !== 'copy') {
+    if (frDownload(text, frExportName())) {
+      frSay('Download started \u2014 ' + frExportName() + '. If your browser ' +
+            'blocked it, use Copy instead.', 'good');
+      return;
+    }
+    frSay('This browser will not let the page save a file. Trying the ' +
+          'clipboard\u2026');
+  }
+  Promise.resolve(frCopy(text)).then(ok => {
+    if (ok) {
+      frSay('Copied to the clipboard \u2014 ' + FR.length +
+            (FR.length === 1 ? ' note' : ' notes') + ', as JSON.', 'good');
+    } else {
+      /* ⚠ SAY WHAT WAS ACTUALLY TRIED. Pressing Copy attempts the clipboard
+         and nothing else, so reporting that "neither saving nor copying" is
+         available names a failure that never happened. The download path DOES
+         try both, and says so. */
+      const tried = (mode === 'copy')
+        ? 'The clipboard is not available in this browser.'
+        : 'Neither saving a file nor the clipboard is available in this browser.';
+      frSay(tried, 'warn');
+      frShowRaw(text, tried);
+    }
+  });
 }
 
 /* FILMROOM-JS-END */

@@ -886,10 +886,30 @@ this session.
 **Two empty states, and they are not the same problem:** an empty notebook is a
 beginning; a blocked one is a browser setting that will lose work.
 
-**Deferred explicitly:** export/import of the notebook as a JSON file. It can
-be done with a Blob and no hosted service, but the viewer sandbox blocks
-page-initiated downloads in some contexts and I would rather not ship a button
-that silently does nothing. Named here rather than half-built.
+**EXPORT SHIPPED (import still deferred).** Versioned JSON --
+`{format:"wvb.filmroom", version:1, exported, count, notes[]}` -- carrying all
+eleven note fields. Download first; clipboard second; and if both are refused
+the JSON is put on screen, pre-selected, to copy by hand. **Four outcomes, each
+stated**: started / copied / nothing to export / neither available.
+
+⚠ **THE DOWNLOAD IS NEVER CLAIMED TO HAVE LANDED.** A page-initiated download
+can be refused by a sandbox or policy with no error and no event, so
+`frDownload()` returns whether the ATTEMPT was made and the status says
+"Download started ... if your browser blocked it, use Copy instead". Saying
+"Saved" would be a confident statement about something the browser never told
+us. Guarded: the words "File saved" may not appear.
+
+⚠ **AND THE FAILURE MESSAGE NAMES ONLY WHAT WAS TRIED.** Pressing Copy attempts
+the clipboard and nothing else, so the first version's "neither saving nor
+copying is available" reported a failure that never happened. The download path
+does try both, and says so.
+
+**No network path exists**: guarded against `fetch`, `XMLHttpRequest`,
+`sendBeacon`, `WebSocket`, form submission, and any `http(s)://` host appearing
+anywhere in the fenced code. **Three negative controls verified to trip**:
+POSTing the export, dropping a field from it, and claiming the download saved.
+
+**Still deferred:** IMPORT of the notebook.
 
 **Guards:** `scripts/test_filmroom.py` (30th suite) -- every layer fenced; not
 one symbol outside a fence; the public build free of all of it; **fourteen

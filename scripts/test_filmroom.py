@@ -90,6 +90,10 @@ def main():
                     "FILMROOM", "Pre-match", "During match", "Post-match",
                     "Watched myself", "Community discussion"):
             check("public: no %r" % sym, sym not in pub)
+        for sym in ("frExport", "frExportDoc", "wvb.filmroom", "frCopyLegacy",
+                    "frDownload", "Download JSON", "Copy JSON",
+                    "filmroom-", "FR_FORMAT"):
+            check("public: no export symbol %r" % sym, sym not in pub)
         fr_css = re.findall(r"\.fr-[a-z0-9-]*\s*[{,]", pub)
         check("public: not one .fr-* CSS rule", not fr_css,
               "%d found" % len(fr_css))
@@ -149,6 +153,57 @@ def main():
                  "therefore rank", "auto-fill", "autofill"):
         check("[-] the notebook never says %r" % word,
               word not in fr_js.lower())
+
+    print("\n5b. EXPORT GOES TO THIS DEVICE AND NOWHERE ELSE")
+    ex = inside
+    check("export exists", "function frExport(" in ex)
+    check("...and is versioned", "FR_FORMAT = 'wvb.filmroom'" in src
+          and "FR_VERSION = 1" in src)
+    check("...and stamps when it was taken", "exported: new Date()" in ex)
+
+    # ⚠ EVERY NOTE FIELD IS CARRIED. An export that quietly dropped a field is
+    # a backup that loses work without saying so.
+    m = re.search(r"notes: FR\.map\(n => \((\{.*?\})\)\)", ex, re.S)
+    body = m.group(1) if m else ""
+    check("[+] the note mapping was found", bool(body))
+    for field in ("id", "created", "ctx", "title", "body", "teams", "players",
+                  "gid", "src", "url", "facts"):
+        check("   export carries %-8s" % field, (field + ":") in body)
+
+    # ⚠ NO NETWORK PATH, AT ALL.
+    for bad in ("fetch(", "XMLHttpRequest", "sendBeacon", "WebSocket",
+                "form.submit", "action="):
+        check("[-] export never uses %r" % bad, bad not in ex)
+    check("[-] no host is named anywhere in the notebook",
+          not re.search(r"https?://[a-z]", ex))
+
+    print("\n5c. THE DOWNLOAD IS NOT CLAIMED TO HAVE LANDED")
+    # ⚠ A PAGE-INITIATED DOWNLOAD CAN BE REFUSED WITH NO ERROR AND NO EVENT.
+    # Saying "saved" would be a confident statement about something the
+    # browser never told us.
+    dl = ex[ex.index("function frDownload("):]
+    dl = dl[:dl.index("\nfunction ")]
+    check("frDownload reports the ATTEMPT, not the outcome",
+          "RETURNS WHETHER THE ATTEMPT WAS MADE" in dl)
+    check("the status says 'started', never 'saved'",
+          "Download started" in ex and "File saved" not in ex
+          and "Saved to your" not in ex)
+    check("...and points at the fallback in the same breath",
+          "use Copy instead" in ex)
+
+    print("\n5d. BLOCKED ROUTES FAIL HONESTLY")
+    check("the clipboard has a legacy fallback", "function frCopyLegacy" in ex)
+    check("...and both are wrapped so a denial cannot throw",
+          ex.count("catch (e) { return false; }") >= 2)
+    check("when both fail the JSON is shown to copy by hand",
+          "function frShowRaw" in ex and "select all and copy it" in ex)
+    check("...and it is pre-selected", "ta.select();" in ex)
+    # ⚠ THE MESSAGE NAMES ONLY WHAT WAS TRIED.
+    check("a failed Copy does not claim saving was attempted",
+          "mode === 'copy'" in ex
+          and "The clipboard is not available in this browser." in ex)
+    check("an empty notebook says so rather than exporting nothing",
+          "There is nothing to export yet." in ex)
 
     print("\n6. FAIL-SOFT PRIVACY, THE SAME AS MY BOARD")
     check("storage failure is caught", "FR_OK = false" in src)
