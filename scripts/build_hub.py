@@ -3765,7 +3765,22 @@ b.kres{color:#F2B441}
 .bwsub{font:12.5px/1.5 var(--sans);color:var(--ink2);margin:0 0 8px}
 .bwlist{list-style:none;margin:0;padding:0;counter-reset:none}
 .bwrow{border-bottom:1px solid var(--line2);padding:10px 0 11px}
-.bwtop{display:flex;align-items:center;gap:10px}
+/* ⚠ THE ROW OVERFLOWED ITS OWN COLUMN. Measured on the desk: scrollWidth 952
+   against clientWidth 906, which clipped the last control ("+ MY BOARD") --
+   the row read as a rank list right up to the point where a control silently
+   vanished. The identity block takes the slack and may shrink; the controls
+   never do, because a control you cannot reach is worse than a wrapped name. */
+.bwtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  row-gap:6px;min-width:0}
+.bwtop>.bwnm,.bwtop>.bwid{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
+.bwtop>.bwctl{flex:0 0 auto;margin-left:auto}
+/* ⚠ THE REAL OFFENDER WAS THE MY BOARD BUTTON, not the row. It was being
+   squeezed to 24px while its own label needed 71 -- so the text overflowed
+   inside the button and pushed the whole row past its column. Measured before
+   guessing: the row reported 952/906, but every direct child fitted; only a
+   walk of the descendants found a control shrunk to a third of its content.
+   Scoped to the ballot row so the My Board rules stay in their own fence. */
+.bwctl .mbbtn{flex:0 0 auto;white-space:nowrap;min-width:0;width:auto}
 /* ⚠ THE 1-25 LIST IS THE LOUDEST THING ON THIS PAGE. It was competing with
    its own evidence line and its own review panel; the slot numeral now reads
    as a scoreboard number and everything else steps back a size. */
@@ -4026,6 +4041,57 @@ b.kres{color:#F2B441}
   .bwaskrow{flex-direction:column}
   .bwask select{width:100%}
 }
+
+/* ── THE VOTER'S DESK: status first, ballot central, finishing last ────────
+   ⚠ EVERY RULE HERE IS INSIDE THE BALLOT-CSS FENCE ON PURPOSE. The selector
+   names alone enumerate a private feature -- that is why the whole stylesheet
+   is stripped from the public build, and why nothing below may drift outside
+   these sentinels. */
+.bwstatus{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:1px;background:var(--vx-rule);border:1px solid var(--vx-rule);
+  border-radius:4px;overflow:hidden;margin:0 0 18px}
+.bwstatus>div{background:var(--sheet);padding:10px 13px;display:flex;
+  flex-direction:column;gap:3px;min-width:0}
+.bwstatus i{font-style:normal;font:700 8.5px/1.4 var(--disp);letter-spacing:.12em;
+  text-transform:uppercase;color:var(--slate)}
+.bwstatus b{font:700 14px/1.2 var(--disp);color:var(--chalk);
+  overflow-wrap:anywhere}
+.bwstatus b.dim{color:var(--ink3);font-weight:600}
+.bwstatus b.warn{color:#F2B441}
+.bwstatus b.ok{color:var(--vx-power)}
+
+/* the ruler key: a swatch and a word, not a sentence each */
+.bwrulers{display:flex;flex-wrap:wrap;gap:6px 18px;margin:0 0 16px;
+  padding:0 0 14px;border-bottom:1px solid var(--vx-rule)}
+.bwrulers .bwr{display:inline-flex;align-items:center;gap:7px;
+  font:700 10px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase;
+  color:var(--ink2);background:none;border:0;padding:0}
+.bwrulers .bwsw{width:8px;height:8px;border-radius:1px;flex:0 0 8px}
+.bwrulers .mine .bwsw{background:var(--vx-ballot)}
+.bwrulers .pow  .bwsw{background:var(--vx-power)}
+.bwrulers .av   .bwsw{background:var(--vx-avca)}
+.bwrulers .off  .bwsw{background:var(--line2)}
+.bwrulers .off{color:var(--ink3)}
+
+/* finishing block */
+.bwfinish{margin:22px 0 0;padding:14px 0 0;border-top:1px solid var(--vx-rule)}
+.bwfinlab{font:700 10px/1 var(--disp);letter-spacing:.16em;text-transform:uppercase;
+  color:var(--slate);margin:0 0 9px}
+.bwfinish .bwbar{margin:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+/* ⚠ THE DESTRUCTIVE ONE IS QUIET AND LAST. Reset replaces all 25 slots; it
+   should not sit beside Save looking like a peer. */
+.bwbtn.bwquiet{margin-left:auto;opacity:.68;font-weight:600}
+.bwbtn.bwquiet:hover{opacity:1;border-color:#F2B441;color:#F2B441}
+
+@media (max-width:560px){
+  .bwstatus{grid-template-columns:1fr 1fr}
+  .bwstatus>div{padding:8px 10px}
+  .bwstatus b{font-size:13px}
+  .bwrulers{gap:5px 13px}
+  .bwfinish .bwbar{gap:8px}
+  .bwbtn.bwquiet{margin-left:0;width:100%}
+}
+
 /* BALLOT-CSS-END */
 
 .leadhint{color:var(--ink2);opacity:.8}
@@ -6186,12 +6252,13 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <h2 class="vh">Ballot Workshop <span class="privtag" title="Your own ballot. It is not published here, it feeds no model, and nothing is posted anywhere.">private</span></h2>
   <p class="tabhint" id="ballotlead"></p>
 
-  <div class="bwbar">
-    <button class="bwbtn primary" id="bwsave" type="button">Save this ballot</button>
-    <button class="bwbtn" id="bwcopy" type="button">Copy for VolleyTalk</button>
-    <button class="bwbtn" id="bwseed" type="button" title="Replace the 25 slots with Digby&rsquo;s current POWER order. Your notes and reasons are kept.">Reset to POWER order</button>
-    <span class="bwstate" id="bwstate"></span>
-  </div>
+  <!-- ⚠ STATUS FIRST, ACTIONS LAST. The workshop used to open with three
+       buttons -- Save, Copy, Reset -- so the first thing on a voter's desk was
+       a way to finish. What a voter needs first is WHERE THEY ARE: which
+       ranking week this is, whether that week's results are actually complete,
+       whether there are unsaved edits, and what they last submitted. The
+       actions moved to the end of the flow, where finishing belongs. -->
+  <div class="bwstatus" id="bwstatus"></div>
 
   <!-- ⚠ NONE OF THESE THREE IS A RECOMMENDATION. Each is a difference between
        two orderings, stated so it can be looked at before saving. -->
@@ -6206,11 +6273,21 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 
   <!-- THREE RULERS, NAMED. The whole point of the workshop is that these are
        different questions; a reader who cannot tell them apart cannot use it. -->
-  <div class="bwrulers">
-    <span class="bwr mine"><i>My ballot</i> your opinion, the thing being written</span>
-    <span class="bwr pow"><i>POWER</i> how strong a team is &mdash; ours</span>
-    <span class="bwr av"><i>AVCA</i> the coaches poll &mdash; external</span>
-    <span class="bwr off"><i>R&Eacute;SUM&Eacute;</i> inactive until enough games are played</span>
+  <!-- ⚠ FOUR RULERS, ONE KEY, THE SAME COLOURS AS EVERY OTHER TAB. This was
+       four sentence-long chips that wrapped to three lines. The distinction it
+       protects is the point of the workshop -- My ballot is a judgement, POWER
+       is ours, AVCA is theirs, and Résumé does not exist yet -- so it stays,
+       but as a key rather than a paragraph. -->
+  <div class="bwrulers" aria-label="Which ranking is which">
+    <span class="bwr mine"><i class="bwsw"></i>My ballot</span>
+    <span class="bwr pow"><i class="bwsw"></i>POWER</span>
+    <span class="bwr av"><i class="bwsw"></i>AVCA</span>
+    <!-- ⚠ THE FULL SENTENCE STAYS. Shortening this to "inactive" lost WHY,
+         and an honest inactive state is one of the things this workshop is
+         careful about -- a résumé does not exist yet because too little of the
+         season has been played, not because a switch is off. The compact key
+         gets its brevity from the other three, not from this one. -->
+    <span class="bwr off"><i class="bwsw"></i>R&Eacute;SUM&Eacute; &mdash; inactive until enough games are played</span>
   </div>
 
   <!-- WEEKLY BRIEFING. Facts about YOUR ballot and the week since you saved
@@ -6283,6 +6360,19 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
         </div>
       </div>
     </aside>
+  </div>
+
+  <!-- ⚠ FINISHING IS A STEP, NOT A TOOLBAR. Save and Copy sit after the
+       ballot because that is when they are used. Reset is here too, and last,
+       because it is the destructive one. -->
+  <div class="bwfinish">
+    <div class="bwfinlab">Finish</div>
+    <div class="bwbar">
+      <button class="bwbtn primary" id="bwsave" type="button">Save this ballot</button>
+      <button class="bwbtn" id="bwcopy" type="button">Copy for VolleyTalk</button>
+      <span class="bwstate" id="bwstate"></span>
+      <button class="bwbtn bwquiet" id="bwseed" type="button" title="Replace the 25 slots with Digby&rsquo;s current POWER order. Your notes and reasons are kept.">Reset to POWER order</button>
+    </div>
   </div>
 
   <details class="method">
@@ -8432,6 +8522,66 @@ function bwSay(msg, kind) {
   if (!el) return;
   el.textContent = msg;
   el.className = 'bwstate' + (kind ? ' ' + kind : '');
+  bwStatusBar();
+}
+
+/* ⚠ WHERE AM I, BEFORE WHAT DO I DO. Four facts, from data that already
+   exists on this page: which ranking week this is, whether that week's results
+   are actually complete (the Digby Weekly cutoff, which the fixture ledger now
+   settles), whether there are unsaved edits, and what was last submitted.
+   Nothing here recommends anything -- it is a position report. */
+function bwStatusBar() {
+  const host = document.getElementById('bwstatus');
+  if (!host) return;
+  const cell = (lab, val, cls) =>
+    '<div><i>' + lab + '</i><b' + (cls ? ' class="' + cls + '"' : '') + '>' +
+    val + '</b></div>';
+
+  /* the week this ballot is for, and how settled its results are */
+  let week = '&mdash;', weekCls = 'dim', settle = 'not known', setCls = 'dim';
+  try {
+    const w = (typeof CAL !== 'undefined' && CAL) ? CAL.waiting : null;
+    if (w) {
+      week = esc(String(w.label || '').replace('Digby Weekly \u00b7 ', ''));
+      weekCls = '';
+      if (w.blocking) {
+        settle = w.blocking + ' unresolved';
+        setCls = 'warn';
+      } else if (w.withdrawn) {
+        settle = 'complete \u00b7 ' + w.withdrawn + ' withdrawn';
+        setCls = 'ok';
+      } else {
+        settle = 'complete';
+        setCls = 'ok';
+      }
+    }
+  } catch (e) { /* the calendar payload is absent: the cells say so */ }
+
+  /* unsaved edits, from the same signature the save path uses */
+  let dirty = 'no changes', dCls = 'dim';
+  try {
+    const last = bwLastSaved();
+    if (!last) { dirty = 'never saved'; dCls = 'warn'; }
+    else if (bwSig(BW) !== bwSig(last.ballot || last)) {
+      dirty = 'unsaved changes'; dCls = 'warn';
+    } else { dirty = 'saved'; dCls = 'ok'; }
+  } catch (e) { /* fall through to the default */ }
+
+  /* what was last submitted */
+  let lastTxt = 'none yet', lCls = 'dim';
+  try {
+    const last = bwLastSaved();
+    if (last && last.saved) {
+      lastTxt = esc(String(last.saved).slice(0, 16).replace('T', ' '));
+      lCls = '';
+    }
+  } catch (e) { /* no history */ }
+
+  host.innerHTML =
+    cell('Ranking week', week, weekCls) +
+    cell('Results', settle, setCls) +
+    cell('This draft', dirty, dCls) +
+    cell('Last saved', lastTxt, lCls);
 }
 
 /* ---- persistence -------------------------------------------------------

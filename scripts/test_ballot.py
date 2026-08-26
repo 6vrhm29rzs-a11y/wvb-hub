@@ -50,8 +50,111 @@ def mk(pairs, **kw):
     return d
 
 
+
+def test_public_strip_is_total():
+    """Nothing of the Workshop may reach the published page.
+
+    ⚠ THE STRIP HAS BEEN INCOMPLETE TWICE. Once the section was removed and its
+    SCRIPT stayed -- dead code naming the forum, which tripped the marker
+    assertion and aborted the build. Once the markup, script, payload and
+    endpoint all went while ~150 lines of `.bw*` RULES stayed behind: no ballot
+    content in them, which is exactly why it survived four review passes. The
+    selector names alone enumerate a private feature.
+
+    Four layers are checked, and the names the voter's-desk restyle ADDED are
+    named explicitly -- a fence slip cannot pass merely by being new.
+    """
+    pub = os.path.join(REPO, "output", "vb_dashboard.html")
+    if not os.path.exists(pub):
+        print("  (no public build -- skipping)")
+        return
+    h = open(pub, encoding="utf-8").read()
+
+    for frag in ('id="v-ballot"', 'data-v="ballot"', "Ballot Workshop",
+                 'id="bwlist"', 'id="bwstatus"', 'id="bwhistory"',
+                 'id="bwsave"', 'id="bwcopy"', 'id="bwseed"'):
+        check("public: no %s" % frag, frag not in h)
+
+    # ⚠ `.bwrap` IS THE BRACKET WRAPPER AND IS LEGITIMATELY PUBLIC. This is the
+    # exact substring trap this project has hit before -- `.bwr` matching
+    # `.bwrap`, and `mbrow` matching the surname Stambrowska. The allowlist is
+    # explicit and short so a genuinely new .bw* rule cannot hide behind it.
+    PUBLIC_BW = {"bwrap"}
+    bw_css = [m for m in re.findall(r"\.(bw[a-z0-9-]*)\s*[{,]", h)
+              if m not in PUBLIC_BW]
+    check("public: not one private .bw* CSS rule survives", not bw_css,
+          "%d found: %s" % (len(bw_css), sorted(set(bw_css))[:6]))
+    check("[+] ...and the allowlisted public one is still there",
+          ".bwrap{" in h, "the check would pass vacuously if the bracket went")
+    for cls in (".bwstatus", ".bwfinish", ".bwrulers", ".bwquiet", ".bwsw",
+                ".bwfinlab"):
+        check("public: no %s rule" % cls, cls not in h)
+
+    for fn in ("function bwStatusBar", "function bwSeed", "function bwQueue",
+               "function bwCase", "BW_KEY", "BW_HIST"):
+        check("public: no %s" % fn, fn not in h)
+
+    for frag in ("/api/ballot", "ballots_2026", "volleytalk_polls",
+                 "wvb.ballot"):
+        check("public: no %s" % frag, frag not in h)
+
+    # ⚠ AND THE FORUM IS NOT NAMED. The workshop writes a post for one; the
+    # published page has no business mentioning it.
+    check("public: the forum is never named", "VolleyTalk" not in h)
+
+    # [+] POSITIVE CONTROL -- the private page really carries all four layers,
+    # so the checks above are not passing against an empty file.
+    priv = os.path.join(REPO, "Cody", "START-HERE.html")
+    if os.path.exists(priv):
+        ph = open(priv, encoding="utf-8").read()
+        have = sum(1 for f in ('id="v-ballot"', 'id="bwstatus"',
+                               "function bwStatusBar", ".bwstatus{")
+                   if f in ph)
+        check("[+] the PRIVATE page carries all four layers", have == 4,
+              "%d of 4" % have)
+
+
+def test_desk_hierarchy():
+    """The workshop reads as a workflow, not a toolbar."""
+    src = open(os.path.join(REPO, "scripts", "build_hub.py"),
+               encoding="utf-8").read()
+    i = src.index('<section id="v-ballot"')
+    sec = src[i:src.index("</section>", i)]
+
+    # ⚠ STATUS BEFORE ACTIONS. The page used to open with Save/Copy/Reset, so
+    # the first thing on a voter's desk was a way to finish.
+    pos_status = sec.find('id="bwstatus"')
+    pos_actions = sec.find('id="bwsave"')
+    pos_list = sec.find('id="bwlist"')
+    check("there is a status bar", pos_status >= 0)
+    check("status comes before the ballot", 0 <= pos_status < pos_list)
+    check("the ballot comes before the finishing actions",
+          0 <= pos_list < pos_actions,
+          "list at %d, save at %d" % (pos_list, pos_actions))
+    check("the review queue sits above the ballot",
+          0 <= sec.find('id="bwqueue"') < pos_list)
+    check("Reset comes after Save, not beside it",
+          sec.find('id="bwseed"') > pos_actions)
+    check("...and is visually quiet",
+          'class="bwbtn bwquiet" id="bwseed"' in sec)
+
+    # ⚠ THE STATUS BAR REPORTS; IT DOES NOT ADVISE.
+    fn = src[src.index("function bwStatusBar"):]
+    fn = fn[:fn.index("\n}")]
+    for word in ("should", "recommend", "suggest", "consider moving",
+                 "needs to", "must move"):
+        check("[-] the status bar never says %r" % word, word not in fn.lower())
+    check("it reports the week and the last save",
+          "Ranking week" in fn and "Last saved" in fn)
+
+
 def main():
     print("BALLOT WORKSHOP GUARDS\n")
+
+    print("0. THE PRIVATE BOUNDARY, AND THE DESK'S SHAPE")
+    test_public_strip_is_total()
+    test_desk_hierarchy()
+    print()
 
     tmp = tempfile.mkdtemp(prefix="wvb-ballot-")
     real = B.PATH

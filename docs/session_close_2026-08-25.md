@@ -775,6 +775,67 @@ one base definition per primitive, per-element reduced-motion coverage, the
 no-characterisation rule, the My Board contract, and phone rules for every
 primitive. **Three negative controls verified to trip.**
 
+## 15. BALLOT WORKSHOP -- THE VOTER'S DESK
+
+**BEFORE:** the page opened with three buttons -- Save, Copy, Reset -- so the
+first thing on a voter's desk was a way to finish. Then a four-sentence ruler
+legend that wrapped to three lines, then the briefing, then review and compare,
+then the ballot, with history and notes as equal-weight sidebar cards.
+
+**AFTER:** status -> key -> this week -> review -> **the ballot** -> finish.
+
+**The status bar is the new thing, and it is built from data earlier phases
+made available**: which ranking week this is, whether that week's results are
+settled (the Digby Weekly cutoff, which the Fixture Truth Ledger now answers --
+it reads `complete · 39 withdrawn`), whether there are unsaved edits, and what
+was last submitted. It reports; it never advises, and a guard forbids
+"should", "recommend", "suggest", "consider moving", "needs to", "must move".
+
+**Finishing is a step, not a toolbar.** Save and Copy sit after the ballot,
+where they are used. Reset is last and deliberately quiet -- it replaces all 25
+slots and should not look like a peer of Save.
+
+⚠ **A CONTROL WAS SILENTLY CLIPPED, AND THE ROW WAS NOT THE CULPRIT.** The
+ballot row reported scrollWidth 952 against clientWidth 906, so the last
+control ("On My Board") was cut off. Every DIRECT child fitted; only a walk of
+the descendants found the button squeezed to **24px while its own label needed
+71**, overflowing inside itself and pushing the row past its column. Measured
+before guessing.
+
+⚠ **I SHORTENED AN HONEST LABEL PAST ITS MEANING.** Compacting the ruler key
+turned "R&Eacute;SUM&Eacute; -- inactive until enough games are played" into
+"inactive", which loses WHY -- and the guard caught it. The full sentence is
+back; the key gets its brevity from the other three.
+
+⚠ **THE `.bwrap` TRAP, AGAIN.** The new "not one private `.bw*` rule survives"
+guard matched `.bwrap` -- the BRACKET wrapper, legitimately public. Same
+substring shape as `.bwr`/`.bwrap` and `mbrow`/Stambrowska. Allowlisted
+explicitly and short, with a positive control asserting the bracket rule is
+still there so the check cannot pass vacuously.
+
+**THE PRIVATE BOUNDARY IS UNCHANGED AND BETTER GUARDED.** All new CSS sits
+inside `BALLOT-CSS`, all new script inside `BALLOT-WORKSHOP`, verified present
+inside the fence and absent everywhere outside it. The strip guard now checks
+**four layers** -- markup/ids, every `.bw*` rule, the script, and the
+data/endpoints -- plus that the forum is never named on the published page, and
+a positive control that the private page really carries all four.
+**Two negative controls verified to trip**: moving the new CSS outside the
+fence, and moving `bwStatusBar` outside it.
+
+⚠ **NOTHING WAS SEEDED.** Cody's standing instruction is that a test ballot must
+never become the baseline. The save button was exercised once and hit the
+"Before you save" gate, as designed; the four workflow states (first ballot,
+saved-and-unchanged, unsaved changes, restored) were verified **in memory
+only**. `data/ballots_2026.jsonl` still does not exist.
+
+**Keyboard:** all six row controls focusable, rank typable in a number field --
+drag is not the only way to rank. **390px:** status becomes 2x2, rows lead with
+rank and crest, zero overflow.
+
+**Left alone deliberately:** ballot persistence, copy-text behaviour, the review
+queue's triggers and the compare workspace's fields -- the brief ruled them out
+and they work.
+
 **State at close:** 29 suites pass with `Cody/` present and 24 with it moved
 aside. Tree is clean apart from the three fixes above. Nothing here changes
 data, ratings, or the crawl -- all three are display-layer only.
