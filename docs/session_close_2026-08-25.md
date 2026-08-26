@@ -703,6 +703,78 @@ zero-filled fallback; every entry point uses one route; box-score totals
 reconcile (18 team boxes); the ribbon keeps its column count; and the audit
 states its own limits. **Five negative controls verified to trip.**
 
-**State at close:** 28 suites pass with `Cody/` present and 24 with it moved
+## 14. VISUAL IDENTITY AND DAILY COMMAND CENTER
+
+**THE INVENTORY CAME FIRST, AND IT EARNED ITS KEEP IMMEDIATELY.**
+`scripts/css_names.py` reports what is already taken: **868 class names, 142
+ids**. The new system lives entirely under `vx-`, verified free before a line
+of CSS was written.
+
+⚠ **AND IT STILL CAUGHT ME -- COLLISION NUMBER NINE.** I checked the `vx-`
+prefix and not the MODIFIER: `.vx-key.digby` inherited `.digby`, an existing
+block style with 12px padding, and the Digby swatch rendered **32x26px beside
+two 8x8 squares**. All four of `power`, `avca`, `digby`, `ballot` were already
+taken. They are `vx-k-*` now, and the guard asserts the bare modifiers are
+never used as selectors.
+
+**THE RULER KEY -- one colour per ranking, everywhere.** POWER green · AVCA
+blue · Digby's Top 25 amber · My Ballot violet.
+⚠ **The key ADOPTS the colours the site already used rather than imposing new
+ones.** POWER has been green since the rating shipped -- including the green
+heat scale on the POWER column itself -- so making the label amber would have
+introduced the exact inconsistency the key exists to remove. Digby takes the
+amber instead. The existing declarations (`b.kpow`, `.bwv.pw`, `.bwv.av`) now
+read the tokens, so they cannot drift.
+
+**Primitives** (one base definition each, all with phone rules): `vx-label`
+(a rule line with a name on it), `vx-facts`, `vx-idrow`, `vx-empty`,
+`vx-read`, `vx-key`.
+
+**Match Desk.** A **Today's read** strip -- live now, ranked v ranked, a ranked
+result, and the next match for a team on My Board. ⚠ **Assembled, never
+written**: every line is a fact already on the page, each links to the
+canonical match route, and a fact that does not exist today yields **no row**
+rather than filler. Guarded against eight characterisation words.
+⚠ **`mbLoad()` POPULATES `MB`; IT DOES NOT RETURN IT.** Reading its return
+value gave `undefined`, so the My Board row silently never appeared -- a
+missing fact rather than a wrong one, which is the harder kind to notice.
+
+**A no-games day is now a page, not an apology** -- what today is, when the
+next window opens, how big it is, and two places worth going.
+
+**Top 25** gained real hierarchy: a 26px amber rank, team-colour edge, quieter
+table furniture. **Team page**: the seven-chip `Context` wall became a fact
+strip -- the header carried **thirteen chips in three tiers** and the reference
+row competed with POWER above it.
+
+**Section headings** lost the gradient bar that made twelve sections look
+equally important; a hairline rule and small caps do the same job quietly.
+
+⚠ **TWO REAL 390px OVERFLOWS, AND MY FIRST PROBE WAS WRONG.** Injecting only
+the 560px rules reported a team-page overflow that does not exist -- the
+collapse rule lives at a wider breakpoint. Re-probed applying **every**
+max-width block a 390px viewport satisfies (560/640/760/900): the genuine
+failures were `.seg` (five ruler buttons plus swatches) and `.rbody` (two
+roster columns in 358px). Both fixed; seven surfaces now measure clean.
+
+**Motion:** one animation, the live dot, because it is the only thing that
+changes without the reader acting.
+⚠ **The file already had 14 `prefers-reduced-motion` blocks**, so "a
+reduced-motion block exists" passed on somebody else's -- I deleted mine as a
+control and the guard stayed green. It now checks **every** animated `vx-`
+element is disabled by name.
+
+**Deliberately untouched:** the Ballot Workshop keeps its current layout (its
+fenced region is stripped from the public build and restyling it risks the
+strip); `build_vb.py` / `vb_template.html` untouched as instructed; Digby
+artwork remains a private-view guide cue and no player likenesses were created.
+
+**Guards:** `scripts/test_visual_system.py` (29th suite) -- namespace purity,
+no collision with the 868, the bare-modifier lesson, token/colour agreement,
+one base definition per primitive, per-element reduced-motion coverage, the
+no-characterisation rule, the My Board contract, and phone rules for every
+primitive. **Three negative controls verified to trip.**
+
+**State at close:** 29 suites pass with `Cody/` present and 24 with it moved
 aside. Tree is clean apart from the three fixes above. Nothing here changes
 data, ratings, or the crawl -- all three are display-layer only.

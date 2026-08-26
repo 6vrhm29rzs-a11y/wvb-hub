@@ -3732,7 +3732,7 @@ details.method[open]>summary::before{transform:rotate(90deg)}
 details.method>summary:hover{color:var(--ink)}
 details.method .note{margin-top:6px}
 /* the two rankings keep their colours wherever they are named in prose */
-b.kpow{color:#31D07E}
+b.kpow{color:var(--vx-power)}
 b.kres{color:#F2B441}
 /* ══ BALLOT WORKSHOP ══════════════════════════════════════════════════════
    The ballot is the object, so the SLOT is the loudest thing in a row and the
@@ -3853,7 +3853,8 @@ b.kres{color:#F2B441}
    is blue. Movement uses ARROWS and never borrows a ruler's colour, so a green
    number is always POWER and never "went up". */
 .bwv{font:600 12px/1 var(--mono)}
-.bwv.mine{color:#e8b13a} .bwv.pw{color:var(--good)} .bwv.av{color:#7aa7ff}
+.bwv.mine{color:var(--vx-ballot)} .bwv.pw{color:var(--vx-power)}
+.bwv.av{color:var(--vx-avca)}
 .bwv.off{color:var(--slate);font-style:italic}
 /* ── COMPARISON WORKSPACE ────────────────────────────────────────────────── */
 .bwcompare{margin:8px 0 14px;border:1px solid var(--line);border-radius:4px;
@@ -5302,6 +5303,192 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 .gline.gopen:hover{background:rgba(91,168,245,.06)}
 .gline.gopen:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
 
+
+
+/* the ruler key on the selector itself: the swatch answers "whose ranking is
+   this" before the label is read */
+.seg .segb .vx-key{margin-right:7px}
+.seg .segb{display:inline-flex;align-items:center}
+/* and the underline of the ACTIVE ruler takes its colour */
+.seg .segb.on[data-r="ours"]{box-shadow:inset 0 -2px 0 var(--vx-power)}
+.seg .segb.on[data-r="avca"]{box-shadow:inset 0 -2px 0 var(--vx-avca)}
+.seg .segb.on[data-r="digby"]{box-shadow:inset 0 -2px 0 var(--vx-digby)}
+/* the calendar tags use the same four colours, so a track and a ruler that
+   mean the same thing look the same */
+.caltag.derived{color:var(--vx-digby);background:var(--vx-digby-dim)}
+.caltag.official{color:var(--vx-avca);background:var(--vx-avca-dim)}
+
+
+/* ── Digby's Top 25: an editorial list, not a dense table ──────────────── */
+/* ⚠ THE RANK IS THE POINT OF A TOP 25, so it is sized like one. Everything
+   else recedes: the crest and name carry identity, the record and form carry
+   evidence, and the amber edge marks the ruler this list belongs to. */
+.t25 .rk{padding-right:10px;font:700 26px/1 var(--disp);
+  color:var(--vx-digby);font-variant-numeric:tabular-nums;text-align:right;
+  width:58px}
+.t25 tbody tr{border-left:3px solid transparent}
+.t25 tbody tr:hover{background:rgba(233,169,61,.05)}
+.t25 tbody tr td:first-child{position:relative}
+.t25 tbody tr td:first-child::before{content:"";position:absolute;left:0;top:6px;
+  bottom:6px;width:3px;background:var(--tc,transparent);border-radius:2px}
+.t25 td{padding:11px 14px}
+.t25 th{color:var(--slate);font-weight:700}
+
+/* ── section labels: a rule with a name on it, replacing the gradient bar ─ */
+/* The old heading was a gradient strip on every section, which made twelve
+   sections look like twelve equally important things. A hairline rule and a
+   small caps label give the same structure without the shouting. */
+.tsec h3{margin:0;padding:11px 15px 9px;font:700 10px/1 var(--disp);
+  letter-spacing:.16em;text-transform:uppercase;color:var(--slate);
+  background:none;border-bottom:1px solid var(--vx-rule);position:relative}
+.tsec h3 .cnt,.tsec h3 .h3n{color:var(--ink3)}
+
+@media (max-width:560px){
+  .t25 .rk{font-size:20px;width:42px;padding-right:7px}
+  .t25 td{padding:9px 8px}
+}
+
+
+@media (max-width:560px){
+  /* ⚠ FIVE RULER BUTTONS PLUS SWATCHES DO NOT FIT 390px. Measured: `.seg`
+     overflowed its section. It wraps rather than scrolling sideways -- a
+     horizontal scroller hides the last ruler behind a gesture nobody knows is
+     there, and the whole point of the key is that all of them are visible. */
+  .rulerbar{align-items:flex-start}
+  .seg{display:flex;flex-wrap:wrap;gap:6px;width:100%}
+  .seg .segb{flex:0 1 auto}
+  /* ⚠ TWO ROSTER COLUMNS IN 358px GIVES 168px EACH, and a name plus a rate
+     does not fit -- the block measured 386px against a 358px box. One column
+     on a phone. */
+  .rbody{column-count:1}
+}
+
+/* ═══ VISUAL SYSTEM ═══════════════════════════════════════════════════════
+   Broadcast graphics + scouting notebook. Everything new lives under `vx-`,
+   a namespace verified free against all 868 existing class names
+   (scripts/css_names.py) -- eight silent collisions in this file are eight
+   too many.
+
+   THE RULER KEY. Four rankings answer four different questions, and a reader
+   should know which one they are looking at before reading a word. One colour
+   each, used identically on the rankings tab, the calendar, a team page and
+   the ballot desk -- never decorative, always the same meaning:
+
+     POWER      amber   ours, predictive
+     AVCA       blue    theirs, official
+     DIGBY 25   green   ours, editorial
+     MY BALLOT  violet  mine, a judgement
+
+   Team colour is a LOCAL identity signal -- a 3px edge on a row that belongs
+   to one team -- never a page theme. 348 schools cannot each own the page. */
+:root{
+  /* ⚠ THE KEY ADOPTS THE COLOURS THIS SITE ALREADY USES rather than imposing
+     new ones. POWER has been green since the rating shipped -- `b.kpow`,
+     `.bwv.pw` and, decisively, the green sequential heat scale on the POWER
+     column itself. Making the label amber while the column stayed green would
+     have been a fresh inconsistency introduced by the very system meant to
+     remove them. Digby's Top 25 takes the amber instead: it is ours and it is
+     the editorial one. */
+  --vx-power:#31D07E;   --vx-power-dim:rgba(49,208,126,.14);
+  --vx-avca:#7AA7FF;    --vx-avca-dim:rgba(122,167,255,.14);
+  --vx-digby:#E9A93D;   --vx-digby-dim:rgba(233,169,61,.14);
+  --vx-ballot:#A98BE8;  --vx-ballot-dim:rgba(169,139,232,.14);
+  --vx-rule:rgba(255,255,255,.10);
+  --vx-rule-strong:rgba(255,255,255,.20);
+}
+
+/* ── section label: a rule line with a name on it ──────────────────────── */
+.vx-label{display:flex;align-items:center;gap:10px;margin:0 0 10px;
+  font:700 10px/1 var(--disp);letter-spacing:.16em;text-transform:uppercase;
+  color:var(--slate)}
+.vx-label::after{content:"";flex:1;height:1px;background:var(--vx-rule)}
+.vx-label b{font-weight:700;color:var(--chalk);letter-spacing:.16em}
+.vx-label .vx-key{width:8px;height:8px;border-radius:1px;flex:0 0 8px}
+
+/* the key swatch, wherever a ruler is named */
+.vx-key{display:inline-block;width:8px;height:8px;border-radius:1px;
+  vertical-align:middle;padding:0;border:0;flex:0 0 8px}
+/* ⚠ THE MODIFIERS ARE NAMESPACED TOO, AND THAT WAS NOT PARANOIA. The first
+   version wrote `.vx-key.digby` -- and `.digby` is an EXISTING block style
+   with its own background, border and 12px padding, so the Digby swatch
+   inherited it and rendered 32x26px beside two 8x8 squares. I had checked the
+   `vx-` prefix and not the modifier. All four of `power`, `avca`, `digby` and
+   `ballot` were already taken. Collision number nine, caught by the tool
+   written for this phase (scripts/css_names.py). */
+.vx-key.vx-k-power{background:var(--vx-power)}
+.vx-key.vx-k-avca{background:var(--vx-avca)}
+.vx-key.vx-k-digby{background:var(--vx-digby)}
+.vx-key.vx-k-ballot{background:var(--vx-ballot)}
+
+
+/* ── fact strip: label over value, in a row, no chips ──────────────────── */
+.vx-facts{display:flex;flex-wrap:wrap;gap:2px 26px;margin:0}
+.vx-facts>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.vx-facts i{font-style:normal;font:700 8.5px/1.4 var(--disp);
+  letter-spacing:.12em;text-transform:uppercase;color:var(--slate)}
+.vx-facts b{font:700 15px/1.15 var(--disp);color:var(--chalk);
+  overflow-wrap:anywhere}
+.vx-facts b.sm{font-size:13px;font-weight:600;color:var(--ink2)}
+
+/* ── team identity row: crest, name, and that team's own colour ────────── */
+.vx-idrow{display:grid;grid-template-columns:3px 30px minmax(0,1fr) auto;
+  align-items:center;gap:11px;padding:7px 0}
+.vx-idrow .vx-edge{width:3px;height:26px;border-radius:2px;
+  background:var(--tc,var(--line2))}
+.vx-idrow .vx-crest{width:30px;height:30px;display:flex;align-items:center;
+  justify-content:center}
+.vx-idrow .vx-crest img{max-width:30px;max-height:30px}
+.vx-idrow .vx-nm{font:700 17px/1.1 var(--disp);color:var(--chalk);
+  min-width:0;overflow-wrap:anywhere}
+
+/* ── empty state: a deliberate page, not a blank one ───────────────────── */
+.vx-empty{border:1px solid var(--vx-rule);border-radius:5px;
+  padding:26px 24px;text-align:center;background:var(--alt)}
+.vx-empty h4{margin:0 0 6px;font:700 17px/1.2 var(--disp);color:var(--chalk);
+  letter-spacing:.01em}
+.vx-empty p{margin:0 auto 14px;max-width:52ch;font-size:13px;color:var(--ink2);
+  line-height:1.55}
+.vx-empty .vx-emptyacts{display:flex;gap:10px;justify-content:center;
+  flex-wrap:wrap}
+.vx-empty a{font:700 10px/1 var(--disp);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--chalk);text-decoration:none;
+  border:1px solid var(--vx-rule-strong);border-radius:3px;padding:9px 13px}
+.vx-empty a:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ── today's read: one line per fact, rule-separated, no cards ─────────── */
+.vx-read{display:flex;flex-direction:column;border-top:1px solid var(--vx-rule);
+  border-bottom:1px solid var(--vx-rule);margin:0 0 20px}
+.vx-read .vx-readrow{display:grid;grid-template-columns:104px minmax(0,1fr);
+  gap:14px;align-items:baseline;padding:9px 0}
+.vx-read .vx-readrow+.vx-readrow{border-top:1px solid var(--vx-rule)}
+.vx-read i{font-style:normal;font:700 8.5px/1.5 var(--disp);letter-spacing:.12em;
+  text-transform:uppercase;color:var(--slate)}
+.vx-read .vx-readv{font-size:13.5px;color:var(--ink2);min-width:0}
+.vx-read .vx-readv b{color:var(--chalk);font-weight:700}
+.vx-read a.vx-readv{text-decoration:none}
+.vx-read a.vx-readv:hover b{color:var(--gold)}
+
+@media (max-width:560px){
+  .vx-read .vx-readrow{grid-template-columns:1fr;gap:2px;padding:8px 0}
+  .vx-facts{gap:2px 18px}
+  .vx-facts b{font-size:14px}
+  .vx-empty{padding:20px 16px}
+  .vx-idrow{grid-template-columns:3px 26px minmax(0,1fr) auto;gap:9px}
+  .vx-idrow .vx-crest{width:26px;height:26px}
+  .vx-idrow .vx-crest img{max-width:26px;max-height:26px}
+  .vx-idrow .vx-nm{font-size:15px}
+}
+
+/* ⚠ MOTION ONLY WHERE IT REPORTS STATE. One pulse, on the live dot, because
+   "this is happening now" is the single thing on this page that changes
+   without the reader acting. Everything else is static on purpose. */
+@keyframes vxpulse{0%,100%{opacity:1}50%{opacity:.35}}
+.vx-livedot{display:inline-block;width:7px;height:7px;border-radius:50%;
+  background:#FF5A5A;margin-right:6px;animation:vxpulse 1.8s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){
+  .vx-livedot{animation:none}
+}
+
 /* the honest "not yet" state, where a table would otherwise be */
 .mpend{display:flex;flex-direction:column;gap:4px;padding:12px 14px;
   border:1px dashed var(--line2);border-radius:4px;background:var(--alt)}
@@ -5866,9 +6053,9 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
        a select that does not compete for attention. -->
   <div class="rulerbar">
     <div class="seg" role="tablist" aria-label="Which ranking">
-      <button class="segb on" data-r="ours">POWER</button>
-      <button class="segb" data-r="avca">AVCA coaches poll</button>
-      <button class="segb" data-r="digby">Digby&rsquo;s Top 25</button>
+      <button class="segb on" data-r="ours"><i class="vx-key vx-k-power"></i>POWER</button>
+      <button class="segb" data-r="avca"><i class="vx-key vx-k-avca"></i>AVCA coaches poll</button>
+      <button class="segb" data-r="digby"><i class="vx-key vx-k-digby"></i>Digby&rsquo;s Top 25</button>
       <button class="segb" data-r="gap">POWER vs AVCA</button>
       <button class="segb" data-r="cal">Weekly calendar</button>
     </div>
@@ -9467,6 +9654,83 @@ document.querySelectorAll('[data-ls2]').forEach(b =>
     renderLedger();
   }));
 
+/* ⚠ TODAY'S READ IS ASSEMBLED, NOT WRITTEN. Every line is a fact already on
+   this page -- a ranked pairing, a finished ranked result, the next match for
+   a team on My Board -- restated in one place because they are the three
+   questions the first screen owes an answer to. Nothing here characterises a
+   match, predicts one, or manufactures urgency: if a fact does not exist
+   today, its row is absent rather than filled with something softer. */
+function todaysRead(mine, soon, liveOf) {
+  const rows = [];
+  const link = (gid, html) =>
+    '<a class="vx-readv" href="' + matchRoute(gid, 'desk') + '">' + html + '</a>';
+  const nm = m => (m.ar ? '#' + m.ar + ' ' : '') + esc(mAway(m)) + ' at ' +
+                  (m.hr ? '#' + m.hr + ' ' : '') + esc(mHome(m));
+
+  /* 1. what is live right now */
+  const live = mine.filter(m => matchState(m, liveOf(m)) === 'live');
+  if (live.length) {
+    const m = live[0];
+    rows.push(['<span class="vx-livedot"></span>Live',
+      link(m.gid, '<b>' + nm(m) + '</b>' +
+        (live.length > 1 ? ' <span class="munk">and ' + (live.length - 1) +
+          ' other' + (live.length > 2 ? 's' : '') + '</span>' : ''))]);
+  }
+
+  /* 2. the ranked pairing on today's card, if there is one */
+  const rr = mine.filter(m => m.ar && m.hr);
+  if (rr.length) {
+    const m = rr[0];
+    rows.push(['Ranked v ranked',
+      link(m.gid, '<b>' + nm(m) + '</b>' +
+        (rr.length > 1 ? ' <span class="munk">+' + (rr.length - 1) +
+          ' more today</span>' : ''))]);
+  }
+
+  /* 3. a finished result involving a ranked side */
+  const done = mine.filter(m => matchState(m, liveOf(m)) === 'final'
+                                && (m.ar || m.hr));
+  if (done.length) {
+    const m = done[0];
+    const sc = matchScore(m, liveOf(m));
+    rows.push(['Ranked result',
+      link(m.gid, '<b>' + nm(m) + '</b> <span class="munk">' +
+        (sc[0] === null || sc[0] === undefined ? '' : sc[0] + '\u2013' + sc[1]) +
+        '</span>')]);
+  }
+
+  /* 4. the next match for a team on My Board -- private surface only, and
+        silent when the board is empty rather than nagging about it */
+  try {
+    if (typeof mbLoad === 'function') {
+      /* ⚠ mbLoad() POPULATES `MB`; IT DOES NOT RETURN IT. Reading its return
+         value gave undefined, so this row silently never appeared -- a fact
+         that was simply missing rather than wrong, which is the harder kind to
+         notice. Call it, then read the list it fills. */
+      mbLoad();
+      const watched = new Set((typeof MB !== 'undefined' && Array.isArray(MB))
+                              ? MB : []);
+      if (watched.size) {
+        const upcoming = mine.concat(soon).filter(m =>
+          watched.has(mAway(m)) || watched.has(mHome(m)));
+        if (upcoming.length) {
+          const m = upcoming[0];
+          const who = watched.has(mHome(m)) ? mHome(m) : mAway(m);
+          rows.push(['On my board',
+            link(m.gid, '<b>' + esc(who) + '</b> <span class="munk">' +
+              esc(m.d === (mine[0] || {}).d ? (m.t || 'today')
+                                            : dayLabel(m.d)) + '</span>')]);
+        }
+      }
+    }
+  } catch (e) { /* storage unavailable -- the row is simply absent */ }
+
+  if (!rows.length) return '';
+  return '<div class="vx-read">' + rows.map(r =>
+    '<div class="vx-readrow"><i>' + r[0] + '</i>' + r[1] + '</div>').join('') +
+    '</div>';
+}
+
 function renderDesk() {
   const todayBox = document.getElementById('desktodaycards');
   if (!todayBox) return;
@@ -9499,15 +9763,23 @@ function renderDesk() {
     const nextDay = soon.length ? soon[0].d : null;
     const nextOn = soon.filter(m => m.d === nextDay);
     const ranked = nextOn.filter(m => m.ar && m.hr).length;
-    todayBox.innerHTML = '<div class="digbox">' + DIGBY_BRIEF +
-      '<div><div class="dwho">Digby</div><div class="dsay">' +
-      '<b>No Division-I matches today.</b> ' +
-      (nextDay
-        ? 'The next are <b>' + esc(dayLabel(nextDay)) + '</b> &mdash; ' +
+    /* ⚠ A DAY WITH NO MATCHES IS A REAL ANSWER AND GETS A REAL PAGE. It used
+       to be a Digby aside, which read as an apology for an empty screen. It is
+       now a deliberate state: what today is, when the next window opens, how
+       big it is, and the two places worth going in the meantime -- all from
+       the schedule that already exists. Nothing is invented to fill it. */
+    todayBox.innerHTML =
+      '<div class="vx-empty"><h4>No Division-I matches today</h4>' +
+      '<p>' + (nextDay
+        ? 'The next window is <b>' + esc(dayLabel(nextDay)) + '</b> &mdash; ' +
           nextOn.length + (nextOn.length === 1 ? ' match' : ' matches') +
-          (ranked ? ', ' + ranked + ' of them ranked against ranked' : '') + '.'
-        : 'Nothing further is on the schedule yet.') +
-      '</div></div></div>' +
+          (ranked ? ', ' + ranked + ' of them ranked against ranked'
+                  : '') + '.'
+        : 'Nothing further is on the schedule yet.') + '</p>' +
+      '<div class="vx-emptyacts">' +
+        '<a href="' + routeFor('rankings', 'power') + '">Rankings</a>' +
+        '<a href="' + routeFor('scores') + '">Recent scores</a>' +
+      '</div></div>' +
       (nextOn.length
         ? '<div class="lane up"><div class="lanehd"><b>Next match window</b>' +
           '<span>' + esc(dayLabel(nextDay)) + '</span></div>' +
@@ -9522,7 +9794,7 @@ function renderDesk() {
 
   /* ONE FEATURED MATCH AT MOST, and only if it earns it. */
   const feat = pickFeatured(mine, liveOf);
-  let html = '';
+  let html = todaysRead(mine, soon, liveOf);
   if (feat) {
     html += ribbonHTML(feat.m, liveOf(feat.m),
       '<b>Featured:</b> ' + feat.why);
@@ -10886,19 +11158,39 @@ function showTeam(name) {
             chip('Tournament', t.sim.tournament_pct + '%') +
           '</div>'
         : '') +
-      '<div class="chips tier3"><span class="tierlab">Context</span>' +
-        chip('2025', '#' + t.rank25) +
-        chip('AVCA poll', t.avca ? '#' + t.avca : '') +
-        chip('VT', t.vt ? '#' + t.vt : '') +
-        chip('Massey', t.massey ? '#' + t.massey : '') +
-        chip('RPI', t.rpi ? '#' + t.rpi : '') +
-        chip('Returning', t.ret !== null ? Math.round(t.ret * 100) + '%' : '') +
-        (t.conf_pos && t.conf_size
-          ? chip('In the ' + (t.conf || 'conference'),
-                 ordinal(t.conf_pos) + ' of ' + t.conf_size) : '') +
-        (t.sos
-          ? chip('Opp rank', t.sos.mean_rank + ' avg' +
-                 (t.sos.top25 ? ' \u00b7 ' + t.sos.top25 + ' top-25' : '')) : '') +
+      /* ⚠ SEVEN EQUAL CHIPS WERE A WALL, NOT A HIERARCHY. This row is
+         reference: last season, four other people's rankings, and where the
+         team sits in its league. As bordered pills they competed with POWER
+         and the outlook above them, and the header carried thirteen chips in
+         three tiers. As a fact strip -- small label over value, no borders --
+         the same facts read in one pass and stop shouting. Values only; an
+         absent one is dropped rather than rendered as an empty pill. */
+      '<div class="vx-label">Context</div>' +
+      '<div class="vx-facts">' +
+        (function () {
+          const f = [];
+          const add = (k, v, sm) => {
+            if (v === '' || v === null || v === undefined) return;
+            f.push('<div><i>' + esc(k) + '</i><b' + (sm ? ' class="sm"' : '') +
+                   '>' + v + '</b></div>');
+          };
+          add('2025', t.rank25 ? '#' + t.rank25 : '');
+          add('AVCA poll', t.avca ? '#' + t.avca : '');
+          add('VT', t.vt ? '#' + t.vt : '');
+          add('Massey', t.massey ? '#' + t.massey : '');
+          add('RPI', t.rpi ? '#' + t.rpi : '');
+          add('Returning', t.ret !== null && t.ret !== undefined
+                ? Math.round(t.ret * 100) + '%' : '');
+          if (t.conf_pos && t.conf_size) {
+            add('In the ' + (t.conf || 'conference'),
+                ordinal(t.conf_pos) + ' of ' + t.conf_size, true);
+          }
+          if (t.sos) {
+            add('Opponent rank', t.sos.mean_rank + ' avg' +
+                (t.sos.top25 ? ' \u00b7 ' + t.sos.top25 + ' top-25' : ''), true);
+          }
+          return f.join('');
+        })() +
       '</div>' +
     '</div></div>' +
     /* ---- AT A GLANCE -------------------------------------------------
