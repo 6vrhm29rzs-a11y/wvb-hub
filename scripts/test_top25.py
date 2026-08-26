@@ -320,8 +320,170 @@ def test_the_season_term_is_opponent_adjusted():
               "(none -- the opponent term is not reaching the payload)")
 
 
+
+def test_rank_size_never_shrinks_at_the_top():
+    """A top-three rank may never render SMALLER than an ordinary one.
+
+    ⚠ THE BUG THIS EXISTS FOR, MEASURED ON THE LIVE PAGE. An unscoped podium
+    rule -- `tbody tr:nth-child(1..3) td.rk{font-size:19px}`, written for the
+    348-row rankings board where 19px is an ENLARGEMENT over a 14px base --
+    reaches into every tbody on the site. In the Top 25, whose base is 26px, it
+    was a REDUCTION: ranks 1, 2 and 3 rendered at 19px beside 26px for 4-25.
+    The list's most important numbers were its smallest. Nothing threw and the
+    colour and alignment were right, which is why it took looking to find.
+
+    ⚠ AND THE FIRST VERSION OF THIS TEST WAS ITSELF THE WORST DEFECT OF THE
+    DAY. It matched rules with `([^{}]+)\\{([^}]*font-size:[^}]*)\\}` and
+    stripped media blocks with `(?:[^{}]|\\{[^{}]*\\})*` -- both classic
+    catastrophic backtracking -- against a 7.6 MB page. Two copies ran at 100%
+    CPU for 16 and 28 minutes and produced not one line of output. A guard that
+    never finishes is worse than no guard: the suite it lives in can never be
+    run, so every OTHER check in that file stops protecting anything.
+    The CSS is scanned linearly below. No nested quantifiers.
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  (no built page -- skipping)")
+        return
+    h = open(hub, encoding="utf-8").read()
+    i, j = h.find("<style>"), h.find("</style>")
+    css = h[i + 7:j] if (i >= 0 and j > i) else ""
+    # ⚠ STRIP CSS COMMENTS BEFORE THE BRACE SCAN. This file's stylesheet is
+    # heavily commented and several of those comments QUOTE CSS -- including
+    # the very rule this test is about, `td.rk{font-size:19px}`. Their braces
+    # desynced the depth counter, selectors merged, and the resolver reported
+    # 26px for the top three when the page renders 30px. It did not error; it
+    # answered confidently and wrongly, which is this project's whole failure
+    # mode. (Non-greedy, non-nesting -- linear, unlike what it replaced.)
+    css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+
+    def rules(text):
+        """Linear scan: (selector, body) pairs. No regex, no backtracking."""
+        out, buf, depth, sel = [], [], 0, None
+        k = 0
+        while k < len(text):
+            c = text[k]
+            if c == "{":
+                depth += 1
+                if depth == 1:
+                    sel = "".join(buf).strip()
+                    buf = []
+                else:
+                    buf.append(c)
+            elif c == "}":
+                depth -= 1
+                if depth == 0:
+                    out.append((sel, "".join(buf)))
+                    buf, sel = [], None
+                else:
+                    buf.append(c)
+            else:
+                buf.append(c)
+            k += 1
+        return out
+
+    def spec(sel):
+        """(ids, classes+pseudo, elements) for ONE simple selector.
+
+        ⚠ SPECIFICITY IS PER SELECTOR, NOT PER RULE, and computing it across a
+        comma-separated LIST is how this resolver first got the answer wrong.
+        The podium rule is written as three selectors on three lines; counting
+        the whole block gave it 6 classes and 9 elements instead of 2 and 3, so
+        it beat the correctly-scoped `table.t25 ... td.rk` and the test
+        reported 19px for a row the browser paints at 30px. A selector list is
+        n separate rules that happen to share a body.
+        """
+        ids = sel.count("#")
+        cls = sel.count(".") + sel.count(":")
+        els = len(re.findall(r"(?:^|[\s>+~])[a-z][a-z0-9]*", sel))
+        return (ids, cls, els)
+
+    def parts(sel):
+        return [x.strip() for x in sel.split(",") if x.strip()]
+
+    def resolve(pairs, kind):
+        """kind 'top' = a rank cell in rows 1-3; 'ord' = rows 4+."""
+        best, best_key = None, None
+        for order, (sel, body) in enumerate(pairs):
+            m = re.search(r"font-size:\s*([0-9.]+)px", body)
+            if not m:
+                m = re.search(r"font:[^;]*?\s([0-9.]+)px", body)
+            if not m:
+                continue
+            for one_sel in parts(sel):
+                if "td.rk" not in one_sel and ".rk" not in one_sel:
+                    continue
+                scoped = ".t25" in one_sel
+                unscoped = (one_sel.startswith("tbody")
+                            or one_sel.startswith("td.rk"))
+                if not (scoped or unscoped):
+                    continue
+                podium = ("nth-child(1)" in one_sel
+                          or "nth-child(2)" in one_sel
+                          or "nth-child(3)" in one_sel
+                          or "nth-child(-n+3)" in one_sel)
+                if podium and kind != "top":
+                    continue
+                key = (spec(one_sel), order)
+                if best_key is None or key > best_key:
+                    best_key, best = key, float(m.group(1))
+        return best
+
+    top_rules = [r for r in rules(css)]
+    # the phone block, resolved as an ADDITIONAL later source
+    phone = ""
+    for sel, body in top_rules:
+        if sel.startswith("@media") and "max-width:560px" in sel:
+            phone = body
+    base = [r for r in top_rules if not r[0].startswith("@")]
+    both = base + [r for r in rules(phone)]
+
+    for label, pairs in (("desktop", base), ("phone", both)):
+        top = resolve(pairs, "top")
+        ordinary = resolve(pairs, "ord")
+        check(bool(top) and bool(ordinary),
+              "%s: both a top-three and an ordinary rank size resolve" % label,
+              "top=%s ord=%s" % (top, ordinary))
+        if top and ordinary:
+            # ⚠ THE INVARIANT: never smaller. Larger is allowed and intended.
+            check(top >= ordinary,
+                  "%s: a top-three rank is never smaller than an ordinary one"
+                  % label,
+                  "top-three %.0fpx vs ordinary %.0fpx" % (top, ordinary))
+
+    # NEGATIVE CONTROL -- and my FIRST attempt at it did not fail, because it
+    # was not the bug. Appending the unscoped podium rule to the CURRENT sheet
+    # changes nothing: `table.t25 tbody tr:nth-child(-n+3) td.rk` is (0,1,4)
+    # and beats `tbody tr:nth-child(1) td.rk` at (0,1,3). That the poison
+    # cannot win IS the fix. To exercise the guard the sheet has to be put back
+    # the way it actually was: the Top 25 base at the old low-specificity
+    # `.t25 .rk`, and no scoped podium rule at all.
+    prefix = [(sel, body) for (sel, body) in base
+              if "nth-child(-n+3)" not in sel
+              and sel != "table.t25 tbody tr td.rk"]
+    prefix = prefix + [(".t25 .rk", "font-size:26px"),
+                       ("tbody tr:nth-child(1) td.rk", "font-size:19px")]
+    ptop, pord = resolve(prefix, "top"), resolve(prefix, "ord")
+    check(ptop is not None and pord is not None and ptop < pord,
+          "[NEG] the check catches the sheet as it actually was before the fix",
+          "top=%s ord=%s (needs top < ord)" % (ptop, pord))
+    print("     (resolved now: top-three %s / ordinary %s; before the fix "
+          "%s / %s)" % (resolve(base, "top"), resolve(base, "ord"),
+                        ptop, pord))
+
+    # and the things the fix had to preserve
+    check("table.t25 tbody tr td.rk{" in h,
+          "the Top 25 rank rule is scoped to its own table")
+    m = re.search(r"table\.t25 tbody tr td\.rk\{([^}]*)\}", h)
+    check(bool(m) and "!important" not in m.group(1),
+          "[-] ...and wins on specificity, not !important")
+    check("color:var(--vx-digby)" in h, "the amber rank colour is kept")
+    check("text-align:right" in h, "right alignment is kept")
+
+
 def main():
-    for fn in (test_the_season_term_is_opponent_adjusted, test_k_uses_the_priors_error_not_the_population_spread,
+    for fn in (test_rank_size_never_shrinks_at_the_top,
+               test_the_season_term_is_opponent_adjusted, test_k_uses_the_priors_error_not_the_population_spread,
                test_a_useless_prior_collapses_to_the_population,
                test_a_perfect_prior_is_never_overturned,
                test_weight_grows_with_matches_and_never_exceeds_one,

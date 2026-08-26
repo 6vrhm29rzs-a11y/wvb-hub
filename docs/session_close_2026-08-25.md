@@ -1076,3 +1076,162 @@ zero, and letting a weak run overwrite a final observation.
 **State at close:** 32 suites pass with `Cody/` present and 24 with it moved
 aside. Tree is clean apart from the three fixes above. Nothing here changes
 data, ratings, or the crawl -- all three are display-layer only.
+
+---
+
+## 19. COURT SIGNAL — a volleyball-native art direction, and one signature band
+
+**The thesis in one sentence.** A volleyball score is the only major-sport
+scoreline that is *a row of boxes with a net standing in the middle of it*
+(`25-22 · 25-19 · 22-25`), and that row is a diagram every viewer of the sport
+already knows how to read. Court Signal makes that diagram the site's signature
+and keeps every other surface quiet around it.
+
+**The signature: the Rally Tape.** One band, mounted once directly under the
+masthead, so it anchors every screen and the Match Desk opens straight into it
+— both things the brief asks for, from ONE instance that cannot drift from a
+second (R4). It reads DESK and LIVE_BY_ID through the same
+`matchState`/`matchScore`/`matchSets` helpers the lanes below it use, so it
+holds no data of its own and cannot disagree with them.
+
+**Five honesty rules, each guarded in `scripts/test_court_signal.py`:**
+1. An upcoming match shows no score and no numbered set cells.
+2. An unplayed set renders a **court dot, never a 0** — `''` is not zero, the
+   same coercion `match_state.py` had to defend against.
+3. The context line is a fact from the feed or it says the fact is missing
+   ("venue not reported"), never an inferred home floor.
+4. A quiet day carries the **next real fixture** or states there is not one. It
+   never fabricates activity, and **it does not animate**.
+5. The live pulse runs only while something is genuinely live. It is the only
+   looping animation in the component, and reduced motion stops it.
+
+### ⚠ SIX DEFECTS FOUND BY LOOKING AT THE BUILT PAGE, NOT BY A FAILING TEST
+
+1. **A masthead value produced by slicing a format I never checked.** The status
+   strip printed `LIVE_STAMP.slice(11,16)` on the assumption of an ISO
+   timestamp. The server sends `"8:59:54 PM PT"`, so characters 11–16 are
+   `"PT"` — and the masthead read **"PT feed"**, a synthesised value rendered
+   with total confidence. Measured with one `fetch('/api/live')`. Print what the
+   server said.
+2. **"194 others on the card" was false.** With nothing scheduled today the pick
+   falls through to the next date, so those matches are not on today's card —
+   and the link went to the Match Desk, which shows none of them.
+3. **Two rank bases, unlabelled, four inches apart.** The tape ranks from the
+   scoreboard feed (the AVCA poll); the readiness panel directly beneath it
+   ranks by Digby's Top 25. Kansas read **#15** in one and **#21** in the other
+   on the same match. Both correct, neither labelled — R4 in miniature.
+4. **The court texture drew its own tile border**, so the repeat printed a
+   **lattice** — a grid of boxes, which is a spreadsheet, not a court. It also
+   carried a dashed net, putting four decorative nets behind the one net the
+   tape draws and depends on.
+5. **The net ended up at the far right edge.** The teams column was the `1fr`,
+   so it absorbed every spare pixel and pushed the set cells against the frame
+   with 600px of empty court between the names and the score.
+6. **The date printed twice**, once in the state column and once in the context
+   line, because both fixes for "say when" landed and neither looked at the
+   other. On the phone, `justify-content:center` survived the row/column flip
+   and floated the state row in the middle of a left-aligned band.
+
+### ⚠ AND FOUR GUARDS WERE WRONG — INCLUDING ONE I WROTE THIS PHASE
+
+- **My Top 25 rank guard hung the suite.** It matched rules with
+  `([^{}]+)\{([^}]*font-size:[^}]*)\}` and stripped media blocks with
+  `(?:[^{}]|\{[^{}]*\})*` — both catastrophic backtracking — against a 7.6 MB
+  page. **Two copies ran at 100% CPU for 16 and 28 minutes and produced not one
+  line of output.** A guard that never finishes is worse than no guard: every
+  other check in that file stops protecting anything. Rewritten as a linear
+  brace scan. Then it was wrong twice more, and both are recorded in the file:
+  it **scanned CSS comments** (which quote the very rule under test, desyncing
+  the brace depth) and it **computed specificity across a comma-separated
+  selector list** instead of per selector, giving the podium rule 6 classes
+  instead of 2. It reported 19px for a row the browser paints at 30px.
+- **`test_display_invariants.py`'s mobile-nav check was over-broad.** It
+  searched the whole 560px block for `overflow-x:auto`, so the tape's set-cell
+  row — wide content scrolling inside its own box, which is what wide content
+  is supposed to do — read as the nav concealing destinations. Scoped to nav
+  rules, with a negative control that a scroller planted on the nav still trips.
+- **The call-graph guard (the one that caught `esc()`) had two flaws.** It took
+  "6000 characters from the function name" as the body, which spills a dozen
+  functions past a 489-character one, and it **scanned comments**: the sentence
+  *"one definition of an unplayed set (R4)"* contains `set (`, which is a call
+  to `set()` as far as a regex is concerned. Three correct new functions were
+  reported as calling stripped code they never mention. Made **accurate, not
+  looser** — brace-matched bodies, comments and string literals removed — with a
+  negative control planting a stripped dependency.
+- **Two of my own new checks were wrong** and are documented in place: one
+  forbade `mAway + ' at ' + mHome` (a *fixture description*, a fact) while
+  meaning to forbid an *inferred venue*; the other flagged `cs-at`/`cs-dot`/
+  `cs-nm` for "shadowing" `at`/`dot`/`nm`, which a class selector cannot do.
+
+### ⚠ AND A REAL LEAK, CAUGHT BY THREE EXISTING GUARDS
+
+The first version styled the three private surfaces in the shared views block,
+which sits **outside every fence** — so their selectors shipped in the published
+stylesheet. No values leaked, but "the markup is gone" is not the same claim as
+"it was not published", and this project has shipped a payload behind removed
+columns once already. Each treatment now lives inside the fence for the surface
+it styles. **The rewrite of the explanatory comment was the second lesson:**
+naming those features in an unfenced comment tripped the fail-closed public gate
+on the marker words alone.
+
+### Views transformed
+Match Desk (tape first) · Rankings and Digby's Top 25 (editorial index, team
+colour signal edge, court ground under the board) · Team page (programme
+identity panel, the school's **own** logo colour from `COLORS` — absent, never
+invented, when we hold none) · Film Room and Intel (scouting wire) · Ballot
+Workshop (poll sheet).
+
+### Verified
+33 suites pass · both builds · public gate · fresh-checkout guard · all 8 direct
+routes paint one section with the tape present · tape links keyboard-focusable ·
+reduced motion covers both the entrance and the pulse · **every colour in the
+tape clears WCAG AA, lowest 5.23:1** · 390px measured programmatically (R6):
+four stacked rows, zero self-overflow, no sideways body scroll, set cells
+scrolling in their own box.
+
+### ⚑ CODY'S REVIEW OF COURT SIGNAL (2026-08-25, live local) — QUEUED, NOT STARTED
+
+Recorded here because his mid-build observations keep producing the largest
+measured gains and because nothing else in this project carries them. **None of
+the below has been touched.** He set the sequence explicitly, and the ordering
+is the point: *"otherwise we would put attractive pictures on top of navigation
+and data-context friction."*
+
+**What landed.** Court Signal is a real improvement — masthead, Rally Tape,
+court-grid texture, crests, compact type and the gold rule system give it a
+volleyball-specific identity; it no longer reads as default dashboard
+furniture. **The best screen is the team profile**, which now reads as a
+scouting card rather than a spreadsheet.
+
+**PHASE 2 — wayfinding + daily-use sweep (do this BEFORE any imagery):**
+1. **A double-active nav state.** On a direct team route, Teams is correctly the
+   one semantically selected tab, but a **gold focus box remains around
+   Rankings** from the prior interaction. The route is right; the page shows two
+   active-looking tabs. (Focus-visible surviving a programmatic route change.)
+2. **Ruler labelling is inconsistent at a glance.** The Rally Tape now says its
+   numbers are AVCA ranks — but elsewhere Kansas renders as a bare `#21` with no
+   ruler beside it. Both may be correct; **a reader should never have to infer
+   which ranking a bare number means.** This is the R4 problem generalised
+   beyond the one place I fixed it.
+3. **Scores opens into a 472-match ledger, including dates ahead of today.** The
+   daily landing should be *today / live / final / next ranked*, with the
+   complete schedule deliberately one click away.
+4. **The team-page Digby write-up is too large and too prose-heavy, and it sits
+   ABOVE the team identity.** Should become a short **"Scout's Read"** with an
+   expandable fuller note — more so once imagery arrives.
+
+**PHASE 3 — the editorial media layer (only after phase 2):**
+5. **Intel is the weakest screen.** Clean and honest, but visually a text list
+   with thin dividers. It is exactly where a **lead item**, a **compact story
+   rail** and **source-supplied preview images where permitted** belong.
+6. **There is no true editorial visual unit.** The site has logos and Digby and
+   nothing repeatable. The ask is a **match "moment graphic"** built from
+   crests, team colours, the result/set line and venue/state — sports-site
+   energy that needs no licensed photography, and which the Rally Tape's
+   geometry already establishes the vocabulary for.
+
+⚠ **Phase 3's images must clear the same bars everything else here does:** no
+AI likenesses of named players or coaches, real headshots and crests stay the
+primary people imagery, and any preview image must be *source-supplied and
+permitted* — `docs/intel_sources.md` is the record, and the NCAA-only allowlist
+is not to be widened without an audit that clears its own gate.

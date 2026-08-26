@@ -2303,15 +2303,68 @@ def check_public_build_can_actually_render():
     # a call the author deliberately guarded is not a missing dependency
     guarded = set(re.findall(
         r"typeof\s+([A-Za-z_$][\w$]*)\s*===?\s*['\"]function['\"]", ujs))
+    # ⚠ TWO FLAWS FOUND IN THIS GUARD, BOTH THE SAME FAMILY: it was reading
+    # things that are not code.
+    #   1. The body was "6000 characters from the function's name", which
+    #      spills well past the function into whatever follows it. csWhere() is
+    #      489 characters; the window covered a dozen neighbours.
+    #   2. It scanned COMMENTS. The sentence "there is one definition of an
+    #      unplayed set (R4)" contains the token `set (` -- which is a call to
+    #      set() as far as a regex is concerned. Three correct new functions
+    #      were reported as calling stripped code they never mention.
+    # The guard itself is valuable -- it is what caught esc() being stripped
+    # out of the public build, which rendered the published Scores ledger empty
+    # and passed every other check. So it is made ACCURATE, not looser: the
+    # body is brace-matched, and comments and string literals are removed
+    # before anything is called a call.
+    def _body(js, fn):
+        i = js.index("function %s(" % fn)
+        j = js.index("{", i)
+        d, k = 0, j
+        while k < len(js):
+            if js[k] == "{":
+                d += 1
+            elif js[k] == "}":
+                d -= 1
+                if d == 0:
+                    return js[i:k + 1]
+            k += 1
+        return js[i:]
+
+    def _code(js):
+        js = re.sub(r"/\*.*?\*/", " ", js, flags=re.S)
+        js = re.sub(r"(?m)//.*$", " ", js)
+        js = re.sub(r"'(?:\\.|[^'\\])*'", "''", js)
+        js = re.sub(r'"(?:\\.|[^"\\])*"', '""', js)
+        return js
+
     broken = {}
     for fn in set(re.findall(r"\bfunction\s+([A-Za-z_$][\w$]*)\s*\(", ujs)):
-        body = ujs[ujs.index("function %s(" % fn):][:6000]
+        body = _code(_body(ujs, fn))
         # a CALL, not a method: an identifier not preceded by a dot
         called = set(re.findall(r"(?<![.\w$])([A-Za-z_$][\w$]*)\s*\(", body))
         gap = sorted(c for c in called
                      if c in ours and c not in pub_def and c not in guarded)
         if gap:
             broken[fn] = gap
+    # NEGATIVE CONTROL: the defect this guard was built for -- a function the
+    # public page calls but no longer defines -- must still be caught after the
+    # accuracy fix. Planted in-process against the real public script.
+    _probe = "function csProbe(){ return escStripped(1); }"
+    _pd = _defined(ujs) | {"escStripped"}
+    _pbody = _code(_body(ujs + _probe, "csProbe"))
+    _pcalled = set(re.findall(r"(?<![.\w$])([A-Za-z_$][\w$]*)\s*\(", _pbody))
+    if "escStripped" in _pcalled and "escStripped" not in _defined(ujs):
+        ok("[NEG] the call-graph check still catches a stripped dependency")
+    else:
+        bad("[NEG] the call-graph check can no longer fail", str(_pcalled))
+    # POSITIVE CONTROL: it is looking at a real, populated call graph.
+    if len(_defined(ujs)) > 100:
+        ok("[+] ...over %d public definitions" % len(_defined(ujs)))
+    else:
+        bad("[+] the public call graph is suspiciously small",
+            str(len(_defined(ujs))))
+
     if broken:
         first = list(broken.items())[:3]
         bad("the public build calls a function the strip removed",
@@ -2459,11 +2512,31 @@ def check_mobile_rankings_are_a_list_not_a_clipped_table():
     # The invariant is the intent, not the mechanism: no destination may sit
     # off-screen behind a horizontal scroll.
     flatmob = mob.replace(" ", "")
-    if "flex-wrap:wrap" not in flatmob or "overflow-x:auto" in flatmob:
+    # ⚠ THIS GUARD WAS OVER-BROAD AND CAUGHT A CORRECT CHANGE. It searched the
+    # WHOLE 560px block for "overflow-x:auto", so the Rally Tape's set-cell
+    # row -- wide content scrolling inside its OWN box, which is exactly what
+    # wide content is supposed to do -- read as the nav concealing
+    # destinations. The invariant it states one line above is about the NAV.
+    # Test the nav. A guard that fires on an unrelated rule teaches whoever
+    # trips it to stop believing the suite.
+    navrules = "".join(b for sel, b in _rules(mob) if "nav" in sel)
+    navflat = navrules.replace(" ", "")
+    if "flex-wrap:wrap" not in flatmob or "overflow-x:auto" in navflat:
         bad("the mobile nav hides destinations behind a horizontal scroll",
             "five items plus More wrap to two rows; a scroller conceals them")
     else:
         ok("the mobile nav wraps so every destination is visible at once")
+    # NEGATIVE CONTROL: plant the scroller on a nav rule and prove it trips.
+    if "overflow-x:auto" in (navrules + "nav{overflow-x:auto}").replace(" ", ""):
+        ok("[NEG] ...and a scroller planted ON THE NAV would still be caught")
+    else:
+        bad("[NEG] the scoped nav check cannot fail", "")
+    # POSITIVE CONTROL: the contained scroller the guard must now tolerate is
+    # genuinely present, or the scoping above is protecting nothing.
+    if "overflow-x:auto" in flatmob:
+        ok("[+] ...while a contained scroller elsewhere in the block is allowed")
+    else:
+        bad("[+] no contained scroller exists to be tolerated", "")
     prim = re.findall(r'<button role="tab"[^>]*data-v="[a-z0-9]+"', src)
     if len(prim) > 6:
         bad("the primary nav has grown back into a tab maze",
@@ -3003,6 +3076,27 @@ def check_page_script_parses():
     else:
         bad("no page scripts found", "the extraction regex is wrong, so this "
                                      "guard was checking nothing")
+
+
+def _rules(block):
+    """(selector, body) pairs from a CSS block. Linear scan, no backtracking."""
+    out, buf, depth, sel = [], [], 0, None
+    for c in block:
+        if c == "{":
+            depth += 1
+            if depth == 1:
+                sel = "".join(buf).strip(); buf = []
+            else:
+                buf.append(c)
+        elif c == "}":
+            depth -= 1
+            if depth == 0:
+                out.append((sel, "".join(buf))); buf, sel = [], None
+            else:
+                buf.append(c)
+        else:
+            buf.append(c)
+    return out
 
 
 def main():

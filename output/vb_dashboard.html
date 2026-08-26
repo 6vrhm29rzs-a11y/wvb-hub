@@ -64,6 +64,70 @@
   --disp:"Barlow Condensed","Oswald","Avenir Next Condensed",
          "HelveticaNeue-CondensedBold","Arial Narrow",var(--sans);
 }
+/* COURTSIGNAL-TOKENS-BEGIN */
+/* ══ COURT SIGNAL ═════════════════════════════════════════════════════════
+   The brief names five colours. Four of them ALREADY EXIST on this page under
+   older names, and repointing an existing token to a new meaning is exactly
+   the failure R4 is written about -- so this is an ALIAS LAYER, not a
+   replacement. Nothing above changes value; these names simply say, in the
+   brief's own vocabulary, which of the existing values plays which part. Only
+   one colour here is genuinely new.
+
+     midnight ink  = --court  #07172B   the ground
+     court blue    = --rally  #1F66D1   structure, fills, rules
+     optic white   = --chalk  #F5F1E8   reading ink
+     signal gold   = --gold   #D99A29   the live/active signal
+     serve cyan    = NEW      #4CD4E4   serve and set-state only
+
+   ⚠ SERVE CYAN IS RATIONED ON PURPOSE. A bright cyan used generally on a dark
+   ground is the "terminal / sci-fi" look the brief explicitly rules out. It is
+   allowed in exactly three places -- the serve indicator, the set-cell rule on
+   a set in progress, and the focus ring -- and nowhere else. That restriction
+   is a guard, not a preference: test_court_signal.py counts its uses. */
+:root{
+  --cs-ink:var(--court); --cs-blue:var(--rally); --cs-white:var(--chalk);
+  --cs-gold:var(--gold); --cs-cyan:#4CD4E4;
+  /* the cyan lifted for anything a reader must actually READ (the fill value
+     is a 3px rule colour, not an ink -- the same distinction --rally already
+     carries above, and for the same reason) */
+  --cs-cyan-ink:#8FE7F2;
+  /* semantic pair, reused rather than redefined */
+  --cs-pos:var(--good); --cs-neg:var(--bad);
+  /* structural greys of the tape itself */
+  --cs-cell:#0E2338; --cs-edge:#1B3050; --cs-edge2:#2C4A72;
+}
+/* THE COURT-LINE TEXTURE. One reusable inline-SVG ground: the net (dashed, in
+   the middle), the two attack lines 3m either side of it, and the service-zone
+   ticks at the ends. It is 3.5% white on navy -- you are meant to feel the
+   geometry, not read it -- sits behind content, and never takes a pointer. */
+.cs-court{position:relative;isolation:isolate}
+.cs-court::before{content:"";position:absolute;inset:0;pointer-events:none;
+  z-index:0;opacity:.55;
+  /* ⚠ THE FIRST TILE DREW ITS OWN BORDER, so the repeat printed a visible
+     LATTICE across every surface -- a grid of boxes, which is a spreadsheet,
+     not a court. Measured on the team header: tile edges at x=670, 1030, 1290,
+     nothing to do with the sport. The outline is gone; what is left is the
+     markings themselves.
+     ⚠ AND THE NET CAME OUT OF THE TILE TOO. A dashed vertical every 240px put
+     four "nets" behind the Rally Tape, competing with the ONE net the tape
+     draws as the border of its set cells -- the single line the whole diagram
+     depends on. The texture is now attack lines and service ticks; the net is
+     drawn once, by the component that means it. */
+  background-image:url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' width='300' height='150' viewBox='0 0 300 150'>\
+<g fill='none' stroke='%23F5F1E8' stroke-opacity='.07'>\
+<line x1='0' y1='37.5' x2='300' y2='37.5' stroke-width='1'/>\
+<line x1='0' y1='112.5' x2='300' y2='112.5' stroke-width='1'/>\
+<line x1='50' y1='0' x2='50' y2='13' stroke-width='1'/>\
+<line x1='50' y1='137' x2='50' y2='150' stroke-width='1'/>\
+<line x1='150' y1='0' x2='150' y2='13' stroke-width='1'/>\
+<line x1='150' y1='137' x2='150' y2='150' stroke-width='1'/>\
+<line x1='250' y1='0' x2='250' y2='13' stroke-width='1'/>\
+<line x1='250' y1='137' x2='250' y2='150' stroke-width='1'/>\
+</g></svg>");
+  background-size:300px 150px}
+.cs-court>*{position:relative;z-index:1}
+/* COURTSIGNAL-TOKENS-END */
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 /* THE GROUND IS LIT, NOT FLAT. Three fixed radial washes -- one cool, one warm,
@@ -129,7 +193,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 <rect width='140' height='140' filter='url(%23n)' opacity='.32'/></svg>")}
 header,nav,main{position:relative;z-index:1}
 
-header{color:var(--ink);padding:20px 24px 0;position:relative;
+header{color:var(--ink);padding:16px 24px 0;position:relative;
   background:
     radial-gradient(120% 180% at 12% -40%, rgba(91,168,245,.30), transparent 60%),
     radial-gradient(90% 160% at 92% -30%, rgba(255,199,44,.20), transparent 62%),
@@ -150,11 +214,260 @@ h1 em{font-style:normal;color:var(--gold)}
 .meta b{color:var(--chalk);font-weight:600}
 /* The net: white mesh under a taut yellow tape. It is the one thing in the
    sport every viewer can draw from memory, so it carries the masthead. */
-.net{max-width:1280px;margin:17px auto 0;height:11px;
+.net{max-width:1280px;margin:12px auto 0;height:11px;
   background:repeating-linear-gradient(90deg,rgba(255,255,255,.30) 0 1px,transparent 1px 6px),
              repeating-linear-gradient(0deg,rgba(255,255,255,.30) 0 1px,transparent 1px 6px);
   border-top:3px solid var(--amber);
   box-shadow:0 -1px 22px -2px rgba(255,199,44,.55),0 6px 30px -14px rgba(255,199,44,.35)}
+/* COURTSIGNAL-TAPE-CSS-BEGIN */
+/* ══ THE RALLY TAPE ═══════════════════════════════════════════════════════
+   The site's one bold move, and it is bold because of its GEOMETRY rather
+   than because of an effect. Volleyball is the only major sport whose score
+   is a ROW OF BOXES with a net standing in the middle of it, and that row is
+   a diagram every viewer of the sport can already read. So the tape is that
+   diagram: two crested sides, the net, five set cells.
+
+   ⚠ EVERY CELL IN IT IS A FACT OR IT IS EMPTY. A set that has not been played
+   renders a court dot, never a 0 -- '' is not zero, the same distinction
+   match_state.py had to make. An upcoming match shows no score at all. A
+   quiet day shows the NEXT REAL FIXTURE, and if there is not one it says so.
+   There is no state of this component that invents activity (R5).
+
+   ⚠ AND IT IS NOT A TICKER. A looping marquee is what a broadcast band is
+   usually copied AS, and it would be ambient motion on a page that may be
+   looking at nothing. The tape is still. */
+.cs-tape{max-width:1280px;margin:12px auto 0;
+  border:1px solid var(--cs-edge);border-top:0;
+  background:linear-gradient(180deg,#0B1D33 0%,#091829 100%);
+  display:grid;grid-template-columns:150px minmax(0,340px) auto minmax(0,1fr);
+  align-items:stretch}
+/* ⚠ THE NET ENDED UP AT THE FAR RIGHT EDGE. The teams column was the 1fr, so
+   it absorbed every spare pixel and pushed the set cells -- and the dashed net
+   line that is their left border -- against the frame, with 600px of empty
+   court between the names and the score. The net has to stand in the MIDDLE of
+   the scoreline or the diagram is not the diagram. Fixed by giving the names a
+   bounded track and putting the 1fr in a fourth, empty column, which is now
+   simply court showing through. */
+.cs-pad{grid-row:1;grid-column:4}
+.cs-tape.cs-court::before{opacity:.62}
+
+/* --- the state column: what this band IS ------------------------------- */
+.cs-st{grid-row:1;display:flex;flex-direction:column;justify-content:center;
+  gap:5px;padding:11px 14px;border-right:1px solid var(--cs-edge);
+  background:rgba(7,23,43,.5)}
+.cs-stl{font:700 12px/1 var(--disp);letter-spacing:.2em;text-transform:uppercase;
+  color:var(--cs-white);display:flex;align-items:center;gap:7px}
+.cs-live .cs-stl{color:var(--cs-gold)}
+.cs-when{font:500 10.5px/1.35 var(--mono);color:var(--slate);
+  letter-spacing:.06em;text-transform:uppercase}
+/* the live dot is the ONLY looping motion on the page, and it loops only
+   while something is genuinely live */
+.cs-dot{width:8px;height:8px;border-radius:50%;background:var(--cs-gold);
+  flex:0 0 auto;box-shadow:0 0 0 0 rgba(217,154,41,.6)}
+.cs-live .cs-dot{animation:cs-pulse 1.9s ease-out infinite}
+@keyframes cs-pulse{
+  0%{box-shadow:0 0 0 0 rgba(217,154,41,.55)}
+  70%{box-shadow:0 0 0 7px rgba(217,154,41,0)}
+  100%{box-shadow:0 0 0 0 rgba(217,154,41,0)}}
+.cs-quiet .cs-dot{background:var(--slate);box-shadow:none;animation:none}
+
+/* --- the two sides ------------------------------------------------------ */
+.cs-teams{grid-row:1;display:flex;flex-direction:column;justify-content:center;
+  padding:7px 16px;min-width:0;gap:1px}
+.cs-side{display:grid;grid-template-columns:30px 26px minmax(0,1fr) 34px;
+  align-items:center;gap:9px;padding:4px 0;min-width:0}
+.cs-trk{font:700 12px/1 var(--mono);color:var(--cs-gold);text-align:right;
+  font-variant-numeric:tabular-nums}
+.cs-side img{width:24px;height:24px;object-fit:contain}
+/* ⚠ THE CREST SLOT IS ALWAYS EMITTED. The same four-column-grid-with-three-
+   children defect the ribbon paid for: logo() returns '' for a team we hold no
+   crest for, every cell shifts one column left, and the name lands in the 26px
+   crest track. This hits every non-Division-I opponent. */
+.cs-nologo{width:24px;height:24px;border:1px solid var(--cs-edge2);
+  border-radius:2px;opacity:.5}
+.cs-nm{font:600 20px/1.12 var(--disp);letter-spacing:.005em;color:var(--ink2);
+  text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;min-width:0}
+.cs-won .cs-nm{color:var(--cs-white)}
+.cs-sets{font:700 26px/1 var(--disp);color:var(--ink3);text-align:right;
+  font-variant-numeric:tabular-nums}
+.cs-won .cs-sets{color:var(--cs-white)}
+.cs-side.cs-serve .cs-trk::after{content:"";display:inline-block;width:5px;
+  height:5px;border-radius:50%;background:var(--cs-cyan);margin-left:5px;
+  vertical-align:.14em}
+
+/* --- the set cells, with the net standing in front of them -------------- */
+.cs-cells{grid-row:1;display:flex;align-items:stretch;
+  border-left:2px dashed rgba(245,241,232,.32);
+  padding:9px 12px 9px 14px;gap:5px}
+.cs-cell{width:38px;display:flex;flex-direction:column;justify-content:center;
+  gap:3px;background:var(--cs-cell);border:1px solid var(--cs-edge);
+  border-radius:2px;padding:6px 0}
+.cs-cell i{font:600 15px/1 var(--mono);font-style:normal;text-align:center;
+  color:var(--ink2);font-variant-numeric:tabular-nums}
+.cs-cell i.cs-cw{color:var(--cs-white);font-weight:700}
+/* an unplayed set is a court dot, never a zero */
+.cs-cell.cs-empty{background:rgba(245,241,232,.02);border-style:dashed;
+  border-color:rgba(245,241,232,.2)}
+.cs-cell.cs-empty i{color:var(--ink3);opacity:.8}
+.cs-cell.cs-now{border-color:var(--cs-cyan);
+  box-shadow:inset 0 -2px 0 -0px var(--cs-cyan)}
+.cs-setno{font:600 9px/1 var(--mono);letter-spacing:.1em;color:var(--ink3);
+  text-align:center;text-transform:uppercase}
+
+/* --- one factual context line ------------------------------------------ */
+.cs-ctx{grid-column:1/-1;grid-row:2;border-top:1px solid var(--cs-edge);
+  padding:8px 16px;font:12.5px/1.45 var(--sans);color:var(--ink2);
+  background:rgba(7,23,43,.42);
+  display:flex;gap:9px;align-items:baseline;flex-wrap:wrap}
+.cs-ctx b{color:var(--cs-white);font-weight:600}
+.cs-ctx .cs-sep{color:var(--cs-edge2)}
+.cs-ctx a{color:var(--navy);text-decoration:none;border-bottom:1px solid transparent}
+.cs-ctx a:hover{border-bottom-color:var(--navy)}
+.cs-unk{color:var(--ink3);font-style:italic}
+
+/* --- the quiet band ----------------------------------------------------- */
+.cs-quiet .cs-nm{color:var(--ink2)}
+.cs-quiet .cs-sets{display:none}
+.cs-quiet .cs-side{grid-template-columns:30px 26px minmax(0,1fr)}
+/* the ranks label and any other stated-provenance aside in the context line */
+.cs-ctx .cs-unk{font-style:normal;font:11px/1.5 var(--mono);
+  letter-spacing:.04em}
+.cs-at{font:600 10px/1 var(--mono);letter-spacing:.18em;color:var(--ink3);
+  text-transform:uppercase;padding:1px 0 1px 65px}
+/* nothing at all on the card: still the tape's geometry, honestly empty */
+.cs-none{grid-column:1/-1;grid-row:1;padding:16px;
+  font:14px/1.5 var(--sans);color:var(--ink2);display:flex;gap:10px;
+  align-items:center}
+.cs-none b{color:var(--cs-white)}
+/* Digby as a SIGNAL GUIDE, at two moments only: the tape with nothing to show,
+   and the Intel wire with nothing to report. Both are honest-empty states --
+   the place a page is most tempted to invent something -- so a small friendly
+   marker there is a cue, not decoration. He is 26px and he does not appear on
+   any surface carrying data. */
+.cs-guide{flex:0 0 auto;display:inline-flex}
+.cs-guide img{width:26px;height:26px}
+
+/* --- ONE orchestrated entrance, and only one --------------------------- */
+.cs-tape{animation:cs-in .5s cubic-bezier(.22,1,.36,1) both}
+.cs-tape .cs-cell{animation:cs-cellin .34s cubic-bezier(.22,1,.36,1) both;
+  animation-delay:calc(120ms + var(--cs-i,0) * 55ms)}
+@keyframes cs-in{from{opacity:0;transform:translateY(-7px)}
+                 to{opacity:1;transform:none}}
+@keyframes cs-cellin{from{opacity:0;transform:translateY(5px)}
+                     to{opacity:1;transform:none}}
+/* ⚠ A QUIET DAY DOES NOT ANIMATE. The entrance is a response to a match
+   existing; playing it over an empty schedule is decoration pretending to be
+   state, which is the thing this whole page is built not to do. */
+.cs-quiet,.cs-quiet .cs-cell{animation:none}
+@media (prefers-reduced-motion:reduce){
+  .cs-tape,.cs-tape .cs-cell{animation:none}
+  .cs-live .cs-dot{animation:none;box-shadow:0 0 0 3px rgba(217,154,41,.28)}
+}
+.cs-tape a:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
+
+/* --- the control-room status strip -------------------------------------- */
+/* ⚠ VERTICAL BUDGET IS REAL. The status strip plus the tape pushed the nav to
+   y=321 -- a third of a laptop viewport spent before the first control. The
+   strip is a single tight line and the tape's own padding came down to match;
+   the identity survives, the nav stays above the fold. */
+.cs-status{max-width:1280px;margin:0 auto;display:flex;flex-wrap:wrap;
+  gap:0 20px;align-items:center;padding:7px 0 0;
+  font:11px/1.5 var(--mono);color:var(--slate);letter-spacing:.05em}
+.cs-status span{display:flex;align-items:center;gap:6px}
+.cs-status b{color:var(--ink2);font-weight:600}
+.cs-status .cs-fresh{color:var(--cs-white)}
+.cs-status .cs-stale{color:var(--cs-gold)}
+
+@media (max-width:860px){
+  .cs-tape{grid-template-columns:minmax(0,1fr) auto}
+  .cs-pad{display:none}
+  /* ⚠ THE BASE RULE'S justify-content:center SURVIVES THE DIRECTION FLIP. In
+     a column it centres vertically, which is right; the moment the narrow
+     block makes it a ROW the same declaration centres it HORIZONTALLY, and
+     "NEXT SERVE  FRI AUG 28" floated in the middle of the phone band while
+     every other line was flush left. Flipping direction means re-stating
+     alignment. */
+  .cs-st{grid-row:1;grid-column:1/-1;border-right:0;
+    border-bottom:1px solid var(--cs-edge);flex-direction:row;
+    justify-content:flex-start;align-items:center;gap:11px;padding:9px 13px}
+  .cs-teams{grid-row:2;grid-column:1}
+  .cs-cells{grid-row:2;grid-column:2}
+  .cs-ctx{grid-row:3}
+}
+/* ⚠ THE PHONE KEEPS THE TAPE. The brief's instruction, and it is the right
+   one: the identity band is the reason the page does not look like a list of
+   tables, so collapsing it behind a hamburger on the device it is most often
+   read on would delete the identity exactly where it is needed. It gets
+   smaller, the set cells scroll sideways in their own box, and that is all. */
+@media (max-width:560px){
+  .cs-tape{margin-top:12px;grid-template-columns:minmax(0,1fr)}
+  .cs-pad{display:none}
+  .cs-teams{grid-row:2;grid-column:1;padding:8px 12px}
+  .cs-cells{grid-row:3;grid-column:1;border-left:0;
+    border-top:2px dashed rgba(245,241,232,.3);
+    padding:9px 12px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .cs-ctx{grid-row:4;padding:8px 12px;font-size:12px}
+  .cs-side{grid-template-columns:26px 22px minmax(0,1fr) 28px;gap:7px}
+  .cs-quiet .cs-side{grid-template-columns:26px 22px minmax(0,1fr)}
+  .cs-side img,.cs-nologo{width:20px;height:20px}
+  .cs-nm{font-size:17px}
+  .cs-sets{font-size:21px}
+  .cs-cell{width:34px}
+  .cs-at{padding-left:55px}
+  .cs-status{gap:0 14px;font-size:10px;padding-top:7px}
+}
+
+/* COURTSIGNAL-VIEWS-CSS-BEGIN */
+/* ══ COURT SIGNAL ON THE PRIORITY SCREENS ═════════════════════════════════
+   The tape is the one bold move. Everything below is the opposite discipline:
+   the same court geometry and the same five colours, applied as STRUCTURE --
+   a rule, an edge, a texture -- so the screens read as one system without any
+   of them competing with the band at the top.
+
+   ⚠ NOTHING HERE CHANGES A NUMBER, A ROUTE OR A PIECE OF MARKUP. It is edges,
+   grounds and type. The one markup change in this phase is the team header
+   gaining its own programme colour, which comes from COLORS -- measured from
+   each school's own logo -- and is absent rather than invented when we do not
+   hold one. */
+
+/* ── TEAM PAGE: a programme identity panel ─────────────────────────────── */
+#teamcard>.thead.cs-prog{padding:16px 18px 15px;
+  border-left:4px solid var(--tc,var(--cs-blue));
+  border-bottom:2px solid var(--cs-edge2);
+  background:linear-gradient(90deg,
+    color-mix(in oklab,var(--tc,var(--cs-blue)) 13%,transparent),
+    transparent 46%)}
+#teamcard>.thead.cs-prog::before{opacity:.5}
+
+/* ── RANKINGS / TOP 25: a strong editorial index ───────────────────────── */
+/* ⚠ NUMBERED MARKERS ARE USUALLY DECORATION AND HERE THEY ARE THE DATA. A
+   ranking IS an ordered index, so setting the rank as an index -- large,
+   right-aligned, tabular, in the display face -- encodes something true. The
+   same treatment on a list that merely happens to have rows would be the
+   generic move. The rule sizes already shipped; this adds the court ground
+   under the table head so the board reads as a board. */
+.t25 thead th{background:rgba(31,102,209,.09);
+  border-bottom:2px solid var(--cs-edge2);
+  font:700 10px/1 var(--disp);letter-spacing:.15em;text-transform:uppercase}
+.t25 tbody tr td:first-child::before{width:4px}
+
+/* ⚠ THE PRIVATE SURFACES' COURT SIGNAL RULES ARE NOT HERE, AND THAT IS THE
+   POINT. My first version styled all three of them in this block -- which
+   sits OUTSIDE every fence, so their selectors shipped in the published
+   stylesheet. No values leaked, but three guards failed and were right to:
+   this project has already shipped a payload behind removed columns once, and
+   "the markup is gone" is not the same claim as "it was not published". Each
+   treatment now lives inside the fence for the surface it styles, so the strip
+   carries it away with the rest of the feature, and there is one place per
+   feature rather than two.
+   ⚠ AND THE REWRITE OF THIS COMMENT IS ITSELF THE SECOND LESSON: naming those
+   features here, in an unfenced block, tripped the public gate on the marker
+   words alone. A comment that documents a removed section both describes
+   something that is not there and fails the check. Say "three private
+   surfaces"; the fences say which. */
+/* COURTSIGNAL-VIEWS-CSS-END */
+/* COURTSIGNAL-TAPE-CSS-END */
 nav{position:sticky;top:0;z-index:6;
   background:linear-gradient(180deg,rgba(12,23,45,.88),rgba(8,14,28,.92));
   backdrop-filter:saturate(1.6) blur(14px);
@@ -1825,9 +2138,28 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 /* ⚠ THE RANK IS THE POINT OF A TOP 25, so it is sized like one. Everything
    else recedes: the crest and name carry identity, the record and form carry
    evidence, and the amber edge marks the ruler this list belongs to. */
-.t25 .rk{padding-right:10px;font:700 26px/1 var(--disp);
+/* ⚠ A PRE-EXISTING PODIUM RULE WAS WINNING ON SPECIFICITY, AND ONLY FOR THE
+   TOP THREE. `tbody tr:nth-child(1..3) td.rk{font-size:19px}` (search "THE TOP
+   THREE LOOK LIKE THE TOP THREE") is UNSCOPED -- written for the 348-row
+   rankings board, where shrinking #1..#3 to 19px from a 14px base is an
+   ENLARGEMENT. It reaches into every tbody on the site, so in the Top 25,
+   whose base is 26px, it was a REDUCTION: ranks 1-3 rendered 19px beside
+   26px for 4-25. Measured on the live page before this fix.
+
+   Specificity, which is the whole bug: the podium rule is (0,2,3) -- two
+   class-likes (.rk, :nth-child) and three elements -- while `.t25 .rk` is
+   only (0,2,0). Adding `table` and the intermediate elements makes this
+   (0,2,4), which wins on element count without `!important` and without
+   touching any other table. The podium rule still applies to the rankings
+   board, the leaders tables and the bracket seeds exactly as before -- all
+   four use `td.rk`, so scoping IT would have changed three surfaces to fix
+   one. */
+table.t25 tbody tr td.rk{padding-right:10px;font:700 26px/1 var(--disp);
   color:var(--vx-digby);font-variant-numeric:tabular-nums;text-align:right;
   width:58px}
+/* The podium idea is kept, in the direction it was meant to go: the top three
+   are LARGER here, never smaller. */
+table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 .t25 tbody tr{border-left:3px solid transparent}
 .t25 tbody tr:hover{background:rgba(233,169,61,.05)}
 .t25 tbody tr td:first-child{position:relative}
@@ -1846,7 +2178,9 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 .tsec h3 .cnt,.tsec h3 .h3n{color:var(--ink3)}
 
 @media (max-width:560px){
-  .t25 .rk{font-size:20px;width:42px;padding-right:7px}
+  /* raised to match the desktop rule above, or the 26px would win here */
+  table.t25 tbody tr td.rk{font-size:20px;width:42px;padding-right:7px}
+  table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:23px}
   .t25 td{padding:9px 8px}
 }
 
@@ -2300,10 +2634,28 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     </div>
     <div class="meta">
       <b>9</b> matches played &middot; <b>348</b> teams rated<br>
-      last result <b>Yesterday</b> &middot; built 2026-08-25 9:02 PM PT
+      last result <b>Yesterday</b> &middot; built 2026-08-25 10:19 PM PT
     </div>
   </div>
+  <!-- COURTSIGNAL-STATUS-BEGIN -->
+  <!-- ⚠ THE CONTROL ROOM STRIP. A broadcast gallery shows you the state of the
+       plant before it shows you the programme: what day it is, how fresh the
+       feed is, and whether anything is actually happening. Every value here is
+       filled in by csStatus() from data that already exists -- the build stamp,
+       today's Pacific date, and a count of live matches. It renders "quiet"
+       when nothing is live, which is a true statement rather than an empty
+       one. -->
+  <div class="cs-status" id="csstatus" role="status" aria-live="polite"></div>
+  <!-- COURTSIGNAL-STATUS-END -->
   <div class="net"></div>
+  <!-- COURTSIGNAL-TAPE-BEGIN -->
+  <!-- THE RALLY TAPE. Mounted once, here, directly under the net -- so it is
+       the visual anchor of every screen and the Match Desk opens straight into
+       it, which is both things the brief asks for from ONE instance rather
+       than two that could drift apart (R4). Empty until csTape() fills it;
+       there is no hand-written fallback markup to go stale. -->
+  <div id="cstape"></div>
+  <!-- COURTSIGNAL-TAPE-END -->
   </header>
   <nav role="tablist"><div class="inner">
     <!-- ⚠ FIVE DESTINATIONS, NOT TWELVE. A flat strip of twelve makes every
@@ -4741,6 +5093,251 @@ function todaysRead(mine, soon, liveOf) {
     '</div>';
 }
 
+/* COURTSIGNAL-JS-BEGIN */
+/* ══ THE RALLY TAPE ═══════════════════════════════════════════════════════
+   Everything below reads DESK and LIVE_BY_ID -- the same two structures the
+   Match Desk lanes read -- through the same matchState/matchScore/matchSets
+   helpers. It holds no data of its own, so it cannot disagree with the lanes
+   below it, and there is no path by which it can show something that is not
+   already in the payload.
+
+   ⚠ THE HONESTY RULES, EACH GUARDED IN test_court_signal.py:
+     1. An upcoming match shows NO score and no numbered set cells.
+     2. An unplayed set renders a court dot. Never 0. ('' is not zero -- the
+        same distinction scripts/match_state.py had to make, and for the same
+        reason: the feed serves '' and '' coerces to 0.)
+     3. The context line is a fact from the feed or it says the fact is
+        missing -- "venue not reported", never an inferred home floor.
+     4. A quiet day carries the NEXT REAL FIXTURE, or states that there is not
+        one. It never fabricates activity, and it does not animate.
+     5. The live pulse runs only while something is genuinely live.        */
+
+const CS_SETS = 5;   /* best-of-five: the shape of the diagram, not a guess */
+/* Empty string in the public build, by the same substitution the chat uses. */
+const CS_DIGBY = "";
+
+function csPick(mine, soon, liveOf) {
+  /* Which single match the tape is about, in a STATED order of preference:
+     live before finished before upcoming, and within each, ranked-vs-ranked
+     before ranked before first. No composite score -- a list of reasons, and
+     the first one that matches wins. */
+  const st = m => matchState(m, liveOf(m));
+  const rr = m => m.ar && m.hr;
+  const rk = m => m.ar || m.hr;
+  const live = mine.filter(m => st(m) === 'live');
+  if (live.length) return [live.filter(rr)[0] || live.filter(rk)[0] || live[0],
+                           'live', live.length];
+  const done = mine.filter(m => st(m) === 'final');
+  if (done.length) return [done.filter(rr)[0] || done.filter(rk)[0] ||
+                           done[done.length - 1], 'final', done.length];
+  const up = mine.filter(m => st(m) === 'upcoming');
+  if (up.length) return [up.filter(rr)[0] || up.filter(rk)[0] || up[0],
+                         'next', up.length];
+  /* nothing today -- the next real fixture on the schedule, never filler */
+  if (soon.length) {
+    const d = soon[0].d;
+    const on = soon.filter(m => m.d === d);
+    return [on.filter(rr)[0] || on.filter(rk)[0] || on[0], 'next', on.length];
+  }
+  return [null, 'none', 0];
+}
+
+function csSide(name, rk, sets, won, serving, quiet) {
+  /* ⚠ FOUR COLUMNS, FOUR CHILDREN, ALWAYS. logo() returns '' for a team we
+     hold no crest for -- which is every non-Division-I opponent -- and a
+     missing child shifts the name into the 26px crest track. The match ribbon
+     paid for this exact defect once already. */
+  return '<div class="cs-side' + (won ? ' cs-won' : '') +
+    (serving ? ' cs-serve' : '') + '">' +
+    '<span class="cs-trk">' + (rk ? '#' + esc(String(rk)) : '') + '</span>' +
+    (logo(name) || '<span class="cs-nologo"></span>') +
+    '<a class="cs-nm" href="' + routeFor('teams', slug(name)) + '">' +
+      esc(name) + '</a>' +
+    (quiet ? '' : '<span class="cs-sets">' +
+      (sets === null || sets === undefined || sets === '' ? '&mdash;' : sets) +
+      '</span>') +
+    '</div>';
+}
+
+function csCells(sets, playing) {
+  /* One cell per set of a best-of-five. A set that happened prints both
+     scores with the winner emphasised; a set that has not prints a dot. */
+  const out = [];
+  for (let i = 0; i < CS_SETS; i++) {
+    const sv = sets[i];
+    /* ⚠ A SET IS PRESENT ONLY IF BOTH SIDES CARRY A NUMBER. */
+    const a = (sv && sv.a !== '' && sv.a !== null && sv.a !== undefined)
+      ? Number(sv.a) : null;
+    const h = (sv && sv.h !== '' && sv.h !== null && sv.h !== undefined)
+      ? Number(sv.h) : null;
+    const has = a !== null && h !== null && !isNaN(a) && !isNaN(h);
+    if (!has) {
+      out.push('<div class="cs-cell cs-empty" style="--cs-i:' + i + '">' +
+        '<i>&middot;</i><i>&middot;</i></div>');
+      continue;
+    }
+    const now = playing && i === sets.length - 1;
+    out.push('<div class="cs-cell' + (now ? ' cs-now' : '') +
+      '" style="--cs-i:' + i + '">' +
+      '<i class="' + (a > h ? 'cs-cw' : '') + '">' + a + '</i>' +
+      '<i class="' + (h > a ? 'cs-cw' : '') + '">' + h + '</i></div>');
+  }
+  return '<div class="cs-cells">' + out.join('') + '</div>';
+}
+
+function csWhere(m) {
+  /* ⚠ AN INFERRED VENUE PRESENTED AS FACT IS AN R5 VIOLATION, and this page
+     has already been wrong about exactly this -- two AVCA First Serve matches
+     on a neutral floor at Fiserv Forum read as home games. The feed says it,
+     or we say it did not. */
+  if (!m.venue) return '<span class="cs-unk">venue not reported</span>';
+  const city = [m.city, m.st].filter(Boolean).join(' ');
+  return '<b>' + esc(m.venue) + '</b>' + (city ? ' ' + esc(city) : '');
+}
+
+function todayPT() {
+  return new Intl.DateTimeFormat('en-CA',
+    { timeZone: 'America/Los_Angeles' }).format(new Date());
+}
+
+function csCtx(m, kind, n) {
+  /* ONE factual line. Each piece is a field that exists, or it is absent.
+     ⚠ ORDER IS BY WHAT THE READER WANTS FIRST, and that differs by state.
+     Before a match the question is WHEN; after it the question is WHERE. The
+     first version led with "venue not reported" on a fixture three days out,
+     so the loudest thing in the band was a missing field. */
+  const bits = [];
+  if (kind === 'next' && m.t) bits.push('<b>' + esc(m.t) + '</b>');
+  bits.push(csWhere(m));
+  if (m.site === 'neutral') bits.push('neutral floor');
+  if (m.event) bits.push(esc(m.event));
+  if (n > 1) {
+    /* ⚠ "ON THE CARD" WAS A FALSE SENTENCE ON A QUIET DAY. With nothing today
+       the pick falls through to the next scheduled date, so those 194 matches
+       are not on today's card at all -- and the link went to the Match Desk,
+       which would have shown none of them. Say which day, and go where they
+       actually are. */
+    const same = kind !== 'next' || m.d === todayPT();
+    bits.push('<a href="' + (same ? routeFor('desk') : routeFor('schedule')) +
+      '">' + (n - 1) + ' other' + (n > 2 ? 's' : '') +
+      (same ? ' on the card' : ' that day') + '</a>');
+  }
+  /* ⚠ TWO RANK BASES SAT INCHES APART, UNLABELLED. The tape's ranks come from
+     the scoreboard feed, which carries the AVCA poll; the readiness panel
+     directly below it ranks by Digby's Top 25. Kansas read #15 in one and #21
+     in the other on the same match. Both are right. Neither said which it was,
+     which is the R4 trap exactly -- one glyph, two meanings. */
+  if (m.ar || m.hr) bits.push('<span class="cs-unk">ranks: AVCA poll</span>');
+  return '<div class="cs-ctx">' +
+    bits.join('<span class="cs-sep">/</span>') + '</div>';
+}
+
+function csTape() {
+  const mount = document.getElementById('cstape');
+  if (!mount) return;
+  const today = new Intl.DateTimeFormat('en-CA',
+    { timeZone: 'America/Los_Angeles' }).format(new Date());
+  const liveOf = m => LIVE_BY_ID[m.gid];
+  const mine = DESK.filter(m => m.d === today);
+  const soon = DESK.filter(m => m.d > today);
+  const picked = csPick(mine, soon, liveOf);
+  const m = picked[0], kind = picked[1], n = picked[2];
+
+  /* ⚠ NOTHING SCHEDULED IS A STATE, NOT A FAILURE. The tape keeps its
+     geometry and says the true thing. Digby appears HERE and in the Intel
+     empty state and nowhere else -- a signal guide for the two moments where
+     the honest answer is "there is nothing", which is exactly where a page
+     most wants to invent something. */
+  if (!m) {
+    mount.innerHTML = '<div class="cs-tape cs-quiet cs-court" ' +
+      'data-cs-state="none"><div class="cs-none">' +
+      (CS_DIGBY ? '<span class="cs-guide">' + CS_DIGBY + '</span>' : '') +
+      '<span><b>No matches on the schedule.</b> ' +
+      'Nothing further has been published to the Division-I scoreboard feed ' +
+      'yet.</span></div></div>';
+    return;
+  }
+
+  const live = liveOf(m);
+  const st = matchState(m, live);
+  const quiet = st === 'upcoming';
+  const sc = quiet ? [null, null] : matchScore(m, live);
+  const sets = quiet ? [] : matchSets(m, live);
+  const aw = (sc[0] !== null && sc[1] !== null) && +sc[0] > +sc[1];
+  const hw = (sc[0] !== null && sc[1] !== null) && +sc[1] > +sc[0];
+  const state6 = matchState6(m, live, !!(m.final && m.final.box));
+
+  const label = st === 'live' ? 'Live' : st === 'final' ? 'Final' : 'Next serve';
+  const when = st === 'live' ? esc((live && live.period) || 'in progress')
+             : esc(dayLabel(m.d));
+  /* ⚠ THE DATE PRINTED TWICE, four inches apart -- once in the state column
+     and once at the head of the context line, because both fixes for "say
+     when" landed and neither looked at the other. The state column answers
+     WHICH DAY; the context line answers what time and where. */
+
+  /* ⚠ THE SERVE INDICATOR IS ONLY EVER SHOWN WHEN THE FEED SAYS SO, and today
+     the feed carries no such field -- so it renders on nobody. The cyan dot
+     exists in the stylesheet for the day probe_live_boxscore.py proves the
+     feed carries it; until then this reads false for both sides rather than
+     being guessed at from the score. */
+  const servingAway = false, servingHome = false;
+
+  mount.innerHTML =
+    '<div class="cs-tape cs-court ' +
+      (st === 'live' ? 'cs-live' : quiet ? 'cs-quiet' : '') +
+      '" data-cs-state="' + esc(state6) + '" data-cs-kind="' + kind + '">' +
+      '<div class="cs-st"><span class="cs-stl"><i class="cs-dot"></i>' +
+        label + '</span><span class="cs-when">' + when + '</span></div>' +
+      '<div class="cs-teams">' +
+        csSide(mAway(m), m.ar, sc[0], aw, servingAway, quiet) +
+        (quiet ? '<div class="cs-at">at</div>' : '') +
+        csSide(mHome(m), m.hr, sc[1], hw, servingHome, quiet) +
+      '</div>' +
+      /* ⚠ THE QUIET BAND KEEPS THE SET CELLS, EMPTY. Dropping them left the
+         right two-thirds of the tape as bare texture and the band stopped
+         reading as a scoreline at all. Five dashed cells with court dots in
+         them are not an invented score -- they are the SHAPE of a best-of-five
+         that has not happened, which is the true thing to show before first
+         serve. csCells([]) produces exactly that by the same code path a live
+         match uses, so there is one definition of an unplayed set (R4). */
+      csCells(sets, st === 'live') +
+      '<div class="cs-pad"></div>' +
+      csCtx(m, kind, n) +
+    '</div>';
+}
+
+function csStatus() {
+  /* The gallery readout: date, feed freshness, and an honest live/quiet word.
+     ⚠ FRESHNESS IS REPORTED, NOT ASSERTED. LIVE_STAMP is empty on a static
+     build because /api/live is not there -- which is a true and useful thing
+     to say ("feed not connected"), and a quite different claim from "stale". */
+  const el = document.getElementById('csstatus');
+  if (!el) return;
+  const today = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Los_Angeles', weekday: 'short', month: 'short',
+    day: 'numeric' }).format(new Date());
+  const liveOf = m => LIVE_BY_ID[m.gid];
+  const day = new Intl.DateTimeFormat('en-CA',
+    { timeZone: 'America/Los_Angeles' }).format(new Date());
+  const nlive = DESK.filter(m => m.d === day &&
+                                 matchState(m, liveOf(m)) === 'live').length;
+  /* ⚠ I SLICED A STRING WHOSE FORMAT I HAD NEVER LOOKED AT. The first
+     version printed LIVE_STAMP.slice(11,16), assuming an ISO timestamp. The
+     server actually sends "8:59:54 PM PT", so characters 11-16 are "PT" -- and
+     the strip read "PT feed", a made-up value rendered with total confidence
+     in the masthead. Measured, not reasoned about: fetch('/api/live').updated.
+     Print what the server said. */
+  const feed = LIVE_STAMP
+    ? 'feed <b class="cs-fresh">' + esc(String(LIVE_STAMP)) + '</b>'
+    : '<b class="cs-stale">feed not connected</b>';
+  el.innerHTML =
+    '<span>' + esc(today) + ' PT</span>' +
+    '<span>' + feed + '</span>' +
+    '<span>' + (nlive ? '<b class="cs-fresh">' + nlive + ' live</b>'
+                      : '<b>quiet</b>') + '</span>';
+}
+/* COURTSIGNAL-JS-END */
+
 function renderDesk() {
   const todayBox = document.getElementById('desktodaycards');
   if (!todayBox) return;
@@ -4883,6 +5480,7 @@ async function deskLive() {
     LIVE_BY_ID = {};
   }
   renderDesk();
+  /* COURTSIGNAL-CALL-BEGIN */ csTape(); csStatus(); /* COURTSIGNAL-CALL-END */
   /* ⚠ THE DETAIL MUST RE-EVALUATE WHEN LIVE DATA LANDS. deskLive() is async and
      resolves AFTER the router has already painted, so a match that is live on
      the feed rendered as "upcoming" -- no Live stats section, no timer -- and
@@ -5667,6 +6265,12 @@ const TEAMS = {"Nebraska":{"conf":"Big Ten","rank":1,"power":85.4,"resume_rank":
 if (!location.hash) { history.replaceState(null, '', routeFor('desk')); }
 route();
 if (typeof mbRenderAll === 'function') mbRenderAll();
+/* COURTSIGNAL-CALL2-BEGIN */
+/* Painted at boot from the static payload, then repainted whenever the live
+   poll lands. TWO CALL SITES, ONE FUNCTION -- the tape can never be a
+   different opinion from the lanes underneath it. */
+try { csTape(); csStatus(); } catch (e) { }
+/* COURTSIGNAL-CALL2-END */
 const dl = document.getElementById('tmlist');
 Object.keys(TEAMS).sort().forEach(n => {
   const o = document.createElement('option'); o.value = n; dl.appendChild(o);
@@ -6132,7 +6736,15 @@ function showTeam(name) {
         'was saved \u2014 anything that did not match was thrown away rather ' +
         'than shown.</div></div>'
       : '') +
-    '<div class="thead"><h2>' + logo(name, 'lg') + name + '</h2>' +
+    /* COURTSIGNAL-THEAD-BEGIN */
+    /* PROGRAMME IDENTITY, from the school's own logo colour rather than a
+       palette I chose. COLORS is the extracted map (373 of 384 teams); a team
+       with no readable colour gets NO edge, not an invented hue -- the same
+       rule crawl_team_colors.py already enforces for the avatars. */
+    '<div class="thead cs-court cs-prog"' +
+      (COLORS[name] ? ' style="--tc:' + esc(COLORS[name]) + '"' : '') +
+      '><h2>' + logo(name, 'lg') + name + '</h2>' +
+    /* COURTSIGNAL-THEAD-END */
     '<div class="sub">' + (t.conf || '') +
       (t.record25 ? ' \u00b7 ' + t.record25 + ' in 2025' : '') + '</div>' +
     /* ⚠ TWELVE CHIPS AT EQUAL WEIGHT SAY NOTHING ABOUT WHAT MATTERS. The
