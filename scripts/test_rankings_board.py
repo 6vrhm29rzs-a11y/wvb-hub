@@ -193,9 +193,16 @@ def main():
                                json.loads(line).get("week")))
                 except ValueError:
                     pass
+    # ⚠ COUNT BASES THROUGH THE SAME ALIAS THE CODE USES. "digby" and "blend"
+    # are one ruler under two spellings; counting the raw strings said no basis
+    # had two weeks while the page -- correctly, via BASIS_ALIASES -- saw two
+    # and drew movement. The guard then failed a page that was right.
+    sys.path.insert(0, os.path.join(REPO, "scripts"))
+    from snapshot_rankings import basis as _basis
     per_basis = {}
     for src_, wk in bases:
-        per_basis[src_] = per_basis.get(src_, 0) + 1
+        b = _basis(src_)
+        per_basis[b] = per_basis.get(b, 0) + 1
     enough = any(v >= 2 for v in per_basis.values())
     if not enough:
         check("[-] no movement is drawn without two same-basis weeks",

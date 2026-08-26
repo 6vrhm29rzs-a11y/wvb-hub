@@ -582,6 +582,67 @@ no duplicate cutoff, W35 intact, AVCA once-per-stamp, Monday cron present, and
 the community poll reaching nothing. **Four negative controls, all verified to
 trip.**
 
-**State at close:** 26 suites pass with `Cody/` present and 24 with it moved
+## 12. FIXTURE TRUTH LEDGER
+
+**THE PROBLEM.** The weekly gate treated every non-final fixture as pending, so
+the 39 records ncaa.com had already removed from Aug 21-22 blocked Week 34
+permanently. A gate that always needs `--force` is not a gate.
+
+**THE EVIDENCE RULE (`scoreboard-absence-v1`), and it contains no invented
+threshold.** A non-final fixture is `source_withdrawn` only when ALL of:
+1. its Eastern date is strictly past;
+2. we hold a saved scoreboard observation of that exact date (all 139 are
+   committed, so every verdict is reproducible from the repo);
+3. that observation was taken at or after the fixture's own scheduled start;
+4. **every game the observation lists is FINAL** -- the source has finished
+   with the date; and
+5. the fixture is absent from it.
+
+Point 4 is what replaces "it is old enough". A cutoff in hours would have been
+a number I chose, which is exactly the kind of threshold that makes a verdict
+meaningless (R1). ⚠ **The observation stamp is read as UTC, the conservative
+choice** -- it places the observation earlier in Eastern terms, so an ambiguity
+in the source can only withhold evidence, never manufacture it.
+
+**FINAL DISPOSITION COUNTS (2026):** `source_withdrawn` **41**, `final` 9,
+`scheduled_or_live` 4,803, **`unknown` 0**. Through the Aug 23 cutoff: 39
+non-final, **all 39 evidenced**, none assumed.
+
+**WEEK 34 FROZE NORMALLY -- no `--force`.** 348 teams, 7 finals included, 39
+source-withdrawn excluded, state `complete_with_withdrawals`.
+
+**Three states, and publishable is not complete.** A week whose only gap is
+documented withdrawals does not get to say "complete". A forced row is stamped
+`forced` forever with the count and reasons it overrode.
+
+⚠ **NOTHING ELSE STOPS BLOCKING.** Live, pending, unknown, no observation,
+observation too early, source not finished with the date, still listed -- all
+still block. With no ledger present the gate behaves exactly as before.
+
+⚠ **THE SAME ALIAS DRIFT APPEARED FOR A THIRD TIME.** `"digby"` vs `"blend"`
+is one ruler under two spellings. `SOURCES` did not list `blend` even though
+the writer could already emit it; the Top 25's movement matched the string
+exactly and so ignored the first real weekly freeze, still printing "vs
+preseason" with a prior week sitting in the archive; and my own new guard
+counted raw strings. All three now go through `snapshot_rankings.basis()`.
+**Week uniqueness is per TRACK**: a weekly freeze keys on the Sunday it covers,
+the legacy rows on the day they were captured, and both can read "2026-W34".
+
+⚠ **TWO TESTS ASSERTED THINGS THAT STOPPED BEING TRUE, AND BOTH WERE RIGHT TO
+FAIL.** "The Top 25 names its biggest movers" -- with the freeze taken from the
+same data the board shows, nothing had moved, and printing a movers line would
+have been inventing movement to satisfy a test. And an alias negative control
+**expires by design** once a canonical row exists. Both now assert the honest
+invariant instead.
+
+**Guards:** `scripts/test_fixture_disposition.py` (27th suite) -- final
+included; live blocks; date-not-passed blocks; **old-with-no-evidence blocks**;
+observation-too-early blocks; source-not-finished blocks; still-listed blocks;
+evidenced withdrawal does not block and stays visible; one unknown blocks the
+whole week; Monday/Eastern/Hawaii unchanged; the real 39 carry evidence; the
+ledger writes exactly one file and deletes nothing; no suite can touch raw logs
+or the real history. **Four negative controls verified to trip.**
+
+**State at close:** 27 suites pass with `Cody/` present and 24 with it moved
 aside. Tree is clean apart from the three fixes above. Nothing here changes
 data, ratings, or the crawl -- all three are display-layer only.

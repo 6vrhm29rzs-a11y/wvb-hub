@@ -95,7 +95,11 @@ def existing_weeks():
 # MONDAYS the mismatch lay dormant for a week and then failed the first real
 # Monday of the season -- taking the commit step with it, so the one artifact
 # that cannot be rebuilt was never archived.
-SOURCES = ("digby", "live", "preseason")
+# ⚠ "blend" WAS MISSING AND THE WRITER COULD ALREADY EMIT IT. current_ranking()
+# returns "blend" for the Top-25 blend; this tuple still listed only the older
+# "digby" spelling, so the first row actually written with the new name failed
+# the archive-shape guard -- the SECOND time this exact drift has happened.
+SOURCES = ("blend", "digby", "live", "preseason")
 
 
 def current_ranking():
@@ -199,7 +203,7 @@ def main():
     # being played is not a poll, and a partial one would be indistinguishable
     # from a complete one a week later.
     st = weekly.status(SEASON, today=today)
-    if st["state"] != "complete" and not force:
+    if not st["publishable"] and not force:
         blocking = st["blocking"]
         why = {}
         for b in blocking:
@@ -213,9 +217,10 @@ def main():
         if len(blocking) > 5:
             print("    ... and %d more" % (len(blocking) - 5))
         print("  The calendar shows this as WAITING. Nothing partial is saved.")
-        print("  A stale match can never resolve on its own (ncaa.com removes "
-              "fixtures from past dates); clearing it is a deliberate act: "
-              "snapshot_rankings.py --force")
+        print("  A fixture the SOURCE has withdrawn no longer blocks -- see "
+              "scripts/fixture_disposition.py, which evidences that from the "
+              "saved scoreboard for the date. Anything still listed here is "
+              "genuinely unresolved, not merely old.")
         return 0
 
     rows, source = current_ranking()
@@ -236,21 +241,46 @@ def main():
         "source": source,
         "source_tier": "DERIVED",
         "finals_included": st["finals"],
-        # "complete" means every match through the cutoff was final when this
-        # was written. "forced" means a human overrode the gate, and the count
-        # it overrode is kept so the two can never be confused later.
-        "completeness": ("complete" if st["state"] == "complete" else "forced"),
+        # ⚠ THREE STATES, AND A FORCED ROW IS MARKED FOREVER.
+        #   complete                  -- every match through the cutoff played
+        #   complete_with_withdrawals -- the rest were withdrawn BY THE SOURCE,
+        #                                with evidence, and are listed below
+        #   forced                    -- a human overrode a real blocker
+        # A forced row can never later be read as either of the other two, and
+        # it keeps the count and the reasons it overrode.
+        "completeness": (st["state"] if st["publishable"] else "forced"),
         "blocking_at_capture": len(st["blocking"]),
-        "note": ("Frozen after every match through the cutoff went final. "
-                 "Append-only: a past week is never rewritten, so this records "
-                 "what we actually said at the time, not what the current model "
-                 "would say about the past."),
+        "blocking_reasons": sorted(set(b["why"] for b in st["blocking"])),
+        "withdrawn_excluded": len(st["withdrawn"]),
+        # The policy that produced those verdicts, stamped at capture: a later
+        # change to the evidence rule must not silently reinterpret this row.
+        "disposition_policy": st.get("policy"),
+        # ⚠ THE NOTE MUST DESCRIBE THIS ROW, NOT THE HAPPY CASE. It said
+        # "after every match through the cutoff went final", which is false of
+        # a row that excluded withdrawn fixtures -- a sentence that would have
+        # quietly overstated the archive every week from here on.
+        "note": (("Frozen after every match through the cutoff went final."
+                  if st["state"] == "complete" else
+                  ("Frozen after every match through the cutoff was either "
+                   "final or withdrawn by the source. %d withdrawal(s) were "
+                   "excluded, each evidenced by the saved scoreboard for its "
+                   "date." % len(st["withdrawn"]))
+                  if st["publishable"] else
+                  ("FORCED. %d match(es) through the cutoff were still "
+                   "unresolved when this was written; a human overrode the "
+                   "gate. This row is not a complete week."
+                   % len(st["blocking"])))
+                 + " Append-only: a past week is never rewritten, so this "
+                   "records what we actually said at the time, not what the "
+                   "current model would say about the past."),
         "teams": rows,
     }
     with open(OUT, "a") as fh:
         fh.write(json.dumps(rec) + "\n")
-    print("captured %s (%s): %d teams, %d finals -> %s"
-          % (label, source, len(rows), st["finals"], OUT))
+    print("captured %s (%s): %d teams, %d finals, %d source-withdrawn "
+          "excluded, state=%s -> %s"
+          % (label, source, len(rows), st["finals"], len(st["withdrawn"]),
+             rec["completeness"], OUT))
     return 0
 
 

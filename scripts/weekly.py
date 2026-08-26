@@ -121,15 +121,29 @@ def _load_games(path):
     return list(best.values())
 
 
-def completeness(games, cutoff, now_epoch, season_start=None):
-    # type: (List[Dict], datetime.date, int, Optional[str]) -> Dict[str, Any]
+def completeness(games, cutoff, now_epoch, season_start=None,
+                 disposition=None):
+    # type: (List[Dict], datetime.date, int, Optional[str], Optional[Dict]) -> Dict[str, Any]
     """Can a weekly freeze be written for this cutoff, and if not, why not?
 
     Only DIVISION-I matches count. A non-D-I fixture on the scoreboard is not
     part of the ranking and must not hold a poll open.
+
+    ⚠ A WITHDRAWN FIXTURE STOPS BLOCKING; NOTHING ELSE DOES. `disposition` maps
+    game_id -> the Fixture Truth Ledger's verdict. A fixture the SOURCE ITSELF
+    no longer lists, evidenced by a saved observation of a date it has already
+    published finals for, is counted as withdrawn rather than pending -- it is
+    not going to resolve, because there is nothing left to resolve. Everything
+    else (live, pending, unknown, no evidence) still blocks, because "we cannot
+    prove what happened" is not the same as "nothing happened".
+
+    Pass `disposition=None` and this behaves exactly as it did before: every
+    non-final match blocks. The ledger can only ever REMOVE a blocker it has
+    evidence for.
     """
     cut = cutoff.isoformat()
-    finals, blocking = [], []
+    disp = disposition or {}
+    finals, blocking, withdrawn = [], [], []
     for g in games:
         d = et_date(g.get("start_time_epoch"))
         if not d or d > cut:
@@ -143,26 +157,66 @@ def completeness(games, cutoff, now_epoch, season_start=None):
         if state == FINAL:
             finals.append(g.get("game_id"))
             continue
+        gid = str(g.get("game_id"))
+        row = {
+            "game_id": g.get("game_id"), "date": d, "state": state,
+            "teams": [t.get("name_short") for t in teams][:2],
+        }
+        if disp.get(gid) == "source_withdrawn":
+            row["why"] = "withdrawn"
+            withdrawn.append(row)
+            continue
         ep = g.get("start_time_epoch") or 0
         age_h = (now_epoch - int(ep)) / 3600.0 if ep else 0.0
         if state in LIVE_STATES:
-            why = "live"
+            row["why"] = "live"
+        elif disp.get(gid) == "unknown":
+            row["why"] = "unknown"
         elif age_h > STALE_AFTER_HOURS:
-            why = "stale"
+            row["why"] = "stale"
         else:
-            why = "unresolved"
-        blocking.append({
-            "game_id": g.get("game_id"), "date": d, "state": state, "why": why,
-            "teams": [t.get("name_short") for t in teams][:2],
-        })
+            row["why"] = "unresolved"
+        blocking.append(row)
     blocking.sort(key=lambda b: (b["date"], str(b["game_id"])))
+    withdrawn.sort(key=lambda b: (b["date"], str(b["game_id"])))
+    # ⚠ THREE STATES, NOT TWO. A week whose only gap is documented withdrawals
+    # is publishable, but it is NOT the same thing as a week where every
+    # scheduled match was played -- so it does not get to say "complete" on
+    # its own. The distinction is carried into the archive row.
+    if blocking:
+        state_ = "waiting"
+    elif withdrawn:
+        state_ = "complete_with_withdrawals"
+    else:
+        state_ = "complete"
     return {
         "cutoff": cut,
         "cutoff_tz": "America/New_York",
         "finals": len(finals),
         "blocking": blocking,
-        "state": "complete" if not blocking else "waiting",
+        "withdrawn": withdrawn,
+        "state": state_,
+        "publishable": not blocking,
     }
+
+
+def disposition(season, root=None):
+    # type: (int, Optional[str]) -> Dict[str, str]
+    """game_id -> disposition, from the Fixture Truth Ledger if it exists.
+
+    Missing ledger means an EMPTY map, which means every non-final match
+    blocks. The gate is never loosened by the absence of evidence.
+    """
+    p = os.path.join(root or REPO, "data",
+                     "fixture_disposition_%d.json" % season)
+    if not os.path.exists(p):
+        return {}
+    try:
+        doc = json.load(open(p))
+    except ValueError:
+        return {}
+    return dict((str(f.get("game_id")), f.get("disposition"))
+                for f in (doc.get("fixtures") or []))
 
 
 def status(season, today=None, now_epoch=None):
@@ -173,8 +227,21 @@ def status(season, today=None, now_epoch=None):
     cutoff = prior_sunday(today)
     games = _load_games(os.path.join(REPO, "data", "raw", str(season),
                                      "games.jsonl"))
-    c = completeness(games, cutoff, now_epoch)
+    c = completeness(games, cutoff, now_epoch, disposition=disposition(season))
     c["week"] = iso_week(cutoff)
     c["label"] = week_label(cutoff)
     c["captured_utc"] = None
+    c["policy"] = _policy(season)
     return c
+
+
+def _policy(season, root=None):
+    """The disposition policy in force, stamped into each archive row."""
+    p = os.path.join(root or REPO, "data",
+                     "fixture_disposition_%d.json" % season)
+    if not os.path.exists(p):
+        return None
+    try:
+        return json.load(open(p)).get("policy")
+    except ValueError:
+        return None

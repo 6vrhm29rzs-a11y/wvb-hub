@@ -231,7 +231,23 @@ def test_the_two_rankings_explain_their_relationship():
         check("strength ranking, not a r&eacute;sum&eacute;" in h
               or "strength</b> ranking" in h,
               "a moving strength ranking still says it is not a resume (R3)")
-    check("Biggest movers" in h, "the Top 25 names its biggest movers")
+    # ⚠ MOVERS EXIST OR THEY DO NOT, AND BOTH ARE HONEST STATES. This asserted
+    # the line was ALWAYS present. The moment the weekly freeze landed, the
+    # comparison basis became a snapshot taken from the same data the board is
+    # showing -- so nothing had moved, and printing a "biggest movers" line
+    # would have been inventing movement to satisfy a test. The real invariant
+    # is that the line appears exactly when something moved.
+    import re as _re
+    _mv = _re.findall(r'<th title="how the rank changed">([^<]*)</th>', h)
+    _marks = _re.findall(r'class="t25mv (up|dn)"', h)
+    if _marks:
+        check("Biggest movers" in h,
+              "the Top 25 names its biggest movers when there are any")
+    else:
+        check("Biggest movers" not in h,
+              "[-] no movers line is drawn when nothing has moved")
+        print("     (no team moved against %s -- correctly silent)"
+              % (_mv[0] if _mv else "the prior week"))
 
 
 def test_the_season_term_is_opponent_adjusted():

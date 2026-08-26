@@ -133,8 +133,13 @@ def main():
               "Through Sunday," in h)
         check("the calendar states the waiting rule",
               "Nothing partial is saved" in h)
-        check("...and explains what stale means",
-              "removes fixtures from past dates" in h)
+        # ⚠ THIS COPY IS CONDITIONAL NOW. The withdrawal explanation renders
+        # only while something is actually blocking; with a clean week it is
+        # correctly absent from the DOM. Assert the page CAN say it.
+        check("...and can explain why a withdrawn fixture stops blocking",
+              "has <b>withdrawn</b> no longer blocks" in h)
+        check("...and names the disposition policy on the active week",
+              "Disposition policy" in h)
         # The tag class is applied at render time ('caltag ' + tagcls), so the
         # joined string is never a literal. Assert the pieces that are.
         check("the three track kinds are styled distinctly",

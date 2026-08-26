@@ -1879,6 +1879,8 @@ def calendar_tracks():
                 "captured": r.get("captured_utc") or r.get("date"),
                 "n": n,
                 "finals": r.get("finals_included"),
+                "withdrawn": r.get("withdrawn_excluded"),
+                "policy": r.get("disposition_policy"),
                 "completeness": r.get("completeness") or ("legacy" if legacy else None),
                 "source": r.get("source"),
                 "partial": n < 300,
@@ -1892,10 +1894,21 @@ def calendar_tracks():
         by = {}
         for b in st["blocking"]:
             by[b["why"]] = by.get(b["why"], 0) + 1
+        # ⚠ BLOCKERS GROUPED, NOT NARRATED. A list of 39 fixtures is a wall;
+        # "29 withdrawn, 0 live, 0 unknown" is the same information a reader
+        # can act on. Each group keeps a couple of examples so it is checkable
+        # rather than merely asserted.
+        eg = {}
+        for b in st["blocking"]:
+            eg.setdefault(b["why"], []).append(
+                "%s %s" % (b["date"], " v ".join(x or "?" for x in b["teams"])))
         out["waiting"] = {
             "label": st["label"], "cutoff": st["cutoff"], "state": st["state"],
             "finals": st["finals"], "blocking": len(st["blocking"]),
-            "why": by,
+            "why": by, "examples": dict((k, v[:3]) for k, v in eg.items()),
+            "withdrawn": len(st["withdrawn"]),
+            "policy": st.get("policy"),
+            "publishable": st.get("publishable"),
             "frozen": any(d.get("cutoff") == st["cutoff"] for d in out["digby"]),
         }
     except Exception:                                    # noqa: BLE001
@@ -2067,6 +2080,7 @@ def top25_view(avca=None):
     # different rulers, the mistake `test_rankings_history.py` was written for.
     # Until such a week exists, fall back to the preseason order and LABEL it.
     pre, basis = {}, "preseason"
+    from snapshot_rankings import basis as _basis
     hist_p = os.path.join(REPO, "data", "rankings_history_%d.jsonl" % SEASON)
     if os.path.exists(hist_p):
         import datetime as _dt
@@ -2078,9 +2092,24 @@ def top25_view(avca=None):
                 row = json.loads(line)
             except ValueError:
                 continue
-            if row.get("source") != "digby" or row.get("week") == this_week:
+            # ⚠ MATCH THE BASIS, NOT THE SPELLING. This read
+            # `row.get("source") != "digby"`, an exact string -- so the first
+            # weekly freeze, written canonically as "blend", was skipped and
+            # the Top 25 kept saying "vs preseason" with a real prior week
+            # sitting in the archive. THIRD place this same alias drift has
+            # appeared; it goes through snapshot_rankings.basis() now, which is
+            # the one definition of what a ruler is called.
+            if _basis(row.get("source")) != "blend" or \
+                    row.get("week") == this_week:
                 continue
-            if best is None or (row.get("week") or "") > (best.get("week") or ""):
+            # ⚠ PREFER A COMPLETED WEEKLY FREEZE. The legacy row stored only
+            # the 35 displayed teams, so comparing against it would leave
+            # movement blank for everyone below 35 -- a real prior week beats a
+            # partial one even when the partial is more recent.
+            def _key(r):
+                return (1 if r.get("track") == "digby_weekly" else 0,
+                        r.get("cutoff") or r.get("week") or "")
+            if best is None or _key(row) > _key(best):
                 best = row
         if best:
             for r in (best.get("ranking") or best.get("teams") or []):
@@ -5254,6 +5283,33 @@ td.wh .wu{color:var(--ink3);font-style:italic}
   background:rgba(242,180,65,.12);padding:1px 5px;border-radius:3px;
   margin-left:5px}
 .caltbl .dim{color:var(--ink3)}
+
+
+/* the active week's counts, read at a glance */
+.calcounts{display:flex;flex-wrap:wrap;gap:6px 18px;margin:2px 0 10px;
+  font-size:12.5px;color:var(--ink2)}
+.calcounts b{font:700 15px/1 var(--disp);color:var(--chalk);margin-right:4px}
+.calcounts .bad b{color:#F2B441}
+.calnow.okw{border-left-color:#8FD3FF}
+.calblock{list-style:none;margin:0 0 10px;padding:0;display:flex;
+  flex-direction:column;gap:5px}
+.calblock li{display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+  font-size:12px;color:var(--ink2)}
+.calblock b{font:700 12px/1 var(--mono);color:var(--chalk)}
+.calblock i{font-style:normal;font-size:11px;color:var(--ink3);
+  background:var(--line);padding:1px 6px;border-radius:3px;white-space:nowrap}
+.calblock i.more{background:none;padding-left:0}
+.calwhy{font:700 8.5px/1.5 var(--disp);letter-spacing:.09em;
+  text-transform:uppercase;padding:2px 6px;border-radius:3px;
+  background:var(--line);color:var(--ink3)}
+.calwhy.live{color:#F2B441;background:rgba(242,180,65,.14)}
+.calwhy.unknown{color:#FF9E9E;background:rgba(255,120,120,.12)}
+.calstate.complete_with_withdrawals{color:#8FD3FF;background:rgba(91,168,245,.12)}
+@media (max-width:560px){
+  .calcounts{gap:4px 14px;font-size:12px}
+  .calcounts b{font-size:14px}
+  .calblock i{font-size:10.5px}
+}
 
 /* ⚠ PHONE: the calendar is the surface a voter checks ON A PHONE on a Monday,
    so it becomes a stack of labelled rows rather than four columns squeezed
@@ -9744,25 +9800,54 @@ function renderCalendar() {
   /* THE ACTIVE WEEK, said first and said plainly. */
   let head = '';
   if (w) {
-    const done = w.frozen;
+    /* ⚠ THREE STATES ON THE FACE OF IT, and "publishable" is not "complete".
+       A week whose only gap is fixtures the SOURCE withdrew can be published,
+       but it is not a week where every scheduled match was played, and it
+       does not get to claim that. */
+    const cls = w.blocking ? 'wait' : (w.withdrawn ? 'okw' : 'ok');
+    const counts =
+      '<div class="calcounts">' +
+      '<span><b>' + w.finals + '</b> final' + (w.finals === 1 ? '' : 's') +
+      ' included</span>' +
+      (w.withdrawn
+        ? '<span title="Fixtures the source itself no longer lists for their ' +
+          'date, each evidenced by the saved scoreboard for that date. They ' +
+          'are excluded, never deleted."><b>' + w.withdrawn +
+          '</b> source-withdrawn excluded</span>' : '') +
+      '<span class="' + (w.blocking ? 'bad' : '') + '"><b>' + w.blocking +
+      '</b> unresolved</span>' +
+      '</div>';
+    /* Blockers grouped, with a couple of examples each -- not a wall. */
+    const groups = Object.keys(w.why || {});
+    const list = groups.length
+      ? '<ul class="calblock">' + groups.map(k =>
+          '<li><span class="calwhy ' + esc(k) + '">' + esc(k) + '</span>' +
+          '<b>' + w.why[k] + '</b>' +
+          ((w.examples || {})[k] || []).map(x =>
+            '<i>' + esc(x) + '</i>').join('') +
+          (w.why[k] > ((w.examples || {})[k] || []).length
+            ? '<i class="more">+' +
+              (w.why[k] - ((w.examples || {})[k] || []).length) + ' more</i>'
+            : '') + '</li>').join('') + '</ul>'
+      : '';
     head =
-      '<div class="calnow ' + (done ? 'ok' : 'wait') + '">' +
+      '<div class="calnow ' + cls + '">' +
       '<div class="calnowhead"><span class="caltag derived">Derived</span>' +
-      '<b>' + esc(w.label) + '</b></div>' +
-      (done
-        ? '<p>Frozen. ' + w.finals + ' final' + (w.finals === 1 ? '' : 's') +
-          ' counted through this cutoff.</p>'
-        : '<p><b>Waiting.</b> ' + w.finals + ' match' +
-          (w.finals === 1 ? '' : 'es') + ' through this cutoff ' +
-          (w.finals === 1 ? 'is' : 'are') + ' final, and <b>' + w.blocking +
-          '</b> ' + (w.blocking === 1 ? 'is' : 'are') + ' not: ' +
-          Object.keys(w.why).map(k => w.why[k] + ' ' + k).join(', ') +
-          '. Nothing partial is saved \u2014 a weekly freeze is written only ' +
-          'once every match through the cutoff is final.</p>' +
-          '<p class="calfine">A <b>stale</b> match cannot resolve on its own: ' +
-          'ncaa.com removes fixtures from past dates, so those records can ' +
-          'never be refetched. Clearing them is a deliberate act, not an ' +
-          'automatic decision to ignore missing results.</p>') +
+      '<b>' + esc(w.label) + '</b>' +
+      '<span class="calstate ' + esc(w.state) + '">' +
+      esc(String(w.state).replace(/_/g, ' ')) + '</span></div>' +
+      counts + list +
+      (w.blocking
+        ? '<p class="calfine">Nothing partial is saved. A fixture the source ' +
+          'has <b>withdrawn</b> no longer blocks \u2014 that is evidenced from ' +
+          'the saved scoreboard for its date. Anything above is genuinely ' +
+          'unresolved, not merely old.</p>'
+        : (w.frozen
+            ? '<p class="calfine">Frozen and archived.</p>'
+            : '<p class="calfine">Ready to freeze on the next Monday run.</p>')) +
+      (w.policy
+        ? '<p class="calfine">Disposition policy <code>' + esc(w.policy) +
+          '</code>.</p>' : '') +
       '</div>';
   }
 
@@ -9778,7 +9863,7 @@ function renderCalendar() {
     '</div>';
 
   /* DIGBY WEEKLY -- ours, derived. */
-  const DG_COLS = ['Week', 'Through', 'Teams', 'Finals', 'State'];
+  const DG_COLS = ['Week', 'Through', 'Teams', 'Finals', 'Withdrawn', 'State'];
   const dg = (CAL.digby || []).slice().reverse().map(r => calRow([
     esc(r.label),
     r.cutoff ? esc(r.cutoff) : '<span class="dim">not stated</span>',
@@ -9789,6 +9874,8 @@ function renderCalendar() {
         'partial</b>' : ''),
     r.finals === null || r.finals === undefined
       ? '<span class="dim">&ndash;</span>' : r.finals,
+    r.withdrawn === null || r.withdrawn === undefined
+      ? '<span class="dim">&ndash;</span>' : r.withdrawn,
     r.legacy
       ? '<span class="calstate legacy" title="Written before the weekly ' +
         'cutoff rule existed. Kept exactly as archived.">archived</span>'

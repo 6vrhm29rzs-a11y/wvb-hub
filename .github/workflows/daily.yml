@@ -184,6 +184,13 @@ jobs:
           # build_vb.py is superseded and no longer run; kept on disk only as
           # the record of the old template.
           python3 scripts/project_lineups.py || echo "no lineups yet; continuing"
+          # ⚠ THE FIXTURE TRUTH LEDGER RUNS FIRST, because the freeze reads
+          # it. It classifies every non-final fixture as final /
+          # scheduled_or_live / source_withdrawn / unknown from the SAVED
+          # scoreboard observations, which are committed -- so the verdicts
+          # are reproducible by anyone with the repo. It writes one derived
+          # file and never touches a raw log.
+          python3 scripts/fixture_disposition.py || echo "disposition unavailable; the freeze will simply block; continuing"
           # ⚠ THE WEEKLY FREEZE, AND WHY IT SITS HERE AND NOT EARLIER.
           # A Digby Weekly covers every match through the PRIOR SUNDAY in
           # Eastern, and it is written only when all of them are final. So it
@@ -281,6 +288,7 @@ jobs:
           python3 scripts/test_player_aggregation.py
           python3 scripts/test_rankings_board.py
           python3 scripts/test_weekly_calendar.py
+          python3 scripts/test_fixture_disposition.py
           python3 scripts/test_freshness_refresh.py
           python3 scripts/test_pipeline_fresh_checkout.py
 
@@ -325,6 +333,11 @@ jobs:
           # Verified in a scratch repo. The archive does not exist until the
           # first Monday of a season, so this WILL be unmatched each new year.
           git add data/rankings_history_*.jsonl 2>/dev/null || true
+          # The derived fixture ledger. Committed because it is the AUDIT of
+          # why a fixture stopped blocking a freeze -- a verdict nobody can
+          # check is not evidence. Same tolerant form: it does not exist until
+          # the first run of a season.
+          git add data/fixture_disposition_*.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "nothing changed"
           else

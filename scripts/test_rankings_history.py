@@ -92,9 +92,17 @@ def test_real_archive_shape():
         print("  skip (no archive yet)")
         return
     rows = [json.loads(x) for x in open(p) if x.strip()]
-    weeks = [r["week"] for r in rows]
-    check(len(weeks) == len(set(weeks)), "real archive has no duplicate weeks",
-          str(weeks))
+    # ⚠ UNIQUENESS IS PER TRACK, NOT PER WEEK LABEL. A `digby_weekly` row keys
+    # on the SUNDAY IT COVERS; the legacy rows key on the day they happened to
+    # be captured. Both can read "2026-W34" and mean different things -- the
+    # preseason board frozen on the 22nd, and the first weekly freeze covering
+    # results through the 23rd. What must never repeat is a track+week pair.
+    keys = [(r.get("track") or "legacy", r["week"]) for r in rows]
+    check(len(keys) == len(set(keys)),
+          "real archive has no duplicate track+week", str(keys))
+    cutoffs = [r["cutoff"] for r in rows if r.get("track") == "digby_weekly"]
+    check(len(cutoffs) == len(set(cutoffs)),
+          "no weekly freeze repeats a cutoff", str(cutoffs))
     check(all(r.get("teams") for r in rows), "every archived week has teams")
     # ⚠ IMPORTED, NOT RESTATED. This line used to whitelist ("live",
     # "preseason") while snapshot_rankings.py had grown a third source,
@@ -197,7 +205,16 @@ def check_basis_aliases():
         # fail to find it, or this guard is testing nothing.
         exact = [s for s in snaps
                  if s.get("week") != future and s.get("source") == "blend"]
-        stored_as_alias = any(s.get("source") == "digby" for s in snaps)
+        # ⚠ THIS CONTROL EXPIRES, BY DESIGN. It proves the alias is
+        # load-bearing by showing exact matching finds nothing -- which is only
+        # true while EVERY blended row is stored under the old name. The first
+        # weekly freeze writes "blend" canonically, so from then on exact
+        # matching legitimately finds that row and the control can no longer
+        # fire. Asserting it anyway would fail a correct archive. The alias
+        # itself is still exercised by the positive check above, which is the
+        # part that matters.
+        stored_as_alias = (any(s.get("source") == "digby" for s in snaps)
+                           and not any(s.get("source") == "blend" for s in snaps))
         if stored_as_alias:
             check(not exact, "...and exact-string matching would NOT have found it",
                   "(the archive already stores the canonical name, so this "
