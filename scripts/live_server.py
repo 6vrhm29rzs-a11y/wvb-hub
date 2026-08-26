@@ -615,6 +615,30 @@ class Handler(SimpleHTTPRequestHandler):
                 self._json({"ok": False, "id": gid, "state": "error",
                             "reason": "detail unavailable: %s" % str(e)[:120]})
             return
+        # ⚠ INTEL IS SERVER-SIDE ON PURPOSE. The browser never fetches a news
+        # feed itself: it asks this local endpoint, which will only ever
+        # request URLs from intel.SOURCES. There is NO url parameter -- the
+        # request names a source KEY or nothing at all, so the page cannot
+        # steer it anywhere. Local requests only, like the rest of /api.
+        if self.path.split("?")[0] == "/api/intel":
+            if not self._is_local():
+                self._json({"ok": False, "reason": "local requests only."}, 403)
+                return
+            try:
+                from urllib.parse import parse_qs, urlparse
+                q = parse_qs(urlparse(self.path).query)
+                force = (q.get("force") or ["0"])[0] == "1"
+            except Exception:                             # noqa: BLE001
+                force = False
+            try:
+                import intel
+                self._json(intel.all_sources(force=force))
+            except Exception as exc:                      # noqa: BLE001
+                # Fail soft: the desk shows "source unavailable" and keeps
+                # whatever it already had.
+                self._json({"items": [], "sources": [],
+                            "error": "intel unavailable: %s" % str(exc)[:120]})
+            return
         if self.path.split("?")[0] == "/api/live":
             body = json.dumps(CACHE.snapshot()).encode("utf-8")
             self.send_response(200)

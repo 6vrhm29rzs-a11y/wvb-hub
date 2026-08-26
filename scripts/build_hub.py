@@ -4253,6 +4253,39 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
   font:11.5px/1 var(--mono);color:var(--slate)}
 
 
+/* INTEL-CSS-BEGIN */
+.in-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 10px}
+.in-state{margin:0 0 16px;font:12px/1.5 var(--mono);color:var(--ink3)}
+.in-row{border-bottom:1px solid var(--vx-rule);padding:11px 0 12px}
+.in-row.read{opacity:.55}
+.in-meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:0 0 4px}
+.in-src{font:700 8.5px/1.5 var(--disp);letter-spacing:.11em;text-transform:uppercase;
+  color:var(--vx-avca);background:var(--vx-avca-dim);padding:2px 7px;border-radius:3px}
+.in-meta time{font:11.5px/1 var(--mono);color:var(--ink3)}
+.in-teams{display:inline-flex;align-items:center;gap:5px}
+.in-teams img{width:16px;height:16px}
+.in-teams b{font:600 11px/1 var(--sans);color:var(--gold)}
+.in-title{display:block;font:700 16px/1.3 var(--disp);color:var(--chalk);
+  text-decoration:none;overflow-wrap:anywhere}
+.in-title:hover{color:var(--gold)}
+.in-acts{display:flex;gap:8px;margin:7px 0 0}
+.in-acts button{font:700 8.5px/1 var(--disp);letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink3);background:none;border:0;
+  padding:3px 0;cursor:pointer}
+.in-acts button:hover{color:var(--gold)}
+.in-note{border-left:2px solid var(--line2);padding:8px 0 8px 12px;margin:0 0 14px;
+  font-size:12.5px;color:var(--ink2)}
+.in-note.warn{border-left-color:#F2B441}
+.in-note b{color:var(--chalk)}
+.in-foot{margin:18px 0 0;font-size:11.5px;color:var(--ink3);max-width:70ch}
+@media (max-width:560px){
+  .in-bar{gap:8px}
+  .in-bar .seg{flex-wrap:wrap;width:100%}
+  .in-title{font-size:15px}
+  .in-meta{gap:7px}
+}
+/* INTEL-CSS-END */
+
 /* FILMROOM-CSS-BEGIN */
 /* ── FILM ROOM: a notebook, ruled and dated ────────────────────────────────
    ⚠ INSIDE A SENTINEL PAIR. The selector names alone say what this feature
@@ -6041,6 +6074,9 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
         <button role="menuitem" data-v="bracket">Projected bracket</button>
         <button role="menuitem" data-v="schedule">Schedule</button>
         <button role="menuitem" data-v="tv">On TV</button>
+        <!-- INTEL-MENU-BEGIN -->
+        <button role="menuitem" data-v="intel">Intel</button>
+        <!-- INTEL-MENU-END -->
         <!-- FILMROOM-MENU-BEGIN -->
         <button role="menuitem" data-v="film">Film Room</button>
         <!-- FILMROOM-MENU-END -->
@@ -6399,6 +6435,33 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     </details>
   </div>
 </section>
+
+<!-- INTEL-HTML-BEGIN -->
+<section id="v-intel" hidden>
+  <h2 class="vh">Intel <span class="privtag" title="A private wire. Headlines and links only, read on this device; nothing is published, stored in the repository, or sent anywhere.">private</span></h2>
+  <p class="tabhint">Official volleyball news, headline and link only. Reading
+    happens at the publisher &mdash; nothing here copies their article, and
+    nothing about what you have read leaves this device.</p>
+
+  <div class="in-bar">
+    <div class="seg" role="tablist" aria-label="Which stories">
+      <button class="segb on" data-inf="new" type="button">New</button>
+      <button class="segb" data-inf="board" type="button">My Board</button>
+      <button class="segb" data-inf="national" type="button">National</button>
+      <button class="segb" data-inf="read" type="button">Read</button>
+    </div>
+    <button type="button" class="fr-btn" id="intelrefresh">Check now</button>
+    <span class="count" id="intelcount"></span>
+  </div>
+  <p class="in-state" id="intelstate"></p>
+  <div id="intelbody"></div>
+
+  <p class="in-foot">Source: NCAA.com Division I women&rsquo;s volleyball.
+    The list of sources is fixed in code and audited in
+    <code>docs/intel_sources.md</code>; this page cannot be pointed at
+    anything else.</p>
+</section>
+<!-- INTEL-HTML-END -->
 
 <!-- FILMROOM-HTML-BEGIN -->
 <section id="v-film" hidden>
@@ -6862,7 +6925,8 @@ function openMore() {
 const ROUTE_OF_VIEW = { desk:'match-desk', scores:'scores', rankings:'rankings',
   teams:'teams', ballot:'ballot', leaders:'stats', players:'players',
   standings:'standings', bracket:'bracket', schedule:'schedule', tv:'tv',
-  /* FILMROOM-ROUTE-BEGIN */ film:'film-room' /* FILMROOM-ROUTE-END */ };
+  /* FILMROOM-ROUTE-BEGIN */ film:'film-room', /* FILMROOM-ROUTE-END */
+  /* INTEL-ROUTE-BEGIN */ intel:'intel' /* INTEL-ROUTE-END */ };
 const VIEW_OF_ROUTE = Object.keys(ROUTE_OF_VIEW)
   .reduce((a,k)=>{a[ROUTE_OF_VIEW[k]]=k;return a;},{});
 
@@ -6911,6 +6975,9 @@ function route() {
   ROUTE_ORIGIN = params.get('from') || null;
   showView(view);
 
+  /* INTEL-WIRE-BEGIN */
+  if (view === 'intel' && typeof inWire === 'function') inWire();
+  /* INTEL-WIRE-END */
   /* FILMROOM-WIRE-BEGIN */
   if (view === 'film' && typeof frWire === 'function') frWire();
   /* FILMROOM-WIRE-END */
@@ -9373,6 +9440,237 @@ const DIGBY_WATCH = `{{DIGBY_WATCH}}`;
 let LIVE_STAMP = '';
 let LIVE_BY_ID = {};
 
+
+/* INTEL-JS-BEGIN */
+/* ═══ INTEL DESK ═════════════════════════════════════════════════════════
+   A private wire. The browser NEVER fetches a feed: it asks the local server,
+   which only ever requests URLs from its own allowlist. Read state lives on
+   this device; nothing about what Cody has read goes anywhere.
+
+   ⚠ FOUR FIELDS PER STORY -- title, link, time, source -- and the click goes
+   to the publisher. No article text, no blurb, no thumbnail, no summary. */
+
+const IN_KEY = 'wvb.intel.read.v1';
+let IN_ITEMS = [];
+let IN_SRC = [];
+let IN_READ = {};
+let IN_OK = true;
+let IN_FILTER = 'new';
+let IN_CHECKED = 0;
+
+function inLoad() {
+  try {
+    const raw = window.localStorage.getItem(IN_KEY);
+    const v = raw ? JSON.parse(raw) : {};
+    IN_READ = (v && typeof v === 'object' && !Array.isArray(v)) ? v : {};
+    IN_OK = true;
+  } catch (e) { IN_READ = {}; IN_OK = false; }
+  return IN_READ;
+}
+function inSave() {
+  try { window.localStorage.setItem(IN_KEY, JSON.stringify(IN_READ)); IN_OK = true; }
+  catch (e) { IN_OK = false; }
+}
+
+/* ⚠ RELEVANCE IS CONSERVATIVE ON PURPOSE. A story attaches to a My Board team
+   only when that team's normalised name appears as a WHOLE phrase in the
+   headline -- no fuzzy matching, no nicknames, and "Texas" cannot swallow
+   "Texas A&M" by prefix because both sides are padded with spaces. An
+   uncertain match stays National. A wrong match is worse than an unsorted one:
+   this is the surface where a guess would look like a fact. */
+function inNorm(t) {
+  return ' ' + String(t || '').toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim() + ' ';
+}
+function inMatch(title) {
+  const hay = inNorm(title);
+  const hits = [];
+  let board = [];
+  try { mbLoad(); board = (typeof MB !== 'undefined' && Array.isArray(MB)) ? MB : []; }
+  catch (e) { board = []; }
+  board.forEach(team => {
+    const needle = inNorm(team);
+    if (needle.trim().length < 3) return;
+    if (hay.indexOf(needle) < 0) return;
+    /* ⚠ A LONGER TEAM NAME WINS, AND THIS WAS A REAL FALSE MATCH. Padding
+       with spaces stops "Texarkana" matching "Texas" -- but not "Texas A&M",
+       which normalises to "texas a m" and CONTAINS " texas ". The headline
+       "SMU sweeps Texas A&M" was being filed under Texas, which is precisely
+       the guess-that-looks-like-a-fact this desk must not make.
+       So: if any OTHER Division-I team whose name contains this one is also
+       in the headline, this match is ambiguous and is dropped. Unmatched is
+       the safe answer; National is not a failure state. */
+    let shadowed = false;
+    try {
+      for (const other in TEAMS) {
+        if (other === team) continue;
+        const on = inNorm(other);
+        if (on.length <= needle.length) continue;
+        if (on.indexOf(needle.trim()) < 0) continue;   /* not a longer form */
+        if (hay.indexOf(on) >= 0) { shadowed = true; break; }
+      }
+    } catch (e) { /* payload not ready: keep the plain match */ }
+    if (!shadowed) hits.push(team);
+  });
+  return hits;
+}
+
+function inWhen(s) {
+  const d = new Date(s);
+  if (!isFinite(d)) return String(s || '').slice(0, 16);
+  const p = n => (n < 10 ? '0' : '') + n;
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) +
+         ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+
+function inRow(it) {
+  const teams = inMatch(it.title);
+  const read = !!IN_READ[it.id];
+  return '<article class="in-row' + (read ? ' read' : '') + '" data-in="' +
+    esc(it.id) + '">' +
+    '<div class="in-meta"><span class="in-src">' + esc(it.source) + '</span>' +
+    '<time>' + esc(inWhen(it.published)) + '</time>' +
+    (teams.length
+      ? '<span class="in-teams">' + teams.map(t => logo(t) || '').join('') +
+        teams.map(t => '<b>' + esc(t) + '</b>').join('') + '</span>'
+      : '') +
+    '</div>' +
+    /* ⚠ THE HEADLINE IS A LINK TO THE PUBLISHER. Reading happens there. */
+    '<a class="in-title" href="' + esc(it.link) + '" target="_blank" ' +
+    'rel="noopener noreferrer">' + esc(it.title) + '</a>' +
+    '<div class="in-acts">' +
+      '<button type="button" data-inread="' + esc(it.id) + '">' +
+      (read ? 'Mark unread' : 'Mark read') + '</button>' +
+      '<button type="button" data-innote="' + esc(it.id) + '">Note this</button>' +
+    '</div></article>';
+}
+
+function inRender() {
+  const host = document.getElementById('intelbody');
+  if (!host) return;
+  inLoad();
+  const board = (() => { try { mbLoad(); return (typeof MB !== 'undefined' && Array.isArray(MB)) ? MB : []; } catch (e) { return []; } })();
+  let rows = IN_ITEMS.slice();
+  if (IN_FILTER === 'new') rows = rows.filter(i => !IN_READ[i.id]);
+  else if (IN_FILTER === 'read') rows = rows.filter(i => !!IN_READ[i.id]);
+  else if (IN_FILTER === 'board') rows = rows.filter(i => inMatch(i.title).length);
+  else if (IN_FILTER === 'national') rows = rows.filter(i => !inMatch(i.title).length);
+
+  const cnt = document.getElementById('intelcount');
+  if (cnt) cnt.textContent = rows.length + (rows.length === 1 ? ' story' : ' stories');
+
+  /* ⚠ EVERY STATE IS ITS OWN SENTENCE. "Nothing new" and "the source is
+     down" are different facts and must not share a blank screen. */
+  const bad = IN_SRC.filter(x => !x.ok);
+  const stale = IN_SRC.filter(x => x.stale);
+  let banner = '';
+  if (bad.length) {
+    banner = '<div class="in-note warn"><b>' + esc(bad[0].source) +
+      ' is not reachable.</b> ' + esc(bad[0].error || '') +
+      ' Nothing has been lost \u2014 this is what was last collected.</div>';
+  } else if (stale.length) {
+    banner = '<div class="in-note warn"><b>Showing the last successful ' +
+      'check.</b> ' + esc(stale[0].error || 'The source did not answer just now.') +
+      '</div>';
+  }
+  if (!IN_OK) {
+    banner += '<div class="in-note warn"><b>This browser is not letting the ' +
+      'page store anything</b>, so read marks will not survive a reload.</div>';
+  }
+
+  if (!rows.length) {
+    const why = IN_FILTER === 'new'
+      ? 'Nothing unread. Everything on the wire has been seen.'
+      : (IN_FILTER === 'board'
+          ? (board.length
+              ? 'No story on the wire mentions a team on My Board.'
+              : 'My Board is empty, so nothing can be matched to it yet.')
+          : 'Nothing here under this filter.');
+    host.innerHTML = banner + '<div class="vx-empty"><h4>Nothing to read</h4>' +
+      '<p>' + esc(why) + '</p></div>';
+    return;
+  }
+  host.innerHTML = banner + rows.map(inRow).join('');
+}
+
+/* ⚠ THE PAGE ASKS THE LOCAL SERVER. It never requests a feed itself, and it
+   passes no URL -- only an optional `force`. Opened straight from Finder this
+   fetch fails and the desk says the local server is not running, which is the
+   truth rather than an empty wire. */
+function inFetch(force) {
+  const st = document.getElementById('intelstate');
+  if (st) st.textContent = 'Checking\u2026';
+  fetch('/api/intel' + (force ? '?force=1' : ''), { cache: 'no-store' })
+    .then(r => r.json())
+    .then(j => {
+      IN_ITEMS = (j && Array.isArray(j.items)) ? j.items : [];
+      IN_SRC = (j && Array.isArray(j.sources)) ? j.sources : [];
+      IN_CHECKED = Date.now();
+      if (st) {
+        st.textContent = IN_ITEMS.length
+          ? 'Checked ' + inWhen(new Date(IN_CHECKED).toISOString())
+          : (j && j.error ? 'Source unavailable.' : 'Nothing came back.');
+      }
+      inRender();
+    })
+    .catch(() => {
+      IN_ITEMS = []; IN_SRC = [];
+      if (st) st.textContent = 'The local server is not running, so the wire ' +
+        'cannot be checked. Everything else on this page still works.';
+      inRender();
+    });
+}
+
+function inWire() {
+  const host = document.getElementById('v-intel');
+  if (!host || host.dataset.wired) return;
+  host.dataset.wired = '1';
+
+  host.addEventListener('click', e => {
+    const seg = e.target.closest('[data-inf]');
+    if (seg) {
+      IN_FILTER = seg.dataset.inf;
+      host.querySelectorAll('[data-inf]').forEach(b =>
+        b.classList.toggle('on', b === seg));
+      inRender();
+      return;
+    }
+    const rd = e.target.closest('[data-inread]');
+    if (rd) {
+      const id = rd.dataset.inread;
+      if (IN_READ[id]) delete IN_READ[id]; else IN_READ[id] = 1;
+      inSave(); inRender();
+      return;
+    }
+    const nt = e.target.closest('[data-innote]');
+    if (nt) {
+      /* ⚠ PREFILLED, NEVER SAVED. The note is opened with the source's title
+         and link filled in and the body left EMPTY -- the takeaway has to be
+         Cody's, so nothing is created until he writes one and presses Save. */
+      const it = IN_ITEMS.find(x => x.id === nt.dataset.innote);
+      if (!it) return;
+      go(routeFor('film'));
+      setTimeout(() => {
+        const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+        set('frtitle', it.title);
+        set('frurl', it.link);
+        set('frsrc', 'article');
+        set('frnote', '');
+        const teams = inMatch(it.title);
+        if (teams.length) set('frteams', teams.join(', '));
+        const body = document.getElementById('frnote');
+        if (body) { body.focus(); }
+        const stt = document.getElementById('frstate');
+        if (stt) stt.textContent = 'Add your own takeaway, then Save.';
+      }, 250);
+      return;
+    }
+    if (e.target.closest('#intelrefresh')) inFetch(true);
+  });
+  inFetch(false);
+}
+
+/* INTEL-JS-END */
 
 /* FILMROOM-JS-BEGIN */
 /* ═══ FILM ROOM / VOTING NOTEBOOK ═════════════════════════════════════════
@@ -12907,6 +13205,9 @@ PRIVATE_MARKERS = ("VolleyTalk", "Massey Ratings", "Massey Ratings, 2026",
                    "FILMROOM-HTML-BEGIN", "FILMROOM-JS-BEGIN",
                    "FILMROOM-CSS-BEGIN", "wvb.filmroom", 'id="v-film"',
                    "Film Room", "FR_KEY",
+                   "INTEL-HTML-BEGIN", "INTEL-JS-BEGIN", "INTEL-CSS-BEGIN",
+                   "wvb.intel", 'id="v-intel"', "IN_KEY", "/api/intel",
+                   "rss.xml",
                    # ── ENDPOINTS THAT ONLY EXIST BEHIND THE LOCAL SERVER ────
                    # ⚠ /api/live IS DELIBERATELY ABSENT FROM THIS LIST. The
                    # live band fetches it and FAILS SOFT on a static host --
@@ -12990,7 +13291,13 @@ def strip_private(html):
                    ("/* FILMROOM-ROUTE-BEGIN */", "/* FILMROOM-ROUTE-END */"),
                    ("<!-- FILMROOM-MENU-BEGIN -->", "<!-- FILMROOM-MENU-END -->"),
                    ("/* FILMROOM-WIRE-BEGIN */", "/* FILMROOM-WIRE-END */"),
-                   ("/* FILMROOM-HOOK-BEGIN */", "/* FILMROOM-HOOK-END */")):
+                   ("/* FILMROOM-HOOK-BEGIN */", "/* FILMROOM-HOOK-END */"),
+                   ("<!-- INTEL-HTML-BEGIN -->", "<!-- INTEL-HTML-END -->"),
+                   ("/* INTEL-JS-BEGIN */", "/* INTEL-JS-END */"),
+                   ("/* INTEL-CSS-BEGIN */", "/* INTEL-CSS-END */"),
+                   ("/* INTEL-ROUTE-BEGIN */", "/* INTEL-ROUTE-END */"),
+                   ("<!-- INTEL-MENU-BEGIN -->", "<!-- INTEL-MENU-END -->"),
+                   ("/* INTEL-WIRE-BEGIN */", "/* INTEL-WIRE-END */")):
         html = re.sub(re.escape(_a) + r".*?" + re.escape(_b), "", html,
                       flags=re.S)
 

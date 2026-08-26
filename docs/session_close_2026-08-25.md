@@ -962,6 +962,58 @@ notebook fetching a pasted link.
 the marker list legitimately NAME every fence -- counting those as leaks failed
 six fence checks and four symbol checks against a correct build.
 
-**State at close:** 30 suites pass with `Cody/` present and 24 with it moved
+## 17. INTEL DESK -- a private news wire
+
+**ONE SOURCE, AUDITED:** the NCAA's own D-I women's volleyball RSS feed
+(`docs/intel_sources.md` records the measurement: HTTP 200, 20,432 bytes,
+20 items, full field list).
+
+⚠ **THE ALLOWLIST IS REAL BECAUSE `fetch_source()` TAKES A KEY, NOT A URL.**
+Nothing -- not the page, not a Film Room note, not a query string -- can
+redirect it. The endpoint accepts only an optional `force` flag, is local-only,
+and the browser never requests a feed itself. Guarded: no host outside
+`www.ncaa.com` appears anywhere in the code, and volleytalk / twitter /
+facebook / reddit / avca are each asserted absent by name.
+
+**FOUR FIELDS RETAINED** -- title, link, publication time, category.
+⚠ **`description`, `enclosure` and `dc:creator` are discarded.** The blurb is
+the publisher's own writing; keeping it would mean storing their work to show
+instead of theirs. The click goes to them.
+
+**NOTHING IS COMMITTED.** Cache in `.intel_cache/`, gitignored, verified with
+`git check-ignore`. Read state in `localStorage`. Thirteen computing modules
+proven never to import the fetcher.
+
+⚠ **A REAL FALSE MATCH, CAUGHT AND FIXED.** Padding names with spaces stops
+"Texarkana" matching "Texas" -- but not **"Texas A&M"**, which normalises to
+`texas a m` and CONTAINS ` texas `. The headline "SMU sweeps Texas A&M" was
+being filed under Texas. A longer Division-I team name now shadows a shorter
+one and the ambiguous match is dropped: unmatched is the safe answer, and
+National is not a failure state.
+
+⚠ **A DEAD SOURCE NEVER EMPTIES THE WIRE.** A failed or malformed fetch leaves
+the last good items in place, marked stale with the reason. An empty wire would
+be a worse lie than an old one that says it is old. Cold start with a dead
+source says so rather than showing nothing silently.
+
+**A note is PREFILLED, never created:** title, link and matched team are filled
+in, the takeaway is left EMPTY, and nothing is saved until Cody writes one.
+
+⚠ **THE FRESH-CHECKOUT HARNESS HAS NO `.git`**, so two repository checks in the
+new suite failed against a correct build. They skip with a printed reason now;
+the `.gitignore` assertion still runs everywhere.
+
+**Guards:** `scripts/test_intel.py` (31st suite) with four saved XML fixtures --
+normal, malformed, duplicate/no-link, empty. **Four negative controls verified
+to trip**: adding an unaudited source, keeping the publisher's description,
+letting a failed fetch wipe the cache, and letting the browser fetch the feed
+directly.
+
+**Before a second source or any alerts:** `docs/intel_sources.md` lists what is
+required -- terms checked and quoted, a measured audit line, a retention
+decision, a fixture, and stated failure behaviour; and for alerts, a delivery
+decision, a rate rule, a quiet-hours rule, and an off-by-default switch.
+
+**State at close:** 31 suites pass with `Cody/` present and 24 with it moved
 aside. Tree is clean apart from the three fixes above. Nothing here changes
 data, ratings, or the crawl -- all three are display-layer only.
