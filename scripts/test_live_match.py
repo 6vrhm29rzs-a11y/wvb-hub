@@ -194,8 +194,13 @@ def main():
           '127.0.0.1' in src and 'HOST' not in src.split('PORT')[0][-200:])
     check("a non-numeric id is rejected before any upstream call",
           "gid.isdigit()" in src)
+    # ⚠ SAME RULE, REWORDED WHEN THE STATE MODEL LANDED. The live endpoint
+    # still refuses to fetch a final's box score; that reaches the page through
+    # the verified crawl. Assert the BEHAVIOUR (the early return on an over
+    # match) rather than one phrasing of the sentence beside it.
     check("a FINAL hands off to the verified pipeline rather than scraping",
-          "the verified result enters the site" in src)
+          "if MS.is_over(row):" in src
+          and "reaches the" in src and "verified crawl" in src)
     check("an unknown id is not looked up (no fishing)",
           "not on the current scoreboard" in src)
     # ⚠ THE PROPERTY THAT MATTERS MOST, AND IT IS STRUCTURAL: this module has

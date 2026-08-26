@@ -36,6 +36,8 @@ import urllib.request
 import urllib.error
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 
+import match_state as MS
+
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WEBROOT = os.path.join(REPO, "Cody")
 API = "https://ncaa-api.henrygd.me"
@@ -184,11 +186,28 @@ class Cache(object):
                     "home": (h.get("names") or {}).get("short"),
                     "away_rank": a.get("rank") or "",
                     "home_rank": h.get("rank") or "",
-                    "away_sets": a.get("score") or "0",
-                    "home_sets": h.get("score") or "0",
+                    # ⚠ NOT `or "0"`. The scoreboard serves score:'' before
+                    # first serve (measured; docs/live_endpoint_audit.md), and
+                    # `'' or "0"` makes an unplayed match read 0-0 -- which is
+                    # indistinguishable from a real 0-0 at first serve. Pass
+                    # the absence through and let the state model decide.
+                    "away_sets": a.get("score"),
+                    "home_sets": h.get("score"),
                     "sets": [],
                     "venue": "",
                 })
+
+        # ⚠ ONE STATE MODEL, RESOLVED HERE. Every consumer of this payload --
+        # the Match Desk band, the Scores ledger, the match detail -- reads
+        # `state6` rather than deciding for itself what "live" or "over" means.
+        # Three renderers each deciding was how a finished match ended up in
+        # "Coming up" and how a 0-0 match showed a leader.
+        for row in games:
+            r = MS.resolve(feed=row)
+            row["state6"] = r["state"]
+            row["state_label"] = r["label"]
+            row["state_note"] = r["note"]
+            row["caps"] = r["caps"]
 
         # Only in-progress matches get a detail call -- a finished match is
         # already in the committed game log, and an unplayed one has nothing.
@@ -284,6 +303,9 @@ def match_detail(gid):
         # Not on today's or yesterday's scoreboard. We will not go fishing for
         # arbitrary ids -- that is how a detail endpoint becomes a crawler.
         return {"ok": False, "id": str(gid), "state": "unknown",
+                "state6": MS.UNAVAILABLE,
+                "state_note": MS.DETAIL_NOTE[MS.UNAVAILABLE],
+                "caps": MS.CAPABILITIES[MS.UNAVAILABLE],
                 "reason": "that match is not on the current scoreboard"}
 
     state = (row.get("state") or "").lower()
@@ -298,13 +320,23 @@ def match_detail(gid):
         "stats_available": False, "stats_reason": "", "teams": [],
         "leaders": [], "stale": False, "age_seconds": 0,
     }
+    # The shared state, resolved once. `box` is filled in below only for a
+    # live match; a final's official box score reaches the page through the
+    # committed archive, so from here a final is `final_box_pending` and the
+    # page upgrades it to `final_with_box` when the archive has the totals.
+    _r = MS.resolve(feed=row)
+    base["state6"] = _r["state"]
+    base["state_label"] = _r["label"]
+    base["state_note"] = _r["note"]
+    base["caps"] = dict(_r["caps"])
 
     # ⚠ A FINAL IS HANDED BACK TO THE VERIFIED PIPELINE, NOT SCRAPED HERE. The
     # inset says "final" and stops; the result reaches the site through the
     # existing crawl/refresh path, which is the only thing allowed to write it.
-    if state in ("final", "f", "completed"):
-        base["stats_reason"] = ("final -- the verified result enters the site "
-                                "through the normal refresh, not from here")
+    if MS.is_over(row):
+        base["stats_reason"] = ("final -- the official box score reaches the "
+                                "page through the verified crawl, not from "
+                                "here")
         return base
 
     if state not in ("live", "in progress", "i"):
@@ -326,6 +358,15 @@ def match_detail(gid):
     base["stats_available"] = True
     base["teams"] = teams
     base["leaders"] = leaders
+    # ⚠ THE STATE IS RE-RESOLVED WITH THE BOX IN HAND, not patched by hand.
+    # A live match that IS serving team totals is `live_with_team_stats`, and
+    # the capabilities come from the same table everything else reads -- so
+    # `player_lines` stays false here unless the payload really carries them.
+    _r2 = MS.resolve(feed=row, box={"teams": teams, "players": leaders})
+    base["state6"] = _r2["state"]
+    base["state_label"] = _r2["label"]
+    base["state_note"] = _r2["note"]
+    base["caps"] = dict(_r2["caps"])
     return base
 
 

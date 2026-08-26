@@ -703,6 +703,11 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
                 ("away", r["home"], r["away_sets"], r["home_sets"], False),
                 ("home", r["away"], r["home_sets"], r["away_sets"], True)):
             played.setdefault(r[side], []).append({
+                # ⚠ THE GAME ID TRAVELS WITH THE ROW. Without it a team's
+                # own result could not open the match it describes -- the one
+                # place a reader is most likely to want the detail -- so five
+                # entry points reached the match page and two dead-ended.
+                "gid": r.get("gid"),
                 "d": r["date"], "opp": opp, "home": home,
                 # Same caveat as the player match log: the RESULT row names the
                 # opponent, so it is where the division belongs. A 3-0 win over
@@ -768,7 +773,7 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
             # "home" for a tournament in Milwaukee is wrong about the one thing
             # a schedule is for. `home` stays a bool for existing consumers;
             # `site` carries the third state (R4 -- new meaning, new name).
-            base = {"d": date, "t": t, "venue": v.get("venue"),
+            base = {"gid": gid, "d": date, "t": t, "venue": v.get("venue"),
                     "city": v.get("city"), "st": v.get("state_usps"),
                     "site": v.get("site"), "event": v.get("event"), "kind": kind}
             aw = dict(base); aw.update({"opp": h, "home": False})
@@ -3132,6 +3137,7 @@ def build():
               "away_sets": r["away_sets"], "home_sets": r["home_sets"],
               "epoch": r.get("epoch")}
              for r in sorted(res, key=lambda x: x.get("epoch") or 0)])) \
+        .replace("{{MSTATE_JSON}}", __import__("match_state").js_table()) \
         .replace("{{CALENDAR_JSON}}",
                  json.dumps(calendar_tracks(), separators=(",", ":"))) \
         .replace("{{NONDI_JSON}}", json.dumps(
@@ -4262,6 +4268,10 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
   gap:12px;padding:7px 0}
 .rbside+.rbside{border-top:1px solid var(--line)}
 .rbside .rbrk{font:600 10px/1 var(--disp);color:var(--gold);text-align:right}
+/* holds the crest column open when a team has no crest -- see the note in
+   ribbonHTML: without it every cell in the row shifts one column left */
+.rbside .rbnologo{display:block;width:34px;height:1px}
+.rbside .rbnm{min-width:0;overflow-wrap:anywhere}
 .rbside .rbnm{font:700 30px/1 var(--disp);letter-spacing:-.01em;color:var(--ink2);
   text-transform:uppercase}
 .rbside.won .rbnm{color:var(--chalk)}
@@ -5284,6 +5294,22 @@ td.wh .wu{color:var(--ink3);font-style:italic}
   margin-left:5px}
 .caltbl .dim{color:var(--ink3)}
 
+
+
+
+/* a result row that opens its match */
+.gline.gopen{cursor:pointer;border-radius:3px}
+.gline.gopen:hover{background:rgba(91,168,245,.06)}
+.gline.gopen:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+
+/* the honest "not yet" state, where a table would otherwise be */
+.mpend{display:flex;flex-direction:column;gap:4px;padding:12px 14px;
+  border:1px dashed var(--line2);border-radius:4px;background:var(--alt)}
+.mpend b{font:700 12px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase;
+  color:var(--chalk)}
+.mpend span{font-size:12.5px;color:var(--ink2)}
+.mpend .mfine{font-size:12px;color:var(--ink3)}
+.msrc{margin:10px 0 0;font-size:11.5px;color:var(--ink3)}
 
 /* the active week's counts, read at a glance */
 .calcounts{display:flex;flex-wrap:wrap;gap:6px 18px;margin:2px 0 10px;
@@ -9071,19 +9097,52 @@ const LEDGER = {{LEDGER_JSON}};
 
 /* TRUE STATE, never a guess. `live` is the scoreboard feed; a match with a
    final result is final; everything else has not started. */
-function matchState(m, live) {
-  /* ⚠ A FEED THAT SAYS FINAL MEANS FINAL, even before the crawl catches up.
-     The first version only ever returned 'final' from a stored result, so a
-     match that had just ended on the scoreboard -- but was not yet in the
-     archive -- fell through to 'upcoming' and sat in "Coming up" with its
-     score showing. That is the live-band/archive seam this project has already
-     been bitten by once, arriving in a new place. */
-  const over = live && (/final|complete/i.test(live.state || '') ||
-                        /final|complete/i.test(live.period || ''));
-  if (live && !over) return 'live';
-  if (over) return 'final';
-  if (m.final || (m.as !== undefined && m.as !== null)) return 'final';
+/* ⚠ THE STATE TABLE COMES FROM PYTHON (scripts/match_state.py). Labels, notes
+   and what each state MAY display are defined once, server-side, and handed to
+   the page. Writing the rules twice is how three renderers came to disagree
+   about whether a match was live. */
+const MSTATE = {{MSTATE_JSON}};
+
+/* Is there a real set count here? ⚠ '' IS NOT 0 -- the scoreboard serves an
+   empty string before first serve and Number('') is 0, which renders an
+   unplayed match as 0-0. Measured; see docs/live_endpoint_audit.md. */
+function mNum(v) {
+  if (v === null || v === undefined) return null;
+  if (typeof v === 'string' && !v.trim()) return null;
+  const n = Number(v);
+  return isFinite(n) ? n : null;
+}
+
+function mOver(live, m) {
+  if (live && (/final|complete/i.test(live.state || '') ||
+               /final|complete/i.test(live.period || ''))) return true;
+  return !!(m && (m.final || mNum(m.as) !== null));
+}
+
+/* The six states, resolved the same way the server resolves them. `box` is
+   whether a VERIFIED box score exists for this match on this page. */
+function matchState6(m, live, box) {
+  if (mOver(live, m)) return box ? 'final_with_box' : 'final_box_pending';
+  if (live && live.state6) {
+    /* the server already decided for a live row -- trust it rather than
+       re-deriving, so the two can never disagree mid-match */
+    if (live.state6 === 'live_with_team_stats' ||
+        live.state6 === 'live_score_only') return live.state6;
+  }
+  if (live) return 'live_score_only';
   return 'upcoming';
+}
+
+/* Back-compat for the lanes and rows, which think in three buckets. */
+function matchState(m, live) {
+  const s6 = matchState6(m, live, false);
+  if (s6 === 'upcoming') return 'upcoming';
+  if (s6.indexOf('final') === 0) return 'final';
+  return 'live';
+}
+
+function mCaps(state6) {
+  return (MSTATE.caps && MSTATE.caps[state6]) || MSTATE.caps.unavailable;
 }
 function matchSets(m, live) {
   if (live && live.sets && live.sets.length) return live.sets;
@@ -9112,7 +9171,16 @@ function ribbonHTML(m, live, why) {
   const side = (name, rk, won, score) =>
     '<div class="rbside ' + (won ? 'won' : '') + '">' +
       '<span class="rbrk">' + (rk ? '#' + esc(String(rk)) : '') + '</span>' +
-      logo(name) +
+      /* ⚠ THE CREST SLOT IS ALWAYS EMITTED, EVEN WHEN THERE IS NO CREST.
+         `.rbside` is a FOUR-column grid and logo() returns an empty string for
+         a team we hold no crest for -- so the row had three children, every
+         cell shifted one column left, and the team name landed in the 34px
+         crest track. Measured on Elizabeth City St.: the name wrapped to three
+         lines at 91px tall and the score sat in the 1fr column beside it
+         instead of at the right edge. This hits EVERY non-Division-I opponent,
+         which is precisely the population we just spent a phase surfacing.
+         An empty span keeps the column count right. */
+      (logo(name) || '<span class="rbnologo"></span>') +
       '<a class="rbnm parentlink" href="' + routeFor('teams', slug(name)) + '">' +
         esc(name) + '</a>' +
       '<span class="rbsc">' + (score === null || score === undefined ? '&mdash;' : score) +
@@ -9245,6 +9313,14 @@ function renderMatchDetail(gid, dest) {
     return true;
   }
   const live = LIVE_BY_ID[m.gid];
+  /* ⚠ ONE RESOLUTION, THEN EVERYTHING ASKS IT WHAT IT MAY DRAW. `hasBox` is
+     whether a VERIFIED box score exists for this match -- not whether the
+     match is over. A final without one is `final_box_pending`, which is a real
+     state and renders as itself rather than as an empty table. */
+  const hasBox = !!(typeof BOXES !== 'undefined' && BOXES[m.gid]
+                    && BOXES[m.gid].length);
+  const s6 = matchState6(m, live, hasBox);
+  const caps = mCaps(s6);
   const st = matchState(m, live);
   const parent = dest === 'scores'
       ? ['Scores', routeFor('scores')] : ['Match Desk', routeFor('desk')];
@@ -9270,7 +9346,11 @@ function renderMatchDetail(gid, dest) {
       ' <span class="munk">current forecast</span>';
   }
 
-  const box = (typeof boxHTML === 'function') ? boxHTML(m.gid) : '';
+  /* ⚠ THE BOX SECTION IS DRAWN ONLY WHEN THE STATE PERMITS IT AND THE DATA
+     EXISTS. Both, not either. A zero-filled table after a final is the exact
+     thing this phase is meant to stop. */
+  const box = (caps.player_lines && typeof boxHTML === 'function')
+    ? boxHTML(m.gid) : '';
   host.hidden = false;
   if (board) board.hidden = true;
   const sec = document.getElementById(dest === 'scores' ? 'v-scores' : 'v-desk');
@@ -9292,13 +9372,28 @@ function renderMatchDetail(gid, dest) {
             '<div class="mfact"><span>' + fc + '</span></div></div>' : '') +
       /* live stats sit UNDER the single score ribbon, and only while this
          match is actually live on this route */
+      /* live statistics, only while this match is live AND the state says
+         team stats exist for it */
       (st === 'live' ? lmcSection(m.gid) : '') +
-      (box ? '<div class="msec"><h3>Box score</h3>' + box + '</div>'
-           : '<div class="msec"><h3>Box score</h3><p class="munk">' +
-             (st === 'live'
-               ? 'The verified box score is written after the match is final.'
-               : 'No verified box score is on record for this match yet.') +
-             '</p></div>') +
+      /* ⚠ ONE SENTENCE PER STATE, FROM THE SHARED TABLE. Each of these is a
+         true statement about the source at that moment -- not a placeholder
+         standing where data should be. */
+      '<div class="msec"><h3>Box score</h3>' +
+        (box ? box
+             : '<div class="mpend"><b>' + esc(MSTATE.label[s6] || '') +
+               '</b><span>' + esc(MSTATE.note[s6] || '') + '</span>' +
+               (s6 === 'final_box_pending'
+                 ? '<span class="mfine">It is written to the site by the ' +
+                   'verified crawl, usually within the hour. Nothing is ' +
+                   'estimated in the meantime.</span>' : '') +
+               '</div>') +
+      '</div>' +
+      /* where this came from and when -- compact, one line */
+      '<p class="msrc">Official NCAA feed' +
+        (live && live.updated ? ' &middot; live score updated ' +
+          esc(String(live.updated)) : '') +
+        (hasBox ? ' &middot; box score from the verified crawl' : '') +
+        '</p>' +
     '</div>';
   if (st === 'live') { lmcStart(m.gid); } else { lmcStop(); }
   return true;
@@ -9321,15 +9416,34 @@ function closeMatchDetail() {
 }
 
 /* every row routes; nothing opens a match by painting it in place */
+/* THE canonical match URL. Every caller goes through here so a match cannot
+   acquire a second address. */
+function matchRoute(gid, dest) {
+  const d = dest === 'scores' ? 'scores' : 'match-desk';
+  return '#/' + d + '/' + encodeURIComponent(gid);
+}
+
+/* Keyboard parity: a row that only answers a mouse is not a link. */
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const row = e.target.closest && e.target.closest('[data-match]');
+  if (!row) return;
+  e.preventDefault();
+  go(matchRoute(row.dataset.match, row.dataset.dest));
+});
+
 document.addEventListener('click', e => {
   if (e.target.closest && e.target.closest('#lmcrefresh')) {
     if (LMC_ROUTE_GID) lmcFetch(LMC_ROUTE_GID);
     return;
   }
-  const row = e.target.closest && e.target.closest('.mrow[data-match]');
+  /* ⚠ ONE HANDLER FOR EVERY ENTRY POINT. It used to match `.mrow[data-match]`
+     only, so the Match Desk and the ledger routed while a team's own result
+     did not. Any element carrying data-match now reaches the same canonical
+     URL -- there is one way to open a match, not one per surface. */
+  const row = e.target.closest && e.target.closest('[data-match]');
   if (row) {
-    const dest = row.dataset.dest === 'scores' ? 'scores' : 'match-desk';
-    go('#/' + dest + '/' + encodeURIComponent(row.dataset.match));
+    go(matchRoute(row.dataset.match, row.dataset.dest));
     return;
   }
   const back = e.target.closest && e.target.closest('[data-back]');
@@ -10291,7 +10405,14 @@ function showTeam(name) {
   const results = (t.played || []).map(g => {
     const won = g.mine > g.theirs;
     const strip = (g.sets || []).map(s => s[0] + '-' + s[1]).join(', ');
-    return '<div class="gline"><span class="dt">' + dayLabel(g.d) + '</span>' +
+    /* ⚠ A TEAM'S OWN RESULT OPENS THE MATCH. This row described a match and
+       could not open it, while five other surfaces could -- so the one place a
+       reader is most likely to want the detail was the one dead end. Same
+       canonical route as every other entry point. */
+    return '<div class="gline' + (g.gid ? ' gopen' : '') + '"' +
+      (g.gid ? ' data-match="' + esc(g.gid) + '" data-dest="scores"' +
+               ' tabindex="0" role="link"' : '') + '>' +
+      '<span class="dt">' + dayLabel(g.d) + '</span>' +
       '<span class="va">' + (g.home ? 'vs' : '@') + '</span>' +
       '<span class="op">' + esc(g.opp) +
       (g.nondi ? '<b class="nondi" title="Not a Division-I opponent. This ' +

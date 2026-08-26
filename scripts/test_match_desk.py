@@ -442,8 +442,12 @@ def main():
           "daygrp" in src and "dayhd" in src)
 
     print("\n11. MATCH ROUTES ARE REAL DESTINATIONS")
+    # ⚠ THE URL IS BUILT IN ONE PLACE NOW. This asserted the inline
+    # construction that used to sit in the click handler; every caller goes
+    # through matchRoute() so a match cannot acquire a second address.
     check("a match opens on a route, never in place",
-          "go('#/' + dest + '/' + encodeURIComponent(row.dataset.match))" in src)
+          "function matchRoute(" in src
+          and "go(matchRoute(row.dataset.match, row.dataset.dest))" in src)
     check("both parents can own a match",
           "renderMatchDetail(decodeURIComponent(parts[1])" in src)
     check("...and the detail names its parent",
@@ -470,10 +474,28 @@ def main():
     if not node:
         print("  (no node -- skipping the behavioural state checks)")
     else:
-        fn = re.search(r"function matchState\(m, live\) \{.*?\n\}", src, re.S)
-        check("matchState is liftable", fn is not None)
+        # ⚠ matchState NOW HAS DEPENDENCIES. It used to be self-contained;
+        # it now delegates to the shared six-state model (matchState6/mNum/
+        # mOver) so the page cannot invent its own idea of "live". Lifting it
+        # alone gives a ReferenceError in node -- lift the whole chain.
+        need = ["function mNum(v) {", "function mOver(live, m) {",
+                "function matchState6(m, live, box) {",
+                "function matchState(m, live) {"]
+        parts = []
+        for sig in need:
+            i = src.find(sig)
+            if i < 0:
+                parts = []
+                break
+            j = src.index("\n}", i) + 2
+            parts.append(src[i:j])
+        fn = "\n".join(parts) if parts else None
+        check("the state chain is liftable", bool(fn),
+              "missing one of %s" % need)
         if fn:
-            js = fn.group(0) + """
+            # the shared table the chain reads, as the page receives it
+            js = ("const MSTATE = " + json.dumps({
+                "caps": {}, "label": {}, "note": {}}) + ";\n") + fn + """
 const cases = [
   ['live now',      {}, {state:'I', period:'2ND SET'}],
   ['feed says final',{}, {state:'F', period:'FINAL'}],

@@ -643,6 +643,66 @@ whole week; Monday/Eastern/Hawaii unchanged; the real 39 carry evidence; the
 ledger writes exactly one file and deletes nothing; no suite can touch raw logs
 or the real history. **Four negative controls verified to trip.**
 
-**State at close:** 27 suites pass with `Cody/` present and 24 with it moved
+## 13. LIVE MATCH TRUTH / BOX SCORE READINESS
+
+**THE AUDIT IS WRITTEN DOWN: `docs/live_endpoint_audit.md`.** Measured against
+real fixtures, not inferred.
+
+⚠ **BEFORE FIRST SERVE `/game/{id}/boxscore` RETURNS HTTP 502 WITH AN HTML
+ERROR PAGE** -- not a 404, not an empty document. Three upcoming ids, all 502;
+a final on the same run returned 200 JSON with full team and player lines. Any
+caller assuming a JSON body throws.
+
+⚠ **AND THE SCOREBOARD SERVES `score: ''` BEFORE FIRST SERVE -- AN EMPTY
+STRING.** `Number('')` is 0, so a careless read renders an unplayed match as
+0-0, indistinguishable from a real 0-0 at first serve. **`live_server.py` had
+exactly this bug**: `a.get("score") or "0"`. Fixed; the absence now passes
+through and the state model decides.
+
+**ONE STATE MODEL (`scripts/match_state.py`), SIX STATES**, with a capability
+table saying what each may display: `upcoming · live_score_only ·
+live_with_team_stats · final_box_pending · final_with_box · unavailable`. The
+rules live in Python and the table is **handed to the page** -- three renderers
+each deciding for themselves is how a finished match once sat in "Coming up".
+
+⚠ **CAPABILITY IS A CEILING, NOT A PROMISE.** `final_with_box` permits player
+lines, but a box score carrying none still forbids the table. A live match
+never unlocks player lines at all. **A stale live row never beats a stored
+final** -- `resolve()` takes the strongest evidence, never the most recent.
+
+**`final_box_pending` renders as itself**: a bordered "the official box score
+has not been published yet", never an empty table, zeroes, or invented leaders.
+
+**ONE CANONICAL MATCH URL.** `matchRoute()` is the only builder and the click
+handler matches **any** `[data-match]` element. Team result rows now carry the
+game id and open the match -- previously five surfaces routed and a team's own
+result, the likeliest place to want the detail, dead-ended. Keyboard parity
+added.
+
+⚠ **A MEASURED LAYOUT BUG THAT HIT EXACTLY THE TEAMS THE LAST PHASE SURFACED.**
+`.rbside` is a FOUR-column grid and `logo()` returns `''` for a team we hold no
+crest for -- so the row had three children, **every cell shifted one column
+left**, the name rendered inside the 34px crest track at three lines and 91px
+tall, and the score sat stranded beside it instead of at the right edge.
+**Every non-Division-I opponent was affected.** An always-emitted placeholder
+holds the column open; name height 91px -> 31px, score right-aligned. Guarded.
+
+**Not measured, and said so:** no D-I match has been in progress during any
+probe window, so `live_score_only` and `live_with_team_stats` are covered by
+fixtures only, as is `final_box_pending` (all 9 stored finals have box scores).
+**The standing rule stands: nothing may claim live statistics are available
+until `probe_live_boxscore.py` has run against a live match** -- Friday
+2026-08-28.
+
+**Guards:** `scripts/test_match_state.py` (28th suite) -- all six states
+resolve and are distinct; a final is never upcoming (five feed shapes); `''` is
+not 0; nothing displays above its state; a live match never unlocks player
+lines; a stale live row never overwrites a final; the page's table matches
+Python exactly, state by state; a final without a box shows no table and no
+zero-filled fallback; every entry point uses one route; box-score totals
+reconcile (18 team boxes); the ribbon keeps its column count; and the audit
+states its own limits. **Five negative controls verified to trip.**
+
+**State at close:** 28 suites pass with `Cody/` present and 24 with it moved
 aside. Tree is clean apart from the three fixes above. Nothing here changes
 data, ratings, or the crawl -- all three are display-layer only.
