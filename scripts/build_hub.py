@@ -4252,6 +4252,101 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
 #v-scores .datejump{display:flex;align-items:center;gap:8px;margin-left:auto;
   font:11.5px/1 var(--mono);color:var(--slate)}
 
+
+/* FILMROOM-CSS-BEGIN */
+/* ── FILM ROOM: a notebook, ruled and dated ────────────────────────────────
+   ⚠ INSIDE A SENTINEL PAIR. The selector names alone say what this feature
+   records; the public build removes the whole block. */
+.fr-new{margin:0 0 20px;padding:0 0 18px;border-bottom:1px solid var(--vx-rule)}
+.fr-form{display:flex;flex-direction:column;gap:11px}
+.fr-form label{display:flex;flex-direction:column;gap:4px;
+  font:700 8.5px/1.4 var(--disp);letter-spacing:.12em;text-transform:uppercase;
+  color:var(--slate);min-width:0}
+.fr-form input,.fr-form select,.fr-form textarea{font:13px/1.5 var(--sans);
+  color:var(--chalk);background:var(--alt);border:1px solid var(--line2);
+  border-radius:3px;padding:8px 10px;letter-spacing:0;text-transform:none;
+  min-width:0;width:100%}
+.fr-form textarea{resize:vertical}
+.fr-row{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.fr-full{width:100%}
+.fr-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.fr-btn{font:700 10px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
+  padding:10px 15px;border-radius:3px;border:1px solid var(--line2);
+  background:none;color:var(--ink2);cursor:pointer}
+.fr-btn.primary{border-color:var(--gold);color:var(--gold)}
+.fr-btn:hover{color:var(--chalk);border-color:var(--chalk)}
+.fr-freeze{flex-direction:row!important;align-items:center;gap:6px!important;
+  text-transform:none!important;letter-spacing:0!important;font:12px/1.4 var(--sans)!important;
+  color:var(--ink2)!important}
+.fr-freeze input{width:auto}
+.fr-state{font:12px/1.4 var(--mono);color:var(--ink3);margin-left:auto}
+
+.fr-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 16px}
+.fr-bar input[type=search]{flex:1 1 200px;min-width:0}
+.fr-bar input,.fr-bar select{font:13px/1.4 var(--sans);color:var(--chalk);
+  background:var(--alt);border:1px solid var(--line2);border-radius:3px;
+  padding:8px 10px}
+
+.fr-day{margin:0 0 22px}
+.fr-entry{border-left:2px solid var(--line2);padding:0 0 14px 14px;
+  margin:0 0 14px;position:relative}
+.fr-entry:hover{border-left-color:var(--gold)}
+.fr-meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:0 0 5px}
+.fr-meta time{font:12px/1 var(--mono);color:var(--ink3)}
+.fr-ctx{font:700 8.5px/1.5 var(--disp);letter-spacing:.1em;text-transform:uppercase;
+  padding:2px 7px;border-radius:3px;background:var(--line);color:var(--ink2)}
+.fr-ctx.pre{color:var(--vx-avca);background:var(--vx-avca-dim)}
+.fr-ctx.during{color:#FF9E5A;background:rgba(255,158,90,.14)}
+.fr-ctx.post{color:var(--vx-power);background:var(--vx-power-dim)}
+.fr-src{font:11px/1 var(--mono);color:var(--ink3)}
+.fr-del{margin-left:auto;background:none;border:0;color:var(--ink3);
+  cursor:pointer;font-size:13px;padding:2px 5px}
+.fr-del:hover{color:#FF7A7A}
+.fr-entry h4{margin:0 0 4px;font:700 15px/1.25 var(--disp);color:var(--chalk)}
+.fr-body{margin:0 0 7px;font-size:13.5px;line-height:1.6;color:var(--ink2);
+  white-space:pre-wrap;overflow-wrap:anywhere}
+.fr-tags{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 6px}
+.fr-tags img{width:18px;height:18px}
+.fr-tag{font:600 11px/1 var(--sans);color:var(--ink2);background:var(--alt);
+  border:1px solid var(--line);border-radius:3px;padding:3px 7px}
+.fr-tag.pl{border-style:dashed}
+/* ⚠ A FROZEN CHIP CARRIES ITS DATE. Without the stamp it reads as a live
+   value, and a note kept for a month would quietly become wrong. */
+.fr-facts{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:0 0 6px}
+.fr-facts>i{font-style:normal;font:700 8px/1.4 var(--disp);letter-spacing:.11em;
+  text-transform:uppercase;color:var(--slate)}
+.fr-chip{font:11px/1 var(--mono);color:var(--ink2);background:var(--alt);
+  border:1px solid var(--line2);border-radius:3px;padding:3px 7px;
+  display:inline-flex;align-items:center;gap:5px}
+.fr-chip b{color:var(--slate);font-weight:700;font-size:9px;
+  letter-spacing:.06em;text-transform:uppercase}
+.fr-chip em{font-style:normal;color:var(--ink3);font-size:10px}
+.fr-link{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;
+  font-size:11.5px;margin:0 0 4px}
+.fr-link a{color:var(--vx-avca)}
+.fr-link span{color:var(--ink3)}
+.fr-open{font:700 9px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase;
+  color:var(--gold);text-decoration:none}
+
+/* the restrained count on a team or match page */
+.fr-count{font:700 9px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase;
+  color:var(--ink3);text-decoration:none;border:1px solid var(--line2);
+  border-radius:3px;padding:5px 9px;display:inline-block}
+.fr-count.has{color:var(--gold);border-color:var(--gold)}
+
+@media (max-width:560px){
+  /* ⚠ RAPID CAPTURE ON A PHONE MEANS ONE COLUMN. Two side-by-side selects at
+     390px leaves each ~170px, which is not a usable control while a match is
+     going on. */
+  .fr-row{grid-template-columns:1fr}
+  .fr-bar{gap:8px}
+  .fr-bar input[type=search]{flex:1 1 100%}
+  .fr-actions{gap:9px}
+  .fr-state{margin-left:0;flex:1 1 100%}
+  .fr-entry{padding-left:11px}
+}
+/* FILMROOM-CSS-END */
+
 /* MYBOARD-CSS-BEGIN */
 /* ── MY BOARD ─────────────────────────────────────────────────────────────
    A pinned film strip inside the Match Desk, not a second dashboard. Compact
@@ -5892,6 +5987,9 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
         <button role="menuitem" data-v="bracket">Projected bracket</button>
         <button role="menuitem" data-v="schedule">Schedule</button>
         <button role="menuitem" data-v="tv">On TV</button>
+        <!-- FILMROOM-MENU-BEGIN -->
+        <button role="menuitem" data-v="film">Film Room</button>
+        <!-- FILMROOM-MENU-END -->
       </div>
     </div>
   </div></nav>
@@ -6247,6 +6345,39 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     </details>
   </div>
 </section>
+
+<!-- FILMROOM-HTML-BEGIN -->
+<section id="v-film" hidden>
+  <h2 class="vh">Film Room <span class="privtag" title="Your notebook. It stays on this device: nothing is published, nothing feeds a rating, and nothing is posted anywhere.">private</span></h2>
+  <p class="tabhint">Your own observations, kept on this device. A note is
+    <b>what you wrote</b>; a chip beside it is a hub value <b>frozen at the
+    moment you saved it</b>. Nothing here is read by any rating, projection or
+    ballot, and no link you paste is ever fetched.</p>
+
+  <div class="fr-new" id="frnew"></div>
+
+  <div class="fr-bar">
+    <input type="search" id="frq" placeholder="Search your notes&hellip;">
+    <select id="frfctx" aria-label="Filter by context">
+      <option value="">Any moment</option>
+      <option value="pre">Pre-match</option>
+      <option value="during">During match</option>
+      <option value="post">Post-match</option>
+    </select>
+    <select id="frfsrc" aria-label="Filter by source">
+      <option value="">Any source</option>
+      <option value="self">Watched myself</option>
+      <option value="official">Official stat/source</option>
+      <option value="article">Article</option>
+      <option value="community">Community discussion</option>
+      <option value="other">Other</option>
+    </select>
+    <span class="count" id="frcount"></span>
+  </div>
+
+  <div id="frbody"></div>
+</section>
+<!-- FILMROOM-HTML-END -->
 
 <section id="v-ballot" hidden>
   <h2 class="vh">Ballot Workshop <span class="privtag" title="Your own ballot. It is not published here, it feeds no model, and nothing is posted anywhere.">private</span></h2>
@@ -6639,7 +6770,8 @@ function openMore() {
    Back, Forward and a direct refresh land in the same place as a click.  */
 const ROUTE_OF_VIEW = { desk:'match-desk', scores:'scores', rankings:'rankings',
   teams:'teams', ballot:'ballot', leaders:'stats', players:'players',
-  standings:'standings', bracket:'bracket', schedule:'schedule', tv:'tv' };
+  standings:'standings', bracket:'bracket', schedule:'schedule', tv:'tv',
+  /* FILMROOM-ROUTE-BEGIN */ film:'film-room' /* FILMROOM-ROUTE-END */ };
 const VIEW_OF_ROUTE = Object.keys(ROUTE_OF_VIEW)
   .reduce((a,k)=>{a[ROUTE_OF_VIEW[k]]=k;return a;},{});
 
@@ -6688,6 +6820,9 @@ function route() {
   ROUTE_ORIGIN = params.get('from') || null;
   showView(view);
 
+  /* FILMROOM-WIRE-BEGIN */
+  if (view === 'film' && typeof frWire === 'function') frWire();
+  /* FILMROOM-WIRE-END */
   if (view === 'rankings') {
     const want = parts[1] === 'power' ? 'ours' : (parts[1] || 'ours');
     /* ⚠ THE REFERENCE VIEWS HAVE NO BUTTON ANY MORE, so gating the render on
@@ -9147,6 +9282,411 @@ const DIGBY_WATCH = `{{DIGBY_WATCH}}`;
 let LIVE_STAMP = '';
 let LIVE_BY_ID = {};
 
+
+/* FILMROOM-JS-BEGIN */
+/* ═══ FILM ROOM / VOTING NOTEBOOK ═════════════════════════════════════════
+   Cody's own observations, kept on Cody's own device.
+
+   ⚠ THE PRIVACY MODEL IS MY BOARD'S, DELIBERATELY. localStorage only, fail
+   soft, and NOTHING about a note -- its text, its links, its tags, even the
+   fact that one exists -- reaches the public build, the rating payload, a
+   prediction, the ballot file, Digby's facts, or git. The whole feature lives
+   inside these sentinels so the public build removes it wholesale rather than
+   hiding it; hiding private content still ships it, which this project has
+   already learned once with third-party rank VALUES hidden in a payload.
+
+   ⚠ AND NOTES NEVER BECOME EVIDENCE THE SITE CITES. A note is Cody's opinion
+   or Cody's transcription. It is displayed back to him and nowhere else -- it
+   does not weight a rating, fill a ballot, or turn into a "reason". The one
+   thing a note may carry that IS checkable is a FROZEN FACT CHIP: a value
+   copied out of the hub at a stated moment, stamped with that moment, so a
+   month later it is clear the number is a snapshot and not a live read. */
+
+const FR_KEY = 'wvb.filmroom.v1';
+let FR = [];
+let FR_OK = true;
+
+/* the three moments a note can belong to, and where a note came from */
+const FR_CTX = [['pre', 'Pre-match'], ['during', 'During match'],
+                ['post', 'Post-match']];
+const FR_SRC = [['self', 'Watched myself'], ['official', 'Official stat/source'],
+                ['article', 'Article'], ['community', 'Community discussion'],
+                ['other', 'Other']];
+
+function frLoad() {
+  try {
+    const raw = window.localStorage.getItem(FR_KEY);
+    const v = raw ? JSON.parse(raw) : [];
+    FR = Array.isArray(v) ? v : [];
+    FR_OK = true;
+  } catch (e) {
+    /* ⚠ FAIL SOFT AND SAY SO. Private window, blocked site data or a full
+       quota all land here. The notebook then works for this session and
+       persists nothing, and the view says that plainly rather than pretending
+       to have saved. */
+    FR = [];
+    FR_OK = false;
+  }
+  return FR;
+}
+
+function frSave() {
+  try {
+    window.localStorage.setItem(FR_KEY, JSON.stringify(FR));
+    FR_OK = true;
+  } catch (e) { FR_OK = false; }
+  return FR_OK;
+}
+
+function frId() {
+  return 'n' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+/* ⚠ A FROZEN FACT IS STAMPED AT THE MOMENT IT IS TAKEN. It is read out of the
+   payload once and stored as text; it is never re-read later. That is the
+   whole point -- "Kentucky POWER #3" means #3 on the day it was captured, and
+   a chip that silently updated itself would be a different claim. */
+function frFreezeTeam(team) {
+  const out = [];
+  try {
+    const t = TEAMS[team];
+    if (!t) return out;
+    if (t.rank) out.push({ k: 'POWER', v: '#' + t.rank });
+    if (t.avca) out.push({ k: 'AVCA', v: '#' + t.avca });
+    if (t.record26) out.push({ k: 'Record', v: t.record26 });
+  } catch (e) { /* payload not ready: no chips rather than wrong ones */ }
+  return out.map(c => ({ k: c.k, v: c.v, at: new Date().toISOString() }));
+}
+
+function frFreezeMatch(gid) {
+  const out = [];
+  try {
+    const m = matchByGid(gid);
+    if (!m) return out;
+    const sc = matchScore(m, LIVE_BY_ID[gid]);
+    out.push({ k: 'Match', v: mAway(m) + ' at ' + mHome(m) });
+    if (sc && sc[0] !== null && sc[0] !== undefined) {
+      out.push({ k: 'Score', v: sc[0] + '\u2013' + sc[1] });
+    }
+    if (m.d) out.push({ k: 'Date', v: m.d });
+  } catch (e) { /* nothing rather than something invented */ }
+  return out.map(c => ({ k: c.k, v: c.v, at: new Date().toISOString() }));
+}
+
+function frAdd(note) {
+  frLoad();
+  const n = {
+    id: frId(),
+    created: new Date().toISOString(),
+    ctx: note.ctx || 'post',
+    title: (note.title || '').slice(0, 200),
+    body: (note.body || '').slice(0, 4000),
+    teams: (note.teams || []).slice(0, 8),
+    players: (note.players || []).slice(0, 8),
+    gid: note.gid || '',
+    src: note.src || '',
+    /* ⚠ THE URL IS STORED; THE PAGE BEHIND IT IS NEVER FETCHED. No request is
+       made, nothing is scraped, and no third-party text is copied in. What is
+       kept is Cody's own link and Cody's own takeaway. */
+    url: (note.url || '').slice(0, 500),
+    facts: note.facts || []
+  };
+  FR.unshift(n);
+  frSave();
+  return n;
+}
+
+function frRemove(id) {
+  frLoad();
+  const i = FR.findIndex(n => n.id === id);
+  if (i >= 0) { FR.splice(i, 1); frSave(); }
+  return i >= 0;
+}
+
+function frFor(opts) {
+  frLoad();
+  const o = opts || {};
+  return FR.filter(n => {
+    if (o.team && (n.teams || []).indexOf(o.team) < 0) return false;
+    if (o.player && (n.players || []).indexOf(o.player) < 0) return false;
+    if (o.gid && n.gid !== o.gid) return false;
+    if (o.ctx && n.ctx !== o.ctx) return false;
+    if (o.src && n.src !== o.src) return false;
+    if (o.q) {
+      const hay = (n.title + ' ' + n.body + ' ' + (n.teams || []).join(' ') +
+                   ' ' + (n.players || []).join(' ')).toLowerCase();
+      if (hay.indexOf(o.q.toLowerCase()) < 0) return false;
+    }
+    return true;
+  });
+}
+
+function frCount(opts) { return frFor(opts).length; }
+
+/* ---- the notebook, rendered ------------------------------------------- */
+/* the calendar day this timestamp falls on WHERE THE READER IS */
+function frLocalDay(t) {
+  const p = n => (n < 10 ? '0' : '') + n;
+  return t.getFullYear() + '-' + p(t.getMonth() + 1) + '-' + p(t.getDate());
+}
+
+function frCtxLabel(c) {
+  const f = FR_CTX.find(x => x[0] === c); return f ? f[1] : c;
+}
+function frSrcLabel(c) {
+  const f = FR_SRC.find(x => x[0] === c); return f ? f[1] : '';
+}
+
+/* one entry: ruled, dated, and clear about what is mine and what is frozen */
+function frEntry(n, compact) {
+  /* shown in the reader's own time, for the same reason */
+  const _t = new Date(n.created);
+  const when = isFinite(_t)
+    ? frLocalDay(_t) + ' ' + String(_t.getHours()).padStart(2, '0') + ':' +
+      String(_t.getMinutes()).padStart(2, '0')
+    : String(n.created || '').slice(0, 16).replace('T', ' ');
+  const crest = (n.teams || []).slice(0, 3)
+    .map(t => logo(t) || '').join('');
+  return '<article class="fr-entry" data-fr="' + esc(n.id) + '">' +
+    '<div class="fr-meta">' +
+      '<span class="fr-ctx ' + esc(n.ctx) + '">' + esc(frCtxLabel(n.ctx)) +
+      '</span>' +
+      '<time>' + esc(when) + '</time>' +
+      (n.src ? '<span class="fr-src">' + esc(frSrcLabel(n.src)) + '</span>' : '') +
+      (compact ? '' : '<button type="button" class="fr-del" data-frdel="' +
+        esc(n.id) + '" title="Delete this note">&#10005;</button>') +
+    '</div>' +
+    (n.title ? '<h4>' + esc(n.title) + '</h4>' : '') +
+    /* ⚠ WHAT CODY WROTE IS MARKED AS WHAT CODY WROTE. The body is his
+       observation; the chips beside it are hub values frozen at a stated
+       moment. Mixing the two would turn an opinion into a citation. */
+    (n.body ? '<p class="fr-body">' + esc(n.body) + '</p>' : '') +
+    ((n.teams || []).length || (n.players || []).length
+      ? '<div class="fr-tags">' + crest +
+        (n.teams || []).map(t => '<span class="fr-tag">' + esc(t) + '</span>').join('') +
+        (n.players || []).map(t => '<span class="fr-tag pl">' + esc(t) + '</span>').join('') +
+        '</div>'
+      : '') +
+    ((n.facts || []).length
+      ? '<div class="fr-facts"><i>Frozen from the hub</i>' +
+        n.facts.map(f => '<span class="fr-chip"><b>' + esc(f.k) + '</b>' +
+          esc(f.v) + '<em>' + esc(String(f.at || '').slice(0, 10)) + '</em></span>')
+          .join('') + '</div>'
+      : '') +
+    (n.url
+      ? '<div class="fr-link"><a href="' + esc(n.url) + '" target="_blank" ' +
+        'rel="noopener noreferrer">source link</a>' +
+        '<span>the page is never fetched or copied &mdash; the takeaway above ' +
+        'is yours</span></div>'
+      : '') +
+    (n.gid ? '<a class="fr-open" href="' + matchRoute(n.gid, 'scores') +
+             '">open the match</a>' : '') +
+    '</article>';
+}
+
+/* the capture form -- three contexts, optional source, optional frozen facts */
+function frForm(pre) {
+  const p = pre || {};
+  const opt = (arr, sel) => arr.map(x =>
+    '<option value="' + x[0] + '"' + (x[0] === sel ? ' selected' : '') + '>' +
+    x[1] + '</option>').join('');
+  return '<form class="fr-form" id="frform">' +
+    '<div class="fr-row">' +
+      '<label>When<select id="frctx">' + opt(FR_CTX, p.ctx || 'post') +
+      '</select></label>' +
+      '<label>Source<select id="frsrc"><option value="">&mdash;</option>' +
+      opt(FR_SRC, p.src || '') + '</select></label>' +
+    '</div>' +
+    '<label class="fr-full">Title<input type="text" id="frtitle" ' +
+      'maxlength="200" placeholder="What you want to remember"></label>' +
+    /* ⚠ NOT `frbody` -- THAT IS THE NOTES LIST. Naming the textarea and the
+       list the same thing meant getElementById returned the TEXTAREA (it comes
+       first in the DOM), so every render wrote the notebook into the form
+       field: innerHTML 905 characters, zero child elements, no visible notes.
+       Same shape as the `sbody` collision that made the just-finished band
+       query the schedule tbody. The name inventory cannot catch this one --
+       it compares against names that already exist, not against the two I add
+       in the same change. */
+    '<label class="fr-full">Your note<textarea id="frnote" rows="4" ' +
+      'placeholder="Your own words. Nothing here is published or read by the ' +
+      'model."></textarea></label>' +
+    '<label class="fr-full">Link (optional)<input type="url" id="frurl" ' +
+      'placeholder="https://&hellip; — stored as a link only"></label>' +
+    '<div class="fr-row">' +
+      '<label>Teams<input type="text" id="frteams" list="bwlist-teams" ' +
+      'value="' + esc((p.teams || []).join(', ')) + '" ' +
+      'placeholder="comma separated"></label>' +
+      '<label>Players<input type="text" id="frplayers" ' +
+      'value="' + esc((p.players || []).join(', ')) + '" ' +
+      'placeholder="comma separated"></label>' +
+    '</div>' +
+    (p.gid ? '<input type="hidden" id="frgid" value="' + esc(p.gid) + '">' : '') +
+    '<div class="fr-actions">' +
+      '<button type="submit" class="fr-btn primary">Save note</button>' +
+      (p.freeze
+        ? '<label class="fr-freeze"><input type="checkbox" id="frfreeze" checked>' +
+          'Attach current hub values, stamped now</label>' : '') +
+      '<span class="fr-state" id="frstate"></span>' +
+    '</div></form>';
+}
+
+
+/* ---- the Film Room view ------------------------------------------------ */
+let FR_FILTER = {};
+
+function frRender() {
+  const host = document.getElementById('frbody');
+  if (!host) return;
+  frLoad();
+  const rows = frFor(FR_FILTER);
+  const cnt = document.getElementById('frcount');
+  if (cnt) cnt.textContent = rows.length + (rows.length === 1 ? ' note' : ' notes');
+
+  /* ⚠ TWO DIFFERENT EMPTY STATES, AND THEY ARE NOT THE SAME PROBLEM. An empty
+     notebook is a beginning; a blocked one is a browser setting that will lose
+     work. Showing the friendly copy for the second would be a lie. */
+  if (!FR_OK) {
+    /* one literal: a sentence split across a concatenation never appears
+       contiguously in the built page, so a guard cannot find it */
+    host.innerHTML = '<div class="vx-empty"><h4>This browser is not letting the page store anything</h4>' +
+      '<p>Private windows and blocked site data ' +
+      'both do this. The notebook still works for this session, but nothing ' +
+      'will be here when you come back. Nothing is sent anywhere either way.' +
+      '</p></div>';
+    return;
+  }
+  if (!FR.length) {
+    host.innerHTML = '<div class="vx-empty"><h4>Your notebook is empty</h4>' +
+      '<p>Add a note from a team page, a player, a match, or from here. Notes ' +
+      'stay on this device: they are not published, not read by any rating, ' +
+      'and never posted anywhere.</p></div>';
+    return;
+  }
+  if (!rows.length) {
+    host.innerHTML = '<p class="emptylane">No note matches these filters.</p>';
+    return;
+  }
+  /* grouped by day, newest first -- a notebook reads by date */
+  /* ⚠ GROUP BY THE LOCAL DAY, NOT THE UTC SLICE. `created` is an ISO string
+     in UTC, so a note written at 7pm Pacific carries tomorrow's UTC date --
+     and the notebook filed it under a heading reading "Tomorrow". A notebook
+     is read by the day the person was watching, which is their day. */
+  const byDay = {};
+  rows.forEach(n => {
+    const t = new Date(n.created);
+    const d = isFinite(t) ? frLocalDay(t) : String(n.created || '').slice(0, 10);
+    (byDay[d] = byDay[d] || []).push(n);
+  });
+  host.innerHTML = Object.keys(byDay).sort().reverse().map(d =>
+    '<div class="fr-day"><div class="vx-label"><b>' + esc(dayLabel(d)) +
+    '</b></div>' + byDay[d].map(n => frEntry(n)).join('') + '</div>').join('');
+}
+
+function frWire() {
+  const host = document.getElementById('v-film');
+  if (!host || host.dataset.wired) return;
+  host.dataset.wired = '1';
+
+  const newBox = document.getElementById('frnew');
+  if (newBox) newBox.innerHTML = frForm({});
+
+  host.addEventListener('submit', e => {
+    const f = e.target.closest('#frform');
+    if (!f) return;
+    e.preventDefault();
+    const val = id => (document.getElementById(id) || {}).value || '';
+    const list = id => val(id).split(',').map(x => x.trim()).filter(Boolean);
+    const teams = list('frteams');
+    const gid = val('frgid');
+    let facts = [];
+    const fz = document.getElementById('frfreeze');
+    if (fz && fz.checked) {
+      if (gid) facts = frFreezeMatch(gid);
+      else if (teams.length) facts = frFreezeTeam(teams[0]);
+    }
+    if (!val('frtitle') && !val('frnote')) {
+      const st = document.getElementById('frstate');
+      if (st) st.textContent = 'A note needs a title or a body.';
+      return;
+    }
+    frAdd({ ctx: val('frctx'), src: val('frsrc'), title: val('frtitle'),
+            body: val('frnote'), url: val('frurl'), teams: teams,
+            players: list('frplayers'), gid: gid, facts: facts });
+    const st = document.getElementById('frstate');
+    if (st) st.textContent = FR_OK ? 'Saved on this device.'
+                                   : 'Kept for this session only.';
+    f.reset();
+    frRender();
+    frSyncCounts();
+  });
+
+  host.addEventListener('click', e => {
+    const del = e.target.closest('[data-frdel]');
+    if (del) {
+      frRemove(del.dataset.frdel);
+      frRender(); frSyncCounts();
+    }
+  });
+
+  ['frq', 'frfctx', 'frfsrc'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', () => {
+      FR_FILTER = { q: (document.getElementById('frq') || {}).value || '',
+                    ctx: (document.getElementById('frfctx') || {}).value || '',
+                    src: (document.getElementById('frfsrc') || {}).value || '' };
+      frRender();
+    });
+  });
+  frRender();
+}
+
+/* ⚠ A COUNT, NOT A WALL. A team page or a match says how many notes exist and
+   links to them; it does not print them. The page belongs to the data, and the
+   notebook belongs to the notebook. */
+function frSyncCounts() {
+  document.querySelectorAll('[data-frcount]').forEach(el => {
+    const key = el.dataset.frcount;
+    const kind = el.dataset.frkind || 'team';
+    const o = {};
+    o[kind] = key;
+    const n = frCount(o);
+    el.textContent = n ? (n + (n === 1 ? ' note' : ' notes')) : 'no notes yet';
+    el.classList.toggle('has', !!n);
+  });
+}
+
+
+/* ⚠ AN ENTRY POINT IS A COUNT AND A LINK, NOT A PANEL. A team page belongs to
+   the data; the notebook belongs to the notebook. */
+function frLink(kind, key) {
+  return '<a class="fr-count" href="' + routeFor('film') + '" ' +
+    'data-frcount="' + esc(key) + '" data-frkind="' + esc(kind) + '">' +
+    'no notes yet</a>';
+}
+
+/* Beside the My Board control that already marks the same objects. */
+function frInject() {
+  /* ⚠ ANCHOR ON THE CONTROL, NOT ON A WRAPPER. The first version looked for
+     `.mbslot`, which only wraps the ROSTER path -- the team header's My Board
+     button has an unclassed parent, so the busiest entry point got nothing.
+     Every My Board control is a team the notebook can be filtered to, wherever
+     it sits. */
+  document.querySelectorAll('[data-mb]').forEach(btn => {
+    const host = btn.parentNode;
+    if (!host || host.querySelector('.fr-count')) return;
+    const nm = btn.dataset.mb;
+    if (nm) btn.insertAdjacentHTML('afterend', ' ' + frLink('team', nm));
+  });
+  document.querySelectorAll('#bwqueue .bwcase').forEach(c => {
+    if (c.querySelector('.fr-count')) return;
+    const nm = ((c.querySelector('.bwcn') || {}).textContent || '').trim();
+    if (nm) c.insertAdjacentHTML('beforeend', ' ' + frLink('team', nm));
+  });
+  frSyncCounts();
+}
+
+/* FILMROOM-JS-END */
+
 /* MYBOARD-JS-BEGIN */
 /* ══ MY BOARD ═════════════════════════════════════════════════════════════
    Cody's private watchlist. It lives in ONE place -- localStorage in his own
@@ -9365,6 +9905,9 @@ function mbInject() {
     sp.innerHTML = mbControl(nm);
     a.parentNode.appendChild(sp);
   });
+  /* FILMROOM-HOOK-BEGIN */
+  if (typeof frInject === 'function') frInject();
+  /* FILMROOM-HOOK-END */
   /* inside the private ballot: review queue, comparison, and each slot */
   document.querySelectorAll('#bwqueue .bwcase').forEach(c => {
     if (c.querySelector('[data-mb]')) return;
@@ -11798,6 +12341,9 @@ PRIVATE_MARKERS = ("VolleyTalk", "Massey Ratings", "Massey Ratings, 2026",
                    # must contain none of them.
                    "MYBOARD-HTML-BEGIN", "MYBOARD-CSS-BEGIN",
                    "MYBOARD-JS-BEGIN", "wvb.myboard",
+                   "FILMROOM-HTML-BEGIN", "FILMROOM-JS-BEGIN",
+                   "FILMROOM-CSS-BEGIN", "wvb.filmroom", 'id="v-film"',
+                   "Film Room", "FR_KEY",
                    # ── ENDPOINTS THAT ONLY EXIST BEHIND THE LOCAL SERVER ────
                    # ⚠ /api/live IS DELIBERATELY ABSENT FROM THIS LIST. The
                    # live band fetches it and FAILS SOFT on a static host --
@@ -11869,6 +12415,22 @@ def strip_private(html):
                   "", html, flags=re.S)
     html = re.sub(r"/\* MYBOARD-CSS-BEGIN \*/.*?/\* MYBOARD-CSS-END \*/",
                   "", html, flags=re.S)
+    # ⚠ THE FILM ROOM IS PRIVATE IN EVERY LAYER. Markup, script, stylesheet,
+    # its route, its menu item and the one line that wires it -- six sentinel
+    # pairs, because a feature that ships any one of them has shipped a
+    # private feature. The notebook itself never leaves the browser, but the
+    # CODE names what Cody records and would enumerate the feature on a public
+    # page exactly as the ballot's selector names once did.
+    for _a, _b in (("<!-- FILMROOM-HTML-BEGIN -->", "<!-- FILMROOM-HTML-END -->"),
+                   ("/* FILMROOM-JS-BEGIN */", "/* FILMROOM-JS-END */"),
+                   ("/* FILMROOM-CSS-BEGIN */", "/* FILMROOM-CSS-END */"),
+                   ("/* FILMROOM-ROUTE-BEGIN */", "/* FILMROOM-ROUTE-END */"),
+                   ("<!-- FILMROOM-MENU-BEGIN -->", "<!-- FILMROOM-MENU-END -->"),
+                   ("/* FILMROOM-WIRE-BEGIN */", "/* FILMROOM-WIRE-END */"),
+                   ("/* FILMROOM-HOOK-BEGIN */", "/* FILMROOM-HOOK-END */")):
+        html = re.sub(re.escape(_a) + r".*?" + re.escape(_b), "", html,
+                      flags=re.S)
+
     html = re.sub(r"/\* MYBOARD-JS-BEGIN \*/.*?/\* MYBOARD-JS-END \*/",
                   "", html, flags=re.S)
     html = re.sub(r"/\* BALLOT-INIT-BEGIN \*/.*?/\* BALLOT-INIT-END \*/",

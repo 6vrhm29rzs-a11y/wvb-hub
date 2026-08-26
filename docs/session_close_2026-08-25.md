@@ -836,6 +836,73 @@ rank and crest, zero overflow.
 queue's triggers and the compare workspace's fields -- the brief ruled them out
 and they work.
 
-**State at close:** 29 suites pass with `Cody/` present and 24 with it moved
+## 16. FILM ROOM / VOTING NOTEBOOK
+
+**THE PRIVATE BOUNDARY, SEVEN FENCES DEEP.** Markup, script, stylesheet, the
+route, the More-menu item, the wire line and the contextual hook -- each its
+own sentinel pair, all seven stripped from the public build. `wvb.filmroom.v1`
+is localStorage only, fail-soft like My Board, and **nothing about a note --
+text, links, tags, or the fact one exists -- enters the public build, a rating,
+a projection, the ballot file, Digby, or git.**
+
+**Workflow, match to ballot:** watch a match -> add a note from the team page
+(`Pre-match` / `During match` / `Post-match`, optional source type and your own
+link) -> optionally attach a **frozen fact chip** (POWER, AVCA, record, or the
+match score) **stamped with the moment it was taken** -> later the team page
+shows `1 note` and routes to the Film Room filtered to that team -> the same
+count appears beside each team in the ballot review queue.
+
+⚠ **A FROZEN CHIP CARRIES ITS DATE ON PURPOSE.** It is read out of the payload
+once and stored as text, never re-read. "Kentucky POWER #3" means #3 on the day
+it was captured; a chip that silently updated itself would be a different
+claim a month later.
+
+⚠ **A PASTED LINK IS STORED AND NEVER FETCHED.** No request, no scrape, no
+third-party text copied in. Guarded: no `fetch` to any http host exists inside
+the fences.
+
+⚠ **I COLLIDED WITH MYSELF -- `id="frbody"` TWICE.** The note TEXTAREA and the
+notes LIST got the same id, so `getElementById` returned the textarea (first in
+the DOM) and every render wrote the notebook **into the form field**: innerHTML
+905 characters, zero child elements, no visible notes. Same shape as the
+`sbody` bug. **`scripts/css_names.py` cannot catch this one** -- it compares a
+candidate against names that already exist, not against two names added in the
+same change.
+
+⚠ **THE ENTRY POINT ANCHORED ON THE WRONG THING.** It looked for `.mbslot`,
+which only wraps the ROSTER path -- the team header's My Board button has an
+unclassed parent, so the busiest entry point got nothing. It anchors on the
+control (`[data-mb]`) now, wherever it sits.
+
+⚠ **NOTES WERE FILED UNDER "TOMORROW".** `created` is a UTC ISO string, so a
+note written at 7pm Pacific carries tomorrow's UTC date and the day heading
+said so. A notebook is read by the day the person was watching; grouping and
+the entry timestamp are both local now.
+
+⚠ **AND A SENTENCE SPLIT ACROSS A CONCATENATION AGAIN** -- the blocked-storage
+copy, so the guard looking for it failed against correct output. Third time
+this session.
+
+**Two empty states, and they are not the same problem:** an empty notebook is a
+beginning; a blocked one is a browser setting that will lose work.
+
+**Deferred explicitly:** export/import of the notebook as a JSON file. It can
+be done with a Blob and no hosted service, but the viewer sandbox blocks
+page-initiated downloads in some contexts and I would rather not ship a button
+that silently does nothing. Named here rather than half-built.
+
+**Guards:** `scripts/test_filmroom.py` (30th suite) -- every layer fenced; not
+one symbol outside a fence; the public build free of all of it; **fourteen
+computing modules proven never to touch the notebook**; nothing fetched or
+posted; frozen chips stamped and labelled; fail-soft storage distinguished from
+empty; phone capture single-column. **Three negative controls verified to
+trip**: CSS leaving its fence, a rating module reading the notebook, and the
+notebook fetching a pasted link.
+
+⚠ **The guard needed fixing twice before it was honest:** `strip_private()` and
+the marker list legitimately NAME every fence -- counting those as leaks failed
+six fence checks and four symbol checks against a correct build.
+
+**State at close:** 30 suites pass with `Cody/` present and 24 with it moved
 aside. Tree is clean apart from the three fixes above. Nothing here changes
 data, ratings, or the crawl -- all three are display-layer only.

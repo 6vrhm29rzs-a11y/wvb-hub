@@ -740,6 +740,9 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
   font:11.5px/1 var(--mono);color:var(--slate)}
 
 
+
+
+
 /* ══ THE MATCH BOARD ══════════════════════════════════════════════════════
    ONE signature surface: a broadcast scoreboard ribbon, used for the featured
    match and reused verbatim as the match-detail header so a score header has
@@ -2293,7 +2296,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     </div>
     <div class="meta">
       <b>9</b> matches played &middot; <b>348</b> teams rated<br>
-      last result <b>Yesterday</b> &middot; built 2026-08-25 7:13 PM PT
+      last result <b>Yesterday</b> &middot; built 2026-08-25 7:44 PM PT
     </div>
   </div>
   <div class="net"></div>
@@ -2317,6 +2320,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
         <button role="menuitem" data-v="standings">Standings</button>
         <button role="menuitem" data-v="bracket">Projected bracket</button>
         <button role="menuitem" data-v="schedule">Schedule</button>
+        
       </div>
     </div>
   </div></nav>
@@ -2670,6 +2674,8 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 
 
 
+
+
 <section id="v-teams" hidden>
   <div class="ctl">
     <input type="search" id="tmq" list="tmlist" placeholder="Type a team&hellip;" autocomplete="off">
@@ -2894,7 +2900,8 @@ function openMore() {
    Back, Forward and a direct refresh land in the same place as a click.  */
 const ROUTE_OF_VIEW = { desk:'match-desk', scores:'scores', rankings:'rankings',
   teams:'teams', ballot:'ballot', leaders:'stats', players:'players',
-  standings:'standings', bracket:'bracket', schedule:'schedule', tv:'tv' };
+  standings:'standings', bracket:'bracket', schedule:'schedule', tv:'tv',
+   };
 const VIEW_OF_ROUTE = Object.keys(ROUTE_OF_VIEW)
   .reduce((a,k)=>{a[ROUTE_OF_VIEW[k]]=k;return a;},{});
 
@@ -2943,6 +2950,7 @@ function route() {
   ROUTE_ORIGIN = params.get('from') || null;
   showView(view);
 
+  
   if (view === 'rankings') {
     const want = parts[1] === 'power' ? 'ours' : (parts[1] || 'ours');
     /* ⚠ THE REFERENCE VIEWS HAVE NO BUTTON ANY MORE, so gating the render on
@@ -4259,6 +4267,9 @@ const DIGBY_WATCH = `<svg class="digby-art" viewBox="0 0 64 64" width="76" heigh
 
 let LIVE_STAMP = '';
 let LIVE_BY_ID = {};
+
+
+
 
 
 
