@@ -909,7 +909,46 @@ does try both, and says so.
 anywhere in the fenced code. **Three negative controls verified to trip**:
 POSTing the export, dropping a field from it, and claiming the download saved.
 
-**Still deferred:** IMPORT of the notebook.
+**IMPORT SHIPPED.** Local-only recovery/transfer, with the safety model in the
+order: **parse -> validate every note -> classify against what is here now ->
+SHOW a preview -> wait for an explicit choice -> back up -> write.** Nothing
+touches localStorage before the confirmation.
+
+- **Accepts** a chosen `.json` file (read with `FileReader`, locally) or pasted
+  text, and only `format:"wvb.filmroom"` at a supported version.
+- **Rejects** malformed JSON, wrong format, unknown version, missing or
+  wrongly-typed fields, unknown moment/source, duplicate ids inside the file,
+  and payloads over 2 MB / 5,000 notes -- each with a plain-English reason.
+- ⚠ **A LINK MUST BE `http(s)`.** `javascript:` and `data:` are refused at
+  validation, so a stored link can never become code even if something later
+  renders it as an anchor.
+- ⚠ **IMPORTED TEXT IS DATA.** Verified by importing a note whose title was
+  `<img src=x onerror=...>` and whose body carried a `<script>`: **0 img, 0
+  script, 0 svg elements created, nothing executed**, title rendered as literal
+  text -- in the notebook AND in the preview.
+- **Preview** shows export date, file count, will-be-added, already-here,
+  same-id-different-note, unreadable, and a five-item sample.
+- **Safe default** is `Add new notes only`; exact duplicates skipped;
+  **a conflicting id is skipped and never silently overwritten** (verified: the
+  local note kept its own title). `Replace my whole notebook (N notes deleted)`
+  is a separate red button behind a confirm that names N. Cancel changes
+  nothing.
+- **One local backup** before any write, plus an in-memory **Undo** for the
+  session -- verified to restore the previous notebook after both add and
+  replace.
+
+⚠ **THE GUARD CAUGHT ME BORROWING A FENCED BALLOT CLASS.** The preview counters
+used bare `class="warn"` / `class="ok"`, and `.warn` exists only as
+`.bwstate.warn` inside the ballot fence -- the exact mistake that guard was
+written for two phases ago. Namespaced to `fr-warn` / `fr-ok`.
+
+**Four negative controls verified to trip**: letting the preview write to
+storage, overwriting a conflicting id, accepting a `javascript:` link, and
+skipping the backup.
+
+⚠ **NO REAL DATA WAS IMPORTED.** Every test ran against fixtures with the real
+notebook saved and restored; both original notes are intact, no fixture id
+survives, and no backup key was left behind.
 
 **Guards:** `scripts/test_filmroom.py` (30th suite) -- every layer fenced; not
 one symbol outside a fence; the public build free of all of it; **fourteen

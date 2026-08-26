@@ -92,7 +92,10 @@ def main():
             check("public: no %r" % sym, sym not in pub)
         for sym in ("frExport", "frExportDoc", "wvb.filmroom", "frCopyLegacy",
                     "frDownload", "Download JSON", "Copy JSON",
-                    "filmroom-", "FR_FORMAT"):
+                    "filmroom-", "FR_FORMAT",
+                    "frValidate", "frPreview", "frApply", "frUndo",
+                    "frBackup", "FR_BAK", "FR_PENDING", "frBadNote",
+                    "Replace my whole notebook", "Before importing"):
             check("public: no export symbol %r" % sym, sym not in pub)
         fr_css = re.findall(r"\.fr-[a-z0-9-]*\s*[{,]", pub)
         check("public: not one .fr-* CSS rule", not fr_css,
@@ -204,6 +207,77 @@ def main():
           and "The clipboard is not available in this browser." in ex)
     check("an empty notebook says so rather than exporting nothing",
           "There is nothing to export yet." in ex)
+
+    print("\n5e. IMPORT VALIDATES BEFORE IT WRITES")
+    check("import exists", "function frValidate(" in ex)
+    check("...and only the versioned Film Room format is accepted",
+          "doc.format !== FR_FORMAT" in ex and "FR_VERSIONS.indexOf" in ex)
+    check("...with a size ceiling", "FR_MAX_BYTES" in ex and "FR_MAX_NOTES" in ex)
+    # every field of every note is checked
+    bad = ex[ex.index("function frBadNote("):]
+    bad = bad[:bad.index("\nfunction ")]
+    for field in ("id", "created", "ctx", "title", "body", "teams", "players",
+                  "gid", "src", "url", "facts"):
+        check("   validates %-8s" % field, ("n." + field) in bad)
+    # ⚠ A STORED LINK MAY NEVER BECOME CODE.
+    check("[-] a link must be http(s), so javascript:/data: are refused",
+          "/^https?:" in bad)
+    check("unknown keys are dropped rather than stored",
+          "function frClean(" in ex)
+
+    print("\n5f. NOTHING IS WRITTEN UNTIL A CHOICE IS MADE")
+    prev = ex[ex.index("function frPreview("):]
+    prev = prev[:prev.index("\nfunction ")]
+    # ⚠ THE PREVIEW MAY NOT TOUCH STORAGE. If it did, "preview" would be a
+    # euphemism for "import".
+    for w in ("localStorage.setItem", "frSave(", "FR.unshift", "FR ="):
+        check("[-] the preview never does %r" % w, w not in prev)
+    check("the preview counts new, duplicate, conflicting and unreadable",
+          "Will be added" in ex and "Already here" in ex
+          and "Same id, different note" in ex and "Unreadable" in ex)
+    check("...and says plainly that nothing has changed",
+          "Nothing has changed yet." in ex)
+
+    print("\n5g. THE SAFE DEFAULT, AND A NAMED DESTRUCTIVE CHOICE")
+    ap = ex[ex.index("function frApply("):]
+    ap = ap[:ap.index("\nfunction ")]
+    check("adding only ever adds the NEW ones", "c.fresh.forEach" in ap)
+    # ⚠ A CLASHING ID IS NEVER SILENTLY OVERWRITTEN.
+    check("[-] a conflicting id is never written over",
+          "c.clash" not in ap.replace("c.clash.length", ""))
+    check("replace is a separate, confirmed path",
+          "window.confirm(" in ex and "fr-danger" in ex)
+    check("...and the confirmation names how many notes are destroyed",
+          "will be deleted" in ex and "cls.localCount" in ex)
+    check("cancel leaves everything untouched",
+          "Cancelled. Nothing changed." in ex)
+
+    print("\n5h. A BACKUP AND AN UNDO")
+    check("one backup is written before any change", "function frBackup(" in ex
+          and "FR_BAK" in ex)
+    check("...to another LOCAL key, going nowhere",
+          "'wvb.filmroom.backup.v1'" in src)
+    check("undo restores the previous notebook", "function frUndo(" in ex
+          and "FR_UNDO" in ex)
+    check("...and is held in memory, so it dies with the tab",
+          "let FR_UNDO = null" in ex)
+    check("a failed backup is reported, not hidden",
+          "No backup could be written." in ex)
+
+    print("\n5i. IMPORTED TEXT IS DATA, NEVER MARKUP")
+    # Everything from a file goes through esc() on the way to the screen.
+    for frag in ("esc(n.title", "esc(v.why)", "esc(b)"):
+        check("imported text is escaped: %s" % frag, frag in ex)
+    check("[-] no imported value is inserted as raw markup",
+          "innerHTML = text" not in ex and "innerHTML = n.body" not in ex)
+    # and the import path introduces no network of any kind
+    imp = ex[ex.index("const FR_BAK"):]
+    for w in ("fetch(", "XMLHttpRequest", "sendBeacon", "WebSocket",
+              "action=", "method=\"post\""):
+        check("[-] import never uses %r" % w, w not in imp)
+    check("the file is read locally with FileReader", "new FileReader()" in ex)
+    check("...and a read failure says so",
+          "That file could not be read." in ex)
 
     print("\n6. FAIL-SOFT PRIVACY, THE SAME AS MY BOARD")
     check("storage failure is caught", "FR_OK = false" in src)

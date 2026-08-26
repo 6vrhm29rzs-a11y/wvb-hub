@@ -4359,6 +4359,46 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
   .fr-exrow .fr-btn{flex:1 1 auto}
   .fr-state{flex:1 1 100%;margin-left:0}
 }
+.fr-import{margin:22px 0 0;padding:16px 0 0;border-top:1px solid var(--vx-rule)}
+.fr-import .fr-raw{margin:10px 0 0}
+.fr-btn.fr-danger{border-color:#8A3B3B;color:#FF9E9E}
+.fr-btn.fr-danger:hover{border-color:#FF7A7A;color:#FF7A7A}
+label.fr-btn{cursor:pointer;display:inline-block}
+#frprev{margin:14px 0 0;border:1px solid var(--vx-rule);border-radius:4px;
+  padding:14px 15px;background:var(--alt)}
+.fr-prevhd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+  margin:0 0 11px}
+.fr-prevhd b{font:700 13px/1 var(--disp);letter-spacing:.06em;
+  text-transform:uppercase;color:var(--chalk)}
+.fr-prevhd span{font:12px/1 var(--mono);color:var(--ink3)}
+.fr-prevnums{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:10px;margin:0 0 12px}
+.fr-prevnums>div{display:flex;flex-direction:column;gap:2px}
+.fr-prevnums i{font-style:normal;font:700 8px/1.4 var(--disp);letter-spacing:.11em;
+  text-transform:uppercase;color:var(--slate)}
+.fr-prevnums b{font:700 20px/1 var(--disp);color:var(--ink2)}
+.fr-prevnums b.fr-ok{color:var(--vx-power)}
+.fr-prevnums b.fr-warn{color:#F2B441}
+.fr-prevlist{margin:0 0 11px}
+.fr-prevlist>i{font-style:normal;font:700 8px/1.4 var(--disp);letter-spacing:.11em;
+  text-transform:uppercase;color:var(--slate)}
+.fr-prevlist ul{list-style:none;margin:5px 0 0;padding:0;display:flex;
+  flex-direction:column;gap:3px}
+.fr-prevlist li{font-size:12.5px;color:var(--ink2);overflow-wrap:anywhere}
+.fr-prevlist li i{font-style:normal;font:700 8px/1 var(--disp);letter-spacing:.09em;
+  text-transform:uppercase;color:var(--slate);margin-right:7px}
+.fr-prevlist li.more{color:var(--ink3)}
+.fr-prevacts{display:flex;gap:9px;flex-wrap:wrap;align-items:center;
+  margin:12px 0 0;padding:11px 0 0;border-top:1px solid var(--vx-rule)}
+.fr-prevbad{display:flex;flex-direction:column;gap:6px}
+.fr-prevbad b{font:700 13px/1 var(--disp);color:#FF9E9E;letter-spacing:.05em;
+  text-transform:uppercase}
+.fr-prevbad span{font-size:13px;color:var(--ink2)}
+.fr-prevbad ul{margin:3px 0 0;padding-left:18px;color:var(--ink3);font-size:12px}
+@media (max-width:560px){
+  .fr-prevnums{grid-template-columns:1fr 1fr}
+  .fr-prevacts .fr-btn{flex:1 1 100%}
+}
 /* FILMROOM-CSS-END */
 
 /* MYBOARD-CSS-BEGIN */
@@ -6404,6 +6444,28 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <span class="fr-state" id="frexstate"></span>
     </div>
     <div id="frout" hidden></div>
+  </div>
+
+  <!-- ⚠ IMPORT READS ONLY WHEN CHOSEN. No drag-and-drop auto-read, no
+       clipboard sniffing: a file is opened because the file input was used,
+       or text is checked because Preview was pressed. Nothing is written
+       until the preview has been seen and a button pressed. -->
+  <div class="fr-import">
+    <div class="vx-label"><b>Import</b></div>
+    <p class="fr-exwhy">Restore or move your own notebook. The file is read on
+      this device, checked note by note, and shown to you before anything
+      changes. Nothing is uploaded and nothing is overwritten by default.</p>
+    <div class="fr-exrow">
+      <label class="fr-btn" for="frfile">Choose a .json file
+        <input type="file" id="frfile" accept="application/json,.json"
+               hidden></label>
+      <button type="button" class="fr-btn" id="frpaste">Preview pasted
+        JSON</button>
+      <span class="fr-state" id="frimpstate"></span>
+    </div>
+    <textarea class="fr-raw" id="frpastebox" rows="4"
+      placeholder="Or paste an exported notebook here, then press Preview."></textarea>
+    <div id="frprev" hidden></div>
   </div>
 </section>
 <!-- FILMROOM-HTML-END -->
@@ -9662,6 +9724,51 @@ function frWire() {
   const cp = document.getElementById('frexcopy');
   if (cp) cp.addEventListener('click', () => frExport('copy'));
 
+  /* ⚠ THE FILE IS READ WITH FileReader, LOCALLY. No upload, no fetch, no
+     form: the bytes never leave the machine. A read failure says so. */
+  const fi = document.getElementById('frfile');
+  if (fi) fi.addEventListener('change', () => {
+    const f = fi.files && fi.files[0];
+    if (!f) return;
+    if (f.size > FR_MAX_BYTES) {
+      frImpSay('That file is too large to be a notebook.', 'warn');
+      fi.value = ''; return;
+    }
+    const rd = new FileReader();
+    rd.onerror = () => frImpSay('That file could not be read.', 'warn');
+    rd.onload = () => { frPreview(String(rd.result || '')); fi.value = ''; };
+    try { rd.readAsText(f); }
+    catch (e) { frImpSay('That file could not be read.', 'warn'); }
+  });
+  const pb = document.getElementById('frpaste');
+  if (pb) pb.addEventListener('click', () => {
+    const box = document.getElementById('frpastebox');
+    frPreview(box ? box.value : '');
+  });
+
+  host.addEventListener('click', e => {
+    if (e.target.closest('#frdoadd')) { frApply('add'); return; }
+    if (e.target.closest('#frdorepl')) {
+      /* ⚠ THE DESTRUCTIVE PATH ASKS, AND NAMES THE NUMBER. */
+      const n = FR_PENDING ? FR_PENDING.cls.localCount : 0;
+      if (window.confirm('Replace your whole Film Room?\n\n' + n +
+            ' note' + (n === 1 ? '' : 's') + ' on this device will be deleted ' +
+            'and replaced by the file. This cannot be undone after you close ' +
+            'the tab.')) {
+        frApply('replace');
+      }
+      return;
+    }
+    if (e.target.closest('#frcancel')) {
+      FR_PENDING = null;
+      const pv = document.getElementById('frprev');
+      if (pv) { pv.hidden = true; pv.innerHTML = ''; }
+      frImpSay('Cancelled. Nothing changed.', '');
+      return;
+    }
+    if (e.target.closest('#frundo')) { frUndo(); }
+  });
+
   ['frq', 'frfctx', 'frfsrc'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('input', () => {
@@ -9871,6 +9978,274 @@ function frExport(mode) {
       frShowRaw(text, tried);
     }
   });
+}
+
+
+/* ---- import: validate everything, write nothing until told --------------- */
+/* ⚠ THE ORDER MATTERS AND IS THE WHOLE SAFETY MODEL:
+       parse -> validate every note -> classify against what is here now ->
+       SHOW a preview -> wait for an explicit choice -> back up -> write.
+   Nothing touches localStorage before the confirmation, and the destructive
+   option is a separate button that names how many notes it will destroy.
+
+   ⚠ AN IMPORTED FILE IS UNTRUSTED DATA. Its text and its URLs are somebody
+   else's bytes even when that somebody is Cody last month. Everything is
+   rendered through esc() as text; nothing from a file is ever inserted as
+   markup or evaluated. */
+
+const FR_BAK = 'wvb.filmroom.backup.v1';
+const FR_MAX_BYTES = 2 * 1024 * 1024;   /* a notebook is text; 2 MB is generous */
+const FR_MAX_NOTES = 5000;
+const FR_VERSIONS = [1];
+let FR_PENDING = null;                  /* the validated import, awaiting a choice */
+let FR_UNDO = null;                     /* the previous notebook, this session */
+
+function frIsStr(v) { return typeof v === 'string'; }
+function frIsArr(v) { return Array.isArray(v); }
+
+/* One note, fully checked. Returns an error string, or '' when it is sound. */
+function frBadNote(n, i) {
+  if (!n || typeof n !== 'object' || frIsArr(n)) return 'note ' + (i + 1) + ' is not a note';
+  if (!frIsStr(n.id) || !n.id.trim()) return 'note ' + (i + 1) + ' has no id';
+  if (!frIsStr(n.created) || isNaN(new Date(n.created).getTime())) {
+    return 'note ' + (i + 1) + ' has no usable date';
+  }
+  if (!frIsStr(n.ctx) || !FR_CTX.some(c => c[0] === n.ctx)) {
+    return 'note ' + (i + 1) + ' has an unknown moment';
+  }
+  if (!frIsStr(n.title) || !frIsStr(n.body)) return 'note ' + (i + 1) + ' has bad text';
+  if (!n.title.trim() && !n.body.trim()) return 'note ' + (i + 1) + ' is empty';
+  if (!frIsArr(n.teams) || !n.teams.every(frIsStr)) return 'note ' + (i + 1) + ' has bad teams';
+  if (!frIsArr(n.players) || !n.players.every(frIsStr)) return 'note ' + (i + 1) + ' has bad players';
+  if (!frIsStr(n.gid)) return 'note ' + (i + 1) + ' has a bad match reference';
+  if (n.src && (!frIsStr(n.src) || !FR_SRC.some(c => c[0] === n.src))) {
+    return 'note ' + (i + 1) + ' has an unknown source type';
+  }
+  if (!frIsStr(n.url)) return 'note ' + (i + 1) + ' has a bad link';
+  /* ⚠ A LINK IS ONLY EVER http(s), AND IT IS NEVER FETCHED. Refusing
+     javascript: and data: here means a stored link can never become code even
+     if something later renders it as an anchor. */
+  if (n.url && !/^https?:\/\//i.test(n.url)) {
+    return 'note ' + (i + 1) + ' has a link that is not a web address';
+  }
+  if (!frIsArr(n.facts)) return 'note ' + (i + 1) + ' has bad frozen facts';
+  for (const f of n.facts) {
+    if (!f || typeof f !== 'object' || !frIsStr(f.k) || !frIsStr(f.v)) {
+      return 'note ' + (i + 1) + ' has a broken frozen fact';
+    }
+  }
+  return '';
+}
+
+/* Keep only the fields we know. Anything else in the file is discarded rather
+   than stored -- an import must not smuggle new keys into the notebook. */
+function frClean(n) {
+  return {
+    id: n.id, created: n.created, ctx: n.ctx,
+    title: String(n.title).slice(0, 200), body: String(n.body).slice(0, 4000),
+    teams: n.teams.slice(0, 8), players: n.players.slice(0, 8),
+    gid: n.gid, src: n.src || '', url: n.url || '',
+    facts: n.facts.map(f => ({ k: String(f.k).slice(0, 40),
+                               v: String(f.v).slice(0, 80),
+                               at: frIsStr(f.at) ? f.at : '' }))
+  };
+}
+
+function frValidate(text) {
+  const out = { ok: false, why: '', meta: null, valid: [], bad: [] };
+  if (!frIsStr(text) || !text.trim()) {
+    out.why = 'There was nothing to read.'; return out;
+  }
+  if (text.length > FR_MAX_BYTES) {
+    out.why = 'That file is much larger than a notebook should be, so it has ' +
+              'not been opened.';
+    return out;
+  }
+  let doc;
+  try { doc = JSON.parse(text); }
+  catch (e) {
+    out.why = 'That is not readable as JSON. If you pasted it, check nothing ' +
+              'was cut off.';
+    return out;
+  }
+  if (!doc || typeof doc !== 'object' || frIsArr(doc)) {
+    out.why = 'That file is not a Film Room export.'; return out;
+  }
+  if (doc.format !== FR_FORMAT) {
+    out.why = 'That file is not a Film Room export.'; return out;
+  }
+  if (FR_VERSIONS.indexOf(doc.version) < 0) {
+    out.why = 'That export was written by a different version of the ' +
+              'notebook (' + esc(String(doc.version)) + ') and cannot be read here.';
+    return out;
+  }
+  if (!frIsArr(doc.notes)) {
+    out.why = 'That export has no notes in it.'; return out;
+  }
+  if (doc.notes.length > FR_MAX_NOTES) {
+    out.why = 'That export contains more notes than this can handle safely.';
+    return out;
+  }
+  const seen = {};
+  doc.notes.forEach((n, i) => {
+    const why = frBadNote(n, i);
+    if (why) { out.bad.push(why); return; }
+    if (seen[n.id]) { out.bad.push('note ' + (i + 1) + ' repeats an id'); return; }
+    seen[n.id] = 1;
+    out.valid.push(frClean(n));
+  });
+  out.meta = { exported: frIsStr(doc.exported) ? doc.exported : '',
+               count: doc.notes.length };
+  out.ok = out.valid.length > 0;
+  if (!out.ok && !out.why) {
+    out.why = 'Nothing in that file could be read as a note.';
+  }
+  return out;
+}
+
+/* What would happen, without doing any of it. */
+function frClassify(valid) {
+  frLoad();
+  const mine = {};
+  FR.forEach(n => { mine[n.id] = n; });
+  const fresh = [], dupe = [], clash = [];
+  const sig = n => JSON.stringify([n.ctx, n.title, n.body, n.teams, n.players,
+                                   n.gid, n.src, n.url, n.facts]);
+  valid.forEach(n => {
+    const here = mine[n.id];
+    if (!here) fresh.push(n);
+    else if (sig(here) === sig(n)) dupe.push(n);
+    else clash.push(n);
+  });
+  return { fresh: fresh, dupe: dupe, clash: clash, localCount: FR.length };
+}
+
+
+/* ---- preview, then a choice -------------------------------------------- */
+function frImpSay(msg, kind) {
+  const el = document.getElementById('frimpstate');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'fr-state' + (kind ? ' ' + kind : '');
+}
+
+function frPreview(text) {
+  const host = document.getElementById('frprev');
+  if (!host) return;
+  const v = frValidate(text);
+  FR_PENDING = null;
+  if (!v.ok) {
+    host.hidden = false;
+    host.innerHTML = '<div class="fr-prevbad"><b>Nothing was imported.</b>' +
+      '<span>' + esc(v.why) + '</span>' +
+      (v.bad.length
+        ? '<ul>' + v.bad.slice(0, 6).map(b => '<li>' + esc(b) + '</li>').join('') +
+          (v.bad.length > 6 ? '<li>and ' + (v.bad.length - 6) + ' more</li>' : '') +
+          '</ul>'
+        : '') + '</div>';
+    frImpSay('That file was not imported.', 'warn');
+    return;
+  }
+  const c = frClassify(v.valid);
+  FR_PENDING = { valid: v.valid, cls: c, meta: v.meta, bad: v.bad };
+
+  /* ⚠ A SAMPLE, NOT THE WHOLE FILE. Five titles is enough to recognise the
+     notebook; printing all of them turns a confirmation into a wall. */
+  const sample = list => list.slice(0, 5).map(n =>
+    '<li><i>' + esc(frCtxLabel(n.ctx)) + '</i>' +
+    esc(n.title || n.body.slice(0, 60)) + '</li>').join('') +
+    (list.length > 5 ? '<li class="more">and ' + (list.length - 5) +
+      ' more</li>' : '');
+
+  host.hidden = false;
+  host.innerHTML =
+    '<div class="fr-prevhd"><b>Before importing</b>' +
+      '<span>' + (v.meta.exported
+        ? 'exported ' + esc(String(v.meta.exported).slice(0, 10)) : 'no date') +
+      ' &middot; ' + v.meta.count +
+      (v.meta.count === 1 ? ' note in the file' : ' notes in the file') +
+      '</span></div>' +
+    '<div class="fr-prevnums">' +
+      '<div><i>Will be added</i><b class="fr-ok">' + c.fresh.length + '</b></div>' +
+      '<div><i>Already here</i><b>' + c.dupe.length + '</b></div>' +
+      '<div><i>Same id, different note</i><b class="fr-warn">' + c.clash.length +
+        '</b></div>' +
+      '<div><i>Unreadable</i><b' + (v.bad.length ? ' class="fr-warn"' : '') + '>' +
+        v.bad.length + '</b></div>' +
+    '</div>' +
+    (c.fresh.length
+      ? '<div class="fr-prevlist"><i>To be added</i><ul>' + sample(c.fresh) +
+        '</ul></div>' : '') +
+    (c.clash.length
+      ? '<div class="fr-prevlist"><i>Skipped &mdash; an id you already have, ' +
+        'with different content</i><ul>' + sample(c.clash) + '</ul></div>' : '') +
+    '<div class="fr-prevacts">' +
+      '<button type="button" class="fr-btn primary" id="frdoadd">Add ' +
+        c.fresh.length + ' new note' + (c.fresh.length === 1 ? '' : 's') +
+        '</button>' +
+      '<button type="button" class="fr-btn" id="frcancel">Cancel</button>' +
+      /* ⚠ THE DESTRUCTIVE ONE IS SEPARATE, LAST, AND NAMES THE COST. */
+      '<button type="button" class="fr-btn fr-danger" id="frdorepl">' +
+        'Replace my whole notebook (' + c.localCount + ' note' +
+        (c.localCount === 1 ? '' : 's') + ' deleted)</button>' +
+    '</div>';
+  frImpSay('Nothing has changed yet.', '');
+}
+
+/* ⚠ ONE BACKUP BEFORE ANY WRITE, AND AN UNDO FOR THIS SESSION. The backup is
+   another local key; it goes nowhere. Undo is held in memory so it dies with
+   the tab -- a long-lived undo would be a second copy of the notebook nobody
+   asked for. */
+function frBackup() {
+  try {
+    window.localStorage.setItem(FR_BAK, JSON.stringify(
+      { at: new Date().toISOString(), notes: FR }));
+    return true;
+  } catch (e) { return false; }
+}
+
+function frApply(mode) {
+  if (!FR_PENDING) return;
+  frLoad();
+  FR_UNDO = FR.slice();
+  const backed = frBackup();
+  const c = FR_PENDING.cls;
+  let msg;
+  if (mode === 'replace') {
+    FR = FR_PENDING.valid.slice();
+    msg = 'Replaced. ' + FR.length + ' note' + (FR.length === 1 ? '' : 's') +
+          ' now, ' + c.localCount + ' removed.';
+  } else {
+    c.fresh.forEach(n => FR.unshift(n));
+    msg = 'Added ' + c.fresh.length + '. Skipped ' + c.dupe.length +
+          ' already here and ' + c.clash.length + ' with a clashing id.';
+  }
+  const ok = frSave();
+  frImpSay(msg + (ok ? '' : ' (this browser will not store it, so it lasts ' +
+                          'for this session only)') +
+           (backed ? '' : ' No backup could be written.'),
+           ok ? 'good' : 'warn');
+  FR_PENDING = null;
+  const host = document.getElementById('frprev');
+  if (host) {
+    host.innerHTML = '<div class="fr-prevacts"><button type="button" ' +
+      'class="fr-btn" id="frundo">Undo this import</button></div>';
+  }
+  frRender();
+  frSyncCounts();
+}
+
+function frUndo() {
+  if (!FR_UNDO) return;
+  FR = FR_UNDO.slice();
+  FR_UNDO = null;
+  frSave();
+  frImpSay('Undone. Your notebook is back to ' + FR.length + ' note' +
+           (FR.length === 1 ? '' : 's') + '.', 'good');
+  const host = document.getElementById('frprev');
+  if (host) { host.hidden = true; host.innerHTML = ''; }
+  frRender();
+  frSyncCounts();
 }
 
 /* FILMROOM-JS-END */
