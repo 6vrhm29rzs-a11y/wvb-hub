@@ -1842,6 +1842,50 @@ def hcell_py(v, txt, lo, hi, kind="seq"):
     return '<td class="n hx %s" style="--t:%.3f"><b>%s</b></td>' % (kind, t, txt)
 
 
+
+def gameday_readiness():
+    """The Friday panel's facts. Read-only, and honest about what is unproven.
+
+    ⚠ IT MAY NEVER IMPLY LIVE STATS ARE ESTABLISHED. The whole point of the
+    four checkpoints is that the question is open; a panel that quietly read
+    "ready" would answer it by decoration.
+    """
+    try:
+        import preflight_live as PF
+        import probe_observe as PO
+    except Exception:                                        # noqa: BLE001
+        return None
+    try:
+        cands = PF.candidates()[:1]
+    except Exception:                                        # noqa: BLE001
+        cands = []
+    if not cands:
+        return {"none": True}
+    c = cands[0]
+    done = {}
+    try:
+        for r in PO.read_observations():
+            if str(r.get("game_id")) == c["game_id"]:
+                done[r.get("checkpoint")] = r.get("outcome")
+    except Exception:                                        # noqa: BLE001
+        done = {}
+    # ⚠ "PROVEN" MEANS ONE THING ONLY: a real match observed serving team
+    # totals while in progress. Nothing else sets it.
+    proven = any(v == "live_with_team_stats" for v in done.values())
+    return {
+        "none": False,
+        "game_id": c["game_id"],
+        "matchup": "%s%s at %s%s" % (
+            ("#%d " % c["away_rank"]) if c["away_rank"] else "", c["away"],
+            ("#%d " % c["home_rank"]) if c["home_rank"] else "", c["home"]),
+        "when_pt": c["when_pt"],
+        "link": c["link"],
+        "steps": [("pre", "Before first serve"), ("live", "During play"),
+                  ("final", "Right after final"), ("box", "Official box score")],
+        "done": done,
+        "live_stats_proven": proven,
+    }
+
 def calendar_tracks():
     """The weekly ranking calendar: three tracks, kept apart on purpose.
 
@@ -3137,6 +3181,8 @@ def build():
               "away_sets": r["away_sets"], "home_sets": r["home_sets"],
               "epoch": r.get("epoch")}
              for r in sorted(res, key=lambda x: x.get("epoch") or 0)])) \
+        .replace("{{GAMEDAY_JSON}}",
+                 json.dumps(gameday_readiness() or {}, separators=(",", ":"))) \
         .replace("{{MSTATE_JSON}}", __import__("match_state").js_table()) \
         .replace("{{CALENDAR_JSON}}",
                  json.dumps(calendar_tracks(), separators=(",", ":"))) \
@@ -4252,6 +4298,32 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
 #v-scores .datejump{display:flex;align-items:center;gap:8px;margin-left:auto;
   font:11.5px/1 var(--mono);color:var(--slate)}
 
+
+/* GAMEDAY-CSS-BEGIN */
+.gd-panel{border:1px solid var(--vx-rule);border-left:3px solid var(--gold);
+  border-radius:4px;padding:13px 15px;margin:0 0 20px;background:var(--alt)}
+.gd-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:0 0 10px}
+.gd-head b{font:700 16px/1.2 var(--disp);color:var(--chalk)}
+.gd-head span{font:12px/1 var(--mono);color:var(--ink2)}
+.gd-head a{font:700 9px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase;
+  color:var(--vx-avca);text-decoration:none}
+.gd-steps{list-style:none;margin:0 0 10px;padding:0;display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.gd-step{display:flex;flex-direction:column;gap:2px;padding:7px 9px;
+  border:1px solid var(--vx-rule);border-radius:3px}
+.gd-step i{font-style:normal;font:700 8px/1.4 var(--disp);letter-spacing:.11em;
+  text-transform:uppercase;color:var(--slate)}
+.gd-step b{font:600 11.5px/1.3 var(--mono);color:var(--ink3)}
+.gd-step.done{border-color:var(--vx-power)}
+.gd-step.done b{color:var(--vx-power)}
+.gd-claim{margin:0;font-size:12.5px;color:var(--ink2);line-height:1.55}
+.gd-claim b{color:#F2B441}
+.gd-none{margin:0;font-size:12.5px;color:var(--ink3)}
+@media (max-width:560px){
+  .gd-steps{grid-template-columns:1fr 1fr}
+  .gd-head b{font-size:15px}
+}
+/* GAMEDAY-CSS-END */
 
 /* INTEL-CSS-BEGIN */
 .in-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 10px}
@@ -9441,6 +9513,44 @@ let LIVE_STAMP = '';
 let LIVE_BY_ID = {};
 
 
+/* GAMEDAY-JS-BEGIN */
+/* ⚠ A READINESS PANEL, NOT A DEVELOPER DASHBOARD. Four checkpoints, what has
+   actually been observed, and one sentence that refuses to overclaim. It shows
+   on the Match Desk only while the question is open. */
+const GAMEDAY = {{GAMEDAY_JSON}};
+
+function gdPanel() {
+  const g = GAMEDAY;
+  if (!g || g.none === undefined) return '';
+  if (g.none) {
+    return '<div class="gd-panel"><div class="vx-label"><b>Live validation' +
+      '</b></div><p class="gd-none">No upcoming Division-I fixture on file, ' +
+      'so there is nothing to validate against yet.</p></div>';
+  }
+  const step = (k, label) => {
+    const got = (g.done || {})[k];
+    return '<li class="gd-step' + (got ? ' done' : '') + '">' +
+      '<i>' + esc(label) + '</i>' +
+      '<b>' + (got ? esc(got) : 'not yet observed') + '</b></li>';
+  };
+  return '<div class="gd-panel">' +
+    '<div class="vx-label"><b>Next live validation</b></div>' +
+    '<div class="gd-head"><b>' + esc(g.matchup) + '</b>' +
+      '<span>' + esc(g.when_pt) + '</span>' +
+      '<a href="' + esc(g.link) + '" target="_blank" rel="noopener noreferrer">' +
+      'game ' + esc(g.game_id) + '</a></div>' +
+    '<ol class="gd-steps">' +
+      (g.steps || []).map(x => step(x[0], x[1])).join('') + '</ol>' +
+    /* ⚠ THE SENTENCE THAT MUST NOT DRIFT. */
+    '<p class="gd-claim">' + (g.live_stats_proven
+      ? 'A real match has been observed serving team totals in progress.'
+      : 'Live team and player statistics are <b>not established</b>. ' +
+        'Nothing on this site claims they are until a match has been ' +
+        'observed serving them.') + '</p>' +
+    '</div>';
+}
+/* GAMEDAY-JS-END */
+
 /* INTEL-JS-BEGIN */
 /* ═══ INTEL DESK ═════════════════════════════════════════════════════════
    A private wire. The browser NEVER fetches a feed: it asks the local server,
@@ -11322,7 +11432,7 @@ function renderDesk() {
        now a deliberate state: what today is, when the next window opens, how
        big it is, and the two places worth going in the meantime -- all from
        the schedule that already exists. Nothing is invented to fill it. */
-    todayBox.innerHTML =
+    todayBox.innerHTML = /* GAMEDAY-CALL2-BEGIN */ (typeof gdPanel === 'function' ? gdPanel() : '') + /* GAMEDAY-CALL2-END */
       '<div class="vx-empty"><h4>No Division-I matches today</h4>' +
       '<p>' + (nextDay
         ? 'The next window is <b>' + esc(dayLabel(nextDay)) + '</b> &mdash; ' +
@@ -11348,7 +11458,8 @@ function renderDesk() {
 
   /* ONE FEATURED MATCH AT MOST, and only if it earns it. */
   const feat = pickFeatured(mine, liveOf);
-  let html = todaysRead(mine, soon, liveOf);
+  let html = /* GAMEDAY-CALL-BEGIN */ (typeof gdPanel === 'function' ? gdPanel() : '') + /* GAMEDAY-CALL-END */
+             todaysRead(mine, soon, liveOf);
   if (feat) {
     html += ribbonHTML(feat.m, liveOf(feat.m),
       '<b>Featured:</b> ' + feat.why);
@@ -13207,6 +13318,8 @@ PRIVATE_MARKERS = ("VolleyTalk", "Massey Ratings", "Massey Ratings, 2026",
                    "Film Room", "FR_KEY",
                    "INTEL-HTML-BEGIN", "INTEL-JS-BEGIN", "INTEL-CSS-BEGIN",
                    "wvb.intel", 'id="v-intel"', "IN_KEY", "/api/intel",
+                   "GAMEDAY-JS-BEGIN", "GAMEDAY-CSS-BEGIN", "gd-panel",
+                   "live validation",
                    "rss.xml",
                    # ── ENDPOINTS THAT ONLY EXIST BEHIND THE LOCAL SERVER ────
                    # ⚠ /api/live IS DELIBERATELY ABSENT FROM THIS LIST. The
@@ -13297,7 +13410,11 @@ def strip_private(html):
                    ("/* INTEL-CSS-BEGIN */", "/* INTEL-CSS-END */"),
                    ("/* INTEL-ROUTE-BEGIN */", "/* INTEL-ROUTE-END */"),
                    ("<!-- INTEL-MENU-BEGIN -->", "<!-- INTEL-MENU-END -->"),
-                   ("/* INTEL-WIRE-BEGIN */", "/* INTEL-WIRE-END */")):
+                   ("/* INTEL-WIRE-BEGIN */", "/* INTEL-WIRE-END */"),
+                   ("/* GAMEDAY-JS-BEGIN */", "/* GAMEDAY-JS-END */"),
+                   ("/* GAMEDAY-CSS-BEGIN */", "/* GAMEDAY-CSS-END */"),
+                   ("/* GAMEDAY-CALL-BEGIN */", "/* GAMEDAY-CALL-END */"),
+                   ("/* GAMEDAY-CALL2-BEGIN */", "/* GAMEDAY-CALL2-END */")):
         html = re.sub(re.escape(_a) + r".*?" + re.escape(_b), "", html,
                       flags=re.S)
 

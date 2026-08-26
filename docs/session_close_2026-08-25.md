@@ -1014,6 +1014,65 @@ required -- terms checked and quoted, a measured audit line, a retention
 decision, a fixture, and stated failure behaviour; and for alerts, a delivery
 decision, a rate rule, a quiet-hours rule, and an off-by-default switch.
 
-**State at close:** 31 suites pass with `Cody/` present and 24 with it moved
+## 18. GAME-DAY READINESS / LIVE PROBE RUNBOOK
+
+**`scripts/preflight_live.py`** -- read-only (asserted over its AST: it opens
+no file for writing and calls no git/subprocess), finds the next D-I slate and
+ranks probe candidates.
+⚠ **RANKED FOR USEFULNESS, NOT DRAMA.** A watchable Pacific hour scores more
+than a marquee fixture, because all four checkpoints have to be observable by a
+human. Top pick for Friday: **#21 Kansas at #2 Pittsburgh, 3:30 PM PT, game
+6625717**.
+
+**`scripts/probe_observe.py`** -- one response, one outcome, six of them kept
+distinct: `network_failure · source_502 · no_data · live_score_only ·
+final_pending · final_with_box`, plus `live_with_team_stats` as its own
+finding, because that is the answer this whole exercise is waiting for.
+
+⚠ **TWO COLLAPSES THAT WOULD RUIN THE MEASUREMENT, BOTH FORBIDDEN.**
+A **blank score is not zero** (`''` -> None; a real `'0'` still parses as 0),
+and **failed JSON is not an empty box score** -- a 502 HTML page is the source
+refusing, which is a different fact from a match having no stats yet.
+
+**`probe_live_boxscore.py --checkpoint pre|live|final|box --id GID`** runs one
+documented checkpoint, prints a block to paste back, and appends one minimal
+record to `docs/live_probe_observations.jsonl`.
+⚠ **NO RAW BODIES, NO CREDENTIALS** -- shape facts only (json?, team entries,
+player rows, status, period) plus the score and the reason.
+⚠ **AND A LATER RUN CANNOT WEAKEN AN EARLIER FINDING.** Once a match is
+observed at a given strength for a checkpoint, a weaker later append is
+REFUSED and says so -- a flaky midnight re-run must not erase what was seen at
+4pm. Append-only; nothing is edited in place. An equal-or-stronger repeat is
+allowed as a second confirmation.
+
+**REHEARSED AGAINST THE REAL SOURCE** three days early: game 6625717, pre
+checkpoint, `source_502`, score `None/None`. That is exactly the documented
+pre-first-serve behaviour, and it is now the first row of the observation log.
+
+**The panel** sits on the Match Desk, private and fenced (JS, CSS and **both
+call sites** -- see below): matchup, Pacific time, game link, four steps with
+what has actually been observed, and one sentence that refuses to overclaim.
+⚠ **"PROVEN" HAS EXACTLY ONE TRIGGER**: a real match observed serving team
+totals in progress. Nothing else sets it, and the guard asserts that.
+
+⚠ **A REAL LEAK THE GUARD CAUGHT: THE CALL SITES WERE NOT FENCED.** The
+function was inside `GAMEDAY-JS`, but the two `typeof gdPanel === 'function'`
+call sites were not -- so the public build carried the name. The typeof guard
+made it harmless at runtime, which is precisely why it would have survived
+review, exactly like the ballot stylesheet did.
+
+⚠ **AND THE GUARD FOUND MY OWN DENIAL AGAIN** -- the eighth time. The
+read-only check forbade the word "commit"; the preflight docstring says "the
+committed game log". Comments and docstrings are stripped before asking what
+the CODE does.
+
+**Guards:** `scripts/test_gameday.py` (32nd suite) -- preflight read-only and
+sensible, all six outcomes distinct, blank-score handling both ways, shape
+without bodies, append-only history that refuses to weaken, panel that cannot
+overclaim, and the public build free of all of it. **Three negative controls
+verified to trip**: reading a 502 as an empty box, reading a blank score as
+zero, and letting a weak run overwrite a final observation.
+
+**State at close:** 32 suites pass with `Cody/` present and 24 with it moved
 aside. Tree is clean apart from the three fixes above. Nothing here changes
 data, ratings, or the crawl -- all three are display-layer only.

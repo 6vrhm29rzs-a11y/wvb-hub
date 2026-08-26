@@ -745,6 +745,8 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
 
 
 
+
+
 /* ══ THE MATCH BOARD ══════════════════════════════════════════════════════
    ONE signature surface: a broadcast scoreboard ribbon, used for the featured
    match and reused verbatim as the match-detail header so a score header has
@@ -2298,7 +2300,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     </div>
     <div class="meta">
       <b>9</b> matches played &middot; <b>348</b> teams rated<br>
-      last result <b>Yesterday</b> &middot; built 2026-08-25 8:32 PM PT
+      last result <b>Yesterday</b> &middot; built 2026-08-25 9:02 PM PT
     </div>
   </div>
   <div class="net"></div>
@@ -4282,6 +4284,8 @@ let LIVE_BY_ID = {};
 
 
 
+
+
 /* ══ SHARED MATCH COMPONENTS ══════════════════════════════════════════════
    ⚠ ONE DEFINITION OF A MATCH HEADER AND A MATCH ROW, used by the Match Desk,
    the Scores ledger and the match detail. Three renderers for the same object
@@ -4774,7 +4778,7 @@ function renderDesk() {
        now a deliberate state: what today is, when the next window opens, how
        big it is, and the two places worth going in the meantime -- all from
        the schedule that already exists. Nothing is invented to fill it. */
-    todayBox.innerHTML =
+    todayBox.innerHTML = 
       '<div class="vx-empty"><h4>No Division-I matches today</h4>' +
       '<p>' + (nextDay
         ? 'The next window is <b>' + esc(dayLabel(nextDay)) + '</b> &mdash; ' +
@@ -4800,7 +4804,8 @@ function renderDesk() {
 
   /* ONE FEATURED MATCH AT MOST, and only if it earns it. */
   const feat = pickFeatured(mine, liveOf);
-  let html = todaysRead(mine, soon, liveOf);
+  let html = 
+             todaysRead(mine, soon, liveOf);
   if (feat) {
     html += ribbonHTML(feat.m, liveOf(feat.m),
       '<b>Featured:</b> ' + feat.why);

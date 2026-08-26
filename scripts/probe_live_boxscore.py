@@ -91,12 +91,90 @@ def probe_once(gid):
     return row, teams
 
 
+def checkpoint_run(gid, checkpoint, note=""):
+    """One CHECKPOINT: fetch, classify, record. The documented workflow.
+
+    ⚠ FOUR CHECKPOINTS, RUN AT FOUR MOMENTS, AND EACH ANSWERS A DIFFERENT
+    QUESTION about the source -- not four samples of one question:
+
+        pre    before first serve   -- does the endpoint even answer?
+        live   during play          -- are statistics served mid-match?
+        final  right after the end  -- is there a pending window, and how long?
+        box    once the box appears -- what does a complete one look like?
+
+    Each writes ONE minimal record. Raw bodies are never stored.
+    """
+    import probe_observe as PO
+    status, body, terr = None, None, None
+    try:
+        req = Request("%s/game/%s/boxscore" % (API, gid),
+                      headers={"User-Agent": UA})
+        resp = urlopen(req, timeout=25)
+        status = getattr(resp, "status", 200) or 200
+        body = resp.read().decode("utf-8", "replace")
+    except Exception as exc:                                  # noqa: BLE001
+        code = getattr(exc, "code", None)
+        if code:
+            status = code
+            try:
+                body = exc.read().decode("utf-8", "replace")
+            except Exception:                                 # noqa: BLE001
+                body = None
+        else:
+            terr = type(exc).__name__
+
+    sb = None
+    try:
+        board = get("/scoreboard/volleyball-women/d1/%s/all-conf"
+                    % datetime.date.today().strftime("%Y/%m/%d"))
+        for entry in ((board or {}).get("games") or []):
+            g = entry.get("game", entry)
+            if str(g.get("gameID")) == str(gid):
+                sb = {"away_sets": (g.get("away") or {}).get("score"),
+                      "home_sets": (g.get("home") or {}).get("score"),
+                      "state": g.get("gameState")}
+                break
+    except Exception:                                         # noqa: BLE001
+        sb = None
+
+    cls = PO.classify(http_status=status, body=body, transport_error=terr,
+                      scoreboard=sb)
+    rec = PO.observation(gid, checkpoint, cls, note)
+    res = PO.append_observation(rec)
+
+    print("CHECKPOINT %s -- game %s" % (checkpoint.upper(), gid))
+    print("  outcome : %s" % cls["outcome"])
+    print("  why     : %s" % cls["why"])
+    print("  http    : %s" % cls["http"])
+    print("  shape   : json=%s teams=%s player_rows=%s status=%r period=%r"
+          % (cls["shape"]["json"], cls["shape"]["team_entries"],
+             cls["shape"]["player_rows"], cls["shape"]["status"],
+             cls["shape"]["period"]))
+    print("  score   : away=%r home=%r state=%r   (None means NO SCORE, not 0)"
+          % (cls["score"]["away"], cls["score"]["home"], cls["score"]["state"]))
+    print("  recorded: %s%s"
+          % (res["written"], "" if res["written"] else " -- " + res["reason"]))
+    print()
+    print("PASTE THE BLOCK ABOVE BACK TO CLAUDE.")
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--checkpoint", choices=("pre", "live", "final", "box"),
+                    help="run ONE documented checkpoint and record it")
+    ap.add_argument("--note", default="")
     ap.add_argument("--id", action="append", default=[])
     ap.add_argument("--minutes", type=float, default=30.0)
     ap.add_argument("--every", type=float, default=20.0)
     a = ap.parse_args()
+
+    if a.checkpoint:
+        if not a.id:
+            print("--checkpoint needs --id GAMEID "
+                  "(run scripts/preflight_live.py to pick one)")
+            return 2
+        return checkpoint_run(a.id[0], a.checkpoint, a.note)
 
     ids = [(i, i) for i in a.id] or live_ids()
     if not ids:
