@@ -106,15 +106,77 @@ def main():
     body = re.search(r"function csCells\(sets, playing\) \{(.*?)\n\}", h, re.S)
     cells = body.group(1) if body else ""
     check("csCells() exists", bool(cells))
-    # '' IS NOT ZERO. The feed serves '' for a score that does not exist yet.
+    # ⚠ '' IS NOT ZERO. The feed serves '' for a score that does not exist
+    # yet, and '' coerces to 0 -- which would print a real-looking 0-0 for a
+    # set nobody played. The check used to read csCells for this test inline;
+    # the rule now lives in setPair(), which is where BOTH surfaces get it, so
+    # that is where it is asserted. Moving a rule means moving its guard.
+    sp = re.search(r"function setPair\(v\) \{(.*?)\n\}", h, re.S)
+    spb = sp.group(1) if sp else ""
     check("a set counts only when BOTH sides carry a real number",
-          "sv.a !== ''" in cells and "sv.h !== ''" in cells and
-          "isNaN" in cells,
+          "=== ''" in spb and "isNaN" in spb,
           "an empty string coerces to 0 and would print a 0-0 nobody played")
+
     check("...and an absent set renders a court dot, never a 0",
           "cs-empty" in cells and "&middot;" in cells)
     check("[+] there IS a numeric path to get wrong",
           "cs-cw" in cells, "the guard above is empty if numbers never render")
+
+    # ══ THE SET SHAPE ════════════════════════════════════════════════════
+    # ⚠ A SET IS AN ARRAY PAIR [away, home]. Measured on both producers:
+    #   live_server.py:228  sets.append([int(s["visit"]), int(s["home"])])
+    #   the crawled ledger  [[25,22],[19,25],[16,25],[25,23],[8,15]]
+    # The tape and the Moment originally read `sv.a` / `sv.h` -- an OBJECT
+    # shape nothing produces -- so every real live match would have shown five
+    # empty court dots where the score belongs, on both surfaces built to show
+    # it, and nothing would have thrown.
+    #
+    # ⚠ IT SURVIVED TWO COMMITS BECAUSE THE ONLY LIVE DATA I HAD WAS A FIXTURE
+    # I WROTE MYSELF, IN THE SHAPE MY OWN CODE EXPECTED. A fixture authored to
+    # match the code under test confirms exactly what it was built to confirm.
+    # It surfaced when a rehearsal put the tape and the ribbon on one screen
+    # and they disagreed: "25-22" against "undefined-undefined".
+    print("\n2b. ONE SET SHAPE, AND IT IS THE ONE THE FEED PRODUCES")
+    check("there is a single reader for a set pair", "function setPair(" in h)
+    check("[-] ...and it reads the ARRAY form", "Array.isArray(v) ? v[0]" in h)
+    # ⚠ STRIP COMMENTS FIRST -- for the ninth time in this project, a guard
+    # that greps for a forbidden string found the comment explaining why the
+    # string is forbidden. The note above literally contains `sv.a`.
+    hc = re.sub(r"/\*.*?\*/", " ", h, flags=re.S)
+    check("[-] the tape no longer reads an object", "sv.a" not in hc and
+          "sv.h" not in hc, "nothing produces {a,h}")
+    check("[-] the Moment no longer reads an object either",
+          "Number(v.a)" not in hc and "v.h !== ''" not in hc)
+    # ⚠ AND COUNT THE BARE REFERENCE TOO. The Moment passes setPair to map()
+    # without calling it -- `sets.map(setPair)` -- so a "setPair(" search finds
+    # the definition and the tape and concludes the Moment does not use it.
+    uses = hc.count("setPair(") + hc.count("map(setPair)")
+    check("both surfaces go through setPair", uses >= 3, "%d uses" % uses)
+    # a real port of the shipped reader, exercised on BOTH shapes
+    import json as _json
+
+    def set_pair(v):
+        if not v:
+            return None
+        if not isinstance(v, list):
+            return None
+        a = v[0] if len(v) > 0 else None
+        hh = v[1] if len(v) > 1 else None
+        if a in ("", None) or hh in ("", None):
+            return None
+        try:
+            return [float(a), float(hh)]
+        except (TypeError, ValueError):
+            return None
+
+    check("the real shape reads", set_pair([25, 22]) == [25.0, 22.0])
+    check("an unplayed set is None", set_pair(["", ""]) is None)
+    check("a half-played set is None", set_pair([25, ""]) is None)
+    check("[NEG] the OBJECT shape yields nothing -- as it must",
+          set_pair({"a": 25, "h": 22}) is None,
+          "if an object parsed here, the bug could come back unnoticed")
+    check("[+] ...and the ledger's own recorded sets all read",
+          all(set_pair(x) for x in [[25, 22], [19, 25], [16, 25], [25, 23], [8, 15]]))
     tape = re.search(r"function csTape\(\) \{(.*?)\n\}\n", h, re.S)
     tb = tape.group(1) if tape else ""
     check("an upcoming match carries no score",

@@ -1370,3 +1370,166 @@ guessed. **Four** templates define that column.
 34 suites · both builds · public gate · fresh-checkout guard (negative control
 tripped) · desktop and 390px for Match Desk, Scores, Rankings, a direct team
 route, a player route and My Ballot · no self-overflow, no sideways body scroll.
+
+---
+
+## 21. THE WIRE — private editorial media + native match moments
+
+### THE AUDIT DECISION, PLAINLY
+
+**A real source image can render today.** `scripts/audit_intel_media.py`
+(re-runnable) measured the approved NCAA D-I women's volleyball feed:
+
+| | |
+|---|---|
+| **Approved** | `<enclosure>`, **URL carried as CDATA element text** · 20/20 items · HTTPS · host **`www.ncaa.com`** only · path `/_flysystem/` only · `large_16x9` (stable 16:9) · HEAD → `200 image/jpeg`, 75–150 KB on 4/4 sampled |
+| **Rejected** | the `<img>` inside `description` (present on 20/20 — that is article markup in a blurb, and lifting a picture out of it is scraping the description) · `media:content`, `media:thumbnail`, `<image>`, `content:encoded` — **absent entirely** |
+| **Not widened** | the *source* allowlist is unchanged. The **media** allowlist is separate and narrower by design, even though today both are the same host. |
+
+⚠ **It is not a spec-compliant enclosure**, and my first pass at the audit said
+it was. I read `el.get("url") or el.get("href") or el.text` and reported "20
+media references" — which reads as *the feed supplies a proper enclosure*.
+**Every `<enclosure>` on this feed has zero attributes.** A spec-shaped parser
+finds nothing; a permissive one would also accept an `<enclosure>` containing
+prose. The audit now reports attribute and text separately.
+
+Two consequences, handled rather than assumed away: no declared `type` and no
+dimensions, so **the ratio is imposed by CSS, never trusted from the file**; and
+the URL carries a Drupal `?itok=` token that **can be invalidated later**, so an
+image that resolves today may 404 next week — the error fallback is mandatory.
+
+### THE THREE MEDIA STATES
+`source-provided` (audited host, private build only, never downloaded) ·
+`derived-native` (a **Match Moment** built from our own data) · `unavailable`
+(a designed court panel that says so).
+
+⚠ **A Moment is attached to a story only when it is unambiguous**: exactly two
+teams named in the headline, and exactly **one** past match between exactly
+those two within two days. Two candidates means we do not know which, so no
+picture. A poster on the wrong match would be a confident, checkable, wrong
+statement — worse than no picture.
+
+### STORY FAMILIES
+Same publisher, within **36 hours**, headline token overlap **≥ 0.60**. The
+oldest leads; every other member is listed **with its format** and its own
+original link. Nothing is deleted and no canonical version is invented — it is
+a reading convenience, not an edit.
+
+### ⚠ THE ONE THAT COST THE MOST: A PHOTO THAT LOADED AND NEVER PAINTED
+The image fetched and decoded — `complete:true`, `naturalWidth 1280`,
+`naturalHeight 720` — `elementFromPoint` at the box centre returned the `<img>`
+itself, opacity 1, visibility visible, no filter, transform, clip or blend,
+nothing flagged anywhere in the ancestor chain — **and the box rendered flat
+navy.**
+
+**Three diagnoses of mine were wrong, and the first two were wrong for the same
+reason.** I blamed `aspect-ratio` + `height:100%`, then `aspect-ratio` alone.
+Both "isolations" were confounded: the way I turned the property off was an
+**inline style write**, and that forces a repaint. *The repaint was doing the
+work, not the property.* The proof is a no-op — setting `opacity:0.999`, which
+changes no geometry at all, makes the photograph appear.
+
+Then a fourth wrong move: I added a class whose declaration resolved to the
+**same computed value**, so it invalidated nothing.
+
+What settled it was a side-by-side control: four container variants and five
+attribute variants of the identical URL, in the same page. **All nine rendered.**
+The real element differed in exactly the attributes the brief asked for —
+`loading="lazy"` and `decoding="async"` — and these images are created by
+`innerHTML` inside a section that is `hidden` until its route opens. Deferred
+inside a hidden subtree, the paint is never scheduled once the bytes land.
+
+**So the brief's lazy/async are not used for wire images, and the reason is
+stated on the line.** They are right in general and wrong here; a blank box is a
+worse outcome than an eager fetch of one above-the-fold image. `referrerpolicy`
+is kept. An `onload` hook plus a sweep for images already `complete` covers the
+case where the file finishes before its handler binds.
+
+⚠ **No geometry assertion could have caught this.** Every reading was identical
+in the broken state and the working one. `test_wire.py` asserts the *hook*,
+because the hook is the part that was missing.
+
+### OTHER DEFECTS FOUND BY LOOKING
+- **`NO-VENUE` printed as a badge on the poster.** `site` takes four values
+  (home 172, neutral 158, **no-venue 132**, null 1); rendering `esc(m.site)`
+  put an internal token on screen as though it were a fact. Only values that
+  mean something to a reader get a badge now.
+- **The cache and the running server both held the old parser**, so the first
+  Wire render showed `unavailable` for stories the audit had just proven carry
+  an image.
+
+### PUBLIC OUTPUT — WHAT IS EXCLUDED
+Verified absent from `output/vb_dashboard.html`: `_flysystem`, `IN_MEDIA_HOSTS`,
+`inImageOK`, `inMediaHTML`, `inFamilies`, `inImgShown`, `in-media`, `in-lead`,
+`in-credit`, `in-nomedia`, `intelbody`, `IN_FAMILY_J`, and **not one feed media
+URL** — asserted on the VALUES, over a page that does carry 1,599 remote images
+(team crests on `/sites/default/files/`, pre-existing, which is why the
+`/_flysystem/` path gate matters). The host list emits as `[]` when `PUBLIC`.
+**The Match Moment survives, and should: it is our own data.**
+
+### Verified
+35 suites · both builds · public gate · fresh-checkout guard · the Wire with
+real stories, with a real photograph, with families grouping · the honest
+failure state (server killed mid-session: "Checking…" ends, message is plain,
+**all 7 stories and the image retained**) · 390px (lead first, no sideways
+scroll, title unclipped at 19px, metadata 11px, zero self-overflow).
+
+⚠ **One existing guard was updated, deliberately.** `test_intel.py` asserted
+`image` is *never* stored — correct when the policy was "discard the
+enclosure", and reversed here by audit. The principle it encodes is unchanged
+and now stated: **a URL is a reference; an article is content.** The blurb, the
+byline and the article text remain absent. This is the same line the project
+already drew for player headshots.
+
+---
+
+## 22. FRIDAY REHEARSAL — and the bug it was built to find
+
+Two days before the season's first real match day, the whole slate was staged
+onto today: **the real 195-fixture Friday, split into 13 live · 36 final · 146
+to come**, with live rows seeded in the shape the live server actually emits.
+A throwaway page, never committed.
+
+### ⚠ THE RALLY TAPE AND THE MATCH MOMENT WERE READING A SET SHAPE NOTHING
+### PRODUCES
+
+A set is an **array pair `[away, home]`**. Measured on both producers:
+
+```
+live_server.py:228   sets.append([int(s["visit"]), int(s["home"])])
+the crawled ledger   [[25,22],[19,25],[16,25],[25,23],[8,15]]
+```
+
+Both new surfaces read `sv.a` / `sv.h` — an **object** shape. On Friday, every
+live match would have shown **five empty court dots where the score belongs**,
+on the two components built specifically to show it, and **nothing would have
+thrown**. The match ribbon, which has always read `x[0]`/`x[1]`, would have been
+right beside them.
+
+**It survived two commits of testing because the only live data I ever had was
+a fixture I wrote myself, in the shape my own code expected.** A fixture
+authored to match the code under test confirms exactly what it was built to
+confirm — the same failure as a nickname map authored from the cases it
+adjudicates. It surfaced the instant the rehearsal put the tape and the ribbon
+on one screen and they disagreed: **`25–22` against `undefined–undefined`**.
+
+Fixed with **one reader**, `setPair(v)`, used by both surfaces, which also owns
+the `'' is not zero` rule. Guarded in `test_court_signal.py` with a **negative
+control that feeds it the object shape and requires nothing back** — if an
+object ever parsed there, the bug could return unnoticed.
+
+### Also this pass
+- **`allMatches()` is memoised.** It rebuilt a ~1,500-row index on every call,
+  and `matchByGid()` did it for a single lookup. Safe only because live data
+  lives in `LIVE_BY_ID` and is read separately — noted in the comment, because
+  folding a live field into those rows would invalidate the cache.
+- Two more of my own guards were wrong in the familiar ways: one **found its
+  own comment** (the note explaining the bug contains `sv.a` — ninth time in
+  this project), and one missed `map(setPair)` because it searched for
+  `setPair(` and a bare function reference has no parenthesis.
+
+### Verified under the staged Friday
+Tape renders `25/22` with the in-progress cell outlined in serve cyan and four
+dots for unplayed · desk reads "13 live · 36 final · 146 to come" · featured
+Moment and ribbon agree · Scores day view lanes correct with the ranked pairing
+lifted and the cap naming the remainder · 35 suites · both builds · public gate.

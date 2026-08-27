@@ -34,6 +34,56 @@ UA = ("wvb-hub/0.1 (personal research project; one feed poll per refresh)")
 TIMEOUT = 20
 MIN_REFRESH_SECONDS = 15 * 60
 
+# ══ THE MEDIA ALLOWLIST ═══════════════════════════════════════════════════
+# ⚠ SEPARATE FROM THE SOURCE ALLOWLIST, AND DELIBERATELY NARROWER. A source we
+# will REQUEST is one thing; a host whose bytes we will let a browser load is
+# another, and conflating them is how a feed ends up able to point the page at
+# anything. Today they happen to be the same host, which is the safest possible
+# case and is not a reason to merge the two lists.
+#
+# Audited 2026-08-25 (scripts/audit_intel_media.py, docs/intel_sources.md):
+# every one of 20 items carries an <enclosure> whose URL is HTTPS on
+# www.ncaa.com under /_flysystem/public-s3, in a large_16x9 derivative.
+MEDIA_HOSTS = ("www.ncaa.com",)
+MEDIA_PATH_PREFIXES = ("/_flysystem/",)
+
+
+def media_url(raw):
+    # type: (Any) -> Optional[str]
+    """A feed-supplied image URL, or None. Never raises.
+
+    ⚠ THIS IS A GATE, NOT A CLEANER. It does not repair a URL, strip a
+    credential or upgrade a scheme -- anything that is not already exactly what
+    was approved comes back as None and the story renders with no photo. A
+    validator that fixes its input is a validator that accepts its input.
+    """
+    if not raw or not isinstance(raw, str):
+        return None
+    raw = raw.strip()
+    if len(raw) > 600 or any(c in raw for c in " \t\r\n<>\"'"):
+        return None
+    try:
+        from urllib.parse import urlparse
+        u = urlparse(raw)
+    except (ValueError, ImportError):
+        return None
+    # ⚠ HTTPS ONLY. A private page loading http:// would leak what is being
+    # read to anything on the path, and mixed content is blocked anyway.
+    if u.scheme != "https":
+        return None
+    # ⚠ NO USERINFO, NO PORT. `https://www.ncaa.com@evil.example/x` parses with
+    # hostname `evil.example` -- the check below catches that, but a URL
+    # carrying credentials at all is malformed for this purpose and is refused
+    # before hostname comparison rather than after it.
+    if u.username or u.password or u.port:
+        return None
+    if (u.hostname or "").lower() not in MEDIA_HOSTS:
+        return None
+    if not any((u.path or "").startswith(p) for p in MEDIA_PATH_PREFIXES):
+        return None
+    return raw
+
+
 # THE COMPLETE ALLOWLIST. See docs/intel_sources.md for the audit behind each.
 SOURCES = {
     "ncaa-d1-wvb": {
@@ -91,7 +141,16 @@ def parse_rss(xml_text, source_key):
             "category": _text(it, "category") or src.get("category") or "",
             "source": src.get("label") or source_key,
             "source_key": source_key,
-            # NOTE: description / enclosure / creator are deliberately absent.
+            # ⚠ THE ENCLOSURE URL IS CDATA ELEMENT TEXT, NOT A url= ATTRIBUTE.
+            # This feed's <enclosure> carries zero attributes, which is not
+            # what RSS 2.0 specifies -- so `.get("url")` returns nothing and a
+            # spec-shaped parser would find no media at all. Read the text,
+            # and put it through the gate.
+            "image": media_url(_text(it, "enclosure")),
+            # NOTE: description and creator remain deliberately absent. The
+            # description contains an <img> on every item and it is NOT used:
+            # that is the publisher's article markup inside their blurb, and
+            # lifting a picture out of it is scraping the description.
         })
     out["ok"] = bool(out["items"])
     if not out["ok"]:

@@ -155,3 +155,58 @@ Not in this phase, and not without:
    an alert makes a false match expensive rather than merely untidy.
 4. **A quiet-hours rule.**
 5. **An off switch that is the default**, and a record of what was sent.
+
+---
+
+## MEDIA AUDIT — 2026-08-25 (`scripts/audit_intel_media.py`, re-runnable)
+
+**Question:** does the approved NCAA D-I women's volleyball feed supply an
+image field good enough to render as a private preview?
+
+**Answer: yes, with two caveats, and the field is non-standard.**
+
+### APPROVED
+| Property | Measured |
+|---|---|
+| Field | `<enclosure>`, **URL carried as CDATA element TEXT** |
+| Coverage | **20 of 20** items |
+| Scheme | HTTPS on all 20 |
+| Host | **`www.ncaa.com`** only — the same host as the feed |
+| Path prefix | `/_flysystem/public-s3` only |
+| Derivative | `large_16x9` only — a **stable 16:9**, so the container can reserve space and there is no layout shift |
+| HEAD (no body read) | `200`, `image/jpeg`, 75–150 KB on 4 of 4 sampled |
+
+### ⚠ IT IS NOT A SPEC-COMPLIANT ENCLOSURE
+RSS 2.0 specifies `<enclosure url="…" length="…" type="…"/>`. On this feed
+**every `<enclosure>` has zero attributes** — no `url`, no `type`, no `length`.
+
+**My first pass at this audit got it wrong, in the direction that matters.** It
+read `el.get("url") or el.get("href") or el.text` and reported "20 media
+references, host www.ncaa.com", which reads as *the feed supplies a compliant
+enclosure*. A parser written to the spec gets **nothing** here; a permissive one
+that silently falls back to text would also cheerfully accept an `<enclosure>`
+containing prose. The audit now reports attribute and text separately.
+
+Consequences, both handled rather than assumed away:
+- **No declared `type` and no dimensions.** The aspect ratio is imposed by CSS
+  from the `large_16x9` derivative, never trusted from the file.
+- **The URL carries `?h=` and `?itok=`** — a Drupal image-style derivative plus
+  a security token. Those can be invalidated when the site regenerates its
+  styles, so **an image that resolves today can 404 later**. The error fallback
+  is therefore mandatory, not decorative.
+
+### REJECTED
+- **`description`'s embedded `<img src=…>`** — present on 20 of 20, and *not
+  used*. That is the publisher's article markup inside their blurb; lifting an
+  image out of it is scraping the description. It happens to point at a
+  `small_16x9` derivative of the same picture, which makes it tempting and
+  makes no difference to the principle.
+- **`media:content` / `media:thumbnail` / `<image>` / `content:encoded`** —
+  absent from the feed entirely. Nothing to approve.
+- **No new hosts.** The media allowlist is exactly `www.ncaa.com`, which is
+  already the source host. The source allowlist is unchanged.
+
+### Verdict
+`source-provided` media **can render today**, privately, direct from
+`www.ncaa.com` over HTTPS, never downloaded and never committed. Every other
+case falls to `derived-native` or `unavailable`.

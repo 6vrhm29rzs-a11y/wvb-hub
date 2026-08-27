@@ -73,10 +73,27 @@ def main():
     keys = set(r["items"][0])
     check("an item carries title, link, time, category, source",
           {"title", "link", "published", "category", "source"} <= keys)
-    # ⚠ THE PUBLISHER'S OWN WRITING IS NOT KEPT.
-    for gone in ("description", "summary", "content", "enclosure", "image",
+    # ⚠ THE PUBLISHER'S OWN WRITING IS NOT KEPT. That is the principle, and it
+    # is unchanged. What changed -- deliberately, through the media audit of
+    # 2026-08-25 -- is that a media URL is now retained.
+    #
+    # ⚠ A URL IS A REFERENCE; AN ARTICLE IS CONTENT. This project already drew
+    # exactly that line for player headshots: "URLS ONLY, NEVER THE FILES --
+    # storing a reference is a different act from republishing the file." The
+    # blurb, the byline and the article text remain absent, because showing
+    # those instead of the publisher's page is the thing worth refusing.
+    for gone in ("description", "summary", "content", "enclosure",
                  "thumbnail", "creator", "author"):
         check("[-] %-11s is never stored" % gone, gone not in keys)
+    check("[+] a media URL IS retained, by audit", "image" in keys,
+          "docs/intel_sources.md records the decision")
+    check("[-] ...and only ever through the gate",
+          all(IN.media_url(i.get("image")) == i.get("image")
+              for i in r["items"] if i.get("image")),
+          "an item's image must be exactly what media_url() would allow")
+    check("[-] ...and nothing is downloaded",
+          "urlretrieve" not in open(
+              os.path.join(REPO, "scripts", "intel.py"), encoding="utf-8").read())
     check("[+] the feed really does carry a description to discard",
           "<description>" in fx("ncaa_normal.xml"))
     check("no stored value contains article prose",

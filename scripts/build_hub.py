@@ -248,6 +248,14 @@ def day_label(iso, today=None):
     return d.strftime("%a %b %-d")
 
 
+# ⚠ THE MEDIA HOST LIST COMES FROM intel.py, WHICH IS WHERE THE AUDIT LIVES.
+# Re-typing it here would be two allowlists with one name -- and the one that
+# governs what a browser will load would be the copy nobody audited.
+try:
+    from intel import MEDIA_HOSTS as INTEL_MEDIA_HOSTS
+except Exception:                                          # noqa: BLE001
+    INTEL_MEDIA_HOSTS = ()
+
 RANK_TITLE = "AVCA coaches poll rank"
 
 # ══ THE RULERS ════════════════════════════════════════════════════════════
@@ -3217,6 +3225,9 @@ def build():
                  if (DIGBY_COACH and not PUBLIC) else "") \
         .replace("{{RULERS_JSON}}",
                  json.dumps(public_rulers(), separators=(",", ":"))) \
+        .replace("{{INTEL_MEDIA_HOSTS_JSON}}",
+                 "[]" if PUBLIC else json.dumps(list(INTEL_MEDIA_HOSTS),
+                                                separators=(",", ":"))) \
         .replace("{{T25_ROWS}}", _t25["rows"]) \
         .replace("{{T25_ALSO}}", _t25["also"]) \
         .replace("{{T25_LEAD}}", _t25["lead"]) \
@@ -3759,6 +3770,89 @@ h1 em{font-style:normal;color:var(--gold)}
    words alone. A comment that documents a removed section both describes
    something that is not there and fails the check. Say "three private
    surfaces"; the fences say which. */
+
+/* MATCHMOMENT-CSS-BEGIN */
+/* ══ THE MATCH MOMENT ═════════════════════════════════════════════════════
+   A result poster built entirely from data we already hold and have already
+   reconciled: crests, the two schools' own colours, the ruler-labelled ranks,
+   the score or the start time, the per-set strip once sets exist, and where it
+   was played.
+
+   ⚠ IT IS DELIBERATELY NOT PHOTOGRAPHIC, and that is the honest design rather
+   than a limitation being dressed up. This project does not draw likenesses of
+   named players, and a "generated action shot" beside real headshots would be
+   the R5 failure in picture form -- a synthesised thing standing where a
+   measurement belongs. What it CAN show, it shows exactly: every value on it
+   is checkable against the match.
+
+   It shares the Rally Tape's vocabulary on purpose -- court lines, condensed
+   display type, the set cells -- because they are the same sport rendered at
+   two sizes. 16:9 so it can occupy the slot a photograph would. */
+.mm{margin:0;position:relative;display:grid;
+  grid-template-rows:auto 1fr auto auto;
+  aspect-ratio:16/9;min-height:190px;overflow:hidden;
+  border:1px solid var(--cs-edge2);
+  background:linear-gradient(180deg,#0B1D33 0%,#07172B 100%)}
+/* the two schools' colours as edges, never as a full-bleed theme */
+.mm::after{content:"";position:absolute;left:0;right:0;top:0;height:4px;
+  background:linear-gradient(90deg,var(--ta,var(--cs-blue)) 0 50%,
+                                    var(--tb,var(--cs-blue)) 50% 100%);
+  z-index:2}
+.mm.cs-court::before{opacity:.85}
+.mm-top{display:flex;align-items:center;gap:10px;padding:12px 14px 0;
+  z-index:1}
+.mm-state{font:700 11px/1 var(--disp);letter-spacing:.2em;text-transform:uppercase;
+  color:var(--cs-white);display:flex;align-items:center;gap:6px}
+.mm.is-live .mm-state{color:var(--cs-gold)}
+.mm-when{font:500 10.5px/1 var(--mono);color:var(--slate);letter-spacing:.06em;
+  text-transform:uppercase;margin-left:auto;text-align:right}
+.mm-body{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+  gap:12px;padding:6px 14px;min-width:0;z-index:1}
+.mm-side{display:flex;flex-direction:column;gap:5px;min-width:0}
+.mm-side.b{align-items:flex-end;text-align:right}
+.mm-side img{width:38px;height:38px;object-fit:contain}
+.mm-nologo{width:38px;height:38px;border:1px solid var(--cs-edge2);
+  border-radius:2px;opacity:.45}
+.mm-nm{font:700 21px/1.05 var(--disp);letter-spacing:.005em;color:var(--ink2);
+  text-transform:uppercase;overflow-wrap:anywhere}
+.mm-side.won .mm-nm{color:var(--cs-white)}
+.mm-rk{font:600 10px/1 var(--mono)}
+.mm-sc{font:700 40px/1 var(--disp);color:var(--cs-white);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.mm-sc i{font-style:normal;color:var(--ink3);margin:0 3px}
+.mm-time{font:700 21px/1.1 var(--disp);color:var(--cs-white);text-align:center;
+  white-space:nowrap}
+.mm-time span{display:block;font:500 10px/1.4 var(--mono);color:var(--slate);
+  letter-spacing:.1em;text-transform:uppercase}
+.mm-sets{display:flex;gap:4px;padding:0 14px 6px;flex-wrap:wrap;z-index:1}
+.mm-set{font:600 11px/1 var(--mono);color:var(--ink2);
+  border:1px solid var(--cs-edge);background:var(--cs-cell);
+  padding:4px 6px;border-radius:2px;font-variant-numeric:tabular-nums}
+.mm-foot{border-top:1px solid var(--cs-edge);padding:8px 14px;
+  font:11.5px/1.4 var(--sans);color:var(--ink2);
+  background:rgba(7,23,43,.5);display:flex;gap:8px;flex-wrap:wrap;z-index:1}
+.mm-foot .mm-sep{color:var(--cs-edge2)}
+.mm-unk{color:var(--ink3);font-style:italic}
+.mm-site{font:600 9.5px/1 var(--disp);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--cs-gold);border:1px solid var(--cs-edge2);padding:3px 5px;
+  border-radius:2px}
+a.mmlink{display:block;text-decoration:none}
+a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
+@media (max-width:560px){
+  .mm{min-height:0;aspect-ratio:4/3}
+  .mm-nm{font-size:17px}.mm-sc{font-size:32px}.mm-time{font-size:17px}
+  .mm-side img,.mm-nologo{width:30px;height:30px}
+  .mm-body{gap:8px;padding:4px 11px}
+  .mm-top,.mm-foot,.mm-sets{padding-left:11px;padding-right:11px}
+  .mm-foot{font-size:11px}
+}
+/* the featured pairing: poster beside the score header, one match */
+.deskfeat{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);
+  gap:16px;align-items:start;margin:14px 0 4px}
+.deskfeat .deskfeatside{min-width:0}
+.deskfeat .deskfeatside>*{margin-top:0}
+@media (max-width:860px){.deskfeat{grid-template-columns:minmax(0,1fr)}}
+/* MATCHMOMENT-CSS-END */
 /* COURTSIGNAL-VIEWS-CSS-END */
 /* COURTSIGNAL-TAPE-CSS-END */
 nav{position:sticky;top:0;z-index:6;
@@ -4742,6 +4836,119 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
 /* GAMEDAY-CSS-END */
 
 /* INTEL-CSS-BEGIN */
+/* ══ THE WIRE ═════════════════════════════════════════════════════════════
+   An editorial desk, not a card grid: ONE lead with a picture, then dense
+   ruled rows. Everything here is inside the Intel fence and is stripped whole
+   from the public build -- markup, styles and the host list alike. */
+.in-lead{display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);
+  gap:18px;align-items:start;padding:0 0 18px;
+  border-bottom:2px solid var(--cs-edge2);margin-bottom:16px}
+.in-lead.read{opacity:.72}
+.in-leadtext{min-width:0;display:flex;flex-direction:column;gap:9px}
+.in-leadtitle{font:700 27px/1.14 var(--disp);letter-spacing:-.004em;
+  color:var(--cs-white);text-decoration:none;text-transform:uppercase;
+  overflow-wrap:anywhere}
+.in-leadtitle:hover{color:var(--cs-gold)}
+.in-leadtitle:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:3px}
+.in-out{font:600 12px/1 var(--sans);color:var(--navy);text-decoration:none;
+  border:1px solid var(--cs-edge2);border-radius:2px;padding:8px 11px}
+.in-out:hover{color:var(--cs-white);border-color:var(--navy)}
+.in-out:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
+.in-fmt{font:600 9.5px/1 var(--disp);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink3);border:1px solid var(--cs-edge);padding:3px 5px;
+  border-radius:2px}
+
+/* ── the three media states ────────────────────────────────────────────── */
+/* ⚠ ONE FIXED-RATIO BOX FOR ALL THREE, so swapping between them -- including
+   an image that 404s after load -- shifts nothing. */
+/* ⚠ THE PHOTO LOADED AND PAINTED NOTHING, AND NO MEASUREMENT COULD SEE IT.
+   The first version was `aspect-ratio:16/9` on this box with
+   `width:100%;height:100%` on the child. The image fetched, decoded
+   (naturalWidth 1280, naturalHeight 720), sat topmost under
+   elementFromPoint, reported opacity 1, visibility visible, no filter, no
+   transform, no clip -- and the box rendered flat navy.
+   The clincher: swapping aspect-ratio for an explicit height made it appear
+   INSTANTLY, and the computed heights either way were 236.25px against 236px.
+   Every number was the same in the broken state and the working one. There was
+   no reading available that told them apart; only the pixels did.
+   (The inverse of the lesson this project already paid for -- there I trusted
+   getComputedStyle over the screen and chased a phantom for six turns. Here
+   the measurements were all correct and the render was still wrong. The rule
+   that survives both: look at the screen, then measure to explain it.)
+   The fix keeps aspect-ratio -- it is what reserves the space and stops the
+   layout shifting -- and drops the percentage height: an absolutely positioned
+   child resolves against the padding box and needs no definite parent height.
+   Guarded in test_wire.py. */
+/* ⚠ AND THE FIX IS NOT "absolute child" EITHER -- I SHIPPED THAT AND IT WAS
+   STILL BLANK. Isolated properly the second time: `aspect-ratio` on this box
+   is the whole cause, on its own, whatever the child does. Toggling ONLY
+   aspect-ratio:16/9 -> auto plus an explicit height makes the photograph
+   appear, and the geometry is byte-identical across the two states -- box
+   420x236, image 418x234, position absolute, in both.
+   So the space is reserved the way it was reserved before `aspect-ratio`
+   existed: padding-top as a percentage of WIDTH. 9/16 = 56.25%. Same
+   no-layout-shift guarantee, no dependence on the property that suppresses
+   the paint. */
+.in-media{position:relative;height:0;padding-top:56.25%;overflow:hidden;
+  border:1px solid var(--cs-edge2);background:#0B1D33}
+.in-media img{position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;display:block}
+/* ⚠ NO opacity:0 START. An earlier attempt began the image transparent and
+   revealed it on load, on the theory that the class change would force the
+   repaint. It did not help, and it added a way for the picture to be invisible
+   FOREVER if onload never fired. The image is opaque from the start; the
+   is-shown class is kept only as the hook the guard asserts. */
+.in-media.is-shown{--in-loaded:1}
+.in-media .mm{position:absolute;inset:0;aspect-ratio:auto;border:0}
+.in-media .in-nomedia{position:absolute;inset:0}
+/* ⚠ THE SOURCE IS NAMED ON THE PICTURE ITSELF. A borrowed image must never be
+   able to read as ours, and a credit that lives only in a caption gets lost
+   the moment anything is rearranged. */
+.in-credit{position:absolute;right:0;bottom:0;z-index:3;
+  font:600 9px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;
+  color:var(--chalk);background:rgba(7,23,43,.82);padding:4px 6px}
+.in-nomedia{display:flex;align-items:center;
+  justify-content:center;text-align:center;
+  border:1px dashed var(--cs-edge2);background:rgba(245,241,232,.02)}
+.in-nomedia span{font:500 11.5px/1.5 var(--mono);color:var(--ink3);
+  letter-spacing:.05em;max-width:70%}
+
+/* ── the rail ──────────────────────────────────────────────────────────── */
+.in-railhd{font:700 10px/1 var(--disp);letter-spacing:.2em;text-transform:uppercase;
+  color:var(--slate);padding-bottom:8px;border-bottom:1px solid var(--cs-edge);
+  margin-bottom:2px}
+.in-rail .in-row{border-bottom:1px solid var(--cs-edge);padding:11px 0}
+.in-rail .in-row:last-child{border-bottom:0}
+.in-also{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;
+  font:11.5px/1.4 var(--sans)}
+.in-also i{font-style:normal;color:var(--ink3);
+  font:600 9.5px/1 var(--disp);letter-spacing:.13em;text-transform:uppercase}
+.in-also a{color:var(--navy);text-decoration:none;
+  border:1px solid var(--cs-edge);border-radius:2px;padding:3px 6px;
+  font:600 10px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase}
+.in-also a:hover{color:var(--cs-white);border-color:var(--navy)}
+.in-also a:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
+.in-more{appearance:none;background:transparent;border:0;
+  border-top:1px solid var(--cs-edge);width:100%;text-align:left;
+  padding:11px 2px;color:var(--navy);font:600 12px/1 var(--sans);cursor:pointer}
+.in-more:hover{color:var(--cs-white)}
+.in-more:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:-2px}
+
+@media (max-width:700px){
+  /* ⚠ LEAD FIRST, AND IT KEEPS ITS PICTURE. The brief's instruction and the
+     right one: the lead is the reason this reads as a desk rather than a list,
+     so it stacks rather than shrinking into a thumbnail. */
+  .in-lead{grid-template-columns:minmax(0,1fr);gap:12px}
+  .in-leadtitle{font-size:21px}
+}
+@media (max-width:560px){
+  .in-leadtitle{font-size:19px}
+  .in-meta{flex-wrap:wrap;row-gap:5px}
+  /* metadata stays legible -- no 9px on a phone */
+  .in-src,.in-row time,.in-fmt{font-size:11px}
+  .in-acts{flex-wrap:wrap;row-gap:7px}
+  .in-out{padding:9px 12px}
+}
 /* ── INTEL: the same treatment one distance out -- a wire ──────────────── */
 #v-intel{position:relative}
 #v-intel .in-bar{border-top:1px solid var(--cs-edge);
@@ -10204,6 +10411,262 @@ function inWhen(s) {
          ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
 }
 
+/* ══ THE WIRE ═════════════════════════════════════════════════════════════
+   Three media states, named, and a story never silently changes between them.
+
+     source-provided  a direct HTTPS URL the AUDITED feed delivered in its own
+                      <enclosure>, on the one approved host. Private build
+                      only. Never downloaded, never rehosted, never ours.
+     derived-native   a Match Moment built from data we already hold, used only
+                      when a story can be tied to a known match CONSERVATIVELY.
+     unavailable      no picture. A designed court panel that says so, never a
+                      grey box and never a stand-in photograph.
+
+   ⚠ THE GATE IS SERVER-SIDE (intel.media_url) AND THIS SIDE TRUSTS NOTHING.
+   The page re-checks scheme and host before it will emit an <img>, because a
+   cached payload from an older build is a real thing that can reach this code.
+   Two gates is not belt-and-braces here; the two run in different processes
+   with different lifetimes. */
+const IN_MEDIA_HOSTS = {{INTEL_MEDIA_HOSTS_JSON}};
+
+function inImageOK(u) {
+  if (!u || typeof u !== 'string') return null;
+  try {
+    const p = new URL(u);
+    if (p.protocol !== 'https:') return null;
+    if (p.username || p.password || p.port) return null;
+    if (IN_MEDIA_HOSTS.indexOf(p.hostname.toLowerCase()) < 0) return null;
+    if (p.pathname.indexOf('/_flysystem/') !== 0) return null;
+    return u;
+  } catch (e) { return null; }
+}
+
+/* ⚠ TIE A STORY TO A MATCH ONLY WHEN IT IS UNAMBIGUOUS. Both teams named in
+   the headline, one match today or in the last two days between exactly those
+   two -- otherwise no Moment. A poster attached to the wrong match would be a
+   confident, checkable, wrong statement, which is worse than no picture. */
+function inMatchOf(title) {
+  const teams = inMatch(title);
+  if (teams.length !== 2) return null;
+  const by = allMatches();
+  const today = todayPT();
+  const cand = Object.keys(by).map(k => by[k]).filter(m => {
+    if (!m.d || m.d > today) return false;
+    const days = (new Date(today) - new Date(m.d)) / 86400000;
+    if (days > 2) return false;
+    const pair = [mAway(m), mHome(m)];
+    return pair.indexOf(teams[0]) >= 0 && pair.indexOf(teams[1]) >= 0;
+  });
+  return cand.length === 1 ? cand[0] : null;   /* exactly one, or none */
+}
+
+function inMediaState(it) {
+  const img = inImageOK(it.image);
+  if (img) return { kind: 'source-provided', url: img };
+  const m = inMatchOf(it.title);
+  if (m) return { kind: 'derived-native', match: m };
+  return { kind: 'unavailable' };
+}
+
+function inMediaHTML(it, big) {
+  const st = inMediaState(it);
+  if (st.kind === 'source-provided') {
+    /* ⚠ FIXED RATIO, LAZY, ASYNC, AND AN ERROR PATH THAT IS NOT A BROKEN
+       GLYPH. The audit found no declared type and no dimensions, and the URL
+       carries a Drupal ?itok= token that CAN be invalidated later -- so an
+       image that loads today may 404 next week. The container reserves 16:9
+       either way, so nothing shifts when it fails. */
+    return '<div class="in-media ' + (big ? 'big' : '') + '" data-media="source">' +
+      /* ⚠ NO loading="lazy" AND NO decoding="async" HERE, AND THE REASON IS
+         MEASURED. With either of them the photograph fetched and decoded --
+         complete:true, naturalWidth 1280, naturalHeight 720 -- and the box
+         painted flat navy anyway. Rebuilding the identical element, from the
+         identical URL, in the identical container, WITHOUT them renders it
+         immediately. These images are created by innerHTML inside a section
+         that is `hidden` until its route opens, and both attributes exist to
+         let the browser defer work; deferred inside a hidden subtree, the
+         paint is never scheduled once the bytes land.
+         The brief asked for lazy and async, and they are the right defaults in
+         general. They are wrong HERE, and a blank box is a worse outcome than
+         an eager fetch of one above-the-fold image. Stated rather than quietly
+         dropped. referrerpolicy stays: it costs nothing and keeps the hub's
+         own URL out of the publisher's logs. */
+      '<img src="' + esc(st.url) + '" alt="" ' +
+      'referrerpolicy="no-referrer" ' +
+      'onload="inImgShown(this)" onerror="inImgFail(this)">' +
+      '<span class="in-credit">Image: NCAA.com</span></div>';
+  }
+  if (st.kind === 'derived-native') {
+    return '<div class="in-media ' + (big ? 'big' : '') + '" data-media="derived">' +
+      momentHTML(st.match, LIVE_BY_ID[st.match.gid], { nolink: true }) +
+      '</div>';
+  }
+  return '<div class="in-media ' + (big ? 'big' : '') + '" data-media="none">' +
+    '<div class="in-nomedia cs-court"><span>No picture with this story</span>' +
+    '</div></div>';
+}
+
+/* ⚠ THE PHOTO LOADED AND THE PAGE NEVER REPAINTED IT. Measured, after two
+   wrong diagnoses of my own:
+     - the file fetched and decoded -- complete:true, naturalWidth 1280,
+       naturalHeight 720, and the same URL renders perfectly on its own;
+     - elementFromPoint at the box centre returned the <img> itself, opacity 1,
+       visibility visible, no filter, transform, clip or blend;
+     - and the box painted flat navy.
+   I first blamed `aspect-ratio` + `height:100%`, then `aspect-ratio` alone --
+   BOTH "isolations" were confounded, because the way I turned the property off
+   was an INLINE STYLE WRITE, and that forces a repaint. The repaint was doing
+   the work, not the property. The proof is a no-op: setting opacity to 0.999,
+   which changes no geometry at all, makes the photograph appear.
+   So the mechanism is invalidation. These images are created inside a section
+   that is `hidden` until the route opens, they carry loading="lazy" and
+   decoding="async" -- both of which exist to let the browser defer -- and
+   nothing ever tells it the region needs repainting once the bytes land.
+   The fix addresses that rather than guessing at an attribute: onload marks
+   the container, which invalidates it. lazy and async are kept, because the
+   reason for them (no layout shift, no blocking decode) is still right.
+   ⚠ A GEOMETRY ASSERTION CANNOT CATCH THIS. Every reading was identical in the
+   broken state and the working one. test_wire.py asserts the onload hook
+   exists, because the hook is the part that was missing. */
+function inImgShown(img) {
+  const box = img.parentNode;
+  if (box && box.classList) box.classList.add('is-shown');
+}
+
+/* ⚠ AN IMAGE CAN FINISH BEFORE ITS HANDLER IS BOUND. innerHTML parses the
+   markup and a cached file can be complete by the time the browser gets to the
+   onload attribute, in which case the event never fires and -- now that the
+   image starts transparent -- it would stay invisible forever. The fix is not
+   to make the CSS forgiving; it is to ask, once, after painting the list. */
+function inSweepImages(host) {
+  if (!host) return;
+  host.querySelectorAll('.in-media img').forEach(im => {
+    if (im.complete && im.naturalWidth) inImgShown(im);
+  });
+}
+
+/* the error path, global so the inline handler can reach it */
+function inImgFail(img) {
+  const box = img.parentNode;
+  if (!box) return;
+  box.setAttribute('data-media', 'none');
+  box.innerHTML = '<div class="in-nomedia cs-court">' +
+    '<span>The publisher&rsquo;s image did not load</span></div>';
+}
+
+/* ⚠ FORMAT FROM THE PUBLISHER'S OWN URL SHAPE, and only shapes I have seen.
+   Anything else is "Story" rather than a guess. */
+function inFormat(link) {
+  const p = String(link || '');
+  if (/\/video\//i.test(p)) return 'Video';
+  if (/\/live-updates\//i.test(p)) return 'Live updates';
+  if (/\/news\//i.test(p)) return 'Story';
+  return 'Story';
+}
+
+/* ══ STORY FAMILIES ═══════════════════════════════════════════════════════
+   The feed runs an article and a video of the same thing within minutes.
+   Grouping them is a READING convenience and must not become an editorial act:
+   nothing is deleted, every original link survives, and no "canonical version"
+   is invented -- the first by publication time leads and the rest are listed
+   with their format.
+
+   ⚠ CONSERVATIVE ON PURPOSE. Same source, published within 36 hours, and a
+   token overlap of 0.6 or better on the headline. Two genuinely different
+   stories that happen to share vocabulary stay apart, which is the failure
+   worth having. */
+const IN_RAIL = 6;          /* four to six information-dense rows */
+let IN_RAIL_ALL = false;
+const IN_FAMILY_J = 0.6;
+const IN_FAMILY_HOURS = 36;
+const IN_STOP = ('the a an and or of in on at to for with vs v is are was were '
+  + 'as by from its it this that day final').split(' ');
+
+function inTokens(title) {
+  const t = String(title || '').toLowerCase()
+    .replace(/[^a-z0-9 ]+/g, ' ').split(/\s+/)
+    .filter(w => w && w.length > 2 && IN_STOP.indexOf(w) < 0);
+  return t;
+}
+function inJaccard(a, b) {
+  const A = {}, B = {};
+  a.forEach(w => A[w] = 1); b.forEach(w => B[w] = 1);
+  const ka = Object.keys(A), kb = Object.keys(B);
+  if (!ka.length || !kb.length) return 0;
+  let inter = 0;
+  ka.forEach(w => { if (B[w]) inter++; });
+  return inter / (ka.length + kb.length - inter);
+}
+function inTime(it) {
+  const d = new Date(it.published || 0);
+  return isNaN(d.getTime()) ? 0 : d.getTime();
+}
+
+function inFamilies(rows) {
+  const used = {};
+  const out = [];
+  rows.forEach((it, i) => {
+    if (used[i]) return;
+    const fam = [it];
+    used[i] = 1;
+    const ta = inTokens(it.title);
+    rows.forEach((jt, j) => {
+      if (j <= i || used[j]) return;
+      if (jt.source_key !== it.source_key) return;
+      const hrs = Math.abs(inTime(jt) - inTime(it)) / 3600000;
+      if (!(hrs <= IN_FAMILY_HOURS)) return;
+      if (inJaccard(ta, inTokens(jt.title)) < IN_FAMILY_J) return;
+      fam.push(jt);
+      used[j] = 1;
+    });
+    /* oldest first -- the original report leads, the follow-ups are listed */
+    fam.sort((x, y) => inTime(x) - inTime(y));
+    out.push(fam);
+  });
+  return out;
+}
+
+/* THE LEAD. One story, given room -- source, time, headline, the link out,
+   and one picture in whichever of the three states applies. */
+function inLead(fam) {
+  const it = fam[0];
+  const teams = inMatch(it.title);
+  const read = !!IN_READ[it.id];
+  return '<article class="in-lead' + (read ? ' read' : '') + '" data-in="' +
+    esc(it.id) + '">' +
+    inMediaHTML(it, true) +
+    '<div class="in-leadtext">' +
+      '<div class="in-meta"><span class="in-src">' + esc(it.source) + '</span>' +
+        '<time>' + esc(inWhen(it.published)) + '</time>' +
+        '<span class="in-fmt">' + esc(inFormat(it.link)) + '</span>' +
+        (teams.length ? '<span class="in-teams">' +
+          teams.map(t => logo(t) || '').join('') +
+          teams.map(t => '<b>' + esc(t) + '</b>').join('') + '</span>' : '') +
+      '</div>' +
+      '<a class="in-leadtitle" href="' + esc(it.link) + '" target="_blank" ' +
+        'rel="noopener noreferrer">' + esc(it.title) + '</a>' +
+      inAlso(fam) +
+      '<div class="in-acts">' +
+        '<a class="in-out" href="' + esc(it.link) + '" target="_blank" ' +
+          'rel="noopener noreferrer">Read at ' + esc(it.source) + ' &rarr;</a>' +
+        '<button type="button" data-inread="' + esc(it.id) + '">' +
+          (read ? 'Mark unread' : 'Mark read') + '</button>' +
+        '<button type="button" data-innote="' + esc(it.id) + '">Note this</button>' +
+      '</div>' +
+    '</div></article>';
+}
+
+/* ⚠ THE OTHER MEMBERS OF A FAMILY ARE LISTED, NOT SWALLOWED. Every original
+   link survives with its own format label. Nothing is deleted and no canonical
+   version is invented -- this is a reading convenience, not an edit. */
+function inAlso(fam) {
+  if (!fam || fam.length < 2) return '';
+  return '<div class="in-also"><i>Also from ' + esc(fam[0].source) + '</i>' +
+    fam.slice(1).map(x =>
+      '<a href="' + esc(x.link) + '" target="_blank" rel="noopener noreferrer">' +
+      esc(inFormat(x.link)) + '</a>').join('') + '</div>';
+}
+
 function inRow(it) {
   const teams = inMatch(it.title);
   const read = !!IN_READ[it.id];
@@ -10211,6 +10674,7 @@ function inRow(it) {
     esc(it.id) + '">' +
     '<div class="in-meta"><span class="in-src">' + esc(it.source) + '</span>' +
     '<time>' + esc(inWhen(it.published)) + '</time>' +
+    '<span class="in-fmt">' + esc(inFormat(it.link)) + '</span>' +
     (teams.length
       ? '<span class="in-teams">' + teams.map(t => logo(t) || '').join('') +
         teams.map(t => '<b>' + esc(t) + '</b>').join('') + '</span>'
@@ -10219,6 +10683,7 @@ function inRow(it) {
     /* ⚠ THE HEADLINE IS A LINK TO THE PUBLISHER. Reading happens there. */
     '<a class="in-title" href="' + esc(it.link) + '" target="_blank" ' +
     'rel="noopener noreferrer">' + esc(it.title) + '</a>' +
+    (it._fam ? inAlso(it._fam) : '') +
     '<div class="in-acts">' +
       '<button type="button" data-inread="' + esc(it.id) + '">' +
       (read ? 'Mark unread' : 'Mark read') + '</button>' +
@@ -10271,34 +10736,95 @@ function inRender() {
       '<p>' + esc(why) + '</p></div>';
     return;
   }
-  host.innerHTML = banner + rows.map(inRow).join('');
+  /* ⚠ GROUP FIRST, THEN LEAD, THEN RAIL. Grouping after choosing a lead would
+     let a follow-up video become the lead while its own article sat below it.
+     ⚠ AND MY BOARD ORDERS, IT DOES NOT RANK. Stories matching a watched team
+     sort first under that filter; every one keeps its source and its time, and
+     nothing is labelled more important than anything else. */
+  const fams = inFamilies(rows);
+  if (IN_FILTER === 'board' && board.length) {
+    fams.sort((a, b) => (inMatch(b[0].title).length ? 1 : 0)
+                      - (inMatch(a[0].title).length ? 1 : 0));
+  }
+  const lead = fams[0];
+  const rail = IN_RAIL_ALL ? fams.slice(1) : fams.slice(1, 1 + IN_RAIL);
+  const restN = Math.max(0, fams.length - 1 - rail.length);
+  const paint = banner +
+    inLead(lead) +
+    (rail.length
+      ? '<div class="in-railhd">The wire</div><div class="in-rail">' +
+        rail.map(f => {
+          const it = Object.assign({}, f[0]);
+          it._fam = f;
+          return inRow(it);
+        }).join('') + '</div>'
+      : '') +
+    (restN
+      ? '<button type="button" class="in-more" id="inmore">Show ' + restN +
+        ' more ' + (restN === 1 ? 'story' : 'stories') + '</button>'
+      : '');
+  host.innerHTML = paint;
+  inSweepImages(host);
 }
 
 /* ⚠ THE PAGE ASKS THE LOCAL SERVER. It never requests a feed itself, and it
    passes no URL -- only an optional `force`. Opened straight from Finder this
    fetch fails and the desk says the local server is not running, which is the
    truth rather than an empty wire. */
+/* ⚠ "CHECKING..." MUST END, AND IT MUST NOT DESTROY WHAT IS ALREADY THERE.
+   The previous version had two faults that only appear when the endpoint is
+   slow or gone: fetch() carries no timeout of its own, so a hung local server
+   left the word on screen indefinitely with nothing to distinguish it from a
+   slow answer; and the catch() emptied IN_ITEMS, so a failed refresh threw
+   away stories that were on the page a second earlier. A wire that goes blank
+   because the CHECK failed is saying something false about the wire.
+   Now: an abort at IN_TIMEOUT_MS, cached stories retained, and a plain
+   sentence saying no update was received. */
+const IN_TIMEOUT_MS = 12000;
+
 function inFetch(force) {
   const st = document.getElementById('intelstate');
-  if (st) st.textContent = 'Checking\u2026';
-  fetch('/api/intel' + (force ? '?force=1' : ''), { cache: 'no-store' })
+  if (st) st.textContent = 'Checking…';
+  const ctl = (typeof AbortController === 'function') ? new AbortController() : null;
+  let timedOut = false;
+  const timer = setTimeout(function () {
+    timedOut = true;
+    if (ctl) { try { ctl.abort(); } catch (e) { } }
+  }, IN_TIMEOUT_MS);
+
+  const done = function (msg) {
+    clearTimeout(timer);
+    if (st) st.textContent = msg;
+    inRender();
+  };
+
+  fetch('/api/intel' + (force ? '?force=1' : ''),
+        Object.assign({ cache: 'no-store' }, ctl ? { signal: ctl.signal } : {}))
     .then(r => r.json())
     .then(j => {
-      IN_ITEMS = (j && Array.isArray(j.items)) ? j.items : [];
-      IN_SRC = (j && Array.isArray(j.sources)) ? j.sources : [];
-      IN_CHECKED = Date.now();
-      if (st) {
-        st.textContent = IN_ITEMS.length
-          ? 'Checked ' + inWhen(new Date(IN_CHECKED).toISOString())
-          : (j && j.error ? 'Source unavailable.' : 'Nothing came back.');
+      const items = (j && Array.isArray(j.items)) ? j.items : [];
+      /* ⚠ ONLY REPLACE WHAT IS THERE WITH SOMETHING. An empty answer is not a
+         reason to clear a wire that is already populated. */
+      if (items.length) {
+        IN_ITEMS = items;
+        IN_SRC = (j && Array.isArray(j.sources)) ? j.sources : [];
+        IN_CHECKED = Date.now();
+        done('Checked ' + inWhen(new Date(IN_CHECKED).toISOString()));
+      } else {
+        IN_SRC = (j && Array.isArray(j.sources)) ? j.sources : IN_SRC;
+        done(IN_ITEMS.length
+          ? 'No update received. Showing what was last collected.'
+          : ((j && j.error) ? 'The source did not return any stories.'
+                            : 'Nothing came back.'));
       }
-      inRender();
     })
     .catch(() => {
-      IN_ITEMS = []; IN_SRC = [];
-      if (st) st.textContent = 'The local server is not running, so the wire ' +
-        'cannot be checked. Everything else on this page still works.';
-      inRender();
+      const why = timedOut
+        ? 'The check timed out after ' + Math.round(IN_TIMEOUT_MS / 1000) +
+          ' seconds. No update received.'
+        : 'The local server is not running, so the wire cannot be checked.';
+      done(IN_ITEMS.length ? why + ' Showing what was last collected.'
+                           : why + ' Everything else on this page still works.');
     });
 }
 
@@ -10346,6 +10872,7 @@ function inWire() {
       }, 250);
       return;
     }
+    if (e.target.closest('#inmore')) { IN_RAIL_ALL = true; inRender(); return; }
     if (e.target.closest('#intelrefresh')) inFetch(true);
   });
   inFetch(false);
@@ -11566,6 +12093,40 @@ function matchState(m, live) {
 function mCaps(state6) {
   return (MSTATE.caps && MSTATE.caps[state6]) || MSTATE.caps.unavailable;
 }
+/* ══ ONE SET, READ ONE WAY ════════════════════════════════════════════════
+   ⚠ A SET IS AN ARRAY PAIR [away, home]. Not an object. Measured on both
+   sources that produce one:
+     live_server.py:228  sets.append([int(s.get("visit")), int(s.get("home"))])
+     the crawled ledger  [[25,22],[19,25],[16,25],[25,23],[8,15]]
+   and the match ribbon has always read x[0]/x[1] accordingly.
+
+   ⚠ THE RALLY TAPE AND THE MATCH MOMENT READ `sv.a` / `sv.h` -- AN OBJECT
+   SHAPE THAT NOTHING PRODUCES. Every real live match would have rendered five
+   empty court dots instead of the score, on both of the surfaces built to show
+   it, and nothing would have thrown.
+
+   ⚠ AND HERE IS WHY IT SURVIVED TWO COMMITS OF TESTING: the only live data I
+   ever had was a fixture I wrote myself, in the shape my own code expected. A
+   fixture authored to match the code under test confirms exactly what it was
+   built to confirm -- the same failure as a nickname map authored from the
+   cases it adjudicates. It surfaced the moment the rehearsal put the tape and
+   the ribbon side by side on one screen and they disagreed: 25-22 against
+   "undefined-undefined".
+
+   Returns [away, home] as numbers, or null when the set has not been played.
+   '' IS NOT ZERO -- the feed serves an empty string for a score that does not
+   exist yet, and '' coerces to 0. */
+function setPair(v) {
+  if (!v) return null;
+  const a = Array.isArray(v) ? v[0] : undefined;
+  const h = Array.isArray(v) ? v[1] : undefined;
+  if (a === '' || h === '' || a === null || h === null ||
+      a === undefined || h === undefined) return null;
+  const na = Number(a), nh = Number(h);
+  if (isNaN(na) || isNaN(nh)) return null;
+  return [na, nh];
+}
+
 function matchSets(m, live) {
   if (live && live.sets && live.sets.length) return live.sets;
   if (m.final && m.final.sets) return m.final.sets;
@@ -11672,12 +12233,26 @@ function pickFeatured(today, liveOf) {
 /* ══ THE LEDGER AND THE MATCH DETAIL ══════════════════════════════════════ */
 let LEDGER_STATE = 'today';
 
+let ALL_MATCHES = null;
+
 function allMatches() {
   /* the two sources, keyed by gid: the crawled FINALS and the schedule. A
-     final is authoritative where both exist -- it has the result. */
+     final is authoritative where both exist -- it has the result.
+
+     ⚠ BUILT ONCE. DESK and LEDGER are page constants -- nothing mutates them
+     after load -- so rebuilding this index on every call was pure repetition:
+     ~1,500 object copies each time, and matchByGid() did it for a SINGLE
+     lookup. The day view, the ledger, the match detail, the live-stats poller
+     and (new this phase) the Wire's story-to-match tie all call it.
+     ⚠ MEMOISING IS ONLY SAFE BECAUSE LIVE DATA IS NOT IN HERE. Live scores
+     live in LIVE_BY_ID and are read separately by matchState/matchScore, which
+     is why a cached index cannot go stale mid-match. If a live field is ever
+     folded into these rows, this cache has to go with it. */
+  if (ALL_MATCHES) return ALL_MATCHES;
   const by = {};
   DESK.forEach(m => { by[m.gid] = Object.assign({}, m); });
   LEDGER.forEach(r => { by[r.gid] = Object.assign({}, by[r.gid] || {}, r); });
+  ALL_MATCHES = by;
   return by;
 }
 function matchByGid(gid) { return allMatches()[String(gid)] || null; }
@@ -12159,14 +12734,10 @@ function csCells(sets, playing) {
      scores with the winner emphasised; a set that has not prints a dot. */
   const out = [];
   for (let i = 0; i < CS_SETS; i++) {
-    const sv = sets[i];
-    /* ⚠ A SET IS PRESENT ONLY IF BOTH SIDES CARRY A NUMBER. */
-    const a = (sv && sv.a !== '' && sv.a !== null && sv.a !== undefined)
-      ? Number(sv.a) : null;
-    const h = (sv && sv.h !== '' && sv.h !== null && sv.h !== undefined)
-      ? Number(sv.h) : null;
-    const has = a !== null && h !== null && !isNaN(a) && !isNaN(h);
-    if (!has) {
+    const pair = setPair(sets[i]);
+    const a = pair ? pair[0] : null;
+    const h = pair ? pair[1] : null;
+    if (!pair) {
       out.push('<div class="cs-cell cs-empty" style="--cs-i:' + i + '">' +
         '<i>&middot;</i><i>&middot;</i></div>');
       continue;
@@ -12301,6 +12872,86 @@ function csTape() {
     '</div>';
 }
 
+/* ══ THE MATCH MOMENT ═════════════════════════════════════════════════════
+   Built from DESK + LIVE_BY_ID through the same helpers everything else uses,
+   so it cannot disagree with the tape above it or the lanes below it.
+
+   ⚠ EVERY VALUE ON IT IS CHECKABLE AND NOTHING IS DECORATIVE-BUT-FACTUAL-
+   LOOKING. Ranks carry their ruler (the contract from the wayfinding phase).
+   An unplayed set is absent, not a 0. A venue is the feed's or it says it was
+   not reported. Home/away/neutral comes from `site`, never inferred.
+
+   ⚠ AND IT IS NOT A PHOTOGRAPH AND MUST NOT BE MISTAKEN FOR ONE. No likeness,
+   no crowd, no invented action -- crests and type only. */
+function momentHTML(m, live, opts) {
+  opts = opts || {};
+  const st = matchState(m, live);
+  const sc = matchScore(m, live);
+  const sets = matchSets(m, live);
+  const aw = (sc[0] !== null && sc[1] !== null) && +sc[0] > +sc[1];
+  const hw = (sc[0] !== null && sc[1] !== null) && +sc[1] > +sc[0];
+  const ca = (typeof COLORS !== 'undefined' && COLORS[mAway(m)]) || '';
+  const cb = (typeof COLORS !== 'undefined' && COLORS[mHome(m)]) || '';
+
+  const side = (name, rk, won, cls) =>
+    '<div class="mm-side ' + cls + (won ? ' won' : '') + '">' +
+      (logo(name) || '<span class="mm-nologo"></span>') +
+      '<span class="mm-nm">' + esc(name) + '</span>' +
+      (rk ? '<span class="mm-rk">' + rankHTML('avca', rk, true) + '</span>' : '') +
+    '</div>';
+
+  /* ⚠ THE SCORE ONLY EXISTS ONCE IT EXISTS. Before first serve the middle of
+     the poster carries the start time, which is the fact available then. */
+  const middle = (st === 'upcoming' || sc[0] === null || sc[0] === undefined)
+    ? '<div class="mm-time">' + esc(m.t || 'Time TBA') +
+      '<span>' + esc(dayLabel(m.d)) + '</span></div>'
+    : '<div class="mm-sc">' + sc[0] + '<i>–</i>' + sc[1] + '</div>';
+
+  /* the per-set strip, only for sets that were actually played */
+  const strip = sets.map(setPair).filter(Boolean);
+  const setsHtml = strip.length
+    ? '<div class="mm-sets">' + strip.map(v =>
+        '<span class="mm-set">' + v[0] + '–' + v[1] + '</span>').join('') + '</div>'
+    : '<div class="mm-sets"></div>';
+
+  const where = m.venue
+    ? esc(m.venue) + ([m.city, m.st].filter(Boolean).length
+        ? ' ' + esc([m.city, m.st].filter(Boolean).join(' ')) : '')
+    : '<span class="mm-unk">venue not reported</span>';
+  /* ⚠ FROM `site`, NEVER INFERRED FROM WHO IS LISTED AT HOME -- and only the
+     values that MEAN something to a reader. The first version printed
+     esc(m.site) for anything non-neutral, which put the internal token
+     "NO-VENUE" on the poster as though it were a fact about the match. It is
+     not: `no-venue` is this pipeline's way of saying the feed published no
+     venue for the fixture (132 of 463), which the footer already says in
+     words. A badge is for a stated condition; an unknown token gets none. */
+  const SITE_WORD = { neutral: 'Neutral floor', home: 'Home' };
+  const siteTag = SITE_WORD[m.site]
+    ? '<span class="mm-site">' + SITE_WORD[m.site] + '</span>' : '';
+
+  const label = st === 'live' ? 'Live' : st === 'final' ? 'Final' : 'Upcoming';
+  const when = st === 'live'
+    ? esc((live && live.period) || 'in progress')
+    : esc(dayLabel(m.d));
+
+  const fig =
+    '<figure class="mm cs-court ' + (st === 'live' ? 'is-live' : '') + '"' +
+      (ca || cb ? ' style="' + (ca ? '--ta:' + esc(ca) + ';' : '') +
+                   (cb ? '--tb:' + esc(cb) : '') + '"' : '') +
+      ' data-mm-state="' + esc(matchState6(m, live, false)) + '">' +
+      '<div class="mm-top"><span class="mm-state">' +
+        (st === 'live' ? '<i class="cs-dot"></i>' : '') + label + '</span>' +
+        '<span class="mm-when">' + when + '</span></div>' +
+      '<div class="mm-body">' +
+        side(mAway(m), m.ar, aw, 'a') + middle + side(mHome(m), m.hr, hw, 'b') +
+      '</div>' + setsHtml +
+      '<div class="mm-foot">' + siteTag + where + '</div>' +
+    '</figure>';
+  return opts.nolink ? fig
+    : '<a class="mmlink" href="' + matchRoute(m.gid, opts.dest || 'desk') +
+      '">' + fig + '</a>';
+}
+
 function csStatus() {
   /* The gallery readout: date, feed freshness, and an honest live/quiet word.
      ⚠ FRESHNESS IS REPORTED, NOT ASSERTED. LIVE_STAMP is empty on a static
@@ -12399,8 +13050,17 @@ function renderDesk() {
   let html = /* GAMEDAY-CALL-BEGIN */ (typeof gdPanel === 'function' ? gdPanel() : '') + /* GAMEDAY-CALL-END */
              todaysRead(mine, soon, liveOf);
   if (feat) {
-    html += ribbonHTML(feat.m, liveOf(feat.m),
-      '<b>Featured:</b> ' + feat.why);
+    /* ⚠ THE RIBBON STAYS. It is the score header this page has one definition
+       of, and replacing it would reopen settled scope. The Moment sits BESIDE
+       it as the poster treatment -- one featured match, two renderings of the
+       same data through the same helpers, so they cannot disagree. Sparing by
+       design: exactly one Moment on this screen, on the match already chosen
+       by a stated rule. */
+    html += '<div class="deskfeat">' +
+      momentHTML(feat.m, liveOf(feat.m), { nolink: true, dest: 'desk' }) +
+      '<div class="deskfeatside">' +
+        ribbonHTML(feat.m, liveOf(feat.m), '<b>Featured:</b> ' + feat.why) +
+      '</div></div>';
   }
   /* ⚠ A FULL MATCH DAY IS 195 FIXTURES, AND THE BOARD WAS PRINTING ALL OF
      THEM. Measured on a stubbed Friday: 206 rows, a 13,593px page -- about ten
