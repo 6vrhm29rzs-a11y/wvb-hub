@@ -1700,3 +1700,72 @@ button for the remainder, and copy that names both sources.
 36 suites · preflight clean · both builds · public gate · fresh-checkout guard
 (which caught `scripts/fixtures.py` being untracked — the build imports it, so
 a fresh clone would have failed) · desktop and 390px, no sideways scroll.
+
+---
+
+## 25. GUARD-LAYER SWEEP, AND THE NEXT PIECE (measured, not guessed)
+
+### A latent hazard in the guard layer, now guarded
+Five suites strip C-style comments from `build_hub.py` before searching it —
+a reasonable habit, since a guard that greps for a forbidden string otherwise
+finds the comment explaining why it is forbidden (this project's oldest trap,
+hit ten times). But `build_hub.py` is **Python that embeds JS and CSS**, so
+those pairs span unrelated blocks and swallow the Python between them:
+**325,263 of 789,437 characters — 41.2% of the file.**
+
+A literal landing in a swallowed region makes an `X not in code` check pass for
+free. **Measured: 0 of 40 literals are currently eaten**, so nothing is lying
+today — which is why the response is a guard rather than a rewrite of five
+working suites. `test_shipping.py` now fails the day that changes, with a
+positive control (40 literals actually checked) and a negative control (a
+literal living only inside a comment must be detected).
+
+⚠ **The positive control immediately caught my own bug**: the first detector
+matched nothing and reported `0 checked`. Four levels of nested backslash
+escaping; rebuilt from `chr(92)`.
+
+### What the site still does not know — counted
+| | |
+|---|---|
+| fixtures with no venue at all | **1,659 of 4,856 (34%)** |
+| site unconfirmed | **1,676 (35%)** |
+| neutral floor, event unnamed | **499** |
+| scoreboard entries carrying a TV network | **0 of 1,971** |
+
+The first three are honest gaps the fail-closed work now renders truthfully
+rather than papering over. The fourth is a **missing feature, not a gap in the
+feed's truthfulness** — and it is the next obvious daily-use win.
+
+### NEXT: join the TV listings to canonical fixtures (measured feasibility)
+`Cody/data/tv_listings_2026.txt` holds **220 hand-transcribed listings** and
+they render as a standalone "On TV" table that is **never joined to a fixture**
+— so no schedule row, desk card or Rally Tape says where to watch. An elite
+sports site answers that first.
+
+Feasibility, measured against the canonical fixtures on (date, team pair) via
+the existing `reconcile_2025.norm()`:
+
+| | |
+|---|---|
+| listings | 220 |
+| name two teams (joinable in principle) | 187 |
+| **join to EXACTLY one fixture** | **130 (70% of 187)** |
+| **ambiguous (>1 fixture)** | **0** |
+| tournament placeholders naming no teams | 30 |
+| exhibitions | 3 |
+
+⚠ **The zero is the important number.** No listing matches two fixtures, so the
+join can be made strict — attach only on an unambiguous single match — without
+losing much. The 30 placeholders ("B1G Tournament", "SEC Tournament 1st Round")
+are correctly unjoinable: those brackets are not scheduled until November, the
+same reason projected wins cannot count them.
+
+The remaining ~57 misses are name/date normalisation and worth a look — e.g.
+`Texas vs Arizona State` on Aug 22 did not join, which smells like the
+`State`/`St.` normalisation that has bitten this project three times.
+
+**Design constraints for whoever builds it:** the network must attach to the
+canonical fixture record (never re-derived per view); an unmatched listing stays
+visible in the On TV table and is counted, never silently dropped; and the count
+of joined-vs-unjoined is stated on the page, because a partial join presented as
+complete is the failure this whole phase was about.

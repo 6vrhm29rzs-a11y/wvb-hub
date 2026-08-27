@@ -26,6 +26,10 @@ import re
 import sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+COMMENT_RE = "/\\*.*?\\*/"
+COMMENT_SRC = 'r"/' + chr(92) + '*.*?' + chr(92) + '*/"'   # the literal r"/\*.*?\*/" as it appears in a suite
+LIT_RE = re.compile(r'''["\']([^"\'\n]{6,80})["\']\s*(?:not\s+)?in\s+(?:C|code|hc)\b''')
+
 FAILS = []
 
 
@@ -155,6 +159,45 @@ def main():
     check("[-] deploy lag is reported, not failed",
           "reported, not failed" in vs and "Fastly" in vs,
           "a verifier that cries wolf during a normal deploy gets ignored")
+
+    # 3b. A GUARD MUST NOT BE MADE VACUOUS BY ITS OWN PREPROCESSING
+    print("\n3b. NO SUITE'S CHECKS ARE EATEN BY ITS OWN COMMENT STRIP")
+    # ⚠ THE HAZARD, MEASURED. Several suites strip C-style comments from
+    # build_hub.py before searching it, to stop a guard matching the comment
+    # that explains the thing it forbids. But build_hub.py is PYTHON that
+    # embeds JS and CSS, so those pairs span unrelated blocks and swallow the
+    # Python between them: 325,263 of 789,437 characters, 41% of the file. A
+    # literal that lands in a swallowed region makes an "X not in code" check
+    # pass for free -- a guard that cannot fail, which is this project's oldest
+    # failure mode. Nothing is lying today (0 of 40 literals eaten). This is
+    # what notices when that changes.
+    import glob as _glob
+    bh = read("scripts/build_hub.py")
+    stripped = re.sub(COMMENT_RE, " ", bh, flags=re.S)
+    removed = len(bh) - len(stripped)
+    print("     the strip removes %d of %d chars (%.1f%%) from build_hub.py"
+          % (removed, len(bh), 100.0 * removed / max(1, len(bh))))
+    eaten, checked = [], 0
+    for path in sorted(_glob.glob(os.path.join(REPO, "scripts", "test_*.py"))):
+        t = open(path, encoding="utf-8").read()
+        if COMMENT_SRC not in t or "build_hub.py" not in t:
+            continue
+        for m in LIT_RE.finditer(t):
+            lit = m.group(1)
+            checked += 1
+            if lit in bh and lit not in stripped:
+                eaten.append("%s: %r" % (os.path.basename(path), lit))
+    check("no suite tests a literal its own strip has swallowed",
+          not eaten, "; ".join(eaten[:3]))
+    check("[+] ...over a real set of literals (%d checked)" % checked,
+          checked >= 20, str(checked))
+    # ⚠ NEGATIVE CONTROL: a literal that exists ONLY inside a comment
+    # region must be detected as eaten, or the check above proves nothing.
+    m_c = re.search(r"/\*([^*]{40,}?)\*/", bh, re.S)
+    inside = " ".join(m_c.group(1).split())[:40] if m_c else ""
+    check("[NEG] a literal living only inside a comment IS detected",
+          bool(inside) and inside in bh and inside not in stripped,
+          "picked %r" % inside)
 
     # ── 4. THEY ARE REACHABLE FROM THE RECORD ───────────────────────────
     print("\n4. SOMEONE WILL ACTUALLY FIND THEM")
