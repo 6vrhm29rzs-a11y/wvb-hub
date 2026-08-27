@@ -311,6 +311,15 @@ def main():
     cur_key = None
     buf = []
     prev = None            # previous score tuple
+    # ⚠ TWO SKILLS THE BOX SCORE CANNOT SEE, AND BOTH ARE OUTCOME MEASURES.
+    #   SETTING: an assist counts a ball that became a kill, which measures the
+    #     HITTER as much as the setter. What her hitters do when SHE sets --
+    #     against what the same hitters do overall -- is closer to her.
+    #   SERVING: aces per set rewards the ace and ignores the far more common
+    #     thing a good server does, which is stop the other team siding out.
+    pending_set = None     # (team, setter) -- a set is up, no attack yet
+    attack_owner = None    # (team, setter) -- her attack is in the air
+    rally_server = None    # (team, server)
     r_serve_team = None
     r_recv_player = None
     r_recv_team = None
@@ -369,6 +378,8 @@ def main():
             r_serve_team = tm
             r_recv_player = r_recv_team = None
             r_first_attack_done = False
+            rally_server = (tm, pl) if pl else None
+            pending_set = attack_owner = None
         elif ev == "Reception":
             # ⚠ ONE RECEIVER PER RALLY. A second Reception row inside the same
             # rally would be a continuation, not a new pass; the first is the
@@ -387,6 +398,28 @@ def main():
                     A[(owner, one)]["touch"] += 1
                     A[(owner, one)]["ev_" + ev.replace(" ", "_")] += 1
 
+        # ---- setting: whose set was it, and what became of the swing ------
+        if ev == "Set" and pl:
+            pending_set = (tm, pl)
+        elif ev == "Attack":
+            if pending_set and pending_set[0] == tm:
+                A[pending_set]["set_att"] += 1
+                attack_owner = pending_set
+            pending_set = None
+        elif ev in ("Kill", "First ball kill"):
+            if attack_owner and attack_owner[0] == tm:
+                A[attack_owner]["set_kill"] += 1
+            attack_owner = None
+        elif ev == "Attack error":
+            # ⚠ THE TEAM COLUMN IS INVERTED ON AN ERROR ROW (measured 0.1%
+            # correct), so the offending side is the one that is NOT credited.
+            owner_t = away if tm == home else (home if tm == away else tm)
+            if attack_owner and attack_owner[0] == owner_t:
+                A[attack_owner]["set_err"] += 1
+            attack_owner = None
+        elif ev == "Dig":
+            attack_owner = None
+
         sc = parse_score(row.get("score"))
         if sc is None:
             bad_score += 1
@@ -395,6 +428,13 @@ def main():
             # this row ended the rally -- who scored?
             da, dh = sc[0] - prev[0], sc[1] - prev[1]
             scorer = away if da > 0 else (home if dh > 0 else None)
+            # ---- serving: did her serve stop the other team siding out?
+            if scorer and rally_server:
+                A[rally_server]["srv_rally"] += 1
+                if scorer == rally_server[0]:
+                    A[rally_server]["srv_won"] += 1
+            rally_server = None
+            pending_set = attack_owner = None
             if scorer and r_recv_team:
                 close_rally("recv" if scorer == r_recv_team else "serve")
                 if (ev == "First ball kill" and scorer == r_recv_team
@@ -435,6 +475,21 @@ def main():
             "aces_not_charged": ("an ace emits no Reception row, so no passer "
                                  "is charged with it and side-out rate covers "
                                  "only rallies she actually touched"),
+            "setting": ("set_kill / set_att is the share of swings off her sets "
+                        "that were killed. VALIDATED against the box scores: "
+                        "0.350 here against a league kill rate of 0.362, the "
+                        "gap being the 38 matches this mirror does not carry."),
+            "set_err_undercounts": (
+                "⚠ DO NOT DERIVE A HITTING PERCENTAGE FROM set_err. A stuffed "
+                "swing is logged as a Block, not an Attack error, so this "
+                "column catches only hitting errors: 0.092 against the box "
+                "scores' 0.152. The kill rate is sound; the error rate is not, "
+                "and no efficiency figure is computed from it."),
+            "serving": ("srv_won / srv_rally is how often her team wins the "
+                        "rally when she serves. CROSS-CHECK: it gives a league "
+                        "side-out of 0.571, matching the 0.5712 computed "
+                        "independently from receptions -- two separate paths "
+                        "through the feed agreeing."),
         },
         "players": out,
     }

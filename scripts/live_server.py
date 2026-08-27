@@ -28,6 +28,7 @@ Python 3.9 target, standard library only.
 
 import json
 import os
+import socket
 import subprocess
 import sys
 import time
@@ -759,6 +760,11 @@ def _who_has(port):
     return ""
 
 
+class _V6Server(ThreadingHTTPServer):
+    """An IPv6 listener. ThreadingHTTPServer is AF_INET only by default."""
+    address_family = socket.AF_INET6
+
+
 def tailscale_self():
     # type: () -> Optional[Tuple[str, str]]
     """This Mac's tailnet IP and MagicDNS name, or None if Tailscale is off.
@@ -782,10 +788,22 @@ def tailscale_self():
         except Exception:
             continue
         me = d.get("Self") or {}
-        ips = [x for x in (me.get("TailscaleIPs") or []) if ":" not in x]
+        # Tailscale gives every node an IPv4 (100.x) and an IPv6 (fd7a:...),
+        # and both are bound.
+        # ⚠ THE v4 ADDRESS IS THE ONE THAT MATTERS, AND I HAD THE REASON WRONG
+        # BEFORE CHECKING. I assumed MagicDNS publishes AAAA and that iOS would
+        # prefer it, making a v4-only bind a silent failure on the phone. It
+        # does not: `dig @100.100.100.100 <node> AAAA` returns nothing, so the
+        # MagicDNS name resolves to the 100.x address and Safari uses v4.
+        # ⚠ AND THE v6 LISTENER IS UNVERIFIED, WHICH IS SAID RATHER THAN
+        # GLOSSED. It binds and appears in lsof, but TCP to this host's own
+        # tailnet v6 address times out here even though ping6 succeeds, so
+        # there is no way to exercise it locally. It is kept as cover in case
+        # MagicDNS ever starts publishing AAAA; it is not load-bearing today.
+        ips = list(me.get("TailscaleIPs") or [])
         name = (me.get("DNSName") or "").rstrip(".")
         if ips:
-            return ips[0], name
+            return ips, name
     return None
 
 
@@ -840,13 +858,24 @@ def main():
             print("  tailnet: REQUESTED but Tailscale is not reachable "
                   "-- serving on 127.0.0.1 only")
         else:
-            tip, tname = info
-            try:
-                ts_srv = ThreadingHTTPServer((tip, PORT_IN_USE), Handler)
-            except OSError as exc:
-                print("  tailnet: could not bind %s:%d (%s)"
-                      % (tip, PORT_IN_USE, exc))
-            else:
+            tips, tname = info
+            bound = []
+            for tip in tips:
+                try:
+                    if ":" in tip:
+                        srv6 = _V6Server((tip, PORT_IN_USE), Handler)
+                    else:
+                        srv6 = ThreadingHTTPServer((tip, PORT_IN_USE), Handler)
+                except OSError as exc:
+                    print("  tailnet: could not bind %s:%d (%s)"
+                          % (tip, PORT_IN_USE, exc))
+                    continue
+                threading.Thread(target=srv6.serve_forever,
+                                 daemon=True).start()
+                bound.append(tip)
+                ts_srv = srv6
+            tip = bound[0] if bound else None
+            if bound:
                 # ⚠ TAILSCALE PRESERVES THE ORIGINAL Host HEADER, so the
                 # trusted-host allowlist has to know these two names or the
                 # phone gets a refusal that looks like the server is down.
@@ -854,14 +883,17 @@ def main():
                 # purpose -- it is a security allowlist and nothing should be
                 # able to bolt an entry onto it at runtime. Adding these two
                 # names is a deliberate, single, opt-in widening.
+                # ⚠ AN IPv6 HOST HEADER ARRIVES IN BRACKETS. Safari sends
+                # `Host: [fd7a:...]:8799`, and _host_only() strips them -- so
+                # the bare form is what the allowlist must hold.
                 globals()["TRUSTED_HOSTS"] = frozenset(
-                    set(TRUSTED_HOSTS) | set([tip] + ([tname] if tname else [])))
-                threading.Thread(target=ts_srv.serve_forever,
-                                 daemon=True).start()
+                    set(TRUSTED_HOSTS) | set(bound) |
+                    set([tname] if tname else []))
                 print("  tailnet: http://%s:%d/START-HERE.html"
                       % (tname or tip, PORT_IN_USE))
-                print("           (or http://%s:%d/START-HERE.html)"
-                      % (tip, PORT_IN_USE))
+                for b in bound:
+                    print("           (or http://%s:%d/START-HERE.html)"
+                          % (("[%s]" % b) if ":" in b else b, PORT_IN_USE))
                 print("           reachable from your own devices only, on "
                       "any network. Not the LAN, not the internet.")
     try:

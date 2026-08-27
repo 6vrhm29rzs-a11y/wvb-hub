@@ -164,6 +164,11 @@ def main():
         check("%-10s is sized at the phone breakpoint" % prim, prim in phone)
 
     print()
+    if not check_ios_zoom(h):
+        FAILS.append("form controls reach 16px at phone width")
+    if not check_css_vars(h):
+        FAILS.append("every CSS variable read is also defined")
+
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))
         for f in FAILS:
@@ -171,6 +176,73 @@ def main():
         return 1
     print("ALL VISUAL SYSTEM GUARDS PASS")
     return 0
+
+
+
+def check_css_vars(page):
+    """Every custom property a rule READS must be DEFINED somewhere.
+
+    ⚠ A PHANTOM TOKEN FAILS SILENTLY AND LOOKS LIKE A STYLING CHOICE. Seventeen
+    rules were written against `--cs-mute`, which does not exist: colour then
+    falls back to whatever is inherited, so a muted caption inside a card that
+    happens to be an <a> rendered in default link blue. Nothing errored and the
+    page still looked deliberate.
+    A property with a FALLBACK -- var(--x, #ccc) -- is fine and is skipped.
+
+    ⚠ IT SCANS COMMENTS TOO, so do not write a dead token's name in var()
+    form inside the comment that explains you removed it. That is exactly what
+    happened here and the guard reported the fix as the bug.
+    """
+    defined = set(re.findall(r"(--[a-z0-9-]+)\s*:", page, re.I))
+    used = set()
+    for m in re.finditer(r"var\(\s*(--[a-z0-9-]+)\s*([,)])", page, re.I):
+        if m.group(2) == ")":
+            used.add(m.group(1))
+    missing = sorted(used - defined)
+    ok = not missing
+    print("  %-64s %s" % ("every CSS variable read is also defined",
+                          "ok" if ok else "FAIL %s" % missing[:6]))
+    return ok
+
+
+
+def check_ios_zoom(h):
+    """A form control under 16px makes iOS Safari zoom, and it never zooms back.
+
+    ⚠ REPORTED FROM A REAL PHONE, NOT GUESSED. Cody read the hub on his iPhone
+    and said the text boxes and the scrolling were wonky. Both are the same
+    cause: iOS zooms the page in when you focus a control whose font-size is
+    under 16px and leaves it zoomed, so every scroll afterwards is against a
+    scaled viewport. All 84 controls measured 11.5-14px.
+
+    ⚠ THE RULE NEEDS !important AND THAT IS NOT LAZINESS. It has to beat about
+    forty more-specific selectors AND every `font:` shorthand on the page,
+    which resets font-size as a side effect. Without it, 84 controls stayed
+    under the threshold with the rule present.
+
+    ⚠ AND NOT maximum-scale=1, which also stops the zoom -- by disabling
+    pinch-zoom for everyone, including anyone who needs to magnify the page.
+    """
+    ok = True
+    # ⚠ READ THE META TAG, NOT THE WHOLE DOCUMENT. Searching the page for
+    # "maximum-scale" matched the CSS COMMENT that explains why we did not use
+    # it, and reported the correct build as broken. Sixth time in this session
+    # a guard has matched prose instead of code; scope every one of them.
+    m = re.search(r'<meta[^>]+name="viewport"[^>]*>', h)
+    meta = m.group(0) if m else ""
+    if "maximum-scale" in meta or "user-scalable=no" in meta:
+        print("  FAIL the viewport meta disables pinch-zoom")
+        ok = False
+    # ⚠ ASSERT THE VALUE, NOT THE BLOCK. A first version accepted the media
+    # query merely EXISTING, so reverting the size to 13px inside it would have
+    # sailed through -- the guard would have been checking that somebody once
+    # wrote a rule, not that the rule still says what it must.
+    if not re.search(r"input,select,textarea\{font-size:16px ?!important\}", h):
+        print("  FAIL no phone rule lifts form controls to 16px")
+        ok = False
+    print("  %-64s %s" % ("form controls reach 16px at phone width",
+                          "ok" if ok else "FAIL"))
+    return ok
 
 
 if __name__ == "__main__":

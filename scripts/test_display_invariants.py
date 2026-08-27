@@ -1892,7 +1892,33 @@ def check_public_build_is_clean():
         # The source is MIT-licensed and must be credited wherever it renders.
         if rots and "ncaavolleyballr" not in h:
             bad("serving rotation shown without crediting its source", "ncaavolleyballr")
-        elif rots:
+        # ⚠ THE CREDIT HAS TO TRAVEL WITH THE DATA, NOT SIT ON ONE PANEL.
+        # Passing, setting, serving, back-row share and rotation side-out all
+        # come from the same MIT-licensed mirror. When these shipped, the page
+        # carried exactly ONE attribution -- on the old rotations panel -- while
+        # four new surfaces rendered the same dataset uncredited.
+        # ⚠ COUNTING OCCURRENCES IN THE PAGE CANNOT MEASURE THIS. The credit is
+        # a const inserted at RUNTIME, so it appears once in the built HTML no
+        # matter how many surfaces emit it -- a negative control that stripped
+        # it entirely still left two unrelated matches and the guard passed.
+        # Check the SOURCE: every renderer that emits play-by-play values must
+        # reference the shared credit.
+        _src = open(os.path.join(REPO, "scripts/build_hub.py"),
+                    encoding="utf-8").read()
+        if "PBP_CREDIT" not in _src:
+            bad("the shared play-by-play credit is gone", "PBP_CREDIT")
+        else:
+            for _fn in ("function ratingHTML", "function rotsoHTML",
+                        "function starsSection", "function renderStars"):
+                _i = _src.find(_fn)
+                if _i < 0:
+                    continue
+                _j = _src.find("\nfunction ", _i + 1)
+                _seg = _src[_i:(_j if _j > 0 else _i + 6000)]
+                if "PBP_CREDIT" not in _seg:
+                    bad("%s renders play-by-play data without the credit"
+                        % _fn.replace("function ", ""), "PBP_CREDIT")
+        if rots and "ncaavolleyballr" in h:
             ok("the rotation's data source is credited on the page")
         # The old copy asserted this was impossible. It is not, and a page that
         # says both is worse than one that says neither.

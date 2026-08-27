@@ -666,6 +666,15 @@ def attach_pbp(rec, pbp, team, sets):
     if rc >= 40:
         out["sideout"] = round((m.get("recv_sideout") or 0) / float(rc), 4)
         out["first_ball_kill"] = round((m.get("recv_fbk") or 0) / float(rc), 4)
+    # ---- setting and serving, the two skills the box score cannot see ------
+    sa = m.get("set_att") or 0
+    if sa >= 200:
+        out["set_att"] = sa
+        out["set_kill_rate"] = round((m.get("set_kill") or 0) / float(sa), 4)
+    sr = m.get("srv_rally") or 0
+    if sr >= 120:
+        out["srv_rally"] = sr
+        out["srv_win"] = round((m.get("srv_won") or 0) / float(sr), 4)
     rec["pass"] = out
 
 
@@ -865,6 +874,16 @@ def main():
     fdp = faced_defence(PRIOR, defp)
     fdc = faced_defence(SEASON, defc)
     pbp = load_pbp(PRIOR)
+    pbp_raw = {}
+    # pbp keys are (normalised team, nkey); recover the display name so team
+    # baselines can be attributed
+    try:
+        from reconcile_2025 import norm as _tn
+    except Exception:
+        _tn = lambda x: (x or "").lower()
+    pbp_team_name = {}
+    for _nm in i2n.values():
+        pbp_team_name[_tn(_nm)] = _nm
 
     # ---- prior season: the reference distribution and every player's prior --
     prior_rows = load_season(PRIOR)
@@ -1013,6 +1032,77 @@ def main():
     for pl in out:
         attach_pbp(pl, pbp, pl.get("team") or "",
                    float(pl.get("prior_sets") or pl.get("sets") or 0))
+
+    # ⚠ EVERY OUTCOME METRIC IS EXPRESSED AGAINST HER OWN TEAM. Absolute kill
+    # rate off her sets mostly measures her HITTERS, and absolute serve-win
+    # rate mostly measures her team's defence and its schedule -- which is why
+    # the raw serving leaderboard came out entirely mid-major. The within-team
+    # difference is the part that is hers.
+    #
+    # ⚠ THE BASELINE IS THE WHOLE TEAM, NOT HER POSITION-MATES, AND THE FIRST
+    # VERSION GOT THAT WRONG. Comparing a setter only against OTHER SETTERS on
+    # her roster needs three of them clearing the volume bar, which almost no
+    # team has -- it covered 107 players out of 456. The right question is how
+    # her sets do against everything her team does.
+    #
+    # ⚠ AND IT SUMS COUNTS RATHER THAN AVERAGING RATES. A mean of per-player
+    # rates weights a libero's 40 receptions the same as a passer's 900.
+    tt = collections.defaultdict(lambda: collections.Counter())
+    for _t, _k in pbp_raw.items():
+        pass
+    for key, m in pbp.items():
+        nm = pbp_team_name.get(key[0])
+        if not nm:
+            continue
+        c = tt[nm]
+        for f in ("set_att", "set_kill", "srv_rally", "srv_won",
+                  "recv", "recv_sideout"):
+            c[f] += m.get(f) or 0
+    # ⚠ A BACKUP SETTER'S 207 SWINGS FLOATED TO THE TOP OF THE LIST. The bar is
+    # not a number I picked: it is HALF HER TEAM'S BUSIEST, the same scaling
+    # rule the leaderboards already use for set counts. It scales with how much
+    # volleyball a team played and it keeps starters while dropping the
+    # third-stringer whose rate is noise.
+    peak = collections.defaultdict(lambda: collections.Counter())
+    for pl in out:
+        ps = pl.get("pass") or {}
+        pk = peak[pl.get("team")]
+        for f in ("set_att", "srv_rally", "receptions"):
+            if (ps.get(f) or 0) > pk[f]:
+                pk[f] = ps.get(f) or 0
+    for pl in out:
+        base = tt.get(pl.get("team"))
+        ps = pl.get("pass")
+        if not base or not ps:
+            continue
+        pk = peak.get(pl.get("team")) or collections.Counter()
+        if (ps.get("set_att") or 0) < 0.5 * pk["set_att"]:
+            ps.pop("set_kill_rate", None)
+            ps.pop("set_att", None)
+        if (ps.get("srv_rally") or 0) < 0.5 * pk["srv_rally"]:
+            ps.pop("srv_win", None)
+            ps.pop("srv_rally", None)
+        for num, den, field, rel in (
+                ("set_kill", "set_att", "set_kill_rate", "set_kill_rel"),
+                ("srv_won", "srv_rally", "srv_win", "srv_win_rel"),
+                ("recv_sideout", "recv", "sideout", "sideout_rel")):
+            v = ps.get(field)
+            if v is None or base[den] < 200:
+                continue
+            # ⚠ SHE CANNOT BE COMPARED WITH A BASELINE SHE IS MOST OF.
+            # A full-time setter delivers ~90% of her team's balls, so her own
+            # rate IS the team rate and the difference is near zero by
+            # construction -- while a backup setting in easy spots shows a big
+            # positive. Measured, and the number was unambiguous: this
+            # "vs team" figure scores 0.380 AUC against All-America selection,
+            # BELOW CHANCE, and adding it to the setter rating made it worse
+            # (0.954 -> 0.942). Suppressed where she is the majority of the
+            # denominator; the raw rate and its sample still render.
+            share = (ps.get(den) or 0) / float(base[den]) if base[den] else 0.0
+            if share > 0.5:
+                ps[rel + "_suppressed"] = round(share, 3)
+                continue
+            ps[rel] = round(v - base[num] / float(base[den]), 4)
 
     # ⚠ SIX-ROTATION AND FRONT-ROW PINS ARE DIFFERENT JOBS AND MUST NOT SHARE A
     # RANKING. An outside who passes every rotation and one who is replaced by a
@@ -1167,6 +1257,13 @@ def main():
                  "threshold"),
     }
     doc["meta"]["passing_season"] = PRIOR
+    doc["meta"]["not_rating_inputs"] = (
+        "setting and serving outcomes are CONTEXT, never rating inputs. "
+        "Measured against All-America selection: team-relative setting alone "
+        "scores 0.380 AUC (below chance, because a primary setter is most of "
+        "her own baseline), and adding setting or serving to the setter "
+        "rating lowered it from 0.954 to 0.942 and 0.898. They describe a "
+        "player; they do not rank her.")
     doc["meta"]["passing_note"] = (
         "passing, touches and rotation role come from the %d play-by-play; "
         "there is no live source for them this season" % PRIOR)

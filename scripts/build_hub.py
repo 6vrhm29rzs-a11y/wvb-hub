@@ -4364,9 +4364,9 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .partsbox .pv{font:700 26px/1 var(--disp)}
 .partsbox .over .pv{color:#5fd39a}
 .partsbox .under .pv{color:#e88}
-.partsbox .pl{font-size:12px;color:var(--cs-mute)}
+.partsbox .pl{font-size:12px;color:var(--ink3)}
 .rprow{display:flex;align-items:center;gap:9px;margin:5px 0;font-size:12.5px}
-.rplab{width:78px;color:var(--cs-mute)}
+.rplab{width:78px;color:var(--ink3)}
 .rpbar{flex:1;max-width:200px;height:7px;border-radius:4px;
   background:var(--cs-edge2);overflow:hidden}
 /* ⚠ NOT SERVE CYAN. That colour is reserved for serve, set-in-progress
@@ -4378,7 +4378,7 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .rotgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;max-width:420px}
 .rotcell{border:1px solid var(--cs-edge2);border-radius:7px;padding:6px 4px;
   text-align:center;display:flex;flex-direction:column;gap:1px}
-.rotcell .rotlab{font:700 10px/1 var(--disp);color:var(--cs-mute)}
+.rotcell .rotlab{font:700 10px/1 var(--disp);color:var(--ink3)}
 .rotcell .rotv{font:700 15px/1 var(--disp)}
 .rotcell.best{border-color:#3a7;background:rgba(60,180,120,.10)}
 .rotcell.worst{border-color:#a55;background:rgba(190,80,80,.10)}
@@ -4387,13 +4387,13 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .rchips{display:flex;flex-wrap:wrap;gap:8px}
 .rchip{display:flex;flex-direction:column;gap:1px;border:1px solid var(--cs-edge2);
   border-radius:8px;padding:6px 10px;font:700 17px/1 var(--disp)}
-.rchip b{font:700 9.5px/1 var(--disp);letter-spacing:.08em;color:var(--cs-mute)}
-.rchip i{font-style:normal;font:400 10.5px/1.2 var(--sans);color:var(--cs-mute)}
+.rchip b{font:700 9.5px/1 var(--disp);letter-spacing:.08em;color:var(--ink3)}
+.rchip i{font-style:normal;font:400 10.5px/1.2 var(--sans);color:var(--ink3)}
 .rchip.pw{border-color:var(--gold,#c9a227)}
 .rchip.off{opacity:.6}
 .rtags{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline;margin-top:8px}
 .rtag{font-size:11px;padding:2px 7px;border-radius:4px;
-  border:1px solid var(--cs-edge2);color:var(--cs-mute)}
+  border:1px solid var(--cs-edge2);color:var(--ink3)}
 .rfoot{margin-top:8px;line-height:1.4}
 .starcols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media (max-width:560px){.starcols{grid-template-columns:1fr}}
@@ -4404,19 +4404,41 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
   text-decoration:none;color:inherit;padding:5px 0;border-top:1px solid var(--cs-edge2)}
 .starrow:first-of-type{border-top:0}
 .starrow:hover .sn{text-decoration:underline}
-.starrow .sp{font:700 9.5px/1.6 var(--disp);color:var(--cs-mute)}
+.starrow .sp{font:700 9.5px/1.6 var(--disp);color:var(--ink3)}
 .starrow .sn{font-size:13.5px;color:var(--cs-white)}
-.starrow .sd{grid-column:2;font-size:11px;color:var(--cs-mute)}
+.starrow .sd{grid-column:2;font-size:11px;color:var(--ink3)}
 .tdstars{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline;margin-top:4px}
-.tdstars .pk{font-size:11.5px;color:var(--cs-mute);white-space:nowrap}
+.tdstars .pk{font-size:11.5px;color:var(--ink3);white-space:nowrap}
 .tdstars .pk i{font-style:normal;font:700 9px/1 var(--disp);letter-spacing:.06em;
   margin-right:4px;opacity:.75}
 .tdstars .pkv{font-size:10px;opacity:.5}
+/* ⚠ 16px IS NOT A STYLE CHOICE ON A PHONE, IT IS THE ZOOM THRESHOLD. iOS
+   Safari zooms the whole page in when you focus a form control whose
+   font-size is under 16px, and it does NOT zoom back out afterwards -- so the
+   page stays scaled and every subsequent scroll feels wrong. Cody reported
+   exactly that from his iPhone ("text boxes are kinda wonky", "scrolling"),
+   and all 43 controls on the page measured between 11.5px and 14px.
+   ⚠ THE ALTERNATIVE FIX IS WORSE. Adding maximum-scale=1 to the viewport meta
+   also stops the zoom, by disabling pinch-zoom entirely -- which takes the
+   page away from anyone who needs to magnify it. Sizing the control is the fix
+   that costs nobody anything.
+   ⚠ PHONE WIDTHS ONLY: desktop typography is untouched. */
+/* ⚠ !important, DELIBERATELY, AND THIS IS THE ONE PLACE IT IS RIGHT. The plain
+   rule lost to about forty more-specific ones (.ctl input, #pq) and to every
+   `font:` SHORTHAND on the page, which resets font-size as a side effect --
+   84 controls still measured under 16px with it in place. This is not a
+   preference being enforced over a designer's; it is a browser threshold that
+   has to hold or the behaviour returns. */
+@media (max-width:560px){
+  input,select,textarea{font-size:16px !important}
+  /* keep the control from growing now that its text is larger */
+  .ctl input,.ctl select{padding:9px 10px}
+}
 .prkctl{flex-wrap:wrap;gap:10px}
 .segbar{display:inline-flex;border:1px solid var(--cs-edge2);border-radius:8px;
   overflow:hidden}
 .segbar button{font:600 11px/1 var(--disp);letter-spacing:.06em;
-  text-transform:uppercase;background:none;border:0;color:var(--cs-mute);
+  text-transform:uppercase;background:none;border:0;color:var(--ink3);
   padding:8px 11px;cursor:pointer;white-space:nowrap}
 .segbar button+button{border-left:1px solid var(--cs-edge2)}
 .segbar button.on{background:var(--cs-edge2);color:var(--cs-white)}
@@ -4438,11 +4460,11 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
   border-radius:4px;border:1px solid var(--cs-edge2);white-space:nowrap}
 .prkd.neg{opacity:.6}
 .prkpass{margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}
-.prkp{font-size:11px;color:var(--cs-mute)}
+.prkp{font-size:11px;color:var(--ink3)}
 .prkrolet.alt{opacity:.75}
 .prkpos,.prkrolet{font:700 9.5px/1 var(--disp);letter-spacing:.06em;
   text-transform:uppercase;padding:2px 5px;border-radius:3px;
-  background:var(--cs-edge2);color:var(--cs-mute);margin-left:4px}
+  background:var(--cs-edge2);color:var(--ink3);margin-left:4px}
 .prkh{font-family:var(--disp);font-size:19px;margin:22px 0 4px}
 .starteam{margin:12px 0;padding:11px 12px;border:1px solid var(--cs-edge2);
   border-radius:10px}
@@ -4453,11 +4475,11 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .star{border:1px solid var(--cs-edge2);border-radius:8px;padding:7px 9px;
   display:flex;flex-direction:column;gap:2px}
 .star.vac{opacity:.5}
-.spos{font:700 10px/1 var(--disp);letter-spacing:.08em;color:var(--cs-mute)}
+.spos{font:700 10px/1 var(--disp);letter-spacing:.08em;color:var(--ink3)}
 .sname{font-size:13.5px;color:var(--cs-white)}
-.steam{font-size:11px;color:var(--cs-mute);display:flex;align-items:center;gap:4px}
+.steam{font-size:11px;color:var(--ink3);display:flex;align-items:center;gap:4px}
 .spw{font:700 12px/1 var(--disp)}
-.sprof{margin-top:9px;font-size:12px;color:var(--cs-mute)}
+.sprof{margin-top:9px;font-size:12px;color:var(--ink3)}
 .hmrow{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;margin:4px 0;
   font-size:12px}
 .hmn{white-space:nowrap}
@@ -4468,10 +4490,10 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .namepop .nphead{display:flex;gap:10px;align-items:flex-start}
 .namepop .npname{font-family:var(--disp);font-size:17px;line-height:1.15;
   color:var(--cs-white)}
-.namepop .sub{font-size:11.5px;color:var(--cs-mute);margin-top:2px}
+.namepop .sub{font-size:11.5px;color:var(--ink3);margin-top:2px}
 .namepop .npface{width:48px;height:48px;border-radius:50%;object-fit:cover;
   flex:0 0 auto}
-.namepop .npx{margin-left:auto;background:none;border:0;color:var(--cs-mute);
+.namepop .npx{margin-left:auto;background:none;border:0;color:var(--ink3);
   font-size:19px;line-height:1;cursor:pointer;padding:0 2px}
 .namepop .npx:hover{color:var(--cs-white)}
 .namepop .npbody{margin-top:9px;display:flex;flex-direction:column;gap:6px}
@@ -9370,6 +9392,28 @@ function renderPlayerDetail(p) {
 /* Her standing on her own position's board, with the two things that decide
    how much it is worth: how thin the sample is, and how well the box score
    supports that position at all. */
+/* The team-relative half of an outcome rate. Absolute kill rate off her sets
+   mostly measures her hitters and absolute serve-win rate mostly measures her
+   team's defence and schedule -- the difference from her own team is the part
+   that belongs to her, so it is shown beside the raw figure rather than
+   instead of it. */
+/* ⚠ AN MIT LICENCE IS A CONDITION, NOT A COURTESY. Passing, setting, serving,
+   back-row share and rotation side-out are all derived from the ncaavolleyballr
+   play-by-play mirror, and the credit has to travel with them. It existed on
+   the old serving-rotation panel and nowhere else, so four new surfaces were
+   rendering that data uncredited. One definition, used by all of them. */
+const PBP_CREDIT = 'From NCAA play-by-play via the ncaavolleyballr dataset ' +
+  '(J. R. Stevens, MIT). Derived here.';
+
+function relBit(v) {
+  /* ⚠ PLAIN TEXT, NOT MARKUP. These strings go through esc() at render time --
+     which is correct and should stay that way -- so a bold tag written here
+     printed on the card as its own angle brackets instead of as emphasis. */
+  if (v == null) return '';
+  const sign = v > 0 ? '+' : '\u2212';
+  return ' (' + sign + Math.abs(Math.round(v * 100)) + ' vs team)';
+}
+
 function ratingHTML(p) {
   const r = p.rt;
   if (!r) return '';
@@ -9397,12 +9441,36 @@ function ratingHTML(p) {
   if (r.brs != null) {
     tags.push(Math.round(r.brs * 100) + '% of swings from the back row');
   }
-  const ps = r['pass'];
-  if (ps && ps.recv_share != null) {
+  const ps = r['pass'] || {};
+  if (ps.recv_share != null) {
     tags.push('takes ' + Math.round(ps.recv_share * 100) + '% of serve-receive');
   }
-  if (ps && ps.sideout != null) {
-    tags.push('sides out ' + Math.round(ps.sideout * 100) + '% when she passes');
+  if (ps.sideout != null) {
+    tags.push('sides out ' + Math.round(ps.sideout * 100) + '% when she passes' +
+      relBit(ps.sideout_rel));
+  }
+  /* ⚠ TWO SKILLS THE BOX SCORE CANNOT SEE, AND BOTH CARRY THEIR SAMPLE.
+     An assist counts a ball that became a kill, which measures the hitter as
+     much as the setter; what her hitters do WHEN SHE SETS, against what the
+     same team does overall, is closer to her. And aces per set rewards the ace
+     while ignoring the commoner thing a good server does, which is stop the
+     other side getting out of system. */
+  if (ps.set_kill_rate != null) {
+    /* ⚠ NO "vs team" FOR A PRIMARY SETTER, AND THE CARD SAYS WHY RATHER THAN
+       GOING QUIET. She delivers most of her team's balls, so she IS the
+       baseline and the difference would be near zero by construction. */
+    const solo = ps.set_kill_rel_suppressed;
+    tags.push('her sets are killed ' + Math.round(ps.set_kill_rate * 100) +
+      '% of the time' + relBit(ps.set_kill_rel) +
+      ' · ' + ps.set_att + ' swings' +
+      (solo ? ' · sets ' + Math.round(solo * 100) +
+        '% of her team\u2019s balls, so there is no one to compare her with'
+        : ''));
+  }
+  if (ps.srv_win != null) {
+    tags.push('her team wins ' + Math.round(ps.srv_win * 100) +
+      '% of rallies she serves' + relBit(ps.srv_win_rel) +
+      ' · ' + ps.srv_rally + ' rallies');
   }
   const thin = !r.w ? 'rated on last season only'
     : (Math.round(r.w * 100) + '% of this rating is this season');
@@ -9411,6 +9479,7 @@ function ratingHTML(p) {
     (tags.length ? '<div class="rtags">' + tags.map(t =>
       '<span class="rtag">' + esc(t) + '</span>').join('') +
       '<span class="munk">2025</span></div>' : '') +
+    (tags.length ? '<div class="munk rfoot">' + esc(PBP_CREDIT) + '</div>' : '') +
     '<div class="munk rfoot">Ranked against ' + esc(posn.toLowerCase()) +
       's only — never across positions. ' + esc(thin) + '. This board is ' +
       esc(SUPLAB[r.sup] || 'partly supported') + ' by what a box score can ' +
@@ -13555,7 +13624,7 @@ function starsSection(m) {
     '<div class="starcols">' + col(away, sa) + col(home, sh) + '</div>' +
     '<p class="mnote munk">The best on each side by how far above her own ' +
     'position she rates — never compared across positions. Serve-receive and ' +
-    'back-row share are 2025.</p></div>';
+    'back-row share are 2025. ' + esc(PBP_CREDIT) + '</p></div>';
 }
 
 function renderMatchDetail(gid, dest) {
@@ -14408,6 +14477,7 @@ function renderDesk() {
       '<span class="wmeta">' + (m.venue ? esc(m.venue) : '<span class="munk">venue TBA</span>') +
         (m.event ? ' &middot; ' + esc(m.event) : '') + '</span>' +
       reasonChips(m, live) +
+      starPeek(m) +
       '<span class="wacts"><span class="wgo">Preview &rarr;</span>' +
         '<span class="wofficial" data-href="https://www.ncaa.com/game/' +
         esc(m.gid) + '">ncaa.com</span></span>' +
@@ -15609,6 +15679,7 @@ function renderStars() {
     /* ⚠ THE LITERAL YEAR, NOT THE JS CONSTANT. The season guard reads the
        BUILT PAGE, and `+ SEASON_YEAR +` leaves no four-digit year in it -- so
        a view that names its season perfectly well at runtime still failed. */
+    '<p class="lead munk">' + esc(PBP_CREDIT) + '</p>' +
     '<p class="lead">The best lineups available for the {{SEASON_YEAR}}' +
     ' season, built by reading each position board in order and filling a six ' +
     'plus the libero. <b>These are constructed, not voted on</b> — nobody ' +
@@ -15969,6 +16040,7 @@ function rotsoHTML(t) {
     'not field one fixed six: the median side used 29 different serve orders ' +
     'last season, which is why these are anchored on the setter rather than ' +
     'on a lineup.</p>' +
+    '<p class="tnote munk">' + esc(PBP_CREDIT) + '</p>' +
     '</div></div>';
 }
 
@@ -16878,7 +16950,11 @@ ASK_CSS = """.digby-hello{float:right;margin:-4px 0 4px 10px}
 .askmeta{font-size:11px;color:var(--ink3);margin:0 0 12px}
 .askform{display:flex;gap:6px;padding:10px 12px;border-top:1px solid var(--line)}
 .askform input{flex:1;min-width:0;padding:8px 10px;border:1px solid var(--line);
-  border-radius:2px;background:var(--bg);color:var(--ink);font:400 13.5px/1.3 var(--sans)}
+  /* ⚠ THIS READ A --bg TOKEN THAT HAS NEVER EXISTED. A phantom property
+     falls back to inherited rather than erroring, so this input has been
+     silently transparent instead of sitting on the panel colour. Found
+     by the css-variable guard, not by looking at it. */
+  border-radius:2px;background:var(--card);color:var(--ink);font:400 13.5px/1.3 var(--sans)}
 .askform button{padding:8px 12px;border:1px solid var(--line);background:var(--alt);
   color:var(--ink);border-radius:2px;cursor:pointer;font:700 11px/1 var(--sans)}
 @media (max-width:560px){.askwrap{right:8px;left:8px;bottom:8px;width:auto}

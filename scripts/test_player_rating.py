@@ -291,6 +291,35 @@ def main():
         print("       %d of %d teams below 70%% setter coverage"
               % (len(lo), len(T)))
 
+    print("\n11b. SETTING AND SERVING ARE CONTEXT, NOT RATING INPUTS")
+    # ⚠ MEASURED, AND THE MEASUREMENT SAID NO. Team-relative setting scores
+    # 0.380 AUC against All-America -- BELOW CHANCE -- because a primary setter
+    # is most of her own baseline. Adding it to the setter rating lowered it
+    # from 0.954 to 0.954->0.942, and adding serving too took it to 0.898.
+    check("the file records that these are not rating inputs",
+          "not_rating_inputs" in meta, "")
+    setw = PR.WEIGHTS.get("S") or {}
+    check("no setting or serving term leaked into the fitted weights",
+          not any(k in setw for k in
+                  ("set_kill_rate", "set_kill_rel", "srv_win", "srv_win_rel")),
+          str(sorted(setw)))
+    sup = [pl for pl in P
+           if (pl.get("pass") or {}).get("set_kill_rel_suppressed")]
+    kept = [pl for pl in P
+            if (pl.get("pass") or {}).get("set_kill_rel") is not None]
+    check("a setter who IS her team's baseline gets no comparison",
+          len(sup) > 50, "%d suppressed" % len(sup))
+    check("...and one who sets a minority still gets one",
+          len(kept) > 100, "%d kept" % len(kept))
+    both = [pl for pl in P
+            if (pl.get("pass") or {}).get("set_kill_rel") is not None
+            and (pl.get("pass") or {}).get("set_kill_rel_suppressed")]
+    check("[NEG] no player carries both a comparison and its suppression",
+          not both, str([pl["name"] for pl in both[:3]]))
+    if page:
+        check("the card explains a missing comparison rather than going quiet",
+              "no one to compare her with" in page)
+
     print("\n12. THE RATING REACHES THE PLACES IT IS USED")
     if page:
         check("a player card carries her own standing",
@@ -316,6 +345,12 @@ def main():
               'overall_pct' in seg and '"power"' not in seg.split("sort")[-1][:120],
               "raw scores are on different scales per position, so sorting a "
               "mixed list by them hands every slot to outsides")
+        # ⚠ THESE STRINGS ARE ESCAPED AT RENDER TIME, which is right. A tag
+        # built with markup in it prints the tags literally on the card.
+        i0 = page.find("function relBit")
+        check("team-relative text carries no markup",
+              i0 < 0 or "<b>" not in page[i0:i0 + 400],
+              "esc() will print the tag literally")
         check("a side with no rated players says so",
               "No rated players" in page,
               "hiding one column reads as though nobody there is worth "
