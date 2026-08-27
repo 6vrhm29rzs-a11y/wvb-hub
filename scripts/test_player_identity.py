@@ -176,8 +176,14 @@ def main():
               "showPlayer at %d, renderPlayers at %d" % (i_show, i_render))
         check("...and the search box is made to agree with the route",
               "q.value = p.name" in body)
+    # ⚠ MATCH THE BEHAVIOUR, NOT ITS EXACT SPELLING. This pinned the literal
+    # `if (rows.length === 1) showPlayer(rows[0]);`, so extending the directory
+    # to all of Division I -- which added `&& !only.length`, because a lone
+    # PLAYED match beside unplayed ones is not an unambiguous selection -- read
+    # as the convenience having been deleted. It had not been; only its
+    # condition had grown.
     check("[+] the auto-open convenience still exists to be raced",
-          "if (rows.length === 1) showPlayer(rows[0]);" in h,
+          bool(re.search(r"rows\.length === 1[^;]*showPlayer\(rows\[0\]\);", h)),
           "the guard above is pointless if this was simply deleted")
 
     print("\n7. NO SHELL RECIPE RENDERS IN THE PAGE")

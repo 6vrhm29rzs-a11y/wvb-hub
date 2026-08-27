@@ -258,9 +258,12 @@ the build works from a fresh checkout with no `Cody/` · `Cody/` holds one page,
 **⚠ Verify the remote with `git ls-remote origin` on boot.** Last push `60242c7`; there is
 uncommitted work after it. Git is classifier-blocked in auto mode — hand Cody the command.
 
-**OPEN (updated 2026-08-24):** 338 Digby summaries to write (10 exist and are verified stable) ·
-Cody has still not run `/code-review ultra` · rotations have no live 2026 source · GitHub Pages no
-longer updates (public build off at Cody's instruction).
+**OPEN (updated 2026-08-27):** ⚠ **THE "338 SUMMARIES TO WRITE" LINE WAS STALE AND I REPEATED IT TO CODY THREE TIMES AS A PENDING ~$4 SPEND.** Counted on 2026-08-27: `data/digby_summaries_2026.json` holds **348 of 348**, and exactly **3** are withheld because their durable facts moved — Central Conn. St., Purdue Fort Wayne and Tennessee Tech, two of which are the rosters that arrived late via the PRESTO parser. Regenerating three is pennies, not four dollars. **Count the file before quoting this number.** ·
+Cody has still not run `/code-review ultra` · rotations have no live 2026 source ·
+⚠ **"GitHub Pages no longer updates" WAS ALSO STALE ON THIS LINE.** The public build was
+re-enabled on 2026-08-24 and `daily.yml` has been running `--public` since; checked
+2026-08-27, the served copy is stamped that morning and `verify_shipped.py` reports it clean.
+Two wrong claims sat in one OPEN line — **verify an OPEN item before repeating it.**
 
 **CLOSED since that line was written — do NOT re-open these:**
 - **Coaches are 341 of 348, not "a sourced-entry job".** The stated reason was wrong: school

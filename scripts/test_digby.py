@@ -477,6 +477,77 @@ def test_the_known_movers_are_excluded():
         check(f in VOLATILE, "%s is treated as volatile" % f)
 
 
+def test_the_gate_accepts_honest_player_prose():
+    """Digby learned to talk about players; the gate must let it.
+
+    ⚠ THE GATE REJECTS ANY NUMBER NOT IN THE FACTS, AND PLAYER PROSE IS FULL OF
+    THEM -- a percentile, a rank, a share of serve-receive, and the word "six"
+    in "plays all six rotations", which the gate reads as a number because
+    word-forms count. A false rejection is expensive here: a gate nobody can
+    satisfy publishes nothing, and this project has already paid for two of
+    them (a won-lost record read as a minus sign; "three of six starters"
+    rejected when six was in the field's own name).
+    """
+    facts = {
+        "team": "Kentucky",
+        "star_1_name": "Brooklyn DeLeye",
+        "star_1_position": "OH",
+        "star_1_percentile_at_her_position": 99.1,
+        "star_1_rank_at_her_position": 4,
+        "star_1_kills_per_set": 3.98,
+        "star_1_share_of_serve_receive": 36,
+        "star_1_share_of_swings_from_back_row": 23,
+        "star_1_rotation": "all six rotations",
+    }
+    C = lambda *fs: [{"field": f} for f in fs]
+    cases = [
+        ("percentile, rotation and serve-receive together",
+         "Brooklyn DeLeye is the one to watch: she rates in the 99.1st "
+         "percentile among outside hitters, plays all six rotations and takes "
+         "36% of Kentucky's serve-receive.",
+         C("star_1_name", "star_1_percentile_at_her_position",
+           "star_1_rotation", "star_1_share_of_serve_receive"), True),
+        ("a rate", "DeLeye put away 3.98 kills per set.",
+         C("star_1_kills_per_set"), True),
+        ("a rank", "She is the 4th-best outside hitter on our board.",
+         C("star_1_rank_at_her_position"), True),
+        ("back-row share", "She takes 23% of her swings from the back row.",
+         C("star_1_share_of_swings_from_back_row"), True),
+        # ⚠ THE NEGATIVE CONTROL USES NUMBERS GENUINELY ABSENT FROM THE FACTS.
+        # A control built from numbers that happen to appear elsewhere in the
+        # sheet passes for the wrong reason -- this project has written that
+        # bad control before.
+        ("[NEG] invented hitting percentage and block count",
+         "DeLeye hit .412 with 77 blocks.", C("star_1_name"), False),
+    ]
+    for label, prose, claims, want in cases:
+        ok, problems = digby.verify(prose, claims, facts)
+        check(ok == want, label,
+              "gate %s it (%s)" % ("rejected" if want else "accepted",
+                                   "; ".join(problems)[:80]))
+
+
+def test_player_fields_can_never_reach_a_stored_summary():
+    """A rank moves the instant anyone at that position plays.
+
+    ⚠ THIS IS THE RULE THAT ALREADY COST A REGENERATION BILL: 326 of 340 stored
+    summaries failed their own gate a day later, on numbers that had drifted.
+    Every player field is volatile by construction, so durable() must drop all
+    of them.
+    """
+    fake = dict(("star_%d_%s" % (i, k), 1)
+                for i in (1, 2, 3)
+                for k in ("name", "position", "class",
+                          "percentile_at_her_position",
+                          "rank_at_her_position", "kills_per_set",
+                          "share_of_swings_from_back_row",
+                          "share_of_serve_receive", "rotation"))
+    fake["team"] = "X"
+    left = [k for k in digby.durable(fake) if k.startswith("star_")]
+    check(not left, "no player field can reach a stored summary",
+          "these survived durable(): %s" % left[:4])
+
+
 def main():
     for fn in (test_truthful_summary_passes,
                test_invented_stat_is_rejected,
@@ -505,7 +576,9 @@ def main():
                test_fatal_auth_error_stops_immediately,
                test_run_gives_up_after_repeated_failure,
                test_a_working_run_is_not_cut_short,
-               test_preflight_spends_nothing_on_a_placeholder_key):
+               test_preflight_spends_nothing_on_a_placeholder_key,
+               test_the_gate_accepts_honest_player_prose,
+               test_player_fields_can_never_reach_a_stored_summary):
         print(fn.__name__)
         fn()
     print()

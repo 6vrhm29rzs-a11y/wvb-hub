@@ -364,6 +364,30 @@ def main():
         check("team star lists are actually shipped", nstars > 200,
               "%d teams carry one" % nstars)
 
+    print("\n12b. THE DIRECTORY COVERS DIVISION I, NOT JUST WHO HAS PLAYED")
+    if page:
+        import re as _re
+        n = len(_re.findall(r'"pc":', page.split("const ROSTER = ")[-1][:900000])) \
+            if "const ROSTER = " in page else 0
+        check("a roster index is shipped", "const ROSTER = " in page)
+        check("...covering thousands, not the handful who have played",
+              n > 2000, "%d entries seen" % n)
+        # ⚠ THE THING THAT HUNG THE TAB. On route entry the query is empty, and
+        # rendering ~2,700 rows there froze the renderer -- three times, through
+        # two wrong diagnoses (row count, then crests, then per-keystroke
+        # re-render). An empty box must render an INVITATION, never a wall.
+        check("an empty search renders no not-yet rows",
+              "const show = q ? only.slice(0, 40) : []" in page,
+              "an empty query must not build the big table")
+        check("...and says so instead of going blank",
+              "have not been on court yet this season" in page)
+        check("the search is debounced",
+              "PQ_T = setTimeout(renderPlayers" in page,
+              "a keystroke rebuilding a 2,800-row search is the failure mode")
+        check("the not-yet table carries no remote crests",
+              "logo(r.t, 'sm') + esc(r.t" not in page,
+              "each crest is a network request, rebuilt on every keystroke")
+
     print("\n13. THE PAGE SAYS WHAT IT IS")
     if page:
         check("the view names its season", "Player ratings for the 2026" in page)

@@ -101,6 +101,21 @@ VOLATILE = (
     # Neither is a fact about a roster; both are on the page's own chips, which
     # are rebuilt nightly and always current.
     "our_rank_2026", "avca_preseason_rank",
+    # ⚠ EVERY PLAYER FIELD IS VOLATILE. A rank at a position moves the instant
+    # anyone at that position plays, and the percentile with it. None of these
+    # may reach a stored summary.
+    "star_1_name", "star_1_position", "star_1_class",
+    "star_1_percentile_at_her_position", "star_1_rank_at_her_position",
+    "star_1_kills_per_set", "star_1_share_of_swings_from_back_row",
+    "star_1_share_of_serve_receive", "star_1_rotation",
+    "star_2_name", "star_2_position", "star_2_class",
+    "star_2_percentile_at_her_position", "star_2_rank_at_her_position",
+    "star_2_kills_per_set", "star_2_share_of_swings_from_back_row",
+    "star_2_share_of_serve_receive", "star_2_rotation",
+    "star_3_name", "star_3_position", "star_3_class",
+    "star_3_percentile_at_her_position", "star_3_rank_at_her_position",
+    "star_3_kills_per_set", "star_3_share_of_swings_from_back_row",
+    "star_3_share_of_serve_receive", "star_3_rotation",
 )
 
 
@@ -146,6 +161,37 @@ def fact_sheet(team, rec):
     put("players_departed", rec.get("n_dep"))
     put("transfers_in", rec.get("n_tin"))
     put("newcomers_no_di_record", rec.get("n_new"))
+
+    # ---- WHO IS GOOD, AND AT WHAT ------------------------------------
+    # ⚠ THE CHAT COULD NOT DISCUSS PLAYERS AT ALL. Everything the ratings know
+    # -- who the best outside is, who passes, who serves well -- was invisible
+    # here, so a question like "who should I watch on Kentucky" was answered
+    # from a preseason team projection.
+    # ⚠ EVERY ONE OF THESE IS VOLATILE. A rank moves the moment anybody plays,
+    # so they are listed in VOLATILE and can never reach a STORED summary --
+    # which is the rule that already cost this project a regeneration bill.
+    for i, st in enumerate((rec.get("stars") or [])[:3], 1):
+        if not isinstance(st, dict) or not st.get("n"):
+            continue
+        p_ = "star_%d" % i
+        put(p_ + "_name", st.get("n"))
+        put(p_ + "_position", st.get("pos"))
+        put(p_ + "_class", st.get("cls"))
+        # her standing is stated as a percentile AT HER POSITION, because that
+        # is the only comparison the rating supports
+        if st.get("pct") is not None:
+            put(p_ + "_percentile_at_her_position", st.get("pct"))
+        put(p_ + "_rank_at_her_position", st.get("pwr"))
+        if st.get("kps") is not None:
+            put(p_ + "_kills_per_set", round(float(st["kps"]), 2))
+        if st.get("brs") is not None:
+            put(p_ + "_share_of_swings_from_back_row",
+                round(100.0 * float(st["brs"])))
+        if st.get("recv") is not None:
+            put(p_ + "_share_of_serve_receive", round(100.0 * float(st["recv"])))
+        if st.get("role"):
+            put(p_ + "_rotation", "all six rotations"
+                if st["role"] == "six" else "front row only")
 
     lu = rec.get("lineup") or {}
     put("offense_system_2025", lu.get("offense_system_2025"))

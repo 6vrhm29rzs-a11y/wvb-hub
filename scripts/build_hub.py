@@ -2029,6 +2029,51 @@ def avca_honours():
     return out
 
 
+def roster_index():
+    # type: () -> List[Dict]
+    """Every rated player, compact, so the directory covers Division I.
+
+    ⚠ THE PLAYERS TAB ONLY KNEW WHOEVER HAD A 2026 BOX-SCORE LINE. In August
+    that is 149 people, so searching for Bergen Reilly -- a First-Team
+    All-American who simply has not played yet -- returned nothing, which reads
+    as "we have never heard of her" rather than "the season has not started".
+    ⚠ MEASURED BEFORE ADDING IT: 142 bytes a head, 392 KB for all 2,828, on a
+    page that is already 9.4 MB. Four percent for the difference between a
+    directory and a fragment. The full card stays behind the click.
+    """
+    doc = load("data/player_rating_%d.json" % SEASON)
+    if not doc:
+        return []
+    out = []
+    for p in (doc.get("players") or []):
+        pr = p.get("prior") or {}
+        ps = p.get("pass") or {}
+
+        def val(k):
+            c = pr.get(k) or {}
+            return c.get("value")
+        r = {"n": p.get("name"), "t": p.get("team"), "p": p.get("pos"),
+             "r": p.get("power_rank"), "pc": p.get("overall_pct")}
+        for key, v in (("c", p.get("cls")), ("nu", p.get("num")),
+                       ("ro", p.get("rotation_role"))):
+            if v:
+                r[key] = v
+        for key, v in (("k", val("kps")), ("h", val("hit")),
+                       ("d", val("dps")), ("b", val("bps"))):
+            if v is not None:
+                r[key] = round(v, 2)
+        if p.get("prior_sets"):
+            r["s"] = int(p["prior_sets"])
+        if ps.get("recv_share") is not None:
+            r["rc"] = round(ps["recv_share"], 2)
+        # whether a full 2026 card exists behind the name
+        if p.get("matches"):
+            r["live"] = 1
+        out.append(r)
+    out.sort(key=lambda x: (x.get("t") or "", x.get("n") or ""))
+    return out
+
+
 def team_stars(limit=3):
     # type: (int) -> Dict
     """The players worth knowing on each team, for a match preview.
@@ -3734,6 +3779,8 @@ def build():
         .replace("{{PLAYERS_JSON}}", json.dumps(plist, separators=(",", ":"))) \
         .replace("{{PRANK_JSON}}", json.dumps(
             player_rating_payload(), separators=(",", ":"))) \
+        .replace("{{ROSTER_JSON}}", json.dumps(
+            roster_index(), separators=(",", ":"))) \
         .replace("{{N_PLAYERS}}", str(len(plist))) \
         .replace("{{LEADERS_JSON}}", json.dumps(ldrs, separators=(",", ":"))) \
         .replace("{{TSTATS_JSON}}", blob(
@@ -4434,6 +4481,13 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
   /* keep the control from growing now that its text is larger */
   .ctl input,.ctl select{padding:9px 10px}
 }
+.notyet{margin-top:14px}
+.nyhd{font:700 12px/1 var(--disp);letter-spacing:.06em;text-transform:uppercase;
+  padding:10px 12px;border-bottom:1px solid var(--cs-edge2);
+  display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.nyrow{cursor:pointer}
+.nyrow:hover td{background:rgba(255,255,255,.04)}
+.nyrow td{font-size:13px}
 .prkctl{flex-wrap:wrap;gap:10px}
 .segbar{display:inline-flex;border:1px solid var(--cs-edge2);border-radius:8px;
   overflow:hidden}
@@ -8308,14 +8362,17 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 </section>
 
 <section id="v-players" hidden>
-  <p class="lead">{{N_PLAYERS}} players with a 2026 line so far. Search a name, or click
-  one for her season and every match she has played.</p>
+  <p class="lead">Every rated player in Division I for the {{SEASON_YEAR}}
+  season. <b>{{N_PLAYERS}}</b> have a 2026 line so far — click one for her
+  season and every match she has played. The rest are listed underneath with
+  <b>last season's</b> numbers, because the season has barely started.</p>
   <div class="ctl">
     <input type="search" id="pq" list="plist" placeholder="Type a player&hellip;" autocomplete="off">
     <datalist id="plist"></datalist>
     <span class="count" id="pcnt"></span>
   </div>
   <div id="playercard"></div>
+  <div id="pnotyet"></div>
   <div class="panel" id="ptable"><div class="scroll"><table>
     <thead><tr><th class="l">Player</th><th class="l">Team</th><th>Pos</th>
       <th>Sets</th><th>Kills</th><th>Hit%</th>
@@ -9099,6 +9156,7 @@ const COLORS = {{COLORS_JSON}};
 const BOXES = {{BOXES_JSON}};
 const PLAYERS = {{PLAYERS_JSON}};
 const PRANK = {{PRANK_JSON}};
+const ROSTER = {{ROSTER_JSON}};
 /* ⚠ DECLARED HERE, BESIDE THE PAYLOAD, AND NOT NEXT TO THE CODE THAT USES IT.
    These sat with renderPrank() ~2,000 lines further down, which is AFTER the
    router that calls it -- and a `const` in the temporal dead zone THROWS on
@@ -9324,9 +9382,111 @@ document.querySelector('#v-scores').addEventListener('click', e => {
 const pdl = document.getElementById('plist');
 PLAYERS.forEach(p => { const o = document.createElement('option');
   o.value = p.name + ' · ' + p.team; pdl.appendChild(o); });
+/* ⚠ THE DIRECTORY SEARCHES ALL OF DIVISION I, NOT ONLY WHOEVER HAS PLAYED.
+   PLAYERS holds a 2026 box-score line, which in August is 149 people -- so a
+   search for a First-Team All-American who has not played yet came back empty,
+   reading as "never heard of her" rather than "the season has not started".
+   ROSTER is every rated player; a name in both resolves to the PLAYERS entry,
+   because that one has a full season card behind it. */
+function playerSearch(q) {
+  const seen = Object.create(null);
+  const out = [];
+  PLAYERS.forEach(p => {
+    if (!q || (p.name + ' ' + p.team).toLowerCase().includes(q)) {
+      seen[p.team + '|' + p.name] = 1;
+      out.push({ live: p, r: null, name: p.name, team: p.team });
+    }
+  });
+  if (typeof ROSTER !== 'undefined') {
+    ROSTER.forEach(r => {
+      const k = r.t + '|' + r.n;
+      if (seen[k]) return;
+      if (!q || ((r.n || '') + ' ' + (r.t || '')).toLowerCase().includes(q)) {
+        seen[k] = 1;
+        out.push({ live: null, r: r, name: r.n, team: r.t });
+      }
+    });
+  }
+  return out;
+}
+
+/* A card for a player who has not been on court this season.
+   ⚠ SHE CANNOT USE showPlayer(). That card is built from 2026 box-score fields
+   -- points per set, sets, a match log -- and she has none of them. Filling
+   those with zeros would render a player who played and did nothing, which is
+   a different claim from a player who has not played (R5). This card states
+   last season and her standing, and nothing else. */
+function showRated(r) {
+  const card = document.getElementById('playercard');
+  if (!card || !r) return;
+  const teamHref = routeFor('teams', slug(r.t || ''));
+  const sub = [
+    '<a class="parentlink" href="' + teamHref + '">' + esc(r.t || '') + '</a>',
+    r.c ? esc(r.c) : null,
+    r.p ? esc(POSFULL[r.p] || r.p) : null,
+    r.nu ? '#' + esc(String(r.nu)) : null
+  ].filter(Boolean).join(' · ');
+  const board = (typeof PRANK !== 'undefined' && PRANK.boards)
+    ? (PRANK.boards[r.p] || {}) : {};
+  const chips = [];
+  if (r.r != null) {
+    chips.push('<span class="rchip pw"><b>POWER</b> #' + r.r + '<i>of ' +
+      (board.n || '?') + ' ' +
+      esc((POSFULL[r.p] || r.p || '').toLowerCase()) + 's</i></span>');
+  }
+  chips.push('<span class="rchip off"><b>RÉSUMÉ</b> —' +
+    '<i>no 2026 line yet</i></span>');
+  if (r.pc != null) {
+    chips.push('<span class="rchip"><b>' + r.pc.toFixed(1) +
+      '</b><i>percentile at her position</i></span>');
+  }
+  const stat = (lab, v, f) => v == null ? '' :
+    '<span class="chip">' + lab + ' <b>' + f(v) + '</b></span>';
+  const line = [
+    stat('Kills/set', r.k, x => x.toFixed(2)),
+    stat('Hit%', r.h, x => pct(x)),
+    stat('Digs/set', r.d, x => x.toFixed(2)),
+    stat('Blocks/set', r.b, x => x.toFixed(2)),
+    stat('Sets', r.s, x => String(x))
+  ].filter(Boolean).join('');
+  const tags = [];
+  if (r.ro) tags.push(PRK_ROLELAB[r.ro] || r.ro);
+  if (r.rc != null) tags.push('takes ' + Math.round(r.rc * 100) +
+    '% of serve-receive');
+  const q = encodeURIComponent((r.n || '') + ' ' + (r.t || '') +
+    ' volleyball highlights');
+  card.innerHTML =
+    '<div class="ratingbox"><div class="rchips">' + chips.join('') + '</div>' +
+      (tags.length ? '<div class="rtags">' + tags.map(t =>
+        '<span class="rtag">' + esc(t) + '</span>').join('') +
+        '<span class="munk">2025</span></div>' : '') +
+      '<div class="munk rfoot">Ranked against ' +
+      esc((POSFULL[r.p] || r.p || '').toLowerCase()) +
+      's only — never across positions.</div></div>' +
+    '<div class="thead phead">' + avatar(r.p, r.t, 72) + '<div><h2>' +
+      '<a class="parentlink" href="' + teamHref + '">' + logo(r.t, 'lg') +
+      '</a>' + esc(r.n || '') + '</h2>' +
+      '<div class="sub">' + sub + '</div>' +
+      '<div class="chips">' + line + '</div>' +
+      '<div class="pvid"><span class="pxlab">Video</span>' +
+        '<a href="https://www.youtube.com/results?search_query=' + q + '" ' +
+        'target="_blank" rel="noopener noreferrer">Search YouTube</a>' +
+        '<a href="https://www.google.com/search?tbm=vid&q=' + q + '" ' +
+        'target="_blank" rel="noopener noreferrer">Search video</a>' +
+        '<span class="munk">a search, not a verified reel</span></div>' +
+    '</div></div>' +
+    '<div class="tsec"><h3>2025 season</h3><div class="body">' +
+      '<p class="tnote">These are <b>last season’s</b> numbers. She has ' +
+      'not been on court in ' + SEASON_YEAR + ' yet, so there is no 2026 line ' +
+      'and no match log to show.</p></div></div>';
+  card.scrollIntoView({ block: 'start' });
+}
+
 function renderPlayers() {
   const q = document.getElementById('pq').value.toLowerCase().split('·')[0].trim();
-  const rows = PLAYERS.filter(p => !q || (p.name + ' ' + p.team).toLowerCase().includes(q));
+  const hits = playerSearch(q);
+  const rows = hits.filter(x => x.live).map(x => x.live);
+  const only = hits.filter(x => !x.live).map(x => x.r);
   /* The column the table is sorted by carries the value scale, exactly as the
      Stats tab does -- 4.50 and 2.86 should not look alike in a list of 129. */
   const pv = rows.slice(0, 300).map(p => p.pps);
@@ -9342,9 +9502,64 @@ function renderPlayers() {
     '<td class="n">' + p.digs + '</td><td class="n">' + (p.bs + p.ba * 0.5) + '</td>' +
     '<td class="n">' + (p.aces || 0) + '</td>' +
     hcell(p.pps, p.pps.toFixed(2), plo, phi, 'high', 'seq') + '</tr>').join('');
+  /* ⚠ THE NOT-YET-PLAYED ROWS RENDER UNDER THEIR OWN HEADING RATHER THAN
+     MIXED IN. Their columns are LAST SEASON's; putting them in the same table
+     as 2026 rates would compare two different seasons in one sort. */
+  const host = document.getElementById('pnotyet');
+  if (host) {
+    /* ⚠ NOTHING UNTIL SHE TYPES, AND THAT IS THE FIX AFTER TWO WRONG ONES.
+       I blamed the row count, then the crests, then the per-keystroke render,
+       and each time the tab still hung -- because the hang was on ROUTE ENTRY,
+       with an empty query, before anybody had typed at all. Whatever the
+       browser is doing with a 2,679-row search on top of a 10 MB page and
+       5,000 images, the honest answer is that this list is for FINDING a
+       player, not for browsing two thousand of them. An empty box now renders
+       an invitation instead of a wall, which is the better product as well as
+       the thing that does not fall over. */
+    const show = q ? only.slice(0, 40) : [];
+    if (!q && only.length) {
+      host.innerHTML = '<p class="tnote munk">' + only.length + ' more rated ' +
+        'players have not been on court yet this season. Type a name or a ' +
+        'team above to find one.</p>';
+    } else {
+    host.innerHTML = !show.length ? '' :
+      '<div class="panel notyet"><div class="nyhd">Not yet on court this ' +
+      'season <span class="munk">' + only.length + ' rated ' +
+      (only.length === 1 ? 'player' : 'players') + ' · the numbers below are ' +
+      '2025</span></div><div class="scroll"><table><thead><tr>' +
+      '<th class="l">Player</th><th class="l">Team</th><th>Pos</th>' +
+      '<th>Cl</th><th>Sets</th><th>K/set</th><th>Hit%</th>' +
+      '<th>Rank at her position</th></tr></thead><tbody>' +
+      show.map(r =>
+        '<tr class="nyrow" data-nyk="' + esc(r.t + '|' + r.n) + '">' +
+        '<td class="l tm"><b>' + esc(r.n || '') + '</b>' +
+          (r.nu ? ' <span class="munk">#' + esc(String(r.nu)) + '</span>' : '') +
+        '</td>' +
+        /* ⚠ NO CREST IN THIS TABLE, AND THAT IS THE FIX, NOT A STYLE CHOICE.
+           Each crest is a REMOTE image, so 200 rows meant 200 requests -- and
+           this table rebuilds on every keystroke, so typing a name fired
+           thousands of image loads and hung the renderer. Measured: building
+           and attaching 200 rows costs 8ms and 31ms, so the rows were never
+           the problem; the images were. The team name is text here. */
+        '<td class="l tm">' + esc(r.t || '') + '</td>' +
+        '<td class="n">' + esc(r.p || '') + '</td>' +
+        '<td class="n">' + esc(r.c || '—') + '</td>' +
+        '<td class="n">' + (r.s == null ? '—' : r.s) + '</td>' +
+        '<td class="n">' + (r.k == null ? '—' : r.k.toFixed(2)) + '</td>' +
+        '<td class="n">' + (r.h == null ? '—' : pct(r.h)) + '</td>' +
+        '<td class="n">' + (r.r == null ? '—' : '#' + r.r) + '</td>' +
+        '</tr>').join('') + '</tbody></table></div>' +
+      (only.length > show.length
+        ? '<p class="tnote munk">Showing ' + show.length + ' of ' +
+          only.length + ' — narrow the search to see the rest.</p>' : '') +
+      '</div>';
+    }
+  }
+  const total = rows.length + only.length;
   document.getElementById('pcnt').textContent =
-    rows.length + (rows.length === 1 ? ' matching player' : ' matching players');
-  if (rows.length === 1) showPlayer(rows[0]);
+    total + (total === 1 ? ' matching player' : ' matching players') +
+    (only.length ? ' · ' + rows.length + ' with a 2026 line' : '');
+  if (rows.length === 1 && !only.length) showPlayer(rows[0]);
 }
 /* The router's entry point for a player. showPlayer() paints the card; this
    also makes the DIRECTORY TABLE stop competing with an exact selection --
@@ -9605,7 +9820,26 @@ document.getElementById('pbody').addEventListener('click', e => {
   /* routed, so Back returns to the directory and a refresh keeps the player */
   openPlayer(parts[1], parts[0], 'players');
 });
-document.getElementById('pq').addEventListener('input', renderPlayers);
+/* ⚠ DEBOUNCED. The directory now spans all of Division I, so a keystroke
+   rebuilds a 2,800-row search and two tables. Firing that per character is what
+   froze the tab -- and typing a full name is the normal case, not an edge one. */
+/* clicking a not-yet-played row opens her card */
+document.addEventListener('click', e => {
+  const row = e.target.closest && e.target.closest('.nyrow');
+  if (!row) return;
+  const k = row.getAttribute('data-nyk') || '';
+  const i = k.indexOf('|');
+  if (i < 0 || typeof ROSTER === 'undefined') return;
+  const t = k.slice(0, i), n = k.slice(i + 1);
+  const hit = ROSTER.find(r => r.t === t && r.n === n);
+  if (hit) showRated(hit);
+});
+
+let PQ_T = null;
+document.getElementById('pq').addEventListener('input', () => {
+  if (PQ_T) clearTimeout(PQ_T);
+  PQ_T = setTimeout(renderPlayers, 140);
+});
 renderPlayers();
 
 
