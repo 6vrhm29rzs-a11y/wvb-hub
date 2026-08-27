@@ -46,21 +46,31 @@ def raw(gid, away, home, epoch, state="P", venue=None, city=None, st=None,
 def resolve(records, corr=None):
     """Run the real resolver over synthetic records, without touching disk."""
     real_det = FX._detail_records
-    real_corr = FX.corrections
+    real_ledger = FX.ledger
     real_load = FX._load
     try:
         FX._detail_records = lambda: {records[0]["game_id"]:
                                       [dict(r, _line=i) for i, r in enumerate(records)]}
-        # ⚠ RUN THE LEDGER THROUGH THE REAL VALIDATOR. Stubbing corrections()
-        # wholesale meant the provenance rule was never exercised and three
-        # negative controls passed for nothing.
-        FX.corrections = lambda: {k: v for k, v in (corr or {}).items()
-                                  if FX.valid_correction(v)}
+        # ⚠ RUN SYNTHETIC ENTRIES THROUGH THE REAL VALIDATOR. Stubbing the
+        # ledger wholesale meant the provenance rules were never exercised and
+        # the negative controls passed for nothing.
+        import ledger as LG
+        ents = list((corr or {}).values())
+        valid = [e for e in ents if not LG.validate_entry(e)]
+        # ⚠ THE ENTRY'S OWN game_id IS THERE TO SATISFY THE SCHEMA (which
+        # requires a real numeric id) -- the synthetic records under test are
+        # keyed "g1".."g9". Map the validated entry onto the record being
+        # resolved, so what is exercised is the RULE, not the id.
+        gid_under_test = records[0]["game_id"]
+        FX.ledger = lambda today=None: {
+            "corrections": {gid_under_test: e for e in valid
+                            if e.get("kind") == "correction"},
+            "conflicts": {}, "stale": {}, "invalid": {}, "entries": valid}
         FX._load = lambda rel: ({"games": []} if "venues_" in rel else None)
         return FX.canonical_fixtures()[records[0]["game_id"]]
     finally:
         FX._detail_records = real_det
-        FX.corrections = real_corr
+        FX.ledger = real_ledger
         FX._load = real_load
 
 
@@ -128,9 +138,11 @@ def main():
     check("[-] ...so the fixture will not claim a home floor",
           not FX.renderable(r))
     # with an official correction naming the site, the flip stops mattering
-    corr = {"g7": {"game_id": "g7", "fields": {"site": "neutral"},
-                   "source_url": "https://example.edu/schedule",
-                   "verified_on": "2026-08-26", "quote": "neutral"}}
+    SUP = {"url": "https://example.edu/schedule", "retrieved": "2026-08-26",
+           "text": "Neutral Saturday Aug 29 vs. UNLV at T-Mobile Arena"}
+    corr = {"g7": {"game_id": "6628315", "kind": "correction",
+                   "review_by": "2026-12-01", "fields": {"site": "neutral"},
+                   "support": {"site": SUP}}}
     r = resolve(flip, corr)
     check("a sourced neutral site settles it", r["site"] == "neutral")
     check("[-] ...the flip is still RECORDED", any(c["field"] == "teams"
@@ -145,26 +157,47 @@ def main():
     r = resolve(base)
     check("[+] uncorrected, the stale feed venue is what you get",
           r["venue"] == "Rec Hall")
-    corr = {"g8": {"game_id": "g8",
+    SUP8 = {"url": "https://gopsusports.com/sports/womens-volleyball/schedule",
+            "retrieved": "2026-08-26",
+            "text": "Big Ten/SEC Challenge neutral Sep 6 vs. Kentucky Wrigley Field"}
+    corr = {"g8": {"game_id": "6626809", "kind": "correction",
+                   "review_by": "2026-12-01",
                    "fields": {"site": "neutral", "venue": "Wrigley Field",
                               "city": "Chicago", "state_usps": "IL"},
-                   "source_url": "https://gopsusports.com/x",
-                   "verified_on": "2026-08-26", "quote": "neutral ... Wrigley"}}
+                   "support": {k: SUP8 for k in
+                               ("site", "venue", "city", "state_usps")}}}
     r = resolve(base, corr)
     check("a sourced correction replaces the stale venue",
           r["venue"] == "Wrigley Field" and r["city"] == "Chicago")
     check("[-] ...and only the listed fields are touched",
           r["start_time_epoch"] == EVENING and "start_time_epoch"
           not in r["corrected_fields"])
-    check("the correction's provenance travels with the record",
-          r["correction"]["source_url"].startswith("https://") and
-          r["correction"]["verified_on"] == "2026-08-26")
-    # ⚠ AN ENTRY WITHOUT PROVENANCE IS NOT A CORRECTION.
-    for missing in ("source_url", "verified_on", "quote"):
+    # ⚠ PROVENANCE IS PER FIELD NOW, so this checks that each corrected fact
+    # carries its OWN url and retrieval date -- the thing the old single-quote
+    # entry could not do.
+    supp = (r["correction"] or {}).get("support") or {}
+    check("the correction's provenance travels PER FIELD",
+          set(supp) == set(r["corrected_fields"]) and
+          all(v["url"].startswith("https://") and v["retrieved"] == "2026-08-26"
+              for v in supp.values()),
+          "supported=%s corrected=%s" % (sorted(supp), sorted(r["corrected_fields"])))
+    # ⚠ AN ENTRY WITHOUT PROVENANCE IS NOT A CORRECTION. Now expressed against
+    # the per-field schema: drop a support key, or a required field on one, and
+    # the whole entry must be refused rather than half-applied.
+    for label, mangle in (
+            ("no support for a corrected field",
+             lambda e: e["support"].pop("venue")),
+            ("a support entry with no url",
+             lambda e: e["support"]["venue"].pop("url")),
+            ("a support entry with no retrieval date",
+             lambda e: e["support"]["venue"].pop("retrieved")),
+            ("a support entry with no quoted text",
+             lambda e: e["support"]["venue"].pop("text")),
+            ("no review_by", lambda e: e.pop("review_by"))):
         bad = copy.deepcopy(corr)
-        bad["g8"].pop(missing)
+        mangle(bad["g8"])
         r2 = resolve(base, bad)
-        check("[NEG] a ledger entry missing %-12s is IGNORED" % missing,
+        check("[NEG] %-38s -> entry IGNORED" % label,
               r2["venue"] == "Rec Hall", r2["venue"])
 
     # ── 4. UNKNOWN VENUE ────────────────────────────────────────────────
@@ -193,14 +226,22 @@ def main():
         for k, v in want.items():
             check("%s %-8s == %r" % (gid, k, v), r.get(k) == v, repr(r.get(k)))
         check("  %s renders confidently" % gid, FX.renderable(r))
-    # every correction in the ledger is sourced
-    doc = json.load(open(os.path.join(REPO, "data/raw/2026/fixture_corrections.json"),
-                         encoding="utf-8"))
-    for c in doc["corrections"]:
-        ok = (str(c.get("source_url", "")).startswith("https://")
-              and re.match(r"^\d{4}-\d{2}-\d{2}$", str(c.get("verified_on", "")))
-              and c.get("quote") and c.get("fields"))
-        check("ledger %s carries url + date + quote + fields" % c["game_id"], bool(ok))
+    # ⚠ THE LEDGER MOVED AND ITS SCHEMA TIGHTENED. Support is now per FIELD,
+    # so this no longer checks "the entry has a url" -- it checks that every
+    # single overridden fact carries its own citation. scripts/test_ledger.py
+    # owns the schema; this checks the shipped file satisfies it.
+    import ledger as LG
+    L = LG.load(today="2026-08-27")
+    check("the shipped ledger has no invalid entries", not L["invalid"],
+          json.dumps(L["invalid"])[:140])
+    for gid, c in sorted(L["corrections"].items()):
+        fields = set(c.get("fields") or {})
+        supported = set(c.get("support") or {})
+        check("ledger %s: every corrected fact has its own citation" % gid,
+              fields and fields == supported,
+              "fields=%s supported=%s" % (sorted(fields), sorted(supported)))
+        check("  %s carries a review date no later than first serve" % gid,
+              bool(c.get("review_by")))
 
     # ── 6. THE PAGE AGREES WITH ITSELF ──────────────────────────────────
     print("\n6. NO VIEW DISAGREES WITH ANOTHER")
@@ -249,6 +290,43 @@ def main():
               "the loop still slices the schedule")
         check("a conflicted fixture says so on the page",
               "schedule conflict" in h)
+
+    # ── 7. A BLOCKED FIXTURE LEAKS NOTHING, ANYWHERE ────────────────────
+    print("\n7. A BLOCKED FIXTURE NEVER LEAKS A CLAIM IT CANNOT SUPPORT")
+    if os.path.exists(hub):
+        blocked = {g: r for g, r in fx.items() if FX.blocking_conflicts(r)}
+        check("[+] there ARE blocked fixtures to leak", len(blocked) > 5,
+              str(len(blocked)))
+        # the page payload for a blocked fixture must not carry a confident fact
+        leaked = []
+        for g, r in blocked.items():
+            row = FIX.get(g)
+            if not row:
+                continue
+            fields = {c["field"] for c in FX.blocking_conflicts(r)}
+            # ⚠ THE CONNECTOR MUST NOT ASSERT A FLOOR.
+            if row.get("site") in ("home", "away", "neutral") and "site" in fields:
+                leaked.append("%s site=%s" % (g, row["site"]))
+            # ⚠ AND A DISPUTED TIME MUST NOT RENDER AS A TIME.
+            if "start_time_epoch" in fields and row.get("t") and \
+                    row.get("t") not in ("TBA", "", None) and \
+                    not row.get("conflict"):
+                leaked.append("%s t=%s" % (g, row["t"]))
+        check("no blocked fixture carries a confident site or time",
+              not leaked, "; ".join(leaked[:3]))
+        # every blocked fixture must actually carry its conflict to the page
+        missing = [g for g in blocked if g in FIX and not FIX[g].get("conflict")]
+        check("[-] every blocked fixture carries its conflict into the payload",
+              not missing, "%d without: %s" % (len(missing), missing[:3]))
+        # ⚠ AND THE CONNECTOR IS FAIL-CLOSED IN THE ONE HELPER.
+        cjs = re.search(r"function connector\(m\) \{(.*?)\n\}", h, re.S)
+        cbody = cjs.group(1) if cjs else ""
+        check("connector refuses to assert on a conflict",
+              "m.conflict && m.conflict.length" in cbody and
+              cbody.index("conflict") < cbody.index("neutral"),
+              "conflict must be checked BEFORE site")
+        check("[-] ...and returns a non-committal connector",
+              "return 'v'" in cbody)
 
     print()
     if FAILS:

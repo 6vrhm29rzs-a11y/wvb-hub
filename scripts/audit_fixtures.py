@@ -3,8 +3,13 @@
 """The fixture-conflict report: what disagrees, on what basis, and whether the
 site may render it.
 
-Run: python3 scripts/audit_fixtures.py [--all] [--json]
-Writes docs/fixture_conflicts.json and prints a reviewable table.
+⚠ READ-ONLY BY DEFAULT. It used to write docs/fixture_conflicts.json on every
+run -- a tracked artefact -- so a command that reads like an inspection quietly
+dirtied the working tree, and would have produced a spurious diff in the middle
+of any other piece of work. Regenerating that file is now an explicit act.
+
+Run: python3 scripts/audit_fixtures.py [--all]      report only, writes nothing
+     python3 scripts/audit_fixtures.py --write      also refresh the artefact
 """
 
 import collections
@@ -30,6 +35,7 @@ def name_of(rec):
 
 def main():
     show_all = "--all" in sys.argv
+    do_write = "--write" in sys.argv
     fx = FX.canonical_fixtures()
     conflicted = {g: r for g, r in fx.items() if r["conflicts"]}
     blocked = {g: r for g, r in fx.items() if FX.blocking_conflicts(r)}
@@ -84,6 +90,32 @@ def main():
             print("     safe to render? YES")
         print()
 
+    # ⚠ AN OFFICIAL-SOURCE CONFLICT IS ITS OWN SECTION. It is not a weaker
+    # correction and must not be read as one.
+    offc = {g: r for g, r in fx.items()
+            if any(c.get("official_conflict") for c in r["conflicts"])}
+    print("OFFICIAL SOURCES THAT DISAGREE WITH EACH OTHER")
+    print("-" * 78)
+    if not offc:
+        print("  none recorded")
+    for g, r in sorted(offc.items()):
+        print("  %s  %s" % (g, name_of(r)))
+        for c in r["conflicts"]:
+            if not c.get("official_conflict"):
+                continue
+            print("     field %s -- rendered UNAVAILABLE, NCAA value not preferred"
+                  % c["field"])
+            for cl in c.get("claims") or []:
+                print("       %-22s %s (read %s)"
+                      % (cl.get("value"), cl.get("url"), cl.get("retrieved")))
+    print()
+
+    stale = {g: r for g, r in fx.items() if r.get("stale_fields")}
+    print("LEDGER ENTRIES PAST THEIR REVIEW DATE (now render as verify)")
+    print("-" * 78)
+    print("  %s" % (", ".join(sorted(stale)) if stale else "none"))
+    print()
+
     print("OFFICIAL-SCHOOL CORRECTIONS IN FORCE")
     print("-" * 78)
     for g, r in sorted(corrected.items()):
@@ -92,10 +124,16 @@ def main():
         print("     corrects : %s" % ", ".join(r["corrected_fields"]))
         print("     now says : site=%s venue=%s, %s %s  event=%s"
               % (r["site"], r["venue"], r["city"], r["state_usps"], r["event"]))
-        print("     source   : %s  (read %s)" % (c["source_url"], c["verified_on"]))
-        if c.get("corroborating_url"):
-            print("     confirmed: %s" % c["corroborating_url"])
-        print("     quote    : \"%s\"" % (c["quote"] or "")[:110])
+        # ⚠ SUPPORT IS PER FIELD NOW. Printing one source line for an entry
+        # that overrides five facts was the reporting half of the same problem
+        # the ledger had: it made a single citation look like it covered
+        # everything. Each corrected fact prints the page it came from.
+        print("     review by: %s" % c.get("review_by"))
+        for f in r["corrected_fields"]:
+            sup = (c.get("support") or {}).get(f) or {}
+            print("       %-12s <- %s (read %s)"
+                  % (f, sup.get("url", "?"), sup.get("retrieved", "?")))
+            print("           \"%s\"" % (sup.get("text") or "")[:96])
     print()
 
     out = {
@@ -107,14 +145,37 @@ def main():
                     for g, r in sorted(blocked.items())},
         "corrections": {g: {"matchup": name_of(r),
                             "fields": r["corrected_fields"],
-                            "source_url": r["correction"]["source_url"],
-                            "verified_on": r["correction"]["verified_on"]}
+                            "review_by": (r["correction"] or {}).get("review_by"),
+                            # per-field provenance, not one url for all of them
+                            "support": (r["correction"] or {}).get("support", {})}
                         for g, r in sorted(corrected.items())},
+        "official_conflicts": {g: [c for c in r["conflicts"]
+                                   if c.get("official_conflict")]
+                               for g, r in sorted(fx.items())
+                               if any(c.get("official_conflict")
+                                      for c in r["conflicts"])},
+        "stale": {g: r.get("stale_fields") for g, r in sorted(fx.items())
+                  if r.get("stale_fields")},
     }
     p = os.path.join(REPO, "docs", "fixture_conflicts.json")
-    with open(p, "w", encoding="utf-8") as fh:
-        json.dump(out, fh, indent=1, sort_keys=True)
-    print("wrote %s" % p)
+    if do_write:
+        with open(p, "w", encoding="utf-8") as fh:
+            json.dump(out, fh, indent=1, sort_keys=True)
+        print("wrote %s" % p)
+    else:
+        # ⚠ SAY WHAT WAS NOT DONE. A silent read-only mode is how someone
+        # concludes the artefact is current when it is three phases old.
+        cur = None
+        if os.path.exists(p):
+            try:
+                cur = json.load(open(p, encoding="utf-8"))
+            except ValueError:
+                cur = None
+        same = cur is not None and cur.get("counts") == out["counts"]
+        print("read-only. %s"
+              % ("docs/fixture_conflicts.json is current."
+                 if same else
+                 "docs/fixture_conflicts.json is STALE -- rerun with --write."))
     return 0
 
 

@@ -1769,3 +1769,94 @@ canonical fixture record (never re-derived per view); an unmatched listing stays
 visible in the On TV table and is counted, never silently dropped; and the count
 of joined-vs-unjoined is stated on the page, because a partial join presented as
 complete is the failure this whole phase was about.
+
+---
+
+## 26. LEDGER HARDENING — and a premise that did not survive checking
+
+### ⚠ FIRST, THE REPORTED CONFLICT: I COULD NOT REPRODUCE IT
+The brief said Nebraska's official page now reads **9:00 PM CDT** against
+UNLV's **5:00 PM PT**, making the ledger's "same instant" note wrong.
+
+Re-fetched both pages at **2026-08-27T02:11Z**:
+- huskers.com — *"Players Era Showcase Neutral Saturday Aug 29 **7:00 PM CDT**
+  #1 vs. UNLV Las Vegas, Nev. / T-Mobile Arena"* (in both list and expanded views)
+- unlvrebels.com — *"Aug 29 (Sat) **5 PM PT** No. 1 Nebraska … T-Mobile Arena"*
+
+**No `9:00 PM CDT` exists anywhere on Nebraska's page.** Its full set of times
+is 11:00 AM, 12:00, 2:00, 2:30, 3:30, 4:00, 5:00, 5:30, 6:00, 6:30, 7:00, 8:00
+CDT plus two CST. The single "9:00 PM" on the page is **Nov 7 at Oregon,
+9:00 PM CST** — a different fixture ten weeks later.
+
+Converted with real tzdata: **7:00 PM CDT = 5:00 PM PDT = 2026-08-30T00:00Z**,
+one instant, and the feed's epoch `1788048000` is exactly that. The two sources
+**agree**, and the hub's 5:00 PM PT agrees with both. The ledger's arithmetic
+note was correct.
+
+So no conflict entry was written for 6628315 — **asserting a disagreement the
+sources do not show would be the same failure as asserting a venue they do not
+show.** The conflict *mechanism* was built and is proven end-to-end against a
+synthetic entry, so the moment either school publishes a different time it is
+one ledger entry away.
+
+### What was hardened
+**A strict schema** (`scripts/ledger.py`): an allowlist of six overridable
+fields with per-field type checks, `^\d{5,9}$` game ids, `YYYY-MM-DD` dates
+that must be real calendar dates, https-only absolute source URLs, enumerated
+site values, and duplicate `(game, kind, field)` detection. **16 malformed
+shapes are each rejected by their own negative control.**
+
+**Field-level support.** ⚠ The shipped ledger had **one quote standing behind
+five independent facts** — site, venue, city, state and event. Every overridden
+fact now carries its own `{url, retrieved, text}`, and a field without support,
+or support for a field that overrides nothing, invalidates the whole entry.
+
+**A conflict kind, distinct from a correction.** Both cited claims are
+preserved, the disputed fact renders **unavailable**, and — asserted by
+negative control — **the NCAA value is not silently preferred**. Field-scoped:
+a time conflict does not erase an undisputed venue.
+
+**`review_by` on every entry.** A schedule reading is a fact about a web page
+on a date, not a permanent fact about a match. Past review it stops being
+applied and becomes "verify". And once a match is **final**, a pregame schedule
+correction is withheld from result facts entirely.
+
+### ⚠ THE UNSAFE TIME INFERENCE IS GONE
+The placeholder rule was "any Eastern hour before 08:00", computed with a
+**fixed UTC−4** — EDT-only, so wrong for every November fixture. And it is not
+a sentinel test at all: measured on the completed 2025 season, **13 of 5,133
+fixtures had an early-AM Eastern time and all thirteen were at Hawaii**, where
+1:00 AM ET is an ordinary 7:00 PM local start. The old rule called those
+unannounced.
+
+Now: real `zoneinfo` `America/New_York`, and the sentinel is **exactly midnight
+Eastern** — what ncaa.com actually emits — and nothing else. Tested at both DST
+boundaries, with Hawaii's 1:00 AM and a real 10:00 AM ET start as negative
+controls. **Blocked fixtures rose 16 → 26**: ten fixtures that previously got a
+guessed time now honestly say verify.
+
+### The audit is read-only
+`audit_fixtures.py` rewrote a **tracked** artefact on every run. It now reports
+only, says whether the artefact is stale, and writes solely under `--write`.
+Both paths tested.
+
+### ⚠ AN INDENTATION SLIP CHANGED BEHAVIOUR WITH NO ERROR
+Splicing the conflict and staleness loops in left the venue-ownership
+derivation four spaces too deep — it became the body of a `for` over an empty
+list. Nothing threw; game 6625717 simply went back to `unconfirmed`. In Python
+an indentation slip is a silent behaviour change.
+
+### Final user-visible rendering
+| fixture | renders |
+|---|---|
+| **6626809** | `Sun Sep 6 · 4:00 PM PT · #3 Kentucky **vs** #10 Penn St. · non-conf · Big Ten/SEC Challenge · Wrigley Field, Chicago IL · school-confirmed` |
+| **6628315** | `Sat Aug 29 · 5:00 PM PT · Nebraska **vs** UNLV · non-conf · Players Era Showcase · T-Mobile Arena, Las Vegas NV · school-confirmed` |
+| **6625717** | `Fri Aug 28 · 3:30 PM PT · #15 Kansas **at** #4 Pittsburgh · non-conf · Opening Spike Classic · Petersen Events Center, Pittsburgh PA · school-confirmed` |
+
+6625717's `at` rests on explicit canonical evidence — Petersen is Pitt's own
+building on record — not on nominal ordering; the site was deliberately left
+out of the correction because SIDEARM's "vs" is ambiguous.
+
+**Unverified facts still on screen: none.** 26 fixtures render "schedule
+conflict — verify" rather than a guess, and a blocked fixture is asserted by
+test to leak no site, time or ordering into any other component.

@@ -60,34 +60,18 @@ def _load(rel):
         return None
 
 
-def valid_correction(c):
-    # type: (Dict[str, Any]) -> bool
-    """⚠ AN ENTRY WITHOUT PROVENANCE IS NOT A CORRECTION, IT IS AN OPINION.
+def ledger(today=None):
+    # type: (Optional[str]) -> Dict[str, Any]
+    """The validated official-source ledger. See scripts/ledger.py.
 
-    Lifted out of corrections() so a test can exercise the real rule rather
-    than a paraphrase of it -- the first version of test_fixture_truth.py
-    stubbed corrections() wholesale and therefore proved nothing about this.
+    ⚠ THE OLD corrections() ACCEPTED AN ENTRY WITH ONE QUOTE BEHIND FIVE
+    INDEPENDENT FACTS. Support is now per field, kinds are separated
+    (correction vs conflict), and an entry past its review_by is no longer
+    applied -- schools move fixtures, so a reading is a fact about a page on a
+    date, not a permanent fact about the match.
     """
-    if not isinstance(c, dict):
-        return False
-    if not (c.get("source_url") and c.get("verified_on") and c.get("quote")):
-        return False
-    return isinstance(c.get("fields"), dict) and bool(c["fields"])
-
-
-def corrections():
-    # type: () -> Dict[str, Dict[str, Any]]
-    """The official-school ledger, keyed by game id. Never inferred."""
-    doc = _load("data/raw/%d/fixture_corrections.json" % SEASON) or {}
-    out = {}
-    for c in doc.get("corrections") or []:
-        gid = str(c.get("game_id") or "")
-        if not gid:
-            continue
-        if not valid_correction(c):
-            continue
-        out[gid] = c
-    return out
+    import ledger as LG
+    return LG.load(today=today)
 
 
 def _detail_records():
@@ -123,41 +107,57 @@ def _loc(rec):
     return (lo.get("venue"), lo.get("city"), lo.get("state"))
 
 
-def _et_hour(epoch):
-    """Hour of day in US Eastern for an epoch, or None."""
+def _et(epoch):
+    """An epoch as a real America/New_York datetime, or None.
+
+    ⚠ NOT A FIXED UTC-4. The previous version subtracted four hours and called
+    it Eastern, which is EDT only. Any fixture in the first week of November --
+    when the NCAA season is at its busiest -- would have been read an hour off,
+    and the sentinel window is defined in wall-clock Eastern. zoneinfo carries
+    the real rules.
+    """
     if not epoch:
         return None
     try:
         import datetime
-        # ⚠ ET, NOT LOCAL AND NOT UTC. The sentinel is defined in Eastern
-        # because that is the zone ncaa.com publishes in. September is EDT
-        # (UTC-4); the window below is wide enough that the DST edge cannot
-        # move a real evening start into it.
-        return (datetime.datetime.utcfromtimestamp(int(epoch))
-                - datetime.timedelta(hours=4)).hour
+        try:
+            from zoneinfo import ZoneInfo
+            tz = ZoneInfo("America/New_York")
+        except Exception:                                  # noqa: BLE001
+            return None
+        return datetime.datetime.fromtimestamp(int(epoch), tz)
     except (ValueError, TypeError, OverflowError):
         return None
 
 
+# ⚠ THE SENTINEL IS EXACTLY MIDNIGHT EASTERN, AND NOTHING ELSE.
+# The previous rule was "any Eastern hour before 08:00", which is not a
+# sentinel test -- it is a guess that happens to catch the sentinel and also
+# catches every genuinely early start. Measured on the completed 2025 season,
+# 13 of 5,133 fixtures carried an early-AM Eastern time and ALL THIRTEEN were
+# at Hawaii, where 1:00 AM ET is an ordinary 7:00 PM local evening start. Under
+# the old rule those thirteen real fixtures were classified as "unannounced".
+#
+# What ncaa.com actually emits for a time it has not set is midnight Eastern.
+# So that -- and only that -- is what this recognises. A real 00:00 ET start
+# does not exist in the sport, and if one ever did, the honest outcome is the
+# same as the sentinel's: we cannot tell, so the time renders unavailable.
+SENTINEL_ET_HOUR = 0
+SENTINEL_ET_MINUTE = 0
+
+
 def is_placeholder_epoch(epoch):
-    """A start time the feed has not actually announced yet.
+    """True only for the exact midnight-Eastern sentinel ncaa.com emits.
 
-    ⚠ THIS IS NOT A NEW RULE, IT IS AN OLD ONE APPLIED ONE LAYER EARLIER.
-    build_hub.listed_time() already knows ncaa.com fills an unannounced start
-    with a midnight-ish Eastern sentinel that formats exactly like a real time
-    (measured: 13 of 5,133 completed-2025 fixtures carried an early-AM ET time
-    and all thirteen were at Hawaii; 192 do in the 2026 schedule). It used that
-    knowledge only for DISPLAY.
-
-    Applying it here matters because a placeholder is not a competing opinion
-    about the start time -- it is the absence of one. Game 6626809 holds three
-    records at 00:00 ET and two at the announced 7:00 PM ET. Treating those as
-    five votes produces a conflict; treating three of them as "not yet
-    announced" produces the answer, for a stated reason rather than because the
-    real time happened to be appended last.
+    ⚠ IF THE RAW DATA CANNOT DISTINGUISH A REAL EARLY START FROM A
+    PLACEHOLDER, THIS RETURNS FALSE and the disagreement becomes a conflict --
+    which renders the time as unavailable. Guessing would trade a visible
+    "verify" for an invisible wrong time.
     """
-    h = _et_hour(epoch)
-    return h is not None and h < 8
+    et = _et(epoch)
+    if et is None:
+        return False
+    return et.hour == SENTINEL_ET_HOUR and et.minute == SENTINEL_ET_MINUTE
 
 
 def _agree(values):
@@ -187,7 +187,8 @@ def canonical_fixtures():
          human reading beats two silent snapshots.
     """
     det = _detail_records()
-    corr = corrections()
+    L = ledger()
+    corr = L["corrections"]
     vdoc = _load("data/venues_%d.json" % SEASON) or {}
     vidx = {str(r.get("game_id")): r for r in (vdoc.get("games") or [])}
     # ⚠ VENUE OWNERSHIP IS EVIDENCE; NOMINAL ORDERING IS NOT. venues.py already
@@ -273,33 +274,82 @@ def canonical_fixtures():
 
         c = corr.get(gid)
         if c:
-            for k, v in (c.get("fields") or {}).items():
-                rec[k] = v
-                rec["corrected_fields"].append(k)
-            # a sourced reading settles the fields it covers
-            rec["conflicts"] = [x for x in rec["conflicts"]
-                                if x["field"] not in rec["corrected_fields"]]
-            rec["correction"] = {
-                "source_url": c.get("source_url"),
-                "verified_on": c.get("verified_on"),
-                "quote": c.get("quote"),
-                "corroborating_url": c.get("corroborating_url"),
-                "why": c.get("why"),
-            }
-            rec["source"] = "ncaa+official-school"
+            # ⚠ A PREGAME SCHEDULE CORRECTION IS NOT A RESULT FACT. Once a
+            # match is final, where it was going to be played is settled by
+            # what happened, not by a schedule page read three weeks earlier.
+            if rec["completed"]:
+                rec["correction_withheld"] = "match is final; pregame schedule correction not applied"
+            else:
+                sup = c.get("support") or {}
+                for k, v in (c.get("fields") or {}).items():
+                    rec[k] = v
+                    rec["corrected_fields"].append(k)
+                rec["conflicts"] = [x for x in rec["conflicts"]
+                                    if x["field"] not in rec["corrected_fields"]]
+                rec["correction"] = {
+                    "why": c.get("why"),
+                    "review_by": c.get("review_by"),
+                    # ⚠ SUPPORT IS PER FIELD, and travels per field.
+                    "support": {k: {"url": sup[k]["url"],
+                                    "retrieved": sup[k]["retrieved"],
+                                    "text": sup[k]["text"]}
+                                for k in c.get("fields") or {} if k in sup},
+                }
+                rec["source"] = "ncaa+official-school"
 
-            # ⚠ A CORRECTED VENUE CAN SETTLE A SITE THAT WAS ONLY UNCONFIRMED
-            # BECAUSE THE VENUE WAS MISSING -- but only from ownership, and
-            # only when the correction did not name the site itself.
-            if ("site" not in rec["corrected_fields"]
-                    and rec["site"] == SITE_UNCONFIRMED and rec.get("venue")):
-                owners = [str(t.get("team_id")) for t in (rec["teams"] or [])
-                          if home_venue_of.get(str(t.get("team_id")), "")
-                          .lower().startswith(rec["venue"].lower())]
-                if len(owners) == 1:
-                    rec["site"] = SITE_HOME
-                    rec["site_basis"] = ("the corrected venue is this team's "
-                                         "own building, on record")
+        # ⚠ AN OFFICIAL-SOURCE CONFLICT IS NOT A WEAKER CORRECTION. Both cited
+        # claims are kept, the fact is cleared, and the NCAA value is NOT
+        # quietly preferred -- preferring it would be choosing a side in a
+        # disagreement we just said we cannot resolve.
+        for cf in L["conflicts"].get(gid, []) if not rec["completed"] else []:
+            f = cf["field"]
+            rec[f] = None
+            rec["conflicts"].append({
+                "field": f,
+                "values": [str(cl.get("value")) for cl in cf["claims"]],
+                "records": len(pool),
+                "official_conflict": True,
+                "claims": [{"value": cl.get("value"),
+                            "url": (cl.get("support") or {}).get("url"),
+                            "retrieved": (cl.get("support") or {}).get("retrieved"),
+                            "text": (cl.get("support") or {}).get("text")}
+                           for cl in cf["claims"]],
+            })
+            if f in rec["corrected_fields"]:
+                rec["corrected_fields"].remove(f)
+
+        # ⚠ A STALE ENTRY DOES NOT VANISH -- it turns the fact into "verify".
+        for st in L["stale"].get(gid, []) if not rec["completed"] else []:
+            for f in ([st.get("field")] if st.get("kind") == "conflict"
+                      else list((st.get("fields") or {}).keys())):
+                if not f:
+                    continue
+                rec.setdefault("stale_fields", []).append(f)
+                rec["conflicts"].append({
+                    "field": f,
+                    "values": ["an official reading from %s has passed its "
+                               "review date (%s)" % (st.get("review_by"), st.get("review_by"))],
+                    "records": len(pool), "stale": True,
+                })
+
+        # ⚠ A CORRECTED VENUE CAN SETTLE A SITE THAT WAS ONLY UNCONFIRMED
+        # BECAUSE THE VENUE WAS MISSING -- but only from ownership, and only
+        # when neither a correction nor a conflict has already spoken for it.
+        # ⚠ THIS BLOCK SILENTLY STOPPED RUNNING when the ledger rewrite spliced
+        # the conflict and staleness loops in above it: the dedent was wrong by
+        # four spaces, so it became the body of a `for` over an empty list.
+        # Nothing threw; game 6625717 just quietly went back to "unconfirmed".
+        # An indentation slip in Python is a behaviour change with no error.
+        if ("site" not in rec["corrected_fields"]
+                and not any(x["field"] == "site" for x in rec["conflicts"])
+                and rec["site"] == SITE_UNCONFIRMED and rec.get("venue")):
+            owners = [str(t.get("team_id")) for t in (rec["teams"] or [])
+                      if home_venue_of.get(str(t.get("team_id")), "")
+                      .lower().startswith(rec["venue"].lower())]
+            if len(owners) == 1:
+                rec["site"] = SITE_HOME
+                rec["site_basis"] = ("the venue on this fixture is that team's "
+                                     "own building, on record")
 
         # ⚠ A HOME/AWAY FLIP STOPS MATTERING ONCE THE SITE IS CONFIRMED
         # NEUTRAL. The flip is only ever a problem because it would drive an
