@@ -84,15 +84,69 @@ def main():
     check("[-] ...and a match with no reason is not a top game",
           ".filter(x => x[1].length)" in src)
 
-    print("\n1c. THE QUIET DAY IS BOUNDED")
-    check("at most three marquee matches", "topGames(soon, liveOf, 3)" in src)
-    check("four to eight compact upcoming", ".slice(0, 8)" in src)
-    check("recent finals from the last day that produced any",
-          "Recent finals" in src)
-    check("a prompt that leads somewhere", "tdprompt" in src)
-    check("[-] no giant permanent hero for a distant match",
-          "vx-empty" not in src.split("QUIET DAY")[1][:2600],
-          "the old full-width empty-state card is back")
+    print("\n1c. THE LANDING PAGE IS WATCH-FIRST AND BOUNDED")
+    # ⚠ THE QUIET-DAY BLOCKS WERE REPLACED WHOLESALE. Cody's own words:
+    # "I don't care about all that info. I just want to know when the top teams
+    # are playing" and "you don't need to say no games today -- I want to know
+    # when the next game that I need to watch is." So the page no longer
+    # announces absence, no longer counts mid-major fixtures, and leads with
+    # matches he might actually watch.
+    check("the first block is Your next watches",
+          "block('Your next watches'" in src)
+    check("[-] at most five watches", "ranked.slice(0, 5)" in src)
+    check("then the rest of the ranked slate", "Big weekend ahead" in src)
+    check("then results that moved the picture",
+          "Results that changed the picture" in src)
+    check("[-] ...on a stated test, not an editorial feel",
+          "const five = (+sc[0] + +sc[1]) === 5" in src and
+          "rankedLost" in src)
+    # ⚠ SCOPE THIS TO THE LANDING PAGE. A DATE view -- the Scoreboard, the day
+    # lanes -- SHOULD say when a chosen date is empty; that is an answer to the
+    # question it was asked. The rule is that the landing page never leads with
+    # absence, because nobody opens it to be told nothing is on.
+    # bounded by the end of renderDesk's landing branch, whose last statement
+    # is the stated-rule paragraph
+    landing = src[src.index("THE LANDING PAGE"):]
+    _end = landing.find("ONE FEATURED MATCH AT MOST")
+    landing = landing[:_end] if _end > 0 else landing[:9000]
+    check("[-] the LANDING page never announces absence",
+          "No Division-I matches" not in landing,
+          "it tells him what to watch, not what is missing")
+    check("[+] ...while a chosen empty DATE still says so",
+          "No Division-I matches on " in src,
+          "a date view owes that answer")
+    check("[-] ...and no mid-major fixture count",
+          "' matches.'" not in src.split("THE LANDING PAGE")[1][:5200],
+          "195 matches is not information he asked for")
+    check("[-] no explanatory sentence about the model on the first screen",
+          "a forecast is a " not in src.split("desklead")[1][:900])
+    check("the selection rule is printed for the reader", "tdrule" in src)
+
+    print("\n1d. WHERE TO WATCH")
+    # ⚠ THE FEED CARRIES NO BROADCAST AT ALL -- measured, empty on all 1,971
+    # scoreboard entries. This is Cody's own transcribed listing, joined
+    # strictly, and it is the first thing he asked for.
+    check("fixtures carry a network", "\"tv\": (tvx.get(gid) or {}).get(\"net\")" in src)
+    check("[-] joined only when exactly one fixture matches",
+          "if len(cand) != 1:" in src)
+    check("[-] ...through the existing normaliser, not a new one",
+          "from reconcile_2025 import norm as _norm" in src)
+    check("a watch card shows the channel", "class=\"wnet\"" in src)
+    check("[-] ...and says so when there is none, rather than implying not-on-TV",
+          "TV not listed" in src)
+    # ⚠ THE NETWORK IS RENDERED BY JS, so it is not in the static markup --
+    # the first version of this check scanned the HTML and found only the
+    # literal fallback string. Assert the DATA instead: the payload the page
+    # renders from is static and carries the joined networks.
+    if private:
+        mfx = re.search(r"const FIXTURES = (\{.*?\});\n", h, re.S)
+        FIXP = json.loads(mfx.group(1)) if mfx else {}
+        nets = sorted({v["tv"] for v in FIXP.values() if v.get("tv")})
+        check("[+] real networks are joined onto real fixtures",
+              len(nets) >= 4, str(nets[:8]))
+        check("[+] ...on a meaningful number of them",
+              sum(1 for v in FIXP.values() if v.get("tv")) >= 20,
+              str(sum(1 for v in FIXP.values() if v.get("tv"))))
 
     # ── 2. THE HEADER ───────────────────────────────────────────────────
     print("\n2. THE HEADER DOES NOT DOMINATE EVERY SCREEN")

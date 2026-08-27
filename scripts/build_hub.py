@@ -422,6 +422,7 @@ def schedule(limit_days: int = 21) -> List[Dict]:
     """Upcoming fixtures from today forward, with WHERE and WHAT KIND."""
     today = today_pt().isoformat()
     vidx = venue_index()
+    tvx = tv_index()
     rows = []
     for path in sorted(glob.glob(os.path.join(REPO, "data/raw/%d/scoreboard/*.json" % SEASON))):
         date = os.path.basename(path)[:-5]
@@ -470,6 +471,9 @@ def schedule(limit_days: int = 21) -> List[Dict]:
                 # could not have known.
                 "conflict": v.get("conflict") or [],
                 "corrected": v.get("corrected") or [],
+                # ⚠ WHERE TO WATCH. The feed carries none, so this is the
+                # joined listing or nothing -- never a guess.
+                "tv": (tvx.get(gid) or {}).get("net"),
                 "csrc": ((v.get("correction") or {}).get("source_url")
                          if v.get("correction") else None),
                 "cverified": ((v.get("correction") or {}).get("verified_on")
@@ -503,6 +507,78 @@ def _tv_pt(t):
     h12 = hr % 12 or 12
     mins = m.group(2)
     return "%d%s %s" % (h12, (":" + mins) if mins else "", ampm)
+
+
+def tv_index():
+    # type: () -> Dict[str, Dict]
+    """game_id -> where to watch it. Private only.
+
+    ⚠ THE FEED CARRIES NO BROADCAST AT ALL -- measured, `network` is empty on
+    all 1,971 scoreboard entries. The only broadcast data that exists here is
+    Cody's own transcribed listings, which until now rendered as a standalone
+    table joined to nothing: the schedule could tell you a match existed and
+    never tell you where to watch it, which is the first thing he actually
+    wants to know.
+
+    ⚠ JOINED STRICTLY, AND NEVER GUESSED. A listing attaches only when exactly
+    ONE fixture that day is between exactly those two teams, matched through
+    reconcile_2025.norm() -- the normaliser that already exists because
+    "LSU New Orleans" vs "New Orleans" has bitten this project three times.
+    Measured on the real file: 187 of 220 listings name two teams, 130 join to
+    exactly one fixture, and ZERO are ambiguous. That zero is what makes a
+    strict join safe. The 30 that name no teams are conference-tournament
+    placeholders ("B1G Tournament") whose brackets do not exist until November;
+    they stay in the standalone table and are counted, never invented onto a
+    fixture.
+
+    ⚠ PRIVATE. The listings are transcribed from a forum, so they are stripped
+    from the public build exactly as tv() already is.
+    """
+    if PUBLIC:
+        return {}
+    import datetime as _dt
+    try:
+        from reconcile_2025 import norm as _norm
+    except Exception:                                       # noqa: BLE001
+        def _norm(x):
+            return re.sub(r"[^a-z]", "", (x or "").lower())
+
+    import fixtures as FX
+    by_pair = {}
+    for gid, rec in FX.canonical_fixtures().items():
+        ts = rec.get("teams") or []
+        ep = rec.get("start_time_epoch")
+        if len(ts) != 2 or not ep:
+            continue
+        try:
+            d = _dt.datetime.utcfromtimestamp(int(ep) - 4 * 3600).date().isoformat()
+        except (ValueError, TypeError):
+            continue
+        key = (d, frozenset(_norm(t.get("name_short")) for t in ts))
+        by_pair.setdefault(key, []).append(gid)
+
+    out, joined, missed = {}, 0, 0
+    for row in tv():
+        m = re.sub(r"^[^:]*:\s*", "", row.get("m") or "")
+        sides = re.split(r"\s+vs\.?\s+|\s+at\s+", m, flags=re.I)
+        if len(sides) != 2:
+            missed += 1
+            continue
+        try:
+            day = row.get("day", "").split(",")[1].strip()
+            iso = _dt.datetime.strptime("%s %d" % (day, SEASON),
+                                        "%b %d %Y").date().isoformat()
+        except (ValueError, IndexError):
+            missed += 1
+            continue
+        cand = by_pair.get((iso, frozenset(_norm(x) for x in sides))) or []
+        if len(cand) != 1:
+            missed += 1
+            continue
+        out[cand[0]] = {"net": row.get("n"), "t": row.get("t")}
+        joined += 1
+    out["_stats"] = {"joined": joined, "unjoined": missed, "total": joined + missed}
+    return out
 
 
 def tv() -> List[Dict]:
@@ -3028,6 +3104,7 @@ def build():
             "ap": _pr.get(r["a"]), "hp": _pr.get(r["h"]),
             "venue": r.get("venue"), "city": r.get("city"), "st": r.get("st"),
             "site": r.get("site"), "event": r.get("event"), "kind": r.get("kind"),
+            "tv": r.get("tv"),
             "conflict": r.get("conflict") or [], "corrected": r.get("corrected") or [],
             "csrc": r.get("csrc"), "cverified": r.get("cverified"),
             "hw": hw, "fsrc": src,
@@ -3314,6 +3391,7 @@ def build():
                 "venue": r.get("venue"), "city": r.get("city"),
                 "st": r.get("st"), "site": r.get("site"),
                 "event": r.get("event"), "kind": r.get("kind"),
+                "tv": r.get("tv"),
                 "conflict": r.get("conflict") or [],
                 "corrected": r.get("corrected") or [],
                 "csrc": r.get("csrc"),
@@ -3932,6 +4010,54 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 /* ⚠ ONE LINE. The marquee is 129px; this is ~34px and carries the same three
    facts -- what is on, when, and a way in. A deep page gets context without
    surrendering its first third to it. */
+/* ── YOUR NEXT WATCHES ───────────────────────────────────────────────── */
+.tdnow{font:700 13px/1 var(--disp);letter-spacing:.16em;text-transform:uppercase;
+  color:var(--slate)}
+.tdlivenow{display:inline-flex;align-items:center;gap:7px;margin-left:14px;
+  font:700 12px/1 var(--disp);letter-spacing:.15em;text-transform:uppercase;
+  color:var(--cs-gold)}
+.wgrid{display:grid;gap:14px;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.wcard{display:flex;flex-direction:column;gap:9px;min-width:0;padding:15px;
+  text-decoration:none;border:1px solid var(--cs-edge2);
+  border-left:3px solid var(--cs-gold);
+  background:linear-gradient(180deg,#0B1D33,#091829)}
+.wcard.islive{border-left-color:var(--live)}
+.wcard:hover{border-color:var(--navy);border-left-color:var(--cs-white)}
+.wcard:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
+.wtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.wwhen{display:flex;align-items:center;gap:6px;
+  font:600 10.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;
+  color:var(--slate)}
+/* ⚠ THE CHANNEL IS THE POINT. It is the first thing he asked for and the feed
+   carries none of it, so a fixture with a joined listing shows the network
+   loudly and one without says so rather than implying it is not on. */
+.wnet{margin-left:auto;font:700 11px/1 var(--disp);letter-spacing:.11em;
+  text-transform:uppercase;color:var(--ink-on-accent);background:var(--cs-gold);
+  padding:5px 8px;border-radius:2px;white-space:nowrap}
+.wnet.none{background:transparent;color:var(--ink3);
+  border:1px dashed var(--cs-edge2);font-weight:500}
+.wteams{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  font:700 20px/1.12 var(--disp);text-transform:uppercase;color:var(--cs-white)}
+.wteams i{font-style:normal;font:500 11px/1 var(--mono);color:var(--ink3);
+  text-transform:lowercase}
+.wmeta{font:12px/1.45 var(--sans);color:var(--ink2)}
+.wacts{display:flex;align-items:center;gap:10px;margin-top:2px}
+.wgo{font:600 11.5px/1 var(--sans);color:var(--navy)}
+.wcard:hover .wgo{color:var(--cs-white)}
+.wofficial{font:500 10px/1 var(--mono);color:var(--ink3);letter-spacing:.06em}
+/* secondary, and it looks it */
+.mbsecondary{margin-top:8px;opacity:.92}
+.mbsecondary .mbrow{padding-top:7px;padding-bottom:7px}
+.tdrule{margin:26px 0 0;padding-top:14px;border-top:1px solid var(--cs-edge);
+  font:12px/1.6 var(--sans);color:var(--slate)}
+.tdrule a{color:var(--navy);text-decoration:none}
+.tdrule a:hover{color:var(--cs-white)}
+@media (max-width:560px){
+  .wgrid{grid-template-columns:minmax(0,1fr)}
+  .wteams{font-size:17px}
+  .wnet{margin-left:0}
+}
 /* ── TODAY ────────────────────────────────────────────────────────────── */
 /* ── SCOREBOARD ───────────────────────────────────────────────────────── */
 /* the season ledger, deliberately behind a name */
@@ -7184,16 +7310,22 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 <section id="v-desk">
   <div id="deskdetail" hidden></div>
   <div id="deskboard">
-  <h2 class="vh">Today</h2>
+  <h2 class="vh">Your next watches</h2>
   <p class="tabhint" id="desklead"></p>
 
-  <!-- MYBOARD-HTML-BEGIN -->
-  <div class="mbpanel" id="mbpanel" role="region" aria-label="My Board" hidden></div>
-  <!-- MYBOARD-HTML-END -->
   <div id="desktoday">
     <span id="desktodaymeta" hidden></span>
     <div id="desktodaycards"></div>
   </div>
+
+  <!-- ⚠ MY BOARD IS LAST, AND SMALL. It was the FIRST block on the landing
+       page -- four rows of watched teams above the matches worth watching --
+       so the personal list outranked the reason for opening the page. It is a
+       secondary, personal aid: it belongs after the watches, the weekend and
+       the results that moved the picture. -->
+  <!-- MYBOARD-HTML-BEGIN -->
+  <div class="mbpanel mbsecondary" id="mbpanel" role="region" aria-label="My Board" hidden></div>
+  <!-- MYBOARD-HTML-END -->
 
   <div id="desksoon">
     <span id="desksoonmeta" hidden></span>
@@ -13524,100 +13656,153 @@ function renderDesk() {
      SAID "No Division-I matches today" -- the same fact twice, four lines
      apart. On a quiet day the lead now carries only the date and the standing
      caveat; the state is stated once, by the block whose job it is. */
+  /* ⚠ NO EXPLANATORY SENTENCE ON THE LANDING PAGE. This read "Today. Live
+     scores come from the official scoreboard feed; a forecast is a probability
+     from the rally model, not a pick." -- a caveat about the machinery, under
+     a heading that already said Today, on the one screen that is supposed to
+     answer what to watch. The caveats are still true and still stated where
+     the numbers they qualify actually appear.
+     What replaces it is a DATE and a COUNT, because that is the whole of what
+     a landing page owes before its first row. */
+  const _nlive = lanes.live.length;
   document.getElementById('desklead').innerHTML =
-    '<b>' + esc(dayLabel(today)) + '</b>' +
-    (parts.length ? ' &mdash; ' + parts.join(' · ') : '') +
-    '. Live scores come from the official scoreboard feed; a forecast is a ' +
-    'probability from the rally model, not a pick.';
+    '<span class="tdnow">' + esc(dayLabel(today)) + '</span>' +
+    (_nlive ? '<span class="tdlivenow"><i class="cs-dot"></i>' + _nlive +
+      ' live</span>' : '');
   document.getElementById('desktodaymeta').textContent = '';
 
-  /* ══ QUIET DAY ═══════════════════════════════════════════════════════
-     ⚠ NO GIANT PERMANENT HERO FOR A MATCH THAT IS DAYS AWAY. The old quiet
-     day led with a full-width empty-state card and then dumped the next
-     window's first eight fixtures in date order. Neither answers "what should
-     I care about" -- one apologises for the day, the other is a list.
+  /* ══ THE LANDING PAGE ════════════════════════════════════════════════
+     ⚠ THE HUB RECORDS ALL 348 DIVISION-I TEAMS. THIS SCREEN SHOWS A HANDFUL.
+     That is the whole product rule, and it is not a filter applied late -- the
+     crawl, the ratings, the ledger and the scoreboard all still carry every
+     match in the division, including the ones in leagues nobody covers. What
+     changes here is only what is put in front of a reader who has five
+     seconds: the matches he is plausibly going to watch or vote on.
 
-     Three bounded blocks instead, each with a stated cap:
-       Next marquee matches   at most THREE, each with its named reasons
-       Coming up              four to eight compact rows
-       Recent finals          the last day that actually produced results
-     plus one prompt that leads somewhere useful rather than decorating. */
-  if (!mine.length) {
-    const nextDay = soon.length ? soon[0].d : null;
-    const nextOn = soon.filter(m => m.d === nextDay);
-    const marquee = topGames(soon, liveOf, 3);
-    const marqueeIds = marquee.map(x => x[0].gid);
-    const upcoming = soon.filter(m => marqueeIds.indexOf(m.gid) < 0).slice(0, 8);
-    const by = allMatches();
-    const done = Object.keys(by).map(k => by[k])
-      .filter(m => m.d && m.d < today && matchState(m, liveOf(m)) === 'final')
-      .sort((a, b) => a.d < b.d ? 1 : -1);
-    const lastDay = done.length ? done[0].d : null;
-    const finals = lastDay ? done.filter(m => m.d === lastDay).slice(0, 6) : [];
+     ⚠ AND ABSENCE IS NEVER ANNOUNCED. The page used to lead with "No
+     Division-I matches today. The next window is Friday, August 28 -- 195
+     matches." Neither half helps: he does not care that 195 mid-major fixtures
+     exist, and if the first row says Friday then there is obviously nothing
+     before Friday. The dates carry that.
 
-    const block = (title, note, body) => body
-      ? '<section class="tdblock"><h3>' + title +
-        (note ? '<span>' + note + '</span>' : '') + '</h3>' + body + '</section>'
-      : '';
+     Four blocks, in this order, each bounded:
+       Your next watches            3-5, with WHERE TO WATCH
+       Big weekend ahead            the rest of the ranked slate, compact
+       Results that changed the picture
+       the personal watchlist       small, last  (private; fenced elsewhere)
+  */
+  const by = allMatches();
+  const every = Object.keys(by).map(k => by[k]);
+  const soon7 = every.filter(m => m.d && m.d >= today &&
+    (new Date(m.d) - new Date(today)) / 86400000 <= 7);
 
-    todayBox.innerHTML =
-      '<p class="tdquiet"><b>No Division-I matches today.</b> ' +
-        (nextDay
-          ? 'The next window is <b>' + esc(dayLabel(nextDay)) + '</b> &mdash; ' +
-            nextOn.length + (nextOn.length === 1 ? ' match' : ' matches') + '.'
-          : 'Nothing further is on the schedule yet.') + '</p>' +
-      block('Next marquee matches',
-            marquee.length ? 'why each one matters' : '',
-            marquee.length
-              ? '<div class="tdmarq">' + marquee.map(x =>
-                  '<a class="tdcard" href="' + matchRoute(x[0].gid, 'desk') + '">' +
-                    '<span class="tdwhen">' + esc(dayLabel(x[0].d)) +
-                      (x[0].t ? ' &middot; ' + esc(x[0].t) : '') + '</span>' +
-                    '<span class="tdteams">' +
-                      rankHTML('avca', x[0].ar, true) + esc(mAway(x[0])) +
-                      '<i>' + connector(x[0]) + '</i>' +
-                      rankHTML('avca', x[0].hr, true) + esc(mHome(x[0])) +
-                    '</span>' +
-                    '<span class="tdwhere">' + (x[0].venue
-                      ? esc(x[0].venue) + (x[0].event ? ' &middot; ' + esc(x[0].event) : '')
-                      : '<span class="munk">venue not reported</span>') + '</span>' +
-                    reasonChips(x[0], null) +
-                  '</a>').join('') + '</div>'
-              : '') +
-      block('Coming up', upcoming.length + ' more scheduled',
-            upcoming.length
-              ? '<div class="tdlist">' +
-                upcoming.map(m => matchRow(m, null, 'desk')).join('') + '</div>'
-              : '') +
-      /* ⚠ WHAT CHANGED, RELOCATED. Today's second question is "what changed";
-         this band answers it from completed matches only and renders nothing
-         when none have been played. */
-      (CHANGED_ROWS_HTML
-        ? '<section class="tdblock"><h3>What changed<span>' +
-          esc(CHANGED_META_TXT) + '</span></h3><div class="chgrow">' +
-          CHANGED_ROWS_HTML + '</div></section>'
-        : '') +
-      block('Recent finals', lastDay ? esc(dayLabel(lastDay)) : '',
-            finals.length
-              ? '<div class="tdlist">' +
-                finals.map(m => matchRow(m, liveOf(m), 'scores')).join('') + '</div>'
-              : '') +
-      /* ⚠ THE READINESS PANEL IS A GAME-DAY TOOL AND SAT ABOVE THE ANSWER.
-         On a day with no matches it is preparation, not news, so it follows
-         the three blocks rather than leading them. */
-      /* GAMEDAY-CALL2-BEGIN */ (typeof gdPanel === 'function' ? gdPanel() : '') + /* GAMEDAY-CALL2-END */
-      '<div class="tdprompt">' +
-        '<a href="' + routeFor('rankings', 'digby') + '">See what moved in the Top 25</a>' +
-        '<a href="' + routeFor('scores') + '">Open the scoreboard</a>' +
-        /* INTEL-WIRE-BEGIN */
-        '<a href="' + routeFor('intel') + '">Check the wire</a>' +
-        /* INTEL-WIRE-END */
-      '</div>';
-    document.getElementById('desksooncards').innerHTML = '';
-    document.getElementById('desksoonmeta').textContent = '';
-    document.getElementById('desksoonrest').textContent = '';
-    return;
-  }
+  /* ⚠ THE SELECTION RULE IS PRINTED, NOT HIDDEN. A reader who disagrees with
+     what is on his own landing page should be able to see why it is there. */
+  const watchable = m => {
+    const rs = todayReasons(m, liveOf(m));
+    if (!rs.length) return null;
+    /* rank the reasons themselves -- a televised ranked pairing beats an
+       untelevised one, and both beat a lone conference match */
+    let w = 0;
+    if (m.ar && m.hr) w += 40;
+    else if (m.ar || m.hr) w += 18;
+    if (m.tv) w += 25;
+    if (rs.some(r => r[0] === 'mb')) w += 20;
+    if (rs.some(r => r[0] === 'dg')) w += 10;
+    if (liveOf(m)) w += 100;
+    return w ? [m, rs, w] : null;
+  };
+  const ranked = soon7.map(watchable).filter(Boolean)
+    .sort((a, b) => b[2] - a[2] ||
+      String(a[0].d + (a[0].t || '')).localeCompare(b[0].d + (b[0].t || '')));
+
+  const watches = ranked.slice(0, 5);
+  const watchIds = watches.map(x => x[0].gid);
+  const weekend = ranked.filter(x => watchIds.indexOf(x[0].gid) < 0).slice(0, 10);
+
+  const done = every
+    .filter(m => m.d && m.d < today && matchState(m, liveOf(m)) === 'final')
+    .sort((a, b) => a.d < b.d ? 1 : -1);
+  /* ⚠ "CHANGED THE PICTURE" IS A STATED TEST, NOT AN EDITORIAL FEEL:
+     a ranked side lost, or a ranked side was taken to five. */
+  const changed = done.filter(m => {
+    if (!(m.ar || m.hr)) return false;
+    const sc = matchScore(m, liveOf(m));
+    if (sc[0] === null || sc[0] === undefined) return false;
+    const five = (+sc[0] + +sc[1]) === 5;
+    const rankedLost = (m.ar && +sc[0] < +sc[1]) || (m.hr && +sc[1] < +sc[0]);
+    return five || rankedLost;
+  }).slice(0, 5);
+
+  const watchCard = x => {
+    const m = x[0];
+    const live = liveOf(m);
+    return '<a class="wcard' + (live ? ' islive' : '') + '" href="' +
+      matchRoute(m.gid, 'desk') + '">' +
+      '<span class="wtop">' +
+        '<span class="wwhen">' + (live ? '<i class="cs-dot"></i>LIVE &middot; ' +
+          esc((live.period) || 'in progress')
+          : esc(dayLabel(m.d)) + (m.t ? ' &middot; ' + esc(m.t) : '')) + '</span>' +
+        /* ⚠ WHERE TO WATCH, OR NOTHING. Joined from Cody's own listings; the
+           feed carries no broadcast at all. An unmatched fixture says so
+           rather than implying it is not televised. */
+        (m.tv ? '<span class="wnet">' + esc(m.tv) + '</span>'
+              : '<span class="wnet none">TV not listed</span>') +
+      '</span>' +
+      '<span class="wteams">' +
+        rankHTML('avca', m.ar, true) + esc(mAway(m)) +
+        '<i>' + connector(m) + '</i>' +
+        rankHTML('avca', m.hr, true) + esc(mHome(m)) +
+      '</span>' +
+      '<span class="wmeta">' + (m.venue ? esc(m.venue) : '<span class="munk">venue TBA</span>') +
+        (m.event ? ' &middot; ' + esc(m.event) : '') + '</span>' +
+      reasonChips(m, live) +
+      '<span class="wacts"><span class="wgo">Preview &rarr;</span>' +
+        '<span class="wofficial" data-href="https://www.ncaa.com/game/' +
+        esc(m.gid) + '">ncaa.com</span></span>' +
+    '</a>';
+  };
+
+  const block = (title, note, bodyHtml) => bodyHtml
+    ? '<section class="tdblock"><h3>' + title +
+      (note ? '<span>' + note + '</span>' : '') + '</h3>' + bodyHtml + '</section>'
+    : '';
+
+  todayBox.innerHTML =
+    block('Your next watches',
+          watches.length ? 'next 7 days &middot; why each is here' : '',
+          watches.length
+            ? '<div class="wgrid">' + watches.map(watchCard).join('') + '</div>'
+            : '<p class="tdquiet">No ranked or televised match in the next seven '
+              + 'days. Everything still being recorded is on the '
+              + '<a href="' + routeFor('scores') + '">scoreboard</a>.</p>') +
+    block('Big weekend ahead', weekend.length + ' more ranked or televised',
+          weekend.length
+            ? '<div class="tdlist">' +
+              weekend.map(x => matchRow(x[0], liveOf(x[0]), 'desk')).join('') +
+              '</div>' : '') +
+    block('Results that changed the picture',
+          changed.length ? 'a ranked side lost or went five' : '',
+          changed.length
+            ? '<div class="tdlist">' +
+              changed.map(m => matchRow(m, liveOf(m), 'scores')).join('') +
+              '</div>' : '') +
+    /* GAMEDAY-CALL2-BEGIN */ (typeof gdPanel === 'function' ? gdPanel() : '') + /* GAMEDAY-CALL2-END */
+    /* ⚠ THE PRIVATE CRITERION IS FENCED. The rule is printed so a reader can
+       argue with his own landing page -- but one of the criteria names a
+       private feature, and the public gate caught it here twice. */
+    '<p class="tdrule">Shown here: AVCA Top 25 pairings &middot; a ranked side ' +
+      '&middot; on TV' +
+      /* MYBOARD-WIRE-BEGIN */ ' &middot; My Board' + /* MYBOARD-WIRE-END */
+      ' &middot; AVCA/POWER disagreement of 8 ' +
+      'or more. Everything else in Division I is still recorded &mdash; ' +
+      '<a href="' + routeFor('scores') + '">scoreboard</a> &middot; ' +
+      '<a href="' + routeFor('schedule') + '">full schedule</a>.</p>';
+
+  document.getElementById('desksooncards').innerHTML = '';
+  document.getElementById('desksoonmeta').textContent = '';
+  document.getElementById('desksoonrest').textContent = '';
+  return;
 
   /* ONE FEATURED MATCH AT MOST, and only if it earns it. */
   const feat = pickFeatured(mine, liveOf);
