@@ -1533,3 +1533,67 @@ Tape renders `25/22` with the in-progress cell outlined in serve cyan and four
 dots for unplayed · desk reads "13 live · 36 final · 146 to come" · featured
 Moment and ribbon agree · Scores day view lanes correct with the ranked pairing
 lifted and the cap naming the remainder · 35 suites · both builds · public gate.
+
+---
+
+## 23. RECOVERY, AND TWO SHIPPING GATES
+
+### The recovery
+`origin/main` had moved to **`b70d612`** — the daily CI snapshot, 133 fresh
+scoreboard files — while the Wire sat uncommitted locally. Local was **0 ahead,
+1 behind**, and both sides had modified the same two generated artefacts.
+
+Landed by preserving first, never discarding: the whole Wire phase committed as
+**`6fb3f9e`** *including* `index.html` and `output/vb_dashboard.html`, then
+rebased onto the snapshot. **Every source file merged cleanly; only the two
+generated artefacts conflicted**, which is what generated files do.
+
+Resolved by **regeneration, not by choosing a side**:
+```
+python3 scripts/build_hub.py            # private
+python3 scripts/build_hub.py --public   # regenerates BOTH tracked artefacts
+```
+⚠ **`output/vb_dashboard.html` came back clean; `index.html` did not.** The
+public build rewrites the redirect by *regex substitution on the existing
+file*, so it stamped the hash on both sides of the conflict and left the
+markers in place. The two sides were byte-identical apart from that hash — the
+conflict was empty of meaning — so the stub was restored from `6fb3f9e` (which
+holds it; nothing discarded) and the build re-run to stamp it. Verified the
+redirect names the bytes actually written: `sha1(dashboard)[:12] ==` the `?v=`
+in `index.html`.
+
+### Two stale records, corrected (`27a99e0`)
+`daily.yml` carried *"the public build is off… so they are not staged either"*
+**directly above `git add output/vb_dashboard.html index.html`**, ninety lines
+under another comment recording the 2026-08-24 re-enable. `CLAUDE.md` said the
+same. **The job was correct throughout; the prose beside it was lying about
+what ran.** CLAUDE.md is superseded by labelling, per its own protocol — the
+old entry's reasoning about what may be published is still exactly right.
+
+### The two gates
+
+| | |
+|---|---|
+| **Before** | `python3 scripts/preflight.py` — every suite (**discovered**, not listed), both builds, the public gate on values, positive control on page size. Prints `DO NOT SHIP` and exits non-zero. `--quick` skips the fresh-checkout guard. |
+| **After** | `python3 scripts/verify_shipped.py` — fetches the **published** page and checks the served redirect and dashboard agree, that no private marker or feed media URL is in the served bytes, and how far behind the served copy is. |
+
+⚠ **The after-gate reads the served bytes, not a local file.** Every gate until
+now ran on something on this disk, which cannot answer the only question that
+matters once something is public. ⚠ **It reports deploy lag rather than failing
+on it** — Pages builds for minutes and Fastly holds ~10; a verifier that cried
+wolf during a normal deploy would be ignored inside a week.
+
+⚠ **`test_shipping.py` guards the drift itself**: if `daily.yml` builds or
+stages the public artefacts, nothing in it — or in `CLAUDE.md` — may claim the
+build is off, unless the claim is labelled superseded. With a negative control
+that replants the exact stale comment and requires it to trip, and a positive
+control that a properly superseded entry is left alone.
+
+⚠ **And the rule's first version flagged the corrections that fixed the drift**,
+because a correction *quotes* the wording it replaces and the quoted phrase
+lands on its own line while "superseded" sits three lines above. The tenth time
+in this project a guard has found its own explanation. It reads a window now.
+
+**Verified after pushing:** the served page at
+`6vrhm29rzs-a11y.github.io/wvb-hub/` is the local artefact, coherent, and
+carries no private marker or media URL over 1,599 remote images.
