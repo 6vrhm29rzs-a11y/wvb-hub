@@ -383,46 +383,40 @@ def listed_time(start_time, home_team, epoch=None):
 
 def venue_index():
     # type: () -> Dict[str, Dict]
-    """game_id -> where it is played and what event it belongs to.
+    """game_id -> where it is played, what event, and whether we may say so.
 
-    THE SCOREBOARD FEED CARRIES NO LOCATION AT ALL -- it enumerates fixtures and
-    nothing more. Venue lives only on /game/{id}, which DOES answer for an
-    unplayed match (gameState "P" still returns a full location block). That is
-    why crawl_2025.py grew a `fixtures` phase: without it a schedule can say who
-    and when but never where, and "at <home team>" is an inference presented as
-    a fact -- the error that put Kentucky-Wisconsin in Lexington when it was
-    played on a neutral floor in Milwaukee.
+    ⚠ THIS NO LONGER DEDUPES. It reads scripts/fixtures.canonical_fixtures(),
+    which is the one place a game id becomes one record. The previous body
+    walked games.jsonl applying "final beats non-final, then LAST WINS" -- and
+    with no crawl timestamp on any record in that file, "last" meant whichever
+    line the crawler happened to append last. Measured on the real data: 1,048
+    ids hold more than one record, and among them 37 disagree about state, 34
+    about start time, 26 about location and 5 about which side is home. File
+    order decided all of it.
+
+    What comes back now carries `site` (which may be "unconfirmed"), the
+    official-school correction if one applies, and `conflict` -- a list of
+    material disagreements a view must NOT paper over.
     """
+    import fixtures as FX
     out = {}
-    path = os.path.join(REPO, "data/raw/%d/games.jsonl" % SEASON)
-    if os.path.exists(path):
-        for line in open(path, encoding="utf-8"):
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                g = json.loads(line)
-            except ValueError:
-                continue
-            gid = str(g.get("game_id") or "")
-            loc = g.get("location") or {}
-            if not gid:
-                continue
-            prev = out.get(gid)
-            # final beats non-final, then last wins -- the project's dedup rule
-            if prev and prev.get("state") == "F" and g.get("game_state") != "F":
-                continue
-            out[gid] = {"venue": loc.get("venue"), "city": loc.get("city"),
-                        "state_usps": loc.get("state"), "state": g.get("game_state")}
-    # site classification and event names, already derived by venues.py
-    vdoc = load("data/venues_%d.json" % SEASON) or {}
-    for row in (vdoc.get("games") or []):
-        gid = str(row.get("game_id") or "")
-        if gid in out:
-            out[gid]["site"] = row.get("site")
-            out[gid]["event"] = row.get("event")
+    for gid, rec in FX.canonical_fixtures().items():
+        out[gid] = {
+            "venue": rec.get("venue"),
+            "city": rec.get("city"),
+            "state_usps": rec.get("state_usps"),
+            "state": rec.get("game_state"),
+            "site": rec.get("site"),
+            "event": rec.get("event"),
+            "epoch": rec.get("start_time_epoch"),
+            "time_unannounced": rec.get("time_unannounced"),
+            "conflict": FX.blocking_conflicts(rec),
+            "corrected": rec.get("corrected_fields") or [],
+            "correction": rec.get("correction"),
+            "source": rec.get("source"),
+            "site_basis": rec.get("site_basis"),
+        }
     return out
-
 
 def schedule(limit_days: int = 21) -> List[Dict]:
     """Upcoming fixtures from today forward, with WHERE and WHAT KIND."""
@@ -454,9 +448,16 @@ def schedule(limit_days: int = 21) -> List[Dict]:
             kind = "conf" if (ac and hc and ac == hc) else "non"
             if v.get("event"):
                 kind = "event"
+            # ⚠ THE TIME COMES FROM THE CANONICAL EPOCH, NOT THE SCOREBOARD
+            # STRING. One conversion, one source. The scoreboard's own epoch is
+            # a per-date snapshot; the canonical one has already had unannounced
+            # placeholders excluded from the vote across every snapshot of this
+            # id, so a fixture whose real time was announced in a later crawl
+            # gets the real time here instead of whichever the file held last.
+            _ep = v.get("epoch") or g.get("startTimeEpoch")
             rows.append({
                 "d": date, "a": a, "h": h,
-                "t": listed_time(g.get("startTime"), h, g.get("startTimeEpoch")),
+                "t": listed_time(g.get("startTime"), h, _ep),
                 "ar": (g.get("away") or {}).get("rank") or "",
                 "hr": (g.get("home") or {}).get("rank") or "",
                 "gid": gid,
@@ -464,6 +465,15 @@ def schedule(limit_days: int = 21) -> List[Dict]:
                 "st": v.get("state_usps"),
                 "site": v.get("site"), "event": v.get("event"),
                 "kind": kind, "conf": ac if kind == "conf" else "",
+                # ⚠ CONFLICT TRAVELS WITH THE FIXTURE. A view that has this and
+                # ignores it is choosing to; a view that never received it
+                # could not have known.
+                "conflict": v.get("conflict") or [],
+                "corrected": v.get("corrected") or [],
+                "csrc": ((v.get("correction") or {}).get("source_url")
+                         if v.get("correction") else None),
+                "cverified": ((v.get("correction") or {}).get("verified_on")
+                              if v.get("correction") else None),
             })
         if len(set(r["d"] for r in rows)) > limit_days:
             break
@@ -3018,6 +3028,8 @@ def build():
             "ap": _pr.get(r["a"]), "hp": _pr.get(r["h"]),
             "venue": r.get("venue"), "city": r.get("city"), "st": r.get("st"),
             "site": r.get("site"), "event": r.get("event"), "kind": r.get("kind"),
+            "conflict": r.get("conflict") or [], "corrected": r.get("corrected") or [],
+            "csrc": r.get("csrc"), "cverified": r.get("cverified"),
             "hw": hw, "fsrc": src,
             "at": _tourn.get(r["a"]), "ht": _tourn.get(r["h"]),
         }
@@ -3089,11 +3101,21 @@ def build():
          "ar": r.get("ar") or "", "hr": r.get("hr") or "",
          "ao": _ourrank.get(r["a"]) or "", "ho": _ourrank.get(r["h"]) or "",
          "venue": r.get("venue"), "city": r.get("city"), "st": r.get("st"),
-         "site": r.get("site"), "event": r.get("event"), "kind": r.get("kind")}
+         "site": r.get("site"), "event": r.get("event"), "kind": r.get("kind"),
+         "conflict": r.get("conflict") or [], "corrected": r.get("corrected") or [],
+         "csrc": r.get("csrc"), "gid": str(r.get("gid") or "")}
         for r in sched if _today_s <= r["d"] <= _horizon]
 
+    # ⚠ EVERY FIXTURE IS EMITTED, NOT THE FIRST 600. The copy above promises
+    # that search reaches any of the rest, and search filters RENDERED rows --
+    # so capping the emit made that promise impossible to keep. The initial
+    # view is still 600 (a 1,763-row table is not a thing anyone reads), but
+    # the rest are present and marked `beyond`, so a search finds them and a
+    # button reveals them. Showing fewer than we have is a display choice;
+    # not having them is a lie about what the page contains.
+    SCHED_INITIAL = 600
     srows = []
-    for r in sched[:600]:
+    for _i, r in enumerate(sched):
         pick, cls = _pick(r)
         # WHERE. A venue we do not have is stated as such -- never inferred
         # from the nominal home team, which is exactly how two AVCA First Serve
@@ -3101,15 +3123,49 @@ def build():
         # (R5). "at" becomes "vs" when the floor is neutral, because "Texas at
         # Arizona St." is a false sentence about a match in Milwaukee.
         neutral = r.get("site") == "neutral"
+        # ⚠ FAIL CLOSED. "at" is a claim that one team travelled to the other's
+        # building. It is now printed ONLY for a site we have confirmed as
+        # home/away; "vs" only for a confirmed neutral. Anything else -- the
+        # feed carried no location, or its snapshots disagree -- renders a
+        # neutral connector that asserts nothing. The old code printed "at" for
+        # everything that was not explicitly neutral, which meant every
+        # unconfirmed fixture in the season made a confident claim about where
+        # it was played.
+        confirmed_site = r.get("site") in ("home", "away", "neutral")
+        conflicted = bool(r.get("conflict"))
+        connector = ("vs" if neutral else "at") if (confirmed_site and not conflicted) else "v"
         where = ""
-        if r.get("venue"):
+        if conflicted:
+            # ⚠ NO CONFIDENT VENUE WHEN THE SOURCES DISAGREE.
+            flds = ", ".join(sorted({c["field"] for c in r["conflict"]}))
+            where = ('<span class="wconf" title="The scheduled %s differs '
+                     'between snapshots of the official record, and none of '
+                     'them carries a crawl time to prefer. Check the schools\u2019 '
+                     'own schedules.">schedule conflict \u2014 verify</span>'
+                     % esc(flds))
+        elif r.get("venue"):
             city = ", ".join(x for x in (r.get("city"), r.get("st")) if x)
             where = ('<b>%s</b>%s' % (esc(r["venue"]),
                                       ('<span class="wc">%s</span>' % esc(city)) if city else ""))
+            if r.get("corrected"):
+                # ⚠ A CORRECTED FACT SAYS SO, AND LINKS ITS SOURCE.
+                where += ('<a class="wsrc" href="%s" target="_blank" '
+                          'rel="noopener noreferrer" title="This fixture is '
+                          'corrected from the school\u2019s own schedule: %s">'
+                          'school-confirmed</a>'
+                          % (esc(r.get("csrc") or "#"),
+                             esc(", ".join(r.get("corrected") or []))))
         else:
             where = '<span class="wu">venue not listed</span>'
+        # ⚠ AN EVENT AND A MATCH TYPE ARE BOTH TRUE AND ARE SHOWN TOGETHER.
+        # A named event used to REPLACE the type, so "Big Ten/SEC Challenge"
+        # hid that it is also a non-conference match.
+        _typ = ("conference" if r["kind"] == "conf" else "non-conf")
+        _tcls = "cf" if r["kind"] == "conf" else "nc"
         if r.get("event"):
-            badge = '<span class="kind ev" title="in-season tournament">%s</span>' % esc(r["event"])
+            badge = ('<span class="kind %s" title="%s match">%s</span>'
+                     '<span class="kind ev" title="in-season tournament">%s</span>'
+                     % (_tcls, _typ, _typ, esc(r["event"])))
         elif neutral:
             # WE KNOW IT IS AN EVENT; WE DO NOT KNOW ITS NAME. venues.py only
             # attaches a name that a human supplied in Cody/data/events_2026.txt
@@ -3123,12 +3179,13 @@ def build():
         else:
             badge = '<span class="kind nc" title="non-conference match">non-conf</span>'
         srows.append(
-            '<tr%s><td class="cd" data-d="%s">%s</td><td class="n">%s</td><td class="tm">%s%s%s</td>'
+            '<tr%s%s><td class="cd" data-d="%s">%s</td><td class="n">%s</td><td class="tm">%s%s%s</td>'
             '<td class="at">%s</td><td class="tm">%s%s%s</td>'
             '<td class="wh l">%s%s</td>'
             '<td class="n pick %s">%s</td></tr>'
             % ((' class="rkd both"' if (r["ar"] and r["hr"])
                 else (' class="rkd"' if (r["ar"] or r["hr"]) else "")),
+               (' data-beyond="1"' if _i >= SCHED_INITIAL else ""),
                # ONE DATE FORMAT ON THE PAGE. The ISO string stays in data-d
                # so any future sort or filter still has a sortable key -- the
                # reason the table kept ISO in the first place -- while the cell
@@ -3136,7 +3193,7 @@ def build():
                r["d"], day_label(r["d"]), r["t"] or "&mdash;",
                rank_badge("avca", r["ar"]),
                logo_img(r["a"], logos), esc(r["a"]),
-               "vs" if neutral else "at",
+               connector,
                rank_badge("avca", r["hr"]),
                logo_img(r["h"], logos), esc(r["h"]),
                badge, where,
@@ -3248,6 +3305,20 @@ def build():
         .replace("{{SEASON_YEAR}}", str(SEASON)) \
         .replace("{{RESUME_ACTIVE_JS}}", "true" if _resume_active else "false") \
         .replace("{{WEEK_JSON}}", json.dumps(_week_rows, separators=(",", ":"))) \
+        .replace("{{FIXTURES_JSON}}", json.dumps(
+            {str(r["gid"]): {
+                "gid": str(r["gid"]), "d": r["d"],
+                "dl": day_label(r["d"], _today), "t": r["t"],
+                "a": r["a"], "h": r["h"],
+                "ar": r.get("ar") or "", "hr": r.get("hr") or "",
+                "venue": r.get("venue"), "city": r.get("city"),
+                "st": r.get("st"), "site": r.get("site"),
+                "event": r.get("event"), "kind": r.get("kind"),
+                "conflict": r.get("conflict") or [],
+                "corrected": r.get("corrected") or [],
+                "csrc": r.get("csrc"),
+             } for r in sched if r.get("gid")},
+            separators=(",", ":"))) \
         .replace("{{SCHED_ROWS}}", srows) \
         .replace("{{TV_ROWS}}", trows) \
         .replace("{{N_PLAYED}}", str(played)) \
@@ -3258,6 +3329,7 @@ def build():
         .replace("{{HERO_SUB}}", _hero["sub"]) \
         .replace("{{HERO_PODIUM}}", _hero["podium"]) \
         .replace("{{N_SCHED}}", "{:,}".format(len(sched))) \
+        .replace("{{N_SHOWN}}", "{:,}".format(min(600, len(sched)))) \
         .replace("{{N_TV}}", str(len(tvrows))) \
         .replace("{{STANDINGS_JSON}}", json.dumps(stand, separators=(",", ":"))) \
         .replace("{{RESULTS_JSON}}", blob(
@@ -5242,6 +5314,19 @@ label.fr-btn{cursor:pointer;display:inline-block}
 .dayhn{font:500 11px/1 var(--mono);color:var(--slate);letter-spacing:.05em;
   text-transform:none;margin-left:9px}
 .dayhc{margin-left:auto;font:600 10px/1 var(--mono);color:var(--ink3)}
+/* ── FIXTURE TRUTH ────────────────────────────────────────────────────── */
+/* a fixture whose sources disagree says so instead of picking one */
+.wconf{color:var(--gold);font:600 11.5px/1.4 var(--sans);
+  border:1px dashed color-mix(in oklab,var(--gold) 55%,transparent);
+  border-radius:2px;padding:2px 6px;white-space:nowrap}
+/* a corrected fact names the school that confirmed it */
+.wsrc{margin-left:8px;font:600 9.5px/1 var(--disp);letter-spacing:.11em;
+  text-transform:uppercase;color:var(--good);text-decoration:none;
+  border:1px solid color-mix(in oklab,var(--good) 45%,transparent);
+  border-radius:2px;padding:3px 5px;white-space:nowrap}
+.wsrc:hover{color:var(--chalk);border-color:var(--good)}
+.wsrc:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
+td.at{white-space:nowrap}
 /* the scouting note, now BELOW the identity and compressed */
 #teamcard .scoutread{margin:4px 0 18px}
 #teamcard .scoutread p{margin:0 0 8px}
@@ -7609,14 +7694,26 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 </section>
 
 <section id="v-schedule" hidden>
-  <p class="lead"><b>2026 schedule.</b> {{N_SCHED}} fixtures from today forward,
-  straight from ncaa.com. Each row says <b>where</b> it is played and whether it
-  is a conference match, a non-conference match or part of a named event. A
-  neutral floor reads <b>vs</b> rather than <b>at</b>. A venue the feed has not
-  published yet says so rather than being guessed from the home team.
-  A tournament is named only where the name was supplied by hand &mdash; a
-  neutral floor whose event has no name says <b>neutral site</b> rather than
-  borrowing the building's name for it.</p>
+  <!-- ⚠ THIS COPY USED TO SAY THE SCHEDULE WAS "STRAIGHT FROM NCAA.COM" AND
+       THAT WAS NO LONGER TRUE. ncaa.com is still the base source for every
+       fixture, but a small ledger of official-school corrections now governs
+       specific verified facts on specific games, and the page has to say so or
+       it is misdescribing where its own numbers come from.
+       ⚠ AND IT USED TO IMPLY THE WHOLE SCHEDULE WAS ON SCREEN. The table
+       renders the first {{N_SHOWN}} rows; the count now names both numbers. -->
+  <p class="lead"><b>2026 schedule.</b> Showing <b>{{N_SHOWN}}</b> of
+  <b>{{N_SCHED}}</b> fixtures from today forward &mdash; search below to reach
+  any of the rest. The base source is <b>ncaa.com</b>; where its record is
+  stale or disagrees with itself, a small ledger of
+  <b>official-school corrections</b> governs the specific facts that were
+  verified against a school&rsquo;s own published schedule, and those rows are
+  marked <b>school-confirmed</b> with a link to the source.
+  Each row says <b>where</b> it is played and whether it is a conference match,
+  a non-conference match, or both a match type and a named event.
+  <b>at</b> is printed only for a confirmed home floor and <b>vs</b> only for a
+  confirmed neutral one; anything unconfirmed reads a plain <b>v</b> and asserts
+  nothing. A fixture whose sources disagree about a material fact says
+  <b>schedule conflict &mdash; verify</b> rather than picking one of them.</p>
   <div class="ctl">
     <input type="search" id="sq" placeholder="Search a team&hellip;">
     <select id="srank">
@@ -7631,7 +7728,8 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <th></th><th class="l">Home</th>
       <th class="l" title="venue from the feed; conference, non-conference or a named event">Where</th>
       <th title="rally model, calibrated Brier 0.1289 on 2025">Projected</th></tr></thead>
-    <tbody id="sbody">{{SCHED_ROWS}}</tbody></table></div></div>
+    <tbody id="sbody">{{SCHED_ROWS}}</tbody></table></div>
+    <button type="button" class="lanemore" id="schedall" hidden></button></div>
 </section>
 
 <section id="v-tv" hidden>
@@ -10103,7 +10201,7 @@ function deskCard(m, live, full) {
     deskTags(m, live && !isFinal) + '</div>';
   let body = '<div class="dteams">' +
     deskSide(m.a, m.ao, m.ap, isFinal && m.final && +m.final.as > +m.final.hs ? 'won' : '') +
-    '<span class="dat">' + (m.site === 'neutral' ? 'vs' : 'at') + '</span>' +
+    '<span class="dat">' + connector(m) + '</span>' +
     deskSide(m.h, m.ho, m.hp, isFinal && m.final && +m.final.hs > +m.final.as ? 'won' : '') +
     '</div>';
 
@@ -10961,7 +11059,7 @@ function frFreezeMatch(gid) {
     const m = matchByGid(gid);
     if (!m) return out;
     const sc = matchScore(m, LIVE_BY_ID[gid]);
-    out.push({ k: 'Match', v: mAway(m) + ' at ' + mHome(m) });
+    out.push({ k: 'Match', v: mAway(m) + ' ' + connector(m) + ' ' + mHome(m) });
     if (sc && sc[0] !== null && sc[0] !== undefined) {
       out.push({ k: 'Score', v: sc[0] + '\u2013' + sc[1] });
     }
@@ -12070,6 +12168,23 @@ function mOver(live, m) {
 
 /* The six states, resolved the same way the server resolves them. `box` is
    whether a VERIFIED box score exists for this match on this page. */
+/* ══ THE CONNECTOR ════════════════════════════════════════════════════════
+   ⚠ "at" IS A CLAIM ABOUT WHERE A MATCH IS PLAYED, and until this phase the
+   page printed it for anything that was not explicitly flagged neutral --
+   including every fixture whose venue the feed had never published. That is
+   how "Kentucky at Penn St." came to describe a match at Wrigley Field.
+
+   at   only for a confirmed home/away site
+   vs   only for a confirmed neutral floor
+   v    for anything unconfirmed or in conflict -- a connector that joins two
+        names and asserts nothing about the building. */
+function connector(m) {
+  if (m && m.conflict && m.conflict.length) return 'v';
+  if (m && m.site === 'neutral') return 'vs';
+  if (m && (m.site === 'home' || m.site === 'away')) return 'at';
+  return 'v';
+}
+
 function matchState6(m, live, box) {
   if (mOver(live, m)) return box ? 'final_with_box' : 'final_box_pending';
   if (live && live.state6) {
@@ -12235,9 +12350,20 @@ let LEDGER_STATE = 'today';
 
 let ALL_MATCHES = null;
 
+/* ⚠ EVERY SCHEDULED FIXTURE, NOT JUST THE NEXT WEEK. DESK is a today..+6
+   window built for the rundown; LEDGER is crawled finals. allMatches() was the
+   two of them, so matchByGid() -- and therefore the whole #/match/<id> route --
+   knew nothing about a fixture eleven days out. The Schedule tab listed
+   Kentucky v Penn State on Sept 6 and the match route said the game "may not
+   have been crawled": one page holding two answers about the same fixture.
+   FIXTURES is the canonical schedule, keyed by id, and it is the FLOOR here --
+   DESK refines it for the current week, a final overrides both. */
+const FIXTURES = {{FIXTURES_JSON}};
+
 function allMatches() {
-  /* the two sources, keyed by gid: the crawled FINALS and the schedule. A
-     final is authoritative where both exist -- it has the result.
+  /* the three sources, keyed by gid: every scheduled fixture, the desk window,
+     and the crawled FINALS. A final is authoritative where they overlap -- it
+     has the result.
 
      ⚠ BUILT ONCE. DESK and LEDGER are page constants -- nothing mutates them
      after load -- so rebuilding this index on every call was pure repetition:
@@ -12250,7 +12376,8 @@ function allMatches() {
      folded into these rows, this cache has to go with it. */
   if (ALL_MATCHES) return ALL_MATCHES;
   const by = {};
-  DESK.forEach(m => { by[m.gid] = Object.assign({}, m); });
+  Object.keys(FIXTURES).forEach(g => { by[g] = Object.assign({}, FIXTURES[g]); });
+  DESK.forEach(m => { by[m.gid] = Object.assign({}, by[m.gid] || {}, m); });
   LEDGER.forEach(r => { by[r.gid] = Object.assign({}, by[r.gid] || {}, r); });
   ALL_MATCHES = by;
   return by;
@@ -12441,6 +12568,18 @@ function renderMatchDetail(gid, dest) {
   bits.push('<span><em>Venue</em>' + (where ? esc(where)
       : '<span class="munk">not reported</span>') + '</span>');
   if (m.site === 'neutral') bits.push('<span><em>Floor</em>neutral site</span>');
+  else if (m.site === 'home' || m.site === 'away') bits.push('<span><em>Floor</em>home floor</span>');
+  else bits.push('<span><em>Floor</em><span class="munk">not confirmed</span></span>');
+  if (m.conflict && m.conflict.length) {
+    /* ⚠ SAY IT, DO NOT PICK ONE. */
+    bits.push('<span><em>Sources</em><span class="wconf">schedule conflict &mdash; verify (' +
+      esc(m.conflict.map(c => c.field).join(', ')) + ')</span></span>');
+  }
+  if (m.corrected && m.corrected.length && m.csrc) {
+    bits.push('<span><em>Corrected</em><a class="wsrc" href="' + esc(m.csrc) +
+      '" target="_blank" rel="noopener noreferrer">school-confirmed: ' +
+      esc(m.corrected.join(', ')) + '</a></span>');
+  }
   if (m.event) bits.push('<span><em>Event</em>' + esc(m.event) + '</span>');
   const tvl = (typeof TV !== 'undefined' && TV) ? (TV[m.gid] || null) : null;
   if (tvl) bits.push('<span><em>Watch</em>' + esc(tvl) + '</span>');
@@ -12469,7 +12608,7 @@ function renderMatchDetail(gid, dest) {
   if (sec) sec.classList.add('detailopen');
   host.innerHTML =
     '<div class="crumb"><a href="' + parent[1] + '">' + parent[0] + '</a>' +
-      '<span class="sep">&rsaquo;</span><b>' + esc(mAway(m)) + ' at ' +
+      '<span class="sep">&rsaquo;</span><b>' + esc(mAway(m)) + ' ' + connector(m) + ' ' +
       esc(mHome(m)) + '</b></div>' +
     '<button type="button" class="backlink" data-back="' + dest + '">&larr; Back to ' +
       parent[0] + '</button>' +
@@ -12592,7 +12731,8 @@ function todaysRead(mine, soon, liveOf) {
   /* ⚠ THIS IS THE LINE CODY NAMED. It read "#21 Kansas at #2 Pittsburgh"
      while the Rally Tape above it read "#15 Kansas" -- two valid rulers, one
      screen, and nothing on it saying which was which. */
-  const nm = m => rankHTML('avca', m.ar, true) + esc(mAway(m)) + ' at ' +
+  const nm = m => rankHTML('avca', m.ar, true) + esc(mAway(m)) + ' ' +
+                  connector(m) + ' ' +
                   rankHTML('avca', m.hr, true) + esc(mHome(m));
 
   /* 1. what is live right now */
@@ -14776,25 +14916,49 @@ drawBracketLines();
 /* Schedule filter: text AND rank together. 1,524 fixtures is a list you cannot
    read; 39 of them are Top 25 against Top 25, which is the question actually
    being asked when someone opens a schedule in August. */
+let SCHED_ALL = false;
+
 function filterSchedule() {
   const q = (document.getElementById('sq').value || '').toLowerCase().trim();
   const want = document.getElementById('srank').value;
-  let shown = 0;
+  /* ⚠ A SEARCH REACHES EVERY FIXTURE, NOT JUST THE VISIBLE WINDOW. The
+     initial 600 is a display window; the moment someone types, or narrows by
+     rank, or presses the button, the window stops applying. Otherwise the
+     page would answer "no such fixture" about a fixture it is holding. */
+  const searching = !!q || want !== 'all';
+  let shown = 0, hiddenBeyond = 0;
   document.querySelectorAll('#sbody tr').forEach(tr => {
     const cls = tr.className || '';
     const rankOk = want === 'all' ||
                    (want === 'one' && cls.includes('rkd')) ||
                    (want === 'both' && cls.includes('both'));
     const textOk = !q || tr.textContent.toLowerCase().includes(q);
-    const show = rankOk && textOk;
+    const beyond = tr.hasAttribute('data-beyond');
+    const windowOk = SCHED_ALL || searching || !beyond;
+    const show = rankOk && textOk && windowOk;
     tr.hidden = !show;
     if (show) shown++;
+    else if (beyond && rankOk && textOk) hiddenBeyond++;
   });
   document.getElementById('scnt').textContent =
-    shown + (shown === 1 ? ' fixture' : ' fixtures');
+    shown + (shown === 1 ? ' fixture' : ' fixtures') +
+    (hiddenBeyond ? ' \u00b7 ' + hiddenBeyond + ' more further out' : '');
+  const btn = document.getElementById('schedall');
+  if (btn) {
+    btn.hidden = !hiddenBeyond && SCHED_ALL;
+    btn.textContent = SCHED_ALL ? 'Show the next few weeks only'
+                                : 'Show all ' + hiddenBeyond + ' later fixtures';
+    btn.hidden = SCHED_ALL ? false : !hiddenBeyond;
+  }
 }
 ['sq', 'srank'].forEach(id =>
   document.getElementById(id).addEventListener('input', filterSchedule));
+(function () {
+  const b = document.getElementById('schedall');
+  if (b) b.addEventListener('click', () => {
+    SCHED_ALL = !SCHED_ALL; filterSchedule();
+  });
+})();
 filterSchedule();
 filter('tq', 'tbody', 'tcnt', 'matches');
 {{ASK_JS}}

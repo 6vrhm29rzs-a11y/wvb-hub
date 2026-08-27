@@ -1597,3 +1597,106 @@ in this project a guard has found its own explanation. It reads a window now.
 **Verified after pushing:** the served page at
 `6vrhm29rzs-a11y.github.io/wvb-hub/` is the local artefact, coherent, and
 carries no private marker or media URL over 1,599 remote images.
+
+---
+
+## 24. FIXTURE TRUTH — one canonical record per game id
+
+### The measured baseline (before anything was changed)
+`data/raw/2026/games.jsonl` holds **8,836 records over 4,856 game ids**;
+**1,048 ids carry more than one record** (max 6). Among those duplicates:
+
+| divergence | ids |
+|---|---|
+| `game_state` | 37 |
+| `start_time_epoch` | 34 |
+| `location` | 26 |
+| **home/away flip** | **5** |
+
+⚠ **And not one record carries a crawl timestamp.** The old rule — "final beats
+non-final, then last wins" — therefore meant *whichever line the crawler
+appended last*. File order was deciding venue, time and which side was home.
+
+### The canonical selection rule, stated once
+1. If any record for an id is **FINAL**, only the final records are considered
+   — a result supersedes a forecast of itself.
+2. A field is canonical only if **every considered record that has an opinion
+   agrees**.
+3. Disagreement is recorded as a **conflict** and the field is left unset.
+   With no timestamps there is no honest basis for a tiebreak, so inventing one
+   would be inventing an answer.
+4. An **official-school correction** then overrides exactly the fields it lists
+   and clears conflicts on those fields only.
+
+Two refinements, both evidence-based:
+- ⚠ **A placeholder is not a vote.** Game `6626809` held three records at
+  00:00 ET — the documented unannounced-start sentinel — and two at the real
+  7:00 PM ET. Counting all five produced a conflict. Excluding placeholders
+  produces the answer *for a stated reason* rather than because the real time
+  happened to be appended last. This alone took blocked fixtures **39 → 19**.
+- ⚠ **A home/away flip at a venue neither team owns is evidence of a neutral
+  site**, not noise — all five flips are third-party arenas hosting multi-team
+  events. And once a site is *confirmed* neutral, the flip stops blocking:
+  nothing displayed depends on which side is nominally home.
+
+**Result: 4,856 canonical fixtures · 47 with a conflict · 16 blocked from a
+confident render · 3 corrected.** `scripts/audit_fixtures.py` writes the
+reviewable report to `docs/fixture_conflicts.json`.
+
+### The correction ledger — every entry sourced, none from memory
+| id | verified | source | corroborated |
+|---|---|---|---|
+| `6626809` Kentucky/Penn St. | site, venue, city, state, event | gopsusports.com | ukathletics.com |
+| `6628315` Nebraska/UNLV | site, venue, city, state, event | huskers.com | unlvrebels.com |
+| `6625717` Kansas/Pittsburgh | venue, city, state, event | pittsburghpanthers.com | — |
+
+Quote from Penn State's own page: *"Big Ten/SEC Challenge neutral Sunday Sep 6
+vs. Kentucky Chicago, Ill. / Wrigley Field 7:00 PM EDT"*.
+
+⚠ **`6625717`'s SITE is deliberately not corrected.** Pitt's page shows "vs",
+which SIDEARM uses for any non-road match including neutral ones — the same
+page lists "Stanford vs. Wisconsin" at Petersen. Venue, city and event are
+verified; the site is left to the canonical rule, which reads venue
+**ownership** (Petersen is Pitt's own building, on record) rather than nominal
+ordering. It resolves to `home`, which is correct.
+
+### Fail closed
+`at` only for a confirmed home floor · `vs` only for a confirmed neutral one ·
+plain **`v`** for anything unconfirmed, asserting nothing · **"schedule
+conflict — verify"** where sources disagree. One `connector()` in JS mirrors
+the Python rule. Event and match type now render **together** —
+`non-conf · Big Ten/SEC Challenge` — where a named event used to replace the
+type and hide it.
+
+### The split-brain route, closed
+`allMatches()` was `DESK` (today..+6) + `LEDGER` (finals), so `#/match/6626809`
+denied a fixture the Schedule was listing eleven days out. A canonical
+`FIXTURES` payload (all 1,763) is now the floor; DESK refines the current week,
+a final overrides both.
+
+### Schedule honesty
+Was: *"{{N}} fixtures … straight from ncaa.com"* while rendering 600 of them
+and while a correction ledger also governed specific facts. Now: **"Showing 600
+of 1,763"**, every fixture emitted so search genuinely reaches the rest, a
+button for the remainder, and copy that names both sources.
+
+### ⚠ THREE OF MY OWN GUARDS WERE WRONG, AND ONE WAS DANGEROUS
+- A test stubbed `corrections()` wholesale, so three negative controls about
+  missing provenance proved nothing. `valid_correction()` is now extracted and
+  the test exercises the real rule.
+- **Stripping `/* */` from a Python file removed 325,263 of 789,437 characters
+  — 41% of it.** `build_hub.py` embeds JS and CSS, so those pairs span
+  unrelated blocks and swallow the Python between them; it ate `SCHED_INITIAL`
+  and failed a check about code that was present all along. Several suites use
+  this technique on this file; this one now reads raw source and picks patterns
+  that cannot occur in prose.
+- `test_display_invariants` inferred neutrality from a **badge** — true while
+  an event badge replaced the match type, false now that the Opening Spike
+  Classic is played at Pitt's own floor. It reads the canonical record instead,
+  and gained a positive control that the payload holds both neutral and home
+  fixtures (460 / 705) so the check cannot be vacuous.
+
+### Verified
+36 suites · preflight clean · both builds · public gate · fresh-checkout guard
+(which caught `scripts/fixtures.py` being untracked — the build imports it, so
+a fresh clone would have failed) · desktop and 390px, no sideways scroll.

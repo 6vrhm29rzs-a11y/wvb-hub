@@ -1,0 +1,79 @@
+{
+  "_README": [
+    "OFFICIAL-SCHOOL CORRECTIONS TO THE NCAA FIXTURE RECORD.",
+    "",
+    "The NCAA scoreboard + /game/{id} feed remains the base schedule source for",
+    "every fixture. This file exists for the cases where that feed is",
+    "demonstrably stale or self-contradictory and an OFFICIAL school schedule",
+    "says otherwise. It is a ledger, not a patch set: each entry names the",
+    "exact fields it is entitled to override, the direct URL it came from, the",
+    "date it was read, and the sentence it was read from.",
+    "",
+    "RULES, ENFORCED IN scripts/test_fixture_truth.py:",
+    "  1. Every entry needs `source_url`, `verified_on`, and `quote`.",
+    "  2. `fields` lists ONLY what was explicitly verified. A correction wins",
+    "     for those fields and nothing else; everything else stays canonical.",
+    "  3. Never write an entry from memory, from a media report, or from a",
+    "     secondary aggregator. Read the school's own schedule page.",
+    "  4. Two participating schools agreeing is stronger than one and is",
+    "     recorded as `corroborating_url` when available -- but the host",
+    "     school's own page is sufficient for a venue it owns.",
+    "  5. This file is small ON PURPOSE. It is not a route to 348 scrapers."
+  ],
+  "season": 2026,
+  "corrections": [
+    {
+      "game_id": "6626809",
+      "matchup": "Kentucky vs Penn St.",
+      "why": "The NCAA /game record carries Rec Hall, State College PA -- Penn State's own gym -- so the hub derived site=home and rendered 'Kentucky at Penn St.'. Both schools publish the match as a NEUTRAL-site Big Ten/SEC Challenge fixture at Wrigley Field. The feed's location block is stale, not wrong-by-parsing.",
+      "fields": {
+        "site": "neutral",
+        "venue": "Wrigley Field",
+        "city": "Chicago",
+        "state_usps": "IL",
+        "event": "Big Ten/SEC Challenge"
+      },
+      "source_url": "https://gopsusports.com/sports/womens-volleyball/schedule",
+      "quote": "Big Ten/SEC Challenge neutral Sunday Sep 6 vs. Kentucky Chicago, Ill. / Wrigley Field 7:00 PM EDT",
+      "corroborating_url": "https://ukathletics.com/schedule.aspx?path=wvball",
+      "corroborating_quote": "Sun. Sep 6 vs. Penn State Wrigley Field (Chicago, Ill.) 7:00 pm Big Ten / SEC Challenge",
+      "verified_on": "2026-08-26",
+      "note": "The feed's START TIME is already correct (7:00 PM ET) and is NOT overridden."
+    },
+    {
+      "game_id": "6628315",
+      "matchup": "Nebraska vs UNLV",
+      "why": "Five raw /game records for this id disagree about which side is home -- three say Nebraska, two say UNLV -- while all five agree the venue is T-Mobile Arena, which belongs to neither school. A home/away flip across snapshots at a third-party venue is itself evidence of a neutral site. Both schools publish it as neutral.",
+      "fields": {
+        "site": "neutral",
+        "venue": "T-Mobile Arena",
+        "city": "Las Vegas",
+        "state_usps": "NV",
+        "event": "Players Era Showcase"
+      },
+      "source_url": "https://huskers.com/sports/volleyball/schedule",
+      "quote": "Players Era Showcase Neutral Saturday Aug 29 7:00 PM CDT #1 vs. UNLV Las Vegas, Nev. / T-Mobile Arena",
+      "corroborating_url": "https://unlvrebels.com/sports/womens-volleyball/schedule",
+      "corroborating_quote": "Players Era Volleyball Showcase Aug 29 (Sat) 5 PM PT No. 1 Nebraska Las Vegas, Nev. / T-Mobile Arena",
+      "verified_on": "2026-08-26",
+      "note": "7:00 PM CDT and 5 PM PT are the same instant; the feed's epoch already agrees, so the time is NOT overridden."
+    },
+    {
+      "game_id": "6625717",
+      "matchup": "Kansas at Pittsburgh",
+      "why": "The feed carries no location for this id at all, so the hub correctly declined to name one and rendered 'venue not reported'. Pitt's own schedule names the building and the event.",
+      "fields": {
+        "venue": "Petersen Events Center",
+        "city": "Pittsburgh",
+        "state_usps": "PA",
+        "event": "Opening Spike Classic"
+      },
+      "source_url": "https://pittsburghpanthers.com/sports/womens-volleyball/schedule",
+      "quote": "Opening Spike Classic vs #15 Kansas Petersen Events Center Pittsburgh, Pa. Aug 28 (Fri) 6:30 PM ESPN2",
+      "corroborating_url": null,
+      "corroborating_quote": null,
+      "verified_on": "2026-08-26",
+      "note": "SITE IS DELIBERATELY NOT CORRECTED. Pitt's page shows 'vs', which SIDEARM uses for any non-road match including neutral ones -- the same page lists 'Stanford vs. Wisconsin' at Petersen, a neutral pairing. What is verified is the venue, the city and the event. Site is left to the canonical rule, which reads venue OWNERSHIP (Petersen is Pitt's own building, on record) rather than nominal home ordering."
+    }
+  ]
+}

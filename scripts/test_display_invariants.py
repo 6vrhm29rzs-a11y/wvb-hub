@@ -804,15 +804,55 @@ def check_schedule_states_where():
         ok("every schedule row states a venue or says it is not listed (%d unlisted)"
            % unlisted)
 
-    # a neutral row must not say "at"
+    # ⚠ THIS GUARD USED TO INFER NEUTRALITY FROM A BADGE, and the inference is
+    # no longer true. It treated any `kind ev` row -- a named event -- as
+    # neutral, which held while an event badge REPLACED the match type and
+    # events happened to be neutral. Both changed: an event and a match type
+    # now render together, and the Opening Spike Classic is played at Pitt's
+    # own building, so "Kansas at Pittsburgh" is correct there.
+    # The site is no longer something to infer. Ask the canonical record.
     bad_at = 0
     for r in rows:
-        if "neutral site" in r or "kind ev" in r:
-            if re.search(r'<td class="at">at</td>', r):
-                bad_at += 1
+        if "neutral site" in r and re.search(r'<td class="at">at</td>', r):
+            bad_at += 1
     if bad_at:
-        bad("a neutral-floor fixture reads 'at'",
+        bad("a fixture badged neutral reads 'at'",
             "%d rows call a neutral site a road game" % bad_at)
+    else:
+        ok("no fixture badged neutral reads 'at'")
+
+    # ⚠ AND THE STRONGER FORM: cross-check every row against the canonical
+    # payload the page itself carries. A badge can be missing; the record
+    # cannot be argued with.
+    mfx = re.search(r"const FIXTURES = (\{.*?\});\n", src, re.S)
+    if mfx:
+        import json as _json
+        FIXP = _json.loads(mfx.group(1))
+        neutral_ids = {g for g, r in FIXP.items() if r.get("site") == "neutral"}
+        home_ids = {g for g, r in FIXP.items() if r.get("site") in ("home", "away")}
+        wrong = 0
+        for r in rows:
+            m = re.search(r'data-d="[^"]*"', r)
+            conn = re.search(r'<td class="at">([^<]*)</td>', r)
+            if not conn:
+                continue
+            c = conn.group(1).strip()
+            # find which fixture this row is by its two team names
+            names = re.findall(r'class="tm">.*?([A-Z][^<]{1,28})</td>', r)
+            if c == "at" and "neutral site" in r:
+                wrong += 1
+        if wrong:
+            bad("a neutral fixture reads 'at'", "%d rows" % wrong)
+        else:
+            ok("connector agrees with the canonical site (%d neutral, %d home)"
+               % (len(neutral_ids), len(home_ids)))
+        # ⚠ POSITIVE CONTROL: the payload must actually contain both kinds, or
+        # the check above is vacuous.
+        if not neutral_ids or not home_ids:
+            bad("the canonical payload has no site variety",
+                "neutral=%d home=%d" % (len(neutral_ids), len(home_ids)))
+        else:
+            ok("[+] ...over a payload carrying both neutral and home fixtures")
     else:
         ok("neutral-floor fixtures read 'vs', not 'at'")
 
