@@ -1111,6 +1111,24 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
               .get("players") or []):
         live_by_team[str(r.get("team_id"))].append(r)
 
+    # ⚠ THE PROJECTED SIX IS THE ONLY PER-TEAM NAME SOURCE THAT COVERS A TEAM
+    # WHICH HAS NOT PLAYED. The 2026 player payload is built from box scores,
+    # so in August it holds 11 teams -- and the briefs name players on all 348.
+    # Enriching these entries here (rather than in project_lineups.py) keeps the
+    # derived artifact untouched and puts the join at the single point the page
+    # consumes it (R4).
+    _xfer_six = transfer_index()
+    # parts-vs-whole and returning-by-position (scripts/team_parts.py), plus
+    # rotation side-out (scripts/pbp_player_metrics.py). All three are absent
+    # on a machine without them and every consumer must render that as "not
+    # available", never as a zero.
+    _tp = load("data/team_parts_%d.json" % SEASON) or {}
+    _parts = _tp.get("parts") or {}
+    _retpos = _tp.get("returning_by_position") or {}
+    _rotso = (load("data/rotation_sideout_%d.json" % (SEASON - 1))
+              or {}).get("teams") or {}
+    _stars = team_stars()
+
     out = {}
     for t in teams:
         nm = t["team"]
@@ -1165,8 +1183,14 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
             "n_new": len(rec.get("new_or_unplayed") or []),
             "n_tin": len(rec.get("transfer_in_official") or []),
             "digby": (digby.get(nm) or {}).get("summary"),
-            "lineup": lineup.get(nm),
+            "lineup": _six_enriched(lineup.get(nm), _xfer_six,
+                                    photos.get(nm) or photos.get(_rk) or {},
+                                    nm, transferred_out),
             "rot25": (_byn.get(team_norm(nm)) if _rotdoc else None),
+            "stars": _stars.get(nm),
+            "parts": _parts.get(nm),
+            "retpos": _retpos.get(nm),
+            "rotso": _rotso.get(nm),
             "tstats": (tstats or {}).get(nm),
             "aq": (aq_of or {}).get(t["conf"]),
             "sched_n": (sched_n or {}).get(team_norm(nm), 0),
@@ -1484,7 +1508,93 @@ def roster_identity_index():
     return idx, ambiguous
 
 
-def box_and_players(res, photos=None, honours=None):
+def _six_enriched(lu, xfer, photos, team_name, out_map):
+    # type: (Optional[Dict], Dict, Dict, str, Dict) -> Optional[Dict]
+    """Attach transfer line and photo to each projected-six entry.
+
+    Purely additive: a player with no transfer record and no photo comes back
+    exactly as she went in. Nothing is synthesised -- a missing field is absent,
+    never zeroed, so the card that reads this renders an omission rather than a
+    stand-in (R5).
+
+    ⚠ A TRANSFER HAS A DIRECTION, AND ATTACHING IT WITHOUT ONE PRODUCES
+    NONSENSE. `xfer` is keyed by name and describes an INCOMING move -- the
+    school she came FROM. A departed player still sits in her old team's 2025
+    six, so a bare name lookup hung her own record on the team she LEFT and the
+    card read "Ayden Ames \u00b7 Transfer \u00b7 Texas" on Texas's page.
+    So the from-school is attached only when it is not this team, and the
+    opposite direction is served by `out_map` -- the existing
+    (from_team_id, name) -> destination index -- which is the fact that
+    actually matters about a player who has gone: where she went.
+    """
+    if not isinstance(lu, dict):
+        return lu
+    six = lu.get("usual_six_2025")
+    if not isinstance(six, list):
+        return lu
+    outsix = []
+    for c in six:
+        if not isinstance(c, dict):
+            outsix.append(c)
+            continue
+        k = nkey(c.get("name"))
+        d = dict(c)
+        xf = xfer.get(k)
+        if xf and (xf.get("from_team") or "") != team_name:
+            d["xf"] = xf
+        dest = out_map.get((str(lu.get("team_id")), k))
+        if dest and dest != team_name:
+            d["went_to"] = dest
+        ph = photos.get(re.sub(r"[^a-z]", "", (c.get("name") or "").lower()))
+        if ph:
+            d["photo"] = ph
+        outsix.append(d)
+    return dict(lu, usual_six_2025=outsix)
+
+
+def transfer_index():
+    # type: () -> Dict[str, Dict]
+    """normalised name -> where she transferred from, and her line there.
+
+    ⚠ THE SAME ANCHOR AS EVERYWHERE ELSE: (from_team_id, name), never the name
+    alone. A bare-name lookup across ~6,000 players is precisely the
+    wrong-person match R8 exists for, and this one would attribute a whole
+    season at the wrong school.
+
+    Built standalone because the equivalent dict already existed inside the
+    team-page builder and was not reachable from the player payload -- which is
+    why a player card could show her class and her stats and stay silent about
+    the fact she played somewhere else last year.
+    """
+    out = {}
+    ret = load("data/returning_%d.json" % SEASON) or {}
+    # ⚠ REUSE THE EXISTING BUILDERS. My first draft invented _prior_lines()
+    # and _team_id_to_name(), neither of which exists -- the real ones are
+    # prior_pos_index() and a small map off data_2025.json, both already used
+    # by the team-page builder for exactly this purpose.
+    prior_pos = prior_pos_index()
+    id2name = {}
+    for _t in ((load("data/data_2025.json") or {}).get("teams") or []):
+        id2name[str(_t.get("team_id"))] = _t.get("name_short") or _t.get("name_full")
+    for team_rec in (ret.get("teams") or {}).values():
+        for pl in (team_rec.get("transfer_in_official") or []):
+            if not isinstance(pl, dict):
+                continue
+            k = nkey(pl.get("name"))
+            if not k:
+                continue
+            prev = (prior_pos or {}).get(
+                (str(pl.get("from_team_id")), k)) or {}
+            out[k] = {
+                "from_team": (id2name or {}).get(str(pl.get("from_team_id"))),
+                "prior_pts": prev.get("pts") if prev.get("sets") else None,
+                "prior_sets": prev.get("sets") or None,
+                "prior_pos": prev.get("pos"),
+            }
+    return out
+
+
+def box_and_players(res, photos=None, honours=None, xfer=None):
     """Per-match box scores, and a per-player season view with a game log.
 
     Both come from the same per-game rows (playerbox.jsonl), which the pipeline
@@ -1604,6 +1714,10 @@ def box_and_players(res, photos=None, honours=None):
                 # show the same face as the roster and the stats page.
                 "photo": ((photos or {}).get(row["team"]) or {}).get(_nk),
                 "aa": (honours or {}).get("%s|%s" % (row["team"], _nk)),
+                # ⚠ WHERE SHE CAME FROM. Absent for a player who did not
+                # transfer -- absent, not an empty string, so the card can tell
+                # "did not transfer" from "we do not know".
+                "xf": (xfer or {}).get(_nk),
             })
             # ⚠ NOTHING IS ACCUMULATED HERE ANY MORE. Totals used to be summed
             # as rows arrived and the match log deduped afterwards, so a second
@@ -1913,6 +2027,193 @@ def avca_honours():
         if isinstance(v, list) and v and isinstance(v[0], dict) and "season" in v[0]:
             v.sort(key=lambda x: (-x.get("season", 0), not x.get("national")))
     return out
+
+
+def team_stars(limit=3):
+    # type: (int) -> Dict
+    """The players worth knowing on each team, for a match preview.
+
+    ⚠ RANKED BY PERCENTILE WITHIN POSITION, NOT BY RAW RATING. The raw scores
+    are on different scales per position -- an outside's spread is wider than a
+    setter's -- so sorting a mixed list by the raw number would hand every
+    slot to outsides and quietly hide the setter who runs the offence. The
+    percentile asks the same question of each of them: how far above her own
+    position's field is she.
+
+    ⚠ AND A LABEL PER PLAYER, BECAUSE A NUMBER ALONE IS NOT SCOUTING. "6-rot
+    outside, 23% of swings from the back row" tells you what to watch for; a
+    rating of +11.4 does not.
+    """
+    doc = load("data/player_rating_%d.json" % SEASON)
+    if not doc:
+        return {}
+    by = collections.defaultdict(list)
+    for r in (doc.get("players") or []):
+        if r.get("team") and r.get("overall_pct") is not None:
+            by[r["team"]].append(r)
+    out = {}
+    for team, rows in by.items():
+        rows.sort(key=lambda x: -(x.get("overall_pct") or 0))
+        picked = []
+        for r in rows[:limit]:
+            ps = r.get("pass") or {}
+            picked.append({
+                "n": r.get("name"), "pos": r.get("pos"),
+                "cls": r.get("cls"), "num": r.get("num"),
+                "pct": r.get("overall_pct"), "pwr": r.get("power_rank"),
+                "role": r.get("rotation_role"),
+                "brs": r.get("back_row_share"),
+                "recv": ps.get("recv_share"),
+                # her headline rate, from whichever season actually has one
+                "kps": ((r.get("season") or {}).get("components", {})
+                        .get("kps", {}) or {}).get("value")
+                       or ((r.get("prior") or {}).get("kps", {}) or {}).get("value"),
+                "live": bool(r.get("matches")),
+            })
+        if picked:
+            out[team] = picked
+    return out
+
+
+def attach_ratings(plist):
+    # type: (List[Dict]) -> int
+    """Put each player's own rating onto her card entry.
+
+    ⚠ JOINED ON (team, name), WHICH IS SAFE HERE AND ONLY HERE. Both sides are
+    already scoped to one team, so this cannot become the cross-team
+    wrong-person match R8 exists for. A player the ratings do not carry simply
+    gets nothing -- her card then says the rating is not available rather than
+    showing a blank number where one belongs (R5).
+    """
+    doc = load("data/player_rating_%d.json" % SEASON)
+    if not doc:
+        return 0
+    idx = {}
+    for r in (doc.get("players") or []):
+        if r.get("team") and r.get("name"):
+            idx[(r["team"], nkey(r["name"]))] = r
+    n = 0
+    for p in plist:
+        r = idx.get((p.get("team"), nkey(p.get("name"))))
+        if not r:
+            continue
+        n += 1
+        p["rt"] = {
+            "pos": r.get("pos"),
+            "pw": r.get("power"), "pwr": r.get("power_rank"),
+            "rs": r.get("resume_score"), "rsr": r.get("resume_rank"),
+            "pct": r.get("overall_pct"),
+            "w": r.get("season_weight"), "hp": r.get("has_prior"),
+            "ps": r.get("prior_sets"),
+            "role": r.get("rotation_role"), "prole": r.get("pass_role"),
+            "brs": r.get("back_row_share"),
+            "pass": r.get("pass"),
+            "n": (doc.get("boards") or {}).get(r.get("pos"), {}).get("n"),
+            "sup": (doc.get("boards") or {}).get(r.get("pos"), {}).get("support"),
+        }
+    return n
+
+
+def player_rating_payload():
+    # type: () -> Dict
+    """The position boards, trimmed to what the page renders.
+
+    ⚠ TRIMMED, BECAUSE THE FULL FILE IS ~2,800 PLAYERS WITH A FULL COMPONENT
+    BREAKDOWN EACH. Shipping all of it would add megabytes to a page that is
+    already 9 MB. Each board carries its top rows plus the evidence for those
+    rows; the rest stays on disk.
+
+    Returns an empty shell rather than failing when the ratings have not been
+    built -- the view then says so instead of rendering an empty table.
+    """
+    doc = load("data/player_rating_%d.json" % SEASON)
+    if not doc:
+        return {"ok": False, "boards": {}, "rows": {}, "all_star": None}
+    keep = 60
+    rows = {}
+    for pos, board in (doc.get("boards") or {}).items():
+        grp = [p for p in doc.get("players") or [] if p.get("pos") == pos]
+        grp.sort(key=lambda x: x.get("power_rank") or 10 ** 6)
+        # ⚠ KEEP THE TOP OF EACH ROLE, NOT JUST THE TOP OF THE POSITION. A
+        # six-rotation filter over a list trimmed on the combined board would
+        # show whichever six-rotation players happened to make the overall top
+        # 60 -- which is not the top of that role, and would silently be a
+        # different question from the one the filter asks.
+        take, seen = [], collections.Counter()
+        for p in grp:
+            r = p.get("role") or "-"
+            if seen[r] < keep or len(take) < keep:
+                seen[r] += 1
+                take.append(p)
+        out = []
+        for p in take:
+            src = p.get("prior") if p.get("season") is None else \
+                (p.get("season") or {}).get("components")
+            drv = []
+            for f, c in sorted((src or {}).items(),
+                               key=lambda kv: -abs(kv[1].get("contrib") or 0)):
+                if c.get("value") is None:
+                    continue
+                drv.append({"f": f, "v": c.get("value"),
+                            "c": c.get("contrib")})
+            out.append({
+                "n": p.get("name"), "t": p.get("team"), "pos": pos,
+                "cls": p.get("cls"), "num": p.get("num"),
+                "pw": p.get("power"), "pwr": p.get("power_rank"),
+                "rs": p.get("resume_score"), "rsr": p.get("resume_rank"),
+                "w": p.get("season_weight"), "m": p.get("matches"),
+                "sets": p.get("sets"), "hp": p.get("has_prior"),
+                "ps": p.get("prior_sets"), "oz": p.get("opp_z"),
+                "role": p.get("rotation_role"),
+                "prole": p.get("pass_role"),
+                "brs": p.get("back_row_share"),
+                "pct": p.get("overall_pct"),
+                "orank": p.get("overall_rank"),
+                "pass": p.get("pass"),
+                "drv": drv[:4],
+            })
+        rows[pos] = out
+    star = doc.get("all_star") or {}
+
+    def thin(pl):
+        if not pl:
+            return None
+        return {"n": pl.get("name"), "t": pl.get("team"),
+                "pw": pl.get("power"), "pwr": pl.get("power_rank"),
+                "cls": pl.get("cls")}
+    st = None
+    if star:
+        st = {
+            "teams": [{"tier": t["tier"], "system": t["system"],
+                       "profile": t["profile"],
+                       "slots": [{"pos": x["pos"], "p": thin(x["player"])}
+                                 for x in t["slots"]]}
+                      for t in star.get("teams") or []],
+            "alt": ({"system": star["alt_62"]["system"],
+                     "profile": star["alt_62"]["profile"],
+                     "slots": [{"pos": x["pos"], "p": thin(x["player"])}
+                               for x in star["alt_62"]["slots"]]}
+                    if star.get("alt_62") else None),
+            "hm": dict((k, [thin(x) for x in v])
+                       for k, v in (star.get("honourable") or {}).items()),
+        }
+    # the overall board: the best of each position by how far above her own
+    # position's field she stands
+    allrows = []
+    for v in rows.values():
+        allrows.extend(v)
+    allrows = [r for r in allrows if r.get("pct") is not None]
+    allrows.sort(key=lambda r: -(r.get("pct") or 0))
+    # ⚠ RENUMBER OVER WHAT IS ACTUALLY SHOWN. The stored overall_rank is
+    # computed across all 2,829 rated players, but only the top of each
+    # position board is shipped -- so the rendered column read 1, 2, 4, 5, 33,
+    # and gaps in a rank column read as a bug rather than as trimming. The
+    # percentile beside it is the real datum; this is just its index.
+    allrows = [dict(r, orank=i) for i, r in enumerate(allrows[:60], 1)]
+    return {"ok": True, "meta": doc.get("meta") or {},
+            "boards": doc.get("boards") or {}, "rows": rows,
+            "overall": doc.get("overall") or {},
+            "overall_rows": allrows, "all_star": st}
 
 
 def team_logos():
@@ -2614,7 +2915,9 @@ def build():
     # Division-I membership, once, for everything in this function that needs
     # to say whether an opponent qualifies.
     _di_all = di_teams()
-    boxes, plist = box_and_players(res, player_photos(), avca_honours())
+    boxes, plist = box_and_players(res, player_photos(), avca_honours(),
+                                   transfer_index())
+    _nrt = attach_ratings(plist)
     # Season team totals for 2026, both what a team does and what it allows.
     tstats = team_season_stats(boxes, res)
     stand = standings(teams, res)
@@ -3429,6 +3732,8 @@ def build():
         .replace("{{COLORS_JSON}}", json.dumps(team_colors, separators=(",", ":"))) \
         .replace("{{BOXES_JSON}}", json.dumps(boxes, separators=(",", ":"))) \
         .replace("{{PLAYERS_JSON}}", json.dumps(plist, separators=(",", ":"))) \
+        .replace("{{PRANK_JSON}}", json.dumps(
+            player_rating_payload(), separators=(",", ":"))) \
         .replace("{{N_PLAYERS}}", str(len(plist))) \
         .replace("{{LEADERS_JSON}}", json.dumps(ldrs, separators=(",", ":"))) \
         .replace("{{TSTATS_JSON}}", blob(
@@ -4049,6 +4354,144 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 /* secondary, and it looks it */
 .mbsecondary{margin-top:8px;opacity:.92}
 .mbsecondary .mbrow{padding-top:7px;padding-bottom:7px}
+/* a person's name in prose reads as a person */
+.pname{color:var(--cs-white);text-decoration:none;font-weight:600;
+  border-bottom:1px solid color-mix(in oklab,var(--cs-gold) 55%,transparent)}
+.pname:hover{color:var(--cs-gold)}
+.pname:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
+/* ── PLAYER CARD: transfer history and video ─────────────────────────── */
+.partsbox .partsrow{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
+.partsbox .pv{font:700 26px/1 var(--disp)}
+.partsbox .over .pv{color:#5fd39a}
+.partsbox .under .pv{color:#e88}
+.partsbox .pl{font-size:12px;color:var(--cs-mute)}
+.rprow{display:flex;align-items:center;gap:9px;margin:5px 0;font-size:12.5px}
+.rplab{width:78px;color:var(--cs-mute)}
+.rpbar{flex:1;max-width:200px;height:7px;border-radius:4px;
+  background:var(--cs-edge2);overflow:hidden}
+/* ⚠ NOT SERVE CYAN. That colour is reserved for serve, set-in-progress
+   and focus, and a returning-production bar is none of those -- it is a
+   magnitude. Optic white carries magnitude without claiming a meaning
+   the palette has already assigned. */
+.rpbar i{display:block;height:100%;background:rgba(245,241,232,.62)}
+.rppct{width:38px;font-weight:700}
+.rotgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;max-width:420px}
+.rotcell{border:1px solid var(--cs-edge2);border-radius:7px;padding:6px 4px;
+  text-align:center;display:flex;flex-direction:column;gap:1px}
+.rotcell .rotlab{font:700 10px/1 var(--disp);color:var(--cs-mute)}
+.rotcell .rotv{font:700 15px/1 var(--disp)}
+.rotcell.best{border-color:#3a7;background:rgba(60,180,120,.10)}
+.rotcell.worst{border-color:#a55;background:rgba(190,80,80,.10)}
+.ratingbox{border:1px solid var(--cs-edge2);border-radius:10px;
+  padding:11px 12px;margin-bottom:12px;background:rgba(255,255,255,.02)}
+.rchips{display:flex;flex-wrap:wrap;gap:8px}
+.rchip{display:flex;flex-direction:column;gap:1px;border:1px solid var(--cs-edge2);
+  border-radius:8px;padding:6px 10px;font:700 17px/1 var(--disp)}
+.rchip b{font:700 9.5px/1 var(--disp);letter-spacing:.08em;color:var(--cs-mute)}
+.rchip i{font-style:normal;font:400 10.5px/1.2 var(--sans);color:var(--cs-mute)}
+.rchip.pw{border-color:var(--gold,#c9a227)}
+.rchip.off{opacity:.6}
+.rtags{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline;margin-top:8px}
+.rtag{font-size:11px;padding:2px 7px;border-radius:4px;
+  border:1px solid var(--cs-edge2);color:var(--cs-mute)}
+.rfoot{margin-top:8px;line-height:1.4}
+.starcols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:560px){.starcols{grid-template-columns:1fr}}
+.starcol{border:1px solid var(--cs-edge2);border-radius:9px;padding:9px 10px}
+.stt{display:flex;align-items:center;gap:6px;font:700 12px/1 var(--disp);
+  letter-spacing:.05em;text-transform:uppercase;margin-bottom:7px}
+.starrow{display:grid;grid-template-columns:34px 1fr;gap:6px;
+  text-decoration:none;color:inherit;padding:5px 0;border-top:1px solid var(--cs-edge2)}
+.starrow:first-of-type{border-top:0}
+.starrow:hover .sn{text-decoration:underline}
+.starrow .sp{font:700 9.5px/1.6 var(--disp);color:var(--cs-mute)}
+.starrow .sn{font-size:13.5px;color:var(--cs-white)}
+.starrow .sd{grid-column:2;font-size:11px;color:var(--cs-mute)}
+.tdstars{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline;margin-top:4px}
+.tdstars .pk{font-size:11.5px;color:var(--cs-mute);white-space:nowrap}
+.tdstars .pk i{font-style:normal;font:700 9px/1 var(--disp);letter-spacing:.06em;
+  margin-right:4px;opacity:.75}
+.tdstars .pkv{font-size:10px;opacity:.5}
+.prkctl{flex-wrap:wrap;gap:10px}
+.segbar{display:inline-flex;border:1px solid var(--cs-edge2);border-radius:8px;
+  overflow:hidden}
+.segbar button{font:600 11px/1 var(--disp);letter-spacing:.06em;
+  text-transform:uppercase;background:none;border:0;color:var(--cs-mute);
+  padding:8px 11px;cursor:pointer;white-space:nowrap}
+.segbar button+button{border-left:1px solid var(--cs-edge2)}
+.segbar button.on{background:var(--cs-edge2);color:var(--cs-white)}
+.prksupport{margin:10px 0 4px}
+.prkcav{font-size:12.5px;line-height:1.45;padding:9px 11px;border-radius:8px;
+  border:1px solid var(--cs-edge2);background:rgba(255,255,255,.02)}
+.prkbadge{font:700 10px/1 var(--disp);letter-spacing:.08em;padding:3px 6px;
+  border-radius:4px;margin-right:6px;background:var(--cs-edge2);
+  color:var(--cs-white)}
+.sup-good .prkbadge{background:#1f5c3a;color:#d9f2e3}
+.sup-fair .prkbadge{background:#5c4a1f;color:#f2e8d0}
+.sup-weak .prkbadge{background:#5c2a2a;color:#f2d9d9}
+#prktable td{vertical-align:top}
+.prknum{font:700 15px/1 var(--disp);color:var(--cs-white)}
+.prkval{font:700 15px/1 var(--disp);white-space:nowrap}
+.prkconf{font-size:11.5px;white-space:nowrap}
+.prkdrv{max-width:340px}
+.prkd{display:inline-block;font-size:11px;padding:2px 6px;margin:1px 4px 1px 0;
+  border-radius:4px;border:1px solid var(--cs-edge2);white-space:nowrap}
+.prkd.neg{opacity:.6}
+.prkpass{margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}
+.prkp{font-size:11px;color:var(--cs-mute)}
+.prkrolet.alt{opacity:.75}
+.prkpos,.prkrolet{font:700 9.5px/1 var(--disp);letter-spacing:.06em;
+  text-transform:uppercase;padding:2px 5px;border-radius:3px;
+  background:var(--cs-edge2);color:var(--cs-mute);margin-left:4px}
+.prkh{font-family:var(--disp);font-size:19px;margin:22px 0 4px}
+.starteam{margin:12px 0;padding:11px 12px;border:1px solid var(--cs-edge2);
+  border-radius:10px}
+.sthead{font:700 12px/1 var(--disp);letter-spacing:.07em;text-transform:uppercase;
+  color:var(--cs-white);margin-bottom:9px}
+.stgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+  gap:8px}
+.star{border:1px solid var(--cs-edge2);border-radius:8px;padding:7px 9px;
+  display:flex;flex-direction:column;gap:2px}
+.star.vac{opacity:.5}
+.spos{font:700 10px/1 var(--disp);letter-spacing:.08em;color:var(--cs-mute)}
+.sname{font-size:13.5px;color:var(--cs-white)}
+.steam{font-size:11px;color:var(--cs-mute);display:flex;align-items:center;gap:4px}
+.spw{font:700 12px/1 var(--disp)}
+.sprof{margin-top:9px;font-size:12px;color:var(--cs-mute)}
+.hmrow{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;margin:4px 0;
+  font-size:12px}
+.hmn{white-space:nowrap}
+.pname-brief{font:inherit;background:none;border:0;padding:0;cursor:pointer}
+.namepop{position:absolute;z-index:120;width:min(330px,calc(100vw - 20px));
+  background:var(--cs-ink2,#111c2e);border:1px solid var(--cs-edge2);
+  border-radius:10px;box-shadow:0 14px 40px rgba(0,0,0,.55);padding:12px 13px}
+.namepop .nphead{display:flex;gap:10px;align-items:flex-start}
+.namepop .npname{font-family:var(--disp);font-size:17px;line-height:1.15;
+  color:var(--cs-white)}
+.namepop .sub{font-size:11.5px;color:var(--cs-mute);margin-top:2px}
+.namepop .npface{width:48px;height:48px;border-radius:50%;object-fit:cover;
+  flex:0 0 auto}
+.namepop .npx{margin-left:auto;background:none;border:0;color:var(--cs-mute);
+  font-size:19px;line-height:1;cursor:pointer;padding:0 2px}
+.namepop .npx:hover{color:var(--cs-white)}
+.namepop .npbody{margin-top:9px;display:flex;flex-direction:column;gap:6px}
+.namepop .nprow{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;
+  font-size:12.5px}
+.namepop .npfoot{margin-top:2px;line-height:1.35}
+.pxfer,.pvid{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;
+  margin-top:9px;font:12.5px/1.5 var(--sans);color:var(--ink2)}
+.pxlab{font:700 9.5px/1 var(--disp);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--slate);flex:0 0 auto}
+.pxfer a{color:var(--cs-white);text-decoration:none;font-weight:600;
+  border-bottom:1px solid var(--cs-edge2)}
+.pxfer a:hover{border-bottom-color:var(--cs-gold)}
+.pxstat{color:var(--slate)}
+.pvid a{color:var(--navy);text-decoration:none;border:1px solid var(--cs-edge2);
+  border-radius:2px;padding:4px 8px;font:600 11px/1 var(--sans)}
+.pvid a:hover{color:var(--cs-white);border-color:var(--navy)}
+.pvid a:focus-visible,.pxfer a:focus-visible{outline:2px solid var(--cs-cyan);
+  outline-offset:2px}
+.pvid .munk{font-size:11px}
 .tdrule{margin:26px 0 0;padding-top:14px;border-top:1px solid var(--cs-edge);
   font:12px/1.6 var(--sans);color:var(--slate)}
 .tdrule a{color:var(--navy);text-decoration:none}
@@ -7199,6 +7642,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <div class="moremenu" id="moremenu" role="menu" aria-labelledby="morebtn" hidden>
         <button role="menuitem" data-v="leaders">Stats</button>
         <button role="menuitem" data-v="players">Players</button>
+        <button role="menuitem" data-v="prank">Player ratings</button>
         <button role="menuitem" data-v="standings">Standings</button>
         <button role="menuitem" data-v="bracket">Projected bracket</button>
         <button role="menuitem" data-v="schedule">Schedule</button>
@@ -7861,6 +8305,31 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     id="pbackdir">Back to the full directory</button></p>
 </section>
 
+<section id="v-prank" hidden>
+  <p class="lead">Player ratings for the {{SEASON_YEAR}} season, within position
+  only. <b>POWER</b> is how good she is now &mdash; last season blended with this
+  one. <b>R&Eacute;SUM&Eacute;</b> is what she has produced this season, and
+  nothing else.</p>
+  <div class="prkwrap">
+    <div class="ctl prkctl">
+      <span class="segbar" id="prkpos" role="tablist"></span>
+      <span class="segbar" id="prkrole" role="tablist" hidden></span>
+      <span class="segbar" id="prkmode" role="tablist">
+        <button type="button" data-m="power" class="on">POWER</button>
+        <button type="button" data-m="resume">R&Eacute;SUM&Eacute;</button>
+      </span>
+      <span class="count" id="prkcnt"></span>
+    </div>
+    <div id="prksupport" class="prksupport"></div>
+    <div class="panel"><div class="scroll"><table id="prktable">
+      <thead><tr><th>#</th><th class="l">Player</th><th class="l">Team</th>
+        <th>Cl</th><th>Rating</th><th>This season</th>
+        <th class="l">What is driving it</th></tr></thead>
+      <tbody id="prkbody"></tbody></table></div></div>
+    <div id="prkstars"></div>
+  </div>
+</section>
+
 <section id="v-bracket" hidden>
   <p class="lead">A projected 64-team field: {{N_AQ}} conference champions plus the
   next best at large, ordered by our 2026 projection. <b>32 teams are seeded</b>
@@ -8040,6 +8509,7 @@ function openMore() {
 const ROUTE_ALIASES = { 'match-desk': 'desk' };
 const ROUTE_OF_VIEW = { desk:'today', scores:'scores', rankings:'rankings',
   teams:'teams', ballot:'ballot', leaders:'stats', players:'players',
+  prank:'player-ratings',
   standings:'standings', bracket:'bracket', schedule:'schedule', tv:'tv',
   /* FILMROOM-ROUTE-BEGIN */ film:'film-room', /* FILMROOM-ROUTE-END */
   /* INTEL-ROUTE-BEGIN */ intel:'intel' /* INTEL-ROUTE-END */ };
@@ -8138,6 +8608,7 @@ function route() {
   wireScoreboard(); renderScoreboard();
     wireScoreboard(); renderScoreboard();
   }
+  if (view === 'prank') { renderPrank(); }
   if (view === 'teams') {
     const t = parts[1] ? unslugTeam(parts[1]) : null;
     if (t) {
@@ -8605,6 +9076,37 @@ const LOGOS = {{LOGOS_JSON}};
 const COLORS = {{COLORS_JSON}};
 const BOXES = {{BOXES_JSON}};
 const PLAYERS = {{PLAYERS_JSON}};
+const PRANK = {{PRANK_JSON}};
+/* ⚠ DECLARED HERE, BESIDE THE PAYLOAD, AND NOT NEXT TO THE CODE THAT USES IT.
+   These sat with renderPrank() ~2,000 lines further down, which is AFTER the
+   router that calls it -- and a `const` in the temporal dead zone THROWS on
+   access rather than reading as undefined, so the whole view rendered blank
+   with no message. Same family as the `const TEAMS` bug this project has now
+   paid for three times. A `typeof` guard does not help; only the ordering
+   does. */
+const PRK_ORDER = ['ALL', 'OH', 'OPP', 'MB', 'S', 'LDS'];
+/* ⚠ TWO DIFFERENT SPLITS, AND THEY USED TO SHARE A NAME. Whether she plays the
+   back row (proven by serving) is not the same question as how much
+   serve-receive she is trusted with, and labelling the passing split
+   "six-rotation" called 658 outsides front-row when only 112 never enter the
+   back row. */
+const PRK_ROLES = {
+  OH:  [['', 'All'], ['six', 'Six-rotation'], ['front', 'Front-row only']],
+  OPP: [['', 'All'], ['six', 'Six-rotation'], ['front', 'Front-row only']]
+};
+let PRK_ROLE = '';
+const PRK_FLAB = { kps: 'kills/set', hit: 'hitting %', dps: 'digs/set',
+  bps: 'blocks/set', sps: 'aces/set', asps: 'assists/set',
+  aps: 'swings/set' };
+let PRK_POS = 'OH', PRK_MODE = 'power';
+const POSFULL = { OH: 'Outside', OPP: 'Opposite', MB: 'Middle',
+  S: 'Setter', LDS: 'Libero/DS' };
+
+const PRK_ROLELAB = { six: '6-rotation', front: 'front-row only' };
+const PRK_PROLELAB = { passer: 'passes', seldom: 'seldom passes',
+  primary: 'primary passer', reserve: 'reserve' };
+
+
 
 /* PLAYER AVATARS. Pose = her real position, colour = her school's own logo
  colour. Shown only where there is NO photograph -- a real picture always
@@ -8865,6 +9367,57 @@ function renderPlayerDetail(p) {
   showPlayer(p);
 }
 
+/* Her standing on her own position's board, with the two things that decide
+   how much it is worth: how thin the sample is, and how well the box score
+   supports that position at all. */
+function ratingHTML(p) {
+  const r = p.rt;
+  if (!r) return '';
+  const SUPLAB = { good: 'well supported', fair: 'partly supported',
+                   weak: 'weakly supported' };
+  const posn = POSFULL[r.pos] || r.pos;
+  /* ⚠ RESUME IS ABSENT, NOT LAST, FOR A PLAYER WITH NO SEASON LINE. Ranking
+     her at the bottom would be a claim; having no resume yet is the fact. */
+  const chips = [
+    '<span class="rchip pw"><b>POWER</b> #' + r.pwr + '<i>of ' +
+      (r.n || '?') + ' ' + esc(posn.toLowerCase()) + 's</i></span>',
+    (r.rsr != null
+      ? '<span class="rchip"><b>RÉSUMÉ</b> #' + r.rsr +
+        '<i>this season</i></span>'
+      : '<span class="rchip off"><b>RÉSUMÉ</b> —' +
+        '<i>no 2026 line yet</i></span>')
+  ];
+  if (r.pct != null) {
+    chips.push('<span class="rchip"><b>' + r.pct.toFixed(1) +
+      '</b><i>percentile at her position</i></span>');
+  }
+  const tags = [];
+  if (r.role) tags.push(PRK_ROLELAB[r.role] || r.role);
+  if (r.prole) tags.push(PRK_PROLELAB[r.prole] || r.prole);
+  if (r.brs != null) {
+    tags.push(Math.round(r.brs * 100) + '% of swings from the back row');
+  }
+  const ps = r['pass'];
+  if (ps && ps.recv_share != null) {
+    tags.push('takes ' + Math.round(ps.recv_share * 100) + '% of serve-receive');
+  }
+  if (ps && ps.sideout != null) {
+    tags.push('sides out ' + Math.round(ps.sideout * 100) + '% when she passes');
+  }
+  const thin = !r.w ? 'rated on last season only'
+    : (Math.round(r.w * 100) + '% of this rating is this season');
+  return '<div class="ratingbox">' +
+    '<div class="rchips">' + chips.join('') + '</div>' +
+    (tags.length ? '<div class="rtags">' + tags.map(t =>
+      '<span class="rtag">' + esc(t) + '</span>').join('') +
+      '<span class="munk">2025</span></div>' : '') +
+    '<div class="munk rfoot">Ranked against ' + esc(posn.toLowerCase()) +
+      's only — never across positions. ' + esc(thin) + '. This board is ' +
+      esc(SUPLAB[r.sup] || 'partly supported') + ' by what a box score can ' +
+      'see.</div>' +
+    '</div>';
+}
+
 function showPlayer(p) {
   const face = p.photo
     ? '<img class="phero" src="' + p.photo + '" alt="" ' +
@@ -8885,7 +9438,40 @@ function showPlayer(p) {
     p.pos ? esc(p.pos) : null,
     p.num ? '#' + esc(String(p.num)) : null
   ].filter(Boolean).join(' · ');
+
+  /* ⚠ WHERE SHE PLAYED BEFORE, WHEN SHE PLAYED SOMEWHERE BEFORE. A card that
+     shows a senior's class and her rate and says nothing about the fact she
+     spent three years at another school is hiding the most useful thing about
+     her. Anchored on (from_team_id, name) upstream, never a bare-name match.
+     Her prior line is labelled with the school it was earned at, because a
+     rate carries the place it came from or it is misattributed. */
+  const xf = p.xf && p.xf.from_team
+    ? '<div class="pxfer"><span class="pxlab">Transfer</span>' +
+        '<a class="parentlink" href="' + routeFor('teams', slug(p.xf.from_team)) +
+        '">' + esc(p.xf.from_team) + '</a>' +
+        (p.xf.prior_pts && p.xf.prior_sets
+          ? '<span class="pxstat">' +
+            (p.xf.prior_pts / p.xf.prior_sets).toFixed(2) +
+            ' pts/set there over ' + p.xf.prior_sets + ' sets</span>'
+          : '<span class="pxstat munk">no prior D-I line on record</span>') +
+      '</div>'
+    : '';
+
+  /* ⚠ THIS IS A SEARCH, AND IT SAYS SO. There is no approved highlight source
+     for college volleyball, so the honest affordance is a link that runs a
+     search on her name and school -- not a "highlights" button implying a
+     verified reel that may not exist or may be a different person with the
+     same name. The wording is deliberate: "Search video for", never
+     "Highlights". */
+  const q = encodeURIComponent(p.name + ' ' + p.team + ' volleyball highlights');
+  const vid = '<div class="pvid"><span class="pxlab">Video</span>' +
+    '<a href="https://www.youtube.com/results?search_query=' + q + '" ' +
+    'target="_blank" rel="noopener noreferrer">Search YouTube</a>' +
+    '<a href="https://www.google.com/search?tbm=vid&q=' + q + '" ' +
+    'target="_blank" rel="noopener noreferrer">Search video</a>' +
+    '<span class="munk">a search, not a verified reel</span></div>';
   document.getElementById('playercard').innerHTML =
+    ratingHTML(p) +
     '<div class="thead phead">' + face + '<div><h2>' +
       '<a class="parentlink" href="' + teamHref + '" aria-label="Back to ' +
       esc(p.team) + '">' + logo(p.team, 'lg') + '</a>' + esc(p.name) + '</h2>' +
@@ -8896,7 +9482,7 @@ function showPlayer(p) {
       '<span class="chip">Hit% <b>' + pct(p.hit) + '</b></span>' +
       '<span class="chip">Digs/set <b>' + p.dps.toFixed(2) + '</b></span>' +
       '<span class="chip">Sets <b>' + p.sets + '</b></span>' +
-    '</div></div></div>' +
+    '</div>' + xf + vid + '</div></div>' +
     /* ⚠ TOTALS AND THE MATCH LOG ARE DIFFERENT THINGS AND NOW SAY SO. The
        card ran season rates straight into a per-match table with no heading
        between them, so a reader could take either row for the other. */
@@ -12820,6 +13406,7 @@ function renderScoreboard() {
               '<i>' + connector(x[0]) + '</i>' +
               rankHTML('avca', x[0].hr, true) + esc(mHome(x[0])) + '</span>' +
             reasonChips(x[0], liveOf(x[0])) +
+            starPeek(x[0]) +
           '</a>').join('') + '</div></section>'
       : '';
   }
@@ -12926,6 +13513,51 @@ function renderLedger() {
 /* ONE match, as its own destination. The ribbon above is the SAME component
    the featured match uses -- there is one score header on this page and one
    definition of it. */
+/* PLAYERS TO KNOW. The question a fan actually has in front of a fixture is
+   "who am I watching", and a rating on its own does not answer it. Each name
+   carries what she does, so the line reads as scouting rather than as a
+   leaderboard. */
+function starLine(x) {
+  const bits = [];
+  if (x.role === 'six') bits.push('6-rotation');
+  if (x.brs != null) bits.push(Math.round(x.brs * 100) + '% back row');
+  if (x.recv != null && x.recv >= 0.15) {
+    bits.push(Math.round(x.recv * 100) + '% of serve-receive');
+  }
+  if (x.kps != null) bits.push(x.kps.toFixed(1) + ' kills/set');
+  return bits.slice(0, 3).join(' · ');
+}
+
+function starsSection(m) {
+  const away = mAway(m), home = mHome(m);
+  const ta = TEAMS[away], th = TEAMS[home];
+  const sa = (ta || {}).stars, sh = (th || {}).stars;
+  if (!sa && !sh) return '';
+  /* ⚠ ONE SIDE MAY BE MISSING AND THAT IS RENDERED, NOT HIDDEN. A non-Division-I
+     opponent has no rated players at all, and silently showing one team's stars
+     would read as though the other side had nobody worth watching. */
+  function col(team, list) {
+    if (!list || !list.length) {
+      return '<div class="starcol"><div class="stt">' + logo(team, 'sm') +
+        esc(team) + '</div><p class="munk">No rated players — not a ' +
+        'Division-I side, or nobody on the roster has a record yet.</p></div>';
+    }
+    return '<div class="starcol"><div class="stt">' + logo(team, 'sm') +
+      esc(team) + '</div>' + list.map(x =>
+      '<a class="starrow" href="' + routeFor('players', slug(team) + '/' +
+        slug(x.n)) + '">' +
+        '<span class="sp">' + esc(x.pos || '') + '</span>' +
+        '<span class="sn">' + esc(x.n) + '</span>' +
+        '<span class="sd">' + esc(starLine(x)) + '</span>' +
+      '</a>').join('') + '</div>';
+  }
+  return '<div class="msec"><h3>Players to know</h3>' +
+    '<div class="starcols">' + col(away, sa) + col(home, sh) + '</div>' +
+    '<p class="mnote munk">The best on each side by how far above her own ' +
+    'position she rates — never compared across positions. Serve-receive and ' +
+    'back-row share are 2025.</p></div>';
+}
+
 function renderMatchDetail(gid, dest) {
   const host = document.getElementById(dest === 'scores' ? 'scoredetail' : 'deskdetail');
   const board = document.getElementById(dest === 'scores' ? 'ledgerwrap' : 'deskboard');
@@ -13015,6 +13647,7 @@ function renderMatchDetail(gid, dest) {
       /* live statistics, only while this match is live AND the state says
          team stats exist for it */
       (st === 'live' ? lmcSection(m.gid) : '') +
+      starsSection(m) +
       /* ⚠ ONE SENTENCE PER STATE, FROM THE SHARED TABLE. Each of these is a
          true statement about the source at that moment -- not a placeholder
          standing where data should be. */
@@ -13091,6 +13724,7 @@ document.addEventListener('click', e => {
     go(back.dataset.back === 'scores' ? routeFor('scores') : routeFor('desk'));
   }
 });
+wirePrank();
 (function wireLedgerDate() {
   const d = document.getElementById('ldate'), c = document.getElementById('lclear');
   if (d) d.addEventListener('input', renderLedger);
@@ -13615,6 +14249,23 @@ function todayReasons(m, live) {
     'Part of ' + m.event]);
   if (live) out.unshift(['lv', 'live now', 'In progress']);
   return out;
+}
+
+/* One line of "who is on the floor" on a Today card. The decision this page
+   exists to serve is whether to make time for a match, and a name you know is
+   often the whole answer.
+   ⚠ ONE NAME PER SIDE, NOT THREE. The full list lives on the match page; a
+   card that turns into a roster stops being scannable, which is the thing
+   Cody asked to fix in the first place. */
+function starPeek(m) {
+  const a = ((TEAMS[mAway(m)] || {}).stars || [])[0];
+  const h = ((TEAMS[mHome(m)] || {}).stars || [])[0];
+  if (!a && !h) return '';
+  const bit = x => x
+    ? '<span class="pk"><i>' + esc(x.pos || '') + '</i>' + esc(x.n) + '</span>'
+    : '';
+  return '<span class="tdstars">' + bit(a) +
+    (a && h ? '<span class="pkv">vs</span>' : '') + bit(h) + '</span>';
 }
 
 function reasonChips(m, live) {
@@ -14751,7 +15402,577 @@ function csSentences(text) {
   return out.filter(x => x.trim());
 }
 
-function scoutRead(t) {
+/* ══ NAMES IN PROSE BECOME PEOPLE ═════════════════════════════════════════
+   ⚠ SCOPED TO ONE ROSTER, AND EXACT. A brief on Nebraska's page may name
+   "Harper Murray"; linking that to whichever Murray a global search hits first
+   is the wrong-person match R8 exists for, and it would be invisible -- the
+   link would look fine and go to a stranger. So the candidate set is ONLY the
+   players the payload holds FOR THIS TEAM, matched on the full name, longest
+   first so "Bergen Reilly" is never clipped to a shorter overlapping name.
+
+   ⚠ AND IT RUNS ON TEXT, NOT MARKUP. The brief is plain prose from digby.py;
+   inserting anchors and then matching again would let a later name land inside
+   an earlier href. Each name is consumed once, left to right. */
+/* ---- PLAYER RATINGS -------------------------------------------------------
+   WITHIN POSITION ONLY. There is deliberately no cross-position board: a box
+   score gives a libero digs and a middle blocks, and nothing in it licenses
+   ranking one against the other. Each board also prints how well the data
+   supports it, measured rather than asserted. */
+
+function prkFmt(f, v) {
+  if (v === null || v === undefined) return '—';
+  return f === 'hit' ? (v < 0 ? '-' : '') + Math.abs(v).toFixed(3).replace(/^0/, '')
+                     : v.toFixed(2);
+}
+
+/* ⚠ CONFIDENCE IS THE SAMPLE, NOT A PERCENTAGE WE INVENT. It states how much
+   of the rating this season carries and how thin that season is -- both
+   measured -- rather than a made-up confidence score. */
+function prkConf(r) {
+  if (!r.m) {
+    return r.hp
+      ? '<span class="munk">last season only · ' + (r.ps || 0) + ' sets</span>'
+      : '<span class="munk">no prior season on record</span>';
+  }
+  const pct = Math.round(100 * (r.w || 0));
+  return '<b>' + pct + '%</b> <span class="munk">of the rating · ' +
+    r.m + (r.m === 1 ? ' match' : ' matches') +
+    (r.hp ? '' : ' · no prior') + '</span>';
+}
+
+function prkDrivers(r) {
+  if (!r.drv || !r.drv.length) return '<span class="munk">—</span>';
+  return r.drv.map(d =>
+    '<span class="prkd' + (d.c < 0 ? ' neg' : '') + '">' +
+    esc(PRK_FLAB[d.f] || d.f) + ' <b>' + prkFmt(d.f, d.v) + '</b></span>'
+  ).join('');
+}
+
+/* ⚠ PASSING IS LAST SEASON'S AND THE CHIP SAYS SO. The play-by-play mirror
+   runs to 2025 and there is no live route for this season, so a side-out rate
+   here describes last year. Letting it sit unlabelled beside this season's
+   rates would read as current form. */
+function prkPass(r) {
+  const p = r['pass'];
+  if (!p) return '';
+  const bits = [];
+  if (p.recv_share != null) {
+    bits.push('<span class="prkp">passes <b>' +
+      Math.round(p.recv_share * 100) + '%</b> of serve-receive</span>');
+  }
+  if (p.sideout != null) {
+    bits.push('<span class="prkp">sides out <b>' +
+      Math.round(p.sideout * 100) + '%</b> when she passes</span>');
+  }
+  if (p.touch_per_set != null) {
+    bits.push('<span class="prkp">touches <b>' +
+      p.touch_per_set.toFixed(1) + '</b>/set</span>');
+  }
+  /* Reported only for outside, opposite and setter. A middle shares her
+     rotation slot with the libero, so the serve order cannot say which of the
+     two was on court -- classified that way a libero comes out 41.8% front
+     row, which cannot happen. */
+  if (r.brs != null) {
+    bits.push('<span class="prkp"><b>' + Math.round(r.brs * 100) +
+      '%</b> of her swings from the back row</span>');
+  }
+  if (!bits.length) return '';
+  return '<div class="prkpass">' + bits.join('') +
+    '<span class="munk">2025</span></div>';
+}
+
+function prkRow(r) {
+  const overall = PRK_POS === 'ALL';
+  const rank = overall ? r.orank : (PRK_MODE === 'resume' ? r.rsr : r.pwr);
+  const val = overall ? r.pct : (PRK_MODE === 'resume' ? r.rs : r.pw);
+  const shown = val === null || val === undefined ? '—'
+    : (overall ? val.toFixed(1) : (val > 0 ? '+' : '') + val.toFixed(2));
+  return '<tr>' +
+    '<td class="prknum">' + (rank == null ? '—' : rank) + '</td>' +
+    '<td class="l tm"><b>' + esc(r.n || '') + '</b>' +
+      (r.num ? ' <span class="munk">#' + esc(String(r.num)) + '</span>' : '') +
+      (overall ? ' <span class="prkpos">' + esc(r.pos) + '</span>' : '') +
+      (r.role ? ' <span class="prkrolet">' +
+        esc(PRK_ROLELAB[r.role] || r.role) + '</span>' : '') +
+      (r.prole ? ' <span class="prkrolet alt">' +
+        esc(PRK_PROLELAB[r.prole] || r.prole) + '</span>' : '') +
+    '</td>' +
+    '<td class="l tm">' + logo(r.t, 'sm') +
+      '<a class="parentlink" href="' + routeFor('teams', slug(r.t || '')) +
+      '">' + esc(r.t || '') + '</a></td>' +
+    '<td>' + esc(r.cls || '—') + '</td>' +
+    '<td class="prkval">' + shown + '</td>' +
+    '<td class="prkconf">' + prkConf(r) + '</td>' +
+    '<td class="l prkdrv">' + prkDrivers(r) + prkPass(r) + '</td>' +
+    '</tr>';
+}
+
+function renderPrank() {
+  const posbar = $$('prkpos'), modebar = $$('prkmode'), sup = $$('prksupport');
+  const body = $$('prkbody'), cnt = $$('prkcnt');
+  if (!body) return;
+  if (!PRANK || !PRANK.ok) {
+    sup.innerHTML = '<div class="prkcav">Player ratings have not been built ' +
+      'yet. Run <code>scripts/player_rating.py</code>.</div>';
+    body.innerHTML = ''; return;
+  }
+  posbar.innerHTML = PRK_ORDER.map(p => {
+    const b = PRANK.boards[p] || {};
+    const lab = p === 'ALL' ? 'Overall'
+      : (b.label || p).replace('Libero / DS', 'Libero/DS');
+    return '<button type="button" data-p="' + p + '"' +
+      (p === PRK_POS ? ' class="on"' : '') + '>' + esc(lab) + '</button>';
+  }).join('');
+  /* ⚠ SIX-ROTATION AND FRONT-ROW PINS ARE DIFFERENT JOBS. An outside who
+     passes every rotation and one who is replaced in the back row are not
+     doing the same thing, so their dig and reception numbers are not
+     comparable and the board offers the split rather than averaging over it. */
+  const rolebar = $$('prkrole');
+  const roles = PRK_ROLES[PRK_POS];
+  if (roles) {
+    rolebar.hidden = false;
+    rolebar.innerHTML = roles.map(r =>
+      '<button type="button" data-r="' + r[0] + '"' +
+      (r[0] === PRK_ROLE ? ' class="on"' : '') + '>' + esc(r[1]) +
+      '</button>').join('');
+  } else {
+    rolebar.hidden = true; rolebar.innerHTML = ''; PRK_ROLE = '';
+  }
+  const b = PRANK.boards[PRK_POS] || {};
+  let rows = (PRK_POS === 'ALL'
+    ? (PRANK.overall_rows || []) : (PRANK.rows[PRK_POS] || [])).slice();
+  if (PRK_ROLE) rows = rows.filter(r => r.role === PRK_ROLE);
+  /* ⚠ THE RESUME BOARD DROPS ANYONE WITH NO SEASON LINE RATHER THAN RANKING
+     HER LAST. Last is a claim; absent is the truth. */
+  const list = PRK_MODE === 'resume'
+    ? rows.filter(r => r.rs !== null && r.rs !== undefined)
+          .sort((a, b2) => a.rsr - b2.rsr)
+    : rows.sort((a, b2) => a.pwr - b2.pwr);
+  if (PRK_POS === 'ALL') {
+    const ov = PRANK.overall || {};
+    sup.innerHTML = '<div class="prkcav sup-fair">' +
+      '<span class="prkbadge">STANDING, NOT VALUE</span> ' +
+      'Ranked by <b>percentile within her own position</b>. ' + esc(ov.note || '') +
+      '</div>';
+    cnt.textContent = list.length + ' shown';
+    body.innerHTML = list.map(prkRow).join('');
+    renderStars();
+    return;
+  }
+  sup.innerHTML =
+    '<div class="prkcav sup-' + esc(b.support || 'fair') + '">' +
+    '<span class="prkbadge">' + esc((b.support || '').toUpperCase()) +
+    ' SUPPORT</span> ' + esc(b.caveat || '') +
+    ' <span class="munk">Measured: this board separates All-Americans from ' +
+    'their peers at ' + ((b.support_auc || 0).toFixed(3)) +
+    ' AUC among players on comparable teams.</span></div>';
+  cnt.textContent = list.length
+    ? list.length + ' shown of ' + (b.n || 0) + ' rated'
+    : 'nobody has a ' + (PRK_MODE === 'resume' ? 'season line' : 'rating') +
+      ' yet';
+  body.innerHTML = list.map(prkRow).join('');
+  renderStars();
+}
+
+/* The constructed teams. ⚠ NOT AN AWARD AND IT SAYS SO ON THE PANEL: this is
+   the position boards read in order and poured into a lineup. A slot nobody
+   can fill renders VACANT rather than borrowing from another position. */
+function renderStars() {
+  const el = $$('prkstars');
+  if (!el) return;
+  const st = PRANK && PRANK.all_star;
+  if (!st) { el.innerHTML = ''; return; }
+  const NAMES = { 1: 'First team', 2: 'Second team', 3: 'Third team' };
+  function slot(x) {
+    if (!x.p) return '<div class="star vac"><span class="spos">' +
+      esc(x.pos) + '</span><span class="munk">vacant</span></div>';
+    return '<div class="star"><span class="spos">' + esc(x.pos) + '</span>' +
+      '<span class="sname">' + esc(x.p.n) + '</span>' +
+      '<span class="steam">' + logo(x.p.t, 'sm') + esc(x.p.t || '') + '</span>' +
+      '<span class="spw">' + (x.p.pw > 0 ? '+' : '') +
+      (x.p.pw || 0).toFixed(2) + '</span></div>';
+  }
+  function prof(p) {
+    if (!p) return '';
+    const bits = [];
+    if (p.block_front !== null) bits.push('blocks <b>' + p.block_front.toFixed(2) + '</b>/set');
+    if (p.kill !== null) bits.push('kills <b>' + p.kill.toFixed(2) + '</b>/set');
+    if (p.hit !== null) bits.push('hits <b>' + p.hit.toFixed(3).replace(/^0/, '') + '</b>');
+    if (p.dig !== null) bits.push('digs <b>' + p.dig.toFixed(2) + '</b>/set');
+    if (p.serve !== null) bits.push('aces <b>' + p.serve.toFixed(2) + '</b>/set');
+    return '<div class="sprof">' + bits.join(' · ') +
+      (p.vacant ? ' <span class="munk">· ' + p.vacant + ' vacant</span>' : '') +
+      '</div>';
+  }
+  el.innerHTML =
+    '<h3 class="prkh">Best available lineups</h3>' +
+    /* ⚠ THE LITERAL YEAR, NOT THE JS CONSTANT. The season guard reads the
+       BUILT PAGE, and `+ SEASON_YEAR +` leaves no four-digit year in it -- so
+       a view that names its season perfectly well at runtime still failed. */
+    '<p class="lead">The best lineups available for the {{SEASON_YEAR}}' +
+    ' season, built by reading each position board in order and filling a six ' +
+    'plus the libero. <b>These are constructed, not voted on</b> — nobody ' +
+    'selected them, and no player here is being compared with a player at ' +
+    'another position.</p>' +
+    st.teams.map(t =>
+      '<div class="starteam"><div class="sthead">' + esc(NAMES[t.tier] || ('Team ' + t.tier)) +
+      ' <span class="munk">' + esc(t.system) + '</span></div>' +
+      '<div class="stgrid">' + t.slots.map(slot).join('') + '</div>' +
+      prof(t.profile) + '</div>').join('') +
+    (st.alt ? '<div class="starteam alt"><div class="sthead">First team, as a ' +
+      esc(st.alt.system) +
+      ' <span class="munk">two setters, no opposite — a different team, ' +
+      'not a re-sort</span></div>' +
+      '<div class="stgrid">' + st.alt.slots.map(slot).join('') + '</div>' +
+      prof(st.alt.profile) + '</div>' : '') +
+    '<div class="starteam hm"><div class="sthead">Honourable mention ' +
+    '<span class="munk">by position</span></div>' +
+    PRK_ORDER.map(p => {
+      const v = (st.hm && st.hm[p]) || [];
+      if (!v.length) return '';
+      return '<div class="hmrow"><span class="spos">' + esc(p) + '</span>' +
+        v.map(x => x ? '<span class="hmn">' + esc(x.n) +
+          ' <span class="munk">' + esc(x.t || '') + '</span></span>' : '').join('') +
+        '</div>';
+    }).join('') + '</div>';
+}
+
+function wirePrank() {
+  const posbar = $$('prkpos'), modebar = $$('prkmode');
+  if (posbar) posbar.addEventListener('click', e => {
+    const b = e.target.closest('button[data-p]');
+    if (!b) return;
+    PRK_POS = b.getAttribute('data-p'); PRK_ROLE = ''; renderPrank();
+  });
+  const rolebar = $$('prkrole');
+  if (rolebar) rolebar.addEventListener('click', e => {
+    const b = e.target.closest('button[data-r]');
+    if (!b) return;
+    PRK_ROLE = b.getAttribute('data-r'); renderPrank();
+  });
+  if (modebar) modebar.addEventListener('click', e => {
+    const b = e.target.closest('button[data-m]');
+    if (!b) return;
+    PRK_MODE = b.getAttribute('data-m');
+    [...modebar.querySelectorAll('button')].forEach(x =>
+      x.classList.toggle('on', x === b));
+    renderPrank();
+  });
+}
+
+function nameCandidates(team, t) {
+  /* ⚠ TWO SOURCES, BECAUSE ONE OF THEM IS EMPTY IN AUGUST. PLAYERS is built
+     from 2026 box scores, so before a team has played it holds nothing for
+     her -- and the briefs name players on all 348 teams. The projected six
+     carries the rest: team, class, position, number, last season's points and
+     her transfer line.
+     A PLAYERS entry WINS when both have her, because that one has a real page
+     behind it. Both are already scoped to this team, so the R8 wrong-person
+     match is structurally impossible here. */
+  const out = [];
+  const seen = Object.create(null);
+  if (typeof PLAYERS !== 'undefined') {
+    PLAYERS.forEach(p => {
+      if (p.team === team && p.name && !seen[p.name]) {
+        seen[p.name] = 1;
+        out.push({ name: p.name, p: p, six: null });
+      }
+    });
+  }
+  const six = ((t || {}).lineup || {}).usual_six_2025 || [];
+  six.forEach(c => {
+    if (c && c.name && !seen[c.name]) {
+      seen[c.name] = 1;
+      out.push({ name: c.name, p: null, six: c });
+    }
+  });
+  return out;
+}
+
+/* A name in a brief resolves one of two ways, and the difference is real:
+   she has a 2026 player page, or she does not. A page exists only once she has
+   a box-score line, so in August most named players have none. The old code
+   linked every name to a players route regardless -- which for an unplayed
+   team is a link to nothing.
+   ⚠ SO: a real page gets an anchor. Everyone else gets a BUTTON that opens a
+   card built from what we actually hold -- team, class, position, number, last
+   season's points, where she transferred from, and video search. No page is
+   invented and no stat is stood in for. */
+function nameChip(best, team) {
+  const nm = esc(best.name);
+  if (best.p) {
+    const p = best.p;
+    return '<a class="pname" href="' +
+      routeFor('players', slug(p.team) + '/' + slug(p.name)) +
+      '" title="' + esc(p.name + ' \u00b7 ' + p.team +
+        (p['class'] ? ' \u00b7 ' + p['class'] : '') +
+        (p.pos ? ' \u00b7 ' + p.pos : '') + ' \u2014 open her page') + '">' +
+      nm + '</a>';
+  }
+  return '<button type="button" class="pname pname-brief" ' +
+    'data-nteam="' + esc(team) + '" data-nname="' + esc(best.name) + '" ' +
+    'aria-haspopup="dialog" title="' + esc(best.name + ' \u2014 who is this') +
+    '">' + nm + '</button>';
+}
+
+/* The card for a player with no 2026 page yet. Every row is omitted when the
+   field is absent -- there is no zero, no dash-shaped placeholder standing
+   where a measurement belongs, and the header says plainly that she has not
+   played this season rather than showing an empty stat block (R5). */
+function briefCard(c, team) {
+  const face = c.photo
+    ? '<img class="npface" src="' + c.photo + '" alt="">'
+    : avatar(c.pos, team, 48);
+  /* ⚠ A DEPARTED PLAYER IS NOT ON THIS ROSTER, AND THE SUBTITLE MUST NOT READ
+     AS THOUGH SHE IS. She still appears in the team's 2025 six -- that is what
+     the record is -- so the school is stamped with the season it belongs to.
+     Class is a 2026 roster field, so it is omitted entirely for someone who is
+     no longer on it rather than shown against the wrong year. */
+  const gone = c.status_2026 === 'departed';
+  const sub = [
+    '<a class="parentlink" href="' + routeFor('teams', slug(team)) + '">' +
+      esc(team) + '</a>' + (gone ? ' <span class="munk">2025</span>' : ''),
+    (!gone && c.class_2026) ? esc(c.class_2026) : null,
+    c.pos ? esc(c.pos) : null,
+    c.num ? '#' + esc(String(c.num)) : null
+  ].filter(Boolean).join(' \u00b7 ');
+  const rows = [];
+  if (c.pts_2025 != null) {
+    rows.push('<div class="nprow"><span class="pxlab">2025</span>' +
+      '<span class="pxstat">' + esc(String(c.pts_2025)) + ' points' +
+      (c.starts_2025 ? ' \u00b7 ' + esc(String(c.starts_2025)) + ' starts' : '') +
+      '</span></div>');
+  } else if (c.starts_2025) {
+    rows.push('<div class="nprow"><span class="pxlab">2025</span>' +
+      '<span class="pxstat">' + esc(String(c.starts_2025)) +
+      ' starts</span></div>');
+  }
+  if (c.status_2026) {
+    rows.push('<div class="nprow"><span class="pxlab">2026</span>' +
+      '<span class="pxstat">' + esc(String(c.status_2026)) + '</span></div>');
+  }
+  if (c.went_to) {
+    rows.push('<div class="nprow"><span class="pxlab">Moved to</span>' +
+      '<a class="parentlink" href="' + routeFor('teams', slug(c.went_to)) +
+      '">' + esc(c.went_to) + '</a></div>');
+  }
+  if (c.xf && c.xf.from_team) {
+    rows.push('<div class="nprow"><span class="pxlab">Transfer</span>' +
+      '<a class="parentlink" href="' + routeFor('teams', slug(c.xf.from_team)) +
+      '">' + esc(c.xf.from_team) + '</a>' +
+      (c.xf.prior_pts && c.xf.prior_sets
+        ? '<span class="pxstat">' +
+          (c.xf.prior_pts / c.xf.prior_sets).toFixed(2) +
+          ' pts/set there over ' + esc(String(c.xf.prior_sets)) + ' sets</span>'
+        : '<span class="pxstat munk">no prior D-I line on record</span>') +
+      '</div>');
+  }
+  const q = encodeURIComponent(c.name + ' ' + team + ' volleyball highlights');
+  const vid = '<div class="pvid"><span class="pxlab">Video</span>' +
+    '<a href="https://www.youtube.com/results?search_query=' + q + '" ' +
+    'target="_blank" rel="noopener noreferrer">Search YouTube</a>' +
+    '<a href="https://www.google.com/search?tbm=vid&q=' + q + '" ' +
+    'target="_blank" rel="noopener noreferrer">Search video</a>' +
+    '<span class="munk">a search, not a verified reel</span></div>';
+  return '<div class="nphead">' + face + '<div><div class="npname">' +
+    esc(c.name) + '</div><div class="sub">' + sub + '</div></div>' +
+    '<button type="button" class="npx" aria-label="Close">\u00d7</button></div>' +
+    '<div class="npbody">' + rows.join('') + vid +
+    '<div class="munk npfoot">' + (gone
+      ? 'She is not on the 2026 roster, so there is no season page for her ' +
+        'here. Everything above is her 2025 record at ' + esc(team) + '.'
+      : 'No 2026 match line yet, so there is no season page for her. ' +
+        'Everything here is last season\u2019s record and her roster listing.') +
+    '</div></div>';
+}
+
+let NAMEPOP = null;
+function closeNamePop() {
+  if (NAMEPOP && NAMEPOP.parentNode) { NAMEPOP.parentNode.removeChild(NAMEPOP); }
+  NAMEPOP = null;
+}
+function openNamePop(btn) {
+  closeNamePop();
+  const team = btn.getAttribute('data-nteam');
+  const name = btn.getAttribute('data-nname');
+  const cand = nameCandidates(team, (typeof TEAMS !== 'undefined' ? TEAMS[team] : null));
+  let hit = null;
+  cand.forEach(x => { if (x.name === name && x.six) hit = x.six; });
+  if (!hit) return;
+  const el = document.createElement('div');
+  el.className = 'namepop';
+  el.setAttribute('role', 'dialog');
+  el.setAttribute('aria-label', name);
+  el.innerHTML = briefCard(hit, team);
+  document.body.appendChild(el);
+  NAMEPOP = el;
+  /* Positioned from the button's MEASURED box, then pulled back inside the
+     viewport -- a card anchored near the right edge would otherwise hang off
+     the page, and on a phone it would be entirely unreachable. */
+  const r = btn.getBoundingClientRect();
+  const w = el.offsetWidth;
+  let left = r.left + window.scrollX;
+  const maxL = window.scrollX + document.documentElement.clientWidth - w - 10;
+  if (left > maxL) left = maxL;
+  if (left < window.scrollX + 10) left = window.scrollX + 10;
+  let top = r.bottom + window.scrollY + 7;
+  if (r.bottom + el.offsetHeight + 14 > window.innerHeight && r.top > el.offsetHeight) {
+    top = r.top + window.scrollY - el.offsetHeight - 7;
+  }
+  el.style.left = left + 'px';
+  el.style.top = top + 'px';
+  const x = el.querySelector('.npx');
+  if (x) x.addEventListener('click', function () { closeNamePop(); btn.focus(); });
+}
+document.addEventListener('click', function (e) {
+  const b = e.target.closest && e.target.closest('.pname-brief');
+  if (b) { e.preventDefault(); openNamePop(b); return; }
+  if (NAMEPOP && !(e.target.closest && e.target.closest('.namepop'))) closeNamePop();
+});
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape' && NAMEPOP) closeNamePop();
+});
+
+function linkNames(text, team, t) {
+  if (!text) return '';
+  const roster = nameCandidates(team, t);
+  if (!roster.length) return esc(text);
+  const byLen = roster.slice().sort((a, b) => b.name.length - a.name.length);
+  const parts = [];
+  let rest = String(text);
+  let guard = 0;
+  while (rest && guard++ < 400) {
+    let best = null, at = -1;
+    byLen.forEach(pl => {
+      const i = rest.indexOf(pl.name);
+      if (i >= 0 && (at < 0 || i < at)) { at = i; best = pl; }
+    });
+    if (!best) break;
+    parts.push(esc(rest.slice(0, at)));
+    parts.push(nameChip(best, team));
+    rest = rest.slice(at + best.name.length);
+  }
+  parts.push(esc(rest));
+  return parts.join('');
+}
+
+/* ⚠ THE TEAM NAME IS PASSED IN, NOT READ OFF THE RECORD. TEAMS is keyed by
+   name and its records carry no `name`/`team` field, so the first version's
+   `t.name || t.team || ''` was always the empty string -- the roster filter
+   matched nobody and every brief rendered with zero links and no error.
+   A silent no-op, which is the failure mode this project keeps paying for. */
+/* ---- PARTS VS WHOLE, ROTATIONS, AND WHAT A TEAM RETURNS ------------------
+   ⚠ ALL THREE ARE LAST SEASON AND EVERY ONE SAYS SO IN ITS OWN HEADING. The
+   play-by-play mirror ends at 2025 and there is no live route, and the
+   parts-vs-whole gap is only honest on a COMPLETED season: this season's team
+   projection is built from last season's production, so comparing the two
+   would be circular and the gap would measure nothing. */
+
+function partsHTML(t) {
+  const p = t.parts;
+  if (!p) return '';
+  const r = p.residual, sd = p.residual_sd;
+  /* ⚠ THE VERDICT IS BUILT FROM THE NUMBER, NOT BEFORE IT (R1). And the band
+     is stated rather than implied: inside one standard deviation is not a
+     finding, it is noise, and the copy says so instead of dressing it up. */
+  let verdict, cls;
+  if (sd == null) { verdict = ''; cls = ''; }
+  else if (sd >= 1) { verdict = 'beat what its roster predicted'; cls = 'over'; }
+  else if (sd <= -1) { verdict = 'fell short of what its roster predicted'; cls = 'under'; }
+  else { verdict = 'landed about where its roster predicted'; cls = 'level'; }
+  return '<div class="tsec partsbox"><h3>Parts vs whole ' +
+    '<span class="munk">2025</span></h3><div class="body">' +
+    '<div class="partsrow ' + cls + '">' +
+      '<span class="pv">' + (r > 0 ? '+' : '') + r.toFixed(2) + '</span>' +
+      '<span class="pl">net points/set vs its players’ forecast</span>' +
+    '</div>' +
+    '<p class="tnote">Its top ' + p.rated_players + ' rated players forecast ' +
+      p.predicted.toFixed(2) + '; it actually rated ' + p.actual.toFixed(2) +
+      ', so it ' + verdict + (sd == null ? '' :
+      ' (' + (sd > 0 ? '+' : '') + sd.toFixed(1) + ' SD)') + '.</p>' +
+    '<p class="tnote munk">What the gap is, we do not claim. The obvious ' +
+      'explanation — that rotation rules punish an unbalanced roster ' +
+      '— was tested and failed: at equal average a team with one dominant ' +
+      'hitter does <b>better</b>, not worse, and rotation imbalance predicts ' +
+      'nothing at all. So this is reported as unexplained rather than ' +
+      'attributed to something it might not be.</p>' +
+    '</div></div>';
+}
+
+function retposHTML(t) {
+  const rp = t.retpos;
+  if (!rp) return '';
+  const rows = PRK_ORDER.filter(x => x !== 'ALL').map(pos => {
+    const v = rp[pos];
+    if (!v) return '';
+    /* ⚠ A POSITION WITH NO RECORDED PRODUCTION RENDERS AS UNKNOWN, NOT 0%.
+       Zero percent returning reads as "they lost everyone there", which is a
+       claim the data has not made. */
+    const sh = v.share;
+    const pct = sh == null ? null : Math.round(sh * 100);
+    return '<div class="rprow">' +
+      '<span class="rplab">' + esc(POSFULL[pos] || pos) + '</span>' +
+      (pct == null
+        ? '<span class="munk">not recorded</span>'
+        : '<span class="rpbar"><i style="width:' + pct + '%"></i></span>' +
+          '<span class="rppct">' + pct + '%</span>') +
+      '<span class="munk">' + v.n_returning + ' back' +
+        (v.n_departed ? ', ' + v.n_departed + ' gone' : '') + '</span>' +
+      '</div>';
+  }).join('');
+  if (!rows) return '';
+  return '<div class="tsec"><h3>What it returns, by position ' +
+    '<span class="munk">2025 production</span></h3><div class="body">' +
+    rows + '<p class="tnote munk">Share of last season’s points at each ' +
+    'position that is back on the roster. One number for the whole squad ' +
+    'hides the difference between losing a setter and losing a middle.</p>' +
+    '</div></div>';
+}
+
+function rotsoHTML(t) {
+  const doc = t.rotso;
+  if (!doc || !doc.rotations) return '';
+  const r = doc.rotations;
+  const keys = ['1', '2', '3', '4', '5', '6'].filter(k => r[k]);
+  if (keys.length < 6) return '';
+  const vals = keys.map(k => r[k].sideout);
+  const lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+  const cells = keys.map(k => {
+    const v = r[k].sideout;
+    const cls = v === hi ? ' best' : (v === lo ? ' worst' : '');
+    return '<div class="rotcell' + cls + '">' +
+      '<span class="rotlab">S' + esc(k) + '</span>' +
+      '<span class="rotv">' + (v * 100).toFixed(0) + '%</span>' +
+      '<span class="munk">' + r[k].att + '</span></div>';
+  }).join('');
+  /* ⚠ WHOSE ROTATIONS THESE ARE, AND HOW MUCH OF THE SEASON THEY COVER.
+     S1..S6 names where the setter stands, so it only means one thing if it is
+     ONE setter -- and 135 of 348 teams give their most-used setter under 70%
+     of the sets. Naming her and stating the coverage is the difference between
+     a rotation profile and an average of two different teams. */
+  const pct = Math.round((doc.share_of_season || 0) * 100);
+  return '<div class="tsec"><h3>Side-out by rotation ' +
+    '<span class="munk">2025</span></h3><div class="body">' +
+    '<div class="rotgrid">' + cells + '</div>' +
+    '<p class="tnote">Rotations are named by where the setter stands — these ' +
+    'are <b>' + esc(doc.setter || 'the primary setter') + '</b>’s, covering ' +
+    pct + '% of the season’s rallies. The team ranged from <b>' +
+    (lo * 100).toFixed(0) + '%</b> to <b>' + (hi * 100).toFixed(0) +
+    '%</b> across the six.</p>' +
+    (pct < 70 ? '<p class="tnote munk">⚠ She set under 70% of the season, so ' +
+      'the rest of it ran through somebody else and is not shown here.</p>'
+      : '') +
+    '<p class="tnote munk">Scouting, not a rating. Rotation imbalance was ' +
+    'measured against team strength and predicts nothing (correlation ' +
+    '−0.09), so it is deliberately kept out of the model. These are ' +
+    '<b>2025</b> rotations — there is no live source for them. A team does ' +
+    'not field one fixed six: the median side used 29 different serve orders ' +
+    'last season, which is why these are anchored on the setter rather than ' +
+    'on a lineup.</p>' +
+    '</div></div>';
+}
+
+function scoutRead(t, team) {
   if (!t.digby) return '';
   const parts = csSentences(String(t.digby));
   let lead = '', i = 0;
@@ -14776,10 +15997,10 @@ function scoutRead(t) {
      in the public build by the same substitution. */
   return '<div class="digby scoutread"><div class="digby-tag">' +
     (typeof CS_DIGBY === 'string' ? CS_DIGBY : '') + 'Scout\u2019s read</div>' +
-    '<p>' + lead.trim() + '</p>' +
+    '<p>' + linkNames(lead.trim(), team, t) + '</p>' +
     (rest
       ? '<details class="scoutmore"><summary>Full scouting note</summary>' +
-        '<p>' + rest + '</p></details>'
+        '<p>' + linkNames(rest, team, t) + '</p></details>'
       : '') +
     '<div class="digby-note">Written from this team\u2019s own numbers on ' +
     'this page. Every figure in it was checked against the source before it ' +
@@ -15338,7 +16559,8 @@ function showTeam(name) {
         '</div>'
       : '') +
     glanceHtml +
-    scoutRead(t) +
+    scoutRead(t, name) +
+    partsHTML(t) + retposHTML(t) + rotsoHTML(t) +
     /* the POWER history, or an honest sentence saying why there is not one.
        Rendered server-side by trend.py so the rule about a same-basis series
        lives in exactly one place. */

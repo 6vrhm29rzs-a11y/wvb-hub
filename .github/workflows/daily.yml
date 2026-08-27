@@ -220,6 +220,18 @@ jobs:
           # played, so the page can state that rather than guess; it switches
           # itself on once the season is big enough.
           python3 scripts/resume_2025.py || echo "resume needs a rating or a blend; skipping"
+          # PLAYER RATINGS -- position boards, POWER and RESUME. Cheap and
+          # offline: it reads the crawled box scores already on disk. It must
+          # run BEFORE build_hub.py, which embeds its output; without it the
+          # view renders a "not built yet" message rather than an empty table.
+          # Passing, touches and rotation role come from the play-by-play, which
+          # is a 775 MB file that is NOT committed -- so this is a no-op in CI
+          # and the ratings simply ship without those fields rather than fail.
+          python3 scripts/pbp_player_metrics.py || echo "no play-by-play on this machine; continuing"
+          python3 scripts/player_rating.py || echo "player ratings skipped; continuing"
+          # Parts-vs-whole and returning-by-position. Reads the ratings above
+          # plus the completed prior season; no network, no big files.
+          python3 scripts/team_parts.py || echo "team parts skipped; continuing"
           python3 scripts/build_hub.py   # Cody's page, everything on it
           # PUBLIC BUILD RE-ENABLED 2026-08-24 at Cody's request, so he can see
           # the hub from a phone. Same code, same page, minus every input that

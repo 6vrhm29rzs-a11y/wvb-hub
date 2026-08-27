@@ -194,7 +194,12 @@ def main():
     # found `function scoutRead(t) {` -- which sits far ABOVE the assembly --
     # so the ordering check compared the wrong two positions and reported the
     # note as rendering before the crest when it does not.
-    order = C.index("scoutRead(t) +") if "scoutRead(t) +" in C else -1
+    # ⚠ AND MATCH THE CALL SHAPE, NOT ITS EXACT ARGUMENTS. This was pinned to
+    # the literal "scoutRead(t) +", so adding the team argument the function
+    # needs -- scoutRead(t, name) -- failed a guard about ORDERING, which the
+    # rename does not touch. Anchor on what the check is actually about.
+    _m = re.search(r"scoutRead\([^)]*\)\s*\+", C)
+    order = _m.start() if _m else -1
     TH = '\'<div class="thead cs-court cs-prog"\''
     thead = C.index(TH) if TH in C else -1
     glance = C.index("glanceHtml +") if "glanceHtml +" in C else -1

@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|WebFetch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 '/Users/codyrose/Womens_College_Volleyball_2026/.codex/hooks/no_scrape.py'"
+          }
+        ]
+      }
+    ]
+  }
+}

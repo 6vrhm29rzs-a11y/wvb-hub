@@ -28,6 +28,7 @@ Python 3.9 target, standard library only.
 
 import json
 import os
+import subprocess
 import sys
 import time
 import threading
@@ -35,6 +36,7 @@ import datetime
 import urllib.request
 import urllib.error
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
+from typing import Optional, Tuple
 
 import match_state as MS
 
@@ -757,6 +759,36 @@ def _who_has(port):
     return ""
 
 
+def tailscale_self():
+    # type: () -> Optional[Tuple[str, str]]
+    """This Mac's tailnet IP and MagicDNS name, or None if Tailscale is off.
+
+    ⚠ THE TAILNET INTERFACE IS NOT THE LAN AND IT IS NOT 0.0.0.0. Binding here
+    exposes the hub to the devices on Cody's own tailnet and to nothing else:
+    a machine on the same coffee-shop wifi cannot reach it, no router port is
+    opened, and this is Tailscale's private mesh, never Funnel.
+    ⚠ AND IT IS OPT-IN. Without WVB_TAILNET=1 the server binds 127.0.0.1 only,
+    exactly as before.
+    """
+    exe = "/Applications/Tailscale.app/Contents/MacOS/Tailscale"
+    for cand in (exe, "tailscale"):
+        try:
+            out = subprocess.check_output([cand, "status", "--json"],
+                                          stderr=subprocess.DEVNULL, timeout=20)
+        except Exception:
+            continue
+        try:
+            d = json.loads(out.decode("utf-8", "replace"))
+        except Exception:
+            continue
+        me = d.get("Self") or {}
+        ips = [x for x in (me.get("TailscaleIPs") or []) if ":" not in x]
+        name = (me.get("DNSName") or "").rstrip(".")
+        if ips:
+            return ips[0], name
+    return None
+
+
 def main():
     if not os.path.isdir(WEBROOT):
         print("no %s -- run scripts/build_hub.py first" % WEBROOT)
@@ -800,6 +832,38 @@ def main():
         print("  Ask Digby: OFF -- no ANTHROPIC_API_KEY in this shell.")
         print("             Everything else on the page works without it.")
     print("  ctrl-c to stop")
+    # ---- optional second listener, on the tailnet interface only ---------
+    ts_srv = None
+    if os.environ.get("WVB_TAILNET") == "1":
+        info = tailscale_self()
+        if not info:
+            print("  tailnet: REQUESTED but Tailscale is not reachable "
+                  "-- serving on 127.0.0.1 only")
+        else:
+            tip, tname = info
+            try:
+                ts_srv = ThreadingHTTPServer((tip, PORT_IN_USE), Handler)
+            except OSError as exc:
+                print("  tailnet: could not bind %s:%d (%s)"
+                      % (tip, PORT_IN_USE, exc))
+            else:
+                # ⚠ TAILSCALE PRESERVES THE ORIGINAL Host HEADER, so the
+                # trusted-host allowlist has to know these two names or the
+                # phone gets a refusal that looks like the server is down.
+                # ⚠ REBOUND, NOT MUTATED. TRUSTED_HOSTS is a frozenset on
+                # purpose -- it is a security allowlist and nothing should be
+                # able to bolt an entry onto it at runtime. Adding these two
+                # names is a deliberate, single, opt-in widening.
+                globals()["TRUSTED_HOSTS"] = frozenset(
+                    set(TRUSTED_HOSTS) | set([tip] + ([tname] if tname else [])))
+                threading.Thread(target=ts_srv.serve_forever,
+                                 daemon=True).start()
+                print("  tailnet: http://%s:%d/START-HERE.html"
+                      % (tname or tip, PORT_IN_USE))
+                print("           (or http://%s:%d/START-HERE.html)"
+                      % (tip, PORT_IN_USE))
+                print("           reachable from your own devices only, on "
+                      "any network. Not the LAN, not the internet.")
     try:
         srv.serve_forever()
     except KeyboardInterrupt:

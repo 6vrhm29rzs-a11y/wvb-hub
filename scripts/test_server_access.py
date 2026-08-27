@@ -142,6 +142,8 @@ def main():
 
     os.environ.pop("WVB_TRUSTED_HOSTS", None)
     print()
+    if not check_tailnet_binding():
+        FAILS.append("tailnet listener binds only its own tailnet address")
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))
         for f in FAILS:
@@ -149,6 +151,52 @@ def main():
         return 1
     print("ALL SERVER ACCESS GUARDS PASS")
     return 0
+
+
+
+def check_tailnet_binding():
+    """The tailnet listener may not become a LAN listener.
+
+    ⚠ THE WHOLE POINT IS THE INTERFACE IT IS NOT ON. Cody asked for the hub on
+    his phone from anywhere, which Tailscale gives, and explicitly ruled out
+    binding 0.0.0.0, exposing the LAN, and opening router ports. Verified live
+    when this was built: the tailnet IP and the MagicDNS name both answer 200,
+    and the machine's own LAN address (192.168.1.26) refuses the connection.
+    ⚠ Tailscale SERVE is not used -- the App Store build cannot run it -- and
+    FUNNEL must never be, because Funnel is the public internet.
+    """
+    src = open(os.path.join(REPO, "scripts/live_server.py"),
+               encoding="utf-8").read()
+    ok = True
+    for bad in ('ThreadingHTTPServer(("0.0.0.0"', "ThreadingHTTPServer((''",
+                'ThreadingHTTPServer(("",'):
+        if bad in src:
+            print("  FAIL binds a wildcard address: %s" % bad)
+            ok = False
+    # ⚠ CHECK WHAT IT RUNS, NOT WHAT IT SAYS. The first version searched for
+    # the word "funnel" and tripped on the comment that promises never to use
+    # it. Scope the check to actual invocations: the only tailscale subcommand
+    # this server may ever run is `status`.
+    import re as _re
+    for m in _re.finditer(r"\[\s*cand\s*,\s*([^\]]*)\]", src):
+        args = m.group(1)
+        if "funnel" in args or "serve" in args:
+            print("  FAIL live_server invokes tailscale %s" % args)
+            ok = False
+    if 'subprocess' in src and '"status", "--json"' not in src:
+        print("  FAIL the tailscale call is not the read-only status call")
+        ok = False
+    # the second listener must come from tailscale_self(), never from a
+    # user-supplied host that could be anything
+    if "WVB_TAILNET" in src and "tailscale_self()" not in src:
+        print("  FAIL the tailnet listener does not resolve its own address")
+        ok = False
+    if "globals()[\"TRUSTED_HOSTS\"]" in src and "frozenset(" not in src:
+        print("  FAIL the allowlist stopped being a frozenset")
+        ok = False
+    print("  %-64s %s" % ("tailnet listener binds only its own tailnet address",
+                          "ok" if ok else "FAIL"))
+    return ok
 
 
 if __name__ == "__main__":
