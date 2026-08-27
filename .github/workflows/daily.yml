@@ -322,9 +322,15 @@ jobs:
           # ONE artifact here that cannot be rebuilt: it records what the ranking
           # said before a week's results. Re-deriving it later from data that
           # includes those results would be a fit, not a ranking.
-          # output/vb_dashboard.html and index.html are no longer regenerated
-          # (the public build is off), so they are not staged either -- staging an
-          # unchanged file is harmless but it makes the diff lie about what ran.
+          # ⚠ THIS COMMENT USED TO SAY THE OPPOSITE OF THE LINE BELOW IT. It
+          # read "output/vb_dashboard.html and index.html are no longer
+          # regenerated (the public build is off), so they are not staged
+          # either" -- left over from 2026-08-23, and still sitting directly
+          # above a `git add` of both files, ninety lines under another comment
+          # recording that the public build was RE-ENABLED on 2026-08-24. The
+          # job was behaving correctly the whole time; the note beside it was
+          # lying about what ran, which is the one thing a comment on a staging
+          # step must not do.
           git add data/raw
           # The published page and its cache-busting redirect. index.html
           # carries a content hash: Fastly holds the object ~10 minutes, so
