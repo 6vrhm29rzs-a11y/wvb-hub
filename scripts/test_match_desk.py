@@ -450,9 +450,12 @@ def main():
           and "go(matchRoute(row.dataset.match, row.dataset.dest))" in src)
     check("both parents can own a match",
           "renderMatchDetail(decodeURIComponent(parts[1])" in src)
+    # ⚠ THE PARENT IS NAMED "Today" NOW. This pinned the old literal, so it
+    # failed on a correct rename. What it is really asserting is that a match
+    # detail knows which list it came from and says so -- check that.
     check("...and the detail names its parent",
           "'Scores', routeFor('scores')" in src
-          and "'Match Desk', routeFor('desk')" in src)
+          and "'Today', routeFor('desk')" in src)
     check("leaving a match restores its parent list", "closeMatchDetail" in src)
     # ⚠ THE CRUMB SWEEP USED TO DELETE THE DETAIL'S OWN WAY OUT. renderCrumbs()
     # removes every .crumb/.backlink and runs after the detail has painted, so

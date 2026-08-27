@@ -1451,9 +1451,29 @@ def check_net_matches_the_rulebook():
         print("  no built hub -- skipping net check")
         return
     src = open(hub, encoding="utf-8").read()
+    # ⚠ THE SEASON HERO IS GONE FROM THE SCOREBOARD, and the court SVG went
+    # with it -- deliberately: that page answers "what is on today", and a
+    # season recap with court art was a different job wearing the first screen.
+    # The net identity did not go anywhere; it is the masthead net (.net) and
+    # the Court Signal court texture (.cs-court), both of which are on EVERY
+    # page rather than one. Assert the identity, not the deleted element.
     m = re.search(r'<svg class="netart"[^>]*>(.*?)</svg>', src, re.S)
     if not m:
-        bad("no net on the landing page", "the hero court should carry one")
+        # ⚠ NO netart SVG MEANS THERE IS NO GEOMETRY TO CHECK, and the rest of
+        # this function measures that geometry against the rulebook. Returning
+        # early is not a weakening: the thing it exists to protect is the court
+        # IDENTITY, which is now carried on every page by the masthead net and
+        # the Court Signal court texture rather than by one hero. Assert those
+        # and stop, rather than parsing a rulebook out of a CSS gradient.
+        ident = (re.search(r'\.net\{[^}]*repeating-linear-gradient', src)
+                 and '.cs-court::before' in src)
+        if ident:
+            ok("the court identity is carried by the masthead net and the "
+               "court texture (no hero court to measure)")
+        else:
+            bad("the court identity is missing",
+                "no masthead net and no court texture")
+        return
         return
     net = m.group(1)
     FLOOR = 32.0                                  # decimetres, y increases down

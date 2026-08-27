@@ -3706,6 +3706,8 @@ h1 em{font-style:normal;color:var(--gold)}
 .cs-quiet .cs-nm{color:var(--ink2)}
 .cs-quiet .cs-sets{display:none}
 .cs-quiet .cs-side{grid-template-columns:max-content 26px minmax(0,1fr)}
+/* with no set cells, the quiet marquee is two columns, not four */
+.cs-tape.cs-quiet{grid-template-columns:150px minmax(0,1fr)}
 /* the ranks label and any other stated-provenance aside in the context line */
 .cs-ctx .cs-unk{font-style:normal;font:11px/1.5 var(--mono);
   letter-spacing:.04em}
@@ -3926,6 +3928,134 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 @media (max-width:860px){.deskfeat{grid-template-columns:minmax(0,1fr)}}
 /* MATCHMOMENT-CSS-END */
 /* COURTSIGNAL-VIEWS-CSS-END */
+/* ── THE RAIL: the compact shape, for every screen that is not Today ──── */
+/* ⚠ ONE LINE. The marquee is 129px; this is ~34px and carries the same three
+   facts -- what is on, when, and a way in. A deep page gets context without
+   surrendering its first third to it. */
+/* ── TODAY ────────────────────────────────────────────────────────────── */
+/* ── SCOREBOARD ───────────────────────────────────────────────────────── */
+/* the season ledger, deliberately behind a name */
+.sbfull{margin-top:30px;border-top:1px solid var(--cs-edge);padding-top:8px}
+.sbfull>summary{cursor:pointer;list-style:none;padding:11px 0;
+  font:700 11px/1 var(--disp);letter-spacing:.17em;text-transform:uppercase;
+  color:var(--navy)}
+.sbfull>summary::-webkit-details-marker{display:none}
+.sbfull>summary::before{content:"\25B8";display:inline-block;margin-right:8px}
+.sbfull[open]>summary::before{content:"\25BE"}
+.sbfull>summary:hover{color:var(--cs-white)}
+.sbfull>summary:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
+.sbbar{display:flex;flex-direction:column;gap:12px;margin:0 0 22px;
+  padding-bottom:16px;border-bottom:2px solid var(--cs-edge2)}
+.sbdate{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sbnav{appearance:none;width:36px;height:36px;flex:0 0 auto;cursor:pointer;
+  border:1px solid var(--cs-edge2);background:var(--cs-cell);color:var(--cs-white);
+  font:600 15px/1 var(--sans);border-radius:2px}
+.sbnav:hover{border-color:var(--navy);color:var(--cs-gold)}
+.sbnav:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
+.sbday{display:flex;flex-direction:column;gap:2px;min-width:150px}
+.sbday b{font:700 21px/1 var(--disp);letter-spacing:.01em;color:var(--cs-white);
+  text-transform:uppercase}
+.sbday span{font:500 10.5px/1 var(--mono);color:var(--slate);letter-spacing:.07em}
+.sbtoday{appearance:none;cursor:pointer;border:1px solid var(--cs-edge2);
+  background:transparent;color:var(--navy);border-radius:2px;padding:9px 12px;
+  font:600 11px/1 var(--disp);letter-spacing:.13em;text-transform:uppercase}
+.sbtoday:disabled{opacity:.4;cursor:default}
+.sbtoday:not(:disabled):hover{color:var(--cs-white);border-color:var(--navy)}
+.sbtoday:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
+.sbpick{display:flex;align-items:center;gap:7px;margin-left:auto;
+  font:500 10.5px/1 var(--mono);color:var(--slate);letter-spacing:.07em;
+  text-transform:uppercase}
+.sbpick input{background:var(--cs-cell);border:1px solid var(--cs-edge2);
+  color:var(--ink);border-radius:2px;padding:7px 8px;font:12px/1 var(--mono)}
+.sbfilters{flex-wrap:wrap}
+/* ⚠ SAME SPECIFICITY, LATER SOURCE WINS. `.tdmarq` sets three columns and is
+   defined after this block, so `.sbtop` alone lost the tie and four cards
+   wrapped 3+1. Qualified so it wins on class count rather than on position,
+   which is the thing that changes when blocks move. */
+.tdmarq.sbtop{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:1100px){.tdmarq.sbtop{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){
+  .tdmarq.sbtop{grid-template-columns:minmax(0,1fr)}
+  .sbpick{margin-left:0;width:100%}
+  .sbday{min-width:0;flex:1 1 auto}
+  .sbday b{font-size:18px}
+  /* ⚠ TOUCH TARGETS. Measured in a real 384px viewport: the Today control came
+     out 31px tall, which is tappable but mean. Every control on this bar is
+     given a 40px floor on a phone -- the filters too, which were sized for a
+     mouse. */
+  .sbtoday,.sbnav,.sbfilters .segb{min-height:40px}
+  .sbpick input{min-height:40px}
+}
+.tdquiet{font:14.5px/1.6 var(--sans);color:var(--ink2);margin:0 0 20px;
+  padding-bottom:16px;border-bottom:1px solid var(--cs-edge)}
+.tdquiet b{color:var(--cs-white)}
+.tdblock{margin:0 0 26px}
+.tdblock h3{display:flex;align-items:baseline;gap:11px;margin:0 0 12px;
+  font:700 11px/1 var(--disp);letter-spacing:.19em;text-transform:uppercase;
+  color:var(--cs-white);padding-bottom:9px;
+  border-bottom:1px solid var(--cs-edge)}
+.tdblock h3 span{font:500 11px/1 var(--mono);letter-spacing:.05em;
+  text-transform:none;color:var(--slate);margin-left:auto}
+/* ⚠ THREE AT MOST, and they are cards because each carries its own reasons --
+   a row cannot hold them legibly. Everything else on this page stays a row. */
+.tdmarq{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.tdcard{display:flex;flex-direction:column;gap:8px;min-width:0;
+  padding:14px;text-decoration:none;
+  border:1px solid var(--cs-edge2);border-left:3px solid var(--cs-gold);
+  background:linear-gradient(180deg,#0B1D33,#091829)}
+.tdcard:hover{border-left-color:var(--cs-white)}
+.tdcard:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
+.tdwhen{font:500 10px/1 var(--mono);letter-spacing:.11em;text-transform:uppercase;
+  color:var(--slate)}
+.tdteams{display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+  font:700 18px/1.15 var(--disp);text-transform:uppercase;color:var(--cs-white)}
+.tdteams i{font-style:normal;font:500 11px/1 var(--mono);color:var(--ink3);
+  text-transform:lowercase}
+.tdwhere{font:12px/1.45 var(--sans);color:var(--ink2)}
+.tdwhy{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
+.tdtag{font:600 9.5px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
+  padding:4px 6px;border-radius:2px;border:1px solid var(--cs-edge2);
+  color:var(--ink2);white-space:nowrap}
+.tdtag.rv{color:var(--cs-gold);border-color:color-mix(in oklab,var(--cs-gold) 45%,transparent)}
+.tdtag.mb{color:var(--vx-ballot,#b8a6ff);border-color:color-mix(in oklab,#b8a6ff 40%,transparent)}
+.tdtag.lv{color:var(--live);border-color:color-mix(in oklab,var(--live) 45%,transparent)}
+/* ⚠ NOT CYAN. Serve cyan is rationed to three roles -- serve, set in
+   progress, focus -- and a tag colour is none of them. The guard caught this
+   the moment it shipped, which is what the rationing rule is for. */
+.tdtag.dg{color:var(--blue);border-color:color-mix(in oklab,#7FC1FF 40%,transparent)}
+.tdlist{border-top:1px solid var(--cs-edge)}
+.tdprompt{display:flex;gap:10px;flex-wrap:wrap;padding-top:6px}
+.tdprompt a{font:600 12px/1 var(--sans);color:var(--navy);text-decoration:none;
+  border:1px solid var(--cs-edge2);border-radius:2px;padding:9px 12px}
+.tdprompt a:hover{color:var(--cs-white);border-color:var(--navy)}
+.tdprompt a:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
+@media (max-width:900px){.tdmarq{grid-template-columns:minmax(0,1fr)}}
+.cs-rail{max-width:1280px;margin:10px auto 0;display:flex;align-items:center;
+  gap:14px;flex-wrap:wrap;padding:8px 14px;
+  border:1px solid var(--cs-edge);border-top:0;
+  background:linear-gradient(180deg,#0B1D33 0%,#091829 100%);
+  font:13px/1.35 var(--sans)}
+.cs-rlab{display:flex;align-items:center;gap:7px;flex:0 0 auto;
+  font:700 10px/1 var(--disp);letter-spacing:.2em;text-transform:uppercase;
+  color:var(--slate)}
+.cs-rail.cs-live .cs-rlab{color:var(--cs-gold)}
+.cs-rmatch{display:flex;align-items:center;gap:7px;min-width:0;
+  color:var(--cs-white);text-decoration:none;
+  font:600 15px/1.2 var(--disp);text-transform:uppercase;letter-spacing:.01em}
+.cs-rmatch:hover{color:var(--cs-gold)}
+.cs-rmatch:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:3px}
+.cs-rv{color:var(--ink3);font:500 11px/1 var(--mono);text-transform:lowercase}
+.cs-rwhen{font:500 11px/1 var(--mono);color:var(--slate);letter-spacing:.05em;
+  text-transform:uppercase;flex:0 0 auto}
+.cs-rmore{margin-left:auto;flex:0 0 auto;color:var(--navy);text-decoration:none;
+  font:600 11px/1 var(--sans)}
+.cs-rmore:hover{color:var(--cs-white)}
+.cs-rmore:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
+@media (max-width:560px){
+  .cs-rail{gap:8px 10px;padding:7px 11px;font-size:12px}
+  .cs-rmatch{font-size:13.5px}
+  .cs-rmore{margin-left:0}
+}
 /* COURTSIGNAL-TAPE-CSS-END */
 nav{position:sticky;top:0;z-index:6;
   background:linear-gradient(180deg,rgba(12,23,45,.88),rgba(8,14,28,.92));
@@ -6930,7 +7060,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
          pages. These five are the daily job -- follow the day, check a
          ranking, research a team, keep the ballot. The reference tools keep
          every capability they had; they move behind More. -->
-    <button role="tab" aria-selected="true" data-v="desk" class="pri">Match Desk</button>
+    <button role="tab" aria-selected="true" data-v="desk" class="pri">Today</button>
     <button role="tab" aria-selected="false" data-v="scores" class="pri">Scores</button>
     <button role="tab" aria-selected="false" data-v="rankings" class="pri">Rankings</button>
     <button role="tab" aria-selected="false" data-v="teams" class="pri">Teams</button>
@@ -6960,137 +7090,72 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 <main>
 
 <section id="v-scores" hidden>
-  <!-- THE HERO. The page used to open straight into a date picker. This is the
-       first thing seen, so it carries the three things worth knowing on arrival:
-       what the season is, who is on top, and where tonight stands. Every figure
-       is read from the same payload the tabs use -- nothing here is written in
-       advance (R1) and nothing is invented (R5). -->
-  <div class="hero">
-    <div class="heroL">
-      <div class="eyebrow"><span class="pulse"></span>{{HERO_EYEBROW}}</div>
-      <h2 class="herotitle">{{HERO_TITLE}}</h2>
-      <p class="herosub">{{HERO_SUB}}</p>
+  <!-- ⚠ THE SEASON HERO AND THE "WHAT CHANGED" RIBBON USED TO OPEN THIS PAGE.
+       Measured before the change: a reader asking "what is on today" met a
+       full-width "THE 2026 SEASON, MEASURED" panel with court art, a podium of
+       three teams, a results ribbon, and a paragraph about per-set scores --
+       roughly a screen and a half before the first date control. Those are
+       real jobs; none of them is this page's job.
+       They now live on Today (which is where "what changed" belongs) and the
+       season summary is reachable from there. This page answers exactly one
+       question: what matches are happening on the selected date. -->
+  <h2 class="vh">Scoreboard</h2>
+  <!-- ⚠ THE SEASON IS STATED IN THE MARKUP, NOT INJECTED. This lead was
+       filled by JS, so the SERVED html carried an empty <p class="lead"> --
+       and the guard that requires every view to name its season was right to
+       fail it: a reader (or a fetch, or the public page) sees the document,
+       not the script that would have populated it. The sentence is static
+       anyway; nothing here depended on the selected date. -->
+  <p class="lead" id="sbLead"><b>2026 season.</b> Every Division-I match on the
+  selected date, from the same canonical fixture record the rest of the hub
+  reads. A rank carries the ranking it came from; a venue is the one the feed
+  or a school published, never inferred.</p>
+
+  <!-- THE DATE IS THE PAGE. Previous / next / today, then the filters. -->
+  <div class="sbbar">
+    <div class="sbdate">
+      <button type="button" class="sbnav" id="sbPrev" aria-label="Previous day">&larr;</button>
+      <div class="sbday"><b id="sbDayLabel"></b><span id="sbDayIso"></span></div>
+      <button type="button" class="sbnav" id="sbNext" aria-label="Next day">&rarr;</button>
+      <button type="button" class="sbtoday" id="sbToday">Today</button>
+      <label class="sbpick"><span>Jump to</span>
+        <input type="date" id="sbDate" min="2026-08-21" max="2026-12-31"></label>
     </div>
-    <div class="heroR">{{HERO_PODIUM}}</div>
-    <div class="courtwrap"><svg class="courtart" viewBox="-5 -5 100 190" aria-hidden="true">
-      <defs>
-        <linearGradient id="ctf" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#5BA8F5" stop-opacity=".08"/>
-          <stop offset="1" stop-color="#5BA8F5" stop-opacity=".30"/>
-        </linearGradient>
-      </defs>
-      <!-- ⚠ ORIENTATION IS THE WHOLE GEOMETRY. We are looking DOWN the court
-           from behind one baseline, so the 9m width runs left-to-right and the
-           18m length recedes: 90 wide by 180 deep, one unit per decimetre. The
-           first version had these swapped -- 18m across and 9m deep, a view
-           from the SIDE -- and then ran the net along the length, which is why
-           it read as a stray line rather than a net. -->
-      <rect x="0" y="0" width="90" height="180" fill="url(#ctf)"/>
-      <rect x="0" y="0" width="90" height="180" fill="none"
-            stroke="#dbe9ff" stroke-opacity=".85" stroke-width="1.3"/>
-      <!-- attack lines, 3m either side of the net -->
-      <line x1="0" y1="60" x2="90" y2="60" stroke="#dbe9ff" stroke-opacity=".62" stroke-width="1"/>
-      <line x1="0" y1="120" x2="90" y2="120" stroke="#dbe9ff" stroke-opacity=".62" stroke-width="1"/>
-      <!-- the centre line the net stands on -->
-      <line x1="0" y1="90" x2="90" y2="90" stroke="#dbe9ff" stroke-opacity=".5" stroke-width=".9"/>
-    </svg>
-      <!-- ---- THE NET, TO THE ACTUAL SPECIFICATION ----------------------
-           Same scale as the floor: ONE UNIT = ONE DECIMETRE, so the 9m court is
-           90 units and everything below is the real measurement rather than a
-           drawing that merely suggests a net.
-             net height (women)  2.24 m   -> top edge 22.4 units above the floor
-             mesh depth          1.00 m   -> 10 units
-             mesh squares        10 cm    -> 1 unit
-             top tape             7 cm    -> 0.7 units, white doubled canvas
-             bottom band          5 cm    -> 0.5 units
-             antennae            1.80 m   -> 18 units, 10 cm stripes (1 unit)
-             antenna reach       80 cm above the net -> the top lands at
-                                 2.24 + 0.80 = 3.04 m, which is 9 ft 11.6 in:
-                                 the 10 feet Cody asked for, and it comes out of
-                                 the measurements rather than being set to it.
-           The antennae sit on the outer edge of the side bands, above the
-           sidelines, on opposite sides of the net -- which is why one is drawn
-           in front of the mesh and one behind. y increases downward, so the
-           floor is y=32 and the antenna tops are near y=1.6. -->
-      <svg class="netart" viewBox="-4 0 98 33" preserveAspectRatio="none" aria-hidden="true">
-        <defs>
-          <pattern id="mesh10" width="1" height="1" patternUnits="userSpaceOnUse">
-            <path d="M1 0H0V1" fill="none" stroke="#eaf2ff" stroke-opacity=".38"
-                  stroke-width=".08"/>
-          </pattern>
-          <linearGradient id="antw" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e8eef7"/>
-          </linearGradient>
-        </defs>
-        <!-- posts, set outside the sidelines, carrying the net at 2.24 m -->
-        <rect x="-2.6" y="9.2" width="1.3" height="22.8" fill="#c9d8ee" fill-opacity=".55"/>
-        <rect x="91.3" y="9.2" width="1.3" height="22.8" fill="#c9d8ee" fill-opacity=".55"/>
-        <!-- the mesh: 1 m deep, 10 cm squares -->
-        <rect x="0" y="9.6" width="90" height="10" fill="url(#mesh10)"/>
-        <!-- 7 cm white tape along the top, 5 cm band beneath -->
-        <rect x="0" y="9.6" width="90" height=".7" fill="#f7fbff" fill-opacity=".92"/>
-        <rect x="0" y="19.1" width="90" height=".5" fill="#dce8f8" fill-opacity=".5"/>
-        <!-- side bands, 5 cm wide, on the sidelines -->
-        <rect x="0" y="9.6" width=".5" height="10" fill="#f7fbff" fill-opacity=".8"/>
-        <rect x="89.5" y="9.6" width=".5" height="10" fill="#f7fbff" fill-opacity=".8"/>
-        <!-- antennae: 1.8 m of 10 cm red/white stripes, 80 cm proud of the net -->
-        <g>
-          <rect x="-.35" y="1.6" width=".7" height="18" fill="url(#antw)"/>
-          <rect x="89.65" y="1.6" width=".7" height="18" fill="url(#antw)"/>
-        </g>
-        <g fill="#D6291F">
-          <rect x="-.35" y="1.6" width=".7" height="1"/><rect x="-.35" y="3.6" width=".7" height="1"/>
-          <rect x="-.35" y="5.6" width=".7" height="1"/><rect x="-.35" y="7.6" width=".7" height="1"/>
-          <rect x="-.35" y="9.6" width=".7" height="1"/><rect x="-.35" y="11.6" width=".7" height="1"/>
-          <rect x="-.35" y="13.6" width=".7" height="1"/><rect x="-.35" y="15.6" width=".7" height="1"/>
-          <rect x="-.35" y="17.6" width=".7" height="1"/>
-          <rect x="89.65" y="1.6" width=".7" height="1"/><rect x="89.65" y="3.6" width=".7" height="1"/>
-          <rect x="89.65" y="5.6" width=".7" height="1"/><rect x="89.65" y="7.6" width=".7" height="1"/>
-          <rect x="89.65" y="9.6" width=".7" height="1"/><rect x="89.65" y="11.6" width=".7" height="1"/>
-          <rect x="89.65" y="13.6" width=".7" height="1"/><rect x="89.65" y="15.6" width=".7" height="1"/>
-          <rect x="89.65" y="17.6" width=".7" height="1"/>
-        </g>
-      </svg>
+    <div class="seg sbfilters" role="tablist" aria-label="Which matches">
+      <button class="segb on" data-sbf="all" type="button">All</button>
+      <!-- MYBOARD-HTML-BEGIN -->
+      <!-- ⚠ THIS FILTER NAMES A PRIVATE FEATURE, so it is fenced like the rest
+           of My Board. It shipped unfenced and the public gate caught it: the
+           published page carried the words on a control that could not work
+           there, because the board itself is stripped. -->
+      <button class="segb" data-sbf="board" type="button">My Board</button>
+      <!-- MYBOARD-HTML-END -->
+      <button class="segb" data-sbf="ranked" type="button">Ranked</button>
+      <button class="segb" data-sbf="live" type="button">Live</button>
+      <button class="segb" data-sbf="final" type="button">Final</button>
+      <button class="segb" data-sbf="upcoming" type="button">Upcoming</button>
+      <span class="count" id="sbCount"></span>
     </div>
   </div>
-  <div id="live" hidden>
-    <div class="livehead">
-      <span class="dot"></span><b>Live</b>
-      <span id="livemeta"></span>
-    </div>
-    <div class="cards" id="livecards"></div>
-  </div>
+  <div id="sbTop"></div>
+  <div id="sbBody"></div>
+
   <div id="justin" hidden>
     <div class="livehead"><b class="justin">Just finished</b><span id="justinmeta"></span></div>
     <div class="cards" id="justincards"></div>
   </div>
-  <!-- ⚠ WHAT CHANGED. A scoreboard that opens with "here is a list of
-       fixtures" makes a returning reader do the work of finding out what
-       happened while they were away. This band answers that in one line, and
-       it is built ONLY from completed matches -- no movers are invented, and
-       when nothing has been played it does not render at all. -->
-  <div id="changed" {{CHANGED_HIDDEN}}>
-    <div class="livehead"><b class="chg">What changed</b><span id="chgmeta">{{CHANGED_META}}</span></div>
-    <div class="chgrow">{{CHANGED_ROWS}}</div>
-  </div>
-  <div id="today" hidden>
-    <div class="livehead"><b class="soon">Later today</b><span id="todaymeta"></span></div>
-    <div class="cards" id="todaycards"></div>
-  </div>
-  <div id="weekbox" hidden>
-    <div class="livehead"><b class="soon">This week</b><span id="weekmeta"></span></div>
-    <div class="cards" id="weekcards"></div>
-  </div>
-  <div class="ctl" id="legacydate" hidden>
-    <label class="dlab" for="sdate">Jump to a date</label>
-    <input type="date" id="sdate" min="2026-08-21" max="2026-12-31">
-    <button class="dbtn" id="sclear" type="button">All results</button>
-    <span class="count" id="dcnt"></span>
-  </div>
-  <p class="lead"><b>2026 results.</b> Every completed match, newest first. The strip under each result is
-  the <b>per-set score</b> &mdash; visitor on top, home below, the set winner lit.
-  A 25&ndash;23 and a 25&ndash;12 are not the same match.</p>
+  <!-- ⚠ "WHAT CHANGED" MOVED TO TODAY. It answers "what happened while I was
+       away", which is Today's second question, not this page's only one. Two
+       date controls and a results ribbon on one screen made the Scoreboard
+       argue with itself about what it was for. -->
+  <div id="today" hidden></div>
+  <div id="weekbox" hidden></div>
   <div id="scoredetail" hidden></div>
+  <!-- ⚠ THE FULL SEASON LEDGER IS KEPT AND NAMED. It is a different question
+       -- "everything, across the season" -- so it is a deliberate disclosure
+       under the day view rather than a second set of controls competing with
+       it. Nothing was deleted. -->
+  <details class="sbfull"><summary>Full season ledger &mdash; every fixture and result</summary>
   <div id="ledgerwrap">
     <div class="seg" role="tablist" aria-label="Match state">
       <!-- ⚠ THIS TAB USED TO OPEN ON "ALL": 472 matches, newest first, and
@@ -7113,12 +7178,13 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <div id="ledgerbody"></div>
   </div>
   <div class="cards" id="resultcards" hidden>{{SCORE_CARDS}}</div>
+  </details>
 </section>
 
 <section id="v-desk">
   <div id="deskdetail" hidden></div>
   <div id="deskboard">
-  <h2 class="vh">Match Desk &mdash; {{SEASON_YEAR}}</h2>
+  <h2 class="vh">Today</h2>
   <p class="tabhint" id="desklead"></p>
 
   <!-- MYBOARD-HTML-BEGIN -->
@@ -7754,6 +7820,20 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 <script>
 const CONFS = {{CONF_JSON}};
 const $ = s => document.querySelector(s);
+/* ⚠ A NODE THAT NO LONGER EXISTS MUST NOT TAKE THE PAGE WITH IT. The Scoreboard
+   rebuild removed the old live / later-today / this-week / legacy-date stack,
+   and several pollers still addressed those ids. `getElementById(x).textContent
+   = ...` on a null throws, and because these run inside one boot sequence the
+   throw took everything after it: the whole page rendered as an empty Today
+   with no header rail.
+   $$ returns a harmless stand-in for a missing node, so a stale writer writes
+   into nothing instead of exploding. It is NOT a licence to leave orphans --
+   test_today_scoreboard.py fails on any id referenced but not rendered. */
+const NOWHERE = { textContent: '', innerHTML: '', hidden: true, value: '',
+                  style: {}, classList: { add(){}, remove(){}, toggle(){} },
+                  addEventListener(){}, querySelectorAll(){ return []; },
+                  setAttribute(){}, removeAttribute(){}, focus(){} };
+function $$(id) { return document.getElementById(id) || NOWHERE; }
 
 /* tabs */
 /* Drive the sliding underline. Measured from the button rather than guessed,
@@ -7816,13 +7896,24 @@ function openMore() {
    row, a roster row, a stats row and the player search all call go(); nothing
    flips a section's hidden attribute on its own any more. That is what makes
    Back, Forward and a direct refresh land in the same place as a click.  */
-const ROUTE_OF_VIEW = { desk:'match-desk', scores:'scores', rankings:'rankings',
+/* ⚠ THE PRIMARY ROUTE IS `today`; `match-desk` IS KEPT AS AN ALIAS. Every
+   ⚠ AND THIS COMMENT MUST NOT NAME A PRIVATE FEATURE. It first cited "a Film
+   Room note" as an example of somewhere the old path is written down; that
+   string is a strip marker, so an unfenced comment mentioning it aborted the
+   public build -- the same trap the On TV comment sprang once before.
+   Every link ever copied, bookmarked or saved into a private note points at
+   the old path, and breaking those to rename a tab would trade the reader's
+   history for a label. VIEW_OF_ROUTE resolves both; ROUTE_OF_VIEW emits only
+   the new one, so nothing new is minted under the old name. */
+const ROUTE_ALIASES = { 'match-desk': 'desk' };
+const ROUTE_OF_VIEW = { desk:'today', scores:'scores', rankings:'rankings',
   teams:'teams', ballot:'ballot', leaders:'stats', players:'players',
   standings:'standings', bracket:'bracket', schedule:'schedule', tv:'tv',
   /* FILMROOM-ROUTE-BEGIN */ film:'film-room', /* FILMROOM-ROUTE-END */
   /* INTEL-ROUTE-BEGIN */ intel:'intel' /* INTEL-ROUTE-END */ };
 const VIEW_OF_ROUTE = Object.keys(ROUTE_OF_VIEW)
   .reduce((a,k)=>{a[ROUTE_OF_VIEW[k]]=k;return a;},{});
+Object.keys(ROUTE_ALIASES).forEach(k => { VIEW_OF_ROUTE[k] = ROUTE_ALIASES[k]; });
 
 function slug(s) {
   return (s || '').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
@@ -7867,6 +7958,10 @@ function showView(view) {
      for a routed view: the stale ring goes, and a keyboard reader lands
      exactly where the thing they asked for now is. Only when focus was ON a
      nav control -- never while someone is typing in a filter box. */
+  /* ⚠ THE HEADER SHAPE DEPENDS ON THE ROUTE, so it has to be repainted when
+     the route changes -- otherwise the marquee painted at boot on Today would
+     follow the reader onto Rankings, which is the whole defect. */
+  try { if (typeof csTape === 'function') csTape(); } catch (e) { }
   if (el) {
     const a = document.activeElement;
     const stale = a && a.closest && a.closest('nav') &&
@@ -7908,6 +8003,8 @@ function route() {
                       view === 'scores' ? 'scores' : 'desk');
   } else if (view === 'scores') {
     renderLedger();
+  wireScoreboard(); renderScoreboard();
+    wireScoreboard(); renderScoreboard();
   }
   if (view === 'teams') {
     const t = parts[1] ? unslugTeam(parts[1]) : null;
@@ -8192,7 +8289,7 @@ function renderWeek() {
   if (!top.length) { box.hidden = true; return; }
   box.hidden = false;
   const both = top.filter(r => r.ar && r.hr).length;
-  document.getElementById('weekmeta').textContent =
+  $$('weekmeta').textContent =
     (both ? (both + ' ranked v ranked') : 'best of the next seven days')
     + ' \u00b7 ranks are the AVCA coaches poll';
   /* WHOSE NUMBER IS THAT? The inline rank is the AVCA coaches poll -- the
@@ -8212,7 +8309,7 @@ function renderWeek() {
         + 'our Top 25: ' + bits.join(' \u00b7 ') + '</div>'
       : '';
   };
-  document.getElementById('weekcards').innerHTML = top.map(r =>
+  $$('weekcards').innerHTML = top.map(r =>
     '<div class="card soon' + (r.ar && r.hr ? ' marquee' : '') + '">' +
     /* the server label if present, otherwise format it here -- never the raw
        ISO string, which is what this fallback used to be */
@@ -8290,9 +8387,9 @@ async function pollLive() {
     tbox.hidden = false;
     document.querySelector('#today .soon').textContent =
       todays.length ? 'Later today' : 'Next up';
-    document.getElementById('todaymeta').textContent =
+    $$('todaymeta').textContent =
       soon.length + ' scheduled' + (todays.length ? '' : ' \u00b7 ' + dayLabel(soon[0].date));
-    document.getElementById('todaycards').innerHTML = soon.map(g =>
+    $$('todaycards').innerHTML = soon.map(g =>
       '<div class="card soon"><div class="cd">' + dayLabel(g.date) + '</div>' +
       '<div class="mt"><div class="side">' + rank(g.away_rank) + logo(g.away) + g.away + '</div>' +
       '<div class="side">' + rank(g.home_rank) + logo(g.home) + g.home + '</div></div>' +
@@ -8335,12 +8432,22 @@ async function pollLive() {
     }
   }
 
-  const box = document.getElementById('live');
+  /* ⚠ THIS BAND'S MARKUP IS GONE. The Scoreboard rebuild removed the old
+     live/just-finished/what-changed stack from the top of that page, and this
+     poller still ran against it -- `box.hidden` on a null throws, which would
+     have taken the rest of the poll callback with it. The Scoreboard renders
+     its own live lane from the same LIVE_BY_ID. Guarded rather than deleted:
+     the function still serves the elements that DO survive. */
+  const box = $$('live');
+  if (!box) return;
   if (!live.length) { box.hidden = true; return; }
   box.hidden = false;
-  document.getElementById('livemeta').textContent =
+  const lm = $$('livemeta');
+  if (lm) lm.textContent =
     (d.error ? d.error + ' \u00b7 ' : '') + 'updated ' + (d.updated || '');
-  document.getElementById('livecards').innerHTML = live.map(g => {
+  const lc = $$('livecards');
+  if (!lc) return;
+  lc.innerHTML = live.map(g => {
     /* AT 0-0 NOBODY IS WINNING. `away > home` is false when the sets are level,
        so the "not away" branch bolded the HOME team from the first whistle --
        Kentucky-Pittsburgh showed Pittsburgh as the leader at 0-0. Three states,
@@ -12494,6 +12601,156 @@ document.addEventListener('click', ev => {
   renderLedger();
 });
 
+/* ══ THE SCOREBOARD ═══════════════════════════════════════════════════════
+   One question: what matches are happening on the selected date?
+
+   ⚠ THE DATE IS STATE, NOT A FILTER OVER EVERYTHING. The old page rendered a
+   season and let you narrow it; this one renders a DAY and lets you move
+   between days. That is the difference between a ledger and a scoreboard, and
+   it is why previous/next/today are the first controls on the page.
+
+   Everything reads canonical fixtures through matchState/matchScore, so no row
+   here can disagree with Today, the header rail, or the match detail. */
+let SB_DATE = null;      /* ISO string; null means "follow today" */
+let SB_FILTER = 'all';
+
+function sbDate() { return SB_DATE || todayPT(); }
+
+function sbShift(days) {
+  const d = new Date(sbDate() + 'T12:00:00');
+  d.setDate(d.getDate() + days);
+  SB_DATE = new Intl.DateTimeFormat('en-CA').format(d);
+  renderScoreboard();
+}
+
+function sbMatchesOn(iso) {
+  const by = allMatches();
+  return Object.keys(by).map(k => by[k]).filter(m => m.d === iso);
+}
+
+function sbPasses(m, live) {
+  if (SB_FILTER === 'all') return true;
+  const st = matchState(m, live);
+  if (SB_FILTER === 'live') return st === 'live';
+  if (SB_FILTER === 'final') return st === 'final';
+  if (SB_FILTER === 'upcoming') return st === 'upcoming';
+  if (SB_FILTER === 'ranked') return !!(m.ar || m.hr);
+  /* MYBOARD-WIRE-BEGIN */
+  if (SB_FILTER === 'board') {
+    try {
+      if (typeof mbLoad === 'function') { mbLoad();
+        const MBs = (typeof MB !== 'undefined' && Array.isArray(MB)) ? MB : [];
+        return MBs.indexOf(mAway(m)) >= 0 || MBs.indexOf(mHome(m)) >= 0; }
+    } catch (e) { }
+    return false;
+  }
+  /* MYBOARD-WIRE-END */
+  return true;
+}
+
+function renderScoreboard() {
+  const body = document.getElementById('sbBody');
+  if (!body) return;
+  const iso = sbDate();
+  const isToday = iso === todayPT();
+  const liveOf = m => LIVE_BY_ID[m.gid];
+
+  const lab = document.getElementById('sbDayLabel');
+  const sub = document.getElementById('sbDayIso');
+  if (lab) lab.textContent = isToday ? 'Today' : dayLabel(iso);
+  if (sub) sub.textContent = iso;
+  const picker = document.getElementById('sbDate');
+  if (picker && picker.value !== iso) picker.value = iso;
+  const tbtn = document.getElementById('sbToday');
+  if (tbtn) tbtn.disabled = isToday;
+
+  const all = sbMatchesOn(iso);
+  const rows = all.filter(m => sbPasses(m, liveOf(m)));
+  const cnt = document.getElementById('sbCount');
+  if (cnt) cnt.textContent = rows.length +
+    (rows.length === 1 ? ' match' : ' matches') +
+    (rows.length !== all.length ? ' of ' + all.length : '');
+
+  /* ── TOP GAMES, FOR THIS DATE ONLY ───────────────────────────────── */
+  const top = topGames(rows, liveOf, 4);
+  const topBox = document.getElementById('sbTop');
+  if (topBox) {
+    topBox.innerHTML = top.length
+      ? '<section class="tdblock"><h3>Top games<span>on this date</span></h3>' +
+        '<div class="tdmarq sbtop">' + top.map(x =>
+          '<a class="tdcard" href="' + matchRoute(x[0].gid, 'scores') + '">' +
+            '<span class="tdwhen">' +
+              (matchState(x[0], liveOf(x[0])) === 'live'
+                ? '<i class="cs-dot"></i>LIVE'
+                : esc(x[0].t || 'time TBA')) + '</span>' +
+            '<span class="tdteams">' +
+              rankHTML('avca', x[0].ar, true) + esc(mAway(x[0])) +
+              '<i>' + connector(x[0]) + '</i>' +
+              rankHTML('avca', x[0].hr, true) + esc(mHome(x[0])) + '</span>' +
+            reasonChips(x[0], liveOf(x[0])) +
+          '</a>').join('') + '</div></section>'
+      : '';
+  }
+
+  if (!rows.length) {
+    /* ⚠ AN EMPTY DAY IS A STATE, NOT A BLANK. Say which day, say whether the
+       filter caused it, and offer the nearest day that is not empty. */
+    const near = all.length
+      ? 'No match on this date matches the <b>' + esc(SB_FILTER) + '</b> filter.'
+      : 'No Division-I matches on <b>' + esc(dayLabel(iso)) + '</b>.';
+    const by = allMatches();
+    const later = Object.keys(by).map(k => by[k])
+      .filter(m => m.d && m.d > iso).sort((a, b) => a.d < b.d ? -1 : 1)[0];
+    body.innerHTML = '<p class="tdquiet">' + near +
+      (later ? ' The next day with matches is <a href="#" data-sbjump="' +
+        esc(later.d) + '">' + esc(dayLabel(later.d)) + '</a>.' : '') + '</p>';
+    return;
+  }
+
+  /* ── GROUPED BY STATE, THEN TIME ──────────────────────────────────── */
+  const lanes = [['live', 'Live now'], ['final', 'Final'],
+                 ['upcoming', 'Scheduled']];
+  const order = (a, b) => {
+    const ra = (a.ar && a.hr) ? 0 : (a.ar || a.hr) ? 1 : 2;
+    const rb = (b.ar && b.hr) ? 0 : (b.ar || b.hr) ? 1 : 2;
+    return ra !== rb ? ra - rb
+      : String(a.t || '').localeCompare(String(b.t || ''));
+  };
+  body.innerHTML = lanes.map(([st, title]) => {
+    const in_ = rows.filter(m => matchState(m, liveOf(m)) === st).sort(order);
+    if (!in_.length) return '';
+    return '<section class="tdblock"><h3>' + title +
+      '<span>' + in_.length + '</span></h3><div class="tdlist">' +
+      in_.map(m => matchRow(m, liveOf(m), 'scores')).join('') +
+      '</div></section>';
+  }).join('');
+}
+
+function wireScoreboard() {
+  const host = document.getElementById('v-scores');
+  if (!host || host.dataset.sbwired) return;
+  host.dataset.sbwired = '1';
+  host.addEventListener('click', e => {
+    const f = e.target.closest('[data-sbf]');
+    if (f) {
+      SB_FILTER = f.dataset.sbf;
+      host.querySelectorAll('[data-sbf]').forEach(b =>
+        b.classList.toggle('on', b === f));
+      renderScoreboard();
+      return;
+    }
+    const j = e.target.closest('[data-sbjump]');
+    if (j) { e.preventDefault(); SB_DATE = j.dataset.sbjump; renderScoreboard(); return; }
+    if (e.target.closest('#sbPrev')) { sbShift(-1); return; }
+    if (e.target.closest('#sbNext')) { sbShift(1); return; }
+    if (e.target.closest('#sbToday')) { SB_DATE = null; renderScoreboard(); return; }
+  });
+  const pick = document.getElementById('sbDate');
+  if (pick) pick.addEventListener('change', () => {
+    if (pick.value) { SB_DATE = pick.value; renderScoreboard(); }
+  });
+}
+
 function renderLedger() {
   const host = document.getElementById('ledgerbody');
   if (!host) return;
@@ -12562,7 +12819,7 @@ function renderMatchDetail(gid, dest) {
   const caps = mCaps(s6);
   const st = matchState(m, live);
   const parent = dest === 'scores'
-      ? ['Scores', routeFor('scores')] : ['Match Desk', routeFor('desk')];
+      ? ['Scores', routeFor('scores')] : ['Today', routeFor('desk')];
   const bits = [];
   const where = [m.venue, m.city, m.st].filter(Boolean).join(', ');
   bits.push('<span><em>Venue</em>' + (where ? esc(where)
@@ -12708,6 +12965,7 @@ document.addEventListener('click', e => {
   if (c) c.addEventListener('click', () => {
     if (d) d.value = '';
     renderLedger();
+    wireScoreboard(); renderScoreboard();
   });
 })();
 document.querySelectorAll('[data-ls2]').forEach(b =>
@@ -12716,6 +12974,7 @@ document.querySelectorAll('[data-ls2]').forEach(b =>
     document.querySelectorAll('[data-ls2]').forEach(x =>
       x.classList.toggle('on', x === b));
     renderLedger();
+    wireScoreboard(); renderScoreboard();
   }));
 
 /* ⚠ TODAY'S READ IS ASSEMBLED, NOT WRITTEN. Every line is a fact already on
@@ -12819,6 +13078,9 @@ function todaysRead(mine, soon, liveOf) {
      5. The live pulse runs only while something is genuinely live.        */
 
 const CS_SETS = 5;   /* best-of-five: the shape of the diagram, not a guess */
+/* the results ribbon, emitted server-side, now rendered on Today */
+const CHANGED_ROWS_HTML = `{{CHANGED_ROWS}}`;
+const CHANGED_META_TXT = `{{CHANGED_META}}`;
 /* Empty string in the public build, by the same substitution the chat uses. */
 const CS_DIGBY = {{DIGBY_FACE_JS}};
 
@@ -12938,6 +13200,39 @@ function csCtx(m, kind, n) {
     bits.join('<span class="cs-sep">/</span>') + '</div>';
 }
 
+/* ⚠ THE BAND WAS THE SAME SIZE ON EVERY SCREEN, AND THAT WAS THE PROBLEM.
+   Measured before this change: 335px of chrome before any content on all six
+   destinations -- 41% of an 825px viewport -- and the band was 129px of it,
+   carrying a match two days away. On Rankings, Teams, Intel, My Ballot and
+   match detail that is a marquee for something the reader did not ask about,
+   sitting on top of the thing they did.
+
+   Two shapes now, chosen by CONTEXT rather than by taste:
+
+     marquee  the full diagram. Today only, and only when the match is
+              genuinely near -- live now, or today, or tomorrow.
+     rail     one compact line: what is on, when, and a link. Everywhere else,
+              and on Today when the next match is days out.
+
+   ⚠ AND AN UPCOMING MATCH NEVER RENDERS SET CELLS. Five dashed boxes with dots
+   in them read as a score that failed to load. They are the shape of a
+   best-of-five that has not happened, which is a fine thing to show ONCE a
+   match is live, and noise before it. */
+function csIsTodayRoute() {
+  const h = (location.hash || '').replace(/^#\/?/, '').split('/')[0];
+  return !h || h === 'today' || h === 'match-desk';
+}
+
+function csNearness(m, live) {
+  if (live) return 'live';
+  const today = todayPT();
+  if (!m || !m.d) return 'far';
+  if (m.d === today) return 'today';
+  const t = new Date(today), d = new Date(m.d);
+  const days = Math.round((d - t) / 86400000);
+  return days === 1 ? 'tomorrow' : 'far';
+}
+
 function csTape() {
   const mount = document.getElementById('cstape');
   if (!mount) return;
@@ -12973,6 +13268,10 @@ function csTape() {
   const hw = (sc[0] !== null && sc[1] !== null) && +sc[1] > +sc[0];
   const state6 = matchState6(m, live, !!(m.final && m.final.box));
 
+  /* marquee only on Today, and only when the match is genuinely near */
+  const near = csNearness(m, live);
+  const marquee = csIsTodayRoute() && (near === 'live' || near === 'today' ||
+                                       near === 'tomorrow' || st === 'final');
   const label = st === 'live' ? 'Live' : st === 'final' ? 'Final' : 'Next serve';
   const when = st === 'live' ? esc((live && live.period) || 'in progress')
              : esc(dayLabel(m.d));
@@ -12988,10 +13287,28 @@ function csTape() {
      being guessed at from the score. */
   const servingAway = false, servingHome = false;
 
+  if (!marquee) {
+    /* ── THE RAIL. One line, no court, no set cells, no vertical budget. */
+    mount.innerHTML =
+      '<div class="cs-rail' + (st === 'live' ? ' cs-live' : '') +
+        '" data-cs-state="' + esc(state6) + '" data-cs-shape="rail">' +
+        '<span class="cs-rlab">' + (st === 'live' ? '<i class="cs-dot"></i>' : '') +
+          label + '</span>' +
+        '<a class="cs-rmatch" href="' + matchRoute(m.gid, 'desk') + '">' +
+          rankHTML('avca', m.ar, true) + esc(mAway(m)) +
+          '<span class="cs-rv">' + connector(m) + '</span>' +
+          rankHTML('avca', m.hr, true) + esc(mHome(m)) + '</a>' +
+        '<span class="cs-rwhen">' + when + '</span>' +
+        (n > 1 ? '<a class="cs-rmore" href="' + routeFor('scores') + '">' +
+          (n - 1) + ' more</a>' : '') +
+      '</div>';
+    return;
+  }
+
   mount.innerHTML =
     '<div class="cs-tape cs-court ' +
       (st === 'live' ? 'cs-live' : quiet ? 'cs-quiet' : '') +
-      '" data-cs-state="' + esc(state6) + '" data-cs-kind="' + kind + '">' +
+      '" data-cs-shape="marquee" data-cs-state="' + esc(state6) + '" data-cs-kind="' + kind + '">' +
       '<div class="cs-st"><span class="cs-stl"><i class="cs-dot"></i>' +
         label + '</span><span class="cs-when">' + when + '</span></div>' +
       '<div class="cs-teams">' +
@@ -13006,7 +13323,8 @@ function csTape() {
          that has not happened, which is the true thing to show before first
          serve. csCells([]) produces exactly that by the same code path a live
          match uses, so there is one definition of an unplayed set (R4). */
-      csCells(sets, st === 'live') +
+      /* ⚠ NOT BEFORE FIRST SERVE. Empty dashed cells read as a broken score. */
+      (quiet ? '' : csCells(sets, st === 'live')) +
       '<div class="cs-pad"></div>' +
       csCtx(m, kind, n) +
     '</div>';
@@ -13124,6 +13442,65 @@ function csStatus() {
 }
 /* COURTSIGNAL-JS-END */
 
+/* ══ WHY A MATCH IS WORTH YOUR TIME ═══════════════════════════════════════
+   ⚠ NAMED REASONS, NOT A RELEVANCE SCORE. Every tag below is a fact about the
+   fixture that a reader can check and disagree with. A single blended number
+   would be unarguable and unexplainable, which is the opposite of what a
+   voter's tool is for -- and it is the one thing this page has refused since
+   the Match Desk was built.
+
+   Order is a STATED PRECEDENCE, not a weighting: a ranked pairing outranks a
+   watched team outranks a televised match, and so on down. */
+function todayReasons(m, live) {
+  const out = [];
+  if (m.ar && m.hr) out.push(['rv', 'ranked v ranked',
+    'Both sides are in the AVCA poll']);
+  /* MYBOARD-WIRE-BEGIN */
+  /* ⚠ THE WATCHED-TEAM REASON IS PRIVATE and is fenced in both layers. It
+     shipped unfenced and the public gate caught the words on the published
+     page -- a reason a public reader could never see the basis for. */
+  let watched = [];
+  try {
+    if (typeof mbLoad === 'function') { mbLoad();
+      const MBs = (typeof MB !== 'undefined' && Array.isArray(MB)) ? MB : [];
+      watched = [mAway(m), mHome(m)].filter(t => MBs.indexOf(t) >= 0); }
+  } catch (e) { }
+  if (watched.length) out.push(['mb', 'my board', watched.join(' and ') +
+    ' on My Board']);
+  /* MYBOARD-WIRE-END */
+  if (m.tv) out.push(['tv', 'national TV', 'On ' + m.tv]);
+  if (m.kind === 'conf') out.push(['cf', 'conference test',
+    'A league match, so it counts toward the table']);
+  /* ⚠ RANKING DISAGREEMENT IS A REAL, CHECKABLE FACT and it is the one a Top
+     25 voter most wants surfaced: the two orders on this page disagree about
+     a team by a wide margin, so the result is evidence either way. Both ranks
+     are shown with their basis so the reader sees the disagreement itself. */
+  const dis = [[mAway(m), m.ao, m.ap], [mHome(m), m.ho, m.hp]]
+    .filter(x => x[1] && x[2] && Math.abs(x[1] - x[2]) >= 8);
+  dis.forEach(x => out.push(['dg', 'ranking disagreement',
+    x[0] + ' is AVCA #' + x[1] + ' and POWER #' + x[2]]));
+  if (m.site === 'neutral' && m.event) out.push(['ev', esc(m.event),
+    'Part of ' + m.event]);
+  if (live) out.unshift(['lv', 'live now', 'In progress']);
+  return out;
+}
+
+function reasonChips(m, live) {
+  const rs = todayReasons(m, live);
+  if (!rs.length) return '';
+  return '<span class="tdwhy">' + rs.map(r =>
+    '<span class="tdtag ' + r[0] + '" title="' + esc(r[2]) + '">' +
+    esc(r[1]) + '</span>').join('') + '</span>';
+}
+
+/* A match with at least one named reason is a "top game". Nothing else is. */
+function topGames(list, liveOf, cap) {
+  return list.map(m => [m, todayReasons(m, liveOf(m))])
+    .filter(x => x[1].length)
+    .sort((a, b) => b[1].length - a[1].length)
+    .slice(0, cap || 6);
+}
+
 function renderDesk() {
   const todayBox = document.getElementById('desktodaycards');
   if (!todayBox) return;
@@ -13143,42 +13520,99 @@ function renderDesk() {
   if (lanes.live.length) parts.push(lanes.live.length + ' live');
   if (lanes.final.length) parts.push(lanes.final.length + ' final');
   if (lanes.up.length) parts.push(lanes.up.length + ' to come');
+  /* ⚠ THE LEAD SAID "no Division-I matches scheduled" AND THE BLOCK BELOW IT
+     SAID "No Division-I matches today" -- the same fact twice, four lines
+     apart. On a quiet day the lead now carries only the date and the standing
+     caveat; the state is stated once, by the block whose job it is. */
   document.getElementById('desklead').innerHTML =
-    '<b>' + esc(dayLabel(today)) + '</b> &mdash; ' +
-    (parts.length ? parts.join(' · ') : 'no Division-I matches scheduled') +
+    '<b>' + esc(dayLabel(today)) + '</b>' +
+    (parts.length ? ' &mdash; ' + parts.join(' · ') : '') +
     '. Live scores come from the official scoreboard feed; a forecast is a ' +
     'probability from the rally model, not a pick.';
   document.getElementById('desktodaymeta').textContent = '';
 
-  /* ⚠ A NO-GAMES DAY IS A REAL ANSWER, and it is answered with the schedule
-     that already exists rather than with invented filler. */
+  /* ══ QUIET DAY ═══════════════════════════════════════════════════════
+     ⚠ NO GIANT PERMANENT HERO FOR A MATCH THAT IS DAYS AWAY. The old quiet
+     day led with a full-width empty-state card and then dumped the next
+     window's first eight fixtures in date order. Neither answers "what should
+     I care about" -- one apologises for the day, the other is a list.
+
+     Three bounded blocks instead, each with a stated cap:
+       Next marquee matches   at most THREE, each with its named reasons
+       Coming up              four to eight compact rows
+       Recent finals          the last day that actually produced results
+     plus one prompt that leads somewhere useful rather than decorating. */
   if (!mine.length) {
     const nextDay = soon.length ? soon[0].d : null;
     const nextOn = soon.filter(m => m.d === nextDay);
-    const ranked = nextOn.filter(m => m.ar && m.hr).length;
-    /* ⚠ A DAY WITH NO MATCHES IS A REAL ANSWER AND GETS A REAL PAGE. It used
-       to be a Digby aside, which read as an apology for an empty screen. It is
-       now a deliberate state: what today is, when the next window opens, how
-       big it is, and the two places worth going in the meantime -- all from
-       the schedule that already exists. Nothing is invented to fill it. */
-    todayBox.innerHTML = /* GAMEDAY-CALL2-BEGIN */ (typeof gdPanel === 'function' ? gdPanel() : '') + /* GAMEDAY-CALL2-END */
-      '<div class="vx-empty"><h4>No Division-I matches today</h4>' +
-      '<p>' + (nextDay
-        ? 'The next window is <b>' + esc(dayLabel(nextDay)) + '</b> &mdash; ' +
-          nextOn.length + (nextOn.length === 1 ? ' match' : ' matches') +
-          (ranked ? ', ' + ranked + ' of them ranked against ranked'
-                  : '') + '.'
-        : 'Nothing further is on the schedule yet.') + '</p>' +
-      '<div class="vx-emptyacts">' +
-        '<a href="' + routeFor('rankings', 'power') + '">Rankings</a>' +
-        '<a href="' + routeFor('scores') + '">Recent scores</a>' +
-      '</div></div>' +
-      (nextOn.length
-        ? '<div class="lane up"><div class="lanehd"><b>Next match window</b>' +
-          '<span>' + esc(dayLabel(nextDay)) + '</span></div>' +
-          nextOn.slice(0, 8).map(m => matchRow(m, null, 'desk')).join('') +
-          '</div>'
-        : '');
+    const marquee = topGames(soon, liveOf, 3);
+    const marqueeIds = marquee.map(x => x[0].gid);
+    const upcoming = soon.filter(m => marqueeIds.indexOf(m.gid) < 0).slice(0, 8);
+    const by = allMatches();
+    const done = Object.keys(by).map(k => by[k])
+      .filter(m => m.d && m.d < today && matchState(m, liveOf(m)) === 'final')
+      .sort((a, b) => a.d < b.d ? 1 : -1);
+    const lastDay = done.length ? done[0].d : null;
+    const finals = lastDay ? done.filter(m => m.d === lastDay).slice(0, 6) : [];
+
+    const block = (title, note, body) => body
+      ? '<section class="tdblock"><h3>' + title +
+        (note ? '<span>' + note + '</span>' : '') + '</h3>' + body + '</section>'
+      : '';
+
+    todayBox.innerHTML =
+      '<p class="tdquiet"><b>No Division-I matches today.</b> ' +
+        (nextDay
+          ? 'The next window is <b>' + esc(dayLabel(nextDay)) + '</b> &mdash; ' +
+            nextOn.length + (nextOn.length === 1 ? ' match' : ' matches') + '.'
+          : 'Nothing further is on the schedule yet.') + '</p>' +
+      block('Next marquee matches',
+            marquee.length ? 'why each one matters' : '',
+            marquee.length
+              ? '<div class="tdmarq">' + marquee.map(x =>
+                  '<a class="tdcard" href="' + matchRoute(x[0].gid, 'desk') + '">' +
+                    '<span class="tdwhen">' + esc(dayLabel(x[0].d)) +
+                      (x[0].t ? ' &middot; ' + esc(x[0].t) : '') + '</span>' +
+                    '<span class="tdteams">' +
+                      rankHTML('avca', x[0].ar, true) + esc(mAway(x[0])) +
+                      '<i>' + connector(x[0]) + '</i>' +
+                      rankHTML('avca', x[0].hr, true) + esc(mHome(x[0])) +
+                    '</span>' +
+                    '<span class="tdwhere">' + (x[0].venue
+                      ? esc(x[0].venue) + (x[0].event ? ' &middot; ' + esc(x[0].event) : '')
+                      : '<span class="munk">venue not reported</span>') + '</span>' +
+                    reasonChips(x[0], null) +
+                  '</a>').join('') + '</div>'
+              : '') +
+      block('Coming up', upcoming.length + ' more scheduled',
+            upcoming.length
+              ? '<div class="tdlist">' +
+                upcoming.map(m => matchRow(m, null, 'desk')).join('') + '</div>'
+              : '') +
+      /* ⚠ WHAT CHANGED, RELOCATED. Today's second question is "what changed";
+         this band answers it from completed matches only and renders nothing
+         when none have been played. */
+      (CHANGED_ROWS_HTML
+        ? '<section class="tdblock"><h3>What changed<span>' +
+          esc(CHANGED_META_TXT) + '</span></h3><div class="chgrow">' +
+          CHANGED_ROWS_HTML + '</div></section>'
+        : '') +
+      block('Recent finals', lastDay ? esc(dayLabel(lastDay)) : '',
+            finals.length
+              ? '<div class="tdlist">' +
+                finals.map(m => matchRow(m, liveOf(m), 'scores')).join('') + '</div>'
+              : '') +
+      /* ⚠ THE READINESS PANEL IS A GAME-DAY TOOL AND SAT ABOVE THE ANSWER.
+         On a day with no matches it is preparation, not news, so it follows
+         the three blocks rather than leading them. */
+      /* GAMEDAY-CALL2-BEGIN */ (typeof gdPanel === 'function' ? gdPanel() : '') + /* GAMEDAY-CALL2-END */
+      '<div class="tdprompt">' +
+        '<a href="' + routeFor('rankings', 'digby') + '">See what moved in the Top 25</a>' +
+        '<a href="' + routeFor('scores') + '">Open the scoreboard</a>' +
+        /* INTEL-WIRE-BEGIN */
+        '<a href="' + routeFor('intel') + '">Check the wire</a>' +
+        /* INTEL-WIRE-END */
+      '</div>';
     document.getElementById('desksooncards').innerHTML = '';
     document.getElementById('desksoonmeta').textContent = '';
     document.getElementById('desksoonrest').textContent = '';
@@ -13294,7 +13728,7 @@ renderWeek();
 /* the router is booted after TEAMS exists -- see the note at that call */
 
 /* ---- date navigation on the scores tab --------------------------------- */
-const sdate = document.getElementById('sdate');
+const sdate = $$('sdate');
 function filterByDate() {
   const d = sdate.value;
   let n = 0;
@@ -13304,11 +13738,11 @@ function filterByDate() {
     c.style.display = show ? '' : 'none';
     if (show) n++;
   });
-  document.getElementById('dcnt').textContent =
+  $$('dcnt').textContent =
     d ? (n + ' on ' + d) : '';
 }
 sdate.addEventListener('input', filterByDate);
-document.getElementById('sclear').addEventListener('click', () => {
+$$('sclear').addEventListener('click', () => {
   sdate.value = ''; filterByDate();
 });
 
@@ -15254,6 +15688,11 @@ def strip_private(html):
     html = re.sub(r"<!-- MYBOARD-HTML-BEGIN -->.*?<!-- MYBOARD-HTML-END -->",
                   "", html, flags=re.S)
     html = re.sub(r"/\* MYBOARD-CSS-BEGIN \*/.*?/\* MYBOARD-CSS-END \*/",
+                  "", html, flags=re.S)
+    # ⚠ AND THE SCOREBOARD'S MY BOARD FILTER, in both layers. The button is
+    # fenced above; this removes the branch that would serve it, so the public
+    # build carries neither the control nor the code behind it.
+    html = re.sub(r"/\* MYBOARD-WIRE-BEGIN \*/.*?/\* MYBOARD-WIRE-END \*/",
                   "", html, flags=re.S)
     # ⚠ THE FILM ROOM IS PRIVATE IN EVERY LAYER. Markup, script, stylesheet,
     # its route, its menu item and the one line that wires it -- six sentinel

@@ -1860,3 +1860,94 @@ out of the correction because SIDEARM's "vs" is ambiguous.
 **Unverified facts still on screen: none.** 26 fixtures render "schedule
 conflict — verify" rather than a guess, and a blocked fixture is asserted by
 test to leak no site, time or ordering into any other component.
+
+---
+
+## 27. TODAY AND THE SCOREBOARD
+
+### The audit, before anything changed
+Measured on the served page, identical on all six destinations:
+
+| | before | after |
+|---|---|---|
+| chrome before first content | **335px** (41% of an 825px viewport) | **239px** |
+| header band height | 129px marquee, everywhere | 34px rail off Today |
+| empty dashed set cells | **5, on every page** | **0** |
+
+The band carried a match **two days out** on Rankings, Teams, Intel, My Ballot
+and match detail, with five dashed cells that read as a score that failed to
+load. And the Scoreboard opened with a season-recap hero, a three-team podium,
+a results ribbon and a paragraph about per-set scores — roughly a screen and a
+half before its first date control.
+
+### Today
+`Match Desk` → **Today**, primary route `#/today`, **`#/match-desk` kept as an
+alias** because every bookmark and saved note points at the old path.
+
+⚠ **A top game explains itself with named reasons, never a score.** `ranked v
+ranked · my board · national TV · conference test · ranking disagreement`, each
+a checkable fact with the source of the claim in its tooltip. Selection is by
+*how many reasons a match has*, so the ordering is arguable — which is the
+point of a voter's tool. **Ranking disagreement** is the one a Top 25 voter
+most wants: it fires when AVCA and POWER differ by ≥8 on a side, and prints
+both ranks with their basis.
+
+Quiet day is bounded: **at most three** marquee cards, **eight** compact
+upcoming rows, recent finals from the last day that produced any, and one
+prompt. The old full-width empty-state card is gone.
+
+**What changed** moved here from the Scoreboard — it answers Today's second
+question, not the Scoreboard's only one.
+
+### Scoreboard
+The date is the page **state**, not a filter over a season: previous / next /
+Today / jump, then All · My Board · Ranked · Live · Final · Upcoming, then Top
+Games *for that date only*, then lanes grouped by state and sorted with ranked
+pairings first. The full season ledger is kept behind a named disclosure.
+
+### ⚠ THE REBUILD BROKE THE PAGE, AND THE WAY IT BROKE IS THE LESSON
+Removing the old live / later-today / this-week / legacy-date stack left four
+pollers addressing nodes that no longer existed.
+`getElementById(x).textContent = …` on a null **throws**, and because these run
+inside one boot sequence the throw took everything after it: Today rendered
+with a heading and nothing else, no header rail, no content. Ten ids were
+orphaned. `$$()` now returns a harmless stand-in — but that is a seatbelt, not
+a fix, so `test_today_scoreboard.py` **fails on any id referenced and not
+rendered**.
+
+### ⚠ AND THE PUBLIC GATE CAUGHT TWO PRIVATE LEAKS I INTRODUCED
+The Scoreboard's **My Board filter** — both the control and the branch behind
+it — and the **My Board reason tag** shipped unfenced. Both now sit inside
+`MYBOARD-WIRE` fences registered with `strip_private()`. A third leak was a
+comment of mine that *named* a private feature while explaining the route
+alias: the same trap the On TV comment sprang once before.
+
+Three existing guards also had premises this phase invalidated, and each was
+repointed at what it actually meant rather than loosened: a net check that
+assumed a hero court (the identity is now the masthead net plus the court
+texture, on every page); a parent-label check pinned to the literal
+`'Match Desk'`; and a season-naming check that was right to fail an empty
+`<p class="lead">` filled only by JS — the served document should state its
+season without a script, so the sentence moved into the markup.
+
+### ⚠ MOBILE WAS VERIFIED IN A REAL VIEWPORT, NOT A SIMULATED ONE
+`resize_window` reports success and **`innerWidth` stays 1512** with the 560px
+query not matching — the documented R6 limitation, and the brief explicitly
+forbids reporting a pass from it. Verified instead by loading the hub in a
+**390px iframe**, which has its own viewport, so media queries respond to it:
+
+```
+frameInnerWidth 384 · matchMedia(max-width:560px) TRUE
+documentElement.scrollWidth 384 === clientWidth 384
+overflow-x: visible on BOTH html and body   (no overflow-hidden cheat)
+per-element self-overflow: none · all six filters present
+```
+
+Touch targets measured in that viewport: the Today control came out **31px**
+and every control on the bar now has a 40px floor on a phone.
+
+### Verified
+37 suites · preflight clean · both builds · public gate · fresh-checkout guard ·
+seven direct routes each with exactly one active destination, **zero stale focus
+outlines**, rail shape and **zero empty set cells** everywhere · `#/match-desk`
+resolves to Today · Back restores the previous route.
