@@ -388,6 +388,25 @@ def main():
               "logo(r.t, 'sm') + esc(r.t" not in page,
               "each crest is a network request, rebuilt on every keystroke")
 
+    print("\n12c. A BOARD ROW IS A WAY IN, NOT A DEAD END")
+    if page:
+        check("board rows are clickable",
+              'class="prkrow"' in page and "openFromBoard" in page,
+              "the team was a link and the player was plain text, so the one "
+              "thing a board is FOR had no way out of it")
+        check("...and reachable by keyboard",
+              'tabindex="0"' in page and "e.key !== 'Enter'" in page)
+        # ⚠ THE ORDERING THAT BIT ONCE ALREADY. The players route CLEARS
+        # #playercard on entry, so painting before the route settles put the
+        # card up and had it wiped a moment later -- route changed, card blank,
+        # nothing thrown.
+        check("the card is painted AFTER the route settles",
+              "go(routeFor('players'));\n  setTimeout(" in page or
+              ("setTimeout(() => {" in page and "showRated(hit);" in page),
+              "painting before the router clears it")
+        check("a player with a 2026 line goes to her real route instead",
+              "routeFor('players', slug(team) + '/' + slug(name))" in page)
+
     print("\n13. THE PAGE SAYS WHAT IT IS")
     if page:
         check("the view names its season", "Player ratings for the 2026" in page)

@@ -4506,6 +4506,9 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .sup-fair .prkbadge{background:#5c4a1f;color:#f2e8d0}
 .sup-weak .prkbadge{background:#5c2a2a;color:#f2d9d9}
 #prktable td{vertical-align:top}
+.prkrow{cursor:pointer}
+.prkrow:hover td{background:rgba(255,255,255,.04)}
+.prkrow:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:-2px}
 .prknum{font:700 15px/1 var(--disp);color:var(--cs-white)}
 .prkval{font:700 15px/1 var(--disp);white-space:nowrap}
 .prkconf{font-size:11.5px;white-space:nowrap}
@@ -9823,6 +9826,48 @@ document.getElementById('pbody').addEventListener('click', e => {
 /* ⚠ DEBOUNCED. The directory now spans all of Division I, so a keystroke
    rebuilds a 2,800-row search and two tables. Firing that per character is what
    froze the tab -- and typing a full name is the normal case, not an edge one. */
+/* ⚠ A BOARD ROW OPENS HER CARD, AND THE ROUTE HAS TO CHANGE FIRST. Painting
+   the card while the reader is still on the ratings view puts it somewhere
+   they cannot see; the players view has to be the destination, and only then
+   does the card get painted. A player with a 2026 line gets her full page; one
+   without gets the last-season card, which is the same split the directory
+   already makes. */
+function openFromBoard(team, name) {
+  const live = (typeof PLAYERS !== 'undefined')
+    ? PLAYERS.find(p => p.team === team && p.name === name) : null;
+  if (live) { go(routeFor('players', slug(team) + '/' + slug(name))); return; }
+  const hit = (typeof ROSTER !== 'undefined')
+    ? ROSTER.find(r => r.t === team && r.n === name) : null;
+  if (!hit) return;
+  /* ⚠ PAINT AFTER THE ROUTER, NOT BEFORE IT. The players route CLEARS
+     #playercard on entry, so calling go() and then painting put the card up
+     and had it wiped a moment later -- the route changed, the card was blank,
+     and nothing errored. This is the same ordering the routed-player fix
+     already had to learn: the destination settles first, then the thing the
+     reader asked for is painted on top. */
+  go(routeFor('players'));
+  setTimeout(() => {
+    const box = document.getElementById('pq');
+    if (box) { box.value = name; renderPlayers(); }
+    showRated(hit);
+  }, 0);
+}
+document.addEventListener('click', e => {
+  const row = e.target.closest && e.target.closest('.prkrow');
+  if (!row || (e.target.closest && e.target.closest('a'))) return;
+  const k = row.getAttribute('data-pk') || '';
+  const i = k.indexOf('|');
+  if (i > 0) openFromBoard(k.slice(0, i), k.slice(i + 1));
+});
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const row = e.target.closest && e.target.closest('.prkrow');
+  if (!row) return;
+  const k = row.getAttribute('data-pk') || '';
+  const i = k.indexOf('|');
+  if (i > 0) { e.preventDefault(); openFromBoard(k.slice(0, i), k.slice(i + 1)); }
+});
+
 /* clicking a not-yet-played row opens her card */
 document.addEventListener('click', e => {
   const row = e.target.closest && e.target.closest('.nyrow');
@@ -15791,7 +15836,11 @@ function prkRow(r) {
   const val = overall ? r.pct : (PRK_MODE === 'resume' ? r.rs : r.pw);
   const shown = val === null || val === undefined ? '—'
     : (overall ? val.toFixed(1) : (val > 0 ? '+' : '') + val.toFixed(2));
-  return '<tr>' +
+  /* ⚠ THE BOARDS WERE A DEAD END. A reader who finds the best middle in the
+     country could not click her -- the team was a link and the player was
+     plain text, so the one thing the board is FOR had no way out of it. */
+  return '<tr class="prkrow" data-pk="' + esc((r.t || '') + '|' + (r.n || '')) +
+    '" tabindex="0">' +
     '<td class="prknum">' + (rank == null ? '—' : rank) + '</td>' +
     '<td class="l tm"><b>' + esc(r.n || '') + '</b>' +
       (r.num ? ' <span class="munk">#' + esc(String(r.num)) + '</span>' : '') +
