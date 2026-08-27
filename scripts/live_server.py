@@ -380,6 +380,52 @@ def match_detail(gid):
 # check below is the second lock -- it stops a DNS-rebinding page in the
 # browser from reaching an endpoint that only expects to hear from localhost.
 
+# ⚠ THE PRIVATE-HOST ALLOWLIST. Empty by default: out of the box only
+# localhost reaches a private endpoint, exactly as before. Set it to the exact
+# hostname a trusted reverse proxy will present, e.g.
+#     export WVB_TRUSTED_HOSTS="codys-mac.tailnet-1234.ts.net"
+# Comma-separated for more than one. Whitespace and case are normalised;
+# entries with a scheme, a path, a port or a wildcard are DROPPED rather than
+# guessed at, because a malformed entry that silently matched nothing would
+# look identical to one that worked.
+def _parse_trusted(raw):
+    out = set()
+    for part in (raw or "").split(","):
+        h = part.strip().strip('"').strip("'").lower()
+        if not h:
+            continue
+        if "*" in h or "/" in h or ":" in h or " " in h:
+            continue
+        out.add(h)
+    return frozenset(out)
+
+
+def _host_only(raw):
+    """The hostname from a Host header, without its port.
+
+    ⚠ SPLITTING ON ":" IS WRONG FOR IPv6, AND THE ORIGINAL CODE DID IT. The old
+    check was `Host.split(":")[0] in ("127.0.0.1","localhost","[::1]","::1")`.
+    For a bare `::1` that yields "" and for `[::1]:8799` it yields "[" -- so
+    NEITHER IPv6 localhost form has ever actually matched, despite both being
+    listed. Nothing broke, because browsers send `localhost` or `127.0.0.1`;
+    it simply meant two of the four entries were decoration.
+    RFC 3986 brackets an IPv6 literal in a host, so: bracketed -> take what is
+    inside; more than one colon and no bracket -> a bare IPv6, keep it whole;
+    otherwise -> split off the port.
+    """
+    h = (raw or "").strip().lower()
+    if not h:
+        return ""
+    if h.startswith("["):
+        end = h.find("]")
+        return h[1:end] if end > 0 else ""
+    if h.count(":") > 1:
+        return h
+    return h.split(":")[0]
+
+
+TRUSTED_HOSTS = _parse_trusted(os.environ.get("WVB_TRUSTED_HOSTS", ""))
+
 DIGBY_MAX_BODY = 4096
 DIGBY_MIN_GAP = float(os.environ.get("WVB_DIGBY_MIN_GAP", "2"))
 DIGBY_MAX_PER_RUN = int(os.environ.get("WVB_DIGBY_MAX", "200"))
@@ -501,9 +547,38 @@ class Handler(SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def _is_local(self):
-        host = (self.headers.get("Host") or "").split(":")[0]
-        return host in ("127.0.0.1", "localhost", "[::1]", "::1")
+    def _is_trusted(self):
+        """May this request reach a private endpoint?
+
+        ⚠ THE BIND IS THE FIRST LOCK AND IT DOES NOT CHANGE. This process
+        answers on 127.0.0.1 only. Nothing here loosens that, and nothing here
+        makes the server reachable from a network -- a reverse proxy in front
+        of localhost is the only way a phone ever talks to it.
+
+        ⚠ THIS IS THE SECOND LOCK: the Host header. A page in the browser can
+        resolve a name it controls to 127.0.0.1 (DNS rebinding) and then fetch
+        these endpoints as same-origin. The bind cannot see that; the Host can,
+        because the attacker's page sends its own name.
+
+        ⚠ WHY IT IS NO LONGER A HARDCODED LIST. Tailscale Serve terminates
+        HTTPS and proxies to localhost, but PRESERVES the original Host -- so
+        an iPhone request arrives with `something.ts.net`. Against the old
+        fixed tuple every private endpoint would 403 and the page would look
+        broken for no visible reason. The allowlist is EXACT-MATCH, empty by
+        default, and comes from the environment: adding a host is a deliberate
+        act, not a wildcard.
+
+        ⚠ EXACT MATCH, NEVER A SUFFIX TEST. `endswith(".ts.net")` would accept
+        `evil.ts.net`; `"ts.net" in host` would accept `ts.net.evil.com`. Both
+        are refused here, and both have negative controls in the test suite.
+        """
+        host = _host_only(self.headers.get("Host"))
+        if host in ("127.0.0.1", "localhost", "::1"):
+            return True
+        return host in TRUSTED_HOSTS
+
+    # kept as the old name so nothing that already calls it changes meaning
+    _is_local = _is_trusted
 
     def do_POST(self):
         path = self.path.split("?")[0]
@@ -585,6 +660,13 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         if self.path.split("?")[0] == "/api/ballot":
+            # ⚠ THIS WAS UNGUARDED. It returns saved ballot history -- Cody's
+            # own Top 25 and his reasons for it -- and was the one private
+            # endpoint a rebinding page could read without passing the Host
+            # check, because the check was simply never applied here.
+            if not self._is_trusted():
+                self._json({"ok": False, "reason": "local requests only."}, 403)
+                return
             try:
                 rows = _ballot_mod().load()
             except Exception as e:                        # noqa: BLE001
@@ -640,6 +722,13 @@ class Handler(SimpleHTTPRequestHandler):
                             "error": "intel unavailable: %s" % str(exc)[:120]})
             return
         if self.path.split("?")[0] == "/api/live":
+            # ⚠ ALSO UNGUARDED. The payload is public scoreboard data, so the
+            # exposure is small -- but an unguarded endpoint still confirms to
+            # any page that this server exists and what it is, and there is no
+            # reason for the live cache to be the one door left open.
+            if not self._is_trusted():
+                self._json({"ok": False, "reason": "local requests only."}, 403)
+                return
             body = json.dumps(CACHE.snapshot()).encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
