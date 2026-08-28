@@ -175,8 +175,18 @@ def main():
           "195 rows under a nicer heading is the same wall")
     check("[-] ...and the remainder is one click from being shown",
           "LEDGER_OPEN[k] = !LEDGER_OPEN[k]" in C)
+    # ⚠ THIS GUARD USED TO ASSERT `(a.ep || 0) - (b.ep || 0)` -- and `ep`
+    # exists on NO match in the payload (0 of 1,594), so the subtraction was
+    # always 0 and the comparator fell through to localeCompare on the
+    # displayed clock string, where "6:00 AM PT" sorts after "5:30 PM PT".
+    # The guard was checking the SHAPE of a fix rather than the behaviour, so
+    # it held the broken version in place and read as proof it worked.
+    # Assert what the lane must actually do: compare times as minutes.
     check("lanes sort by time, with ranked pairings lifted",
-          "(a.ep || 0) - (b.ep || 0)" in C)
+          "tMinutes(a.t)" in C and "ra - rb" in C,
+          "a clock string compared with localeCompare is not a time sort")
+    check("[-] ...and not on a field no match carries",
+          "(a.ep || 0) - (b.ep || 0)" not in C)
     # ⚠ dayLabel() returns the WORD "Today"
     check("[-] an empty today does not say 'matches on Today'",
           "'No Division-I matches today.'" in C,

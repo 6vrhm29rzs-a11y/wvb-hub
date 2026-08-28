@@ -146,6 +146,34 @@ def main():
     check("[+] ...over a page that has plenty of them", len(names) > 80,
           "%d found" % len(names))
 
+    # ⚠ NO CLOCK STRING MAY BE SORTED WITH localeCompare, ANYWHERE. This bug
+    # has now been found in THREE separate places: the Scoreboard lanes, the
+    # "tonight's slate" band, and the ledger day view -- plus the watch list's
+    # date+time concatenation. "6:00 AM PT" sorts after "5:30 PM PT" because
+    # '6' > '5'. It survived so long because every day the page had rendered
+    # held two matches, and in the day view it was hidden behind a sort on
+    # `a.ep`, an epoch field that exists on NO match in the payload (0 of
+    # 1,594) -- so the subtraction was always 0 and it fell through to the
+    # broken compare while a comment above claimed the problem was solved.
+    # ISO dates are fine: they sort correctly as strings.
+    bad_sorts = []
+    for m in re.finditer(r"[^\n]*localeCompare[^\n]*", src):
+        line = m.group(0)
+        if "was visibly wrong" in line or "//" in line.split("localeCompare")[0]:
+            continue
+        # a time operand looks like `.t`, `.t ||`, `.time`, or `+ (x.t`
+        if re.search(r"\.\s*t\s*(\|\||\)|,)|\.time\b|\.\s*t\s*\+", line):
+            bad_sorts.append(line.strip()[:90])
+    check("[-] no clock string is ordered with localeCompare",
+          not bad_sorts, str(bad_sorts[:2]))
+    check("[+] ...over a file that really does sort things",
+          len(re.findall(r"localeCompare", src)) >= 3,
+          "%d call sites" % len(re.findall(r"localeCompare", src)))
+    # and the dead sort key must not come back
+    check("[-] nothing sorts on the `ep` field, which no match carries",
+          not re.search(r"\(\s*a\.ep\s*\|\|\s*0\s*\)", src),
+          "a sort key that is always 0 reads as a fix and is not one")
+
     print("\n2. The context column")
     ctx = fn(src, "matchContext")
     check("matchContext exists", bool(ctx))

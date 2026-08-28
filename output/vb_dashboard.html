@@ -3288,7 +3288,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     </div>
     <div class="meta">
       <b>9</b> matches played &middot; <b>348</b> teams rated<br>
-      last result <b>Mon Aug 24</b> &middot; built 2026-08-27 8:47 PM PT
+      last result <b>Mon Aug 24</b> &middot; built 2026-08-27 9:00 PM PT
     </div>
   </div>
   <!-- COURTSIGNAL-STATUS-BEGIN -->
@@ -6192,16 +6192,24 @@ function ledgerDayView(host, all, day, isToday) {
   const liveOf = m => LIVE_BY_ID[m.gid];
   const onDay = all.filter(m => m.d === day);
   const lane = st => onDay.filter(m => matchState(m, liveOf(m)) === st);
-  /* ⚠ SORTED BY START TIME, and this was wrong first time round: the lane
-     rendered in payload order, so a Friday read 4:00 PM, 11:00 AM, 12:00 PM,
-     4:00 PM, 10:00 AM. A day view whose times do not ascend is not a day
-     view. Ranked pairings lift to the top of their lane -- a stated sort, not
-     a score -- and everything else follows the clock. */
+  /* ⚠ SORTED BY START TIME, and this took two goes. The lane first rendered in
+     payload order, so a Friday read 4:00 PM, 11:00 AM, 12:00 PM, 4:00 PM,
+     10:00 AM. The repair sorted on `a.ep` -- an epoch field that EXISTS ON NO
+     MATCH IN THE PAYLOAD (measured: 0 of 1,594) -- so the subtraction was
+     always 0 and every comparison fell through to `localeCompare` on the
+     displayed clock string, which is the original bug wearing a fix. A dead
+     sort key is worse than none: the comment above it says the problem is
+     solved. Times are compared as MINUTES now. Ranked pairings still lift to
+     the top of their lane -- a stated sort, not a score. */
   const order = (a, b) => {
     const ra = (a.ar && a.hr) ? 0 : (a.ar || a.hr) ? 1 : 2;
     const rb = (b.ar && b.hr) ? 0 : (b.ar || b.hr) ? 1 : 2;
     if (ra !== rb) return ra - rb;
-    return (a.ep || 0) - (b.ep || 0) || String(a.t || '').localeCompare(b.t || '');
+    const ma = tMinutes(a.t), mb = tMinutes(b.t);
+    if (ma === null && mb === null) return 0;
+    if (ma === null) return 1;      /* an unreadable time sorts last */
+    if (mb === null) return -1;
+    return ma - mb;
   };
   const live = lane('live').sort(order);
   const fin = lane('final').sort(order);
@@ -6480,6 +6488,15 @@ function wireScoreboard() {
     if (pick.value) { SB_DATE = pick.value; renderScoreboard(); }
   });
 }
+
+/* Opening the ledger renders it, so it cannot show what the page knew before
+   the first poll landed. Bound once, on the document, because the <details>
+   is present from load and never replaced. */
+document.addEventListener('toggle', function (e) {
+  const d = e.target;
+  if (d && d.classList && d.classList.contains('sbfull') && d.open &&
+      typeof renderLedger === 'function') renderLedger();
+}, true);
 
 function renderLedger() {
   const host = document.getElementById('ledgerbody');
@@ -7403,9 +7420,15 @@ function renderDesk() {
     if (st === 'live') w += 100;
     return w ? [m, rs, w] : null;
   };
+  /* ⚠ THIRD SITE OF THE SAME DATE+TIME CONCATENATION. Comparing
+     `date + "6:00 AM PT"` lexically is right about the date and wrong about
+     the clock. Ties on watch weight are broken by the real chronology. */
   const ranked = soon7.map(watchable).filter(Boolean)
     .sort((a, b) => b[2] - a[2] ||
-      String(a[0].d + (a[0].t || '')).localeCompare(b[0].d + (b[0].t || '')));
+      String(a[0].d || '').localeCompare(String(b[0].d || '')) ||
+      ((ma, mb) => (ma === null && mb === null) ? 0
+        : ma === null ? 1 : mb === null ? -1 : ma - mb
+      )(tMinutes(a[0].t), tMinutes(b[0].t)));
 
   const watches = ranked.slice(0, 5);
   const watchIds = watches.map(x => x[0].gid);
@@ -7610,6 +7633,20 @@ async function deskLive() {
      with no score and would have until the reader touched a filter.
      Cody saw exactly that and called the page a mess. It was. */
   if (typeof renderScoreboard === 'function') renderScoreboard();
+  /* ⚠ AND THE LEDGER, WHICH IS THE SAME BUG ONE VIEW ACROSS. The note above
+     says the Scoreboard was "the one view the poll never told" -- it was not.
+     The full-season ledger reads the identical matchState(m, LIVE_BY_ID[...])
+     and renders once at load, BEFORE the first poll returns, so with an empty
+     LIVE_BY_ID every finished-but-not-yet-crawled match lands in the
+     `upcoming` lane. Measured tonight: the ledger headed two matches that had
+     been final for hours "STILL TO COME", and a forced re-render immediately
+     changed it to "FINAL TODAY 2". On a match day the view whose own summary
+     promises "every fixture and result" is the one that is wrong.
+     Only when it is OPEN: it can hold 1,594 rows and rebuilding them into a
+     collapsed <details> every 60 seconds is work nobody can see. It renders on
+     open too, so a reader never sees the stale state either way. */
+  const _lg = document.querySelector('details.sbfull');
+  if (_lg && _lg.open && typeof renderLedger === 'function') renderLedger();
   /* ⚠ THE DETAIL MUST RE-EVALUATE WHEN LIVE DATA LANDS. deskLive() is async and
      resolves AFTER the router has already painted, so a match that is live on
      the feed rendered as "upcoming" -- no Live stats section, no timer -- and

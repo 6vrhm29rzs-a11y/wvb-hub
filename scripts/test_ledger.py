@@ -210,6 +210,34 @@ def main():
     check("[+] ...and --write does refresh it",
           os.path.getmtime(art) > before if os.path.exists(art) else False)
 
+    # ── 7. THE LEDGER LEARNS WHAT THE POLL LEARNS ───────────────────────
+    print("\n7. THE LEDGER IS TOLD WHEN LIVE DATA LANDS")
+    # ⚠ IT WAS NOT, AND THE SYMPTOM WAS ON SCREEN FOR HOURS. The ledger reads
+    # matchState(m, LIVE_BY_ID[m.gid]) and renders ONCE at load -- before the
+    # first poll returns -- so with an empty LIVE_BY_ID every match that had
+    # finished but not yet been crawled fell into the `upcoming` lane. Two
+    # matches that ended hours earlier sat under "STILL TO COME"; a forced
+    # re-render changed the heading to "FINAL TODAY 2" immediately.
+    # deskLive() already re-rendered the SCOREBOARD for exactly this reason and
+    # carried a comment calling it "the one view the poll never told" -- it was
+    # not the only one. Same bug, one view across.
+    src = open(os.path.join(REPO, "scripts", "build_hub.py"),
+               encoding="utf-8").read()
+    live_fn = src[src.find("async function deskLive"):]
+    live_fn = live_fn[:live_fn.find("\nasync function ", 10)
+                      if live_fn.find("\nasync function ", 10) > 0 else 4000]
+    check("the poll re-renders the scoreboard",
+          "renderScoreboard()" in live_fn)
+    check("[+] ...and the ledger too", "renderLedger()" in live_fn,
+          "the ledger reads the same live state and must learn with it")
+    # only while it is open -- 1,594 rows rebuilt into a collapsed <details>
+    # every 60 seconds is work nobody can see
+    check("...but only while the ledger is open",
+          "_lg.open" in live_fn or ".open &&" in live_fn)
+    # and opening it renders, so a ledger opened later is never stale either
+    check("opening the ledger renders it",
+          "addEventListener('toggle'" in src and "sbfull" in src)
+
     print()
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))
