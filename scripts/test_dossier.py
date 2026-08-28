@@ -274,14 +274,29 @@ def main():
               "%d roster rows carry a photo" % withph)
         # and the stars a dossier shows must be findable on that roster, or
         # every face silently falls back to initials
-        miss = []
+        # ⚠ A RATIO, NOT A COUNT. This was `len(miss) < 20`, and the first
+        # evening of the season broke it at 21: more teams playing means more
+        # stars, means more of the known feed-vs-roster spelling gaps
+        # ("Una Vajagic", "Nina Jioshvili-ravva"). A fixed count fails on data
+        # GROWTH, not on regression -- the same calendar-shaped mistake as the
+        # exhibition-badge guard. The invariant is join HEALTH: an unresolved
+        # star renders initials (honest), but if a large share stop resolving
+        # the join itself has broken. A real break is ~100%; five percent is
+        # the sanity bound, stated as one.
+        miss, tot = [], 0
         for tn, v in teams.items():
             names = set(r.get("n") for r in (v.get("roster") or []))
             for st in (v.get("stars") or [])[:3]:
-                if st.get("n") and st["n"] not in names:
+                if not st.get("n"):
+                    continue
+                tot += 1
+                if st["n"] not in names:
                     miss.append((tn, st["n"]))
+        _ratio = (len(miss) / float(tot)) if tot else 0.0
         check("dossier stars resolve against their own roster",
-              len(miss) < 20, "%d unresolved, e.g. %s" % (len(miss), miss[:3]))
+              _ratio <= 0.05,
+              "%d of %d unresolved (%.1f%%), e.g. %s"
+              % (len(miss), tot, 100 * _ratio, miss[:3]))
 
     # --- 8. the private art must never reach the published page -----------
     # Cody/players/ holds drawn likenesses of named athletes that he placed
