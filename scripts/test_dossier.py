@@ -96,6 +96,36 @@ def main():
               "querySelector('.tdnav')" in g,
               "a dataset stamp alone survives a re-render that wipes the work")
 
+    # --- 3c. the open team page is told when live data lands ---------------
+    # ⚠ THIRD MEMBER OF THE POLL-STALENESS FAMILY (scoreboard, ledger, now
+    # this). The Next-match card reads matchState(m, LIVE_BY_ID[...]) and
+    # renders on route entry -- on a fresh load that is BEFORE the first poll
+    # returns, so Michigan's page said "Next match - 3:00 PM PT - 99% to win"
+    # while Michigan was mid-2nd-set, and nothing re-rendered it. deskLive()
+    # must re-render the OPEN team route (and only that one), and the entry
+    # is safe because teamDossier checks for its own nav, not just its stamp.
+    live_fn = src[src.find("async function deskLive"):]
+    live_fn = live_fn[:live_fn.find("\nasync function ", 10)
+                      if live_fn.find("\nasync function ", 10) > 0 else 6000]
+    check("the poll re-renders the open team page",
+          "#\\/teams\\/" in live_fn and "showTeam(" in live_fn,
+          "a live team's own page must not show the pre-match card")
+    check("...and only the one actually open",
+          "location.hash" in live_fn)
+    # --- 3d. a live or finished match shows no pre-match pick --------------
+    # ⚠ "99% TO WIN" SAT BESIDE A LIVE MATCH. The simulator's number is a
+    # statement about a match that has not started; on a live card it reads as
+    # a live win probability, which this site never shows.
+    # (this module has no fn() helper -- that lives in a sibling suite; the
+    #  bounded-body regex is the same technique inline)
+    _nmm = re.search(r"function tdNextMatch\(.*?\n\}", src, re.S)
+    nm = _nmm.group(0) if _nmm else ""
+    check("the pick renders only on an upcoming match",
+          "st === 'upcoming' && f.pick" in nm,
+          "a pre-match pick on a live card reads as a live probability")
+    check("...and a live card carries the tally, not the start time",
+          "st === 'live'" in nm and "matchScore(" in nm)
+
     print("overview promises")
 
     # --- 4. Overview carries the three things the brief asked for ---------

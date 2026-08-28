@@ -15819,6 +15819,19 @@ async function deskLive() {
      open too, so a reader never sees the stale state either way. */
   const _lg = document.querySelector('details.sbfull');
   if (_lg && _lg.open && typeof renderLedger === 'function') renderLedger();
+  /* ⚠ AND THE OPEN TEAM PAGE -- the THIRD member of the same family. Its
+     "Next match" card reads matchState(m, LIVE_BY_ID[...]) and renders on
+     route entry, which on a fresh load is BEFORE the first poll returns -- so
+     Michigan's page said "Next match - 3:00 PM PT - 99% to win" while
+     Michigan was mid-2nd-set, and nothing ever told it. Re-render only the
+     team actually open; teamDossier() is idempotent by checking for its own
+     nav, so this cannot double-build. */
+  const _tm = (location.hash || '').match(/^#\/teams\/([^/]+)$/);
+  if (_tm && typeof unslugTeam === 'function' &&
+      typeof showTeam === 'function') {
+    const _tn = unslugTeam(decodeURIComponent(_tm[1]));
+    if (_tn) showTeam(_tn);
+  }
   /* ⚠ THE DETAIL MUST RE-EVALUATE WHEN LIVE DATA LANDS. deskLive() is async and
      resolves AFTER the router has already painted, so a match that is live on
      the feed rendered as "upcoming" -- no Live stats section, no timer -- and
@@ -17999,8 +18012,27 @@ function tdNextMatch(t, name) {
     '<a class="tdnextrow" href="' + matchRoute(f.gid, 'teams') + '">' +
       '<span class="tdvs">' + (f.home ? 'vs ' : 'at ') + logo(opp, 'sm') +
         '<b>' + esc(opp) + '</b></span>' +
-      '<span class="tdwhen">' + esc(dayLabel(f.d)) +
-        (f.t ? ' &middot; ' + esc(f.t) : '') +
+      /* ⚠ A CARD ABOUT A MATCH IN PROGRESS SAYS THE SCORE, NOT THE START
+         TIME -- and NEVER the pre-match pick. "TODAY - 3:00 PM PT - 99% TO
+         WIN" rendered beside a live match (Michigan, 2026-08-28): a
+         simulator's PRE-match number sitting on a live card reads as a live
+         win probability, which this site never shows. The pick
+         is a statement about a match that has not started; the moment it has,
+         the truthful line is the tally and the period. */
+      '<span class="tdwhen">' + (st === 'live'
+        ? (function () {
+            const _sc = matchScore(m || f, live);
+            return (_sc && _sc[0] !== null && _sc[0] !== undefined
+                    ? _sc[0] + '\u2013' + _sc[1] + ' &middot; ' : '') +
+              esc((live && live.period) || 'in progress');
+          })()
+        : st === 'final'
+        ? (function () {
+            const _sc = matchScore(m || f, live);
+            return 'FINAL' + (_sc && _sc[0] !== null && _sc[0] !== undefined
+                              ? ' ' + _sc[0] + '\u2013' + _sc[1] : '');
+          })()
+        : esc(dayLabel(f.d)) + (f.t ? ' &middot; ' + esc(f.t) : '')) +
         /* ⚠ THE MODEL'S PRE-MATCH PICK MOVED HERE FROM THE GLANCE STRIP,
            IT WAS NOT DROPPED. The strip's "Next" tile and this card said the
            same thing twice in one viewport; this card is the richer of the two
@@ -18011,7 +18043,7 @@ function tdNextMatch(t, name) {
            ⚠ It is labelled, unlike the bare "93%" the strip showed: a naked
            percentage beside a start time invites being read as anything. It
            is the simulator's pre-match pick and says so. */
-        (f.pick !== null && f.pick !== undefined
+        (st === 'upcoming' && f.pick !== null && f.pick !== undefined
           ? ' &middot; <i class="tdpick" title="The season simulator\u2019s ' +
             'pre-match pick for this fixture.">' + Math.round(f.pick * 100) +
             '% to win</i>' : '') + '</span>' +
