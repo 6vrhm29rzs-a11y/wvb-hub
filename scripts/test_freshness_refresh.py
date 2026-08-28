@@ -177,8 +177,29 @@ def main():
           "crawl_2025.py schedule" in d)
     check("the daily job still writes the weekly ranking freeze",
           "snapshot_rankings" in d)
-    check("the daily job still runs the fresh-checkout guard",
-          "test_pipeline_fresh_checkout" in d)
+    # ⚠ THE GUARD ASKS WHETHER THE SUITE RUNS, NOT WHETHER IT IS NAMED. The
+    # daily job used to list every suite by hand and the list drifted three
+    # times, ending at 32 of 46; the step now DISCOVERS them, so the literal
+    # string "test_pipeline_fresh_checkout" is no longer in the workflow and a
+    # check for it failed a job that runs the suite more reliably than before.
+    # Same shape as the `ep` sort key: asserting the form of a fix rather than
+    # the fact of it. Accept either -- named explicitly, or covered by
+    # discovery (in which case the runner and the suite must both exist).
+    runner = os.path.join(REPO, "scripts", "run_all_guards.py")
+    covered = ("test_pipeline_fresh_checkout" in d
+               or ("run_all_guards.py" in d and os.path.exists(runner)
+                   and os.path.exists(os.path.join(
+                       REPO, "scripts", "test_pipeline_fresh_checkout.py"))))
+    check("the daily job still runs the fresh-checkout guard", covered,
+          "neither named nor reachable by discovery")
+    # and discovery must actually be able to fail: a runner that skips suites
+    # silently would satisfy the line above while covering nothing
+    if os.path.exists(runner):
+        rsrc = open(runner, encoding="utf-8").read()
+        check("...and the discovery runner refuses to pass on an empty sweep",
+              "MIN_SUITES" in rsrc and "refusing to report a clean run" in rsrc)
+        check("...and any skip has to carry a written reason",
+              "SKIP = {}" in rsrc or "SKIP[" in rsrc)
     check("the daily cron is unchanged (09:15 UTC)", 'cron: "15 9 * * *"' in d)
 
     print()

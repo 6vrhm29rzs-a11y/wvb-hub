@@ -258,56 +258,15 @@ jobs:
       # documentation; a guard that fails there for a missing input is
       # noise. Give it the input.
       - name: Invariant guards
+        # ⚠ DISCOVERED, NOT LISTED. This step used to name every suite by hand
+        # and the list drifted three times -- by 2026-08-27 it ran 32 of 46, so
+        # fourteen guards protected nothing here. run_all_guards.py finds them,
+        # runs them all even after one fails, and refuses to report a clean run
+        # if discovery comes back near-empty. A new guard now runs the day it
+        # is written. Kept to ONE command on purpose: the fresh-checkout guard
+        # executes this workflow's commands line by line.
         run: |
-          python3 scripts/test_display_invariants.py
-          python3 scripts/test_roster_parser.py
-          python3 scripts/test_venues.py
-          python3 scripts/test_join_invariants.py
-          python3 scripts/test_projection.py
-          python3 scripts/test_score_predictions.py
-          python3 scripts/test_lineups.py
-          python3 scripts/test_rankings_history.py
-          python3 scripts/test_top25.py
-          # Four suites were written today and never added here. A guard that
-          # does not run in CI protects nothing -- it only reassures whoever
-          # wrote it. None of these need network or an API key: digby's tests
-          # exercise the fidelity gate and the driver with a stubbed model,
-          # digby_chat's use a synthetic league, rotations' use synthetic
-          # lineups, and the hook test drives the hook directly.
-          python3 scripts/test_digby.py
-          python3 scripts/test_digby_chat.py
-          python3 scripts/test_rotations.py
-          python3 scripts/test_no_scrape_hook.py
-          # Does the whole thing still work from a FRESH CHECKOUT? Both of
-          # 2026-08-23's nightly breakages were invisible on a laptop that
-          # already had the gitignored build artifacts. This re-runs the
-          # offline heart of the pipeline against tracked files only, and
-          # reads the command list out of THIS file rather than restating
-          # it. It excludes itself by name -- it is in this very list.
-          # ⚠ FIVE MORE SUITES THAT EXISTED AND DID NOT RUN HERE. The comment
-          # above says a guard that does not run in CI protects nothing, and
-          # then five were added without being listed. test_ballot matters most
-          # for a PUBLISHING change: it is the check that the Ballot Workshop --
-          # Cody's own ballot, his notes, his reasons for overruling the model --
-          # is absent from the published file.
-          python3 scripts/test_resume.py
-          python3 scripts/test_coaches.py
-          python3 scripts/test_rating_factors.py
-          python3 scripts/test_ballot.py
-          python3 scripts/test_match_desk.py
-          python3 scripts/test_live_match.py
-          python3 scripts/test_player_identity.py
-          python3 scripts/test_player_aggregation.py
-          python3 scripts/test_rankings_board.py
-          python3 scripts/test_weekly_calendar.py
-          python3 scripts/test_fixture_disposition.py
-          python3 scripts/test_match_state.py
-          python3 scripts/test_visual_system.py
-          python3 scripts/test_filmroom.py
-          python3 scripts/test_intel.py
-          python3 scripts/test_gameday.py
-          python3 scripts/test_freshness_refresh.py
-          python3 scripts/test_pipeline_fresh_checkout.py
+          python3 scripts/run_all_guards.py
 
       # Coverage gate: a NEW displayed field with no declared provenance fails
       # the run. It cannot catch a client-side expression inventing a value for

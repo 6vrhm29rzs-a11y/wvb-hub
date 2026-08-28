@@ -100,6 +100,17 @@ def step_commands(step, workflow=None):
         return []
     while i < len(lines) and not lines[i].strip().startswith("run:"):
         i += 1
+    if i >= len(lines):
+        return []
+    # ⚠ `run:` COMES IN TWO SHAPES AND THIS ONLY UNDERSTOOD ONE. A block
+    # (`run: |`) puts the commands on following lines; an INLINE `run: cmd`
+    # puts it right there. Reading only the block form, an inline step returned
+    # NO commands and the guard reported the step as "renamed or restructured"
+    # -- failing a workflow that was correct. Other steps in this file already
+    # use the inline form.
+    inline = lines[i].strip()[4:].strip()
+    if inline and inline != "|" and not inline.startswith("|"):
+        return [inline]
     i += 1
     for ln in lines[i:]:
         if ln.strip() and not ln.startswith("          "):
@@ -146,6 +157,31 @@ def run_sequence(cmds, cwd, season, stop_on_required_failure=True):
     env["WVB_SEASON"] = season
     env.pop("ANTHROPIC_API_KEY", None)      # never spend money from a guard
     results = []
+    # ⚠ THE SELF-EXCLUSION USED TO WORK BY NAME, AND THE NAME MOVED. This
+    # suite skips any workflow command that mentions it -- otherwise it runs
+    # itself inside its own sandbox forever. The daily job now invokes the
+    # guards through run_all_guards.py, so this file's name no longer appears
+    # in any command and the cycle came back. The exclusion travels in the
+    # environment instead, and the runner prints what it skipped.
+    env = dict(env or os.environ)
+    # ⚠ THE SANDBOX IS NARROWER THAN CI, AND THE EXCLUSIONS SAY SO. This test
+    # runs only the workflow's "Rebuild derived outputs" and "Invariant guards"
+    # steps; the real job also crawls and rebuilds the 2025 base, so two suites
+    # assert on inputs that exist in CI and not here:
+    #   test_player_rating     -- schedule-adjusted priors need the 2025
+    #                             opponent graph (data/rating_2025.json), which
+    #                             is gitignored and rebuilt by steps this
+    #                             sandbox does not run. Measured here: 0 of
+    #                             2,789 priors carried an opponent z.
+    #   test_today_scoreboard  -- its TV assertions read
+    #                             Cody/data/tv_listings_2026.txt, which lives
+    #                             inside the gitignored private folder and is
+    #                             not ours to publish. It cannot exist here.
+    # Both still run in CI and in preflight, where their inputs are present.
+    # They are excluded from THIS sandbox only, and the runner prints each skip
+    # so an exclusion can never be silent.
+    env["WVB_GUARD_EXCLUDE"] = ",".join(
+        [SELF, "test_player_rating.py", "test_today_scoreboard.py"])
     for c in cmds:
         if SELF in c or SKIP.search(c):
             continue
