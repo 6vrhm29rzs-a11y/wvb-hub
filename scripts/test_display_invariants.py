@@ -281,6 +281,105 @@ def check_tv_opens_on_what_is_still_to_come():
 
 
 
+
+def check_team_stats_reconcile_with_their_box_scores():
+    """The team-stats numbers must be reproducible from the box lines beside them.
+
+    ⚠ THIS IS A VALUE CHECK, AND THE EXISTING ONE IS NOT. The guard further
+    down asserts the JS box-score row contains the literal expression
+    `(t.k - t.e) / t.ta` -- true of the markup, and silent about the numbers
+    actually on the page. `tstats` is computed in PYTHON on a different path
+    and was never checked against anything. Three claims from CLAUDE.md, each
+    a thing this project has got wrong somewhere before:
+
+      1. hitting % is (K-E)/TA from SUMMED counts, never the mean of the
+         players' percentages -- a mean weights a libero's one swing like an
+         outside's thirty
+      2. blocks are solo + HALF assists, the NCAA convention
+      3. the per-set denominator is the MATCH's sets, not the sum of the
+         players' -- six are on court at once, so summing them is ~6x the
+         truth and would make every rate look a sixth of what it is
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  --   no built hub; skipping team-stat reconciliation")
+        return
+    h = open(hub, encoding="utf-8").read()
+
+    def _grab(name):
+        m = re.search(r"const %s = (\{)" % name, h)
+        if not m:
+            return None
+        i = m.start(1)
+        d, j, instr, esc = 0, i, False, False
+        while j < len(h):
+            c = h[j]
+            if instr:
+                if esc:
+                    esc = False
+                elif c == "\\":
+                    esc = True
+                elif c == '"':
+                    instr = False
+            elif c == '"':
+                instr = True
+            elif c in "[{":
+                d += 1
+            elif c in "]}":
+                d -= 1
+                if d == 0:
+                    break
+            j += 1
+        return json.loads(h[i:j + 1])
+
+    T, B = _grab("TEAMS"), _grab("BOXES")
+    if not T or not B:
+        print("  --   no TEAMS/BOXES payload; skipping")
+        return
+    agg = {}
+    for _gid, rows in B.items():
+        for r in rows:
+            a = agg.setdefault(r["team"], {"k": 0, "e": 0, "ta": 0, "bs": 0,
+                                           "ba": 0, "psets": 0, "hits": []})
+            for f in ("k", "e", "ta", "bs", "ba"):
+                a[f] += r.get(f) or 0
+            a["psets"] += r.get("sets") or 0
+            if r.get("hit") is not None and (r.get("ta") or 0) > 0:
+                a["hits"].append(r["hit"])
+    n = 0
+    for name, rec in T.items():
+        ts = (rec.get("tstats") or {}).get("own")
+        a = agg.get(name)
+        if not ts or not a or not a["ta"]:
+            continue
+        n += 1
+        summed = (a["k"] - a["e"]) / float(a["ta"])
+        if abs(summed - (ts.get("hit") or 0)) > 0.0015:
+            bad("team hitting % does not match its own box scores",
+                "%s shows %.3f, its counts give %.3f" % (name, ts.get("hit"),
+                                                         summed))
+        if a["hits"]:
+            mean = sum(a["hits"]) / len(a["hits"])
+            if abs(mean - (ts.get("hit") or 0)) < 0.0015 \
+                    and abs(mean - summed) > 0.004:
+                bad("team hitting % is the MEAN of player percentages",
+                    "%s: mean %.3f, summed %.3f" % (name, mean, summed))
+        blocks = a["bs"] + 0.5 * a["ba"]
+        if abs(blocks - (ts.get("blocks") or 0)) > 0.51:
+            bad("team blocks are not solo + half assists",
+                "%s shows %.1f, convention gives %.1f" % (name,
+                                                          ts.get("blocks"),
+                                                          blocks))
+        if a["psets"] and abs((ts.get("sets") or 0) - a["psets"]) < 0.5:
+            bad("per-set rates use the SUM of players' sets",
+                "%s: %.0f -- six are on court at once" % (name, a["psets"]))
+    if not n:
+        print("  --   no team has 2026 box scores yet; skipping")
+        return
+    ok("team stats reconcile with their own box scores", n)
+
+
+
 def check_rating():
     """Validate EVERY rating payload on disk, not one chosen by an env var.
 
@@ -3334,6 +3433,7 @@ def main():
     check_standings_diff_shares_the_record_basis()
     print()
     check_tv_opens_on_what_is_still_to_come()
+    check_team_stats_reconcile_with_their_box_scores()
     check_rating()
     print()
     if FAILS:
