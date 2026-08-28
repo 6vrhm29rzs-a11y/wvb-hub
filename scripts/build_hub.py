@@ -963,6 +963,21 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
         _w26[_nm] = (_w, len(_di_g) - _w, _nw, len(_nd_g) - _nw)
 
     fixtures = {}
+    # ⚠ THE COUNT WAS NORMALISED AND THE LIST WAS NOT. `sched_n` keys through
+    # team_norm() -- fixed when "LSU New Orleans" vs "New Orleans" first bit --
+    # but THIS loop, over the same scoreboard files, kept using the raw feed
+    # name. So New Orleans' page said "29 scheduled matches" and listed ZERO:
+    # the count and the list came from two loops and only one was joined
+    # properly. The existing guard checks `sched_n`, which is the half that
+    # was already right, so it passed throughout.
+    # `teams` is the hub's own roster of names; a feed name that normalises to
+    # one of them is DISPLAYED as the hub spells it, so a crest and a link
+    # resolve. A name we do not know keeps exactly what the feed said.
+    _hub_disp = {}
+    for _t in (teams or []):
+        _n = _t.get("team") if isinstance(_t, dict) else _t
+        if _n:
+            _hub_disp.setdefault(team_norm(_n), _n)
     vidx = venue_index()
     today = today_pt().isoformat()
     for path in sorted(glob.glob(os.path.join(REPO, "data/raw/%d/scoreboard/*.json" % SEASON))):
@@ -991,10 +1006,13 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
             base = {"gid": gid, "d": date, "t": t, "venue": v.get("venue"),
                     "city": v.get("city"), "st": v.get("state_usps"),
                     "site": v.get("site"), "event": v.get("event"), "kind": kind}
-            aw = dict(base); aw.update({"opp": h, "home": False})
-            hm = dict(base); hm.update({"opp": a, "home": True})
-            fixtures.setdefault(a, []).append(aw)
-            fixtures.setdefault(h, []).append(hm)
+            _ka, _kh = team_norm(a), team_norm(h)
+            aw = dict(base); aw.update({"opp": _hub_disp.get(_kh, h),
+                                        "home": False})
+            hm = dict(base); hm.update({"opp": _hub_disp.get(_ka, a),
+                                        "home": True})
+            fixtures.setdefault(_ka, []).append(aw)
+            fixtures.setdefault(_kh, []).append(hm)
 
     # ---- CONFERENCE POSITION, SCHEDULE STRENGTH, HEAD-TO-HEAD ------------
     # All three are derived from data already on the page. Nothing here is an
@@ -1278,7 +1296,8 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
                                 key=lambda x: -(x.get("pts") or 0))[:3]],
             "played": played.get(nm, []),
             "fixtures": [dict(f, pick=_fixture_pick(pred_by_pair, f, nm))
-                         for f in fixtures.get(nm, []) if f["d"] >= today][:40],
+                         for f in fixtures.get(team_norm(nm), [])
+                         if f["d"] >= today][:40],
         }
     # ⚠ A SUMMARY IS ONLY VALID FOR THE FACTS IT WAS WRITTEN FROM.
     # Measured: a day after they were generated, 326 of 340 stored summaries

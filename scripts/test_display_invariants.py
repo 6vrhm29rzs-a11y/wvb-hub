@@ -2220,6 +2220,31 @@ def check_public_build_is_clean():
                 ", ".join(zero[:5]))
         else:
             ok("every team but one has a scheduled-match count", len(_zt) - len(zero))
+        # ⚠ AND THE LIST, NOT JUST THE COUNT. This guard checked `sched_n`
+        # alone -- the half that had already been fixed -- and passed while the
+        # FIXTURE LIST was still keyed on the raw feed name. New Orleans' page
+        # said "29 scheduled matches" and listed ZERO, because the count and
+        # the list came from two loops over the same files and only one went
+        # through team_norm(). A count with an empty list is the join breaking
+        # again in the half nobody was watching.
+        _split = [k for k, v in _zt.items()
+                  if (v.get("sched_n") or 0) > 0 and not (v.get("fixtures") or [])]
+        if _split:
+            bad("a team counts scheduled matches but lists none",
+                ", ".join(_split[:5]))
+        else:
+            ok("every counted schedule also has its fixtures listed",
+               len(_zt) - len(_split))
+        # a feed name that never resolved shows up as stray whitespace or a
+        # name the hub does not know; the display name must be the hub's own
+        _ws = sorted({f.get("opp") for v in _zt.values()
+                      for f in (v.get("fixtures") or [])
+                      if f.get("opp") and f["opp"] != f["opp"].strip()})
+        if _ws:
+            bad("an opponent name carries stray whitespace from the feed",
+                ", ".join(repr(x) for x in _ws[:3]))
+        else:
+            ok("no opponent name is passed through unnormalised")
         # And a team with none must SAY so rather than showing blank projections.
         if zero and _zh and "No 2026 Division-I schedule" not in _zh:
             bad("a team with no 2026 schedule shows blank numbers with no reason")
