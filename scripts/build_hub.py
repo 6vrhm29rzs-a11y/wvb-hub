@@ -3811,11 +3811,49 @@ def build():
                cls, pick))
     srows = "".join(srows)
 
-    trows = "".join(
-        '<tr><td class="cd">%s</td><td class="tm">%s</td>'
-        '<td class="tvnet"><span class="netchip">%s</span></td><td class="n">%s</td></tr>'
-        % (esc(r["day"]), esc(r["m"]), esc(r["n"]), esc(r["t"]))
-        for r in tvrows)
+    # ⚠ A BROADCAST LISTING IS FORWARD-LOOKING, AND THIS ONE OPENED WITH
+    # HISTORY. The transcribed file is chronological from the start of the
+    # season, so on 2026-08-27 the first four rows were Aug 21-24 -- already
+    # played -- and tonight's listing was below them. The Schedule tab already
+    # solved this ("fixtures from today forward").
+    # ⚠ NOTHING IS DROPPED. Past rows are marked and collapsed behind a stated
+    # count, the same way the schedule holds its later fixtures: showing fewer
+    # than we have is a display choice, not having them is a lie about what the
+    # page contains. A day that does not parse is ALWAYS shown -- the file is
+    # hand-transcribed prose, and an unreadable date must not make a listing
+    # disappear.
+    _today_iso = datetime.date.today().isoformat()
+    def _tv_iso(day):
+        # "Fri, Aug 21" -> "2026-08-21"; None when it cannot be read
+        m = re.search(r"([A-Z][a-z]{2})\w*\.?\s+(\d{1,2})", str(day or ""))
+        if not m:
+            return None
+        try:
+            mo = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
+                  "Sep", "Oct", "Nov", "Dec"].index(m.group(1)) + 1
+        except ValueError:
+            return None
+        return "%d-%02d-%02d" % (SEASON, mo, int(m.group(2)))
+    _tv_past = 0
+    _tr = []
+    for r in tvrows:
+        _iso = _tv_iso(r["day"])
+        _is_past = bool(_iso and _iso < _today_iso)
+        if _is_past:
+            _tv_past += 1
+        _tr.append(
+            '<tr%s><td class="cd">%s</td><td class="tm">%s</td>'
+            '<td class="tvnet"><span class="netchip">%s</span></td>'
+            '<td class="n">%s</td></tr>'
+            % (' class="tvpast" hidden' if _is_past else "",
+               esc(r["day"]), esc(r["m"]), esc(r["n"]), esc(r["t"])))
+    trows = "".join(_tr)
+    if _tv_past:
+        trows = ('<tr class="tvearlier"><td colspan="4">'
+                 '<button type="button" id="tvpastbtn">Show %d earlier '
+                 'listing%s</button></td></tr>' % (_tv_past,
+                                                   "" if _tv_past == 1 else "s")
+                 ) + trows
 
     # ---- HERO -----------------------------------------------------------
     # EVERY STRING HERE IS BUILT FROM A MEASURED VALUE AT PRINT TIME (R1).
@@ -6975,7 +7013,21 @@ td.tvnet{text-align:left}
 .csec{margin-bottom:18px}
 .cnote{margin:0;padding:10px 15px 4px;font:12.5px/1.55 var(--sans);
   color:var(--ink2);max-width:80ch}
+tr.tvearlier td{padding:6px 0 10px;border:0}
+#tvpastbtn{appearance:none;background:none;border:1px dashed var(--line2);
+  border-radius:4px;color:var(--slate);cursor:pointer;padding:6px 11px;
+  font:700 10px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase}
+#tvpastbtn:hover{color:var(--chalk);border-color:var(--cs-edge2)}
 .cstrip{padding:6px 15px 4px}
+/* the head mirrors .crow's grid so the labels land over their columns */
+/* ⚠ THE SAME TRACK LIST AS .crow, or the labels sit over the wrong
+   columns -- 118px name, 1fr track, 34px median, 26px count. */
+.chead{display:grid;grid-template-columns:118px 1fr 34px 26px;gap:10px;
+  align-items:end;padding:0 15px 4px;
+  font:700 9px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink3)}
+.chead .chlab{grid-column:3 / span 2;text-align:right;white-space:nowrap}
+
 .crow{display:grid;grid-template-columns:118px 1fr 34px 26px;gap:10px;
   align-items:center;padding:5px 0;border-bottom:1px solid var(--line)}
 .crow:last-child{border-bottom:0}
@@ -10376,6 +10428,20 @@ function formPills(team, n) {
     (g.nondi ? '<i class="fndt">nD1</i>' : '') + '</span>').join('');
 }
 
+/* The TV table opens on what is still to come; earlier listings are present
+   and one click away, never removed. */
+document.addEventListener('click', function (e) {
+  const b = e.target.closest && e.target.closest('#tvpastbtn');
+  if (!b) return;
+  const rows = document.querySelectorAll('tr.tvpast');
+  const showing = b.getAttribute('data-on') === '1';
+  rows.forEach(r => { r.hidden = showing; });
+  b.setAttribute('data-on', showing ? '0' : '1');
+  b.textContent = showing
+    ? 'Show ' + rows.length + ' earlier listing' + (rows.length === 1 ? '' : 's')
+    : 'Hide earlier listings';
+});
+
 function renderStandings() {
   const only = stsel.value;
   const confs = only ? [only] : Object.keys(STANDINGS).sort();
@@ -10458,6 +10524,19 @@ function renderConfStrength(confs) {
     'Leagues are ordered by their <b>median</b> &mdash; the dot spread is the ' +
     'part worth reading: two contenders and a long tail is a different league ' +
     'from a deep one. Filled dots are inside the top 25.</p>' +
+    /* ⚠ THE LEGEND WAS 32 ROWS BELOW THE NUMBERS IT EXPLAINS. There is a
+       footer reading "median rank · teams", but the reader meets the columns
+       at row 1 -- Big 12 showing a bare `44  15` -- and the legend is off the
+       bottom of the screen. The hover title says it too, and a phone has no
+       hover. Same labels, repeated at the head of the chart where the first
+       number is. */
+    /* ⚠ ONE LABEL ACROSS BOTH COLUMNS. "MEDIAN" is ~42px at 9px condensed
+       with .1em tracking and the column is 34px, so two separate headings
+       rendered as "MEDIANTEAMS". Widening the columns would move the chart;
+       one right-aligned label spanning them says the same thing in the space
+       that exists, and uses the footer's exact wording. */
+    '<div class="chead"><span></span><span></span>' +
+      '<span class="chlab">median &middot; teams</span></div>' +
     '<div class="cstrip">' + rows.map(r =>
       '<div class="crow"><span class="cnm" title="' + r.conf + ' \u2014 ' + r.n +
         ' teams, median rank ' + r.median + '">' + r.conf + '</span>' +

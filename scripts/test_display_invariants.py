@@ -199,6 +199,88 @@ def check_model(M):
             bad("freshness", "data_through unparseable: %r" % dt)
 
 
+
+def check_tv_opens_on_what_is_still_to_come():
+    """The broadcast table must not open with matches already played.
+
+    ⚠ IT DID. The transcribed file is chronological from the start of the
+    season, so on 2026-08-27 the first four rows were Aug 21-24 -- finished --
+    and tonight's listing sat below them. A broadcast listing is a
+    forward-looking document; the Schedule tab already says "fixtures from
+    today forward".
+
+    ⚠ AND NOTHING IS DROPPED. Past rows are marked and collapsed behind a
+    STATED count, the same way the schedule holds its later fixtures --
+    "showing fewer than we have is a display choice; not having them is a lie
+    about what the page contains". A day the parser cannot read is always
+    shown: the file is hand-transcribed prose, and an unreadable date must
+    never make a listing vanish.
+    """
+    # (this module has no page() helper -- every check opens the file itself;
+    #  `page` was a name I assumed from a sibling suite)
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    h = open(hub, encoding="utf-8").read() if os.path.exists(hub) else ""
+    if not h or 'id="tbody"' not in h:
+        print("  --   no TV table on this build; skipping")
+        return
+    import re as _re
+    body = h.split('<tbody id="tbody">')[1].split("</tbody>")[0]
+    rows = _re.findall(r"<tr([^>]*)>", body)
+    past = [r for r in rows if "tvpast" in r]
+    # this module reports with ok()/bad(), not a check() helper
+    # ⚠ AN EMPTY TABLE IS NOT A FAILURE HERE. The listings live in
+    # Cody/data/tv_listings_2026.txt, inside the gitignored private folder, so
+    # in CI and in the fresh-checkout sandbox there are legitimately none. An
+    # earlier version called that a defect and failed a correct build.
+    if len(rows) <= 3:
+        print("  --   no TV listings on this build (private file absent); "
+              "skipping")
+        return
+    ok("the TV table has rows to judge", len(rows))
+    # ⚠ FIND THE PAST ROWS FROM THE DATES, NOT FROM THE MARKER. A negative
+    # control proved the point: deleting `class="tvpast" hidden` outright left
+    # `past` empty, the guard took the "nothing to collapse" branch, and the
+    # regression sailed through. Read each row's own date cell and decide.
+    import datetime as _dt
+    _today = _dt.date.today()
+    _MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
+            "Sep", "Oct", "Nov", "Dec"]
+    shown_past = []
+    for m in _re.finditer(r"<tr([^>]*)>\s*<td class=\"cd\">([^<]*)</td>", body):
+        attrs, day = m.group(1), m.group(2)
+        dm = _re.search(r"([A-Z][a-z]{2})\w*\.?\s+(\d{1,2})", day)
+        if not dm or dm.group(1) not in _MON:
+            continue                      # unreadable date -- must stay shown
+        d = _dt.date(_today.year, _MON.index(dm.group(1)) + 1, int(dm.group(2)))
+        if d < _today and "hidden" not in attrs:
+            shown_past.append(day)
+    if shown_past:
+        bad("a past TV listing is shown at load",
+            "%d already played, e.g. %s" % (len(shown_past), shown_past[:3]))
+    else:
+        ok("no already-played listing is shown at load",
+           len(past) or None)
+    if not past:
+        ok("nothing to collapse (no listing is in the past yet)")
+        return
+    if not all("hidden" in r for r in past):
+        bad("a row marked past is not hidden",
+            "%d marked, %d hidden" % (len(past),
+                                      sum(1 for r in past if "hidden" in r)))
+    else:
+        ok("every past listing is hidden, not deleted", len(past))
+    if _re.search(r"Show \d+ earlier listing", body) is None:
+        bad("the collapsed TV listings are not counted",
+            "a silent cut reads as 'this is all there is'")
+    else:
+        ok("the count of collapsed listings is stated")
+    if 'id="tvpastbtn"' not in body:
+        bad("collapsed TV listings cannot be revealed", "no reveal control")
+    else:
+        ok("collapsed listings are one click from being shown")
+
+
+
 def check_rating():
     """Validate EVERY rating payload on disk, not one chosen by an env var.
 
@@ -3251,6 +3333,7 @@ def main():
     check_nondi_form_marker_is_visible()
     check_standings_diff_shares_the_record_basis()
     print()
+    check_tv_opens_on_what_is_still_to_come()
     check_rating()
     print()
     if FAILS:
