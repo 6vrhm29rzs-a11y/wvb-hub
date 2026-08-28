@@ -229,6 +229,15 @@ trap, and the one bug that actually shipped (`esc()` stripped out of the public
 build, which rendered the published Scores ledger empty and passed every test,
 because the public checks only asserted what must be ABSENT).
 
+**✅ RESOLVED 2026-08-27 — LIVE BOX SCORES ARE AVAILABLE. `probe_live_boxscore.py`
+ran during Florida-Nebraska: 54 consecutive in-progress polls, 54/54 with team
+totals AND per-player rows (median 36), 0 failures. `docs/live_boxscore_finding.md`.
+⚠ **But live numbers are REVISED, downward included** — Nebraska's kills fell 9->8
+mid-match on a scorer's correction. A live figure is provisional: never accumulate
+it, never cache it as a season total, never write it to `data/`. ⚠ The team block
+uses `attackAttempts` and `serviceAces`, NOT `totalAttacks`/`aces`; the obvious
+names return None and read as "not carried mid-match", which is wrong.
+
 **⚑ NEXT ACTION IS DATED: FRIDAY 2026-08-28**, the season's first real match
 day. Run `python3 scripts/probe_live_boxscore.py` during a live match — it is
 the measurement that settles whether the box-score endpoint carries usable
