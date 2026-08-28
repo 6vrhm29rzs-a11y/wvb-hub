@@ -445,8 +445,11 @@ def main():
         # live with the payload they belong to. It is a registry, maintained by
         # hand, and a new table has to be added here. That is a real limit and
         # it is written down rather than papered over.
+        # ⚠ THE REGISTRY GREW BECAUSE THE MISTAKE KEPT REPEATING. Every entry
+        # here is a table that was once declared beside the function that reads
+        # it and blanked a view: PRK_ORDER, PRK_ROLELAB, POSFULL, TD_GROUPS.
         TABLES = ["PRK_ORDER", "PRK_ROLES", "PRK_ROLELAB", "PRK_PROLELAB",
-                  "PRK_FLAB", "POSFULL"]
+                  "PRK_FLAB", "POSFULL", "TD_GROUPS", "TD_MAP"]
         anchor = page.find("const PRANK =")
         missing = [t for t in TABLES if ("const %s" % t) not in page
                    and ("let %s" % t) not in page]

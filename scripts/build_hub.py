@@ -2187,9 +2187,30 @@ def team_stars(limit=3):
                 "brs": r.get("back_row_share"),
                 "recv": ps.get("recv_share"),
                 # her headline rate, from whichever season actually has one
+                # ⚠ A HEADLINE STAT HAS TO SUIT THE POSITION. Kills per set is
+                # meaningless for a libero -- Bryant's Carrina Barron rendered
+                # "-0.0 kills/set", a negative zero, because a defender's
+                # schedule-adjusted kill rate sits at nothing and the
+                # adjustment can push it just below. Digs travel too, so the
+                # card can lead with the number that describes her job.
                 "kps": ((r.get("season") or {}).get("components", {})
                         .get("kps", {}) or {}).get("value")
                        or ((r.get("prior") or {}).get("kps", {}) or {}).get("value"),
+                "dps": ((r.get("season") or {}).get("components", {})
+                        .get("dps", {}) or {}).get("value")
+                       or ((r.get("prior") or {}).get("dps", {}) or {}).get("value"),
+                "bps": ((r.get("season") or {}).get("components", {})
+                        .get("bps", {}) or {}).get("value")
+                       or ((r.get("prior") or {}).get("bps", {}) or {}).get("value"),
+                # ⚠ asps IS ASSISTS/SET, sps IS ACES, aps IS ATTACKS -- verified
+                # against player_rating.py:213-215 and by magnitude (setter
+                # median asps 4.68, sps 0.19). This project has already shipped
+                # one build where two files disagreed about which key meant
+                # aces and which meant assists (R4); check the definition, do
+                # not infer it from the name.
+                "asps": ((r.get("season") or {}).get("components", {})
+                         .get("asps", {}) or {}).get("value")
+                        or ((r.get("prior") or {}).get("asps", {}) or {}).get("value"),
                 "live": bool(r.get("matches")),
             })
         if picked:
@@ -4632,6 +4653,65 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
   font:700 9px/1.5 var(--disp);letter-spacing:.07em;padding:2px 6px;
   border-radius:3px;border:1px solid var(--gold,#c9a227);
   color:var(--gold,#c9a227);vertical-align:middle}
+/* ── TEAM DOSSIER ─────────────────────────────────────────────────────── */
+.tdnav{display:flex;gap:2px;flex-wrap:wrap;margin:16px 0 0;
+  border-bottom:1px solid var(--cs-edge2);padding-bottom:0}
+.tdnav button{appearance:none;background:none;border:0;cursor:pointer;
+  font:700 12px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink3);padding:11px 14px;border-bottom:2px solid transparent;
+  margin-bottom:-1px;white-space:nowrap}
+.tdnav button:hover{color:var(--ink2)}
+.tdnav button.on{color:var(--chalk);border-bottom-color:var(--cs-gold)}
+.tdnav button:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:-3px}
+.tdpanel{padding-top:16px}
+.tdpanel[hidden]{display:none}
+.tdlab{display:block;font:700 10px/1 var(--disp);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink3);margin-bottom:8px}
+/* the next match: the single decision this page exists to serve */
+.tdnext{border:1px solid var(--cs-edge2);border-left:3px solid var(--cs-gold);
+  border-radius:10px;padding:12px 14px;margin-bottom:14px}
+.tdnextrow{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+  text-decoration:none;color:inherit}
+.tdnextrow:hover b{text-decoration:underline}
+.tdvs{display:flex;align-items:center;gap:7px;font:700 22px/1.1 var(--disp);
+  color:var(--chalk)}
+.tdvs b{font-weight:700}
+.tdwhen{font:700 13px/1 var(--disp);letter-spacing:.05em;color:var(--ink2)}
+.tdtv{font:700 11px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-on-accent);background:var(--cs-gold);padding:4px 7px;
+  border-radius:2px}
+.tdwhere{margin:7px 0 0;font-size:12.5px;color:var(--ink3)}
+.tdnotv{margin:4px 0 0;font-size:11.5px}
+.tdnext.empty p{margin:0}
+/* players to know */
+.tdknow{margin-bottom:14px}
+.tdpgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:10px}
+.tdpcard{display:grid;grid-template-columns:44px 1fr;gap:3px 11px;
+  align-items:center;border:1px solid var(--cs-edge2);border-radius:10px;
+  padding:10px 12px;text-decoration:none;color:inherit}
+.tdpcard:hover{background:rgba(255,255,255,.03)}
+.tdpcard:hover .tdpn{text-decoration:underline}
+.tdface{grid-row:1/4;width:44px;height:44px;border-radius:50%;
+  object-fit:cover;background:var(--cs-edge2);display:flex;
+  align-items:center;justify-content:center;font:700 15px/1 var(--disp);
+  color:var(--ink2)}
+.tdpn{font:700 15px/1.15 var(--disp);color:var(--chalk)}
+.tdpm{font-size:11.5px;color:var(--ink3)}
+.tdpick{font-style:normal;color:var(--good);font-weight:700}
+.tdppct{font:700 13px/1 var(--disp);color:var(--ink2)}
+.tdppct i{font-style:normal;font:400 10px/1 var(--sans);color:var(--ink3);
+  margin-left:5px}
+.tdpl{grid-column:2;font-size:11.5px;color:var(--ink3)}
+@media (max-width:560px){
+  /* ⚠ ONE COLUMN, NOTHING SIDEWAYS. The dossier's whole point on a phone is a
+     simple vertical flow; a grid that keeps two columns at 390px produces the
+     squeeze this redesign exists to remove. */
+  .tdpgrid{grid-template-columns:1fr}
+  .tdnav{gap:0}
+  .tdnav button{padding:10px 11px;font-size:11px}
+  .tdvs{font-size:19px}
+}
 .prkctl{flex-wrap:wrap;gap:10px}
 .segbar{display:inline-flex;border:1px solid var(--cs-edge2);border-radius:8px;
   overflow:hidden}
@@ -6873,7 +6953,13 @@ td.tvnet{text-align:left}
 .card.marquee{border-left:3px solid var(--amber)}
 .card.marquee .cd .tag{margin-left:8px}
 #weekcards .card{border-style:solid}
-.glance{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0 18px}
+/* ⚠ auto-fit, NOT repeat(4,1fr). The strip is not always four tiles: the
+   dossier removes "Next" because its Overview card says the same thing
+   with more in it, and a hard-coded four then left a dead quarter-width
+   column on every team page. auto-fit collapses the unfilled track and
+   the survivors take the space, so the strip is correct at three or at
+   four without either count being written down. */
+.glance{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:14px 0 18px}
 .gl{padding:13px 15px;border-radius:4px;border:1px solid transparent;
   background-origin:border-box;background-clip:padding-box,border-box;
   background-image:
@@ -9334,6 +9420,28 @@ const PRK_FLAB = { kps: 'kills/set', hit: 'hitting %', dps: 'digs/set',
 let PRK_POS = 'OH', PRK_MODE = 'power';
 const POSFULL = { OH: 'Outside', OPP: 'Opposite', MB: 'Middle',
   S: 'Setter', LDS: 'Libero/DS' };
+/* ⚠ WITH THE PAYLOAD, NOT WITH THE FUNCTION. Seventh temporal-dead-zone
+   blank view in this file: a top-level const read before its declaration
+   line has run THROWS, and the throw lands inside showTeam's assembly, so
+   the team card renders with its sections orphaned and no error on screen. */
+const TD_GROUPS = [['overview', 'Overview'], ['matches', 'Matches'],
+                   ['roster', 'Roster'], ['numbers', 'Numbers'],
+                   ['scouting', 'Scouting'], ['outlook', 'Outlook']];
+/* Heading -> section. A heading nobody has claimed lands in Numbers, which is
+   visible and wrong-ish rather than invisible and lost. */
+const TD_MAP = [
+  [/^results/i, 'matches'], [/^upcoming/i, 'matches'], [/^next up/i, 'matches'],
+  [/^postseason/i, 'outlook'], [/^outlook/i, 'outlook'],
+  [/^projected six/i, 'roster'], [/^full roster/i, 'roster'],
+  [/^returning avca/i, 'roster'], [/^biggest losses/i, 'roster'],
+  [/^roster turnover/i, 'roster'], [/^who arrived/i, 'roster'],
+  [/^team stats/i, 'numbers'], [/^parts vs whole/i, 'numbers'],
+  [/^what it returns/i, 'numbers'], [/power/i, 'numbers'],
+  [/^side-out by rotation/i, 'scouting'], [/^serving rotation/i, 'scouting'],
+  [/^who came in/i, 'scouting'], [/^most-started six/i, 'scouting'],
+  [/^rotation/i, 'scouting']
+];
+let TD_TAB = 'overview';
 
 const PRK_ROLELAB = { six: '6-rotation', front: 'front-row only' };
 const PRK_PROLELAB = { passer: 'passes', seldom: 'seldom passes',
@@ -17250,9 +17358,257 @@ function showTeam(name) {
         '<b>&mdash;</b> rather than a number \u2014 about a fifth of a season\u2019s ' +
         'production comes from players like her, and we do not invent it.</div></div>'
       : '');
+  /* ⚠ REORGANISE AFTER RENDERING, NOT INSTEAD OF IT. Everything above still
+     builds exactly as it did; the dossier moves the finished sections into
+     Overview / Matches / Roster / Numbers / Scouting / Outlook so the first
+     screen answers who, how good, what next and who to watch. */
+  teamDossier(box, t, name);
 }
 /* The sticky table headers offset themselves by the nav's real height; the tab
    row wraps on a narrow window, so this is measured rather than hard-coded. */
+/* ══ THE TEAM DOSSIER ══════════════════════════════════════════════════════
+   ⚠ A TEAM PAGE WAS 5,464 PIXELS OF EQUAL-WEIGHT REPORT -- 6.8 screens, 14
+   sections, everything shouting at the same volume. Kentucky's page opened on
+   "Parts vs whole 2025" and buried who was playing tonight three screens down.
+   The information was good and the shape was wrong.
+
+   ⚠ THIS REORGANISES THE RENDERED DOM RATHER THAN REWRITING THE ASSEMBLY.
+   The assembly above is one 195-line concatenation carrying years of decisions
+   and their reasoning; splitting it by hand is exactly the kind of edit that
+   silently drops a branch. Every existing section is MOVED, not rebuilt, so
+   nothing that was true a moment ago stops being true. */
+
+function tdGroupOf(el) {
+  const h = el.querySelector('h3');
+  const txt = ((h && h.textContent) || '').trim();
+  for (let i = 0; i < TD_MAP.length; i++) {
+    if (TD_MAP[i][0].test(txt)) return TD_MAP[i][1];
+  }
+  return 'numbers';
+}
+
+/* ⚠ A REAL HEADSHOT OR HER INITIALS. Nothing else. No drawn likeness stands in
+   for a photograph on a card that names a real person, and an empty frame is
+   worse than initials because it reads as a failed image. */
+function tdFace(nm, photo) {
+  if (photo) {
+    return '<img class="tdface" src="' + esc(photo) + '" alt="" ' +
+      'onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),' +
+      '{className:\'tdface tdinit\',textContent:this.dataset.i}))" ' +
+      'data-i="' + esc(tdInitials(nm)) + '">';
+  }
+  return '<span class="tdface tdinit">' + esc(tdInitials(nm)) + '</span>';
+}
+function tdInitials(nm) {
+  const p = String(nm || '').trim().split(/\s+/);
+  return ((p[0] || ' ')[0] + (p.length > 1 ? (p[p.length - 1] || ' ')[0] : ''))
+    .toUpperCase();
+}
+
+/* The one match a reader is deciding about: when, where, on what, and a way in. */
+function tdNextMatch(t, name) {
+  const today = new Intl.DateTimeFormat('en-CA',
+    { timeZone: 'America/Los_Angeles' }).format(new Date());
+  const fx = (t.fixtures || []).filter(f => f.d && f.d >= today);
+  if (!fx.length) {
+    return '<div class="tdnext empty"><span class="tdlab">Next match</span>' +
+      '<p class="munk">No remaining fixture on file for this team.</p></div>';
+  }
+  const f = fx[0];
+  const all = (typeof allMatches === 'function') ? allMatches() : {};
+  const m = all[String(f.gid)] || null;
+  const live = (typeof LIVE_BY_ID !== 'undefined') ? LIVE_BY_ID[f.gid] : null;
+  const st = m ? matchState(m, live) : 'upcoming';
+  const opp = f.opp || '';
+  const where = f.site === 'neutral' ? 'neutral floor'
+    : (f.home ? 'home' : 'away');
+  const tv = m && m.tv ? m.tv : null;
+  return '<div class="tdnext">' +
+    '<span class="tdlab">' + (st === 'live' ? 'Playing now'
+      : st === 'final' ? 'Most recent' : 'Next match') + '</span>' +
+    '<a class="tdnextrow" href="' + matchRoute(f.gid, 'teams') + '">' +
+      '<span class="tdvs">' + (f.home ? 'vs ' : 'at ') + logo(opp, 'sm') +
+        '<b>' + esc(opp) + '</b></span>' +
+      '<span class="tdwhen">' + esc(dayLabel(f.d)) +
+        (f.t ? ' &middot; ' + esc(f.t) : '') +
+        /* ⚠ THE MODEL'S PRE-MATCH PICK MOVED HERE FROM THE GLANCE STRIP,
+           IT WAS NOT DROPPED. The strip's "Next" tile and this card said the
+           same thing twice in one viewport; this card is the richer of the two
+           (venue, broadcast), so the tile goes -- but only after the one
+           number it carried that this card did not is carried here. Removing
+           a tile before checking it is a strict subset is how a fact
+           disappears in a tidy-up.
+           ⚠ It is labelled, unlike the bare "93%" the strip showed: a naked
+           percentage beside a start time invites being read as anything. It
+           is the simulator's pre-match pick and says so. */
+        (f.pick !== null && f.pick !== undefined
+          ? ' &middot; <i class="tdpick" title="The season simulator\u2019s ' +
+            'pre-match pick for this fixture.">' + Math.round(f.pick * 100) +
+            '% to win</i>' : '') + '</span>' +
+      (tv ? '<span class="tdtv">' + esc(tv) + '</span>' : '') +
+    '</a>' +
+    '<p class="tdwhere">' + esc(where) +
+      (f.venue ? ' &middot; ' + esc(f.venue) : '') +
+      (f.city ? ', ' + esc(f.city) : '') +
+      (f.event ? ' &middot; ' + esc(f.event) : '') + '</p>' +
+    (tv ? '' : '<p class="munk tdnotv">No broadcast listed for this fixture ' +
+      '&mdash; that means unknown, not untelevised.</p>') +
+    '</div>';
+}
+
+/* Two or three names, what each does, and a way to her page. */
+function tdPlayers(t, name) {
+  const stars = (t.stars || []).slice(0, 3);
+  if (!stars.length) return '';
+  const photoOf = {};
+  (t.roster || []).forEach(r => { if (r.ph) photoOf[r.n] = r.ph; });
+  return '<div class="tdknow"><span class="tdlab">Players to know</span>' +
+    '<div class="tdpgrid">' + stars.map(x => {
+      const bits = [];
+      if (x.pos) bits.push(POSFULL[x.pos] || x.pos);
+      if (x.cls) bits.push(x.cls);
+      /* ⚠ THE RIGHT NUMBER FOR THE JOB, AND NEVER A NEGATIVE ZERO. A libero
+         showed "-0.0 kills/set" -- schedule adjustment can push a
+         non-attacker's kill rate a hair below zero, and rounding prints the
+         sign. A defender leads with digs, a middle with blocks, everyone else
+         with kills, and a rate that is not meaningfully above zero is simply
+         left out rather than printed as nothing. */
+      const line2 = [];
+      const rate = (v, unit) => (v != null && v >= 0.05)
+        ? v.toFixed(1) + ' ' + unit : null;
+      const head = x.pos === 'LDS' ? rate(x.dps, 'digs/set')
+        : x.pos === 'S' ? (rate(x.asps, 'assists/set') || rate(x.kps, 'kills/set'))
+        : x.pos === 'MB' ? (rate(x.bps, 'blocks/set') || rate(x.kps, 'kills/set'))
+        : rate(x.kps, 'kills/set');
+      if (head) line2.push(head);
+      if (x.role === 'six') line2.push('all six rotations');
+      if (x.recv != null && x.recv >= 0.15) {
+        line2.push(Math.round(x.recv * 100) + '% of serve-receive');
+      }
+      return '<a class="tdpcard" href="' +
+        routeFor('players', slug(name) + '/' + slug(x.n)) + '">' +
+        tdFace(x.n, photoOf[x.n]) +
+        '<span class="tdpn">' + esc(x.n) + '</span>' +
+        '<span class="tdpm">' + esc(bits.join(' · ')) + '</span>' +
+        (x.pct != null ? '<span class="tdppct">' + x.pct.toFixed(1) +
+          '<i>percentile at her position</i></span>' : '') +
+        (line2.length ? '<span class="tdpl">' + esc(line2.slice(0, 2).join(' · ')) +
+          '</span>' : '') +
+      '</a>';
+    }).join('') + '</div>' +
+    '<p class="munk">Ranked against her own position only, never across ' +
+    'positions. Serve-receive and back-row share are 2025.</p></div>';
+}
+
+function teamDossier(box, t, name) {
+  /* ⚠ THE STAMP ALONE IS NOT EVIDENCE THE WORK IS STILL THERE, and relying on
+     it silently reverted the whole page. `dataset` lives on the #teamcard
+     ELEMENT, which survives; what the stamp guards is the innerHTML, which the
+     renderer replaces wholesale. So on team -> player -> Back the box was
+     rebuilt with the flat 5,400px section wall, the stamp still read
+     "Kentucky", this function returned early, and the reader got the old page
+     back with no tabs and no Overview. Nothing errored -- the dossier simply
+     was not there, which looks like it was never built rather than like a bug.
+     The fix is to check for the thing itself: the nav only exists if the
+     reorganisation survived the last render. */
+  if (!box) return;
+  if (box.dataset.dossier === name && box.querySelector('.tdnav')) return;
+  /* every section that is not the identity block */
+  const loose = [...box.children].filter(el =>
+    el.classList.contains('tsec') || el.classList.contains('tcols') ||
+    el.classList.contains('trend'));
+  const sections = [];
+  loose.forEach(el => {
+    if (el.classList.contains('tcols')) {
+      [...el.querySelectorAll(':scope > div > .tsec, :scope > .tsec')]
+        .forEach(s => sections.push(s));
+      [...el.children].forEach(col => {
+        [...col.children].forEach(ch => {
+          if (!ch.classList.contains('tsec')) sections.push(ch);
+        });
+      });
+      el.remove();
+    } else {
+      sections.push(el);
+    }
+  });
+  const scout = box.querySelector('.digby.scoutread');
+  const panels = {};
+  TD_GROUPS.forEach(g => {
+    const d = document.createElement('div');
+    d.className = 'tdpanel';
+    d.setAttribute('data-tdp', g[0]);
+    panels[g[0]] = d;
+  });
+  sections.forEach(el => {
+    if (!el.parentNode && !el.isConnected) { /* already detached */ }
+    panels[el.classList.contains('tsec') || el.classList.contains('trend')
+      ? tdGroupOf(el) : 'numbers'].appendChild(el);
+  });
+
+  /* the Overview is assembled, not moved: it is the one thing that did not
+     exist before */
+  const ov = panels.overview;
+  ov.insertAdjacentHTML('beforeend', tdNextMatch(t, name) + tdPlayers(t, name));
+  /* The glance strip's "Next" tile is now a strict subset of the card above,
+     down to the pre-match pick -- so it is removed rather than shown twice in
+     the same viewport. If the card came back empty (no fixture on file) the
+     tile is left alone, because then it is the only answer there is. */
+  if (ov.querySelector('.tdnext:not(.empty)')) {
+    box.querySelectorAll('.glance .gl').forEach(g => {
+      const lab = g.querySelector('.gll');
+      if (lab && lab.textContent.trim().toLowerCase() === 'next') g.remove();
+    });
+  }
+  if (scout) ov.appendChild(scout);
+
+  const nav = document.createElement('div');
+  nav.className = 'tdnav';
+  nav.setAttribute('role', 'tablist');
+  nav.innerHTML = TD_GROUPS.filter(g => panels[g[0]].children.length)
+    .map(g => '<button type="button" role="tab" data-tdt="' + g[0] + '"' +
+      (g[0] === TD_TAB ? ' class="on" aria-selected="true"' :
+       ' aria-selected="false"') + '>' + g[1] + '</button>').join('');
+  box.appendChild(nav);
+  TD_GROUPS.forEach(g => {
+    if (!panels[g[0]].children.length) return;
+    panels[g[0]].hidden = g[0] !== TD_TAB;
+    box.appendChild(panels[g[0]]);
+  });
+  if (!nav.querySelector('[data-tdt="' + TD_TAB + '"]')) {
+    TD_TAB = 'overview';
+    const first = nav.querySelector('button');
+    if (first) first.classList.add('on');
+    if (panels.overview) panels.overview.hidden = false;
+  }
+  box.dataset.dossier = name;
+}
+
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('.tdnav [data-tdt]');
+  if (!b) return;
+  TD_TAB = b.getAttribute('data-tdt');
+  const box = b.closest('#teamcard');
+  if (!box) return;
+  box.querySelectorAll('.tdnav [data-tdt]').forEach(x => {
+    const on = x === b;
+    x.classList.toggle('on', on);
+    x.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  box.querySelectorAll('[data-tdp]').forEach(p => {
+    p.hidden = p.getAttribute('data-tdp') !== TD_TAB;
+  });
+  /* ⚠ SCROLL THE NAV INTO VIEW, NOT THE TOP. Jumping to the page top on a tab
+     change hides the very control just used. */
+  const nav = box.querySelector('.tdnav');
+  if (nav) {
+    const y = nav.getBoundingClientRect().top + window.scrollY -
+      (parseFloat(getComputedStyle(document.documentElement)
+        .getPropertyValue('--navh')) || 60) - 8;
+    if (window.scrollY > y) window.scrollTo({ top: y });
+  }
+});
+
 function syncNavHeight() {
   const nav = document.querySelector('nav');
   if (nav) document.documentElement.style.setProperty('--navh', nav.offsetHeight + 'px');
