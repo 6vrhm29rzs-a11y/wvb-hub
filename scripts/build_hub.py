@@ -6586,6 +6586,13 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
   color:var(--slate);border:1px solid var(--line);border-radius:2px;padding:3px 5px}
 .mrow .mtg.rv{color:var(--gold);border-color:color-mix(in oklab,var(--gold) 40%,transparent)}
 .mrow .mtg.lv{color:var(--coral);border-color:color-mix(in oklab,var(--coral) 45%,transparent)}
+/* ⚠ A LIVE ROW ALREADY SAYS SO TWICE -- its eyebrow shows the set period and
+   the whole row wears the live treatment -- so the LIVE chip was a third
+   statement of one fact, on all twenty rows of a live lane at once (Cody's
+   phone screenshot: LIVE + NEUTRAL right-aligned on every row, reading as
+   noise). The chip stays in the DOM for anything that filters on it; it is
+   hidden only where the row itself is already marked live. */
+.mrow.islive .mtg.lv{display:none}
 /* ── THE STATE CONTROL AND DAY GROUPS ON SCORES ─────────────────────────── */
 .daygrp{margin:20px 0 0}
 .dayhd{font:700 10.5px/1 var(--disp);letter-spacing:.17em;text-transform:uppercase;
