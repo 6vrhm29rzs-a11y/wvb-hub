@@ -138,6 +138,12 @@ def current_ranking():
     # happen: board said `live`, snapshot said `blend`.
     rows = []
     live = load("data/rating_%d.json" % SEASON) or {}
+    # ⚠ SAME GATE AS THE BOARD: the live fit counts only once its own
+    # validation has run (meta.validated). A fitted-but-unvalidated rating --
+    # the degenerate 71-match file of 2026-08-28 -- must not become the
+    # archived ruler either.
+    if not (live.get("meta") or {}).get("validated"):
+        live = {}
     for r in (live.get("teams") or []):
         if r.get("composite_rank"):
             rows.append({"team": r["team"], "rank": r["composite_rank"],

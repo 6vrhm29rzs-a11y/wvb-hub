@@ -256,10 +256,25 @@ def build():
     # why this is a fallback rather than a switch: the live rating takes over
     # automatically the moment the season has produced enough evidence.
     live = load_json("data/rating_%d.json" % SEASON) or {}
+    # ⚠ A RATING FILE EXISTING IS NOT THE SAME AS A RATING BEING USABLE. The
+    # 50-match floor in rating_2025.py is fit-FEASIBILITY (can a logistic run
+    # at all), and the 2026 calendar delivered 73 matches in a single day --
+    # so on the evening of 2026-08-28 the file appeared with median
+    # games_played 0, every team flagged low_confidence, five teams at 100.0
+    # and duplicate ranks, and this board ranked Missouri St. #3 on it. The
+    # script itself had printed "too few matches to validate; skipping".
+    # The gate is therefore the rating's OWN verdict: `meta.validated` is True
+    # only when the incremental validation ran (>=400 dated matches, the gate
+    # that already existed) and produced numbers. Until then the blend -- built
+    # and MEASURED for exactly this window (k=13.5 matches per team) -- keeps
+    # the board. No new threshold is introduced here (R1): the board defers to
+    # a validation the model already performs.
+    _live_ok = bool((live.get("meta") or {}).get("validated"))
     live_by_team = {}
-    for r in (live.get("teams") or []):
-        if r.get("composite_rank"):
-            live_by_team[r["team"]] = r
+    if _live_ok:
+        for r in (live.get("teams") or []):
+            if r.get("composite_rank"):
+                live_by_team[r["team"]] = r
 
     # ⚠ THE TAB CALLED "RANKINGS" USED TO BE UNABLE TO MOVE, AND THAT WAS THE
     # WHOLE OF Cody's objection ("texas looks a hot mess and is too high").
@@ -431,9 +446,20 @@ def build():
     else:
         print("  no earlier weekly snapshot yet -- movement column stays blank")
 
-    print("  rank source: %s%s" % (rank_source,
-          ("  (%d teams rated on 2026 results)" % len(live_by_team))
-          if live_by_team else "  (no 2026 rating yet -- under 50 played matches)"))
+    # ⚠ SAY WHICH CASE IT ACTUALLY IS. "no 2026 rating yet -- under 50 played
+    # matches" became FALSE the moment a fitted-but-unvalidated rating existed:
+    # the file was there, the gate just refused it. A log line that
+    # mis-states the reason sends the next debugging session to the wrong
+    # place.
+    if live_by_team:
+        _why = "  (%d teams rated on 2026 results)" % len(live_by_team)
+    elif (live.get("meta") or {}).get("validated") is False:
+        _why = ("  (a 2026 fit exists but has NOT validated yet -- "
+                "%s matches; the blend holds until it does)"
+                % ((live.get("meta") or {}).get("matches") or "too few"))
+    else:
+        _why = "  (no 2026 rating file yet)"
+    print("  rank source: %s%s" % (rank_source, _why))
     unranked = [t for t in teams if t["rank26"] is None]
     nmax = max([t["rank26"] for t in teams if t["rank26"]] or [0])
     for i, t in enumerate(sorted(unranked, key=lambda x: x["rank25"]), 1):

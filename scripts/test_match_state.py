@@ -196,7 +196,16 @@ def main():
                 t["ta"] += r.get("ta") or 0
             for t, v in by.items():
                 checked += 1
-                if v["ta"] and not (0 <= (v["k"] - v["e"]) / v["ta"] <= 1):
+                # ⚠ HITTING PERCENTAGE IS NEGATIVE WHEN ERRORS EXCEED KILLS,
+                # and that is real volleyball, not corruption. The first real
+                # match day produced three: Montreat 10K-14E (-.063),
+                # Southern U. 23-24, NJIT 22-27 -- overmatched teams erring
+                # more than they kill. The old lower bound of 0 was a
+                # plausibility rule invented from the typical case, the same
+                # mistake as validating a set score against 25: it failed
+                # correct data the first time the sport produced the tail.
+                # The true range of (K-E)/TA is -1..1.
+                if v["ta"] and not (-1 <= (v["k"] - v["e"]) / v["ta"] <= 1):
                     bad.append("%s %s" % (gid, t))
                 if v["k"] > v["ta"]:
                     bad.append("%s %s kills>attempts" % (gid, t))

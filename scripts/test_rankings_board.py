@@ -261,6 +261,47 @@ def main():
         check("public: the reference group shrank with its columns",
               gm and int(gm.group(1)) == 2, gm.group(1) if gm else "absent")
 
+    print("\nTHE BOARD USES A LIVE FIT ONLY ONCE IT HAS VALIDATED")
+    # ⚠ ON THE FIRST REAL MATCH DAY THIS WAS THE HEADLINE BUG. 73 matches
+    # landed in one day, the 50-match fit-feasibility floor passed, and the
+    # board switched to a rating whose own file said: every team
+    # low_confidence, median games_played 0 -- and ranked Missouri St. #3 with
+    # five teams at power 100.0 and duplicate ranks. The gate is the rating's
+    # own meta.validated (written only when its >=400-match incremental
+    # validation ran). Checked by BEHAVIOUR: the loader is stubbed with an
+    # unvalidated fit and the board must stay on the blend.
+    import build_rankings_board as BB
+    _real = BB.load_json
+    _fake_rating = {"meta": {"validated": False, "matches": 71},
+                    "teams": [{"team": "Missouri St.", "composite_rank": 1,
+                               "games_played": 2}]}
+    def _stub(path):
+        if "rating_" in path:
+            return _fake_rating
+        return _real(path)
+    BB.load_json = _stub
+    try:
+        _teams = BB.build()[0] if isinstance(BB.build(), tuple) else None
+    except Exception:
+        _teams = None
+    finally:
+        BB.load_json = _real
+    if _teams is None:
+        # build() may not return a tuple in every version -- fall back to the
+        # source list it mutates
+        BB.load_json = _stub
+        try:
+            _out = BB.build()
+            _teams = _out if isinstance(_out, list) else (
+                _out[0] if isinstance(_out, tuple) else [])
+        finally:
+            BB.load_json = _real
+    _srcs = set(t.get("rank_source") for t in (_teams or []) if t.get("rank_source"))
+    check("an unvalidated fit does not become the rank source",
+          "live" not in _srcs, "sources present: %s" % sorted(_srcs))
+    check("[+] ...and the board still ranks on something", bool(_srcs),
+          "no rank_source at all -- the stub broke the build")
+
     print()
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))

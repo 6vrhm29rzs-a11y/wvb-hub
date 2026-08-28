@@ -205,19 +205,31 @@ def check_snapshot_and_board_agree_on_the_basis():
     """
     import snapshot_rankings as SR
     real = SR.load
+    # ⚠ FOUR STATES NOW, because "a rating file exists" and "the rating is
+    # usable" turned out to be different things on the very first live fit:
+    # 73 matches landed in one day, the file appeared with every team
+    # low_confidence and a degenerate top, and the board ranked Missouri St.
+    # #3 on it. The gate is the rating's own `meta.validated`; a fitted-but-
+    # unvalidated file must archive as BLEND, exactly as the board shows.
     states = [
-        ("a fitted rating exists", {"rating": True, "blend": True, "proj": True},
-         "live"),
-        ("no rating yet, blend exists", {"rating": False, "blend": True,
-                                         "proj": True}, "blend"),
-        ("neither -- projection only", {"rating": False, "blend": False,
-                                        "proj": True}, "preseason"),
+        ("a VALIDATED rating exists", {"rating": True, "validated": True,
+                                       "blend": True, "proj": True}, "live"),
+        ("a fit exists but has not validated", {"rating": True,
+                                                "validated": False,
+                                                "blend": True, "proj": True},
+         "blend"),
+        ("no rating yet, blend exists", {"rating": False, "validated": False,
+                                         "blend": True, "proj": True}, "blend"),
+        ("neither -- projection only", {"rating": False, "validated": False,
+                                        "blend": False, "proj": True},
+         "preseason"),
     ]
 
     def fake(have):
         def _load(path):
             if "rating_" in path:
-                return ({"teams": [{"team": "A", "composite_rank": 1,
+                return ({"meta": {"validated": have.get("validated", False)},
+                         "teams": [{"team": "A", "composite_rank": 1,
                                     "games_played": 4}]} if have["rating"]
                         else None)
             if "digby_top25_" in path:

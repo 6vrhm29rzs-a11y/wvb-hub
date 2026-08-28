@@ -405,7 +405,10 @@ def main():
 
     payload = {
         "meta": {
-            "season": 2025,
+            # ⚠ THE SEASON THIS FILE DESCRIBES, not the season the weights were
+            # first fitted on. This was the literal 2025, so the first
+            # rating_2026.json shipped stamped "season": 2025.
+            "season": SEASON,
             "source_tier": "DERIVED",
             "primary_margin_metric": PRIMARY,
             "selected_over": "adj_hit_eff_diff (redundant, +0.002 incremental; "
@@ -417,6 +420,17 @@ def main():
             "cody_original_model": "Adj = Z(net points/set) + 2*Z(SOS)",
             "in_sample_auc": in_auc,
             "validation": val,
+            # ⚠ THE VERDICT THE BOARD GATES ON. `val` is non-empty only when
+            # the incremental validation actually RAN (>=400 dated matches --
+            # the existing gate above, not a new knob) and produced numbers.
+            # On 2026-08-28 the fit succeeded on 71 matches and produced a
+            # DEGENERATE top -- five teams at 100.0, duplicate ranks, median
+            # games_played 0, every team low_confidence -- and the board
+            # switched to it anyway, because "a rating file exists" was the
+            # only test. A fit the script itself declined to validate must
+            # not replace the blend, which is built for exactly this window.
+            "validated": bool(val),
+            "matches": len(matches),
             "disagreement_diagnostics": globals().get("_DIAG"),
             "use_caveat": "STRENGTH metric, not RESUME metric. corr(delta vs RPI, "
                           "own win%) is negative: relative to RPI it favors teams "
