@@ -1625,8 +1625,19 @@ def transfer_index():
     return out
 
 
-def box_and_players(res, photos=None, honours=None, xfer=None):
+def box_and_players(res, photos=None, honours=None, xfer=None,
+                    count_gids=None):
     """Per-match box scores, and a per-player season view with a game log.
+
+    ⚠ THESE TWO OUTPUTS NEED DIFFERENT INPUTS AND I HAD THEM SHARING ONE.
+    Passing only the counting matches kept an exhibition out of every rate --
+    correct -- but it also meant the match had NO BOX SCORE AT ALL, so a night
+    against Nebraska simply vanished. Cody asked for the opposite: keep it out
+    of the ratings, but log it.
+    So `res` is every match, and the BOXES are built from all of it; only the
+    per-player SEASON AGGREGATE is restricted, to `count_gids`. A reader can
+    open the exhibition and read every line in it; nothing in a career total,
+    a per-set rate or a rating can see it.
 
     Both come from the same per-game rows (playerbox.jsonl), which the pipeline
     has been collecting daily since the season opened but nothing displayed.
@@ -1694,8 +1705,11 @@ def box_and_players(res, photos=None, honours=None, xfer=None):
 
     _roster_ident, _roster_ambiguous = roster_identity_index()
 
+    # None means "everything counts", which is what every other caller wants.
+    _counts = None if count_gids is None else set(str(x) for x in count_gids)
     boxes = {}
     players = {}
+    _skipped_from_totals = set()
     for line in open(path):
         try:
             rec = json.loads(line)
@@ -1731,6 +1745,12 @@ def box_and_players(res, photos=None, honours=None, xfer=None):
             # team plus nkey(), the lowercase-letters-only convention already
             # used for photos, honours and the transfer join.
             _nk = nkey(nm)
+            # ⚠ THE ROW IS STILL BUILT AND STILL LANDS IN THE BOX SCORE -- only
+            # the season aggregate skips it. That is the whole distinction:
+            # logged, not counted.
+            if _counts is not None and gid not in _counts:
+                _skipped_from_totals.add(gid)
+                continue
             _ident = _roster_ident.get((team_norm(row["team"]), _nk)) or {}
             pk = row["team"] + "|" + _nk
             p = players.setdefault(pk, {
@@ -2984,6 +3004,11 @@ def build():
     # the NCAA does not recognise.
     res_cnt = [r for r in res if not r.get("exhibition")]
     _n_exh = len(res) - len(res_cnt)
+    # ⚠ RESULTS_JSON TAKES res_cnt TOO. That payload is what the form pills and
+    # the Top 25's W/L strip read, so an exhibition there would put a result in
+    # a team's form that its own record does not contain -- the two would
+    # disagree on the same screen, which is how this project has been bitten
+    # before (R4: sharing an input is not sharing a definition).
     # School colours read out of each logo SVG (scripts/crawl_team_colors.py).
     # A team with no readable colour is simply absent, and the avatar falls
     # back to a neutral rather than to an invented hue.
@@ -3004,8 +3029,13 @@ def build():
     # Division-I membership, once, for everything in this function that needs
     # to say whether an opponent qualifies.
     _di_all = di_teams()
-    boxes, plist = box_and_players(res_cnt, player_photos(), avca_honours(),
-                                   transfer_index())
+    # ⚠ ALL the matches for the box scores, only the counting ones for the
+    # season totals. Passing res_cnt for both kept the exhibition out of every
+    # rate and also made it disappear entirely -- no box score, no line, as
+    # though it had never been played.
+    boxes, plist = box_and_players(res, player_photos(), avca_honours(),
+                                   transfer_index(),
+                                   count_gids=[r["gid"] for r in res_cnt])
     _nrt = attach_ratings(plist)
     # Season team totals for 2026, both what a team does and what it allows.
     tstats = team_season_stats(boxes, res_cnt)
@@ -3479,6 +3509,7 @@ def build():
     _desk_today = _today.isoformat()
     _desk_end = (_today + datetime.timedelta(days=6)).isoformat()
 
+    _exh_ledger = exhibitions()
     _desk = []
     for r in sched:
         if not (_desk_today <= r["d"] <= _desk_end):
@@ -3498,6 +3529,12 @@ def build():
             "site": r.get("site"), "event": r.get("event"), "kind": r.get("kind"),
             "tv": r.get("tv"),
             "conflict": r.get("conflict") or [], "corrected": r.get("corrected") or [],
+            # ⚠ THE MATCH HAS TO SAY IT DOES NOT COUNT. Without this the data is
+            # right and the screen still misleads: Nebraska beats Florida and
+            # its record reads 0-0 the next morning, which looks like a broken
+            # site rather than a decision. The event name rides along because
+            # "exhibition" alone invites the question this answers.
+            "exh": (_exh_ledger.get(gid) or {}).get("event") if gid in _exh_ledger else None,
             "csrc": r.get("csrc"), "cverified": r.get("cverified"),
             "hw": hw, "fsrc": src,
             "at": _tourn.get(r["a"]), "ht": _tourn.get(r["h"]),
@@ -3806,7 +3843,7 @@ def build():
             [{"away": r["away"], "home": r["home"],
               "away_sets": r["away_sets"], "home_sets": r["home_sets"],
               "epoch": r.get("epoch")}
-             for r in sorted(res, key=lambda x: x.get("epoch") or 0)])) \
+             for r in sorted(res_cnt, key=lambda x: x.get("epoch") or 0)])) \
         .replace("{{GAMEDAY_JSON}}",
                  json.dumps(gameday_readiness() or {}, separators=(",", ":"))) \
         .replace("{{MSTATE_JSON}}", __import__("match_state").js_table()) \
@@ -4532,6 +4569,14 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .nyrow{cursor:pointer}
 .nyrow:hover td{background:rgba(255,255,255,.04)}
 .nyrow td{font-size:13px}
+.exhban{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;
+  border:1px solid var(--cs-edge2);border-left:4px solid var(--gold,#c9a227);
+  border-radius:8px;padding:9px 12px;margin-bottom:12px;font-size:12.5px}
+.exhban b{font:700 11px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase;
+  color:var(--gold,#c9a227)}
+.exhtag{font:700 9px/1 var(--disp);letter-spacing:.07em;padding:2px 5px;
+  border-radius:3px;border:1px solid var(--gold,#c9a227);
+  color:var(--gold,#c9a227);margin-left:5px;vertical-align:middle}
 .prkctl{flex-wrap:wrap;gap:10px}
 .segbar{display:inline-flex;border:1px solid var(--cs-edge2);border-radius:8px;
   overflow:hidden}
@@ -11501,6 +11546,17 @@ function lmcBody(d) {
       '<td>' + lmcNum(x.hitpct, 3) + '</td><td>' + lmcNum(x.digs) + '</td>' +
       '<td>' + lmcNum(x.blocks) + '</td><td>' + lmcNum(x.serviceAces) + '</td>' +
       '</tr>').join('') + '</tbody></table>';
+  /* ⚠ THIS TABLE WILL NOT ADD UP TO THE SCOREBOARD, AND A READER WILL TRY.
+     Cody did, mid-match: "these stats add up to 10 points for florida but it's
+     9-11". The stats are what a team EARNED -- kills, blocks, aces, which is
+     his own settled definition of a point. The rest of a scoreboard is the
+     OPPONENT's errors, and that is a large share of it: measured live in this
+     very match, Florida held 12 points having earned 7.5, the other 4.5
+     arriving from Nebraska's six attack errors.
+     Saying so costs one line and stops the table reading as broken. */
+  out += '<p class="lnote">Kills, blocks and aces are what a team <b>earned</b>' +
+    ' — they will not add up to the score, because the rest of a scoreboard is' +
+    ' the other team\u2019s errors.</p>';
   if (d.leaders && d.leaders.length) {
     out += '<p class="lmcldr">' + d.leaders.map(p =>
       '<b>' + esc(p.name) + '</b> ' + esc(p.team) + ' &middot; ' +
@@ -13541,7 +13597,8 @@ function matchRow(m, live, dest) {
     '<span class="mwhen">' + esc(st === 'live'
         ? ((live && live.period) || 'live')
         : (m.t || m.dl || '')) + '</span>' +
-    '<span class="mteams">' + t(mAway(m), m.ar, aw) + t(mHome(m), m.hr, hw) + '</span>' +
+    '<span class="mteams">' + t(mAway(m), m.ar, aw) + t(mHome(m), m.hr, hw) +
+      exhTag(m) + '</span>' +
     '<span class="mmeta">' +
       (done ? '<span class="msc">' + sc[0] + '&ndash;' + sc[1] + '</span>' : '') +
       (tags.length ? '<span class="mtags">' + tags.map(x =>
@@ -13958,6 +14015,29 @@ function starsSection(m) {
     'back-row share are 2025. ' + esc(PBP_CREDIT) + '</p></div>';
 }
 
+/* ⚠ A MATCH THAT DOES NOT COUNT MUST SAY SO, ON ITSELF. The data being right
+   is not enough: Nebraska beats Florida tonight, its record reads 0-0 in the
+   morning, and without this the reader concludes the site is broken rather
+   than that the match was an exhibition.
+   It also says WHY, because "exhibition" alone invites the question -- the
+   first two sets go to 21 rather than 25, so the per-set rates are on a
+   different denominator and cannot be mixed with the rest of the season. */
+function exhBanner(m) {
+  if (!m || !m.exh) return '';
+  return '<div class="exhban"><b>Exhibition</b>' +
+    '<span>' + esc(m.exh) + '</span>' +
+    '<span class="munk">Sets to 21, not 25 — so this does not count toward ' +
+    'either record and its per-set numbers are kept out of every rating. ' +
+    'The box score below is the full match.</span></div>';
+}
+
+/* The compact form, for a row in a list. */
+function exhTag(m) {
+  return (m && m.exh)
+    ? '<span class="exhtag" title="' + esc(m.exh) +
+      ' — does not count toward either record">EXH</span>' : '';
+}
+
 function renderMatchDetail(gid, dest) {
   const host = document.getElementById(dest === 'scores' ? 'scoredetail' : 'deskdetail');
   const board = document.getElementById(dest === 'scores' ? 'ledgerwrap' : 'deskboard');
@@ -14033,7 +14113,7 @@ function renderMatchDetail(gid, dest) {
       esc(mHome(m)) + '</b></div>' +
     '<button type="button" class="backlink" data-back="' + dest + '">&larr; Back to ' +
       parent[0] + '</button>' +
-    '<div class="mdet">' + ribbonHTML(m, live, null) +
+    '<div class="mdet">' + exhBanner(m) + ribbonHTML(m, live, null) +
       '<div class="msec"><h3>Match facts</h3><div class="mfact">' +
         bits.join('') + '</div></div>' +
       /* ⚠ THE HEADING FOLLOWS THE STATE. "Forecast before first serve" is a

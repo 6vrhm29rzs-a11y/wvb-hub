@@ -63,10 +63,28 @@ def main():
           '"exhibition": bool(_exh_hit)' in src)
     check("the build splits counting results from displayable ones",
           'res_cnt = [r for r in res if not r.get("exhibition")]' in src)
-    for fn in ("box_and_players(res_cnt", "team_season_stats(boxes, res_cnt)",
+    # ⚠ box_and_players IS DELIBERATELY NOT ON THIS LIST. It takes the FULL
+    # list, because its box scores are the log; only its season aggregate is
+    # restricted, via count_gids. Section 2b checks that half.
+    for fn in ("team_season_stats(boxes, res_cnt)",
                "standings(teams, res_cnt)", "team_index(teams, res_cnt"):
         check("...and %s uses it" % fn.split("(")[0], fn in src,
               "this one would count an exhibition into a record or a rate")
+
+    print("\n2b. LOGGED, NOT COUNTED -- THE BOX SCORE STILL EXISTS")
+    # ⚠ THE FIRST FIX OVER-CORRECTED. Passing only the counting matches to
+    # box_and_players kept the exhibition out of every rate, and also gave it
+    # NO BOX SCORE -- a night against Nebraska simply vanished. Cody asked for
+    # the opposite: out of the ratings, but logged.
+    check("boxes are built from every match",
+          "boxes, plist = box_and_players(res, player_photos()" in src,
+          "passing res_cnt here deletes the match instead of discounting it")
+    check("...while the season totals take only what counts",
+          "count_gids=[r[\"gid\"] for r in res_cnt]" in src)
+    check("the row still reaches the box score before the skip",
+          src.find("rows.append(row)", src.find("def box_and_players")) <
+          src.find("_skipped_from_totals.add(gid)"),
+          "skipping before the append would drop the line from the box too")
 
     print("\n3. THE FILTER ACTUALLY WORKS -- ON A SYNTHETIC EXHIBITION")
     # ⚠ REHEARSED RATHER THAN WAITED FOR. The real matches are not crawled yet,
