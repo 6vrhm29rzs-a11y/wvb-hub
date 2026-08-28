@@ -60,6 +60,15 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    # ⚠ BOUND IT. `cancel-in-progress: false` is correct -- a crawl killed
+    # mid-write is exactly what the append-only log must never see -- but it
+    # means a HUNG run blocks every later one, and with no timeout GitHub's
+    # default is SIX HOURS. On a 196-match Friday that is the site silently
+    # not updating for the rest of the day. 25 minutes sits under the
+    # half-hourly cadence, and a timeout here is safe: the crawl checkpoints
+    # atomically and nothing publishes until the sanity gate has passed, so
+    # a killed run simply does not publish.
+    timeout-minutes: 25
     env:
       WVB_SEASON: ${{ github.event.inputs.season || '2026' }}
     steps:

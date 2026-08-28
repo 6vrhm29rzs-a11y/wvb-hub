@@ -187,6 +187,25 @@ def main():
                          or "python3 scripts/test_display_invariants" in y))
         check("it runs the publishing gate's own guard", _covered,
               "not named, and not reachable through discovery")
+        # ⚠ A HUNG RUN MUST NOT HOLD THE SHARED GROUP ALL DAY. Both jobs use
+        # `cancel-in-progress: false`, which is right -- a crawl killed
+        # mid-write is what the append-only log must never see -- but it means
+        # a stuck run blocks every later one, and GitHub's default timeout is
+        # SIX HOURS. On a 196-match Friday that is the site quietly not
+        # updating until evening, with nothing to say why.
+        check("the half-hourly job is time-bounded",
+              re.search(r"timeout-minutes:\s*(\d+)", y) is not None
+              and int(re.search(r"timeout-minutes:\s*(\d+)", y).group(1)) <= 30,
+              "a refresh must not outlive its own cadence")
+        # (read the daily workflow here rather than reusing `d` -- it is
+        #  assigned further down this function, and referencing it early
+        #  raised UnboundLocalError and killed the whole suite)
+        _dy = os.path.join(REPO, ".github", "workflows", "daily.yml")
+        _dt = open(_dy, encoding="utf-8").read() if os.path.exists(_dy) else ""
+        _dm = re.search(r"timeout-minutes:\s*(\d+)", _dt)
+        check("...and the nightly job too",
+              _dm is not None and int(_dm.group(1)) <= 180,
+              "unbounded, or longer than three hours")
         check("...and the fresh-checkout suite is the ONLY thing it skips",
               _excl in ("", "test_pipeline_fresh_checkout.py"),
               "excluding %r on the half-hourly job needs a reason" % _excl)

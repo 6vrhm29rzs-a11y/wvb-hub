@@ -37,6 +37,11 @@ concurrency:
 jobs:
   run:
     runs-on: ubuntu-latest
+    # The nightly job does the whole-season pass, 46 guard suites and the
+    # fresh-checkout rebuild, so it is allowed far longer than the refresh --
+    # but not GitHub's six-hour default, which would hold the shared
+    # concurrency group all morning if a fetch ever hangs.
+    timeout-minutes: 90
     env:
       WVB_SEASON: ${{ github.event.inputs.season || '2026' }}
     steps:
