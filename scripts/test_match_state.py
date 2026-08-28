@@ -220,6 +220,38 @@ def main():
         check("...and repeats the standing rule about claiming live stats",
               "may claim live team or player statistics" in t)
 
+    # ── THE PAGE MUST NOT OVERRULE THE SERVER'S STATE ──────────────────
+    print("\nTHE CLIENT HONOURS EVERY STATE THE SERVER NAMES")
+    # ⚠ THIS SHIPPED WRONG AND CODY CAUGHT IT ON THE SEASON'S FIRST NIGHT.
+    # matchState6() said it trusted the server's state6 and then honoured
+    # exactly TWO of its five values; anything else fell through to
+    # `if (live) return 'live_score_only'`, so merely APPEARING on today's
+    # scoreboard made a match live. At 4:45pm Pacific, with first serve at 5:00
+    # and 6:00, Florida at Nebraska and SMU at Penn St. both rendered LIVE while
+    # the feed said state:"pre", state6:"upcoming", "Not started." for both.
+    hub = page()
+    if hub:
+        i = hub.find("function matchState6(")
+        j = hub.find("\nfunction ", i + 1)
+        body = hub[i:j] if i >= 0 else ""
+        check("matchState6 exists", bool(body))
+        check("it honours any state the server names, not a hand-picked pair",
+              "MSTATE.caps[live.state6]" in body,
+              "an allow-list of two values is how 'upcoming' became 'live'")
+        # ⚠ NEGATIVE CONTROL: the old shape must be gone, not merely joined by
+        # the new one. Leaving it in place would let the fall-through win again.
+        check("[NEG] the two-value allow-list is gone",
+              "live.state6 === 'live_with_team_stats' ||" not in body,
+              "the old branch still decides before the new one")
+        # and the renderers that consume it must ask, not test truthiness
+        wc = hub.find("const watchCard = x =>")
+        wbody = hub[wc:wc + 1400] if wc >= 0 else ""
+        check("a watch card asks the state model, not whether a feed row exists",
+              "matchState(m, live) === 'live'" in wbody,
+              "being on today's scoreboard is not being in progress")
+        check("...and the 'live now' reason chip does the same",
+              "if (matchState(m, live) === 'live') {" in hub)
+
     print()
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))

@@ -119,11 +119,34 @@ def esc(s) -> str:
 
 
 # ---------------------------------------------------------------- results
+def exhibitions():
+    # type: () -> Dict[str, Dict]
+    """Game ids that do NOT count, keyed by id.
+
+    ⚠ THE FEED CANNOT TELL US THIS. Checked game 6640217 directly: there is no
+    type, gameType or exhibition field anywhere on the contest, division reads
+    1, and both teams show record (0-0). An exhibition is indistinguishable
+    from a match that counts, so this file is maintained BY HAND with a source
+    on every entry, the same way venue corrections are.
+
+    ⚠ AND MIXING ONE IN IS NOT COSMETIC. Spikes Under the Lights plays its
+    first two sets to 21 rather than 25 (huskers.com match notes, 2026-08-26).
+    Every rate here is per SET, so a 21-point set quietly deflates points per
+    set, swings per set, the opponent adjustment and the rally model for four
+    of the best teams in the country -- and nothing on the page would look
+    wrong. That format is also the proof it cannot be an NCAA result: the
+    playing rules put a set at 25.
+    """
+    doc = load("data/raw/%d/exhibitions.json" % SEASON) or {}
+    return dict((str(k), v) for k, v in (doc.get("exhibitions") or {}).items())
+
+
 def results() -> List[Dict]:
     """Every final 2026 match, newest first, with its per-set scores."""
     path = os.path.join(REPO, "data/raw/%d/games.jsonl" % SEASON)
     if not os.path.exists(path):
         return []
+    _exh = exhibitions()
     best = {}
     for line in open(path):
         try:
@@ -166,7 +189,15 @@ def results() -> List[Dict]:
         # Friday-night match under Saturday. Every evening game in the country
         # lands on the wrong day that way, and it is the kind of error a reader
         # spots instantly and a test never would.
+        # ⚠ MARKED, NOT DROPPED. A match against good opposition still says
+        # something about a team even when it does not count, so the record
+        # rides along and every consumer that builds a RECORD or a RATE filters
+        # on this flag. Deleting it would throw away real evidence; counting it
+        # would corrupt four teams' seasons.
+        _exh_hit = _exh.get(str(g.get("game_id")))
         out.append({
+            "exhibition": bool(_exh_hit),
+            "exhibition_event": (_exh_hit or {}).get("event"),
             "date": (_pt_date(ep) if ep else None),
             "epoch": int(ep) if ep else 0,
             "away": away.get("name_short"), "home": home.get("name_short"),
@@ -2940,6 +2971,19 @@ def build():
             for gid in e.get("game_ids", []):
                 event_of[gid] = e["name"]
     res = results()
+    # ⚠ TWO LISTS, ON PURPOSE, AND THE SPLIT IS THE WHOLE POINT.
+    #   `res`      -- everything, for anything that DISPLAYS a match. An
+    #                 exhibition against good opposition is still worth seeing.
+    #   `res_cnt`  -- only what counts, for anything that builds a RECORD or a
+    #                 RATE: standings, the 2026 record chip, team season stats,
+    #                 player lines.
+    # Spikes Under the Lights plays its first two sets to 21 rather than 25, so
+    # folding it in would deflate every PER-SET number for Nebraska, Florida,
+    # SMU and Penn St. -- four of the best teams in the country -- and nothing
+    # on the page would look wrong. It would also invent wins and losses that
+    # the NCAA does not recognise.
+    res_cnt = [r for r in res if not r.get("exhibition")]
+    _n_exh = len(res) - len(res_cnt)
     # School colours read out of each logo SVG (scripts/crawl_team_colors.py).
     # A team with no readable colour is simply absent, and the avatar falls
     # back to a neutral rather than to an invented hue.
@@ -2960,12 +3004,12 @@ def build():
     # Division-I membership, once, for everything in this function that needs
     # to say whether an opponent qualifies.
     _di_all = di_teams()
-    boxes, plist = box_and_players(res, player_photos(), avca_honours(),
+    boxes, plist = box_and_players(res_cnt, player_photos(), avca_honours(),
                                    transfer_index())
     _nrt = attach_ratings(plist)
     # Season team totals for 2026, both what a team does and what it allows.
-    tstats = team_season_stats(boxes, res)
-    stand = standings(teams, res)
+    tstats = team_season_stats(boxes, res_cnt)
+    stand = standings(teams, res_cnt)
     for _rows in stand.values():
         for _r in _rows:
             _ts = tstats.get(_r["team"]) or {}
@@ -3004,7 +3048,7 @@ def build():
                     # join that `reconcile_2025.norm()` already exists to fix.
                     _k = team_norm(_n)
                     sched_n[_k] = sched_n.get(_k, 0) + 1
-    tindex = team_index(teams, res, pred_by_pair, sim_of, ldr_floor,
+    tindex = team_index(teams, res_cnt, pred_by_pair, sim_of, ldr_floor,
                         tstats=tstats, aq_of=aq_of, sched_n=sched_n)
     proj_meta = (load("data/projection_2026.json") or {}).get("meta", {})
     level = load("data/level_effect.json") or {}
@@ -13360,11 +13404,19 @@ function connector(m) {
 
 function matchState6(m, live, box) {
   if (mOver(live, m)) return box ? 'final_with_box' : 'final_box_pending';
-  if (live && live.state6) {
-    /* the server already decided for a live row -- trust it rather than
-       re-deriving, so the two can never disagree mid-match */
-    if (live.state6 === 'live_with_team_stats' ||
-        live.state6 === 'live_score_only') return live.state6;
+  /* ⚠ TRUST THE SERVER'S VERDICT, ALL OF IT. This said it trusted state6 and
+     then honoured exactly TWO of its five values; everything else fell through
+     to `if (live) return 'live_score_only'` -- so merely APPEARING on today's
+     scoreboard made a match live.
+     Cody caught it on the season's first night: at 4:45pm Pacific, with first
+     serve at 5:00 and 6:00, Florida at Nebraska and SMU at Penn St. both read
+     LIVE. The feed had said `state:"pre"`, `state6:"upcoming"`, "Not started."
+     for both. We were told the right answer and threw it away.
+     The whole point of one resolved state model is that a renderer asks
+     instead of deriving. Ask properly: any state the server names is the
+     state, and the fall-through applies only when it named none. */
+  if (live && live.state6 && MSTATE.caps && MSTATE.caps[live.state6]) {
+    return live.state6;
   }
   if (live) return 'live_score_only';
   return 'upcoming';
@@ -14595,7 +14647,12 @@ function todayReasons(m, live) {
     x[0] + ' is AVCA #' + x[1] + ' and POWER #' + x[2]]));
   if (m.site === 'neutral' && m.event) out.push(['ev', esc(m.event),
     'Part of ' + m.event]);
-  if (live) out.unshift(['lv', 'live now', 'In progress']);
+  /* ⚠ SAME MISTAKE, SAME LINE OF REASONING: a feed entry exists for every
+     match on today's card, started or not. Only a resolved live state earns
+     the chip. */
+  if (matchState(m, live) === 'live') {
+    out.unshift(['lv', 'live now', 'In progress']);
+  }
   return out;
 }
 
@@ -14736,11 +14793,21 @@ function renderDesk() {
   const watchCard = x => {
     const m = x[0];
     const live = liveOf(m);
-    return '<a class="wcard' + (live ? ' islive' : '') + '" href="' +
+    /* ⚠ BEING IN THE LIVE FEED IS NOT THE SAME AS BEING IN PROGRESS, AND THIS
+       SHIPPED SAYING OTHERWISE. liveOf() returns the feed's entry for EVERY
+       match on today's scoreboard, including ones it explicitly marks
+       `state:"pre"` / `state6:"upcoming"` / "Not started." -- so at 4:45pm
+       Pacific, with first serve at 5:00, Florida at Nebraska and SMU at Penn
+       St. both rendered as LIVE. The feed was right the whole time; this card
+       was answering a question it had not asked.
+       The codebase already resolves this once, centrally, exactly so three
+       renderers do not each invent it. Ask it. */
+    const isLive = matchState(m, live) === 'live';
+    return '<a class="wcard' + (isLive ? ' islive' : '') + '" href="' +
       matchRoute(m.gid, 'desk') + '">' +
       '<span class="wtop">' +
-        '<span class="wwhen">' + (live ? '<i class="cs-dot"></i>LIVE &middot; ' +
-          esc((live.period) || 'in progress')
+        '<span class="wwhen">' + (isLive ? '<i class="cs-dot"></i>LIVE &middot; ' +
+          esc((live && live.period) || 'in progress')
           : esc(dayLabel(m.d)) + (m.t ? ' &middot; ' + esc(m.t) : '')) + '</span>' +
         /* ⚠ WHERE TO WATCH, OR NOTHING. Joined from Cody's own listings; the
            feed carries no broadcast at all. An unmatched fixture says so

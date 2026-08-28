@@ -1,0 +1,54 @@
+{
+ "exhibitions": {
+  "6640217": {
+   "counts_toward_record": false,
+   "date": "2026-08-27",
+   "event": "Spikes Under the Lights",
+   "sets_to": [
+    21,
+    21,
+    15
+   ],
+   "source": "Cody, 2026-08-27, from the broadcast/event billing",
+   "teams": [
+    "Florida",
+    "Nebraska"
+   ],
+   "venue": "AT&T Stadium, Arlington TX"
+  },
+  "6640218": {
+   "counts_toward_record": false,
+   "date": "2026-08-27",
+   "event": "Spikes Under the Lights",
+   "sets_to": [
+    21,
+    21,
+    15
+   ],
+   "source": "Cody, 2026-08-27, from the broadcast/event billing",
+   "teams": [
+    "SMU",
+    "Penn St."
+   ],
+   "venue": "AT&T Stadium, Arlington TX"
+  }
+ },
+ "meta": {
+  "consequence": "An exhibition that lands in the game log as a real result corrupts both teams' won-lost records, and everything built on them: RPI, the opponent adjustment, the resume view and the field projector.",
+  "event": "Spikes Under the Lights, AT&T Stadium, Arlington TX",
+  "expect_a_third": "The two winners meet in a championship match the same night. Its game id is not known yet; if it appears in the feed it belongs in this file too.",
+  "format": "Best of three, the first two sets to 21 points and a deciding third to 15. Source: huskers.com match notes, 2026-08-26 -- \"All three matches will be played in a best-of-three sets format, with the first two sets played to 21 points and a deciding third set (if needed) played to 15 points.\"",
+  "how_to_detect_later": "A record that does not move. The feed carries each team's record on its NEXT match, so a team that played but whose record is unchanged played an exhibition. That is a real after-the-fact check and it is how this file should be audited, not extended by guesswork.",
+  "note_on_use": "Excluded from records and ratings, NOT hidden. Cody's point is that a match against good opposition still tells you something about a team even when it does not count.",
+  "season": 2026,
+  "source_tier": "OFFICIAL-BY-HAND",
+  "sources": [
+   "https://huskers.com/news/2026/08/26/vb-preview-spikes-under-the-lights",
+   "https://www.ncaa.com/news/volleyball-women/article/2026-08-14/spikes-under-lights-schedule-times-how-college-volleyball-event-works",
+   "Cody, 2026-08-27: these are exhibitions and do not count toward W/L"
+  ],
+  "why": "The feed does not mark exhibitions. Checked game 6640217 directly: no type, gameType or exhibition field exists, division reads 1, and both teams show record (0-0) -- it is indistinguishable from a counting match. So these are recorded by hand, with a source, rather than inferred from anything.",
+  "why_it_cannot_count": "\u26a0 THE FORMAT IS THE PROOF, AND IT IS STRONGER THAN ANY ARTICLE. NCAA playing rules put a set at 25 points. A set played to 21 is therefore not an NCAA match, whatever anyone writes about it -- and no source I could find states the exhibition status outright, so this is the evidence that actually settles it.",
+  "why_the_stats_are_poison": "\u26a0 AND EXCLUSION IS NOT OPTIONAL, IT IS ARITHMETIC. Every rate this hub computes is PER SET: points per set, kills per set, swings per set, the opponent adjustment, the rally model. A 21-point set offers roughly 16% fewer points than a 25-point one, so folding these in would quietly deflate the per-set numbers of four of the best teams in the country and nothing on screen would look wrong."
+ }
+}

@@ -3140,7 +3140,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     </div>
     <div class="meta">
       <b>9</b> matches played &middot; <b>348</b> teams rated<br>
-      last result <b>Mon Aug 24</b> &middot; built 2026-08-27 4:41 PM PT
+      last result <b>Mon Aug 24</b> &middot; built 2026-08-27 4:58 PM PT
     </div>
   </div>
   <!-- COURTSIGNAL-STATUS-BEGIN -->
@@ -5649,11 +5649,19 @@ function connector(m) {
 
 function matchState6(m, live, box) {
   if (mOver(live, m)) return box ? 'final_with_box' : 'final_box_pending';
-  if (live && live.state6) {
-    /* the server already decided for a live row -- trust it rather than
-       re-deriving, so the two can never disagree mid-match */
-    if (live.state6 === 'live_with_team_stats' ||
-        live.state6 === 'live_score_only') return live.state6;
+  /* ⚠ TRUST THE SERVER'S VERDICT, ALL OF IT. This said it trusted state6 and
+     then honoured exactly TWO of its five values; everything else fell through
+     to `if (live) return 'live_score_only'` -- so merely APPEARING on today's
+     scoreboard made a match live.
+     Cody caught it on the season's first night: at 4:45pm Pacific, with first
+     serve at 5:00 and 6:00, Florida at Nebraska and SMU at Penn St. both read
+     LIVE. The feed had said `state:"pre"`, `state6:"upcoming"`, "Not started."
+     for both. We were told the right answer and threw it away.
+     The whole point of one resolved state model is that a renderer asks
+     instead of deriving. Ask properly: any state the server names is the
+     state, and the fall-through applies only when it named none. */
+  if (live && live.state6 && MSTATE.caps && MSTATE.caps[live.state6]) {
+    return live.state6;
   }
   if (live) return 'live_score_only';
   return 'upcoming';
@@ -6863,7 +6871,12 @@ function todayReasons(m, live) {
     x[0] + ' is AVCA #' + x[1] + ' and POWER #' + x[2]]));
   if (m.site === 'neutral' && m.event) out.push(['ev', esc(m.event),
     'Part of ' + m.event]);
-  if (live) out.unshift(['lv', 'live now', 'In progress']);
+  /* ⚠ SAME MISTAKE, SAME LINE OF REASONING: a feed entry exists for every
+     match on today's card, started or not. Only a resolved live state earns
+     the chip. */
+  if (matchState(m, live) === 'live') {
+    out.unshift(['lv', 'live now', 'In progress']);
+  }
   return out;
 }
 
@@ -7004,11 +7017,21 @@ function renderDesk() {
   const watchCard = x => {
     const m = x[0];
     const live = liveOf(m);
-    return '<a class="wcard' + (live ? ' islive' : '') + '" href="' +
+    /* ⚠ BEING IN THE LIVE FEED IS NOT THE SAME AS BEING IN PROGRESS, AND THIS
+       SHIPPED SAYING OTHERWISE. liveOf() returns the feed's entry for EVERY
+       match on today's scoreboard, including ones it explicitly marks
+       `state:"pre"` / `state6:"upcoming"` / "Not started." -- so at 4:45pm
+       Pacific, with first serve at 5:00, Florida at Nebraska and SMU at Penn
+       St. both rendered as LIVE. The feed was right the whole time; this card
+       was answering a question it had not asked.
+       The codebase already resolves this once, centrally, exactly so three
+       renderers do not each invent it. Ask it. */
+    const isLive = matchState(m, live) === 'live';
+    return '<a class="wcard' + (isLive ? ' islive' : '') + '" href="' +
       matchRoute(m.gid, 'desk') + '">' +
       '<span class="wtop">' +
-        '<span class="wwhen">' + (live ? '<i class="cs-dot"></i>LIVE &middot; ' +
-          esc((live.period) || 'in progress')
+        '<span class="wwhen">' + (isLive ? '<i class="cs-dot"></i>LIVE &middot; ' +
+          esc((live && live.period) || 'in progress')
           : esc(dayLabel(m.d)) + (m.t ? ' &middot; ' + esc(m.t) : '')) + '</span>' +
         /* ⚠ WHERE TO WATCH, OR NOTHING. Joined from Cody's own listings; the
            feed carries no broadcast at all. An unmatched fixture says so
