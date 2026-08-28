@@ -164,8 +164,32 @@ def main():
         check("it shares the daily job's concurrency group",
               "group: daily-pipeline" in y,
               "two jobs appending to one game log is how a race corrupts it")
-        check("it runs the publishing gate's own guard",
-              "test_display_invariants" in y)
+        # ⚠ ASK WHETHER IT RUNS, NOT WHETHER IT IS NAMED -- the third guard in
+        # this repo to assert the shape of a fix. The refresh job used to list
+        # 22 of 46 suites by hand; it now discovers them, so the literal string
+        # "test_display_invariants" is gone from the workflow while the suite
+        # runs more reliably than before.
+        # ⚠ AND CHECK THE EXCLUSION LIST. Discovery plus a quiet exclusion
+        # would satisfy "it is covered" while covering nothing, so the suite
+        # must ALSO not appear in WVB_GUARD_EXCLUDE.
+        _excl = ""
+        _m = re.search(r"WVB_GUARD_EXCLUDE:\s*(.+)", y)
+        if _m:
+            _excl = _m.group(1).strip()
+        # ⚠ AND "THE NAME APPEARS SOMEWHERE" IS NOT "IT RUNS". The negative
+        # control caught this: adding test_display_invariants.py to the
+        # EXCLUSION list puts the string in the workflow, so a bare
+        # `"test_display_invariants" in y` was satisfied by the very edit that
+        # switched it off. Being excluded disqualifies it first, whichever way
+        # it would otherwise be covered.
+        _covered = ("test_display_invariants" not in _excl
+                    and ("run_all_guards.py" in y
+                         or "python3 scripts/test_display_invariants" in y))
+        check("it runs the publishing gate's own guard", _covered,
+              "not named, and not reachable through discovery")
+        check("...and the fresh-checkout suite is the ONLY thing it skips",
+              _excl in ("", "test_pipeline_fresh_checkout.py"),
+              "excluding %r on the half-hourly job needs a reason" % _excl)
         # the private ballot backup must never run in CI
         check("it never touches the private ballot backup",
               "ballot_backup" not in y)

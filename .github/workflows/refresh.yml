@@ -154,33 +154,23 @@ jobs:
           python3 scripts/build_hub.py
           python3 scripts/build_hub.py --public
 
-      # Every guard that can run in the time budget. The fresh-checkout test is
-      # deliberately absent: it re-runs the entire pipeline and takes 41 of the
-      # suite's 46 seconds, which is a daily cost, not a half-hourly one.
+      # ⚠ DISCOVERED, NOT LISTED -- the same drift the daily job had. This
+      # step named 22 suites while 46 existed, so 24 guards did not run on the
+      # job that publishes DURING a match day, every half hour. The daily job
+      # had the identical problem (32 of 46) and its own comments had already
+      # admitted the list drifting twice. A hand-maintained list of things that
+      # must not be forgotten is the wrong shape.
+      #
+      # ONE suite is excluded, and only this one: test_pipeline_fresh_checkout
+      # re-runs the whole pipeline in a throwaway checkout and takes ~100 of
+      # the sweep's ~128 seconds. That is a daily cost, not a half-hourly one,
+      # and the daily job does run it. Every skip is printed by the runner.
       - name: Invariant guards
         if: steps.after.outputs.changed == 'yes' || github.event.inputs.force == 'true'
+        env:
+          WVB_GUARD_EXCLUDE: test_pipeline_fresh_checkout.py
         run: |
-          python3 scripts/test_display_invariants.py
-          python3 scripts/test_join_invariants.py
-          python3 scripts/test_rankings_history.py
-          python3 scripts/test_top25.py
-          python3 scripts/test_resume.py
-          python3 scripts/test_ballot.py
-          python3 scripts/test_match_desk.py
-          python3 scripts/test_live_match.py
-          python3 scripts/test_player_identity.py
-          python3 scripts/test_player_aggregation.py
-          python3 scripts/test_rankings_board.py
-          python3 scripts/test_weekly_calendar.py
-          python3 scripts/test_fixture_disposition.py
-          python3 scripts/test_match_state.py
-          python3 scripts/test_visual_system.py
-          python3 scripts/test_filmroom.py
-          python3 scripts/test_intel.py
-          python3 scripts/test_gameday.py
-          python3 scripts/test_lineups.py
-          python3 scripts/test_venues.py
-          python3 scripts/test_score_predictions.py
+          python3 scripts/run_all_guards.py
           python3 scripts/provenance.py --check
 
       - name: Commit and publish
