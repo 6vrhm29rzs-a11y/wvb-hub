@@ -1702,7 +1702,14 @@ td.at{white-space:nowrap}
 .lanemore a{color:var(--navy);text-decoration:none;border-bottom:1px solid var(--line2)}
 .lanemore a:hover{border-bottom-color:var(--navy)}
 /* a compact, scannable row -- deliberately NOT a miniature card */
-.mrow{display:grid;grid-template-columns:74px 1fr auto;align-items:center;
+/* ⚠ FOUR COLUMNS NOW: the line score sits in what was dead space. The
+   team column is minmax(0,1fr) rather than 1fr so a long school name
+   wraps instead of pushing the sets off the row. */
+/* ⚠ THE TEAM COLUMN IS CAPPED, NOT 1fr. Left to flex it absorbed every
+   spare pixel and pushed the line score to the far edge, ~830px from
+   the names it belongs to. The context column takes the slack instead,
+   which is what the space is actually for. */
+.mrow{display:grid;grid-template-columns:74px minmax(150px,270px) minmax(0,1fr) auto auto;align-items:center;
   gap:12px;padding:10px 2px;border-bottom:1px solid var(--line);cursor:pointer;
   background:none;border-left:0;border-right:0;border-top:0;width:100%;
   text-align:left;color:inherit;font:inherit}
@@ -1719,6 +1726,17 @@ td.at{white-space:nowrap}
   font-variant-numeric:tabular-nums}
 .mrow .mrt.won .msc,.mrow.islive .msc{color:var(--chalk)}
 .mrow .mmeta{font:10.5px/1.5 var(--mono);color:var(--ink3);text-align:right}
+/* the two numerals stack so they line up with the two team rows above */
+.mrow .mctx{display:flex;flex-direction:column;gap:2px;min-width:0;overflow:hidden}
+.mctxe{font:600 10.5px/1.3 var(--disp);letter-spacing:.04em;text-transform:uppercase;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mctxv{font:11px/1.3 var(--sans);color:var(--slate);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mrow .mline{display:flex;gap:3px;justify-content:flex-end;min-width:0}
+.mset{display:flex;flex-direction:column;gap:3px;padding:2px 5px;border-radius:3px;background:var(--cs-cell,rgba(255,255,255,.03))}
+.mset b{font:600 12.5px/1.15 var(--mono);color:var(--slate);font-variant-numeric:tabular-nums;text-align:center;min-width:17px}
+.mset b.sw{color:var(--chalk)}
+.mline.islive .mset.now{background:color-mix(in oklab,var(--coral) 18%,transparent)}
+.mline.islive .mset.now b{color:var(--coral)}
+
 .mrow .mtags{display:flex;gap:5px;justify-content:flex-end;flex-wrap:wrap;
   margin-top:3px}
 .mrow .mtg{font:600 8.5px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
@@ -1766,7 +1784,15 @@ td.at{white-space:nowrap}
   .rbside .rbnm{font-size:21px}
   .rbside .rbsc{font-size:26px}
   .rbside img{width:26px;height:26px}
-  .mrow{grid-template-columns:60px 1fr auto;gap:8px}
+  /* ⚠ THE LINE SCORE IS THE FIRST THING TO GO ON A PHONE. Five sets of
+     two numerals cannot share a 390px row with two school names; the
+     set tally and the names are what matter at that width, and the
+     per-set detail is one tap away in the match itself. */
+  .mrow{grid-template-columns:60px minmax(0,1fr) auto;gap:8px}
+  .mrow .mline{display:none}
+  /* the venue is a tap away in the match itself; at 390px the names
+     and the result are the whole job */
+  .mrow .mctx{display:none}
   .mrow .mrt b{font-size:14px}
   .mrow .msc{font-size:15px}
   .mdet .mfact{gap:6px 16px}
@@ -3248,7 +3274,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     </div>
     <div class="meta">
       <b>9</b> matches played &middot; <b>348</b> teams rated<br>
-      last result <b>Mon Aug 24</b> &middot; built 2026-08-27 7:28 PM PT
+      last result <b>Mon Aug 24</b> &middot; built 2026-08-27 7:47 PM PT
     </div>
   </div>
   <!-- COURTSIGNAL-STATUS-BEGIN -->
@@ -5909,6 +5935,76 @@ function ribbonHTML(m, live, why) {
 }
 
 /* A COMPACT ROW. Scannable, ruled, not a miniature card. */
+/* THE SET-BY-SET LINE SCORE -- the detail a volleyball scoreboard is FOR.
+   The row already knew who played and how many sets each won; the ~1,000px
+   between the names and the score was empty, and the only place the per-set
+   points existed was a collapsed card grid further down the page.
+
+   ⚠ TWO SOURCES, AND THEY DO NOT OVERLAP THE WAY YOU EXPECT. The crawled
+   ledger carries `sets` on a final and is authoritative. The live feed carries
+   `sets` WHILE A MATCH IS BEING PLAYED and then EMPTIES the array the moment
+   it goes final -- so a match that has just ended has line scores in neither
+   place until the next crawl catches up. That is the same seam that once made
+   a finished match vanish from the Scores tab entirely. Here it degrades
+   correctly: no sets means no strip, never a placeholder and never a zero.
+
+   ⚠ DO NOT VALIDATE THESE AGAINST 25. Set one of SMU-Penn St. read 24-22 and
+   that is a REAL completed set: the exhibition is played first-two-to-21. A
+   plausibility rule invented from the standard format would have suppressed a
+   true score, which is the R5 failure in reverse.
+
+   ⚠ A LIVE SET IS PROVISIONAL AND IS MARKED AS ONE. Live figures get revised,
+   downward included, so the set in progress is rendered as in progress rather
+   than as a result. Nothing here is accumulated or stored. */
+/* ⚠ NOT `setStrip` -- THAT NAME WAS ALREADY TAKEN, and taking it again would
+   have silently emptied the two cards a reader looks at first. `setStrip(sets,
+   live)` (line ~9136) is called by the live band and the just-finished cards
+   with a bare array; a second declaration of the same name in the same scope
+   simply wins, so those calls would have arrived here as (m=Array, live=false,
+   st=undefined), found no `.sets` property on an array, and returned an empty
+   strip. No error, no warning -- the set scores would just have stopped
+   appearing on the Today tab. Same family as the duplicate `id="sbody"`. */
+function rowSetStrip(m, live, st) {
+  const raw = (live && live.sets && live.sets.length) ? live.sets
+    : (m.sets && m.sets.length ? m.sets : null);
+  if (!raw) return '<span class="mline"></span>';
+  const playing = st === 'live';
+  /* the in-progress set is the last one, and only while the match is live */
+  const cells = raw.map((sv, i) => {
+    const a = sv[0], h = sv[1];
+    if (a === null || a === undefined || h === null || h === undefined) return '';
+    const now = playing && i === raw.length - 1;
+    return '<span class="mset' + (now ? ' now' : '') + '"' +
+      ' title="set ' + (i + 1) + (now ? ' (in progress)' : '') + '">' +
+      '<b class="' + (!now && +a > +h ? 'sw' : '') + '">' + esc(String(a)) + '</b>' +
+      '<b class="' + (!now && +h > +a ? 'sw' : '') + '">' + esc(String(h)) + '</b>' +
+      '</span>';
+  }).join('');
+  return '<span class="mline' + (playing ? ' islive' : '') + '">' + cells + '</span>';
+}
+
+/* WHERE IT WAS PLAYED, AND WHAT IT WAS PART OF -- reported, never inferred.
+   The row had ~830px of empty space between the school names and the score,
+   and the payload was already carrying the event and the venue for every
+   fixture. This is the honest way to spend it: real fields, not decoration.
+
+   ⚠ VENUE IS THE ONE FIELD THIS PROJECT HAS ALREADY GOT WRONG BY GUESSING.
+   The dashboard once inferred "at <home team>" and was wrong the first weekend
+   it mattered -- Kentucky-Wisconsin and Louisville-Texas A&M were both at
+   Fiserv Forum on a neutral floor. So this prints what the feed reported or it
+   prints nothing at all. There is no fallback. */
+function matchContext(m) {
+  const bits = [];
+  if (m.event) bits.push(esc(m.event));
+  if (m.venue) {
+    bits.push(esc(m.venue) + (m.city ? ', ' + esc(m.city) : ''));
+  }
+  if (!bits.length) return '<span class="mctx"></span>';
+  return '<span class="mctx" title="' + bits.join(' \u00b7 ') + '">' +
+    bits.map((b, i) => '<span class="' + (i ? 'mctxv' : 'mctxe') + '">' + b +
+      '</span>').join('') + '</span>';
+}
+
 function matchRow(m, live, dest) {
   const st = matchState(m, live);
   const sc = matchScore(m, live);
@@ -5933,6 +6029,8 @@ function matchRow(m, live, dest) {
        when it sits beside the other badges. */
     '<span class="mteams">' + t(mAway(m), m.ar, aw) + t(mHome(m), m.hr, hw) +
       '</span>' +
+    matchContext(m) +
+    rowSetStrip(m, live, st) +
     '<span class="mmeta">' +
       (done ? '<span class="msc">' + sc[0] + '&ndash;' + sc[1] + '</span>' : '') +
       ((tags.length || m.exh)
