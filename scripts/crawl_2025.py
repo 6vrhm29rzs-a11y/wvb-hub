@@ -749,7 +749,23 @@ def crawl_players():
     seen_names = {}
     ngames = 0
     dropped_lines = 0
-    for rec in load_records_jsonl(PLAYERBOX_JSONL, key="game_id").values():
+    # ⚠ AN EXHIBITION'S PLAYER LINES MUST NOT REACH THE SEASON AGGREGATE. This
+    # file is what player_rating.py turns into per-set rates, and Spikes Under
+    # the Lights plays its first two sets to 21 rather than 25 -- so folding it
+    # in would deflate the rates of four of the best teams in the country while
+    # nothing looked wrong. The ids are resolved once, centrally, because a
+    # playerbox record carries a game_id and rows and nothing else: it cannot
+    # evaluate a venue rule on its own.
+    try:
+        import exhibitions as _EXH
+        _skip_gids = _EXH.resolved_gids(SEASON)
+    except Exception:
+        _skip_gids = set()
+    _skipped_exh = 0
+    for gid_key, rec in load_records_jsonl(PLAYERBOX_JSONL, key="game_id").items():
+        if str(gid_key) in _skip_gids:
+            _skipped_exh += 1
+            continue
         ngames += 1
         _rows = rec.get("rows") or []
         _broken = _uniform_gp_game(_rows)
@@ -793,6 +809,10 @@ def crawl_players():
             "season": SEASON, "source_tier": "OFFICIAL",
             "source": "ncaa-api /game/{id}/boxscore playerStats, aggregated",
             "games_aggregated": ngames,
+            "exhibitions_excluded": len(_skip_gids),
+            "exhibitions_note": ("matches that do not count are excluded here, "
+                                 "not just from the display: their per-set "
+                                 "rates are on a different scale"),
             "players": len(agg),
             "name_merge": "aggregated on a case/punctuation-insensitive whole "
                           "name; the feed spells players inconsistently between "
@@ -808,6 +828,9 @@ def crawl_players():
         json.dump(out, fh, indent=1)
     print("players: %d aggregated from %d games -> %s"
           % (len(agg), ngames, PLAYERS_JSON))
+    if _skipped_exh:
+        print("  %d exhibition game(s) left OUT of the season aggregate"
+              % _skipped_exh)
 
 
 def verify_season_pin():

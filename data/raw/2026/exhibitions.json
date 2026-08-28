@@ -48,7 +48,20 @@
    "Cody, 2026-08-27: these are exhibitions and do not count toward W/L"
   ],
   "why": "The feed does not mark exhibitions. Checked game 6640217 directly: no type, gameType or exhibition field exists, division reads 1, and both teams show record (0-0) -- it is indistinguishable from a counting match. So these are recorded by hand, with a source, rather than inferred from anything.",
+  "why_a_rule_as_well_as_ids": "\u26a0 A LEDGER OF GAME IDS HAS A DEADLINE, AND A DEADLINE THAT DEPENDS ON SOMEBODY REMEMBERING IS NOT A CONTROL. The championship match between the two winners had no game id at all while the first matches were still being played -- it appears on the scoreboard only once the field is known -- so an id-only ledger would have missed it and the 2:15am crawl would have counted it. A RULE closes that: every match at this venue on this date belongs to this event, whether or not we have seen its id yet.",
   "why_it_cannot_count": "\u26a0 THE FORMAT IS THE PROOF, AND IT IS STRONGER THAN ANY ARTICLE. NCAA playing rules put a set at 25 points. A set played to 21 is therefore not an NCAA match, whatever anyone writes about it -- and no source I could find states the exhibition status outright, so this is the evidence that actually settles it.",
   "why_the_stats_are_poison": "\u26a0 AND EXCLUSION IS NOT OPTIONAL, IT IS ARITHMETIC. Every rate this hub computes is PER SET: points per set, kills per set, swings per set, the opponent adjustment, the rally model. A 21-point set offers roughly 16% fewer points than a 25-point one, so folding these in would quietly deflate the per-set numbers of four of the best teams in the country and nothing on screen would look wrong."
- }
+ },
+ "rules": [
+  {
+   "counts_toward_record": false,
+   "event": "Spikes Under the Lights",
+   "match_on": {
+    "date": "2026-08-27",
+    "venue": "AT&T Stadium"
+   },
+   "note": "Catches the championship match, whose id does not exist until the two winners are known.",
+   "source": "Cody, 2026-08-27; format confirmed by huskers.com match notes"
+  }
+ ]
 }

@@ -23,6 +23,7 @@ Python 3.9 target.
 """
 
 import datetime
+import exhibitions as _EXH
 import json
 import os
 import sys
@@ -109,6 +110,24 @@ def load_stats():
     return out
 
 
+def _local_date(g):
+    """The Pacific date of a match, for the venue+date exhibition rule.
+
+    ⚠ PACIFIC, because that is what the ledger is written in and what the hub
+    displays. Using UTC here would put a 5pm Pacific match on the next day and
+    the rule would silently never fire.
+    """
+    ep = g.get("start_time_epoch")
+    if not ep:
+        return None
+    try:
+        import zoneinfo
+        tz = zoneinfo.ZoneInfo("America/Los_Angeles")
+        return datetime.datetime.fromtimestamp(int(ep), tz).strftime("%Y-%m-%d")
+    except Exception:
+        return datetime.datetime.utcfromtimestamp(int(ep)).strftime("%Y-%m-%d")
+
+
 def main():
     games = load_games()
     stats = load_stats()
@@ -133,8 +152,20 @@ def main():
         "name_full": None, "division": None,
     })
 
+    _skipped_exhibitions = set()
     for g in games:
         if g.get("game_state") != "F":
+            continue
+        # ⚠ AN EXHIBITION IS FINAL TOO, AND FILTERING ON 'F' ALONE LET IT IN.
+        # This function builds the dataset the RATING, the RPI, the simulator
+        # and the field projector all read. Until this line existed, the hub's
+        # display layer excluded Spikes Under the Lights correctly while every
+        # rating in the project would have counted it -- which is the exact
+        # opposite of the priority Cody set ("keep the stats out of the ratings
+        # and rankings"). Its first two sets go to 21 rather than 25, so it
+        # would also have deflated every per-set rate it touched.
+        if _EXH.is_exhibition(g, SEASON, _local_date(g)):
+            _skipped_exhibitions.add(str(g.get("game_id")))
             continue
         teams = g.get("teams") or []
         if len(teams) != 2:
@@ -330,6 +361,13 @@ def main():
         payload["meta"]["counts"]["teams_in_official_rpi"],
         payload["meta"]["counts"]["teams_in_stat_leaderboards"]))
     print("games: %d" % len(games_out))
+    # ⚠ SAY WHAT WAS LEFT OUT. A filter that removes matches silently is
+    # indistinguishable from a crawl that missed them, and the daily log is
+    # the first place anyone would look.
+    if _skipped_exhibitions:
+        print("excluded %d exhibition match(es) that do not count: %s"
+              % (len(_skipped_exhibitions),
+                 ", ".join(sorted(_skipped_exhibitions))))
     # NAME THE PROBLEM, DO NOT WALLPAPER THE LOG WITH IT.
     # Early in a season the stat leaderboards are empty, so EVERY team is
     # unjoined -- 338 of them, dumped in full into the daily log every morning.

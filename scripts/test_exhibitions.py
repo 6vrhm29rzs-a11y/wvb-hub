@@ -86,6 +86,50 @@ def main():
           src.find("_skipped_from_totals.add(gid)"),
           "skipping before the append would drop the line from the box too")
 
+    print("\n2c. A RULE CATCHES WHAT THE ID LEDGER CANNOT")
+    # ⚠ THE CHAMPIONSHIP MATCH HAD NO GAME ID while the semi-finals were being
+    # played -- the scoreboard lists it only once the field is known. An
+    # id-only ledger would have missed it and the 2:15am crawl would have
+    # counted a result that does not exist into two teams' records.
+    rules = B.exhibition_rules()
+    check("a venue+date rule exists", bool(rules), "id-only has a deadline")
+    check("...and it names a venue and a date",
+          all((r.get("match_on") or {}).get("venue")
+              and (r.get("match_on") or {}).get("date") for r in rules))
+    check("...and says it does not count",
+          all(r.get("counts_toward_record") is False for r in rules))
+    check("results() consults the rules, not just the ids",
+          "_exh_rules = exhibition_rules()" in src and
+          'if not _exh_hit and _exh_rules:' in src)
+
+    print("\n2d. THE RATING PIPELINE, NOT JUST THE DISPLAY")
+    # ⚠ THE REVIEW THAT FOUND THIS IS THE POINT. The first pass put the filter
+    # in build_hub.py alone: records, standings and per-set rates on the PAGE
+    # were right, while build_dataset.py -- the dataset the RATING, the RPI,
+    # the simulator and the field projector all read -- filtered on
+    # `game_state == "F"` and nothing else. An exhibition is final too. Cody's
+    # instruction was "keep the stats out of the ratings and rankings"; the
+    # display was the half that mattered least.
+    import exhibitions as X
+    check("there is ONE shared definition of a non-counting match",
+          hasattr(X, "is_exhibition") and hasattr(X, "resolved_gids"))
+    gids = X.resolved_gids(2026)
+    check("it resolves the known exhibition ids", len(gids) >= 2, str(sorted(gids)))
+    bd = io.open(os.path.join(REPO, "scripts/build_dataset.py"),
+                 encoding="utf-8").read()
+    check("build_dataset excludes them from the RATING dataset",
+          "_EXH.is_exhibition(g, SEASON, _local_date(g))" in bd,
+          "filtering on game_state alone lets a final exhibition through")
+    check("...using a PACIFIC date, not UTC",
+          "America/Los_Angeles" in bd,
+          "a UTC date pushes a 5pm Pacific match to the next day and the "
+          "venue rule silently never fires")
+    cr = io.open(os.path.join(REPO, "scripts/crawl_2025.py"),
+                 encoding="utf-8").read()
+    check("the player season aggregate excludes them too",
+          "_skip_gids" in cr and "resolved_gids(SEASON)" in cr,
+          "this file becomes per-set player rates; a 21-point set deflates them")
+
     print("\n3. THE FILTER ACTUALLY WORKS -- ON A SYNTHETIC EXHIBITION")
     # ⚠ REHEARSED RATHER THAN WAITED FOR. The real matches are not crawled yet,
     # and finding out at 2:15am that four teams' records were wrong is not a

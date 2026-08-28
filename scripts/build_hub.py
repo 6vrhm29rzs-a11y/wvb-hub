@@ -141,12 +141,28 @@ def exhibitions():
     return dict((str(k), v) for k, v in (doc.get("exhibitions") or {}).items())
 
 
+def exhibition_rules():
+    # type: () -> List[Dict]
+    """Venue+date rules, for matches whose id does not exist yet.
+
+    ⚠ AN ID LEDGER HAS A DEADLINE AND A DEADLINE IS NOT A CONTROL. The
+    championship match of this event had no game id while the semi-finals were
+    still being played -- the scoreboard only lists it once the field is known.
+    An id-only ledger would have missed it and the 2:15am crawl would have
+    counted a fake result into two teams' records. A rule does not depend on
+    anyone remembering to come back.
+    """
+    doc = load("data/raw/%d/exhibitions.json" % SEASON) or {}
+    return doc.get("rules") or []
+
+
 def results() -> List[Dict]:
     """Every final 2026 match, newest first, with its per-set scores."""
     path = os.path.join(REPO, "data/raw/%d/games.jsonl" % SEASON)
     if not os.path.exists(path):
         return []
     _exh = exhibitions()
+    _exh_rules = exhibition_rules()
     best = {}
     for line in open(path):
         try:
@@ -195,6 +211,16 @@ def results() -> List[Dict]:
         # on this flag. Deleting it would throw away real evidence; counting it
         # would corrupt four teams' seasons.
         _exh_hit = _exh.get(str(g.get("game_id")))
+        if not _exh_hit and _exh_rules:
+            _loc = g.get("location") or {}
+            _vn = (_loc.get("venue") or "").strip()
+            _dt = _pt_date(ep) if ep else None
+            for _r in _exh_rules:
+                _m = _r.get("match_on") or {}
+                if (_m.get("venue") and _vn == _m["venue"]
+                        and _m.get("date") and _dt == _m["date"]):
+                    _exh_hit = _r
+                    break
         out.append({
             "exhibition": bool(_exh_hit),
             "exhibition_event": (_exh_hit or {}).get("event"),
@@ -4557,6 +4583,27 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
    84 controls still measured under 16px with it in place. This is not a
    preference being enforced over a designer's; it is a browser threshold that
    has to hold or the behaviour returns. */
+/* ⚠ A READABILITY FLOOR ON A PHONE, MEASURED NOT GUESSED. Cody reads this hub
+   on an iPhone and said the formatting was wonky. Audited at 386px: the
+   Rankings view alone rendered 381 text nodes under 10.5px. Most were the
+   movement column's en-dashes, which are fine as glyphs -- but the rest were
+   TABLE HEADERS at 9.5-10px ("Our system", "Coaches poll", "Our outlook",
+   "Form"), which is squinting distance on a handset.
+   ⚠ VERIFIED IT COSTS NOTHING: with the floor applied at 386px the page still
+   measured scrollWidth 386 against clientWidth 386 -- no new overflow, because
+   these tables already scroll inside their own box. Desktop is untouched. */
+@media (max-width:560px){
+  th{font-size:11px !important}
+  .pl6,.nvd{font-size:11px !important}
+  /* ⚠ THE WORST OFFENDER WAS A PHRASE, NOT A TOKEN. A short uppercase tracked
+     tag like "OH" or "non-conf" reads fine at 9px; "Before first serve" set at
+     8px does not, and that is the difference the floor has to respect. Short
+     badges are nudged, phrase-length labels are lifted properly. */
+  .mrow .mtg,.mbhd .mbpriv{font-size:9.5px !important}
+  .gd-step i,.fr-facts>i,.fr-prevnums i{font-size:10px !important}
+  /* the label above each figure in the team header's fact strip */
+  .vx-facts i{font-size:9.5px !important}
+}
 @media (max-width:560px){
   input,select,textarea{font-size:16px !important}
   /* keep the control from growing now that its text is larger */
@@ -6418,7 +6465,13 @@ td.at{white-space:nowrap}
   color:var(--ink3,var(--ink2))}
 .dfcs{font:11px/1 var(--mono);color:var(--ink3,var(--ink2));opacity:.75}
 .dfc.none{color:var(--ink2);font-style:italic}
-.rank-label{font-size:.72em;letter-spacing:.06em;opacity:.72;margin-right:2px}
+/* ⚠ A RELATIVE SIZE WITH NO FLOOR COMPOUNDS UNTIL IT IS UNREADABLE.
+   This is .72em, and .62em in the compact contexts below, so inside an
+   11px parent it resolved to 6.82px -- measured on the Today view at
+   phone width, 27 instances of it. Nothing looked broken; the label just
+   quietly shrank below legibility. max() keeps the proportional scaling
+   where the parent is big enough and stops it where it is not. */
+.rank-label{font-size:max(9.5px,.72em);letter-spacing:.06em;opacity:.72;margin-right:2px}
 /* ⚠ THE RULER LABEL IS NEVER DECORATION AND MAY NEVER BE HIDDEN. It is the
    difference between a fact and a number. Anything that shrinks it has a floor
    of 9px; nothing may set it to display:none. Guarded in test_rulers.py. */
@@ -6429,7 +6482,7 @@ td.at{white-space:nowrap}
 .rnkbad{color:var(--bad);border:1px dashed var(--bad);padding:0 4px;
   font:700 10px/1.5 var(--mono);text-transform:uppercase}
 /* the tape and the ribbon carry the label at their own scale */
-.cs-trk .rank-label,.rbrk .rank-label,.mrk .rank-label{font-size:.62em;
+.cs-trk .rank-label,.rbrk .rank-label,.mrk .rank-label{font-size:max(9px,.62em);
   opacity:.8;margin-right:1px;display:inline}
 .cs-trk .rnk,.rbrk .rnk,.mrk .rnk{color:inherit}
 .dlive{margin-top:11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}

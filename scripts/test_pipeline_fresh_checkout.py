@@ -150,8 +150,18 @@ def run_sequence(cmds, cwd, season, stop_on_required_failure=True):
         if SELF in c or SKIP.search(c):
             continue
         tolerated = "||" in c
-        rc = subprocess.call(c, shell=True, cwd=cwd, env=env,
-                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        # ⚠ A GUARD THAT HIDES WHY IT FAILED COSTS MORE THAN IT SAVES. Output
+        # is suppressed so the ordinary pass is quiet, but when a required
+        # command fails the reason is exactly what you need and it was being
+        # thrown away -- reproducing it by hand took several wrong attempts.
+        # WVB_TEST_VERBOSE=1 lets it through.
+        _verbose = os.environ.get("WVB_TEST_VERBOSE") == "1"
+        if _verbose:
+            print("       $ %s" % c)
+        rc = subprocess.call(
+            c, shell=True, cwd=cwd, env=env,
+            stdout=(None if _verbose else subprocess.DEVNULL),
+            stderr=(None if _verbose else subprocess.DEVNULL))
         results.append((c, tolerated, rc))
         if rc != 0 and not tolerated and stop_on_required_failure:
             break
