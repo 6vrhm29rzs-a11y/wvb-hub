@@ -151,6 +151,29 @@ def test_movement_never_crosses_the_basis():
     check(mover({"move": None}) == "",
           "and that renders blank, not a dash")
 
+    # ⚠ THE CROSSOVER THAT IS ACTUALLY COMING IS blend -> live, NOT
+    # preseason -> live. The cases above were written when the board had two
+    # sources; it has three, and the archive on disk is preseason + blend with
+    # no live row yet. `rating_2026.json` does not exist because rating_2025.py
+    # refuses to fit under 50 played matches -- and 2026-08-28 alone schedules
+    # 196, so the board flips to `live` within days and the first live Monday
+    # will have nothing but blend and preseason behind it. If those compared,
+    # every team would show a confident movement arrow for a change of ruler.
+    blend_a = {"week": "2026-W34", "source": "blend"}
+    blend_b = {"week": "2026-W35", "source": "digby"}   # the alias, as written
+    got = pick_comparison([blend_a, blend_b], "2026-W36", "live")
+    check(got is None,
+          "the blend -> live crossover refuses to compare",
+          "a change of ruler is not a change of rank")
+    # and the alias must not leak the other way either
+    got = pick_comparison([blend_a, {"week": "2026-W35", "source": "live"}],
+                          "2026-W36", "blend")
+    check(got is blend_a,
+          "blend compares against the blend week, not the live one")
+    # digby-as-written resolves for a blend comparison
+    got = pick_comparison([blend_b], "2026-W36", "blend")
+    check(got is blend_b, "a week written 'digby' is found by a 'blend' compare")
+
     # once a live week exists, live compares against live
     got = pick_comparison(snaps + [{"week": "2026-W37", "source": "live"}],
                           "2026-W37", "live")

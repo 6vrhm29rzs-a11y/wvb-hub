@@ -446,6 +446,88 @@ DURABLE_SHAPES = {
 }
 
 
+def test_a_result_moves_no_durable_fact():
+    """THE INVARIANT ITSELF, not a whitelist of field names.
+
+    DURABLE_SHAPES asserts that no UNKNOWN field reaches a stored summary. This
+    asserts the thing that actually costs money: that a field already on the
+    list does not move when a match finishes. The two are different -- a field
+    can be correctly classified today and start carrying a 2026 number later,
+    and the shape check would not notice.
+
+    ⚠ WHY IT MATTERS ON A DATE. 2026-08-28 schedules 196 matches. The first
+    time this went wrong, 326 of 340 summaries failed their own gate a day
+    after being written and the fix cost a regeneration. Simulating a result
+    here is free; discovering it on Saturday is not.
+    """
+    import copy as _c, json as _j, os as _o, re as _re
+    from digby import durable, fact_sheet, input_hash
+    hub = _o.path.join(REPO, "Cody", "START-HERE.html")
+    if not _o.path.exists(hub):
+        print("  --   no built page; skipping")
+        return
+    h = open(hub, encoding="utf-8").read()
+    T = _j.loads(_re.search(r"const TEAMS = (\{.*?\});\n", h, _re.S).group(1))
+    moved, checked = [], 0
+    for nm in list(T)[:120]:
+        rec = T[nm]
+        before = input_hash(durable(fact_sheet(nm, rec)))
+        r2 = _c.deepcopy(rec)
+        # ⚠ PERTURB EVERY BLOCK A RESULTS DAY TOUCHES, NOT JUST `played`. The
+        # first version of this test inserted a match into `played` and passed
+        # even with `record_so_far_2026` deliberately moved into durable --
+        # because that field is read from the precomputed `sim` block, which
+        # the injection never touched. A simulation that does not reach the
+        # field it is testing proves nothing.
+        r2.setdefault("played", []).insert(0, {
+            "gid": "9999999", "d": "2026-08-28", "opp": "Test Opponent",
+            "mine": 3, "theirs": 1, "home": True, "nondi": False})
+        if r2.get("fixtures"):
+            r2["fixtures"] = r2["fixtures"][1:]
+        if isinstance(r2.get("sim"), dict):
+            sim = r2["sim"]
+            sim["played"] = (sim.get("played") or 0) + 1
+            sim["record_so_far"] = "9-9"
+            for k in ("proj_wins_mean", "proj_wins_p10", "proj_wins_p50",
+                      "proj_wins_p90", "conf_wins_mean", "conf_title_pct",
+                      "tournament_pct"):
+                if isinstance(sim.get(k), (int, float)):
+                    sim[k] = round(sim[k] + 1.37, 2)
+        for k in ("record26", "record26_nondi"):
+            if r2.get(k) is not None:
+                r2[k] = "9-9"
+        if isinstance(r2.get("tstats"), dict):
+            for k, v in list(r2["tstats"].items()):
+                if isinstance(v, (int, float)):
+                    r2["tstats"][k] = round(v + 0.77, 3)
+        # ⚠ PERTURB WHAT A RESULT ACTUALLY CHANGES, AND NOTHING ELSE. An
+        # earlier version also moved `rpi`, and the test then reported
+        # `rpi_rank_2025_final` as rotting -- but that field is the FINAL 2025
+        # official RPI ("official NCAA RPI rank, final 2025"), an archived
+        # capture that no 2026 match can touch. A simulation that changes
+        # things the world does not manufactures failures, which is as useless
+        # as one that changes nothing. `rank` is this season's rank and is
+        # already declared volatile, so it belongs here; `rpi`, `rank25` and
+        # `record25` are last season's and do not.
+        if isinstance(r2.get("rank"), (int, float)):
+            r2["rank"] = r2["rank"] + 3
+        for st in (r2.get("stars") or []):
+            if isinstance(st, dict):
+                for k, v in list(st.items()):
+                    if isinstance(v, (int, float)):
+                        st[k] = round(v + 0.41, 3)
+        checked += 1
+        if before != input_hash(durable(fact_sheet(nm, r2))):
+            d1, d2 = durable(fact_sheet(nm, rec)), durable(fact_sheet(nm, r2))
+            moved.append((nm, [k for k in set(list(d1) + list(d2))
+                               if d1.get(k) != d2.get(k)][:4]))
+    check(checked > 50, "enough teams were actually exercised",
+          "only %d" % checked)
+    check(not moved,
+          "a finished match moves NO durable fact",
+          "these would rot on the next results day: %s" % moved[:3])
+
+
 def test_every_durable_field_was_classified_deliberately():
     """THE STRUCTURAL FIX. Two volatile fields slipped through -- `our_rank_2026`
     (moves with the rating, changes basis at 50 matches) and
@@ -569,6 +651,7 @@ def main():
                test_a_summary_is_written_from_durable_facts_only,
                test_the_hash_ignores_volatile_movement,
                test_every_durable_field_was_classified_deliberately,
+               test_a_result_moves_no_durable_fact,
                test_the_known_movers_are_excluded,
                test_limit_caps_attempts_when_everything_succeeds,
                test_limit_caps_attempts_when_everything_fails,
