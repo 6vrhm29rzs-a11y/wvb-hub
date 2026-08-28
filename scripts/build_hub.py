@@ -14174,6 +14174,25 @@ function matchContext(m) {
     '</span>';
 }
 
+/* One phrasing of a live match for a one-line eyebrow: sets tally, the set
+   we are in, and the points in it -- "1-0 · 2ND SET · 18-15". The rows carry
+   their numbers per team line; a CARD has one line, so it says all three
+   there. Missing pieces are omitted, never zero-filled. */
+function liveLine(m, live) {
+  const sc = matchScore(m, live);
+  const bits = [];
+  if (sc && sc[0] !== null && sc[0] !== undefined) {
+    bits.push(sc[0] + '\u2013' + sc[1]);
+  }
+  if (live && live.period) bits.push(esc(live.period));
+  const cur = (live && live.sets && live.sets.length)
+    ? live.sets[live.sets.length - 1] : null;
+  if (cur && cur[0] !== null && cur[0] !== undefined) {
+    bits.push(cur[0] + '\u2013' + cur[1]);
+  }
+  return bits.join(' \u00b7 ');
+}
+
 function matchRow(m, live, dest) {
   const st = matchState(m, live);
   const sc = matchScore(m, live);
@@ -14525,7 +14544,7 @@ function renderScoreboard() {
           const tally = (sc && sc[0] !== null && sc[0] !== undefined)
             ? ' ' + sc[0] + '\u2013' + sc[1] : '';
           const when = st === 'live'
-            ? '<i class="cs-dot"></i>LIVE' + tally
+            ? '<i class="cs-dot"></i>LIVE ' + liveLine(x[0], lv)
             : st === 'final' ? 'FINAL' + tally
             : esc(x[0].t || 'time TBA');
           return '<a class="tdcard" href="' + matchRoute(x[0].gid, 'scores') + '">' +
@@ -15668,12 +15687,8 @@ function renderDesk() {
         /* ⚠ A LIVE CARD SAYS THE SCORE (Cody's phone screenshot: "LIVE -
            3RD SET" and not a number in sight). Set tally beside the period,
            the same rule as the Top Games eyebrow. */
-        '<span class="wwhen">' + (isLive ? '<i class="cs-dot"></i>LIVE ' +
-          (function () {
-            const sc = matchScore(m, live);
-            return (sc && sc[0] !== null && sc[0] !== undefined)
-              ? sc[0] + '\u2013' + sc[1] + ' &middot; ' : '';
-          })() + esc((live && live.period) || 'in progress')
+        '<span class="wwhen">' + (isLive
+          ? '<i class="cs-dot"></i>LIVE ' + (liveLine(m, live) || 'in progress')
           : esc(dayLabel(m.d)) + (m.t ? ' &middot; ' + esc(m.t) : '')) + '</span>' +
         /* ⚠ WHERE TO WATCH, OR NOTHING. Joined from Cody's own listings; the
            feed carries no broadcast at all. An unmatched fixture says so
