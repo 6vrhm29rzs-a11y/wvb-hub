@@ -261,6 +261,27 @@ def main():
         check("...and the 'live now' reason chip does the same",
               "if (matchState(m, live) === 'live') {" in hub)
 
+    print("\n11. THREE SETS IS A WIN BY RULE, WHATEVER THE STATE FIELDS SAY")
+    # ⚠ SEEN LIVE, 2026-08-28, FIU-Merrimack: the feed carried away_sets "3"
+    # while state was still "live" and period still "3RD SET" -- the inverse
+    # of the documented period-flips-first lag. The tape showed the impossible
+    # "LIVE - 3RD SET" beside a 3-0 tally. A side with three sets has won by
+    # rule; the match is over the moment either tally reaches three. Asserted
+    # on the shared mOver() and on the poller's isOver, the two over-tests the
+    # R4 audit found.
+    src = open(os.path.join(REPO, "scripts", "build_hub.py"),
+               encoding="utf-8").read()
+    mo = src[src.find("function mOver"):]
+    mo = mo[:mo.find("\n}") + 2]
+    check("mOver treats a tally of three as over",
+          "away_sets) >= 3" in mo and "home_sets) >= 3" in mo,
+          "the feed can lag state AND period past the final rally")
+    check("...through the null-safe reader",
+          "mNum(live.away_sets)" in mo,
+          "an empty-string tally must not be coerced to a number")
+    check("the poller's isOver carries the same rule",
+          "+g.away_sets >= 3" in src and "+g.home_sets >= 3" in src)
+
     print()
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))

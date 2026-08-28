@@ -8288,7 +8288,12 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 <section id="v-desk">
   <div id="deskdetail" hidden></div>
   <div id="deskboard">
-  <h2 class="vh">Your next watches</h2>
+  <!-- ⚠ NOT "Your next watches": the first SECTION inside this view is
+       titled exactly that, so the words appeared twice within sixty
+       pixels on a phone (Cody's screenshot). The view header names the
+       view -- the product's own name for it -- and the section keeps
+       the words, because it is the one carrying the note. -->
+  <h2 class="vh">Match desk</h2>
   <p class="tabhint" id="desklead"></p>
 
   <div id="desktoday">
@@ -9512,7 +9517,10 @@ async function pollLive() {
      LIVE whose own first line said FINAL. Trust whichever source says it is
      over. */
   const isOver = g => /final|complete/i.test(g.period || '') ||
-                      /final|^f$/i.test(g.state || '');
+                      /final|^f$/i.test(g.state || '') ||
+                      /* three sets is a win by rule -- the feed can lag both
+                         state and period past the final rally */
+                      (+g.away_sets >= 3 || +g.home_sets >= 3);
   const live = all.filter(g => LIVE_STATES.includes(g.state) && !isOver(g));
   const justEnded = all.filter(isOver);
 
@@ -13919,6 +13927,17 @@ function mNum(v) {
 function mOver(live, m) {
   if (live && (/final|complete/i.test(live.state || '') ||
                /final|complete/i.test(live.period || ''))) return true;
+  /* ⚠ THE THIRD OVER-SIGNAL: THE TALLY ITSELF. Seen live on 2026-08-28,
+     FIU-Merrimack: the feed carried away_sets "3" while state was still
+     "live" and period still "3RD SET" -- the inverse of the documented
+     period-flips-first lag. A side with three sets has WON by rule (a match
+     ends the moment a side reaches three), so the tape showed the impossible
+     "LIVE - 3RD SET" beside a 3-0 tally for several minutes. Whichever field
+     says it is over first is believed; this one is not even a feed field, it
+     is the sport. */
+  if (live && (mNum(live.away_sets) >= 3 || mNum(live.home_sets) >= 3)) {
+    return true;
+  }
   return !!(m && (m.final || mNum(m.as) !== null));
 }
 
@@ -15587,8 +15606,15 @@ function renderDesk() {
     return '<a class="wcard' + (isLive ? ' islive' : '') + '" href="' +
       matchRoute(m.gid, 'desk') + '">' +
       '<span class="wtop">' +
-        '<span class="wwhen">' + (isLive ? '<i class="cs-dot"></i>LIVE &middot; ' +
-          esc((live && live.period) || 'in progress')
+        /* ⚠ A LIVE CARD SAYS THE SCORE (Cody's phone screenshot: "LIVE -
+           3RD SET" and not a number in sight). Set tally beside the period,
+           the same rule as the Top Games eyebrow. */
+        '<span class="wwhen">' + (isLive ? '<i class="cs-dot"></i>LIVE ' +
+          (function () {
+            const sc = matchScore(m, live);
+            return (sc && sc[0] !== null && sc[0] !== undefined)
+              ? sc[0] + '\u2013' + sc[1] + ' &middot; ' : '';
+          })() + esc((live && live.period) || 'in progress')
           : esc(dayLabel(m.d)) + (m.t ? ' &middot; ' + esc(m.t) : '')) + '</span>' +
         /* ⚠ WHERE TO WATCH, OR NOTHING. Joined from Cody's own listings; the
            feed carries no broadcast at all. An unmatched fixture says so
@@ -15606,7 +15632,9 @@ function renderDesk() {
       '</span>' +
       '<span class="wmeta">' + (m.venue ? esc(m.venue) : '<span class="munk">venue TBA</span>') +
         (m.event ? ' &middot; ' + esc(m.event) : '') + '</span>' +
-      reasonChips(m, live) +
+      /* the eyebrow already says LIVE with the tally; a second chip
+         repeating it is the duplication Cody's screenshot showed */
+      reasonChips(m, live, isLive ? ['lv'] : null) +
       starPeek(m) +
       '<span class="wacts"><span class="wgo">Preview &rarr;</span>' +
         '<span class="wofficial" data-href="https://www.ncaa.com/game/' +
