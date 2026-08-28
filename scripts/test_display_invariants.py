@@ -336,8 +336,23 @@ def check_team_stats_reconcile_with_their_box_scores():
     if not T or not B:
         print("  --   no TEAMS/BOXES payload; skipping")
         return
+    # ⚠ SUM ONLY THE MATCHES THE RECORD COUNTS. BOXES deliberately carries
+    # every match INCLUDING exhibitions (so their box scores stay viewable);
+    # tstats excludes them. The first version of this guard summed everything
+    # and, the morning after the exhibitions were crawled, reported SMU's
+    # hitting % as wrong when it was the guard mixing bases -- the exact
+    # mistake the +/- fix was for, made in the test that polices it. Each
+    # team's `played` list IS the counting set, so the guard and the page
+    # cannot disagree about it.
+    _cnt = set()
+    for _tn, _tv in T.items():
+        for _g in (_tv.get("played") or []):
+            if _g.get("gid"):
+                _cnt.add(str(_g["gid"]))
     agg = {}
     for _gid, rows in B.items():
+        if _cnt and str(_gid) not in _cnt:
+            continue
         for r in rows:
             a = agg.setdefault(r["team"], {"k": 0, "e": 0, "ta": 0, "bs": 0,
                                            "ba": 0, "psets": 0, "hits": []})

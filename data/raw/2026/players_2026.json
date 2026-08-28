@@ -4,6 +4,8 @@
   "source_tier": "OFFICIAL",
   "source": "ncaa-api /game/{id}/boxscore playerStats, aggregated",
   "games_aggregated": 9,
+  "exhibitions_excluded": 2,
+  "exhibitions_note": "matches that do not count are excluded here, not just from the display: their per-set rates are on a different scale",
   "players": 141,
   "name_merge": "aggregated on a case/punctuation-insensitive whole name; the feed spells players inconsistently between games. Display name is the most frequent spelling.",
   "note": "Names stored exactly as served; no normalisation at ingest. Per-game rows are NOT committed -- /boxscore is ID-addressed and re-crawlable (verified against a 2024 game)."

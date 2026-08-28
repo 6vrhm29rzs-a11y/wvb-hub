@@ -239,7 +239,14 @@ def test_the_two_rankings_explain_their_relationship():
     # is that the line appears exactly when something moved.
     import re as _re
     _mv = _re.findall(r'<th title="how the rank changed">([^<]*)</th>', h)
-    _marks = _re.findall(r'class="t25mv (up|dn)"', h)
+    # ⚠ THE MARKS ARE mv-up / mv-dn. This regex used to look for
+    # `class="t25mv (up|dn)"` -- a selector that exists NOWHERE in build_hub or
+    # on the page, so `_marks` was always empty and this pair of checks
+    # silently reduced to "the movers line must never appear". It passed
+    # locally only because nothing had moved yet, and failed the first sandbox
+    # in which movement existed -- blocking CI on the first real match day.
+    # Same family as the `a.ep` sort key: a guard aimed at a phantom.
+    _marks = _re.findall(r'class="mv-(up|dn)"', h)
     if _marks:
         check("Biggest movers" in h,
               "the Top 25 names its biggest movers when there are any")

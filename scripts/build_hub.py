@@ -196,9 +196,21 @@ def results() -> List[Dict]:
         sets = []
         for s in g.get("linescores") or []:
             try:
-                sets.append((int(s.get("visit")), int(s.get("home"))))
+                _pair = (int(s.get("visit")), int(s.get("home")))
             except (TypeError, ValueError):
                 continue
+            # ⚠ A 0-0 ROW ON A FINAL IS A SET THAT WAS NEVER PLAYED. The feed
+            # keeps the scaffold: both Spikes Under the Lights finals came back
+            # with a third linescore reading 0-0 -- the best-of-3 ended 2-0 and
+            # the unplayed set's row shipped anyway. A set someone actually
+            # played cannot end 0-0 (a set ends when a side reaches the
+            # target), so on a FINAL -- this loop only sees finals, the guard
+            # above just checked game_state -- an all-zero pair is always the
+            # feed's placeholder, never a result. Caught in CI by the guard
+            # that recomputes each match score from its own line scores.
+            if _pair == (0, 0):
+                continue
+            sets.append(_pair)
         ep = g.get("start_time_epoch")
         # DATE IN EASTERN, NOT UTC. Kentucky beat Wisconsin at 9pm ET on the
         # 21st, which is 01:00 UTC on the 22nd -- bucketing by UTC filed a
@@ -2011,7 +2023,17 @@ def team_season_stats(boxes, res):
             r.get("home"): float(sum(p[1] for p in sets if len(p) == 2)),
         }
 
+    # ⚠ ONLY THE MATCHES THAT COUNT. `boxes` deliberately carries every match
+    # including exhibitions -- that is what lets an exhibition's box score be
+    # VIEWED -- but these are SEASON totals, and the D-I split below cannot
+    # exclude an exhibition because Nebraska v Florida is D-I on both sides.
+    # So the standings' +/- showed Nebraska a differential from a match its
+    # record on the same row refuses to count. The counting set is `res` --
+    # the same list the record is built from -- so the two cannot disagree.
+    _cnt_gids = set(str(r.get("gid")) for r in (res or []) if r.get("gid"))
     for gid, rows in (boxes or {}).items():
+        if _cnt_gids and str(gid) not in _cnt_gids:
+            continue                                    # exhibition or otherwise non-counting
         by_team = {}
         for r in rows or []:
             by_team.setdefault(r.get("team"), []).append(r)
