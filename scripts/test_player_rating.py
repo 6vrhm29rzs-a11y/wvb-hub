@@ -40,6 +40,72 @@ def check(label, ok, detail=""):
         FAILS.append(label)
 
 
+def check_class_labels_are_canonical(page):
+    """One class year, one spelling.
+
+    ⚠ THE SAME SORTED COLUMN HELD TEN SPELLINGS OF FIVE CLASSES: "Jr" (12) and
+    "Junior" (2), "Sr" (16) and "Senior" (6), "R-Jr" and "Redshirt Junior".
+    `class_full()` already existed but was wired to ONE of the two places a
+    class reaches the page, so the Player Ratings board rendered whatever the
+    school's own roster happened to say. Same shape as every R4 case here.
+
+    The canonical set is derived from CLASS_FULL rather than restated, so
+    adding a class to the map cannot leave this guard behind. A value the map
+    does not know is still allowed through UNCHANGED -- normalising a label is
+    not the same as inventing one, and a player with no published class must
+    keep rendering as missing.
+    """
+    import json as _j, re as _re, sys as _s, os as _o
+    _s.path.insert(0, _o.path.join(REPO, "scripts"))
+    from build_hub import CLASS_SHORT
+
+    m = _re.search(r"const PRANK = (\{)", page)
+    if not m:
+        print("  --   no PRANK payload; skipping")
+        return True
+    i = m.start(1)
+    d, j, instr, esc = 0, i, False, False
+    while j < len(page):
+        c = page[j]
+        if instr:
+            if esc:
+                esc = False
+            elif c == "\\":
+                esc = True
+            elif c == '"':
+                instr = False
+        elif c == '"':
+            instr = True
+        elif c in "[{":
+            d += 1
+        elif c in "]}":
+            d -= 1
+            if d == 0:
+                break
+        j += 1
+    P = _j.loads(page[i:j + 1])
+    seen = {}
+    for rows in list((P.get("rows") or {}).values()) + [P.get("overall_rows") or []]:
+        for r in rows:
+            if r.get("cls"):
+                seen[r["cls"]] = seen.get(r["cls"], 0) + 1
+    canonical = set(CLASS_SHORT.values())
+    # anything that is a SPELLED-OUT form of a class we know is a failure --
+    # it means the raw string reached the page instead of the code
+    spelled = sorted(v for v in seen
+                     if v not in canonical
+                     and _re.sub(r"[.\s-]", "", v).upper() in
+                     set(_re.sub(r"[.\s-]", "", f).upper()
+                         for f in __import__("build_hub").CLASS_FULL.values()))
+    ok = not spelled
+    print("  %-64s %s" % ("class labels are one canonical form",
+                          "ok" if ok else "FAIL %s" % spelled))
+    if ok:
+        print("       (%d values across %d forms: %s)"
+              % (sum(seen.values()), len(seen), ", ".join(sorted(seen))))
+    return ok
+
+
 def main():
     f = os.path.join(REPO, "data/player_rating_2026.json")
     if not os.path.exists(f):
@@ -319,6 +385,9 @@ def main():
     if page:
         check("the card explains a missing comparison rather than going quiet",
               "no one to compare her with" in page)
+
+    if page and not check_class_labels_are_canonical(page):
+        FAILS.append("class labels are one canonical form")
 
     print("\n12. THE RATING REACHES THE PLACES IT IS USED")
     if page:

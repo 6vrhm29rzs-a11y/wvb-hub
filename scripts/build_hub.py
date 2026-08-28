@@ -832,7 +832,11 @@ def roster_rows(roster_rec, ret_rec, lu_rec, live_by_team, team_id,
             pos_raw = pos_raw.get("pos")
         row = {
             "n": name,
-            "c": pl.get("class_raw") or (p25 or {}).get("class") or None,
+            # ⚠ NORMALISED, NOT RAW. This is the value the Player Ratings
+            # column renders; passing the school's own string through put
+            # "Jr" and "Senior" in the same sorted column.
+            "c": class_code(pl.get("class_raw")
+                            or (p25 or {}).get("class") or None),
             # position: the school's own listing wins, box score fills the gap
             "p": pos_bucket(pos_raw),
             "praw": pos_raw or None,
@@ -1507,16 +1511,50 @@ CLASS_FULL = {
 }
 
 
+# The reverse map, so a spelled-out value normalises too. Built from
+# CLASS_FULL rather than typed a second time -- two maps for one relation is
+# how the two ends drift apart.
+# Title case, because that is how the column has always read ("Sr", not "SR").
+CLASS_SHORT = dict([(k, "-".join([w.capitalize() for w in k.split("-")]))
+                    for k in CLASS_FULL])
+CLASS_CODE = {}
+for _k, _v in CLASS_FULL.items():
+    CLASS_CODE[re.sub(r"[.\s-]", "", _k).upper()] = CLASS_SHORT[_k]
+    CLASS_CODE[re.sub(r"[.\s-]", "", _v).upper()] = CLASS_SHORT[_k]
+
+
+def class_code(raw):
+    """The class year as ONE canonical short code: Fr, So, Jr, Sr, Gr, R-Sr...
+
+    ⚠ THE SAME COLUMN WAS SHOWING TWO FORMATS. The Player Ratings board read
+    the school's raw string, so one sorted column held "Jr" (12), "Sr" (16),
+    "Senior" (6), "Junior" (2), "R-Sr", "Redshirt Junior" -- ten spellings of
+    five classes, because `class_full()` existed but was wired to only one of
+    the two places a class reaches the page (R4).
+
+    An unrecognised value comes back UNCHANGED and a missing one stays missing:
+    this normalises a LABEL, it never invents a class for a player who has no
+    published one.
+    """
+    if not raw:
+        return raw
+    key = re.sub(r"[.\s-]", "", str(raw)).upper()
+    return CLASS_CODE.get(key, raw)
+
+
 def class_full(raw):
     """The published class year, spelled out when it is a known abbreviation.
 
     Case and full stops vary between schools ("So.", "so", "R-Fr."), so the
     lookup is normalised. An unknown value comes back UNCHANGED -- including
     one already spelled out, which simply is not in the map.
+
+    Goes through class_code() first so a value the school spelled out ("Senior")
+    and one it abbreviated ("Sr.") land on the same answer.
     """
     if not raw:
         return raw
-    key = re.sub(r"[.\s]", "", str(raw)).upper()
+    key = re.sub(r"[.\s]", "", str(class_code(raw))).upper()
     return CLASS_FULL.get(key, raw)
 
 
@@ -2301,7 +2339,13 @@ def player_rating_payload():
                             "c": c.get("contrib")})
             out.append({
                 "n": p.get("name"), "t": p.get("team"), "pos": pos,
-                "cls": p.get("cls"), "num": p.get("num"),
+                # ⚠ NORMALISED HERE, AT THE BOUNDARY. player_rating.py reads
+                # the school's own string via roster_class(), so this column
+                # held "Jr" and "Senior" and "Redshirt Junior" at once -- ten
+                # spellings of five classes in one sorted column. The map is
+                # not copied into player_rating.py; the value is canonicalised
+                # where it enters the page, so there is one definition (R4).
+                "cls": class_code(p.get("cls")), "num": p.get("num"),
                 "pw": p.get("power"), "pwr": p.get("power_rank"),
                 "rs": p.get("resume_score"), "rsr": p.get("resume_rank"),
                 "w": p.get("season_weight"), "m": p.get("matches"),
