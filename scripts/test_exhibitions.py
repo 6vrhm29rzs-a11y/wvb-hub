@@ -172,6 +172,38 @@ def main():
           neb_all is not None and (neb_all["w"], neb_all["l"]) != (neb["w"], neb["l"]),
           "the filter is a no-op, so this guard proves nothing")
 
+    print("\nEVERY VIEW THAT SHOWS THE FIXTURE SAYS IT DOES NOT COUNT")
+    # ⚠ ONE FIXTURE, TWO ANSWERS ON ONE PAGE. The Scoreboard tagged these EXH
+    # and the Schedule did not -- and the answer the Schedule gave was the
+    # misleading one: it labelled them "non-conf", which describes a match that
+    # counts. Florida-Nebraska and SMU-Penn St. count toward nobody's record.
+    # Both badges are now built from the same hand-maintained ledger.
+    import os as _o
+    _hub = _o.path.join(REPO, "Cody", "START-HERE.html")
+    if not _o.path.exists(_hub):
+        print("  --   no built page; skipping")
+    else:
+        h = open(_hub, encoding="utf-8").read()
+        # (this module already binds the ledger via B.exhibitions() at the top
+        #  of main; `EX` was a name I invented and nothing defines it)
+        led = B.exhibitions()
+        gids = sorted(led)
+        check("[+] there are exhibitions on file to check", len(gids) > 0,
+              "%d" % len(gids))
+        # the scoreboard/desk row helper
+        check("the row helper tags an exhibition", "function exhTag(m)" in h)
+        # the server-rendered schedule table
+        check("the schedule table tags one too",
+              'class="kind exh"' in h,
+              "a fixture that does not count must not read as 'non-conf' alone")
+        check("...and says what it means, not just that it is one",
+              "does not count toward either record" in h)
+        # and the badge is not invented per-view: one ledger, both readers
+        check("[-] neither view keeps its own list of exhibitions",
+              h.count("Spikes Under the Lights") >= 1
+              and "_sched_exh" not in h,
+              "the ledger must not be inlined into the page twice")
+
     print("\n%s" % ("ALL EXHIBITION GUARDS PASS" if not FAILS
                     else "FAILED: %s" % FAILS))
     return 1 if FAILS else 0

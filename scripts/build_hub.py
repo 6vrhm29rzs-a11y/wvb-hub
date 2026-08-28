@@ -3712,6 +3712,9 @@ def build():
     # not having them is a lie about what the page contains.
     SCHED_INITIAL = 600
     srows = []
+    # the hand-maintained exhibition ledger, read ONCE for this table
+    _sched_exh = dict([(k, (v or {}).get("event") or "exhibition")
+                       for k, v in exhibitions().items()])
     for _i, r in enumerate(sched):
         pick, cls = _pick(r)
         # WHERE. A venue we do not have is stated as such -- never inferred
@@ -3775,6 +3778,17 @@ def build():
             badge = '<span class="kind cf" title="conference match">conference</span>'
         else:
             badge = '<span class="kind nc" title="non-conference match">non-conf</span>'
+        # ⚠ AN EXHIBITION HAS TO SAY SO HERE TOO. The Scoreboard tagged these
+        # EXH and the Schedule did not, so one fixture had two answers on one
+        # page -- and the answer the Schedule gave was the misleading one:
+        # "non-conf" implies a match that counts, and Florida-Nebraska and
+        # SMU-Penn St. count toward nobody's record. The badge is built from
+        # the same hand-maintained ledger the rest of the page reads, so there
+        # is one definition of "does not count" (R4).
+        _ex = _sched_exh.get(str(r.get("gid") or ""))
+        if _ex:
+            badge = ('<span class="kind exh" title="%s &mdash; does not count '
+                     'toward either record">exhibition</span>' % esc(_ex)) + badge
         srows.append(
             '<tr%s%s><td class="cd" data-d="%s">%s</td><td class="n">%s</td><td class="tm">%s%s%s</td>'
             '<td class="at">%s</td><td class="tm">%s%s%s</td>'
@@ -7285,6 +7299,9 @@ td.wh .wu{color:var(--ink3);font-style:italic}
   vertical-align:2px}
 .kind.cf{background:color-mix(in oklab,var(--navy) 12%,transparent);color:var(--navy)}
 .kind.nc{background:var(--sand);color:var(--ink2)}
+/* an exhibition is the one badge here that changes what a result MEANS,
+   so it is the one that is outlined rather than filled */
+.kind.exh{background:transparent;color:var(--gold);border:1px solid color-mix(in oklab,var(--gold) 45%,transparent)}
 /* A named event is the one that changes what the fixture MEANS -- an August
    tournament on a neutral floor is not a road trip -- so it gets the ball's
    yellow and the other two stay quiet. */
