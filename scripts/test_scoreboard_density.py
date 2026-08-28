@@ -96,15 +96,15 @@ def main():
     src = io.open(SRC, encoding="utf-8").read()
 
     print("1. The line score")
-    strip = fn(src, "rowSetStrip")
-    check("rowSetStrip exists", bool(strip))
+    strip = fn(src, "rowLinescore")
+    check("rowLinescore exists", bool(strip))
 
     # ⚠ NO PLACEHOLDER, EVER. A match with no line scores on file must render
     # nothing -- not a zero, not a dash, not an empty set box. R5.
-    check("no sets renders an empty strip, not a stand-in",
-          "if (!raw) return '<span class=\"mline\"></span>';" in strip)
+    check("no data renders an empty cell, not a stand-in",
+          "if (!raw && !tally) return '<span class=\"mls\"></span>';" in strip)
     for bad in ("'0'", '"0"', "|| 0", "'\\u2014'", "&mdash;"):
-        check("[-] rowSetStrip substitutes no %s" % bad, bad not in strip)
+        check("[-] rowLinescore substitutes no %s" % bad, bad not in strip)
 
     # ⚠ TWO SOURCES THAT DO NOT OVERLAP. The live feed carries `sets` while a
     # match is being played and EMPTIES the array the instant it goes final;
@@ -127,9 +127,11 @@ def main():
 
     # a live set is provisional and is marked as such, never as a result
     check("the in-progress set is marked, and only while live",
-          "const now = playing && i === raw.length - 1;" in strip)
+          "const now = playing && i === n - 1;" in strip)
+    # the ternary gives `now` its own class BEFORE the winner test runs, so
+    # an in-progress column can never carry the winner style
     check("...and the in-progress set crowns no winner",
-          "!now && +a > +h" in strip and "!now && +h > +a" in strip)
+          "(now ? ' now' : (+v > +o ? ' w' : ''))" in strip)
     check("...and 'playing' comes from the state, not the score",
           "const playing = st === 'live';" in strip)
 
@@ -219,8 +221,13 @@ def main():
         k += 1
     check("the phone rules were actually found", len(ptxt) > 2000,
           "%d chars" % len(ptxt))
-    check("the line score is hidden at phone width",
-          ".mrow .mline{display:none}" in ptxt)
+    # ⚠ REVERSED BY CODY with a broadcast linescore as the reference: the
+    # per-set table IS what a phone reader wants. The guard used to assert it
+    # was hidden; now it asserts it is NOT.
+    check("the linescore is NOT hidden at phone width",
+          ".mls{display:none}" not in ptxt and ".mrow .mline" not in ptxt)
+    check("...and long names ellipsize instead of running under the numbers",
+          "text-overflow:ellipsis" in ptxt)
     check("the context is hidden at phone width",
           ".mrow .mctx{display:none}" in ptxt)
 
@@ -230,12 +237,13 @@ def main():
     else:
         # ⚠ Tests read the page Cody actually opens.
         page = io.open(PAGE, encoding="utf-8").read()
-        check("the strip ships", "function rowSetStrip" in page)
+        check("the linescore ships", "function rowLinescore" in page)
         check("the context ships", "function matchContext" in page)
-        # a set cell is two stacked numerals, so it lines up with the two team
-        # rows above it -- one numeral per team, never a single "25-22" string
-        check("a set cell carries two numerals",
-              re.search(r"<b class=\"' \+ \(!now && \+a", page) is not None)
+        # the linescore is a grid: away row of cells then home row, with the
+        # ruled-off tally column ending each -- broadcast shape, per Cody's
+        # reference image
+        check("the linescore is the broadcast grid",
+              'class="mls"' in page and 'class="mlt' in page)
 
     print("\n5. The 60-second poller cannot be killed by a missing band")
     # ⚠ THE ONE THAT WAS GOING TO BREAK ON THE FIRST FULL MATCH DAY. The
