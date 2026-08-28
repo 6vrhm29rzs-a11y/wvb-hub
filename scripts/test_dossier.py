@@ -124,6 +124,25 @@ def main():
     # A libero rendered "-0.0 kills/set" on Bryant: schedule adjustment can
     # push a non-attacker's kill rate a hair below zero and rounding prints
     # the sign. 120 star rows sat below that threshold.
+    # ⚠ ONE DEFINITION, EVERY CALLER. The rule below was first fixed inside
+    # the dossier's own renderer -- and hours later Cody's phone showed
+    # "-0.0 kills/set" on a LIVE MATCH PREVIEW, because starLine() was a
+    # second copy of the same line with the old behaviour. posHeadline() is
+    # now the single definition; both renderers must call it and neither may
+    # keep a private kps fallback.
+    check("posHeadline is the one definition",
+          src.count("function posHeadline(") == 1)
+    # (body extracted to the closing brace at column 0 -- `[^}]*` stopped at
+    #  the FIRST inner brace and failed the correct code, the same extractor
+    #  mistake this session has already made twice)
+    _sl = re.search(r"function starLine\(.*?\n\}", src, re.S)
+    check("...the match preview's starLine calls it",
+          _sl is not None and "posHeadline(" in _sl.group(0),
+          "a second copy of the rule is how the bug outlived its fix")
+    check("...and starLine keeps no kps line of its own",
+          re.search(r"function starLine\(.*?\n\}", src, re.S) and
+          "kills/set" not in re.search(r"function starLine\(.*?\n\}", src,
+                                       re.S).group(0))
     check("headline rate is floored above zero",
           re.search(r"v != null && v >= 0\.05", src) is not None)
     for pos, unit in (("LDS", "digs/set"), ("S", "assists/set"),

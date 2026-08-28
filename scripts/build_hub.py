@@ -14646,6 +14646,22 @@ function renderLedger() {
    "who am I watching", and a rating on its own does not answer it. Each name
    carries what she does, so the line reads as scouting rather than as a
    leaderboard. */
+/* ⚠ ONE DEFINITION OF A STAR'S HEADLINE NUMBER. Three renderers each built
+   their own stat line, and the negative-zero libero bug was fixed in ONE of
+   them (the dossier) while this match-preview line kept printing raw kps --
+   Cody's phone showed "Miabella Musignac ... -0.0 kills/set" on a live match
+   preview hours after the dossier fix shipped. A defender leads with digs, a
+   setter with assists, a middle with blocks, pins with kills, and a rate not
+   meaningfully above zero is omitted rather than printed as nothing. */
+function posHeadline(x) {
+  const rate = (v, unit) => (v != null && v >= 0.05)
+    ? v.toFixed(1) + ' ' + unit : null;
+  return x.pos === 'LDS' ? rate(x.dps, 'digs/set')
+    : x.pos === 'S' ? (rate(x.asps, 'assists/set') || rate(x.kps, 'kills/set'))
+    : x.pos === 'MB' ? (rate(x.bps, 'blocks/set') || rate(x.kps, 'kills/set'))
+    : rate(x.kps, 'kills/set');
+}
+
 function starLine(x) {
   const bits = [];
   if (x.role === 'six') bits.push('6-rotation');
@@ -14653,7 +14669,8 @@ function starLine(x) {
   if (x.recv != null && x.recv >= 0.15) {
     bits.push(Math.round(x.recv * 100) + '% of serve-receive');
   }
-  if (x.kps != null) bits.push(x.kps.toFixed(1) + ' kills/set');
+  const head = posHeadline(x);
+  if (head) bits.push(head);
   return bits.slice(0, 3).join(' · ');
 }
 
@@ -18020,12 +18037,9 @@ function tdPlayers(t, name) {
          with kills, and a rate that is not meaningfully above zero is simply
          left out rather than printed as nothing. */
       const line2 = [];
-      const rate = (v, unit) => (v != null && v >= 0.05)
-        ? v.toFixed(1) + ' ' + unit : null;
-      const head = x.pos === 'LDS' ? rate(x.dps, 'digs/set')
-        : x.pos === 'S' ? (rate(x.asps, 'assists/set') || rate(x.kps, 'kills/set'))
-        : x.pos === 'MB' ? (rate(x.bps, 'blocks/set') || rate(x.kps, 'kills/set'))
-        : rate(x.kps, 'kills/set');
+      /* posHeadline() is THE definition -- see its note; a second copy here is
+         how the match preview kept the bug after the dossier was fixed */
+      const head = posHeadline(x);
       if (head) line2.push(head);
       if (x.role === 'six') line2.push('all six rotations');
       if (x.recv != null && x.recv >= 0.15) {
