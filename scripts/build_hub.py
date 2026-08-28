@@ -6551,6 +6551,16 @@ td.at{white-space:nowrap}
 .mrow .mrt b{font:600 15px/1.15 var(--disp);color:var(--ink2);overflow-wrap:anywhere}
 .mrow .mrt.won b{color:var(--chalk)}
 .mrow .mrt .mrk{font:600 9.5px/1 var(--disp);color:var(--gold);flex:none}
+/* the live numbers at the end of each team line: current-set points big
+   (they are what is moving), sets-won small beside them */
+.mrt .mnum{margin-left:auto;display:flex;align-items:baseline;gap:8px;
+  flex:none;padding-left:8px}
+.mpts{font:700 16px/1 var(--mono);color:var(--ink2);min-width:24px;
+  text-align:right;font-variant-numeric:tabular-nums}
+.mpts.lead{color:var(--chalk)}
+.msets{font-style:normal;font:600 11px/1 var(--mono);color:var(--slate);
+  min-width:12px;text-align:right;font-variant-numeric:tabular-nums}
+
 .mrow .msc{font:700 17px/1.2 var(--mono);color:var(--ink3);text-align:right;
   font-variant-numeric:tabular-nums}
 .mrow .mrt.won .msc,.mrow.islive .msc{color:var(--chalk)}
@@ -14173,10 +14183,32 @@ function matchRow(m, live, dest) {
   if (m.ar && m.hr) tags.push(['rv', 'ranked v ranked']);
   if (st === 'live') tags.push(['lv', 'live']);
   if (m.site === 'neutral') tags.push(['', 'neutral']);
-  const t = (name, rk, won, score) =>
+  /* ⚠ A LIVE ROW SAYS THE POINTS, RIGHT HERE (Cody, mid-slate, with the
+     NCAA.com card as the reference: "I shouldn't have to click on a match to
+     see if someone is winning or losing"). This is the canonical live-
+     scoreboard shape -- each team line ends in its own numbers: the CURRENT
+     SET'S points, big, because they are the thing moving; the sets-won tally
+     small beside them. The set is named in the row's own eyebrow (2ND SET).
+     The leader of the current set is emphasised -- that is a fact about the
+     set in progress, not a crowned winner. If the feed's per-set points have
+     not arrived yet, only the tally renders: no invented zeros. */
+  let anum = '', hnum = '';
+  if (st === 'live' && live) {
+    const _as = mNum(live.away_sets) || 0, _hs = mNum(live.home_sets) || 0;
+    const _cur = (live.sets && live.sets.length)
+      ? live.sets[live.sets.length - 1] : null;
+    const _cell = (pts, opp, sets) => '<span class="mnum">' +
+      (pts !== null && pts !== undefined
+        ? '<b class="mpts' + (+pts > +opp ? ' lead' : '') + '">' + pts + '</b>'
+        : '') +
+      '<i class="msets" title="sets won">' + sets + '</i></span>';
+    anum = _cell(_cur ? _cur[0] : null, _cur ? _cur[1] : null, _as);
+    hnum = _cell(_cur ? _cur[1] : null, _cur ? _cur[0] : null, _hs);
+  }
+  const t = (name, rk, won, num) =>
     '<div class="mrt ' + (won ? 'won' : '') + '">' +
       (rk ? '<span class="mrk">' + rankHTML('avca', rk, true) + '</span>' : '') +
-      logo(name) + '<b>' + esc(name) + '</b></div>';
+      logo(name) + '<b>' + esc(name) + '</b>' + (num || '') + '</div>';
   return '<button type="button" class="mrow ' + (st === 'live' ? 'islive' : '') +
     '" data-match="' + esc(m.gid) + '" data-dest="' + dest + '">' +
     '<span class="mwhen">' + esc(st === 'live'
@@ -14186,12 +14218,15 @@ function matchRow(m, live, dest) {
        flex item in a COLUMN flex, so it stretched to the full row width -- a
        1,061px empty gold box under every exhibition. It reads as a badge only
        when it sits beside the other badges. */
-    '<span class="mteams">' + t(mAway(m), m.ar, aw) + t(mHome(m), m.hr, hw) +
-      '</span>' +
+    '<span class="mteams">' + t(mAway(m), m.ar, aw, anum) +
+      t(mHome(m), m.hr, hw, hnum) + '</span>' +
     matchContext(m) +
     rowSetStrip(m, live, st) +
     '<span class="mmeta">' +
-      (done ? '<span class="msc">' + sc[0] + '&ndash;' + sc[1] + '</span>' : '') +
+      /* live rows carry their numbers per team line; the aggregate tally here
+         would say the sets a third time */
+      (done && st !== 'live'
+        ? '<span class="msc">' + sc[0] + '&ndash;' + sc[1] + '</span>' : '') +
       ((tags.length || m.exh)
         ? '<span class="mtags">' + exhTag(m) + tags.map(x =>
           '<span class="mtg ' + x[0] + '">' + x[1] + '</span>').join('') +
