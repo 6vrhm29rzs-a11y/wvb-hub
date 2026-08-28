@@ -5336,9 +5336,34 @@ td.pick b{color:var(--navy)}
      which hid destinations behind a gesture with no affordance. Five plus More
      wrap onto two short rows and every destination is visible at once. */
   nav .inner{flex-wrap:wrap;overflow-x:visible;scrollbar-width:none;
-    -webkit-overflow-scrolling:touch;padding:0 6px}
+    -webkit-overflow-scrolling:touch;padding:0 6px;justify-content:center}
   nav .inner::-webkit-scrollbar{display:none}
   nav button{flex:0 0 auto;white-space:nowrap}
+  /* ⚠ THE WRAP IS DELIBERATE (no sideways gesture); the SHAPE of it was not.
+     At 390px the five primaries filled row one and MORE sat alone at the left
+     of row two beside a field of nothing -- Cody's screenshot. Centred and a
+     step tighter, the same six wrap as two balanced rows. */
+  nav button.pri{font-size:13px;padding:12px 7px}
+  nav button{font-size:11px;padding:12px 6px}
+  nav .morebtn{padding:12px 6px}
+
+  /* SCOREBOARD CONTROLS, phone shape (Cody's screenshots, 2026-08-28):
+     -- the six filters wrapped 5+1 with UPCOMING orphaned and the count
+        floating mid-control. A 3-per-row grid wraps 6 as two full rows (the
+        public build's five as 3+2), and the count gets its own line.
+     -- the date bar and lead ate half the first screen before a score. */
+  .seg.sbfilters{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .seg.sbfilters .segb{width:100%}
+  .sbfilters .count{grid-column:1/-1;text-align:right;padding-top:2px}
+  .sbbar{gap:8px;margin-bottom:14px;padding-bottom:10px}
+  #v-scores .lead{font-size:12.5px;line-height:1.5;margin-bottom:10px}
+  .tdmarq.sbtop .tdcard{padding:10px 12px;gap:5px}
+
+  /* bottom clearance so a fixed floating control never covers the last row
+     at scroll-end; harmless padding on a build that has no such control.
+     (Do not name the control here: this comment SHIPS, and the public gate
+     aborts on the name -- which is exactly what it is for.) */
+  main{padding-bottom:72px}
 
   /* RANKINGS + TOP 25 become a two-line row per team.
      Line 1: rank, crest, team, movement.
@@ -14427,19 +14452,31 @@ function renderScoreboard() {
   if (topBox) {
     topBox.innerHTML = top.length
       ? '<section class="tdblock"><h3>Top games<span>on this date</span></h3>' +
-        '<div class="tdmarq sbtop">' + top.map(x =>
-          '<a class="tdcard" href="' + matchRoute(x[0].gid, 'scores') + '">' +
-            '<span class="tdwhen">' +
-              (matchState(x[0], liveOf(x[0])) === 'live'
-                ? '<i class="cs-dot"></i>LIVE'
-                : esc(x[0].t || 'time TBA')) + '</span>' +
+        '<div class="tdmarq sbtop">' + top.map(x => {
+          /* ⚠ A TOP-GAMES CARD WITH NO SCORE ON A LIVE MATCH is a scoreboard
+             withholding the score (Cody's phone screenshot: four LIVE cards,
+             not a number on any of them). The eyebrow now carries the set
+             tally for live AND final; only a genuinely un-started match shows
+             a time. */
+          const lv = liveOf(x[0]);
+          const st = matchState(x[0], lv);
+          const sc = matchScore(x[0], lv);
+          const tally = (sc && sc[0] !== null && sc[0] !== undefined)
+            ? ' ' + sc[0] + '\u2013' + sc[1] : '';
+          const when = st === 'live'
+            ? '<i class="cs-dot"></i>LIVE' + tally
+            : st === 'final' ? 'FINAL' + tally
+            : esc(x[0].t || 'time TBA');
+          return '<a class="tdcard" href="' + matchRoute(x[0].gid, 'scores') + '">' +
+            '<span class="tdwhen">' + when + '</span>' +
             '<span class="tdteams">' +
               rankHTML('avca', x[0].ar, true) + esc(mAway(x[0])) +
               '<i>' + connector(x[0]) + '</i>' +
               rankHTML('avca', x[0].hr, true) + esc(mHome(x[0])) + '</span>' +
-            reasonChips(x[0], liveOf(x[0])) +
+            reasonChips(x[0], lv, st === 'live' ? ['lv'] : null) +
             starPeek(x[0]) +
-          '</a>').join('') + '</div></section>'
+          '</a>';
+        }).join('') + '</div></section>'
       : '';
   }
 
@@ -15389,8 +15426,14 @@ function starPeek(m) {
     (a && h ? '<span class="pkv">vs</span>' : '') + bit(h) + '</span>';
 }
 
-function reasonChips(m, live) {
-  const rs = todayReasons(m, live);
+function reasonChips(m, live, skip) {
+  /* `skip` lists reason KEYS a caller already states elsewhere on the same
+     card. The Top Games eyebrow says LIVE with the set tally, and the card
+     then wore a second "live now" chip two lines down -- the same fact twice
+     in forty pixels (Cody's phone screenshot). Existing callers pass two
+     args and are untouched. */
+  const rs = todayReasons(m, live)
+    .filter(r => !skip || skip.indexOf(r[0]) < 0);
   if (!rs.length) return '';
   return '<span class="tdwhy">' + rs.map(r =>
     '<span class="tdtag ' + r[0] + '" title="' + esc(r[2]) + '">' +
@@ -18318,7 +18361,17 @@ ASK_CSS = """.digby-hello{float:right;margin:-4px 0 4px 10px}
 .askform button{padding:8px 12px;border:1px solid var(--line);background:var(--alt);
   color:var(--ink);border-radius:2px;cursor:pointer;font:700 11px/1 var(--sans)}
 @media (max-width:560px){.askwrap{right:8px;left:8px;bottom:8px;width:auto}
-  .asklaunch{right:8px;bottom:8px}}
+  /* ⚠ ICON-ONLY ON A PHONE, AND IT LIVES HERE, NOT IN THE SHARED BLOCK.
+     The first version put these two rules in the page-wide 560px block, and
+     the public gate ABORTED the build: "asklaunch, digby-face" -- dead CSS
+     naming a private feature is still the private feature's name on a public
+     page. Digby styling belongs inside Digby's own stripped region.
+     The full-width pill sat on top of card content in Cody's screenshot; a
+     fixed button always overlays SOMETHING, so make the something small. The
+     accessible name survives (the text is present at zero size). */
+  .asklaunch{right:8px;bottom:8px;font-size:0;padding:12px;border-radius:50%;
+    letter-spacing:0}
+  .asklaunch .digby-face{width:24px;height:24px;margin:0;display:block}}
 """
 
 ASK_HTML = """<button class="asklaunch" id="asklaunch" aria-expanded="false"

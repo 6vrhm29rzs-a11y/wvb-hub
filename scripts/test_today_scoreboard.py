@@ -148,7 +148,17 @@ def main():
     # the first version of this check scanned the HTML and found only the
     # literal fallback string. Assert the DATA instead: the payload the page
     # renders from is static and carries the joined networks.
-    if private:
+    # ⚠ GATE ON THE DATA, NOT ON WHICH PAGE. `private` here meant "the private
+    # page exists" -- and CI BUILDS the private page, just without
+    # Cody/data/tv_listings_2026.txt, which is gitignored and can never be in
+    # a checkout. So this check demanded four joined networks from a build
+    # that legitimately has zero, and blocked the publish pipeline on the
+    # first real match day. The join can only be judged where its source is.
+    _tv_src = os.path.join(REPO, "Cody", "data", "tv_listings_2026.txt")
+    if private and not os.path.exists(_tv_src):
+        print("  --   no TV listings on this machine (private file absent); "
+              "join not judgeable here")
+    if private and os.path.exists(_tv_src):
         mfx = re.search(r"const FIXTURES = (\{.*?\});\n", h, re.S)
         FIXP = json.loads(mfx.group(1)) if mfx else {}
         nets = sorted({v["tv"] for v in FIXP.values() if v.get("tv")})
