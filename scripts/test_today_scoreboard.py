@@ -170,9 +170,24 @@ def main():
     check("the header repaints when the route changes",
           "csTape(); } catch (e) { }" in src)
     # ⚠ THE ARTEFACT THAT READ AS A BROKEN SCORE
+    # ⚠ ASSERT THE RULE, NOT THE EXPRESSION. This checked for the literal
+    # string "(quiet ? '' : csCells(sets, st === 'live'))" -- the fourth guard
+    # in this repo to pin the SHAPE of a fix rather than what it does. Adding a
+    # second, correct suppression (a final whose line score is not in yet)
+    # changed that expression and failed a build that satisfies the rule more
+    # completely than before.
+    # ⚠ ...and anchor on the CALL, not the first textual match. The first
+    # version split the file at "csCells(sets" and inspected what came before
+    # it -- which is the FUNCTION DEFINITION, several hundred lines above the
+    # call, and of course mentions no `quiet`. It failed correct code.
+    _call = re.search(r"\(quiet[^;]{0,120}?csCells\(sets,\s*st === 'live'\)",
+                      src, re.S)
     check("[-] an upcoming match renders NO set cells",
-          "(quiet ? '' : csCells(sets, st === 'live'))" in src,
+          "const quiet = st === 'upcoming';" in src and _call is not None,
           "empty dashed boxes read as a score that failed to load")
+    check("[-] ...and neither does a final whose line score is not in yet",
+          "st === 'final' && !sets.length" in src,
+          "five empty boxes beside a FINAL read as a failed load")
 
     # ── 3. THE SCOREBOARD ───────────────────────────────────────────────
     print("\n3. THE SCOREBOARD ANSWERS ONE QUESTION")

@@ -15025,15 +15025,35 @@ function csTape() {
         (quiet ? '<div class="cs-at">at</div>' : '') +
         csSide(mHome(m), m.hr, sc[1], hw, servingHome, quiet) +
       '</div>' +
-      /* ⚠ THE QUIET BAND KEEPS THE SET CELLS, EMPTY. Dropping them left the
-         right two-thirds of the tape as bare texture and the band stopped
-         reading as a scoreline at all. Five dashed cells with court dots in
-         them are not an invented score -- they are the SHAPE of a best-of-five
-         that has not happened, which is the true thing to show before first
-         serve. csCells([]) produces exactly that by the same code path a live
-         match uses, so there is one definition of an unplayed set (R4). */
-      /* ⚠ NOT BEFORE FIRST SERVE. Empty dashed cells read as a broken score. */
-      (quiet ? '' : csCells(sets, st === 'live')) +
+      /* ⚠ SET CELLS ARE DRAWN ONLY WHILE THERE IS A SCORELINE TO DRAW.
+         The history here is two reversals and the comments had been stacked
+         rather than reconciled, so the file argued with itself: an earlier
+         note said five dashed cells were "the true thing to show before first
+         serve", and the note directly beneath it said the opposite. The
+         SECOND one won in code and is right -- `quiet` is exactly
+         `st === 'upcoming'`, so a match that has not started draws none.
+         Both suppressions exist for the same reason: an empty dashed cell can
+         only ever mean "not yet", and beside a match that is not going to
+         play any more sets it reads as a scoreline that failed to load.
+           upcoming        -> no cells (nothing has happened)
+           live / final    -> cells, showing the shape of a best-of-five
+           final, no sets  -> no cells (the two-source seam: the live feed
+                              empties `sets` at the whistle and the crawl has
+                              not caught up; "we do not have it" renders as
+                              nothing, the same rule the scoreboard row uses)
+         csCells() stays the single definition of an unplayed set (R4). */
+      /* ⚠ AND NOT AFTER THE LAST ONE EITHER. The reasoning above holds for a
+         match that has not started -- five dashed cells are the shape of a
+         best-of-five still to come. On a match that is OVER they say the
+         opposite: Florida-Nebraska sat under the word FINAL at 0-2 with five
+         empty boxes beside it, which reads as a scoreline that failed to
+         load. It is the two-source seam -- the live feed empties `sets` the
+         instant a match goes final and the crawl has not caught up -- and the
+         honest rendering of "we do not have the line score" is nothing at
+         all, the same rule the scoreboard row follows. (This one was also
+         a best-of-THREE exhibition, so five cells were wrong twice over.) */
+      (quiet || (st === 'final' && !sets.length)
+        ? '' : csCells(sets, st === 'live')) +
       '<div class="cs-pad"></div>' +
       csCtx(m, kind, n) +
     '</div>';

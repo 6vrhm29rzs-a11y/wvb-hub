@@ -329,6 +329,29 @@ def main():
     check("[-] no dashed net in the tile", "stroke-dasharray" not in tex,
           "four decorative nets competed with the one real one")
 
+    print("\nEMPTY SET CELLS MEAN 'NOT YET', NEVER 'MISSING'")
+    # ⚠ THE SAME FIVE DASHED CELLS SAY TWO OPPOSITE THINGS. Before first serve
+    # they are the SHAPE of a best-of-five still to come, which is true and is
+    # why they are drawn -- that reasoning is in build_hub and stands. After
+    # the match they say the scoreline failed to load: Florida-Nebraska sat
+    # under the word FINAL at 0-2 with five empty boxes beside it. It is the
+    # two-source seam (the live feed empties `sets` the instant a match goes
+    # final, and the crawl has not caught up), and the honest rendering of "we
+    # do not have the line score" is nothing at all -- the same rule the
+    # scoreboard row follows. That match was also a best-of-THREE exhibition,
+    # so five cells were wrong twice over.
+    # (named _bh, not `src` -- this module already HAS a src() function and
+    #  shadowing it with a local raised UnboundLocalError at the top of main)
+    _bh = open(os.path.join(REPO, "scripts", "build_hub.py"),
+               encoding="utf-8").read()
+    check("a FINAL with no line score draws no set cells",
+          "st === 'final' && !sets.length" in _bh,
+          "empty cells beside a final read as a scoreline that failed to load")
+    check("[+] ...but a match still to come keeps them",
+          "quiet ? '' : csCells" in _bh or "quiet || (st === 'final'" in _bh)
+    check("[+] ...and there is still one definition of an unplayed set",
+          _bh.count("function csCells(") == 1)
+
     print()
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))
