@@ -209,7 +209,72 @@ def main():
         check("a set cell carries two numerals",
               re.search(r"<b class=\"' \+ \(!now && \+a", page) is not None)
 
-    print("\n5. The line scores reconcile with the result they sit beside")
+    print("\n5. The 60-second poller cannot be killed by a missing band")
+    # ⚠ THE ONE THAT WAS GOING TO BREAK ON THE FIRST FULL MATCH DAY. The
+    # Scoreboard rebuild removed the slate band's markup -- #todaymeta,
+    # #todaycards and the `.soon` label -- leaving #today as an empty hidden
+    # div. The live band below was guarded when that happened; the slate branch
+    # was not, because REACHING it needs a fixture in state 'pre', and every
+    # day this page had ever rendered held two finals and nothing scheduled.
+    # With 196 scheduled the branch runs, `querySelector('#today .soon')`
+    # returns null, and the throw happens INSIDE the poll callback -- so the
+    # just-finished band and the live band stop running too, every 60 seconds,
+    # all day. Nothing in the UI would say why.
+    poll = fn(src, "pollLive")
+    check("pollLive is found", bool(poll))
+    if poll:
+        # every element the poller touches must be checked before it is used
+        # (a) nothing is written through an inline lookup
+        raw = re.findall(
+            r"(?:document\.getElementById\([^)]*\)|document\.querySelector"
+            r"\([^)]*\)|\$\$\([^)]*\))\s*\.\s*(?:textContent|innerHTML|hidden)",
+            poll)
+        check("[-] no element is written to through an inline lookup",
+              not raw, str(raw[:2]))
+        # (b) ⚠ AND THE VARIABLE FORM, WHICH THE PATTERN ABOVE CANNOT SEE. A
+        # negative control proved it: reverting `if (jbox && jmeta && jcards)`
+        # to `if (jbox)` left `jmeta.textContent = ...` in place, which passes
+        # a search for chained lookups and still throws on null. So every
+        # variable that holds an element lookup and is later written through
+        # must appear in a truthiness test somewhere in the function.
+        # (findall with one group yields strings -- a set, not a dict; dict()
+        #  would try to unpack 'tbox' into a key/value pair)
+        held = set(re.findall(
+            r"(?:const|let)\s+(\w+)\s*=\s*(?:\$\$\(|document\.getElementById\(|"
+            r"document\.querySelector\()", poll))
+        held |= set(re.findall(
+            r",\s*(\w+)\s*=\s*(?:\$\$\(|document\.getElementById\(|"
+            r"document\.querySelector\()", poll))
+        unchecked = []
+        for name in held:
+            written = re.search(r"\b%s\s*\.\s*(?:textContent|innerHTML|hidden)\s*="
+                                % re.escape(name), poll)
+            if not written:
+                continue
+            # a name can be guarded as the FIRST, MIDDLE or LAST term of an
+            # && chain, or negated, or tested alone -- the first version of
+            # this pattern missed the last-term case and flagged correct code
+            guarded = re.search(
+                r"(?:!\s*%s\b|\b%s\s*&&|&&\s*%s\b|\bif\s*\(\s*%s\s*\))"
+                % ((re.escape(name),) * 4), poll)
+            if not guarded:
+                unchecked.append(name)
+        check("[-] ...nor through a variable that was never null-checked",
+              not unchecked, str(unchecked))
+        check("[+] ...over a poller that really does hold element refs",
+              len(held) >= 4, "%d found" % len(held))
+        # and the specific guard that replaced the crash
+        check("the slate band no-ops when its markup is absent",
+              "if (!tbox || !tmeta || !tcards || !tlabel)" in poll)
+        check("the live band keeps its own guard", "if (!box) return;" in poll)
+        check("...and its cards element too", "if (!lc) return;" in poll)
+        # a cap must state what it is hiding
+        check("the slate cap says how many are not shown",
+              "showing the first" in poll and "more" in poll)
+        check("the live cap says how many are not shown",
+              "more live" in poll and "showing " in poll)
+
+    print("\n6. The line scores reconcile with the result they sit beside")
     # ⚠ THE STRIP AND THE SCORE ARE TWO RENDERINGS OF ONE FACT, so they can
     # disagree -- and a row showing 3-0 above line scores that only add to 2-1
     # is worse than showing neither. Counting sets won from the per-set points

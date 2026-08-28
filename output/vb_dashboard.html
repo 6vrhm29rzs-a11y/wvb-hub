@@ -1735,6 +1735,10 @@ td.at{white-space:nowrap}
 @media (max-width:560px){
   .tdlist.bytime .mrow{grid-template-columns:minmax(0,1fr) auto}
 }
+a.card.morecard{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;text-decoration:none;border-style:dashed}
+a.card.morecard b{font:700 17px/1 var(--disp);color:var(--ink2)}
+a.card.morecard span{font:11px/1 var(--sans);color:var(--slate)}
+a.card.morecard:hover b{color:var(--chalk)}
 h4.sbtime{display:flex;align-items:baseline;gap:8px;margin:16px 0 0;padding:0 2px 6px;border-bottom:1px solid var(--line);font:700 11px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;color:var(--slate)}
 h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
 .mrow .mctx{display:flex;flex-direction:column;gap:2px;min-width:0;overflow:hidden}
@@ -3284,7 +3288,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     </div>
     <div class="meta">
       <b>9</b> matches played &middot; <b>348</b> teams rated<br>
-      last result <b>Mon Aug 24</b> &middot; built 2026-08-27 8:10 PM PT
+      last result <b>Mon Aug 24</b> &middot; built 2026-08-27 8:24 PM PT
     </div>
   </div>
   <!-- COURTSIGNAL-STATUS-BEGIN -->
@@ -4385,33 +4389,74 @@ async function pollLive() {
      today". Today's matches are today's; if there are none, the next date that
      HAS fixtures is shown and the heading says which day it is rather than
      claiming it is this one. */
+  /* ⚠ THE SAME STRING-TIME SORT THAT BROKE THE SCOREBOARD LIVES HERE TOO.
+     Concatenating date+time and comparing lexically is right about the date
+     and wrong about the clock: "6:00 AM PT" sorts after "5:30 PM PT" because
+     '6' > '5'. Compare the date as a string (ISO, so that is correct) and the
+     time as MINUTES. Fixing one call site and not the other is how two views
+     end up disagreeing about the same slate. */
   const pre = all.filter(g => g.state === 'pre' && g.date >= todayISO)
-                 .sort((a, b) => (a.date + (a.time || '')).localeCompare(b.date + (b.time || '')));
+                 .sort((a, b) => String(a.date).localeCompare(String(b.date)) ||
+                   ((ma, mb) => (ma === null && mb === null) ? 0
+                     : ma === null ? 1 : mb === null ? -1 : ma - mb
+                   )(tMinutes(a.time), tMinutes(b.time)));
   const todays = pre.filter(g => g.date === todayISO);
   const soon = todays.length ? todays
                             : pre.filter(g => pre.length && g.date === pre[0].date);
+  /* ⚠ THIS BRANCH HAD NEVER RUN, AND IT WOULD HAVE THROWN TOMORROW. The
+     Scoreboard rebuild removed the slate band's markup -- #todaymeta,
+     #todaycards and the `.soon` label are all gone, and #today survives as an
+     empty hidden div. The live band below was guarded when that happened; this
+     one was not, because reaching it needs a match in state 'pre' and every
+     day the page had rendered held two finals. On the first Friday, with 196
+     scheduled, `querySelector('#today .soon').textContent` throws -- and the
+     throw is inside the poll callback, so the just-finished band and the live
+     band never run either, every 60 seconds, all day.
+     Guarded the same way as the live band: if the markup is not here, this
+     poller has nothing to say and says nothing. */
   const tbox = document.getElementById('today');
-  if (!soon.length) { tbox.hidden = true; }
+  const tmeta = $$('todaymeta'), tcards = $$('todaycards');
+  const tlabel = tbox && tbox.querySelector('.soon');
+  if (!tbox || !tmeta || !tcards || !tlabel) { /* band removed -- nothing to do */ }
+  else if (!soon.length) { tbox.hidden = true; }
   else {
     tbox.hidden = false;
-    document.querySelector('#today .soon').textContent =
-      todays.length ? 'Later today' : 'Next up';
-    $$('todaymeta').textContent =
-      soon.length + ' scheduled' + (todays.length ? '' : ' \u00b7 ' + dayLabel(soon[0].date));
-    $$('todaycards').innerHTML = soon.map(g =>
+    tlabel.textContent = todays.length ? 'Later today' : 'Next up';
+    /* ⚠ CAP IT, AND NEVER SILENTLY. On the first Friday this band would have
+       rendered 196 cards above the curated rundown -- a wall in the one place
+       the page is supposed to be answering "what should I watch". The count
+       beside the heading is the TRUE total, and what is not shown is stated
+       with a link to the view that holds it. A cap nobody is told about reads
+       as "this is all there is". */
+    const SLATE_CAP = 12;
+    const shownSoon = soon.slice(0, SLATE_CAP);
+    tmeta.textContent =
+      soon.length + ' scheduled' + (todays.length ? '' : ' \u00b7 ' + dayLabel(soon[0].date)) +
+      (soon.length > SLATE_CAP
+        ? ' \u00b7 showing the first ' + SLATE_CAP : '');
+    tcards.innerHTML = shownSoon.map(g =>
       '<div class="card soon"><div class="cd">' + dayLabel(g.date) + '</div>' +
       '<div class="mt"><div class="side">' + rank(g.away_rank) + logo(g.away) + g.away + '</div>' +
       '<div class="side">' + rank(g.home_rank) + logo(g.home) + g.home + '</div></div>' +
       '<div class="venue"><span class="tipoff">' + (g.time || 'time TBA') + '</span></div>' +
-      '</div>').join('');
+      '</div>').join('') +
+      (soon.length > SLATE_CAP
+        ? '<a class="card morecard" href="' + routeFor('scores') + '">' +
+          '<b>+' + (soon.length - SLATE_CAP) + ' more</b>' +
+          '<span>on the scoreboard</span></a>' : '');
   }
 
   /* JUST FINISHED, not yet crawled. Rendered from the feed so a match is never
      invisible: it leaves the live band the moment the scoreboard says FINAL,
      but the results list below is built from the last crawl and will not carry
      it until the next one runs. Without this it falls between the two. */
+  /* ⚠ CHECKING THE PARENT IS NOT CHECKING THE CHILDREN. `jbox` was tested and
+     then #justinmeta and #justincards were written to unchecked -- the same
+     shape as the slate-band crash above, one level down. They exist today;
+     the slate band's did too, until a rebuild removed them. */
   const jbox = document.getElementById('justin');
-  if (jbox) {
+  const jmeta = $$('justinmeta'), jcards = $$('justincards');
+  if (jbox && jmeta && jcards) {
     const known = new Set([...document.querySelectorAll('#resultcards [data-gid]')]
       .map(el => el.dataset.gid));
     const fresh = justEnded.filter(g => !known.has(String(g.id)));
@@ -4424,10 +4469,10 @@ async function pollLive() {
          on it are recomputed by the next verified refresh rather than the
          instant the scoreboard flips. Naming that is the difference between a
          site that looks stale and one that is honest about its own pipeline. */
-      document.getElementById('justinmeta').textContent =
+      jmeta.textContent =
         fresh.length + (fresh.length === 1 ? ' result' : ' results') +
         ' \u2014 final, awaiting the next rating refresh';
-      document.getElementById('justincards').innerHTML = fresh.map(g => {
+      jcards.innerHTML = fresh.map(g => {
         const aw = +g.away_sets > +g.home_sets;
         return '<div class="card done"><div class="cd">' + dayLabel(g.date || '') +
           ' \u00b7 final</div><div class="mt">' +
@@ -4456,7 +4501,12 @@ async function pollLive() {
     (d.error ? d.error + ' \u00b7 ' : '') + 'updated ' + (d.updated || '');
   const lc = $$('livecards');
   if (!lc) return;
-  lc.innerHTML = live.map(g => {
+  /* 29 matches share a 4:00 PM slot on the first Friday, so "everything that
+     is live" is a plausible 29-card wall. Same rule as the slate: cap, and say
+     what is not shown. */
+  const LIVE_CAP = 12;
+  const liveShown = live.slice(0, LIVE_CAP);
+  lc.innerHTML = liveShown.map(g => {
     /* AT 0-0 NOBODY IS WINNING. `away > home` is false when the sets are level,
        so the "not away" branch bolded the HOME team from the first whistle --
        Kentucky-Pittsburgh showed Pittsburgh as the leader at 0-0. Three states,
@@ -4471,7 +4521,13 @@ async function pollLive() {
         rank(g.home_rank) + logo(g.home) + g.home + '<b>' + g.home_sets + '</b></div></div>' +
       setStrip(g.sets, true) +
       '<div class="venue">' + venue + '</div></div>';
-  }).join('');
+  }).join('') +
+    (live.length > LIVE_CAP
+      ? '<a class="card morecard" href="' + routeFor('scores') + '">' +
+        '<b>+' + (live.length - LIVE_CAP) + ' more live</b>' +
+        '<span>on the scoreboard</span></a>' : '');
+  if (lm) lm.textContent += (live.length > LIVE_CAP
+    ? ' \u00b7 showing ' + LIVE_CAP + ' of ' + live.length : '');
 }
 pollLive();
 setInterval(pollLive, 60000);
