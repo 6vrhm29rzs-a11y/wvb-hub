@@ -105,20 +105,50 @@ SOURCES = ("blend", "digby", "live", "preseason")
 def current_ranking():
     """Whatever the page is showing right now.
 
-    PRECEDENCE, and why it changed: Digby's Top 25 comes first because it is the
-    ranking that actually MOVES. The board's order is a preseason projection
-    until 50 matches are played, so archiving it weekly in August stores the
-    same numbers over and over -- a history of nothing. The Top 25 blends the
-    projection with results from the first match onward, which is what a weekly
-    poll archive is for.
+    PRECEDENCE -- live, then blend, then preseason -- and it MUST match
+    build_rankings_board.py's, because this archive is meant to record the
+    ruler the page was showing.
+
+    ⚠ THIS DOCSTRING USED TO SAY "Digby's Top 25 comes first" and the code did
+    exactly that. The reasoning was sound against the only alternative it knew:
+    the board's order was a preseason projection until 50 matches, so archiving
+    it weekly in August stored the same numbers over and over -- a history of
+    nothing -- while the Top 25 blends the projection with results from the
+    first match onward. What it did not anticipate is the board gaining a THIRD
+    source and reordering to live-first. Blend still beats preseason for that
+    original reason; it does NOT beat a fitted rating.
 
     The `source` field keeps the three apart, and the movement rule already
     refuses to compare across bases -- subtracting a rank on one ruler from a
     rank on another is arithmetic on two different things, which is the bug
     `test_rankings_history.py` exists to prevent.
     """
-    t25 = load("data/digby_top25_%d.json" % SEASON) or {}
+    # ⚠ LIVE FIRST, AND THIS WAS INVERTED. The note below is the reasoning for
+    # putting the blend AHEAD OF THE PRESEASON PROJECTION, and it still holds.
+    # What it did not anticipate is that build_rankings_board.py later gained a
+    # THIRD source and its precedence became live -> blend -> preseason. This
+    # function kept blend first, so with a fitted rating on disk the BOARD said
+    # "rank source: live" while the snapshot recorded the week as "blend" --
+    # and stored the blend's ranks, not the ones on the page.
+    # That matters on a date: the season is at 9 matches, 2026-08-28 schedules
+    # 196 and the 29th another 179, so rating_2026.json appears this weekend
+    # and Monday is the first live freeze. The archive is APPEND-ONLY; a week
+    # written under the wrong ruler, with the wrong numbers, cannot be
+    # corrected later. Measured with a synthetic rating file before it could
+    # happen: board said `live`, snapshot said `blend`.
     rows = []
+    live = load("data/rating_%d.json" % SEASON) or {}
+    for r in (live.get("teams") or []):
+        if r.get("composite_rank"):
+            rows.append({"team": r["team"], "rank": r["composite_rank"],
+                         "source": "live", "gp": r.get("games_played"),
+                         "record": ("%s-%s" % (r.get("wins"), r.get("losses"))
+                                    if r.get("wins") is not None else None)})
+    if rows:
+        rows.sort(key=lambda x: x["rank"])
+        return rows, "live"
+
+    t25 = load("data/digby_top25_%d.json" % SEASON) or {}
     # ALL 348, not the 35 that are displayed. The first blended week archived
     # only the Top 25 plus also-receiving, so movement could never be computed
     # for team 36 onward -- a ranking board of 348 rows with 313 permanently
@@ -135,17 +165,9 @@ def current_ranking():
         rows.sort(key=lambda x: x["rank"])
         return rows, "blend"
 
-    live = load("data/rating_%d.json" % SEASON) or {}
-    for r in (live.get("teams") or []):
-        if r.get("composite_rank"):
-            rows.append({"team": r["team"], "rank": r["composite_rank"],
-                         "source": "live", "gp": r.get("games_played"),
-                         "record": ("%s-%s" % (r.get("wins"), r.get("losses"))
-                                    if r.get("wins") is not None else None)})
-    if rows:
-        rows.sort(key=lambda x: x["rank"])
-        return rows, "live"
-
+    # (the live branch is at the TOP of this function now -- a second copy
+    #  here would be unreachable, and dead code that looks live is exactly the
+    #  liability the `a.ep` sort key turned out to be)
     proj = load("data/projection_%d.json" % SEASON) or {}
     for r in (proj.get("teams") or []):
         if r.get("talent_rank"):

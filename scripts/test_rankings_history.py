@@ -184,6 +184,64 @@ def test_movement_never_crosses_the_basis():
     check(got is None, "this week is never its own comparison")
 
 
+def check_snapshot_and_board_agree_on_the_basis():
+    """The archive must record the ruler the PAGE was showing.
+
+    ⚠ THEY DISAGREED, AND THE ARCHIVE IS APPEND-ONLY. current_ranking() put the
+    blend first -- correct when the only alternative was a static preseason
+    projection, which is what its docstring reasons about. It never learned
+    that build_rankings_board.py had since gained a third source and reordered
+    to live -> blend -> preseason. So with a fitted rating on disk the board
+    said "rank source: live" while the snapshot recorded the week as "blend"
+    AND stored the blend's ranks, not the ones on the page.
+
+    That lands on a date. At 9 played matches with 196 scheduled for
+    2026-08-28 and 179 for the 29th, rating_2026.json appears this weekend and
+    the following Monday is the first live freeze. A week written under the
+    wrong ruler cannot be corrected afterwards.
+
+    Checked by BEHAVIOUR, not by reading the order of the branches: the loader
+    is replaced so each of the three states can be presented in turn.
+    """
+    import snapshot_rankings as SR
+    real = SR.load
+    states = [
+        ("a fitted rating exists", {"rating": True, "blend": True, "proj": True},
+         "live"),
+        ("no rating yet, blend exists", {"rating": False, "blend": True,
+                                         "proj": True}, "blend"),
+        ("neither -- projection only", {"rating": False, "blend": False,
+                                        "proj": True}, "preseason"),
+    ]
+
+    def fake(have):
+        def _load(path):
+            if "rating_" in path:
+                return ({"teams": [{"team": "A", "composite_rank": 1,
+                                    "games_played": 4}]} if have["rating"]
+                        else None)
+            if "digby_top25_" in path:
+                return ({"all": [{"team": "A", "rank": 1, "matches": 2}],
+                         "top": [], "also_receiving": []} if have["blend"]
+                        else None)
+            if "projection_" in path:
+                return ({"teams": [{"team": "A", "talent_rank": 1}]}
+                        if have["proj"] else None)
+            return real(path)
+        return _load
+
+    try:
+        for label, have, want in states:
+            SR.load = fake(have)
+            cur = SR.current_ranking()
+            got = cur[1] if isinstance(cur, tuple) and len(cur) > 1 else None
+            check(got == want,
+                  "%s -> archive records %r" % (label, want),
+                  "got %r; the board would show %r" % (got, want))
+    finally:
+        SR.load = real
+
+
 def check_basis_aliases():
     """ONE RULER MUST NOT HAVE TWO NAMES.
 
@@ -249,6 +307,7 @@ def check_basis_aliases():
 
 def main():
     for fn in (test_mover_direction, test_movement_never_crosses_the_basis,
+               check_snapshot_and_board_agree_on_the_basis,
                check_basis_aliases,
                test_snapshot_is_weekly_and_append_only,
                test_real_archive_shape):

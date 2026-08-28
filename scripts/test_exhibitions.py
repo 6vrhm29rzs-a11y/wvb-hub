@@ -192,16 +192,60 @@ def main():
               "%d" % len(gids))
         # the scoreboard/desk row helper
         check("the row helper tags an exhibition", "function exhTag(m)" in h)
-        # the server-rendered schedule table
-        check("the schedule table tags one too",
-              'class="kind exh"' in h,
+        # ⚠ THE SCHEDULE SHOWS TODAY FORWARD, SO THIS CANNOT ASSERT A BADGE
+        # UNCONDITIONALLY. The first version required `class="kind exh"` to be
+        # present, which was true while the Spikes Under the Lights fixtures
+        # were upcoming and became FALSE the morning after they were played --
+        # a guard that fails on a date rather than on a regression. Check the
+        # mechanism always, and the rendered badge only when an exhibition is
+        # actually inside the range the table draws.
+        src_ = open(_o.path.join(REPO, "scripts", "build_hub.py"),
+                    encoding="utf-8").read()
+        check("the schedule renderer has an exhibition branch",
+              'class="kind exh"' in src_ and "_sched_exh" in src_,
               "a fixture that does not count must not read as 'non-conf' alone")
+        # is any exhibition still in the displayed range (today forward)?
+        import datetime as _dt
+        import re as _re2
+        _today = _dt.date.today().isoformat()
+        _m = _re2.search(r"const FIXTURES = (\{)", h)
+        _upcoming = 0
+        if _m:
+            _i = _m.start(1)
+            _d, _j, _in, _es = 0, _i, False, False
+            while _j < len(h):
+                _c = h[_j]
+                if _in:
+                    if _es:
+                        _es = False
+                    elif _c == "\\":
+                        _es = True
+                    elif _c == '"':
+                        _in = False
+                elif _c == '"':
+                    _in = True
+                elif _c in "[{":
+                    _d += 1
+                elif _c in "]}":
+                    _d -= 1
+                    if _d == 0:
+                        break
+                _j += 1
+            _fx = json.loads(h[_i:_j + 1])
+            _upcoming = sum(1 for f in _fx.values()
+                            if str(f.get("gid")) in led and (f.get("d") or "") >= _today)
+        if _upcoming:
+            check("...and the table actually renders it",
+                  'class="kind exh"' in h, "%d upcoming exhibition(s)" % _upcoming)
+        else:
+            print("  --   no exhibition in the displayed range today; "
+                  "mechanism checked, badge not applicable")
         check("...and says what it means, not just that it is one",
               "does not count toward either record" in h)
         # and the badge is not invented per-view: one ledger, both readers
+        # the page must not carry a second, inlined copy of the ledger
         check("[-] neither view keeps its own list of exhibitions",
-              h.count("Spikes Under the Lights") >= 1
-              and "_sched_exh" not in h,
+              "_sched_exh" not in h,
               "the ledger must not be inlined into the page twice")
 
     print("\n%s" % ("ALL EXHIBITION GUARDS PASS" if not FAILS
