@@ -282,6 +282,13 @@ Repo initialized 2026-08-09 on `main`, commit `499a537` (20 files). Identity set
 
 ## Next steps
 
+**⚑ 2026-08-27 — READ `docs/session_close_2026-08-27.md` FIRST.** It supersedes the
+2026-08-25 close on the product and carries today's 13 commits: the poller crash that
+would have fired all day on the first match day, the string-sorted clock times in four
+places, the guard that was holding one of them in place, 14 of 46 guards never running
+in CI, and both workflows being unbounded in time. The 2026-08-25 note below is still
+the right record of the routing, the Match Desk and the class/id collisions.
+
 **⚑ 2026-08-25 — WHERE THIS ACTUALLY IS.** Read
 `docs/session_close_2026-08-25.md` first; it carries the full handoff, the six
 class/id collisions this file keeps producing, the `const TEAMS` dead-zone
