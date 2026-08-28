@@ -8787,19 +8787,35 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
        it is misdescribing where its own numbers come from.
        ⚠ AND IT USED TO IMPLY THE WHOLE SCHEDULE WAS ON SCREEN. The table
        renders the first {{N_SHOWN}} rows; the count now names both numbers. -->
+  <!-- ⚠ THREE FACTS, THEN THE TABLE. This lead had grown to a ten-line
+       essay standing between a reader and the fixtures -- the identical
+       problem already fixed on the Rankings tab, where the note reads "the
+       methodology was collapsed and the intro absorbed it, which is the
+       opposite of progressive disclosure". None of the detail was wrong or
+       is dropped: it moved into the disclosure below, which is where a
+       reader who wants to know what `v` means will go looking. -->
   <p class="lead"><b>2026 schedule.</b> Showing <b>{{N_SHOWN}}</b> of
   <b>{{N_SCHED}}</b> fixtures from today forward &mdash; search below to reach
-  any of the rest. The base source is <b>ncaa.com</b>; where its record is
-  stale or disagrees with itself, a small ledger of
-  <b>official-school corrections</b> governs the specific facts that were
-  verified against a school&rsquo;s own published schedule, and those rows are
-  marked <b>school-confirmed</b> with a link to the source.
-  Each row says <b>where</b> it is played and whether it is a conference match,
-  a non-conference match, or both a match type and a named event.
-  <b>at</b> is printed only for a confirmed home floor and <b>vs</b> only for a
-  confirmed neutral one; anything unconfirmed reads a plain <b>v</b> and asserts
-  nothing. A fixture whose sources disagree about a material fact says
-  <b>schedule conflict &mdash; verify</b> rather than picking one of them.</p>
+  any of the rest. Each row says <b>where</b> it is played, and a fixture whose
+  sources disagree says <b>schedule conflict &mdash; verify</b> rather than
+  picking one of them.</p>
+  <details class="method">
+    <summary><b>How to read a row</b> &mdash; sources, and what
+      <b>at</b> / <b>vs</b> / <b>v</b> each assert</summary>
+    <div class="note">
+      <p>The base source is <b>ncaa.com</b>. Where its record is stale or
+      disagrees with itself, a small ledger of <b>official-school
+      corrections</b> governs the specific facts that were verified against a
+      school&rsquo;s own published schedule, and those rows are marked
+      <b>school-confirmed</b> with a link to the source.</p>
+      <p><b>at</b> is printed only for a confirmed home floor and <b>vs</b>
+      only for a confirmed neutral one; anything unconfirmed reads a plain
+      <b>v</b> and asserts nothing. A row carries whether it is a conference
+      match, a non-conference match, or both a match type and a named event
+      &mdash; and an <b>exhibition</b> where the fixture does not count toward
+      either record.</p>
+    </div>
+  </details>
   <div class="ctl">
     <input type="search" id="sq" placeholder="Search a team&hellip;">
     <select id="srank">
