@@ -739,7 +739,49 @@ class Handler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(body)
             return
-        return SimpleHTTPRequestHandler.do_GET(self)
+        return self._serve_static()
+
+    # ⚠ THE PHONE WAS DOWNLOADING 10.5 MB WHEN 1.6 MB WOULD DO. GitHub Pages
+    # gzips this page to 1.5 MB; SimpleHTTPRequestHandler does not compress at
+    # all, and the local server is the one Cody's phone actually reads over
+    # Tailscale -- so every visit pulled the whole uncompressed page over
+    # cellular. 84% of that was avoidable and nothing about the content changes.
+    #
+    # ⚠ TEXT ONLY, AND ONLY WHEN ASKED. Images and fonts are already compressed
+    # and re-compressing them wastes CPU for nothing; a client that does not
+    # advertise gzip still gets the plain bytes.
+    _GZIP_TYPES = ("text/html", "text/css", "application/javascript",
+                   "text/javascript", "application/json", "image/svg+xml",
+                   "text/plain")
+
+    def _serve_static(self):
+        import gzip as _gzip
+        import posixpath
+        import mimetypes
+        path = self.translate_path(self.path)
+        if os.path.isdir(path):
+            return SimpleHTTPRequestHandler.do_GET(self)
+        accepts = "gzip" in (self.headers.get("Accept-Encoding") or "").lower()
+        ctype = mimetypes.guess_type(path)[0] or ""
+        if not accepts or not ctype.startswith(self._GZIP_TYPES):
+            return SimpleHTTPRequestHandler.do_GET(self)
+        try:
+            with open(path, "rb") as fh:
+                raw = fh.read()
+        except OSError:
+            # ⚠ FALL BACK, NEVER 500. A missing file is the base handler's job
+            # to report, and it words it better than this would.
+            return SimpleHTTPRequestHandler.do_GET(self)
+        body = _gzip.compress(raw, 6)
+        self.send_response(200)
+        self.send_header("Content-Type", ctype)
+        self.send_header("Content-Encoding", "gzip")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Vary", "Accept-Encoding")
+        self.end_headers()
+        if self.command != "HEAD":
+            self.wfile.write(body)
+        return None
 
     def log_message(self, fmt, *args):
         pass                                          # keep the console quiet

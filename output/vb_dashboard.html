@@ -588,8 +588,15 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .wnet{margin-left:auto;font:700 11px/1 var(--disp);letter-spacing:.11em;
   text-transform:uppercase;color:var(--ink-on-accent);background:var(--cs-gold);
   padding:5px 8px;border-radius:2px;white-space:nowrap}
-.wnet.none{background:transparent;color:var(--ink3);
-  border:1px dashed var(--cs-edge2);font-weight:500}
+/* ⚠ AN UNKNOWN BROADCAST IS NOT A DATA POINT AND MUST NOT LOOK LIKE ONE. This
+   carried a dashed border in the exact slot where FOX, BTN and ESPN2 appear,
+   so "TV NOT LISTED" read as a featured fact -- in the one place Cody is
+   scanning for a channel. It stays on the card, because silence would imply
+   "not televised" when what we mean is "we do not know", but it is now plain
+   muted type rather than a badge competing with the real ones. */
+.wnet.none{background:transparent;color:var(--ink3);border:0;padding:5px 0;
+  font:400 10.5px/1 var(--sans);letter-spacing:.02em;text-transform:none;
+  opacity:.65}
 .wteams{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
   font:700 20px/1.12 var(--disp);text-transform:uppercase;color:var(--cs-white)}
 .wteams i{font-style:normal;font:500 11px/1 var(--mono);color:var(--ink3);
@@ -715,9 +722,10 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
   border-radius:8px;padding:9px 12px;margin-bottom:12px;font-size:12.5px}
 .exhban b{font:700 11px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase;
   color:var(--gold,#c9a227)}
-.exhtag{font:700 9px/1 var(--disp);letter-spacing:.07em;padding:2px 5px;
+.exhtag{display:inline-block;flex:0 0 auto;align-self:center;width:auto;
+  font:700 9px/1.5 var(--disp);letter-spacing:.07em;padding:2px 6px;
   border-radius:3px;border:1px solid var(--gold,#c9a227);
-  color:var(--gold,#c9a227);margin-left:5px;vertical-align:middle}
+  color:var(--gold,#c9a227);vertical-align:middle}
 .prkctl{flex-wrap:wrap;gap:10px}
 .segbar{display:inline-flex;border:1px solid var(--cs-edge2);border-radius:8px;
   overflow:hidden}
@@ -3175,7 +3183,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     </div>
     <div class="meta">
       <b>9</b> matches played &middot; <b>348</b> teams rated<br>
-      last result <b>Mon Aug 24</b> &middot; built 2026-08-27 6:17 PM PT
+      last result <b>Mon Aug 24</b> &middot; built 2026-08-27 6:51 PM PT
     </div>
   </div>
   <!-- COURTSIGNAL-STATUS-BEGIN -->
@@ -5832,12 +5840,18 @@ function matchRow(m, live, dest) {
     '<span class="mwhen">' + esc(st === 'live'
         ? ((live && live.period) || 'live')
         : (m.t || m.dl || '')) + '</span>' +
+    /* ⚠ THE TAG GOES WITH THE OTHER TAGS. Dropped into .mteams it became a
+       flex item in a COLUMN flex, so it stretched to the full row width -- a
+       1,061px empty gold box under every exhibition. It reads as a badge only
+       when it sits beside the other badges. */
     '<span class="mteams">' + t(mAway(m), m.ar, aw) + t(mHome(m), m.hr, hw) +
-      exhTag(m) + '</span>' +
+      '</span>' +
     '<span class="mmeta">' +
       (done ? '<span class="msc">' + sc[0] + '&ndash;' + sc[1] + '</span>' : '') +
-      (tags.length ? '<span class="mtags">' + tags.map(x =>
-        '<span class="mtg ' + x[0] + '">' + x[1] + '</span>').join('') + '</span>' : '') +
+      ((tags.length || m.exh)
+        ? '<span class="mtags">' + exhTag(m) + tags.map(x =>
+          '<span class="mtg ' + x[0] + '">' + x[1] + '</span>').join('') +
+          '</span>' : '') +
     '</span></button>';
 }
 
@@ -6073,7 +6087,13 @@ function renderScoreboard() {
     (rows.length !== all.length ? ' of ' + all.length : '');
 
   /* ── TOP GAMES, FOR THIS DATE ONLY ───────────────────────────────── */
-  const top = topGames(rows, liveOf, 4);
+  /* ⚠ "TOP GAMES" MEANS A SELECTION. On a two-match evening every match was
+     also a top game, so the band repeated the entire day directly above the
+     list -- the same two fixtures twice, which reads as a broken page rather
+     than as emphasis. It earns its place only when it is picking SOME of the
+     card, so it hides when it would name all of it. */
+  const topAll = topGames(rows, liveOf, 4);
+  const top = topAll.length < rows.length ? topAll : [];
   const topBox = document.getElementById('sbTop');
   if (topBox) {
     topBox.innerHTML = top.length
@@ -7059,7 +7079,20 @@ function renderDesk() {
     if (m.tv) w += 25;
     if (rs.some(r => r[0] === 'mb')) w += 20;
     if (rs.some(r => r[0] === 'dg')) w += 10;
-    if (liveOf(m)) w += 100;
+    /* ⚠ A FINISHED MATCH IS NOT A NEXT WATCH, AND THIS OFFERED ONE. Two
+       separate faults, both here:
+         * `if (liveOf(m))` is the truthiness mistake again -- a feed row
+           exists for every match on today's card, finished ones included, so
+           a completed match collected +100 and floated to the TOP of the list.
+         * nothing ever removed it, because `done` below only looked at days
+           BEFORE today.
+       The result was Florida-Nebraska sitting in "Your next watches" as
+       "TODAY 5:00 PM PT" while the masthead rail, the Scoreboard and the match
+       detail all correctly said FINAL 0-2. One match, two answers, on one
+       screen. */
+    const st = matchState(m, liveOf(m));
+    if (st === 'final') return null;
+    if (st === 'live') w += 100;
     return w ? [m, rs, w] : null;
   };
   const ranked = soon7.map(watchable).filter(Boolean)
@@ -7070,8 +7103,11 @@ function renderDesk() {
   const watchIds = watches.map(x => x[0].gid);
   const weekend = ranked.filter(x => watchIds.indexOf(x[0].gid) < 0).slice(0, 10);
 
+  /* ⚠ INCLUDING TODAY. This read `m.d < today`, so a match that finished a few
+     hours ago belonged to no section at all -- not a watch, not a result. It
+     simply stayed where it was. A final is a final on the day it happens. */
   const done = every
-    .filter(m => m.d && m.d < today && matchState(m, liveOf(m)) === 'final')
+    .filter(m => m.d && m.d <= today && matchState(m, liveOf(m)) === 'final')
     .sort((a, b) => a.d < b.d ? 1 : -1);
   /* ⚠ "CHANGED THE PICTURE" IS A STATED TEST, NOT AN EDITORIAL FEEL:
      a ranked side lost, or a ranked side was taken to five. */
@@ -7107,7 +7143,10 @@ function renderDesk() {
            feed carries no broadcast at all. An unmatched fixture says so
            rather than implying it is not televised. */
         (m.tv ? '<span class="wnet">' + esc(m.tv) + '</span>'
-              : '<span class="wnet none">TV not listed</span>') +
+              : '<span class="wnet none" title="No broadcast is listed in the '
+                + 'TV file for this fixture. The feed carries no broadcast '
+                + 'information at all, so this means unknown, not untelevised."'
+                + '>no listing</span>') +
       '</span>' +
       '<span class="wteams">' +
         rankHTML('avca', m.ar, true) + esc(mAway(m)) +
@@ -7256,6 +7295,13 @@ async function deskLive() {
   }
   renderDesk();
   /* COURTSIGNAL-CALL-BEGIN */ csTape(); csStatus(); /* COURTSIGNAL-CALL-END */
+  /* ⚠ THE SCOREBOARD WAS THE ONE VIEW THE POLL NEVER TOLD. renderDesk(), the
+     rally tape and the open match detail were all refreshed when live data
+     landed; the Scores list was not. So Florida-Nebraska finished 2-0, the
+     masthead rail said FINAL, and the lane underneath still read SCHEDULED
+     with no score and would have until the reader touched a filter.
+     Cody saw exactly that and called the page a mess. It was. */
+  if (typeof renderScoreboard === 'function') renderScoreboard();
   /* ⚠ THE DETAIL MUST RE-EVALUATE WHEN LIVE DATA LANDS. deskLive() is async and
      resolves AFTER the router has already painted, so a match that is live on
      the feed rendered as "upcoming" -- no Live stats section, no timer -- and

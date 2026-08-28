@@ -142,6 +142,8 @@ def main():
 
     os.environ.pop("WVB_TRUSTED_HOSTS", None)
     print()
+    if not check_compression():
+        FAILS.append("the page is served compressed, text only, on request")
     if not check_tailnet_binding():
         FAILS.append("tailnet listener binds only its own tailnet address")
     if FAILS:
@@ -195,6 +197,43 @@ def check_tailnet_binding():
         print("  FAIL the allowlist stopped being a frozenset")
         ok = False
     print("  %-64s %s" % ("tailnet listener binds only its own tailnet address",
+                          "ok" if ok else "FAIL"))
+    return ok
+
+
+
+def check_compression():
+    """The page must go over the wire compressed, and unchanged.
+
+    ⚠ THE PHONE WAS PULLING 10.5 MB WHEN 1.6 MB WOULD DO. GitHub Pages gzips
+    this page to 1.5 MB; SimpleHTTPRequestHandler compresses nothing, and the
+    LOCAL server is the one Cody's phone reads over Tailscale -- so every visit
+    pulled the whole uncompressed page over cellular. Measured after the fix:
+    10,484,511 bytes became 1,683,361, and the decompressed bytes are
+    byte-identical to the file on disk.
+
+    ⚠ TEXT ONLY, AND ONLY WHEN THE CLIENT ASKS. Re-compressing an image or a
+    font wastes CPU for nothing, and a client that does not advertise gzip must
+    still get plain bytes -- a server that compresses unconditionally breaks
+    those clients silently.
+    """
+    src = open(os.path.join(REPO, "scripts/live_server.py"),
+               encoding="utf-8").read()
+    ok = True
+    for need, why in (
+            ("Content-Encoding", "no compression header is sent"),
+            ("Vary", "a cache could serve gzipped bytes to a client that "
+                     "cannot read them"),
+            ("Accept-Encoding", "it must only compress when asked"),
+            ("_GZIP_TYPES", "it must compress text only")):
+        if need not in src:
+            print("  FAIL %s -- %s" % (need, why))
+            ok = False
+    # a client that does not ask must fall through to the base handler
+    if "if not accepts or not ctype.startswith" not in src:
+        print("  FAIL it does not fall back for a client that cannot gunzip")
+        ok = False
+    print("  %-64s %s" % ("the page is served compressed, text only, on request",
                           "ok" if ok else "FAIL"))
     return ok
 

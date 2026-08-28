@@ -132,8 +132,18 @@ def main():
     check("[-] ...through the existing normaliser, not a new one",
           "from reconcile_2025 import norm as _norm" in src)
     check("a watch card shows the channel", "class=\"wnet\"" in src)
+    # ⚠ ASSERT THE MEANING, NOT THE WORDING. This pinned the literal string
+    # "TV not listed", which was rendered as a dashed BADGE in the very slot
+    # where FOX and BTN appear -- so an unknown broadcast looked like a
+    # featured fact in the one place Cody scans for a channel. The badge is now
+    # plain muted type reading "no listing", with the distinction spelled out
+    # on hover. What must not change is that the card still SAYS SOMETHING:
+    # silence would imply "not televised" when we mean "we do not know".
     check("[-] ...and says so when there is none, rather than implying not-on-TV",
-          "TV not listed" in src)
+          'class="wnet none"' in src and "means unknown, not untelevised" in src)
+    check("[-] ...without dressing an unknown up as a badge",
+          ".wnet.none{" in src and "border:0" in src,
+          "a dashed border in the channel slot reads as a data point")
     # ⚠ THE NETWORK IS RENDERED BY JS, so it is not in the static markup --
     # the first version of this check scanned the HTML and found only the
     # literal fallback string. Assert the DATA instead: the payload the page
@@ -206,6 +216,13 @@ def main():
           "function $$(id)" in src)
 
     print()
+    # ⚠ page() returns (html, filename), not a string. Passing the tuple
+    #   made every `in` check test tuple MEMBERSHIP, which is always
+    #   false for a substring -- so the guard failed against a correct
+    #   build and would have 'passed' nothing.
+    if not check_scoreboard_follows_the_feed(page()[0] or ''):
+        FAILS.append("the Scoreboard follows the feed and does not repeat itself")
+
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))
         for f in FAILS:
@@ -213,6 +230,41 @@ def main():
         return 1
     print("ALL TODAY / SCOREBOARD GUARDS PASS")
     return 0
+
+
+
+def check_scoreboard_follows_the_feed(h):
+    """The Scores list must be refreshed when live data lands.
+
+    ⚠ IT WAS THE ONE VIEW THE POLL NEVER TOLD. renderDesk(), the rally tape,
+    csStatus() and any open match detail were all re-rendered when a poll
+    returned; the Scoreboard list was not. So Florida-Nebraska finished 2-0,
+    the masthead rail said FINAL, and the lane beneath it still read SCHEDULED
+    with no score -- and would have until the reader touched a filter. Cody
+    called the page a mess and he was right.
+
+    ⚠ AND "TOP GAMES" MUST BE A SELECTION. On a two-match evening every match
+    was also a top game, so the band repeated the whole day directly above the
+    list: the same two fixtures twice, which reads as a bug rather than as
+    emphasis.
+    """
+    ok = True
+    if "if (typeof renderScoreboard === 'function') renderScoreboard();" not in h:
+        print("  FAIL the live poll does not refresh the Scoreboard")
+        ok = False
+    if "topAll.length < rows.length ? topAll : []" not in h:
+        print("  FAIL Top games can repeat the entire day")
+        ok = False
+    # the exhibition badge must not be a flex item in the team column
+    if "exhTag(m) + '</span>'" in h and "'<span class=\"mteams\">'" in h:
+        i = h.find("'<span class=\"mteams\">'")
+        if "exhTag" in h[i:i + 200]:
+            print("  FAIL the EXH badge is back inside the team column, where "
+                  "a column flex stretches it to the full row width")
+            ok = False
+    print("  %-64s %s" % ("the Scoreboard follows the feed and does not repeat "
+                          "itself", "ok" if ok else "FAIL"))
+    return ok
 
 
 if __name__ == "__main__":
