@@ -168,6 +168,8 @@ def main():
         FAILS.append("form controls reach 16px at phone width")
     if not check_css_vars(h):
         FAILS.append("every CSS variable read is also defined")
+    if not check_type_floor(h):
+        FAILS.append("no type is set below the 9px floor")
 
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))
@@ -242,6 +244,35 @@ def check_ios_zoom(h):
         ok = False
     print("  %-64s %s" % ("form controls reach 16px at phone width",
                           "ok" if ok else "FAIL"))
+    return ok
+
+
+def check_type_floor(page):
+    """No text on the page is set below 9px.
+
+    ⚠ THIS DRIFTS DOWNWARD ONE LABEL AT A TIME. Twenty-seven rules had reached
+    8-8.5px -- all of them small uppercase qualifiers, each defensible on its
+    own, none of them legible at arm's length. It is the same drift that once
+    put `.rank-label` at 6.82px through a compounding `.72em`, which is why the
+    floor is asserted in PIXELS on the built page rather than trusted to the
+    author of the next micro-label.
+
+    The floor is deliberately a floor, not a target: 9px is still small type
+    for a badge. What it rules out is 8px and below.
+    """
+    import re as _re
+    bad = []
+    for m in _re.finditer(r"font(?:-size)?\s*:\s*[^;{}]*?(\d+(?:\.\d+)?)px",
+                          page):
+        v = float(m.group(1))
+        if v < 9.0:
+            b = page.rfind("{", 0, m.start())
+            a = max(page.rfind("}", 0, b), page.rfind(";", 0, b),
+                    page.rfind("\n", 0, b))
+            bad.append("%gpx %s" % (v, page[a + 1:b].strip()[:40]))
+    ok = not bad
+    print("  %-64s %s" % ("no type is set below the 9px floor",
+                          "ok" if ok else "FAIL %s" % bad[:3]))
     return ok
 
 

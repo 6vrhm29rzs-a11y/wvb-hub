@@ -55,7 +55,26 @@ def block(src, start):
                 esc = True
             elif c == instr:
                 instr = None
-        elif c in "'\"":
+            j += 1
+            continue
+        # ⚠ SKIP COMMENTS BEFORE ANYTHING ELSE. A quote inside a comment is not
+        # a string. This file's comments quote rendered text -- "CLIFF KEEN
+        # ARENA, ANN ARBOR" -- and an earlier version of this scanner treated
+        # that opening quote as a string start, lost brace synchronisation, and
+        # returned matchContext PLUS the two functions after it. The guard for
+        # "never inferred from the home team" then found `mHome` in a function
+        # it was never meant to be reading and failed correct code. Third time
+        # a scanner in this file has been wrong about the source it scans.
+        if c == "/" and j + 1 < len(src):
+            if src[j + 1] == "*":
+                k = src.find("*/", j + 2)
+                j = (k + 2) if k >= 0 else len(src)
+                continue
+            if src[j + 1] == "/":
+                k = src.find("\n", j + 2)
+                j = (k + 1) if k >= 0 else len(src)
+                continue
+        if c in "'\"":
             instr = c
         elif c == "{":
             d += 1
@@ -137,6 +156,16 @@ def main():
           "if (m.venue) {" in ctx)
     check("[-] ...and is never inferred from the home team",
           "mHome" not in ctx and "m.h" not in ctx.replace("m.hr", ""))
+    # ⚠ the event style and the venue style are keyed to the VALUE, not to a
+    # position in the list -- keying on index gave a venue the event's gold
+    # caps whenever there was no event, so a gymnasium read as a tournament
+    check("[-] the style follows the value, not the array index",
+          "(i ? 'mctxv' : 'mctxe')" not in ctx,
+          "index-keyed styling reintroduced")
+    check("the event carries the event class",
+          "bits.push(['mctxe'" in ctx)
+    check("the venue carries the venue class",
+          "bits.push(['mctxv'" in ctx)
     check("no event and no venue renders nothing",
           "if (!bits.length) return '<span class=\"mctx\"></span>';" in ctx)
 
@@ -179,6 +208,60 @@ def main():
         # rows above it -- one numeral per team, never a single "25-22" string
         check("a set cell carries two numerals",
               re.search(r"<b class=\"' \+ \(!now && \+a", page) is not None)
+
+    print("\n5. The line scores reconcile with the result they sit beside")
+    # ⚠ THE STRIP AND THE SCORE ARE TWO RENDERINGS OF ONE FACT, so they can
+    # disagree -- and a row showing 3-0 above line scores that only add to 2-1
+    # is worse than showing neither. Counting sets won from the per-set points
+    # must reproduce the reported match score for every match on file. This is
+    # the check that catches a feed change or a parsing slip, and it costs
+    # nothing because the data is already in the page.
+    import json
+    page = io.open(PAGE, encoding="utf-8").read() if os.path.exists(PAGE) else ""
+    k = page.find("const LEDGER = [")
+    if k < 0:
+        check("the ledger is in the page", False)
+    else:
+        i = page.find("[", k)
+        d, j, instr, esc = 0, i, False, False
+        while j < len(page):
+            c = page[j]
+            if instr:
+                if esc:
+                    esc = False
+                elif c == "\\":
+                    esc = True
+                elif c == '"':
+                    instr = False
+            elif c == '"':
+                instr = True
+            elif c in "[{":
+                d += 1
+            elif c in "]}":
+                d -= 1
+                if d == 0:
+                    break
+            j += 1
+        led = json.loads(page[i:j + 1])
+        check("[+] there are finals to check at all", len(led) > 0,
+              "%d" % len(led))
+        withsets = [g for g in led if g.get("sets")]
+        check("[+] ...and they carry line scores", len(withsets) > 0,
+              "%d of %d" % (len(withsets), len(led)))
+        wrong = []
+        for g in withsets:
+            aw = sum(1 for sv in g["sets"] if sv[0] > sv[1])
+            hw = sum(1 for sv in g["sets"] if sv[1] > sv[0])
+            if aw != g.get("as") or hw != g.get("hs"):
+                wrong.append("%s-%s %s-%s vs line %d-%d"
+                             % (g.get("a"), g.get("h"), g.get("as"),
+                                g.get("hs"), aw, hw))
+        check("[-] every match score is reproduced by its own line scores",
+              not wrong, str(wrong[:2]))
+        # a completed set cannot be tied -- one side has to have won it
+        ties = ["%s-%s %s" % (g.get("a"), g.get("h"), sv)
+                for g in withsets for sv in g["sets"] if sv[0] == sv[1]]
+        check("[-] no completed set is tied", not ties, str(ties[:2]))
 
     print("")
     if FAIL:

@@ -5459,7 +5459,7 @@ b.kres{color:#F2B441}
 /* the evidence: one quiet line, never competing with the slot */
 .bwev{display:flex;flex-wrap:wrap;gap:5px 12px;margin:7px 0 0 40px;
   font:12px/1.4 var(--mono);color:var(--ink2)}
-.bwe i{font-style:normal;font:700 8.5px/1 var(--sans);letter-spacing:.11em;
+.bwe i{font-style:normal;font:700 9px/1 var(--sans);letter-spacing:.11em;
   margin-right:4px;opacity:.85}
 .bwe.pw i{color:#31D07E}
 .bwe.rs i{color:#F2B441}
@@ -5640,7 +5640,7 @@ b.kres{color:#F2B441}
 .bwhrow{display:flex;align-items:baseline;gap:8px;padding:5px 0;
   border-bottom:1px solid var(--line2);font:12px var(--mono);color:var(--ink)}
 .bwhrow:last-child{border-bottom:0}
-.bwlatest{font:700 8.5px/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;
+.bwlatest{font:700 9px/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;
   color:#31D07E;margin-left:auto}
 /* ⚠ A GRID ITEM'S DEFAULT min-width IS auto, NOT 0, so collapsing to one
    column is not enough: the column still cannot shrink below its content's
@@ -5682,7 +5682,7 @@ b.kres{color:#F2B441}
   border-radius:4px;overflow:hidden;margin:0 0 18px}
 .bwstatus>div{background:var(--sheet);padding:10px 13px;display:flex;
   flex-direction:column;gap:3px;min-width:0}
-.bwstatus i{font-style:normal;font:700 8.5px/1.4 var(--disp);letter-spacing:.12em;
+.bwstatus i{font-style:normal;font:700 9px/1.4 var(--disp);letter-spacing:.12em;
   text-transform:uppercase;color:var(--slate)}
 .bwstatus b{font:700 14px/1.2 var(--disp);color:var(--chalk);
   overflow-wrap:anywhere}
@@ -5895,7 +5895,7 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
   grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
 .gd-step{display:flex;flex-direction:column;gap:2px;padding:7px 9px;
   border:1px solid var(--vx-rule);border-radius:3px}
-.gd-step i{font-style:normal;font:700 8px/1.4 var(--disp);letter-spacing:.11em;
+.gd-step i{font-style:normal;font:700 9px/1.4 var(--disp);letter-spacing:.11em;
   text-transform:uppercase;color:var(--slate)}
 .gd-step b{font:600 11.5px/1.3 var(--mono);color:var(--ink3)}
 .gd-step.done{border-color:var(--vx-power)}
@@ -6035,7 +6035,7 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
 .in-row{border-bottom:1px solid var(--vx-rule);padding:11px 0 12px}
 .in-row.read{opacity:.55}
 .in-meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:0 0 4px}
-.in-src{font:700 8.5px/1.5 var(--disp);letter-spacing:.11em;text-transform:uppercase;
+.in-src{font:700 9px/1.5 var(--disp);letter-spacing:.11em;text-transform:uppercase;
   color:var(--vx-avca);background:var(--vx-avca-dim);padding:2px 7px;border-radius:3px}
 .in-meta time{font:11.5px/1 var(--mono);color:var(--ink3)}
 .in-teams{display:inline-flex;align-items:center;gap:5px}
@@ -6045,7 +6045,7 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
   text-decoration:none;overflow-wrap:anywhere}
 .in-title:hover{color:var(--gold)}
 .in-acts{display:flex;gap:8px;margin:7px 0 0}
-.in-acts button{font:700 8.5px/1 var(--disp);letter-spacing:.09em;
+.in-acts button{font:700 9px/1 var(--disp);letter-spacing:.09em;
   text-transform:uppercase;color:var(--ink3);background:none;border:0;
   padding:3px 0;cursor:pointer}
 .in-acts button:hover{color:var(--gold)}
@@ -6075,7 +6075,7 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
 .fr-new{margin:0 0 20px;padding:0 0 18px;border-bottom:1px solid var(--vx-rule)}
 .fr-form{display:flex;flex-direction:column;gap:11px}
 .fr-form label{display:flex;flex-direction:column;gap:4px;
-  font:700 8.5px/1.4 var(--disp);letter-spacing:.12em;text-transform:uppercase;
+  font:700 9px/1.4 var(--disp);letter-spacing:.12em;text-transform:uppercase;
   color:var(--slate);min-width:0}
 .fr-form input,.fr-form select,.fr-form textarea{font:13px/1.5 var(--sans);
   color:var(--chalk);background:var(--alt);border:1px solid var(--line2);
@@ -6108,7 +6108,7 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
 .fr-entry:hover{border-left-color:var(--gold)}
 .fr-meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:0 0 5px}
 .fr-meta time{font:12px/1 var(--mono);color:var(--ink3)}
-.fr-ctx{font:700 8.5px/1.5 var(--disp);letter-spacing:.1em;text-transform:uppercase;
+.fr-ctx{font:700 9px/1.5 var(--disp);letter-spacing:.1em;text-transform:uppercase;
   padding:2px 7px;border-radius:3px;background:var(--line);color:var(--ink2)}
 .fr-ctx.pre{color:var(--vx-avca);background:var(--vx-avca-dim)}
 .fr-ctx.during{color:#FF9E5A;background:rgba(255,158,90,.14)}
@@ -6128,7 +6128,7 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
 /* ⚠ A FROZEN CHIP CARRIES ITS DATE. Without the stamp it reads as a live
    value, and a note kept for a month would quietly become wrong. */
 .fr-facts{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:0 0 6px}
-.fr-facts>i{font-style:normal;font:700 8px/1.4 var(--disp);letter-spacing:.11em;
+.fr-facts>i{font-style:normal;font:700 9px/1.4 var(--disp);letter-spacing:.11em;
   text-transform:uppercase;color:var(--slate)}
 .fr-chip{font:11px/1 var(--mono);color:var(--ink2);background:var(--alt);
   border:1px solid var(--line2);border-radius:3px;padding:3px 7px;
@@ -6189,18 +6189,18 @@ label.fr-btn{cursor:pointer;display:inline-block}
 .fr-prevnums{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
   gap:10px;margin:0 0 12px}
 .fr-prevnums>div{display:flex;flex-direction:column;gap:2px}
-.fr-prevnums i{font-style:normal;font:700 8px/1.4 var(--disp);letter-spacing:.11em;
+.fr-prevnums i{font-style:normal;font:700 9px/1.4 var(--disp);letter-spacing:.11em;
   text-transform:uppercase;color:var(--slate)}
 .fr-prevnums b{font:700 20px/1 var(--disp);color:var(--ink2)}
 .fr-prevnums b.fr-ok{color:var(--vx-power)}
 .fr-prevnums b.fr-warn{color:#F2B441}
 .fr-prevlist{margin:0 0 11px}
-.fr-prevlist>i{font-style:normal;font:700 8px/1.4 var(--disp);letter-spacing:.11em;
+.fr-prevlist>i{font-style:normal;font:700 9px/1.4 var(--disp);letter-spacing:.11em;
   text-transform:uppercase;color:var(--slate)}
 .fr-prevlist ul{list-style:none;margin:5px 0 0;padding:0;display:flex;
   flex-direction:column;gap:3px}
 .fr-prevlist li{font-size:12.5px;color:var(--ink2);overflow-wrap:anywhere}
-.fr-prevlist li i{font-style:normal;font:700 8px/1 var(--disp);letter-spacing:.09em;
+.fr-prevlist li i{font-style:normal;font:700 9px/1 var(--disp);letter-spacing:.09em;
   text-transform:uppercase;color:var(--slate);margin-right:7px}
 .fr-prevlist li.more{color:var(--ink3)}
 .fr-prevacts{display:flex;gap:9px;flex-wrap:wrap;align-items:center;
@@ -6226,7 +6226,7 @@ label.fr-btn{cursor:pointer;display:inline-block}
 .mbhd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px}
 .mbhd b{font:700 11px/1 var(--disp);letter-spacing:.18em;text-transform:uppercase;
   color:var(--gold)}
-.mbhd .mbpriv{font:600 8.5px/1 var(--disp);letter-spacing:.14em;
+.mbhd .mbpriv{font:600 9px/1 var(--disp);letter-spacing:.14em;
   text-transform:uppercase;color:var(--slate);border:1px solid var(--line2);
   border-radius:2px;padding:3px 5px}
 .mbhd .mbn{font:11.5px/1 var(--mono);color:var(--slate)}
@@ -6353,7 +6353,7 @@ td.at{white-space:nowrap}
 .rledger{display:flex;gap:5px;margin-top:12px;flex-wrap:wrap}
 .rledger .rl{min-width:46px;border:1px solid var(--line2);border-radius:2px;
   padding:5px 7px;text-align:center;font:600 12px/1.35 var(--mono);color:var(--ink2)}
-.rledger .rl i{display:block;font:600 8.5px/1 var(--disp);letter-spacing:.12em;
+.rledger .rl i{display:block;font:600 9px/1 var(--disp);letter-spacing:.12em;
   color:var(--slate);font-style:normal;margin-bottom:3px}
 .rledger .rl.aw{color:var(--chalk)}
 /* ── LANES ──────────────────────────────────────────────────────────────── */
@@ -6394,6 +6394,16 @@ td.at{white-space:nowrap}
 .mrow .mrt.won .msc,.mrow.islive .msc{color:var(--chalk)}
 .mrow .mmeta{font:10.5px/1.5 var(--mono);color:var(--ink3);text-align:right}
 /* the two numerals stack so they line up with the two team rows above */
+/* under a time heading the row's own clock is redundant; hiding it takes
+   .mwhen out of grid flow, so the remaining four cells map to four
+   columns and the row reclaims the width */
+.tdlist.bytime .mrow{grid-template-columns:minmax(150px,270px) minmax(0,1fr) auto auto}
+.tdlist.bytime .mrow .mwhen{display:none}
+@media (max-width:560px){
+  .tdlist.bytime .mrow{grid-template-columns:minmax(0,1fr) auto}
+}
+h4.sbtime{display:flex;align-items:baseline;gap:8px;margin:16px 0 0;padding:0 2px 6px;border-bottom:1px solid var(--line);font:700 11px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;color:var(--slate)}
+h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
 .mrow .mctx{display:flex;flex-direction:column;gap:2px;min-width:0;overflow:hidden}
 .mctxe{font:600 10.5px/1.3 var(--disp);letter-spacing:.04em;text-transform:uppercase;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mctxv{font:11px/1.3 var(--sans);color:var(--slate);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -6406,7 +6416,7 @@ td.at{white-space:nowrap}
 
 .mrow .mtags{display:flex;gap:5px;justify-content:flex-end;flex-wrap:wrap;
   margin-top:3px}
-.mrow .mtg{font:600 8.5px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
+.mrow .mtg{font:600 9px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
   color:var(--slate);border:1px solid var(--line);border-radius:2px;padding:3px 5px}
 .mrow .mtg.rv{color:var(--gold);border-color:color-mix(in oklab,var(--gold) 40%,transparent)}
 .mrow .mtg.lv{color:var(--coral);border-color:color-mix(in oklab,var(--coral) 45%,transparent)}
@@ -6545,7 +6555,7 @@ td.at{white-space:nowrap}
 .dboard{border-top:1px solid var(--line)}
 .dboard .dcard{padding:11px 2px 12px}
 .dboard .dside b{font-size:18px}
-.dboard .dtag{font-size:8.5px;padding:3px 6px}
+.dboard .dtag{font-size:9px;padding:3px 6px}
 .dboard .dwhy{display:none}          /* context is one line on a board row */
 .dcard{border-bottom:1px solid var(--line2);padding:15px 2px 16px}
 .dcard:last-child{border-bottom:0}
@@ -7370,10 +7380,10 @@ td.wh .wu{color:var(--ink3);font-style:italic}
    it; only the width grows. */
 .fw.fnd,.fl.fnd{width:auto;min-width:19px;padding:0 4px;
   background:transparent;border:1px dashed currentColor}
-.fndt{font-style:normal;font-weight:700;font-size:8.5px;letter-spacing:.03em;
+.fndt{font-style:normal;font-weight:700;font-size:9px;letter-spacing:.03em;
   margin-left:3px;opacity:.9}
 @media (max-width:560px){.fw.fnd,.fl.fnd{padding:0 3px}
-  .fndt{font-size:8px;margin-left:2px}}
+  .fndt{font-size:9px;margin-left:2px}}
 
 
 
@@ -7395,7 +7405,7 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 .calnow p{margin:0 0 6px;font-size:13px;color:var(--ink2);line-height:1.55}
 .calnow p:last-child{margin-bottom:0}
 .calfine{font-size:12px;color:var(--ink3)}
-.caltag{font:700 8.5px/1.5 var(--disp);letter-spacing:.1em;text-transform:uppercase;
+.caltag{font:700 9px/1.5 var(--disp);letter-spacing:.1em;text-transform:uppercase;
   padding:3px 7px;border-radius:3px;white-space:nowrap}
 .caltag.derived{color:#8FD3FF;background:rgba(91,168,245,.14)}
 .caltag.official{color:#FFD98A;background:rgba(242,180,65,.14)}
@@ -7412,7 +7422,7 @@ td.wh .wu{color:var(--ink3);font-style:italic}
   border-radius:3px;white-space:nowrap;background:var(--line);color:var(--ink3)}
 .calstate.complete{color:#31D07E;background:rgba(49,208,126,.12)}
 .calstate.forced{color:#F2B441;background:rgba(242,180,65,.12)}
-.calwarn{font:700 8.5px/1.4 var(--mono);letter-spacing:.03em;color:#F2B441;
+.calwarn{font:700 9px/1.4 var(--mono);letter-spacing:.03em;color:#F2B441;
   background:rgba(242,180,65,.12);padding:1px 5px;border-radius:3px;
   margin-left:5px}
 .caltbl .dim{color:var(--ink3)}
@@ -7567,7 +7577,7 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 /* ── fact strip: label over value, in a row, no chips ──────────────────── */
 .vx-facts{display:flex;flex-wrap:wrap;gap:2px 26px;margin:0}
 .vx-facts>div{display:flex;flex-direction:column;gap:2px;min-width:0}
-.vx-facts i{font-style:normal;font:700 8.5px/1.4 var(--disp);
+.vx-facts i{font-style:normal;font:700 9px/1.4 var(--disp);
   letter-spacing:.12em;text-transform:uppercase;color:var(--slate)}
 .vx-facts b{font:700 15px/1.15 var(--disp);color:var(--chalk);
   overflow-wrap:anywhere}
@@ -7604,7 +7614,7 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 .vx-read .vx-readrow{display:grid;grid-template-columns:104px minmax(0,1fr);
   gap:14px;align-items:baseline;padding:9px 0}
 .vx-read .vx-readrow+.vx-readrow{border-top:1px solid var(--vx-rule)}
-.vx-read i{font-style:normal;font:700 8.5px/1.5 var(--disp);letter-spacing:.12em;
+.vx-read i{font-style:normal;font:700 9px/1.5 var(--disp);letter-spacing:.12em;
   text-transform:uppercase;color:var(--slate)}
 .vx-read .vx-readv{font-size:13.5px;color:var(--ink2);min-width:0}
 .vx-read .vx-readv b{color:var(--chalk);font-weight:700}
@@ -7655,7 +7665,7 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 .calblock i{font-style:normal;font-size:11px;color:var(--ink3);
   background:var(--line);padding:1px 6px;border-radius:3px;white-space:nowrap}
 .calblock i.more{background:none;padding-left:0}
-.calwhy{font:700 8.5px/1.5 var(--disp);letter-spacing:.09em;
+.calwhy{font:700 9px/1.5 var(--disp);letter-spacing:.09em;
   text-transform:uppercase;padding:2px 6px;border-radius:3px;
   background:var(--line);color:var(--ink3)}
 .calwhy.live{color:#F2B441;background:rgba(242,180,65,.14)}
@@ -7681,7 +7691,7 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
   /* the column name in front of the value -- without it a stacked cell is a
      bare "-" with nothing saying which column it came from */
   .caltbl td[data-l]:not(:first-child)::before{content:attr(data-l) " ";
-    font:700 8.5px/1 var(--disp);letter-spacing:.08em;color:var(--slate);
+    font:700 9px/1 var(--disp);letter-spacing:.08em;color:var(--slate);
     text-transform:uppercase;margin-right:4px}
   .caltrack .panel,.caltrack .scroll{overflow:visible}
 }
@@ -7721,7 +7731,7 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 .gaptbl tr[data-team]{cursor:pointer}
 .gaptbl tr[data-team]:hover td{background:rgba(91,168,245,.06)}
 .gaptbl tr[data-team]:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
-.gaptbl .rl{display:block;font:700 8.5px/1.4 var(--disp);letter-spacing:.09em;
+.gaptbl .rl{display:block;font:700 9px/1.4 var(--disp);letter-spacing:.09em;
   color:var(--slate);font-style:normal}
 .gaptbl .gapn{font:700 17px/1 var(--disp);color:var(--chalk)}
 .nrtag{font:700 9px/1.5 var(--mono);letter-spacing:.04em;color:var(--ink3);
@@ -7762,7 +7772,7 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
   .rk3 tr.row td.c-ref{display:none}
   /* the label rides in front of the value, so no number is anonymous */
   .rk3 tr.row td[data-l]::before{content:attr(data-l) " ";
-    font:700 8.5px/1 var(--disp);letter-spacing:.08em;color:var(--slate);
+    font:700 9px/1 var(--disp);letter-spacing:.08em;color:var(--slate);
     text-transform:uppercase;margin-right:3px}
   .rulerbar{gap:10px}
   .refcols{display:none}
@@ -7771,7 +7781,7 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 
 /* The basis, stamped on the column header itself so the number cannot be
    read as something wider than it is. */
-.thb{display:block;font:700 8px/1.4 var(--mono);letter-spacing:.06em;
+.thb{display:block;font:700 9px/1.4 var(--mono);letter-spacing:.06em;
   color:var(--ink3);font-weight:700}
 
 /* The non-D-I record, shown beside the record it is excluded from. Quiet:
@@ -13833,15 +13843,21 @@ function rowSetStrip(m, live, st) {
    Fiserv Forum on a neutral floor. So this prints what the feed reported or it
    prints nothing at all. There is no fallback. */
 function matchContext(m) {
+  /* ⚠ THE CLASS FOLLOWS WHAT THE VALUE IS, NEVER ITS POSITION. Keying the
+     style on the array index meant the first bit always got the event's
+     treatment -- so a fixture with no event rendered its VENUE in gold caps,
+     and "CLIFF KEEN ARENA, ANN ARBOR" read as the name of a tournament. Same
+     shape as every R4 case here: one slot, two meanings. */
   const bits = [];
-  if (m.event) bits.push(esc(m.event));
+  if (m.event) bits.push(['mctxe', esc(m.event)]);
   if (m.venue) {
-    bits.push(esc(m.venue) + (m.city ? ', ' + esc(m.city) : ''));
+    bits.push(['mctxv', esc(m.venue) + (m.city ? ', ' + esc(m.city) : '')]);
   }
   if (!bits.length) return '<span class="mctx"></span>';
-  return '<span class="mctx" title="' + bits.join(' \u00b7 ') + '">' +
-    bits.map((b, i) => '<span class="' + (i ? 'mctxv' : 'mctxe') + '">' + b +
-      '</span>').join('') + '</span>';
+  return '<span class="mctx" title="' +
+    bits.map(b => b[1]).join(' \u00b7 ') + '">' +
+    bits.map(b => '<span class="' + b[0] + '">' + b[1] + '</span>').join('') +
+    '</span>';
 }
 
 function matchRow(m, live, dest) {
@@ -14062,6 +14078,25 @@ document.addEventListener('click', ev => {
 let SB_DATE = null;      /* ISO string; null means "follow today" */
 let SB_FILTER = 'all';
 
+/* Minutes since midnight for a rendered clock time like "4:00 PM PT".
+
+   ⚠ THE SCOREBOARD WAS SORTING TIMES AS STRINGS, and on a full slate the
+   result was visibly wrong rather than subtly wrong: localeCompare puts
+   "6:00 AM PT" after "5:30 PM PT" because '6' > '5', so the first Friday's
+   order ran 5:30 PM, 6:00 AM, 6:00 PM, 7:00 AM, 7:00 PM, 7:30 AM -- morning
+   matches scattered through the evening. It went unnoticed because every day
+   the page had ever rendered held two matches.
+
+   Returns null for anything it cannot read, INCLUDING "TBA". A time we cannot
+   parse is not a time we may place: the caller sorts those last and prints
+   what the feed said. */
+function tMinutes(t) {
+  const m = String(t == null ? '' : t).match(/^\s*(\d{1,2}):(\d{2})\s*(AM|PM)\b/i);
+  if (!m) return null;
+  const h = (+m[1] % 12) + (/pm/i.test(m[3]) ? 12 : 0);
+  return h * 60 + (+m[2]);
+}
+
 function sbDate() { return SB_DATE || todayPT(); }
 
 function sbShift(days) {
@@ -14162,22 +14197,54 @@ function renderScoreboard() {
     return;
   }
 
-  /* ── GROUPED BY STATE, THEN TIME ──────────────────────────────────── */
+  /* ── GROUPED BY STATE, THEN BY START TIME ─────────────────────────── */
   const lanes = [['live', 'Live now'], ['final', 'Final'],
                  ['upcoming', 'Scheduled']];
-  const order = (a, b) => {
-    const ra = (a.ar && a.hr) ? 0 : (a.ar || a.hr) ? 1 : 2;
-    const rb = (b.ar && b.hr) ? 0 : (b.ar || b.hr) ? 1 : 2;
-    return ra !== rb ? ra - rb
-      : String(a.t || '').localeCompare(String(b.t || ''));
+  /* ranked pairings first, then one side ranked, then the rest */
+  const tier = m => (m.ar && m.hr) ? 0 : (m.ar || m.hr) ? 1 : 2;
+  const byTier = (a, b) => tier(a) - tier(b);
+  const byTime = (a, b) => {
+    const ma = tMinutes(a.t), mb = tMinutes(b.t);
+    /* a time we cannot read is not a time we may guess at: it sorts last and
+       keeps whatever the feed said (TBA), rather than being placed */
+    if (ma === null && mb === null) return 0;
+    if (ma === null) return 1;
+    if (mb === null) return -1;
+    return ma - mb;
   };
   body.innerHTML = lanes.map(([st, title]) => {
-    const in_ = rows.filter(m => matchState(m, liveOf(m)) === st).sort(order);
+    const in_ = rows.filter(m => matchState(m, liveOf(m)) === st);
     if (!in_.length) return '';
+    const times = {};
+    in_.forEach(m => { times[m.t || ''] = 1; });
+    /* ⚠ GROUP ONLY WHEN THERE IS SOMETHING TO GROUP. On the first Friday the
+       slate is 196 matches across 23 start times, which as one list is 15.7
+       screens of undifferentiated rows; on a Tuesday it is four. Splitting
+       four rows under four headings is worse than not splitting them, so the
+       block stays whole until it is genuinely a wall. This is a presentation
+       choice, not a verdict about the data. */
+    const many = in_.length >= 12 && Object.keys(times).length >= 3;
+    const head = (t, n) => '<h4 class="sbtime">' + esc(t || 'Time not set') +
+      '<span>' + n + '</span></h4>';
+    let inner;
+    if (many) {
+      const keys = Object.keys(times).sort((a, b) => byTime({ t: a }, { t: b }));
+      inner = keys.map(k => {
+        const g = in_.filter(m => (m.t || '') === k).sort(byTier);
+        /* `bytime` drops the per-row clock: under a "3:00 PM PT" heading,
+           twenty-eight rows each repeating "3:00 PM PT" is the heading said
+           twenty-nine times. Done in CSS so matchRow keeps one signature and
+           the other seven callers are untouched (R4). */
+        return head(k, g.length) + '<div class="tdlist bytime">' +
+          g.map(m => matchRow(m, liveOf(m), 'scores')).join('') + '</div>';
+      }).join('');
+    } else {
+      inner = '<div class="tdlist">' +
+        in_.slice().sort((a, b) => byTier(a, b) || byTime(a, b))
+          .map(m => matchRow(m, liveOf(m), 'scores')).join('') + '</div>';
+    }
     return '<section class="tdblock"><h3>' + title +
-      '<span>' + in_.length + '</span></h3><div class="tdlist">' +
-      in_.map(m => matchRow(m, liveOf(m), 'scores')).join('') +
-      '</div></section>';
+      '<span>' + in_.length + '</span></h3>' + inner + '</section>';
   }).join('');
 }
 
