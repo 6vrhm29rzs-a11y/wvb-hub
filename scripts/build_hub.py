@@ -172,6 +172,11 @@ def results() -> List[Dict]:
             continue
         best[gid] = g
 
+    try:
+        from dupes import duplicate_gids as _dgf
+        _dup_gids = set(_dgf(SEASON))
+    except Exception:                                  # noqa: BLE001
+        _dup_gids = set()
     out = []
     for g in best.values():
         if g.get("game_state") != "F":
@@ -182,6 +187,16 @@ def results() -> List[Dict]:
         home = next((t for t in teams if t.get("is_home")), None)
         away = next((t for t in teams if not t.get("is_home")), None)
         if not home or not away:
+            continue
+        # ⚠ A LEDGERED DUPLICATE LISTING COUNTS NOWHERE (round 11). This
+        # loop reads the RAW gamelog, which never carries the dataset's
+        # duplicate_of mark -- checking that field here fired on nothing
+        # while the records happened to come out right through the OTHER
+        # (scoreboard-derived) loop, the exact two-sources seam this
+        # codebase keeps paying for. The gid is checked against the ledger
+        # itself; this list feeds records, form, standings, player
+        # aggregates and the scores views.
+        if str(g.get("game_id")) in _dup_gids:
             continue
         # ⚠ A "FINAL" THAT ASSERTS NO RESULT COUNTS NOWHERE (2026-08-29).
         # Game 6625090 (Delaware St. v Mississippi Val.) came back state F
@@ -3134,6 +3149,8 @@ def conference_lab(bteams, tj):
         if g.get("state") != "F":
             continue
         gid = str(g.get("game_id"))
+        if g.get("duplicate_of"):
+            continue                       # ledgered duplicate: counts nowhere
         if gid in exh:
             n_exh += 1
             continue
@@ -3770,6 +3787,8 @@ def build():
             _ts2 = _g.get("teams") or []
             if _g.get("winner_team_id") is None and all(
                     t.get("sets_won") is None for t in _ts2):
+                continue
+            if _g.get("duplicate_of"):
                 continue
             _final_of[_gid] = _g
 

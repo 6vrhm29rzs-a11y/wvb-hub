@@ -149,7 +149,7 @@ def build(today=None):
                 for t in (doc.get("teams") or []))
     date_of = {}
     for g in (doc.get("games") or []):
-        if g.get("state") == "F":
+        if g.get("state") == "F" and not g.get("duplicate_of"):
             date_of[str(g.get("game_id"))] = int(g.get("start_time_epoch")
                                                  or 0)
     per_team_latest = {}

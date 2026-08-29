@@ -65,6 +65,11 @@ def load_di_games():
     from gamelog import load_games_jsonl as _lg
     from membership import resolve as _resolve
     _all = _lg(os.path.join(RAW, "games.jsonl"))
+    # ledgered duplicate listings count nowhere (round 11; see dupes.py) --
+    # this list feeds membership AND the RPI game loop below
+    from dupes import duplicate_gids as _dg
+    _dups = set(_dg(SEASON))
+    _all = [g for g in _all if str(g.get("game_id")) not in _dups]
     di, official_rows, _src = _resolve(RAW, _all)
     teams = {}
     for k in di:
@@ -86,8 +91,12 @@ def load_di_games():
 
     from gamelog import load_games_jsonl
     games = []
+    from dupes import duplicate_gids as _dg2
+    _dups2 = set(_dg2(SEASON))
     for g in load_games_jsonl(os.path.join(RAW, "games.jsonl")):
             if g.get("game_state") != "F":
+                continue
+            if str(g.get("game_id")) in _dups2:
                 continue
             t = g.get("teams") or []
             if len(t) != 2:

@@ -153,8 +153,21 @@ def main():
     })
 
     _skipped_exhibitions = set()
+    try:
+        from dupes import duplicate_gids
+        _dup_of = duplicate_gids(SEASON)
+    except Exception:                                  # noqa: BLE001
+        _dup_of = {}
     for g in games:
         if g.get("game_state") != "F":
+            continue
+        # ⚠ A LEDGERED DUPLICATE COUNTS NOWHERE (round 11). Entered only on
+        # authoritative evidence (both schools' official schedules establish
+        # ONE meeting) -- never by heuristic, so real doubleheaders are safe.
+        # The game itself is still persisted below, marked duplicate_of, so
+        # the Result Ledger can show it with the reason; these tallies are
+        # what the ratings, RPI, records and every counting surface read.
+        if str(g.get("game_id")) in _dup_of:
             continue
         # ⚠ AN EXHIBITION IS FINAL TOO, AND FILTERING ON 'F' ALONE LET IT IN.
         # This function builds the dataset the RATING, the RPI, the simulator
@@ -285,6 +298,7 @@ def main():
     for g in games:
         teams = g.get("teams") or []
         games_out.append({
+            "duplicate_of": _dup_of.get(str(g.get("game_id"))) or None,
             "game_id": g["game_id"],
             "season": g.get("season_year"),
             "start_time_epoch": g.get("start_time_epoch"),

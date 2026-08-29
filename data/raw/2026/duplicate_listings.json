@@ -1,0 +1,59 @@
+{
+ "_doc": "Feed listings established as ONE match represented twice, by AUTHORITATIVE sources only -- never by an identical score, a calendar gap, or an aggregator. Append-only. The duplicate gid stays in the raw log untouched and remains inspectable (Result Ledger marks it and says why); it is excluded from every COUNTING consumer: records, conference results, player aggregates, form, rating inputs, scores lists and snapshots. A candidate the sources cannot settle is NOT entered here -- it stays counted, flagged pending in the candidate artifact. Real doubleheaders and repeat tournament meetings remain possible because nothing is ever deduplicated by heuristic.",
+ "duplicates": {
+  "6640357": {
+   "canonical_gid": "6625089",
+   "teams": [
+    "UMES",
+    "Mississippi Val."
+   ],
+   "established": "one meeting only, 2026-08-28, UMES 3-0 (25-13, 25-20, 25-14)",
+   "quality_asymmetry": "6640357 carries a midnight-ET placeholder start, no venue and no box score; 6625089 carries the Friday start, Elmore Gymnasium and the held box",
+   "evidence": [
+    {
+     "url": "https://easternshorehawks.com/sports/womens-volleyball/schedule/",
+     "kind": "school_site",
+     "school": "UMES",
+     "retrieved": "2026-08-29T15:29:49Z",
+     "text": "schema.org event 'University of Maryland Eastern Shore Vs Mississippi Valley State', startDate 2026-08-28T18:00:00, location Huntsville, AL -- the ONLY Mississippi Valley State entry among all 25 events on the official schedule",
+     "establishes": "exactly one UMES-MVSU meeting in the window"
+    },
+    {
+     "url": "https://mvsusports.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Mississippi Valley State",
+     "retrieved": "2026-08-29T15:29:49Z",
+     "text": "schema.org event 'Mississippi Valley State University Vs UMES', startDate 2026-08-28T18:00:00; rendered result on the row: 'UMES  L, 0-3' -- the ONLY UMES entry among all 26 events on the official schedule",
+     "establishes": "exactly one meeting; MVSU lost 0-3, matching the canonical gid's result"
+    }
+   ]
+  },
+  "6640332": {
+   "canonical_gid": "6624350",
+   "teams": [
+    "Boise St.",
+    "Middle Tenn."
+   ],
+   "established": "one meeting on 2026-08-28, Middle Tennessee 3-2 (25-23, 29-27, 21-25, 23-25, 15-12); the Aug 29 rematch at the same event is a SEPARATE fixture with its own gid, still upcoming, and is untouched",
+   "quality_asymmetry": "6640332 carries the midnight-ET placeholder start; 6624350 carries the real start and the held box",
+   "evidence": [
+    {
+     "url": "https://broncosports.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Boise St.",
+     "retrieved": "2026-08-29T15:33:54Z",
+     "text": "'Bulldog Invitational vs Middle Tennessee, Asheville N.C., L, 2-3, Aug 28 (Fri) 10 a.m., Box Score / Recap' -- exactly ONE Aug-28 meeting; a separate 'vs Middle Tennessee, Aug 29 (Sat) 10 a.m.' remains upcoming with a countdown",
+     "establishes": "exactly one PLAYED meeting on Aug 28; Boise St. lost 2-3, matching both feed records"
+    },
+    {
+     "url": "https://goblueraiders.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Middle Tenn.",
+     "retrieved": "2026-08-29T15:33:54Z",
+     "text": "'Bulldog Invitational, Boise State, Asheville N.C., W, 3-2, Aug 28 (Fri) 11:00 AM' plus recap 'Volleyball Opens Season with Thrilling Five-Set Win over Boise State, Friday, August 28' -- exactly ONE Aug-28 meeting; 'vs Boise State, Aug 29 (Sat) 11:00 AM' is separate and upcoming",
+     "establishes": "exactly one played meeting; MT won 3-2"
+    }
+   ]
+  }
+ }
+}

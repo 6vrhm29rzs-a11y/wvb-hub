@@ -71,7 +71,7 @@ def per_match_margins(doc):
     """team_id -> [net points per set, one per completed D-I match]."""
     out = collections.defaultdict(list)
     for g in (doc or {}).get("games") or []:
-        if g.get("state") != "F":
+        if g.get("state") != "F" or g.get("duplicate_of"):
             continue
         ts = g.get("teams") or []
         ls = [l for l in (g.get("linescores") or []) if l.get("home") is not None]
@@ -101,7 +101,7 @@ def per_match_detail(doc):
     """
     out = collections.defaultdict(list)
     for g in (doc or {}).get("games") or []:
-        if g.get("state") != "F":
+        if g.get("state") != "F" or g.get("duplicate_of"):
             continue
         ts = g.get("teams") or []
         ls = [l for l in (g.get("linescores") or []) if l.get("home") is not None]
@@ -301,7 +301,7 @@ def main():
     # W-L from the live dataset, so the poll can show a record beside the rank.
     wl = collections.defaultdict(lambda: [0, 0])
     for g in (live.get("games") or []):
-        if g.get("state") != "F":
+        if g.get("state") != "F" or g.get("duplicate_of"):
             continue
         for t in (g.get("teams") or []):
             nm = id2name.get(str(t.get("team_id")))

@@ -160,6 +160,49 @@ def box_teams():
     return out
 
 
+def duplicate_candidates(finals):
+    """AUDIT CANDIDATES, never removals (round 11): pairs of finals with the
+    same unordered teams, the same winner, an identical ordered set line, a
+    start-time gap under 36 hours AND a quality asymmetry (placeholder-hour
+    start, missing venue, or missing box on exactly one side). A real
+    doubleheader or a repeat tournament meeting fails the identical-set-line
+    test in practice and, even when it would not, nothing here changes a
+    count -- a candidate waits for authoritative evidence in the
+    duplicate-listings ledger. Same-teams-same-score-nearby is only ever a
+    review trigger."""
+    by_pair = {}
+    for g in finals:
+        key = tuple(sorted([g["a"], g["h"]]))
+        by_pair.setdefault(key, []).append(g)
+    out = []
+    for key, gs in by_pair.items():
+        if len(gs) < 2:
+            continue
+        for i in range(len(gs)):
+            for j in range(i + 1, len(gs)):
+                a, b = gs[i], gs[j]
+                if a.get("winner") != b.get("winner"):
+                    continue
+                if a.get("setline") != b.get("setline") or not a.get("setline"):
+                    continue
+                if abs((a.get("ep") or 0) - (b.get("ep") or 0)) > 36 * 3600:
+                    continue
+                asym = (bool(a.get("placeholder")) != bool(b.get("placeholder"))
+                        or bool(a.get("venue")) != bool(b.get("venue"))
+                        or bool(a.get("has_box")) != bool(b.get("has_box")))
+                if not asym:
+                    continue
+                out.append({"pair": list(key),
+                            "gids": [a["gid"], b["gid"]],
+                            "setline": a.get("setline"),
+                            "gap_hours": round(abs((a.get("ep") or 0)
+                                                   - (b.get("ep") or 0))
+                                               / 3600.0, 1),
+                            "status": "candidate duplicate \u2014 "
+                                      "verification pending"})
+    return out
+
+
 def build():
     doc = load("data/data_%d.json" % SEASON) or {}
     ev = (load("data/raw/%d/result_evidence.json" % SEASON) or {}) \
@@ -176,6 +219,12 @@ def build():
             exh_names[str(_gid)] = _t
     today = datetime.date.today().isoformat()
     boxes = box_teams()
+    try:
+        from dupes import duplicate_gids
+        dup_of = duplicate_gids(SEASON)
+    except Exception:                                  # noqa: BLE001
+        dup_of = {}
+    _cand_src = []
     rows, counts = [], {"finals": 0, "official_only": 0, "reconciled": 0,
                         "confirmed": 0, "disputed": 0, "pending_second": 0}
     for g in (doc.get("games") or []):
@@ -215,7 +264,25 @@ def build():
         checked = max([e.get("retrieved") or "" for e in entries] or [""])
         ts = g.get("teams") or []
         _fallback = exh_names.get(gid) or ["", ""]
+        _ep = int(g.get("start_time_epoch") or 0)
+        _et_hour = datetime.datetime.utcfromtimestamp(_ep).hour - 4 if _ep else None
+        _cand_src.append({
+            "gid": gid,
+            "a": id2n.get(str(([t for t in ts if not t.get("is_home")] or
+                               [{}])[0].get("team_id")), "") or _fallback[0],
+            "h": id2n.get(str(([t for t in ts if t.get("is_home")] or
+                               [{}])[0].get("team_id")), "") or _fallback[1],
+            "winner": str(g.get("winner_team_id") or ""),
+            "setline": tuple((l.get("visit"), l.get("home"))
+                             for l in (g.get("linescores") or [])
+                             if l.get("home") is not None),
+            "ep": _ep,
+            "placeholder": (_et_hour is not None and 0 <= (_et_hour % 24) < 7),
+            "venue": (g.get("location") or {}).get("venue"),
+            "has_box": gid in boxes,
+        })
         rows.append({
+            "duplicate_of": dup_of.get(gid) or None,
             "gid": gid,
             "a": id2n.get(str(([t for t in ts if not t.get("is_home")] or
                                [{}])[0].get("team_id")), "") or _fallback[0],
@@ -255,6 +322,17 @@ def build():
             counts["official_only"] += 1
     counts["pending_second"] = counts["finals"] - counts["confirmed"] \
         - counts["disputed"]
+    counts["duplicate_listings"] = sum(1 for r in rows if r["duplicate_of"])
+    cands = [c for c in duplicate_candidates(_cand_src)
+             if not any(gid in dup_of for gid in c["gids"])]
+    counts["duplicate_candidates_pending"] = len(cands)
+    json.dump({"meta": {"season": SEASON,
+                        "note": "review candidates only; nothing here "
+                                "changes a count"},
+               "candidates": cands},
+              open(os.path.join(REPO, "data",
+                                "duplicate_candidates_%d.json" % SEASON),
+                   "w"), indent=1)
     out = {"meta": {"season": SEASON, "source_tier": "DERIVED",
                     "generated_at_utc": datetime.datetime.utcnow().replace(
                         microsecond=0).isoformat() + "Z",
