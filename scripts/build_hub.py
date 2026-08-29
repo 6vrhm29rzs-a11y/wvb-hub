@@ -3719,15 +3719,10 @@ def build():
     _chg_meta = ("%d ranked v ranked" % sum(1 for c in _chg if c["both"])
                  if any(c["both"] for c in _chg) else "latest results")
 
-    _week_rows = [
-        {"d": r["d"], "dl": day_label(r["d"], _today), "a": r["a"], "h": r["h"], "t": r["t"],
-         "ar": r.get("ar") or "", "hr": r.get("hr") or "",
-         "ao": _ourrank.get(r["a"]) or "", "ho": _ourrank.get(r["h"]) or "",
-         "venue": r.get("venue"), "city": r.get("city"), "st": r.get("st"),
-         "site": r.get("site"), "event": r.get("event"), "kind": r.get("kind"),
-         "conflict": r.get("conflict") or [], "corrected": r.get("corrected") or [],
-         "csrc": r.get("csrc"), "gid": str(r.get("gid") or "")}
-        for r in sched if _today_s <= r["d"] <= _horizon]
+    # _week_rows was DELETED with renderWeek (round 5): its `ao` meant OUR
+    # rank while DESK's `ao` means the AVCA poll -- one key, two meanings,
+    # feeding a surface CSS had already hidden. The living disagreement
+    # display is on the desk watch cards, from DESK's honestly-named fields.
 
     # ⚠ EVERY FIXTURE IS EMITTED, NOT THE FIRST 600. The copy above promises
     # that search reaches any of the rest, and search filters RENDERED rows --
@@ -3979,7 +3974,6 @@ def build():
         .replace("{{CHANGED_HIDDEN}}", "" if _chg else "hidden") \
         .replace("{{SEASON_YEAR}}", str(SEASON)) \
         .replace("{{RESUME_ACTIVE_JS}}", "true" if _resume_active else "false") \
-        .replace("{{WEEK_JSON}}", json.dumps(_week_rows, separators=(",", ":"))) \
         .replace("{{FIXTURES_JSON}}", json.dumps(
             {str(r["gid"]): {
                 "gid": str(r["gid"]), "d": r["d"],
@@ -9597,11 +9591,10 @@ function rank(v) { return rankHTML('avca', v); }
    assumed -- ncaa.com's scoreboard rank matches the AVCA poll on every team
    where the two orders differ (BYU 24 to our 16, Kansas 15 to our 21,
    Indiana 16 to our 24). */
-/* renderWeek() and the #weekbox card grid were DELETED here (round 5): the
-   mount sat inside #v-scores where `#v-scores #weekbox{display:none!important}`
-   has hidden it since the Scoreboard redesign -- a renderer painting a box
-   nobody can see is the a.ep pattern again. The desk's "Big weekend ahead"
-   is the living version of the same answer. */
+/* the weekend card-grid renderer was DELETED here (round 5): its mount sat
+   inside the Scores view where CSS had hidden it since the Scoreboard
+   redesign -- painting a box nobody can see is the dead-code pattern again.
+   The desk's "Big weekend ahead" is the living version of the same answer. */
 
 /* TODAY'S FIXTURES WITHOUT A SERVER. The live band and the slate were both fed
    by /api/live, which only exists behind live_server.py -- so on the PUBLISHED
@@ -9612,7 +9605,6 @@ function rank(v) { return rankHTML('avca', v); }
    because the schedule is already embedded in the page. So the fixtures come
    from SCHED and the live scores are an upgrade applied when a server is there,
    rather than the whole block depending on one. */
-const WEEK = {{WEEK_JSON}};
 function slateFromSchedule() {
   const today = new Intl.DateTimeFormat('en-CA',
     { timeZone: 'America/Los_Angeles' }).format(new Date());
@@ -16062,6 +16054,20 @@ function renderDesk() {
          repeating it is the duplication Cody's screenshot showed */
       reasonChips(m, live, isLive ? ['lv'] : null) +
       starPeek(m) +
+      /* ⚠ OUR RANK BESIDE THE OFFICIAL ONE, where they disagree. Restored
+         from the deleted weekbox: a reader who sees "24 BYU" on a page that
+         ranks BYU 16th is owed the second number. ap/hp are OUR board rank
+         (rank26); ar/hr are the AVCA poll -- DESK's field names, one
+         meaning each. */
+      (function () {
+        const bits = [];
+        if (m.ap && m.ar && +m.ap !== +m.ar) bits.push(esc(m.a) + ' ' + m.ap);
+        if (m.hp && m.hr && +m.hp !== +m.hr) bits.push(esc(m.h) + ' ' + m.hp);
+        return bits.length
+          ? '<div class="ourrk" title="our POWER rating disagrees with the ' +
+            'coaches poll">our Top 25: ' + bits.join(' \u00b7 ') + '</div>'
+          : '';
+      })() +
       '<span class="wacts"><span class="wgo">Preview &rarr;</span>' +
         '<span class="wofficial" data-href="https://www.ncaa.com/game/' +
         esc(m.gid) + '">ncaa.com</span></span>' +

@@ -3235,10 +3235,35 @@ def check_week_names_whose_ranking():
         print("  no built hub -- skipping week-ranking check")
         return
     src = open(hub, encoding="utf-8").read()
-    m = re.search(r"const WEEK = (\[.*?\]);", src, re.S)
-    if not m:
-        bad("the week payload is missing", "renderWeek has nothing to render")
+    # ⚠ RE-ANCHORED (round 5): renderWeek and the WEEK payload were deleted
+    # -- the mount had been invisible under `#v-scores` CSS since the
+    # Scoreboard redesign, and WEEK's `ao` meant OUR rank while DESK's `ao`
+    # means the AVCA poll (one key, two meanings). The living surface for
+    # the same invariant is the desk watch card: our rank appears beside the
+    # official one where they disagree, labelled as ours, built from DESK's
+    # ap/hp (our board rank) against ar/hr (the AVCA poll).
+    if "const WEEK = " in src or "renderWeek" in src:
+        bad("the deleted week surface came back",
+            "renderWeek/WEEK were removed on purpose; see round-5 notes")
         return
+    if "our Top 25: " not in src:
+        bad("our own ranking is never shown beside the official one",
+            "the watch cards must carry the disagreement note")
+        return
+    if "our POWER rating disagrees with the" not in src:
+        bad("the disagreement note lost its label",
+            "a second rank without a named basis is a bare numeral")
+        return
+    gen = open(os.path.join(REPO, "scripts", "build_hub.py"),
+               encoding="utf-8").read()
+    if not re.search(r'"ap": _pr\.get\(r\["a"\]\)', gen) or \
+       not re.search(r'"ao": _av\.get\(r\["a"\]\)', gen):
+        bad("the DESK rank fields moved",
+            "ap must stay our board rank (_pr/rank26) and ao the AVCA poll "
+            "(_av) -- if these swap, the disagreement note lies (R4)")
+        return
+    ok("our rank is shown beside the AVCA poll where they disagree, labelled")
+    return
     rows = json.loads(m.group(1))
     if not rows:
         # Legitimately empty out of season -- not a failure, but say so.
