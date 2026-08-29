@@ -9173,7 +9173,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 
 <section id="v-conflab" hidden>
   <h2>Conference Lab</h2>
-  <p class="lead" id="cflead"></p>
+  <p class="lead" id="cflead">The <b>2026</b> interconference evidence, loading&hellip;</p>
   <div id="cfcards"></div>
   <div class="scroll"><table class="cftab"><thead id="cfhead"></thead>
     <tbody id="cfbody"></tbody></table></div>
@@ -15128,7 +15128,8 @@ function cfRecord(w, l) {
 
 function cfLead() {
   const m = CONFLAB.meta || {};
-  return 'Completed <b>' + m.n_interconf + '</b> interconference Division-I ' +
+  return 'The <b>2026</b> season\u2019s conference evidence. Completed ' +
+    '<b>' + m.n_interconf + '</b> interconference Division-I ' +
     'matches through <b>' + esc(m.results_through || '\u2014') + '</b>' +
     (m.n_intraconf ? ', plus ' + m.n_intraconf + ' in conference play' : '') +
     '. Excluded: ' + m.n_exhibitions_excluded + ' exhibition' +
