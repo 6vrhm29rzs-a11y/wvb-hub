@@ -114,8 +114,10 @@ def main():
                                     if r["overall"] == "confirmed")
           and c["disputed"] == sum(1 for r in rows
                                    if r["overall"] == "disputed")
+          and c.get("corrected", 0) == sum(1 for r in rows
+                                           if r["overall"] == "corrected")
           and c["official_only"] + c["reconciled"] + c["confirmed"]
-              + c["disputed"] == c["finals"],
+              + c["disputed"] + c.get("corrected", 0) == c["finals"],
           json.dumps(c))
     check("every confirmed row holds >=1 attributable source",
           all(r["n_indep"] >= 1 for r in rows
@@ -153,10 +155,22 @@ def main():
     check("...and at least one attributable school citation",
           all(any(e.get("text") for e in r.get("corr_evidence") or [])
               for r in _corr))
-    check("the corrected result reconciles internally (winner now agrees "
-          "with the set line)",
-          all(r["states"]["result"] == "reconciled" for r in _corr
-              if r["gid"] == "6628406"))
+    # ⚠ REWRITTEN with the corrected state (USC-ASU incident): a corrected
+    # record must never read as "reconciled" -- this module sees the
+    # corrected dataset, so agreement there is BY CONSTRUCTION, and calling
+    # it reconciled laundered the correction into the feed's credibility.
+    check("a corrected result carries the corrected state, not reconciled",
+          all(r["states"]["result"] == "corrected"
+              and r["overall"] in ("corrected", "confirmed", "disputed")
+              for r in _corr))
+    check("...and a correction alone never reads cross-source confirmed",
+          all(r["overall"] != "confirmed" or r["n_indep"] >= 2
+              for r in _corr))
+    check("the empty-final kind is distinguished from the contradicted kind",
+          any(r.get("corr_kind") == "incomplete" for r in _corr
+              if r["gid"] == "6627523")
+          and any(r.get("corr_kind") == "contradicted" for r in _corr
+                  if r["gid"] == "6628406"))
     check("the page renders the corrected chip and the audit block",
           "RESULT CORRECTED" in src and "Result corrected on ledger" in src)
     check("[NEG] an uncorrected row carries no corrected flag",
@@ -173,8 +187,8 @@ const matchRoute = g => '#/m/' + g;
 const RC_LABEL = { reconciled: 'Reconciled' };
 let RC_FILTER = 'all';
 const CONFIDENCE = { meta: { counts: {} }, finals: [
-  { gid: 'CORR', a: 'A', h: 'B', d: '2026-08-29', overall: 'reconciled',
-    duplicate_of: null, result_corrected: true,
+  { gid: 'CORR', a: 'A', h: 'B', d: '2026-08-29', overall: 'corrected',
+    duplicate_of: null, result_corrected: true, corr_kind: 'contradicted',
     corr_evidence: [
       { school: 'A U', text: 'L, 2-3 on the row', status: 'confirms' },
       { school: 'B U', text: null, status: 'attempted_unverifiable' }],
@@ -195,7 +209,7 @@ if (corr.indexOf('independent: none yet') >= 0)
   bad.push('corrected row still shows the contradictory generic phrase');
 if (corr.indexOf('corrected against raw set line') < 0)
   bad.push('corrected row lacks the correction summary');
-if (corr.indexOf('1 attributable school source') < 0)
+if (corr.indexOf('1 attributable official source') < 0)
   bad.push('attributable correction-evidence count missing or wrong');
 if (corr.indexOf('1 attempted, unreadable') < 0)
   bad.push('the attempted recheck is not distinguished');

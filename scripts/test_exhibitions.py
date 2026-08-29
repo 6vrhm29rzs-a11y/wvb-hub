@@ -248,6 +248,94 @@ def main():
               "_sched_exh" not in h,
               "the ledger must not be inlined into the page twice")
 
+    # ================= THE USC-ARIZONA ST. INCIDENT, AS A FIXTURE =========
+    # 2026-08-29: a real counting match (USC 3-0 ASU at the Sanford Pentagon)
+    # received a start-time/venue correction -- correct -- and was ALSO
+    # hand-ledgered as an exhibition on a "Scrimmage / Exhibition" label that
+    # belonged to a neighbouring card on USC's schedule page. Withdrawn the
+    # same afternoon when Cody produced the official box (sets to 25, records
+    # moving). These checks pin the separation of facts permanently.
+    import exhibitions as EXHMOD
+
+    # (1) the corrected match itself: fixture-corrected AND still counted
+    fl = json.load(io.open(os.path.join(
+        REPO, "data", "raw", "2026", "fixture_ledger.json"), encoding="utf-8"))
+    has_fix = any(e.get("game_id") == "6627523" and e.get("kind") == "correction"
+                  for e in fl.get("entries") or [])
+    check("USC-ASU carries a fixture (time/venue) correction", has_fix)
+    check("...and is NOT in the exhibitions ledger",
+          "6627523" not in EXHMOD.ledger(2026))
+    check("...and counts: it is not among the resolved exhibition gids",
+          "6627523" not in EXHMOD.resolved_gids(2026))
+
+    # (2) a deliberate classification change WITHOUT classification evidence
+    # must be refused by the validator -- this is the exact entry that was
+    # wrongly accepted on 2026-08-29 (site/event/time facts, no proof of kind)
+    bad = {
+        "counts_toward_record": False,
+        "date": "2026-08-29",
+        "teams": ["Southern California", "Arizona St."],
+        "venue": "Sanford Pentagon, Sioux Falls, S.D.",
+        "event": "State Farm Women's Volleyball Showcase",
+        "source": "a schedule card mentioning a scrimmage somewhere nearby",
+    }
+    probs = EXHMOD.entry_problems("999999", bad)
+    check("[NEG] an entry with venue/event/time facts but no classification "
+          "proof is refused", bool(probs), str(probs))
+
+    # (3) a quote that says exhibition but does not bind BOTH teams is
+    # still refused -- a label lifted from a neighbouring card names at most
+    # one side of this matchup
+    bad2 = dict(bad, classification_evidence={
+        "url": "https://usctrojans.com/sports/womens-volleyball/schedule",
+        "retrieved": "2026-08-29",
+        "text": "Scrimmage / Exhibition -- UC Irvine, Irvine, Calif."})
+    check("[NEG] an exhibition quote naming a different opponent is refused",
+          bool(EXHMOD.entry_problems("999999", bad2)))
+
+    # (4) the two proofs that DO satisfy it
+    ok_fmt = dict(bad, sets_to=[21, 21, 15])
+    check("a format proof (sets to 21) validates",
+          not EXHMOD.entry_problems("999999", ok_fmt))
+    ok_quote = dict(bad, classification_evidence={
+        "url": "https://example-school.edu/schedule",
+        "retrieved": "2026-08-29",
+        "text": "Exhibition: Southern California vs Arizona State "
+                "(does not count)"})
+    check("a bound quote naming both teams validates",
+          not EXHMOD.entry_problems("999999", ok_quote))
+
+    # (5) the genuine, explicitly-proven exhibitions still validate and are
+    # still excluded -- loosening the bar to fix the incident would be the
+    # opposite regression
+    check("the real ledger validates clean", not EXHMOD.validate(2026),
+          str(EXHMOD.validate(2026)[:2]))
+    check("Spikes Under the Lights stays excluded",
+          {"6640217", "6640218"} <= EXHMOD.resolved_gids(2026))
+
+    # (6) an invalid ledger ABORTS the reader rather than being believed or
+    # silently dropped -- dropped means a genuine exhibition would COUNT
+    import json as _json
+    import tempfile
+    with tempfile.TemporaryDirectory() as td:
+        raw = os.path.join(td, "data", "raw", "2026")
+        os.makedirs(raw)
+        _json.dump({"exhibitions": {"111111": bad}},
+                   io.open(os.path.join(raw, "exhibitions.json"), "w",
+                           encoding="utf-8"))
+        real_repo = EXHMOD.REPO
+        try:
+            EXHMOD.REPO = td
+            try:
+                EXHMOD.ledger(2026)
+                aborted = False
+            except ValueError:
+                aborted = True
+        finally:
+            EXHMOD.REPO = real_repo
+        check("[NEG] an unvalidatable ledger raises instead of loading",
+              aborted)
+
     print("\n%s" % ("ALL EXHIBITION GUARDS PASS" if not FAILS
                     else "FAILED: %s" % FAILS))
     return 1 if FAILS else 0

@@ -2,15 +2,15 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 277,
+  "scored": 288,
   "logged_after_tipoff_excluded": 7,
   "team_mismatch_excluded": 10,
   "predictions_on_record": 4768,
-  "results_available": 303,
-  "brier": 0.1971,
+  "results_available": 314,
+  "brier": 0.1927,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 196,
-  "favourite_correct_pct": 70.8
+  "favourite_correct": 206,
+  "favourite_correct_pct": 71.5
  },
  "calibration": [
   {
@@ -27,21 +27,21 @@
   },
   {
    "range": "70-80%",
-   "n": 36,
-   "said": 75.5,
-   "happened": 63.9
+   "n": 37,
+   "said": 75.4,
+   "happened": 64.9
   },
   {
    "range": "80-90%",
-   "n": 47,
-   "said": 84.8,
-   "happened": 70.2
+   "n": 52,
+   "said": 84.9,
+   "happened": 71.2
   },
   {
    "range": "90-101%",
-   "n": 95,
-   "said": 95.7,
-   "happened": 88.4
+   "n": 100,
+   "said": 95.6,
+   "happened": 89.0
   }
  ],
  "matches": [
@@ -215,6 +215,15 @@
    "p_home": 0.1455,
    "home_won": true,
    "brier": 0.73017025
+  },
+  {
+   "game_id": "6626484",
+   "date": "2026-08-29",
+   "away": "UIC",
+   "home": "Saint Louis",
+   "p_home": 0.1503,
+   "home_won": true,
+   "brier": 0.72199009
   },
   {
    "game_id": "6639570",
@@ -485,15 +494,6 @@
    "p_home": 0.6497,
    "home_won": false,
    "brier": 0.42211009000000005
-  },
-  {
-   "game_id": "6626167",
-   "date": "2026-08-29",
-   "away": "Holy Cross",
-   "home": "Siena",
-   "p_home": 0.6488,
-   "home_won": false,
-   "brier": 0.42094144000000006
   }
  ]
 }

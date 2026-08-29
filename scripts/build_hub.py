@@ -130,6 +130,17 @@ def exhibitions():
     wrong. That format is also the proof it cannot be an NCAA result: the
     playing rules put a set at 25.
     """
+    # ⚠ VALIDATED BEFORE BELIEVED (USC-Arizona St. incident, 2026-08-29):
+    # a counting match was hand-ledgered as an exhibition on a label read
+    # off a NEIGHBOURING schedule card, and nothing refused the entry.
+    # Classification is its own fact needing its own proof -- a format
+    # proof (sets_to != 25) or a bound quote naming both teams. The build
+    # ABORTS on an unvalidatable ledger; silently dropping an entry would
+    # let a genuine exhibition count, which is worse.
+    import exhibitions as _EXH
+    _probs = _EXH.validate(SEASON)
+    if _probs:
+        raise SystemExit("exhibitions ledger invalid: %s" % "; ".join(_probs))
     doc = load("data/raw/%d/exhibitions.json" % SEASON) or {}
     return dict((str(k), v) for k, v in (doc.get("exhibitions") or {}).items())
 
@@ -203,6 +214,9 @@ def results() -> List[Dict]:
                                        == str(_fx2["winner_team_id"]))
             if _fx2.get("winner_team_id"):
                 g["winner_team_id"] = _fx2["winner_team_id"]
+            # fill-only, never replace -- same rule as build_dataset's applier
+            if _fx2.get("linescores") and not (g.get("linescores") or []):
+                g["linescores"] = [dict(r) for r in _fx2["linescores"]]
         teams = g.get("teams") or []
         if len(teams) != 2:
             continue
@@ -3246,13 +3260,24 @@ def conference_lab(bteams, tj):
         if not all(canon):
             n_unres += 1
             continue
-        ca, cb = conf_of[canon[0]], conf_of[canon[1]]
+        # ⚠ ORDER BY THE REAL is_home FLAG, NEVER BY ARRAY POSITION (found
+        # 2026-08-29 via USC-Arizona St.). The feed's teams array is not
+        # away-first: ts[0] was the HOME side here, while the set counts
+        # below come from the linescores' visit/home columns -- so the cell
+        # drill paired the home team's NAME with the away team's SETS and
+        # displayed the wrong winner for every game where ts[0] was home.
+        # The W/L tallies were internally consistent; only the display lied.
+        t_away = next((t for t in ts if not t.get("is_home")), ts[0])
+        t_home = next((t for t in ts if t.get("is_home")), ts[1])
+        an = n2team.get(_n(id2n.get(str(t_away.get("team_id")), "")))
+        hn = n2team.get(_n(id2n.get(str(t_home.get("team_id")), "")))
+        ca, cb = conf_of[an], conf_of[hn]
         if ca == cb:
             n_intra += 1
             continue                     # conference play: not evidence ABOUT the league
         n_inter += 1
         through_ep = max(through_ep, int(g.get("start_time_epoch") or 0))
-        awin = str(g.get("winner_team_id")) == str(ts[0].get("team_id"))
+        awin = str(g.get("winner_team_id")) == str(t_away.get("team_id"))
         nsets = len([l for l in (g.get("linescores") or [])
                      if l.get("home") is not None])
         sc = [0, 0]
@@ -3264,12 +3289,20 @@ def conference_lab(bteams, tj):
                 sc[0] += 1
             elif h0 > a0:
                 sc[1] += 1
-        row = {"gid": gid, "a": canon[0], "h": canon[1],
-               "as": sc[0], "hs": sc[1],
+        # ⚠ sets_won OUTRANKS lines-derived counts. Two finals ship a real
+        # winner beside all-zero linescore scaffolds (6640356, 6640361) --
+        # counting those lines shows 0-0 next to a decided match. The
+        # derived count only fills where the feed's own tally is absent
+        # (the empty-final class).
+        _asw = t_away.get("sets_won")
+        _hsw = t_home.get("sets_won")
+        row = {"gid": gid, "a": an, "h": hn,
+               "as": _asw if _asw is not None else sc[0],
+               "hs": _hsw if _hsw is not None else sc[1],
                "d": _pt_date(g.get("start_time_epoch") or 0)}
         for me, opp, mine_won, is_away in (
-                (ca, canon[1], awin, not ts[0].get("is_home", True)),
-                (cb, canon[0], not awin, not ts[1].get("is_home", True))):
+                (ca, hn, awin, True),
+                (cb, an, not awin, False)):
             p = per[me]
             p["w" if mine_won else "l"] += 1
             if nsets == 5:
@@ -3369,6 +3402,37 @@ def build():
             for gid in e.get("game_ids", []):
                 event_of[gid] = e["name"]
     res = results()
+    # ⚠ AN APPLIED FIXTURE CORRECTION OUTRANKS THE RAW ROW ON WHERE AND WHEN.
+    # The Scores ledger read time/venue/event straight off the raw log, so
+    # USC-Arizona St. kept the feed's provably-wrong 2:00 PM PT clock and no
+    # event name even after the fixture ledger corrected both (the correction
+    # applied in fixtures.py and this surface never asked). Only rows whose
+    # canonical record actually carries corrected_fields are touched -- the
+    # raw value stands everywhere else.
+    import fixtures as _FXL
+    _fxfix = {}
+    for _g, _rec in _FXL.canonical_fixtures().items():
+        if _rec.get("corrected_fields"):
+            _fxfix[str(_g)] = _rec
+    for _r in res:
+        _rec = _fxfix.get(str(_r.get("gid")))
+        if not _rec:
+            continue
+        _cf = _rec["corrected_fields"]
+        if "start_time_epoch" in _cf and _rec.get("start_time_epoch"):
+            _r["time"] = _pt_time(_rec["start_time_epoch"])
+        _loc = dict(_r.get("loc") or {})
+        if "venue" in _cf:
+            _loc["venue"] = _rec.get("venue")
+        if "city" in _cf:
+            _loc["city"] = _rec.get("city")
+        if "state_usps" in _cf:
+            _loc["state"] = _rec.get("state_usps")
+        _r["loc"] = _loc
+        if "event" in _cf and _rec.get("event"):
+            event_of[str(_r.get("gid"))] = _rec["event"]
+        if "site" in _cf and _rec.get("site"):
+            site_of[str(_r.get("gid"))] = _rec["site"]
     # ⚠ TWO LISTS, ON PURPOSE, AND THE SPLIT IS THE WHOLE POINT.
     #   `res`      -- everything, for anything that DISPLAYS a match. An
     #                 exhibition against good opposition is still worth seeing.
@@ -15727,6 +15791,10 @@ const CONFIDENCE = {{CONFIDENCE_JSON}};
 let RC_FILTER = 'all';
 const RC_LABEL = { official: 'Official final \u00b7 confirmation pending',
   reconciled: 'Reconciled \u00b7 confirmation pending',
+  /* corrected: the feed's record was incomplete or wrong and the counted
+     result comes from named official evidence. Deliberately NOT the
+     confirmed label -- a correction never rides the confirmation ladder. */
+  corrected: 'Corrected from official evidence',
   confirmed: 'Cross-source confirmed', disputed: 'Result under review' };
 
 function renderConfidence() {
@@ -15741,6 +15809,8 @@ function renderConfidence() {
       'set line, winner and tally agree; one source'],
      ['Official only', c.official_only,
       'final on the scoreboard; set line not yet coherent or held'],
+     ['Corrected from official evidence', c.corrected,
+      'the feed record was incomplete or wrong; named sources supply it'],
      ['Under review', c.disputed, 'sources conflict \u2014 shown, not chosen'],
      ['Awaiting independent result confirmation', c.pending_second,
       'a result-level count \u2014 the normal early-season state']].map(x =>
@@ -15769,7 +15839,7 @@ function renderConfidence() {
           'DOES NOT COUNT</span>'
         : '<span class="rcstate rc-' + r.overall + '">' +
           (RC_LABEL[r.overall] || r.overall) + '</span>') +
-      (r.result_corrected
+      (r.result_corrected && r.overall !== 'corrected'
         ? '<span class="rcstate rc-corrected">RESULT CORRECTED</span>' : '') +
       /* ⚠ A CORRECTED ROW'S SUMMARY NAMES ITS OWN EVIDENCE (round 19).
          "independent: none yet" beside a school citation in the audit block
@@ -15786,9 +15856,17 @@ function renderConfidence() {
               e.status !== 'attempted_unverifiable' && e.text).length;
             const tried = ev2.filter(e =>
               e.status === 'attempted_unverifiable').length;
-            return '<span class="rcsrc">official: corrected against raw ' +
-              'set line \u00b7 correction evidence: ' + attrib +
-              ' attributable school source' + (attrib === 1 ? '' : 's') +
+            /* the summary names WHICH failure was corrected: a feed
+               record contradicted by its own set line (Kent, Iona) reads
+               differently from one that asserted nothing at all (USC-ASU,
+               an empty final) -- blurring them would overstate what the
+               feed ever claimed */
+            return '<span class="rcsrc">' +
+              (r.corr_kind === 'incomplete'
+                ? 'official record incomplete \u00b7 corrected from '
+                : 'official: corrected against raw set line \u00b7 ' +
+                  'correction evidence: ') + attrib +
+              ' attributable official source' + (attrib === 1 ? '' : 's') +
               (tried ? ' \u00b7 ' + tried + ' attempted, unreadable' : '') +
               '</span>';
           })()
@@ -15837,10 +15915,17 @@ function rcDrill(gid) {
       '</div>'
     : '';
   const corrBlock = r.result_corrected
-    ? '<div class="rcdup rccorr"><b>Result corrected on ledger evidence.</b> ' +
-      'The feed\u2019s derived winner/sets fields disagreed with its own ' +
-      'set-by-set record and with a school source; every surface counts the ' +
-      'corrected result, and the raw log is untouched.' +
+    ? '<div class="rcdup rccorr">' +
+      (r.corr_kind === 'incomplete'
+        ? '<b>Incomplete scoreboard record corrected from named official ' +
+          'evidence.</b> The feed published this final with no winner, no ' +
+          'set counts and no set line; the result and per-set line are ' +
+          'supplied from the cited official sources. Every surface counts ' +
+          'the corrected result, and the raw log is untouched.'
+        : '<b>Result corrected on ledger evidence.</b> ' +
+          'The feed\u2019s derived winner/sets fields disagreed with its own ' +
+          'set-by-set record and with a school source; every surface counts ' +
+          'the corrected result, and the raw log is untouched.') +
       (r.corr_feed_said ? '<span class="avmeta">The feed said: ' +
         esc(r.corr_feed_said) + '</span>' : '') +
       (r.corr_reason ? '<span class="avmeta">Established: ' +

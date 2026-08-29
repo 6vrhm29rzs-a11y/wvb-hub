@@ -238,6 +238,26 @@ def main():
     check("opening the ledger renders it",
           "addEventListener('toggle'" in src and "sbfull" in src)
 
+    # --- classification can never ride a fixture correction (USC-ASU) ----
+    # The fixture ledger corrects WHERE and WHEN a match happens. Whether it
+    # COUNTS is a different fact with its own ledger and its own evidence
+    # bar (exhibitions.json + exhibitions.entry_problems). If a field like
+    # "exhibition", "counts" or "classification" ever became overridable
+    # here, a venue repair could quietly flip a match's competition status,
+    # which is the incident of 2026-08-29 rebuilt as a code path.
+    import ledger as _ledger_mod
+    _banned = ("exhibition", "scrimmage", "counts", "classif", "kind",
+               "type", "status")
+    _leak = [f for f in _ledger_mod.OVERRIDABLE
+             if any(b in f.lower() for b in _banned)]
+    check("no classification-like field is overridable in the fixture ledger",
+          not _leak, str(_leak))
+    check("the overridable set is exactly the where-and-when fields",
+          set(_ledger_mod.OVERRIDABLE) == {
+              "site", "venue", "city", "state_usps", "event",
+              "start_time_epoch"},
+          str(sorted(_ledger_mod.OVERRIDABLE)))
+
     print()
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))

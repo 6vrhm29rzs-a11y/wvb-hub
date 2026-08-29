@@ -52,9 +52,93 @@ def _load(season):
         return {}
 
 
+EXH_WORDS = ("exhibition", "scrimmage")
+
+
+def entry_problems(gid, e):
+    # type: (str, Dict) -> List[str]
+    """Why this exhibition entry may NOT be believed. Empty list = valid.
+
+    ⚠ WRITTEN AFTER THE USC-ARIZONA ST. INCIDENT (2026-08-29). A counting
+    match was ledgered as an exhibition for about an hour, on a "Scrimmage /
+    Exhibition" label that belonged to a NEIGHBOURING card on USC's schedule
+    page -- evidence gathered for a start-time correction was reused for a
+    classification it never supported. Nothing refused the entry, because
+    nothing validated this file at all: the Spikes entries carried their own
+    proof (sets to 21 cannot be an NCAA result) and the reader trusted
+    whatever else was written beside them.
+
+    Classification is ITS OWN FACT. A neutral site, an event name, a time
+    discrepancy, missing metadata or an incomplete feed result can never
+    imply exhibition. An entry must carry one of exactly two proofs:
+
+      * a FORMAT proof: `sets_to` with any target other than 25 -- NCAA
+        playing rules put a set at 25, so the format itself is the evidence
+        (this is how Spikes Under the Lights is proven); or
+      * an explicit CLASSIFICATION_EVIDENCE object: url + retrieved + a
+        quoted text that (a) contains the word exhibition or scrimmage and
+        (b) names BOTH teams, so the quote is bound to this matchup and a
+        label lifted from a neighbouring card cannot satisfy it.
+    """
+    errs = []
+    if e.get("counts_toward_record") is not False:
+        errs.append("counts_toward_record must be exactly False")
+    if not e.get("date"):
+        errs.append("no date")
+    teams = e.get("teams") or []
+    if len(teams) != 2:
+        errs.append("must name exactly two teams")
+    fmt = [x for x in (e.get("sets_to") or []) if x != 25]
+    ce = e.get("classification_evidence") or {}
+    txt = (ce.get("text") or "").lower()
+    quote_ok = (ce.get("url") and ce.get("retrieved")
+                and any(w in txt for w in EXH_WORDS)
+                and all(_team_token(t) in txt for t in teams))
+    if not fmt and not quote_ok:
+        errs.append(
+            "no classification proof: needs sets_to with a non-25 target "
+            "(format proof) or classification_evidence whose quoted text "
+            "contains 'exhibition'/'scrimmage' AND names both teams")
+    return errs
+
+
+def _team_token(name):
+    # type: (str) -> str
+    """The distinctive lowercase token of a team name, for quote-binding.
+
+    'Arizona St.' must be findable in a quote reading 'Arizona State', so
+    strip the abbreviation dot and use the leading words: 'arizona st' ->
+    'arizona'. Loose on purpose -- the check is that the quote is ABOUT this
+    matchup, not that it spells our normalised name."""
+    w = (name or "").lower().replace(".", "").split()
+    return w[0] if w else ""
+
+
+def validate(season):
+    # type: (int) -> List[str]
+    """All problems across the season's ledger. Empty = clean."""
+    out = []
+    doc = _load(season)
+    for gid, e in (doc.get("exhibitions") or {}).items():
+        for p in entry_problems(str(gid), e):
+            out.append("%s: %s" % (gid, p))
+    for i, r in enumerate(doc.get("rules") or []):
+        if r.get("counts_toward_record") is not False:
+            out.append("rule %d: counts_toward_record must be exactly False" % i)
+        m = r.get("match_on") or {}
+        if not (m.get("venue") and m.get("date")):
+            out.append("rule %d: match_on needs venue and date" % i)
+    return out
+
+
 def ledger(season):
     # type: (int) -> Dict[str, Dict]
-    """game id -> entry."""
+    """game id -> entry. REFUSES an unvalidatable ledger rather than
+    believing or silently dropping it: dropping an invalid entry would let a
+    genuine exhibition COUNT, and believing it is the USC incident."""
+    probs = validate(season)
+    if probs:
+        raise ValueError("exhibitions ledger invalid: %s" % "; ".join(probs))
     doc = _load(season)
     return dict((str(k), v) for k, v in (doc.get("exhibitions") or {}).items())
 

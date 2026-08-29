@@ -176,6 +176,19 @@ def main():
         fix = c.get("correct") or {}
         g = dict(g)
         g["result_corrected"] = True
+        # ⚠ TWO KINDS OF WRONG, AND THE AUDIT SURFACE MUST NOT BLUR THEM.
+        # "contradicted": the feed asserted a result its own set line (or a
+        # school) refutes (Kent St.-W&M, Iona-Little Rock). "incomplete": the
+        # feed asserted NOTHING -- winner null, sets null, no lines (USC-
+        # Arizona St.) -- and the values are supplied from cited official
+        # evidence. Decided from the PRE-correction record, the only place
+        # the distinction exists.
+        _had = (g.get("winner_team_id")
+                or any(t.get("sets_won") is not None
+                       for t in (g.get("teams") or []))
+                or [l for l in (g.get("linescores") or [])
+                    if l.get("home") is not None])
+        g["result_corrected_kind"] = "contradicted" if _had else "incomplete"
         if fix.get("winner_team_id"):
             g["winner_team_id"] = fix["winner_team_id"]
         ts = []
@@ -190,6 +203,15 @@ def main():
                 t["sets_won"] = fix["away_sets"]
             ts.append(t)
         g["teams"] = ts
+        # ⚠ A CORRECTION MAY FILL AN EMPTY SET LINE, NEVER REPLACE ONE.
+        # USC-Arizona St. (6627523) went final with linescores [] -- the
+        # feed published no per-set scores at all -- and the official box
+        # carries them. Evidence-backed fill only where the feed is silent:
+        # if the feed DOES carry lines, they stand, even against the ledger,
+        # because a disagreement there is a conflict to surface, not an
+        # overwrite to make.
+        if fix.get("linescores") and not (g.get("linescores") or []):
+            g["linescores"] = [dict(r) for r in fix["linescores"]]
         return g
     games = [_apply_result_correction(g) for g in games]
     for g in games:
@@ -334,6 +356,12 @@ def main():
         games_out.append({
             "duplicate_of": _dup_of.get(str(g.get("game_id"))) or None,
             "result_corrected": bool(g.get("result_corrected")) or None,
+            "result_corrected_kind": g.get("result_corrected_kind"),
+            # ⚠ location was dropped here, which made the Result Ledger's
+            # venue state read "unavailable" on all 310 finals -- the feed
+            # DOES carry a venue on most of them; the state was vacuous
+            # because this whitelist never passed it through.
+            "location": g.get("location") or None,
             "game_id": g["game_id"],
             "season": g.get("season_year"),
             "start_time_epoch": g.get("start_time_epoch"),

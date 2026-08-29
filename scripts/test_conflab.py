@@ -132,6 +132,37 @@ def main():
     check("[NEG] dropping the display-floor label is caught",
           "display floor, not a verdict" not in _b2)
 
+    # --- cell rows show the REAL winner (USC-Arizona St. incident) --------
+    # The drill rows once took NAMES from the feed's array order and SETS
+    # from the linescores' visit/home columns -- two different orientations,
+    # so any game whose ts[0] was the home side displayed the wrong winner
+    # (Arizona St. "3-0" over USC in a match USC won). Cross-checked against
+    # the dataset's own winner_team_id for EVERY row in every cell; and the
+    # two zero-scaffold finals must show their sets_won tally, never 0-0.
+    ds = os.path.join(REPO, "data", "data_%d.json" % SEASON)
+    if os.path.exists(ds):
+        by = dict((str(g["game_id"]), g)
+                  for g in json.load(open(ds, encoding="utf-8"))["games"])
+        mism, zero, nrows = [], [], 0
+        for cell in (doc.get("matrix") or {}).values():
+            for r in cell.get("games") or []:
+                nrows += 1
+                g = by.get(str(r.get("gid")))
+                if not g:
+                    continue
+                th = next((t for t in g["teams"] if t.get("is_home")), {})
+                win_home = (str(g.get("winner_team_id"))
+                            == str(th.get("team_id")))
+                if g.get("winner_team_id") and                         win_home != ((r.get("hs") or 0) > (r.get("as") or 0)):
+                    mism.append(r.get("gid"))
+                if g.get("winner_team_id") and                         not (r.get("as") or r.get("hs")):
+                    zero.append(r.get("gid"))
+        check("every cell row's displayed winner matches the dataset winner "
+              "(%d rows)" % nrows, not mism, str(mism[:4]))
+        check("no decided match displays a 0-0 set tally", not zero,
+              str(zero[:4]))
+        check("...and the check saw a real sample", nrows >= 50, str(nrows))
+
     print()
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))

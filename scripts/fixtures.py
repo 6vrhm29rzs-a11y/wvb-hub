@@ -277,7 +277,16 @@ def canonical_fixtures():
             # ⚠ A PREGAME SCHEDULE CORRECTION IS NOT A RESULT FACT. Once a
             # match is final, where it was going to be played is settled by
             # what happened, not by a schedule page read three weeks earlier.
-            if rec["completed"]:
+            # ⚠ EXCEPT when the entry says `applies_to_final: true` -- an
+            # explicit, per-entry assertion that its evidence is corroborated
+            # by the COMPLETED match, not merely a pregame reading. Written
+            # for USC-Arizona St. (6627523): the feed's final kept a start
+            # time three hours late while USC's card and the official box
+            # agree on 2:00 PM CT, so withholding the correction left a
+            # provably wrong clock on a finished match. The flag is opt-in
+            # per entry precisely so no OTHER match's withheld correction
+            # changes behaviour (the Petersen question stays open).
+            if rec["completed"] and not c.get("applies_to_final"):
                 rec["correction_withheld"] = "match is final; pregame schedule correction not applied"
             else:
                 sup = c.get("support") or {}

@@ -144,7 +144,7 @@
    "conflicts": [
     {
      "field": "game_state",
-     "records": 44,
+     "records": 46,
      "values": [
       "P",
       "I"
@@ -152,7 +152,7 @@
     },
     {
      "field": "city",
-     "records": 44,
+     "records": 46,
      "values": [
       "Bryan-College Station",
       "College Station"
@@ -160,7 +160,7 @@
     }
    ],
    "matchup": "Arkansas St. / Grand Canyon",
-   "records": 44
+   "records": 46
   },
   "6626976": {
    "conflicts": [
@@ -208,7 +208,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 44,
+     "records": 46,
      "values": [
       "1788044400",
       "1788048000"
@@ -216,7 +216,7 @@
     }
    ],
    "matchup": "Montana / Washington St.",
-   "records": 44
+   "records": 46
   },
   "6627931": {
    "conflicts": [
@@ -288,33 +288,11 @@
    "matchup": "Texas Southern / Houston",
    "records": 6
   },
-  "6628525": {
-   "conflicts": [
-    {
-     "field": "start_time_epoch",
-     "records": 44,
-     "values": [
-      "1787979600",
-      "1788033600"
-     ]
-    },
-    {
-     "field": "game_state",
-     "records": 44,
-     "values": [
-      "P",
-      "I"
-     ]
-    }
-   ],
-   "matchup": "Cincinnati / Syracuse",
-   "records": 44
-  },
   "6628592": {
    "conflicts": [
     {
      "field": "teams",
-     "records": 44,
+     "records": 46,
      "values": [
       "(('46507', True), ('46755', False))",
       "(('46507', False), ('46755', True))"
@@ -322,7 +300,7 @@
     },
     {
      "field": "site",
-     "records": 44,
+     "records": 46,
      "values": [
       "home/away flip across snapshots",
       "no venue owner on record"
@@ -330,7 +308,7 @@
     }
    ],
    "matchup": "Texas / TCU",
-   "records": 44
+   "records": 46
   },
   "6628652": {
    "conflicts": [
@@ -371,9 +349,9 @@
  },
  "by_field": {
   "city": 1,
-  "game_state": 65,
+  "game_state": 56,
   "site": 2,
-  "start_time_epoch": 21,
+  "start_time_epoch": 20,
   "teams": 2,
   "teams (non-blocking)": 1
  },
@@ -413,6 +391,50 @@
      "retrieved": "2026-08-26",
      "text": "Sunday Sep 6 vs. Kentucky Chicago, Ill. / Wrigley Field 7:00 PM EDT",
      "url": "https://gopsusports.com/sports/womens-volleyball/schedule"
+    }
+   }
+  },
+  "6627523": {
+   "fields": [
+    "site",
+    "venue",
+    "city",
+    "state_usps",
+    "event",
+    "start_time_epoch"
+   ],
+   "matchup": "Southern California / Arizona St.",
+   "review_by": "2026-09-05",
+   "support": {
+    "city": {
+     "retrieved": "2026-08-29",
+     "text": "Scrimmage / Exhibition | State Farm Women's Volleyball Showcase | vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT",
+     "url": "https://usctrojans.com/sports/womens-volleyball/schedule"
+    },
+    "event": {
+     "retrieved": "2026-08-29",
+     "text": "Scrimmage / Exhibition | State Farm Women's Volleyball Showcase | vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT",
+     "url": "https://usctrojans.com/sports/womens-volleyball/schedule"
+    },
+    "site": {
+     "retrieved": "2026-08-29",
+     "text": "Scrimmage / Exhibition | State Farm Women's Volleyball Showcase | vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT",
+     "url": "https://usctrojans.com/sports/womens-volleyball/schedule"
+    },
+    "start_time_epoch": {
+     "retrieved": "2026-08-29",
+     "text": "Scrimmage / Exhibition | State Farm Women's Volleyball Showcase | vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT",
+     "url": "https://usctrojans.com/sports/womens-volleyball/schedule"
+    },
+    "state_usps": {
+     "retrieved": "2026-08-29",
+     "text": "Scrimmage / Exhibition | State Farm Women's Volleyball Showcase | vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT",
+     "url": "https://usctrojans.com/sports/womens-volleyball/schedule"
+    },
+    "venue": {
+     "retrieved": "2026-08-29",
+     "text": "Scrimmage / Exhibition | State Farm Women's Volleyball Showcase | vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT",
+     "url": "https://usctrojans.com/sports/womens-volleyball/schedule"
     }
    }
   },
@@ -456,9 +478,9 @@
   }
  },
  "counts": {
-  "blocked": 24,
-  "conflicted": 88,
-  "corrected": 2,
+  "blocked": 23,
+  "conflicted": 79,
+  "corrected": 3,
   "fixtures": 4872
  },
  "official_conflicts": {},

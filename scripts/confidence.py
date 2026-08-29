@@ -232,7 +232,8 @@ def build():
                     or {}).get("corrections") or {})
     _cand_src = []
     rows, counts = [], {"finals": 0, "official_only": 0, "reconciled": 0,
-                        "confirmed": 0, "disputed": 0, "pending_second": 0}
+                        "confirmed": 0, "disputed": 0, "pending_second": 0,
+                        "corrected": 0}
     for g in (doc.get("games") or []):
         if g.get("state") != "F":
             continue
@@ -250,9 +251,21 @@ def build():
         # a location and unavailable when it did not, until a venue-specific
         # source exists.
         bt = boxes.get(gid)
+        # ⚠ A CORRECTED RECORD IS NEVER "RECONCILED" (USC-Arizona St.,
+        # 2026-08-29). This module reads the corrected dataset, so a set
+        # line supplied by the correction agrees with the corrected winner
+        # BY CONSTRUCTION -- calling that agreement "internally reconciled"
+        # would launder the correction into the feed's own credibility.
+        # The state says what actually happened: an incomplete or incorrect
+        # scoreboard record, corrected from named official evidence. The
+        # confirmation ladder stays with result_evidence.json; a correction
+        # never upgrades anything to cross-source confirmed.
+        _cd = corr_detail.get(gid) or {}
         bases = {
-            "result": "reconciled" if rec else "official",
-            "sets": "reconciled" if rec else "official",
+            "result": ("corrected" if _cd else
+                       "reconciled" if rec else "official"),
+            "sets": ("corrected" if _cd else
+                     "reconciled" if rec else "official"),
             "box": ("reconciled" if bt and bt[0] == 2 and nsets
                     and bt[1] == nsets else "official"),
             "venue": ("official" if (g.get("location") or {}).get("venue")
@@ -262,6 +275,7 @@ def build():
                       for f in FIELDS)
         overall = ("disputed" if "disputed" in states.values()
                    else "confirmed" if states["result"] == "confirmed"
+                   else "corrected" if _cd
                    else "reconciled" if rec else "official")
         srcs = [e for e in entries if isinstance(e, dict)
                 and e.get("status") in ("confirms", "conflicts")]
@@ -288,7 +302,6 @@ def build():
             "has_box": gid in boxes,
         })
         _dd = dup_detail.get(gid) or {}
-        _cd = corr_detail.get(gid) or {}
         rows.append({
             # ⚠ A CORRECTED RESULT SAYS SO. The feed's derived winner field
             # for this final was overridden at the counting layer on ledger
@@ -297,6 +310,7 @@ def build():
             # the raw feed (round 18+, Kent St.-W&M).
             "result_corrected": bool(_cd) or None,
             "corr_reason": _cd.get("established"),
+            "corr_kind": g.get("result_corrected_kind") if _cd else None,
             "corr_feed_said": _cd.get("feed_said"),
             "corr_evidence": [
                 {"school": e.get("school"), "url": e.get("url"),
@@ -345,6 +359,8 @@ def build():
             counts["disputed"] += 1
         elif overall == "confirmed":
             counts["confirmed"] += 1
+        elif overall == "corrected":
+            counts["corrected"] += 1
         elif overall == "reconciled":
             counts["reconciled"] += 1
         else:
@@ -371,7 +387,8 @@ def build():
     json.dump(out, open(dst, "w"), indent=1)
     print("confidence: %(finals)d finals -- %(confirmed)d cross-source "
           "confirmed, %(disputed)d disputed, %(reconciled)d internally "
-          "reconciled, %(official_only)d official-only" % counts)
+          "reconciled, %(corrected)d corrected from official evidence, "
+          "%(official_only)d official-only" % counts)
     return 0
 
 

@@ -65,9 +65,26 @@
    "correct": {
     "winner_team_id": "46121",
     "away_sets": 3,
-    "home_sets": 0
+    "home_sets": 0,
+    "linescores": [
+     {
+      "period": "1",
+      "home": "23",
+      "visit": "25"
+     },
+     {
+      "period": "2",
+      "home": "21",
+      "visit": "25"
+     },
+     {
+      "period": "3",
+      "home": "22",
+      "visit": "25"
+     }
+    ]
    },
-   "established": "Southern California (away) beat Arizona St. 3-0 (25-23, 25-21, 25-22) at the Sanford Pentagon, Sioux Falls -- State Farm Women's Volleyball Showcase. The official NCAA LiveStats box score (supplied by Cody as a PDF) shows sets to 25, attendance 3,376, and team records moving (USC 1-0, ASU 2-1): a counting match.",
+   "established": "Southern California (away) beat Arizona St. 3-0 (25-23, 25-21, 25-22) at the Sanford Pentagon, Sioux Falls -- State Farm Women's Volleyball Showcase. The official NCAA LiveStats box score (supplied by Cody as a PDF) shows sets to 25, attendance 3,376, and team records moving (USC 1-0, ASU 2-1): a counting match. The per-set line is supplied from the box score because the feed's own linescores array is EMPTY on this final; a correction may fill an absent line from cited official evidence but may never overwrite one the feed carries.",
    "evidence": [
     {
      "url": "https://usctrojans.com/sports/womens-volleyball/schedule",
