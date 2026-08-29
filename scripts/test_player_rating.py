@@ -188,9 +188,20 @@ def main():
     rc, rp = PR.roster_class(), PR.roster_positions()
     check("roster class lookup is populated", len(rc) > 2000, "%d" % len(rc))
     check("roster position lookup is populated", len(rp) > 800, "%d" % len(rp))
-    check("no player is left without a resolvable position",
-          meta.get("n_unresolved_position", 0) == 0,
-          str(meta.get("n_unresolved_position")))
+    # ⚠ A RATIO, NOT ZERO. `== 0` held while two matches had been played;
+    # the first full slate (147 finals) brought 44 debutantes with no roster
+    # row and no usable box position -- 1.1% of the pool, each correctly
+    # SKIPPED rather than guessed at (R5). A fixed zero fails on data
+    # growth, not regression -- the same calendar-shaped mistake as the
+    # star-join count and the exhibition badge. The invariant is resolution
+    # HEALTH: a real join break is ~100%; five percent is the sanity bound,
+    # stated as one.
+    _nun = meta.get("n_unresolved_position", 0) or 0
+    _npl = len(d.get("players") or []) or 1
+    check("unresolved positions stay a rare skip, never a guess",
+          _nun / float(_nun + _npl) <= 0.05,
+          "%d unresolved vs %d rated (%.1f%%)"
+          % (_nun, _npl, 100.0 * _nun / (_nun + _npl)))
 
     print("\n7. THE CONSTRUCTED LINEUPS")
     st = d.get("all_star") or {}

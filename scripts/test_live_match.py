@@ -326,6 +326,51 @@ def main():
               cols == ["Team", "K", "E", "TA", "Hit%", "Digs", "Blk", "Aces"],
               str(cols))
 
+    # ── ONE LIVE-BOX STATE PER MATCH PAGE (outside review, 2026-08-28) ──
+    # Stanford-Wisconsin rendered a populated Live-stats table ABOVE a Box
+    # score note reading "the source is not serving statistics for this match
+    # yet". Two verdicts from two sources: the bulk scoreboard (cannot see
+    # stats, so every live match resolves live_score_only) and the per-match
+    # fetch (can, and did). The fix: the per-match verdict OWNS the state
+    # note the moment it lands -- lmcRender rewrites #mpendnote from
+    # d.state_label/d.state_note, both drawn from the same match_state.py
+    # table. These guards pin the mechanism and its wiring.
+    hub2 = os.path.join(REPO, "Cody", "START-HERE.html")
+    if os.path.exists(hub2):
+        page2 = open(hub2, encoding="utf-8").read()
+        check("the pending box-score note is addressable (#mpendnote)",
+              'id="mpendnote"' in page2)
+        lr = re.search(r"function lmcRender.*?\n\}", page2, re.S)
+        lrs = lr.group(0) if lr else ""
+        check("lmcRender rewrites the note from the per-match verdict",
+              "getElementById('mpendnote')" in lrs
+              and "d.state_note" in lrs and "d.state_label" in lrs, 
+              "lmcRender does not own the state note")
+        # the note text itself must come from the shared table, not a second
+        # spelling -- match_state.py is the one place the words live
+        import match_state as MS2
+        check("score-only wording exists only in the shared state table",
+              page2.count("not serving statistics")
+              <= len(re.findall(r"not serving statistics",
+                                json.dumps(MS2.DETAIL_NOTE))) + 1,
+              "%d occurrences in the page" % page2.count("not serving statistics"))
+        # negative control: a page whose lmcRender lost the rewrite must trip
+        bogus = page2.replace("getElementById('mpendnote')",
+                              "getElementById('mpendnote_gone')")
+        lrb = re.search(r"function lmcRender.*?\n\}", bogus, re.S)
+        check("[NEG] removing the rewrite is caught",
+              "getElementById('mpendnote')" not in (lrb.group(0) if lrb else ""))
+        # the dossier's live card uses the ONE live phrasing
+        tdn = re.search(r"function tdNextMatch.*?\n\}", page2, re.S)
+        tds = tdn.group(0) if tdn else ""
+        check("team-card live line is liveLine(), not a bespoke tally",
+              "liveLine(m || f, live)" in tds)
+        check("  ...and no leftover inline tally builder",
+              "_sc[0] + '\\u2013' + _sc[1] + ' &middot; '" not in tds)
+        # neutral floor never renders as somebody's home
+        check("a neutral fixture on the team card says 'v', never 'at'",
+              "f.site === 'neutral' ? 'v '" in tds)
+
     print()
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))

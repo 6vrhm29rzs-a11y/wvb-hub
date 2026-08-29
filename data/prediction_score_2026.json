@@ -2,46 +2,46 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 141,
+  "scored": 168,
   "logged_after_tipoff_excluded": 2,
-  "team_mismatch_excluded": 4,
-  "predictions_on_record": 4762,
-  "results_available": 152,
-  "brier": 0.1954,
+  "team_mismatch_excluded": 5,
+  "predictions_on_record": 4764,
+  "results_available": 181,
+  "brier": 0.1863,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 101,
-  "favourite_correct_pct": 71.6
+  "favourite_correct": 122,
+  "favourite_correct_pct": 72.6
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 20,
-   "said": 55.7,
-   "happened": 60.0
+   "n": 24,
+   "said": 55.6,
+   "happened": 58.3
   },
   {
    "range": "60-70%",
-   "n": 23,
-   "said": 64.8,
-   "happened": 52.2
+   "n": 28,
+   "said": 64.6,
+   "happened": 53.6
   },
   {
    "range": "70-80%",
-   "n": 19,
-   "said": 75.8,
-   "happened": 63.2
+   "n": 24,
+   "said": 75.7,
+   "happened": 66.7
   },
   {
    "range": "80-90%",
-   "n": 29,
-   "said": 84.8,
-   "happened": 75.9
+   "n": 33,
+   "said": 84.7,
+   "happened": 75.8
   },
   {
    "range": "90-101%",
-   "n": 50,
-   "said": 95.6,
-   "happened": 86.0
+   "n": 59,
+   "said": 95.5,
+   "happened": 88.1
   }
  ],
  "matches": [
@@ -154,6 +154,15 @@
    "brier": 0.73017025
   },
   {
+   "game_id": "6624352",
+   "date": "2026-08-28",
+   "away": "Miami (FL)",
+   "home": "Michigan St.",
+   "p_home": 0.162,
+   "home_won": true,
+   "brier": 0.702244
+  },
+  {
    "game_id": "6628213",
    "date": "2026-08-28",
    "away": "UT Arlington",
@@ -215,6 +224,15 @@
    "p_home": 0.7438,
    "home_won": false,
    "brier": 0.55323844
+  },
+  {
+   "game_id": "6628405",
+   "date": "2026-08-28",
+   "away": "William & Mary",
+   "home": "Virginia Tech",
+   "p_home": 0.7239,
+   "home_won": false,
+   "brier": 0.52403121
   },
   {
    "game_id": "6626781",
@@ -316,6 +334,24 @@
    "brier": 0.394384
   },
   {
+   "game_id": "6627900",
+   "date": "2026-08-28",
+   "away": "St. John's (NY)",
+   "home": "Old Dominion",
+   "p_home": 0.3738,
+   "home_won": true,
+   "brier": 0.39212643999999997
+  },
+  {
+   "game_id": "6637449",
+   "date": "2026-08-28",
+   "away": "Winthrop",
+   "home": "Davidson",
+   "p_home": 0.3792,
+   "home_won": true,
+   "brier": 0.38539264
+  },
+  {
    "game_id": "6627962",
    "date": "2026-08-28",
    "away": "Oregon St.",
@@ -332,6 +368,15 @@
    "p_home": 0.3859,
    "home_won": true,
    "brier": 0.37711880999999997
+  },
+  {
+   "game_id": "6624294",
+   "date": "2026-08-28",
+   "away": "Marquette",
+   "home": "Dayton",
+   "p_home": 0.4011,
+   "home_won": true,
+   "brier": 0.35868121
   },
   {
    "game_id": "6628259",
@@ -406,6 +451,15 @@
    "brier": 0.26615281
   },
   {
+   "game_id": "6627619",
+   "date": "2026-08-28",
+   "away": "UC Davis",
+   "home": "Colorado St.",
+   "p_home": 0.4922,
+   "home_won": true,
+   "brier": 0.25786084000000004
+  },
+  {
    "game_id": "6639888",
    "date": "2026-08-23",
    "away": "Kentucky",
@@ -424,6 +478,15 @@
    "brier": 0.24314761
   },
   {
+   "game_id": "6625576",
+   "date": "2026-08-28",
+   "away": "South Dakota",
+   "home": "Drake",
+   "p_home": 0.4768,
+   "home_won": false,
+   "brier": 0.22733824
+  },
+  {
    "game_id": "6624301",
    "date": "2026-08-28",
    "away": "Utah Tech",
@@ -431,69 +494,6 @@
    "p_home": 0.4629,
    "home_won": false,
    "brier": 0.21427640999999997
-  },
-  {
-   "game_id": "6624987",
-   "date": "2026-08-28",
-   "away": "UNI",
-   "home": "Georgia Tech",
-   "p_home": 0.5512,
-   "home_won": true,
-   "brier": 0.20142143999999998
-  },
-  {
-   "game_id": "6638585",
-   "date": "2026-08-28",
-   "away": "Oral Roberts",
-   "home": "Nicholls",
-   "p_home": 0.4433,
-   "home_won": false,
-   "brier": 0.19651489000000003
-  },
-  {
-   "game_id": "6625869",
-   "date": "2026-08-28",
-   "away": "Idaho St.",
-   "home": "Missouri St.",
-   "p_home": 0.5727,
-   "home_won": true,
-   "brier": 0.18258529
-  },
-  {
-   "game_id": "6628603",
-   "date": "2026-08-28",
-   "away": "Santa Clara",
-   "home": "Wright St.",
-   "p_home": 0.5728,
-   "home_won": true,
-   "brier": 0.18249984000000002
-  },
-  {
-   "game_id": "6625217",
-   "date": "2026-08-28",
-   "away": "Fairfield",
-   "home": "Morehead St.",
-   "p_home": 0.5732,
-   "home_won": true,
-   "brier": 0.18215823999999997
-  },
-  {
-   "game_id": "6628152",
-   "date": "2026-08-28",
-   "away": "Eastern Mich.",
-   "home": "NIU",
-   "p_home": 0.4233,
-   "home_won": false,
-   "brier": 0.17918289
-  },
-  {
-   "game_id": "6627747",
-   "date": "2026-08-28",
-   "away": "North Dakota",
-   "home": "Eastern Wash.",
-   "p_home": 0.4198,
-   "home_won": false,
-   "brier": 0.17623204
   }
  ]
 }

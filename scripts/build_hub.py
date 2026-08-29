@@ -6499,6 +6499,25 @@ label.fr-btn{cursor:pointer;display:inline-block}
    colour and a rule. */
 .ribbon{border-top:2px solid var(--line2);border-bottom:1px solid var(--line);
   padding:16px 0 14px;margin:2px 0 6px}
+/* ⚠ ONE FIRST-SCREEN BROADCAST MODULE (outside review, 2026-08-28: "the
+   important line score begins below a large empty field"). The ribbon was
+   two full-width team rows whose only number sat at the FAR right edge, with
+   the reference table floating centered BELOW -- so the first screen spent
+   ~350px saying very little. Now a two-column grid: team identities left,
+   the reference table right, vertically centered across both team rows. The
+   lone far-right tally is hidden when the table is present -- its S column
+   already states it, and one fact should not render twice at two sizes. */
+.ribbon.hasdls{display:grid;grid-template-columns:minmax(0,1fr) auto;
+  column-gap:30px;align-items:center}
+.ribbon.hasdls .rbtop{grid-column:1 / -1}
+.ribbon.hasdls .dlswrap{grid-column:2;grid-row:2 / span 2;margin:0;
+  justify-self:end;align-self:center}
+.ribbon.hasdls .rbside{grid-column:1}
+.ribbon.hasdls .rbsc{display:none}
+@media (max-width:760px){
+  .ribbon.hasdls{display:block}
+  .ribbon.hasdls .dlswrap{margin:12px 0 2px}
+}
 .ribbon.live{border-top-color:var(--coral)}
 .ribbon.final{border-top-color:var(--line2)}
 .ribbon.upcoming{border-top-color:var(--navy)}
@@ -12244,6 +12263,20 @@ function lmcRender(gid) {
     '</div>' + lmcBody(d);
   /* the freshness line beside the manual control, so the reader can see when
      the last SUCCESSFUL refresh was without reading the panel */
+  /* ⚠ ONE LIVE-BOX STATE, EVERY SECTION TOGETHER. The Box score section is
+     rendered once from the BULK feed's verdict, which is 'live_score_only'
+     for every live match -- the scoreboard call cannot see stats. This
+     per-match fetch CAN, and the page was leaving both verdicts standing:
+     a populated Live-stats table above a note reading "the source is not
+     serving statistics for this match yet" (caught by outside review,
+     2026-08-28, on Stanford-Wisconsin). The per-match resolve is the more
+     informed one, so when it lands it OWNS the state note -- same words,
+     same table (match_state.py), later knowledge. */
+  const mp = document.getElementById('mpendnote');
+  if (mp && d && !d.unreachable && d.state_label && d.state_note) {
+    mp.innerHTML = '<b>' + esc(d.state_label) + '</b><span>' +
+      esc(d.state_note) + '</span>';
+  }
   const sp = document.getElementById('lmcstamp');
   if (sp) {
     sp.textContent = !d ? 'contacting the local server\u2026'
@@ -14271,7 +14304,7 @@ function ribbonHTML(m, live, why) {
       rowOf(mAway(m), 0, sc[0]) + rowOf(mHome(m), 1, sc[1]) +
       '</table></div>';
   }
-  return '<div class="ribbon ' + st + '">' +
+  return '<div class="ribbon ' + st + (ledger ? ' hasdls' : '') + '">' +
     '<div class="rbtop"><span class="rbstate ' + st + '">' +
       (st === 'live' ? ICON_LIVE + ' Live' : st === 'final' ? 'Final' : 'Upcoming') +
       '</span><span class="rbwhen">' + when + '</span>' +
@@ -15029,7 +15062,7 @@ function renderMatchDetail(gid, dest) {
          standing where data should be. */
       '<div class="msec"><h3>Box score</h3>' +
         (box ? box
-             : '<div class="mpend"><b>' + esc(MSTATE.label[s6] || '') +
+             : '<div class="mpend" id="mpendnote"><b>' + esc(MSTATE.label[s6] || '') +
                '</b><span>' + esc(MSTATE.note[s6] || '') + '</span>' +
                (s6 === 'final_box_pending'
                  ? '<span class="mfine">It is written to the site by the ' +
@@ -18267,7 +18300,11 @@ function tdNextMatch(t, name) {
     '<span class="tdlab">' + (st === 'live' ? 'Playing now'
       : st === 'final' ? 'Most recent' : 'Next match') + '</span>' +
     '<a class="tdnextrow" href="' + matchRoute(f.gid, 'teams') + '">' +
-      '<span class="tdvs">' + (f.home ? 'vs ' : 'at ') + logo(opp, 'sm') +
+      /* 'at Wisconsin' beside 'neutral floor - Pittsburgh' is a
+         contradiction: 'at' claims their floor. Neutral gets 'v', the same
+         connector rule the rest of the page uses. */
+      '<span class="tdvs">' + (f.site === 'neutral' ? 'v '
+                               : f.home ? 'vs ' : 'at ') + logo(opp, 'sm') +
         '<b>' + esc(opp) + '</b></span>' +
       /* ⚠ A CARD ABOUT A MATCH IN PROGRESS SAYS THE SCORE, NOT THE START
          TIME -- and NEVER the pre-match pick. "TODAY - 3:00 PM PT - 99% TO
@@ -18277,12 +18314,13 @@ function tdNextMatch(t, name) {
          is a statement about a match that has not started; the moment it has,
          the truthful line is the tally and the period. */
       '<span class="tdwhen">' + (st === 'live'
-        ? (function () {
-            const _sc = matchScore(m || f, live);
-            return (_sc && _sc[0] !== null && _sc[0] !== undefined
-                    ? _sc[0] + '\u2013' + _sc[1] + ' &middot; ' : '') +
-              esc((live && live.period) || 'in progress');
-          })()
+        /* ⚠ THE ONE LIVE PHRASING. This branch used to build its own
+           "tally - period" line, so the dossier said "0-1 - 2ND SET" while
+           every other surface also carried the current-set points (17-17).
+           liveLine() is the single definition -- tally, period, current
+           points when the feed supplies them, nothing invented when it
+           does not. Caught by outside review, 2026-08-28. */
+        ? (liveLine(m || f, live) || 'in progress')
         : st === 'final'
         ? (function () {
             const _sc = matchScore(m || f, live);
