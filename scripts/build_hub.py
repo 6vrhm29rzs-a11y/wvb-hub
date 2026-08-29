@@ -3761,6 +3761,16 @@ def build():
         _gid = str(_g.get("game_id"))
         _epoch_of[_gid] = _g.get("start_time_epoch")
         if _g.get("state") == "F":
+            # ⚠ SAME RULE AS `res` (2026-08-29): a "final" with no winner, no
+            # set counts and no line scores asserts no result. Baking it into
+            # a desk card as final:{hs:None,as:None,sets:[]} is exactly the
+            # half-finished object the desk guard forbids. It counts nowhere;
+            # the Result Ledger's official-only state is where it stays
+            # visible.
+            _ts2 = _g.get("teams") or []
+            if _g.get("winner_team_id") is None and all(
+                    t.get("sets_won") is None for t in _ts2):
+                continue
             _final_of[_gid] = _g
 
     def _desk_forecast(gid, is_final):

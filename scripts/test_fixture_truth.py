@@ -236,8 +236,21 @@ def main():
     r = fx.get("6625717") or {}
     check("6625717 (final, feed silent): no venue asserted", r.get("venue") is None,
           repr(r.get("venue")))
-    check("  ...and the withheld correction says so",
-          bool(r.get("correction_withheld")), repr(r.get("correction_withheld")))
+    # ⚠ CLOCK-AWARE, NOT CALENDAR-PINNED (the round-10 lesson, same day).
+    # While the pregame ledger entry was VALID, the final withholds it and
+    # says so; once the entry passes its review_by date the ledger retires
+    # it, there is nothing left to withhold, and correction_withheld is
+    # correctly absent. Both are honest states of the same policy; pinning
+    # the first made the suite go red at the entry's review date.
+    import ledger as _LG
+    _has_corr = "6625717" in (_LG.load()["corrections"] or {})
+    if _has_corr:
+        check("  ...and the withheld correction says so",
+              bool(r.get("correction_withheld")),
+              repr(r.get("correction_withheld")))
+    else:
+        check("  ...its pregame entry has retired (review date passed); "
+              "nothing to withhold", not r.get("venue"))
     # ⚠ THE LEDGER MOVED AND ITS SCHEMA TIGHTENED. Support is now per FIELD,
     # so this no longer checks "the entry has a url" -- it checks that every
     # single overridden fact carries its own citation. scripts/test_ledger.py
@@ -271,7 +284,16 @@ def main():
               "the Schedule would list a match the match route denies")
         for gid in ("6626809", "6628315", "6625717"):
             a, b = FIX.get(gid) or {}, fx.get(gid) or {}
-            same = all(a.get(k) == b.get(k)
+            # ⚠ None and "unconfirmed" are ONE claim in two spellings --
+            # both mean "no site asserted, fail closed". The schedule payload
+            # leaves the field empty; canonical_fixtures names the state.
+            # Surfaced when 6625717's pregame correction retired and the
+            # underlying no-assertion state showed through on both sides.
+            def _norm(v, k):
+                if k == "site" and v in (None, "", "unconfirmed"):
+                    return None
+                return v
+            same = all(_norm(a.get(k), k) == _norm(b.get(k), k)
                        for k in ("venue", "city", "site", "event"))
             check("%s: page payload == canonical record" % gid, same,
                   "%s vs %s" % (a.get("venue"), b.get("venue")))
