@@ -2,28 +2,28 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 221,
+  "scored": 225,
   "logged_after_tipoff_excluded": 6,
   "team_mismatch_excluded": 6,
   "predictions_on_record": 4766,
-  "results_available": 239,
-  "brier": 0.1877,
+  "results_available": 245,
+  "brier": 0.187,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 160,
+  "favourite_correct": 163,
   "favourite_correct_pct": 72.4
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 29,
-   "said": 55.2,
-   "happened": 55.2
+   "n": 30,
+   "said": 55.3,
+   "happened": 56.7
   },
   {
    "range": "60-70%",
-   "n": 45,
+   "n": 46,
    "said": 64.5,
-   "happened": 57.8
+   "happened": 56.5
   },
   {
    "range": "70-80%",
@@ -39,9 +39,9 @@
   },
   {
    "range": "90-101%",
-   "n": 76,
+   "n": 78,
    "said": 95.8,
-   "happened": 88.2
+   "happened": 88.5
   }
  ],
  "matches": [
@@ -388,6 +388,15 @@
    "brier": 0.41744521
   },
   {
+   "game_id": "6624644",
+   "date": "2026-08-29",
+   "away": "CSU Bakersfield",
+   "home": "Abilene Christian",
+   "p_home": 0.6391,
+   "home_won": false,
+   "brier": 0.40844881
+  },
+  {
    "game_id": "6626328",
    "date": "2026-08-28",
    "away": "High Point",
@@ -485,15 +494,6 @@
    "p_home": 0.4011,
    "home_won": true,
    "brier": 0.35868121
-  },
-  {
-   "game_id": "6628259",
-   "date": "2026-08-29",
-   "away": "N.C. Central",
-   "home": "Florida A&M",
-   "p_home": 0.5853,
-   "home_won": false,
-   "brier": 0.34257609000000006
   }
  ]
 }
