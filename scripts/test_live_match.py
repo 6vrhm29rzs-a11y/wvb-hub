@@ -348,10 +348,17 @@ def main():
     else:
         page2 = open(hub2, encoding="utf-8").read()
     if page2:
+        # ⚠ BRACE-AWARE, NOT NON-GREEDY (review round 3): `.*?\n\}` truncates
+        # at the first nested function, the exact trap test_scoreboard_density
+        # already paid for -- so its comment-aware matcher is the one used.
+        from test_scoreboard_density import block as _js_block
+
+        def _fn(name):
+            i = page2.find("function %s(" % name)
+            return _js_block(page2, i) if i >= 0 else None
         check("the pending box-score note is addressable (#mpendnote)",
               'id="mpendnote"' in page2)
-        lr = re.search(r"function lmcRender.*?\n\}", page2, re.S)
-        lrs = lr.group(0) if lr else ""
+        lrs = _fn("lmcRender") or ""
         check("lmcRender rewrites the note from the per-match verdict",
               "getElementById('mpendnote')" in lrs
               and "d.state_note" in lrs and "d.state_label" in lrs, 
@@ -368,8 +375,8 @@ def main():
         # functions). Both fixture states, then the same invariant against a
         # deliberately regressed lmcRender -- the control is the invariant
         # FAILING, not a string being absent. ──────────────────────────────
-        _lmcbody = re.search(r"function lmcBody\(d\).*?\n\}", page2, re.S)
-        _lmcrend = re.search(r"function lmcRender\(gid\).*?\n\}", page2, re.S)
+        _lmcbody = _fn("lmcBody")
+        _lmcrend = _fn("lmcRender")
         if not (_lmcbody and _lmcrend):
             check("lmcBody/lmcRender extracted for behavioural run", False)
         else:
@@ -412,15 +419,15 @@ if (!/not serving statistics/.test(so.note))
   bad.push('score-only: the score-only note is missing');
 if (bad.length) { console.log('INVARIANT-FAILED: ' + bad.join(' | ')); process.exit(1); }
 console.log('INVARIANT-HOLDS'); process.exit(0);
-""" % (_lmcbody.group(0), render_src)
+""" % (_lmcbody, render_src)
                 r = _sp.run(["node", "-e", js], capture_output=True, text=True)
                 return r.returncode == 0, (r.stdout + r.stderr).strip()
 
-            _okrun, _why = _run_invariant(_lmcrend.group(0))
+            _okrun, _why = _run_invariant(_lmcrend)
             check("BEHAVIOUR: both live-box states hold the invariant",
                   _okrun, _why[:200])
             # the regression: lmcRender that no longer rewrites the note
-            _regressed = _lmcrend.group(0).replace(
+            _regressed = _lmcrend.replace(
                 "document.getElementById('mpendnote')", "null")
             _okbad, _whybad = _run_invariant(_regressed)
             check("[NEG] the regressed lmcRender FAILS the same invariant",
@@ -448,9 +455,32 @@ console.log('INVARIANT-HOLDS'); process.exit(0);
         check("[NEG] removing the upcoming gate is caught",
               "st === 'upcoming' && m.hw !== null" not in _b2)
 
+        # ── PROBABILITY DISPLAY RULE (review round 3): never rounded
+        # certainty. 99.97% printed as "100%" reads as a guarantee. The rule
+        # lives in ONE function (deskPct) and every pick call site uses it,
+        # so the boundary behaviour is executed, not pattern-matched.
+        _dp = _fn("deskPct")
+        if not _dp:
+            check("deskPct extracted", False)
+        else:
+            import subprocess as _sp2
+            _bjs = _dp + """
+const cases = [[0.0003,'<1%'],[0.005,'1%'],[0.5,'50%'],[0.994,'99%'],
+               [0.9997,'99+%'],[1.0,'99+%'],[0.0,'<1%']];
+const bad2 = cases.filter(c => deskPct(c[0]) !== c[1])
+  .map(c => c[0]+' -> '+deskPct(c[0])+' (want '+c[1]+')');
+if (bad2.length) { console.log('FAIL: '+bad2.join(' | ')); process.exit(1); }
+console.log('OK'); process.exit(0);
+"""
+            _r2 = _sp2.run(["node", "-e", _bjs], capture_output=True, text=True)
+            check("BEHAVIOUR: probability boundaries (99+%, <1%)",
+                  _r2.returncode == 0, (_r2.stdout + _r2.stderr).strip()[:160])
+            check("no pick site bypasses deskPct",
+                  not re.search(r"Math\.round\([^)]*(?:pick|hw)[^)]*\*\s*100\)",
+                                page2))
+
         # the dossier's live card uses the ONE live phrasing
-        tdn = re.search(r"function tdNextMatch.*?\n\}", page2, re.S)
-        tds = tdn.group(0) if tdn else ""
+        tds = _fn("tdNextMatch") or ""
         check("team-card live line is liveLine(), not a bespoke tally",
               "liveLine(m || f, live)" in tds)
         check("  ...and no leftover inline tally builder",

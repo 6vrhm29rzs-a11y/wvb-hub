@@ -244,6 +244,36 @@ def main():
     check("a safe accessor exists for the ones that survive a removal",
           "function $$(id)" in src)
 
+    # ── THE LIVE TICKER (Cody, 2026-08-28: "every sports site has an upper
+    # banner of live games"). Invariants: every chip routes through the ONE
+    # open-a-match handler (data-match); the strip hides when nothing is
+    # live rather than rendering an empty frame; a rebuild preserves the
+    # reader's scroll position and skips when content is unchanged -- a strip
+    # that snaps back to the left every 60 seconds is unusable; and the live
+    # band's cards route too (a match-shaped box that does nothing when
+    # tapped reads as broken -- the just-finished and live cards were the
+    # only match surfaces with no data-match).
+    print("\n8. THE LIVE TICKER")
+    check("the ticker mount exists", 'id="livetick"' in h)
+    _tk = src[src.find("function csTicker"):]
+    _tk = _tk[:_tk.find("async function pollLive")]
+    check("chips route through data-match", "data-match=" in _tk
+          and 'class="tkm"' in _tk)
+    check("hidden when nothing is live",
+          "el.hidden = true" in _tk and "TK_LAST = ''" in _tk)
+    check("scroll position survives a rebuild",
+          "el.scrollLeft" in _tk and "keep" in _tk)
+    check("unchanged content skips the rebuild",
+          "html === TK_LAST" in _tk)
+    check("current-set points come from the feed, never invented",
+          "cur[0] !== null" in _tk)
+    check("the live band cards carry data-match",
+          "class=\"card islive\" data-match=" in src.replace("' +\n      '", ""))
+    check("the just-finished cards carry data-match",
+          "class=\"card done\" data-match=" in src)
+    _b = _tk.replace("data-match=", "data-nothing=")
+    check("[NEG] chips without routing are caught", "data-match=" not in _b)
+
     print()
     # ⚠ page() returns (html, filename), not a string. Passing the tuple
     #   made every `in` check test tuple MEMBERSHIP, which is always

@@ -6511,8 +6511,15 @@ label.fr-btn{cursor:pointer;display:inline-block}
    pushed the table to the far right edge and re-created a blank centre one
    size smaller. Both columns are content-sized and sit together; the module
    reads as one unit and the page's whitespace falls OUTSIDE it. */
-.ribbon.hasdls{display:grid;grid-template-columns:minmax(auto,620px) auto;
+.ribbon.hasdls{display:grid;grid-template-columns:max-content auto;
   justify-content:start;column-gap:56px;align-items:center}
+/* the identity rows must actually BE max-content: the inner 1fr name track
+   stretched the anchor across ~620px even for "STANFORD", so the measured
+   gap was 68px while the VISIBLE gap from the last glyph was ~300px. The
+   name column sizes to its text (capped for pathological names) and the
+   whole module truly hugs its content. */
+.ribbon.hasdls .rbside{grid-template-columns:26px 34px minmax(max-content,auto)}
+.ribbon.hasdls .rbnm{max-width:520px}
 .ribbon.hasdls .rbtop{grid-column:1 / -1}
 .ribbon.hasdls .dlswrap{grid-column:2;grid-row:2 / span 2;margin:0;
   align-self:center}
@@ -7999,6 +8006,36 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 }
 
 /* the honest "not yet" state, where a table would otherwise be */
+/* ── THE LIVE TICKER ─────────────────────────────────────────────────── */
+#livetick{display:flex;align-items:stretch;gap:0;overflow-x:auto;
+  border-bottom:1px solid var(--line);background:color-mix(in oklab,var(--navy) 24%,black);
+  scrollbar-width:none}
+#livetick::-webkit-scrollbar{display:none}
+#livetick .tklab{display:flex;align-items:center;gap:6px;flex:0 0 auto;
+  padding:0 12px;font:700 9.5px/1 var(--disp);letter-spacing:.14em;color:var(--coral);
+  border-right:1px solid var(--line);position:sticky;left:0;z-index:2;
+  background:inherit}
+#livetick .tkdot{width:6px;height:6px;border-radius:50%;background:var(--coral);
+  animation:tkpulse 1.6s ease-in-out infinite}
+@keyframes tkpulse{50%{opacity:.35}}
+#livetick .tkm{flex:0 0 auto;display:flex;align-items:center;gap:7px;
+  padding:7px 13px;border-right:1px solid var(--line);cursor:pointer;
+  font:600 11.5px/1 var(--mono);color:var(--ink2);background:none;border-top:0;
+  border-bottom:0;border-left:0}
+#livetick .tkm:hover{background:color-mix(in oklab,var(--line) 40%,transparent)}
+#livetick .tkm:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:-2px}
+#livetick .tkm img{width:15px;height:15px;object-fit:contain}
+#livetick .tkm b{color:var(--chalk);font-weight:700}
+#livetick .tkm .tkset{color:var(--gold);font-weight:700}
+#livetick .tkm .tkrk{font:600 9px/1 var(--disp);color:var(--gold)}
+#livetick .tkm .tkper{font:600 9px/1 var(--disp);letter-spacing:.08em;
+  color:var(--ink3);text-transform:uppercase}
+@media (max-width:560px){
+  #livetick .tkm{padding:9px 12px}
+}
+.card[data-match]{cursor:pointer}
+.card[data-match]:hover{border-color:var(--line2)}
+.card[data-match]:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .mpend{display:flex;flex-direction:column;gap:4px;padding:12px 14px;
   border:1px dashed var(--line2);border-radius:4px;background:var(--alt)}
 .mpend b{font:700 12px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase;
@@ -8328,6 +8365,13 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
        than two that could drift apart (R4). Empty until csTape() fills it;
        there is no hand-written fallback markup to go stale. -->
   <div id="cstape"></div>
+  <!-- THE LIVE TICKER. Every match in progress, one slim scrollable strip --
+       the banner every sports site keeps across the top (Cody's ask,
+       2026-08-28). The tape above features ONE match; this answers "and what
+       else is on". Filled by the poller; hidden when nothing is live, and on
+       a static host it simply never appears -- the honest state, not an
+       empty frame. -->
+  <div id="livetick" hidden></div>
   <!-- COURTSIGNAL-TAPE-END -->
   </header>
   <nav role="tablist"><div class="inner">
@@ -9696,6 +9740,48 @@ function slateFromSchedule() {
                  away_rank: r.ar, home_rank: r.hr, state: 'pre' }));
 }
 
+/* THE LIVE TICKER. Every in-progress match as one slim chip: crests, the set
+   tally, the current set's points, the set name -- and each chip routes
+   through the same open-a-match handler as every row. Rebuilt only when its
+   content actually changes, and the reader's scroll position survives the
+   rebuild; a strip that snaps back to the left every 60 seconds is unusable.
+   Ranked pairings sort first: with 50+ live the leftmost chips are the ones
+   worth a glance. */
+let TK_LAST = '';
+function csTicker(live) {
+  const el = document.getElementById('livetick');
+  if (!el) return;
+  if (!live || !live.length) { el.hidden = true; TK_LAST = ''; return; }
+  const rows = live.slice().sort((a, b) => {
+    const ra = (a.away_rank || a.home_rank) ? 0 : 1;
+    const rb2 = (b.away_rank || b.home_rank) ? 0 : 1;
+    if (ra !== rb2) return ra - rb2;
+    return String(a.id).localeCompare(String(b.id));
+  });
+  const chip = g => {
+    const cur = (g.sets && g.sets.length) ? g.sets[g.sets.length - 1] : null;
+    const pts = (cur && cur[0] !== null && cur[0] !== undefined)
+      ? ' <span class="tkset">' + cur[0] + '\u2013' + cur[1] + '</span>' : '';
+    const rk = n => n ? '<span class="tkrk">#' + n + '</span>' : '';
+    return '<button type="button" class="tkm" data-match="' + esc(String(g.id)) +
+      '" data-dest="desk">' +
+      rk(g.away_rank) + logo(g.away, 'sm') + '<b>' + esc(g.away) + '</b> ' +
+      mNum(g.away_sets) + '\u2013' + mNum(g.home_sets) +
+      ' <b>' + esc(g.home) + '</b>' + logo(g.home, 'sm') + rk(g.home_rank) +
+      pts +
+      (g.period ? ' <span class="tkper">' + esc(g.period) + '</span>' : '') +
+      '</button>';
+  };
+  const html = '<span class="tklab"><i class="tkdot"></i>LIVE ' + live.length +
+    '</span>' + rows.map(chip).join('');
+  if (html === TK_LAST) { el.hidden = false; return; }
+  const keep = el.scrollLeft;
+  el.innerHTML = html;
+  el.hidden = false;
+  el.scrollLeft = keep;
+  TK_LAST = html;
+}
+
 async function pollLive() {
   let d = null;
   try {
@@ -9716,6 +9802,8 @@ async function pollLive() {
                       (+g.away_sets >= 3 || +g.home_sets >= 3);
   const live = all.filter(g => LIVE_STATES.includes(g.state) && !isOver(g));
   const justEnded = all.filter(isOver);
+
+  csTicker(live);
 
   /* Tonight's slate, shown as soon as the page loads rather than only once a
      match tips off -- the question "what is on later" is the other half of a
@@ -9818,7 +9906,14 @@ async function pollLive() {
         ' \u2014 final, awaiting the next rating refresh';
       jcards.innerHTML = fresh.map(g => {
         const aw = +g.away_sets > +g.home_sets;
-        return '<div class="card done"><div class="cd">' + dayLabel(g.date || '') +
+        /* ⚠ A MATCH-SHAPED BOX THAT DOES NOTHING WHEN TAPPED reads as broken
+           (Cody: "the scores tab match boxes aren't clickable"). These cards
+           and the live band below were the only match surfaces with no
+           data-match -- every other row routes through the one open-a-match
+           handler. Now they do too. */
+        return '<div class="card done" data-match="' + esc(String(g.id)) +
+          '" data-dest="desk" role="button" tabindex="0">' +
+          '<div class="cd">' + dayLabel(g.date || '') +
           ' \u00b7 final</div><div class="mt">' +
           '<div class="side' + (aw ? ' win' : '') + '">' + rank(g.away_rank) +
             logo(g.away) + g.away + '<b>' + g.away_sets + '</b></div>' +
@@ -9857,7 +9952,8 @@ async function pollLive() {
        not two. */
     const lead = +g.away_sets === +g.home_sets ? 0 : (+g.away_sets > +g.home_sets ? -1 : 1);
     const venue = g.venue || 'venue not reported';
-    return '<div class="card islive"><div class="cd">' +
+    return '<div class="card islive" data-match="' + esc(String(g.id)) +
+      '" data-dest="desk" role="button" tabindex="0"><div class="cd">' +
       (g.period || 'in progress') + '</div>' +
       '<div class="mt"><div class="side' + (lead < 0 ? ' win' : '') + '">' +
         rank(g.away_rank) + logo(g.away) + g.away + '<b>' + g.away_sets + '</b></div>' +
@@ -11999,7 +12095,18 @@ function fxPickable(f) {
   return matchState(all[String(f.gid)] || f, lv) === 'upcoming';
 }
 
-function deskPct(p) { return Math.round(p * 100) + '%'; }
+/* ⚠ NEVER PRINT CERTAINTY THE MODEL DOES NOT HAVE (review round 3).
+   Nebraska-UNLV's 99.97% rendered as "100%", which reads as a guarantee.
+   One display rule for every probability on the page: a value that would
+   round to 100 says 99+%, one that would round to 0 says <1%, everything
+   else keeps the whole percent. A truthful display interval, not a
+   replacement value -- nothing upstream changes. */
+function deskPct(p) {
+  const r = Math.round(p * 100);
+  if (r >= 100) return '99+%';
+  if (r <= 0) return '<1%';
+  return r + '%';
+}
 
 function deskTags(m, live) {
   /* Facts only. Each tag is a thing that is true of this match, named. */
@@ -17659,7 +17766,7 @@ function showTeam(name) {
           _next.opp + '</b>' +
           '<span class="gls">' + dayLabel(_next.d) + (_next.t ? ' &middot; ' + _next.t : '') +
           (fxPickable(_next)
-            ? ' &middot; <i class="glpick">' + Math.round(_next.pick * 100) + '%</i>' : '') +
+            ? ' &middot; <i class="glpick">' + deskPct(_next.pick) + '</i>' : '') +
           '</span>'
         : '<b class="glbig glmuted">&mdash;</b><span class="gls">no fixtures on file</span>') +
     '</div>';
@@ -17691,7 +17798,7 @@ function showTeam(name) {
     '<span class="ss">' + (f.t || '') + '</span>' +
     (fxPickable(f)
       ? '<span class="rs ' + (f.pick >= 0.5 ? 'w' : 'l') + '">' +
-        Math.round(f.pick * 100) + '%</span>' : '') +
+        deskPct(f.pick) + '</span>' : '') +
     '<span class="wh2">' + tag +
       (place ? '<span class="pl">' + place + '</span>'
              : '<span class="pl u">venue not listed</span>') +
@@ -18383,8 +18490,8 @@ function tdNextMatch(t, name) {
            is the simulator's pre-match pick and says so. */
         (st === 'upcoming' && f.pick !== null && f.pick !== undefined
           ? ' &middot; <i class="tdpick" title="The season simulator\u2019s ' +
-            'pre-match pick for this fixture.">' + Math.round(f.pick * 100) +
-            '% to win</i>' : '') + '</span>' +
+            'pre-match pick for this fixture.">' + deskPct(f.pick) +
+            ' to win</i>' : '') + '</span>' +
       (tv ? '<span class="tdtv">' + esc(tv) + '</span>' : '') +
     '</a>' +
     '<p class="tdwhere">' + esc(where) +
@@ -18754,6 +18861,12 @@ ASK_CSS = """.digby-hello{float:right;margin:-4px 0 4px 10px}
    scoreboard the launcher is hidden entirely -- Digby is one tab away
    on Today and on every team page. */
 body[data-view=scores] .asklaunch{display:none}
+/* ⚠ AND NEVER OVER AN OPEN MATCH (review round 3): the fixed launcher sat on
+   the lower-right of the match detail, covering Match Facts. A match page's
+   corner belongs to the match. The section gets .detailopen when a detail is
+   routed in, and :has() lifts that to the body -- no JS bookkeeping to fall
+   out of step with the route. */
+body:has(section.detailopen) .asklaunch{display:none}
 .asklaunch{position:fixed;right:16px;bottom:16px;z-index:60;border:1px solid var(--line);
   background:var(--card);color:var(--ink);border-left:3px solid var(--amber);
   border-radius:2px;padding:10px 14px;cursor:pointer;box-shadow:0 3px 14px rgba(0,0,0,.16);
