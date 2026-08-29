@@ -91,8 +91,11 @@ def main():
     # when the next game that I need to watch is." So the page no longer
     # announces absence, no longer counts mid-major fixtures, and leads with
     # matches he might actually watch.
-    check("the first block is Your next watches",
-          "block('Your next watches'" in src)
+    # ⚠ THE HEADING IS LIVE-AWARE NOW (round 5): "Watch now" while cards
+    # are in progress, "Your next watches" otherwise -- pinning the literal
+    # would fail the better behavior.
+    check("the first block is the watch list (live-aware title)",
+          "? 'Watch now' : 'Your next watches'" in src)
     check("[-] at most five watches", "ranked.slice(0, 5)" in src)
     check("then the rest of the ranked slate", "Big weekend ahead" in src)
     check("then results that moved the picture",

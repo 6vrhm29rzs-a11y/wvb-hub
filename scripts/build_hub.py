@@ -2242,6 +2242,14 @@ def team_stars(limit=3):
                          .get("asps", {}) or {}).get("value")
                         or ((r.get("prior") or {}).get("asps", {}) or {}).get("value"),
                 "live": bool(r.get("matches")),
+                # the headline's BASIS, decided by the same season-else-prior
+                # pick the values above use -- so the label and the number
+                # cannot disagree about which season is being described
+                "hb": (SEASON if ((r.get("season") or {}).get("components")
+                                  or {}) else SEASON - 1),
+                "hs": (r.get("sets") if ((r.get("season") or {})
+                                         .get("components") or {})
+                       else r.get("prior_sets")),
             })
         if picked:
             out[team] = picked
@@ -6022,7 +6030,7 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
    know what the crawl has already caught. They are data plumbing now, not a
    surface. "What changed" stays -- it is a one-line digest, not a card list. */
 #v-scores #live,#v-scores #justin,#v-scores #today,
-#v-scores #weekbox,#v-scores #resultcards{display:none!important}
+#v-scores #resultcards{display:none!important}
 /* the date jump moves INTO the ledger's control row, where its target is */
 #v-scores .datejump{display:flex;align-items:center;gap:8px;margin-left:auto;
   font:11.5px/1 var(--mono);color:var(--slate)}
@@ -7273,7 +7281,6 @@ tr.tvearlier td{padding:6px 0 10px;border:0}
 /* the week's headline matches: a ranked-v-ranked card earns the ball's yellow */
 .card.marquee{border-left:3px solid var(--amber)}
 .card.marquee .cd .tag{margin-left:8px}
-#weekcards .card{border-style:solid}
 /* ⚠ auto-fit, NOT repeat(4,1fr). The strip is not always four tiles: the
    dossier removes "Next" because its Overview card says the same thing
    with more in it, and a hard-coded four then left a dead quarter-width
@@ -7946,6 +7953,7 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 .wwlist{display:flex;flex-direction:column;gap:7px}
 .wwrow{display:flex;align-items:baseline;gap:10px}
 .wwfact{font-size:13px;color:var(--ink2)}
+#livetick .tklab .tkshown{font-style:normal;color:var(--ink3);letter-spacing:.05em}
 #livetick .tkall{color:var(--gold);font-weight:700}
 #livetick .tklab.tkquiet{color:var(--slate)}
 #livetick .tklab.tkquiet ~ .tkm .tkper{color:var(--ink3)}
@@ -8402,7 +8410,6 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
        date controls and a results ribbon on one screen made the Scoreboard
        argue with itself about what it was for. -->
   <div id="today" hidden></div>
-  <div id="weekbox" hidden></div>
   <div id="scoredetail" hidden></div>
   <!-- ⚠ THE FULL SEASON LEDGER IS KEPT AND NAMED. It is a different question
        -- "everything, across the season" -- so it is a deliberate disclosure
@@ -9590,57 +9597,11 @@ function rank(v) { return rankHTML('avca', v); }
    assumed -- ncaa.com's scoreboard rank matches the AVCA poll on every team
    where the two orders differ (BYU 24 to our 16, Kansas 15 to our 21,
    Indiana 16 to our 24). */
-function renderWeek() {
-  const box = document.getElementById('weekbox');
-  if (!box || typeof WEEK === 'undefined') return;
-  const today = new Intl.DateTimeFormat('en-CA',
-    { timeZone: 'America/Los_Angeles' }).format(new Date());
-  const up = WEEK.filter(r => r.d >= today);
-  const score = r => {
-    const a = +r.ar || 0, h = +r.hr || 0;
-    if (a && h) return a + h;              // both ranked: lower is better
-    if (a || h) return 100 + (a || h);     // one ranked: after every pairing
-    return 9999;
-  };
-  const top = up.filter(r => r.ar || r.hr)
-                .sort((x, y) => score(x) - score(y) || x.d.localeCompare(y.d))
-                .slice(0, 5);
-  if (!top.length) { box.hidden = true; return; }
-  box.hidden = false;
-  const both = top.filter(r => r.ar && r.hr).length;
-  $$('weekmeta').textContent =
-    (both ? (both + ' ranked v ranked') : 'best of the next seven days')
-    + ' \u00b7 ranks are the AVCA coaches poll';
-  /* WHOSE NUMBER IS THAT? The inline rank is the AVCA coaches poll -- the
-     official one -- and it now says so on hover instead of appearing as a bare
-     numeral. Where our own Top 25 disagrees, the disagreement is printed rather
-     than hidden: a reader who sees "24 BYU" on a page that ranks BYU 16th is
-     owed the second number, and a page that shows only one of them is claiming
-     more agreement than exists. Both ranks are computed server-side (see the
-     TEAMS temporal-dead-zone note in build()). */
-  const rk = rank;
-  const ours = r => {
-    const bits = [];
-    if (r.ao && r.ao != r.ar) bits.push(r.a + ' ' + r.ao);
-    if (r.ho && r.ho != r.hr) bits.push(r.h + ' ' + r.ho);
-    return bits.length
-      ? '<div class="ourrk" title="our rating disagrees with the coaches poll">'
-        + 'our Top 25: ' + bits.join(' \u00b7 ') + '</div>'
-      : '';
-  };
-  $$('weekcards').innerHTML = top.map(r =>
-    '<div class="card soon' + (r.ar && r.hr ? ' marquee' : '') + '">' +
-    /* the server label if present, otherwise format it here -- never the raw
-       ISO string, which is what this fallback used to be */
-    '<div class="cd">' + (r.dl || dayLabel(r.d)) + (r.t ? ' \u00b7 ' + r.t : '') +
-      (r.ar && r.hr ? '<span class="tag">ranked v ranked</span>' : '') + '</div>' +
-    '<div class="mt"><div class="side">' + rk(r.ar) + logo(r.a) + r.a + '</div>' +
-    '<div class="side">' + rk(r.hr) + logo(r.h) + r.h + '</div></div>' +
-    ours(r) +
-    '<div class="venue">' + (r.venue
-        ? r.venue + (r.city ? ', ' + r.city + (r.st ? ' ' + r.st : '') : '')
-        : 'venue not listed') + '</div></div>').join('');
-}
+/* renderWeek() and the #weekbox card grid were DELETED here (round 5): the
+   mount sat inside #v-scores where `#v-scores #weekbox{display:none!important}`
+   has hidden it since the Scoreboard redesign -- a renderer painting a box
+   nobody can see is the a.ep pattern again. The desk's "Big weekend ahead"
+   is the living version of the same answer. */
 
 /* TODAY'S FIXTURES WITHOUT A SERVER. The live band and the slate were both fed
    by /api/live, which only exists behind live_server.py -- so on the PUBLISHED
@@ -9762,7 +9723,12 @@ function csTicker(live) {
              (pa.dg - pb.dg) || (pa.rk - pb.rk) ||
              String(a.id).localeCompare(String(b.id));
     });
-    html = '<span class="tklab"><i class="tkdot"></i>LIVE ' + live.length +
+    const nshown = Math.min(live.length, TK_CAP);
+    html = '<span class="tklab" title="' + live.length +
+      ' in progress \u00b7 ' + nshown + ' shown here">' +
+      '<i class="tkdot"></i>LIVE ' + live.length +
+      (live.length > TK_CAP ? ' <i class="tkshown">\u00b7 ' + nshown +
+        ' shown</i>' : '') +
       '</span>' + rows.slice(0, TK_CAP).map(tkChip).join('') +
       (live.length > TK_CAP
         ? '<button type="button" class="tkm tkall" data-alllive>' +
@@ -9801,7 +9767,16 @@ async function pollLive() {
   const live = all.filter(g => LIVE_STATES.includes(g.state) && !isOver(g));
   const justEnded = all.filter(isOver);
 
+  /* ⚠ ONE LIVE COUNT, ONE DEFINITION (review round 5). The masthead counted
+     today's SCHEDULE rows that resolve live -- which drops a match still in
+     progress past midnight and anything the schedule missed -- while the
+     rail counted this filtered feed list. "9 live" above "LIVE 6" is two
+     rulers, not two facts. The poller's in-progress list is the definition;
+     every surface reads this. */
+  window.LIVE_NOW = live.length;
+
   csTicker(live);
+  if (typeof csStatus === 'function') { try { csStatus(); } catch (e) { } }
 
   /* Tonight's slate, shown as soon as the page loads rather than only once a
      match tips off -- the question "what is on later" is the other half of a
@@ -10293,7 +10268,7 @@ function showRated(r) {
   const tags = [];
   if (r.ro) tags.push(PRK_ROLELAB[r.ro] || r.ro);
   if (r.rc != null) tags.push('takes ' + Math.round(r.rc * 100) +
-    '% of serve-receive');
+    '% serve-receive share');
   const q = encodeURIComponent((r.n || '') + ' ' + (r.t || '') +
     ' volleyball highlights');
   card.innerHTML =
@@ -10499,7 +10474,7 @@ function ratingHTML(p) {
   }
   const ps = r['pass'] || {};
   if (ps.recv_share != null) {
-    tags.push('takes ' + Math.round(ps.recv_share * 100) + '% of serve-receive');
+    tags.push('takes ' + Math.round(ps.recv_share * 100) + '% serve-receive share');
   }
   if (ps.sideout != null) {
     tags.push('sides out ' + Math.round(ps.sideout * 100) + '% when she passes' +
@@ -14559,9 +14534,12 @@ function matchRow(m, live, dest) {
   if (m.tv) _mbits.push(esc(m.tv));
   return '<button type="button" class="mrow ' + (st === 'live' ? 'islive' : '') +
     '" data-match="' + esc(m.gid) + '" data-dest="' + dest + '">' +
+    /* a row about ANOTHER DAY names the day (round 5): the weekend list
+       showed bare clocks, so "7:00 PM PT" could be any of five days */
     '<span class="mwhen">' + esc(st === 'live'
         ? ((live && live.period) || 'live')
-        : (m.t || m.dl || '')) + '</span>' +
+        : ((m.d && m.d !== todayPT() && m.dl ? m.dl + ' \u00b7 ' : '') +
+           (m.t || m.dl || ''))) + '</span>' +
     '<span class="mteams">' + t(mAway(m), m.ar, aw) + t(mHome(m), m.hr, hw) +
       '</span>' +
     rowLinescore(m, live, st) +
@@ -15013,15 +14991,26 @@ function posHeadline(x) {
 }
 
 function starLine(x) {
+  /* ⚠ EVERY METRIC NAMES WHAT IT MEASURES (review round 5): "8% back row"
+     reads as anything; "8% back-row attack share" is checkable. The role
+     and both shares are DERIVED from 2025 play-by-play -- stated once for
+     the group in starsSection's note, not repeated per chip. The headline
+     rate carries its own season and sample because the basis differs per
+     player (2026 once she has played, 2025 prior until then). */
   const bits = [];
   if (x.role === 'six') bits.push('6-rotation');
-  if (x.brs != null) bits.push(Math.round(x.brs * 100) + '% back row');
+  if (x.brs != null) {
+    bits.push(Math.round(x.brs * 100) + '% back-row attack share');
+  }
   if (x.recv != null && x.recv >= 0.15) {
-    bits.push(Math.round(x.recv * 100) + '% of serve-receive');
+    bits.push(Math.round(x.recv * 100) + '% serve-receive share');
   }
   const head = posHeadline(x);
-  if (head) bits.push(head);
-  return bits.slice(0, 3).join(' · ');
+  if (head) {
+    bits.push(head + (x.hb ? ' (' + x.hb +
+      (x.hs ? ', ' + Math.round(x.hs) + ' sets' : '') + ')' : ''));
+  }
+  return bits.slice(0, 3).join(' \u00b7 ');
 }
 
 function starsSection(m) {
@@ -15050,8 +15039,10 @@ function starsSection(m) {
   return '<div class="msec"><h3>Players to know</h3>' +
     '<div class="starcols">' + col(away, sa) + col(home, sh) + '</div>' +
     '<p class="mnote munk">The best on each side by how far above her own ' +
-    'position she rates — never compared across positions. Serve-receive and ' +
-    'back-row share are 2025. ' + esc(PBP_CREDIT) + '</p></div>';
+    'position she rates &mdash; never compared across positions. The ' +
+    '6-rotation role, back-row attack share and serve-receive share are ' +
+    'DERIVED from 2025 play-by-play, not roster listings; each headline ' +
+    'rate names its own season and sets. ' + esc(PBP_CREDIT) + '</p></div>';
 }
 
 /* ⚠ A MATCH THAT DOES NOT COUNT MUST SAY SO, ON ITSELF. The data being right
@@ -15167,6 +15158,26 @@ function renderMatchDetail(gid, dest) {
     '<button type="button" class="backlink" data-back="' + dest + '">&larr; Back to ' +
       parent[0] + '</button>' +
     '<div class="mdet">' + exhBanner(m) + ribbonHTML(m, live, null) +
+      /* WHY WATCH -- directly after the identity block, before the facts
+         (review round 5): the decision module leads. At most three factual
+         reason chips, then the watch line. ⚠ THE WATCH LINE NEVER IMPLIES
+         UNAVAILABILITY: a network renders when the transcribed listings
+         carry one; otherwise the row is OMITTED -- the build not holding a
+         listing is not evidence a match cannot be watched. No official
+         stream links are held for any match, so no outbound action renders
+         (reported, not faked). */
+      (st === 'upcoming' ? (function () {
+        const rs = todayReasons(m, null).slice(0, 3);
+        const watch = m.tv
+          ? '<div class="wwrow"><span class="tdtag tv">watch</span>' +
+            '<span class="wwfact">' + esc(m.tv) + '</span></div>' : '';
+        if (!rs.length && !watch) return '';
+        return '<div class="msec"><h3>Why watch</h3>' +
+          '<div class="wwlist">' + rs.map(r =>
+            '<div class="wwrow"><span class="tdtag ' + r[0] + '">' +
+            esc(r[1]) + '</span><span class="wwfact">' + esc(r[2]) +
+            '</span></div>').join('') + watch + '</div></div>';
+      })() : '') +
       '<div class="msec"><h3>Match facts</h3><div class="mfact">' +
         bits.join('') + '</div></div>' +
       /* ⚠ THE HEADING FOLLOWS THE STATE. "Forecast before first serve" is a
@@ -15180,21 +15191,6 @@ function renderMatchDetail(gid, dest) {
       /* live statistics, only while this match is live AND the state says
          team stats exist for it */
       (st === 'live' ? lmcSection(m.gid) : '') +
-      /* WHY THIS MATTERS -- at most three factual reason chips, upcoming
-         only (review round 4's Why Watch). Every chip is a checkable fact
-         from the payload (ranked pairing, POWER top-50, My Board, verified
-         TV, AVCA/POWER disagreement with both labelled values, the event).
-         No reasons -> no section -- absence is rendered as absence, never
-         filled with prose. */
-      (st === 'upcoming' ? (function () {
-        const rs = todayReasons(m, null).slice(0, 3);
-        if (!rs.length) return '';
-        return '<div class="msec"><h3>Why this matters</h3>' +
-          '<div class="wwlist">' + rs.map(r =>
-            '<div class="wwrow"><span class="tdtag ' + r[0] + '">' +
-            esc(r[1]) + '</span><span class="wwfact">' + esc(r[2]) +
-            '</span></div>').join('') + '</div></div>';
-      })() : '') +
       starsSection(m) +
       /* ⚠ ONE SENTENCE PER STATE, FROM THE SHARED TABLE. Each of these is a
          true statement about the source at that moment -- not a placeholder
@@ -15788,8 +15784,9 @@ function csStatus() {
   const liveOf = m => LIVE_BY_ID[m.gid];
   const day = new Intl.DateTimeFormat('en-CA',
     { timeZone: 'America/Los_Angeles' }).format(new Date());
-  const nlive = DESK.filter(m => m.d === day &&
-                                 matchState(m, liveOf(m)) === 'live').length;
+  const nlive = (typeof LIVE_NOW === 'number') ? LIVE_NOW
+    : DESK.filter(m => m.d === day &&
+                       matchState(m, liveOf(m)) === 'live').length;
   /* ⚠ I SLICED A STRING WHOSE FORMAT I HAD NEVER LOOKED AT. The first
      version printed LIVE_STAMP.slice(11,16), assuming an ISO timestamp. The
      server actually sends "8:59:54 PM PT", so characters 11-16 are "PT" -- and
@@ -16077,7 +16074,8 @@ function renderDesk() {
     : '';
 
   todayBox.innerHTML =
-    block('Your next watches',
+    block(watches.some(x => matchState(x[0], liveOf(x[0])) === 'live')
+            ? 'Watch now' : 'Your next watches',
           watches.length ? 'next 7 days &middot; why each is here' : '',
           watches.length
             ? '<div class="wgrid">' + watches.map(watchCard).join('') + '</div>'
@@ -16251,7 +16249,6 @@ async function deskLive() {
 }
 
 renderStandings();
-renderWeek();
 /* the router is booted after TEAMS exists -- see the note at that call */
 
 /* ---- date navigation on the scores tab --------------------------------- */
@@ -18553,7 +18550,7 @@ function tdPlayers(t, name) {
       if (head) line2.push(head);
       if (x.role === 'six') line2.push('all six rotations');
       if (x.recv != null && x.recv >= 0.15) {
-        line2.push(Math.round(x.recv * 100) + '% of serve-receive');
+        line2.push(Math.round(x.recv * 100) + '% serve-receive share');
       }
       return '<a class="tdpcard" href="' +
         routeFor('players', slug(name) + '/' + slug(x.n)) + '">' +

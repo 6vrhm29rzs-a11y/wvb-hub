@@ -66,13 +66,22 @@ def main():
     check("no giant empty message in the ticker path",
           "No matches on the schedule" not in tk)
 
-    print("\n4. WHY WATCH IS FACTS OR ABSENCE")
-    ww = src[src.find("WHY THIS MATTERS"):src.find("starsSection(m) +")]
+    print("\n4. WHY WATCH IS FACTS OR ABSENCE, AND IT LEADS")
+    ww = src[src.find("/* WHY WATCH"):src.find("Match facts")]
     check("the module exists on the upcoming branch",
           "st === 'upcoming'" in ww and "todayReasons(m, null)" in ww)
+    check("it renders BEFORE Match Facts (decision module leads)",
+          "ribbonHTML(m, live, null)" in src[:src.find("/* WHY WATCH")]
+          or src.find("ribbonHTML(m, live, null)") < src.find("/* WHY WATCH"))
     check("at most three reason chips", ".slice(0, 3)" in ww)
-    check("no reasons renders no section (absence, not prose)",
-          "if (!rs.length) return '';" in ww)
+    check("no reasons and no listing renders no section",
+          "if (!rs.length && !watch) return '';" in ww)
+    check("a held TV listing renders; a missing one is OMITTED, never "
+          "phrased as unavailable",
+          "m.tv" in ww and "not televised" not in ww
+          and "unavailable" not in ww)
+    check("no outbound stream link is invented (none are held)",
+          "http" not in ww)
     # no marketing adjectives anywhere in the module or the reason set
     reasons = src[src.find("function todayReasons"):src.find("function starPeek")]
     _banned = re.compile(r"'[^']*\b(?:hot|struggling|decisive|must-see|"
@@ -84,14 +93,45 @@ def main():
     check("POWER top-50 pairing yields to the stronger AVCA chip",
           "!(m.ar && m.hr)" in reasons)
 
-    print("\n5. NEGATIVE CONTROLS")
+    print("\n5. ROUND-5 CONTRACTS")
+    # one live count, one definition
+    check("the poller owns THE live count (LIVE_NOW)",
+          "window.LIVE_NOW = live.length" in src)
+    check("the masthead reads it",
+          "typeof LIVE_NOW === 'number'" in src)
+    check("a capped rail SAYS both numbers",
+          "' shown</i>'" in src and "in progress" in src)
+    # the featured marquee never sits above an open match detail
+    check("no marquee above an open match detail",
+          "if (h === 'match-desk') return !parts[1];" in src)
+    # players-to-know metric precision
+    check("metrics name what they measure",
+          "% back-row attack share'" in src
+          and "% serve-receive share'" in src)
+    check("...and the bare ambiguous labels are gone",
+          "'% back row'" not in src and "'% of serve-receive'" not in src)
+    check("the headline rate carries its own season and sets",
+          "x.hb" in src and "x.hs" in src)
+    check("the derivation is stated for the group",
+          "DERIVED from 2025 play-by-play" in src)
+    # today watch cards
+    check("a watch card REQUIRES a reason (no reason, no card)",
+          "return w ? [m, rs, w] : null;" in src)
+    check("the watch heading is live-aware",
+          "? 'Watch now' : 'Your next watches'" in src)
+    check("a row about another day names the day",
+          "m.d !== todayPT() && m.dl" in src)
+    # the dead weekend surface is gone, not hidden
+    check("the invisible weekbox surface was deleted",
+          'id="weekbox"' not in src and "renderWeek();" not in src)
+
+    print("\n6. NEGATIVE CONTROLS")
     check("[NEG] an uncapped rail is caught", "TK_CAP = 6" not in
           tk.replace("TK_CAP = 6", "TK_CAP = 999"))
-    _wwbad = ww.replace("if (!rs.length) return '';",
-                        "if (!rs.length) return 'A big matchup!';")
+    _wwbad = ww.replace("if (!rs.length && !watch) return '';",
+                        "if (!rs.length && !watch) return 'A big matchup!';")
     check("[NEG] filler prose on an empty reason list is caught",
-          "return '';" in ww and "return '';" not in _wwbad
-          or "A big matchup!" in _wwbad and "if (!rs.length) return '';" not in _wwbad)
+          _wwbad != ww and "A big matchup!" in _wwbad)
 
     print()
     if FAILS:
