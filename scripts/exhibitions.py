@@ -87,8 +87,13 @@ def entry_problems(gid, e):
         target, the entry must carry the bound quote instead; or
       * an explicit CLASSIFICATION_EVIDENCE object: url + retrieved + a
         quoted text that (a) contains the word exhibition or scrimmage and
-        (b) names BOTH teams, so the quote is bound to this matchup and a
-        label lifted from a neighbouring card cannot satisfy it.
+        (b) STRICTLY names both teams, so the quote is bound to this
+        matchup and a label lifted from a neighbouring card cannot satisfy
+        it. ⚠ Strictly means the full canonical name resolves, never a
+        shared first word or substring -- the first version reduced a team
+        to its leading token, so "USC vs Arizona" could have bound an
+        Arizona St. entry and "Kentucky" a Kent St. one. See
+        _team_bound_in().
     """
     errs = []
     if e.get("counts_toward_record") is not False:
@@ -100,10 +105,11 @@ def entry_problems(gid, e):
         errs.append("must name exactly two teams")
     fmt = _nonstandard_targets(e.get("sets_to") or [])
     ce = e.get("classification_evidence") or {}
-    txt = (ce.get("text") or "").lower()
+    txt = ce.get("text") or ""
     quote_ok = (ce.get("url") and ce.get("retrieved")
-                and any(w in txt for w in EXH_WORDS)
-                and all(_team_token(t) in txt for t in teams))
+                and any(w in txt.lower() for w in EXH_WORDS)
+                and len(teams) == 2
+                and all(_team_bound_in(txt, t) for t in teams))
     if not fmt and not quote_ok:
         errs.append(
             "no classification proof: needs sets_to with a non-25 target "
@@ -132,16 +138,46 @@ def _nonstandard_targets(sets_to):
     return out
 
 
-def _team_token(name):
-    # type: (str) -> str
-    """The distinctive lowercase token of a team name, for quote-binding.
+def _fold(name):
+    # type: (str) -> List[str]
+    """A team name's canonical comparable tokens.
 
-    'Arizona St.' must be findable in a quote reading 'Arizona State', so
-    strip the abbreviation dot and use the leading words: 'arizona st' ->
-    'arizona'. Loose on purpose -- the check is that the quote is ABOUT this
-    matchup, not that it spells our normalised name."""
-    w = (name or "").lower().replace(".", "").split()
-    return w[0] if w else ""
+    reconcile_2025.norm() is the project's ONE team-name resolver (aliases,
+    punctuation, &->and); on top of it, exactly the two official-variant
+    folds the AVCA join already uses: State->St and Saint->St. Nothing
+    fuzzy -- 'Kentucky' and 'Kent St' share no folded token sequence."""
+    import re as _re
+    from reconcile_2025 import norm as _cn
+    t = _cn(name or "")
+    t = _re.sub(r"\bstate\b", "st", t)
+    t = _re.sub(r"\bsaint\b", "st", t)
+    return t.split()
+
+
+def _team_bound_in(text, team):
+    # type: (str, str) -> bool
+    """True only when the quote names THIS team in full.
+
+    ⚠ REPLACES first-word substring binding, which was not binding at all:
+    'USC vs Arizona' satisfied an Arizona St. entry and 'Kentucky' a
+    Kent St. one, because sharing a leading geographic word is common and
+    substring presence proves nothing. The rule now: some contiguous run
+    of the quote's own words must FOLD TO EXACTLY the team's canonical
+    token sequence -- whole tokens, full name, through the project's
+    resolver plus its two official-variant folds. 'Arizona State' binds
+    'Arizona St.'; 'Arizona' alone binds nothing with a two-token name."""
+    tgt = _fold(team)
+    if not tgt:
+        return False
+    words = [w for w in
+             (text or "").replace("|", " ").replace("/", " ").split()
+             if w]
+    limit = len(tgt) + 2               # folds can merge/split a token
+    for n in range(1, limit + 1):
+        for i in range(len(words) - n + 1):
+            if _fold(" ".join(words[i:i + n])) == tgt:
+                return True
+    return False
 
 
 def validate(season):

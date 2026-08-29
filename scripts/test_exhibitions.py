@@ -292,6 +292,32 @@ def main():
         "text": "Scrimmage / Exhibition -- UC Irvine, Irvine, Calif."})
     check("[NEG] an exhibition quote naming a different opponent is refused",
           bool(EXHMOD.entry_problems("999999", bad2)))
+    # (3b) ⚠ BINDING IS THE FULL CANONICAL NAME, NEVER A SHARED FIRST WORD.
+    # The first matcher reduced a team to its leading token and tested
+    # substring presence, so these two quotes -- each about a DIFFERENT
+    # school sharing a leading word -- would have validated. Strict now:
+    # a contiguous run of the quote must fold to the team's whole canonical
+    # token sequence (reconcile_2025.norm + the AVCA join's State/Saint->St
+    # folds), so 'Arizona' cannot bind 'Arizona St.' and 'Kentucky' cannot
+    # bind 'Kent St.'.
+    check("[NEG] 'USC vs Arizona' cannot bind an Arizona St. entry",
+          bool(EXHMOD.entry_problems("999999", dict(bad,
+              classification_evidence={
+                  "url": "https://x.edu/s", "retrieved": "2026-08-29",
+                  "text": "Exhibition: USC vs Arizona"}))))
+    check("[NEG] 'Kentucky' cannot bind a Kent St. entry",
+          bool(EXHMOD.entry_problems("999999", dict(bad,
+              teams=["Kent St.", "William & Mary"],
+              classification_evidence={
+                  "url": "https://x.edu/s", "retrieved": "2026-08-29",
+                  "text": "Exhibition: Kentucky vs William & Mary"}))))
+    check("the official long-form name binds its short form "
+          "(Arizona State -> Arizona St.)",
+          not EXHMOD.entry_problems("999999", dict(bad,
+              classification_evidence={
+                  "url": "https://x.edu/s", "retrieved": "2026-08-29",
+                  "text": "Exhibition: Southern California vs "
+                          "Arizona State (does not count)"})))
 
     # (4) the two proofs that DO satisfy it -- and the formats that must
     # NOT. ⚠ The first format rule took ANY non-25 target as proof, so an
