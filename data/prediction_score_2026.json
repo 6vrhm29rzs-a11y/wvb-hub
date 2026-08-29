@@ -2,15 +2,15 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 203,
+  "scored": 215,
   "logged_after_tipoff_excluded": 6,
   "team_mismatch_excluded": 6,
   "predictions_on_record": 4766,
-  "results_available": 221,
-  "brier": 0.1872,
+  "results_available": 233,
+  "brier": 0.1867,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 146,
-  "favourite_correct_pct": 71.9
+  "favourite_correct": 156,
+  "favourite_correct_pct": 72.6
  },
  "calibration": [
   {
@@ -21,27 +21,27 @@
   },
   {
    "range": "60-70%",
-   "n": 41,
-   "said": 64.5,
-   "happened": 56.1
+   "n": 43,
+   "said": 64.4,
+   "happened": 58.1
   },
   {
    "range": "70-80%",
-   "n": 29,
-   "said": 75.4,
-   "happened": 65.5
+   "n": 31,
+   "said": 75.3,
+   "happened": 67.7
   },
   {
    "range": "80-90%",
-   "n": 36,
+   "n": 38,
    "said": 84.9,
-   "happened": 77.8
+   "happened": 76.3
   },
   {
    "range": "90-101%",
-   "n": 68,
-   "said": 95.7,
-   "happened": 88.2
+   "n": 74,
+   "said": 95.8,
+   "happened": 87.8
   }
  ],
  "matches": [
@@ -84,6 +84,15 @@
   {
    "game_id": "6624350",
    "date": "2026-08-28",
+   "away": "Middle Tenn.",
+   "home": "Boise St.",
+   "p_home": 0.9668,
+   "home_won": false,
+   "brier": 0.93470224
+  },
+  {
+   "game_id": "6625596",
+   "date": "2026-08-29",
    "away": "Middle Tenn.",
    "home": "Boise St.",
    "p_home": 0.9668,
@@ -134,6 +143,15 @@
    "p_home": 0.8773,
    "home_won": false,
    "brier": 0.76965529
+  },
+  {
+   "game_id": "6628624",
+   "date": "2026-08-29",
+   "away": "Stetson",
+   "home": "Merrimack",
+   "p_home": 0.1283,
+   "home_won": true,
+   "brier": 0.75986089
   },
   {
    "game_id": "6624596",
@@ -476,24 +494,6 @@
    "p_home": 0.5765,
    "home_won": false,
    "brier": 0.33235225
-  },
-  {
-   "game_id": "6626165",
-   "date": "2026-08-28",
-   "away": "Holy Cross",
-   "home": "Central Conn. St.",
-   "p_home": 0.4235,
-   "home_won": true,
-   "brier": 0.33235225
-  },
-  {
-   "game_id": "6625966",
-   "date": "2026-08-28",
-   "away": "Eastern Mich.",
-   "home": "Southern Ind.",
-   "p_home": 0.5617,
-   "home_won": false,
-   "brier": 0.31550689
   }
  ]
 }

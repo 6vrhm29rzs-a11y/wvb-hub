@@ -110,8 +110,11 @@ def main():
           and nk(p.get("name")) == "georgiawatson"]
     check("Georgia Watson is on the page", len(gw) == 1, "%d rows" % len(gw))
     if gw:
-        check("...and shows Sophomore", gw[0].get("class") == "Sophomore",
-              repr(gw[0].get("class")))
+        # round 18: ONE class spelling on every surface -- the roster table
+        # already rendered the canonical code and the player payload said
+        # "Sophomore"; the payload now speaks the code too
+        check("...and shows the canonical class code",
+              gw[0].get("class") == "So", repr(gw[0].get("class")))
     bd = [p for p in P if p.get("team") == "Kentucky"
           and nk(p.get("name")) == "brooklyndeleye"]
     if bd:

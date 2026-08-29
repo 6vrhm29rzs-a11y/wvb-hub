@@ -222,7 +222,8 @@ def main():
         _dash_ok = True
         _js = """
 const esc = s => String(s == null ? '' : s);
-const routeFor = v => '#/' + v;
+const routeFor = (v, r) => '#/' + v + (r ? '/' + r : '');
+const slug = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-');
 const PLAYERS = [
   { team: 'X', name: 'A Hitter', sets: 10, k: 39, ast: 2, digs: 12,
     bs: 1, ba: 4, aces: 3 },
@@ -280,6 +281,74 @@ console.log('DASH-OK');
         check("the dashboard grid is two columns on desktop, one on a phone",
               "grid-template-columns:1fr 1fr" in src
               and ".tddash{grid-template-columns:1fr}" in src)
+        # ── PLAYER DOSSIER (round 18): the real showPlayer under node ──
+        _sp_src = _jfn("showPlayer")
+        _pd_js = """
+const esc = s => String(s == null ? '' : s);
+const pct = v => (v==null) ? '\\u2014' : String(v);
+const routeFor = (v, r) => '#/' + v + (r ? '/' + r : '');
+const slug = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-');
+const logo = () => '';
+const avatar = () => '<svg class="av"></svg>';
+const ratingHTML = () => '';
+const dayLabel = d => d;
+const mHome = m => m.h;
+const matchScore = m => [m.as, m.hs];
+const allMatches = () => ({ M1: { gid:'M1', h:'X', as:1, hs:3 } });
+const TEAMS = { X: { rank: 12, power_basis: 'preseason', avca: 6,
+                     record26: '1-2' } };
+const els = { playercard: { innerHTML: '' } };
+global.document = { getElementById: id => els[id] };
+%s
+const base = { name: 'P', team: 'X', pos: 'S', num: 9, 'class': 'Jr',
+  photo: null, sets: 10, ast: 118, dps: 2.7, aces: 0, kps: 0.4, hit: 0.1,
+  bs: 0, ba: 0, pps: 1, games: [
+    { gid:'M1', d:'2026-08-28', opp:'Opp', nondi:false, k:1, e:0, ta:3,
+      hit:0.333, digs:8, bs:0, ba:1, ast:36, aces:0, sets:4, pts:1.5 }],
+  aa: [], xf: null };
+showPlayer(base);
+const h = els.playercard.innerHTML;
+const bad = [];
+if (!/Assists\\/set/.test(h) || /Kills\\/set/.test(h))
+  bad.push('setter chips not position-aware');
+if (h.indexOf('2026 \\u00b7 10 sets') < 0 && h.indexOf('2026 · 10 sets') < 0)
+  bad.push('season sample missing');
+if (!/POWER <b>#12<\\/b> <i>preseason<\\/i>/.test(h)
+    && h.indexOf('preseason') < 0)
+  bad.push('rank basis missing');
+if (h.indexOf('data-match="M1"') < 0) bad.push('log row lacks a route');
+if (h.indexOf('>W</i>') < 0 && h.indexOf('>L</i>') < 0)
+  bad.push('log row lacks the match result');
+if (!/36 ast<\\/b>/.test(h) && h.indexOf('36 ast') < 0)
+  bad.push('setter log does not lead with assists');
+showPlayer(Object.assign({}, base, { sets: 0, games: [] }));
+const h2 = els.playercard.innerHTML;
+if (h2.indexOf('No counted 2026 match yet') < 0)
+  bad.push('no-season state missing');
+if (/0\\.00/.test(h2)) bad.push('zeros invented for an unplayed player');
+if (bad.length) { console.log('PD-FAIL: ' + bad.join(' | '));
+  process.exit(1); }
+console.log('PD-OK');
+""" % _sp_src
+        _rp = _sp.run(["node", "-e", _pd_js], capture_output=True, text=True)
+        check("PLAYER DOSSIER BEHAVIOUR: position chips, samples, rank "
+              "basis, routed log, no-season state",
+              _rp.returncode == 0, (_rp.stdout + _rp.stderr).strip()[:160])
+        # negative controls: strip the sample suffix / the rank basis
+        _bad1 = _sp_src.replace("' sets</i></span></div>'", "'</i></span></div>'")
+        _r_b1 = _sp.run(["node", "-e", _pd_js.replace(_sp_src, _bad1)],
+                        capture_output=True, text=True)
+        check("[NEG] a season without its sample is caught",
+              _r_b1.returncode != 0)
+        _bad2 = _sp_src.replace("power_basis === 'live'", "false && ''")
+        check("[NEG] the rank-basis expression exists to strip",
+              _bad2 != _sp_src)
+        check("the log reads p.games and nothing else",
+              "(p.games || []).slice(0, 5)" in _sp_src
+              and "LEDGER" not in _sp_src)
+        check("the player availability block is AVAIL-fenced with its hook",
+              "AVAILP-HOOK-BEGIN" in src and "function pdAvailability" in
+              src.split("AVAIL-JS-BEGIN")[1].split("AVAIL-JS-END")[0])
         check("match-by-match table ships", 'Match by match, 2026' in page)
         _mbm = page[page.find('MATCH BY MATCH, THE TEAM AS A BOX-SCORE LINE'):]
         _mbm = _mbm[:_mbm.find('const rt = t.rot25')] if _mbm else ''

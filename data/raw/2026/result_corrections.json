@@ -1,0 +1,34 @@
+{
+ "_doc": "Corrections to the feed's DERIVED result fields (winner_team_id, sets_won), entered only when an attributable public source AND the feed's own primary set-by-set record agree against them. Raw history is never rewritten: the correction applies at the derived-dataset layer, the game carries result_corrected, and the Result Ledger shows the evidence. Append-only. The linescores are the primary record and the winner/sets_won columns are the feed's derivations -- raw counts over derived rates is this project's standing schema decision, and this ledger exists for the day the two disagree.",
+ "corrections": {
+  "6628406": {
+   "field": "result",
+   "feed_said": "William & Mary won 3-2 (winner_team_id 46446, sets_won 3-2)",
+   "correct": {
+    "winner_team_id": "46558",
+    "away_sets": 2,
+    "home_sets": 3
+   },
+   "established": "Kent St. won 3-2. The feed's OWN linescores say so (25-20, 25-23 W&M, then 13-25, 14-25, 9-15 -- home Kent St. takes sets 3, 4 and 5), and William & Mary's official schedule confirms the loss.",
+   "evidence": [
+    {
+     "url": "https://tribeathletics.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "William & Mary",
+     "retrieved": "2026-08-29T17:51:16Z",
+     "text": "'Kent State ... Blacksburg, Va. L, 2-3 Box Score' -- the row for August 29, 2026",
+     "establishes": "William & Mary lost 2-3"
+    },
+    {
+     "url": "https://kentstatesports.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Kent St.",
+     "retrieved": "2026-08-29T17:51:16Z",
+     "text": null,
+     "status": "attempted_unverifiable",
+     "establishes": "nothing yet -- the row had no posted result within the hour of the final; recheck"
+    }
+   ]
+  }
+ }
+}

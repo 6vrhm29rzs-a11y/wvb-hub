@@ -177,10 +177,31 @@ def results() -> List[Dict]:
         _dup_gids = set(_dgf(SEASON))
     except Exception:                                  # noqa: BLE001
         _dup_gids = set()
+    # result corrections apply HERE TOO -- this loop reads the RAW log, the
+    # same seam the duplicate skip already paid for once (round 18:
+    # Kent St.-W&M, the feed's winner/sets_won contradicting its own
+    # linescores and the school's published result)
+    _rcorr = (load("data/raw/%d/result_corrections.json" % SEASON)
+              or {}).get("corrections") or {}
     out = []
     for g in best.values():
         if g.get("game_state") != "F":
             continue
+        _c = _rcorr.get(str(g.get("game_id")))
+        if _c and (_c.get("correct") or {}):
+            _fx2 = _c["correct"]
+            g = dict(g)
+            g["teams"] = [dict(t) for t in (g.get("teams") or [])]
+            for _t in g["teams"]:
+                if _t.get("is_home") and _fx2.get("home_sets") is not None:
+                    _t["sets_won"] = _fx2["home_sets"]
+                if not _t.get("is_home") and _fx2.get("away_sets") is not None:
+                    _t["sets_won"] = _fx2["away_sets"]
+                if _fx2.get("winner_team_id"):
+                    _t["is_winner"] = (str(_t.get("team_id"))
+                                       == str(_fx2["winner_team_id"]))
+            if _fx2.get("winner_team_id"):
+                g["winner_team_id"] = _fx2["winner_team_id"]
         teams = g.get("teams") or []
         if len(teams) != 2:
             continue
@@ -1616,7 +1637,10 @@ def roster_identity_index():
             seen[k] = nm
             idx[(tn, k)] = {
                 "display": nm,
-                "class": class_full((pl.get("class_raw") or "").strip()) or None,
+                # ⚠ THE CANONICAL SHORT FORM, the same one the roster table
+                # renders -- "Jr" here and "Junior" there was one fact in two
+                # spellings across two surfaces (round 18's guard case)
+                "class": class_code((pl.get("class_raw") or "").strip()) or None,
                 "pos": (pl.get("pos_raw") or "").strip() or None,
                 "num": pl.get("num_raw"),
             }
@@ -8235,6 +8259,15 @@ details.avhist{margin:14px 0}
 .tddbldr{display:flex;align-items:baseline;gap:8px;padding:4px 0;
   font-size:13px;color:var(--ink2)}
 .tddbldr b{color:var(--chalk)}
+.tddbplink{text-decoration:none}
+.tddbplink:hover b,.tddbplink:focus-visible b{color:var(--gold)}
+.tddbplink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
+.pdranks{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.pdranks .chip i{font-style:normal;font:600 9px/1 var(--disp);
+  letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);
+  margin-left:4px}
+.pdlog{width:100%;text-align:left;background:none;border:0;cursor:pointer}
+.tsec .tddbnote{font-weight:600}
 .tddbldr .lpcat{min-width:74px;margin-right:0}
 .fp{font:700 10px/1 var(--disp);border-radius:2px;padding:2px 5px;
   font-style:normal;margin-right:2px}
@@ -10983,26 +11016,64 @@ function showPlayer(p) {
       '.createContextualFragment(this.dataset.fb))" data-fb=\'' +
       avatar(p.pos, p.team, 72) + '\'>'
     : avatar(p.pos, p.team, 72);
-  /* ⚠ THE TEAM IS A LINK, NOT A LABEL. A player belongs to a team and the
-     crest is the obvious way back to it -- the page used to print the team as
-     dead text and leave the top nav as the only escape.
-     Subtitle order is team, official class, position, number: the class year
-     comes from the school's own roster, so it is stated before anything the
-     box-score feed supplied. A field we do not have is omitted, never zeroed. */
   const teamHref = routeFor('teams', slug(p.team));
   const sub = [
     '<a class="parentlink" href="' + teamHref + '">' + esc(p.team) + '</a>',
     p['class'] ? esc(p['class']) : null,
     p.pos ? esc(p.pos) : null,
     p.num ? '#' + esc(String(p.num)) : null
-  ].filter(Boolean).join(' · ');
+  ].filter(Boolean).join(' \u00b7 ');
+  /* team ranking context, every basis named -- a bare # is banned */
+  const tt = (typeof TEAMS !== 'undefined') ? TEAMS[p.team] : null;
+  const tctx = tt ? '<div class="pdranks">' +
+    (tt.rank ? '<span class="chip">POWER <b>#' + tt.rank + '</b> <i>' +
+      esc(tt.power_basis === 'live' ? '2026 results'
+          : tt.power_basis === 'blend' ? 'blend' : 'preseason') +
+      '</i></span>' : '') +
+    (tt.avca ? '<span class="chip">AVCA poll <b>#' + tt.avca +
+      '</b></span>' : '') +
+    (tt.record26 ? '<span class="chip">2026 <b>' + esc(tt.record26) +
+      '</b></span>' : '') + '</div>' : '';
 
-  /* ⚠ WHERE SHE PLAYED BEFORE, WHEN SHE PLAYED SOMEWHERE BEFORE. A card that
-     shows a senior's class and her rate and says nothing about the fact she
-     spent three years at another school is hiding the most useful thing about
-     her. Anchored on (from_team_id, name) upstream, never a bare-name match.
-     Her prior line is labelled with the school it was earned at, because a
-     rate carries the place it came from or it is misattributed. */
+  /* ── POSITION-AWARE 2026 CHIPS (round 18). Each position shows the
+     metrics that describe its job, every rate stamped 2026 with its set
+     sample, an unavailable metric omitted -- and no cross-position "best"
+     scale exists here. Buckets reuse the page's own position codes. */
+  const P = (p.pos || '').toUpperCase();
+  const isSetter = P === 'S';
+  const isMB = P === 'MB';
+  const isLib = P === 'L' || P === 'DS' || P === 'LDS' || P === 'L/DS';
+  const chips = [];
+  const addRate = (label, num, digits) => {
+    if (num === null || num === undefined || !p.sets) return;
+    chips.push('<span class="chip">' + label + ' <b>' +
+      (digits === 'pct' ? pct(num) : num.toFixed(2)) + '</b></span>');
+  };
+  if (isSetter) {
+    addRate('Assists/set', p.sets ? (p.ast || 0) / p.sets : null);
+    addRate('Digs/set', p.dps);
+    addRate('Aces/set', p.sets ? (p.aces || 0) / p.sets : null);
+  } else if (isMB) {
+    addRate('Kills/set', p.kps);
+    addRate('Hit%', p.hit, 'pct');
+    addRate('Blocks/set', p.sets
+      ? ((p.bs || 0) + 0.5 * (p.ba || 0)) / p.sets : null);
+  } else if (isLib) {
+    addRate('Digs/set', p.dps);
+    addRate('Aces/set', p.sets ? (p.aces || 0) / p.sets : null);
+  } else {
+    addRate('Kills/set', p.kps);
+    addRate('Hit%', p.hit, 'pct');
+    addRate('Digs/set', p.dps);
+    addRate('Aces/set', p.sets ? (p.aces || 0) / p.sets : null);
+  }
+  const season = chips.length
+    ? '<div class="chips">' + chips.join('') +
+      '<span class="chip"><i class="rcbasis">2026 \u00b7 ' +
+      Math.round(p.sets) + ' sets</i></span></div>'
+    : '<div class="tnote">No counted 2026 match yet \u2014 identity only, ' +
+      'no zeros invented.</div>';
+
   const xf = p.xf && p.xf.from_team
     ? '<div class="pxfer"><span class="pxlab">Transfer</span>' +
         '<a class="parentlink" href="' + routeFor('teams', slug(p.xf.from_team)) +
@@ -11011,16 +11082,9 @@ function showPlayer(p) {
           ? '<span class="pxstat">' +
             (p.xf.prior_pts / p.xf.prior_sets).toFixed(2) +
             ' pts/set there over ' + p.xf.prior_sets + ' sets</span>'
-          : '<span class="pxstat munk">no prior D-I line on record</span>') +
-      '</div>'
+          : '<span class="pxstat munk">no prior D-I line on record</span>')
+      + '</div>'
     : '';
-
-  /* ⚠ THIS IS A SEARCH, AND IT SAYS SO. There is no approved highlight source
-     for college volleyball, so the honest affordance is a link that runs a
-     search on her name and school -- not a "highlights" button implying a
-     verified reel that may not exist or may be a different person with the
-     same name. The wording is deliberate: "Search video for", never
-     "Highlights". */
   const q = encodeURIComponent(p.name + ' ' + p.team + ' volleyball highlights');
   const vid = '<div class="pvid"><span class="pxlab">Video</span>' +
     '<a href="https://www.youtube.com/results?search_query=' + q + '" ' +
@@ -11028,27 +11092,56 @@ function showPlayer(p) {
     '<a href="https://www.google.com/search?tbm=vid&q=' + q + '" ' +
     'target="_blank" rel="noopener noreferrer">Search video</a>' +
     '<span class="munk">a search, not a verified reel</span></div>';
+
+  /* ── RECENT MATCH LOG: the last five counted D-I finals, newest first
+     (p.games is already duplicate/exhibition/empty clean upstream). Each
+     row carries the match result from the ONE ledger reader, her
+     position-first raw line, and a real route. */
+  const all = (typeof allMatches === 'function') ? allMatches() : {};
+  /* p.games is already NEWEST-FIRST; slice(-5).reverse() served the oldest
+     five, oldest first, under a heading claiming the opposite */
+  const recent = (p.games || []).slice(0, 5);
+  const logRows = recent.map(g => {
+    const m = all[String(g.gid)] || null;
+    let res = '';
+    if (m) {
+      const sc = matchScore(m, null);
+      if (sc[0] !== null && sc[0] !== undefined) {
+        const mineHome = mHome(m) === p.team;
+        const mine = mineHome ? sc[1] : sc[0], theirs = mineHome ? sc[0] : sc[1];
+        res = '<i class="fp ' + (mine > theirs ? 'fw' : 'fl') + '">' +
+          (mine > theirs ? 'W' : 'L') + '</i> ' + mine + '\u2013' + theirs + ' ';
+      }
+    }
+    const lead = isSetter ? g.ast + ' ast'
+      : isLib ? g.digs + 'd'
+      : isMB ? ((g.bs + g.ba * 0.5) + 'b \u00b7 ' + g.k + 'k')
+      : g.k + 'k';
+    return '<button type="button" class="gline gopen pdlog" data-match="' +
+      esc(g.gid) + '"><span class="dt">' + dayLabel(g.d || '') + '</span>' +
+      '<span class="op">' + res + esc(g.opp || '') +
+      (g.nondi ? '<b class="nondi" title="Not a Division-I opponent. This ' +
+        'site does not filter these matches out -- filtering would change ' +
+        'what every rate means without saying so -- so it is marked ' +
+        'instead.">non-D-I</b>' : '') + '</span>' +
+      '<span class="ss pgl"><b>' + lead + '</b> \u00b7 ' + g.k + 'k \u00b7 ' +
+      g.e + 'e \u00b7 ' + g.ta + 'ta \u00b7 ' + pct(g.hit) + ' \u00b7 ' +
+      g.digs + 'd \u00b7 ' + g.aces + 'a' +
+      ((g.bs + g.ba * 0.5) ? ' \u00b7 ' + (g.bs + g.ba * 0.5) + 'b' : '') +
+      (g.ast && !isSetter ? ' \u00b7 ' + g.ast + ' ast' : '') + '</span>' +
+      '<span class="rs">' + g.sets + ' sets</span></button>';
+  }).join('');
+
   document.getElementById('playercard').innerHTML =
     ratingHTML(p) +
     '<div class="thead phead">' + face + '<div><h2>' +
       '<a class="parentlink" href="' + teamHref + '" aria-label="Back to ' +
       esc(p.team) + '">' + logo(p.team, 'lg') + '</a>' + esc(p.name) + '</h2>' +
-    '<div class="sub">' + sub + '</div>' +
-    '<div class="chips">' +
-      '<span class="chip ours">Pts/set <b>' + p.pps.toFixed(2) + '</b></span>' +
-      '<span class="chip">Kills/set <b>' + p.kps.toFixed(2) + '</b></span>' +
-      '<span class="chip">Hit% <b>' + pct(p.hit) + '</b></span>' +
-      '<span class="chip">Digs/set <b>' + p.dps.toFixed(2) + '</b></span>' +
-      '<span class="chip">Sets <b>' + p.sets + '</b></span>' +
-    '</div>' + xf + vid + '</div></div>' +
-    /* ⚠ TOTALS AND THE MATCH LOG ARE DIFFERENT THINGS AND NOW SAY SO. The
-       card ran season rates straight into a per-match table with no heading
-       between them, so a reader could take either row for the other. */
-    '<div class="tsec"><h3>2026 season</h3><div class="body">' +
-      '<div class="statline">' + statLine(p) + '</div>' +
-      '<div class="tnote">Totals across ' + p.games.length +
-      (p.games.length === 1 ? ' match' : ' matches') + ' this season.</div>' +
+    '<div class="sub">' + sub + '</div>' + tctx + season + xf + vid +
     '</div></div>' +
+    /* AVAILP-HOOK-BEGIN */
+    (typeof pdAvailability === 'function' ? pdAvailability(p) : '') +
+    /* AVAILP-HOOK-END */
     (p.aa && p.aa.length
       ? '<div class="tsec"><h3>AVCA honours</h3><div class="body">' +
         p.aa.map(x => '<div class="plrow"><span class="nm">' + x.honour +
@@ -11058,35 +11151,20 @@ function showPlayer(p) {
         'workbook. Only the last two seasons are loaded \u2014 an older honour ' +
         'belongs to somebody who may not be on a 2026 roster.</div></div>'
       : '') +
-    '<div class="tsec"><h3>Match log</h3><div class="body">' +
-    p.games.map(g => '<div class="gline"><span class="dt">' + dayLabel(g.d || '') + '</span>' +
-      '<span class="op">' + esc(g.opp || '') +
-      /* the caveat sits on the row, beside the number it qualifies */
-      (g.nondi ? '<b class="nondi" title="Not a Division-I opponent. This ' +
-        'site does not filter these matches out -- filtering would change ' +
-        'what every rate means without saying so -- so it is marked ' +
-        'instead.">non-D-I</b>' : '') + '</span>' +
-      /* assists only appear when there are any, so a hitter's line is not
-         padded with "0s" -- but a setter's night is no longer invisible */
-      '<span class="ss pgl">' + g.k + 'k · ' + g.e + 'e · ' + g.ta + 'ta · ' +
-      pct(g.hit) + ' · ' + g.digs + 'd · ' + g.aces + 'a' +
-      /* blocks by the NCAA convention -- a solo counts one, an assist a half --
-         the same arithmetic the team totals and Pts/set already use, so a
-         middle's night is not the one line on the page that omits her work */
-      ((g.bs + g.ba * 0.5) ? ' · ' + (g.bs + g.ba * 0.5) + 'b' : '') +
-      (g.ast ? ' · ' + g.ast + ' ast' : '') + '</span>' +
-      '<span class="rs">' + g.pts + ' pts</span></div>').join('') +
-    /* ⚠ SAID ONLY WHEN IT IS TRUE, and it says how much of the season it is.
-       "one of her two matches" and "her only match" are different facts and
-       the reader needs the second one loudly. */
-    ((p.games || []).some(g => g.nondi)
-      ? '<div class="tnote"><b class="dicaveat">' +
-        nonDiPhrase(p.games.filter(g => g.nondi).length, p.games.length,
-                    'on file') +
-        '</b>, so the rates above are not measured against Division-I ' +
-        'competition. ' + NONDI_WHY + '</div>'
-      : '') +
-    '</div></div>';
+    (logRows
+      ? '<div class="tsec"><h3>Recent match log <span class="tddbnote">' +
+        'newest first \u00b7 last ' + recent.length + ' counted D-I ' +
+        'finals</span></h3><div class="body">' + logRows +
+        /* the division caveat, said where the rows are read -- the same
+           nonDiPhrase every other surface uses, with THIS surface's subject */
+        (function () {
+          const nd = recent.filter(g => g.nondi).length;
+          return nd ? '<p class="tnote"><b class="dicaveat">' +
+            nonDiPhrase(nd, recent.length, 'on file') +
+            '</b>. ' + NONDI_WHY + '</p>' : '';
+        })() + '</div></div>'
+      : '<div class="tsec"><h3>Recent match log</h3><div class="body">' +
+        '<p class="tnote">No counted 2026 match on file.</p></div></div>');
 }
 document.getElementById('pbody').addEventListener('click', e => {
   const tr = e.target.closest('.prow'); if (!tr || !tr.dataset.k) return;
@@ -15724,6 +15802,36 @@ function rcDrill(gid) {
 })();
 
 /* AVAIL-JS-BEGIN */
+function pdAvailability(p) {
+  /* the player-scoped desk state: current sourced status, or a labelled
+     signal that sets none, or the honest default -- never "healthy". */
+  if (typeof AVAIL === 'undefined' || !AVAIL.meta) return '';
+  const st = (AVAIL.statuses || []).filter(x =>
+    x.player === p.name && x.team === p.team);
+  const sg = (AVAIL.signals || []).filter(x =>
+    x.player === p.name && x.team === p.team);
+  const hist = (AVAIL.expired || []).filter(x =>
+    x.player === p.name && x.team === p.team);
+  let body;
+  if (st.length || sg.length) {
+    body = st.map(x => '<span class="avrowline">' +
+        esc(x.claim === 'confirmed_unavailable'
+          ? 'Unavailable (sourced)' : 'Limited / game-time (sourced)') +
+        ' <span class="avq">\u201c' + esc(x.quote) + '\u201d</span>' +
+        '</span>').join('') +
+      sg.map(x => '<span class="avrowline"><i class="avkind">' +
+        esc(x.kind) + '</i> signal, sets no status</span>').join('');
+  } else {
+    body = '<span class="tddbquiet">No availability information \u2014 no ' +
+      'attributable public status is held' +
+      (hist.length ? '; ' + hist.length + ' historical item' +
+        (hist.length === 1 ? '' : 's') + ' on the desk' : '') + '.</span>';
+  }
+  return '<div class="tddb pdav"><em>Availability</em>' + body +
+    '<a class="tddblink" href="' + routeFor('avail') + '">Availability ' +
+    'Desk \u2192</a></div>';
+}
+
 function tdAvailability(t, name) {
   if (typeof AVAIL === 'undefined' || !AVAIL.meta) return '';
   const st = (AVAIL.statuses || []).filter(x => x.team === name);
@@ -19713,8 +19821,10 @@ function tdLeaders(t, name) {
     const top = pool[0];
     const rate = c[1](top) / top.sets;
     if (!(rate > 0)) return '';
-    return '<div class="tddbldr"><i class="lpcat">' + c[0] + '</i><b>' +
-      esc(top.name) + '</b><span>' + rate.toFixed(2) +
+    return '<div class="tddbldr"><i class="lpcat">' + c[0] + '</i>' +
+      '<a class="tddbplink" href="' + routeFor('players',
+        slug(name) + '/' + slug(top.name)) + '?from=teams"><b>' +
+      esc(top.name) + '</b></a><span>' + rate.toFixed(2) +
       ' <em class="rcbasis">2026, ' + Math.round(top.sets) +
       ' sets</em></span></div>';
   }).join('');
@@ -20373,6 +20483,7 @@ def strip_private(html):
                    ("<!-- AVAIL-HTML-BEGIN -->", "<!-- AVAIL-HTML-END -->"),
                    ("/* AVAIL-JS-BEGIN */", "/* AVAIL-JS-END */"),
                    ("/* AVAIL-HOOK-BEGIN */", "/* AVAIL-HOOK-END */"),
+                   ("/* AVAILP-HOOK-BEGIN */", "/* AVAILP-HOOK-END */"),
                    ("/* AVAIL-ROUTE-BEGIN */", "/* AVAIL-ROUTE-END */"),
                    ("<!-- AVAIL-MENU-BEGIN -->", "<!-- AVAIL-MENU-END -->"),
                    ("/* AVAIL-MD-BEGIN */", "/* AVAIL-MD-END */"),

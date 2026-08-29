@@ -158,6 +158,40 @@ def main():
         _dup_of = duplicate_gids(SEASON)
     except Exception:                                  # noqa: BLE001
         _dup_of = {}
+    # ⚠ RESULT CORRECTIONS (round 18, Kent St.-W&M): the feed's DERIVED
+    # winner/sets_won fields corrected at this layer only, on the ledger's
+    # evidence (the feed's own linescores + a school source). Raw untouched.
+    _res_corr = {}
+    try:
+        _rc_doc = json.load(open(os.path.join(
+            REPO, "data", "raw", str(SEASON), "result_corrections.json")))
+        _res_corr = _rc_doc.get("corrections") or {}
+    except Exception:                                  # noqa: BLE001
+        _res_corr = {}
+
+    def _apply_result_correction(g):
+        c = _res_corr.get(str(g.get("game_id")))
+        if not c:
+            return g
+        fix = c.get("correct") or {}
+        g = dict(g)
+        g["result_corrected"] = True
+        if fix.get("winner_team_id"):
+            g["winner_team_id"] = fix["winner_team_id"]
+        ts = []
+        for t in (g.get("teams") or []):
+            t = dict(t)
+            if fix.get("winner_team_id"):
+                t["is_winner"] = (str(t.get("team_id"))
+                                  == str(fix["winner_team_id"]))
+            if t.get("is_home") and fix.get("home_sets") is not None:
+                t["sets_won"] = fix["home_sets"]
+            if not t.get("is_home") and fix.get("away_sets") is not None:
+                t["sets_won"] = fix["away_sets"]
+            ts.append(t)
+        g["teams"] = ts
+        return g
+    games = [_apply_result_correction(g) for g in games]
     for g in games:
         if g.get("game_state") != "F":
             continue
@@ -299,6 +333,7 @@ def main():
         teams = g.get("teams") or []
         games_out.append({
             "duplicate_of": _dup_of.get(str(g.get("game_id"))) or None,
+            "result_corrected": bool(g.get("result_corrected")) or None,
             "game_id": g["game_id"],
             "season": g.get("season_year"),
             "start_time_epoch": g.get("start_time_epoch"),
