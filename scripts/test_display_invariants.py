@@ -631,6 +631,37 @@ def check_sticky_headers():
         ok("sticky header offset cancelled for internally-scrolling tables")
 
 
+def check_no_consumer_reads_totalblocks():
+    """The feed's derived totalBlocks column is UNUSABLE and must stay unread.
+
+    Measured 2026-08-28 across 304 team box rows: totalBlocks equals
+    BS + BA/2 in 154 of them and BS + BA (unhalved -- block assists double
+    counted) in 144, with 6 matching neither. A coin flip per scorer. Cody
+    asked whether 20+ team PPS meant blocks were being double counted; the
+    audit found every page number correct (blocks are always BS + BA/2 from
+    raw counts, and earned points never exceed scoreboard points in any
+    match) -- and found THIS column, which would have produced exactly the
+    defect he described in whichever games use the unhalved convention.
+    Raw counts, never derived rates: this is the schema decision earning
+    its keep. The guard keeps anyone from "simplifying" to the feed column.
+    """
+    hits = []
+    sdir = os.path.join(REPO, "scripts")
+    for fn in os.listdir(sdir):
+        if not fn.endswith(".py") or fn.startswith("test_"):
+            continue
+        src = open(os.path.join(sdir, fn), encoding="utf-8").read()
+        if "totalBlocks" in src or "total_blocks" in src:
+            hits.append(fn)
+    if hits:
+        bad("a script reads the feed's totalBlocks column",
+            "%s -- that column double-counts block assists in ~half of all "
+            "games (measured 144 of 304); compute BS + BA/2 from raw counts"
+            % ", ".join(hits))
+    else:
+        ok("no script reads the feed's inconsistent totalBlocks column")
+
+
 def check_router_hides_only_top_level_sections(page_text=None):
     """The router's hide-everything sweep must be scoped to main's DIRECT
     children.
@@ -3483,6 +3514,7 @@ def main():
     print()
     check_sticky_headers()
     check_router_hides_only_top_level_sections()
+    check_no_consumer_reads_totalblocks()
     check_stats_dispatcher_does_not_recurse()
     check_value_scale_polarity()
     check_bracket_seed_structure()

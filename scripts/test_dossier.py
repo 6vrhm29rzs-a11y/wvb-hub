@@ -198,6 +198,44 @@ def main():
         # ⚠ Tests must read the page Cody actually opens -- a guard that read
         # output/vb_dashboard.html once passed against a frozen artefact.
         check("dossier ships in the page", "teamDossier" in page)
+
+        # ── MATCH BY MATCH, 2026 (Cody, 2026-08-28) ─────────────────────
+        # "stats per match and totals (kinda like players in a match is
+        # formatted)". The invariants that matter: the table exists; its rows
+        # come from teamTotals() over the same BOXES payload the match view
+        # reads (one definition -- the table and a clicked box score cannot
+        # disagree); the totals row RECOMPUTES hit% and pts/set from summed
+        # counts rather than averaging match rates; and the dossier files it
+        # under Numbers, or it renders into no panel and silently vanishes.
+        check("match-by-match table ships", 'Match by match, 2026' in page)
+        _mbm = page[page.find('MATCH BY MATCH, THE TEAM AS A BOX-SCORE LINE'):]
+        _mbm = _mbm[:_mbm.find('const rt = t.rot25')] if _mbm else ''
+        check("  ...its rows come from teamTotals()", 'teamTotals(mine)' in _mbm)
+        check("  ...totals recompute hit%% from summed counts",
+              '(agg.k - agg.e) / agg.ta' in _mbm)
+        check("  ...pts/set recomputed, never averaged",
+              'aPts / agg.sets' in _mbm)
+        check("  ...a missing box renders as absence, not a synthesized line",
+              'no box score on file' in _mbm)
+        check("  ...rows route to the match (data-match)", 'data-match=' in _mbm)
+        # TD_MAP behavior: apply the page's own mapping rules to the heading
+        _map = re.search(r"const TD_MAP = \[(.*?)\];", page, re.S)
+        _files_to = None
+        if _map:
+            for pat, grp in re.findall(r"\[/(.+?)/i, '([a-z]+)'\]", _map.group(1)):
+                if re.search(pat, 'Match by match, 2026', re.I):
+                    _files_to = grp
+                    break
+        check("  ...TD_MAP files it into Numbers", _files_to == 'numbers',
+              repr(_files_to))
+        # negative control: an unmapped heading must NOT resolve to numbers
+        _neg = None
+        if _map:
+            for pat, grp in re.findall(r"\[/(.+?)/i, '([a-z]+)'\]", _map.group(1)):
+                if re.search(pat, 'Completely Unmapped Heading Xyz', re.I):
+                    _neg = grp
+                    break
+        check("  [NEG] an unmapped heading files nowhere", _neg is None, repr(_neg))
         check("nav is a tablist", 'class="tdnav"' in page or
               "'tdnav'" in page)
         # mobile: the player grid must collapse to one column

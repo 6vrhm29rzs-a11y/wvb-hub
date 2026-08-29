@@ -865,6 +865,15 @@ def main():
     i2n = id2name()
     rpos = roster_positions()
     rcls = roster_class()
+    # ⚠ THE ROSTER OUTRANKS THE BOX SCORE FOR THE NAME TOO, same rule as the
+    # position above it. The feed spells Kentucky's outside "Brooklyn Deleye";
+    # her school spells her DeLeye. Every consumer that joins stars back to a
+    # roster -- the dossier's faces, the photo lookup -- compares STRINGS, so
+    # a feed-cased name silently falls back to initials. Measured the night
+    # this was fixed: 68 of 1,013 dossier stars (6.7%) failed to resolve, and
+    # every example was a feed-vs-roster spelling gap. nkey() is unchanged by
+    # the swap (it is how the lookup hits), so no key or join moves.
+    rname = _roster_field("name_raw")
     zp, zp_src = strength_z(PRIOR, i2n)
     zc, zc_src = strength_z(SEASON, i2n)
     ozp = mean_opp_z(PRIOR, i2n, zp)
@@ -959,6 +968,7 @@ def main():
         if tid not in i2n:
             continue
         name = ((r.get("first") or "") + " " + (r.get("last") or "")).strip()
+        name = rname.get((tid, nkey(name))) or name
         # ⚠ THE SCHOOL'S OWN ROSTER OUTRANKS THE BOX SCORE, AND THIS WAS THE
         # WRONG WAY ROUND. The feed's per-match position field calls 43 players
         # OH whom their own school lists as RS -- Olivia Babcock and Kennedy

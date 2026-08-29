@@ -9900,7 +9900,8 @@ const TD_MAP = [
   [/^projected six/i, 'roster'], [/^full roster/i, 'roster'],
   [/^returning avca/i, 'roster'], [/^biggest losses/i, 'roster'],
   [/^roster turnover/i, 'roster'], [/^who arrived/i, 'roster'],
-  [/^team stats/i, 'numbers'], [/^parts vs whole/i, 'numbers'],
+  [/^team stats/i, 'numbers'], [/^match by match/i, 'numbers'],
+  [/^parts vs whole/i, 'numbers'],
   [/^what it returns/i, 'numbers'], [/power/i, 'numbers'],
   [/^side-out by rotation/i, 'scouting'], [/^serving rotation/i, 'scouting'],
   [/^who came in/i, 'scouting'], [/^most-started six/i, 'scouting'],
@@ -17906,6 +17907,66 @@ function showTeam(name) {
         : '') +
       '</div></div>';
   }
+  /* ---- MATCH BY MATCH, THE TEAM AS A BOX-SCORE LINE --------------------
+     Cody: "i want to see a team's points per set listed on their team page
+     and stats per match and totals (kinda like players in a match is
+     formatted)". Same table dress as the player box, same columns, and the
+     numbers come from teamTotals() over the SAME BOXES payload the match
+     view reads -- one definition, so this table and a clicked box score
+     cannot disagree. A match whose box is not on file renders dashes, never
+     a synthesized line (R5). Chronological, oldest first, like a log. */
+  let mbmHtml = '';
+  {
+    const games = (t.played || []).slice().reverse();
+    if (games.length && typeof BOXES !== 'undefined') {
+      const agg = {k:0,e:0,ta:0,ast:0,digs:0,bs:0,ba:0,aces:0,pts:0,sets:0,n:0};
+      const trs = games.map(g => {
+        const mine = (BOXES[g.gid] || []).filter(r => r.team === name);
+        const wl = (g.mine > g.theirs ? 'W' : 'L') + ' ' + g.mine + '\u2013' + g.theirs;
+        const opp = (g.home ? 'v ' : 'at ') + g.opp +
+          (g.nondi ? ' <i class="dicaveat" title="not a Division-I opponent">non-D-I</i>' : '');
+        if (!mine.length) {
+          return '<tr><td class="pn">' + g.d.slice(5) + '</td>' +
+            '<td class="pn">' + opp + '</td><td>' + wl + '</td>' +
+            '<td colspan="11" style="color:var(--ink3)">no box score on file</td></tr>';
+        }
+        const x = teamTotals(mine);
+        agg.k += x.k; agg.e += x.e; agg.ta += x.ta; agg.ast += x.ast;
+        agg.digs += x.digs; agg.bs += x.bs; agg.ba += x.ba; agg.aces += x.aces;
+        agg.sets += x.sets; agg.n += 1;
+        const earned = x.k + x.aces + x.bs + x.ba * 0.5;
+        return '<tr data-match="' + g.gid + '" class="mbmr">' +
+          '<td class="pn">' + g.d.slice(5) + '</td>' +
+          '<td class="pn">' + opp + '</td><td>' + wl + '</td>' +
+          '<td>' + x.sets + '</td><td>' + x.k + '</td><td>' + x.e + '</td>' +
+          '<td>' + x.ta + '</td><td>' + pct(x.hit) + '</td><td>' + x.ast + '</td>' +
+          '<td>' + x.digs + '</td><td>' + x.blk + '</td><td>' + x.aces + '</td>' +
+          '<td>' + earned + '</td><td><b>' + (x.sets ? (earned / x.sets).toFixed(2) : '\u2014') + '</b></td></tr>';
+      }).join('');
+      const aBlk = agg.bs + agg.ba * 0.5;
+      const aPts = agg.k + agg.aces + aBlk;
+      const tot = agg.n
+        ? '<tr class="btot"><td class="pn">Totals</td>' +
+          '<td class="l">' + agg.n + (agg.n === 1 ? ' match' : ' matches') + '</td><td></td>' +
+          '<td>' + agg.sets + '</td><td>' + agg.k + '</td><td>' + agg.e + '</td>' +
+          '<td>' + agg.ta + '</td><td>' + pct(agg.ta ? (agg.k - agg.e) / agg.ta : null) + '</td>' +
+          '<td>' + agg.ast + '</td><td>' + agg.digs + '</td><td>' + aBlk + '</td>' +
+          '<td>' + agg.aces + '</td><td>' + aPts + '</td>' +
+          '<td><b>' + (agg.sets ? (aPts / agg.sets).toFixed(2) : '\u2014') + '</b></td></tr>'
+        : '';
+      mbmHtml =
+        '<div class="tsec" style="margin-top:14px"><h3>Match by match, 2026</h3>' +
+        '<div class="scroll"><table class="box mbm"><thead><tr>' +
+        '<th class="l">Date</th><th class="l">Opponent</th><th>Res</th>' +
+        '<th>S</th><th>K</th><th>E</th><th>TA</th><th>Hit%</th><th>Ast</th>' +
+        '<th>Digs</th><th>Blk</th><th>Aces</th><th>Pts</th><th>Pts/Set</th>' +
+        '</tr></thead><tbody>' + trs + tot + '</tbody></table></div>' +
+        '<div class="tnote"><b>Pts</b> are kills + blocks + aces, and the ' +
+        'totals row recomputes hitting % and points per set from the summed ' +
+        'counts \u2014 never by averaging the match rates. Click a row to ' +
+        'open that match.</div></div>';
+    }
+  }
   const rt = t.rot25;
   let rotHtml = '';
   if (rt && rt.rotation && rt.rotation.length === 6) {
@@ -18109,6 +18170,7 @@ function showTeam(name) {
                    : '')) +
              ' Listed by matches started.</div></div>' : '') +
         statHtml +
+        mbmHtml +
         honHtml +
         postHtml +
         rotHtml +
