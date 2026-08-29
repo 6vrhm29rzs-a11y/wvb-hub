@@ -2,15 +2,15 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 272,
+  "scored": 277,
   "logged_after_tipoff_excluded": 7,
   "team_mismatch_excluded": 10,
   "predictions_on_record": 4768,
-  "results_available": 298,
-  "brier": 0.1953,
+  "results_available": 303,
+  "brier": 0.1971,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 194,
-  "favourite_correct_pct": 71.3
+  "favourite_correct": 196,
+  "favourite_correct_pct": 70.8
  },
  "calibration": [
   {
@@ -21,15 +21,15 @@
   },
   {
    "range": "60-70%",
-   "n": 59,
+   "n": 61,
    "said": 64.9,
-   "happened": 57.6
+   "happened": 55.7
   },
   {
    "range": "70-80%",
-   "n": 34,
+   "n": 36,
    "said": 75.5,
-   "happened": 64.7
+   "happened": 63.9
   },
   {
    "range": "80-90%",
@@ -39,9 +39,9 @@
   },
   {
    "range": "90-101%",
-   "n": 94,
+   "n": 95,
    "said": 95.7,
-   "happened": 88.3
+   "happened": 88.4
   }
  ],
  "matches": [
@@ -343,6 +343,15 @@
    "brier": 0.55323844
   },
   {
+   "game_id": "6628023",
+   "date": "2026-08-29",
+   "away": "Texas Tech",
+   "home": "St. Thomas (MN)",
+   "p_home": 0.7424,
+   "home_won": false,
+   "brier": 0.5511577599999999
+  },
+  {
    "game_id": "6628405",
    "date": "2026-08-28",
    "away": "William & Mary",
@@ -433,6 +442,15 @@
    "brier": 0.438244
   },
   {
+   "game_id": "6627523",
+   "date": "2026-08-29",
+   "away": "Southern California",
+   "home": "Arizona St.",
+   "p_home": 0.6599,
+   "home_won": false,
+   "brier": 0.43546801000000007
+  },
+  {
    "game_id": "6625161",
    "date": "2026-08-29",
    "away": "Belmont",
@@ -440,6 +458,15 @@
    "p_home": 0.3468,
    "home_won": true,
    "brier": 0.42667024
+  },
+  {
+   "game_id": "6628569",
+   "date": "2026-08-29",
+   "away": "Ball St.",
+   "home": "Xavier",
+   "p_home": 0.6521,
+   "home_won": false,
+   "brier": 0.42523441
   },
   {
    "game_id": "6625160",
@@ -467,33 +494,6 @@
    "p_home": 0.6488,
    "home_won": false,
    "brier": 0.42094144000000006
-  },
-  {
-   "game_id": "6624934",
-   "date": "2026-08-28",
-   "away": "Oakland",
-   "home": "Binghamton",
-   "p_home": 0.6462,
-   "home_won": false,
-   "brier": 0.41757444
-  },
-  {
-   "game_id": "6625219",
-   "date": "2026-08-29",
-   "away": "Fairfield",
-   "home": "Colgate",
-   "p_home": 0.6461,
-   "home_won": false,
-   "brier": 0.41744521
-  },
-  {
-   "game_id": "6624644",
-   "date": "2026-08-29",
-   "away": "CSU Bakersfield",
-   "home": "Abilene Christian",
-   "p_home": 0.6391,
-   "home_won": false,
-   "brier": 0.40844881
   }
  ]
 }
