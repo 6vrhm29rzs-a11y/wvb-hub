@@ -143,7 +143,90 @@ def main():
         check("...and appears in no team's played list",
               "6625090" not in gids_all)
 
-    print("\n5. NEGATIVE CONTROLS")
+    print("\n5. THE LEDGER UI RENDERS THE DUPLICATE STATE (behavioural)")
+    # node executes the page's own renderConfidence + rcDrill against
+    # fixtures -- an artifact field that never reaches the DOM is invisible,
+    # which is exactly what round 12 reopened this for.
+    import subprocess
+    from test_scoreboard_density import block as _js_block
+    src2 = io.open(os.path.join(REPO, "scripts", "build_hub.py"),
+                   encoding="utf-8").read()
+
+    def _fn(name):
+        i = src2.find("function %s(" % name)
+        return _js_block(src2, i) if i >= 0 else None
+    rc_render, rc_drill = _fn("renderConfidence"), _fn("rcDrill")
+
+    def run_ui(render_src, drill_src):
+        js = """
+const esc = s => String(s == null ? '' : s);
+const matchRoute = (gid, d) => '#/match-desk/' + gid;
+const RC_LABEL = { official: 'Official', reconciled: 'Reconciled',
+  confirmed: 'Confirmed', disputed: 'Under review' };
+let RC_FILTER = 'all';
+const CONFIDENCE = { meta: { counts: { finals: 2 } }, finals: [
+  { gid: 'DUP', a: 'A', h: 'B', d: '2026-08-28', overall: 'reconciled',
+    duplicate_of: 'CANON', dup_reason: 'one meeting only, per both schools',
+    dup_asym: 'placeholder start on the duplicate',
+    dup_evidence: [
+      { school: 'A University', url: 'https://a.example/schedule',
+        text: 'exactly one meeting listed', retrieved: '2026-08-29' },
+      { school: 'B University', url: 'https://b.example/schedule',
+        text: 'W, 3-0 -- the only entry', retrieved: '2026-08-29' }],
+    states: {}, n_indep: 0, n_attempted: 0, sources: [] },
+  { gid: 'CANON', a: 'A', h: 'B', d: '2026-08-28', overall: 'reconciled',
+    duplicate_of: null, states: {}, n_indep: 0, n_attempted: 0,
+    sources: [] }]};
+const els = {};
+const mk = id => els[id] = { id, innerHTML: '', hidden: false,
+  scrollIntoView: () => {} };
+['rcsummary','rclist','rcdrill'].forEach(mk);
+global.document = { getElementById: id => els[id] || null };
+%s
+%s
+renderConfidence();
+const list = els['rclist'].innerHTML;
+const bad = [];
+if (!/DUPLICATE LISTING \\u00b7 DOES NOT COUNT|DUPLICATE LISTING \u00b7 DOES NOT COUNT/.test(list)
+    && list.indexOf('DUPLICATE LISTING') < 0)
+  bad.push('duplicate row does not render the duplicate state');
+const canonRow = (list.match(/<button[^>]*data-rcgid="CANON"[\\s\\S]*?<\\/button>/) || [''])[0];
+if (!canonRow) bad.push('canonical row not rendered');
+if (canonRow.indexOf('DUPLICATE LISTING') >= 0)
+  bad.push('the canonical row is wrongly labelled duplicate');
+rcDrill('DUP');
+const drill = els['rcdrill'].innerHTML;
+if (drill.indexOf('does not') < 0 || drill.indexOf('count') < 0)
+  bad.push('drill lacks the plain-English exclusion');
+if (drill.indexOf('#/match-desk/CANON') < 0)
+  bad.push('drill lacks a real route to the canonical match');
+if (drill.indexOf('one meeting only, per both schools') < 0)
+  bad.push('drill lacks the readable reason');
+if (drill.indexOf('exactly one meeting listed') < 0
+    || drill.indexOf('W, 3-0') < 0)
+  bad.push('drill lacks the school citations');
+if (drill.indexOf('2026-08-29') < 0)
+  bad.push('drill lacks retrieval dates');
+rcDrill('CANON');
+if (els['rcdrill'].innerHTML.indexOf('Duplicate feed listing') >= 0)
+  bad.push('a normal final renders the duplicate block');
+if (bad.length) { console.log('UI-FAIL: ' + bad.join(' | ')); process.exit(1); }
+console.log('UI-OK'); process.exit(0);
+""" % (render_src, drill_src)
+        r = subprocess.run(["node", "-e", js], capture_output=True, text=True)
+        return r.returncode == 0, (r.stdout + r.stderr).strip()
+
+    okui, why = run_ui(rc_render, rc_drill)
+    check("BEHAVIOUR: rows + drill render the full duplicate audit",
+          okui, why[:200])
+    # ⚠ PROVE THE FAILURE MODE: with the render branches stripped,
+    # duplicate_of exists only in JSON -- and the same invariant must fail.
+    okstr, whystr = run_ui(rc_render.replace("r.duplicate_of", "false"),
+                           rc_drill.replace("r.duplicate_of", "false"))
+    check("[NEG] duplicate_of living only in JSON is caught",
+          not okstr and "duplicate" in whystr.lower(), whystr[:160])
+
+    print("\n6. NEGATIVE CONTROLS")
     check("[NEG] a heuristic that excluded the identical pair on its own "
           "would break: the detector's output carries no exclusion field",
           "exclude" not in json.dumps(c1))

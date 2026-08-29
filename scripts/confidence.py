@@ -224,6 +224,10 @@ def build():
         dup_of = duplicate_gids(SEASON)
     except Exception:                                  # noqa: BLE001
         dup_of = {}
+    # the full ledger entries ride into the payload so the drill-down can
+    # show the READABLE reason and both school citations, not a bare gid
+    dup_detail = ((load("data/raw/%d/duplicate_listings.json" % SEASON)
+                   or {}).get("duplicates") or {})
     _cand_src = []
     rows, counts = [], {"finals": 0, "official_only": 0, "reconciled": 0,
                         "confirmed": 0, "disputed": 0, "pending_second": 0}
@@ -281,8 +285,16 @@ def build():
             "venue": (g.get("location") or {}).get("venue"),
             "has_box": gid in boxes,
         })
+        _dd = dup_detail.get(gid) or {}
         rows.append({
             "duplicate_of": dup_of.get(gid) or None,
+            "dup_reason": _dd.get("established"),
+            "dup_asym": _dd.get("quality_asymmetry"),
+            "dup_evidence": [
+                {"school": e.get("school"), "url": e.get("url"),
+                 "text": e.get("text"),
+                 "retrieved": str(e.get("retrieved") or "")[:10]}
+                for e in (_dd.get("evidence") or [])],
             "gid": gid,
             "a": id2n.get(str(([t for t in ts if not t.get("is_home")] or
                                [{}])[0].get("team_id")), "") or _fallback[0],

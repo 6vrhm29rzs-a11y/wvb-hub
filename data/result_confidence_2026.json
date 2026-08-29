@@ -2,7 +2,7 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-08-29T15:34:09Z",
+  "generated_at_utc": "2026-08-29T15:47:56Z",
   "counts": {
    "finals": 214,
    "official_only": 4,
@@ -17,6 +17,9 @@
  "finals": [
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6639844",
    "a": "Louisville",
    "h": "Texas A&M",
@@ -36,6 +39,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6639842",
    "a": "Kentucky",
    "h": "Wisconsin",
@@ -55,6 +61,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6639889",
    "a": "Louisville",
    "h": "Wisconsin",
@@ -74,6 +83,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6639821",
    "a": "Elizabeth City St.",
    "h": "Norfolk St.",
@@ -93,6 +105,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6639890",
    "a": "Arizona St.",
    "h": "Texas",
@@ -112,6 +127,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6639886",
    "a": "SMU",
    "h": "Texas A&M",
@@ -131,6 +149,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6639888",
    "a": "Kentucky",
    "h": "Pittsburgh",
@@ -150,6 +171,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6639891",
    "a": "Pittsburgh",
    "h": "Xavier",
@@ -169,6 +193,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6639887",
    "a": "Marquette",
    "h": "Texas",
@@ -188,6 +215,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6640217",
    "a": "Florida",
    "h": "Nebraska",
@@ -220,6 +250,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6640218",
    "a": "SMU",
    "h": "Penn St.",
@@ -239,6 +272,22 @@
   },
   {
    "duplicate_of": "6624350",
+   "dup_reason": "one meeting on 2026-08-28, Middle Tennessee 3-2 (25-23, 29-27, 21-25, 23-25, 15-12); the Aug 29 rematch at the same event is a SEPARATE fixture with its own gid, still upcoming, and is untouched",
+   "dup_asym": "6640332 carries the midnight-ET placeholder start; 6624350 carries the real start and the held box",
+   "dup_evidence": [
+    {
+     "school": "Boise St.",
+     "url": "https://broncosports.com/sports/womens-volleyball/schedule",
+     "text": "'Bulldog Invitational vs Middle Tennessee, Asheville N.C., L, 2-3, Aug 28 (Fri) 10 a.m., Box Score / Recap' -- exactly ONE Aug-28 meeting; a separate 'vs Middle Tennessee, Aug 29 (Sat) 10 a.m.' remains upcoming with a countdown",
+     "retrieved": "2026-08-29"
+    },
+    {
+     "school": "Middle Tenn.",
+     "url": "https://goblueraiders.com/sports/womens-volleyball/schedule",
+     "text": "'Bulldog Invitational, Boise State, Asheville N.C., W, 3-2, Aug 28 (Fri) 11:00 AM' plus recap 'Volleyball Opens Season with Thrilling Five-Set Win over Boise State, Friday, August 28' -- exactly ONE Aug-28 meeting; 'vs Boise State, Aug 29 (Sat) 11:00 AM' is separate and upcoming",
+     "retrieved": "2026-08-29"
+    }
+   ],
    "gid": "6640332",
    "a": "Middle Tenn.",
    "h": "Boise St.",
@@ -258,6 +307,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6640356",
    "a": "Cleveland St.",
    "h": "Lehigh",
@@ -277,6 +329,22 @@
   },
   {
    "duplicate_of": "6625089",
+   "dup_reason": "one meeting only, 2026-08-28, UMES 3-0 (25-13, 25-20, 25-14)",
+   "dup_asym": "6640357 carries a midnight-ET placeholder start, no venue and no box score; 6625089 carries the Friday start, Elmore Gymnasium and the held box",
+   "dup_evidence": [
+    {
+     "school": "UMES",
+     "url": "https://easternshorehawks.com/sports/womens-volleyball/schedule/",
+     "text": "schema.org event 'University of Maryland Eastern Shore Vs Mississippi Valley State', startDate 2026-08-28T18:00:00, location Huntsville, AL -- the ONLY Mississippi Valley State entry among all 25 events on the official schedule",
+     "retrieved": "2026-08-29"
+    },
+    {
+     "school": "Mississippi Valley State",
+     "url": "https://mvsusports.com/sports/womens-volleyball/schedule",
+     "text": "schema.org event 'Mississippi Valley State University Vs UMES', startDate 2026-08-28T18:00:00; rendered result on the row: 'UMES  L, 0-3' -- the ONLY UMES entry among all 26 events on the official schedule",
+     "retrieved": "2026-08-29"
+    }
+   ],
    "gid": "6640357",
    "a": "UMES",
    "h": "Mississippi Val.",
@@ -296,6 +364,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6640365",
    "a": "USC Upstate",
    "h": "Norfolk St.",
@@ -315,6 +386,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6640361",
    "a": "Iona",
    "h": "Louisiana Tech",
@@ -334,6 +408,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627402",
    "a": "Florida A&M",
    "h": "Delaware St.",
@@ -353,6 +430,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628246",
    "a": "N.C. Central",
    "h": "Ark.-Pine Bluff",
@@ -372,6 +452,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625689",
    "a": "USC Upstate",
    "h": "Old Dominion",
@@ -391,6 +474,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625808",
    "a": "The Citadel",
    "h": "Kennesaw St.",
@@ -410,6 +496,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627092",
    "a": "Bradley",
    "h": "Binghamton",
@@ -429,6 +518,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627720",
    "a": "Grambling",
    "h": "Presbyterian",
@@ -448,6 +540,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628011",
    "a": "Merrimack",
    "h": "Fla. Atlantic",
@@ -467,6 +562,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628152",
    "a": "Eastern Mich.",
    "h": "NIU",
@@ -486,6 +584,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628259",
    "a": "N.C. Central",
    "h": "Florida A&M",
@@ -505,6 +606,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6637949",
    "a": "Montreat",
    "h": "UNC Asheville",
@@ -524,6 +628,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627165",
    "a": "North Florida",
    "h": "Georgia",
@@ -543,6 +650,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628426",
    "a": "Kent St.",
    "h": "Virginia Tech",
@@ -562,6 +672,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624908",
    "a": "Buffalo",
    "h": "UIC",
@@ -581,6 +694,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625817",
    "a": "Stonehill",
    "h": "Nicholls",
@@ -600,6 +716,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625868",
    "a": "Idaho St.",
    "h": "SFA",
@@ -619,6 +738,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626241",
    "a": "Gardner-Webb",
    "h": "Lehigh",
@@ -638,6 +760,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626798",
    "a": "Jackson St.",
    "h": "Kansas City",
@@ -657,6 +782,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627232",
    "a": "Purdue Fort Wayne",
    "h": "Rutgers",
@@ -676,6 +804,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627305",
    "a": "McNeese",
    "h": "Miami (OH)",
@@ -695,6 +826,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627637",
    "a": "Eastern Ill.",
    "h": "Santa Clara",
@@ -714,6 +848,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627704",
    "a": "Canisius",
    "h": "Duquesne",
@@ -733,6 +870,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627811",
    "a": "Stony Brook",
    "h": "Robert Morris",
@@ -752,6 +892,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628051",
    "a": "Bucknell",
    "h": "Ohio",
@@ -771,6 +914,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625667",
    "a": "Southern U.",
    "h": "Jacksonville",
@@ -790,6 +936,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626226",
    "a": "Western Ill.",
    "h": "Missouri",
@@ -809,6 +958,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626424",
    "a": "Valparaiso",
    "h": "UAB",
@@ -828,6 +980,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627049",
    "a": "Le Moyne",
    "h": "UNCW",
@@ -847,6 +1002,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627569",
    "a": "Grand Canyon",
    "h": "Texas A&M",
@@ -866,6 +1024,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628471",
    "a": "Manhattan",
    "h": "Temple",
@@ -885,6 +1046,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6637097",
    "a": "FDU",
    "h": "NJIT",
@@ -904,6 +1068,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626923",
    "a": "FIU",
    "h": "Stetson",
@@ -923,6 +1090,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624301",
    "a": "Utah Tech",
    "h": "Utah Valley",
@@ -942,6 +1112,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624502",
    "a": "St. John's (NY)",
    "h": "Elon",
@@ -961,6 +1134,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624754",
    "a": "Mercyhurst",
    "h": "Youngstown St.",
@@ -980,6 +1156,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624840",
    "a": "Coppin St.",
    "h": "William & Mary",
@@ -999,6 +1178,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625145",
    "a": "UMES",
    "h": "Alabama A&M",
@@ -1018,6 +1200,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625924",
    "a": "Western Ky.",
    "h": "Southeast Mo. St.",
@@ -1037,6 +1222,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625945",
    "a": "George Washington",
    "h": "Furman",
@@ -1056,6 +1244,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626080",
    "a": "Niagara",
    "h": "Marshall",
@@ -1075,6 +1266,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627426",
    "a": "Wheeling",
    "h": "West Florida",
@@ -1094,6 +1288,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627609",
    "a": "Akron",
    "h": "ETSU",
@@ -1113,6 +1310,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628585",
    "a": "Cleveland St.",
    "h": "Morgan St.",
@@ -1132,6 +1332,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624262",
    "a": "Western Caro.",
    "h": "Butler",
@@ -1151,6 +1354,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624350",
    "a": "Middle Tenn.",
    "h": "Boise St.",
@@ -1170,6 +1376,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624595",
    "a": "Northwestern St.",
    "h": "West Ga.",
@@ -1189,6 +1398,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625446",
    "a": "Eastern Ky.",
    "h": "South Fla.",
@@ -1208,6 +1420,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625965",
    "a": "Murray St.",
    "h": "Southern Ind.",
@@ -1227,6 +1442,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625991",
    "a": "Cal St. Fullerton",
    "h": "Sam Houston",
@@ -1246,6 +1464,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626882",
    "a": "UT Martin",
    "h": "Austin Peay",
@@ -1265,6 +1486,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628176",
    "a": "Idaho",
    "h": "Towson",
@@ -1284,6 +1508,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6639575",
    "a": "Hampton",
    "h": "Bethune-Cookman",
@@ -1303,6 +1530,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624541",
    "a": "Lamar University",
    "h": "CSU Bakersfield",
@@ -1322,6 +1552,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624934",
    "a": "Oakland",
    "h": "Binghamton",
@@ -1341,6 +1574,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624265",
    "a": "Illinois St.",
    "h": "Seton Hall",
@@ -1360,6 +1596,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624669",
    "a": "Rhode Island",
    "h": "Siena",
@@ -1379,6 +1618,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625356",
    "a": "Tennessee St.",
    "h": "Chattanooga",
@@ -1398,6 +1640,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625489",
    "a": "Central Mich.",
    "h": "Montana",
@@ -1417,6 +1662,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625786",
    "a": "LMU (CA)",
    "h": "Northern Ariz.",
@@ -1436,6 +1684,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625823",
    "a": "Stonehill",
    "h": "Oral Roberts",
@@ -1455,6 +1706,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625869",
    "a": "Idaho St.",
    "h": "Missouri St.",
@@ -1474,6 +1728,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626200",
    "a": "Fresno St.",
    "h": "Northern Ky.",
@@ -1493,6 +1750,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626257",
    "a": "Saint Peter's",
    "h": "Providence",
@@ -1512,6 +1772,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627265",
    "a": "Georgia St.",
    "h": "Mississippi St.",
@@ -1531,6 +1794,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627290",
    "a": "N.C. A&T",
    "h": "App State",
@@ -1550,6 +1816,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627645",
    "a": "Indiana St.",
    "h": "Navy",
@@ -1569,6 +1838,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628543",
    "a": "Ohio",
    "h": "Niagara",
@@ -1588,6 +1860,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6639306",
    "a": "Alabama St.",
    "h": "North Ala.",
@@ -1607,6 +1882,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6639364",
    "a": "ULM",
    "h": "Southern Ill.",
@@ -1626,6 +1904,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6639577",
    "a": "Mississippi Val.",
    "h": "South Carolina St.",
@@ -1645,6 +1926,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624402",
    "a": "Lindenwood",
    "h": "UIC",
@@ -1664,6 +1948,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624724",
    "a": "Milwaukee",
    "h": "DePaul",
@@ -1683,6 +1970,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625217",
    "a": "Fairfield",
    "h": "Morehead St.",
@@ -1702,6 +1992,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625555",
    "a": "Southern Miss.",
    "h": "Southern U.",
@@ -1721,6 +2014,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626717",
    "a": "UIW",
    "h": "Houston",
@@ -1740,6 +2036,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626781",
    "a": "Mercyhurst",
    "h": "Canisius",
@@ -1759,6 +2058,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626875",
    "a": "BYU",
    "h": "Florida St.",
@@ -1778,6 +2080,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627233",
    "a": "Purdue Fort Wayne",
    "h": "Evansville",
@@ -1797,6 +2102,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627385",
    "a": "NC State",
    "h": "Stony Brook",
@@ -1816,6 +2124,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627747",
    "a": "North Dakota",
    "h": "Eastern Wash.",
@@ -1835,6 +2146,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624841",
    "a": "Coppin St.",
    "h": "Kent St.",
@@ -1854,6 +2168,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624887",
    "a": "FIU",
    "h": "Merrimack",
@@ -1873,6 +2190,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625809",
    "a": "The Citadel",
    "h": "Le Moyne",
@@ -1892,6 +2212,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628274",
    "a": "Houston Christian",
    "h": "Little Rock",
@@ -1911,6 +2234,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6637012",
    "a": "Murray St.",
    "h": "NIU",
@@ -1930,6 +2256,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624987",
    "a": "UNI",
    "h": "Georgia Tech",
@@ -1949,6 +2278,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625050",
    "a": "USC Upstate",
    "h": "Norfolk St.",
@@ -1968,6 +2300,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625160",
    "a": "Belmont",
    "h": "San Jose St.",
@@ -1987,6 +2322,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625485",
    "a": "Iowa",
    "h": "Army West Point",
@@ -2006,6 +2344,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625946",
    "a": "Furman",
    "h": "North Florida",
@@ -2025,6 +2366,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626302",
    "a": "Denver",
    "h": "Central Ark.",
@@ -2044,6 +2388,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626328",
    "a": "High Point",
    "h": "UConn",
@@ -2063,6 +2410,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626884",
    "a": "UT Martin",
    "h": "Kansas City",
@@ -2082,6 +2432,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627307",
    "a": "McNeese",
    "h": "Cal St. Fullerton",
@@ -2101,6 +2454,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627896",
    "a": "Gonzaga",
    "h": "Southern Utah",
@@ -2120,6 +2476,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628213",
    "a": "UT Arlington",
    "h": "UTSA",
@@ -2139,6 +2498,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627099",
    "a": "Fordham",
    "h": "Rider",
@@ -2158,6 +2520,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624316",
    "a": "LIU",
    "h": "Michigan",
@@ -2177,6 +2542,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624352",
    "a": "Miami (FL)",
    "h": "Michigan St.",
@@ -2196,6 +2564,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624441",
    "a": "Northwestern",
    "h": "George Mason",
@@ -2215,6 +2586,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624596",
    "a": "Grambling",
    "h": "West Ga.",
@@ -2234,6 +2608,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624622",
    "a": "Maryland",
    "h": "Howard",
@@ -2253,6 +2630,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625089",
    "a": "UMES",
    "h": "Mississippi Val.",
@@ -2272,6 +2652,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625357",
    "a": "Valparaiso",
    "h": "Chattanooga",
@@ -2291,6 +2674,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625392",
    "a": "Loyola Maryland",
    "h": "James Madison",
@@ -2310,6 +2696,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625896",
    "a": "Duke",
    "h": "Coastal Carolina",
@@ -2329,6 +2718,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626165",
    "a": "Holy Cross",
    "h": "Central Conn. St.",
@@ -2348,6 +2740,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626545",
    "a": "UTRGV",
    "h": "West Virginia",
@@ -2367,6 +2762,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626604",
    "a": "Green Bay",
    "h": "Western Mich.",
@@ -2386,6 +2784,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627093",
    "a": "Bradley",
    "h": "Toledo",
@@ -2405,6 +2806,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627365",
    "a": "Texas Southern",
    "h": "East Texas A&M",
@@ -2424,6 +2828,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627595",
    "a": "Sacramento St.",
    "h": "South Dakota St.",
@@ -2443,6 +2850,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627610",
    "a": "Auburn",
    "h": "ETSU",
@@ -2462,6 +2872,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627673",
    "a": "Charleston So.",
    "h": "Clemson",
@@ -2481,6 +2894,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627790",
    "a": "Georgetown",
    "h": "American",
@@ -2500,6 +2916,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627962",
    "a": "Oregon St.",
    "h": "Utah Tech",
@@ -2519,6 +2938,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628360",
    "a": "Boise St.",
    "h": "UNC Asheville",
@@ -2538,6 +2960,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628493",
    "a": "VCU",
    "h": "FGCU",
@@ -2557,6 +2982,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628603",
    "a": "Santa Clara",
    "h": "Wright St.",
@@ -2576,6 +3004,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6637146",
    "a": "Bryant",
    "h": "Charlotte",
@@ -2595,6 +3026,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6637630",
    "a": "Bowling Green",
    "h": "Ohio St.",
@@ -2614,6 +3048,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6638585",
    "a": "Oral Roberts",
    "h": "Nicholls",
@@ -2633,6 +3070,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624516",
    "a": "UC Santa Barbara",
    "h": "Tarleton St.",
@@ -2652,6 +3092,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625717",
    "a": "Kansas",
    "h": "Pittsburgh",
@@ -2671,6 +3114,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626321",
    "a": "Ball St.",
    "h": "Notre Dame",
@@ -2690,6 +3136,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627051",
    "a": "Kennesaw St.",
    "h": "UNCW",
@@ -2709,6 +3158,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627255",
    "a": "Cal Poly",
    "h": "Grand Canyon",
@@ -2728,6 +3180,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628405",
    "a": "William & Mary",
    "h": "Virginia Tech",
@@ -2747,6 +3202,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628586",
    "a": "Cleveland St.",
    "h": "Lehigh",
@@ -2766,6 +3224,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6638581",
    "a": "CSU Bakersfield",
    "h": "North Texas",
@@ -2785,6 +3246,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624236",
    "a": "Indiana",
    "h": "Louisville",
@@ -2804,6 +3268,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624294",
    "a": "Marquette",
    "h": "Dayton",
@@ -2823,6 +3290,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624755",
    "a": "Duquesne",
    "h": "Youngstown St.",
@@ -2842,6 +3312,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624765",
    "a": "Mercer",
    "h": "Troy",
@@ -2861,6 +3334,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624909",
    "a": "Buffalo",
    "h": "Saint Louis",
@@ -2880,6 +3356,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625166",
    "a": "Samford",
    "h": "Alabama",
@@ -2899,6 +3378,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625200",
    "a": "Colgate",
    "h": "Tennessee",
@@ -2918,6 +3400,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625270",
    "a": "Oregon",
    "h": "Western Ky.",
@@ -2937,6 +3422,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625301",
    "a": "New Haven",
    "h": "New Hampshire",
@@ -2956,6 +3444,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625530",
    "a": "Memphis",
    "h": "Lipscomb",
@@ -2975,6 +3466,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625576",
    "a": "South Dakota",
    "h": "Drake",
@@ -2994,6 +3488,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625609",
    "a": "Wake Forest",
    "h": "LSU",
@@ -3013,6 +3510,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625630",
    "a": "UNC Greensboro",
    "h": "South Carolina",
@@ -3032,6 +3532,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626100",
    "a": "Bucknell",
    "h": "Marshall",
@@ -3051,6 +3554,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626130",
    "a": "Bethune-Cookman",
    "h": "East Carolina",
@@ -3070,6 +3576,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626515",
    "a": "SFA",
    "h": "Wichita St.",
@@ -3089,6 +3598,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626586",
    "a": "Rice",
    "h": "South Alabama",
@@ -3108,6 +3620,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626678",
    "a": "Air Force",
    "h": "Boston College",
@@ -3127,6 +3642,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626806",
    "a": "Utah St.",
    "h": "Kentucky",
@@ -3156,6 +3674,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626846",
    "a": "Robert Morris",
    "h": "UCF",
@@ -3175,6 +3696,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626974",
    "a": "Purdue",
    "h": "Creighton",
@@ -3194,6 +3718,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627166",
    "a": "George Washington",
    "h": "Georgia",
@@ -3213,6 +3740,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627554",
    "a": "IU Indy",
    "h": "San Diego St.",
@@ -3232,6 +3762,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627659",
    "a": "Oklahoma",
    "h": "Texas St.",
@@ -3251,6 +3784,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627900",
    "a": "St. John's (NY)",
    "h": "Old Dominion",
@@ -3270,6 +3806,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628013",
    "a": "Stetson",
    "h": "Fla. Atlantic",
@@ -3289,6 +3828,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6637449",
    "a": "Winthrop",
    "h": "Davidson",
@@ -3308,6 +3850,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6638153",
    "a": "Southeastern La.",
    "h": "Ole Miss",
@@ -3327,6 +3872,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6639402",
    "a": "Rutgers",
    "h": "Bellarmine",
@@ -3346,6 +3894,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6639569",
    "a": "South Carolina St.",
    "h": "Alabama A&M",
@@ -3365,6 +3916,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625415",
    "a": "Alcorn",
    "h": "LSU New Orleans ",
@@ -3384,6 +3938,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625757",
    "a": "Iona",
    "h": "Louisiana Tech",
@@ -3403,6 +3960,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626194",
    "a": "North Dakota St.",
    "h": "Tulane",
@@ -3422,6 +3982,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626699",
    "a": "Loyola Chicago",
    "h": "Iowa St.",
@@ -3441,6 +4004,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627510",
    "a": "A&M-Corpus Christi",
    "h": "Kansas St.",
@@ -3460,6 +4026,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624351",
    "a": "Cincinnati",
    "h": "Illinois",
@@ -3479,6 +4048,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624960",
    "a": "Col. of Charleston",
    "h": "Vanderbilt",
@@ -3498,6 +4070,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625992",
    "a": "Miami (OH)",
    "h": "Sam Houston",
@@ -3517,6 +4092,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626048",
    "a": "Tulsa",
    "h": "New Mexico St.",
@@ -3536,6 +4114,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626091",
    "a": "Jacksonville",
    "h": "Jacksonville St.",
@@ -3555,6 +4136,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626227",
    "a": "Towson",
    "h": "Missouri",
@@ -3574,6 +4158,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626799",
    "a": "Jackson St.",
    "h": "Austin Peay",
@@ -3593,6 +4180,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627619",
    "a": "UC Davis",
    "h": "Colorado St.",
@@ -3612,6 +4202,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628215",
    "a": "San Francisco",
    "h": "Weber St.",
@@ -3631,6 +4224,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628224",
    "a": "CSUN",
    "h": "Colorado",
@@ -3650,6 +4246,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628676",
    "a": "SIUE",
    "h": "Arkansas",
@@ -3669,6 +4268,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624542",
    "a": "Lamar University",
    "h": "Abilene Christian",
@@ -3688,6 +4290,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625966",
    "a": "Eastern Mich.",
    "h": "Southern Ind.",
@@ -3707,6 +4312,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626469",
    "a": "Arkansas St.",
    "h": "Texas A&M",
@@ -3726,6 +4334,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627471",
    "a": "Texas Tech",
    "h": "Wyoming",
@@ -3745,6 +4356,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624302",
    "a": "Utah",
    "h": "Utah Valley",
@@ -3764,6 +4378,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624570",
    "a": "Portland St.",
    "h": "Portland",
@@ -3783,6 +4400,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6624826",
    "a": "Minnesota",
    "h": "Arizona St.",
@@ -3802,6 +4422,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626381",
    "a": "Villanova",
    "h": "Pepperdine",
@@ -3821,6 +4444,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627489",
    "a": "California Baptist",
    "h": "New Mexico",
@@ -3840,6 +4466,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628123",
    "a": "Chicago St.",
    "h": "Seattle U",
@@ -3859,6 +4488,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628236",
    "a": "Stanford",
    "h": "Wisconsin",
@@ -3890,6 +4522,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628238",
    "a": "Prairie View",
    "h": "Arizona",
@@ -3909,6 +4544,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628366",
    "a": "Omaha",
    "h": "Washington St.",
@@ -3928,6 +4566,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625235",
    "a": "UC San Diego",
    "h": "Saint Mary's (CA)",
@@ -3947,6 +4588,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625818",
    "a": "Baylor",
    "h": "San Diego",
@@ -3966,6 +4610,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625951",
    "a": "UCLA",
    "h": "Long Beach St.",
@@ -3985,6 +4632,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626504",
    "a": "Pacific",
    "h": "California",
@@ -4004,6 +4654,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627346",
    "a": "UC Irvine",
    "h": "Washington",
@@ -4023,6 +4676,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625328",
    "a": "Ga. Southern",
    "h": "Hawaii",
@@ -4042,6 +4698,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6625090",
    "a": "Mississippi Val.",
    "h": "Delaware St.",
@@ -4061,6 +4720,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626242",
    "a": "Gardner-Webb",
    "h": "Morgan St.",
@@ -4080,6 +4742,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627745",
    "a": "Presbyterian",
    "h": "Northwestern St.",
@@ -4099,6 +4764,9 @@
   },
   {
    "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6627406",
    "a": "Delaware St.",
    "h": "Ark.-Pine Bluff",

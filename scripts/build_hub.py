@@ -8197,6 +8197,11 @@ details.avhist{margin:14px 0}
   border:1px solid var(--line);color:var(--ink2);white-space:nowrap}
 .rc-confirmed{color:var(--good);border-color:color-mix(in oklab,var(--good) 45%,transparent)}
 .rc-disputed{color:var(--coral);border-color:color-mix(in oklab,var(--coral) 50%,transparent)}
+.rc-duplicate{color:var(--ink3);border-style:dashed;text-decoration:line-through transparent}
+.rcdup{border:1px dashed var(--line2);border-radius:3px;padding:12px 14px;
+  margin:0 0 12px;font-size:13px;color:var(--ink2)}
+.rcdup b{color:var(--chalk)}
+.rcdup a{color:var(--gold)}
 .rcsrc{font:600 10.5px/1 var(--mono);color:var(--ink3);white-space:nowrap}
 .rcrow{display:flex;align-items:center;gap:14px}
 .rcfields{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px}
@@ -15499,7 +15504,11 @@ function renderConfidence() {
       (x[2] ? '<span>' + x[2] + '</span>' : '') + '</div>').join('') +
     '</div>';
   const rows = (CONFIDENCE.finals || []).filter(r =>
-    RC_FILTER === 'all' ? true : r.overall === RC_FILTER);
+    /* ⚠ a duplicate listing is NOT another final in a state -- it appears
+       under All (and its own chip), never inside a counted-state filter */
+    RC_FILTER === 'all' ? true
+      : r.duplicate_of ? false
+      : r.overall === RC_FILTER);
   const el = document.getElementById('rclist');
   el.innerHTML = rows.length ? rows.slice().sort((a, b) =>
     String(b.d).localeCompare(String(a.d)) ||
@@ -15510,8 +15519,11 @@ function renderConfidence() {
       '<span class="mrt"><b class="tn">' + esc(r.a || '\u2014') + '</b> v <b class="tn">' +
       esc(r.h || '\u2014') + '</b>' + (r.exh ? ' <i class="kind exh">EXH</i>' : '') +
       '</span>' +
-      '<span class="rcstate rc-' + r.overall + '">' +
-      (RC_LABEL[r.overall] || r.overall) + '</span>' +
+      (r.duplicate_of
+        ? '<span class="rcstate rc-duplicate">DUPLICATE LISTING \u00b7 ' +
+          'DOES NOT COUNT</span>'
+        : '<span class="rcstate rc-' + r.overall + '">' +
+          (RC_LABEL[r.overall] || r.overall) + '</span>') +
       '<span class="rcsrc">official: recorded \u00b7 independent: ' +
       (r.n_indep ? r.n_indep + ' attributable source' +
         (r.n_indep === 1 ? '' : 's') : 'none yet') +
@@ -15528,8 +15540,36 @@ function rcDrill(gid) {
   const el = document.getElementById('rcdrill');
   el.hidden = false;
   const st = r.states || {};
+  /* ⚠ A DUPLICATE'S DRILL LEADS WITH THE AUDIT, IN ENGLISH (round 12):
+     what it is, what it is excluded from, the canonical match with a real
+     route, the established reason, and both school citations with their
+     retrieval dates. The canonical match itself stays unlabelled. */
+  const dupBlock = r.duplicate_of
+    ? '<div class="rcdup"><b>Duplicate feed listing \u2014 does not ' +
+      'count.</b> The NCAA feed listed this match twice; this copy is ' +
+      'excluded from records, rates, form, Conference Lab, ratings and ' +
+      'snapshots. The match that counts is ' +
+      '<a href="' + matchRoute(r.duplicate_of, 'desk') + '?from=ledger">' +
+      esc(r.a || '') + ' v ' + esc(r.h || '') + ' \u2014 the canonical ' +
+      'listing</a>.' +
+      (r.dup_reason ? '<span class="avmeta">Established: ' +
+        esc(r.dup_reason) + '</span>' : '') +
+      (r.dup_asym ? '<span class="avmeta">' + esc(r.dup_asym) +
+        '</span>' : '') +
+      (r.dup_evidence || []).map(e =>
+        '<div class="rcsource"><b>' + esc(e.school || '') + '</b>' +
+        '<span class="rck">official schedule</span>' +
+        '<span class="rcq">\u201c' + esc(e.text || '') + '\u201d</span>' +
+        (e.url ? '<a class="rcu" href="' + esc(e.url) +
+          '" target="_blank" rel="noopener noreferrer">' +
+          esc((e.url || '').replace(/^https?:\/\//, '').split('/')[0]) +
+          '</a>' : '') +
+        '<span class="rct">retrieved ' + esc(e.retrieved || '') +
+        '</span></div>').join('') +
+      '</div>'
+    : '';
   el.innerHTML = '<h3 class="cfh">' + esc(r.a || '?') + ' v ' +
-    esc(r.h || '?') + ' \u2014 ' + esc(r.d) + '</h3>' +
+    esc(r.h || '?') + ' \u2014 ' + esc(r.d) + '</h3>' + dupBlock +
     '<div class="rcfields">' + ['result', 'sets', 'box', 'venue'].map(f => {
       /* ⚠ THE BOX STATE'S NAME IS NARROWER THAN "RECONCILED" (round 9): the
          check is only that a HELD box aligns with the match's teams and set
