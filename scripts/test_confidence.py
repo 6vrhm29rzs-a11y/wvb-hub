@@ -162,6 +162,62 @@ def main():
     check("[NEG] an uncorrected row carries no corrected flag",
           not any(r.get("result_corrected") for r in rows
                   if r["gid"] not in [c["gid"] for c in _corr]))
+    # ── ROUND 19: the corrected row's SUMMARY names its correction
+    # evidence and never the contradictory generic phrase ──────────────
+    import subprocess as _sp19
+    from test_scoreboard_density import block as _jsb19
+    _rc19 = _jsb19(src, src.find("function renderConfidence("))
+    _js19 = """
+const esc = s => String(s == null ? '' : s);
+const matchRoute = g => '#/m/' + g;
+const RC_LABEL = { reconciled: 'Reconciled' };
+let RC_FILTER = 'all';
+const CONFIDENCE = { meta: { counts: {} }, finals: [
+  { gid: 'CORR', a: 'A', h: 'B', d: '2026-08-29', overall: 'reconciled',
+    duplicate_of: null, result_corrected: true,
+    corr_evidence: [
+      { school: 'A U', text: 'L, 2-3 on the row', status: 'confirms' },
+      { school: 'B U', text: null, status: 'attempted_unverifiable' }],
+    states: {}, n_indep: 0, n_attempted: 0, sources: [] },
+  { gid: 'PLAIN', a: 'C', h: 'D', d: '2026-08-29', overall: 'official',
+    duplicate_of: null, result_corrected: null,
+    states: {}, n_indep: 0, n_attempted: 0, sources: [] }]};
+const els = {}; const mk = id => els[id] = { innerHTML: '', hidden: false };
+['rcsummary','rclist','rcdrill'].forEach(mk);
+global.document = { getElementById: id => els[id] || null };
+%s
+renderConfidence();
+const list = els.rclist.innerHTML;
+const corr = (list.match(/<button[^>]*data-rcgid="CORR"[\\s\\S]*?<\\/button>/) || [''])[0];
+const plain = (list.match(/<button[^>]*data-rcgid="PLAIN"[\\s\\S]*?<\\/button>/) || [''])[0];
+const bad = [];
+if (corr.indexOf('independent: none yet') >= 0)
+  bad.push('corrected row still shows the contradictory generic phrase');
+if (corr.indexOf('corrected against raw set line') < 0)
+  bad.push('corrected row lacks the correction summary');
+if (corr.indexOf('1 attributable school source') < 0)
+  bad.push('attributable correction-evidence count missing or wrong');
+if (corr.indexOf('1 attempted, unreadable') < 0)
+  bad.push('the attempted recheck is not distinguished');
+if (corr.indexOf('CROSS-SOURCE') >= 0 || corr.indexOf('Confirmed') >= 0)
+  bad.push('a correction was promoted toward cross-source confirmed');
+if (plain.indexOf('independent: none yet') < 0)
+  bad.push('the ordinary row lost its generic summary');
+if (bad.length) { console.log('R19-FAIL: ' + bad.join(' | ')); process.exit(1); }
+console.log('R19-OK'); process.exit(0);
+""" % _rc19
+    _r19 = _sp19.run(["node", "-e", _js19], capture_output=True, text=True)
+    check("BEHAVIOUR: corrected summary counts from the payload; ordinary "
+          "rows keep the generic one",
+          _r19.returncode == 0, (_r19.stdout + _r19.stderr).strip()[:160])
+    _bad19 = _rc19.replace("r.result_corrected\n        ? (function", "false\n        ? (function")
+    if _bad19 == _rc19:
+        _bad19 = _rc19.replace("(r.result_corrected", "(false")
+    _rb19 = _sp19.run(["node", "-e", _js19.replace(_rc19, _bad19)],
+                      capture_output=True, text=True)
+    check("[NEG] reverting to the generic summary on corrected rows fails",
+          _rb19.returncode != 0
+          and "contradictory generic phrase" in (_rb19.stdout + _rb19.stderr))
 
     print("\n6. THE DISPUTE QUARANTINE (this suite red IS the halt)")
     # stated policy: raw history is never rewritten and no silent per-match

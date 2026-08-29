@@ -15695,13 +15695,34 @@ function renderConfidence() {
           (RC_LABEL[r.overall] || r.overall) + '</span>') +
       (r.result_corrected
         ? '<span class="rcstate rc-corrected">RESULT CORRECTED</span>' : '') +
-      '<span class="rcsrc">official: recorded \u00b7 independent: ' +
-      (r.n_indep ? r.n_indep + ' attributable source' +
-        (r.n_indep === 1 ? '' : 's') : 'none yet') +
-      (r.n_attempted ? ' \u00b7 ' + r.n_attempted +
-        ' attempted, unreadable' : '') +
-      (r.last_checked ? ' \u00b7 checked ' + esc(String(r.last_checked)
-        .slice(0, 10)) : '') + '</span></button>').join('')
+      /* ⚠ A CORRECTED ROW'S SUMMARY NAMES ITS OWN EVIDENCE (round 19).
+         "independent: none yet" beside a school citation in the audit block
+         was a contradiction: correction evidence is real, attributable, and
+         COUNTED here -- while deliberately never upgrading the ordinary
+         taxonomy to cross-source confirmed (that ladder belongs to
+         result_evidence.json, which corrections never feed). Attempted,
+         unreadable rechecks are shown and establish nothing. Counts come
+         from the row's actual evidence payload, never a literal. */
+      (r.result_corrected
+        ? (function () {
+            const ev2 = r.corr_evidence || [];
+            const attrib = ev2.filter(e =>
+              e.status !== 'attempted_unverifiable' && e.text).length;
+            const tried = ev2.filter(e =>
+              e.status === 'attempted_unverifiable').length;
+            return '<span class="rcsrc">official: corrected against raw ' +
+              'set line \u00b7 correction evidence: ' + attrib +
+              ' attributable school source' + (attrib === 1 ? '' : 's') +
+              (tried ? ' \u00b7 ' + tried + ' attempted, unreadable' : '') +
+              '</span>';
+          })()
+        : '<span class="rcsrc">official: recorded \u00b7 independent: ' +
+          (r.n_indep ? r.n_indep + ' attributable source' +
+            (r.n_indep === 1 ? '' : 's') : 'none yet') +
+          (r.n_attempted ? ' \u00b7 ' + r.n_attempted +
+            ' attempted, unreadable' : '') +
+          (r.last_checked ? ' \u00b7 checked ' + esc(String(r.last_checked)
+            .slice(0, 10)) : '') + '</span>') + '</button>').join('')
     : '<p class="tdquiet">No final in this state.</p>';
 }
 
