@@ -102,7 +102,7 @@ def main():
     # ⚠ NO PLACEHOLDER, EVER. A match with no line scores on file must render
     # nothing -- not a zero, not a dash, not an empty set box. R5.
     check("no data renders an empty cell, not a stand-in",
-          "if (!raw && !tally) return '<span class=\"mls\"></span>';" in strip)
+          "if (!full && !tally) return '<span class=\"mls\"></span>';" in strip)
     for bad in ("'0'", '"0"', "|| 0", "'\\u2014'", "&mdash;"):
         check("[-] rowLinescore substitutes no %s" % bad, bad not in strip)
 
@@ -126,12 +126,23 @@ def main():
           not nums, str(nums))
 
     # a live set is provisional and is marked as such, never as a result
-    check("the in-progress set is marked, and only while live",
-          "const now = playing && i === n - 1;" in strip)
-    # the ternary gives `now` its own class BEFORE the winner test runs, so
-    # an in-progress column can never carry the winner style
-    check("...and the in-progress set crowns no winner",
-          "(now ? ' now' : (+v > +o ? ' w' : ''))" in strip)
+    # ⚠ THE RULE EVOLVED TWICE IN ONE EVENING, both times at Cody's word.
+    # First the in-progress set was sliced out of the table (its points lived
+    # by the names); then he asked for the sets strictly in order with "the
+    # current set boxed or bordered and clear that it's ongoing". So it is
+    # back in sequence as the LAST column, boxed -- and the invariant is that
+    # the box exists and is the only live accent.
+    check("the in-progress set is the boxed last column",
+          "const cur = playing && i === n - 1;" in strip and
+          "' cur '" in strip)
+    # the boxed cell may mark who is AHEAD (up) but never carries the
+    # winner-bold class -- nobody has won a set still being played
+    check("...and the boxed set is marked ahead, never won",
+          "(+v > +o ? ' up' : '')" in strip and
+          "cur ? ' cur '" in strip)
+    check("...and the sets-won tally leads the line",
+          strip.find("mlt") < strip.find("mlc"),
+          "Cody: sets won on the LEFT of the set scores")
     check("...and 'playing' comes from the state, not the score",
           "const playing = st === 'live';" in strip)
 
@@ -200,14 +211,19 @@ def main():
           "if (!bits.length) return '<span class=\"mctx\"></span>';" in ctx)
 
     print("\n3. The row still fits, and the phone drops the extras first")
-    grid = re.search(r"\.mrow\{display:grid;grid-template-columns:([^;]+);", src)
+    # the composed row (design review, 2026-08-28): when | teams | linescore
+    # ADJACENT | meta takes the slack at the right edge
+    grid = re.search(r"\.mrow\{display:grid;\s*grid-template-columns:([^;]+);",
+                     src)
     check("the row grid is declared", grid is not None)
     if grid:
         cols = grid.group(1)
         check("the team column is capped, not 1fr",
-              "minmax(150px,270px)" in cols,
-              "an uncapped team column pushes the line score to the far edge")
-        check("the context column takes the slack", "minmax(0,1fr)" in cols)
+              "minmax(210px,300px)" in cols,
+              "an uncapped team column pushes the linescore to the far edge")
+        check("the meta column takes the slack, keeping the linescore adjacent",
+              cols.strip().endswith("minmax(0,1fr)"),
+              "the 1fr must be LAST or the dead middle returns")
     # ⚠ THERE ARE FORTY-ODD @media (max-width:560px) BLOCKS IN THIS FILE, not
     # one. A guard that read `src.find(...)` inspected the first of them and
     # reported working rules as missing -- the guard being wrong, again. Every

@@ -5066,6 +5066,13 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
   .cs-rmore{margin-left:0}
 }
 /* COURTSIGNAL-TAPE-CSS-END */
+/* the Scores route compresses the shared hero: identity in one line,
+   the tape kept (it is the broadcast state), the counters hidden */
+body[data-view=scores] .mast{padding-top:10px;padding-bottom:2px}
+body[data-view=scores] .mast h1{font-size:30px}
+body[data-view=scores] .mast .meta{display:none}
+body[data-view=scores] .season{display:none}
+body[data-view=scores] #v-scores .vh{display:none}
 nav{position:sticky;top:0;z-index:6;
   background:linear-gradient(180deg,rgba(12,23,45,.88),rgba(8,14,28,.92));
   backdrop-filter:saturate(1.6) blur(14px);
@@ -5344,6 +5351,8 @@ td.pick b{color:var(--navy)}
      of row two beside a field of nothing -- Cody's screenshot. Centred and a
      step tighter, the same six wrap as two balanced rows. */
   nav button.pri{font-size:13px;padding:12px 7px}
+  /* four primaries on a phone; the ballot rides in More (see the menu) */
+  nav button.pri[data-v=ballot]{display:none}
   nav button{font-size:11px;padding:12px 6px}
   nav .morebtn{padding:12px 6px}
 
@@ -6538,7 +6547,9 @@ td.at{white-space:nowrap}
    spare pixel and pushed the line score to the far edge, ~830px from
    the names it belongs to. The context column takes the slack instead,
    which is what the space is actually for. */
-.mrow{display:grid;grid-template-columns:74px minmax(150px,270px) minmax(0,1fr) auto auto;align-items:center;
+.mrow{display:grid;
+  grid-template-columns:64px minmax(210px,300px) auto minmax(0,1fr);
+  align-items:center;
   gap:12px;padding:10px 2px;border-bottom:1px solid var(--line);cursor:pointer;
   background:none;border-left:0;border-right:0;border-top:0;width:100%;
   text-align:left;color:inherit;font:inherit}
@@ -6555,19 +6566,35 @@ td.at{white-space:nowrap}
 .mrow .msc{font:700 17px/1.2 var(--mono);color:var(--ink3);text-align:right;
   font-variant-numeric:tabular-nums}
 .mrow .mrt.won .msc,.mrow.islive .msc{color:var(--chalk)}
-.mrow .mmeta{font:10.5px/1.5 var(--mono);color:var(--ink3);text-align:right}
+.mrow .mmeta{display:flex;flex-direction:column;align-items:flex-end;gap:3px;
+  min-width:0;overflow:hidden;text-align:right}
+.mvn{font:11px/1.4 var(--sans);color:var(--slate);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;max-width:100%}
 /* the two numerals stack so they line up with the two team rows above */
 /* under a time heading the row's own clock is redundant; hiding it takes
    .mwhen out of grid flow, so the remaining four cells map to four
    columns and the row reclaims the width */
-.tdlist.bytime .mrow{grid-template-columns:minmax(150px,270px) minmax(0,1fr) auto auto}
+.tdlist.bytime .mrow{grid-template-columns:minmax(210px,300px) auto minmax(0,1fr)}
 .tdlist.bytime .mrow .mwhen{display:none}
 /* ⚠ A LIVE ROW'S "when" IS THE SET, NOT THE CLOCK -- hiding it under a time
    heading removed the one label that says where the match stands. Cody's
    desktop screenshot: live rows with no period anywhere. The clock is
    redundant under its heading; the period never is. */
-.tdlist.bytime .mrow.islive{grid-template-columns:74px minmax(150px,270px) minmax(0,1fr) auto auto}
+.tdlist.bytime .mrow.islive{grid-template-columns:64px minmax(210px,300px) auto minmax(0,1fr)}
 .tdlist.bytime .mrow.islive .mwhen{display:block}
+/* ⚠ THE PHONE CARD MUST OUTRANK THE bytime DESKTOP TEMPLATES. Those two rules
+   above are not media-scoped and carry three classes, so the 560px card
+   template (one class, earlier in the sheet) lost everywhere inside a time
+   group -- the teams area collapsed to 64px and every NAME vanished, leaving
+   crest-and-points cards. Cody's phone would have shown a scoreboard with no
+   teams on it. Same selectors, media-scoped, declared after. */
+@media (max-width:560px){
+  .mrow,.tdlist.bytime .mrow,.tdlist.bytime .mrow.islive{
+    grid-template-columns:1fr;
+    grid-template-areas:"when" "teams" "mls" "meta"}
+  .tdlist.bytime .mrow .mwhen{display:none}
+  .tdlist.bytime .mrow.islive .mwhen{display:block}
+}
 @media (max-width:560px){
   .tdlist.bytime .mrow{grid-template-columns:minmax(0,1fr) auto}
 }
@@ -6577,17 +6604,28 @@ a.card.morecard span{font:11px/1 var(--sans);color:var(--slate)}
 a.card.morecard:hover b{color:var(--chalk)}
 h4.sbtime{display:flex;align-items:baseline;gap:8px;margin:16px 0 0;padding:0 2px 6px;border-bottom:1px solid var(--line);font:700 11px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;color:var(--slate)}
 h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
+/* THE BOX: the set in progress, one live accent (Cody: "boxing things makes
+   it cleaner"). Two stacked grid cells drawn as one box -- top cell carries
+   the top and sides, bottom cell the bottom and sides. Larger numerals (they
+   are the ones moving); the side ahead in the set reads gold; no winner-bold,
+   because nobody has won a set still being played. */
+.mlc.cur{font:700 15.5px/1.2 var(--mono);color:var(--chalk);
+  border:1px solid color-mix(in oklab,var(--cs-gold) 55%,transparent);
+  padding:1px 5px}
+.mlc.cur.ca{border-bottom:0;border-radius:3px 3px 0 0}
+.mlc.cur.ch{border-top:0;border-radius:0 0 3px 3px}
+.mlc.cur.up{color:var(--cs-gold)}
 /* THE LINESCORE GRID -- broadcast shape: one column per set, tally ruled off.
    Two rows in source order away-then-home, matching the names beside it. */
 .mls{display:grid;
-  grid-template-columns:repeat(var(--mlsn,0),minmax(25px,auto)) auto;
+  grid-template-columns:repeat(var(--mlsn,0),minmax(25px,auto));
   justify-content:end;align-content:center;column-gap:1px;row-gap:4px}
+.mls.hastally{grid-template-columns:auto repeat(var(--mlsn,0),minmax(25px,auto))}
 .mlc{font:600 13.5px/1.2 var(--mono);color:var(--slate);text-align:center;
   padding:0 4px;font-variant-numeric:tabular-nums;font-style:normal}
 .mlc.w{color:var(--chalk);font-weight:700}
-.mlc.now{color:var(--coral);font-weight:700;background:color-mix(in oklab,var(--coral) 12%,transparent);border-radius:2px}
 .mlt{font:700 15px/1.1 var(--mono);color:var(--ink2);text-align:center;
-  margin-left:9px;padding-left:11px;border-left:1px solid var(--cs-edge2);
+  margin-right:9px;padding-right:11px;border-right:1px solid var(--cs-edge2);
   font-variant-numeric:tabular-nums}
 .mlt.w{color:var(--chalk)}
 .mrow .mctx{display:flex;flex-direction:column;gap:2px;min-width:0;overflow:hidden}
@@ -6647,22 +6685,33 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
   .rbside .rbnm{font-size:21px}
   .rbside .rbsc{font-size:26px}
   .rbside img{width:26px;height:26px}
-  /* ⚠ REVERSED (Cody, with a broadcast linescore as the reference): the
-     per-set table IS what a phone reader wants -- "I shouldn't have to click
-     on a match to see if someone is winning or losing." At 25px a column,
-     five sets plus the tally is ~150px; the names truncate before the
-     numbers do. Only the venue stays a tap away. */
-  .mrow{grid-template-columns:minmax(0,1fr) auto auto;gap:8px}
-  .mrow .mwhen{display:none}
-  .mrow.islive .mwhen{display:block;font-size:9.5px;grid-row:1 / span 1}
-  .mrow.islive{grid-template-columns:44px minmax(0,1fr) auto auto}
-  .mlc{font-size:12.5px;padding:0 3px}
-  .mlt{font-size:14px;margin-left:6px;padding-left:8px}
-  /* a five-set linescore leaves ~150px for the name; it must ellipsize, not
-     run under the numbers ("High Po26" on the first phone screenshot) */
+  /* ⚠ A DEDICATED MATCH CARD, NOT A COMPRESSED DESKTOP ROW (design review
+     via Cody, 2026-08-28). Same DOM, re-laid as a card:
+       state row (period, small)
+       away line:  crest  name .............. current points
+       home line
+       completed sets, small and dim, left-aligned under the names
+     Venue and network stay in the match detail at this width. */
+  .mrow{grid-template-columns:1fr;
+    grid-template-areas:"when" "teams" "mls" "meta";
+    gap:4px;padding:12px 2px}
+  .mrow .mwhen{grid-area:when;display:none;font-size:10px}
+  .mrow.islive .mwhen{display:block}
+  .mrow .mteams{grid-area:teams}
+  .mrow .mls{grid-area:mls;justify-content:start;margin-left:27px;row-gap:2px}
+  /* venue and network as the card's quiet last line -- secondary, one line,
+     ellipsized; the design review's sketch ends the card exactly this way */
+  .mrow .mmeta{display:flex;grid-area:meta;align-items:center;gap:8px;
+    margin-left:27px}
+  .mrow .mvn{font:10.5px/1.3 var(--sans);color:var(--ink3)}
+  .mlc{font-size:11.5px;padding:0 3px;color:var(--ink3)}
+  .mlt{font-size:12.5px;margin-right:6px;padding-right:8px}
+  .mrt .mcur{font-size:21px}
   .mrow .mrt{min-width:0}
-  .mrow .mrt b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  .mrow .mrt b.tn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
     overflow-wrap:normal}
+  /* an upcoming match card: time left of the names on one line */
+  .mrow:not(.islive) .mwhen{display:block;font-size:10px;color:var(--slate)}
   .mrow .mctx{display:none}
   .mrow .mrt b{font-size:14px}
   .mrow .msc{font-size:15px}
@@ -6679,6 +6728,8 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
   padding:15px 13px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;
   border-bottom:3px solid transparent}
 .morebtn:hover,.morebtn[aria-expanded=true]{color:var(--ink)}
+.moremenu .phoneonly{display:none}
+@media (max-width:560px){.moremenu .phoneonly{display:block}}
 .moremenu{position:absolute;top:100%;right:0;z-index:20;min-width:206px;
   background:var(--chrome2);border:1px solid var(--line2);border-radius:4px;
   padding:5px;box-shadow:0 18px 40px -18px rgba(0,0,0,.85)}
@@ -8202,6 +8253,13 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <button type="button" class="morebtn" id="morebtn" aria-haspopup="true"
         aria-expanded="false" aria-controls="moremenu">More<span aria-hidden="true">&#9662;</span></button>
       <div class="moremenu" id="moremenu" role="menu" aria-labelledby="morebtn" hidden>
+        <!-- PRIVATE. The ballot rides here on a PHONE ONLY (design review
+             via Cody, 2026-08-28): six text tabs across a phone is too
+             cramped, so four primaries stay visible and the nav's ballot
+             button hides at that width -- reachable exactly once either way.
+             The strip removes any PRIVATE-commented ballot button, this one
+             included. -->
+        <button role="menuitem" data-v="ballot" class="phoneonly">My Ballot</button>
         <button role="menuitem" data-v="leaders">Stats</button>
         <button role="menuitem" data-v="players">Players</button>
         <button role="menuitem" data-v="prank">Player ratings</button>
@@ -8238,10 +8296,15 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
        fail it: a reader (or a fetch, or the public page) sees the document,
        not the script that would have populated it. The sentence is static
        anyway; nothing here depended on the selected date. -->
-  <p class="lead" id="sbLead"><b>2026 season.</b> Every Division-I match on the
-  selected date, from the same canonical fixture record the rest of the hub
-  reads. A rank carries the ranking it came from; a venue is the one the feed
-  or a school published, never inferred.</p>
+  <!-- ⚠ THE WORKING SCOREBOARD CARRIES ALMOST NO PROSE (design review via
+       Cody, 2026-08-28: "You know what the page does"). The methodology moved
+       behind a disclosure; the season is still named for the guard that
+       requires a view to say which year it describes. -->
+  <details class="method sbmeth" id="sbLead"><summary><b>2026 season</b> &mdash; where these numbers come from</summary>
+    <div class="note"><p>Every Division-I match on the selected date, from the
+    same canonical fixture record the rest of the hub reads. A rank carries the
+    ranking it came from; a venue is the one the feed or a school published,
+    never inferred.</p></div></details>
 
   <!-- THE DATE IS THE PAGE. Previous / next / today, then the filters. -->
   <div class="sbbar">
@@ -8269,7 +8332,6 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <span class="count" id="sbCount"></span>
     </div>
   </div>
-  <div id="sbTop"></div>
   <div id="sbBody"></div>
 
   <div id="justin" hidden>
@@ -9134,6 +9196,9 @@ function showView(view) {
     '#moremenu button[aria-current=page]'));
   moveNavBar();
   document.querySelectorAll('main section').forEach(s => { s.hidden = true; });
+  /* the view name on <body>, so a view can shape the shared chrome without
+     JS -- the Scores control room compresses the hero this way */
+  document.body.dataset.view = view;
   const el = $('#v-' + view);
   if (el) el.hidden = false;
   /* ⚠ A STALE NAV CONTROL KEPT BOTH DOM FOCUS AND ITS RING. Setting
@@ -14131,30 +14196,41 @@ function ribbonHTML(m, live, why) {
    ⚠ THE SET IN PROGRESS IS MARKED, NOT CROWNED: its column is tinted and its
    numbers carry no winner-bold, because nobody has won it. */
 function rowLinescore(m, live, st) {
-  const raw = (live && live.sets && live.sets.length) ? live.sets
+  const full = (live && live.sets && live.sets.length) ? live.sets
     : (m.sets && m.sets.length ? m.sets : null);
   const sc = matchScore(m, live);
   const tally = (sc && sc[0] !== null && sc[0] !== undefined) ? sc : null;
-  if (!raw && !tally) return '<span class="mls"></span>';
+  if (!full && !tally) return '<span class="mls"></span>';
   const playing = st === 'live';
+  const raw = full;
   const n = raw ? raw.length : 0;
+  /* THE SHAPE, all of it Cody's (2026-08-28): sets-won FIRST, rule on its
+     right; then the sets strictly in order, set one leftmost; and the set in
+     progress is the LAST column, BOXED -- "make sure the current set is boxed
+     or bordered and clear that it's ongoing. i think boxing things makes it
+     cleaner." The box is the one live accent; its numerals are larger because
+     they are the ones moving, and they carry no winner-bold -- nobody has won
+     a set that is still being played. */
   let cells = '';
   for (let r = 0; r < 2; r++) {
-    for (let i = 0; i < n; i++) {
-      const a = raw[i][0], h = raw[i][1];
-      const v = r === 0 ? a : h, o = r === 0 ? h : a;
-      const now = playing && i === n - 1;
-      cells += '<i class="mlc' + (now ? ' now' : (+v > +o ? ' w' : '')) +
-        '" title="set ' + (i + 1) + (now ? ' (in progress)' : '') + '">' +
-        esc(String(v)) + '</i>';
-    }
     if (tally) {
       cells += '<b class="mlt' +
         (!playing && +tally[r] > +tally[1 - r] ? ' w' : '') +
         '" title="sets won">' + esc(String(tally[r])) + '</b>';
     }
+    for (let i = 0; i < n; i++) {
+      const a = raw[i][0], h = raw[i][1];
+      const v = r === 0 ? a : h, o = r === 0 ? h : a;
+      const cur = playing && i === n - 1;
+      cells += '<i class="mlc' +
+        (cur ? ' cur ' + (r === 0 ? 'ca' : 'ch') + (+v > +o ? ' up' : '')
+             : (+v > +o ? ' w' : '')) +
+        '" title="set ' + (i + 1) + (cur ? ' (in progress)' : '') + '">' +
+        esc(String(v)) + '</i>';
+    }
   }
-  return '<span class="mls" style="--mlsn:' + n + '">' + cells + '</span>';
+  return '<span class="mls' + (tally ? ' hastally' : '') +
+    '" style="--mlsn:' + n + '">' + cells + '</span>';
 }
 
 function matchContext(m) {
@@ -14212,30 +14288,37 @@ function matchRow(m, live, dest) {
      The leader of the current set is emphasised -- that is a fact about the
      set in progress, not a crowned winner. If the feed's per-set points have
      not arrived yet, only the tally renders: no invented zeros. */
+  /* ⚠ ONE COMPOSED SCORE OBJECT (design review via Cody, 2026-08-28): the
+     current set's points sit AT THE END OF EACH TEAM LINE -- the dominant
+     number, because it is the one moving -- with the completed sets dimmed
+     beside them and the tally behind a rule. No dead middle: the linescore is
+     adjacent to the teams, and the venue is the quiet right edge. */
+  /* the names stay clean (the review's "team names must remain the dominant
+     text"); the current set lives in the linescore's boxed last column */
   const t = (name, rk, won) =>
     '<div class="mrt ' + (won ? 'won' : '') + '">' +
       (rk ? '<span class="mrk">' + rankHTML('avca', rk, true) + '</span>' : '') +
-      logo(name) + '<b>' + esc(name) + '</b></div>';
+      logo(name) + '<b class="tn">' + esc(name) + '</b></div>';
+  /* venue as quiet metadata, not a badged shout: "Neutral · Rec Hall, State
+     College". The one badge that changes what a result MEANS -- exhibition --
+     keeps its outline. Everything else is text. */
+  const _mbits = [];
+  if (m.site === 'neutral') _mbits.push('Neutral');
+  if (m.event) _mbits.push(esc(m.event));
+  if (m.venue) _mbits.push(esc(m.venue) + (m.city ? ', ' + esc(m.city) : ''));
+  if (m.tv) _mbits.push(esc(m.tv));
   return '<button type="button" class="mrow ' + (st === 'live' ? 'islive' : '') +
     '" data-match="' + esc(m.gid) + '" data-dest="' + dest + '">' +
     '<span class="mwhen">' + esc(st === 'live'
         ? ((live && live.period) || 'live')
         : (m.t || m.dl || '')) + '</span>' +
-    /* ⚠ THE TAG GOES WITH THE OTHER TAGS. Dropped into .mteams it became a
-       flex item in a COLUMN flex, so it stretched to the full row width -- a
-       1,061px empty gold box under every exhibition. It reads as a badge only
-       when it sits beside the other badges. */
     '<span class="mteams">' + t(mAway(m), m.ar, aw) + t(mHome(m), m.hr, hw) +
       '</span>' +
-    matchContext(m) +
     rowLinescore(m, live, st) +
     '<span class="mmeta">' +
-      /* the tally lives in the linescore's ruled-off column; repeating it
-         here would state the sets twice */
-      ((tags.length || m.exh)
-        ? '<span class="mtags">' + exhTag(m) + tags.map(x =>
-          '<span class="mtg ' + x[0] + '">' + x[1] + '</span>').join('') +
-          '</span>' : '') +
+      (_mbits.length ? '<span class="mvn">' + _mbits.join(' \u00b7 ') +
+        '</span>' : '') +
+      (m.exh ? '<span class="mtags">' + exhTag(m) + '</span>' : '') +
     '</span></button>';
 }
 
@@ -14512,40 +14595,10 @@ function renderScoreboard() {
      list -- the same two fixtures twice, which reads as a broken page rather
      than as emphasis. It earns its place only when it is picking SOME of the
      card, so it hides when it would name all of it. */
-  const topAll = topGames(rows, liveOf, 4);
-  const top = topAll.length < rows.length ? topAll : [];
-  const topBox = document.getElementById('sbTop');
-  if (topBox) {
-    topBox.innerHTML = top.length
-      ? '<section class="tdblock"><h3>Top games<span>on this date</span></h3>' +
-        '<div class="tdmarq sbtop">' + top.map(x => {
-          /* ⚠ A TOP-GAMES CARD WITH NO SCORE ON A LIVE MATCH is a scoreboard
-             withholding the score (Cody's phone screenshot: four LIVE cards,
-             not a number on any of them). The eyebrow now carries the set
-             tally for live AND final; only a genuinely un-started match shows
-             a time. */
-          const lv = liveOf(x[0]);
-          const st = matchState(x[0], lv);
-          const sc = matchScore(x[0], lv);
-          const tally = (sc && sc[0] !== null && sc[0] !== undefined)
-            ? ' ' + sc[0] + '\u2013' + sc[1] : '';
-          const when = st === 'live'
-            ? '<i class="cs-dot"></i>LIVE ' + liveLine(x[0], lv)
-            : st === 'final' ? 'FINAL' + tally
-            : esc(x[0].t || 'time TBA');
-          return '<a class="tdcard" href="' + matchRoute(x[0].gid, 'scores') + '">' +
-            '<span class="tdwhen">' + when + '</span>' +
-            '<span class="tdteams">' +
-              rankHTML('avca', x[0].ar, true) + esc(mAway(x[0])) +
-              '<i>' + connector(x[0]) + '</i>' +
-              rankHTML('avca', x[0].hr, true) + esc(mHome(x[0])) + '</span>' +
-            reasonChips(x[0], lv, st === 'live' ? ['lv'] : null) +
-            starPeek(x[0]) +
-          '</a>';
-        }).join('') + '</div></section>'
-      : '';
-  }
-
+  /* ⚠ TOP GAMES LEFT THIS PAGE (design review via Cody, 2026-08-28):
+     highlights belong on Today; the Scoreboard is the working board and its
+     first pixel row on a live day is Live now. The band's renderer lives on
+     in the Today view; nothing here mounts it. */
   if (!rows.length) {
     /* ⚠ AN EMPTY DAY IS A STATE, NOT A BLANK. Say which day, say whether the
        filter caused it, and offer the nearest day that is not empty. */
@@ -18448,6 +18501,10 @@ ASK_CSS = """.digby-hello{float:right;margin:-4px 0 4px 10px}
 /* Ask Digby. A launcher rather than a tab: the question is about whatever is
    already on screen, so it must not cost a navigation. Fixed position keeps it
    out of the sticky-nav offset trap that once hid the #1 team. */
+/* ⚠ NEVER OVER A SCORE (design review via Cody): on the working
+   scoreboard the launcher is hidden entirely -- Digby is one tab away
+   on Today and on every team page. */
+body[data-view=scores] .asklaunch{display:none}
 .asklaunch{position:fixed;right:16px;bottom:16px;z-index:60;border:1px solid var(--line);
   background:var(--card);color:var(--ink);border-left:3px solid var(--amber);
   border-radius:2px;padding:10px 14px;cursor:pointer;box-shadow:0 3px 14px rgba(0,0,0,.16);
@@ -18676,7 +18733,11 @@ def strip_private(html):
     # privacy of the feature and names the forum, so leaving it behind both
     # documents a section that is no longer there and trips the marker check.
     html = re.sub(r'\s*<!--\s*PRIVATE\..*?-->\s*'
-                  r'<button role="tab"[^>]*data-v="ballot"[^>]*>.*?</button>', "",
+                  # ⚠ ANY button that routes to the ballot, not just the nav
+                  # tab -- the phone More-menu entry (role="menuitem") slipped
+                  # past the tab-shaped pattern and the gate caught
+                  # data-v="ballot" in the published bytes.
+                  r'<button role="(?:tab|menuitem)"[^>]*data-v="ballot"[^>]*>.*?</button>', "",
                   html, flags=re.S)
     html = re.sub(r'\s*<button role="tab"[^>]*data-v="ballot"[^>]*>.*?</button>', "",
                   html, flags=re.S)

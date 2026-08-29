@@ -209,8 +209,12 @@ def main():
     want = ["all", "board", "ranked", "live", "final", "upcoming"] if private \
         else ["all", "ranked", "live", "final", "upcoming"]
     check("the filters are exactly the six (five in public)", fl == want, str(fl))
-    check("top games are for the selected date only",
-          "topGames(rows, liveOf, 4)" in src)
+    # ⚠ TOP GAMES LEFT THE SCOREBOARD ENTIRELY (design review via Cody,
+    # 2026-08-28): highlights belong on Today; Scores opens straight into
+    # Live now. The guard flips from "scoped to the date" to "absent".
+    check("the Scoreboard mounts no Top Games band",
+          'id="sbTop"' not in h,
+          "highlights on the working board duplicate the live lane below")
     # ⚠ THE THREE THINGS THAT USED TO OPEN THIS PAGE
     scores = h[h.index('<section id="v-scores"'):]
     scores = scores[:scores.index("</section>")]
@@ -277,8 +281,10 @@ def check_scoreboard_follows_the_feed(h):
     if "if (typeof renderScoreboard === 'function') renderScoreboard();" not in h:
         print("  FAIL the live poll does not refresh the Scoreboard")
         ok = False
-    if "topAll.length < rows.length ? topAll : []" not in h:
-        print("  FAIL Top games can repeat the entire day")
+    # (the day-repeat guard retired with the band itself; its renderer no
+    #  longer mounts on this page)
+    if 'id="sbTop"' in h:
+        print("  FAIL the Top Games band came back to the Scoreboard")
         ok = False
     # the exhibition badge must not be a flex item in the team column
     if "exhTag(m) + '</span>'" in h and "'<span class=\"mteams\">'" in h:

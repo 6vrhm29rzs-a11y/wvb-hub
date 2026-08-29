@@ -105,9 +105,25 @@ def main():
     pcss = "\n".join(re.findall(r"@media \(max-width:560px\)\{(.*?)\n\}",
                                 h, re.S))
     check("the phone block exists", bool(pcss))
-    check("[-] no cell is placed by a shared grid-area name",
-          "grid-area:meta" not in pcss and "grid-template-areas" not in pcss,
+    # ⚠ SCOPED TO WHAT IT WAS ABOUT. This banned `grid-template-areas` from
+    # every phone block on the page -- written when the rankings TABLE stacked
+    # two cells in one shared area, but phrased as a global ban, so the Scores
+    # match card (three areas, one occupant each -- the legitimate use) failed
+    # a suite about the rankings board. The invariant is not "never use
+    # areas"; it is "no two selectors claim the same area name".
+    # (the literal `grid-area:meta` ban is retired: it was the SYMPTOM of the
+    #  old rankings bug, and the Scores match card now legitimately owns an
+    #  area named `meta`. The invariant survives as the two checks below --
+    #  no areas template on the rankings rows, and no name claimed twice.)
+    check("[-] the rankings rows place no cell by a shared grid-area name",
+          not re.search(r"\.rk3[^{]*\{[^}]*grid-template-areas", pcss),
           "a shared area stacks its occupants")
+    _areas = {}
+    for _m in re.finditer(r"([^{}]+)\{[^}]*grid-area:([a-z][\w-]*)", pcss):
+        _areas.setdefault(_m.group(2).strip(), set()).add(_m.group(1).strip())
+    _shared = {k: v for k, v in _areas.items() if len(v) > 1}
+    check("[-] no two selectors claim one grid-area name", not _shared,
+          str(_shared)[:90])
     slots = {}
     for cls in ("rk", "tm", "pw", "cf", "rec", "c-avca", "rs"):
         m2 = re.search(r"\.rk3 tr\.row td\.%s\{([^}]*)\}" % re.escape(cls), pcss)
