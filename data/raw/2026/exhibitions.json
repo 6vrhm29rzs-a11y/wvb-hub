@@ -1,21 +1,5 @@
 {
  "exhibitions": {
-  "6627523": {
-   "counts_toward_record": false,
-   "date": "2026-08-29",
-   "event": "State Farm Women's Volleyball Showcase",
-   "feed_discrepancies": {
-    "kind": "feed carries no exhibition marker, as usual",
-    "listed_time": "feed says 5:00 PM ET (2:00 PM PT); USC's site says 2:00 PM CT (12:00 PM PT) -- the feed is two hours late",
-    "listed_venue": "feed serves it as a home match at Arizona St.; it is a neutral-floor showcase in Sioux Falls"
-   },
-   "source": "usctrojans.com/sports/womens-volleyball/schedule, retrieved 2026-08-29: game card labeled 'Scrimmage / Exhibition', 'State Farm Women's Volleyball Showcase', 'vs #12 Arizona State', 'Sanford Pentagon', 'Sioux Falls, S.D.', 'Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT'. Cody flagged it was played earlier than the feed's listed time.",
-   "teams": [
-    "Southern California",
-    "Arizona St."
-   ],
-   "venue": "Sanford Pentagon, Sioux Falls, S.D."
-  },
   "6640217": {
    "counts_toward_record": false,
    "date": "2026-08-27",
@@ -66,7 +50,8 @@
   "why": "The feed does not mark exhibitions. Checked game 6640217 directly: no type, gameType or exhibition field exists, division reads 1, and both teams show record (0-0) -- it is indistinguishable from a counting match. So these are recorded by hand, with a source, rather than inferred from anything.",
   "why_a_rule_as_well_as_ids": "⚠ A LEDGER OF GAME IDS HAS A DEADLINE, AND A DEADLINE THAT DEPENDS ON SOMEBODY REMEMBERING IS NOT A CONTROL. The championship match between the two winners had no game id at all while the first matches were still being played -- it appears on the scoreboard only once the field is known -- so an id-only ledger would have missed it and the 2:15am crawl would have counted it. A RULE closes that: every match at this venue on this date belongs to this event, whether or not we have seen its id yet.",
   "why_it_cannot_count": "⚠ THE FORMAT IS THE PROOF, AND IT IS STRONGER THAN ANY ARTICLE. NCAA playing rules put a set at 25 points. A set played to 21 is therefore not an NCAA match, whatever anyone writes about it -- and no source I could find states the exhibition status outright, so this is the evidence that actually settles it.",
-  "why_the_stats_are_poison": "⚠ AND EXCLUSION IS NOT OPTIONAL, IT IS ARITHMETIC. Every rate this hub computes is PER SET: points per set, kills per set, swings per set, the opponent adjustment, the rally model. A 21-point set offers roughly 16% fewer points than a 25-point one, so folding these in would quietly deflate the per-set numbers of four of the best teams in the country and nothing on screen would look wrong."
+  "why_the_stats_are_poison": "⚠ AND EXCLUSION IS NOT OPTIONAL, IT IS ARITHMETIC. Every rate this hub computes is PER SET: points per set, kills per set, swings per set, the opponent adjustment, the rally model. A 21-point set offers roughly 16% fewer points than a 25-point one, so folding these in would quietly deflate the per-set numbers of four of the best teams in the country and nothing on screen would look wrong.",
+  "withdrawn_2026_08_29": "6627523 (USC-Arizona St., Sanford Pentagon) was ledgered as an exhibition for ~1 hour and WITHDRAWN the same afternoon. The 'Scrimmage / Exhibition' label on usctrojans.com belongs to the UC Irvine (Aug 15) and Loyola Marymount (Aug 19) cards; a 3000-char text window read a neighbouring card's label onto the ASU fixture. The official LiveStats box (supplied by Cody) shows sets to 25, USC 3-0, and team records moving (1-0) -- a counting match. Evidence must bind to ITS OWN card boundary, not to DOM proximity."
  },
  "rules": [
   {
