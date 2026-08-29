@@ -172,7 +172,12 @@ def main():
               "logo(name) || '<span class=\"rbnologo\"></span>'" in h)
         check("...and that placeholder holds the column open",
               ".rbside .rbnologo{" in h and "width:34px" in h)
-        m4 = re.search(r"\.rbside\{[^}]*grid-template-columns:([^;]+);", h)
+        # ⚠ ANCHOR ON THE BASE RULE. `\.rbside\{` also matches the scoped
+        # `.ribbon.hasdls .rbside{` override (3 columns, correct there: its
+        # 4th cell is display:none) -- and that rule sits EARLIER in the
+        # stylesheet, so the loose regex read the override and failed the
+        # correct base. The invariant is about the BASE grid.
+        m4 = re.search(r"(?:^|\n)\.rbside\{[^}]*grid-template-columns:([^;}]+)", h)
         cols = (m4.group(1).strip() if m4 else "")
         check("[+] the grid really does declare four columns",
               len(cols.split()) == 4, cols)
