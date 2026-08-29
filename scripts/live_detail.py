@@ -176,10 +176,20 @@ def player_leaders(tb, names, top=3):
             pts = k + a + bs + 0.5 * ba
             if pts <= 0:
                 continue
+            # sets/assists/blocks travel too (round 15: the Live Pulse
+            # names each leader's metric AND current sets sample; a leader
+            # whose sets the feed does not carry renders without one, never
+            # with an invented zero -- None is preserved as None)
             out.append({"name": name, "team_id": tid,
                         "team": names.get(tid, ""), "kills": k,
                         "digs": _int(p.get("digs")) or 0,
-                        "aces": a, "points": pts})
+                        "aces": a, "points": pts,
+                        # ⚠ MEASURED FIELD NAME: this feed's per-player sets column is
+                        # gamesPlayed (checked live on 6627234); setsPlayed
+                        # exists in a different payload variant and reads None here
+                        "sets": _int(p.get("gamesPlayed")),
+                        "assists": _int(p.get("assists")),
+                        "blocks": (bs + 0.5 * ba)})
     out.sort(key=lambda r: (-r["points"], r["name"]))
     return out[:top]
 

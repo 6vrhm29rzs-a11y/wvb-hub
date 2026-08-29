@@ -8208,6 +8208,8 @@ details.avhist{margin:14px 0}
   text-transform:uppercase;color:var(--ink3);font-style:normal;
   border:1px solid var(--line);border-radius:2px;padding:2px 4px;
   margin-left:6px;white-space:nowrap}
+.lpstate{font:600 12.5px/1 var(--mono);color:var(--ink2);margin:0 0 8px}
+.lpldrs{margin:8px 0}
 .rccmp{margin:4px 0 10px}
 .rccmp > em{display:block;font:600 9.5px/1 var(--disp);letter-spacing:.1em;
   text-transform:uppercase;color:var(--ink3);font-style:normal;
@@ -12706,7 +12708,7 @@ function lmcNum(v, d) {
                                         : (Math.round(v * 10) / 10)) : esc(v));
 }
 
-function lmcBody(d) {
+function lmcBody(d, gid) {
   if (!d) {
     return '<p class="lnote">Loading the official box score&hellip;</p>';
   }
@@ -12722,15 +12724,47 @@ function lmcBody(d) {
      inset already carries it, and printing it twice reads as two sources. */
   let out = '';
   if (!d.stats_available) {
-    /* THE EXPECTED PATH until a live match proves otherwise. Say what we have
-       and what we do not; never a zero, never a placeholder. */
+    /* the honest fallback, in the round-15 wording: a fact about the feed,
+       never a zero, never a placeholder */
     out += '<p class="lnote">' +
       (d.state === 'final'
-        ? 'This match is <b>final</b>. '
-        : 'Live score above is from the official scoreboard. ') +
-      'Box-score detail is <b>not available from the official feed</b>' +
+        ? 'This match is <b>final</b>. Box-score detail is not available ' +
+          'from the held feed'
+        : 'Live score available; detailed live box has not arrived from ' +
+          'the held feed') +
       (d.stats_reason ? ' &mdash; ' + esc(d.stats_reason) : '') + '.</p>';
     return out;
+  }
+  /* the score state, from the ONE shared live reader -- never a second
+     definition of live */
+  const _gid = String(gid || '');
+  const _all = (typeof allMatches === 'function') ? allMatches() : {};
+  const _lv = (typeof LIVE_BY_ID !== 'undefined') ? LIVE_BY_ID[_gid] : null;
+  if (_lv && typeof liveLine === 'function') {
+    out += '<p class="lpstate">' + liveLine(_all[_gid] || { gid: _gid },
+                                            _lv) + '</p>';
+  }
+  /* CURRENT STAT LEADERS -- each line names the player, team, her leading
+     metric among kills/assists/digs/blocks/aces, the raw value, and the
+     sets she has played SO FAR. Raw counts only: a partial box supports no
+     rate, no role, and no verdict about how anyone is playing. */
+  if (d.leaders && d.leaders.length) {
+    const METS = [['kills', 'kills'], ['assists', 'assists'],
+                  ['digs', 'digs'], ['blocks', 'blocks'], ['aces', 'aces']];
+    out += '<div class="lpldrs">' + d.leaders.map(pl => {
+      let top = null;
+      for (const mt of METS) {
+        const v = pl[mt[0]];
+        if (v === null || v === undefined) continue;
+        if (!top || v > top.v) top = { v: v, label: mt[1] };
+      }
+      if (!top || !(top.v > 0)) return '';
+      return '<div class="rcldr"><b>' + esc(pl.name) + '</b> (' +
+        esc(pl.team) + ') \u2014 ' + top.v + ' ' + top.label +
+        (pl.sets !== null && pl.sets !== undefined
+          ? ' <span class="rcbasis">' + pl.sets + ' sets so far</span>'
+          : '') + '</div>';
+    }).join('') + '</div>';
   }
   const t = d.teams || [];
   out += '<table><thead><tr><th>Team</th><th>K</th><th>E</th><th>TA</th>' +
@@ -12752,12 +12786,8 @@ function lmcBody(d) {
   out += '<p class="lnote">Kills, blocks and aces are what a team <b>earned</b>' +
     ' — they will not add up to the score, because the rest of a scoreboard is' +
     ' the other team\u2019s errors.</p>';
-  if (d.leaders && d.leaders.length) {
-    out += '<p class="lmcldr">' + d.leaders.map(p =>
-      '<b>' + esc(p.name) + '</b> ' + esc(p.team) + ' &middot; ' +
-      p.kills + 'k' + (p.aces ? ', ' + p.aces + ' ace' + (p.aces > 1 ? 's' : '') : '') +
-      (p.digs ? ', ' + p.digs + ' digs' : '')).join('<br>') + '</p>';
-  }
+  /* (the old compact leaders paragraph rendered here; the labelled Pulse
+     leaders above replaced it -- the same fact twice in one panel) */
   return out;
 }
 
@@ -12770,11 +12800,11 @@ function lmcRender(gid) {
   host.innerHTML =
     '<div class="lhd"><span class="ldot"></span>' +
     (d && d.state === 'final' ? 'Final' : 'Live') +
-    ' &mdash; official NCAA feed' +
+    ' &mdash; official live feed' +
     (stamp ? ' &mdash; refreshed ' + esc(stamp) : '') +
     (stale ? ' &mdash; <b>stale, retrying</b>' : '') +
     '<span style="color:var(--ink3)">Not used in ratings until final</span>' +
-    '</div>' + lmcBody(d);
+    '</div>' + lmcBody(d, gid);
   /* the freshness line beside the manual control, so the reader can see when
      the last SUCCESSFUL refresh was without reading the panel */
   /* ⚠ ONE LIVE-BOX STATE, EVERY SECTION TOGETHER. The Box score section is
@@ -12846,7 +12876,7 @@ const LMC_EVERY_MS = 20000;
 
 /* the section the routed detail hosts */
 function lmcSection(gid) {
-  return '<div class="msec"><h3>Live stats</h3>' +
+  return '<div class="msec"><h3>Live Match Pulse</h3>' +
     '<div class="lmcbar">' +
       '<button type="button" class="lmcbtn" id="lmcrefresh">Refresh live stats</button>' +
       '<span class="lmcnote" id="lmcstamp"></span>' +

@@ -294,8 +294,14 @@ def main():
     check("the score ribbon stays the only score header",
           h.split("function renderMatchDetail")[1]
              .split("\nfunction ")[0].count("ribbonHTML(") == 1)
-    check("live stats reach no rating or projection",
-          "LIVE_BY_ID" not in h.split("function lmcBody")[1].split("\n}")[0])
+    # ⚠ ROUND 15: the Pulse READS the shared live state for its score line
+    # -- that is the one-reader rule working, not a leak. The invariant is
+    # that nothing in the body PERSISTS or feeds a rating: no storage, no
+    # data write, no rating symbol.
+    _lmcb = h.split("function lmcBody")[1].split("\nfunction ")[0]
+    check("live stats reach no rating, projection or store",
+          "localStorage" not in _lmcb and "RATING" not in _lmcb
+          and "composite" not in _lmcb and "fetch(" not in _lmcb)
 
     print("\n7. The page states its source and never claims more")
     for label, path in (("private", os.path.join(REPO, "Cody", "START-HERE.html")),
@@ -304,12 +310,12 @@ def main():
         if not os.path.exists(path):
             continue
         h = open(path, encoding="utf-8").read()
-        check("%s: the inset names the official feed" % label,
-              "official NCAA feed" in h)
+        check("%s: the inset names the official live feed" % label,
+              "official live feed" in h)
         check("%s: it says live is not used in ratings" % label,
               "Not used in ratings until final" in h)
         check("%s: a missing box score says so honestly" % label,
-              "not available from the official feed" in h)
+              "detailed live box has not arrived from" in h)
         check("%s: a static host is told it needs the local server" % label,
               "Live detail needs the local server" in h)
         check("%s: staleness is visible" % label, "stale, retrying" in h)
@@ -363,6 +369,15 @@ def main():
               "getElementById('mpendnote')" in lrs
               and "d.state_note" in lrs and "d.state_label" in lrs, 
               "lmcRender does not own the state note")
+        check("the Pulse renders only on the live route (st gate)",
+              "(st === 'live' ? lmcSection(m.gid) : '')" in page2)
+        check("the Pulse heading and source wording are the round-15 ones",
+              "Live Match Pulse" in page2
+              and "official live feed" in page2)
+        check("leaders come from the ONE server reader (no second feed)",
+              "player_leaders" in open(os.path.join(
+                  REPO, "scripts", "live_detail.py")).read()
+              and "fetch('/api/match" in page2)
         # the note text itself must come from the shared table, not a second
         # spelling -- match_state.py is the one place the words live
         import match_state as MS2
@@ -386,6 +401,10 @@ def main():
                 js = """
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 const lmcNum = (v,d) => (v===null||v===undefined) ? '\u2014' : v;
+const allMatches = () => ({ G: { gid: 'G' } });
+const LIVE_BY_ID = { G: { away_sets: '2', home_sets: '2',
+  period: '5TH SET', sets: [[25,20],[20,25],[25,23],[19,25],[7,5]] } };
+const liveLine = (m, lv) => '2\u20132 \u00b7 5TH SET \u00b7 7\u20135';
 %s
 %s
 const LMC_DATA = {};
@@ -405,18 +424,45 @@ function state(d) {
 const av = state({ ok: true, state: 'live', stats_available: true,
   state_label: 'Live',
   state_note: 'Live score and team totals from the official feed.',
-  teams: [{team:'A',kills:10},{team:'B',kills:9}] });
+  teams: [{team:'A',kills:10},{team:'B',kills:9}],
+  leaders: [
+    { name: 'L One', team: 'A', kills: 14, assists: 2, digs: 6,
+      blocks: 1.5, aces: 1, sets: 5 },
+    { name: 'L Two', team: 'B', kills: 3, assists: 31, digs: 4,
+      blocks: 0, aces: 0, sets: 5 },
+    { name: 'L Three', team: 'A', kills: 0, assists: 0, digs: 12,
+      blocks: 0, aces: 0, sets: null }] });
 const so = state({ ok: true, state: 'live', stats_available: false,
   state_label: 'Live',
   state_note: 'Live score only \u2014 the source is not serving statistics for this match yet.',
   stats_reason: '' });
 const bad = [];
 if (!/<table/.test(av.box)) bad.push('stats-available: no table rendered');
+if (av.box.indexOf('14 kills') < 0 || av.box.indexOf('5 sets so far') < 0)
+  bad.push('leader lacks metric/value/sets');
+if (av.box.indexOf('31 assists') < 0)
+  bad.push('an assists leader is not labelled by her leading metric');
+if (av.box.indexOf('L Three') >= 0 && av.box.indexOf('12 digs') >= 0
+    && /L Three[^<]*<\/b>[^<]*12 digs[^<]*sets/.test(av.box) === false
+    && av.box.split('L Three')[1].indexOf('sets so far') >= 0
+    && av.box.split('L Three')[1].indexOf('null') >= 0)
+  bad.push('a missing sets sample rendered as a value');
+if (/null sets|undefined sets/.test(av.box))
+  bad.push('missing fields rendered as null/undefined');
+if (av.box.indexOf('2\u20132') < 0 && av.box.indexOf('5TH SET') < 0)
+  bad.push('the shared live-score state line is missing');
+if (/playing well|struggling|carrying|dominant|clutch|poor passing/i
+    .test(av.box))
+  bad.push('verdict language leaked into the pulse');
 if (/not serving statistics/.test(av.note))
   bad.push('stats-available: score-only note survived');
 if (/<table/.test(so.box)) bad.push('score-only: a numeric table rendered');
 if (!/not serving statistics/.test(so.note))
   bad.push('score-only: the score-only note is missing');
+if (so.box.indexOf('detailed live box has not arrived') < 0)
+  bad.push('score-only: the honest fallback sentence is missing');
+if (so.box.indexOf('sets so far') >= 0 || /<table/.test(so.box))
+  bad.push('score-only: invented leaders or comparison rendered');
 if (bad.length) { console.log('INVARIANT-FAILED: ' + bad.join(' | ')); process.exit(1); }
 console.log('INVARIANT-HOLDS'); process.exit(0);
 """ % (_lmcbody, render_src)
