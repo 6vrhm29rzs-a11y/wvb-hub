@@ -2,7 +2,7 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-08-29T21:27:22Z",
+  "generated_at_utc": "2026-08-29T21:31:41Z",
   "counts": {
    "finals": 303,
    "official_only": 9,
@@ -7963,10 +7963,27 @@
    "sources": []
   },
   {
-   "result_corrected": null,
-   "corr_reason": null,
-   "corr_feed_said": null,
-   "corr_evidence": [],
+   "result_corrected": true,
+   "corr_reason": "Southern California (away) beat Arizona St. 3-0 (25-23, 25-21, 25-22) at the Sanford Pentagon, Sioux Falls -- State Farm Women's Volleyball Showcase. The official NCAA LiveStats box score (supplied by Cody as a PDF) shows sets to 25, attendance 3,376, and team records moving (USC 1-0, ASU 2-1): a counting match.",
+   "corr_feed_said": "EMPTY FINAL -- game_state F with sets_won null on both sides, is_winner false on both, and no linescores. As served, the match counts toward nobody's record.",
+   "corr_evidence": [
+    {
+     "school": "Southern California",
+     "url": "https://usctrojans.com/sports/womens-volleyball/schedule",
+     "text": "'vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | State Farm Women's Volleyball Showcase | W, 3-0 | Aug 29 (Sat)' -- the schedule card, result posted",
+     "status": null,
+     "note": null,
+     "retrieved": "2026-08-29"
+    },
+    {
+     "school": "Arizona St.",
+     "url": "https://thesundevils.com/sports/volleyball/schedule",
+     "text": "NCAA LiveStats box score PDF supplied by Cody: 'Southern California vs Arizona St. (08/29/2026 at Sanford Pentagon)' -- set scores 25-23, 25-21, 25-22, Southern California (3) Arizona St. (0), 'Team records: 1-0, 0-0 / 2-1, 0-0'. ASU's own schedule page is JavaScript-rendered and unreadable to a plain fetch.",
+     "status": null,
+     "note": null,
+     "retrieved": "2026-08-29"
+    }
+   ],
    "duplicate_of": null,
    "dup_reason": null,
    "dup_asym": null,
