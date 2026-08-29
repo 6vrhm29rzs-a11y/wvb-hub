@@ -8225,6 +8225,8 @@ details.avhist{margin:14px 0}
 .rc-confirmed{color:var(--good);border-color:color-mix(in oklab,var(--good) 45%,transparent)}
 .rc-disputed{color:var(--coral);border-color:color-mix(in oklab,var(--coral) 50%,transparent)}
 .rc-duplicate{color:var(--ink3);border-style:dashed;text-decoration:line-through transparent}
+.rc-corrected{color:var(--gold);border-color:color-mix(in oklab,var(--gold) 50%,transparent)}
+.rccorr{border-style:solid;border-color:color-mix(in oklab,var(--gold) 40%,transparent)}
 .rchd{font-size:14px;color:var(--ink2);margin:0 0 10px}
 .rchd b{color:var(--chalk);font:700 15px/1.2 var(--disp);letter-spacing:.02em}
 .rcsets{font:600 12px/1 var(--mono);color:var(--ink3)}
@@ -15691,6 +15693,8 @@ function renderConfidence() {
           'DOES NOT COUNT</span>'
         : '<span class="rcstate rc-' + r.overall + '">' +
           (RC_LABEL[r.overall] || r.overall) + '</span>') +
+      (r.result_corrected
+        ? '<span class="rcstate rc-corrected">RESULT CORRECTED</span>' : '') +
       '<span class="rcsrc">official: recorded \u00b7 independent: ' +
       (r.n_indep ? r.n_indep + ' attributable source' +
         (r.n_indep === 1 ? '' : 's') : 'none yet') +
@@ -15735,8 +15739,32 @@ function rcDrill(gid) {
         '</span></div>').join('') +
       '</div>'
     : '';
+  const corrBlock = r.result_corrected
+    ? '<div class="rcdup rccorr"><b>Result corrected on ledger evidence.</b> ' +
+      'The feed\u2019s derived winner/sets fields disagreed with its own ' +
+      'set-by-set record and with a school source; every surface counts the ' +
+      'corrected result, and the raw log is untouched.' +
+      (r.corr_feed_said ? '<span class="avmeta">The feed said: ' +
+        esc(r.corr_feed_said) + '</span>' : '') +
+      (r.corr_reason ? '<span class="avmeta">Established: ' +
+        esc(r.corr_reason) + '</span>' : '') +
+      (r.corr_evidence || []).map(e =>
+        '<div class="rcsource"><b>' + esc(e.school || '') + '</b>' +
+        '<span class="rck">official schedule</span>' +
+        (e.status === 'attempted_unverifiable'
+          ? '<span class="rcnote">attempted \u2014 ' +
+            esc(e.note || 'no readable result') + '</span>'
+          : '<span class="rcq">\u201c' + esc(e.text || '') + '\u201d</span>') +
+        (e.url ? '<a class="rcu" href="' + esc(e.url) +
+          '" target="_blank" rel="noopener noreferrer">' +
+          esc((e.url || '').replace(/^https?:\/\//, '').split('/')[0]) +
+          '</a>' : '') +
+        (e.retrieved ? '<span class="rct">retrieved ' + esc(e.retrieved) +
+          '</span>' : '') + '</div>').join('') + '</div>'
+    : '';
   el.innerHTML = '<h3 class="cfh">' + esc(r.a || '?') + ' v ' +
     esc(r.h || '?') + ' \u2014 ' + esc(r.d) + '</h3>' + dupBlock +
+    corrBlock +
     '<div class="rcfields">' + ['result', 'sets', 'box', 'venue'].map(f => {
       /* ⚠ THE BOX STATE'S NAME IS NARROWER THAN "RECONCILED" (round 9): the
          check is only that a HELD box aligns with the match's teams and set

@@ -228,6 +228,8 @@ def build():
     # show the READABLE reason and both school citations, not a bare gid
     dup_detail = ((load("data/raw/%d/duplicate_listings.json" % SEASON)
                    or {}).get("duplicates") or {})
+    corr_detail = ((load("data/raw/%d/result_corrections.json" % SEASON)
+                    or {}).get("corrections") or {})
     _cand_src = []
     rows, counts = [], {"finals": 0, "official_only": 0, "reconciled": 0,
                         "confirmed": 0, "disputed": 0, "pending_second": 0}
@@ -286,7 +288,22 @@ def build():
             "has_box": gid in boxes,
         })
         _dd = dup_detail.get(gid) or {}
+        _cd = corr_detail.get(gid) or {}
         rows.append({
+            # ⚠ A CORRECTED RESULT SAYS SO. The feed's derived winner field
+            # for this final was overridden at the counting layer on ledger
+            # evidence; the audit surface must show that, with the evidence,
+            # or the ledger would present a silently different result from
+            # the raw feed (round 18+, Kent St.-W&M).
+            "result_corrected": bool(_cd) or None,
+            "corr_reason": _cd.get("established"),
+            "corr_feed_said": _cd.get("feed_said"),
+            "corr_evidence": [
+                {"school": e.get("school"), "url": e.get("url"),
+                 "text": e.get("text"), "status": e.get("status"),
+                 "note": e.get("note"),
+                 "retrieved": str(e.get("retrieved") or "")[:10]}
+                for e in (_cd.get("evidence") or [])],
             "duplicate_of": dup_of.get(gid) or None,
             "dup_reason": _dd.get("established"),
             "dup_asym": _dd.get("quality_asymmetry"),

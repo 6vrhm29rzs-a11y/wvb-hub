@@ -142,6 +142,27 @@ def main():
     check("pending is phrased as normal, not alarming",
           "normal state" in src)
 
+    print("\n5b. A CORRECTED RESULT IS VISIBLE, EVIDENCED, AND COUNTED "
+          "CORRECTLY")
+    _corr = [r for r in rows if r.get("result_corrected")]
+    check("the Kent St.-W&M correction is marked on its ledger row",
+          any(r["gid"] == "6628406" for r in _corr))
+    check("...with the feed's original claim and the established reason",
+          all(r.get("corr_feed_said") and r.get("corr_reason")
+              for r in _corr))
+    check("...and at least one attributable school citation",
+          all(any(e.get("text") for e in r.get("corr_evidence") or [])
+              for r in _corr))
+    check("the corrected result reconciles internally (winner now agrees "
+          "with the set line)",
+          all(r["states"]["result"] == "reconciled" for r in _corr
+              if r["gid"] == "6628406"))
+    check("the page renders the corrected chip and the audit block",
+          "RESULT CORRECTED" in src and "Result corrected on ledger" in src)
+    check("[NEG] an uncorrected row carries no corrected flag",
+          not any(r.get("result_corrected") for r in rows
+                  if r["gid"] not in [c["gid"] for c in _corr]))
+
     print("\n6. THE DISPUTE QUARANTINE (this suite red IS the halt)")
     # stated policy: raw history is never rewritten and no silent per-match
     # exclusion is invented inside the rating (that would change ranking
