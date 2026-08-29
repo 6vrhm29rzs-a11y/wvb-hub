@@ -72,9 +72,19 @@ def entry_problems(gid, e):
     discrepancy, missing metadata or an incomplete feed result can never
     imply exhibition. An entry must carry one of exactly two proofs:
 
-      * a FORMAT proof: `sets_to` with any target other than 25 -- NCAA
-        playing rules put a set at 25, so the format itself is the evidence
-        (this is how Spikes Under the Lights is proven); or
+      * a FORMAT proof: a NON-DECIDING set target other than 25. NCAA
+        playing rules put a set at 25 -- EXCEPT the deciding set (third of
+        five in a best-of-3-shaped listing, fifth of five), which is played
+        to 15 by rule. So [25,25,25,25,15] is an ordinary five-set match
+        and proves NOTHING; the early 21-point sets of Spikes Under the
+        Lights ([21,21,15]) are the format that cannot be an NCAA result.
+        Only the LAST listed target may be the deciding set; a nonstandard
+        target anywhere else is the proof. ⚠ This rule was repaired the day
+        after it shipped: the first version took ANY non-25 target as
+        proof, which would have called every legitimate five-setter an
+        exhibition -- the exact false exclusion the validator exists to
+        prevent. If position cannot establish a nonstandard NON-deciding
+        target, the entry must carry the bound quote instead; or
       * an explicit CLASSIFICATION_EVIDENCE object: url + retrieved + a
         quoted text that (a) contains the word exhibition or scrimmage and
         (b) names BOTH teams, so the quote is bound to this matchup and a
@@ -88,7 +98,7 @@ def entry_problems(gid, e):
     teams = e.get("teams") or []
     if len(teams) != 2:
         errs.append("must name exactly two teams")
-    fmt = [x for x in (e.get("sets_to") or []) if x != 25]
+    fmt = _nonstandard_targets(e.get("sets_to") or [])
     ce = e.get("classification_evidence") or {}
     txt = (ce.get("text") or "").lower()
     quote_ok = (ce.get("url") and ce.get("retrieved")
@@ -100,6 +110,26 @@ def entry_problems(gid, e):
             "(format proof) or classification_evidence whose quoted text "
             "contains 'exhibition'/'scrimmage' AND names both teams")
     return errs
+
+
+def _nonstandard_targets(sets_to):
+    # type: (List) -> List
+    """Targets that are nonstandard FOR THEIR POSITION -- the only kind
+    that is exhibition evidence. The last listed target is the deciding
+    set, and a deciding set to 15 is the NCAA's own format: zero evidence.
+    A non-25 target in any NON-deciding position (Spikes' 21s) cannot be
+    an NCAA match. A deciding-set target that is neither 25 nor 15 is also
+    nonstandard and counts."""
+    out = []
+    n = len(sets_to)
+    for i, t in enumerate(sets_to):
+        deciding = (i == n - 1)
+        if t == 25:
+            continue
+        if deciding and t == 15:
+            continue
+        out.append(t)
+    return out
 
 
 def _team_token(name):

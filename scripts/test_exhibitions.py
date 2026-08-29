@@ -293,9 +293,24 @@ def main():
     check("[NEG] an exhibition quote naming a different opponent is refused",
           bool(EXHMOD.entry_problems("999999", bad2)))
 
-    # (4) the two proofs that DO satisfy it
+    # (4) the two proofs that DO satisfy it -- and the formats that must
+    # NOT. ⚠ The first format rule took ANY non-25 target as proof, so an
+    # ordinary five-setter's deciding set to 15 ([25,25,25,25,15] -- the
+    # NCAA's OWN format) would have been read as exhibition evidence: the
+    # exact false exclusion this validator exists to prevent. The proof is
+    # a nonstandard NON-deciding target; a deciding set to 15 is normal
+    # and provides zero evidence.
+    check("[NEG] a normal five-setter [25,25,25,25,15] is refused as "
+          "exhibition proof",
+          bool(EXHMOD.entry_problems("999999",
+                                     dict(bad, sets_to=[25, 25, 25, 25, 15]))))
+    check("[NEG] a normal three-setter shape [25,25,15] is refused as "
+          "exhibition proof",
+          bool(EXHMOD.entry_problems("999999",
+                                     dict(bad, sets_to=[25, 25, 15]))))
     ok_fmt = dict(bad, sets_to=[21, 21, 15])
-    check("a format proof (sets to 21) validates",
+    check("a nonstandard NON-deciding target ([21,21,15]) validates as a "
+          "format proof",
           not EXHMOD.entry_problems("999999", ok_fmt))
     ok_quote = dict(bad, classification_evidence={
         "url": "https://example-school.edu/schedule",

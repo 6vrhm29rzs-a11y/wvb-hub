@@ -281,7 +281,7 @@ def canonical_fixtures():
             # explicit, per-entry assertion that its evidence is corroborated
             # by the COMPLETED match, not merely a pregame reading. Written
             # for USC-Arizona St. (6627523): the feed's final kept a start
-            # time three hours late while USC's card and the official box
+            # time two hours late while USC's card and the official box
             # agree on 2:00 PM CT, so withholding the correction left a
             # provably wrong clock on a finished match. The flag is opt-in
             # per entry precisely so no OTHER match's withheld correction
