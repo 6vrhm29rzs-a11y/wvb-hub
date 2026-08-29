@@ -1590,8 +1590,14 @@ def check_players_view_shows_every_stat():
     # matched from "Match log" to the first </span>, which stops long before the
     # stat tokens -- so it reported the page as missing assists that were right
     # there. Take the game-line template by its own class instead.
-    mlog = re.search(r"p\.games\.map\(g =>.*?\)\.join\(''\)", src, re.S)
+    # round 18: the loop variable moved (p.games -> a sliced `recent`);
+    # anchor on the row's own class, exactly as the note above prescribes
+    mlog = re.search(r"const logRows = recent\.map\(g =>.*?\)\.join\(''\)",
+                     src, re.S)
     body = mlog.group(0) if mlog else ""
+    if not body:
+        bad("the match-log template was not found",
+            "the extractor's anchor moved again -- fix the anchor, not the log")
     for token, what in (("g.ast", "assists"), ("g.aces", "aces"), ("g.digs", "digs")):
         if token not in body:
             bad("the match log omits %s" % what,

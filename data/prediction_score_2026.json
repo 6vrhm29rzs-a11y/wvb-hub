@@ -2,15 +2,15 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 215,
+  "scored": 221,
   "logged_after_tipoff_excluded": 6,
   "team_mismatch_excluded": 6,
   "predictions_on_record": 4766,
-  "results_available": 233,
-  "brier": 0.1867,
+  "results_available": 239,
+  "brier": 0.1877,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 156,
-  "favourite_correct_pct": 72.6
+  "favourite_correct": 160,
+  "favourite_correct_pct": 72.4
  },
  "calibration": [
   {
@@ -21,9 +21,9 @@
   },
   {
    "range": "60-70%",
-   "n": 43,
-   "said": 64.4,
-   "happened": 58.1
+   "n": 45,
+   "said": 64.5,
+   "happened": 57.8
   },
   {
    "range": "70-80%",
@@ -33,15 +33,15 @@
   },
   {
    "range": "80-90%",
-   "n": 38,
-   "said": 84.9,
-   "happened": 76.3
+   "n": 40,
+   "said": 84.8,
+   "happened": 75.0
   },
   {
    "range": "90-101%",
-   "n": 74,
+   "n": 76,
    "said": 95.8,
-   "happened": 87.8
+   "happened": 88.2
   }
  ],
  "matches": [
@@ -170,6 +170,15 @@
    "p_home": 0.8636,
    "home_won": false,
    "brier": 0.7458049600000001
+  },
+  {
+   "game_id": "6627101",
+   "date": "2026-08-29",
+   "away": "Fordham",
+   "home": "Temple",
+   "p_home": 0.8564,
+   "home_won": false,
+   "brier": 0.7334209600000001
   },
   {
    "game_id": "6624441",
@@ -314,6 +323,15 @@
    "p_home": 0.3252,
    "home_won": true,
    "brier": 0.4553550400000001
+  },
+  {
+   "game_id": "6626332",
+   "date": "2026-08-29",
+   "away": "High Point",
+   "home": "Hofstra",
+   "p_home": 0.6736,
+   "home_won": false,
+   "brier": 0.45373695999999997
   },
   {
    "game_id": "6626321",
@@ -476,24 +494,6 @@
    "p_home": 0.5853,
    "home_won": false,
    "brier": 0.34257609000000006
-  },
-  {
-   "game_id": "6637630",
-   "date": "2026-08-28",
-   "away": "Bowling Green",
-   "home": "Ohio St.",
-   "p_home": 0.5803,
-   "home_won": false,
-   "brier": 0.33674809000000006
-  },
-  {
-   "game_id": "6624840",
-   "date": "2026-08-28",
-   "away": "Coppin St.",
-   "home": "William & Mary",
-   "p_home": 0.5765,
-   "home_won": false,
-   "brier": 0.33235225
   }
  ]
 }
