@@ -1,149 +1,196 @@
 {
-  "_README": [
-    "THE OFFICIAL-SOURCE LEDGER. Schema and validation: scripts/ledger.py.",
-    "",
-    "Two kinds of entry, and they are NOT interchangeable:",
-    "",
-    "  correction  an official source contradicts the NCAA record and we",
-    "              believe it. EVERY overridden field carries its own support:",
-    "              url, retrieved date, and the exact text it was read from.",
-    "              One quote may not stand behind five independent facts.",
-    "",
-    "  conflict    two official sources disagree WITH EACH OTHER. Both claims",
-    "              are preserved, the fact renders as unavailable, and the NCAA",
-    "              value is NOT quietly preferred. A conflict says we do not",
-    "              know -- it is not a weaker correction.",
-    "",
-    "Every entry carries review_by. A schedule claim is perishable: schools",
-    "move fixtures, so a reading is a fact about a web page on a date, not a",
-    "permanent fact about the match. Past review_by an entry stops being",
-    "applied and the affected fact renders as 'verify'. review_by must not be",
-    "later than first serve.",
-    "",
-    "Do not write an entry from memory, from a media report, or from an",
-    "aggregator. Read the school's own schedule page and quote it."
-  ],
-  "season": 2026,
-  "entries": [
-    {
-      "game_id": "6626809",
-      "kind": "correction",
-      "matchup": "Kentucky vs Penn St.",
-      "why": "The NCAA /game record carries Rec Hall, State College PA -- Penn State's own gym -- so the hub derived site=home and rendered 'Kentucky at Penn St.'. Both schools publish it as a neutral-site Big Ten/SEC Challenge fixture at Wrigley Field. The feed's location block is stale.",
-      "review_by": "2026-09-06",
-      "fields": {
-        "site": "neutral",
-        "venue": "Wrigley Field",
-        "city": "Chicago",
-        "state_usps": "IL",
-        "event": "Big Ten/SEC Challenge"
-      },
-      "support": {
-        "site": {
-          "url": "https://gopsusports.com/sports/womens-volleyball/schedule",
-          "retrieved": "2026-08-26",
-          "text": "Big Ten/SEC Challenge neutral Sunday Sep 6 vs. Kentucky Chicago, Ill. / Wrigley Field 7:00 PM EDT"
-        },
-        "venue": {
-          "url": "https://gopsusports.com/sports/womens-volleyball/schedule",
-          "retrieved": "2026-08-26",
-          "text": "Sunday Sep 6 vs. Kentucky Chicago, Ill. / Wrigley Field 7:00 PM EDT"
-        },
-        "city": {
-          "url": "https://ukathletics.com/schedule.aspx?path=wvball",
-          "retrieved": "2026-08-26",
-          "text": "Sun. Sep 6 vs. Penn State Wrigley Field (Chicago, Ill.) 7:00 pm Big Ten / SEC Challenge"
-        },
-        "state_usps": {
-          "url": "https://ukathletics.com/schedule.aspx?path=wvball",
-          "retrieved": "2026-08-26",
-          "text": "Sun. Sep 6 vs. Penn State Wrigley Field (Chicago, Ill.) 7:00 pm Big Ten / SEC Challenge"
-        },
-        "event": {
-          "url": "https://ukathletics.com/schedule.aspx?path=wvball",
-          "retrieved": "2026-08-26",
-          "text": "Sun. Sep 6 vs. Penn State Wrigley Field (Chicago, Ill.) 7:00 pm Big Ten / SEC Challenge"
-        }
-      },
-      "note": "The feed's START TIME (7:00 PM ET) already agrees with both schools and is deliberately NOT overridden."
+ "_README": [
+  "THE OFFICIAL-SOURCE LEDGER. Schema and validation: scripts/ledger.py.",
+  "",
+  "Two kinds of entry, and they are NOT interchangeable:",
+  "",
+  "  correction  an official source contradicts the NCAA record and we",
+  "              believe it. EVERY overridden field carries its own support:",
+  "              url, retrieved date, and the exact text it was read from.",
+  "              One quote may not stand behind five independent facts.",
+  "",
+  "  conflict    two official sources disagree WITH EACH OTHER. Both claims",
+  "              are preserved, the fact renders as unavailable, and the NCAA",
+  "              value is NOT quietly preferred. A conflict says we do not",
+  "              know -- it is not a weaker correction.",
+  "",
+  "Every entry carries review_by. A schedule claim is perishable: schools",
+  "move fixtures, so a reading is a fact about a web page on a date, not a",
+  "permanent fact about the match. Past review_by an entry stops being",
+  "applied and the affected fact renders as 'verify'. review_by must not be",
+  "later than first serve.",
+  "",
+  "Do not write an entry from memory, from a media report, or from an",
+  "aggregator. Read the school's own schedule page and quote it."
+ ],
+ "season": 2026,
+ "entries": [
+  {
+   "game_id": "6626809",
+   "kind": "correction",
+   "matchup": "Kentucky vs Penn St.",
+   "why": "The NCAA /game record carries Rec Hall, State College PA -- Penn State's own gym -- so the hub derived site=home and rendered 'Kentucky at Penn St.'. Both schools publish it as a neutral-site Big Ten/SEC Challenge fixture at Wrigley Field. The feed's location block is stale.",
+   "review_by": "2026-09-06",
+   "fields": {
+    "site": "neutral",
+    "venue": "Wrigley Field",
+    "city": "Chicago",
+    "state_usps": "IL",
+    "event": "Big Ten/SEC Challenge"
+   },
+   "support": {
+    "site": {
+     "url": "https://gopsusports.com/sports/womens-volleyball/schedule",
+     "retrieved": "2026-08-26",
+     "text": "Big Ten/SEC Challenge neutral Sunday Sep 6 vs. Kentucky Chicago, Ill. / Wrigley Field 7:00 PM EDT"
     },
-    {
-      "game_id": "6628315",
-      "kind": "correction",
-      "matchup": "Nebraska vs UNLV",
-      "why": "Five raw /game records disagree about which side is home -- three say Nebraska, two say UNLV -- while all five agree the venue is T-Mobile Arena, which belongs to neither school. Both schools publish it as neutral.",
-      "review_by": "2026-08-29",
-      "fields": {
-        "site": "neutral",
-        "venue": "T-Mobile Arena",
-        "city": "Las Vegas",
-        "state_usps": "NV",
-        "event": "Players Era Showcase"
-      },
-      "support": {
-        "site": {
-          "url": "https://huskers.com/sports/volleyball/schedule",
-          "retrieved": "2026-08-27",
-          "text": "Players Era Showcase Neutral Saturday Aug 29 7:00 PM CDT #1 vs. UNLV Las Vegas, Nev. / T-Mobile Arena"
-        },
-        "venue": {
-          "url": "https://unlvrebels.com/sports/womens-volleyball/schedule",
-          "retrieved": "2026-08-27",
-          "text": "Players Era Volleyball Showcase Aug 29 (Sat) 5 PM PT No. 1 Nebraska Las Vegas, Nev. / T-Mobile Arena"
-        },
-        "city": {
-          "url": "https://unlvrebels.com/sports/womens-volleyball/schedule",
-          "retrieved": "2026-08-27",
-          "text": "Aug 29 (Sat) 5 PM PT No. 1 Nebraska Las Vegas, Nev. / T-Mobile Arena"
-        },
-        "state_usps": {
-          "url": "https://unlvrebels.com/sports/womens-volleyball/schedule",
-          "retrieved": "2026-08-27",
-          "text": "Aug 29 (Sat) 5 PM PT No. 1 Nebraska Las Vegas, Nev. / T-Mobile Arena"
-        },
-        "event": {
-          "url": "https://huskers.com/sports/volleyball/schedule",
-          "retrieved": "2026-08-27",
-          "text": "Players Era Showcase Neutral Saturday Aug 29 7:00 PM CDT #1 vs. UNLV"
-        }
-      },
-      "note": "TIME IS NOT OVERRIDDEN AND THE TWO SOURCES AGREE ABOUT IT. Re-read 2026-08-27T02:11Z: huskers.com says 7:00 PM CDT, unlvrebels.com says 5 PM PT. Converted with real tzdata those are the same instant -- 2026-08-30T00:00Z. The feed's epoch is 1788048000, which is that instant. If either school later publishes a different time, this becomes a `conflict` entry on start_time_epoch, not a silent re-pick."
+    "venue": {
+     "url": "https://gopsusports.com/sports/womens-volleyball/schedule",
+     "retrieved": "2026-08-26",
+     "text": "Sunday Sep 6 vs. Kentucky Chicago, Ill. / Wrigley Field 7:00 PM EDT"
     },
-    {
-      "game_id": "6625717",
-      "kind": "correction",
-      "matchup": "Kansas at Pittsburgh",
-      "why": "The feed carries no location for this id at all, so the hub correctly declined to name one. Pitt's own schedule names the building and the event.",
-      "review_by": "2026-08-28",
-      "fields": {
-        "venue": "Petersen Events Center",
-        "city": "Pittsburgh",
-        "state_usps": "PA",
-        "event": "Opening Spike Classic"
-      },
-      "support": {
-        "venue": {
-          "url": "https://pittsburghpanthers.com/sports/womens-volleyball/schedule",
-          "retrieved": "2026-08-26",
-          "text": "Opening Spike Classic vs #15 Kansas Petersen Events Center Pittsburgh, Pa. Aug 28 (Fri) 6:30 PM ESPN2"
-        },
-        "city": {
-          "url": "https://pittsburghpanthers.com/sports/womens-volleyball/schedule",
-          "retrieved": "2026-08-26",
-          "text": "vs #15 Kansas Petersen Events Center Pittsburgh, Pa."
-        },
-        "state_usps": {
-          "url": "https://pittsburghpanthers.com/sports/womens-volleyball/schedule",
-          "retrieved": "2026-08-26",
-          "text": "vs #15 Kansas Petersen Events Center Pittsburgh, Pa."
-        },
-        "event": {
-          "url": "https://pittsburghpanthers.com/sports/womens-volleyball/schedule",
-          "retrieved": "2026-08-26",
-          "text": "Opening Spike Classic vs #15 Kansas Petersen Events Center Pittsburgh, Pa."
-        }
-      },
-      "note": "SITE IS DELIBERATELY NOT CORRECTED. Pitt's page shows 'vs', which SIDEARM uses for any non-road match including neutral ones -- the same page lists 'Stanford vs. Wisconsin' at Petersen. Site is left to the canonical rule, which reads venue OWNERSHIP rather than nominal ordering."
+    "city": {
+     "url": "https://ukathletics.com/schedule.aspx?path=wvball",
+     "retrieved": "2026-08-26",
+     "text": "Sun. Sep 6 vs. Penn State Wrigley Field (Chicago, Ill.) 7:00 pm Big Ten / SEC Challenge"
+    },
+    "state_usps": {
+     "url": "https://ukathletics.com/schedule.aspx?path=wvball",
+     "retrieved": "2026-08-26",
+     "text": "Sun. Sep 6 vs. Penn State Wrigley Field (Chicago, Ill.) 7:00 pm Big Ten / SEC Challenge"
+    },
+    "event": {
+     "url": "https://ukathletics.com/schedule.aspx?path=wvball",
+     "retrieved": "2026-08-26",
+     "text": "Sun. Sep 6 vs. Penn State Wrigley Field (Chicago, Ill.) 7:00 pm Big Ten / SEC Challenge"
     }
-  ]
+   },
+   "note": "The feed's START TIME (7:00 PM ET) already agrees with both schools and is deliberately NOT overridden."
+  },
+  {
+   "game_id": "6628315",
+   "kind": "correction",
+   "matchup": "Nebraska vs UNLV",
+   "why": "Five raw /game records disagree about which side is home -- three say Nebraska, two say UNLV -- while all five agree the venue is T-Mobile Arena, which belongs to neither school. Both schools publish it as neutral.",
+   "review_by": "2026-08-29",
+   "fields": {
+    "site": "neutral",
+    "venue": "T-Mobile Arena",
+    "city": "Las Vegas",
+    "state_usps": "NV",
+    "event": "Players Era Showcase"
+   },
+   "support": {
+    "site": {
+     "url": "https://huskers.com/sports/volleyball/schedule",
+     "retrieved": "2026-08-27",
+     "text": "Players Era Showcase Neutral Saturday Aug 29 7:00 PM CDT #1 vs. UNLV Las Vegas, Nev. / T-Mobile Arena"
+    },
+    "venue": {
+     "url": "https://unlvrebels.com/sports/womens-volleyball/schedule",
+     "retrieved": "2026-08-27",
+     "text": "Players Era Volleyball Showcase Aug 29 (Sat) 5 PM PT No. 1 Nebraska Las Vegas, Nev. / T-Mobile Arena"
+    },
+    "city": {
+     "url": "https://unlvrebels.com/sports/womens-volleyball/schedule",
+     "retrieved": "2026-08-27",
+     "text": "Aug 29 (Sat) 5 PM PT No. 1 Nebraska Las Vegas, Nev. / T-Mobile Arena"
+    },
+    "state_usps": {
+     "url": "https://unlvrebels.com/sports/womens-volleyball/schedule",
+     "retrieved": "2026-08-27",
+     "text": "Aug 29 (Sat) 5 PM PT No. 1 Nebraska Las Vegas, Nev. / T-Mobile Arena"
+    },
+    "event": {
+     "url": "https://huskers.com/sports/volleyball/schedule",
+     "retrieved": "2026-08-27",
+     "text": "Players Era Showcase Neutral Saturday Aug 29 7:00 PM CDT #1 vs. UNLV"
+    }
+   },
+   "note": "TIME IS NOT OVERRIDDEN AND THE TWO SOURCES AGREE ABOUT IT. Re-read 2026-08-27T02:11Z: huskers.com says 7:00 PM CDT, unlvrebels.com says 5 PM PT. Converted with real tzdata those are the same instant -- 2026-08-30T00:00Z. The feed's epoch is 1788048000, which is that instant. If either school later publishes a different time, this becomes a `conflict` entry on start_time_epoch, not a silent re-pick."
+  },
+  {
+   "game_id": "6625717",
+   "kind": "correction",
+   "matchup": "Kansas at Pittsburgh",
+   "why": "The feed carries no location for this id at all, so the hub correctly declined to name one. Pitt's own schedule names the building and the event.",
+   "review_by": "2026-08-28",
+   "fields": {
+    "venue": "Petersen Events Center",
+    "city": "Pittsburgh",
+    "state_usps": "PA",
+    "event": "Opening Spike Classic"
+   },
+   "support": {
+    "venue": {
+     "url": "https://pittsburghpanthers.com/sports/womens-volleyball/schedule",
+     "retrieved": "2026-08-26",
+     "text": "Opening Spike Classic vs #15 Kansas Petersen Events Center Pittsburgh, Pa. Aug 28 (Fri) 6:30 PM ESPN2"
+    },
+    "city": {
+     "url": "https://pittsburghpanthers.com/sports/womens-volleyball/schedule",
+     "retrieved": "2026-08-26",
+     "text": "vs #15 Kansas Petersen Events Center Pittsburgh, Pa."
+    },
+    "state_usps": {
+     "url": "https://pittsburghpanthers.com/sports/womens-volleyball/schedule",
+     "retrieved": "2026-08-26",
+     "text": "vs #15 Kansas Petersen Events Center Pittsburgh, Pa."
+    },
+    "event": {
+     "url": "https://pittsburghpanthers.com/sports/womens-volleyball/schedule",
+     "retrieved": "2026-08-26",
+     "text": "Opening Spike Classic vs #15 Kansas Petersen Events Center Pittsburgh, Pa."
+    }
+   },
+   "note": "SITE IS DELIBERATELY NOT CORRECTED. Pitt's page shows 'vs', which SIDEARM uses for any non-road match including neutral ones -- the same page lists 'Stanford vs. Wisconsin' at Petersen. Site is left to the canonical rule, which reads venue OWNERSHIP rather than nominal ordering."
+  },
+  {
+   "game_id": "6627523",
+   "kind": "correction",
+   "matchup": "Southern California vs Arizona St.",
+   "why": "The NCAA /game record serves this as a counting home match at Arizona St. starting 5:00 PM ET. USC's own schedule card says it is a Scrimmage/Exhibition at the State Farm Women's Volleyball Showcase, on a neutral floor in Sioux Falls, starting 2:00 PM CT (12:00 PM PT) -- three hours earlier than the feed's listing. Cody noticed it had already been played while the hub still showed it as upcoming. The exhibition status itself lives in data/raw/2026/exhibitions.json; this entry corrects the fixture facts.",
+   "review_by": "2026-09-05",
+   "fields": {
+    "site": "neutral",
+    "venue": "Sanford Pentagon",
+    "city": "Sioux Falls",
+    "state_usps": "SD",
+    "event": "State Farm Women's Volleyball Showcase",
+    "start_time_epoch": 1788030000
+   },
+   "support": {
+    "site": {
+     "url": "https://usctrojans.com/sports/womens-volleyball/schedule",
+     "retrieved": "2026-08-29",
+     "text": "Scrimmage / Exhibition | State Farm Women's Volleyball Showcase | vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT"
+    },
+    "venue": {
+     "url": "https://usctrojans.com/sports/womens-volleyball/schedule",
+     "retrieved": "2026-08-29",
+     "text": "Scrimmage / Exhibition | State Farm Women's Volleyball Showcase | vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT"
+    },
+    "city": {
+     "url": "https://usctrojans.com/sports/womens-volleyball/schedule",
+     "retrieved": "2026-08-29",
+     "text": "Scrimmage / Exhibition | State Farm Women's Volleyball Showcase | vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT"
+    },
+    "state_usps": {
+     "url": "https://usctrojans.com/sports/womens-volleyball/schedule",
+     "retrieved": "2026-08-29",
+     "text": "Scrimmage / Exhibition | State Farm Women's Volleyball Showcase | vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT"
+    },
+    "event": {
+     "url": "https://usctrojans.com/sports/womens-volleyball/schedule",
+     "retrieved": "2026-08-29",
+     "text": "Scrimmage / Exhibition | State Farm Women's Volleyball Showcase | vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT"
+    },
+    "start_time_epoch": {
+     "url": "https://usctrojans.com/sports/womens-volleyball/schedule",
+     "retrieved": "2026-08-29",
+     "text": "Scrimmage / Exhibition | State Farm Women's Volleyball Showcase | vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT"
+    }
+   }
+  }
+ ]
 }

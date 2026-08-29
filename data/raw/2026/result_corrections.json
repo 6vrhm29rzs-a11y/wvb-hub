@@ -28,6 +28,36 @@
      "establishes": "Kent St. won 3-2 -- the second school source; both schools now agree with the feed's own set line against its winner field"
     }
    ]
+  },
+  "6625758": {
+   "field": "result",
+   "feed_said": "Iona won 3-0 (winner_team_id 45782, sets_won 3-0 away)",
+   "correct": {
+    "winner_team_id": "45805",
+    "away_sets": 0,
+    "home_sets": 3
+   },
+   "established": "Little Rock won 3-0 (25-5, 25-15, 25-18). The feed's own linescores say so (home side takes every set), and Iona's official schedule prints the loss WITH the identical per-set scores.",
+   "evidence": [
+    {
+     "url": "https://icgaels.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Iona",
+     "retrieved": "2026-08-29T20:56:18Z",
+     "text": "'vs Little Rock ... Ruston, LA, Thomas Assembly Center ... L, 0-3 (5-25, 15-25, 18-25)' -- the per-set scores match the feed's linescores exactly",
+     "establishes": "Iona lost 0-3; the set line is corroborated digit for digit"
+    },
+    {
+     "url": "https://lrtrojans.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Little Rock",
+     "retrieved": "2026-08-29T20:56:18Z",
+     "text": null,
+     "status": "attempted_unverifiable",
+     "note": "the schedule page serves ~450KB with no readable result text for the row yet; recheck",
+     "establishes": "nothing yet"
+    }
+   ]
   }
  }
 }

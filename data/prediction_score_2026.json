@@ -2,46 +2,46 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 258,
+  "scored": 272,
   "logged_after_tipoff_excluded": 7,
-  "team_mismatch_excluded": 9,
+  "team_mismatch_excluded": 10,
   "predictions_on_record": 4768,
-  "results_available": 283,
-  "brier": 0.199,
+  "results_available": 298,
+  "brier": 0.1953,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 183,
-  "favourite_correct_pct": 70.9
+  "favourite_correct": 194,
+  "favourite_correct_pct": 71.3
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 37,
+   "n": 38,
    "said": 55.3,
-   "happened": 59.5
+   "happened": 57.9
   },
   {
    "range": "60-70%",
-   "n": 56,
+   "n": 59,
    "said": 64.9,
-   "happened": 57.1
+   "happened": 57.6
   },
   {
    "range": "70-80%",
-   "n": 32,
-   "said": 75.4,
-   "happened": 65.6
+   "n": 34,
+   "said": 75.5,
+   "happened": 64.7
   },
   {
    "range": "80-90%",
-   "n": 46,
-   "said": 84.9,
-   "happened": 69.6
+   "n": 47,
+   "said": 84.8,
+   "happened": 70.2
   },
   {
    "range": "90-101%",
-   "n": 87,
-   "said": 95.9,
-   "happened": 87.4
+   "n": 94,
+   "said": 95.7,
+   "happened": 88.3
   }
  ],
  "matches": [
@@ -280,6 +280,15 @@
    "brier": 0.625681
   },
   {
+   "game_id": "6625051",
+   "date": "2026-08-29",
+   "away": "Norfolk St.",
+   "home": "Elon",
+   "p_home": 0.7826,
+   "home_won": false,
+   "brier": 0.61246276
+  },
+  {
    "game_id": "6625577",
    "date": "2026-08-29",
    "away": "DePaul",
@@ -379,6 +388,15 @@
    "brier": 0.48664576
   },
   {
+   "game_id": "6627191",
+   "date": "2026-08-29",
+   "away": "Green Bay",
+   "home": "Indiana St.",
+   "p_home": 0.312,
+   "home_won": true,
+   "brier": 0.47334399999999993
+  },
+  {
    "game_id": "6625328",
    "date": "2026-08-29",
    "away": "Ga. Southern",
@@ -476,24 +494,6 @@
    "p_home": 0.6391,
    "home_won": false,
    "brier": 0.40844881
-  },
-  {
-   "game_id": "6626328",
-   "date": "2026-08-28",
-   "away": "High Point",
-   "home": "UConn",
-   "p_home": 0.6383,
-   "home_won": false,
-   "brier": 0.40742689
-  },
-  {
-   "game_id": "6627645",
-   "date": "2026-08-28",
-   "away": "Indiana St.",
-   "home": "Navy",
-   "p_home": 0.6372,
-   "home_won": false,
-   "brier": 0.40602383999999997
   }
  ]
 }

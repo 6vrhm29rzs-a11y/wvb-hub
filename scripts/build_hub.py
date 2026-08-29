@@ -23,6 +23,7 @@ import collections
 import json
 import os
 import re
+import unicodedata
 import sys
 import time
 import glob
@@ -735,7 +736,33 @@ def pos_bucket(p):
     return ""
 
 def nkey(name):
-    return re.sub(r"[^a-z]", "", (name or "").lower())
+    """Join key: lowercase letters only, after two repairs measured on the
+    first big slate. (1) MOJIBAKE: the feed ships UTF-8 read as Latin-1,
+    sometimes case-mangled ("Kria\\x8dkovia\\x87" for Krickovic) -- restore a
+    lowercased lead byte, round-trip latin-1->utf-8, and keep the repair only
+    if it decodes to something different. (2) ACCENT FOLD: NFKD-transliterate
+    so the feed\\x27s Krickovic-with-hacheks and a roster\\x27s plain Krickovic
+    land on ONE key. Pure-ASCII names are byte-for-byte unchanged, so no
+    existing join moves; only joins that previously FAILED can now succeed."""
+    s = name or ""
+    if any(ord(c) > 0x7F for c in s):
+        cased = "".join(
+            chr(ord(c) - 0x20)
+            if (0xE0 <= ord(c) <= 0xFE and i + 1 < len(s)
+                and 0x80 <= ord(s[i + 1]) <= 0xBF)
+            else c
+            for i, c in enumerate(s))
+        for cand in (s, cased):
+            try:
+                r = cand.encode("latin-1").decode("utf-8")
+            except (UnicodeEncodeError, UnicodeDecodeError):
+                continue
+            if r != cand:
+                s = r
+                break
+        s = unicodedata.normalize("NFKD", s)
+        s = s.encode("ascii", "ignore").decode("ascii")
+    return re.sub(r"[^a-z]", "", s.lower())
 
 def prior_pos_index():
     """(team_id, name) -> position from last season's box scores.
@@ -1296,7 +1323,7 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
                                     photos.get(nm) or photos.get(_rk) or {},
                                     nm, transferred_out),
             "rot25": (_byn.get(team_norm(nm)) if _rotdoc else None),
-            "stars": _stars.get(nm),
+            "stars": _star_names_aligned(_stars.get(nm), roster),
             "parts": _parts.get(nm),
             "retpos": _retpos.get(nm),
             "rotso": _rotso.get(nm),
@@ -2235,6 +2262,25 @@ def roster_index():
         out.append(r)
     out.sort(key=lambda x: (x.get("t") or "", x.get("n") or ""))
     return out
+
+def _star_names_aligned(stars, roster):
+    """Respell each star with the payload roster's own spelling when the two
+    normalise to one key. The dossier's faces and photo lookups compare
+    DISPLAY STRINGS against the roster rows, and the feed disagrees with
+    itself across seasons about casing ("Martinez-Robinson" in 2025,
+    "Martinez-robinson" in 2026) -- so a star spelled by one season silently
+    missed a roster row spelled by the other. The roster list here is the
+    exact list the page compares against, which makes it the only correct
+    authority. A star with no roster row keeps its name untouched."""
+    if not stars:
+        return stars
+    byk = dict((nkey(r.get("n")), r.get("n")) for r in (roster or []) if r.get("n"))
+    out = []
+    for st in stars:
+        rn = byk.get(nkey(st.get("n")))
+        out.append(dict(st, n=rn) if rn and rn != st.get("n") else st)
+    return out
+
 
 def team_stars(limit=3):
     # type: (int) -> Dict

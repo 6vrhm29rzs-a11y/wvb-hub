@@ -94,17 +94,26 @@ def main():
             check("%s: duplicate out, canonical in" % team,
                   gid not in gids and led[gid] in gids,
                   "dup in list" if gid in gids else "canonical missing")
-        # ⚠ VERIFIED AGAINST THE SCHOOLS' OWN RECORDS, not against what the
-        # page said before the repair: easternshorehawks.com prints
-        # "Overall 1-1" (L 0-3 Alabama A&M, W 3-0 MVSU) and goblueraiders.com
-        # shows one played match (W 3-2 Boise St.). The first draft of this
-        # check pinned the still-inflated 2-1/2-0.
-        check("UMES matches its school's own record (1-1)",
-              (T.get("UMES") or {}).get("record26") == "1-1",
-              (T.get("UMES") or {}).get("record26"))
-        check("Middle Tenn. matches its school's own record (1-0)",
-              (T.get("Middle Tenn.") or {}).get("record26") == "1-0",
-              (T.get("Middle Tenn.") or {}).get("record26"))
+        # ⚠ MEETING COUNTS, NOT PINNED RECORDS. The first fix pinned the
+        # school-verified records (1-1, 1-0) -- and UMES then PLAYED AGAIN
+        # the same afternoon, so a correct 2-1 failed a guard about
+        # duplicates. The duplicate invariant is that each ledgered pair
+        # counts ONCE: exactly one UMES-MVSU meeting and one played
+        # Boise-MT Aug-28 meeting in the played lists (the real Aug-29
+        # rematch has its own gid and may add more meetings legitimately).
+        def _meetings(team, opp):
+            return [p for p in (T.get(team) or {}).get("played") or []
+                    if p.get("opp") == opp]
+        check("UMES counts exactly one MVSU meeting",
+              len(_meetings("UMES", "Mississippi Val.")) == 1,
+              str([p.get("gid") for p in _meetings("UMES",
+                                                   "Mississippi Val.")]))
+        _bmt = _meetings("Middle Tenn.", "Boise St.")
+        check("Middle Tenn. counts the Aug-28 Boise meeting once "
+              "(rematch, own gid, may add another)",
+              sum(1 for p in _bmt if p.get("gid") == "6624350") == 1
+              and not any(p.get("gid") == "6640332" for p in _bmt),
+              str([p.get("gid") for p in _bmt]))
     lab = json.load(open(os.path.join(REPO, "data",
                                       "conference_lab_%d.json" % SEASON)))
     in_matrix = set()

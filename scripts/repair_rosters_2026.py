@@ -53,6 +53,20 @@ def main():
         before = len(players)
         for p in players:
             nm = p.get("name_raw") or ""
+            # A manual-drop parser glued the CLASS onto the name ("Magda
+            # Kobaidze Freshman" -- all 18 Georgia Tech rows). Strip only a
+            # suffix that exactly equals the record's OWN class_raw: no
+            # denylist of "words that are not names" (that pattern nearly
+            # deleted Alma Kovaci Lee once), just the record contradicting
+            # itself. Idempotent: once stripped, the suffix is gone.
+            cls = (p.get("class_raw") or "").strip()
+            if cls and nm.endswith(" " + cls):
+                nm = nm[: -len(cls) - 1].rstrip()
+                if nm != (p.get("name_raw") or ""):
+                    stripped += 1
+                    p["name_raw"] = nm
+                    p["first"] = nm.split(" ")[0]
+                    p["last"] = " ".join(nm.split(" ")[1:])
             fixed = MEDIA.sub("", nm)
             if fixed != nm:
                 stripped += 1

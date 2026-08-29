@@ -493,8 +493,21 @@ def main():
         for ruler in ("My ballot", "POWER", "AVCA"):
             check("the legend names %r as its own ruler" % ruler,
                   ruler in h)
-        check("the legend says RESUME is inactive",
-              "inactive until enough games are played" in h)
+        # round 21: the legend follows the artifact -- inactive wording
+        # while the resume is off, live wording once it crossed its floor
+        import json as _j, os as _o
+        _rsa = (_j.load(open(_o.path.join(REPO, "data", "resume_2026.json")))
+                .get("meta", {}).get("active")
+                if _o.path.exists(_o.path.join(REPO, "data",
+                                               "resume_2026.json"))
+                else False)
+        if _rsa:
+            check("the legend says RESUME is live",
+                  "live \u2014 what each team has earned" in h
+                  or "live — what each team has earned" in h)
+        else:
+            check("the legend says RESUME is inactive",
+                  "inactive until enough games are played" in h)
         # Each is described as a DIFFERENT question, not three views of one.
         check("the legend distinguishes ours from the external poll",
               "the coaches poll" in h and "how strong a team is" in h)
