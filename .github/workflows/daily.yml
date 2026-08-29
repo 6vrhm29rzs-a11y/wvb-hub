@@ -226,6 +226,7 @@ jobs:
           # played, so the page can state that rather than guess; it switches
           # itself on once the season is big enough.
           python3 scripts/resume_2025.py || echo "resume needs a rating or a blend; skipping"
+          python3 scripts/confidence.py || echo "confidence ledger skipped"
           # PLAYER RATINGS -- position boards, POWER and RESUME. Cheap and
           # offline: it reads the crawled box scores already on disk. It must
           # run BEFORE build_hub.py, which embeds its output; without it the

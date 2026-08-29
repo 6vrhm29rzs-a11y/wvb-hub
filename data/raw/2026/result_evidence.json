@@ -1,0 +1,45 @@
+{
+ "_doc": "Cross-source evidence for RESULTS, one entry per attributable source per match. Extends the fixture-correction ledger's discipline (url + retrieved + exact supporting text, per FIELD) to result confirmation. An entry supports ONLY the fields it lists -- a source confirming a 3-1 result says nothing about box stats, broadcast, or availability. kind names the source class; 'ncaa_official' entries can never make a result cross-source CONFIRMED (a second NCAA endpoint is the same source wearing a different URL, and is never called independent). Joins are anchored on the explicit game id in this file plus the exact matchup/score in the supporting text -- a shared school name is not enough. A page that could not be verified (JS-rendered, no readable text) is recorded as attempted_unverifiable and stays PENDING, never confirmed.",
+ "evidence": {
+  "6640217": [
+   {
+    "url": "https://huskers.com/sports/volleyball/schedule",
+    "kind": "school_site",
+    "school": "Nebraska",
+    "retrieved": "2026-08-29T05:07:20Z",
+    "text": "Florida  Arlington, Texas / AT&T Stadium  W Win 2-0",
+    "fields": ["result", "venue"],
+    "value": {"result": "Nebraska 2-0 Florida (exhibition, best-of-3)", "venue": "AT&T Stadium, Arlington TX"},
+    "status": "confirms",
+    "review_by": null
+   }
+  ],
+  "6628236": [
+   {
+    "url": "https://uwbadgers.com/sports/womens-volleyball/schedule",
+    "kind": "school_site",
+    "school": "Wisconsin",
+    "retrieved": "2026-08-29T05:07:20Z",
+    "text": "L, 1-3 (on the game card titled '#5 Stanford')",
+    "fields": ["result"],
+    "value": {"result": "Stanford 3-1 Wisconsin"},
+    "status": "confirms",
+    "review_by": null
+   }
+  ],
+  "6626806": [
+   {
+    "url": "https://ukathletics.com/sports/womens-volleyball/schedule/",
+    "kind": "school_site",
+    "school": "Kentucky",
+    "retrieved": "2026-08-29T05:07:20Z",
+    "text": null,
+    "fields": [],
+    "value": null,
+    "status": "attempted_unverifiable",
+    "note": "SIDEARM template renders the schedule in JavaScript; the served HTML carries no readable result text (the only '3-0' on the page is an SVG path coordinate). Stays PENDING.",
+    "review_by": null
+   }
+  ]
+ }
+}

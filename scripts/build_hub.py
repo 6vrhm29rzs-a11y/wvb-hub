@@ -4192,6 +4192,10 @@ def build():
         .replace("{{N_PLAYERS}}", str(len(plist))) \
         .replace("{{LEADERS_JSON}}", json.dumps(ldrs, separators=(",", ":"))) \
         .replace("{{CONFLAB_JSON}}", json.dumps(_conflab, separators=(",", ":"))) \
+        .replace("{{CONFIDENCE_JSON}}", json.dumps(
+            load("data/result_confidence_%d.json" % SEASON) or
+            {"meta": {"counts": {}}, "finals": []},
+            separators=(",", ":"))) \
         .replace("{{TSTATS_JSON}}", blob(
             [dict(team=k, conf=(tindex.get(k) or {}).get("conf"), **v)
              for k, v in sorted(tstats.items())])) \
@@ -8109,6 +8113,33 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 #livetick .tkm b{color:var(--chalk);font-weight:700}
 #livetick .tkm .tkset{color:var(--gold);font-weight:700}
 #livetick .tkm .tkrk{font:600 9px/1 var(--disp);color:var(--gold)}
+/* ── RESULT CONFIDENCE LEDGER ───────────────────────────────────────── */
+.rcstate{font:600 10px/1.2 var(--disp);letter-spacing:.07em;
+  text-transform:uppercase;padding:3px 7px;border-radius:2px;
+  border:1px solid var(--line);color:var(--ink2);white-space:nowrap}
+.rc-confirmed{color:var(--good);border-color:color-mix(in oklab,var(--good) 45%,transparent)}
+.rc-disputed{color:var(--coral);border-color:color-mix(in oklab,var(--coral) 50%,transparent)}
+.rcsrc{font:600 10.5px/1 var(--mono);color:var(--ink3);white-space:nowrap}
+.rcrow{display:flex;align-items:center;gap:14px}
+.rcfields{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px}
+.rcf{font:600 10px/1 var(--disp);letter-spacing:.07em;text-transform:uppercase;
+  padding:3px 7px;border:1px solid var(--line);border-radius:2px;color:var(--ink3)}
+.rcf.rc-confirmed{color:var(--good)}
+.rcf.rc-disputed{color:var(--coral)}
+.rcsource{border:1px solid var(--line);border-radius:3px;padding:10px 12px;
+  margin:0 0 8px;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline;
+  font-size:12.5px;color:var(--ink2)}
+.rck{font:600 9.5px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink3)}
+.rcq{flex:1 1 100%;font-style:italic;color:var(--ink2)}
+.rcnote{color:var(--ink3)}
+.rcu{color:var(--gold);font:600 11px/1 var(--mono);text-decoration:underline}
+.rct{font:600 10px/1 var(--mono);color:var(--ink3)}
+.rcmatch{display:inline-block;margin-top:8px;font:600 11px/1 var(--disp);
+  letter-spacing:.08em;text-transform:uppercase;color:var(--gold)}
+@media (max-width:560px){
+  .rcrow{flex-wrap:wrap;gap:6px 10px}
+}
 /* ── CONFERENCE LAB ─────────────────────────────────────────────────── */
 .cfcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
   gap:10px;margin:0 0 16px}
@@ -8534,6 +8565,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
         <button role="menuitem" data-v="prank">Player ratings</button>
         <button role="menuitem" data-v="standings">Standings</button>
         <button role="menuitem" data-v="conflab">Conference Lab</button>
+        <button role="menuitem" data-v="confidence">Result Ledger</button>
         <button role="menuitem" data-v="bracket">Projected bracket</button>
         <button role="menuitem" data-v="schedule">Schedule</button>
         <button role="menuitem" data-v="tv">On TV</button>
@@ -9188,6 +9220,30 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <p class="tnote" id="cfsnap"></p>
 </section>
 
+<section id="v-confidence" hidden>
+  <h2>Result Confidence Ledger</h2>
+  <p class="lead">The <b>2026</b> season&rsquo;s evidence, per final, per field.
+    <b>Official final</b> is the canonical scoreboard&rsquo;s claim &mdash;
+    true of every final here, the floor not a boast. <b>Internally
+    reconciled</b> means the held records agree with each other: set line,
+    winner and tally are coherent. <b>Cross-source confirmed</b> requires a
+    second <i>attributable</i> public source for the specific field &mdash;
+    a second NCAA endpoint is the same source wearing a different URL and
+    never counts. A source confirming the 3&ndash;1 confirms nothing about
+    the box score. <b>&ldquo;Official final; independent confirmation
+    pending&rdquo; is an honest, normal state</b> &mdash; not an alarm.</p>
+  <div id="rcsummary"></div>
+  <div class="seg" id="rcfilters" role="group" aria-label="confidence filter">
+    <button class="segb on" data-rcf="all" type="button">All</button>
+    <button class="segb" data-rcf="confirmed" type="button">Confirmed</button>
+    <button class="segb" data-rcf="reconciled" type="button">Reconciled</button>
+    <button class="segb" data-rcf="official" type="button">Official only</button>
+    <button class="segb" data-rcf="disputed" type="button">Under review</button>
+  </div>
+  <div id="rclist" class="tdlist"></div>
+  <div id="rcdrill" hidden></div>
+</section>
+
 <section id="v-standings" hidden>
   <p class="lead"><b>2026 standings.</b> Conference tables, filling in as results land. Conference record first,
   overall beside it &mdash; early in a season nearly every match is non-conference, so the
@@ -9444,7 +9500,7 @@ const ROUTE_ALIASES = { 'match-desk': 'desk' };
 const ROUTE_OF_VIEW = { desk:'today', scores:'scores', rankings:'rankings',
   teams:'teams', ballot:'ballot', leaders:'stats', players:'players',
   prank:'player-ratings',
-  standings:'standings', conflab:'conference-lab',
+  standings:'standings', conflab:'conference-lab', confidence:'result-ledger',
   bracket:'bracket', schedule:'schedule', tv:'tv',
   /* FILMROOM-ROUTE-BEGIN */ film:'film-room', /* FILMROOM-ROUTE-END */
   /* INTEL-ROUTE-BEGIN */ intel:'intel' /* INTEL-ROUTE-END */ };
@@ -15154,7 +15210,10 @@ const CF_COLS = [
   ['n_p50', 'P50', -1, 'teams in our board top 50'],
   ['med_power', 'Med POWER', 1, 'median board rank of members'],
   ['top3_power', 'Top-3 POWER', 1, 'mean board rank of the best three'],
-  ['ahead', 'Ranked ahead', -1, 'scheduled future matches vs the coaches poll'],
+  ['ahead', 'Upcoming AVCA tests', -1,
+   'scheduled future matches against teams currently in the coaches poll; ' +
+   '"away" counts the feed\u2019s nominal-away subset \u2014 a neutral-floor ' +
+   'match with a nominal away side is counted there, not as a true road trip'],
 ];
 
 function cfVal(c, k) {
@@ -15179,8 +15238,10 @@ function cfCell(c, k) {
     return '<td>' + cfRecord(c[k][0], c[k][1]) + '</td>';
   }
   if (k === 'ahead') {
+    /* readable prose, not a bare pair: "126 \u00b7 64 away" */
     return '<td>' + c.ahead.ranked + (c.ahead.road
-      ? ' <i class="cfroad">' + c.ahead.road + ' away</i>' : '') + '</td>';
+      ? ' <i class="cfroad">\u00b7 ' + c.ahead.road + ' away</i>' : '') +
+      '</td>';
   }
   const v = c[k];
   return '<td>' + (v === null || v === undefined ? '\u2014' : v) + '</td>';
@@ -15290,6 +15351,115 @@ function cfDrill(key) {
     if (c) { cfDrill(c.dataset.cfcell); }
   });
   renderConfLab();
+})();
+
+/* ── RESULT CONFIDENCE LEDGER ────────────────────────────────────────────
+   The audit surface: what each final's evidence actually is, per field.
+   Uncertainty is rendered as USEFUL, not alarming -- "official final;
+   independent confirmation pending" is the season's normal state, and a
+   dispute renders as "result under review" with BOTH claims shown, never a
+   silent choice between them. */
+const CONFIDENCE = {{CONFIDENCE_JSON}};
+let RC_FILTER = 'all';
+const RC_LABEL = { official: 'Official final \u00b7 confirmation pending',
+  reconciled: 'Reconciled \u00b7 confirmation pending',
+  confirmed: 'Cross-source confirmed', disputed: 'Result under review' };
+
+function renderConfidence() {
+  const sumEl = document.getElementById('rcsummary');
+  if (!sumEl || typeof CONFIDENCE === 'undefined') return;
+  const c = (CONFIDENCE.meta || {}).counts || {};
+  sumEl.innerHTML = '<div class="cfcards">' +
+    [['Completed finals', c.finals, ''],
+     ['Cross-source confirmed', c.confirmed,
+      'a second attributable public source'],
+     ['Internally reconciled', c.reconciled,
+      'set line, winner and tally agree; one source'],
+     ['Official only', c.official_only,
+      'final on the scoreboard; set line not yet coherent or held'],
+     ['Under review', c.disputed, 'sources conflict \u2014 shown, not chosen'],
+     ['Awaiting second source', c.pending_second,
+      'the normal early-season state']].map(x =>
+      '<div class="cfcard"><em>' + x[0] + '</em><b>' +
+      (x[1] === undefined ? '\u2014' : x[1]) + '</b>' +
+      (x[2] ? '<span>' + x[2] + '</span>' : '') + '</div>').join('') +
+    '</div>';
+  const rows = (CONFIDENCE.finals || []).filter(r =>
+    RC_FILTER === 'all' ? true : r.overall === RC_FILTER);
+  const el = document.getElementById('rclist');
+  el.innerHTML = rows.length ? rows.slice().sort((a, b) =>
+    String(b.d).localeCompare(String(a.d)) ||
+    String(a.gid).localeCompare(String(b.gid)))
+    .map(r =>
+      '<button type="button" class="mrow rcrow" data-rcgid="' + esc(r.gid) +
+      '"><span class="mwhen">' + esc(r.d) + '</span>' +
+      '<span class="mrt"><b class="tn">' + esc(r.a || '\u2014') + '</b> v <b class="tn">' +
+      esc(r.h || '\u2014') + '</b>' + (r.exh ? ' <i class="kind exh">EXH</i>' : '') +
+      '</span>' +
+      '<span class="rcstate rc-' + r.overall + '">' +
+      (RC_LABEL[r.overall] || r.overall) + '</span>' +
+      '<span class="rcsrc">' + r.n_sources +
+      (r.n_sources === 1 ? ' source' : ' sources') +
+      (r.last_checked ? ' \u00b7 checked ' + esc(String(r.last_checked)
+        .slice(0, 10)) : '') + '</span></button>').join('')
+    : '<p class="tdquiet">No final in this state.</p>';
+}
+
+function rcDrill(gid) {
+  const r = (CONFIDENCE.finals || []).filter(x => x.gid === gid)[0];
+  if (!r) return;
+  const el = document.getElementById('rcdrill');
+  el.hidden = false;
+  const st = r.states || {};
+  el.innerHTML = '<h3 class="cfh">' + esc(r.a || '?') + ' v ' +
+    esc(r.h || '?') + ' \u2014 ' + esc(r.d) + '</h3>' +
+    '<div class="rcfields">' + ['result', 'sets', 'box', 'venue'].map(f =>
+      '<span class="rcf rc-' + (st[f] || 'official') + '">' + f + ': ' +
+      (st[f] || 'official') + '</span>').join('') + '</div>' +
+    ((r.sources || []).length
+      ? (r.sources || []).map(sr =>
+        '<div class="rcsource"><b>' + esc(sr.school || sr.kind || 'source') +
+        '</b> <span class="rck">' + esc(sr.kind || '') + '</span>' +
+        (sr.status === 'attempted_unverifiable'
+          ? '<span class="rcnote">attempted; the page could not be read ' +
+            '(JS-rendered) \u2014 stays pending, never assumed</span>'
+          : '<span class="rcnote">supports: ' +
+            esc((sr.fields || []).join(', ') || '\u2014') +
+            (sr.status === 'conflicts' ? ' \u2014 <b>CONFLICTS</b>' : '') +
+            '</span>' +
+            (sr.text ? '<span class="rcq">\u201c' + esc(sr.text) +
+              '\u201d</span>' : '')) +
+        (sr.url ? '<a class="rcu" href="' + esc(sr.url) +
+          '" target="_blank" rel="noopener noreferrer">' +
+          esc((sr.url || '').replace(/^https?:\/\//, '').split('/')[0]) +
+          '</a>' : '') +
+        (sr.retrieved ? '<span class="rct">retrieved ' +
+          esc(String(sr.retrieved).slice(0, 10)) + '</span>' : '') +
+        '</div>').join('')
+      : '<p class="tnote">No second source held for this final yet \u2014 ' +
+        'it stands on the official feed and internal reconciliation, which ' +
+        'is the normal state.</p>') +
+    '<a class="rcmatch" href="' + matchRoute(r.gid, 'desk') +
+      '">Open the match \u2192</a>';
+  el.scrollIntoView({ block: 'nearest' });
+}
+
+(function wireConfidence() {
+  const sec = document.getElementById('v-confidence');
+  if (!sec) return;
+  sec.addEventListener('click', e => {
+    const f = e.target.closest('[data-rcf]');
+    if (f) {
+      RC_FILTER = f.dataset.rcf;
+      sec.querySelectorAll('[data-rcf]').forEach(b =>
+        b.classList.toggle('on', b === f));
+      renderConfidence();
+      return;
+    }
+    const row = e.target.closest('[data-rcgid]');
+    if (row) rcDrill(row.dataset.rcgid);
+  });
+  renderConfidence();
 })();
 
 function wireScoreboard() {
