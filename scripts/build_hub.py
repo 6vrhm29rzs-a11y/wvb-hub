@@ -8212,6 +8212,37 @@ details.avhist{margin:14px 0}
 .lpldrs{margin:8px 0}
 .lpcat{font:600 9px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
   color:var(--gold);font-style:normal;margin-right:8px}
+/* ── TEAM DOSSIER DASHBOARD ─────────────────────────────────────────── */
+.tddash{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:0 0 16px}
+.tddcol{display:flex;flex-direction:column;gap:12px;min-width:0}
+.tddb{border:1px solid var(--line);border-radius:3px;padding:11px 13px}
+.tddb > em{display:block;font:600 9.5px/1 var(--disp);letter-spacing:.11em;
+  text-transform:uppercase;color:var(--ink3);font-style:normal;
+  margin-bottom:8px}
+.tddbnote{font:600 9px/1 var(--disp);letter-spacing:.06em;color:var(--ink3);
+  font-style:normal;text-transform:none;margin-left:7px}
+.tddbrow{display:block;width:100%;text-align:left;background:none;border:0;
+  border-bottom:1px solid var(--line);padding:6px 0;font-size:13px;
+  color:var(--ink2);cursor:pointer}
+.tddbrow:last-of-type{border-bottom:0}
+.tddbrow b{color:var(--chalk)}
+.tddbrow:hover{color:var(--chalk)}
+.tddbsets{font:600 11px/1 var(--mono);color:var(--ink3);margin-left:7px}
+.tddbquiet{font-size:12.5px;color:var(--ink3)}
+.tddblink{display:inline-block;margin-top:7px;font:600 10px/1 var(--disp);
+  letter-spacing:.09em;text-transform:uppercase;color:var(--gold)}
+.avrowline{display:block;font-size:12.5px;color:var(--ink2);padding:3px 0}
+.tddbldr{display:flex;align-items:baseline;gap:8px;padding:4px 0;
+  font-size:13px;color:var(--ink2)}
+.tddbldr b{color:var(--chalk)}
+.tddbldr .lpcat{min-width:74px;margin-right:0}
+.fp{font:700 10px/1 var(--disp);border-radius:2px;padding:2px 5px;
+  font-style:normal;margin-right:2px}
+.fp.fw{color:var(--good);border:1px solid color-mix(in oklab,var(--good) 45%,transparent)}
+.fp.fl{color:var(--coral);border:1px solid color-mix(in oklab,var(--coral) 40%,transparent)}
+@media (max-width:760px){
+  .tddash{grid-template-columns:1fr}
+}
 .rccmp{margin:4px 0 10px}
 .rccmp > em{display:block;font:600 9.5px/1 var(--disp);letter-spacing:.1em;
   text-transform:uppercase;color:var(--ink3);font-style:normal;
@@ -15693,6 +15724,30 @@ function rcDrill(gid) {
 })();
 
 /* AVAIL-JS-BEGIN */
+function tdAvailability(t, name) {
+  if (typeof AVAIL === 'undefined' || !AVAIL.meta) return '';
+  const st = (AVAIL.statuses || []).filter(x => x.team === name);
+  const sg = (AVAIL.signals || []).filter(x => x.team === name);
+  const hist = (AVAIL.expired || []).filter(x => x.team === name);
+  let body;
+  if (st.length || sg.length) {
+    body = st.map(x => '<span class="avrowline"><b>' + esc(x.player) +
+        '</b> \u2014 ' + esc(x.claim === 'confirmed_unavailable'
+          ? 'unavailable (sourced)' : 'limited / game-time (sourced)') +
+        '</span>').join('') +
+      sg.map(x => '<span class="avrowline"><b>' + esc(x.player) +
+        '</b> \u2014 <i class="avkind">' + esc(x.kind) +
+        '</i> signal, sets no status</span>').join('');
+  } else {
+    body = '<span class="tddbquiet">No availability information \u2014 ' +
+      'no attributable public status is held' +
+      (hist.length ? '; ' + hist.length + ' historical item' +
+        (hist.length === 1 ? '' : 's') + ' on the desk' : '') + '.</span>';
+  }
+  return '<div class="tddb"><em>Availability</em>' + body +
+    '<a class="tddblink" href="' + routeFor('avail') + '">Availability ' +
+    'Desk \u2192</a></div>';
+}
 /* ── AVAILABILITY & PARTICIPATION DESK (private) ───────────────────────── */
 const AVAIL = {{AVAIL_JSON}};
 
@@ -19578,6 +19633,110 @@ function tdNextMatch(t, name) {
 }
 
 /* Two or three names, what each does, and a way to her page. */
+/* ── TEAM DOSSIER DASHBOARD (round 17) ───────────────────────────────────
+   The ten-second answers, as a two-column desktop grid (one column on a
+   phone): next up and the latest final with its Result-Confidence state,
+   the current sourced-status state where the private build holds one, the
+   last five counted finals with
+   set lines and routes, and the season's category stat leaders with their
+   samples. Everything reads the page's EXISTING payloads -- t.played /
+   t.fixtures (already duplicate/exhibition/empty-final clean), CONFIDENCE,
+   AVAIL, PLAYERS -- so no second definition of a record, a state or an
+   identity exists here. */
+function tdLatestFinal(t, name) {
+  const g = (t.played || [])[0];
+  if (!g) return '';
+  const won = g.mine > g.theirs;
+  /* ⚠ t.played sets are ALREADY mine-first -- the payload builder flips
+     the home side's pairs (its own hard-won comment: "the home team's view
+     is the flipped one"). Re-flipping here was a double flip: Wisconsin's
+     3-0 sweep of Louisville rendered as 18-25, 20-25, 18-25. */
+  const line = (g.sets || []).map(p =>
+    p[0] + '\u2013' + p[1]).join(', ');
+  let conf = '';
+  if (typeof CONFIDENCE !== 'undefined') {
+    const r = (CONFIDENCE.finals || []).filter(x => x.gid ===
+      String(g.gid))[0];
+    if (r && r.overall === 'disputed') {
+      conf = '<span class="rcstate rc-disputed">Result under review</span>';
+    } else if (r && r.overall === 'confirmed') {
+      conf = '<span class="rcstate rc-confirmed">Cross-source ' +
+        'confirmed</span>';
+    }
+  }
+  return '<div class="tddb"><em>Latest final</em>' +
+    '<button type="button" class="tddbrow" data-match="' + esc(g.gid) + '">' +
+    '<b>' + (won ? 'W' : 'L') + ' ' + g.mine + '\u2013' + g.theirs +
+    '</b> ' + (g.home ? 'v ' : 'at ') + esc(g.opp) +
+    (line ? ' <span class="tddbsets">' + line + '</span>' : '') +
+    '</button>' + conf + '</div>';
+}
+
+function tdForm(t, name) {
+  const gs = (t.played || []).slice(0, 5);   /* newest first, stated */
+  if (!gs.length) return '';
+  return '<div class="tddb"><em>Recent form <i class="tddbnote">newest ' +
+    'first \u00b7 counted D-I finals only</i></em>' +
+    gs.map(g => {
+      const won = g.mine > g.theirs;
+      const line = (g.sets || []).map(p =>
+        p[0] + '\u2013' + p[1]).join(', ');   /* mine-first already */
+      return '<button type="button" class="tddbrow" data-match="' +
+        esc(g.gid) + '"><i class="fp ' + (won ? 'fw' : 'fl') + '">' +
+        (won ? 'W' : 'L') + '</i> ' + g.mine + '\u2013' + g.theirs + ' ' +
+        (g.home ? 'v ' : 'at ') + esc(g.opp) +
+        (g.nondi ? ' <i class="dicaveat">non-D-I</i>' : '') +
+        (line ? ' <span class="tddbsets">' + line + '</span>' : '') +
+        '</button>';
+    }).join('') + '</div>';
+}
+
+function tdLeaders(t, name) {
+  if (typeof PLAYERS === 'undefined') return '';
+  const mine = PLAYERS.filter(p => p.team === name && (p.sets || 0) > 0);
+  if (!mine.length) return '';
+  /* the SAME sample rule as the season leaderboards: half the most-played
+     player's sets, floor 3 -- one definition of "enough of this season",
+     applied to this team's own distribution */
+  const mx = Math.max.apply(null, mine.map(p => p.sets || 0));
+  const floor = Math.max(3, Math.round(mx * 0.5));
+  const CATS = [
+    ['kills/set', p => p.k], ['assists/set', p => p.ast],
+    ['digs/set', p => p.digs], ['blocks/set', p => (p.bs || 0) +
+      0.5 * (p.ba || 0)], ['aces/set', p => p.aces]];
+  const rows = CATS.map(c => {
+    const pool = mine.filter(p => (p.sets || 0) >= floor &&
+      c[1](p) !== null && c[1](p) !== undefined);
+    if (!pool.length) return '';
+    pool.sort((a, b) => (c[1](b) / b.sets) - (c[1](a) / a.sets) ||
+      String(a.name).localeCompare(String(b.name)));
+    const top = pool[0];
+    const rate = c[1](top) / top.sets;
+    if (!(rate > 0)) return '';
+    return '<div class="tddbldr"><i class="lpcat">' + c[0] + '</i><b>' +
+      esc(top.name) + '</b><span>' + rate.toFixed(2) +
+      ' <em class="rcbasis">2026, ' + Math.round(top.sets) +
+      ' sets</em></span></div>';
+  }).join('');
+  if (!rows) return '';
+  return '<div class="tddb"><em>2026 statistical leaders <i class="tddbnote">' +
+    'min ' + floor + ' sets, the leaderboard\u2019s own rule</i></em>' +
+    rows + '</div>';
+}
+
+function tdDashboard(t, name) {
+  return '<div class="tddash">' +
+    '<div class="tddcol">' + tdNextMatch(t, name) +
+      tdLatestFinal(t, name) +
+      /* AVAIL-HOOK-BEGIN */
+      (typeof tdAvailability === 'function'
+        ? tdAvailability(t, name) : '') +
+      /* AVAIL-HOOK-END */
+      '</div>' +
+    '<div class="tddcol">' + tdForm(t, name) + tdLeaders(t, name) +
+    '</div></div>';
+}
+
 function tdPlayers(t, name) {
   const stars = (t.stars || []).slice(0, 3);
   if (!stars.length) return '';
@@ -19667,7 +19826,7 @@ function teamDossier(box, t, name) {
   /* the Overview is assembled, not moved: it is the one thing that did not
      exist before */
   const ov = panels.overview;
-  ov.insertAdjacentHTML('beforeend', tdNextMatch(t, name) + tdPlayers(t, name));
+  ov.insertAdjacentHTML('beforeend', tdDashboard(t, name) + tdPlayers(t, name));
   /* The glance strip's "Next" tile is now a strict subset of the card above,
      down to the pre-match pick -- so it is removed rather than shown twice in
      the same viewport. If the card came back empty (no fixture on file) the
@@ -20213,6 +20372,7 @@ def strip_private(html):
                    ("/* FILMROOM-HOOK-BEGIN */", "/* FILMROOM-HOOK-END */"),
                    ("<!-- AVAIL-HTML-BEGIN -->", "<!-- AVAIL-HTML-END -->"),
                    ("/* AVAIL-JS-BEGIN */", "/* AVAIL-JS-END */"),
+                   ("/* AVAIL-HOOK-BEGIN */", "/* AVAIL-HOOK-END */"),
                    ("/* AVAIL-ROUTE-BEGIN */", "/* AVAIL-ROUTE-END */"),
                    ("<!-- AVAIL-MENU-BEGIN -->", "<!-- AVAIL-MENU-END -->"),
                    ("/* AVAIL-MD-BEGIN */", "/* AVAIL-MD-END */"),

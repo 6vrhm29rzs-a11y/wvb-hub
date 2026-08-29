@@ -130,8 +130,9 @@ def main():
 
     # --- 4. Overview carries the three things the brief asked for ---------
     ov = re.search(r"ov\.insertAdjacentHTML\('beforeend',(.*?)\);", src, re.S)
-    check("Overview assembled from next-match + players", ov is not None and
-          "tdNextMatch" in ov.group(1) and "tdPlayers" in ov.group(1))
+    # round 17: the dashboard wraps the next-match card and the new blocks
+    check("Overview assembled from the dashboard + players", ov is not None and
+          "tdDashboard" in ov.group(1) and "tdPlayers" in ov.group(1))
     check("Scout's Read appended to Overview",
           re.search(r"if \(scout\) ov\.appendChild\(scout\)", src) is not None)
 
@@ -207,6 +208,78 @@ def main():
         # disagree); the totals row RECOMPUTES hit% and pts/set from summed
         # counts rather than averaging match rates; and the dossier files it
         # under Numbers, or it renders into no panel and silently vanishes.
+        # ── THE DASHBOARD (round 17) ────────────────────────────────────
+        # node executes the real block builders against fixtures; every
+        # rendered rate must name its season and sample, form rows come only
+        # from t.played (already duplicate/exhibition/empty clean), and a
+        # signal can never read as an injury or status.
+        import subprocess as _sp
+        from test_scoreboard_density import block as _jsb
+
+        def _jfn(name):
+            i = src.find("function %s(" % name)
+            return _jsb(src, i) if i >= 0 else None
+        _dash_ok = True
+        _js = """
+const esc = s => String(s == null ? '' : s);
+const routeFor = v => '#/' + v;
+const PLAYERS = [
+  { team: 'X', name: 'A Hitter', sets: 10, k: 39, ast: 2, digs: 12,
+    bs: 1, ba: 4, aces: 3 },
+  { team: 'X', name: 'B Setter', sets: 10, k: 4, ast: 112, digs: 20,
+    bs: 0, ba: 2, aces: 1 },
+  { team: 'X', name: 'C Bench', sets: 2, k: 9, ast: 0, digs: 1,
+    bs: 0, ba: 0, aces: 0 }];
+const AVAIL = { meta: {}, statuses: [], expired: [],
+  signals: [{ team: 'X', player: 'A Hitter', kind: 'cody_observation' }] };
+%s
+%s
+%s
+const t = { played: [
+  { gid: 'G1', d: '2026-08-28', opp: 'Opp', home: true, nondi: false,
+    /* t.played sets arrive MINE-FIRST -- the payload builder flips the
+       home side's pairs at source, so renderers must never flip again */
+    mine: 3, theirs: 1, sets: [[25,20],[20,25],[25,18],[25,22]] }] };
+const out = { form: tdForm(t, 'X'), ldr: tdLeaders(t, 'X'),
+              av: tdAvailability(t, 'X') };
+const bad = [];
+if (!/2026, 10 sets/.test(out.ldr))
+  bad.push('a leader rate lacks season+sample');
+if (/C Bench/.test(out.ldr))
+  bad.push('an under-floor sample entered the leaders');
+if (!/assists\/set/.test(out.ldr) || !/B Setter/.test(out.ldr))
+  bad.push('category leaders missing the setter');
+if (out.form.indexOf('>W</i>') < 0 || !/3(\u2013|–)1/.test(out.form)
+    || !/25(\u2013|–)20/.test(out.form))
+  bad.push('form row lacks result or set line');
+if (/injur|\bout\b(?!put)|unavailable/i.test(out.av))
+  bad.push('a signal was promoted toward a status');
+if (!/sets no status/.test(out.av))
+  bad.push('the signal is not labelled as setting no status');
+if (bad.length) { console.log('DASH-FAIL: ' + bad.join(' | '));
+  process.exit(1); }
+console.log('DASH-OK');
+""" % (_jfn("tdForm"), _jfn("tdLeaders"), _jfn("tdAvailability"))
+        _r = _sp.run(["node", "-e", _js], capture_output=True, text=True)
+        check("DASHBOARD BEHAVIOUR: samples, floor, categories, form, "
+              "signal wording", _r.returncode == 0,
+              (_r.stdout + _r.stderr).strip()[:160])
+        # negative control: strip the sample span and the same invariant fails
+        _bad_ldr = _jfn("tdLeaders").replace(
+            "' <em class=\"rcbasis\">2026, ' + Math.round(top.sets) +\n      ' sets</em>'", "''")
+        if _bad_ldr == _jfn("tdLeaders"):
+            _bad_ldr = _jfn("tdLeaders").replace("2026, ", "")
+        _js2 = _js.replace(_jfn("tdLeaders"), _bad_ldr)
+        _r2 = _sp.run(["node", "-e", _js2], capture_output=True, text=True)
+        check("[NEG] a rate without its season+sample is caught",
+              _r2.returncode != 0
+              and "lacks season+sample" in (_r2.stdout + _r2.stderr))
+        check("form reads t.played and nothing else",
+              "(t.played || []).slice(0, 5)" in src
+              and "LEDGER" not in _jfn("tdForm"))
+        check("the dashboard grid is two columns on desktop, one on a phone",
+              "grid-template-columns:1fr 1fr" in src
+              and ".tddash{grid-template-columns:1fr}" in src)
         check("match-by-match table ships", 'Match by match, 2026' in page)
         _mbm = page[page.find('MATCH BY MATCH, THE TEAM AS A BOX-SCORE LINE'):]
         _mbm = _mbm[:_mbm.find('const rt = t.rot25')] if _mbm else ''
