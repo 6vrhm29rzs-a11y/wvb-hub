@@ -6507,11 +6507,15 @@ label.fr-btn{cursor:pointer;display:inline-block}
    the reference table right, vertically centered across both team rows. The
    lone far-right tally is hidden when the table is present -- its S column
    already states it, and one fact should not render twice at two sizes. */
-.ribbon.hasdls{display:grid;grid-template-columns:minmax(0,1fr) auto;
-  column-gap:30px;align-items:center}
+/* ⚠ ADJACENT, NOT OPPOSITE CORNERS (review round 2): a 1fr identity column
+   pushed the table to the far right edge and re-created a blank centre one
+   size smaller. Both columns are content-sized and sit together; the module
+   reads as one unit and the page's whitespace falls OUTSIDE it. */
+.ribbon.hasdls{display:grid;grid-template-columns:minmax(auto,620px) auto;
+  justify-content:start;column-gap:56px;align-items:center}
 .ribbon.hasdls .rbtop{grid-column:1 / -1}
 .ribbon.hasdls .dlswrap{grid-column:2;grid-row:2 / span 2;margin:0;
-  justify-self:end;align-self:center}
+  align-self:center}
 .ribbon.hasdls .rbside{grid-column:1}
 .ribbon.hasdls .rbsc{display:none}
 @media (max-width:760px){
@@ -11984,6 +11988,17 @@ const DESK_SOON_SHOWN = 12;
    a threshold that changes any number. */
 const DESK_CLOSE = 0.10;
 
+/* A fixture's pre-match pick may render ONLY while the match is genuinely
+   upcoming -- the moment it starts, a model number beside it reads as a live
+   win probability, which this site never shows. One gate, every call site. */
+function fxPickable(f) {
+  if (!f || f.pick === null || f.pick === undefined) return false;
+  const lv = (typeof LIVE_BY_ID !== 'undefined') ? LIVE_BY_ID[f.gid] : null;
+  if (!lv) return true;                       /* not on today's feed: upcoming */
+  const all = (typeof allMatches === 'function') ? allMatches() : {};
+  return matchState(all[String(f.gid)] || f, lv) === 'upcoming';
+}
+
 function deskPct(p) { return Math.round(p * 100) + '%'; }
 
 function deskTags(m, live) {
@@ -12036,14 +12051,16 @@ function deskForecast(m) {
 }
 
 /* ---- why it matters: measured facts, nothing else --------------------- */
-function deskWhy(m) {
+function deskWhy(m, isLive) {
   const out = [];
   if (m.ar && m.hr) {
     out.push('Both sides are ranked in the AVCA poll (#' + m.ar + ' and #' + m.hr + ').');
   } else if (m.ar || m.hr) {
     out.push('A ranked side: #' + (m.ar || m.hr) + ' ' + esc(m.ar ? m.a : m.h) + '.');
   }
-  if (m.hw != null && Math.abs(m.hw - 0.5) <= DESK_CLOSE) {
+  /* forecast wording never rides on a live card -- same rule as the
+     detail's Forecast section and the team card's pick */
+  if (!isLive && m.hw != null && Math.abs(m.hw - 0.5) <= DESK_CLOSE) {
     out.push('The forecast is close &mdash; ' + deskPct(Math.max(m.hw, 1 - m.hw)) +
       ' for the favourite, which is about as even as this model gets.');
   }
@@ -12173,7 +12190,7 @@ function deskCard(m, live, full) {
     (full && isFinal ? matchStrip(m) : '') +
     (livebox || (isFinal ? deskStory(m, full) : deskForecast(m))) +
     '<div class="dwhere">' + deskWhere(m) + '</div>' +
-    (full ? deskWhy(m) : '') + '</article>';
+    (full ? deskWhy(m, !!(live && !isFinal)) : '') + '</article>';
 }
 
 /* ---- Live Match Center: detail for the ONE card you opened -------------
@@ -15016,15 +15033,29 @@ function renderMatchDetail(gid, dest) {
 
   /* the forecast, and only one that can be proved to predate first serve */
   let fc = '';
+  /* ⚠ PHRASE THE FAVOURITE, NOT THE HOME SIDE. Always printing the home
+     team's probability rendered "0% UNLV" on Nebraska-UNLV -- true, and
+     exactly the kind of true that reads as broken. deskForecast() already
+     names the favourite; the detail says the same fact the same way. */
+  const _fcline = () => {
+    const hf = m.hw >= 0.5;
+    return deskPct(hf ? m.hw : 1 - m.hw) + ' ' +
+      esc(hf ? mHome(m) : mAway(m));
+  };
   if (st === 'final') {
     fc = m.hw === null || m.hw === undefined
       ? '<span class="munk">forecast unavailable' +
         (m.fsrc ? ' &mdash; ' + esc(m.fsrc) : '') + '</span>'
-      : deskPct(m.hw) + ' ' + esc(mHome(m)) +
+      : _fcline() +
         ' <span class="munk">' + esc(m.fsrc || '') + '</span>';
-  } else if (m.hw !== null && m.hw !== undefined) {
-    fc = deskPct(m.hw) + ' ' + esc(mHome(m)) +
-      ' <span class="munk">current forecast</span>';
+  } else if (st === 'upcoming' && m.hw !== null && m.hw !== undefined) {
+    /* ⚠ UPCOMING ONLY. This branch also caught LIVE, so a mid-match page
+       showed "57% Wisconsin -- current forecast": a pre-match model number
+       reading as a live win probability, which this page never shows -- the
+       exact thing the team card was already fixed for. A live match's facts are the score, the set, the
+       totals and the stamp; the forecast returns on the final as the
+       provably pre-serve record or not at all. (Outside review, round 2.) */
+    fc = _fcline() + ' <span class="munk">current forecast</span>';
   }
 
   /* ⚠ THE BOX SECTION IS DRAWN ONLY WHEN THE STATE PERMITS IT AND THE DATA
@@ -15447,7 +15478,19 @@ function csTape() {
   const near = csNearness(m, live);
   const marquee = csIsTodayRoute() && (near === 'live' || near === 'today' ||
                                        near === 'tomorrow' || st === 'final');
-  const label = st === 'live' ? 'Live' : st === 'final' ? 'Final' : 'Next serve';
+  let label = st === 'live' ? 'Live' : st === 'final' ? 'Final' : 'Next serve';
+  /* ⚠ WHILE A MATCH DETAIL IS OPEN, THE MASTHEAD MUST SAY WHOSE MATCH IT IS
+     TALKING ABOUT. The tape features the best match on the slate, so a
+     reader deep in Stanford-Wisconsin watched the masthead flip to
+     Minnesota-Arizona St. with nothing saying it was a DIFFERENT match --
+     "a user should never wonder whether the page is describing two versions
+     of one match" (outside review, round 2). If the featured match is not
+     the routed one, the state label carries the distinction; the routed
+     match itself keeps its plain label. */
+  const _rtm = (location.hash.match(/^#\/(?:match-desk|scores)\/([^\/?]+)/) || [])[1];
+  if (_rtm && String(m.gid) !== decodeURIComponent(_rtm)) {
+    label = 'Elsewhere \u00b7 ' + label.toLowerCase();
+  }
   const when = st === 'live' ? esc((live && live.period) || 'in progress')
              : esc(dayLabel(m.d));
   /* ⚠ THE DATE PRINTED TWICE, four inches apart -- once in the state column
@@ -17615,7 +17658,7 @@ function showTeam(name) {
             : (_next.home ? 'vs ' : ICON_ROAD + ' at ')) +
           _next.opp + '</b>' +
           '<span class="gls">' + dayLabel(_next.d) + (_next.t ? ' &middot; ' + _next.t : '') +
-          (_next.pick !== null && _next.pick !== undefined
+          (fxPickable(_next)
             ? ' &middot; <i class="glpick">' + Math.round(_next.pick * 100) + '%</i>' : '') +
           '</span>'
         : '<b class="glbig glmuted">&mdash;</b><span class="gls">no fixtures on file</span>') +
@@ -17646,7 +17689,7 @@ function showTeam(name) {
       (neutral ? ' title="neutral site"' : '') + '>' + va + '</span>' +
     '<span class="op">' + f.opp + '</span>' +
     '<span class="ss">' + (f.t || '') + '</span>' +
-    (f.pick !== null && f.pick !== undefined
+    (fxPickable(f)
       ? '<span class="rs ' + (f.pick >= 0.5 ? 'w' : 'l') + '">' +
         Math.round(f.pick * 100) + '%</span>' : '') +
     '<span class="wh2">' + tag +

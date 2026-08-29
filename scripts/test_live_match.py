@@ -335,9 +335,19 @@ def main():
     # note the moment it lands -- lmcRender rewrites #mpendnote from
     # d.state_label/d.state_note, both drawn from the same match_state.py
     # table. These guards pin the mechanism and its wiring.
-    hub2 = os.path.join(REPO, "Cody", "START-HERE.html")
-    if os.path.exists(hub2):
+    # ⚠ THE INVARIANT LIVES IN THE SOURCE, WHICH ALWAYS EXISTS. Round 1 of
+    # this guard read the built private page and silently SKIPPED when it was
+    # absent -- which is every CI checkout, since Cody/ is gitignored. A guard
+    # that quietly stands down in exactly the environment that publishes is
+    # not a guard (outside review, round 2). The generator is asserted always;
+    # the built page adds a second layer only when present.
+    hub2 = os.path.join(REPO, "scripts", "build_hub.py")
+    if not os.path.exists(hub2):
+        check("build_hub.py exists to be audited", False, hub2)
+        page2 = ""
+    else:
         page2 = open(hub2, encoding="utf-8").read()
+    if page2:
         check("the pending box-score note is addressable (#mpendnote)",
               'id="mpendnote"' in page2)
         lr = re.search(r"function lmcRender.*?\n\}", page2, re.S)
@@ -354,12 +364,90 @@ def main():
               <= len(re.findall(r"not serving statistics",
                                 json.dumps(MS2.DETAIL_NOTE))) + 1,
               "%d occurrences in the page" % page2.count("not serving statistics"))
-        # negative control: a page whose lmcRender lost the rewrite must trip
-        bogus = page2.replace("getElementById('mpendnote')",
-                              "getElementById('mpendnote_gone')")
-        lrb = re.search(r"function lmcRender.*?\n\}", bogus, re.S)
-        check("[NEG] removing the rewrite is caught",
-              "getElementById('mpendnote')" not in (lrb.group(0) if lrb else ""))
+        # ── THE INVARIANT, RUN AS BEHAVIOUR (node executes the page's own
+        # functions). Both fixture states, then the same invariant against a
+        # deliberately regressed lmcRender -- the control is the invariant
+        # FAILING, not a string being absent. ──────────────────────────────
+        _lmcbody = re.search(r"function lmcBody\(d\).*?\n\}", page2, re.S)
+        _lmcrend = re.search(r"function lmcRender\(gid\).*?\n\}", page2, re.S)
+        if not (_lmcbody and _lmcrend):
+            check("lmcBody/lmcRender extracted for behavioural run", False)
+        else:
+            import subprocess as _sp
+
+            def _run_invariant(render_src):
+                js = """
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const lmcNum = (v,d) => (v===null||v===undefined) ? '\u2014' : v;
+%s
+%s
+const LMC_DATA = {};
+// minimal DOM: the two elements lmcRender touches
+const els = {};
+const mk = id => els[id] = { id: id, innerHTML: '', textContent: '' };
+mk('lmc-G'); mk('mpendnote'); mk('lmcstamp');
+global.document = { getElementById: id => els[id] || null };
+function state(d) {
+  LMC_DATA['G'] = d;
+  els['mpendnote'].innerHTML =
+    '<b>Live</b><span>Live score only \u2014 the source is not serving ' +
+    'statistics for this match yet.</span>';   // what the bulk feed painted
+  lmcRender('G');
+  return { box: els['lmc-G'].innerHTML, note: els['mpendnote'].innerHTML };
+}
+const av = state({ ok: true, state: 'live', stats_available: true,
+  state_label: 'Live',
+  state_note: 'Live score and team totals from the official feed.',
+  teams: [{team:'A',kills:10},{team:'B',kills:9}] });
+const so = state({ ok: true, state: 'live', stats_available: false,
+  state_label: 'Live',
+  state_note: 'Live score only \u2014 the source is not serving statistics for this match yet.',
+  stats_reason: '' });
+const bad = [];
+if (!/<table/.test(av.box)) bad.push('stats-available: no table rendered');
+if (/not serving statistics/.test(av.note))
+  bad.push('stats-available: score-only note survived');
+if (/<table/.test(so.box)) bad.push('score-only: a numeric table rendered');
+if (!/not serving statistics/.test(so.note))
+  bad.push('score-only: the score-only note is missing');
+if (bad.length) { console.log('INVARIANT-FAILED: ' + bad.join(' | ')); process.exit(1); }
+console.log('INVARIANT-HOLDS'); process.exit(0);
+""" % (_lmcbody.group(0), render_src)
+                r = _sp.run(["node", "-e", js], capture_output=True, text=True)
+                return r.returncode == 0, (r.stdout + r.stderr).strip()
+
+            _okrun, _why = _run_invariant(_lmcrend.group(0))
+            check("BEHAVIOUR: both live-box states hold the invariant",
+                  _okrun, _why[:200])
+            # the regression: lmcRender that no longer rewrites the note
+            _regressed = _lmcrend.group(0).replace(
+                "document.getElementById('mpendnote')", "null")
+            _okbad, _whybad = _run_invariant(_regressed)
+            check("[NEG] the regressed lmcRender FAILS the same invariant",
+                  not _okbad and "score-only note survived" in _whybad,
+                  _whybad[:200])
+        # ── NO FORECAST ON A LIVE MATCH, ANY SURFACE (review round 2) ──
+        # The detail's "current forecast" branch also caught LIVE, so a
+        # mid-match page showed a pre-match number under a Forecast heading.
+        # Upcoming shows the current pick; live shows nothing; final shows
+        # only the provably pre-serve log. Every fixture-pick call site goes
+        # through one gate (fxPickable) or an explicit upcoming test.
+        check("detail forecast is gated to the upcoming state",
+              "st === 'upcoming' && m.hw !== null" in page2)
+        check("fixture picks share one gate (fxPickable)",
+              page2.count("fxPickable(") >= 3,   # defn + 2 call sites
+              "%d occurrences" % page2.count("fxPickable("))
+        check("deskWhy suppresses forecast wording on live cards",
+              "function deskWhy(m, isLive)" in page2
+              and "!isLive && m.hw != null" in page2)
+        check("the forecast phrases the favourite, never the home side",
+              "const _fcline" in page2 and "hf ? mHome(m) : mAway(m)" in page2)
+        # negative control: ungating the detail branch must be caught
+        _b2 = page2.replace("st === 'upcoming' && m.hw !== null",
+                            "m.hw !== null")
+        check("[NEG] removing the upcoming gate is caught",
+              "st === 'upcoming' && m.hw !== null" not in _b2)
+
         # the dossier's live card uses the ONE live phrasing
         tdn = re.search(r"function tdNextMatch.*?\n\}", page2, re.S)
         tds = tdn.group(0) if tdn else ""

@@ -2,15 +2,15 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 168,
-  "logged_after_tipoff_excluded": 2,
+  "scored": 172,
+  "logged_after_tipoff_excluded": 3,
   "team_mismatch_excluded": 5,
   "predictions_on_record": 4764,
-  "results_available": 181,
-  "brier": 0.1863,
+  "results_available": 186,
+  "brier": 0.1849,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 122,
-  "favourite_correct_pct": 72.6
+  "favourite_correct": 125,
+  "favourite_correct_pct": 72.7
  },
  "calibration": [
   {
@@ -21,9 +21,9 @@
   },
   {
    "range": "60-70%",
-   "n": 28,
-   "said": 64.6,
-   "happened": 53.6
+   "n": 30,
+   "said": 64.7,
+   "happened": 53.3
   },
   {
    "range": "70-80%",
@@ -39,9 +39,9 @@
   },
   {
    "range": "90-101%",
-   "n": 59,
-   "said": 95.5,
-   "happened": 88.1
+   "n": 61,
+   "said": 95.4,
+   "happened": 88.5
   }
  ],
  "matches": [
@@ -334,6 +334,15 @@
    "brier": 0.394384
   },
   {
+   "game_id": "6625992",
+   "date": "2026-08-28",
+   "away": "Miami (OH)",
+   "home": "Sam Houston",
+   "p_home": 0.3721,
+   "home_won": true,
+   "brier": 0.39425841
+  },
+  {
    "game_id": "6627900",
    "date": "2026-08-28",
    "away": "St. John's (NY)",
@@ -485,15 +494,6 @@
    "p_home": 0.4768,
    "home_won": false,
    "brier": 0.22733824
-  },
-  {
-   "game_id": "6624301",
-   "date": "2026-08-28",
-   "away": "Utah Tech",
-   "home": "Utah Valley",
-   "p_home": 0.4629,
-   "home_won": false,
-   "brier": 0.21427640999999997
   }
  ]
 }
