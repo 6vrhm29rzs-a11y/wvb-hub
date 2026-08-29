@@ -77,9 +77,16 @@ def entry_supports(e, field, today=None):
     return True
 
 
-def field_state(entries, field, reconciled, today=None):
-    """One field's state from its evidence list. One source can never
-    confirm; a conflict outranks everything."""
+def field_state(entries, field, base, today=None):
+    """One field's state, lifted from that field's own BASE by evidence.
+
+    ⚠ THE BASE IS PER FIELD, NEVER A SHARED BOOLEAN (review round 8). The
+    first version passed one internal-coherence flag for all four fields,
+    so a coherent SCORELINE rendered "venue: reconciled" -- set arithmetic
+    cannot corroborate where a match was played. Each caller computes its
+    own base; this function only lifts it to confirmed/disputed on
+    field-specific evidence. One source can never confirm; a conflict
+    outranks everything."""
     seen = set()
     confirms = conflicts = 0
     for e in entries or []:
@@ -97,7 +104,7 @@ def field_state(entries, field, reconciled, today=None):
         return "disputed"
     if confirms >= 1:
         return "confirmed"
-    return "reconciled" if reconciled else "official"
+    return base
 
 
 def internally_reconciled(g):
@@ -128,6 +135,31 @@ def internally_reconciled(g):
     return (aw > hw) == (win == str(away[0].get("team_id")))
 
 
+def box_teams():
+    """gid -> (n_distinct_team_ids, max sets a row claims): enough to say a
+    HELD box is internally coherent with the match -- presence alone is not
+    coherence."""
+    out = {}
+    path = os.path.join(REPO, "data", "raw", str(SEASON), "playerbox.jsonl")
+    if not os.path.exists(path):
+        return out
+    for ln in open(path, encoding="utf-8"):
+        try:
+            rec = json.loads(ln)
+        except ValueError:
+            continue
+        rows = rec.get("rows") or []
+        tids = set(str(r.get("team_id")) for r in rows if r.get("team_id"))
+        mx = 0
+        for r in rows:
+            try:
+                mx = max(mx, int(float(r.get("gp") or 0)))
+            except (TypeError, ValueError):
+                pass
+        out[str(rec.get("game_id"))] = (len(tids), mx)
+    return out
+
+
 def build():
     doc = load("data/data_%d.json" % SEASON) or {}
     ev = (load("data/raw/%d/result_evidence.json" % SEASON) or {}) \
@@ -143,6 +175,7 @@ def build():
         if len(_t) == 2:
             exh_names[str(_gid)] = _t
     today = datetime.date.today().isoformat()
+    boxes = box_teams()
     rows, counts = [], {"finals": 0, "official_only": 0, "reconciled": 0,
                         "confirmed": 0, "disputed": 0, "pending_second": 0}
     for g in (doc.get("games") or []):
@@ -152,17 +185,33 @@ def build():
         gid = str(g.get("game_id"))
         rec = internally_reconciled(g)
         entries = ev.get(gid) or []
-        states = dict((f, field_state(entries, f, rec, today))
+        nsets = len([l for l in (g.get("linescores") or [])
+                     if l.get("home") is not None])
+        # ⚠ EACH FIELD EARNS ITS OWN BASE. Result and sets may cite the set
+        # line's coherence with the official winner; the BOX is reconciled
+        # only when a held box actually agrees with the match (two teams,
+        # max player sets == the match's set count); the VENUE can never be
+        # lifted by score arithmetic -- it is official when the feed carried
+        # a location and unavailable when it did not, until a venue-specific
+        # source exists.
+        bt = boxes.get(gid)
+        bases = {
+            "result": "reconciled" if rec else "official",
+            "sets": "reconciled" if rec else "official",
+            "box": ("reconciled" if bt and bt[0] == 2 and nsets
+                    and bt[1] == nsets else "official"),
+            "venue": ("official" if (g.get("location") or {}).get("venue")
+                      else "unavailable"),
+        }
+        states = dict((f, field_state(entries, f, bases[f], today))
                       for f in FIELDS)
-        # a held box score is what the box field's "reconciled" means
-        if states["box"] in ("official", "reconciled"):
-            states["box"] = "reconciled" if g.get("has_boxscore") and rec \
-                else "official"
         overall = ("disputed" if "disputed" in states.values()
                    else "confirmed" if states["result"] == "confirmed"
                    else "reconciled" if rec else "official")
         srcs = [e for e in entries if isinstance(e, dict)
                 and e.get("status") in ("confirms", "conflicts")]
+        attempted = sum(1 for e in entries if isinstance(e, dict)
+                        and e.get("status") == "attempted_unverifiable")
         checked = max([e.get("retrieved") or "" for e in entries] or [""])
         ts = g.get("teams") or []
         _fallback = exh_names.get(gid) or ["", ""]
@@ -181,7 +230,13 @@ def build():
                 if PT else datetime.datetime.utcfromtimestamp(
                 int(g.get("start_time_epoch") or 0)).strftime("%Y-%m-%d")),
             "overall": overall, "states": states,
-            "n_sources": len(set(e.get("url") for e in srcs)),
+            # ⚠ INDEPENDENT CORROBORATION, distinct from the official
+            # scoreboard record every final has -- "0 sources" beside
+            # "every final is official" read as a contradiction (round 8).
+            # n_attempted keeps "tried, unreadable" visibly separate from
+            # "none tried".
+            "n_indep": len(set(e.get("url") for e in srcs)),
+            "n_attempted": attempted,
             "last_checked": checked or None,
             "sources": [{"url": e.get("url"), "kind": e.get("kind"),
                          "school": e.get("school"),

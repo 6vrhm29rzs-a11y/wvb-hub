@@ -8126,6 +8126,7 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
   padding:3px 7px;border:1px solid var(--line);border-radius:2px;color:var(--ink3)}
 .rcf.rc-confirmed{color:var(--good)}
 .rcf.rc-disputed{color:var(--coral)}
+.rcf.rc-unavailable{color:var(--ink3);border-style:dashed}
 .rcsource{border:1px solid var(--line);border-radius:3px;padding:10px 12px;
   margin:0 0 8px;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline;
   font-size:12.5px;color:var(--ink2)}
@@ -15378,8 +15379,8 @@ function renderConfidence() {
      ['Official only', c.official_only,
       'final on the scoreboard; set line not yet coherent or held'],
      ['Under review', c.disputed, 'sources conflict \u2014 shown, not chosen'],
-     ['Awaiting second source', c.pending_second,
-      'the normal early-season state']].map(x =>
+     ['Awaiting independent result confirmation', c.pending_second,
+      'a result-level count \u2014 the normal early-season state']].map(x =>
       '<div class="cfcard"><em>' + x[0] + '</em><b>' +
       (x[1] === undefined ? '\u2014' : x[1]) + '</b>' +
       (x[2] ? '<span>' + x[2] + '</span>' : '') + '</div>').join('') +
@@ -15392,14 +15393,17 @@ function renderConfidence() {
     String(a.gid).localeCompare(String(b.gid)))
     .map(r =>
       '<button type="button" class="mrow rcrow" data-rcgid="' + esc(r.gid) +
-      '"><span class="mwhen">' + esc(r.d) + '</span>' +
+      '" data-from="ledger"><span class="mwhen">' + esc(r.d) + '</span>' +
       '<span class="mrt"><b class="tn">' + esc(r.a || '\u2014') + '</b> v <b class="tn">' +
       esc(r.h || '\u2014') + '</b>' + (r.exh ? ' <i class="kind exh">EXH</i>' : '') +
       '</span>' +
       '<span class="rcstate rc-' + r.overall + '">' +
       (RC_LABEL[r.overall] || r.overall) + '</span>' +
-      '<span class="rcsrc">' + r.n_sources +
-      (r.n_sources === 1 ? ' source' : ' sources') +
+      '<span class="rcsrc">official: recorded \u00b7 independent: ' +
+      (r.n_indep ? r.n_indep + ' attributable source' +
+        (r.n_indep === 1 ? '' : 's') : 'none yet') +
+      (r.n_attempted ? ' \u00b7 ' + r.n_attempted +
+        ' attempted, unreadable' : '') +
       (r.last_checked ? ' \u00b7 checked ' + esc(String(r.last_checked)
         .slice(0, 10)) : '') + '</span></button>').join('')
     : '<p class="tdquiet">No final in this state.</p>';
@@ -15416,6 +15420,11 @@ function rcDrill(gid) {
     '<div class="rcfields">' + ['result', 'sets', 'box', 'venue'].map(f =>
       '<span class="rcf rc-' + (st[f] || 'official') + '">' + f + ': ' +
       (st[f] || 'official') + '</span>').join('') + '</div>' +
+    '<div class="rcsource rcofficial"><b>Official scoreboard</b>' +
+      '<span class="rck">ncaa canonical record</span>' +
+      '<span class="rcnote">recorded \u2014 the claim every state here is ' +
+      'measured against; it is one source, and it is not independent of ' +
+      'itself</span></div>' +
     ((r.sources || []).length
       ? (r.sources || []).map(sr =>
         '<div class="rcsource"><b>' + esc(sr.school || sr.kind || 'source') +
@@ -15436,11 +15445,11 @@ function rcDrill(gid) {
         (sr.retrieved ? '<span class="rct">retrieved ' +
           esc(String(sr.retrieved).slice(0, 10)) + '</span>' : '') +
         '</div>').join('')
-      : '<p class="tnote">No second source held for this final yet \u2014 ' +
-        'it stands on the official feed and internal reconciliation, which ' +
-        'is the normal state.</p>') +
+      : '<p class="tnote">No independent source held for this final yet ' +
+        '\u2014 it stands on the official record and internal ' +
+        'reconciliation, which is the normal state. None attempted.</p>') +
     '<a class="rcmatch" href="' + matchRoute(r.gid, 'desk') +
-      '">Open the match \u2192</a>';
+      '?from=ledger">Open the match \u2192</a>';
   el.scrollIntoView({ block: 'nearest' });
 }
 
@@ -15661,7 +15670,13 @@ function renderMatchDetail(gid, dest) {
   const s6 = matchState6(m, live, hasBox);
   const caps = mCaps(s6);
   const st = matchState(m, live);
-  const parent = dest === 'scores'
+  /* ⚠ BACK RESTORES WHERE THE READER WAS (round 8): a match opened from
+     the Result Ledger goes back to the ledger, not Today. Extends the same
+     ?from= origin the player pages already use. */
+  const parent = (typeof ROUTE_ORIGIN !== 'undefined'
+                  && ROUTE_ORIGIN === 'ledger')
+      ? ['Result Ledger', routeFor('confidence')]
+      : dest === 'scores'
       ? ['Scores', routeFor('scores')] : ['Today', routeFor('desk')];
   const bits = [];
   const where = [m.venue, m.city, m.st].filter(Boolean).join(', ');
@@ -15724,7 +15739,9 @@ function renderMatchDetail(gid, dest) {
     '<div class="crumb"><a href="' + parent[1] + '">' + parent[0] + '</a>' +
       '<span class="sep">&rsaquo;</span><b>' + esc(mAway(m)) + ' ' + connector(m) + ' ' +
       esc(mHome(m)) + '</b></div>' +
-    '<button type="button" class="backlink" data-back="' + dest + '">&larr; Back to ' +
+    '<button type="button" class="backlink" data-back="' +
+      ((typeof ROUTE_ORIGIN !== 'undefined' && ROUTE_ORIGIN === 'ledger')
+        ? 'ledger' : dest) + '">&larr; Back to ' +
       parent[0] + '</button>' +
     '<div class="mdet">' + exhBanner(m) + ribbonHTML(m, live, null) +
       /* WHY WATCH -- directly after the identity block, before the facts
@@ -15850,12 +15867,15 @@ document.addEventListener('click', e => {
        parents the match route supports. */
     const dest = row.dataset.dest ||
       (document.body.dataset.view === 'scores' ? 'scores' : 'desk');
-    go(matchRoute(row.dataset.match, dest));
+    go(matchRoute(row.dataset.match, dest) +
+       (row.dataset.from ? '?from=' + row.dataset.from : ''));
     return;
   }
   const back = e.target.closest && e.target.closest('[data-back]');
   if (back) {
-    go(back.dataset.back === 'scores' ? routeFor('scores') : routeFor('desk'));
+    go(back.dataset.back === 'ledger' ? routeFor('confidence')
+       : back.dataset.back === 'scores' ? routeFor('scores')
+       : routeFor('desk'));
   }
 });
 wirePrank();
