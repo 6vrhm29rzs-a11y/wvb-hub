@@ -3485,7 +3485,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     </div>
     <div class="meta">
       <b>201</b> matches played &middot; <b>348</b> teams rated<br>
-      last result <b>Today</b> &middot; built 2026-08-28 9:02 PM PT
+      last result <b>Today</b> &middot; built 2026-08-28 9:09 PM PT
     </div>
   </div>
   <!-- COURTSIGNAL-STATUS-BEGIN -->
@@ -7195,7 +7195,11 @@ function renderMatchDetail(gid, dest) {
          stream links are held for any match, so no outbound action renders
          (reported, not faked). */
       (st === 'upcoming' ? (function () {
-        const rs = todayReasons(m, null).slice(0, 3);
+        /* the watch line is the canonical TV statement here, so the 'tv'
+           reason chip is skipped -- the same fact twice in one section is
+           the exact dup the reasonChips skip convention exists for */
+        const rs = todayReasons(m, null)
+          .filter(r => !(m.tv && r[0] === 'tv')).slice(0, 3);
         const watch = m.tv
           ? '<div class="wwrow"><span class="tdtag tv">watch</span>' +
             '<span class="wwfact">' + esc(m.tv) + '</span></div>' : '';

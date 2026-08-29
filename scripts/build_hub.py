@@ -15159,7 +15159,11 @@ function renderMatchDetail(gid, dest) {
          stream links are held for any match, so no outbound action renders
          (reported, not faked). */
       (st === 'upcoming' ? (function () {
-        const rs = todayReasons(m, null).slice(0, 3);
+        /* the watch line is the canonical TV statement here, so the 'tv'
+           reason chip is skipped -- the same fact twice in one section is
+           the exact dup the reasonChips skip convention exists for */
+        const rs = todayReasons(m, null)
+          .filter(r => !(m.tv && r[0] === 'tv')).slice(0, 3);
         const watch = m.tv
           ? '<div class="wwrow"><span class="tdtag tv">watch</span>' +
             '<span class="wwfact">' + esc(m.tv) + '</span></div>' : '';
