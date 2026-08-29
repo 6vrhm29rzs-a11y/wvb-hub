@@ -161,6 +161,7 @@ jobs:
           python3 scripts/digby_top25.py || echo "top 25 needs a projection; skipping"
           python3 scripts/resume_2025.py || echo "resume not active yet; skipping"
           python3 scripts/confidence.py || echo "confidence ledger skipped"
+          python3 scripts/availability_desk.py || echo "availability desk skipped"
           python3 scripts/build_hub.py
           python3 scripts/build_hub.py --public
 

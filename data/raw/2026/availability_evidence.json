@@ -1,0 +1,17 @@
+{
+ "_doc": "Field-scoped AVAILABILITY evidence, one entry per attributable source per player. Extends the result-evidence discipline. claim is one of confirmed_unavailable | limited_gtd -- nothing else may be asserted. Only an ATTRIBUTABLE PUBLIC source (school_release, school_site, beat_report, broadcast) can support a claim; kind community_forum and cody_observation are SIGNALS -- stored, labelled, and never able to set a status. Every entry carries the exact quoted wording, url, retrieved time, an effective date range and a review_by date; evidence past review_by or outside its effective range supports nothing and the player falls back to the honest default. Support never spills: one entry, one player, one claim, one date range. A DNP row, a zero-action listing, reduced minutes, a roster omission or a social post is NEVER promoted into out/injured/unavailable, and no diagnosis is ever shown unless an official public source used that exact language -- and then only as the source's own quoted words.",
+ "players": {
+  "Wisconsin|Jaela Auguste": [
+   {
+    "kind": "cody_observation",
+    "quote": "oh darn no jaela auguste today for wisconsin vs stanford",
+    "url": null,
+    "retrieved": "2026-08-29T05:48:57Z",
+    "effective": {"from": "2026-08-28", "to": "2026-08-28"},
+    "review_by": "2026-09-04",
+    "claim": null,
+    "note": "SIGNAL ONLY -- an eye-test observation during the live broadcast. Sets no status. Corroborating participation fact: the crawled box lists her gp=4 with zero recorded actions in every column; the live box carried setsPlayed:null mid-match. The Wisconsin-Stanford VolleyTalk thread was checked the same evening (in-browser): its Aug 26 preview projected her starting and asked for unavailability news; nobody answered -- no public pre-match signal existed there."
+   }
+  ]
+ }
+}

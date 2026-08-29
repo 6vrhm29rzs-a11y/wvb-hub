@@ -69,6 +69,7 @@ REBUILD = [
     ({}, ["scripts/digby_top25.py"]),
     ({}, ["scripts/resume_2025.py"]),
     ({}, ["scripts/confidence.py"]),
+    ({}, ["scripts/availability_desk.py"]),
     ({}, ["scripts/provenance.py", "--check"]),
     ({}, ["scripts/build_hub.py"]),
 ]

@@ -4192,6 +4192,9 @@ def build():
         .replace("{{N_PLAYERS}}", str(len(plist))) \
         .replace("{{LEADERS_JSON}}", json.dumps(ldrs, separators=(",", ":"))) \
         .replace("{{CONFLAB_JSON}}", json.dumps(_conflab, separators=(",", ":"))) \
+        .replace("{{AVAIL_JSON}}", json.dumps(
+            load("data/availability_desk_%d.json" % SEASON) or {},
+            separators=(",", ":"))) \
         .replace("{{CONFIDENCE_JSON}}", json.dumps(
             load("data/result_confidence_%d.json" % SEASON) or
             {"meta": {"counts": {}}, "finals": []},
@@ -8113,6 +8116,31 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 #livetick .tkm b{color:var(--chalk);font-weight:700}
 #livetick .tkm .tkset{color:var(--gold);font-weight:700}
 #livetick .tkm .tkrk{font:600 9px/1 var(--disp);color:var(--gold)}
+/* AVAIL-CSS-BEGIN */
+.avrow{border:1px solid var(--line);border-radius:3px;padding:9px 12px;
+  margin:0 0 7px;font-size:12.5px;color:var(--ink2)}
+.avrow b{color:var(--chalk)}
+.avrow.avsg{border-style:dashed}
+.avkind{font:600 9.5px/1 var(--disp);letter-spacing:.09em;
+  text-transform:uppercase;color:var(--gold);font-style:normal}
+.avq{font-style:italic;color:var(--ink2)}
+.avmeta{display:block;margin-top:4px;font-size:11.5px;color:var(--ink3)}
+.avpart{font-size:12.5px;color:var(--ink2)}
+.avnote{color:var(--ink3);font-style:normal;font-size:11.5px}
+.avteamblk{border:1px solid var(--line);border-radius:3px;padding:12px 14px;
+  margin-top:10px}
+.avtl{display:flex;gap:6px;align-items:center;margin-top:8px}
+.avtl em{font:600 11px/1 var(--disp);letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink2);font-style:normal;
+  margin-right:6px}
+.avtlc{font:600 10.5px/1 var(--mono);padding:5px 8px;border-radius:2px;
+  border:1px solid var(--line);background:none;color:var(--ink2);cursor:pointer}
+.avtlc.av-zero_action{color:var(--gold);border-color:color-mix(in oklab,var(--gold) 45%,transparent)}
+.avtlc.av-not_listed{color:var(--ink3);border-style:dashed}
+.avside{margin:0 0 8px}
+.avside > b{display:block;margin-bottom:5px;font:700 12px/1 var(--disp);
+  letter-spacing:.07em;text-transform:uppercase;color:var(--ink2)}
+/* AVAIL-CSS-END */
 /* ── RESULT CONFIDENCE LEDGER ───────────────────────────────────────── */
 .rcstate{font:600 10px/1.2 var(--disp);letter-spacing:.07em;
   text-transform:uppercase;padding:3px 7px;border-radius:2px;
@@ -8567,6 +8595,9 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
         <button role="menuitem" data-v="standings">Standings</button>
         <button role="menuitem" data-v="conflab">Conference Lab</button>
         <button role="menuitem" data-v="confidence">Result Ledger</button>
+        <!-- AVAIL-MENU-BEGIN -->
+        <button role="menuitem" data-v="avail">Availability</button>
+        <!-- AVAIL-MENU-END -->
         <button role="menuitem" data-v="bracket">Projected bracket</button>
         <button role="menuitem" data-v="schedule">Schedule</button>
         <button role="menuitem" data-v="tv">On TV</button>
@@ -9221,6 +9252,32 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <p class="tnote" id="cfsnap"></p>
 </section>
 
+<!-- AVAIL-HTML-BEGIN -->
+<section id="v-avail" hidden>
+  <h2>Availability &amp; Participation</h2>
+  <p class="lead">The <b>2026</b> season, private. Four different things,
+    never blended: <b>availability</b> is a sourced status &mdash; only an
+    attributable public source with its exact wording can set one.
+    <b>Participation</b> is an observed match fact: recorded actions, a
+    zero-action listing (the feed&rsquo;s DNP convention), or not in the box.
+    A <b>participation anomaly</b> is a review signal against a stated
+    baseline. <b>None of these is a diagnosis</b>, and no reason is ever
+    inferred from an absence.</p>
+  <div id="avsummary"></div>
+  <h3 class="cfh">Sourced statuses</h3>
+  <div id="avstatuses"></div>
+  <h3 class="cfh">Labelled signals</h3>
+  <p class="tnote">Eye-test notes and community items. A signal can never
+    set a status &mdash; it is a reason to look, recorded with its source
+    kind.</p>
+  <div id="avsignals"></div>
+  <h3 class="cfh">Participation, last completed match</h3>
+  <div class="ctl"><input type="search" id="avq"
+    placeholder="Type a team&hellip;"></div>
+  <div id="avteam"></div>
+</section>
+<!-- AVAIL-HTML-END -->
+
 <section id="v-confidence" hidden>
   <h2>Result Confidence Ledger</h2>
   <p class="lead">The <b>2026</b> season&rsquo;s evidence, per final, per field.
@@ -9502,6 +9559,7 @@ const ROUTE_OF_VIEW = { desk:'today', scores:'scores', rankings:'rankings',
   teams:'teams', ballot:'ballot', leaders:'stats', players:'players',
   prank:'player-ratings',
   standings:'standings', conflab:'conference-lab', confidence:'result-ledger',
+  /* AVAIL-ROUTE-BEGIN */ avail:'availability', /* AVAIL-ROUTE-END */
   bracket:'bracket', schedule:'schedule', tv:'tv',
   /* FILMROOM-ROUTE-BEGIN */ film:'film-room', /* FILMROOM-ROUTE-END */
   /* INTEL-ROUTE-BEGIN */ intel:'intel' /* INTEL-ROUTE-END */ };
@@ -15417,9 +15475,19 @@ function rcDrill(gid) {
   const st = r.states || {};
   el.innerHTML = '<h3 class="cfh">' + esc(r.a || '?') + ' v ' +
     esc(r.h || '?') + ' \u2014 ' + esc(r.d) + '</h3>' +
-    '<div class="rcfields">' + ['result', 'sets', 'box', 'venue'].map(f =>
-      '<span class="rcf rc-' + (st[f] || 'official') + '">' + f + ': ' +
-      (st[f] || 'official') + '</span>').join('') + '</div>' +
+    '<div class="rcfields">' + ['result', 'sets', 'box', 'venue'].map(f => {
+      /* ⚠ THE BOX STATE'S NAME IS NARROWER THAN "RECONCILED" (round 9): the
+         check is only that a HELD box aligns with the match's teams and set
+         count. It does not verify a single player stat, and the label must
+         not imply it does. */
+      let v = st[f] || 'official';
+      const lbl = (f === 'box' && v === 'reconciled') ? 'match-aligned' : v;
+      return '<span class="rcf rc-' + v + '" title="' + (f === 'box'
+        ? 'match-aligned: a held player box lists both teams and its set ' +
+          'counts agree with the match. No individual player stat has been ' +
+          'independently verified.'
+        : '') + '">' + f + ': ' + lbl + '</span>';
+    }).join('') + '</div>' +
     '<div class="rcsource rcofficial"><b>Official scoreboard</b>' +
       '<span class="rck">ncaa canonical record</span>' +
       '<span class="rcnote">recorded \u2014 the claim every state here is ' +
@@ -15470,6 +15538,102 @@ function rcDrill(gid) {
   });
   renderConfidence();
 })();
+
+/* AVAIL-JS-BEGIN */
+/* ── AVAILABILITY & PARTICIPATION DESK (private) ───────────────────────── */
+const AVAIL = {{AVAIL_JSON}};
+
+function avStatusLine(team) {
+  const st = (AVAIL.statuses || []).filter(s => s.team === team);
+  const sg = (AVAIL.signals || []).filter(s => s.team === team);
+  if (!st.length && !sg.length) return '';
+  return st.map(s =>
+    '<div class="avrow avst"><b>' + esc(s.player) + '</b> \u2014 ' +
+    esc(s.claim === 'confirmed_unavailable' ? 'unavailable (sourced)'
+        : 'limited / game-time (sourced)') +
+    ' <span class="avq">\u201c' + esc(s.quote) + '\u201d</span>' +
+    '<span class="avmeta">' + esc(s.kind) + ' \u00b7 retrieved ' +
+    esc(String(s.retrieved || '').slice(0, 10)) + '</span></div>').join('') +
+  sg.map(s =>
+    '<div class="avrow avsg"><b>' + esc(s.player) + '</b> \u2014 ' +
+    '<i class="avkind">' + esc(s.kind) + '</i> signal, sets no status' +
+    ' <span class="avq">\u201c' + esc(s.quote) + '\u201d</span></div>')
+    .join('');
+}
+
+function avTeamBlock(team) {
+  const L = (AVAIL.latest || {})[team];
+  const status = avStatusLine(team);
+  const tl = Object.keys(AVAIL.timelines || {})
+    .filter(k => k.indexOf(team + '|') === 0);
+  return '<div class="avteamblk"><div class="stt">' + logo(team, 'sm') +
+    esc(team) + '</div>' +
+    (status || '<p class="tnote">No current sourced availability ' +
+      'information for anyone on this roster.</p>') +
+    (L ? '<p class="avpart"><b>' + esc(L.d) + '</b>: ' + L.appeared +
+      ' recorded actions' +
+      (L.zero_action && L.zero_action.length
+        ? ' \u00b7 zero-action listings: ' +
+          L.zero_action.map(esc).join(', ') +
+          ' <i class="avnote">(a participation fact \u2014 reserves sit ' +
+          'routinely; this is not an availability claim)</i>'
+        : '') + '</p>'
+       : '<p class="tnote">No completed match with a held box yet.</p>') +
+    tl.map(k => {
+      const nm = k.split('|')[1];
+      return '<div class="avtl"><em>' + esc(nm) + '</em>' +
+        (AVAIL.timelines[k] || []).map(x =>
+          '<button type="button" class="avtlc av-' + x.state +
+          '" data-match="' + esc(x.gid) + '" title="' + x.state + '">' +
+          (x.state === 'appeared' ? x.sets + ' sets'
+            : x.state === 'zero_action' ? '0 actions' : 'not listed') +
+          '</button>').join('') + '</div>';
+    }).join('') + '</div>';
+}
+
+function renderAvail() {
+  const el = document.getElementById('avsummary');
+  if (!el || typeof AVAIL === 'undefined' || !AVAIL.meta) return;
+  const c = AVAIL.meta.counts || {};
+  el.innerHTML = '<div class="cfcards">' +
+    [['Sourced statuses', c.statuses,
+      'attributable public sources only'],
+     ['Labelled signals', c.signals, 'observations; set no status'],
+     ['Expired evidence', c.expired, 'fell back to unknown \u2014 visibly'],
+     ['Baseline anomalies', c.anomalies,
+      esc(AVAIL.meta.anomaly_floor || '')]].map(x =>
+      '<div class="cfcard"><em>' + x[0] + '</em><b>' +
+      (x[1] === undefined ? '\u2014' : x[1]) + '</b><span>' + x[2] +
+      '</span></div>').join('') + '</div>';
+  document.getElementById('avstatuses').innerHTML =
+    (AVAIL.statuses || []).length
+      ? (AVAIL.statuses || []).map(s => avStatusLine(s.team)).join('')
+      : '<p class="tnote">None. No attributable public source currently ' +
+        'reports a player unavailable or limited \u2014 the honest ' +
+        'default, not a gap.</p>';
+  document.getElementById('avsignals').innerHTML =
+    (AVAIL.signals || []).map(s =>
+      '<div class="avrow avsg"><b>' + esc(s.player) + '</b> (' +
+      esc(s.team) + ') \u2014 <i class="avkind">' + esc(s.kind) +
+      '</i> <span class="avq">\u201c' + esc(s.quote) + '\u201d</span>' +
+      (s.note ? '<span class="avmeta">' + esc(s.note) + '</span>' : '') +
+      '</div>').join('') ||
+    '<p class="tnote">None recorded.</p>';
+}
+
+(function wireAvail() {
+  const sec = document.getElementById('v-avail');
+  if (!sec) return;
+  const q = document.getElementById('avq');
+  q.addEventListener('input', () => {
+    const t = Object.keys(AVAIL.latest || {}).filter(k =>
+      k.toLowerCase().indexOf(q.value.toLowerCase()) === 0)[0];
+    document.getElementById('avteam').innerHTML =
+      (q.value.length >= 2 && t) ? avTeamBlock(t) : '';
+  });
+  renderAvail();
+})();
+/* AVAIL-JS-END */
 
 function wireScoreboard() {
   const host = document.getElementById('v-scores');
@@ -15781,6 +15945,17 @@ function renderMatchDetail(gid, dest) {
       /* live statistics, only while this match is live AND the state says
          team stats exist for it */
       (st === 'live' ? lmcSection(m.gid) : '') +
+      /* AVAIL-MD-BEGIN */
+      (typeof avStatusLine === 'function' ? (function () {
+        const a = avStatusLine(mAway(m)), h = avStatusLine(mHome(m));
+        if (!a && !h) return '';
+        return '<div class="msec"><h3>Availability</h3>' +
+          (a ? '<div class="avside"><b>' + esc(mAway(m)) + '</b>' + a +
+            '</div>' : '') +
+          (h ? '<div class="avside"><b>' + esc(mHome(m)) + '</b>' + h +
+            '</div>' : '') + '</div>';
+      })() : '') +
+      /* AVAIL-MD-END */
       starsSection(m) +
       /* ⚠ ONE SENTENCE PER STATE, FROM THE SHARED TABLE. Each of these is a
          true statement about the source at that moment -- not a placeholder
@@ -19767,6 +19942,12 @@ def strip_private(html):
                    ("<!-- FILMROOM-MENU-BEGIN -->", "<!-- FILMROOM-MENU-END -->"),
                    ("/* FILMROOM-WIRE-BEGIN */", "/* FILMROOM-WIRE-END */"),
                    ("/* FILMROOM-HOOK-BEGIN */", "/* FILMROOM-HOOK-END */"),
+                   ("<!-- AVAIL-HTML-BEGIN -->", "<!-- AVAIL-HTML-END -->"),
+                   ("/* AVAIL-JS-BEGIN */", "/* AVAIL-JS-END */"),
+                   ("/* AVAIL-ROUTE-BEGIN */", "/* AVAIL-ROUTE-END */"),
+                   ("<!-- AVAIL-MENU-BEGIN -->", "<!-- AVAIL-MENU-END -->"),
+                   ("/* AVAIL-MD-BEGIN */", "/* AVAIL-MD-END */"),
+                   ("/* AVAIL-CSS-BEGIN */", "/* AVAIL-CSS-END */"),
                    ("<!-- INTEL-HTML-BEGIN -->", "<!-- INTEL-HTML-END -->"),
                    ("/* INTEL-JS-BEGIN */", "/* INTEL-JS-END */"),
                    ("/* INTEL-CSS-BEGIN */", "/* INTEL-CSS-END */"),

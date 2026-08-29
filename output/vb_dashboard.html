@@ -3162,6 +3162,7 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 #livetick .tkm b{color:var(--chalk);font-weight:700}
 #livetick .tkm .tkset{color:var(--gold);font-weight:700}
 #livetick .tkm .tkrk{font:600 9px/1 var(--disp);color:var(--gold)}
+
 /* ── RESULT CONFIDENCE LEDGER ───────────────────────────────────────── */
 .rcstate{font:600 10px/1.2 var(--disp);letter-spacing:.07em;
   text-transform:uppercase;padding:3px 7px;border-radius:2px;
@@ -3556,7 +3557,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     </div>
     <div class="meta">
       <b>208</b> matches played &middot; <b>348</b> teams rated<br>
-      last result <b>Today</b> &middot; built 2026-08-28 10:36 PM PT
+      last result <b>Today</b> &middot; built 2026-08-28 10:50 PM PT
     </div>
   </div>
   <!-- COURTSIGNAL-STATUS-BEGIN -->
@@ -3606,6 +3607,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
         <button role="menuitem" data-v="standings">Standings</button>
         <button role="menuitem" data-v="conflab">Conference Lab</button>
         <button role="menuitem" data-v="confidence">Result Ledger</button>
+        
         <button role="menuitem" data-v="bracket">Projected bracket</button>
         <button role="menuitem" data-v="schedule">Schedule</button>
         
@@ -3997,6 +3999,8 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <p class="tnote" id="cfsnap"></p>
 </section>
 
+
+
 <section id="v-confidence" hidden>
   <h2>Result Confidence Ledger</h2>
   <p class="lead">The <b>2026</b> season&rsquo;s evidence, per final, per field.
@@ -4267,6 +4271,7 @@ const ROUTE_OF_VIEW = { desk:'today', scores:'scores', rankings:'rankings',
   teams:'teams', ballot:'ballot', leaders:'stats', players:'players',
   prank:'player-ratings',
   standings:'standings', conflab:'conference-lab', confidence:'result-ledger',
+  
   bracket:'bracket', schedule:'schedule', tv:'tv',
   
    };
@@ -7284,9 +7289,19 @@ function rcDrill(gid) {
   const st = r.states || {};
   el.innerHTML = '<h3 class="cfh">' + esc(r.a || '?') + ' v ' +
     esc(r.h || '?') + ' \u2014 ' + esc(r.d) + '</h3>' +
-    '<div class="rcfields">' + ['result', 'sets', 'box', 'venue'].map(f =>
-      '<span class="rcf rc-' + (st[f] || 'official') + '">' + f + ': ' +
-      (st[f] || 'official') + '</span>').join('') + '</div>' +
+    '<div class="rcfields">' + ['result', 'sets', 'box', 'venue'].map(f => {
+      /* ⚠ THE BOX STATE'S NAME IS NARROWER THAN "RECONCILED" (round 9): the
+         check is only that a HELD box aligns with the match's teams and set
+         count. It does not verify a single player stat, and the label must
+         not imply it does. */
+      let v = st[f] || 'official';
+      const lbl = (f === 'box' && v === 'reconciled') ? 'match-aligned' : v;
+      return '<span class="rcf rc-' + v + '" title="' + (f === 'box'
+        ? 'match-aligned: a held player box lists both teams and its set ' +
+          'counts agree with the match. No individual player stat has been ' +
+          'independently verified.'
+        : '') + '">' + f + ': ' + lbl + '</span>';
+    }).join('') + '</div>' +
     '<div class="rcsource rcofficial"><b>Official scoreboard</b>' +
       '<span class="rck">ncaa canonical record</span>' +
       '<span class="rcnote">recorded \u2014 the claim every state here is ' +
@@ -7337,6 +7352,8 @@ function rcDrill(gid) {
   });
   renderConfidence();
 })();
+
+
 
 function wireScoreboard() {
   const host = document.getElementById('v-scores');
@@ -7648,6 +7665,7 @@ function renderMatchDetail(gid, dest) {
       /* live statistics, only while this match is live AND the state says
          team stats exist for it */
       (st === 'live' ? lmcSection(m.gid) : '') +
+      
       starsSection(m) +
       /* ⚠ ONE SENTENCE PER STATE, FROM THE SHARED TABLE. Each of these is a
          true statement about the source at that moment -- not a placeholder
