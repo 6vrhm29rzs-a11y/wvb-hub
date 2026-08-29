@@ -40,6 +40,7 @@ Python 3.9 target.
 """
 
 import collections
+import datetime
 import json
 import os
 import statistics as st
@@ -420,6 +421,17 @@ def main():
                  "weight_on_season": r["weight_on_season"]} for r in rows],
     }
     doc["meta"]["home_advantage_pts_per_set"] = round(home_adv, 4)
+    # When was this ranking computed, and through what? Two different facts:
+    # the run stamp moves every time the script runs, while data_through moves
+    # only when a new final is actually in the dataset. Cody asked for exactly
+    # this pair -- "when was it last updated?" is unanswerable from a page
+    # build time, because a page rebuild without a recompute keeps old ranks.
+    # Same field names as rating_2025.py meta, so consumers read one shape.
+    doc["meta"]["generated_at_utc"] = datetime.datetime.utcnow().replace(
+        microsecond=0).isoformat() + "Z"
+    _fin = [g.get("start_time_epoch") for g in (live.get("games") or [])
+            if g.get("state") == "F" and g.get("start_time_epoch")]
+    doc["meta"]["data_through_epoch"] = max(_fin) if _fin else None
     json.dump(doc, open(OUT, "w"), indent=1, sort_keys=False)
     m = doc["meta"]
     print("k = %.2f matches  (sigma^2 %.2f / tau^2 %.2f)"

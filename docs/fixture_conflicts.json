@@ -60,15 +60,23 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 9,
+     "records": 10,
      "values": [
       "1787893200",
       "1787958000"
      ]
+    },
+    {
+     "field": "game_state",
+     "records": 10,
+     "values": [
+      "P",
+      "I"
+     ]
     }
    ],
    "matchup": "Samford / Alabama",
-   "records": 9
+   "records": 10
   },
   "6625167": {
    "conflicts": [
@@ -154,20 +162,6 @@
    "matchup": "LMU (CA) / Utah Tech",
    "records": 6
   },
-  "6625823": {
-   "conflicts": [
-    {
-     "field": "start_time_epoch",
-     "records": 9,
-     "values": [
-      "1787954400",
-      "1787943600"
-     ]
-    }
-   ],
-   "matchup": "Stonehill / Oral Roberts",
-   "records": 9
-  },
   "6626229": {
    "conflicts": [
     {
@@ -237,20 +231,6 @@
    ],
    "matchup": "George Washington / Charlotte",
    "records": 6
-  },
-  "6627255": {
-   "conflicts": [
-    {
-     "field": "city",
-     "records": 9,
-     "values": [
-      "Bryan-College Station",
-      "College Station"
-     ]
-    }
-   ],
-   "matchup": "Cal Poly / Grand Canyon",
-   "records": 9
   },
   "6627723": {
    "conflicts": [
@@ -322,21 +302,6 @@
    "matchup": "Utah Tech / UC San Diego",
    "records": 6
   },
-  "6628246": {
-   "conflicts": [
-    {
-     "field": "start_time_epoch",
-     "records": 9,
-     "values": [
-      "1787929200",
-      "1787947200",
-      "1787922000"
-     ]
-    }
-   ],
-   "matchup": "N.C. Central / Ark.-Pine Bluff",
-   "records": 9
-  },
   "6628262": {
    "conflicts": [
     {
@@ -355,15 +320,23 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 9,
+     "records": 10,
      "values": [
       "1787958000",
       "1787965200"
      ]
+    },
+    {
+     "field": "game_state",
+     "records": 10,
+     "values": [
+      "P",
+      "I"
+     ]
     }
    ],
    "matchup": "Omaha / Washington St.",
-   "records": 9
+   "records": 10
   },
   "6628520": {
    "conflicts": [
@@ -437,34 +410,6 @@
    "matchup": "Sacred Heart / Iowa",
    "records": 6
   },
-  "6637146": {
-   "conflicts": [
-    {
-     "field": "start_time_epoch",
-     "records": 9,
-     "values": [
-      "1787911200",
-      "1787954400"
-     ]
-    }
-   ],
-   "matchup": "Bryant / Charlotte",
-   "records": 9
-  },
-  "6638585": {
-   "conflicts": [
-    {
-     "field": "start_time_epoch",
-     "records": 9,
-     "values": [
-      "1787943600",
-      "1787954400"
-     ]
-    }
-   ],
-   "matchup": "Oral Roberts / Nicholls",
-   "records": 9
-  },
   "6639081": {
    "conflicts": [
     {
@@ -479,26 +424,11 @@
    "matchup": "Oral Roberts / Eastern Wash.",
    "records": 6
   },
-  "6639569": {
-   "conflicts": [
-    {
-     "field": "start_time_epoch",
-     "records": 9,
-     "values": [
-      "1788008400",
-      "1787954400",
-      "1787958000"
-     ]
-    }
-   ],
-   "matchup": "South Carolina St. / Alabama A&M",
-   "records": 9
-  },
   "6639598": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 9,
+     "records": 10,
      "values": [
       "1787893200",
       "1787954400"
@@ -506,7 +436,7 @@
     }
    ],
    "matchup": "Florida A&M / UMES",
-   "records": 9
+   "records": 10
   },
   "6639604": {
    "conflicts": [
@@ -532,46 +462,13 @@
   }
  },
  "by_field": {
-  "city": 1,
-  "game_state": 47,
+  "game_state": 70,
   "site": 3,
-  "start_time_epoch": 32,
+  "start_time_epoch": 27,
   "teams": 3,
   "teams (non-blocking)": 3
  },
  "corrections": {
-  "6625717": {
-   "fields": [
-    "venue",
-    "city",
-    "state_usps",
-    "event"
-   ],
-   "matchup": "Kansas / Pittsburgh",
-   "review_by": "2026-08-28",
-   "support": {
-    "city": {
-     "retrieved": "2026-08-26",
-     "text": "vs #15 Kansas Petersen Events Center Pittsburgh, Pa.",
-     "url": "https://pittsburghpanthers.com/sports/womens-volleyball/schedule"
-    },
-    "event": {
-     "retrieved": "2026-08-26",
-     "text": "Opening Spike Classic vs #15 Kansas Petersen Events Center Pittsburgh, Pa.",
-     "url": "https://pittsburghpanthers.com/sports/womens-volleyball/schedule"
-    },
-    "state_usps": {
-     "retrieved": "2026-08-26",
-     "text": "vs #15 Kansas Petersen Events Center Pittsburgh, Pa.",
-     "url": "https://pittsburghpanthers.com/sports/womens-volleyball/schedule"
-    },
-    "venue": {
-     "retrieved": "2026-08-26",
-     "text": "Opening Spike Classic vs #15 Kansas Petersen Events Center Pittsburgh, Pa. Aug 28 (Fri) 6:30 PM ESPN2",
-     "url": "https://pittsburghpanthers.com/sports/womens-volleyball/schedule"
-    }
-   }
-  },
   "6626809": {
    "fields": [
     "site",
@@ -650,9 +547,9 @@
   }
  },
  "counts": {
-  "blocked": 36,
-  "conflicted": 86,
-  "corrected": 3,
+  "blocked": 30,
+  "conflicted": 101,
+  "corrected": 2,
   "fixtures": 4865
  },
  "official_conflicts": {},

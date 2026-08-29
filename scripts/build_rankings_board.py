@@ -293,11 +293,22 @@ def build():
     #   blend  -- projection + results so far, so the tab moves from match one
     #   preseason -- projection alone, only if the blend is missing
     blend_by_team = {}
-    for r in ((load_json("data/digby_top25_%d.json" % SEASON) or {}).get("all") or []):
+    _blend_doc = load_json("data/digby_top25_%d.json" % SEASON) or {}
+    for r in (_blend_doc.get("all") or []):
         if r.get("rank"):
             blend_by_team[r["team"]] = r
     rank_source = ("live" if live_by_team
                    else ("blend" if blend_by_team else "preseason"))
+    # The stamp of the ranking actually SHOWN, from that artifact's own meta --
+    # never the page build time, which keeps ticking when nothing recomputed.
+    _src_meta = ((live.get("meta") or {}) if live_by_team
+                 else (_blend_doc.get("meta") or {}))
+    rank_stamp = {
+        "generated_at_utc": _src_meta.get("generated_at_utc"),
+        "matches_in": (_src_meta.get("matches") if live_by_team
+                       else _src_meta.get("matches_counted")),
+        "data_through_epoch": _src_meta.get("data_through_epoch"),
+    }
 
     for t in teams:
         r = pj.get(t["team"]) or {}
@@ -547,6 +558,7 @@ def build():
         "ret_known": sum(1 for t in teams if t["ret"] is not None),
         "projected": sum(1 for t in teams if not t.get("unranked")),
         "rank_source": rank_source,
+        "rank_stamp": rank_stamp,
         "resume_active": resume_active,
         "resume": resume_meta,
     }

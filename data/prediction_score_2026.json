@@ -2,37 +2,211 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 5,
-  "logged_after_tipoff_excluded": 1,
-  "team_mismatch_excluded": 0,
-  "predictions_on_record": 4745,
-  "results_available": 9,
-  "brier": 0.2136,
+  "scored": 141,
+  "logged_after_tipoff_excluded": 2,
+  "team_mismatch_excluded": 4,
+  "predictions_on_record": 4762,
+  "results_available": 152,
+  "brier": 0.1954,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 3,
-  "favourite_correct_pct": 60.0
+  "favourite_correct": 101,
+  "favourite_correct_pct": 71.6
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 2,
-   "said": 51.0,
-   "happened": 50.0
+   "n": 20,
+   "said": 55.7,
+   "happened": 60.0
+  },
+  {
+   "range": "60-70%",
+   "n": 23,
+   "said": 64.8,
+   "happened": 52.2
   },
   {
    "range": "70-80%",
-   "n": 1,
-   "said": 74.4,
-   "happened": 0.0
+   "n": 19,
+   "said": 75.8,
+   "happened": 63.2
+  },
+  {
+   "range": "80-90%",
+   "n": 29,
+   "said": 84.8,
+   "happened": 75.9
   },
   {
    "range": "90-101%",
-   "n": 2,
-   "said": 96.6,
-   "happened": 100.0
+   "n": 50,
+   "said": 95.6,
+   "happened": 86.0
   }
  ],
  "matches": [
+  {
+   "game_id": "6627232",
+   "date": "2026-08-28",
+   "away": "Purdue Fort Wayne",
+   "home": "Rutgers",
+   "p_home": 0.993,
+   "home_won": false,
+   "brier": 0.986049
+  },
+  {
+   "game_id": "6639575",
+   "date": "2026-08-28",
+   "away": "Hampton",
+   "home": "Bethune-Cookman",
+   "p_home": 0.9686,
+   "home_won": false,
+   "brier": 0.93818596
+  },
+  {
+   "game_id": "6624402",
+   "date": "2026-08-28",
+   "away": "Lindenwood",
+   "home": "UIC",
+   "p_home": 0.9676,
+   "home_won": false,
+   "brier": 0.93624976
+  },
+  {
+   "game_id": "6624350",
+   "date": "2026-08-28",
+   "away": "Middle Tenn.",
+   "home": "Boise St.",
+   "p_home": 0.9668,
+   "home_won": false,
+   "brier": 0.93470224
+  },
+  {
+   "game_id": "6624516",
+   "date": "2026-08-28",
+   "away": "UC Santa Barbara",
+   "home": "Tarleton St.",
+   "p_home": 0.044,
+   "home_won": true,
+   "brier": 0.913936
+  },
+  {
+   "game_id": "6624908",
+   "date": "2026-08-28",
+   "away": "Buffalo",
+   "home": "UIC",
+   "p_home": 0.936,
+   "home_won": false,
+   "brier": 0.8760960000000001
+  },
+  {
+   "game_id": "6628176",
+   "date": "2026-08-28",
+   "away": "Idaho",
+   "home": "Towson",
+   "p_home": 0.9005,
+   "home_won": false,
+   "brier": 0.81090025
+  },
+  {
+   "game_id": "6624265",
+   "date": "2026-08-28",
+   "away": "Illinois St.",
+   "home": "Seton Hall",
+   "p_home": 0.1044,
+   "home_won": true,
+   "brier": 0.8020993599999999
+  },
+  {
+   "game_id": "6627790",
+   "date": "2026-08-28",
+   "away": "Georgetown",
+   "home": "American",
+   "p_home": 0.8773,
+   "home_won": false,
+   "brier": 0.76965529
+  },
+  {
+   "game_id": "6624596",
+   "date": "2026-08-28",
+   "away": "Grambling",
+   "home": "West Ga.",
+   "p_home": 0.8711,
+   "home_won": false,
+   "brier": 0.75881521
+  },
+  {
+   "game_id": "6625868",
+   "date": "2026-08-28",
+   "away": "Idaho St.",
+   "home": "SFA",
+   "p_home": 0.8636,
+   "home_won": false,
+   "brier": 0.7458049600000001
+  },
+  {
+   "game_id": "6624441",
+   "date": "2026-08-28",
+   "away": "Northwestern",
+   "home": "George Mason",
+   "p_home": 0.1455,
+   "home_won": true,
+   "brier": 0.73017025
+  },
+  {
+   "game_id": "6628213",
+   "date": "2026-08-28",
+   "away": "UT Arlington",
+   "home": "UTSA",
+   "p_home": 0.8205,
+   "home_won": false,
+   "brier": 0.67322025
+  },
+  {
+   "game_id": "6627290",
+   "date": "2026-08-28",
+   "away": "N.C. A&T",
+   "home": "App State",
+   "p_home": 0.8029,
+   "home_won": false,
+   "brier": 0.64464841
+  },
+  {
+   "game_id": "6626884",
+   "date": "2026-08-28",
+   "away": "UT Martin",
+   "home": "Kansas City",
+   "p_home": 0.7693,
+   "home_won": false,
+   "brier": 0.59182249
+  },
+  {
+   "game_id": "6627233",
+   "date": "2026-08-28",
+   "away": "Purdue Fort Wayne",
+   "home": "Evansville",
+   "p_home": 0.7663,
+   "home_won": false,
+   "brier": 0.58721569
+  },
+  {
+   "game_id": "6625896",
+   "date": "2026-08-28",
+   "away": "Duke",
+   "home": "Coastal Carolina",
+   "p_home": 0.7599,
+   "home_won": false,
+   "brier": 0.57744801
+  },
+  {
+   "game_id": "6625786",
+   "date": "2026-08-28",
+   "away": "LMU (CA)",
+   "home": "Northern Ariz.",
+   "p_home": 0.7446,
+   "home_won": false,
+   "brier": 0.5544291600000001
+  },
   {
    "game_id": "6639890",
    "date": "2026-08-22",
@@ -41,6 +215,186 @@
    "p_home": 0.7438,
    "home_won": false,
    "brier": 0.55323844
+  },
+  {
+   "game_id": "6626781",
+   "date": "2026-08-28",
+   "away": "Mercyhurst",
+   "home": "Canisius",
+   "p_home": 0.7107,
+   "home_won": false,
+   "brier": 0.50509449
+  },
+  {
+   "game_id": "6627609",
+   "date": "2026-08-28",
+   "away": "Akron",
+   "home": "ETSU",
+   "p_home": 0.7089,
+   "home_won": false,
+   "brier": 0.50253921
+  },
+  {
+   "game_id": "6625446",
+   "date": "2026-08-28",
+   "away": "Eastern Ky.",
+   "home": "South Fla.",
+   "p_home": 0.6976,
+   "home_won": false,
+   "brier": 0.48664576
+  },
+  {
+   "game_id": "6626321",
+   "date": "2026-08-28",
+   "away": "Ball St.",
+   "home": "Notre Dame",
+   "p_home": 0.662,
+   "home_won": false,
+   "brier": 0.438244
+  },
+  {
+   "game_id": "6625160",
+   "date": "2026-08-28",
+   "away": "Belmont",
+   "home": "San Jose St.",
+   "p_home": 0.6512,
+   "home_won": false,
+   "brier": 0.42406144
+  },
+  {
+   "game_id": "6627637",
+   "date": "2026-08-28",
+   "away": "Eastern Ill.",
+   "home": "Santa Clara",
+   "p_home": 0.6497,
+   "home_won": false,
+   "brier": 0.42211009000000005
+  },
+  {
+   "game_id": "6624934",
+   "date": "2026-08-28",
+   "away": "Oakland",
+   "home": "Binghamton",
+   "p_home": 0.6462,
+   "home_won": false,
+   "brier": 0.41757444
+  },
+  {
+   "game_id": "6626328",
+   "date": "2026-08-28",
+   "away": "High Point",
+   "home": "UConn",
+   "p_home": 0.6383,
+   "home_won": false,
+   "brier": 0.40742689
+  },
+  {
+   "game_id": "6627645",
+   "date": "2026-08-28",
+   "away": "Indiana St.",
+   "home": "Navy",
+   "p_home": 0.6372,
+   "home_won": false,
+   "brier": 0.40602383999999997
+  },
+  {
+   "game_id": "6625946",
+   "date": "2026-08-28",
+   "away": "Furman",
+   "home": "North Florida",
+   "p_home": 0.3698,
+   "home_won": true,
+   "brier": 0.39715204
+  },
+  {
+   "game_id": "6624841",
+   "date": "2026-08-28",
+   "away": "Coppin St.",
+   "home": "Kent St.",
+   "p_home": 0.372,
+   "home_won": true,
+   "brier": 0.394384
+  },
+  {
+   "game_id": "6627962",
+   "date": "2026-08-28",
+   "away": "Oregon St.",
+   "home": "Utah Tech",
+   "p_home": 0.3811,
+   "home_won": true,
+   "brier": 0.38303721
+  },
+  {
+   "game_id": "6627099",
+   "date": "2026-08-28",
+   "away": "Fordham",
+   "home": "Rider",
+   "p_home": 0.3859,
+   "home_won": true,
+   "brier": 0.37711880999999997
+  },
+  {
+   "game_id": "6628259",
+   "date": "2026-08-29",
+   "away": "N.C. Central",
+   "home": "Florida A&M",
+   "p_home": 0.5853,
+   "home_won": false,
+   "brier": 0.34257609000000006
+  },
+  {
+   "game_id": "6637630",
+   "date": "2026-08-28",
+   "away": "Bowling Green",
+   "home": "Ohio St.",
+   "p_home": 0.5803,
+   "home_won": false,
+   "brier": 0.33674809000000006
+  },
+  {
+   "game_id": "6624840",
+   "date": "2026-08-28",
+   "away": "Coppin St.",
+   "home": "William & Mary",
+   "p_home": 0.5765,
+   "home_won": false,
+   "brier": 0.33235225
+  },
+  {
+   "game_id": "6626165",
+   "date": "2026-08-28",
+   "away": "Holy Cross",
+   "home": "Central Conn. St.",
+   "p_home": 0.4235,
+   "home_won": true,
+   "brier": 0.33235225
+  },
+  {
+   "game_id": "6628585",
+   "date": "2026-08-28",
+   "away": "Cleveland St.",
+   "home": "Morgan St.",
+   "p_home": 0.5384,
+   "home_won": false,
+   "brier": 0.28987456
+  },
+  {
+   "game_id": "6626798",
+   "date": "2026-08-28",
+   "away": "Jackson St.",
+   "home": "Kansas City",
+   "p_home": 0.4638,
+   "home_won": true,
+   "brier": 0.28751044000000003
+  },
+  {
+   "game_id": "6625270",
+   "date": "2026-08-28",
+   "away": "Oregon",
+   "home": "Western Ky.",
+   "p_home": 0.519,
+   "home_won": false,
+   "brier": 0.269361
   },
   {
    "game_id": "6639886",
@@ -61,22 +415,85 @@
    "brier": 0.24601599999999998
   },
   {
-   "game_id": "6639887",
-   "date": "2026-08-24",
-   "away": "Marquette",
-   "home": "Texas",
-   "p_home": 0.9545,
-   "home_won": true,
-   "brier": 0.0020702499999999987
+   "game_id": "6625689",
+   "date": "2026-08-28",
+   "away": "USC Upstate",
+   "home": "Old Dominion",
+   "p_home": 0.4931,
+   "home_won": false,
+   "brier": 0.24314761
   },
   {
-   "game_id": "6639891",
-   "date": "2026-08-24",
-   "away": "Pittsburgh",
-   "home": "Xavier",
-   "p_home": 0.0221,
+   "game_id": "6624301",
+   "date": "2026-08-28",
+   "away": "Utah Tech",
+   "home": "Utah Valley",
+   "p_home": 0.4629,
    "home_won": false,
-   "brier": 0.0004884100000000001
+   "brier": 0.21427640999999997
+  },
+  {
+   "game_id": "6624987",
+   "date": "2026-08-28",
+   "away": "UNI",
+   "home": "Georgia Tech",
+   "p_home": 0.5512,
+   "home_won": true,
+   "brier": 0.20142143999999998
+  },
+  {
+   "game_id": "6638585",
+   "date": "2026-08-28",
+   "away": "Oral Roberts",
+   "home": "Nicholls",
+   "p_home": 0.4433,
+   "home_won": false,
+   "brier": 0.19651489000000003
+  },
+  {
+   "game_id": "6625869",
+   "date": "2026-08-28",
+   "away": "Idaho St.",
+   "home": "Missouri St.",
+   "p_home": 0.5727,
+   "home_won": true,
+   "brier": 0.18258529
+  },
+  {
+   "game_id": "6628603",
+   "date": "2026-08-28",
+   "away": "Santa Clara",
+   "home": "Wright St.",
+   "p_home": 0.5728,
+   "home_won": true,
+   "brier": 0.18249984000000002
+  },
+  {
+   "game_id": "6625217",
+   "date": "2026-08-28",
+   "away": "Fairfield",
+   "home": "Morehead St.",
+   "p_home": 0.5732,
+   "home_won": true,
+   "brier": 0.18215823999999997
+  },
+  {
+   "game_id": "6628152",
+   "date": "2026-08-28",
+   "away": "Eastern Mich.",
+   "home": "NIU",
+   "p_home": 0.4233,
+   "home_won": false,
+   "brier": 0.17918289
+  },
+  {
+   "game_id": "6627747",
+   "date": "2026-08-28",
+   "away": "North Dakota",
+   "home": "Eastern Wash.",
+   "p_home": 0.4198,
+   "home_won": false,
+   "brier": 0.17623204
   }
  ]
 }

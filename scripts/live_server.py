@@ -857,6 +857,31 @@ def main():
     t.daemon = True
     t.start()
 
+    # ---- local refresh loop ------------------------------------------------
+    # The score poll above keeps the LIVE numbers fresh; it does nothing for
+    # the RANKINGS, which are baked into the page at build time. Without this,
+    # the local page's power rankings sit frozen at the last manual pipeline
+    # run while looking live -- found on the season's first full match day.
+    # Each cycle shells out to scripts/local_refresh.py (the CI refresh's
+    # local twin); its flock makes overlap with a manual run impossible, and
+    # its fingerprint gate means a cycle with no new final rebuilds nothing.
+    refresh_every = int(os.environ.get("WVB_LOCAL_REFRESH_SECONDS", "1200"))
+
+    def _local_refresh_loop():
+        while True:
+            time.sleep(refresh_every)
+            try:
+                subprocess.run(
+                    [sys.executable or "python3",
+                     os.path.join(REPO, "scripts", "local_refresh.py")],
+                    cwd=REPO, stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL, timeout=1800)
+            except Exception:                     # never let the loop die
+                pass
+
+    if refresh_every > 0:
+        threading.Thread(target=_local_refresh_loop, daemon=True).start()
+
     # A LEFTOVER SERVER FROM AN EARLIER SESSION IS THE NORMAL CASE, not an
     # exceptional one -- this thing is meant to be left running, and the old
     # behaviour was a nine-line traceback ending in "Address already in use",
@@ -884,6 +909,13 @@ def main():
     print("live scoreboard running")
     print("  open: %s" % url)
     print("  refreshing every %ds -- one upstream request per cycle" % REFRESH_SECONDS)
+    if refresh_every > 0:
+        print("  rankings: recomputed every %d min once a new final lands"
+              " (WVB_LOCAL_REFRESH_SECONDS=0 to disable)"
+              % (refresh_every // 60))
+    else:
+        print("  rankings: local refresh OFF -- the page only changes when"
+              " the pipeline is run by hand")
     # Say plainly whether the chat will work, at the moment it can still be
     # fixed. Finding out by clicking the button and reading an error is worse.
     if (os.environ.get("ANTHROPIC_API_KEY") or "").startswith("sk-ant-"):

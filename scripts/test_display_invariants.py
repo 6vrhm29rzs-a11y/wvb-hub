@@ -631,6 +631,58 @@ def check_sticky_headers():
         ok("sticky header offset cancelled for internally-scrolling tables")
 
 
+def check_router_hides_only_top_level_sections(page_text=None):
+    """The router's hide-everything sweep must be scoped to main's DIRECT
+    children.
+
+    Paid for 2026-08-28: the scoreboard redesign made each lane its own
+    <section class="tdblock"> nested inside a view. showView's un-scoped
+    querySelectorAll('main section') stamped hidden on every nested lane; the
+    view was then un-hidden but the lanes stayed dark, and Cody reported it as
+    "some of the buttons on pages aren't working" -- the content the buttons
+    lived in was invisible. A poll re-render recreated the lanes, so the page
+    FLAPPED: rows there one minute, gone after the next click, which is worse
+    than a steady failure because every look tells a different story.
+
+    Behavioral core: the condition only matters because nested sections exist,
+    so assert BOTH halves -- nested lane sections are present, and the sweep
+    is scoped past them.
+    """
+    hub = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(hub):
+        print("  no built hub -- skipping router-scope check")
+        return
+    src = page_text if page_text is not None else open(hub, encoding="utf-8").read()
+    nested = re.search(r"<section class=\"tdblock\"", src) or \
+        re.search(r"'<section class=\"tdblock\">'", src)
+    swept = re.search(r"querySelectorAll\(\s*'main section'\s*\)[^;]*hidden\s*=\s*true", src)
+    scoped = re.search(r"querySelectorAll\(\s*'main > section'\s*\)[^;]*hidden\s*=\s*true", src)
+    if nested and swept:
+        bad("router sweeps nested sections",
+            "showView hides 'main section' (all depths) while lanes are "
+            "nested <section class=tdblock> -- one navigation blanks every "
+            "lane until the next poll re-render")
+    elif nested and not scoped:
+        bad("router hide-sweep not found in scoped form",
+            "nested lane sections exist but no `querySelectorAll('main > "
+            "section')` hide-sweep is present -- the router changed shape; "
+            "re-verify nested lanes survive navigation and update this check")
+    else:
+        ok("router hide-sweep is scoped to main > section; nested lanes survive navigation")
+        # negative control: the un-scoped sweep must TRIP this check
+        _saved = list(FAILS)
+        bogus = src.replace("querySelectorAll('main > section')",
+                            "querySelectorAll('main section')")
+        check_router_hides_only_top_level_sections(page_text=bogus)
+        if len(FAILS) == len(_saved):
+            bad("router-scope negative control",
+                "re-introducing the un-scoped 'main section' sweep did not "
+                "trip the check -- the guard cannot fail")
+        else:
+            del FAILS[len(_saved):]
+            ok("negative control: un-scoped sweep is caught")
+
+
 def check_nondi_form_marker_is_visible():
     """A form result the Division-I record excludes must SAY SO in the pill.
 
@@ -3430,6 +3482,7 @@ def main():
     check_roster()
     print()
     check_sticky_headers()
+    check_router_hides_only_top_level_sections()
     check_stats_dispatcher_does_not_recurse()
     check_value_scale_polarity()
     check_bracket_seed_structure()

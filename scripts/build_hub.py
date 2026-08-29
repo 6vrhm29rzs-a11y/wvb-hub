@@ -24,6 +24,7 @@ import json
 import os
 import re
 import sys
+import time
 import glob
 import datetime
 from typing import Dict, List, Optional
@@ -2770,6 +2771,26 @@ def resumecell(t, active):
     return '<td class="n rs" title="%s"><b>%d</b></td>' % (tip, v)
 
 
+def rank_stamp_pt(utc_iso, now_epoch=None):
+    """Human PT phrase for a ranking's own generated_at_utc, or None.
+
+    None -- not a placeholder -- when the stamp is missing or unreadable:
+    the caller drops the sentence entirely rather than invent a time (R5).
+    """
+    ep = parse_logged_utc(utc_iso)
+    if ep is None or PT is None:
+        return None
+    dt = datetime.datetime.fromtimestamp(ep, PT)
+    now = datetime.datetime.fromtimestamp(
+        now_epoch if now_epoch is not None else time.time(), PT)
+    clock = dt.strftime("%I:%M %p").lstrip("0")
+    if dt.date() == now.date():
+        return "%s PT today" % clock
+    if dt.date() == now.date() - datetime.timedelta(days=1):
+        return "%s PT yesterday" % clock
+    return dt.strftime("%b %d, ") + clock + " PT"
+
+
 def top25_view(avca=None):
     # type: (Optional[Dict[str, int]]) -> Dict[str, str]
     """Rows and copy for Digby's Top 25.
@@ -2994,6 +3015,12 @@ def top25_view(avca=None):
         "is being judged on this season is <b>%d%%</b>."
         % (k, k, played, sum(1 for r in top if r.get("matches")),
            round(100 * maxw)))
+    _st = rank_stamp_pt(m.get("generated_at_utc"))
+    if _st:
+        lead += (" <span class=\"rkstamp\">Last recomputed <b>%s</b>, from the "
+                 "%d finals in at that moment &mdash; a final folds in on the "
+                 "next recompute, not the instant a match ends.</span>"
+                 % (_st, played))
     foot = (
         mv_txt + poll_txt +
         "<b>Why so little movement in August?</b> %.1f is not a preference "
@@ -3331,10 +3358,16 @@ def build():
         rank_basis = (
             "<b>Our ranking, from 2026 results.</b> %d teams rated on matches "
             "played this season (median %d each), using the same fitted "
-            "composite that beat RPI out of sample in 2025. Updated every "
-            "morning; frozen every Monday so the movement column has something "
-            "to measure against."
+            "composite that beat RPI out of sample in 2025. Frozen every "
+            "Monday so the movement column has something to measure against."
             % (len(_live), sorted(_gp)[len(_gp) // 2]))
+        _rst = rank_stamp_pt(
+            ((meta.get("rank_stamp") or {}).get("generated_at_utc")))
+        if _rst:
+            _rn = (meta.get("rank_stamp") or {}).get("matches_in")
+            rank_basis += (
+                " <span class=\"rkstamp\">Last recomputed <b>%s</b>%s.</span>"
+                % (_rst, (", through %d finals" % _rn) if _rn else ""))
     else:
         _blend = [t for t in teams if t.get("rank_source") == "blend"]
         if _blend:
@@ -3351,6 +3384,8 @@ def build():
             # this page carries 2025 context beside 2026 numbers, and a view
             # that does not say which year it is describing is how a finished
             # season leaked into a live one once already.
+            _rst = rank_stamp_pt(
+                ((meta.get("rank_stamp") or {}).get("generated_at_utc")))
             rank_basis = (
                 "<b>Our %d ranking, and it moves with every result.</b> "
                 "<b>%d of %d teams have played</b>; the most any team is judged "
@@ -3363,6 +3398,13 @@ def build():
                     "not live until %d D-I matches have been played (%d so far)"
                     % ((meta.get("resume") or {}).get("min_matches") or 200,
                        (meta.get("resume") or {}).get("matches") or 0))))
+            if _rst:
+                _rn = (meta.get("rank_stamp") or {}).get("matches_in")
+                rank_basis += (
+                    " <span class=\"rkstamp\">POWER last recomputed <b>%s</b>%s"
+                    " &mdash; a final folds in on the next recompute, not the "
+                    "instant a match ends.</span>"
+                    % (_rst, (", through %d finals" % _rn) if _rn else ""))
         else:
             rank_basis = (
                 "<b>Still the preseason projection &mdash; not yet a "
@@ -5120,6 +5162,8 @@ main{max-width:1280px;margin:0 auto;padding:22px 16px 70px}
 section[hidden]{display:none}
 .lead{color:var(--ink2);font-size:14px;max-width:74ch;margin:0 0 16px}
 .lead b{color:var(--ink)}
+.rkstamp{color:var(--ink3);font-size:12.5px}
+.rkstamp b{color:var(--ink2)}
 
 /* Surfaces fade rather than sit flat. Every box on this page was #0E1524 on
    #070B14 with a hairline, which is what made a dense stats page read as
@@ -9222,7 +9266,13 @@ function showView(view) {
   if (mb) mb.classList.toggle('on', !!document.querySelector(
     '#moremenu button[aria-current=page]'));
   moveNavBar();
-  document.querySelectorAll('main section').forEach(s => { s.hidden = true; });
+  /* ⚠ Direct children ONLY. The lanes inside a view are themselves
+     <section class="tdblock"> elements, and the un-scoped 'main section'
+     swept them too: one navigation stamped hidden on every nested lane, the
+     parent view was then un-hidden but the lanes stayed dark, and the page
+     read as "the buttons stopped working". A poll re-render recreated the
+     lanes and they vanished again on the next click. */
+  document.querySelectorAll('main > section').forEach(s => { s.hidden = true; });
   /* the view name on <body>, so a view can shape the shared chrome without
      JS -- the Scores control room compresses the hero this way */
   document.body.dataset.view = view;

@@ -220,12 +220,24 @@ def main():
                       ("6628315", {"site": "neutral",
                                    "venue": "T-Mobile Arena",
                                    "event": "Players Era Showcase"}),
-                      ("6625717", {"venue": "Petersen Events Center",
-                                   "event": "Opening Spike Classic"})):
+                      ):
         r = fx.get(gid) or {}
         for k, v in want.items():
             check("%s %-8s == %r" % (gid, k, v), r.get(k) == v, repr(r.get(k)))
         check("  %s renders confidently" % gid, FX.renderable(r))
+    # ⚠ 6625717 CHANGED CLASS THE MOMENT IT WENT FINAL (2026-08-28). Its
+    # venue was never in the feed -- "Petersen Events Center / Opening Spike
+    # Classic" came from a cited PREGAME ledger correction, and fixtures.py
+    # deliberately withholds pregame schedule corrections once a match is
+    # final: where it was going to be played is settled by what happened,
+    # and the feed reported nothing. So the pinned expectation above became
+    # wrong BY POLICY, not by defect. What must now hold: no venue asserted,
+    # and the withholding is stated on the record rather than silent.
+    r = fx.get("6625717") or {}
+    check("6625717 (final, feed silent): no venue asserted", r.get("venue") is None,
+          repr(r.get("venue")))
+    check("  ...and the withheld correction says so",
+          bool(r.get("correction_withheld")), repr(r.get("correction_withheld")))
     # ⚠ THE LEDGER MOVED AND ITS SCHEMA TIGHTENED. Support is now per FIELD,
     # so this no longer checks "the entry has a url" -- it checks that every
     # single overridden fact carries its own citation. scripts/test_ledger.py
