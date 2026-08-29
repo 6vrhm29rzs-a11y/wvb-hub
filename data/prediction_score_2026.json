@@ -2,34 +2,34 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 178,
+  "scored": 183,
   "logged_after_tipoff_excluded": 4,
   "team_mismatch_excluded": 5,
-  "predictions_on_record": 4764,
-  "results_available": 193,
-  "brier": 0.1829,
+  "predictions_on_record": 4765,
+  "results_available": 198,
+  "brier": 0.1852,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 130,
-  "favourite_correct_pct": 73.0
+  "favourite_correct": 132,
+  "favourite_correct_pct": 72.1
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 26,
-   "said": 55.5,
-   "happened": 57.7
+   "n": 27,
+   "said": 55.3,
+   "happened": 55.6
   },
   {
    "range": "60-70%",
-   "n": 31,
-   "said": 64.6,
-   "happened": 54.8
+   "n": 32,
+   "said": 64.4,
+   "happened": 53.1
   },
   {
    "range": "70-80%",
-   "n": 25,
+   "n": 27,
    "said": 75.7,
-   "happened": 68.0
+   "happened": 66.7
   },
   {
    "range": "80-90%",
@@ -39,9 +39,9 @@
   },
   {
    "range": "90-101%",
-   "n": 62,
-   "said": 95.5,
-   "happened": 88.7
+   "n": 63,
+   "said": 95.6,
+   "happened": 88.9
   }
  ],
  "matches": [
@@ -179,6 +179,15 @@
    "p_home": 0.8029,
    "home_won": false,
    "brier": 0.64464841
+  },
+  {
+   "game_id": "6627489",
+   "date": "2026-08-28",
+   "away": "California Baptist",
+   "home": "New Mexico",
+   "p_home": 0.791,
+   "home_won": false,
+   "brier": 0.625681
   },
   {
    "game_id": "6626884",
@@ -379,6 +388,15 @@
    "brier": 0.37711880999999997
   },
   {
+   "game_id": "6628236",
+   "date": "2026-08-28",
+   "away": "Stanford",
+   "home": "Wisconsin",
+   "p_home": 0.6102,
+   "home_won": false,
+   "brier": 0.37234403999999993
+  },
+  {
    "game_id": "6624294",
    "date": "2026-08-28",
    "away": "Marquette",
@@ -476,24 +494,6 @@
    "p_home": 0.4922,
    "home_won": true,
    "brier": 0.25786084000000004
-  },
-  {
-   "game_id": "6639888",
-   "date": "2026-08-23",
-   "away": "Kentucky",
-   "home": "Pittsburgh",
-   "p_home": 0.504,
-   "home_won": true,
-   "brier": 0.24601599999999998
-  },
-  {
-   "game_id": "6625689",
-   "date": "2026-08-28",
-   "away": "USC Upstate",
-   "home": "Old Dominion",
-   "p_home": 0.4931,
-   "home_won": false,
-   "brier": 0.24314761
   }
  ]
 }

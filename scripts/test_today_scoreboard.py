@@ -170,8 +170,15 @@ def main():
 
     # ── 2. THE HEADER ───────────────────────────────────────────────────
     print("\n2. THE HEADER DOES NOT DOMINATE EVERY SCREEN")
-    check("the band has two shapes", "data-cs-shape=\"rail\"" in src and
-          "data-cs-shape=\"marquee\"" in src)
+    # ⚠ THE RAIL SHAPE IS RETIRED (review round 4): the ticker is the one
+    # global strip, and the tape renders the marquee on the Today landing or
+    # nothing at all. Asserting the old rail's existence would pin the shape
+    # of a deleted feature.
+    check("the band has one shape: the marquee, or nothing",
+          "data-cs-shape=\"marquee\"" in src and
+          "data-cs-shape=\"rail\"" not in src)
+    check("...and the non-marquee branch renders empty",
+          "mount.innerHTML = '';" in src)
     check("the marquee is Today-only", "csIsTodayRoute()" in src and
           "marquee = csIsTodayRoute()" in src)
     check("[-] ...and only when the match is genuinely near",
@@ -255,7 +262,7 @@ def main():
     # only match surfaces with no data-match).
     print("\n8. THE LIVE TICKER")
     check("the ticker mount exists", 'id="livetick"' in h)
-    _tk = src[src.find("function csTicker"):]
+    _tk = src[src.find("let TK_LAST"):]
     _tk = _tk[:_tk.find("async function pollLive")]
     check("chips route through data-match", "data-match=" in _tk
           and 'class="tkm"' in _tk)

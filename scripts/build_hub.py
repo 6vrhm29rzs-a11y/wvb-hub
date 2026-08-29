@@ -57,11 +57,9 @@ OUT = (os.path.join(REPO, "output", "vb_dashboard.html") if PUBLIC
        else os.path.join(REPO, "Cody", "START-HERE.html"))
 SEASON = 2026
 
-
 def load(p, default=None):
     path = os.path.join(REPO, p)
     return json.load(open(path)) if os.path.exists(path) else default
-
 
 # Cody watches from the Pacific timezone, so the page reads in Pacific. The
 # SPORT still schedules in Eastern and the feed still publishes in Eastern --
@@ -73,7 +71,6 @@ try:
 except Exception:                                      # noqa: BLE001
     PT = None
 
-
 def _pt_date(epoch) -> str:
     """Calendar date as Cody sees it."""
     if PT is not None:
@@ -81,12 +78,10 @@ def _pt_date(epoch) -> str:
     return (datetime.datetime.utcfromtimestamp(int(epoch))
             - datetime.timedelta(hours=7)).strftime("%Y-%m-%d")
 
-
 def _pt_time(epoch) -> str:
     if PT is None:
         return ""
     return datetime.datetime.fromtimestamp(int(epoch), PT).strftime("%-I:%M %p PT")
-
 
 def _et_date(epoch) -> str:
     """Calendar date in US Eastern -- the timezone the sport schedules in."""
@@ -96,12 +91,10 @@ def _et_date(epoch) -> str:
     return (datetime.datetime.utcfromtimestamp(int(epoch))
             - datetime.timedelta(hours=4)).strftime("%Y-%m-%d")
 
-
 def _et_time(epoch) -> str:
     if ET is None:
         return ""
     return datetime.datetime.fromtimestamp(int(epoch), ET).strftime("%-I:%M %p ET")
-
 
 def blob(o) -> str:
     """JSON for embedding in a <script> block.
@@ -114,10 +107,8 @@ def blob(o) -> str:
     """
     return json.dumps(o, separators=(",", ":")).replace("</", "<\\/")
 
-
 def esc(s) -> str:
     return (str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
-
 
 # ---------------------------------------------------------------- results
 def exhibitions():
@@ -141,7 +132,6 @@ def exhibitions():
     doc = load("data/raw/%d/exhibitions.json" % SEASON) or {}
     return dict((str(k), v) for k, v in (doc.get("exhibitions") or {}).items())
 
-
 def exhibition_rules():
     # type: () -> List[Dict]
     """Venue+date rules, for matches whose id does not exist yet.
@@ -155,7 +145,6 @@ def exhibition_rules():
     """
     doc = load("data/raw/%d/exhibitions.json" % SEASON) or {}
     return doc.get("rules") or []
-
 
 def results() -> List[Dict]:
     """Every final 2026 match, newest first, with its per-set scores."""
@@ -251,7 +240,6 @@ def results() -> List[Dict]:
     out.sort(key=lambda r: -r["epoch"])
     return out
 
-
 # --------------------------------------------------------------- schedule
 # Programs whose local clock is far enough behind Eastern that a midnight-to-6am
 # ET tip is an ordinary evening match at home. Hawaii (UTC-10) is the only D-I
@@ -264,7 +252,6 @@ FAR_WEST_HOME = ("Hawaii",)
 # happen: an August tournament routinely opens at 10:00 AM ET, which is a real
 # 7:00 AM for a Pacific viewer and must not be suppressed.
 _EARLY_AM = re.compile(r"^(12|[1-7]):\d\d\s*AM", re.I)
-
 
 def today_pt():
     # type: () -> datetime.date
@@ -281,7 +268,6 @@ def today_pt():
     """
     return (datetime.datetime.now(PT).date() if PT
             else datetime.datetime.utcnow().date())
-
 
 def day_label(iso, today=None):
     """"Sun Aug 30" -- a calendar date the way a reader reads one.
@@ -316,7 +302,6 @@ def day_label(iso, today=None):
     if d == today - datetime.timedelta(days=1):
         return "Yesterday"
     return d.strftime("%a %b %-d")
-
 
 # ⚠ THE MEDIA HOST LIST COMES FROM intel.py, WHICH IS WHERE THE AUDIT LIVES.
 # Re-typing it here would be two allowlists with one name -- and the one that
@@ -360,7 +345,6 @@ RULERS = {
     "seed":      ("SEED", "SEED", "projected tournament seed"),
 }
 
-
 # ⚠ TWO OF THESE RULERS NAME SOMEBODY ELSE'S PRODUCT, and this table is
 # SERIALISED INTO THE PAGE. Adding them shipped the strings "VolleyTalk" and
 # "Massey Ratings" straight into the public build -- and the fail-closed gate
@@ -371,12 +355,10 @@ RULERS = {
 # we publish X", grep the DATA. A table is data.
 PRIVATE_RULERS = ("vt", "massey")
 
-
 def public_rulers():
     """The ruler table as the built page should carry it."""
     return {k: list(v) for k, v in RULERS.items()
             if not (PUBLIC and k in PRIVATE_RULERS)}
-
 
 def rank_badge(basis, v, compact=False, text=False):
     """The one way a rank is rendered. BASIS IS REQUIRED.
@@ -409,12 +391,9 @@ def rank_badge(basis, v, compact=False, text=False):
     return ('<i class="rnk" title="%s"><span class="rank-label">%s</span>'
             '#%s</i> ' % (r[2], label, v))
 
-
-
 import digby_art as DIGBY_ART            # noqa: E402
 import icons as ICONS                    # noqa: E402
 import trend as TREND                    # noqa: E402
-
 
 def listed_time(start_time, home_team, epoch=None):
     """The feed's start time, or "TBA" when that time is a placeholder.
@@ -449,7 +428,6 @@ def listed_time(start_time, home_team, epoch=None):
         except (TypeError, ValueError, OSError):
             pass
     return st
-
 
 def venue_index():
     # type: () -> Dict[str, Dict]
@@ -553,9 +531,7 @@ def schedule(limit_days: int = 21) -> List[Dict]:
             break
     return rows
 
-
 _TV_T = re.compile(r"^\s*(\d{1,2})(?::(\d{2}))?\s*([ap])\.?m\.?\s*$", re.I)
-
 
 def _tv_pt(t):
     """TV listings are transcribed in EASTERN. Shift them to Pacific.
@@ -577,7 +553,6 @@ def _tv_pt(t):
     h12 = hr % 12 or 12
     mins = m.group(2)
     return "%d%s %s" % (h12, (":" + mins) if mins else "", ampm)
-
 
 def tv_index():
     # type: () -> Dict[str, Dict]
@@ -650,7 +625,6 @@ def tv_index():
     out["_stats"] = {"joined": joined, "unjoined": missed, "total": joined + missed}
     return out
 
-
 def tv() -> List[Dict]:
     if PUBLIC:
         return []
@@ -666,15 +640,12 @@ def tv() -> List[Dict]:
         out.append({"day": d, "m": m, "n": n, "t": _tv_pt(t)})
     return out
 
-
-
 # Position buckets, in the order a volleyball person reads a roster: the setter
 # first, then the players who attack, then the back-row specialists.
 POS_ORDER = ("S", "OPP", "OH", "MB", "L/DS", "")
 POS_LABEL = {"S": "Setters", "OPP": "Opposites", "OH": "Outside hitters",
              "MB": "Middle blockers", "L/DS": "Libero / defensive specialists",
              "": "Position not listed"}
-
 
 def mover(t):
     """Movement since the LAST WEEKLY FREEZE, the way a poll shows it.
@@ -691,7 +662,6 @@ def mover(t):
     if mv < 0:
         return '<span class="mv dn">&#9660;%d</span>' % abs(mv)
     return '<span class="mv sm">&ndash;</span>'
-
 
 def pos_bucket(p):
     """School sites and box scores spell positions a dozen ways. Anything we do
@@ -712,10 +682,8 @@ def pos_bucket(p):
         return "S"
     return ""
 
-
 def nkey(name):
     return re.sub(r"[^a-z]", "", (name or "").lower())
-
 
 def prior_pos_index():
     """(team_id, name) -> position from last season's box scores.
@@ -741,7 +709,6 @@ def prior_pos_index():
         idx.setdefault((str(r.get("team_id")), nkey(nm)),
                        {"pos": r.get("pos"), "sets": sets, "pts": pts})
     return idx
-
 
 def roster_rows(roster_rec, ret_rec, lu_rec, live_by_team, team_id,
                 prior_pos=None, site_pos=None, id2name=None, live_floor=0,
@@ -905,7 +872,6 @@ def roster_rows(roster_rec, ret_rec, lu_rec, live_by_team, team_id,
                              -(r["r"] or 0), r["n"]))
     return rows
 
-
 # ------------------------------------------------------------- team index
 def _fixture_pick(pred_by_pair, f, me):
     """This team's own win probability for an upcoming fixture, or None."""
@@ -914,7 +880,6 @@ def _fixture_pick(pred_by_pair, f, me):
     if not p:
         return None
     return round(p["home_win"] if f["home"] else p["away_win"], 3)
-
 
 def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
                aq_of=None, sched_n=None, honours=None):
@@ -1343,7 +1308,6 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
                 _rec["digby"] = None
     return out
 
-
 # -------------------------------------------------------------- leaders
 def head_coaches():
     # type: () -> Dict[str, Dict]
@@ -1385,7 +1349,6 @@ def head_coaches():
                          "source": rec.get("source"), "note": rec.get("note")}
     return out
 
-
 def di_teams():
     # type: () -> set
     """The 348 Division-I programmes, from the archived official RPI table.
@@ -1407,7 +1370,6 @@ def di_teams():
     """
     doc = load("data/raw/2025/rpi_official.json") or {}
     return set(r["School"] for r in (doc.get("data") or []) if r.get("School"))
-
 
 def leaders(photos=None, honours=None):
     """Season leaders from the per-player aggregate, per set.
@@ -1477,7 +1439,6 @@ def leaders(photos=None, honours=None):
     out.sort(key=lambda r: -r["pps"])
     return out, floor, len(rows)
 
-
 # ------------------------------------------------------- box scores & players
 
 def standings(teams, res):
@@ -1542,7 +1503,6 @@ CLASS_FULL = {
     "GR": "Graduate",
 }
 
-
 # The reverse map, so a spelled-out value normalises too. Built from
 # CLASS_FULL rather than typed a second time -- two maps for one relation is
 # how the two ends drift apart.
@@ -1553,7 +1513,6 @@ CLASS_CODE = {}
 for _k, _v in CLASS_FULL.items():
     CLASS_CODE[re.sub(r"[.\s-]", "", _k).upper()] = CLASS_SHORT[_k]
     CLASS_CODE[re.sub(r"[.\s-]", "", _v).upper()] = CLASS_SHORT[_k]
-
 
 def class_code(raw):
     """The class year as ONE canonical short code: Fr, So, Jr, Sr, Gr, R-Sr...
@@ -1573,7 +1532,6 @@ def class_code(raw):
     key = re.sub(r"[.\s-]", "", str(raw)).upper()
     return CLASS_CODE.get(key, raw)
 
-
 def class_full(raw):
     """The published class year, spelled out when it is a known abbreviation.
 
@@ -1588,7 +1546,6 @@ def class_full(raw):
         return raw
     key = re.sub(r"[.\s]", "", str(class_code(raw))).upper()
     return CLASS_FULL.get(key, raw)
-
 
 def roster_identity_index():
     """(team_norm, nkey(name)) -> official identity, from the 2026 rosters.
@@ -1634,7 +1591,6 @@ def roster_identity_index():
             }
     return idx, ambiguous
 
-
 def _six_enriched(lu, xfer, photos, team_name, out_map):
     # type: (Optional[Dict], Dict, Dict, str, Dict) -> Optional[Dict]
     """Attach transfer line and photo to each projected-six entry.
@@ -1678,7 +1634,6 @@ def _six_enriched(lu, xfer, photos, team_name, out_map):
         outsix.append(d)
     return dict(lu, usual_six_2025=outsix)
 
-
 def transfer_index():
     # type: () -> Dict[str, Dict]
     """normalised name -> where she transferred from, and her line there.
@@ -1719,7 +1674,6 @@ def transfer_index():
                 "prior_pos": prev.get("pos"),
             }
     return out
-
 
 def box_and_players(res, photos=None, honours=None, xfer=None,
                     count_gids=None):
@@ -1974,7 +1928,6 @@ def player_photos():
                 re.sub(r"[^a-z]", "", (nm or "").lower()), url)
     return out
 
-
 def team_season_stats(boxes, res):
     # type: (Dict, Any) -> Dict[str, Any]
     """Season team totals for 2026, from the same raw counts the box scores use.
@@ -2119,7 +2072,6 @@ def team_season_stats(boxes, res):
         out = dict((k, v) for k, v in out.items() if k in _di)
     return out
 
-
 def avca_honours():
     # type: () -> Dict[str, List[Dict[str, Any]]]
     """team|squashed-name -> AVCA honours, most recent first.
@@ -2185,7 +2137,6 @@ def avca_honours():
             v.sort(key=lambda x: (-x.get("season", 0), not x.get("national")))
     return out
 
-
 def roster_index():
     # type: () -> List[Dict]
     """Every rated player, compact, so the directory covers Division I.
@@ -2229,7 +2180,6 @@ def roster_index():
         out.append(r)
     out.sort(key=lambda x: (x.get("t") or "", x.get("n") or ""))
     return out
-
 
 def team_stars(limit=3):
     # type: (int) -> Dict
@@ -2297,7 +2247,6 @@ def team_stars(limit=3):
             out[team] = picked
     return out
 
-
 def attach_ratings(plist):
     # type: (List[Dict]) -> int
     """Put each player's own rating onto her card entry.
@@ -2335,7 +2284,6 @@ def attach_ratings(plist):
             "sup": (doc.get("boards") or {}).get(r.get("pos"), {}).get("support"),
         }
     return n
-
 
 def player_rating_payload():
     # type: () -> Dict
@@ -2444,7 +2392,6 @@ def player_rating_payload():
             "overall": doc.get("overall") or {},
             "overall_rows": allrows, "all_star": st}
 
-
 def team_logos():
     # type: () -> Dict[str, str]
     """team -> crest URL, from each school's ncaa.com seoname."""
@@ -2455,7 +2402,6 @@ def team_logos():
                 "https://www.ncaa.com/sites/default/files/images/logos/schools/"
                 "bgl/%s.svg" % t["seoname"])
     return out
-
 
 def logo_img(team, logos, cls=""):
     # type: (str, Dict[str, str], str) -> str
@@ -2471,7 +2417,6 @@ def logo_img(team, logos, cls=""):
         return ""
     return ('<img class="tlogo %s" src="%s" alt="" loading="lazy" '
             'onerror="this.style.display=\'none\'">' % (cls, esc(u)))
-
 
 def form_strip(games, n=5):
     # type: (List[Dict], int) -> str
@@ -2492,7 +2437,6 @@ def form_strip(games, n=5):
                       "beat" if g["won"] else "lost to", esc(opp), g["score"],
                       "W" if g["won"] else "L"))
     return "".join(out)
-
 
 def hcell_py(v, txt, lo, hi, kind="seq"):
     # type: (Optional[float], str, float, float, str) -> str
@@ -2524,8 +2468,6 @@ def hcell_py(v, txt, lo, hi, kind="seq"):
     t = 0.5 if hi == lo else (float(v) - lo) / (hi - lo)
     t = max(0.0, min(1.0, t))
     return '<td class="n hx %s" style="--t:%.3f"><b>%s</b></td>' % (kind, t, txt)
-
-
 
 def gameday_readiness():
     """The Friday panel's facts. Read-only, and honest about what is unproven.
@@ -2709,7 +2651,6 @@ def calendar_tracks():
         "one is added by hand. It informs nothing else on this site.")
     return out
 
-
 def powercell(t):
     """POWER, with the scale carried in its own tooltip.
 
@@ -2741,7 +2682,6 @@ def powercell(t):
             'deviation. Built from %s."><b>%.1f</b></td>'
             % (max(0.0, min(1.0, (v - 10.0) / 80.0)), v, basis, v))
 
-
 def resumecell(t, active):
     """RESUME rank -- what a team has EARNED, beside how good it is.
 
@@ -2770,7 +2710,6 @@ def resumecell(t, active):
                 "from this schedule" % wab)
     return '<td class="n rs" title="%s"><b>%d</b></td>' % (tip, v)
 
-
 def rank_stamp_pt(utc_iso, now_epoch=None):
     """Human PT phrase for a ranking's own generated_at_utc, or None.
 
@@ -2789,7 +2728,6 @@ def rank_stamp_pt(utc_iso, now_epoch=None):
     if dt.date() == now.date() - datetime.timedelta(days=1):
         return "%s PT yesterday" % clock
     return dt.strftime("%b %d, ") + clock + " PT"
-
 
 def top25_view(avca=None):
     # type: (Optional[Dict[str, int]]) -> Dict[str, str]
@@ -3045,8 +2983,6 @@ def top25_view(avca=None):
             "season": str(SEASON),
             "movehead": ("vs last week" if basis == "week" else "vs preseason")}
 
-
-
 def parse_logged_utc(text):
     """Epoch seconds for a prediction-log stamp, or None if it cannot be read."""
     if not text or not isinstance(text, str):
@@ -3057,7 +2993,6 @@ def parse_logged_utc(text):
             tzinfo=datetime.timezone.utc).timestamp()
     except (ValueError, TypeError):
         return None
-
 
 def played_forecast(rows, epoch):
     """What a FINISHED match may quote as "what we expected" -- (home_win, why).
@@ -4103,7 +4038,6 @@ def build():
             datetime.datetime.now(PT).strftime("%Y-%m-%d %-I:%M %p PT") if PT
             else datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%MZ")))
 
-
 TEMPLATE = r"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <!-- Oswald: the condensed, squared display face broadcast graphics are built on.
@@ -5081,15 +5015,11 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .tdprompt a:hover{color:var(--cs-white);border-color:var(--navy)}
 .tdprompt a:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 @media (max-width:900px){.tdmarq{grid-template-columns:minmax(0,1fr)}}
-.cs-rail{max-width:1280px;margin:10px auto 0;display:flex;align-items:center;
-  gap:14px;flex-wrap:wrap;padding:8px 14px;
-  border:1px solid var(--cs-edge);border-top:0;
-  background:linear-gradient(180deg,#0B1D33 0%,#091829 100%);
-  font:13px/1.35 var(--sans)}
+
 .cs-rlab{display:flex;align-items:center;gap:7px;flex:0 0 auto;
   font:700 10px/1 var(--disp);letter-spacing:.2em;text-transform:uppercase;
   color:var(--slate)}
-.cs-rail.cs-live .cs-rlab{color:var(--cs-gold)}
+
 .cs-rmatch{display:flex;align-items:center;gap:7px;min-width:0;
   color:var(--cs-white);text-decoration:none;
   font:600 15px/1.2 var(--disp);text-transform:uppercase;letter-spacing:.01em}
@@ -5103,7 +5033,7 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .cs-rmore:hover{color:var(--cs-white)}
 .cs-rmore:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 @media (max-width:560px){
-  .cs-rail{gap:8px 10px;padding:7px 11px;font-size:12px}
+
   .cs-rmatch{font-size:13.5px}
   .cs-rmore{margin-left:0}
 }
@@ -6097,7 +6027,6 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
 #v-scores .datejump{display:flex;align-items:center;gap:8px;margin-left:auto;
   font:11.5px/1 var(--mono);color:var(--slate)}
 
-
 /* GAMEDAY-CSS-BEGIN */
 .gd-panel{border:1px solid var(--vx-rule);border-left:3px solid var(--gold);
   border-radius:4px;padding:13px 15px;margin:0 0 20px;background:var(--alt)}
@@ -7019,8 +6948,6 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
   .dwhy{padding-left:15px}
 }
 
-
-
 /* ── WHAT CHANGED ────────────────────────────────────────────────────────
    Editorial rather than another row of cards: a result reads as a sentence --
    winner, score, loser -- with the ranked ones marked. */
@@ -7042,12 +6969,10 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
   .chgc{width:100%;justify-content:space-between}
 }
 
-
 @media (max-width:560px){
   .chips.tier1 .chip{font-size:12.5px;padding:6px 10px}
   .chips.tier1 .chip b{font-size:15px}
 }
-
 
 .t25 td.poll i{font:700 10.5px/1 var(--mono);font-style:normal;margin-left:4px;
   padding:1px 3px;border-radius:3px}
@@ -7748,8 +7673,6 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 @media (max-width:560px){.fw.fnd,.fl.fnd{padding:0 3px}
   .fndt{font-size:9px;margin-left:2px}}
 
-
-
 /* ---- WEEKLY RANKING CALENDAR ----------------------------------------------
    Three tracks that must never look like one table. Each carries a tag saying
    what KIND of ranking it is -- Derived (ours), Official (the coaches poll),
@@ -7790,15 +7713,10 @@ td.wh .wu{color:var(--ink3);font-style:italic}
   margin-left:5px}
 .caltbl .dim{color:var(--ink3)}
 
-
-
-
 /* a result row that opens its match */
 .gline.gopen{cursor:pointer;border-radius:3px}
 .gline.gopen:hover{background:rgba(91,168,245,.06)}
 .gline.gopen:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
-
-
 
 /* the ruler key on the selector itself: the swatch answers "whose ranking is
    this" before the label is read */
@@ -7812,7 +7730,6 @@ td.wh .wu{color:var(--ink3);font-style:italic}
    mean the same thing look the same */
 .caltag.derived{color:var(--vx-digby);background:var(--vx-digby-dim)}
 .caltag.official{color:var(--vx-avca);background:var(--vx-avca-dim)}
-
 
 /* ── Digby's Top 25: an editorial list, not a dense table ──────────────── */
 /* ⚠ THE RANK IS THE POINT OF A TOP 25, so it is sized like one. Everything
@@ -7863,7 +7780,6 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
   table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:23px}
   .t25 td{padding:9px 8px}
 }
-
 
 @media (max-width:560px){
   /* ⚠ FIVE RULER BUTTONS PLUS SWATCHES DO NOT FIT 390px. Measured: `.seg`
@@ -7935,7 +7851,6 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 .vx-key.vx-k-avca{background:var(--vx-avca)}
 .vx-key.vx-k-digby{background:var(--vx-digby)}
 .vx-key.vx-k-ballot{background:var(--vx-ballot)}
-
 
 /* ── fact strip: label over value, in a row, no chips ──────────────────── */
 .vx-facts{display:flex;flex-wrap:wrap;gap:2px 26px;margin:0}
@@ -8028,6 +7943,12 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 #livetick .tkm b{color:var(--chalk);font-weight:700}
 #livetick .tkm .tkset{color:var(--gold);font-weight:700}
 #livetick .tkm .tkrk{font:600 9px/1 var(--disp);color:var(--gold)}
+.wwlist{display:flex;flex-direction:column;gap:7px}
+.wwrow{display:flex;align-items:baseline;gap:10px}
+.wwfact{font-size:13px;color:var(--ink2)}
+#livetick .tkall{color:var(--gold);font-weight:700}
+#livetick .tklab.tkquiet{color:var(--slate)}
+#livetick .tklab.tkquiet ~ .tkm .tkper{color:var(--ink3)}
 #livetick .tkm .tkper{font:600 9px/1 var(--disp);letter-spacing:.08em;
   color:var(--ink3);text-transform:uppercase}
 @media (max-width:560px){
@@ -9740,40 +9661,117 @@ function slateFromSchedule() {
                  away_rank: r.ar, home_rank: r.hr, state: 'pre' }));
 }
 
-/* THE LIVE TICKER. Every in-progress match as one slim chip: crests, the set
-   tally, the current set's points, the set name -- and each chip routes
-   through the same open-a-match handler as every row. Rebuilt only when its
-   content actually changes, and the reader's scroll position survives the
-   rebuild; a strip that snaps back to the left every 60 seconds is unusable.
-   Ranked pairings sort first: with 50+ live the leftmost chips are the ones
-   worth a glance. */
+/* THE GLOBAL RAIL. One job on every route: the compact always-useful strip
+   (review round 4). Live: at most SIX priority chips -- ranked-v-ranked,
+   then My Board, then verified TV, then a wide AVCA/POWER disagreement,
+   then the rest -- with an explicit "All live - N" control that routes to
+   Scores with the Live filter. The order is DETERMINISTIC and each chip's
+   title says which reason put it there. Finals never linger here: the
+   caller already filters to in-progress. Quiet: "NEXT TO WATCH", at most
+   three upcoming priority matches inside 72 hours -- never a giant
+   nothing-today message. Rebuilt only when content changes, and the
+   reader's scroll position survives; a strip that snaps back to the left
+   every 60 seconds is unusable. */
 let TK_LAST = '';
+const TK_CAP = 6, TK_QUIET_CAP = 3;
+
+function tkPriority(g) {
+  /* deterministic, and stated: the tuple IS the explanation */
+  const all = (typeof allMatches === 'function') ? allMatches() : {};
+  const m = all[String(g.id)] || {};
+  const full = (typeof todayReasons === 'function')
+    ? todayReasons(m, g) : [];
+  const rs = full.map(r => r[0]);
+  /* the stated reason is the FIRST priority reason's own label, straight
+     from todayReasons -- one definition, already private-fenced, so a
+     private wording cannot leak into this shared code path */
+  const order = ['rv', 'mb', 'tv', 'dg'];
+  let why = null;
+  for (const k of order) {
+    const hit = full.filter(r => r[0] === k)[0];
+    if (hit) { why = hit[1]; break; }
+  }
+  return {
+    rv: rs.indexOf('rv') >= 0 ? 0 : 1,
+    mb: rs.indexOf('mb') >= 0 ? 0 : 1,
+    tv: rs.indexOf('tv') >= 0 ? 0 : 1,
+    dg: rs.indexOf('dg') >= 0 ? 0 : 1,
+    rk: (g.away_rank || g.home_rank) ? 0 : 1,
+    why: why || ((g.away_rank || g.home_rank) ? 'ranked side' : 'live'),
+  };
+}
+
+function tkChip(g) {
+  const cur = (g.sets && g.sets.length) ? g.sets[g.sets.length - 1] : null;
+  const pts = (cur && cur[0] !== null && cur[0] !== undefined)
+    ? ' <span class="tkset">' + cur[0] + '\u2013' + cur[1] + '</span>' : '';
+  const rk = n => n ? '<span class="tkrk">#' + n + '</span>' : '';
+  const why = tkPriority(g).why;
+  return '<button type="button" class="tkm" data-match="' + esc(String(g.id)) +
+    '" title="' + esc(why) + '" aria-label="' +
+    esc(g.away + ' ' + (mNum(g.away_sets) || 0) + ' ' + (mNum(g.home_sets) || 0) +
+        ' ' + g.home + ', ' + (g.period || 'in progress')) + '">' +
+    rk(g.away_rank) + logo(g.away, 'sm') + '<b>' + esc(g.away) + '</b> ' +
+    mNum(g.away_sets) + '\u2013' + mNum(g.home_sets) +
+    ' <b>' + esc(g.home) + '</b>' + logo(g.home, 'sm') + rk(g.home_rank) +
+    pts +
+    (g.period ? ' <span class="tkper">' + esc(g.period) + '</span>' : '') +
+    '</button>';
+}
+
+function tkQuietChips() {
+  /* NEXT TO WATCH: upcoming priority fixtures inside 72 hours, from the
+     schedule already on the page -- reasons first, then the soonest. */
+  const today = todayPT();
+  /* the 72h boundary in PACIFIC, like every other date on this page --
+     toISOString() is UTC and names tomorrow after 5pm PT (guarded) */
+  const lim = new Intl.DateTimeFormat('en-CA',
+    { timeZone: 'America/Los_Angeles' }).format(
+      new Date(Date.now() + 3 * 86400000));
+  const liveOf = m => (typeof LIVE_BY_ID !== 'undefined') ? LIVE_BY_ID[m.gid] : null;
+  const up = DESK.filter(m => m.d >= today && m.d <= lim &&
+                              matchState(m, liveOf(m)) === 'upcoming');
+  const scored = up.map(m => [m, todayReasons(m, null)])
+    .sort((a, b) => (b[1].length - a[1].length) ||
+                    /* date is ISO (safe to compare); the CLOCK is parsed --
+                       "6:00 AM" sorting after "5:30 PM" is the exact string-
+                       sort bug this codebase has now hit five times */
+                    String(a[0].d).localeCompare(String(b[0].d)) ||
+                    ((tMinutes(a[0].t) === null ? 1e9 : tMinutes(a[0].t)) -
+                     (tMinutes(b[0].t) === null ? 1e9 : tMinutes(b[0].t))));
+  return scored.slice(0, TK_QUIET_CAP).map(x => {
+    const m = x[0];
+    const rk = n => n ? '<span class="tkrk">#' + n + '</span>' : '';
+    return '<button type="button" class="tkm" data-match="' +
+      esc(String(m.gid)) + '">' +
+      rk(m.ar) + logo(m.a, 'sm') + '<b>' + esc(m.a) + '</b> ' +
+      connector(m) + ' <b>' + esc(m.h) + '</b>' + logo(m.h, 'sm') + rk(m.hr) +
+      ' <span class="tkper">' + esc(dayLabel(m.d)) +
+      (m.t ? ' \u00b7 ' + esc(m.t) : '') + '</span></button>';
+  }).join('');
+}
+
 function csTicker(live) {
   const el = document.getElementById('livetick');
   if (!el) return;
-  if (!live || !live.length) { el.hidden = true; TK_LAST = ''; return; }
-  const rows = live.slice().sort((a, b) => {
-    const ra = (a.away_rank || a.home_rank) ? 0 : 1;
-    const rb2 = (b.away_rank || b.home_rank) ? 0 : 1;
-    if (ra !== rb2) return ra - rb2;
-    return String(a.id).localeCompare(String(b.id));
-  });
-  const chip = g => {
-    const cur = (g.sets && g.sets.length) ? g.sets[g.sets.length - 1] : null;
-    const pts = (cur && cur[0] !== null && cur[0] !== undefined)
-      ? ' <span class="tkset">' + cur[0] + '\u2013' + cur[1] + '</span>' : '';
-    const rk = n => n ? '<span class="tkrk">#' + n + '</span>' : '';
-    return '<button type="button" class="tkm" data-match="' + esc(String(g.id)) +
-      '" data-dest="desk">' +
-      rk(g.away_rank) + logo(g.away, 'sm') + '<b>' + esc(g.away) + '</b> ' +
-      mNum(g.away_sets) + '\u2013' + mNum(g.home_sets) +
-      ' <b>' + esc(g.home) + '</b>' + logo(g.home, 'sm') + rk(g.home_rank) +
-      pts +
-      (g.period ? ' <span class="tkper">' + esc(g.period) + '</span>' : '') +
-      '</button>';
-  };
-  const html = '<span class="tklab"><i class="tkdot"></i>LIVE ' + live.length +
-    '</span>' + rows.map(chip).join('');
+  let html;
+  if (live && live.length) {
+    const rows = live.slice().sort((a, b) => {
+      const pa = tkPriority(a), pb = tkPriority(b);
+      return (pa.rv - pb.rv) || (pa.mb - pb.mb) || (pa.tv - pb.tv) ||
+             (pa.dg - pb.dg) || (pa.rk - pb.rk) ||
+             String(a.id).localeCompare(String(b.id));
+    });
+    html = '<span class="tklab"><i class="tkdot"></i>LIVE ' + live.length +
+      '</span>' + rows.slice(0, TK_CAP).map(tkChip).join('') +
+      (live.length > TK_CAP
+        ? '<button type="button" class="tkm tkall" data-alllive>' +
+          'All live \u2014 ' + live.length + ' matches \u2192</button>' : '');
+  } else {
+    const q = tkQuietChips();
+    if (!q) { el.hidden = true; TK_LAST = ''; return; }
+    html = '<span class="tklab tkquiet">NEXT TO WATCH</span>' + q;
+  }
   if (html === TK_LAST) { el.hidden = false; return; }
   const keep = el.scrollLeft;
   el.innerHTML = html;
@@ -9972,7 +9970,6 @@ async function pollLive() {
 pollLive();
 setInterval(pollLive, 60000);
 
-
 /* ---- logos, box scores, player pages ---------------------------------- */
 const LOGOS = {{LOGOS_JSON}};
 const COLORS = {{COLORS_JSON}};
@@ -10031,8 +10028,6 @@ let TD_TAB = 'overview';
 const PRK_ROLELAB = { six: '6-rotation', front: 'front-row only' };
 const PRK_PROLELAB = { passer: 'passes', seldom: 'seldom passes',
   primary: 'primary passer', reserve: 'reserve' };
-
-
 
 /* PLAYER AVATARS. Pose = her real position, colour = her school's own logo
  colour. Shown only where there is NO photograph -- a real picture always
@@ -10729,7 +10724,6 @@ document.getElementById('pq').addEventListener('input', () => {
   PQ_T = setTimeout(renderPlayers, 140);
 });
 renderPlayers();
-
 
 /* ---- standings --------------------------------------------------------- */
 const STANDINGS = {{STANDINGS_JSON}};
@@ -11685,7 +11679,6 @@ function renderBallot() {
   }
 }
 
-
 /* ---- comparison against the PREVIOUS SAVED BALLOT ---------------------- */
 function renderBallotDiff() {
   const box = document.getElementById('bwdiff');
@@ -12064,7 +12057,6 @@ function bwWire() {
   bwLoadHistory();
 }
 /* BALLOT-WORKSHOP-END */
-
 
 /* ══ MATCH DESK ═══════════════════════════════════════════════════════════
    "What should I watch today, why does it matter, and what did it mean after
@@ -12479,7 +12471,6 @@ const DIGBY_WATCH = `{{DIGBY_WATCH}}`;
 
 let LIVE_STAMP = '';
 let LIVE_BY_ID = {};
-
 
 /* GAMEDAY-JS-BEGIN */
 /* ⚠ A READINESS PANEL, NOT A DEVELOPER DASHBOARD. Four checkpoints, what has
@@ -13317,7 +13308,6 @@ function frForm(pre) {
     '</div></form>';
 }
 
-
 /* ---- the Film Room view ------------------------------------------------ */
 let FR_FILTER = {};
 
@@ -13492,7 +13482,6 @@ function frSyncCounts() {
   });
 }
 
-
 /* ⚠ AN ENTRY POINT IS A COUNT AND A LINK, NOT A PANEL. A team page belongs to
    the data; the notebook belongs to the notebook. */
 function frLink(kind, key) {
@@ -13521,7 +13510,6 @@ function frInject() {
   });
   frSyncCounts();
 }
-
 
 /* ---- export: this device, and nowhere else ----------------------------- */
 /* ⚠ THERE IS NO NETWORK PATH HERE, AND THERE MUST NOT BE. Export produces a
@@ -13676,7 +13664,6 @@ function frExport(mode) {
   });
 }
 
-
 /* ---- import: validate everything, write nothing until told --------------- */
 /* ⚠ THE ORDER MATTERS AND IS THE WHOLE SAFETY MODEL:
        parse -> validate every note -> classify against what is here now ->
@@ -13815,7 +13802,6 @@ function frClassify(valid) {
   });
   return { fresh: fresh, dupe: dupe, clash: clash, localCount: FR.length };
 }
-
 
 /* ---- preview, then a choice -------------------------------------------- */
 function frImpSay(msg, kind) {
@@ -15194,6 +15180,21 @@ function renderMatchDetail(gid, dest) {
       /* live statistics, only while this match is live AND the state says
          team stats exist for it */
       (st === 'live' ? lmcSection(m.gid) : '') +
+      /* WHY THIS MATTERS -- at most three factual reason chips, upcoming
+         only (review round 4's Why Watch). Every chip is a checkable fact
+         from the payload (ranked pairing, POWER top-50, My Board, verified
+         TV, AVCA/POWER disagreement with both labelled values, the event).
+         No reasons -> no section -- absence is rendered as absence, never
+         filled with prose. */
+      (st === 'upcoming' ? (function () {
+        const rs = todayReasons(m, null).slice(0, 3);
+        if (!rs.length) return '';
+        return '<div class="msec"><h3>Why this matters</h3>' +
+          '<div class="wwlist">' + rs.map(r =>
+            '<div class="wwrow"><span class="tdtag ' + r[0] + '">' +
+            esc(r[1]) + '</span><span class="wwfact">' + esc(r[2]) +
+            '</span></div>').join('') + '</div></div>';
+      })() : '') +
       starsSection(m) +
       /* ⚠ ONE SENTENCE PER STATE, FROM THE SHARED TABLE. Each of these is a
          true statement about the source at that moment -- not a placeholder
@@ -15261,9 +15262,26 @@ document.addEventListener('click', e => {
      only, so the Match Desk and the ledger routed while a team's own result
      did not. Any element carrying data-match now reaches the same canonical
      URL -- there is one way to open a match, not one per surface. */
+  const al2 = e.target.closest && e.target.closest('[data-alllive]');
+  if (al2) {
+    /* the rail's cap control: Scores, with the Live filter already applied */
+    SB_FILTER = 'live';
+    document.querySelectorAll('#v-scores [data-sbf]').forEach(b =>
+      b.classList.toggle('on', b.dataset.sbf === 'live'));
+    go(routeFor('scores'));
+    if (typeof renderScoreboard === 'function') renderScoreboard();
+    return;
+  }
   const row = e.target.closest && e.target.closest('[data-match]');
   if (row) {
-    go(matchRoute(row.dataset.match, row.dataset.dest));
+    /* ⚠ BACK MUST RESTORE WHERE THE READER WAS (review round 4). A chip
+       that pins its destination sends someone who clicked from Scores
+       "Back to Today". No explicit data-dest means: openings from the
+       Scores route go back to Scores, everything else to Today -- the two
+       parents the match route supports. */
+    const dest = row.dataset.dest ||
+      (document.body.dataset.view === 'scores' ? 'scores' : 'desk');
+    go(matchRoute(row.dataset.match, dest));
     return;
   }
   const back = e.target.closest && e.target.closest('[data-back]');
@@ -15532,8 +15550,15 @@ function csCtx(m, kind, n) {
    best-of-five that has not happened, which is a fine thing to show ONCE a
    match is live, and noise before it. */
 function csIsTodayRoute() {
-  const h = (location.hash || '').replace(/^#\/?/, '').split('/')[0];
-  return !h || h === 'today' || h === 'match-desk';
+  /* ⚠ AN OPEN MATCH DETAIL IS NOT THE TODAY LANDING (review round 4). The
+     marquee above a routed match is a second global summary of a DIFFERENT
+     match -- the exact duplication the rail retirement removed elsewhere.
+     The featured treatment belongs to the landing view alone; a match-desk
+     DETAIL route keeps only the ticker. */
+  const parts = (location.hash || '').replace(/^#\/?/, '').split('/');
+  const h = parts[0];
+  if (h === 'match-desk') return !parts[1];
+  return !h || h === 'today';
 }
 
 function csNearness(m, live) {
@@ -15613,22 +15638,17 @@ function csTape() {
   const servingAway = false, servingHome = false;
 
   if (!marquee) {
-    /* ── THE RAIL. One line, no court, no set cells, no vertical budget. */
-    mount.innerHTML =
-      '<div class="cs-rail' + (st === 'live' ? ' cs-live' : '') +
-        '" data-cs-state="' + esc(state6) + '" data-cs-shape="rail">' +
-        '<span class="cs-rlab">' + (st === 'live' ? '<i class="cs-dot"></i>' : '') +
-          label + '</span>' +
-        '<a class="cs-rmatch" href="' + matchRoute(m.gid, 'desk') + '">' +
-          rankHTML('avca', m.ar, true) + esc(mAway(m)) +
-          '<span class="cs-rv">' + connector(m) + '</span>' +
-          rankHTML('avca', m.hr, true) + esc(mHome(m)) + '</a>' +
-        '<span class="cs-rwhen">' + when + '</span>' +
-        (n > 1 ? '<a class="cs-rmore" href="' + routeFor('scores') + '">' +
-          (n - 1) + ' more</a>' : '') +
-      '</div>';
+    /* ⚠ THE RAIL FORM IS RETIRED (review round 4). The ticker below the
+       tape is the one global score strip, so a second one-line summary of
+       one match on Scores/Rankings/Teams/Match Detail was the same fact
+       twice in forty pixels, page-wide. A featured match -- with the room
+       to say WHY it is featured -- belongs to Today alone. */
+    mount.innerHTML = '';
     return;
   }
+  /* (the one-line rail form that used to render here was deleted, not
+     disabled -- dead code that looks live is how the a.ep sort guard
+     happened. git has it if it is ever wanted back.) */
 
   mount.innerHTML =
     '<div class="cs-tape cs-court ' +
@@ -15813,6 +15833,12 @@ function todayReasons(m, live) {
   if (watched.length) out.push(['mb', 'my board', watched.join(' and ') +
     ' on My Board']);
   /* MYBOARD-WIRE-END */
+  if (m.ap && m.hp && m.ap <= 50 && m.hp <= 50 && !(m.ar && m.hr)) {
+    /* stated only when the AVCA pairing chip is not already saying a
+       stronger version of the same thing */
+    out.push(['p50', 'POWER top-50 matchup',
+      'POWER #' + m.ap + ' against POWER #' + m.hp]);
+  }
   if (m.tv) out.push(['tv', 'national TV', 'On ' + m.tv]);
   if (m.kind === 'conf') out.push(['cf', 'conference test',
     'A league match, so it counts toward the table']);
@@ -18673,7 +18699,6 @@ document.getElementById('rbody').addEventListener('click', e => {
   go(routeFor('teams', slug(nm)));
 });
 
-
 /* BRACKET CONNECTORS. Drawn as one SVG behind the cards, from the MEASURED
    position of every box rather than from assumptions about the layout -- the
    columns distribute with space-around inside a scrolling box, so the maths for
@@ -18807,7 +18832,6 @@ filter('tq', 'tbody', 'tcnt', 'matches');
 </script>
 </body></html>"""
 
-
 # Markers that must not survive into a PUBLIC build. Asserted after the strip,
 # so a template edit that reintroduces one fails the build instead of quietly
 # republishing somebody else's work.
@@ -18826,7 +18850,6 @@ def _b64(path):
     return "data:image/%s;base64,%s" % (
         ext, base64.b64encode(open(full, "rb").read()).decode("ascii"))
 
-
 # Digby, drawn by Cody. The head alone for anything small -- at 18px a whole
 # figure is a smudge and only the ball reads. PRIVATE BUILD ONLY, like the rest
 # of the Digby feature, which also keeps the Molten/NCAA marks on his head off
@@ -18839,7 +18862,6 @@ DIGBY_CSS = (".digby-face{vertical-align:middle;margin-right:6px}\n"
              ".digby-tag img{width:18px;height:18px;margin-right:6px;flex:none}\n")
 DIGBY_SVG = ('<img class="digby-face" src="%s" alt="" width="18" height="18">'
              % DIGBY_HEAD) if DIGBY_HEAD else ""
-
 
 # ------------------------------------------------------------------ Ask Digby
 # PRIVATE ONLY. The chat needs scripts/live_server.py behind it (which holds the
@@ -19007,7 +19029,6 @@ ASK_JS = r"""
 })();
 """
 
-
 PRIVATE_MARKERS = ("VolleyTalk", "Massey Ratings", "Massey Ratings, 2026",
                    'data-v="tv"', 'id="v-tv"', "tv_listings",
                    "chip('Massey'", "chip('VT'",
@@ -19067,7 +19088,6 @@ PRIVATE_MARKERS = ("VolleyTalk", "Massey Ratings", "Massey Ratings, 2026",
                    # removed.
                    "ANTHROPIC_API_KEY", "sk-ant-", "ghp_", "github_pat_",
                    "/Users/", "127.0.0.1", "localhost:")
-
 
 def strip_private(html):
     # type: (str) -> str
@@ -19186,7 +19206,6 @@ def strip_private(html):
     html = re.sub(r"chip\('Massey',[^)]*\)\s*\+\s*", "", html)
     return html
 
-
 def public_leaks(html):
     # type: (str) -> List[str]
     """Everything private still present in a page about to be published.
@@ -19215,7 +19234,6 @@ def public_leaks(html):
             if n:
                 found.append("%d %s ranks inside const TEAMS" % (n, label))
     return found
-
 
 if __name__ == "__main__":
     html = build()
