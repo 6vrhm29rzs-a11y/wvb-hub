@@ -8208,20 +8208,24 @@ details.avhist{margin:14px 0}
   text-transform:uppercase;color:var(--ink3);font-style:normal;
   border:1px solid var(--line);border-radius:2px;padding:2px 4px;
   margin-left:6px;white-space:nowrap}
-.rcedge{font-size:13px;color:var(--ink2);margin:0 0 6px}
-.rcedge em{font:600 9.5px/1 var(--disp);letter-spacing:.1em;
-  text-transform:uppercase;color:var(--gold);font-style:normal;
-  margin-right:7px}
-.rcedge b{color:var(--chalk)}
+.rccmp{margin:4px 0 10px}
+.rccmp > em{display:block;font:600 9.5px/1 var(--disp);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink3);font-style:normal;
+  margin-bottom:6px}
+.rccols,.rcline{display:grid;grid-template-columns:110px 64px 14px 64px;
+  gap:0 8px;align-items:baseline}
+.rccols .rctm{font:600 9px/1.2 var(--disp);letter-spacing:.07em;
+  text-transform:uppercase;color:var(--ink3);text-align:right}
+.rcline{font-size:13px;color:var(--ink2);padding:2px 0}
+.rcline .rcm{font:600 10px/1.4 var(--disp);letter-spacing:.07em;
+  text-transform:uppercase;color:var(--ink3)}
+.rcline b{text-align:right;color:var(--ink2);font-variant-numeric:tabular-nums}
+.rcline b.rchi{color:var(--chalk);font-weight:700}
+.rcline .rcvs{color:var(--ink3);font-style:normal;text-align:center}
 .rcldrs{margin:8px 0}
 .rcldr{font-size:12.5px;color:var(--ink2);margin:0 0 4px}
 .rcldr b{color:var(--chalk)}
 .rcbasis{font:600 10px/1 var(--mono);color:var(--ink3);margin-left:6px}
-.rcdecided{border-top:1px solid var(--line);padding-top:8px;margin-top:8px;
-  font-size:13px;color:var(--ink2)}
-.rcdecided em{display:block;font:600 9.5px/1 var(--disp);letter-spacing:.1em;
-  text-transform:uppercase;color:var(--ink3);font-style:normal;
-  margin-bottom:5px}
 .rcline b{color:var(--chalk)}
 .rcdup{border:1px dashed var(--line2);border-radius:3px;padding:12px 14px;
   margin:0 0 12px;font-size:13px;color:var(--ink2)}
@@ -15769,8 +15773,8 @@ function renderAvail() {
 })();
 /* AVAIL-JS-END */
 
-/* ── VERIFIED MATCH RECAP (round 13) ─────────────────────────────────────
-   What happened, who drove it, and what data supports it -- nothing else.
+/* ── VERIFIED MATCH RECAP (rounds 13-14) ─────────────────────────────────
+   A FACTUAL SUMMARY of a completed match -- never an explanation of it.
    Facts come from exactly two held sources, each labelled at the point of
    use: the official scoreboard (result, set line) and the match-aligned box
    (team totals, leaders). No narrative synthesis, no causal language: a
@@ -15815,8 +15819,8 @@ function recapHTML(m) {
   if (!byTeam) {
     return '<div class="msec"><h3>Match recap</h3>' + head +
       '<p class="tnote">Detailed box not available from the held feed for ' +
-      'this match \u2014 team edges and stat leaders are omitted rather ' +
-      'than estimated.</p></div>';
+      'this match \u2014 the box-score comparison and stat leaders are ' +
+      'omitted rather than estimated.</p></div>';
   }
   const tt = {};
   Object.keys(byTeam).forEach(t => { tt[t] = teamTotals(byTeam[t]); });
@@ -15825,31 +15829,33 @@ function recapHTML(m) {
   const A = tt[names[0]], B = tt[names[1]];
   const fmtPct = v => (v < 0 ? '-' : '') +
     Math.abs(v).toFixed(3).replace(/^0/, '');
-  /* each team's single best EDGE from the held totals -- largest
-     advantage across the comparable categories, both values shown */
-  const cats = [
-    ['hitting', t => t.hit, v => fmtPct(v), (a, b) => a - b],
-    ['blocks', t => t.blk, v => String(v), (a, b) => (a - b) / 6],
-    ['aces', t => t.aces, v => String(v), (a, b) => (a - b) / 4],
-    ['digs', t => t.digs, v => String(v), (a, b) => (a - b) / 30],
+  /* ⚠ A FIXED, STATED METRIC SET -- NEVER A CHOSEN "EDGE" (round 14). A
+     box score is evidence, not a causal explanation: Wisconsin led aces
+     8-7 in a match Stanford won, and any heading claiming what "decided"
+     a match, or any single best-edge pick ranking hitting percentage
+     against dig counts on no common scale, says more than the data does.
+     Each line is one metric, both teams' named values; the larger value
+     on THAT metric is emphasised and nothing more is claimed. */
+  const METRICS = [
+    ['hitting %', t => t.hit, fmtPct],
+    ['blocks', t => t.blk, String],
+    ['aces', t => t.aces, String],
+    ['digs', t => t.digs, String],
+    ['attack errors', t => t.e, String],
   ];
-  const edge = (mine, theirs, mn, tn) => {
-    let best = null;
-    for (const c of cats) {
-      const a = c[1](mine), b = c[1](theirs);
-      if (a === null || b === null) continue;
-      const adv = c[3](a, b);
-      if (adv > 0 && (!best || adv > best.adv)) {
-        best = { adv: adv, label: c[0], a: c[2](a), b: c[2](b) };
-      }
+  const cmp = METRICS.map(mt => {
+    const a = mt[1](A), b = mt[1](B);
+    if (a === null || a === undefined || b === null || b === undefined) {
+      return '';
     }
-    return best
-      ? '<div class="rcedge"><em>' + esc(mn) + ' edge</em> ' + best.label +
-        ' <b>' + best.a + '</b> to ' + esc(tn) + '\u2019s ' + best.b +
-        ' <i class="rcsrctag">match-aligned box</i></div>'
-      : '';
-  };
-  /* leaders: one per metric, named, valued, with the sample */
+    const aHi = a > b, bHi = b > a;
+    return '<div class="rcline"><span class="rcm">' + mt[0] + '</span>' +
+      '<b class="' + (aHi ? 'rchi' : '') + '">' + mt[2](a) + '</b>' +
+      '<i class="rcvs">\u2013</i>' +
+      '<b class="' + (bHi ? 'rchi' : '') + '">' + mt[2](b) + '</b></div>';
+  }).join('');
+  /* leaders: one per metric, named, valued, with the sample -- a factual
+     list, never a claim about who produced the result */
   const all = byTeam[names[0]].concat(byTeam[names[1]]);
   const leader = (key, label) => {
     const top = all.slice().sort((x, y) => (y[key] || 0) - (x[key] || 0))[0];
@@ -15859,21 +15865,13 @@ function recapHTML(m) {
       ' <span class="rcbasis">' + top.sets + ' sets \u00b7 ' +
       'match-aligned box</span></div>';
   };
-  /* what decided it: measurable differentials, two named values per line,
-     one metric per line, no causal words */
-  const decided =
-    '<div class="rcline">' + esc(names[0]) + ' hit <b>' + fmtPct(A.hit) +
-      '</b> to ' + esc(names[1]) + '\u2019s <b>' + fmtPct(B.hit) +
-      '</b></div>' +
-    '<div class="rcline">blocks <b>' + A.blk + '\u2013' + B.blk +
-      '</b> \u00b7 aces <b>' + A.aces + '\u2013' + B.aces +
-      '</b> \u00b7 attack errors <b>' + A.e + '\u2013' + B.e + '</b></div>';
   return '<div class="msec"><h3>Match recap</h3>' + head +
-    edge(A, B, names[0], names[1]) + edge(B, A, names[1], names[0]) +
+    '<div class="rccmp"><em>Final box-score comparison</em>' +
+    '<div class="rccols"><span></span><span class="rctm">' + esc(names[0]) +
+    '</span><span></span><span class="rctm">' + esc(names[1]) + '</span></div>' +
+    cmp + ' <i class="rcsrctag">match-aligned box</i></div>' +
     '<div class="rcldrs">' + leader('k', 'kills') + leader('digs', 'digs') +
-    leader('ast', 'assists') + '</div>' +
-    '<div class="rcdecided"><em>What decided it</em>' + decided +
-    ' <i class="rcsrctag">match-aligned box</i></div></div>';
+    leader('ast', 'assists') + '</div></div>';
 }
 
 function wireScoreboard() {

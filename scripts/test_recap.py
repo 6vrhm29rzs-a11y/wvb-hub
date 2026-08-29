@@ -90,18 +90,25 @@ console.log(JSON.stringify(html));
               "3\\u20131" in h.replace("\\\\u", "\\u") or "3–1" in h,
               h[:80])
         check("...the source tag is present", "official scoreboard" in h)
-        check("both teams get a labelled edge",
-              h.count("edge") >= 2 and "match-aligned box" in h)
+        check("the neutral comparison renders with its heading",
+              "Final box-score comparison" in h
+              and "match-aligned box" in h)
+        check("every comparison line is one metric with BOTH values",
+              h.count('class="rcline"') == 5
+              and re.search(r'hitting %.*?<b[^>]*>\.\d{3}</b>.*?'
+                            r'<b[^>]*>\.\d{3}</b>', h))
+        check("the larger value is emphasised, never named an edge",
+              "rchi" in h and "edge" not in h.lower())
+        check("aces render neutrally even when the LOSER led them",
+              re.search(r'aces.*?<b[^>]*>3</b>.*?<b class="rchi">3</b>|aces',
+                        h) is not None)
         check("leaders are named with metric, value and sample",
               "P One" in h and "18 kills" in h and "4 sets" in h)
         check("digs leader crosses teams honestly",
               "Q One" in h and "22 digs" in h)
-        check("What decided it carries two named values per metric",
-              "What decided it" in h and re.search(
-                  r"hit <b>\.\d{3}</b> to .*<b>\.\d{3}</b>", h))
-        check("no causal language anywhere",
-              not re.search(r"won because|dominat|collaps|clutch|cruis|"
-                            r"outclass", h, re.I))
+        check("no causal or verdict language anywhere (round 14)",
+              not re.search(r"what decided|decided it|drove it|because|"
+                            r"dominat|clutch|collaps|edge", h, re.I))
 
     print("\n2. NO ALIGNED BOX: A USEFUL FINAL, NOTHING INVENTED")
     h2, err2 = run(recap, "NOBOX")
@@ -113,8 +120,8 @@ console.log(JSON.stringify(html));
         # structural, not word-level: the no-box prose legitimately SAYS
         # "team edges and stat leaders are omitted"
         check("no team or player detail is invented",
-              "rcedge" not in h2 and "rcldr" not in h2
-              and "What decided it" not in h2)
+              "rcline" not in h2 and "rcldr" not in h2
+              and "rccmp" not in h2)
     h3, _ = run(recap, "MISALIGNED")
     check("a box that disagrees with the match is treated as absent",
           h3 is not None and "Detailed box not available" in (h3 or ""))
@@ -134,7 +141,8 @@ console.log(JSON.stringify(html));
     h5, err5 = run(bogus, "MISALIGNED")
     check("[NEG] removing the alignment gate is caught (detail appears "
           "where the suite requires absence)",
-          h5 is not None and "What decided it" in (h5 or ""), err5[:120])
+          h5 is not None and "Final box-score comparison" in (h5 or ""),
+          err5[:120])
     bogus2 = recap.replace(" <i class=\"rcsrctag\">match-aligned box</i>", "")
     bogus2 = bogus2.replace("'match-aligned box</span></div>'",
                             "'</span></div>'")
@@ -144,7 +152,20 @@ console.log(JSON.stringify(html));
           h6 is not None and "match-aligned box" not in (h6 or "")
           and "official scoreboard" not in (h6 or ""))
 
-    print("\n5. PLACEMENT AND REUSE")
+    print("\n5. NO CROSS-METRIC RANKING EXISTS AT ALL")
+    # the implementation may not contain best/largest-edge logic -- the
+    # round-13 version ranked hitting %% against dig counts on no common
+    # scale, and the code itself is the thing to assert on
+    # code only -- the comment explaining WHY the rule was removed may
+    # name it (the prose-guard lesson: a comment is not logic)
+    _code = re.sub(r"/\*.*?\*/", "", recap, flags=re.S)
+    check("no edge-selection or cross-metric ranking in recapHTML",
+          "best" not in _code and ".adv" not in _code
+          and "edge(" not in _code)
+    check("the metric set is fixed and stated",
+          "const METRICS" in recap and recap.count("['") >= 5)
+
+    print("\n6. PLACEMENT AND REUSE")
     check("the recap renders on finals only, after Match facts",
           "(st === 'final' ? recapHTML(m) : '')" in src
           and src.find("Match facts") < src.find(

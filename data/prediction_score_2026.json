@@ -2,15 +2,15 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 197,
+  "scored": 200,
   "logged_after_tipoff_excluded": 6,
   "team_mismatch_excluded": 5,
   "predictions_on_record": 4766,
-  "results_available": 214,
+  "results_available": 217,
   "brier": 0.1872,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 142,
-  "favourite_correct_pct": 72.1
+  "favourite_correct": 144,
+  "favourite_correct_pct": 72.0
  },
  "calibration": [
   {
@@ -21,9 +21,9 @@
   },
   {
    "range": "60-70%",
-   "n": 37,
-   "said": 64.6,
-   "happened": 56.8
+   "n": 39,
+   "said": 64.5,
+   "happened": 56.4
   },
   {
    "range": "70-80%",
@@ -39,9 +39,9 @@
   },
   {
    "range": "90-101%",
-   "n": 67,
-   "said": 95.6,
-   "happened": 88.1
+   "n": 68,
+   "said": 95.7,
+   "happened": 88.2
   }
  ],
  "matches": [
@@ -334,6 +334,15 @@
    "brier": 0.41757444
   },
   {
+   "game_id": "6625219",
+   "date": "2026-08-29",
+   "away": "Fairfield",
+   "home": "Colgate",
+   "p_home": 0.6461,
+   "home_won": false,
+   "brier": 0.41744521
+  },
+  {
    "game_id": "6626328",
    "date": "2026-08-28",
    "away": "High Point",
@@ -485,15 +494,6 @@
    "p_home": 0.5384,
    "home_won": false,
    "brier": 0.28987456
-  },
-  {
-   "game_id": "6626798",
-   "date": "2026-08-28",
-   "away": "Jackson St.",
-   "home": "Kansas City",
-   "p_home": 0.4638,
-   "home_won": true,
-   "brier": 0.28751044000000003
   }
  ]
 }
