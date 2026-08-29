@@ -155,8 +155,19 @@ def validate(payload, expect_sets=None):
 
 
 def player_leaders(tb, names, top=3):
-    """Top scorers by RAW production. [] if the rows are not usable."""
-    out = []
+    """CATEGORY leaders -- kills, assists, digs -- in that fixed order.
+
+    ⚠ NO DERIVED-POINTS SELECTOR (round 16). The first version ranked
+    players by an internal production-points formula and then displayed
+    each pick's largest raw metric -- which hid the selection basis and,
+    on a real fifth set, rendered three kill lines and no setter or
+    defender. Each category now names its own raw leader, only when the
+    metric is held and greater than zero; an unavailable category is
+    OMITTED, never replaced with a second kills line. The same player may
+    lead two categories, and the labels make that plain. Ties break by
+    name for determinism.
+    """
+    rows = []
     for t in tb or []:
         if not isinstance(t, dict):
             continue
@@ -164,34 +175,33 @@ def player_leaders(tb, names, top=3):
         for p in (t.get("playerStats") or []):
             if not isinstance(p, dict):
                 continue
-            k, a = _int(p.get("kills")), _int(p.get("serviceAces"))
-            bs, ba = _int(p.get("blockSolos")), _int(p.get("blockAssists"))
-            if None in (k, a, bs, ba):
-                continue
             name = (" ".join(x for x in ((p.get("firstName") or "").strip(),
-                                         (p.get("lastName") or "").strip()) if x)
-                    ).strip()
+                                         (p.get("lastName") or "").strip())
+                             if x)).strip()
             if not name:
                 continue
-            pts = k + a + bs + 0.5 * ba
-            if pts <= 0:
-                continue
-            # sets/assists/blocks travel too (round 15: the Live Pulse
-            # names each leader's metric AND current sets sample; a leader
-            # whose sets the feed does not carry renders without one, never
-            # with an invented zero -- None is preserved as None)
-            out.append({"name": name, "team_id": tid,
-                        "team": names.get(tid, ""), "kills": k,
-                        "digs": _int(p.get("digs")) or 0,
-                        "aces": a, "points": pts,
-                        # ⚠ MEASURED FIELD NAME: this feed's per-player sets column is
-                        # gamesPlayed (checked live on 6627234); setsPlayed
-                        # exists in a different payload variant and reads None here
-                        "sets": _int(p.get("gamesPlayed")),
-                        "assists": _int(p.get("assists")),
-                        "blocks": (bs + 0.5 * ba)})
-    out.sort(key=lambda r: (-r["points"], r["name"]))
-    return out[:top]
+            rows.append({
+                "name": name, "team_id": tid, "team": names.get(tid, ""),
+                "kills": _int(p.get("kills")),
+                "assists": _int(p.get("assists")),
+                "digs": _int(p.get("digs")),
+                # ⚠ MEASURED FIELD NAME: this feed's per-player sets column
+                # is gamesPlayed (checked live on 6627234); setsPlayed
+                # exists in a different payload variant and reads None here
+                "sets": _int(p.get("gamesPlayed")),
+            })
+    out = []
+    for cat in ("kills", "assists", "digs"):
+        held = [r for r in rows
+                if r[cat] is not None and r[cat] > 0]
+        if not held:
+            continue                       # omitted, never substituted
+        held.sort(key=lambda r: (-r[cat], r["name"]))
+        r = held[0]
+        out.append({"category": cat, "name": r["name"], "team": r["team"],
+                    "team_id": r["team_id"], "value": r[cat],
+                    "sets": r["sets"]})
+    return out
 
 
 class DetailCache(object):

@@ -8210,6 +8210,8 @@ details.avhist{margin:14px 0}
   margin-left:6px;white-space:nowrap}
 .lpstate{font:600 12.5px/1 var(--mono);color:var(--ink2);margin:0 0 8px}
 .lpldrs{margin:8px 0}
+.lpcat{font:600 9px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
+  color:var(--gold);font-style:normal;margin-right:8px}
 .rccmp{margin:4px 0 10px}
 .rccmp > em{display:block;font:600 9.5px/1 var(--disp);letter-spacing:.1em;
   text-transform:uppercase;color:var(--ink3);font-style:normal;
@@ -12744,23 +12746,20 @@ function lmcBody(d, gid) {
     out += '<p class="lpstate">' + liveLine(_all[_gid] || { gid: _gid },
                                             _lv) + '</p>';
   }
-  /* CURRENT STAT LEADERS -- each line names the player, team, her leading
-     metric among kills/assists/digs/blocks/aces, the raw value, and the
-     sets she has played SO FAR. Raw counts only: a partial box supports no
-     rate, no role, and no verdict about how anyone is playing. */
+  /* CATEGORY LEADERS (round 16): kills, assists, digs, in that stated
+     order, each the raw leader of its OWN metric -- the server picks per
+     category with no derived score, so the selection basis is the label
+     itself. An unavailable category is omitted; the same player leading
+     twice appears twice, under both labels. Raw counts only: a partial box
+     supports no rate, no role, and no verdict. */
   if (d.leaders && d.leaders.length) {
-    const METS = [['kills', 'kills'], ['assists', 'assists'],
-                  ['digs', 'digs'], ['blocks', 'blocks'], ['aces', 'aces']];
+    const CATLAB = { kills: 'Kills leader', assists: 'Assists leader',
+                     digs: 'Digs leader' };
     out += '<div class="lpldrs">' + d.leaders.map(pl => {
-      let top = null;
-      for (const mt of METS) {
-        const v = pl[mt[0]];
-        if (v === null || v === undefined) continue;
-        if (!top || v > top.v) top = { v: v, label: mt[1] };
-      }
-      if (!top || !(top.v > 0)) return '';
-      return '<div class="rcldr"><b>' + esc(pl.name) + '</b> (' +
-        esc(pl.team) + ') \u2014 ' + top.v + ' ' + top.label +
+      if (!CATLAB[pl.category] || !(pl.value > 0)) return '';
+      return '<div class="rcldr"><em class="lpcat">' + CATLAB[pl.category] +
+        '</em><b>' + esc(pl.name) + '</b> (' + esc(pl.team) + ') \u2014 ' +
+        pl.value + ' ' + pl.category +
         (pl.sets !== null && pl.sets !== undefined
           ? ' <span class="rcbasis">' + pl.sets + ' sets so far</span>'
           : '') + '</div>';

@@ -374,6 +374,54 @@ def main():
         check("the Pulse heading and source wording are the round-15 ones",
               "Live Match Pulse" in page2
               and "official live feed" in page2)
+        # ── CATEGORY SELECTION (round 16), tested on the reader itself
+        # (LD = live_detail is already this module's top-level import) ──
+        def TB(players):
+            return [{"teamId": "1", "playerStats": players}]
+
+        def P(fn, ln, k, a, dg, gp="5"):
+            return {"firstName": fn, "lastName": ln, "kills": str(k),
+                    "assists": str(a), "digs": str(dg), "gamesPlayed": gp,
+                    "serviceAces": "0", "blockSolos": "0",
+                    "blockAssists": "0"}
+        # three attackers dominate any derived-points ranking; the category
+        # picker must still surface the setter and the defender
+        _tb = TB([P("A", "Hitter", 20, 0, 2), P("B", "Hitter", 18, 1, 3),
+                  P("C", "Hitter", 15, 0, 1), P("S", "Setter", 1, 44, 5),
+                  P("D", "Libero", 0, 2, 23)])
+        _ld = LD.player_leaders(_tb, {"1": "X"})
+        _by = dict((r["category"], r["name"]) for r in _ld)
+        check("attack-heavy box still yields kills, ASSISTS and DIGS leaders",
+              _by.get("kills") == "A Hitter"
+              and _by.get("assists") == "S Setter"
+              and _by.get("digs") == "D Libero", str(_by))
+        check("every leader row carries category/name/team/value/sets",
+              all(set(("category", "name", "team", "value", "sets"))
+                  <= set(r) for r in _ld))
+        # a missing category is omitted, never replaced by a second kills
+        _tb2 = TB([P("A", "Hitter", 20, 0, 0), P("B", "Hitter", 12, 0, 0)])
+        _ld2 = LD.player_leaders(_tb2, {"1": "X"})
+        check("zero-digs box omits the digs category (no substitute)",
+              [r["category"] for r in _ld2] == ["kills"]
+              or [r["category"] for r in _ld2] == ["kills", "assists"],
+              str([r["category"] for r in _ld2]))
+        check("...and no category appears twice",
+              len(set(r["category"] for r in _ld2)) == len(_ld2))
+        # the same player may honestly lead two categories, labelled
+        _tb3 = TB([P("Q", "Both", 10, 12, 2), P("R", "Other", 4, 3, 1)])
+        _by3 = [(r["category"], r["name"])
+                for r in LD.player_leaders(_tb3, {"1": "X"})]
+        check("one player leading two categories appears under both labels",
+              ("kills", "Q Both") in _by3 and ("assists", "Q Both") in _by3)
+        # the old derived-points selector must be GONE from the source
+        _lds = open(os.path.join(REPO, "scripts",
+                                 "live_detail.py")).read()
+        _ldcode = re.sub(r'"""[\s\S]*?"""', "", _lds)
+        check("[NEG] no derived-points selection survives in the reader",
+              "0.5 * ba" not in _ldcode.split("def player_leaders")[1]
+              .split("def ")[0]
+              and "points" not in _ldcode.split("def player_leaders")[1]
+              .split("def ")[0])
         check("leaders come from the ONE server reader (no second feed)",
               "player_leaders" in open(os.path.join(
                   REPO, "scripts", "live_detail.py")).read()
@@ -426,27 +474,23 @@ const av = state({ ok: true, state: 'live', stats_available: true,
   state_note: 'Live score and team totals from the official feed.',
   teams: [{team:'A',kills:10},{team:'B',kills:9}],
   leaders: [
-    { name: 'L One', team: 'A', kills: 14, assists: 2, digs: 6,
-      blocks: 1.5, aces: 1, sets: 5 },
-    { name: 'L Two', team: 'B', kills: 3, assists: 31, digs: 4,
-      blocks: 0, aces: 0, sets: 5 },
-    { name: 'L Three', team: 'A', kills: 0, assists: 0, digs: 12,
-      blocks: 0, aces: 0, sets: null }] });
+    { category: 'kills', name: 'L One', team: 'A', value: 14, sets: 5 },
+    { category: 'assists', name: 'L Two', team: 'B', value: 31, sets: 5 },
+    { category: 'digs', name: 'L Three', team: 'A', value: 12,
+      sets: null }] });
 const so = state({ ok: true, state: 'live', stats_available: false,
   state_label: 'Live',
   state_note: 'Live score only \u2014 the source is not serving statistics for this match yet.',
   stats_reason: '' });
 const bad = [];
 if (!/<table/.test(av.box)) bad.push('stats-available: no table rendered');
-if (av.box.indexOf('14 kills') < 0 || av.box.indexOf('5 sets so far') < 0)
-  bad.push('leader lacks metric/value/sets');
-if (av.box.indexOf('31 assists') < 0)
-  bad.push('an assists leader is not labelled by her leading metric');
-if (av.box.indexOf('L Three') >= 0 && av.box.indexOf('12 digs') >= 0
-    && /L Three[^<]*<\/b>[^<]*12 digs[^<]*sets/.test(av.box) === false
-    && av.box.split('L Three')[1].indexOf('sets so far') >= 0
-    && av.box.split('L Three')[1].indexOf('null') >= 0)
-  bad.push('a missing sets sample rendered as a value');
+if (av.box.indexOf('Kills leader') < 0 || av.box.indexOf('14 kills') < 0
+    || av.box.indexOf('5 sets so far') < 0)
+  bad.push('kills leader lacks category/value/sets');
+if (av.box.indexOf('Assists leader') < 0 || av.box.indexOf('31 assists') < 0)
+  bad.push('assists category missing');
+if (av.box.indexOf('Digs leader') < 0 || av.box.indexOf('12 digs') < 0)
+  bad.push('digs category missing');
 if (/null sets|undefined sets/.test(av.box))
   bad.push('missing fields rendered as null/undefined');
 if (av.box.indexOf('2\u20132') < 0 && av.box.indexOf('5TH SET') < 0)
