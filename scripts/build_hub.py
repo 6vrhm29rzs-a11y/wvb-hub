@@ -3073,6 +3073,165 @@ def played_forecast(rows, epoch):
         return None, "no forecast was logged before this match"
     return None, "no forecast was logged before this match"
 
+
+def conference_lab(bteams, tj):
+    # type: (List[Dict], Dict) -> Dict
+    """The Conference Lab payload: how each league has ACTUALLY fared.
+
+    Two things this deliberately is not (review round 6):
+      * a single conference score -- "current strength" (POWER-derived) and
+        "results so far" (completed interconference matches) are separate,
+        separately-labelled columns and are never blended into one number;
+      * a verdict -- with the season days old, every figure carries its
+        sample size, and a league below the (stated, display-only) sample
+        floor wears an "early" tag instead of winner/loser language.
+
+    Basis facts the page states: results come from the verified crawl
+    (finals only, exhibitions and non-D-I excluded); AVCA = the coaches
+    poll as captured; POWER = our board rank with its own recompute stamp.
+    The interconference matrix's cells each carry the exact match list
+    behind them, so a cell can be opened and checked -- a count that cannot
+    be drilled into is a claim, not a fact.
+    """
+    from reconcile_2025 import norm as _n
+    conf_of = dict((t["team"], t["conf"]) for t in bteams if t.get("conf"))
+    avca = dict((t["team"], t.get("avca")) for t in bteams if t.get("avca"))
+    power = dict((t["team"], t.get("rank26")) for t in bteams if t.get("rank26"))
+    n2team = dict((_n(t), t) for t in conf_of)
+    doc = load("data/data_%d.json" % SEASON) or {}
+    id2n = dict((str(t["team_id"]), t.get("name_short"))
+                for t in (doc.get("teams") or []))
+    exh = set(str(k) for k in (exhibitions() or {}))
+
+    def blank():
+        return {"w": 0, "l": 0, "vs25w": 0, "vs25l": 0,
+                "vsp25w": 0, "vsp25l": 0, "vsp50w": 0, "vsp50l": 0,
+                "five": 0, "roadw": 0, "roadl": 0}
+
+    per = {}
+    for c in set(conf_of.values()):
+        per[c] = blank()
+    matrix = {}
+    n_inter = n_intra = n_exh = n_unres = 0
+    through_ep = 0
+    for g in (doc.get("games") or []):
+        if g.get("state") != "F":
+            continue
+        gid = str(g.get("game_id"))
+        if gid in exh:
+            n_exh += 1
+            continue
+        ts = g.get("teams") or []
+        if len(ts) != 2 or any(t.get("division") != 1 for t in ts):
+            continue
+        names = [id2n.get(str(t.get("team_id")), "") for t in ts]
+        canon = [n2team.get(_n(n)) for n in names]
+        if not all(canon):
+            n_unres += 1
+            continue
+        ca, cb = conf_of[canon[0]], conf_of[canon[1]]
+        if ca == cb:
+            n_intra += 1
+            continue                     # conference play: not evidence ABOUT the league
+        n_inter += 1
+        through_ep = max(through_ep, int(g.get("start_time_epoch") or 0))
+        awin = str(g.get("winner_team_id")) == str(ts[0].get("team_id"))
+        nsets = len([l for l in (g.get("linescores") or [])
+                     if l.get("home") is not None])
+        sc = [0, 0]
+        for l in (g.get("linescores") or []):
+            if l.get("home") is None:
+                continue
+            a0, h0 = int(l.get("visit") or 0), int(l.get("home") or 0)
+            if a0 > h0:
+                sc[0] += 1
+            elif h0 > a0:
+                sc[1] += 1
+        row = {"gid": gid, "a": canon[0], "h": canon[1],
+               "as": sc[0], "hs": sc[1],
+               "d": _pt_date(g.get("start_time_epoch") or 0)}
+        for me, opp, mine_won, is_away in (
+                (ca, canon[1], awin, not ts[0].get("is_home", True)),
+                (cb, canon[0], not awin, not ts[1].get("is_home", True))):
+            p = per[me]
+            p["w" if mine_won else "l"] += 1
+            if nsets == 5:
+                p["five"] += 1
+            if is_away:
+                p["roadw" if mine_won else "roadl"] += 1
+            if avca.get(opp):
+                p["vs25w" if mine_won else "vs25l"] += 1
+            opr = power.get(opp)
+            if opr and opr <= 25:
+                p["vsp25w" if mine_won else "vsp25l"] += 1
+            if opr and opr <= 50:
+                p["vsp50w" if mine_won else "vsp50l"] += 1
+        key = ca + "|" + cb
+        cell = matrix.setdefault(key, {"w": 0, "l": 0, "games": []})
+        cell["w" if awin else "l"] += 1
+        cell["games"].append(row)
+
+    # tests ahead, from each team's own fixture list already assembled
+    ahead = {}
+    for nm, rec in (tj or {}).items():
+        c = conf_of.get(nm)
+        if not c:
+            continue
+        a = ahead.setdefault(c, {"ranked": 0, "p50": 0, "road": 0})
+        for f in (rec.get("fixtures") or []):
+            opp = f.get("opp")
+            if avca.get(opp):
+                a["ranked"] += 1
+            opr = power.get(opp)
+            if opr and opr <= 50:
+                a["p50"] += 1
+            if not f.get("home") and avca.get(opp):
+                a["road"] += 1
+
+    confs = []
+    for c in sorted(per):
+        members = [t for t, cc in conf_of.items() if cc == c]
+        pranks = sorted(power[t] for t in members if power.get(t))
+        p = per[c]
+        n = p["w"] + p["l"]
+        confs.append({
+            "conf": c, "size": len(members),
+            "w": p["w"], "l": p["l"],
+            "vs25": [p["vs25w"], p["vs25l"]],
+            "vsp25": [p["vsp25w"], p["vsp25l"]],
+            "vsp50": [p["vsp50w"], p["vsp50l"]],
+            "five": p["five"], "road": [p["roadw"], p["roadl"]],
+            "n_avca": sum(1 for t in members if avca.get(t)),
+            "n_p25": sum(1 for r in pranks if r <= 25),
+            "n_p50": sum(1 for r in pranks if r <= 50),
+            "med_power": (pranks[len(pranks) // 2] if pranks else None),
+            "top3_power": (round(sum(pranks[:3]) / 3.0) if len(pranks) >= 3
+                           else None),
+            "top5_power": (round(sum(pranks[:5]) / 5.0) if len(pranks) >= 5
+                           else None),
+            "ahead": ahead.get(c) or {"ranked": 0, "p50": 0, "road": 0},
+            # ⚠ a DISPLAY floor, stated as one on the page -- not a verdict
+            # threshold (R1). Ten completed interconference matches is when
+            # a league record stops being three schools' opening weekend.
+            "early": n < 10,
+        })
+
+    snaps = 0
+    sp = os.path.join(REPO, "data", "conference_snapshots_%d.jsonl" % SEASON)
+    if os.path.exists(sp):
+        snaps = sum(1 for _ln in open(sp, encoding="utf-8") if _ln.strip())
+    return {
+        "meta": {
+            "results_through": (_pt_date(through_ep) if through_ep else None),
+            "n_interconf": n_inter, "n_intraconf": n_intra,
+            "n_exhibitions_excluded": n_exh, "n_unresolved": n_unres,
+            "snapshots_held": snaps,
+        },
+        "confs": confs,
+        "matrix": matrix,
+    }
+
+
 def build():
     teams, field, unmatched, n_aq, meta = BOARD.build()
     if PUBLIC:
@@ -3182,6 +3341,11 @@ def build():
                     sched_n[_k] = sched_n.get(_k, 0) + 1
     tindex = team_index(teams, res_cnt, pred_by_pair, sim_of, ldr_floor,
                         tstats=tstats, aq_of=aq_of, sched_n=sched_n)
+    _conflab = conference_lab(teams, tindex)
+    # a side artifact so the Sunday-cutoff snapshot script can freeze the
+    # SAME payload the page renders, without re-deriving it (R4)
+    json.dump(_conflab, open(os.path.join(REPO, "data",
+              "conference_lab_%d.json" % SEASON), "w"), indent=1)
     proj_meta = (load("data/projection_2026.json") or {}).get("meta", {})
     level = load("data/level_effect.json") or {}
 
@@ -4027,6 +4191,7 @@ def build():
             roster_index(), separators=(",", ":"))) \
         .replace("{{N_PLAYERS}}", str(len(plist))) \
         .replace("{{LEADERS_JSON}}", json.dumps(ldrs, separators=(",", ":"))) \
+        .replace("{{CONFLAB_JSON}}", json.dumps(_conflab, separators=(",", ":"))) \
         .replace("{{TSTATS_JSON}}", blob(
             [dict(team=k, conf=(tindex.get(k) or {}).get("conf"), **v)
              for k, v in sorted(tstats.items())])) \
@@ -7944,6 +8109,49 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 #livetick .tkm b{color:var(--chalk);font-weight:700}
 #livetick .tkm .tkset{color:var(--gold);font-weight:700}
 #livetick .tkm .tkrk{font:600 9px/1 var(--disp);color:var(--gold)}
+/* ── CONFERENCE LAB ─────────────────────────────────────────────────── */
+.cfcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:10px;margin:0 0 16px}
+.cfcard{border:1px solid var(--line);border-radius:3px;padding:11px 13px;
+  display:flex;flex-direction:column;gap:5px}
+.cfcard em{font:600 9.5px/1 var(--disp);letter-spacing:.12em;
+  text-transform:uppercase;font-style:normal;color:var(--ink3)}
+.cfcard b{font:700 17px/1.2 var(--disp);color:var(--chalk);
+  text-transform:uppercase}
+.cfcard span{font-size:12px;color:var(--ink2)}
+.cftab{width:100%;border-collapse:collapse}
+.cftab th{font:600 9.5px/1.2 var(--disp);letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink3);padding:7px 8px;cursor:pointer;
+  white-space:nowrap}
+.cftab th.on{color:var(--gold)}
+.cftab th.l{text-align:left}.cftab th.n{text-align:right}
+.cftab td{padding:6px 8px;border-bottom:1px solid var(--line);font-size:12.5px;
+  text-align:right;font-variant-numeric:tabular-nums}
+.cftab td.tm{text-align:left;font-weight:600;color:var(--chalk)}
+.cfearly{font:600 9px/1 var(--disp);letter-spacing:.1em;color:var(--gold);
+  border:1px solid color-mix(in oklab,var(--gold) 50%,transparent);
+  border-radius:2px;padding:2px 4px;font-style:normal;margin-left:6px}
+.cfroad{font-size:10px;color:var(--ink3);font-style:normal}
+.cfh{font:700 13px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink2);margin:22px 0 8px}
+.cfmat{border-collapse:collapse}
+.cfmat th{font:600 9px/1.2 var(--disp);letter-spacing:.06em;color:var(--ink3);
+  padding:5px 6px;text-transform:uppercase}
+.cfmat th.l{text-align:left;white-space:nowrap}
+.cfmat td{padding:2px;text-align:center}
+.cfmat .cfself{background:color-mix(in oklab,var(--line) 35%,transparent)}
+.cfmat .cfnone{color:var(--ink3)}
+.cfcellb{font:600 11px/1 var(--mono);padding:5px 7px;border-radius:2px;
+  border:1px solid var(--line);background:none;color:var(--ink2);
+  cursor:pointer;font-variant-numeric:tabular-nums}
+.cfcellb.up{color:var(--good);border-color:color-mix(in oklab,var(--good) 45%,transparent)}
+.cfcellb.dn{color:var(--coral);border-color:color-mix(in oklab,var(--coral) 40%,transparent)}
+.cfcellb:hover{border-color:var(--line2)}
+#cfdrill .cfg .mrt b.tn{font:600 13px/1.2 var(--sans);text-transform:none;
+  letter-spacing:0}
+@media (max-width:560px){
+  .cfcards{grid-template-columns:1fr}
+}
 .wwlist{display:flex;flex-direction:column;gap:7px}
 .wwrow{display:flex;align-items:baseline;gap:10px}
 .wwfact{font-size:13px;color:var(--ink2)}
@@ -8325,6 +8533,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
         <button role="menuitem" data-v="players">Players</button>
         <button role="menuitem" data-v="prank">Player ratings</button>
         <button role="menuitem" data-v="standings">Standings</button>
+        <button role="menuitem" data-v="conflab">Conference Lab</button>
         <button role="menuitem" data-v="bracket">Projected bracket</button>
         <button role="menuitem" data-v="schedule">Schedule</button>
         <button role="menuitem" data-v="tv">On TV</button>
@@ -8962,6 +9171,23 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   </div>
 </section>
 
+<section id="v-conflab" hidden>
+  <h2>Conference Lab</h2>
+  <p class="lead" id="cflead"></p>
+  <div id="cfcards"></div>
+  <div class="scroll"><table class="cftab"><thead id="cfhead"></thead>
+    <tbody id="cfbody"></tbody></table></div>
+  <h3 class="cfh">Interconference results matrix</h3>
+  <p class="tnote">Completed Division-I matches between two different
+    conferences, from the verified crawl. Exhibitions, non-D-I opponents and
+    unresolved fixtures are excluded (the lead states how many). Rows read
+    across: wins by the row conference over the column conference. Click a
+    cell for the exact matches behind it.</p>
+  <div class="scroll" id="cfmatwrap"></div>
+  <div id="cfdrill" hidden></div>
+  <p class="tnote" id="cfsnap"></p>
+</section>
+
 <section id="v-standings" hidden>
   <p class="lead"><b>2026 standings.</b> Conference tables, filling in as results land. Conference record first,
   overall beside it &mdash; early in a season nearly every match is non-conference, so the
@@ -9218,7 +9444,8 @@ const ROUTE_ALIASES = { 'match-desk': 'desk' };
 const ROUTE_OF_VIEW = { desk:'today', scores:'scores', rankings:'rankings',
   teams:'teams', ballot:'ballot', leaders:'stats', players:'players',
   prank:'player-ratings',
-  standings:'standings', bracket:'bracket', schedule:'schedule', tv:'tv',
+  standings:'standings', conflab:'conference-lab',
+  bracket:'bracket', schedule:'schedule', tv:'tv',
   /* FILMROOM-ROUTE-BEGIN */ film:'film-room', /* FILMROOM-ROUTE-END */
   /* INTEL-ROUTE-BEGIN */ intel:'intel' /* INTEL-ROUTE-END */ };
 const VIEW_OF_ROUTE = Object.keys(ROUTE_OF_VIEW)
@@ -14884,6 +15111,185 @@ function renderScoreboard() {
       '<span>' + in_.length + '</span></h3>' + inner + '</section>';
   }).join('');
 }
+
+/* ── CONFERENCE LAB ──────────────────────────────────────────────────────
+   A conference intelligence desk, not a second standings page. Two ideas
+   carry it (review round 6): "current strength" (POWER-derived columns) and
+   "results so far" (completed interconference matches) are separate,
+   separately-labelled things -- never one blended score; and every count can
+   be OPENED -- each matrix cell carries the exact match list behind it, so a
+   number on this page is a drillable fact, not a claim. */
+const CONFLAB = {{CONFLAB_JSON}};
+let CF_SORT = ['w', -1];
+
+function cfRecord(w, l) {
+  return (w + l) ? w + '\u2013' + l : '\u2014';
+}
+
+function cfLead() {
+  const m = CONFLAB.meta || {};
+  return 'Completed <b>' + m.n_interconf + '</b> interconference Division-I ' +
+    'matches through <b>' + esc(m.results_through || '\u2014') + '</b>' +
+    (m.n_intraconf ? ', plus ' + m.n_intraconf + ' in conference play' : '') +
+    '. Excluded: ' + m.n_exhibitions_excluded + ' exhibition' +
+    (m.n_exhibitions_excluded === 1 ? '' : 's') +
+    (m.n_unresolved ? ', ' + m.n_unresolved + ' unresolvable' : '') +
+    ', and every non-D-I opponent. ' +
+    '<b>Results are early</b>: a league under 10 completed matches wears an ' +
+    'EARLY tag \u2014 a display floor, not a verdict. AVCA is the coaches ' +
+    'poll as captured; POWER is our board rank \u2014 the two "strength" ' +
+    'columns and the "results" columns are separate claims and are never ' +
+    'blended into one score.';
+}
+
+const CF_COLS = [
+  ['conf', 'Conference', 0, 'the league'],
+  ['w', 'Non-conf', -1, 'completed interconference D-I record'],
+  ['vs25', 'vs AVCA 25', -1, 'record against teams in the coaches poll'],
+  ['vsp50', 'vs POWER 50', -1, 'record against our board top 50'],
+  ['road', 'Road/neutral', -1, 'record when not the feed\u2019s home side'],
+  ['five', '5-set', -1, 'five-set interconference matches'],
+  ['n_avca', 'AVCA', -1, 'teams in the coaches poll'],
+  ['n_p50', 'P50', -1, 'teams in our board top 50'],
+  ['med_power', 'Med POWER', 1, 'median board rank of members'],
+  ['top3_power', 'Top-3 POWER', 1, 'mean board rank of the best three'],
+  ['ahead', 'Ranked ahead', -1, 'scheduled future matches vs the coaches poll'],
+];
+
+function cfVal(c, k) {
+  if (k === 'w') return c.w + c.l ? c.w / (c.w + c.l) : -1;
+  if (k === 'vs25' || k === 'vsp50' || k === 'road') {
+    const v = c[k];
+    return (v[0] + v[1]) ? v[0] / (v[0] + v[1]) : -1;
+  }
+  if (k === 'ahead') return c.ahead.ranked;
+  return c[k] === null || c[k] === undefined ? 1e9 : c[k];
+}
+
+function cfCell(c, k) {
+  if (k === 'conf') {
+    return '<td class="tm">' + esc(c.conf) +
+      (c.early ? ' <i class="cfearly" title="under 10 completed ' +
+        'interconference matches \u2014 a display floor, not a verdict">' +
+        'EARLY</i>' : '') + '</td>';
+  }
+  if (k === 'w') return '<td>' + cfRecord(c.w, c.l) + '</td>';
+  if (k === 'vs25' || k === 'vsp50' || k === 'road') {
+    return '<td>' + cfRecord(c[k][0], c[k][1]) + '</td>';
+  }
+  if (k === 'ahead') {
+    return '<td>' + c.ahead.ranked + (c.ahead.road
+      ? ' <i class="cfroad">' + c.ahead.road + ' away</i>' : '') + '</td>';
+  }
+  const v = c[k];
+  return '<td>' + (v === null || v === undefined ? '\u2014' : v) + '</td>';
+}
+
+function renderConfLab() {
+  const lead = document.getElementById('cflead');
+  if (!lead || typeof CONFLAB === 'undefined') return;
+  lead.innerHTML = cfLead();
+  const confs = (CONFLAB.confs || []).slice();
+  /* the ten-second cards: fared / deep / missing */
+  const withN = confs.filter(c => c.w + c.l >= 10);
+  const best = withN.slice().sort((a, b) => cfVal(b, 'w') - cfVal(a, 'w'))[0];
+  const deep = confs.slice().sort((a, b) => b.n_p50 - a.n_p50)[0];
+  const none = confs.filter(c => !(c.w + c.l));
+  document.getElementById('cfcards').innerHTML =
+    '<div class="cfcards">' +
+    (best ? '<div class="cfcard"><em>Best non-conf record (10+ played)</em>' +
+      '<b>' + esc(best.conf) + '</b><span>' + cfRecord(best.w, best.l) +
+      ' \u00b7 vs AVCA 25: ' + cfRecord(best.vs25[0], best.vs25[1]) +
+      '</span></div>' : '') +
+    (deep ? '<div class="cfcard"><em>Deepest by POWER top-50</em><b>' +
+      esc(deep.conf) + '</b><span>' + deep.n_p50 + ' teams \u00b7 median ' +
+      'POWER ' + deep.med_power + '</span></div>' : '') +
+    '<div class="cfcard"><em>Evidence still missing</em><b>' +
+      (none.length ? none.map(c => c.conf).join(', ') : 'none') + '</b>' +
+      '<span>' + (none.length ? 'no completed interconference match yet'
+                              : 'every league has played') + '</span></div>' +
+    '</div>';
+  const [sk, sdir] = CF_SORT;
+  confs.sort((a, b) => (cfVal(b, sk) - cfVal(a, sk)) * -sdir ||
+                       String(a.conf).localeCompare(String(b.conf)));
+  document.getElementById('cfhead').innerHTML = '<tr>' + CF_COLS.map(c =>
+    '<th class="' + (c[0] === 'conf' ? 'l' : 'n') + (sk === c[0] ? ' on' : '') +
+    '" data-cfsort="' + c[0] + '" title="' + c[3] + '">' + c[1] + '</th>')
+    .join('') + '</tr>';
+  document.getElementById('cfbody').innerHTML = confs.map(c =>
+    '<tr>' + CF_COLS.map(col => cfCell(c, col[0])).join('') + '</tr>').join('');
+  renderConfMatrix();
+  const m = CONFLAB.meta || {};
+  document.getElementById('cfsnap').innerHTML =
+    '<b>Weekly snapshots:</b> ' + (m.snapshots_held || 0) + ' held, frozen ' +
+    'on the Sunday-night cutoff the ballot work uses. Movement columns ' +
+    'appear once <b>two comparable snapshots on the same POWER basis</b> ' +
+    'exist \u2014 until then there is nothing honest to compare.';
+}
+
+function renderConfMatrix() {
+  const wrap = document.getElementById('cfmatwrap');
+  const M = CONFLAB.matrix || {};
+  const names = {};
+  Object.keys(M).forEach(k => {
+    const [a, b] = k.split('|');
+    names[a] = 1; names[b] = 1;
+  });
+  const list = Object.keys(names).sort();
+  const cell = (a, b) => {
+    if (a === b) return '<td class="cfself"></td>';
+    const f = M[a + '|' + b], r = M[b + '|' + a];
+    const w = (f ? f.w : 0) + (r ? r.l : 0);
+    const l = (f ? f.l : 0) + (r ? r.w : 0);
+    if (!w && !l) return '<td class="cfnone">\u00b7</td>';
+    return '<td><button type="button" class="cfcellb' +
+      (w > l ? ' up' : l > w ? ' dn' : '') + '" data-cfcell="' +
+      esc(a) + '|' + esc(b) + '">' + w + '\u2013' + l + '</button></td>';
+  };
+  wrap.innerHTML = '<table class="cfmat"><thead><tr><th></th>' +
+    list.map(c => '<th title="' + esc(c) + '">' + esc(c).slice(0, 7) +
+      '</th>').join('') + '</tr></thead><tbody>' +
+    list.map(a => '<tr><th class="l">' + esc(a) + '</th>' +
+      list.map(b => cell(a, b)).join('') + '</tr>').join('') +
+    '</tbody></table>';
+}
+
+function cfDrill(key) {
+  const [a, b] = key.split('|');
+  const M = CONFLAB.matrix || {};
+  const rows = ((M[a + '|' + b] || {}).games || [])
+    .concat(((M[b + '|' + a] || {}).games || []))
+    .slice().sort((x, y) => String(x.d).localeCompare(String(y.d)));
+  const el = document.getElementById('cfdrill');
+  el.hidden = false;
+  el.innerHTML = '<h3 class="cfh">' + esc(a) + ' v ' + esc(b) + ' \u2014 ' +
+    rows.length + (rows.length === 1 ? ' match' : ' matches') + '</h3>' +
+    '<div class="tdlist">' + rows.map(g =>
+      '<button type="button" class="mrow cfg" data-match="' + esc(g.gid) +
+      '"><span class="mwhen">' + esc(g.d) + '</span>' +
+      '<span class="mrt"><b class="tn">' + logo(g.a, 'sm') + esc(g.a) +
+      '</b> ' + g.as + '\u2013' + g.hs + ' <b class="tn">' + logo(g.h, 'sm') +
+      esc(g.h) + '</b></span></button>').join('') + '</div>';
+  el.scrollIntoView({ block: 'nearest' });
+}
+
+(function wireConfLab() {
+  const sec = document.getElementById('v-conflab');
+  if (!sec) return;
+  sec.addEventListener('click', e => {
+    const th = e.target.closest('[data-cfsort]');
+    if (th) {
+      const k = th.dataset.cfsort;
+      const def = CF_COLS.filter(c => c[0] === k)[0];
+      CF_SORT = CF_SORT[0] === k ? [k, -CF_SORT[1]] : [k, def ? def[2] : -1];
+      renderConfLab();
+      return;
+    }
+    const c = e.target.closest('[data-cfcell]');
+    if (c) { cfDrill(c.dataset.cfcell); }
+  });
+  renderConfLab();
+})();
 
 function wireScoreboard() {
   const host = document.getElementById('v-scores');

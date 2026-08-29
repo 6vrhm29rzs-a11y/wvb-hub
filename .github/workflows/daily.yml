@@ -209,6 +209,7 @@ jobs:
           # naming what it is waiting for. The Monday 20:15 UTC run above is
           # the second chance; a partial freeze is never the fallback.
           python3 scripts/snapshot_rankings.py || echo "snapshot skipped; continuing"
+          python3 scripts/snapshot_conferences.py || echo "conference snapshot skipped; continuing"
           # The published polls. The rankings endpoint is CURRENT-ONLY and
           # cannot be season-pinned, so a poll not captured the day it is
           # published is gone for good. Appends only when the poll's own

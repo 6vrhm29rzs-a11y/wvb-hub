@@ -183,13 +183,27 @@ def main():
     check("it describes itself as a difference, not a verdict",
           "statement of difference" in h)
 
-    print("\n5. AN INACTIVE RESUME SAYS SO")
-    check("the inactive resume renders an explicit off-state",
-          'class="rsoff"' in h)
-    check("...explaining that nobody has earned anything yet",
-          "have earned anything yet" in h)
-    check("[-] and it does not print a rank while inactive",
-          not re.search(r'class="n rs"><span class="rsoff"[^>]*>#\d', h))
+    print("\n5. THE RESUME STATE MATCHES ITS OWN ARTIFACT")
+    # ⚠ STATE-CONDITIONAL, NOT PINNED (2026-08-28): the resume crossed its
+    # 200-match floor on the season's first full night (202 matches) and went
+    # ACTIVE -- and this guard, written in the preseason, pinned the OFF
+    # state as permanent. The invariant is agreement with the artifact:
+    # inactive renders the explicit off-state and no rank; active renders
+    # ranks and no off-state.
+    _rsm = (json.load(open(os.path.join(REPO, "data", "resume_2026.json")))
+            .get("meta", {}) if os.path.exists(
+                os.path.join(REPO, "data", "resume_2026.json")) else {})
+    if _rsm.get("active"):
+        check("the ACTIVE resume prints ranks",
+              re.search(r'class="n rs"', h) is not None)
+        check("...and the off-state is gone", 'class="rsoff"' not in h)
+    else:
+        check("the inactive resume renders an explicit off-state",
+              'class="rsoff"' in h)
+        check("...explaining that nobody has earned anything yet",
+              "have earned anything yet" in h)
+        check("[-] and it does not print a rank while inactive",
+              not re.search(r'class="n rs"><span class="rsoff"[^>]*>#\d', h))
 
     print("\n6. NO FABRICATED MOVEMENT")
     # Movement is only honest with enough dated, SAME-BASIS snapshots.
