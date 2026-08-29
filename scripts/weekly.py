@@ -219,6 +219,35 @@ def disposition(season, root=None):
                 for f in (doc.get("fixtures") or []))
 
 
+def ballot_sunday(today):
+    # type: (datetime.date) -> datetime.date
+    """The Sunday a ballot written `today` covers THROUGH: today when it is
+    Sunday, otherwise the next one. The freeze uses prior_sunday (strictly
+    before, because a Monday freeze cannot claim Sunday-night matches it has
+    not crawled); the BALLOT is the opposite object -- Cody writes it Sunday
+    night for the week ending that same day, so on ballot night the label
+    must name that week, not the one already frozen. Round 21: the workshop
+    header read "Through Sunday, August 23 -- complete" on the eve of the
+    Aug-30 ballot."""
+    ahead = (6 - today.weekday()) % 7        # Sun -> 0, Mon -> 6, Sat -> 1
+    return today + datetime.timedelta(days=ahead)
+
+
+def ballot_status(season, today=None, now_epoch=None):
+    # type: (int, Optional[datetime.date], Optional[int]) -> Dict
+    """status(), but for the week the CURRENT ballot covers."""
+    today = today or datetime.date.today()
+    now_epoch = now_epoch or int(datetime.datetime.now().timestamp())
+    cutoff = ballot_sunday(today)
+    games = _load_games(os.path.join(REPO, "data", "raw", str(season),
+                                     "games.jsonl"))
+    c = completeness(games, cutoff, now_epoch, disposition=disposition(season))
+    c["week"] = iso_week(cutoff)
+    c["label"] = week_label(cutoff)
+    c["policy"] = _policy(season)
+    return c
+
+
 def status(season, today=None, now_epoch=None):
     # type: (int, Optional[datetime.date], Optional[int]) -> Dict[str, Any]
     """The whole picture the calendar view renders."""

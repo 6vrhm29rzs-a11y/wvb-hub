@@ -2658,6 +2658,20 @@ def calendar_tracks():
     except Exception:                                    # noqa: BLE001
         out["waiting"] = None
 
+    # ---- the week the CURRENT ballot covers (round 21) ---------------------
+    # prior_sunday is freeze semantics; Cody ballots Sunday night for the
+    # week ending THAT day, and the workshop header must name it.
+    try:
+        bst = WK.ballot_status(SEASON)
+        out["ballot"] = {
+            "label": bst["label"], "cutoff": bst["cutoff"],
+            "state": bst["state"], "finals": bst["finals"],
+            "blocking": len(bst["blocking"]),
+            "withdrawn": len(bst["withdrawn"]),
+        }
+    except Exception:                                    # noqa: BLE001
+        out["ballot"] = None
+
     # ---- AVCA (OFFICIAL) ---------------------------------------------------
     avca = os.path.join(REPO, "data", "raw", str(SEASON), "polls_avca.jsonl")
     if os.path.exists(avca):
@@ -4207,6 +4221,11 @@ def build():
         .replace("{{CHANGED_HIDDEN}}", "" if _chg else "hidden") \
         .replace("{{SEASON_YEAR}}", str(SEASON)) \
         .replace("{{RESUME_ACTIVE_JS}}", "true" if _resume_active else "false") \
+        .replace("{{BW_RESUME_LEGEND}}",
+                 '<i class="bwsw"></i>R&Eacute;SUM&Eacute; &mdash; ' +
+                 ("live \u2014 what each team has earned"
+                  if _resume_active else
+                  "inactive until enough games are played")) \
         .replace("{{FIXTURES_JSON}}", json.dumps(
             {str(r["gid"]): {
                 "gid": str(r["gid"]), "d": r["d"],
@@ -9211,7 +9230,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
          careful about -- a résumé does not exist yet because too little of the
          season has been played, not because a switch is off. The compact key
          gets its brevity from the other three, not from this one. -->
-    <span class="bwr off"><i class="bwsw"></i>R&Eacute;SUM&Eacute; &mdash; inactive until enough games are played</span>
+    <span class="bwr off">{{BW_RESUME_LEGEND}}</span>
   </div>
 
   <!-- WEEKLY BRIEFING. Facts about YOUR ballot and the week since you saved
@@ -12039,6 +12058,10 @@ function bwEvidence(name) {
   }
   bits.push(RESUME_ACTIVE && t.resume_rank
     ? '<span class="bwe rs"><i>RÉSUMÉ</i> #' + t.resume_rank + '</span>'
+    /* two different absences (round 21): the feature being off and THIS
+       team having no counted result yet are not one fact */
+    : RESUME_ACTIVE
+    ? '<span class="bwe rs off" title="The résumé ranking is live, but this team has no counted Division-I result yet."><i>RÉSUMÉ</i> no counted result yet</span>'
     : '<span class="bwe rs off" title="A résumé measures what a team has earned against the schedule it has played. Not enough of the season has been played yet."><i>RÉSUMÉ</i> not active yet</span>');
   bits.push('<span class="bwe ref"><i>AVCA</i> ' +
     (t.avca ? '#' + t.avca : 'unranked') + '</span>');
@@ -12330,13 +12353,20 @@ function bwStatusBar() {
   /* the week this ballot is for, and how settled its results are */
   let week = '&mdash;', weekCls = 'dim', settle = 'not known', setCls = 'dim';
   try {
-    const w = (typeof CAL !== 'undefined' && CAL) ? CAL.waiting : null;
+    /* ⚠ THE BALLOT'S OWN WEEK (round 21), not the freeze's. CAL.waiting is
+       prior-Sunday freeze semantics, so on ballot night it named the week
+       ALREADY FROZEN ("Through Sunday, August 23 -- complete") while Cody
+       was balloting the week ending that same evening. CAL.ballot is the
+       week this ballot covers; a week still in progress says how much of
+       it is in, not "unresolved". */
+    const w = (typeof CAL !== 'undefined' && CAL) ? CAL.ballot : null;
     if (w) {
       week = esc(String(w.label || '').replace('Digby Weekly \u00b7 ', ''));
       weekCls = '';
       if (w.blocking) {
-        settle = w.blocking + ' unresolved';
-        setCls = 'warn';
+        settle = w.finals + ' finals in \u00b7 ' + w.blocking +
+          ' still to play';
+        setCls = '';
       } else if (w.withdrawn) {
         settle = 'complete \u00b7 ' + w.withdrawn + ' withdrawn';
         setCls = 'ok';
