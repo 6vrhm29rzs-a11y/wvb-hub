@@ -1824,6 +1824,33 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
   margin-right:9px;padding-right:11px;border-right:1px solid var(--cs-edge2);
   font-variant-numeric:tabular-nums}
 .mlt.w{color:var(--chalk)}
+/* THE DETAIL LINESCORE -- the reference table, drawn as a table */
+.dlswrap{overflow-x:auto;margin:12px 0 2px}
+/* width:auto beats the page-wide `table{width:100%}` -- the reference is
+   a COMPACT centred table, not columns stretched across the viewport */
+.dls{border-collapse:collapse;margin:0 auto;width:auto}
+/* ⚠ position:static, or the page-wide sticky-th rule (the sticky-header
+   saga's survivor) slides this header row DOWN over the away line -- it
+   rendered BETWEEN the two teams, striped, and read as a defect. */
+.dls th{position:static;font:700 11px/1 var(--disp);letter-spacing:.08em;color:var(--slate);
+  padding:5px 0 7px;text-align:center;min-width:40px}
+.dls td{font:600 16px/1.2 var(--mono);color:var(--slate);text-align:center;
+  padding:8px 0;min-width:40px;font-variant-numeric:tabular-nums;
+  border-top:1px solid var(--cs-edge)}
+.dls td.w{color:var(--chalk);font-weight:700}
+.dls .dtm{min-width:44px}
+.dls .dtm img{width:22px;height:22px;object-fit:contain;vertical-align:middle}
+.dls .dst{border-left:1px solid var(--cs-edge2);font-weight:700;
+  color:var(--ink2);min-width:44px}
+.dls td.dst.w{color:var(--chalk)}
+/* the one live accent: the current column boxed, same as the rows */
+.dls td.cur{font-weight:700;color:var(--chalk);
+  border-left:1px solid color-mix(in oklab,var(--cs-gold) 55%,transparent);
+  border-right:1px solid color-mix(in oklab,var(--cs-gold) 55%,transparent)}
+.dls td.cur.ca{border-top:1px solid color-mix(in oklab,var(--cs-gold) 55%,transparent)}
+.dls td.cur.ch{border-bottom:1px solid color-mix(in oklab,var(--cs-gold) 55%,transparent)}
+.dls td.cur.up{color:var(--cs-gold)}
+.dls th.ct{color:var(--cs-gold)}
 .mrow .mctx{display:flex;flex-direction:column;gap:2px;min-width:0;overflow:hidden}
 .mctxe{font:600 10.5px/1.3 var(--disp);letter-spacing:.04em;text-transform:uppercase;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
@@ -3409,7 +3436,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     </div>
     <div class="meta">
       <b>82</b> matches played &middot; <b>348</b> teams rated<br>
-      last result <b>Today</b> &middot; built 2026-08-28 5:24 PM PT
+      last result <b>Today</b> &middot; built 2026-08-28 5:35 PM PT
     </div>
   </div>
   <!-- COURTSIGNAL-STATUS-BEGIN -->
@@ -6176,11 +6203,40 @@ function ribbonHTML(m, live, why) {
         esc(name) + '</a>' +
       '<span class="rbsc">' + (score === null || score === undefined ? '&mdash;' : score) +
       '</span></div>';
-  const ledger = sets.length
-    ? '<div class="rledger">' + sets.map((x, i) =>
-        '<span class="rl ' + (+x[0] > +x[1] ? 'aw' : '') + '"><i>Set ' + (i + 1) +
-        '</i>' + x[0] + '&ndash;' + x[1] + '</span>').join('') + '</div>'
-    : '';
+  /* ⚠ THE REFERENCE TABLE IS THE MATCH-DETAIL STANDARD (Cody's broadcast
+     screenshots + the design review: "the reference score graphic should
+     become the match-detail standard"). Set numbers across the top, a crest
+     per row, the points in order, sets-won ruled off at the right -- and on a
+     live match the current column boxed, the same one live accent the
+     scoreboard rows use. Replaces the old "Set 1 8-15" tile strip. */
+  let ledger = '';
+  if (sets.length) {
+    const nS = sets.length;
+    const isL = st === 'live';
+    let head = '<tr><th></th>';
+    for (let i = 0; i < nS; i++) {
+      head += '<th' + (isL && i === nS - 1 ? ' class="cur ct"' : '') + '>' +
+        (i + 1) + '</th>';
+    }
+    head += '<th class="dst" title="sets won">S</th></tr>';
+    const rowOf = (name, idx, tally) => {
+      let tr = '<tr><td class="dtm">' + logo(name) + '</td>';
+      for (let i = 0; i < nS; i++) {
+        const v = sets[i][idx], o = sets[i][1 - idx];
+        const cur = isL && i === nS - 1;
+        tr += '<td class="' +
+          (cur ? 'cur ' + (idx === 0 ? 'ca' : 'ch') + (+v > +o ? ' up' : '')
+               : (+v > +o ? 'w' : '')) + '">' + v + '</td>';
+      }
+      tr += '<td class="dst' + (!isL && +sc[idx] > +sc[1 - idx] ? ' w' : '') +
+        '">' + (tally === null || tally === undefined ? '&mdash;' : tally) +
+        '</td></tr>';
+      return tr;
+    };
+    ledger = '<div class="dlswrap"><table class="dls">' + head +
+      rowOf(mAway(m), 0, sc[0]) + rowOf(mHome(m), 1, sc[1]) +
+      '</table></div>';
+  }
   return '<div class="ribbon ' + st + '">' +
     '<div class="rbtop"><span class="rbstate ' + st + '">' +
       (st === 'live' ? ICON_LIVE + ' Live' : st === 'final' ? 'Final' : 'Upcoming') +
