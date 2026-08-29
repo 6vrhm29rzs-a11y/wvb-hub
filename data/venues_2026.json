@@ -6,13 +6,13 @@
   "min_home_games": 3,
   "note": "'unknown' means we do not yet have 3 home matches for that team, so no claim is made either way -- it is not a synonym for 'home'",
   "counts": {
-   "no-venue": 1666,
-   "neutral": 515,
-   "home": 2681,
+   "no-venue": 1668,
+   "neutral": 514,
+   "home": 2680,
    "unknown": 7
   },
   "teams_with_known_home": 263,
-  "teams_seen_at_home": 324
+  "teams_seen_at_home": 323
  },
  "home_venues": {
   "46006": "Reed Arena, College Station, TX",
@@ -142,7 +142,6 @@
   "46731": "Convocation Center, Athens, OH",
   "46499": "First Community Arena, Edwardsville, IL",
   "46756": "Historic Memorial Coliseum, Lexington, KY",
-  "46734": "McKale Center, Tucson, AZ",
   "46548": "Charles E. Smith Center, Washington, DC",
   "46436": "G.B. Hodge Center, Spartanburg, SC",
   "46667": "Bob Carpenter Center, Newark, DE",
@@ -157,7 +156,6 @@
   "45984": "UTRGV Fieldhouse, Edinburg, TX",
   "46656": "Curry Arena, Charlotte, NC",
   "46167": "Redhawk Center, Seattle, WA",
-  "46211": "McKale Center, Tucson, AZ",
   "46417": "McDonough Arena, Washington, DC",
   "46618": "Yanitelli Center, Jersey City, NJ",
   "46614": "Rec Hall, State College, PA",
@@ -174,12 +172,14 @@
   "51287": "Thomas Assembly Center, Ruston, LA",
   "45907": "Bogota Savings Bank Center, Hackensack, NJ",
   "46561": "Kirby Sports Center, Easton, PA",
+  "46734": "Hanner Fieldhouse, Statesboro, GA",
   "46301": "Exactech Arena at Stephen C. O'Connell Center, Gainesville, FL",
   "45943": "Ferrell Center, Waco, TX",
   "46235": "The Pit, Albuquerque, NM",
   "46036": "University Credit Union Center, Davis, CA",
   "46659": "Mott Athletics Center, San Luis Obispo, CA",
   "46628": "Jon M. Huntsman Center , Salt Lake City, UT",
+  "46211": "McKale Center, Tucson, AZ",
   "46474": "T-Mobile Arena, Las Vegas, NV",
   "46471": "Carmichael Arena, Chapel Hill, NC",
   "45987": "Viking Pavilion, Portland, OR",
@@ -286,14 +286,14 @@
    "first_date": "2026-08-28",
    "last_date": "2026-08-29",
    "game_ids": [
-    "6639598",
     "6627402",
     "6628246",
     "6625089",
     "6639577",
-    "6625090",
     "6628283",
     "6628259",
+    "6639598",
+    "6625090",
     "6625091",
     "6627406"
    ],
@@ -579,11 +579,11 @@
    "venue": "Liberty Arena, Evansville, IN",
    "matches": 3,
    "first_date": "2026-08-28",
-   "last_date": "2026-08-28",
+   "last_date": "2026-08-29",
    "game_ids": [
     "6628152",
-    "6628153",
-    "6637012"
+    "6637012",
+    "6628153"
    ],
    "name": null
   },
@@ -1722,13 +1722,13 @@
    "name": null
   },
   {
-   "venue": "McKale Center, Tucson, AZ",
+   "venue": "Reed Arena, College Station, TX",
    "matches": 2,
-   "first_date": "2026-08-29",
-   "last_date": "2026-08-30",
+   "first_date": "2026-08-28",
+   "last_date": "2026-08-29",
    "game_ids": [
-    "6624517",
-    "6627022"
+    "6627255",
+    "6626470"
    ],
    "name": null
   },
@@ -1740,17 +1740,6 @@
    "game_ids": [
     "6626049",
     "6626050"
-   ],
-   "name": null
-  },
-  {
-   "venue": "Reed Arena, Bryan-College Station, TX",
-   "matches": 2,
-   "first_date": "2026-08-29",
-   "last_date": "2026-08-30",
-   "game_ids": [
-    "6626470",
-    "6626471"
    ],
    "name": null
   },
@@ -4624,12 +4613,12 @@
   },
   {
    "game_id": "6624517",
-   "venue": "McKale Center, Tucson, AZ",
+   "venue": null,
    "home_team_id": "46734",
-   "home_venue_on_record": "McKale Center, Tucson, AZ",
-   "venue_owner": "46211",
+   "home_venue_on_record": "Hanner Fieldhouse, Statesboro, GA",
+   "venue_owner": null,
    "event": null,
-   "site": "neutral"
+   "site": "no-venue"
   },
   {
    "game_id": "6625201",
@@ -4859,8 +4848,8 @@
   {
    "game_id": "6628518",
    "venue": "Maravich Assembly Center, Baton Rouge, LA",
-   "home_team_id": "46133",
-   "home_venue_on_record": null,
+   "home_team_id": "46054",
+   "home_venue_on_record": "Fertitta Center, Houston, TX",
    "venue_owner": "46059",
    "event": null,
    "site": "neutral"
@@ -5128,12 +5117,12 @@
   },
   {
    "game_id": "6627010",
-   "venue": "McKale Center, Tucson, AZ",
+   "venue": null,
    "home_team_id": "46211",
    "home_venue_on_record": "McKale Center, Tucson, AZ",
-   "venue_owner": "46211",
+   "venue_owner": null,
    "event": null,
-   "site": "home"
+   "site": "no-venue"
   },
   {
    "game_id": "6627306",
@@ -5371,10 +5360,10 @@
   },
   {
    "game_id": "6626470",
-   "venue": "Reed Arena, Bryan-College Station, TX",
+   "venue": "Reed Arena, College Station, TX",
    "home_team_id": "46590",
    "home_venue_on_record": "Global Credit Union Arena, Phoenix, AZ",
-   "venue_owner": null,
+   "venue_owner": "46006",
    "event": null,
    "site": "neutral"
   },
@@ -6165,7 +6154,7 @@
    "game_id": "6627022",
    "venue": "McKale Center, Tucson, AZ",
    "home_team_id": "46734",
-   "home_venue_on_record": "McKale Center, Tucson, AZ",
+   "home_venue_on_record": "Hanner Fieldhouse, Statesboro, GA",
    "venue_owner": "46211",
    "event": null,
    "site": "neutral"
@@ -6445,7 +6434,7 @@
    "venue": "Reed Arena, Bryan-College Station, TX",
    "home_team_id": "46659",
    "home_venue_on_record": "Mott Athletics Center, San Luis Obispo, CA",
-   "venue_owner": null,
+   "venue_owner": "46659",
    "event": null,
    "site": "neutral"
   },
@@ -7713,7 +7702,7 @@
    "game_id": "6626920",
    "venue": "Hanner Fieldhouse, Statesboro, GA",
    "home_team_id": "46734",
-   "home_venue_on_record": "McKale Center, Tucson, AZ",
+   "home_venue_on_record": "Hanner Fieldhouse, Statesboro, GA",
    "venue_owner": "45910",
    "event": null,
    "site": "neutral"
@@ -9315,7 +9304,7 @@
    "game_id": "6625470",
    "venue": "Hanner Fieldhouse, Statesboro, GA",
    "home_team_id": "46734",
-   "home_venue_on_record": "McKale Center, Tucson, AZ",
+   "home_venue_on_record": "Hanner Fieldhouse, Statesboro, GA",
    "venue_owner": "45910",
    "event": null,
    "site": "neutral"
@@ -11673,7 +11662,7 @@
    "game_id": "6627138",
    "venue": "United Supermarkets Arena, Lubbock, TX",
    "home_team_id": "46734",
-   "home_venue_on_record": "McKale Center, Tucson, AZ",
+   "home_venue_on_record": "Hanner Fieldhouse, Statesboro, GA",
    "venue_owner": "46253",
    "event": null,
    "site": "neutral"
@@ -15903,7 +15892,7 @@
    "game_id": "6624550",
    "venue": null,
    "home_team_id": "46734",
-   "home_venue_on_record": "McKale Center, Tucson, AZ",
+   "home_venue_on_record": "Hanner Fieldhouse, Statesboro, GA",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -17163,7 +17152,7 @@
    "game_id": "6626523",
    "venue": "Moody Coliseum, Abilene, TX",
    "home_team_id": "46734",
-   "home_venue_on_record": "McKale Center, Tucson, AZ",
+   "home_venue_on_record": "Hanner Fieldhouse, Statesboro, GA",
    "venue_owner": "45940",
    "event": null,
    "site": "neutral"
@@ -18522,7 +18511,7 @@
    "game_id": "6639465",
    "venue": "Moody Coliseum, Abilene, TX",
    "home_team_id": "46734",
-   "home_venue_on_record": "McKale Center, Tucson, AZ",
+   "home_venue_on_record": "Hanner Fieldhouse, Statesboro, GA",
    "venue_owner": "45940",
    "event": null,
    "site": "neutral"
@@ -24219,7 +24208,7 @@
    "game_id": "6625676",
    "venue": null,
    "home_team_id": "46734",
-   "home_venue_on_record": "McKale Center, Tucson, AZ",
+   "home_venue_on_record": "Hanner Fieldhouse, Statesboro, GA",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -25830,7 +25819,7 @@
    "game_id": "6627568",
    "venue": null,
    "home_team_id": "46734",
-   "home_venue_on_record": "McKale Center, Tucson, AZ",
+   "home_venue_on_record": "Hanner Fieldhouse, Statesboro, GA",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -27315,7 +27304,7 @@
    "game_id": "6625125",
    "venue": null,
    "home_team_id": "46734",
-   "home_venue_on_record": "McKale Center, Tucson, AZ",
+   "home_venue_on_record": "Hanner Fieldhouse, Statesboro, GA",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -29052,7 +29041,7 @@
    "game_id": "6639312",
    "venue": null,
    "home_team_id": "46734",
-   "home_venue_on_record": "McKale Center, Tucson, AZ",
+   "home_venue_on_record": "Hanner Fieldhouse, Statesboro, GA",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -33714,7 +33703,7 @@
    "game_id": "6639616",
    "venue": null,
    "home_team_id": "46734",
-   "home_venue_on_record": "McKale Center, Tucson, AZ",
+   "home_venue_on_record": "Hanner Fieldhouse, Statesboro, GA",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -40023,7 +40012,7 @@
    "game_id": "6639610",
    "venue": null,
    "home_team_id": "46734",
-   "home_venue_on_record": "McKale Center, Tucson, AZ",
+   "home_venue_on_record": "Hanner Fieldhouse, Statesboro, GA",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -42957,7 +42946,7 @@
    "game_id": "6627743",
    "venue": null,
    "home_team_id": "46734",
-   "home_venue_on_record": "McKale Center, Tucson, AZ",
+   "home_venue_on_record": "Hanner Fieldhouse, Statesboro, GA",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -44253,7 +44242,7 @@
    "game_id": "6628297",
    "venue": null,
    "home_team_id": "46734",
-   "home_venue_on_record": "McKale Center, Tucson, AZ",
+   "home_venue_on_record": "Hanner Fieldhouse, Statesboro, GA",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -45693,7 +45682,7 @@
    "game_id": "6640130",
    "venue": "United Supermarkets Arena, Lubbock, TX",
    "home_team_id": "46734",
-   "home_venue_on_record": "McKale Center, Tucson, AZ",
+   "home_venue_on_record": "Hanner Fieldhouse, Statesboro, GA",
    "venue_owner": "46253",
    "event": null,
    "site": "neutral"

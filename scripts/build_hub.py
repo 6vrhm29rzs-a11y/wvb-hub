@@ -183,6 +183,22 @@ def results() -> List[Dict]:
         away = next((t for t in teams if not t.get("is_home")), None)
         if not home or not away:
             continue
+        # ⚠ A "FINAL" THAT ASSERTS NO RESULT COUNTS NOWHERE (2026-08-29).
+        # Game 6625090 (Delaware St. v Mississippi Val.) came back state F
+        # with winner_team_id null, sets_won null on both sides and zero
+        # linescores. One surface counted it as a LOSS for both sides
+        # ((mine or 0) > (theirs or 0) is false both ways) and another
+        # differently -- Mississippi Val. read 0-4 on its chip and 1-3 in
+        # the standings, caught by the one-definition-of-a-record guard.
+        # No winner and no set line is not a result; it is the feed's
+        # scaffold wearing state F, and nothing can honestly be tallied
+        # from it. It stays out of `res` entirely (so no record, no rate,
+        # no form pill), and the Result Ledger's official-only state is
+        # where its existence remains visible.
+        if g.get("winner_team_id") is None \
+                and home.get("sets_won") is None \
+                and away.get("sets_won") is None:
+            continue
         sets = []
         for s in g.get("linescores") or []:
             try:
@@ -8140,6 +8156,11 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 .avside{margin:0 0 8px}
 .avside > b{display:block;margin-bottom:5px;font:700 12px/1 var(--disp);
   letter-spacing:.07em;text-transform:uppercase;color:var(--ink2)}
+.avhistrow{opacity:.85}
+.avhistlab{font:600 9px/1 var(--disp);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink3);
+  border:1px dashed var(--line2);border-radius:2px;padding:2px 5px}
+details.avhist{margin:14px 0}
 /* AVAIL-CSS-END */
 /* ── RESULT CONFIDENCE LEDGER ───────────────────────────────────────── */
 .rcstate{font:600 10px/1.2 var(--disp);letter-spacing:.07em;
@@ -9271,6 +9292,11 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     set a status &mdash; it is a reason to look, recorded with its source
     kind.</p>
   <div id="avsignals"></div>
+  <details class="method avhist"><summary>Evidence history</summary>
+    <p class="tnote">Expired items keep their exact words and the date rule
+      that retired them. <b>Historical &mdash; sets no current status.</b></p>
+    <div id="avexpired"></div>
+  </details>
   <h3 class="cfh">Participation, last completed match</h3>
   <div class="ctl"><input type="search" id="avq"
     placeholder="Type a team&hellip;"></div>
@@ -15611,6 +15637,19 @@ function renderAvail() {
       : '<p class="tnote">None. No attributable public source currently ' +
         'reports a player unavailable or limited \u2014 the honest ' +
         'default, not a gap.</p>';
+  document.getElementById('avexpired').innerHTML =
+    (AVAIL.expired || []).length
+      ? (AVAIL.expired || []).map(s =>
+        '<div class="avrow avhistrow"><b>' + esc(s.player) + '</b> (' +
+        esc(s.team) + ') \u2014 <i class="avkind">' + esc(s.kind) +
+        '</i> <span class="avhistlab">Historical \u2014 sets no current ' +
+        'status</span>' +
+        ' <span class="avq">\u201c' + esc(s.quote) + '\u201d</span>' +
+        '<span class="avmeta">effective ' +
+        esc(((s.effective || {}).from) || '?') + ' \u2192 ' +
+        esc(((s.effective || {}).to) || '?') + ' \u00b7 ' +
+        esc(s.expired_on || 'expired') + '</span></div>').join('')
+      : '<p class="tnote">None yet.</p>';
   document.getElementById('avsignals').innerHTML =
     (AVAIL.signals || []).map(s =>
       '<div class="avrow avsg"><b>' + esc(s.player) + '</b> (' +
@@ -15618,7 +15657,8 @@ function renderAvail() {
       '</i> <span class="avq">\u201c' + esc(s.quote) + '\u201d</span>' +
       (s.note ? '<span class="avmeta">' + esc(s.note) + '</span>' : '') +
       '</div>').join('') ||
-    '<p class="tnote">None recorded.</p>';
+    '<p class="tnote">None current. Anything recorded earlier lives under ' +
+    'Evidence history below.</p>';
 }
 
 (function wireAvail() {

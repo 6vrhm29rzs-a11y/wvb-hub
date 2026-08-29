@@ -95,12 +95,18 @@ def participation(rows):
     return out
 
 
-def build():
-    today = datetime.date.today().isoformat()
-    ev = (load("data/raw/%d/availability_evidence.json" % SEASON) or {}) \
-        .get("players") or {}
+def classify(ev, today):
+    """(statuses, signals, expired) for one evidence map at one DATE.
+
+    Pure and clock-injectable (round 10): the Saturday-morning regression
+    was a suite that let the LIVE calendar decide whether a shipped test
+    was green -- the Auguste observation was effective Aug 28 only, so at
+    midnight it correctly expired and two calendar-pinned checks went red.
+    Tests now call this with an explicit date and assert BOTH sides of the
+    boundary; nothing here weakens expiry.
+    """
     statuses, signals, expired = [], [], []
-    for key, entries in ev.items():
+    for key, entries in (ev or {}).items():
         team, _, player = key.partition("|")
         for e in entries or []:
             st = entry_state(e, today)
@@ -115,7 +121,27 @@ def build():
             elif st == "signal":
                 signals.append(row)
             elif st == "expired":
+                # ⚠ HISTORY, NOT A COUNT. An expired item keeps its words
+                # and gains WHY it expired -- it renders in the collapsed
+                # Evidence history as "Historical -- sets no current
+                # status", and its player keeps her participation timeline.
+                eff = e.get("effective") or {}
+                row["expired_on"] = (
+                    ("effective range ended %s" % eff.get("to"))
+                    if eff.get("to") and str(today) > str(eff["to"])
+                    else ("review date %s passed" % e.get("review_by"))
+                    if e.get("review_by")
+                    and str(today) > str(e.get("review_by"))
+                    else "not yet effective")
                 expired.append(row)
+    return statuses, signals, expired
+
+
+def build(today=None):
+    today = today or datetime.date.today().isoformat()
+    ev = (load("data/raw/%d/availability_evidence.json" % SEASON) or {}) \
+        .get("players") or {}
+    statuses, signals, expired = classify(ev, today)
 
     # participation, from the crawled boxes, most recent match per team
     doc = load("data/data_%d.json" % SEASON) or {}
@@ -128,7 +154,12 @@ def build():
                                                  or 0)
     per_team_latest = {}
     timelines = {}
-    watch = set((s["team"], s["player"]) for s in signals + statuses)
+    # ⚠ EXPIRED EVIDENCE KEEPS ITS TIMELINE. The watch set once held only
+    # current statuses/signals, so the moment an observation expired, the
+    # participation history that explains why it was recorded vanished with
+    # it. Evidence of any age keeps its player's observed facts.
+    watch = set((s["team"], s["player"])
+                for s in signals + statuses + expired)
     path = os.path.join(REPO, "data", "raw", str(SEASON), "playerbox.jsonl")
     if os.path.exists(path):
         for ln in open(path, encoding="utf-8"):

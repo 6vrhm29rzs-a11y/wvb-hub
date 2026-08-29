@@ -2,18 +2,19 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-08-29T05:49:58Z",
+  "generated_at_utc": "2026-08-29T15:11:16Z",
   "counts": {
    "statuses": 0,
-   "signals": 1,
-   "expired": 0,
+   "signals": 0,
+   "expired": 1,
    "anomalies": 0
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
  },
  "statuses": [],
- "signals": [
+ "signals": [],
+ "expired": [
   {
    "team": "Wisconsin",
    "player": "Jaela Auguste",
@@ -27,10 +28,10 @@
    },
    "review_by": "2026-09-04",
    "claim": null,
-   "note": "SIGNAL ONLY -- an eye-test observation during the live broadcast. Sets no status. Corroborating participation fact: the crawled box lists her gp=4 with zero recorded actions in every column; the live box carried setsPlayed:null mid-match. The Wisconsin-Stanford VolleyTalk thread was checked the same evening (in-browser): its Aug 26 preview projected her starting and asked for unavailability news; nobody answered -- no public pre-match signal existed there."
+   "note": "SIGNAL ONLY -- an eye-test observation during the live broadcast. Sets no status. Corroborating participation fact: the crawled box lists her gp=4 with zero recorded actions in every column; the live box carried setsPlayed:null mid-match. The Wisconsin-Stanford VolleyTalk thread was checked the same evening (in-browser): its Aug 26 preview projected her starting and asked for unavailability news; nobody answered -- no public pre-match signal existed there.",
+   "expired_on": "effective range ended 2026-08-28"
   }
  ],
- "expired": [],
  "anomalies": [],
  "latest": {
   "Texas A&M": {
@@ -1477,9 +1478,9 @@
    ]
   },
   "Mississippi Val.": {
-   "gid": "6625089",
-   "d": "2026-08-28",
-   "appeared": 10,
+   "gid": "6625090",
+   "d": "2026-08-29",
+   "appeared": 11,
    "zero_action": []
   },
   "Lindenwood": {
@@ -1564,18 +1565,18 @@
    ]
   },
   "Delaware St.": {
-   "gid": "6627402",
-   "d": "2026-08-28",
-   "appeared": 10,
-   "zero_action": []
-  },
-  "Ark.-Pine Bluff": {
-   "gid": "6628246",
-   "d": "2026-08-28",
+   "gid": "6627406",
+   "d": "2026-08-29",
    "appeared": 12,
    "zero_action": [
-    "Trinity Gibbs"
+    "Aubree Mon"
    ]
+  },
+  "Ark.-Pine Bluff": {
+   "gid": "6627406",
+   "d": "2026-08-29",
+   "appeared": 12,
+   "zero_action": []
   },
   "Oral Roberts": {
    "gid": "6638585",
@@ -3527,6 +3528,56 @@
     "Ava Sarafa",
     "Hazel Alevok",
     "Sakura Codling"
+   ]
+  },
+  "Portland": {
+   "gid": "6624570",
+   "d": "2026-08-28",
+   "appeared": 11,
+   "zero_action": [
+    "Josephine Portela",
+    "Meki Maile",
+    "Lila Krall",
+    "Ava Lilo",
+    "Alana Villela",
+    "Shaylee Stephen",
+    "Amiyah Eason",
+    "Sophia Schneck"
+   ]
+  },
+  "Portland St.": {
+   "gid": "6624570",
+   "d": "2026-08-28",
+   "appeared": 11,
+   "zero_action": [
+    "Katie Brewer",
+    "Jessica Truong",
+    "Ashley Repetti",
+    "Alyssandra Ordona",
+    "Asya Akbulut",
+    "Katarina Kosic",
+    "Jordyn Romano"
+   ]
+  },
+  "Hawaii": {
+   "gid": "6625328",
+   "d": "2026-08-28",
+   "appeared": 9,
+   "zero_action": [
+    "Manon Baudrillard",
+    "Kahea Moriwaki",
+    "Marnie Ursem",
+    "Leilani Lopez",
+    "Mano Antiga",
+    "Cameron Holcomb"
+   ]
+  },
+  "Ga. Southern": {
+   "gid": "6625328",
+   "d": "2026-08-28",
+   "appeared": 11,
+   "zero_action": [
+    "Amelia Robinson"
    ]
   }
  },

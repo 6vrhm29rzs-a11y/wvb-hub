@@ -56,6 +56,28 @@
    "matchup": "Minnesota / Auburn",
    "records": 6
   },
+  "6625142": {
+   "conflicts": [
+    {
+     "field": "start_time_epoch",
+     "records": 28,
+     "values": [
+      "1787943600",
+      "1788015600"
+     ]
+    },
+    {
+     "field": "game_state",
+     "records": 28,
+     "values": [
+      "P",
+      "I"
+     ]
+    }
+   ],
+   "matchup": "N.C. Central / Alabama A&M",
+   "records": 28
+  },
   "6625167": {
    "conflicts": [
     {
@@ -116,7 +138,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 6,
+     "records": 27,
      "values": [
       "1788019200",
       "1788026400"
@@ -124,7 +146,7 @@
     }
    ],
    "matchup": "Middle Tenn. / Boise St.",
-   "records": 6
+   "records": 27
   },
   "6625790": {
    "conflicts": [
@@ -158,7 +180,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 6,
+     "records": 27,
      "values": [
       "1788035400",
       "1788017400"
@@ -166,7 +188,21 @@
     }
    ],
    "matchup": "High Point / Hofstra",
-   "records": 6
+   "records": 27
+  },
+  "6626470": {
+   "conflicts": [
+    {
+     "field": "city",
+     "records": 26,
+     "values": [
+      "Bryan-College Station",
+      "College Station"
+     ]
+    }
+   ],
+   "matchup": "Arkansas St. / Grand Canyon",
+   "records": 26
   },
   "6626976": {
    "conflicts": [
@@ -214,7 +250,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 6,
+     "records": 27,
      "values": [
       "1788109200",
       "1788022800"
@@ -222,13 +258,13 @@
     }
    ],
    "matchup": "Grambling / Northwestern St.",
-   "records": 6
+   "records": 27
   },
   "6627928": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 6,
+     "records": 26,
      "values": [
       "1788044400",
       "1788048000"
@@ -236,7 +272,7 @@
     }
    ],
    "matchup": "Montana / Washington St.",
-   "records": 6
+   "records": 26
   },
   "6627931": {
    "conflicts": [
@@ -280,6 +316,20 @@
    "matchup": "Utah Tech / UC San Diego",
    "records": 6
   },
+  "6628153": {
+   "conflicts": [
+    {
+     "field": "start_time_epoch",
+     "records": 30,
+     "values": [
+      "1787949000",
+      "1788015600"
+     ]
+    }
+   ],
+   "matchup": "Eastern Mich. / Murray St.",
+   "records": 30
+  },
   "6628262": {
    "conflicts": [
     {
@@ -312,7 +362,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 6,
+     "records": 26,
      "values": [
       "1787979600",
       "1788033600"
@@ -320,13 +370,13 @@
     }
    ],
    "matchup": "Cincinnati / Syracuse",
-   "records": 6
+   "records": 26
   },
   "6628592": {
    "conflicts": [
     {
      "field": "teams",
-     "records": 6,
+     "records": 26,
      "values": [
       "(('46507', True), ('46755', False))",
       "(('46507', False), ('46755', True))"
@@ -334,7 +384,7 @@
     },
     {
      "field": "site",
-     "records": 6,
+     "records": 26,
      "values": [
       "home/away flip across snapshots",
       "no venue owner on record"
@@ -342,7 +392,7 @@
     }
    ],
    "matchup": "Texas / TCU",
-   "records": 6
+   "records": 26
   },
   "6628652": {
    "conflicts": [
@@ -384,21 +434,22 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 10,
+     "records": 31,
      "values": [
       "1787893200",
-      "1787954400"
+      "1787954400",
+      "1788019200"
      ]
     }
    ],
    "matchup": "Florida A&M / UMES",
-   "records": 10
+   "records": 31
   },
   "6639604": {
    "conflicts": [
     {
      "field": "teams",
-     "records": 6,
+     "records": 26,
      "values": [
       "(('46553', False), ('46569', True))",
       "(('46553', True), ('46569', False))"
@@ -406,7 +457,7 @@
     },
     {
      "field": "site",
-     "records": 6,
+     "records": 26,
      "values": [
       "home/away flip across snapshots",
       "no venue owner on record"
@@ -414,15 +465,16 @@
     }
    ],
    "matchup": "Iowa / UAlbany",
-   "records": 6
+   "records": 26
   }
  },
  "by_field": {
-  "game_state": 29,
+  "city": 1,
+  "game_state": 40,
   "site": 3,
-  "start_time_epoch": 25,
+  "start_time_epoch": 27,
   "teams": 3,
-  "teams (non-blocking)": 3
+  "teams (non-blocking)": 4
  },
  "corrections": {
   "6626809": {
@@ -503,8 +555,8 @@
   }
  },
  "counts": {
-  "blocked": 28,
-  "conflicted": 60,
+  "blocked": 31,
+  "conflicted": 73,
   "corrected": 2,
   "fixtures": 4869
  },

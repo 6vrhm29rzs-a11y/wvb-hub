@@ -109,6 +109,9 @@ def main():
         REPO, "data", "availability_desk_%d.json" % SEASON)))
     check("expired evidence is SHOWN as expired, not silently dropped",
           "expired" in art and "expired" in art["meta"]["counts"])
+    check("the page renders an Evidence history, collapsed by default",
+          "Evidence history" in src
+          and "Historical \\u2014 sets no current" in src)
 
     print("\n4. NO SPILL ACROSS PLAYER / TEAM / CLAIM")
     check("evidence is keyed to exactly one team|player",
@@ -120,15 +123,39 @@ def main():
 
     print("\n5. THE SHIPPED ARTIFACT AND PAGE")
     c = art["meta"]["counts"]
-    check("current truth: 0 sourced statuses (none found in the wild)",
+    check("no sourced status exists on the shipped artifact",
           c["statuses"] == 0, c)
-    check("the Auguste signal is stored, labelled cody_observation",
+    check("evidence is conserved: signals + expired == entries recorded",
+          c["signals"] + c["expired"] >= 1)
+    # ⚠ CLOCK-CONTROLLED, NOT CALENDAR-PINNED (round 10). The original
+    # form asserted the Auguste observation was a CURRENT signal -- true on
+    # Aug 28, false at midnight, red suite on Saturday morning for no code
+    # change. The live calendar must never decide whether a shipped test is
+    # green. Both sides of the boundary are asserted with an INJECTED date;
+    # the artifact-level checks below are date-agnostic.
+    _ev = json.load(open(os.path.join(
+        REPO, "data", "raw", str(SEASON),
+        "availability_evidence.json")))["players"]
+    _s28, _g28, _x28 = A.classify(_ev, "2026-08-28")
+    _s29, _g29, _x29 = A.classify(_ev, "2026-08-29")
+    check("ON its effective date: the observation is an ACTIVE signal",
           any(s["kind"] == "cody_observation" and s["player"] ==
-              "Jaela Auguste" for s in art["signals"]))
-    check("...and it did NOT create a status",
+              "Jaela Auguste" for s in _g28))
+    check("...and sets no status on that date either", not _s28)
+    check("THE DAY AFTER: it is expired, not a current signal",
+          not any(s["player"] == "Jaela Auguste" for s in _g29)
+          and any(s["player"] == "Jaela Auguste" for s in _x29))
+    check("...the expired row says WHY it expired",
+          any("effective range ended" in (s.get("expired_on") or "")
+              for s in _x29 if s["player"] == "Jaela Auguste"))
+    check("...and expiry creates no status", not _s29)
+    check("the SHIPPED artifact holds it as signal OR history, never lost",
+          any(s["player"] == "Jaela Auguste"
+              for s in art["signals"] + art["expired"]))
+    check("it never created a status on any date",
           not any(s["player"] == "Jaela Auguste"
                   for s in art["statuses"]))
-    check("her timeline holds the observed non-participation fact",
+    check("her participation timeline SURVIVES expiry (date-agnostic)",
           any(x["state"] == "zero_action"
               for x in art["timelines"].get("Wisconsin|Jaela Auguste", [])))
     check("the honest default is on the page",
@@ -158,6 +185,10 @@ def main():
     check("[NEG] a stale status kept active would be caught",
           A.entry_state(ENT(review_by="2020-01-01"), "2026-08-28")
           != "status")
+    check("[NEG] a date-pinned assertion would now be caught: the same "
+          "entry is signal on one date and expired the next",
+          any(s["player"] == "Jaela Auguste" for s in _g28)
+          and not any(s["player"] == "Jaela Auguste" for s in _g29))
     check("[NEG] a zero-action row promoted to 'appeared' would be caught",
           A.participation([{"first": "Z", "last": "Q", "team_id": "1",
                             "gp": "4", "kills": "0", "errors": "0",
