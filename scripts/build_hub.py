@@ -4240,6 +4240,9 @@ def build():
         .replace("{{AVAIL_JSON}}", json.dumps(
             load("data/availability_desk_%d.json" % SEASON) or {},
             separators=(",", ":"))) \
+        .replace("{{DUP_GIDS_JSON}}", json.dumps(
+            sorted(__import__("dupes").duplicate_gids(SEASON)),
+            separators=(",", ":"))) \
         .replace("{{CONFIDENCE_JSON}}", json.dumps(
             load("data/result_confidence_%d.json" % SEASON) or
             {"meta": {"counts": {}}, "finals": []},
@@ -8198,6 +8201,28 @@ details.avhist{margin:14px 0}
 .rc-confirmed{color:var(--good);border-color:color-mix(in oklab,var(--good) 45%,transparent)}
 .rc-disputed{color:var(--coral);border-color:color-mix(in oklab,var(--coral) 50%,transparent)}
 .rc-duplicate{color:var(--ink3);border-style:dashed;text-decoration:line-through transparent}
+.rchd{font-size:14px;color:var(--ink2);margin:0 0 10px}
+.rchd b{color:var(--chalk);font:700 15px/1.2 var(--disp);letter-spacing:.02em}
+.rcsets{font:600 12px/1 var(--mono);color:var(--ink3)}
+.rcsrctag{font:600 9px/1 var(--disp);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink3);font-style:normal;
+  border:1px solid var(--line);border-radius:2px;padding:2px 4px;
+  margin-left:6px;white-space:nowrap}
+.rcedge{font-size:13px;color:var(--ink2);margin:0 0 6px}
+.rcedge em{font:600 9.5px/1 var(--disp);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--gold);font-style:normal;
+  margin-right:7px}
+.rcedge b{color:var(--chalk)}
+.rcldrs{margin:8px 0}
+.rcldr{font-size:12.5px;color:var(--ink2);margin:0 0 4px}
+.rcldr b{color:var(--chalk)}
+.rcbasis{font:600 10px/1 var(--mono);color:var(--ink3);margin-left:6px}
+.rcdecided{border-top:1px solid var(--line);padding-top:8px;margin-top:8px;
+  font-size:13px;color:var(--ink2)}
+.rcdecided em{display:block;font:600 9.5px/1 var(--disp);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink3);font-style:normal;
+  margin-bottom:5px}
+.rcline b{color:var(--chalk)}
 .rcdup{border:1px dashed var(--line2);border-radius:3px;padding:12px 14px;
   margin:0 0 12px;font-size:13px;color:var(--ink2)}
 .rcdup b{color:var(--chalk)}
@@ -15744,6 +15769,113 @@ function renderAvail() {
 })();
 /* AVAIL-JS-END */
 
+/* ── VERIFIED MATCH RECAP (round 13) ─────────────────────────────────────
+   What happened, who drove it, and what data supports it -- nothing else.
+   Facts come from exactly two held sources, each labelled at the point of
+   use: the official scoreboard (result, set line) and the match-aligned box
+   (team totals, leaders). No narrative synthesis, no causal language: a
+   differential is reported as two named values on one metric, and a claim
+   whose source is not held is OMITTED, never filled. One grammar, one
+   function -- a later compact card must call this, not re-invent it. */
+const DUP_GIDS = {{DUP_GIDS_JSON}};
+
+function recapAligned(gid, nsets) {
+  const rows = (typeof BOXES !== 'undefined' && BOXES[gid]) || [];
+  if (!rows.length || !nsets) return null;
+  const byTeam = {};
+  rows.forEach(r => (byTeam[r.team] = byTeam[r.team] || []).push(r));
+  const teams = Object.keys(byTeam);
+  if (teams.length !== 2) return null;
+  for (const t of teams) {
+    const mx = Math.max.apply(null, byTeam[t].map(r => r.sets || 0));
+    if (mx !== nsets) return null;         /* box disagrees with the match */
+  }
+  return byTeam;
+}
+
+function recapHTML(m) {
+  const gid = String(m.gid);
+  if (DUP_GIDS.indexOf(gid) >= 0) return '';   /* ledger-only, by decision */
+  /* ⚠ THE PAGE'S OWN ACCESSORS, NOT A GUESSED SHAPE. The first version
+     read m.final.{as,hs,sets} -- the DESK card shape -- and the routed
+     detail hands the LEDGER shape (flat m.as/m.sets), so the recap
+     silently rendered nothing on a real final. matchScore/matchSets are
+     the one definition and read both. */
+  const sc = matchScore(m, null);
+  const sets = matchSets(m, null) || [];
+  if (sc[0] === null || sc[0] === undefined) return '';
+  const setline = sets.length
+    ? sets.map(p => p[0] + '\u2013' + p[1]).join(', ') : '';
+  const head =
+    '<div class="rchd"><b>' + esc(mAway(m)) + ' ' + sc[0] + '\u2013' +
+    sc[1] + ' ' + esc(mHome(m)) + '</b>' +
+    (setline ? ' <span class="rcsets">' + setline + '</span>' : '') +
+    ' <i class="rcsrctag">official scoreboard</i></div>';
+  const byTeam = recapAligned(gid, sets.length);
+  if (!byTeam) {
+    return '<div class="msec"><h3>Match recap</h3>' + head +
+      '<p class="tnote">Detailed box not available from the held feed for ' +
+      'this match \u2014 team edges and stat leaders are omitted rather ' +
+      'than estimated.</p></div>';
+  }
+  const tt = {};
+  Object.keys(byTeam).forEach(t => { tt[t] = teamTotals(byTeam[t]); });
+  const names = [mAway(m), mHome(m)].filter(t => tt[t]);
+  if (names.length !== 2) return '';
+  const A = tt[names[0]], B = tt[names[1]];
+  const fmtPct = v => (v < 0 ? '-' : '') +
+    Math.abs(v).toFixed(3).replace(/^0/, '');
+  /* each team's single best EDGE from the held totals -- largest
+     advantage across the comparable categories, both values shown */
+  const cats = [
+    ['hitting', t => t.hit, v => fmtPct(v), (a, b) => a - b],
+    ['blocks', t => t.blk, v => String(v), (a, b) => (a - b) / 6],
+    ['aces', t => t.aces, v => String(v), (a, b) => (a - b) / 4],
+    ['digs', t => t.digs, v => String(v), (a, b) => (a - b) / 30],
+  ];
+  const edge = (mine, theirs, mn, tn) => {
+    let best = null;
+    for (const c of cats) {
+      const a = c[1](mine), b = c[1](theirs);
+      if (a === null || b === null) continue;
+      const adv = c[3](a, b);
+      if (adv > 0 && (!best || adv > best.adv)) {
+        best = { adv: adv, label: c[0], a: c[2](a), b: c[2](b) };
+      }
+    }
+    return best
+      ? '<div class="rcedge"><em>' + esc(mn) + ' edge</em> ' + best.label +
+        ' <b>' + best.a + '</b> to ' + esc(tn) + '\u2019s ' + best.b +
+        ' <i class="rcsrctag">match-aligned box</i></div>'
+      : '';
+  };
+  /* leaders: one per metric, named, valued, with the sample */
+  const all = byTeam[names[0]].concat(byTeam[names[1]]);
+  const leader = (key, label) => {
+    const top = all.slice().sort((x, y) => (y[key] || 0) - (x[key] || 0))[0];
+    if (!top || !(top[key] > 0)) return '';
+    return '<div class="rcldr"><b>' + esc(top.name) + '</b> (' +
+      esc(top.team) + ') \u2014 ' + top[key] + ' ' + label +
+      ' <span class="rcbasis">' + top.sets + ' sets \u00b7 ' +
+      'match-aligned box</span></div>';
+  };
+  /* what decided it: measurable differentials, two named values per line,
+     one metric per line, no causal words */
+  const decided =
+    '<div class="rcline">' + esc(names[0]) + ' hit <b>' + fmtPct(A.hit) +
+      '</b> to ' + esc(names[1]) + '\u2019s <b>' + fmtPct(B.hit) +
+      '</b></div>' +
+    '<div class="rcline">blocks <b>' + A.blk + '\u2013' + B.blk +
+      '</b> \u00b7 aces <b>' + A.aces + '\u2013' + B.aces +
+      '</b> \u00b7 attack errors <b>' + A.e + '\u2013' + B.e + '</b></div>';
+  return '<div class="msec"><h3>Match recap</h3>' + head +
+    edge(A, B, names[0], names[1]) + edge(B, A, names[1], names[0]) +
+    '<div class="rcldrs">' + leader('k', 'kills') + leader('digs', 'digs') +
+    leader('ast', 'assists') + '</div>' +
+    '<div class="rcdecided"><em>What decided it</em>' + decided +
+    ' <i class="rcsrctag">match-aligned box</i></div></div>';
+}
+
 function wireScoreboard() {
   const host = document.getElementById('v-scores');
   if (!host || host.dataset.sbwired) return;
@@ -16043,6 +16175,7 @@ function renderMatchDetail(gid, dest) {
       })() : '') +
       '<div class="msec"><h3>Match facts</h3><div class="mfact">' +
         bits.join('') + '</div></div>' +
+      (st === 'final' ? recapHTML(m) : '') +
       /* ⚠ THE HEADING FOLLOWS THE STATE. "Forecast before first serve" is a
          claim about a match that HAS started; on an upcoming match it is
          simply the current forecast, and the two must not be labelled alike. */
