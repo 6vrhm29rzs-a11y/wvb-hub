@@ -4,7 +4,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 6,
+     "records": 8,
      "values": [
       "1788109200",
       "1788130800"
@@ -12,7 +12,7 @@
     }
    ],
    "matchup": "Syracuse / Illinois",
-   "records": 6
+   "records": 8
   },
   "6624381": {
    "conflicts": [
@@ -60,7 +60,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 6,
+     "records": 8,
      "values": [
       "1788066000",
       "1788112800"
@@ -68,7 +68,7 @@
     }
    ],
    "matchup": "UC Riverside / Samford",
-   "records": 6
+   "records": 8
   },
   "6625272": {
    "conflicts": [
@@ -140,33 +140,25 @@
    "matchup": "Missouri / Nebraska",
    "records": 6
   },
-  "6626470": {
+  "6626471": {
    "conflicts": [
     {
-     "field": "game_state",
-     "records": 47,
-     "values": [
-      "P",
-      "I"
-     ]
-    },
-    {
      "field": "city",
-     "records": 47,
+     "records": 8,
      "values": [
       "Bryan-College Station",
       "College Station"
      ]
     }
    ],
-   "matchup": "Arkansas St. / Grand Canyon",
-   "records": 47
+   "matchup": "Arkansas St. / Cal Poly",
+   "records": 8
   },
   "6626976": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 6,
+     "records": 8,
      "values": [
       "1788116400",
       "1788109200"
@@ -174,7 +166,7 @@
     }
    ],
    "matchup": "Southern California / Creighton",
-   "records": 6
+   "records": 8
   },
   "6627195": {
    "conflicts": [
@@ -204,19 +196,19 @@
    "matchup": "George Washington / Charlotte",
    "records": 6
   },
-  "6627928": {
+  "6627772": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 47,
+     "records": 8,
      "values": [
-      "1788044400",
-      "1788048000"
+      "1788107400",
+      "1788143400"
      ]
     }
    ],
-   "matchup": "Montana / Washington St.",
-   "records": 47
+   "matchup": "Montana St. / Marist",
+   "records": 8
   },
   "6627931": {
    "conflicts": [
@@ -288,33 +280,11 @@
    "matchup": "Texas Southern / Houston",
    "records": 6
   },
-  "6628592": {
-   "conflicts": [
-    {
-     "field": "teams",
-     "records": 47,
-     "values": [
-      "(('46507', True), ('46755', False))",
-      "(('46507', False), ('46755', True))"
-     ]
-    },
-    {
-     "field": "site",
-     "records": 47,
-     "values": [
-      "home/away flip across snapshots",
-      "no venue owner on record"
-     ]
-    }
-   ],
-   "matchup": "Texas / TCU",
-   "records": 47
-  },
   "6628652": {
    "conflicts": [
     {
      "field": "teams",
-     "records": 6,
+     "records": 8,
      "values": [
       "(('46553', True), ('46737', False))",
       "(('46553', False), ('46737', True))"
@@ -322,7 +292,7 @@
     },
     {
      "field": "site",
-     "records": 6,
+     "records": 8,
      "values": [
       "home/away flip across snapshots",
       "no venue owner on record"
@@ -330,7 +300,7 @@
     }
    ],
    "matchup": "Sacred Heart / Iowa",
-   "records": 6
+   "records": 8
   },
   "6639081": {
    "conflicts": [
@@ -349,13 +319,44 @@
  },
  "by_field": {
   "city": 1,
-  "game_state": 62,
-  "site": 2,
+  "game_state": 28,
+  "site": 1,
   "start_time_epoch": 20,
-  "teams": 2,
-  "teams (non-blocking)": 1
+  "teams": 1
  },
  "corrections": {
+  "6625717": {
+   "fields": [
+    "venue",
+    "city",
+    "state_usps",
+    "event"
+   ],
+   "matchup": "Kansas / Pittsburgh",
+   "review_by": "2026-08-28",
+   "support": {
+    "city": {
+     "retrieved": "2026-08-26",
+     "text": "vs #15 Kansas Petersen Events Center Pittsburgh, Pa.",
+     "url": "https://pittsburghpanthers.com/sports/womens-volleyball/schedule"
+    },
+    "event": {
+     "retrieved": "2026-08-26",
+     "text": "Opening Spike Classic vs #15 Kansas Petersen Events Center Pittsburgh, Pa.",
+     "url": "https://pittsburghpanthers.com/sports/womens-volleyball/schedule"
+    },
+    "state_usps": {
+     "retrieved": "2026-08-26",
+     "text": "vs #15 Kansas Petersen Events Center Pittsburgh, Pa.",
+     "url": "https://pittsburghpanthers.com/sports/womens-volleyball/schedule"
+    },
+    "venue": {
+     "retrieved": "2026-08-26",
+     "text": "Opening Spike Classic vs #15 Kansas Petersen Events Center Pittsburgh, Pa. Aug 28 (Fri) 6:30 PM ESPN2",
+     "url": "https://pittsburghpanthers.com/sports/womens-volleyball/schedule"
+    }
+   }
+  },
   "6626809": {
    "fields": [
     "site",
@@ -440,48 +441,24 @@
   },
   "6628315": {
    "fields": [
-    "site",
-    "venue",
-    "city",
-    "state_usps",
     "event"
    ],
-   "matchup": "UNLV / Nebraska",
+   "matchup": "Nebraska / UNLV",
    "review_by": "2026-08-29",
    "support": {
-    "city": {
-     "retrieved": "2026-08-27",
-     "text": "Aug 29 (Sat) 5 PM PT No. 1 Nebraska Las Vegas, Nev. / T-Mobile Arena",
-     "url": "https://unlvrebels.com/sports/womens-volleyball/schedule"
-    },
     "event": {
      "retrieved": "2026-08-27",
      "text": "Players Era Showcase Neutral Saturday Aug 29 7:00 PM CDT #1 vs. UNLV",
      "url": "https://huskers.com/sports/volleyball/schedule"
-    },
-    "site": {
-     "retrieved": "2026-08-27",
-     "text": "Players Era Showcase Neutral Saturday Aug 29 7:00 PM CDT #1 vs. UNLV Las Vegas, Nev. / T-Mobile Arena",
-     "url": "https://huskers.com/sports/volleyball/schedule"
-    },
-    "state_usps": {
-     "retrieved": "2026-08-27",
-     "text": "Aug 29 (Sat) 5 PM PT No. 1 Nebraska Las Vegas, Nev. / T-Mobile Arena",
-     "url": "https://unlvrebels.com/sports/womens-volleyball/schedule"
-    },
-    "venue": {
-     "retrieved": "2026-08-27",
-     "text": "Players Era Volleyball Showcase Aug 29 (Sat) 5 PM PT No. 1 Nebraska Las Vegas, Nev. / T-Mobile Arena",
-     "url": "https://unlvrebels.com/sports/womens-volleyball/schedule"
     }
    }
   }
  },
  "counts": {
-  "blocked": 23,
-  "conflicted": 85,
-  "corrected": 3,
-  "fixtures": 4872
+  "blocked": 22,
+  "conflicted": 50,
+  "corrected": 4,
+  "fixtures": 4874
  },
  "official_conflicts": {},
  "stale": {}

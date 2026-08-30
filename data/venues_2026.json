@@ -6,9 +6,9 @@
   "min_home_games": 3,
   "note": "'unknown' means we do not yet have 3 home matches for that team, so no claim is made either way -- it is not a synonym for 'home'",
   "counts": {
-   "no-venue": 1669,
-   "neutral": 514,
-   "home": 2682,
+   "no-venue": 1671,
+   "neutral": 513,
+   "home": 2683,
    "unknown": 7
   },
   "teams_with_known_home": 263,
@@ -172,14 +172,12 @@
   "51287": "Thomas Assembly Center, Ruston, LA",
   "45907": "Bogota Savings Bank Center, Hackensack, NJ",
   "46561": "Kirby Sports Center, Easton, PA",
-  "46734": "Hanner Fieldhouse, Statesboro, GA",
   "46301": "Exactech Arena at Stephen C. O'Connell Center, Gainesville, FL",
   "45943": "Ferrell Center, Waco, TX",
   "46235": "The Pit, Albuquerque, NM",
   "46036": "University Credit Union Center, Davis, CA",
   "46659": "Mott Athletics Center, San Luis Obispo, CA",
   "46628": "Jon M. Huntsman Center , Salt Lake City, UT",
-  "46211": "McKale Center, Tucson, AZ",
   "46474": "T-Mobile Arena, Las Vegas, NV",
   "46471": "Carmichael Arena, Chapel Hill, NC",
   "45987": "Viking Pavilion, Portland, OR",
@@ -208,6 +206,7 @@
   "46501": "Maples Pavilion, Stanford, CA",
   "46613": "Matthew Knight Arena, Eugene, OR",
   "46071": "Stroh Center, Bowling Green, OH",
+  "46734": "Hanner Fieldhouse, Statesboro, GA",
   "45828": "Paul Porter Arena, Boiling Springs, NC",
   "46729": "Rolle Activity Center, Flagstaff, AZ",
   "46437": "Bartow Arena, Birmingham, AL",
@@ -263,6 +262,7 @@
   "46572": "Worthen Arena, Muncie, IN",
   "46046": "Leede Arena, Hanover, NH",
   "46218": "Pizzitola Sports Center, Providence, RI",
+  "46211": "McKale Center, Tucson, AZ",
   "46615": "The Palestra, Philadelphia, PA",
   "46300": "Leo D. Mahoney Arena, Fairfield, CT",
   "45808": "Neville Arena, Auburn, AL",
@@ -932,6 +932,18 @@
     "6627595",
     "6626382",
     "6626383"
+   ],
+   "name": null
+  },
+  {
+   "venue": "Reed Arena, College Station, TX",
+   "matches": 3,
+   "first_date": "2026-08-28",
+   "last_date": "2026-08-30",
+   "game_ids": [
+    "6627255",
+    "6626470",
+    "6626471"
    ],
    "name": null
   },
@@ -1718,17 +1730,6 @@
    "game_ids": [
     "6624316",
     "6624317"
-   ],
-   "name": null
-  },
-  {
-   "venue": "Reed Arena, College Station, TX",
-   "matches": 2,
-   "first_date": "2026-08-28",
-   "last_date": "2026-08-29",
-   "game_ids": [
-    "6627255",
-    "6626470"
    ],
    "name": null
   },
@@ -6152,12 +6153,12 @@
   },
   {
    "game_id": "6627022",
-   "venue": "McKale Center, Tucson, AZ",
+   "venue": null,
    "home_team_id": "46734",
    "home_venue_on_record": "Hanner Fieldhouse, Statesboro, GA",
-   "venue_owner": "46211",
+   "venue_owner": null,
    "event": null,
-   "site": "neutral"
+   "site": "no-venue"
   },
   {
    "game_id": "6627292",
@@ -6431,10 +6432,10 @@
   },
   {
    "game_id": "6626471",
-   "venue": "Reed Arena, Bryan-College Station, TX",
+   "venue": "Reed Arena, College Station, TX",
    "home_team_id": "46659",
    "home_venue_on_record": "Mott Athletics Center, San Luis Obispo, CA",
-   "venue_owner": "46659",
+   "venue_owner": "46006",
    "event": null,
    "site": "neutral"
   },
@@ -6503,12 +6504,12 @@
   },
   {
    "game_id": "6624518",
-   "venue": "McKale Center, Tucson, AZ",
+   "venue": null,
    "home_team_id": "46211",
    "home_venue_on_record": "McKale Center, Tucson, AZ",
-   "venue_owner": "46211",
+   "venue_owner": null,
    "event": null,
-   "site": "home"
+   "site": "no-venue"
   },
   {
    "game_id": "6627472",
@@ -45905,6 +45906,24 @@
   },
   {
    "game_id": "6640391",
+   "venue": "Pete Mathews Coliseum, Jacksonville, AL",
+   "home_team_id": "45784",
+   "home_venue_on_record": "Pete Mathews Coliseum, Jacksonville, AL",
+   "venue_owner": "45784",
+   "event": null,
+   "site": "home"
+  },
+  {
+   "game_id": "6640427",
+   "venue": "Pete Mathews Coliseum, Jacksonville, AL",
+   "home_team_id": "45784",
+   "home_venue_on_record": "Pete Mathews Coliseum, Jacksonville, AL",
+   "venue_owner": "45784",
+   "event": null,
+   "site": "home"
+  },
+  {
+   "game_id": "6640466",
    "venue": "Pete Mathews Coliseum, Jacksonville, AL",
    "home_team_id": "45784",
    "home_venue_on_record": "Pete Mathews Coliseum, Jacksonville, AL",

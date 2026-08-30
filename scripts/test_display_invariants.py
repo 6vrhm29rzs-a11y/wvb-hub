@@ -28,6 +28,25 @@ import re
 import sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(REPO, "scripts"))
+
+
+def _ckey(r):
+    """The player-aggregate's OWN key (crawl_2025._canon), for audits.
+
+    ⚠ Both phantom-set audits once keyed on raw or [^a-z]-stripped display
+    strings -- accent-sensitive either way -- so the night the feed spelled
+    Antonie Kelnarova with and without accents, the recount split her and
+    false-flagged a correct merged aggregate. An auditor that speaks a
+    different key than the thing it audits is auditing a different question.
+    """
+    import unicodedata as _ud
+    import nameclean as _nc
+    w = "%s %s" % (_nc.repair(r.get("first") or ""),
+                   _nc.repair(r.get("last") or ""))
+    w = "".join(c for c in _ud.normalize("NFKD", w.lower())
+                if not _ud.combining(c))
+    return (str(r.get("team_id")), re.sub(r"[^a-z]", "", w))
 SEASON = int(os.environ.get("WVB_SEASON", "2025"))
 DASH = os.path.join(REPO, "output", "vb_dashboard.html")
 
@@ -1360,6 +1379,14 @@ def check_phantom_sets_are_harmless():
         except (TypeError, ValueError):
             return 0.0
     COUNTS = ("kills", "atts", "digs", "aces", "assists", "bs", "ba", "errors")
+    # ⚠ KEY EXACTLY AS THE AGGREGATOR KEYS (2026-08-30). This block used the
+    # raw display string, which is accent- and case-SENSITIVE -- so the night
+    # the feed spelled Antonie Kelnarova with and without her accents, the
+    # recount split her across two keys and compared one fragment's sets to
+    # the merged aggregate row: a false "phantom sets" alarm against a
+    # correct aggregate. crawl_2025._canon merges case, accents and
+    # feed-corruption (nameclean); the auditor must speak the same key or it
+    # is auditing a different question.
     recs = [json.loads(l) for l in open(pb) if l.strip()]
     phantom, real = set(), {}
     for rec in recs:
@@ -1368,7 +1395,7 @@ def check_phantom_sets_are_harmless():
             continue
         uniform = len(set(str(r.get("gp")) for r in rows)) == 1
         for r in rows:
-            key = (str(r.get("team_id")), (r.get("first") or "") + " " + (r.get("last") or ""))
+            key = _ckey(r)
             produced = any(num(r.get(k)) for k in COUNTS)
             if uniform and not produced:
                 phantom.add(key)
@@ -1406,8 +1433,7 @@ def check_phantom_sets_are_harmless():
         if os.path.exists(aggp):
             agg = {}
             for pl in (json.load(open(aggp, encoding="utf-8")).get("players") or []):
-                key = (str(pl.get("team_id")),
-                       ((pl.get("first") or "") + " " + (pl.get("last") or "")))
+                key = _ckey(pl)
                 agg[key] = pl
             # recompute each bitten player's justified sets from the raw lines
             justified = {}
@@ -1417,8 +1443,7 @@ def check_phantom_sets_are_harmless():
                     continue
                 uniform = len(set(str(r.get("gp")) for r in rows)) == 1
                 for r in rows:
-                    key = (str(r.get("team_id")),
-                           (r.get("first") or "") + " " + (r.get("last") or ""))
+                    key = _ckey(r)
                     if key not in bitten:
                         continue
                     if uniform and not any(num(r.get(k)) for k in COUNTS):
@@ -1490,16 +1515,16 @@ def check_aggregate_excludes_phantom_sets():
         for r in rows:
             if broken and not produced(r):
                 continue
-            key = (str(r.get("team_id")),
-                   re.sub(r"[^a-z]", "",
-                          ((r.get("first") or "") + (r.get("last") or "")).lower()))
+            # ⚠ same key as the aggregator (see _ckey above): a bare
+            # [^a-z] strip DELETES accented letters, so 'Kelnárová' keyed
+            # as 'kelnrov' while her unaccented rows keyed 'kelnarova' --
+            # a split recount false-flagging a correct merged aggregate
+            key = _ckey(r)
             want[key] = want.get(key, 0) + n(r.get("gp"))
 
     over = []
     for p in (json.load(open(agg)) or {}).get("players", []):
-        key = (str(p.get("team_id")),
-               re.sub(r"[^a-z]", "",
-                      ((p.get("first") or "") + (p.get("last") or "")).lower()))
+        key = _ckey(p)
         expect = want.get(key)
         if expect is not None and p.get("sets", 0) > expect:
             over.append((p.get("last"), p.get("sets"), expect))

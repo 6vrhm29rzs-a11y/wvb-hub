@@ -225,32 +225,27 @@ def main():
         for k, v in want.items():
             check("%s %-8s == %r" % (gid, k, v), r.get(k) == v, repr(r.get(k)))
         check("  %s renders confidently" % gid, FX.renderable(r))
-    # ⚠ 6625717 CHANGED CLASS THE MOMENT IT WENT FINAL (2026-08-28). Its
-    # venue was never in the feed -- "Petersen Events Center / Opening Spike
-    # Classic" came from a cited PREGAME ledger correction, and fixtures.py
-    # deliberately withholds pregame schedule corrections once a match is
-    # final: where it was going to be played is settled by what happened,
-    # and the feed reported nothing. So the pinned expectation above became
-    # wrong BY POLICY, not by defect. What must now hold: no venue asserted,
-    # and the withholding is stated on the record rather than silent.
+    # ⚠ THE PETERSEN QUESTION IS CLOSED BY RULE (2026-08-30, third
+    # occurrence forced it: Petersen venue, Players Era event, USC-ASU).
+    # fixtures.py now applies FILL-ONLY-ON-FINAL: a pregame correction --
+    # stale or not -- may still FILL a field the feed asserts nothing
+    # about on a completed match, and may never override an asserted one.
+    # review_by exists because schedules MOVE; a played match cannot, so
+    # staleness no longer deletes a cited fact from a final the feed left
+    # blank. What must hold now: the cited venue RENDERS, with per-field
+    # provenance, and any withheld remainder names the fields the feed
+    # itself asserted.
     r = fx.get("6625717") or {}
-    check("6625717 (final, feed silent): no venue asserted", r.get("venue") is None,
-          repr(r.get("venue")))
-    # ⚠ CLOCK-AWARE, NOT CALENDAR-PINNED (the round-10 lesson, same day).
-    # While the pregame ledger entry was VALID, the final withholds it and
-    # says so; once the entry passes its review_by date the ledger retires
-    # it, there is nothing left to withhold, and correction_withheld is
-    # correctly absent. Both are honest states of the same policy; pinning
-    # the first made the suite go red at the entry's review date.
-    import ledger as _LG
-    _has_corr = "6625717" in (_LG.load()["corrections"] or {})
-    if _has_corr:
-        check("  ...and the withheld correction says so",
-              bool(r.get("correction_withheld")),
-              repr(r.get("correction_withheld")))
-    else:
-        check("  ...its pregame entry has retired (review date passed); "
-              "nothing to withhold", not r.get("venue"))
+    check("6625717 (final, feed silent): the cited venue fills",
+          r.get("venue") == "Petersen Events Center", repr(r.get("venue")))
+    check("  ...with provenance on the record",
+          bool(((r.get("correction") or {}).get("support") or {})
+               .get("venue")),
+          repr(r.get("correction"))[:80])
+    check("  ...and nothing the feed asserted was overridden",
+          not r.get("correction_withheld")
+          or "asserts" in r.get("correction_withheld"),
+          repr(r.get("correction_withheld")))
     # ⚠ THE LEDGER MOVED AND ITS SCHEMA TIGHTENED. Support is now per FIELD,
     # so this no longer checks "the entry has a url" -- it checks that every
     # single overridden fact carries its own citation. scripts/test_ledger.py
@@ -284,6 +279,13 @@ def main():
               "the Schedule would list a match the match route denies")
         for gid in ("6626809", "6628315", "6625717"):
             a, b = FIX.get(gid) or {}, fx.get(gid) or {}
+            # ⚠ THE SCHEDULE PAYLOAD IS TODAY-FORWARD BY DESIGN. A completed
+            # match leaves it, so an empty page row beside a populated
+            # canonical record is the documented shape, not a divergence.
+            if not a and b.get("completed"):
+                check("%s: completed -- correctly absent from the "
+                      "schedule payload" % gid, True)
+                continue
             # ⚠ None and "unconfirmed" are ONE claim in two spellings --
             # both mean "no site asserted, fail closed". The schedule payload
             # leaves the field empty; canonical_fixtures names the state.

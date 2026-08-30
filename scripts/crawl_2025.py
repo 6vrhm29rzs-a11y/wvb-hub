@@ -713,7 +713,13 @@ def crawl_players():
     import unicodedata as _ud
 
     def _canon(first, last):
-        w = "%s %s" % (first or "", last or "")
+        # ⚠ FEED-CORRUPTION REPAIR FIRST (Taryn Gilreath, 2026-08-30): the
+        # feed served one player as '\u200bTaryn' and as the same zero-width
+        # space mojibake'd + case-mangled -- NFKD alone turned the mojibake
+        # into a stray letter 'a' and split her season across two rows.
+        # nameclean.repair is the ONE definition, shared with both nkey()s.
+        import nameclean as _nc
+        w = "%s %s" % (_nc.repair(first or ""), _nc.repair(last or ""))
         w = "".join(c for c in _ud.normalize("NFKD", w.lower())
                     if not _ud.combining(c))
         return re.sub(r"[^a-z]", "", w)
@@ -775,7 +781,9 @@ def crawl_players():
                 continue
             key = (r["team_id"], _canon(r.get("first"), r.get("last")))
             # keep the most frequently served spelling as the display name
-            nm = ((r.get("first") or "").strip(), (r.get("last") or "").strip())
+            import nameclean as _nc2
+            nm = (_nc2.repair((r.get("first") or "").strip()),
+                  _nc2.repair((r.get("last") or "").strip()))
             seen_names.setdefault(key, collections.Counter())[nm] += 1
             e = agg.setdefault(key, {
                 "team_id": r["team_id"], "first": r.get("first"),
@@ -801,7 +809,15 @@ def crawl_players():
     for key, e in agg.items():
         best = seen_names.get(key)
         if best:
-            f, l = best.most_common(1)[0][0]
+            # most frequent spelling wins; a TIE prefers the properly
+            # cased form -- the mojibake repair leaves 'taryn' lowercase
+            # (the feed case-mangled it), and with one game each the
+            # counter's tie-break is arbitrary
+            _top = best.most_common()
+            _n0 = _top[0][1]
+            _tied = [nm for nm, n in _top if n == _n0]
+            f, l = sorted(_tied, key=lambda nm: (
+                not (nm[0][:1].isupper() and nm[1][:1].isupper()),))[0]
             e["first"], e["last"] = f, l
 
     out = {

@@ -150,16 +150,32 @@ def main():
     # ── 4. THE CONFLICT MECHANISM ───────────────────────────────────────
     print("\n4. TWO OFFICIAL SOURCES THAT DISAGREE")
     # a synthetic conflict on the real corpus, applied through the real path
+    # ⚠ THE TARGET GID IS CHOSEN AT TEST TIME, NOT PINNED. The first version
+    # pinned 6628315 (Nebraska-UNLV) -- and the night that match went FINAL,
+    # all five conflict checks failed at once, because conflicts stop
+    # applying to a completed match BY DESIGN (a result settles what a
+    # schedule page could only claim). A guard pinned to a real fixture
+    # inherits that fixture's calendar. Any still-upcoming fixture
+    # exercises the identical path.
+    _upc = sorted(g for g, r in FX.canonical_fixtures().items()
+                  if not r.get("completed") and r.get("start_time_epoch")
+                  and not r.get("correction"))
+    check("[+] an upcoming fixture exists to host the synthetic conflict",
+          bool(_upc), "no upcoming fixtures at all?")
+    _cgid = _upc[0] if _upc else "0"
+    _cep = FX.canonical_fixtures()[_cgid]["start_time_epoch"] if _upc else 0
+    FX_real_venue = (FX.canonical_fixtures()[_cgid].get("venue")
+                     if _upc else None)
     conflict = {
-        "game_id": "6628315", "kind": "conflict", "field": "start_time_epoch",
-        "review_by": "2026-08-29",
+        "game_id": _cgid, "kind": "conflict", "field": "start_time_epoch",
+        "review_by": "2099-01-01",
         "claims": [
-            {"value": 1788048000, "support": sup(
-                url="https://unlvrebels.com/sports/womens-volleyball/schedule",
-                text="Aug 29 (Sat) 5 PM PT No. 1 Nebraska T-Mobile Arena")},
-            {"value": 1788055200, "support": sup(
-                url="https://huskers.com/sports/volleyball/schedule",
-                text="Saturday Aug 29 9:00 PM CDT #1 vs. UNLV T-Mobile Arena")},
+            {"value": int(_cep) + 3600, "support": sup(
+                url="https://school-a.example.edu/schedule",
+                text="synthetic claim A, one hour later")},
+            {"value": int(_cep) + 7200, "support": sup(
+                url="https://school-b.example.edu/schedule",
+                text="synthetic claim B, two hours later")},
         ],
     }
     check("[+] a well-formed conflict validates",
@@ -169,8 +185,8 @@ def main():
               open(tmp, "w", encoding="utf-8"))
     real_ledger = FX.ledger
     try:
-        FX.ledger = lambda today=None: LG.load(path=tmp, today="2026-08-27")
-        r = FX.canonical_fixtures()["6628315"]
+        FX.ledger = lambda today=None: LG.load(path=tmp)
+        r = FX.canonical_fixtures()[_cgid]
         check("the conflicted fact is rendered UNAVAILABLE",
               r["start_time_epoch"] is None, str(r["start_time_epoch"]))
         # ⚠ NEGATIVE CONTROL: the NCAA value must NOT quietly win.
@@ -184,9 +200,13 @@ def main():
                          and c.get("retrieved") for c in oc[0]["claims"]))
         check("[-] the fixture is blocked from a confident render",
               not FX.renderable(r))
-        # other facts survive -- a conflict is field-scoped
+        # other facts survive -- a conflict is field-scoped. Compared
+        # against the fixture's own undisputed venue, not a pinned arena
+        # (the pinned "T-Mobile Arena" broke when the host gid went dynamic).
+        _venue_before = FX_real_venue
         check("[+] ...while the venue it does NOT dispute survives",
-              r["venue"] == "T-Mobile Arena")
+              r["venue"] == _venue_before, "%r vs %r" % (r["venue"],
+                                                         _venue_before))
     finally:
         FX.ledger = real_ledger
         os.remove(tmp)

@@ -164,30 +164,14 @@ def L(path):
 
 
 def nkey(s):
-    """Join key: lowercase letters only, after two repairs measured on the
-    first big slate. (1) MOJIBAKE: the feed ships UTF-8 read as Latin-1,
-    sometimes case-mangled ("Kria\\x8dkovia\\x87" for Krickovic) -- restore a
-    lowercased lead byte, round-trip latin-1->utf-8, and keep the repair only
-    if it decodes to something different. (2) ACCENT FOLD: NFKD-transliterate
-    so the feed\\x27s Krickovic-with-hacheks and a roster\\x27s plain Krickovic
-    land on ONE key. Pure-ASCII names are byte-for-byte unchanged, so no
-    existing join moves; only joins that previously FAILED can now succeed."""
-    s = s or ""
+    """Join key: lowercase letters only, after nameclean.repair -- the ONE
+    shared repair for feed-corrupted names (mojibake round-trip, C1-debris
+    pairs, zero-width characters) -- then an NFKD accent fold. Pure-ASCII
+    keys are byte-for-byte unchanged, so no existing join moves; only
+    joins that previously FAILED can now succeed."""
+    import nameclean as _nc
+    s = _nc.repair(s or "")
     if any(ord(c) > 0x7F for c in s):
-        cased = "".join(
-            chr(ord(c) - 0x20)
-            if (0xE0 <= ord(c) <= 0xFE and i + 1 < len(s)
-                and 0x80 <= ord(s[i + 1]) <= 0xBF)
-            else c
-            for i, c in enumerate(s))
-        for cand in (s, cased):
-            try:
-                r = cand.encode("latin-1").decode("utf-8")
-            except (UnicodeEncodeError, UnicodeDecodeError):
-                continue
-            if r != cand:
-                s = r
-                break
         s = unicodedata.normalize("NFKD", s)
         s = s.encode("ascii", "ignore").decode("ascii")
     return re.sub(r"[^a-z]", "", s.lower())

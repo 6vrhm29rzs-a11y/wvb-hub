@@ -273,6 +273,17 @@ def canonical_fixtures():
         }
 
         c = corr.get(gid)
+        # ⚠ A STALE CORRECTION IS NOT DEAD ON A COMPLETED MATCH. review_by
+        # exists because a schedule claim is perishable -- schools move
+        # fixtures. A PLAYED match cannot move, so on a final the newest
+        # stale correction stays eligible for the fill-only path below
+        # (it still cannot override anything the feed asserted).
+        if not c and rec["completed"]:
+            _stale_corr = [e for e in L["stale"].get(gid, [])
+                           if e.get("kind") == "correction"]
+            if _stale_corr:
+                c = sorted(_stale_corr,
+                           key=lambda e: e.get("review_by") or "")[-1]
         if c:
             # ⚠ A PREGAME SCHEDULE CORRECTION IS NOT A RESULT FACT. Once a
             # match is final, where it was going to be played is settled by
@@ -287,7 +298,40 @@ def canonical_fixtures():
             # per entry precisely so no OTHER match's withheld correction
             # changes behaviour (the Petersen question stays open).
             if rec["completed"] and not c.get("applies_to_final"):
-                rec["correction_withheld"] = "match is final; pregame schedule correction not applied"
+                # ⚠ FILL-ONLY ON A FINAL (three cases forced the rule:
+                # Petersen venue, Players Era event, USC-ASU). "The result
+                # settles where it was played" only bites where the feed
+                # OBSERVED something -- a field the feed asserts nothing
+                # about (event, always; venue when the record is silent)
+                # cannot be settled by the result, and withholding a cited
+                # fact there just deletes information. So a pregame
+                # correction may still FILL an empty field on a completed
+                # match, and may never override an asserted one -- the same
+                # fill-never-replace rule the result corrections follow.
+                sup = c.get("support") or {}
+                _filled = []
+                for k, v in (c.get("fields") or {}).items():
+                    if rec.get(k) in (None, "", SITE_UNCONFIRMED):
+                        rec[k] = v
+                        rec["corrected_fields"].append(k)
+                        _filled.append(k)
+                if _filled:
+                    rec["correction"] = {
+                        "why": c.get("why"),
+                        "review_by": c.get("review_by"),
+                        "support": {k: {"url": sup[k]["url"],
+                                        "retrieved": sup[k]["retrieved"],
+                                        "text": sup[k]["text"]}
+                                    for k in _filled if k in sup},
+                    }
+                    rec["source"] = "ncaa+official-school"
+                _held = [k for k in (c.get("fields") or {})
+                         if k not in _filled]
+                if _held:
+                    rec["correction_withheld"] = (
+                        "match is final; pregame correction withheld on "
+                        "fields the feed itself asserts: %s"
+                        % ", ".join(sorted(_held)))
             else:
                 sup = c.get("support") or {}
                 for k, v in (c.get("fields") or {}).items():
