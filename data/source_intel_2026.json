@@ -1,0 +1,590 @@
+{
+ "meta": {
+  "season": 2026,
+  "generated_at_utc": "2026-08-30T19:01:32Z",
+  "n_claims": 13,
+  "feed_cap": 5,
+  "recent_hours": 72,
+  "states": {
+   "confirmed_official": 7,
+   "corroborated": 2,
+   "official_unconfirmed": 0,
+   "community_signal": 0,
+   "conflicting": 0,
+   "expired": 3,
+   "inaccessible": 1
+  }
+ },
+ "claims": [
+  {
+   "id": "27790879126a",
+   "type": "result_correction",
+   "subject": {
+    "kind": "match",
+    "gid": "6628406"
+   },
+   "what": "Result corrected: Kent St. won 3-2. The feed's OWN linescores say so (25-20, 25-23 W&M, then 13-25, 14-25, 9-15 -- home Kent …",
+   "state": "confirmed_official",
+   "state_label": "confirmed by an official source",
+   "why": "the feed's record was incomplete or wrong; 2 named official source(s) supply the result",
+   "sources": [
+    {
+     "url": "https://tribeathletics.com/sports/womens-volleyball/schedule",
+     "excerpt": "'Kent State ... Blacksburg, Va. L, 2-3 Box Score' -- the row for August 29, 2026",
+     "retrieved": "2026-08-29T17:51:16Z",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://kentstatesports.com/sports/womens-volleyball/schedule",
+     "excerpt": "'vs William & Mary, Blacksburg, Va., Hokie Invitational, W, 3-2, Aug 29 (Sat)' -- posted on the third recheck, ~90 minutes after the final",
+     "retrieved": "2026-08-29T18:40:11Z",
+     "source_class": "official_school"
+    }
+   ],
+   "public": true,
+   "priority": 90,
+   "route": {
+    "match": "6628406",
+    "ledger": true
+   },
+   "effective": null,
+   "review_by": null
+  },
+  {
+   "id": "0b6e40f988be",
+   "type": "result_correction",
+   "subject": {
+    "kind": "match",
+    "gid": "6625758"
+   },
+   "what": "Result corrected: Little Rock won 3-0 (25-5, 25-15, 25-18). The feed's own linescores say so (home side takes every set), and …",
+   "state": "confirmed_official",
+   "state_label": "confirmed by an official source",
+   "why": "the feed's record was incomplete or wrong; 1 named official source(s) supply the result",
+   "sources": [
+    {
+     "url": "https://icgaels.com/sports/womens-volleyball/schedule",
+     "excerpt": "'vs Little Rock ... Ruston, LA, Thomas Assembly Center ... L, 0-3 (5-25, 15-25, 18-25)' -- the per-set scores match the feed's linescores exactly",
+     "retrieved": "2026-08-29T20:56:18Z",
+     "source_class": "official_school"
+    }
+   ],
+   "public": true,
+   "priority": 90,
+   "route": {
+    "match": "6625758",
+    "ledger": true
+   },
+   "effective": null,
+   "review_by": null
+  },
+  {
+   "id": "3f67da99d82a",
+   "type": "result_correction",
+   "subject": {
+    "kind": "match",
+    "gid": "6627523"
+   },
+   "what": "Result corrected: Southern California (away) beat Arizona St. 3-0 (25-23, 25-21, 25-22) at the Sanford Pentagon, Sioux Falls -- …",
+   "state": "confirmed_official",
+   "state_label": "confirmed by an official source",
+   "why": "the feed's record was incomplete or wrong; 2 named official source(s) supply the result",
+   "sources": [
+    {
+     "url": "https://usctrojans.com/sports/womens-volleyball/schedule",
+     "excerpt": "'vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | State Farm Women's Volleyball Showcase | W, 3-0 | Aug 29 (Sat)' -- the schedule card, result posted",
+     "retrieved": "2026-08-29T22:05:00Z",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://thesundevils.com/sports/volleyball/schedule",
+     "excerpt": "NCAA LiveStats box score PDF supplied by Cody: 'Southern California vs Arizona St. (08/29/2026 at Sanford Pentagon)' -- set scores 25-23, 25-21, 25-22, Southern California (3) Arizona St. (0), 'Team records: 1-0, 0-0 / 2-1, 0-0'. ASU's own schedule page is JavaScript-rendered and unreadable to a plain fetch.",
+     "retrieved": "2026-08-29",
+     "source_class": "official_school"
+    }
+   ],
+   "public": true,
+   "priority": 90,
+   "route": {
+    "match": "6627523",
+    "ledger": true
+   },
+   "effective": null,
+   "review_by": null
+  },
+  {
+   "id": "e79084be3b35",
+   "type": "fixture_update",
+   "subject": {
+    "kind": "match",
+    "gid": "6626809"
+   },
+   "what": "city / event / site / state_usps / venue corrected for Kentucky vs Penn St.",
+   "state": "confirmed_official",
+   "state_label": "confirmed by an official source",
+   "why": "the school's own page contradicts the feed on city, event, site, state_usps, venue; every overridden field carries its own citation",
+   "sources": [
+    {
+     "url": "https://gopsusports.com/sports/womens-volleyball/schedule",
+     "excerpt": "Big Ten/SEC Challenge neutral Sunday Sep 6 vs. Kentucky Chicago, Ill. / Wrigley Field 7:00 PM EDT",
+     "retrieved": "2026-08-26",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://gopsusports.com/sports/womens-volleyball/schedule",
+     "excerpt": "Sunday Sep 6 vs. Kentucky Chicago, Ill. / Wrigley Field 7:00 PM EDT",
+     "retrieved": "2026-08-26",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://ukathletics.com/schedule.aspx?path=wvball",
+     "excerpt": "Sun. Sep 6 vs. Penn State Wrigley Field (Chicago, Ill.) 7:00 pm Big Ten / SEC Challenge",
+     "retrieved": "2026-08-26",
+     "source_class": "official_school"
+    }
+   ],
+   "public": true,
+   "priority": 70,
+   "route": {
+    "match": "6626809"
+   },
+   "effective": null,
+   "review_by": "2026-09-06"
+  },
+  {
+   "id": "bffff5caac58",
+   "type": "fixture_update",
+   "subject": {
+    "kind": "match",
+    "gid": "6627523"
+   },
+   "what": "city / event / site / start_time_epoch / state_usps / venue corrected for Southern California vs Arizona St.",
+   "state": "confirmed_official",
+   "state_label": "confirmed by an official source",
+   "why": "the school's own page contradicts the feed on city, event, site, start_time_epoch, state_usps, venue; every overridden field carries its own citation",
+   "sources": [
+    {
+     "url": "https://usctrojans.com/sports/womens-volleyball/schedule",
+     "excerpt": "Scrimmage / Exhibition | State Farm Women's Volleyball Showcase | vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT",
+     "retrieved": "2026-08-29",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://usctrojans.com/sports/womens-volleyball/schedule",
+     "excerpt": "Scrimmage / Exhibition | State Farm Women's Volleyball Showcase | vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT",
+     "retrieved": "2026-08-29",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://usctrojans.com/sports/womens-volleyball/schedule",
+     "excerpt": "Scrimmage / Exhibition | State Farm Women's Volleyball Showcase | vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT",
+     "retrieved": "2026-08-29",
+     "source_class": "official_school"
+    }
+   ],
+   "public": true,
+   "priority": 70,
+   "route": {
+    "match": "6627523"
+   },
+   "effective": null,
+   "review_by": "2026-09-05"
+  },
+  {
+   "id": "1016a62c9316",
+   "type": "fixture_evidence",
+   "subject": {
+    "kind": "match",
+    "gid": "6628315"
+   },
+   "what": "A schedule reading for Nebraska vs UNLV passed its review date",
+   "state": "expired",
+   "state_label": "evidence past its review date",
+   "why": "a schedule claim is perishable; this one was not re-verified by its review date",
+   "sources": [],
+   "public": true,
+   "priority": 20,
+   "route": {
+    "match": "6628315"
+   },
+   "effective": null,
+   "review_by": "2026-08-29"
+  },
+  {
+   "id": "a4136bc0fe3f",
+   "type": "fixture_evidence",
+   "subject": {
+    "kind": "match",
+    "gid": "6625717"
+   },
+   "what": "A schedule reading for Kansas at Pittsburgh passed its review date",
+   "state": "expired",
+   "state_label": "evidence past its review date",
+   "why": "a schedule claim is perishable; this one was not re-verified by its review date",
+   "sources": [],
+   "public": true,
+   "priority": 20,
+   "route": {
+    "match": "6625717"
+   },
+   "effective": null,
+   "review_by": "2026-08-28"
+  },
+  {
+   "id": "2765db9a1884",
+   "type": "duplicate_listing",
+   "subject": {
+    "kind": "match",
+    "gid": "6640357"
+   },
+   "what": "Duplicate feed listing excluded (canonical: None)",
+   "state": "corroborated",
+   "state_label": "corroborated by independent sources",
+   "why": "both schools' official schedules establish exactly one meeting",
+   "sources": [
+    {
+     "url": "https://easternshorehawks.com/sports/womens-volleyball/schedule/",
+     "excerpt": "schema.org event 'University of Maryland Eastern Shore Vs Mississippi Valley State', startDate 2026-08-28T18:00:00, location Huntsville, AL -- the ONLY Mississippi Valley State entry among all 25 events on the official schedule",
+     "retrieved": "2026-08-29T15:29:49Z",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://mvsusports.com/sports/womens-volleyball/schedule",
+     "excerpt": "schema.org event 'Mississippi Valley State University Vs UMES', startDate 2026-08-28T18:00:00; rendered result on the row: 'UMES  L, 0-3' -- the ONLY UMES entry among all 26 events on the official schedule",
+     "retrieved": "2026-08-29T15:29:49Z",
+     "source_class": "official_school"
+    }
+   ],
+   "public": true,
+   "priority": 60,
+   "route": {
+    "match": "6640357",
+    "ledger": true
+   },
+   "effective": null,
+   "review_by": null
+  },
+  {
+   "id": "f463fb661664",
+   "type": "duplicate_listing",
+   "subject": {
+    "kind": "match",
+    "gid": "6640332"
+   },
+   "what": "Duplicate feed listing excluded (canonical: None)",
+   "state": "corroborated",
+   "state_label": "corroborated by independent sources",
+   "why": "both schools' official schedules establish exactly one meeting",
+   "sources": [
+    {
+     "url": "https://broncosports.com/sports/womens-volleyball/schedule",
+     "excerpt": "'Bulldog Invitational vs Middle Tennessee, Asheville N.C., L, 2-3, Aug 28 (Fri) 10 a.m., Box Score / Recap' -- exactly ONE Aug-28 meeting; a separate 'vs Middle Tennessee, Aug 29 (Sat) 10 a.m.' remains upcoming with a countdown",
+     "retrieved": "2026-08-29T15:33:54Z",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://goblueraiders.com/sports/womens-volleyball/schedule",
+     "excerpt": "'Bulldog Invitational, Boise State, Asheville N.C., W, 3-2, Aug 28 (Fri) 11:00 AM' plus recap 'Volleyball Opens Season with Thrilling Five-Set Win over Boise State, Friday, August 28' -- exactly ONE Aug-28 meeting; 'vs Boise State, Aug 29 (Sat) 11:00 AM' is separate and upcoming",
+     "retrieved": "2026-08-29T15:33:54Z",
+     "source_class": "official_school"
+    }
+   ],
+   "public": true,
+   "priority": 60,
+   "route": {
+    "match": "6640332",
+    "ledger": true
+   },
+   "effective": null,
+   "review_by": null
+  },
+  {
+   "id": "afcb40be5c14",
+   "type": "classification",
+   "subject": {
+    "kind": "match",
+    "gid": "6640217",
+    "teams": [
+     "Florida",
+     "Nebraska"
+    ]
+   },
+   "what": "Florida v Nebraska is an exhibition — counts toward nothing",
+   "state": "confirmed_official",
+   "state_label": "confirmed by an official source",
+   "why": "its format proves it: sets to [21, 21] cannot be an NCAA result",
+   "sources": [],
+   "public": true,
+   "priority": 50,
+   "route": {
+    "match": "6640217"
+   },
+   "effective": null,
+   "review_by": null
+  },
+  {
+   "id": "86912b4a7ae1",
+   "type": "classification",
+   "subject": {
+    "kind": "match",
+    "gid": "6640218",
+    "teams": [
+     "SMU",
+     "Penn St."
+    ]
+   },
+   "what": "SMU v Penn St. is an exhibition — counts toward nothing",
+   "state": "confirmed_official",
+   "state_label": "confirmed by an official source",
+   "why": "its format proves it: sets to [21, 21] cannot be an NCAA result",
+   "sources": [],
+   "public": true,
+   "priority": 50,
+   "route": {
+    "match": "6640218"
+   },
+   "effective": null,
+   "review_by": null
+  },
+  {
+   "id": "f7074390c150",
+   "type": "verification_attempt",
+   "subject": {
+    "kind": "match",
+    "gid": "6626806"
+   },
+   "what": "Independent confirmation attempted; source unreadable",
+   "state": "inaccessible",
+   "state_label": "source attempted, unreadable",
+   "why": "the attempt is recorded and establishes nothing",
+   "sources": [
+    {
+     "url": "https://ukathletics.com/sports/womens-volleyball/schedule/",
+     "excerpt": "SIDEARM template renders the schedule in JavaScript; the served HTML carries no readable result text (the only '3-0' on the page is an SVG path coordinate). Stays PENDING.",
+     "retrieved": "2026-08-29T05:07:20Z",
+     "source_class": "school_site"
+    }
+   ],
+   "public": true,
+   "priority": 10,
+   "route": {
+    "match": "6626806",
+    "ledger": true
+   },
+   "effective": null,
+   "review_by": null
+  },
+  {
+   "id": "7e5d6a47bcb2",
+   "type": "availability",
+   "subject": {
+    "kind": "player",
+    "team": "Wisconsin",
+    "player": "Jaela Auguste"
+   },
+   "what": "Jaela Auguste (Wisconsin): availability signal",
+   "state": "expired",
+   "state_label": "evidence past its review date",
+   "why": "evidence past its review date",
+   "sources": [
+    {
+     "url": null,
+     "excerpt": "oh darn no jaela auguste today for wisconsin vs stanford",
+     "retrieved": "2026-08-29T05:48:57Z",
+     "source_class": "community"
+    }
+   ],
+   "public": false,
+   "priority": 20,
+   "route": {
+    "team": "Wisconsin"
+   },
+   "effective": {
+    "from": "2026-08-28",
+    "to": "2026-08-28"
+   },
+   "review_by": "2026-09-04"
+  }
+ ],
+ "feed": [
+  {
+   "id": "27790879126a",
+   "type": "result_correction",
+   "subject": {
+    "kind": "match",
+    "gid": "6628406"
+   },
+   "what": "Result corrected: Kent St. won 3-2. The feed's OWN linescores say so (25-20, 25-23 W&M, then 13-25, 14-25, 9-15 -- home Kent …",
+   "state": "confirmed_official",
+   "state_label": "confirmed by an official source",
+   "why": "the feed's record was incomplete or wrong; 2 named official source(s) supply the result",
+   "sources": [
+    {
+     "url": "https://tribeathletics.com/sports/womens-volleyball/schedule",
+     "excerpt": "'Kent State ... Blacksburg, Va. L, 2-3 Box Score' -- the row for August 29, 2026",
+     "retrieved": "2026-08-29T17:51:16Z",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://kentstatesports.com/sports/womens-volleyball/schedule",
+     "excerpt": "'vs William & Mary, Blacksburg, Va., Hokie Invitational, W, 3-2, Aug 29 (Sat)' -- posted on the third recheck, ~90 minutes after the final",
+     "retrieved": "2026-08-29T18:40:11Z",
+     "source_class": "official_school"
+    }
+   ],
+   "public": true,
+   "priority": 90,
+   "route": {
+    "match": "6628406",
+    "ledger": true
+   },
+   "effective": null,
+   "review_by": null,
+   "first_seen": "2026-08-30T18:56:13Z"
+  },
+  {
+   "id": "0b6e40f988be",
+   "type": "result_correction",
+   "subject": {
+    "kind": "match",
+    "gid": "6625758"
+   },
+   "what": "Result corrected: Little Rock won 3-0 (25-5, 25-15, 25-18). The feed's own linescores say so (home side takes every set), and …",
+   "state": "confirmed_official",
+   "state_label": "confirmed by an official source",
+   "why": "the feed's record was incomplete or wrong; 1 named official source(s) supply the result",
+   "sources": [
+    {
+     "url": "https://icgaels.com/sports/womens-volleyball/schedule",
+     "excerpt": "'vs Little Rock ... Ruston, LA, Thomas Assembly Center ... L, 0-3 (5-25, 15-25, 18-25)' -- the per-set scores match the feed's linescores exactly",
+     "retrieved": "2026-08-29T20:56:18Z",
+     "source_class": "official_school"
+    }
+   ],
+   "public": true,
+   "priority": 90,
+   "route": {
+    "match": "6625758",
+    "ledger": true
+   },
+   "effective": null,
+   "review_by": null,
+   "first_seen": "2026-08-30T18:56:13Z"
+  },
+  {
+   "id": "3f67da99d82a",
+   "type": "result_correction",
+   "subject": {
+    "kind": "match",
+    "gid": "6627523"
+   },
+   "what": "Result corrected: Southern California (away) beat Arizona St. 3-0 (25-23, 25-21, 25-22) at the Sanford Pentagon, Sioux Falls -- …",
+   "state": "confirmed_official",
+   "state_label": "confirmed by an official source",
+   "why": "the feed's record was incomplete or wrong; 2 named official source(s) supply the result",
+   "sources": [
+    {
+     "url": "https://usctrojans.com/sports/womens-volleyball/schedule",
+     "excerpt": "'vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | State Farm Women's Volleyball Showcase | W, 3-0 | Aug 29 (Sat)' -- the schedule card, result posted",
+     "retrieved": "2026-08-29T22:05:00Z",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://thesundevils.com/sports/volleyball/schedule",
+     "excerpt": "NCAA LiveStats box score PDF supplied by Cody: 'Southern California vs Arizona St. (08/29/2026 at Sanford Pentagon)' -- set scores 25-23, 25-21, 25-22, Southern California (3) Arizona St. (0), 'Team records: 1-0, 0-0 / 2-1, 0-0'. ASU's own schedule page is JavaScript-rendered and unreadable to a plain fetch.",
+     "retrieved": "2026-08-29",
+     "source_class": "official_school"
+    }
+   ],
+   "public": true,
+   "priority": 90,
+   "route": {
+    "match": "6627523",
+    "ledger": true
+   },
+   "effective": null,
+   "review_by": null,
+   "first_seen": "2026-08-30T18:56:13Z"
+  },
+  {
+   "id": "e79084be3b35",
+   "type": "fixture_update",
+   "subject": {
+    "kind": "match",
+    "gid": "6626809"
+   },
+   "what": "city / event / site / state_usps / venue corrected for Kentucky vs Penn St.",
+   "state": "confirmed_official",
+   "state_label": "confirmed by an official source",
+   "why": "the school's own page contradicts the feed on city, event, site, state_usps, venue; every overridden field carries its own citation",
+   "sources": [
+    {
+     "url": "https://gopsusports.com/sports/womens-volleyball/schedule",
+     "excerpt": "Big Ten/SEC Challenge neutral Sunday Sep 6 vs. Kentucky Chicago, Ill. / Wrigley Field 7:00 PM EDT",
+     "retrieved": "2026-08-26",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://gopsusports.com/sports/womens-volleyball/schedule",
+     "excerpt": "Sunday Sep 6 vs. Kentucky Chicago, Ill. / Wrigley Field 7:00 PM EDT",
+     "retrieved": "2026-08-26",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://ukathletics.com/schedule.aspx?path=wvball",
+     "excerpt": "Sun. Sep 6 vs. Penn State Wrigley Field (Chicago, Ill.) 7:00 pm Big Ten / SEC Challenge",
+     "retrieved": "2026-08-26",
+     "source_class": "official_school"
+    }
+   ],
+   "public": true,
+   "priority": 70,
+   "route": {
+    "match": "6626809"
+   },
+   "effective": null,
+   "review_by": "2026-09-06",
+   "first_seen": "2026-08-30T18:56:13Z"
+  },
+  {
+   "id": "bffff5caac58",
+   "type": "fixture_update",
+   "subject": {
+    "kind": "match",
+    "gid": "6627523"
+   },
+   "what": "city / event / site / start_time_epoch / state_usps / venue corrected for Southern California vs Arizona St.",
+   "state": "confirmed_official",
+   "state_label": "confirmed by an official source",
+   "why": "the school's own page contradicts the feed on city, event, site, start_time_epoch, state_usps, venue; every overridden field carries its own citation",
+   "sources": [
+    {
+     "url": "https://usctrojans.com/sports/womens-volleyball/schedule",
+     "excerpt": "Scrimmage / Exhibition | State Farm Women's Volleyball Showcase | vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT",
+     "retrieved": "2026-08-29",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://usctrojans.com/sports/womens-volleyball/schedule",
+     "excerpt": "Scrimmage / Exhibition | State Farm Women's Volleyball Showcase | vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT",
+     "retrieved": "2026-08-29",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://usctrojans.com/sports/womens-volleyball/schedule",
+     "excerpt": "Scrimmage / Exhibition | State Farm Women's Volleyball Showcase | vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT",
+     "retrieved": "2026-08-29",
+     "source_class": "official_school"
+    }
+   ],
+   "public": true,
+   "priority": 70,
+   "route": {
+    "match": "6627523"
+   },
+   "effective": null,
+   "review_by": "2026-09-05",
+   "first_seen": "2026-08-30T18:56:13Z"
+  }
+ ]
+}

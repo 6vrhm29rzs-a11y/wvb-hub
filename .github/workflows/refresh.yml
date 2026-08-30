@@ -162,6 +162,7 @@ jobs:
           python3 scripts/resume_2025.py || echo "resume not active yet; skipping"
           python3 scripts/confidence.py || echo "confidence ledger skipped"
           python3 scripts/availability_desk.py || echo "availability desk skipped"
+          python3 scripts/source_intel.py || echo "source intel skipped"
           python3 scripts/build_hub.py
           python3 scripts/build_hub.py --public
 

@@ -144,6 +144,26 @@ def exhibitions():
     doc = load("data/raw/%d/exhibitions.json" % SEASON) or {}
     return dict((str(k), v) for k, v in (doc.get("exhibitions") or {}).items())
 
+def _intel_payload():
+    """The Source Intel payload -- and THE public filter for it.
+
+    ⚠ VALUE-LEVEL, at the single point the claims enter the build (the
+    R4/BOARD.build pattern): the public page gets only claims marked
+    public. Availability items and community signals are private by
+    construction in source_intel.py (public=False), so no quote of
+    Cody's, no forum lead and no availability text can reach the
+    published page -- asserted in test_source_intel.py on the VALUES."""
+    doc = load("data/source_intel_%d.json" % SEASON) or \
+        {"meta": {}, "claims": [], "feed": []}
+    if PUBLIC:
+        doc = {"meta": doc.get("meta") or {},
+               "claims": [c for c in doc.get("claims") or []
+                          if c.get("public")],
+               "feed": [c for c in doc.get("feed") or []
+                        if c.get("public")]}
+    return doc
+
+
 def exhibition_rules():
     # type: () -> List[Dict]
     """Venue+date rules, for matches whose id does not exist yet.
@@ -4401,6 +4421,8 @@ def build():
             load("data/result_confidence_%d.json" % SEASON) or
             {"meta": {"counts": {}}, "finals": []},
             separators=(",", ":"))) \
+        .replace("{{INTEL_JSON}}", json.dumps(
+            _intel_payload(), separators=(",", ":"))) \
         .replace("{{TSTATS_JSON}}", blob(
             [dict(team=k, conf=(tindex.get(k) or {}).get("conf"), **v)
              for k, v in sorted(tstats.items())])) \
@@ -5022,6 +5044,30 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .wgo{font:600 11.5px/1 var(--sans);color:var(--navy)}
 .wcard:hover .wgo{color:var(--cs-white)}
 .wofficial{font:500 10px/1 var(--mono);color:var(--ink3);letter-spacing:.06em}
+/* ── source intel: what changed ── */
+.silist{display:flex;flex-direction:column;gap:6px}
+.siitem{border:1px solid var(--line2);border-radius:4px;background:var(--card)}
+.siitem summary{display:flex;align-items:center;gap:9px;padding:9px 11px;
+  cursor:pointer;list-style:none;font:500 12.5px/1.4 var(--sans);color:var(--ink)}
+.siitem summary::-webkit-details-marker{display:none}
+.siwhat{min-width:0}
+.sichip{flex:none;font:600 9px/1 var(--mono);letter-spacing:.08em;
+  padding:3px 6px;border-radius:3px;border:1px solid var(--line2);color:var(--ink2)}
+.si-confirmed_official{color:var(--cs-white);background:var(--navy);border-color:var(--navy)}
+.si-corroborated{color:var(--navy);border-color:var(--navy)}
+.si-conflicting{color:var(--cs-white);background:var(--live);border-color:var(--live)}
+.si-community_signal{color:var(--ink3);border-style:dashed}
+.si-expired,.si-inaccessible{color:var(--ink3)}
+.sidrill{padding:2px 11px 10px;display:flex;flex-direction:column;gap:6px}
+.siwhy{font:italic 11.5px/1.5 var(--sans);color:var(--ink2)}
+.sisrc{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;
+  border-left:2px solid var(--line2);padding-left:8px}
+.siq{font:11.5px/1.5 var(--sans);color:var(--ink);flex-basis:100%}
+.siu{font:500 10.5px/1 var(--mono);color:var(--cs-cyan)}
+.sit,.sik{font:10px/1 var(--mono);color:var(--ink3);letter-spacing:.05em}
+.sigo{font:600 11px/1 var(--sans);color:var(--navy);text-decoration:none}
+.tdintel h4{margin:0 0 7px}
+
 /* secondary, and it looks it */
 .mbsecondary{margin-top:8px;opacity:.92}
 .mbsecondary .mbrow{padding-top:7px;padding-bottom:7px}
@@ -15789,6 +15835,7 @@ function cfDrill(key) {
    dispute renders as "result under review" with BOTH claims shown, never a
    silent choice between them. */
 const CONFIDENCE = {{CONFIDENCE_JSON}};
+const INTEL = {{INTEL_JSON}};
 let RC_FILTER = 'all';
 const RC_LABEL = { official: 'Official final \u00b7 confirmation pending',
   reconciled: 'Reconciled \u00b7 confirmation pending',
@@ -17341,6 +17388,58 @@ function wcardEnforceActions(root) {
   });
 }
 
+function intelChip(state) {
+  /* one chip per state; a community signal can NEVER wear a confirmed
+     face -- the class and the words both come from the state */
+  return '<span class="sichip si-' + esc(state) + '">' +
+    esc((INTEL_CHIP[state] || state).toUpperCase()) + '</span>';
+}
+const INTEL_CHIP = { confirmed_official: 'official', corroborated: 'corroborated',
+  official_unconfirmed: 'unconfirmed', community_signal: 'signal',
+  conflicting: 'conflict', expired: 'expired', inaccessible: 'unreadable' };
+
+function intelRoute(c) {
+  const r = c.route || {};
+  if (r.ledger) return routeFor('confidence');
+  if (r.match) return matchRoute(r.match, 'desk');
+  if (r.team && typeof routeFor === 'function' && typeof slug === 'function')
+    return routeFor('teams', slug(r.team));
+  return null;
+}
+
+function intelItem(c, i) {
+  /* what changed, why it is credible, and the evidence itself one toggle
+     away -- never a bare headline */
+  const srcs = (c.sources || []).map(s2 =>
+    '<div class="sisrc">' +
+      (s2.excerpt ? '<span class="siq">“' + esc(s2.excerpt) +
+        '”</span>' : '') +
+      (s2.url ? '<a class="siu" href="' + esc(s2.url) +
+        '" target="_blank" rel="noopener noreferrer">' +
+        esc(String(s2.url).replace(/^https?:\/\//, '').split('/')[0]) +
+        '</a>' : '') +
+      (s2.retrieved ? '<span class="sit">retrieved ' +
+        esc(String(s2.retrieved).slice(0, 10)) + '</span>' : '') +
+      '<span class="sik">' + esc(s2.source_class || '') + '</span>' +
+    '</div>').join('');
+  const route = intelRoute(c);
+  return '<details class="siitem"><summary>' + intelChip(c.state) +
+    '<span class="siwhat">' + esc(c.what) + '</span></summary>' +
+    '<div class="sidrill"><span class="siwhy">' + esc(c.why) + '</span>' +
+    srcs +
+    (route ? '<a class="sigo" href="' + route + '">open the ' +
+      (c.route && c.route.ledger ? 'Result Ledger' : 'match') +
+      ' →</a>' : '') +
+    '</div></details>';
+}
+
+function intelBlock() {
+  /* EMPTY RATHER THAN PADDED: no material event, no section at all */
+  const feed = (typeof INTEL !== 'undefined' && INTEL.feed) || [];
+  if (!feed.length) return '';
+  return '<div class="silist">' + feed.map(intelItem).join('') + '</div>';
+}
+
 function renderDesk() {
   const todayBox = document.getElementById('desktodaycards');
   if (!todayBox) return;
@@ -17558,6 +17657,13 @@ function renderDesk() {
             ? '<div class="tdlist">' +
               changed.map(m => matchRow(m, liveOf(m), 'scores')).join('') +
               '</div>' : '') +
+    block('Source intel — what changed',
+          (typeof INTEL !== 'undefined' && INTEL.feed && INTEL.feed.length)
+            ? 'verified changes, last ' +
+              ((INTEL.meta || {}).recent_hours || 72) + 'h · capped at ' +
+              ((INTEL.meta || {}).feed_cap || 5)
+            : '',
+          intelBlock()) +
     /* GAMEDAY-CALL2-BEGIN */ (typeof gdPanel === 'function' ? gdPanel() : '') + /* GAMEDAY-CALL2-END */
     /* ⚠ THE PRIVATE CRITERION IS FENCED. The rule is printed so a reader can
        argue with his own landing page -- but one of the criteria names a
@@ -20087,6 +20193,30 @@ function tdLeaders(t, name) {
     rows + '</div>';
 }
 
+function tdIntel(t, name) {
+  /* SOURCED INTELLIGENCE TIMELINE -- rendered ONLY when material evidence
+     exists for this team (a claim about the team, its players, or one of
+     its matches). Availability/community items never reach the public
+     payload (filtered at the value in _intel_payload), so this renders
+     from whatever THIS build was given. */
+  const all = (typeof INTEL !== 'undefined' && INTEL.claims) || [];
+  const by = (typeof allMatches === 'function') ? allMatches() : {};
+  const mine = all.filter(c => {
+    const s2 = c.subject || {};
+    if (s2.team === name) return true;
+    if (s2.teams && s2.teams.indexOf(name) >= 0) return true;
+    if (s2.gid && by[s2.gid] &&
+        (mAway(by[s2.gid]) === name || mHome(by[s2.gid]) === name))
+      return true;
+    return false;
+  });
+  if (!mine.length) return '';
+  mine.sort((a, b) => b.priority - a.priority);
+  return '<div class="tdd-box tdintel"><h4>Sourced intel</h4>' +
+    '<div class="silist">' + mine.slice(0, 4).map(intelItem).join('') +
+    '</div></div>';
+}
+
 function tdDashboard(t, name) {
   return '<div class="tddash">' +
     '<div class="tddcol">' + tdNextMatch(t, name) +
@@ -20097,6 +20227,7 @@ function tdDashboard(t, name) {
       /* AVAIL-HOOK-END */
       '</div>' +
     '<div class="tddcol">' + tdForm(t, name) + tdLeaders(t, name) +
+      tdIntel(t, name) +
     '</div></div>';
 }
 
