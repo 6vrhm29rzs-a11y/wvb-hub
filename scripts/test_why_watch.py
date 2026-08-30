@@ -158,6 +158,130 @@ def main():
           "const by = allMatches();" in src
           and "const every = Object.keys(by).map(k => by[k]);" in src)
 
+    # ── BEHAVIORAL: the rendered card, not the source string ───────────
+    # A multi-reason card (ranked-v-ranked + ranking disagreement + stars +
+    # our-Top-25) and a plain card are RENDERED by the page's own
+    # watchCard, then swept by the page's own wcardEnforceActions on a
+    # real-ish DOM; the assertions read the surviving DOM, never the
+    # source. A pre-seeded duplicate action row must be removed by the
+    # paint-time contract.
+    import subprocess as _sp
+    from test_scoreboard_density import block as _blk
+    _enf = _blk(src, src.find("function wcardEnforceActions("))
+    # ⚠ brace-matched, never regexed -- a non-greedy [\s\S]*? swallowed
+    # everything to the end of renderDesk on the first try (the documented
+    # extractor lesson, again) and the harness died on a bare `return`
+    _wc = _blk(src, src.find("const watchCard = x =>"))
+    check("watchCard and the enforcement are extractable",
+          bool(_wc) and bool(_enf) and "wacts" in _wc
+          and "return" in _wc and len(_wc) < 8000, str(len(_wc or "")))
+    _js = r"""
+const esc = s => String(s == null ? '' : s);
+const rankHTML = () => '';
+const logo = () => '';
+const mAway = m => m.a, mHome = m => m.h;
+const matchRoute = (g) => '#/m/' + g;
+const matchState = (m, live) => live ? 'live' : 'upcoming';
+const matchScore = () => ['0','0'];
+const liveLine = () => 'LIVE';
+const reasonChips = m => '<span class="tdwhy">' +
+  (m.ar && m.hr ? '<span class="tdtag">ranked v ranked</span>' : '') +
+  (m.ap ? '<span class="tdtag dg">ranking disagreement</span>' : '') +
+  '</span>';
+const starPeek = m => m.stars
+  ? '<span class="tdstars"><span class="pk">OH A</span><span class="pk">MB B</span></span>' : '';
+const liveOf = () => null;
+const dayLabel = d => d;
+const tvOf = () => null;
+const deskPct = p => p == null ? null : Math.round(p * 100) + '%%';
+const deskForecast = () => '';
+const nonDiPhrase = () => '';
+const connector = () => ' v ';
+const starLine = () => '';
+const reasonWhy = () => '';
+const fxPickable = () => false;
+const posHeadline = () => '';
+%s
+// -- minimal DOM: parse the rendered string into a queryable tree --------
+function parse(html) {
+  const nodes = []; const stack = [];
+  const re = /<(\/?)([a-zA-Z]+)((?:\s+[a-zA-Z-]+="[^"]*")*)\s*\/?>/g;
+  let m2;
+  const root = { tag: 'root', cls: '', attrs: {}, kids: [], parent: null };
+  let cur = root;
+  while ((m2 = re.exec(html))) {
+    if (m2[1]) { cur = cur.parent || root; continue; }
+    const attrs = {};
+    (m2[3].match(/[a-zA-Z-]+="[^"]*"/g) || []).forEach(a => {
+      const i = a.indexOf('='); attrs[a.slice(0, i)] = a.slice(i + 2, -1);
+    });
+    const n = { tag: m2[2], cls: attrs['class'] || '', attrs, kids: [],
+                parent: cur, removed: false };
+    cur.kids.push(n);
+    if (!/^(br|img)$/.test(m2[2])) cur = n;   /* i/b are NOT void */
+  }
+  return root;
+}
+function q(node, cls, out) {
+  out = out || [];
+  node.kids.forEach(k => { if (!k.removed) {
+    if (k.cls.split(' ').indexOf(cls) >= 0) out.push(k);
+    q(k, cls, out); } });
+  return out;
+}
+function wrapDom(tree) {
+  const mk = n => ({
+    _n: n,
+    get href() { return n.attrs.href; },
+    getAttribute: a => n.attrs[a] || null,
+    querySelectorAll: sel => q(n, sel.replace('.', '')).map(mk),
+    remove: () => { n.removed = true; },
+  });
+  return mk(tree);
+}
+const multi = { gid: 'G1', a: 'A U', h: 'B U', ar: '2', hr: '1',
+  ap: 11, hp: 1, t: '1:00 PM PT', d: '2026-08-30', venue: 'Arena',
+  stars: true };
+const plain = { gid: 'G2', a: 'C U', h: 'D U', t: '2:00 PM PT',
+  d: '2026-08-30', venue: 'Gym' };
+const html = watchCard([multi, [], 1]) + watchCard([plain, [], 1]);
+const dom = wrapDom(parse(html));
+const cards = dom.querySelectorAll('.wcard');
+const bad = [];
+if (cards.length !== 2) bad.push('expected 2 cards, got ' + cards.length);
+cards.forEach((c, i) => {
+  wcardEnforceActions({ querySelectorAll: s2 => (s2 === '.wcard' ? [c] : c.querySelectorAll(s2)) });
+  const acts = c.querySelectorAll('.wacts');
+  const gos = c.querySelectorAll('.wgo');
+  const offs = c.querySelectorAll('.wofficial');
+  if (acts.length !== 1) bad.push('card ' + i + ': ' + acts.length + ' action rows');
+  if (gos.length !== 1) bad.push('card ' + i + ': ' + gos.length + ' internal labels');
+  const hosts = offs.map(o => ((o.getAttribute('data-href') || '')
+    .match(/https?:\/\/([^/]+)/) || [])[1]);
+  if (new Set(hosts).size !== hosts.length)
+    bad.push('card ' + i + ': repeated outbound destination');
+  if (!c.href) bad.push('card ' + i + ': no internal route on the card');
+});
+// pre-seeded duplicate: the contract must sweep it
+const dupHtml = watchCard([multi, [], 1]).replace('<span class="wacts">',
+  '<span class="wacts"><span class="wgo">Open match →</span>' +
+  '<span class="wofficial" data-href="https://www.ncaa.com/game/G1">' +
+  'preview: ncaa.com</span></span><span class="wacts">');
+const ddom = wrapDom(parse(dupHtml));
+const dcard = ddom.querySelectorAll('.wcard')[0];
+const before = dcard.querySelectorAll('.wacts').length;
+wcardEnforceActions({ querySelectorAll: s2 => (s2 === '.wcard' ? [dcard] : dcard.querySelectorAll(s2)) });
+const after = dcard.querySelectorAll('.wacts').length;
+if (before !== 2) bad.push('seed failed: ' + before + ' rows before sweep');
+if (after !== 1) bad.push('sweep left ' + after + ' rows');
+if (bad.length) { console.log('WC-FAIL: ' + bad.join(' | ')); process.exit(1); }
+console.log('WC-OK'); process.exit(0);
+""" % ((_wc or "") + "\n" + (_enf or ""))
+    _r = _sp.run(["node", "-e", _js], capture_output=True, text=True)
+    check("BEHAVIOR: rendered multi-reason and plain cards each carry "
+          "exactly one action row; a seeded duplicate is swept",
+          _r.returncode == 0, (_r.stdout + _r.stderr).strip()[:200])
+
     print()
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))

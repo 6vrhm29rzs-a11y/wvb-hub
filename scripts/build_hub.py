@@ -17310,6 +17310,37 @@ function topGames(list, liveOf, cap) {
     .slice(0, cap || 6);
 }
 
+function wcardEnforceActions(root) {
+  /* ⚠ THE WATCH-CARD ACTION CONTRACT, ENFORCED AT PAINT (review,
+     2026-08-30). Cody reproduced a card showing "Open match -> preview:
+     ncaa.com" twice -- once under the player names, again under the
+     our-Top-25 note -- in a state the DOM never showed under inspection:
+     one emitter, gid-keyed input, one .wacts across poll cycles. Rather
+     than argue with a transient, the invariant is enforced on whatever
+     was painted: each card keeps its LAST action row (the designed
+     position, card end), one internal-route label, and at most one
+     outbound action per destination host. When this ever fires it LOGS,
+     so the rogue path becomes findable instead of visual. */
+  (root || document).querySelectorAll('.wcard').forEach(card => {
+    const acts = card.querySelectorAll('.wacts');
+    for (let i = 0; i < acts.length - 1; i++) {
+      console.warn('[wcard] duplicate action row removed', card.href);
+      acts[i].remove();
+    }
+    const seen = {};
+    card.querySelectorAll('.wofficial').forEach(o => {
+      const host = (((o.getAttribute('data-href') || '')
+        .match(/https?:\/\/([^/]+)/) || [])[1] || '').toLowerCase();
+      if (seen[host]) {
+        console.warn('[wcard] duplicate outbound removed', host);
+        o.remove();
+      } else { seen[host] = 1; }
+    });
+    const gos = card.querySelectorAll('.wgo');
+    for (let i = 0; i < gos.length - 1; i++) gos[i].remove();
+  });
+}
+
 function renderDesk() {
   const todayBox = document.getElementById('desktodaycards');
   if (!todayBox) return;
@@ -17542,6 +17573,7 @@ function renderDesk() {
   document.getElementById('desksooncards').innerHTML = '';
   document.getElementById('desksoonmeta').textContent = '';
   document.getElementById('desksoonrest').textContent = '';
+  wcardEnforceActions(todayBox);
   return;
 
   /* ONE FEATURED MATCH AT MOST, and only if it earns it. */
@@ -17596,6 +17628,7 @@ function renderDesk() {
   html += lane('up', 'up', 'Coming up', notFeat(lanes.up));
   todayBox.innerHTML = html;
 
+  wcardEnforceActions(todayBox);
   const shown = soon.slice(0, DESK_SOON_SHOWN);
   document.getElementById('desksooncards').innerHTML =
     shown.length ? '<div class="lane up"><div class="lanehd"><b>Next few days</b>' +

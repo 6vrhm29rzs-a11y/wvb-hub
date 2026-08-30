@@ -1,27 +1,5 @@
 {
  "blocked": {
-  "6624378": {
-   "conflicts": [
-    {
-     "field": "start_time_epoch",
-     "records": 5,
-     "values": [
-      "1788109200",
-      "1788130800"
-     ]
-    },
-    {
-     "field": "game_state",
-     "records": 5,
-     "values": [
-      "P",
-      "I"
-     ]
-    }
-   ],
-   "matchup": "Syracuse / Illinois",
-   "records": 5
-  },
   "6624381": {
    "conflicts": [
     {
@@ -68,15 +46,23 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 4,
+     "records": 6,
      "values": [
       "1788066000",
       "1788112800"
      ]
+    },
+    {
+     "field": "game_state",
+     "records": 6,
+     "values": [
+      "P",
+      "I"
+     ]
     }
    ],
    "matchup": "UC Riverside / Samford",
-   "records": 4
+   "records": 6
   },
   "6625272": {
    "conflicts": [
@@ -152,7 +138,7 @@
    "conflicts": [
     {
      "field": "city",
-     "records": 3,
+     "records": 5,
      "values": [
       "Bryan-College Station",
       "College Station"
@@ -160,13 +146,13 @@
     }
    ],
    "matchup": "Arkansas St. / Cal Poly",
-   "records": 3
+   "records": 5
   },
   "6626976": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 5,
+     "records": 7,
      "values": [
       "1788116400",
       "1788109200"
@@ -174,7 +160,7 @@
     },
     {
      "field": "game_state",
-     "records": 5,
+     "records": 7,
      "values": [
       "P",
       "I"
@@ -182,7 +168,7 @@
     }
    ],
    "matchup": "Southern California / Creighton",
-   "records": 5
+   "records": 7
   },
   "6627195": {
    "conflicts": [
@@ -299,8 +285,8 @@
  },
  "by_field": {
   "city": 1,
-  "game_state": 54,
-  "start_time_epoch": 19
+  "game_state": 52,
+  "start_time_epoch": 18
  },
  "corrections": {
   "6625717": {
@@ -433,8 +419,8 @@
   }
  },
  "counts": {
-  "blocked": 20,
-  "conflicted": 72,
+  "blocked": 19,
+  "conflicted": 69,
   "corrected": 4,
   "fixtures": 4874
  },
