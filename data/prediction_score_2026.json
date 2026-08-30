@@ -2,15 +2,15 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 437,
+  "scored": 438,
   "logged_after_tipoff_excluded": 8,
   "team_mismatch_excluded": 13,
   "predictions_on_record": 4769,
-  "results_available": 469,
-  "brier": 0.1831,
+  "results_available": 470,
+  "brier": 0.184,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
   "favourite_correct": 318,
-  "favourite_correct_pct": 72.8
+  "favourite_correct_pct": 72.6
  },
  "calibration": [
   {
@@ -27,9 +27,9 @@
   },
   {
    "range": "70-80%",
-   "n": 65,
-   "said": 75.2,
-   "happened": 69.2
+   "n": 66,
+   "said": 75.3,
+   "happened": 68.2
   },
   {
    "range": "80-90%",
@@ -451,6 +451,15 @@
    "brier": 0.57744801
   },
   {
+   "game_id": "6628124",
+   "date": "2026-08-30",
+   "away": "Eastern Wash.",
+   "home": "Seattle U",
+   "p_home": 0.758,
+   "home_won": false,
+   "brier": 0.574564
+  },
+  {
    "game_id": "6625786",
    "date": "2026-08-28",
    "away": "LMU (CA)",
@@ -485,15 +494,6 @@
    "p_home": 0.7306,
    "home_won": false,
    "brier": 0.5337763600000001
-  },
-  {
-   "game_id": "6628405",
-   "date": "2026-08-28",
-   "away": "William & Mary",
-   "home": "Virginia Tech",
-   "p_home": 0.7239,
-   "home_won": false,
-   "brier": 0.52403121
   }
  ]
 }

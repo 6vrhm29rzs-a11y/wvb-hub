@@ -773,15 +773,23 @@ def crawl_players():
     # zero-scaffold twins' boxes (which carry NAMELESS player rows) were
     # folded in, and the blank names merged into per-team piles that
     # crossed the leaderboard floor (2026-08-31).
+    _dup_gids = set()
     try:
         from dupes import duplicate_gids as _dg
-        _skip_gids |= set(_dg(SEASON))
+        _dup_gids = set(_dg(SEASON))
+        _skip_gids |= _dup_gids
     except Exception:
         pass
     _skipped_exh = 0
+    _skipped_dup = 0
     for gid_key, rec in load_records_jsonl(PLAYERBOX_JSONL, key="game_id").items():
         if str(gid_key) in _skip_gids:
-            _skipped_exh += 1
+            # count the two exclusion classes separately -- the meta line
+            # briefly reported 5 duplicate skips under the exhibitions label
+            if str(gid_key) in _dup_gids:
+                _skipped_dup += 1
+            else:
+                _skipped_exh += 1
             continue
         ngames += 1
         _rows = rec.get("rows") or []
@@ -855,7 +863,8 @@ def crawl_players():
             "season": SEASON, "source_tier": "OFFICIAL",
             "source": "ncaa-api /game/{id}/boxscore playerStats, aggregated",
             "games_aggregated": ngames,
-            "exhibitions_excluded": len(_skip_gids),
+            "exhibitions_excluded": len(_skip_gids) - len(_dup_gids & _skip_gids),
+            "duplicate_listings_excluded": len(_dup_gids & _skip_gids),
             "exhibitions_note": ("matches that do not count are excluded here, "
                                  "not just from the display: their per-set "
                                  "rates are on a different scale"),

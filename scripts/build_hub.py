@@ -745,10 +745,15 @@ def mover(t):
     if mv is None:
         return ""
     if mv > 0:
-        return '<span class="mv up">&#9650;%d</span>' % mv
+        return ('<span class="mv up" title="up %d place%s vs the last '
+                'weekly snapshot on the same basis">&#9650;%d</span>'
+                % (mv, '' if mv == 1 else 's', mv))
     if mv < 0:
-        return '<span class="mv dn">&#9660;%d</span>' % abs(mv)
-    return '<span class="mv sm">&ndash;</span>'
+        return ('<span class="mv dn" title="down %d place%s vs the last '
+                'weekly snapshot on the same basis">&#9660;%d</span>'
+                % (abs(mv), '' if abs(mv) == 1 else 's', abs(mv)))
+    return ('<span class="mv sm" title="unchanged vs the last weekly '
+            'snapshot on the same basis">&ndash;</span>')
 
 def pos_bucket(p):
     """School sites and box scores spell positions a dozen ways. Anything we do
@@ -3023,9 +3028,13 @@ def top25_view(avca=None):
         elif was == r["rank"]:
             mv = '<span class="mv-flat">&ndash;</span>'
         elif was > r["rank"]:
-            mv = '<span class="mv-up">&#9650;%d</span>' % (was - r["rank"])
+            mv = ('<span class="mv-up" title="up %d vs the previous '
+                  'Top 25 on the same basis">&#9650;%d</span>'
+                  % (was - r["rank"], was - r["rank"]))
         else:
-            mv = '<span class="mv-dn">&#9660;%d</span>' % (r["rank"] - was)
+            mv = ('<span class="mv-dn" title="down %d vs the previous '
+                  'Top 25 on the same basis">&#9660;%d</span>'
+                  % (r["rank"] - was, r["rank"] - was))
         wt = r.get("weight_on_season") or 0
         rows.append(
             '<tr class="row" data-team="%s" style="--tc:%s"><td class="rk">%d</td>'
@@ -4427,6 +4436,9 @@ def build():
             [dict(team=k, conf=(tindex.get(k) or {}).get("conf"), **v)
              for k, v in sorted(tstats.items())])) \
         .replace("{{LDR_FLOOR}}", str(ldr_floor)) \
+        .replace("{{LDR_GAMES}}", str(
+            ((load("data/raw/%d/players_%d.json" % (SEASON, SEASON)) or {})
+             .get("meta") or {}).get("games_aggregated") or 0)) \
         .replace("{{LDR_POOL}}", str(ldr_pool)) \
         .replace("{{TEAMS_JSON}}", blob(tindex)) \
         .replace("{{CONF_JSON}}", json.dumps(sorted(set(t["conf"] for t in teams if t["conf"])))) \
@@ -4888,6 +4900,9 @@ h1 em{font-style:normal;color:var(--gold)}
    same treatment on a list that merely happens to have rows would be the
    generic move. The rule sizes already shipped; this adds the court ground
    under the table head so the board reads as a board. */
+.ldrfloor{font:600 11px/1 var(--mono);color:var(--ink2);
+  background:var(--alt);border:1px solid var(--line);border-radius:3px;
+  padding:6px 9px;white-space:nowrap}
 .thu{font:600 11px/1 var(--mono);letter-spacing:.02em;color:#8DA2BF;font-style:normal;text-transform:none}
 .t25 thead th{background:rgba(31,102,209,.09);
   border-bottom:2px solid var(--cs-edge2);
@@ -9530,9 +9545,11 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 
 <section id="v-leaders" hidden>
   <h2 class="vh">Stats</h2>
-  <p class="tabhint">2026 season statistics &mdash; player leaders and team
-    rates, from the same box scores the records are built on &middot;
-    through <b>{{N_PLAYED}}</b> results &middot; built {{BUILT}}</p>
+  <p class="tabhint">2026 season statistics &mdash; player leaders are built
+    from the held box scores of <b>{{LDR_GAMES}}</b> counted finals
+    (exhibitions and duplicate feed listings excluded); team rates come from
+    each team&rsquo;s own counted matches, with the match count in every row
+    &middot; built {{BUILT}}</p>
   <div class="seg" role="tablist" aria-label="Player or team stats">
     <button class="segb on" data-ls="player">Players</button>
     <button class="segb" data-ls="team">Teams</button>
@@ -9561,6 +9578,10 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <option value="own">This team</option>
       <option value="opp">Allowed to opponents</option>
     </select>
+    <span class="ldrfloor" id="ldrfloor" title="A player needs at least
+      {{LDR_FLOOR}} sets this season to appear; the minimum scales with the
+      most-played player and rises as the season runs.">min
+      {{LDR_FLOOR}} sets</span>
     <span class="count" id="lcnt"></span>
   </div>
   <div class="panel" id="lplayer"><div class="scroll"><table>
@@ -10746,12 +10767,19 @@ const aa = best(o.aa);
 const short = {'Player of the Year': 'POY', 'Freshman of the Year': 'FOY',
                'First Team': 'AA1', 'Second Team': 'AA2', 'Third Team': 'AA3',
                'Honorable Mention': 'HM'};
+/* ⚠ A BADGE NAMES ITS YEAR ON ITS FACE (meaning pass, 2026-08-31): a
+   bare POY beside a 2026 stat line reads as a current-season claim, and
+   Babcock's award is 2025's. The face stays compact (POY '25); the title
+   carries organisation, award, season and source in full. */
 const badge = aa
   ? '<span class="aa ' + (aa.national ? 'aaNat' : 'aa' +
       (aa.honour || '').replace(/[^A-Za-z]/g, '').slice(0, 5)) +
-    '" title="AVCA ' + aa.honour + (aa.national ? '' : ' All-American') + ', ' + aa.season +
-    (o.aa.length > 1 ? ' \u2014 ' + o.aa.length + ' selections' : '') + '">' +
-    (short[aa.honour] || 'AA') + '</span>'
+    '" title="AVCA ' + aa.honour + (aa.national ? '' : ' All-American') +
+    ', ' + aa.season + ' season' +
+    (o.aa.length > 1 ? ' \u2014 ' + o.aa.length + ' selections' : '') +
+    ' \u00b7 from the published AVCA All-America workbook">' +
+    (short[aa.honour] || 'AA') +
+    ' \u2019' + String(aa.season).slice(-2) + '</span>'
   : '';
 return '<span class="pcell">' + face +
   '<span class="pinfo"><span class="pnm">' + o.name + badge + '</span>' +
