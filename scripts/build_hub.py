@@ -5063,7 +5063,7 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .sisrc{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;
   border-left:2px solid var(--line2);padding-left:8px}
 .siq{font:11.5px/1.5 var(--sans);color:var(--ink);flex-basis:100%}
-.siu{font:500 10.5px/1 var(--mono);color:var(--cs-cyan)}
+.siu{font:500 10.5px/1 var(--mono);color:var(--navy)}
 .sit,.sik{font:10px/1 var(--mono);color:var(--ink3);letter-spacing:.05em}
 .sigo{font:600 11px/1 var(--sans);color:var(--navy);text-decoration:none}
 .tdintel h4{margin:0 0 7px}
