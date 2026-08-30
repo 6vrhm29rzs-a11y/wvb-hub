@@ -4470,28 +4470,28 @@ TEMPLATE = r"""<!doctype html><html lang="en"><head><meta charset="utf-8">
      its own name and a separate lighter token for anything a reader has to
      read. Repointing one token to serve both is how a page ends up with
      text nobody can see (R4). */
-  --court:#07172B; --chalk:#F5F1E8; --rally:#1F66D1;
-  --gold:#D99A29; --coral:#E55E4F; --slate:#8390A1;
+  --court:#12294B; --chalk:#F5F7FA; --rally:#1D5FC2;   /* ARENA DAYLIGHT 2026-08-30 */
+  --gold:#8A6508; --gold-fill:#E3B341; --coral:#C2553F; --slate:#5D6B80;
 
-  --page:#07172B; --card:#0C1F36; --alt:#112741;
-  --ink:#F5F1E8; --ink2:#B7C2D2; --ink3:#8390A1;
-  --line:#1B3050; --line2:#2C4A72;
-  --navy:#5BA8F5; --blue:#7FC1FF; --amber:#D99A29; --amber-bg:#33280A;
-  --sand:#12283F;
+  --page:#F4F6F9; --card:#FFFFFF; --alt:#EDF1F6;
+  --ink:#16233B; --ink2:#3F5068; --ink3:#5D6B80;
+  --line:#DDE4EE; --line2:#C9D4E2;
+  --navy:#12294B; --blue:#1D5FC2; --amber:#8A6508; --amber-bg:#FBF3DC;
+  --sand:#EDF1F6;
   /* the chalk sheet: a reading surface, not another card */
-  --sheet:rgba(245,241,232,.035); --sheet2:rgba(245,241,232,.055);
+  --sheet:rgba(18,41,75,.04); --sheet2:rgba(18,41,75,.07);
   /* ⚠ --navy CHANGED MEANING when the page went dark: it used to be a dark
      blue used BOTH as chrome and as ink. On a dark ground the ink has to be
      light, so --navy is now the bright blue INK and the chrome that used to be
      navy gets its own name. Renaming rather than silently repointing is the
      whole of R4 -- the alternative is a masthead painted in a text colour. */
-  --chrome:#0A1428; --chrome2:#132743;
-  --ink-on-accent:#06101F;
-  --live:#FF5F57; --win:#2FD07A;
+  --chrome:#12294B; --chrome2:#1A3557;
+  --ink-on-accent:#FFFFFF;
+  --live:#C81E2E; --win:#1D7D4F;
   /* The good -> bad pair. Both are LIFTED for a dark ground: #0E7C4A and
      #FF5F6E were chosen to sit on sand and go muddy on near-black, where a
      colour needs more light than the ink around it, not less. */
-  --good:#31D07E; --bad:#FF5F6E; --mid:#8494B2;
+  --good:#1D7D4F; --bad:#B42332; --mid:#5D6B80;
   /* THREE ROLES, NAMED BY JOB. Display is for scores, ranks and short
      labels -- condensed type is fast in three words and slow in three
      sentences. Editorial is for anything anyone actually reads. Utility is
@@ -4523,16 +4523,16 @@ TEMPLATE = r"""<!doctype html><html lang="en"><head><meta charset="utf-8">
    a set in progress, and the focus ring -- and nowhere else. That restriction
    is a guard, not a preference: test_court_signal.py counts its uses. */
 :root{
-  --cs-ink:var(--court); --cs-blue:var(--rally); --cs-white:var(--chalk);
-  --cs-gold:var(--gold); --cs-cyan:#4CD4E4;
+  --cs-ink:var(--chalk); --cs-blue:var(--rally); --cs-white:var(--chalk);
+  --cs-gold:var(--gold-fill); --cs-cyan:#0E7490;
   /* the cyan lifted for anything a reader must actually READ (the fill value
      is a 3px rule colour, not an ink -- the same distinction --rally already
      carries above, and for the same reason) */
-  --cs-cyan-ink:#8FE7F2;
+  --cs-cyan-ink:#0E7490;
   /* semantic pair, reused rather than redefined */
   --cs-pos:var(--good); --cs-neg:var(--bad);
   /* structural greys of the tape itself */
-  --cs-cell:#0E2338; --cs-edge:#1B3050; --cs-edge2:#2C4A72;
+  --cs-cell:#1A3557; --cs-edge:#2C4A72; --cs-edge2:#3E5C86;
 }
 /* THE COURT-LINE TEXTURE. One reusable inline-SVG ground: the net (dashed, in
    the middle), the two attack lines 3m either side of it, and the service-zone
@@ -4600,14 +4600,15 @@ html{-webkit-text-size-adjust:100%}
    property reading, and a useless one. The property says what was ASKED FOR;
    the widths say whether it changed anything. Same lesson as the phantom nav
    underline: measure the pixels, not the declaration.  */
+/* ── ARENA DAYLIGHT: the header is the one navy chrome band. Everything
+   inside it reads in chalk, whatever token the child rules name -- the
+   band kept dark-theme ink tokens when the page went light. ── */
+header .mast .meta, header .mast .season{color:#ADBDD4}
+header .mast .meta b{color:var(--chalk)}
+header h1{color:var(--chalk)}
 body{margin:0;color:var(--ink);font:15px/1.55 var(--sans);
   font-feature-settings:"tnum" 1;
-  background:
-    radial-gradient(1400px 520px at 50% 128%, rgba(91,168,245,.16), transparent 70%),
-    radial-gradient(1100px 700px at 4% -10%, rgba(91,168,245,.13), transparent 62%),
-    radial-gradient(900px 640px at 98% 2%, rgba(255,199,44,.10), transparent 58%),
-    var(--page);
-  background-attachment:fixed;
+  background:var(--page);
   background-repeat:no-repeat}
 /* THE FLOOR. Flat vertical stripes read as stripes; a court reads as a court
    only in perspective, so this is a grid rotated back in X and faded out as it
@@ -4631,32 +4632,25 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 <rect width='140' height='140' filter='url(%23n)' opacity='.32'/></svg>")}
 header,nav,main{position:relative;z-index:1}
 
-header{color:var(--ink);padding:16px 24px 0;position:relative;
-  background:
-    radial-gradient(120% 180% at 12% -40%, rgba(91,168,245,.30), transparent 60%),
-    radial-gradient(90% 160% at 92% -30%, rgba(255,199,44,.20), transparent 62%),
-    linear-gradient(180deg,var(--chrome2) 0%,var(--chrome) 78%,#08101F 100%)}
-.mast{max-width:1280px;margin:0 auto;display:flex;align-items:flex-end;
+header{color:var(--chalk);padding:10px 24px 0;position:relative;
+  background:linear-gradient(180deg,#0F2340,var(--chrome))}
+.mast{max-width:1280px;margin:0 auto;display:flex;align-items:center;
   justify-content:space-between;gap:20px;flex-wrap:wrap}
 /* ⚠ THE WORDMARK IS A LOCKUP, NOT A HEADING THAT HAPPENS TO BE BIG. A rule
    under the season line and a tighter, heavier condensed face make it read as
    a masthead; the previous 40px/.92 sat at the same weight as a section
    title, which is why the page opened like a dashboard. */
-h1{margin:0;font:700 52px/.86 var(--disp);letter-spacing:-.005em;
-  color:var(--chalk);text-transform:uppercase}
+h1{margin:0;font:700 26px/.9 var(--disp);letter-spacing:.01em;
+  color:var(--ink);text-transform:uppercase}
 h1 em{font-style:normal;color:var(--gold)}
-.season{font:600 10px/1 var(--mono);color:var(--slate);letter-spacing:.36em;
-  text-transform:uppercase;margin-bottom:10px;padding-bottom:9px;
-  border-bottom:1px solid var(--line);display:inline-block}
+.season{font:600 11px/1 var(--mono);letter-spacing:.3em;
+  text-transform:uppercase;margin-bottom:4px;display:inline-block}
 .meta{font:11.5px/1.7 var(--mono);color:var(--slate);text-align:right}
-.meta b{color:var(--chalk);font-weight:600}
+.meta b{color:var(--ink);font-weight:600}
 /* The net: white mesh under a taut yellow tape. It is the one thing in the
    sport every viewer can draw from memory, so it carries the masthead. */
-.net{max-width:1280px;margin:12px auto 0;height:11px;
-  background:repeating-linear-gradient(90deg,rgba(255,255,255,.30) 0 1px,transparent 1px 6px),
-             repeating-linear-gradient(0deg,rgba(255,255,255,.30) 0 1px,transparent 1px 6px);
-  border-top:3px solid var(--amber);
-  box-shadow:0 -1px 22px -2px rgba(255,199,44,.55),0 6px 30px -14px rgba(255,199,44,.35)}
+.net{max-width:1280px;margin:8px auto 0;height:0;
+  border-top:3px solid var(--gold-fill)}
 /* COURTSIGNAL-TAPE-CSS-BEGIN */
 /* ══ THE RALLY TAPE ═══════════════════════════════════════════════════════
    The site's one bold move, and it is bold because of its GEOMETRY rather
@@ -4696,7 +4690,7 @@ h1 em{font-style:normal;color:var(--gold)}
 .cs-stl{font:700 12px/1 var(--disp);letter-spacing:.2em;text-transform:uppercase;
   color:var(--cs-white);display:flex;align-items:center;gap:7px}
 .cs-live .cs-stl{color:var(--cs-gold)}
-.cs-when{font:500 10.5px/1.35 var(--mono);color:var(--slate);
+.cs-when{font:500 11px/1.35 var(--mono);color:#8DA2BF;
   letter-spacing:.06em;text-transform:uppercase}
 /* the live dot is the ONLY looping motion on the page, and it loops only
    while something is genuinely live */
@@ -4730,11 +4724,11 @@ h1 em{font-style:normal;color:var(--gold)}
    crest track. This hits every non-Division-I opponent. */
 .cs-nologo{width:24px;height:24px;border:1px solid var(--cs-edge2);
   border-radius:2px;opacity:.5}
-.cs-nm{font:600 20px/1.12 var(--disp);letter-spacing:.005em;color:var(--ink2);
+.cs-nm{font:600 20px/1.12 var(--disp);letter-spacing:.005em;color:#C6D3E6;
   text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;
   white-space:nowrap;min-width:0}
 .cs-won .cs-nm{color:var(--cs-white)}
-.cs-sets{font:700 26px/1 var(--disp);color:var(--ink3);text-align:right;
+.cs-sets{font:700 26px/1 var(--disp);color:#8DA2BF;text-align:right;
   font-variant-numeric:tabular-nums}
 .cs-won .cs-sets{color:var(--cs-white)}
 .cs-side.cs-serve .cs-trk::after{content:"";display:inline-block;width:5px;
@@ -4749,30 +4743,30 @@ h1 em{font-style:normal;color:var(--gold)}
   gap:3px;background:var(--cs-cell);border:1px solid var(--cs-edge);
   border-radius:2px;padding:6px 0}
 .cs-cell i{font:600 15px/1 var(--mono);font-style:normal;text-align:center;
-  color:var(--ink2);font-variant-numeric:tabular-nums}
+  color:#AFBED6;font-variant-numeric:tabular-nums}
 .cs-cell i.cs-cw{color:var(--cs-white);font-weight:700}
 /* an unplayed set is a court dot, never a zero */
 .cs-cell.cs-empty{background:rgba(245,241,232,.02);border-style:dashed;
   border-color:rgba(245,241,232,.2)}
-.cs-cell.cs-empty i{color:var(--ink3);opacity:.8}
+.cs-cell.cs-empty i{color:#8DA2BF;opacity:.8}
 .cs-cell.cs-now{border-color:var(--cs-cyan);
   box-shadow:inset 0 -2px 0 -0px var(--cs-cyan)}
-.cs-setno{font:600 9px/1 var(--mono);letter-spacing:.1em;color:var(--ink3);
+.cs-setno{font:600 11px/1 var(--mono);letter-spacing:.1em;color:#8DA2BF;
   text-align:center;text-transform:uppercase}
 
 /* --- one factual context line ------------------------------------------ */
 .cs-ctx{grid-column:1/-1;grid-row:2;border-top:1px solid var(--cs-edge);
-  padding:8px 16px;font:12.5px/1.45 var(--sans);color:var(--ink2);
+  padding:8px 16px;font:12.5px/1.45 var(--sans);color:#AFBED6;
   background:rgba(7,23,43,.42);
   display:flex;gap:9px;align-items:baseline;flex-wrap:wrap}
 .cs-ctx b{color:var(--cs-white);font-weight:600}
 .cs-ctx .cs-sep{color:var(--cs-edge2)}
-.cs-ctx a{color:var(--navy);text-decoration:none;border-bottom:1px solid transparent}
-.cs-ctx a:hover{border-bottom-color:var(--navy)}
-.cs-unk{color:var(--ink3);font-style:italic}
+.cs-ctx a{color:#7FB3F5;text-decoration:none;border-bottom:1px solid transparent}
+.cs-ctx a:hover{border-bottom-color:#7FB3F5}
+.cs-unk{color:#8DA2BF;font-style:italic}
 
 /* --- the quiet band ----------------------------------------------------- */
-.cs-quiet .cs-nm{color:var(--ink2)}
+.cs-quiet .cs-nm{color:#9FB2CC}
 .cs-quiet .cs-sets{display:none}
 .cs-quiet .cs-side{grid-template-columns:max-content 26px minmax(0,1fr)}
 /* with no set cells, the quiet marquee is two columns, not four */
@@ -4780,11 +4774,11 @@ h1 em{font-style:normal;color:var(--gold)}
 /* the ranks label and any other stated-provenance aside in the context line */
 .cs-ctx .cs-unk{font-style:normal;font:11px/1.5 var(--mono);
   letter-spacing:.04em}
-.cs-at{font:600 10px/1 var(--mono);letter-spacing:.18em;color:var(--ink3);
+.cs-at{font:600 11px/1 var(--mono);letter-spacing:.18em;color:#8DA2BF;
   text-transform:uppercase;padding:1px 0 1px 74px}
 /* nothing at all on the card: still the tape's geometry, honestly empty */
 .cs-none{grid-column:1/-1;grid-row:1;padding:16px;
-  font:14px/1.5 var(--sans);color:var(--ink2);display:flex;gap:10px;
+  font:14px/1.5 var(--sans);color:#AFBED6;display:flex;gap:10px;
   align-items:center}
 .cs-none b{color:var(--cs-white)}
 /* Digby as a SIGNAL GUIDE, at two moments only: the tape with nothing to show,
@@ -4820,9 +4814,9 @@ h1 em{font-style:normal;color:var(--gold)}
    the identity survives, the nav stays above the fold. */
 .cs-status{max-width:1280px;margin:0 auto;display:flex;flex-wrap:wrap;
   gap:0 20px;align-items:center;padding:7px 0 0;
-  font:11px/1.5 var(--mono);color:var(--slate);letter-spacing:.05em}
+  font:11px/1.5 var(--mono);color:#8DA2BF;letter-spacing:.05em}
 .cs-status span{display:flex;align-items:center;gap:6px}
-.cs-status b{color:var(--ink2);font-weight:600}
+.cs-status b{color:#AFBED6;font-weight:600}
 .cs-status .cs-fresh{color:var(--cs-white)}
 .cs-status .cs-stale{color:var(--cs-gold)}
 
@@ -4862,7 +4856,7 @@ h1 em{font-style:normal;color:var(--gold)}
   .cs-sets{font-size:21px}
   .cs-cell{width:34px}
   .cs-at{padding-left:55px}
-  .cs-status{gap:0 14px;font-size:10px;padding-top:7px}
+  .cs-status{gap:0 14px;font-size:11px;padding-top:7px}
 }
 
 /* COURTSIGNAL-VIEWS-CSS-BEGIN */
@@ -4896,7 +4890,7 @@ h1 em{font-style:normal;color:var(--gold)}
    under the table head so the board reads as a board. */
 .t25 thead th{background:rgba(31,102,209,.09);
   border-bottom:2px solid var(--cs-edge2);
-  font:700 10px/1 var(--disp);letter-spacing:.15em;text-transform:uppercase}
+  font:700 11px/1 var(--disp);letter-spacing:.15em;text-transform:uppercase}
 .t25 tbody tr td:first-child::before{width:4px}
 
 /* ⚠ THE PRIVATE SURFACES' COURT SIGNAL RULES ARE NOT HERE, AND THAT IS THE
@@ -4934,7 +4928,7 @@ h1 em{font-style:normal;color:var(--gold)}
 .mm{margin:0;position:relative;display:grid;
   grid-template-rows:auto 1fr auto auto;
   aspect-ratio:16/9;min-height:190px;overflow:hidden;
-  border:1px solid var(--cs-edge2);
+  border:1px solid var(--line2);
   background:linear-gradient(180deg,#0B1D33 0%,#07172B 100%)}
 /* the two schools' colours as edges, never as a full-bleed theme */
 .mm::after{content:"";position:absolute;left:0;right:0;top:0;height:4px;
@@ -4947,7 +4941,7 @@ h1 em{font-style:normal;color:var(--gold)}
 .mm-state{font:700 11px/1 var(--disp);letter-spacing:.2em;text-transform:uppercase;
   color:var(--cs-white);display:flex;align-items:center;gap:6px}
 .mm.is-live .mm-state{color:var(--cs-gold)}
-.mm-when{font:500 10.5px/1 var(--mono);color:var(--slate);letter-spacing:.06em;
+.mm-when{font:500 11px/1 var(--mono);color:#8DA2BF;letter-spacing:.06em;
   text-transform:uppercase;margin-left:auto;text-align:right}
 .mm-body{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
   gap:12px;padding:6px 14px;min-width:0;z-index:1}
@@ -4956,27 +4950,27 @@ h1 em{font-style:normal;color:var(--gold)}
 .mm-side img{width:38px;height:38px;object-fit:contain}
 .mm-nologo{width:38px;height:38px;border:1px solid var(--cs-edge2);
   border-radius:2px;opacity:.45}
-.mm-nm{font:700 21px/1.05 var(--disp);letter-spacing:.005em;color:var(--ink2);
+.mm-nm{font:700 21px/1.05 var(--disp);letter-spacing:.005em;color:#AFBED6;
   text-transform:uppercase;overflow-wrap:anywhere}
 .mm-side.won .mm-nm{color:var(--cs-white)}
-.mm-rk{font:600 10px/1 var(--mono)}
+.mm-rk{font:600 11px/1 var(--mono)}
 .mm-sc{font:700 40px/1 var(--disp);color:var(--cs-white);
   font-variant-numeric:tabular-nums;white-space:nowrap}
-.mm-sc i{font-style:normal;color:var(--ink3);margin:0 3px}
+.mm-sc i{font-style:normal;color:#8DA2BF;margin:0 3px}
 .mm-time{font:700 21px/1.1 var(--disp);color:var(--cs-white);text-align:center;
   white-space:nowrap}
-.mm-time span{display:block;font:500 10px/1.4 var(--mono);color:var(--slate);
+.mm-time span{display:block;font:500 11px/1.4 var(--mono);color:#8DA2BF;
   letter-spacing:.1em;text-transform:uppercase}
 .mm-sets{display:flex;gap:4px;padding:0 14px 6px;flex-wrap:wrap;z-index:1}
-.mm-set{font:600 11px/1 var(--mono);color:var(--ink2);
+.mm-set{font:600 11px/1 var(--mono);color:#AFBED6;
   border:1px solid var(--cs-edge);background:var(--cs-cell);
   padding:4px 6px;border-radius:2px;font-variant-numeric:tabular-nums}
 .mm-foot{border-top:1px solid var(--cs-edge);padding:8px 14px;
-  font:11.5px/1.4 var(--sans);color:var(--ink2);
+  font:11.5px/1.4 var(--sans);color:#AFBED6;
   background:rgba(7,23,43,.5);display:flex;gap:8px;flex-wrap:wrap;z-index:1}
 .mm-foot .mm-sep{color:var(--cs-edge2)}
-.mm-unk{color:var(--ink3);font-style:italic}
-.mm-site{font:600 9.5px/1 var(--disp);letter-spacing:.14em;text-transform:uppercase;
+.mm-unk{color:#8DA2BF;font-style:italic}
+.mm-site{font:600 11px/1 var(--disp);letter-spacing:.14em;text-transform:uppercase;
   color:var(--cs-gold);border:1px solid var(--cs-edge2);padding:3px 5px;
   border-radius:2px}
 a.mmlink{display:block;text-decoration:none}
@@ -5010,15 +5004,15 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .wgrid{display:grid;gap:14px;
   grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
 .wcard{display:flex;flex-direction:column;gap:9px;min-width:0;padding:15px;
-  text-decoration:none;border:1px solid var(--cs-edge2);
-  border-left:3px solid var(--cs-gold);
-  background:linear-gradient(180deg,#0B1D33,#091829)}
+  text-decoration:none;border:1px solid var(--line);
+  border-left:3px solid var(--gold-fill);
+  background:var(--card)}
 .wcard.islive{border-left-color:var(--live)}
-.wcard:hover{border-color:var(--navy);border-left-color:var(--cs-white)}
+.wcard:hover{border-color:var(--navy);border-left-color:var(--ink)}
 .wcard:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .wtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .wwhen{display:flex;align-items:center;gap:6px;
-  font:600 10.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;
+  font:600 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;
   color:var(--slate)}
 /* ⚠ THE CHANNEL IS THE POINT. It is the first thing he asked for and the feed
    carries none of it, so a fixture with a joined listing shows the network
@@ -5033,17 +5027,17 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
    "not televised" when what we mean is "we do not know", but it is now plain
    muted type rather than a badge competing with the real ones. */
 .wnet.none{background:transparent;color:var(--ink3);border:0;padding:5px 0;
-  font:400 10.5px/1 var(--sans);letter-spacing:.02em;text-transform:none;
+  font:400 11px/1 var(--sans);letter-spacing:.02em;text-transform:none;
   opacity:.65}
 .wteams{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
-  font:700 20px/1.12 var(--disp);text-transform:uppercase;color:var(--cs-white)}
+  font:700 20px/1.12 var(--disp);text-transform:uppercase;color:var(--ink)}
 .wteams i{font-style:normal;font:500 11px/1 var(--mono);color:var(--ink3);
   text-transform:lowercase}
 .wmeta{font:12px/1.45 var(--sans);color:var(--ink2)}
 .wacts{display:flex;align-items:center;gap:10px;margin-top:2px}
 .wgo{font:600 11.5px/1 var(--sans);color:var(--navy)}
-.wcard:hover .wgo{color:var(--cs-white)}
-.wofficial{font:500 10px/1 var(--mono);color:var(--ink3);letter-spacing:.06em}
+.wcard:hover .wgo{color:var(--ink)}
+.wofficial{font:500 11px/1 var(--mono);color:var(--ink3);letter-spacing:.06em}
 /* ── source intel: what changed ── */
 .silist{display:flex;flex-direction:column;gap:6px}
 .siitem{border:1px solid var(--line2);border-radius:4px;background:var(--card)}
@@ -5051,20 +5045,20 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
   cursor:pointer;list-style:none;font:500 12.5px/1.4 var(--sans);color:var(--ink)}
 .siitem summary::-webkit-details-marker{display:none}
 .siwhat{min-width:0}
-.sichip{flex:none;font:600 9px/1 var(--mono);letter-spacing:.08em;
+.sichip{flex:none;font:600 11px/1 var(--mono);letter-spacing:.08em;
   padding:3px 6px;border-radius:3px;border:1px solid var(--line2);color:var(--ink2)}
-.si-confirmed_official{color:var(--cs-white);background:var(--navy);border-color:var(--navy)}
+.si-confirmed_official{color:var(--chalk);background:var(--navy);border-color:var(--navy)}
 .si-corroborated{color:var(--navy);border-color:var(--navy)}
-.si-conflicting{color:var(--cs-white);background:var(--live);border-color:var(--live)}
+.si-conflicting{color:var(--chalk);background:var(--live);border-color:var(--live)}
 .si-community_signal{color:var(--ink3);border-style:dashed}
 .si-expired,.si-inaccessible{color:var(--ink3)}
 .sidrill{padding:2px 11px 10px;display:flex;flex-direction:column;gap:6px}
 .siwhy{font:italic 11.5px/1.5 var(--sans);color:var(--ink2)}
-.siscope{font:600 10px/1.4 var(--mono);color:var(--ink3);letter-spacing:.04em}
+.siscope{font:600 11px/1.4 var(--mono);color:var(--ink3);letter-spacing:.04em}
 .sisrc{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;
   border-left:2px solid var(--line2);padding-left:8px}
 .siq{font:11.5px/1.5 var(--sans);color:var(--ink);flex-basis:100%}
-.siu{font:500 10.5px/1 var(--mono);color:var(--navy)}
+.siu{font:500 11px/1 var(--mono);color:var(--navy)}
 .sit,.sik{font:10px/1 var(--mono);color:var(--ink3);letter-spacing:.05em}
 .sigo{font:600 11px/1 var(--sans);color:var(--navy);text-decoration:none}
 .tdintel h4{margin:0 0 7px}
@@ -5073,7 +5067,7 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .mbsecondary{margin-top:8px;opacity:.92}
 .mbsecondary .mbrow{padding-top:7px;padding-bottom:7px}
 /* a person's name in prose reads as a person */
-.pname{color:var(--cs-white);text-decoration:none;font-weight:600;
+.pname{color:var(--ink);text-decoration:none;font-weight:600;
   border-bottom:1px solid color-mix(in oklab,var(--cs-gold) 55%,transparent)}
 .pname:hover{color:var(--cs-gold)}
 .pname:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
@@ -5086,7 +5080,7 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .rprow{display:flex;align-items:center;gap:9px;margin:5px 0;font-size:12.5px}
 .rplab{width:78px;color:var(--ink3)}
 .rpbar{flex:1;max-width:200px;height:7px;border-radius:4px;
-  background:var(--cs-edge2);overflow:hidden}
+  background:var(--line2);overflow:hidden}
 /* ⚠ NOT SERVE CYAN. That colour is reserved for serve, set-in-progress
    and focus, and a returning-production bar is none of those -- it is a
    magnitude. Optic white carries magnitude without claiming a meaning
@@ -5094,42 +5088,42 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .rpbar i{display:block;height:100%;background:rgba(245,241,232,.62)}
 .rppct{width:38px;font-weight:700}
 .rotgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;max-width:420px}
-.rotcell{border:1px solid var(--cs-edge2);border-radius:7px;padding:6px 4px;
+.rotcell{border:1px solid var(--line2);border-radius:7px;padding:6px 4px;
   text-align:center;display:flex;flex-direction:column;gap:1px}
-.rotcell .rotlab{font:700 10px/1 var(--disp);color:var(--ink3)}
+.rotcell .rotlab{font:700 11px/1 var(--disp);color:var(--ink3)}
 .rotcell .rotv{font:700 15px/1 var(--disp)}
 .rotcell.best{border-color:#3a7;background:rgba(60,180,120,.10)}
 .rotcell.worst{border-color:#a55;background:rgba(190,80,80,.10)}
-.ratingbox{border:1px solid var(--cs-edge2);border-radius:10px;
+.ratingbox{border:1px solid var(--line2);border-radius:10px;
   padding:11px 12px;margin-bottom:12px;background:rgba(255,255,255,.02)}
 .rchips{display:flex;flex-wrap:wrap;gap:8px}
-.rchip{display:flex;flex-direction:column;gap:1px;border:1px solid var(--cs-edge2);
+.rchip{display:flex;flex-direction:column;gap:1px;border:1px solid var(--line2);
   border-radius:8px;padding:6px 10px;font:700 17px/1 var(--disp)}
-.rchip b{font:700 9.5px/1 var(--disp);letter-spacing:.08em;color:var(--ink3)}
-.rchip i{font-style:normal;font:400 10.5px/1.2 var(--sans);color:var(--ink3)}
+.rchip b{font:700 11px/1 var(--disp);letter-spacing:.08em;color:var(--ink3)}
+.rchip i{font-style:normal;font:400 11px/1.2 var(--sans);color:var(--ink3)}
 .rchip.pw{border-color:var(--gold,#c9a227)}
 .rchip.off{opacity:.6}
 .rtags{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline;margin-top:8px}
 .rtag{font-size:11px;padding:2px 7px;border-radius:4px;
-  border:1px solid var(--cs-edge2);color:var(--ink3)}
+  border:1px solid var(--line2);color:var(--ink3)}
 .rfoot{margin-top:8px;line-height:1.4}
 .starcols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media (max-width:560px){.starcols{grid-template-columns:1fr}}
-.starcol{border:1px solid var(--cs-edge2);border-radius:9px;padding:9px 10px}
+.starcol{border:1px solid var(--line2);border-radius:9px;padding:9px 10px}
 .stt{display:flex;align-items:center;gap:6px;font:700 12px/1 var(--disp);
   letter-spacing:.05em;text-transform:uppercase;margin-bottom:7px}
 .starrow{display:grid;grid-template-columns:34px 1fr;gap:6px;
-  text-decoration:none;color:inherit;padding:5px 0;border-top:1px solid var(--cs-edge2)}
+  text-decoration:none;color:inherit;padding:5px 0;border-top:1px solid var(--line2)}
 .starrow:first-of-type{border-top:0}
 .starrow:hover .sn{text-decoration:underline}
-.starrow .sp{font:700 9.5px/1.6 var(--disp);color:var(--ink3)}
-.starrow .sn{font-size:13.5px;color:var(--cs-white)}
+.starrow .sp{font:700 11px/1.6 var(--disp);color:var(--ink3)}
+.starrow .sn{font-size:13.5px;color:var(--ink)}
 .starrow .sd{grid-column:2;font-size:11px;color:var(--ink3)}
 .tdstars{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline;margin-top:4px}
 .tdstars .pk{font-size:11.5px;color:var(--ink3);white-space:nowrap}
-.tdstars .pk i{font-style:normal;font:700 9px/1 var(--disp);letter-spacing:.06em;
+.tdstars .pk i{font-style:normal;font:700 11px/1 var(--disp);letter-spacing:.06em;
   margin-right:4px;opacity:.75}
-.tdstars .pkv{font-size:10px;opacity:.5}
+.tdstars .pkv{font-size:11px;opacity:.5}
 /* ⚠ 16px IS NOT A STYLE CHOICE ON A PHONE, IT IS THE ZOOM THRESHOLD. iOS
    Safari zooms the whole page in when you focus a form control whose
    font-size is under 16px, and it does NOT zoom back out afterwards -- so the
@@ -5163,10 +5157,10 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
      tag like "OH" or "non-conf" reads fine at 9px; "Before first serve" set at
      8px does not, and that is the difference the floor has to respect. Short
      badges are nudged, phrase-length labels are lifted properly. */
-  .mrow .mtg,.mbhd .mbpriv{font-size:9.5px !important}
-  .gd-step i,.fr-facts>i,.fr-prevnums i{font-size:10px !important}
+  .mrow .mtg,.mbhd .mbpriv{font-size:11px !important}
+  .gd-step i,.fr-facts>i,.fr-prevnums i{font-size:11px !important}
   /* the label above each figure in the team header's fact strip */
-  .vx-facts i{font-size:9.5px !important}
+  .vx-facts i{font-size:11px !important}
 }
 @media (max-width:560px){
   input,select,textarea{font-size:16px !important}
@@ -5175,42 +5169,42 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 }
 .notyet{margin-top:14px}
 .nyhd{font:700 12px/1 var(--disp);letter-spacing:.06em;text-transform:uppercase;
-  padding:10px 12px;border-bottom:1px solid var(--cs-edge2);
+  padding:10px 12px;border-bottom:1px solid var(--line2);
   display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
 .nyrow{cursor:pointer}
 .nyrow:hover td{background:rgba(255,255,255,.04)}
 .nyrow td{font-size:13px}
 .exhban{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;
-  border:1px solid var(--cs-edge2);border-left:4px solid var(--gold,#c9a227);
+  border:1px solid var(--line2);border-left:4px solid var(--gold,#c9a227);
   border-radius:8px;padding:9px 12px;margin-bottom:12px;font-size:12.5px}
 .exhban b{font:700 11px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase;
   color:var(--gold,#c9a227)}
 .exhtag{display:inline-block;flex:0 0 auto;align-self:center;width:auto;
-  font:700 9px/1.5 var(--disp);letter-spacing:.07em;padding:2px 6px;
+  font:700 11px/1.5 var(--disp);letter-spacing:.07em;padding:2px 6px;
   border-radius:3px;border:1px solid var(--gold,#c9a227);
   color:var(--gold,#c9a227);vertical-align:middle}
 /* ── TEAM DOSSIER ─────────────────────────────────────────────────────── */
 .tdnav{display:flex;gap:2px;flex-wrap:wrap;margin:16px 0 0;
-  border-bottom:1px solid var(--cs-edge2);padding-bottom:0}
+  border-bottom:1px solid var(--line2);padding-bottom:0}
 .tdnav button{appearance:none;background:none;border:0;cursor:pointer;
   font:700 12px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase;
   color:var(--ink3);padding:11px 14px;border-bottom:2px solid transparent;
   margin-bottom:-1px;white-space:nowrap}
 .tdnav button:hover{color:var(--ink2)}
-.tdnav button.on{color:var(--chalk);border-bottom-color:var(--cs-gold)}
+.tdnav button.on{color:var(--ink);border-bottom-color:var(--cs-gold)}
 .tdnav button:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:-3px}
 .tdpanel{padding-top:16px}
 .tdpanel[hidden]{display:none}
-.tdlab{display:block;font:700 10px/1 var(--disp);letter-spacing:.1em;
+.tdlab{display:block;font:700 11px/1 var(--disp);letter-spacing:.1em;
   text-transform:uppercase;color:var(--ink3);margin-bottom:8px}
 /* the next match: the single decision this page exists to serve */
-.tdnext{border:1px solid var(--cs-edge2);border-left:3px solid var(--cs-gold);
+.tdnext{border:1px solid var(--line2);border-left:3px solid var(--cs-gold);
   border-radius:10px;padding:12px 14px;margin-bottom:14px}
 .tdnextrow{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
   text-decoration:none;color:inherit}
 .tdnextrow:hover b{text-decoration:underline}
 .tdvs{display:flex;align-items:center;gap:7px;font:700 22px/1.1 var(--disp);
-  color:var(--chalk)}
+  color:var(--ink)}
 .tdvs b{font-weight:700}
 .tdwhen{font:700 13px/1 var(--disp);letter-spacing:.05em;color:var(--ink2)}
 .tdtv{font:700 11px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
@@ -5224,19 +5218,19 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .tdpgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
   gap:10px}
 .tdpcard{display:grid;grid-template-columns:44px 1fr;gap:3px 11px;
-  align-items:center;border:1px solid var(--cs-edge2);border-radius:10px;
+  align-items:center;border:1px solid var(--line2);border-radius:10px;
   padding:10px 12px;text-decoration:none;color:inherit}
 .tdpcard:hover{background:rgba(255,255,255,.03)}
 .tdpcard:hover .tdpn{text-decoration:underline}
 .tdface{grid-row:1/4;width:44px;height:44px;border-radius:50%;
-  object-fit:cover;background:var(--cs-edge2);display:flex;
+  object-fit:cover;background:var(--line2);display:flex;
   align-items:center;justify-content:center;font:700 15px/1 var(--disp);
   color:var(--ink2)}
-.tdpn{font:700 15px/1.15 var(--disp);color:var(--chalk)}
+.tdpn{font:700 15px/1.15 var(--disp);color:var(--ink)}
 .tdpm{font-size:11.5px;color:var(--ink3)}
 .tdpick{font-style:normal;color:var(--good);font-weight:700}
 .tdppct{font:700 13px/1 var(--disp);color:var(--ink2)}
-.tdppct i{font-style:normal;font:400 10px/1 var(--sans);color:var(--ink3);
+.tdppct i{font-style:normal;font:400 11px/1 var(--sans);color:var(--ink3);
   margin-left:5px}
 .tdpl{grid-column:2;font-size:11.5px;color:var(--ink3)}
 @media (max-width:560px){
@@ -5249,19 +5243,19 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
   .tdvs{font-size:19px}
 }
 .prkctl{flex-wrap:wrap;gap:10px}
-.segbar{display:inline-flex;border:1px solid var(--cs-edge2);border-radius:8px;
+.segbar{display:inline-flex;border:1px solid var(--line2);border-radius:8px;
   overflow:hidden}
 .segbar button{font:600 11px/1 var(--disp);letter-spacing:.06em;
   text-transform:uppercase;background:none;border:0;color:var(--ink3);
   padding:8px 11px;cursor:pointer;white-space:nowrap}
-.segbar button+button{border-left:1px solid var(--cs-edge2)}
-.segbar button.on{background:var(--cs-edge2);color:var(--cs-white)}
+.segbar button+button{border-left:1px solid var(--line2)}
+.segbar button.on{background:var(--line2);color:var(--ink)}
 .prksupport{margin:10px 0 4px}
 .prkcav{font-size:12.5px;line-height:1.45;padding:9px 11px;border-radius:8px;
-  border:1px solid var(--cs-edge2);background:rgba(255,255,255,.02)}
-.prkbadge{font:700 10px/1 var(--disp);letter-spacing:.08em;padding:3px 6px;
-  border-radius:4px;margin-right:6px;background:var(--cs-edge2);
-  color:var(--cs-white)}
+  border:1px solid var(--line2);background:rgba(255,255,255,.02)}
+.prkbadge{font:700 11px/1 var(--disp);letter-spacing:.08em;padding:3px 6px;
+  border-radius:4px;margin-right:6px;background:var(--line2);
+  color:var(--ink)}
 .sup-good .prkbadge{background:#1f5c3a;color:#d9f2e3}
 .sup-fair .prkbadge{background:#5c4a1f;color:#f2e8d0}
 .sup-weak .prkbadge{background:#5c2a2a;color:#f2d9d9}
@@ -5269,31 +5263,31 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .prkrow{cursor:pointer}
 .prkrow:hover td{background:rgba(255,255,255,.04)}
 .prkrow:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:-2px}
-.prknum{font:700 15px/1 var(--disp);color:var(--cs-white)}
+.prknum{font:700 15px/1 var(--disp);color:var(--ink)}
 .prkval{font:700 15px/1 var(--disp);white-space:nowrap}
 .prkconf{font-size:11.5px;white-space:nowrap}
 .prkdrv{max-width:340px}
 .prkd{display:inline-block;font-size:11px;padding:2px 6px;margin:1px 4px 1px 0;
-  border-radius:4px;border:1px solid var(--cs-edge2);white-space:nowrap}
+  border-radius:4px;border:1px solid var(--line2);white-space:nowrap}
 .prkd.neg{opacity:.6}
 .prkpass{margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}
 .prkp{font-size:11px;color:var(--ink3)}
 .prkrolet.alt{opacity:.75}
-.prkpos,.prkrolet{font:700 9.5px/1 var(--disp);letter-spacing:.06em;
+.prkpos,.prkrolet{font:700 11px/1 var(--disp);letter-spacing:.06em;
   text-transform:uppercase;padding:2px 5px;border-radius:3px;
-  background:var(--cs-edge2);color:var(--ink3);margin-left:4px}
+  background:var(--line2);color:var(--ink3);margin-left:4px}
 .prkh{font-family:var(--disp);font-size:19px;margin:22px 0 4px}
-.starteam{margin:12px 0;padding:11px 12px;border:1px solid var(--cs-edge2);
+.starteam{margin:12px 0;padding:11px 12px;border:1px solid var(--line2);
   border-radius:10px}
 .sthead{font:700 12px/1 var(--disp);letter-spacing:.07em;text-transform:uppercase;
-  color:var(--cs-white);margin-bottom:9px}
+  color:var(--ink);margin-bottom:9px}
 .stgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
   gap:8px}
-.star{border:1px solid var(--cs-edge2);border-radius:8px;padding:7px 9px;
+.star{border:1px solid var(--line2);border-radius:8px;padding:7px 9px;
   display:flex;flex-direction:column;gap:2px}
 .star.vac{opacity:.5}
-.spos{font:700 10px/1 var(--disp);letter-spacing:.08em;color:var(--ink3)}
-.sname{font-size:13.5px;color:var(--cs-white)}
+.spos{font:700 11px/1 var(--disp);letter-spacing:.08em;color:var(--ink3)}
+.sname{font-size:13.5px;color:var(--ink)}
 .steam{font-size:11px;color:var(--ink3);display:flex;align-items:center;gap:4px}
 .spw{font:700 12px/1 var(--disp)}
 .sprof{margin-top:9px;font-size:12px;color:var(--ink3)}
@@ -5302,39 +5296,39 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .hmn{white-space:nowrap}
 .pname-brief{font:inherit;background:none;border:0;padding:0;cursor:pointer}
 .namepop{position:absolute;z-index:120;width:min(330px,calc(100vw - 20px));
-  background:var(--cs-ink2,#111c2e);border:1px solid var(--cs-edge2);
+  background:var(--cs-ink2,#111c2e);border:1px solid var(--line2);
   border-radius:10px;box-shadow:0 14px 40px rgba(0,0,0,.55);padding:12px 13px}
 .namepop .nphead{display:flex;gap:10px;align-items:flex-start}
 .namepop .npname{font-family:var(--disp);font-size:17px;line-height:1.15;
-  color:var(--cs-white)}
+  color:var(--ink)}
 .namepop .sub{font-size:11.5px;color:var(--ink3);margin-top:2px}
 .namepop .npface{width:48px;height:48px;border-radius:50%;object-fit:cover;
   flex:0 0 auto}
 .namepop .npx{margin-left:auto;background:none;border:0;color:var(--ink3);
   font-size:19px;line-height:1;cursor:pointer;padding:0 2px}
-.namepop .npx:hover{color:var(--cs-white)}
+.namepop .npx:hover{color:var(--ink)}
 .namepop .npbody{margin-top:9px;display:flex;flex-direction:column;gap:6px}
 .namepop .nprow{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;
   font-size:12.5px}
 .namepop .npfoot{margin-top:2px;line-height:1.35}
 .pxfer,.pvid{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;
   margin-top:9px;font:12.5px/1.5 var(--sans);color:var(--ink2)}
-.pxlab{font:700 9.5px/1 var(--disp);letter-spacing:.14em;text-transform:uppercase;
+.pxlab{font:700 11px/1 var(--disp);letter-spacing:.14em;text-transform:uppercase;
   color:var(--slate);flex:0 0 auto}
-.pxfer a{color:var(--cs-white);text-decoration:none;font-weight:600;
-  border-bottom:1px solid var(--cs-edge2)}
+.pxfer a{color:var(--ink);text-decoration:none;font-weight:600;
+  border-bottom:1px solid var(--line2)}
 .pxfer a:hover{border-bottom-color:var(--cs-gold)}
 .pxstat{color:var(--slate)}
-.pvid a{color:var(--navy);text-decoration:none;border:1px solid var(--cs-edge2);
+.pvid a{color:var(--navy);text-decoration:none;border:1px solid var(--line2);
   border-radius:2px;padding:4px 8px;font:600 11px/1 var(--sans)}
-.pvid a:hover{color:var(--cs-white);border-color:var(--navy)}
+.pvid a:hover{color:var(--ink);border-color:var(--navy)}
 .pvid a:focus-visible,.pxfer a:focus-visible{outline:2px solid var(--cs-cyan);
   outline-offset:2px}
 .pvid .munk{font-size:11px}
-.tdrule{margin:26px 0 0;padding-top:14px;border-top:1px solid var(--cs-edge);
+.tdrule{margin:26px 0 0;padding-top:14px;border-top:1px solid var(--line);
   font:12px/1.6 var(--sans);color:var(--slate)}
 .tdrule a{color:var(--navy);text-decoration:none}
-.tdrule a:hover{color:var(--cs-white)}
+.tdrule a:hover{color:var(--ink)}
 @media (max-width:560px){
   .wgrid{grid-template-columns:minmax(0,1fr)}
   .wteams{font-size:17px}
@@ -5343,37 +5337,37 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 /* ── TODAY ────────────────────────────────────────────────────────────── */
 /* ── SCOREBOARD ───────────────────────────────────────────────────────── */
 /* the season ledger, deliberately behind a name */
-.sbfull{margin-top:30px;border-top:1px solid var(--cs-edge);padding-top:8px}
+.sbfull{margin-top:30px;border-top:1px solid var(--line);padding-top:8px}
 .sbfull>summary{cursor:pointer;list-style:none;padding:11px 0;
   font:700 11px/1 var(--disp);letter-spacing:.17em;text-transform:uppercase;
   color:var(--navy)}
 .sbfull>summary::-webkit-details-marker{display:none}
 .sbfull>summary::before{content:"\25B8";display:inline-block;margin-right:8px}
 .sbfull[open]>summary::before{content:"\25BE"}
-.sbfull>summary:hover{color:var(--cs-white)}
+.sbfull>summary:hover{color:var(--ink)}
 .sbfull>summary:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .sbbar{display:flex;flex-direction:column;gap:12px;margin:0 0 22px;
-  padding-bottom:16px;border-bottom:2px solid var(--cs-edge2)}
+  padding-bottom:16px;border-bottom:2px solid var(--line2)}
 .sbdate{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .sbnav{appearance:none;width:36px;height:36px;flex:0 0 auto;cursor:pointer;
-  border:1px solid var(--cs-edge2);background:var(--cs-cell);color:var(--cs-white);
+  border:1px solid var(--line2);background:var(--alt);color:var(--ink);
   font:600 15px/1 var(--sans);border-radius:2px}
 .sbnav:hover{border-color:var(--navy);color:var(--cs-gold)}
 .sbnav:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .sbday{display:flex;flex-direction:column;gap:2px;min-width:150px}
-.sbday b{font:700 21px/1 var(--disp);letter-spacing:.01em;color:var(--cs-white);
+.sbday b{font:700 21px/1 var(--disp);letter-spacing:.01em;color:var(--ink);
   text-transform:uppercase}
-.sbday span{font:500 10.5px/1 var(--mono);color:var(--slate);letter-spacing:.07em}
-.sbtoday{appearance:none;cursor:pointer;border:1px solid var(--cs-edge2);
+.sbday span{font:500 11px/1 var(--mono);color:var(--slate);letter-spacing:.07em}
+.sbtoday{appearance:none;cursor:pointer;border:1px solid var(--line2);
   background:transparent;color:var(--navy);border-radius:2px;padding:9px 12px;
   font:600 11px/1 var(--disp);letter-spacing:.13em;text-transform:uppercase}
 .sbtoday:disabled{opacity:.4;cursor:default}
-.sbtoday:not(:disabled):hover{color:var(--cs-white);border-color:var(--navy)}
+.sbtoday:not(:disabled):hover{color:var(--ink);border-color:var(--navy)}
 .sbtoday:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .sbpick{display:flex;align-items:center;gap:7px;margin-left:auto;
-  font:500 10.5px/1 var(--mono);color:var(--slate);letter-spacing:.07em;
+  font:500 11px/1 var(--mono);color:var(--slate);letter-spacing:.07em;
   text-transform:uppercase}
-.sbpick input{background:var(--cs-cell);border:1px solid var(--cs-edge2);
+.sbpick input{background:var(--alt);border:1px solid var(--line2);
   color:var(--ink);border-radius:2px;padding:7px 8px;font:12px/1 var(--mono)}
 .sbfilters{flex-wrap:wrap}
 /* ⚠ SAME SPECIFICITY, LATER SOURCE WINS. `.tdmarq` sets three columns and is
@@ -5395,13 +5389,13 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
   .sbpick input{min-height:40px}
 }
 .tdquiet{font:14.5px/1.6 var(--sans);color:var(--ink2);margin:0 0 20px;
-  padding-bottom:16px;border-bottom:1px solid var(--cs-edge)}
-.tdquiet b{color:var(--cs-white)}
+  padding-bottom:16px;border-bottom:1px solid var(--line)}
+.tdquiet b{color:var(--ink)}
 .tdblock{margin:0 0 26px}
 .tdblock h3{display:flex;align-items:baseline;gap:11px;margin:0 0 12px;
   font:700 11px/1 var(--disp);letter-spacing:.19em;text-transform:uppercase;
-  color:var(--cs-white);padding-bottom:9px;
-  border-bottom:1px solid var(--cs-edge)}
+  color:var(--ink);padding-bottom:9px;
+  border-bottom:1px solid var(--line)}
 .tdblock h3 span{font:500 11px/1 var(--mono);letter-spacing:.05em;
   text-transform:none;color:var(--slate);margin-left:auto}
 /* ⚠ THREE AT MOST, and they are cards because each carries its own reasons --
@@ -5409,20 +5403,20 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .tdmarq{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 .tdcard{display:flex;flex-direction:column;gap:8px;min-width:0;
   padding:14px;text-decoration:none;
-  border:1px solid var(--cs-edge2);border-left:3px solid var(--cs-gold);
-  background:linear-gradient(180deg,#0B1D33,#091829)}
-.tdcard:hover{border-left-color:var(--cs-white)}
+  border:1px solid var(--line);border-left:3px solid var(--gold-fill);
+  background:var(--card)}
+.tdcard:hover{border-left-color:var(--ink)}
 .tdcard:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
-.tdwhen{font:500 10px/1 var(--mono);letter-spacing:.11em;text-transform:uppercase;
+.tdwhen{font:500 11px/1 var(--mono);letter-spacing:.11em;text-transform:uppercase;
   color:var(--slate)}
 .tdteams{display:flex;align-items:center;gap:7px;flex-wrap:wrap;
-  font:700 18px/1.15 var(--disp);text-transform:uppercase;color:var(--cs-white)}
+  font:700 18px/1.15 var(--disp);text-transform:uppercase;color:var(--ink)}
 .tdteams i{font-style:normal;font:500 11px/1 var(--mono);color:var(--ink3);
   text-transform:lowercase}
 .tdwhere{font:12px/1.45 var(--sans);color:var(--ink2)}
 .tdwhy{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
-.tdtag{font:600 9.5px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
-  padding:4px 6px;border-radius:2px;border:1px solid var(--cs-edge2);
+.tdtag{font:600 11px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
+  padding:4px 6px;border-radius:2px;border:1px solid var(--line2);
   color:var(--ink2);white-space:nowrap}
 .tdtag.rv{color:var(--cs-gold);border-color:color-mix(in oklab,var(--cs-gold) 45%,transparent)}
 .tdtag.mb{color:var(--vx-ballot,#b8a6ff);border-color:color-mix(in oklab,#b8a6ff 40%,transparent)}
@@ -5431,27 +5425,27 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
    progress, focus -- and a tag colour is none of them. The guard caught this
    the moment it shipped, which is what the rationing rule is for. */
 .tdtag.dg{color:var(--blue);border-color:color-mix(in oklab,#7FC1FF 40%,transparent)}
-.tdlist{border-top:1px solid var(--cs-edge)}
+.tdlist{border-top:1px solid var(--line)}
 .tdprompt{display:flex;gap:10px;flex-wrap:wrap;padding-top:6px}
 .tdprompt a{font:600 12px/1 var(--sans);color:var(--navy);text-decoration:none;
-  border:1px solid var(--cs-edge2);border-radius:2px;padding:9px 12px}
-.tdprompt a:hover{color:var(--cs-white);border-color:var(--navy)}
+  border:1px solid var(--line2);border-radius:2px;padding:9px 12px}
+.tdprompt a:hover{color:var(--ink);border-color:var(--navy)}
 .tdprompt a:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 @media (max-width:900px){.tdmarq{grid-template-columns:minmax(0,1fr)}}
 
 .cs-rlab{display:flex;align-items:center;gap:7px;flex:0 0 auto;
-  font:700 10px/1 var(--disp);letter-spacing:.2em;text-transform:uppercase;
-  color:var(--slate)}
+  font:700 11px/1 var(--disp);letter-spacing:.2em;text-transform:uppercase;
+  color:#8DA2BF}
 
 .cs-rmatch{display:flex;align-items:center;gap:7px;min-width:0;
   color:var(--cs-white);text-decoration:none;
   font:600 15px/1.2 var(--disp);text-transform:uppercase;letter-spacing:.01em}
 .cs-rmatch:hover{color:var(--cs-gold)}
 .cs-rmatch:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:3px}
-.cs-rv{color:var(--ink3);font:500 11px/1 var(--mono);text-transform:lowercase}
-.cs-rwhen{font:500 11px/1 var(--mono);color:var(--slate);letter-spacing:.05em;
+.cs-rv{color:#8DA2BF;font:500 11px/1 var(--mono);text-transform:lowercase}
+.cs-rwhen{font:500 11px/1 var(--mono);color:#8DA2BF;letter-spacing:.05em;
   text-transform:uppercase;flex:0 0 auto}
-.cs-rmore{margin-left:auto;flex:0 0 auto;color:var(--navy);text-decoration:none;
+.cs-rmore{margin-left:auto;flex:0 0 auto;color:#7FB3F5;text-decoration:none;
   font:600 11px/1 var(--sans)}
 .cs-rmore:hover{color:var(--cs-white)}
 .cs-rmore:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
@@ -5469,11 +5463,9 @@ body[data-view=scores] .mast .meta{display:none}
 body[data-view=scores] .season{display:none}
 body[data-view=scores] #v-scores .vh{display:none}
 nav{position:sticky;top:0;z-index:6;
-  background:linear-gradient(180deg,rgba(12,23,45,.88),rgba(8,14,28,.92));
-  backdrop-filter:saturate(1.6) blur(14px);
-  border-bottom:1px solid transparent;
-  border-image:linear-gradient(90deg,transparent,rgba(120,180,255,.5) 18%,
-    rgba(255,199,44,.55) 52%,rgba(120,180,255,.5) 84%,transparent) 1}
+  background:rgba(255,255,255,.94);
+  backdrop-filter:saturate(1.2) blur(10px);
+  border-bottom:1px solid var(--line2)}
 /* ⚠ THE LIT SLOT IS GONE. A filled, glowing tab is the generic dashboard
    move and it made twelve tabs shout equally. The active item is now marked by
    the gold rule alone, and RANK is carried by type size instead. */
@@ -5600,8 +5592,8 @@ td.hx b{position:relative;font-weight:700;
 @media (prefers-reduced-motion:reduce){td.hx::before{animation:none}}
 table{width:100%;border-collapse:collapse}
 th{font:500 12px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase;
-  color:var(--ink2);text-align:right;padding:12px 10px;
-  background:linear-gradient(180deg,rgba(30,42,66,.95),rgba(17,25,41,.95));
+  color:#AFBED6;text-align:right;padding:12px 10px;
+  background:var(--navy);
   border-bottom:2px solid var(--line2);position:sticky;top:var(--navh,0px);
   z-index:2;white-space:nowrap}
 /* A header inside its OWN scroll box sticks to that box, not to the page, so
@@ -5624,9 +5616,9 @@ td.sp .spread{font-family:var(--mono);font-size:11.5px;color:var(--ink2);
   border:1px solid var(--line2);border-radius:4px;padding:2px 6px;background:var(--alt)}
 td.aq{color:var(--blue);font-weight:700;font-size:12.5px}
 td.al{color:var(--ink2);font-size:12.5px}
-tr.row:hover td{background:#12233C;cursor:pointer}
+tr.row:hover td{background:var(--alt);cursor:pointer}
 i.rnk{font:800 11px/1 var(--mono);color:var(--amber);font-style:normal;vertical-align:1px}
-b.pl6{font:800 10px/1 var(--mono);color:var(--live);vertical-align:2px;margin-left:5px}
+b.pl6{font:800 11px/1 var(--mono);color:var(--live);vertical-align:2px;margin-left:5px}
 .scroll{max-height:72vh;overflow:auto}
 
 /* ---- score cards ---- */
@@ -5689,9 +5681,9 @@ b.pl6{font:800 10px/1 var(--mono);color:var(--live);vertical-align:2px;margin-le
 /* A PILL MUST NOT BREAK ACROSS LINES. "neutral site" wrapped to "neutral" /
    "site" with its border split across both rows -- which reads as text being
    cut off. The LINE may wrap; the chip may not. Same for the kind badges. */
-.tag{white-space:nowrap;font:700 10px/1 var(--mono);color:#FFD97A;background:var(--amber-bg);
+.tag{white-space:nowrap;font:700 11px/1 var(--mono);color:#FFD97A;background:var(--amber-bg);
   border:1px solid #6B551C;border-radius:4px;padding:3px 5px;letter-spacing:.05em}
-.tag.neutral{color:var(--navy);background:#12233C;border-color:#2A4570;margin-left:6px}
+.tag.neutral{color:var(--ink2);background:var(--alt);border-color:var(--line2);margin-left:6px}
 td.pick{color:var(--navy)}
 td.pick.toss{color:var(--ink2)}
 td.pick b{color:var(--navy)}
@@ -5827,7 +5819,7 @@ td.pick b{color:var(--navy)}
   .t25 tbody td.pw::before,.t25 tbody td.poll::before{
     position:static;display:inline;width:auto;height:auto;
     top:auto;right:auto;bottom:auto;left:auto;background:none;border:0;
-    animation:none;font:700 9px/1 var(--sans);letter-spacing:.1em;
+    animation:none;font:700 11px/1 var(--sans);letter-spacing:.1em;
     margin-right:4px;vertical-align:baseline}
   .rk3 tbody td.pw::before{content:"POWER ";color:#31D07E;opacity:.9}
   .rk3 tbody td.rs::before{content:"R\00c9SUM\00c9 ";color:#F2B441;opacity:.9}
@@ -5870,7 +5862,7 @@ td.pick b{color:var(--navy)}
    distinction so it survives a glance: OURS is the green/amber pair, REFERENCE
    is deliberately recessed, and the group row above the header says which is
    which without a reader having to find the prose.  */
-.rk3 tr.grp th{font:700 9.5px/1 var(--sans);letter-spacing:.14em;
+.rk3 tr.grp th{font:700 11px/1 var(--sans);letter-spacing:.14em;
   text-transform:uppercase;color:var(--ink3,var(--ink2));padding:9px 10px 3px;
   border-bottom:0;background:transparent;text-align:center}
 .rk3 tr.grp th.g-ours{color:#31D07E;
@@ -5898,14 +5890,14 @@ td.pick b{color:var(--navy)}
 .chips.tier1{gap:8px}
 .chips.tier1 .chip{font-size:13.5px;padding:7px 12px;border-width:1px}
 .chips.tier1 .chip b{font:700 17px/1 var(--disp)}
-.chip.pow b{color:#31D07E}
-.chip.res b{color:#F2B441}
+.chip.pow b{color:#7FD0A4}
+.chip.res b{color:var(--gold-fill)}
 .chips.tier2 .chip{font-size:12px;padding:5px 9px}
 .chips.tier3{align-items:center;gap:5px;opacity:.72}
 .chips.tier3 .chip{font-size:11.5px;padding:3px 8px;border-color:var(--line2);
   background:transparent}
 .chips.tier3 .chip b{font-weight:600;color:var(--ink2)}
-.tierlab{font:700 9px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;
+.tierlab{font:700 11px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;
   color:var(--ink3,var(--ink2));opacity:.8;margin-right:2px}
 /* ── COLLAPSIBLE METHODOLOGY ─────────────────────────────────────────────
    The reasoning stays on the page in full; it stops being the first thing a
@@ -5937,12 +5929,12 @@ b.kres{color:#F2B441}
 /* The hierarchy built in the previous phase is untouched. This is the SHEET
    the list sits on: a ruled ground and a bounded column -- the look of a
    ballot that gets sent in, which is exactly what this list is. */
-.bwlist{border-top:2px solid var(--cs-edge2);
-  border-bottom:2px solid var(--cs-edge2)}
-.bwrow{border-bottom:1px solid var(--cs-edge)}
+.bwlist{border-top:2px solid var(--line2);
+  border-bottom:2px solid var(--line2)}
+.bwrow{border-bottom:1px solid var(--line)}
 .bwrow:last-child{border-bottom:0}
 .bwrow:nth-child(odd){background:rgba(245,241,232,.018)}
-.privtag{font:700 9px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;
+.privtag{font:700 11px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;
   color:#F2B441;background:color-mix(in oklab,#F2B441 14%,transparent);
   border:1px solid color-mix(in oklab,#F2B441 32%,transparent);
   border-radius:3px;padding:3px 6px;vertical-align:middle;margin-left:9px}
@@ -5982,7 +5974,7 @@ b.kres{color:#F2B441}
 /* ⚠ THE 1-25 LIST IS THE LOUDEST THING ON THIS PAGE. It was competing with
    its own evidence line and its own review panel; the slot numeral now reads
    as a scoreboard number and everything else steps back a size. */
-.bwslot{font:700 30px/1 var(--disp);color:var(--chalk);min-width:40px;
+.bwslot{font:700 30px/1 var(--disp);color:var(--ink);min-width:40px;
   text-align:right;font-variant-numeric:tabular-nums}
 .bwteam{letter-spacing:-.005em}
 /* evidence recedes by SCALE and COLOUR, never by being faded to unreadable */
@@ -6001,7 +5993,7 @@ b.kres{color:#F2B441}
    is allowed to appear */
 .bwrow:focus-within{background:var(--sheet)}
 .bwrow:focus-within .bwslot{color:var(--gold)}
-.bwmv{font:700 10px/1 var(--mono);padding:2px 4px;border-radius:3px}
+.bwmv{font:700 11px/1 var(--mono);padding:2px 4px;border-radius:3px}
 .bwmv.up{color:#31D07E;background:color-mix(in oklab,#31D07E 14%,transparent)}
 .bwmv.dn{color:#FF6B6B;background:color-mix(in oklab,#FF6B6B 14%,transparent)}
 .bwmv.flat{color:var(--ink2)}
@@ -6027,14 +6019,14 @@ b.kres{color:#F2B441}
 /* the evidence: one quiet line, never competing with the slot */
 .bwev{display:flex;flex-wrap:wrap;gap:5px 12px;margin:7px 0 0 40px;
   font:12px/1.4 var(--mono);color:var(--ink2)}
-.bwe i{font-style:normal;font:700 9px/1 var(--sans);letter-spacing:.11em;
+.bwe i{font-style:normal;font:700 11px/1 var(--sans);letter-spacing:.11em;
   margin-right:4px;opacity:.85}
 .bwe.pw i{color:#31D07E}
 .bwe.rs i{color:#F2B441}
 .bwe.rs.off{opacity:.62}
 .bwe.ref i{color:var(--ink3,var(--ink2))}
 .bwe.form i{display:inline-block;width:14px;height:14px;line-height:14px;
-  text-align:center;border-radius:3px;font:700 9px/14px var(--sans);margin-right:2px}
+  text-align:center;border-radius:3px;font:700 11px/14px var(--sans);margin-right:2px}
 .bwe.form i.fw{color:#31D07E;background:color-mix(in oklab,#31D07E 16%,transparent)}
 .bwe.form i.fl{color:#FF6B6B;background:color-mix(in oklab,#FF6B6B 16%,transparent)}
 /* ── THE WEEKLY BRIEFING ──────────────────────────────────────────────────
@@ -6047,20 +6039,20 @@ b.kres{color:#F2B441}
 .bwbrief .bwbsub{margin:0 0 11px;font:12px/1.55 var(--sans);color:var(--slate)}
 .bwbfacts{display:flex;flex-wrap:wrap;gap:10px 30px}
 .bwbf{min-width:0}
-.bwbf em{display:block;font:600 9px/1 var(--disp);letter-spacing:.15em;
+.bwbf em{display:block;font:600 11px/1 var(--disp);letter-spacing:.15em;
   text-transform:uppercase;color:var(--slate);font-style:normal;margin-bottom:5px}
-.bwbf b{font:700 21px/1 var(--disp);color:var(--chalk)}
+.bwbf b{font:700 21px/1 var(--disp);color:var(--ink)}
 .bwbf span{font:12.5px/1.5 var(--sans);color:var(--ink2);display:block;
   margin-top:3px;max-width:42ch}
 .bwbf .none{color:var(--slate);font-style:italic}
 .bwbf .bwrulerline{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 2px}
 .bwbf .bwrulerline i{color:var(--line2);font-style:normal;margin:0 4px}
 /* ── THE REVIEW QUEUE: one trigger per item, named ───────────────────────── */
-.bwtrig{font:600 9.5px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase;
+.bwtrig{font:600 11px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase;
   border:1px solid var(--line2);border-radius:2px;padding:3px 6px;color:var(--slate)}
 .bwtrig.pw{color:var(--good);border-color:color-mix(in oklab,var(--good) 40%,transparent)}
 .bwtrig.av{color:#7aa7ff;border-color:color-mix(in oklab,#7aa7ff 40%,transparent)}
-.bwtrig.res{color:var(--chalk);border-color:var(--line2)}
+.bwtrig.res{color:var(--ink);border-color:var(--line2)}
 .bwtrig.mine{color:#e8b13a;border-color:color-mix(in oklab,#e8b13a 45%,transparent)}
 /* ⚠ ONE COLOUR PER RULER, EVERYWHERE. My ballot is amber, POWER is green, AVCA
    is blue. Movement uses ARROWS and never borrows a ruler's colour, so a green
@@ -6075,28 +6067,28 @@ b.kres{color:#F2B441}
 .bwcompare>summary{cursor:pointer;padding:9px 12px;font-size:13px}
 .bwcompare .bwsub{padding:0 12px}
 .bwcmppick{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:0 12px 10px}
-.bwcmppick label{font:600 9.5px/1 var(--disp);letter-spacing:.13em;
+.bwcmppick label{font:600 11px/1 var(--disp);letter-spacing:.13em;
   text-transform:uppercase;color:var(--slate)}
 .bwcmppick input{flex:1 1 190px;min-width:0;background:transparent;
   border:1px solid var(--line2);border-radius:3px;color:var(--ink);
   padding:7px 9px;font:13px var(--sans)}
 #bwteamcmp{padding:0 12px 12px}
 .bwcmptbl{width:100%;border-collapse:collapse}
-.bwcmptbl th{text-align:left;font:600 9.5px/1 var(--disp);letter-spacing:.13em;
+.bwcmptbl th{text-align:left;font:600 11px/1 var(--disp);letter-spacing:.13em;
   text-transform:uppercase;color:var(--slate);padding:8px 10px 8px 0;
   border-bottom:1px solid var(--line2);vertical-align:bottom}
 .bwcmptbl th.tm{font:700 17px/1.1 var(--disp);letter-spacing:-.005em;
-  color:var(--chalk);text-transform:none}
+  color:var(--ink);text-transform:none}
 .bwcmptbl td{padding:8px 10px 8px 0;border-bottom:1px solid var(--line);
   font-size:13px;color:var(--ink2);vertical-align:top}
-.bwcmptbl td.lab{font:600 9.5px/1.4 var(--disp);letter-spacing:.12em;
+.bwcmptbl td.lab{font:600 11px/1.4 var(--disp);letter-spacing:.12em;
   text-transform:uppercase;color:var(--slate);width:118px}
 .bwcmptbl .un{color:var(--slate);font-style:italic}
 /* ── HISTORY AS AN EDITORIAL RECORD ──────────────────────────────────────── */
 .bwweek{border-top:1px solid var(--line);padding:9px 0}
 .bwweek:first-child{border-top:0}
 .bwweek .wkhd{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
-.bwweek .wkhd b{font:700 12px/1 var(--disp);color:var(--chalk)}
+.bwweek .wkhd b{font:700 12px/1 var(--disp);color:var(--ink)}
 .bwweek .wkhd span{font:11px/1 var(--mono);color:var(--slate)}
 .bwweek .wkline{margin-top:5px;font-size:12px;color:var(--ink2);line-height:1.6}
 .bwweek button{margin-top:6px}
@@ -6118,7 +6110,7 @@ b.kres{color:#F2B441}
 /* ---- Ballot review: evidence is SECONDARY, the slots stay dominant ------ */
 .bwrulers{display:flex;flex-wrap:wrap;gap:6px 14px;margin:10px 0 4px;
   font-size:11.5px;color:var(--ink2)}
-.bwr i{font:600 10px/1 var(--disp);letter-spacing:.07em;text-transform:uppercase;
+.bwr i{font:600 11px/1 var(--disp);letter-spacing:.07em;text-transform:uppercase;
   margin-right:5px;font-style:normal}
 .bwr.mine i{color:#e8b13a}.bwr.pow i{color:#31D07E}.bwr.av i{color:#7aa7ff}
 .bwr.off i{color:var(--ink3)}.bwr.off{color:var(--ink3)}
@@ -6128,7 +6120,7 @@ b.kres{color:#F2B441}
 .bwreview .bwsub{padding:0 12px}
 .bwrn{color:var(--ink3);font-size:11.5px;margin-left:6px}
 .bwgrp{border-top:1px solid var(--line);padding:8px 12px 10px}
-.bwgrp>h4{margin:0 0 2px;font:600 10px/1.3 var(--disp);letter-spacing:.08em;
+.bwgrp>h4{margin:0 0 2px;font:600 11px/1.3 var(--disp);letter-spacing:.08em;
   text-transform:uppercase;color:var(--ink2)}
 .bwgrp>p{margin:0 0 7px;font-size:11.5px;color:var(--ink3)}
 .bwcase{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;padding:5px 0;
@@ -6139,7 +6131,7 @@ b.kres{color:#F2B441}
 .bwcase em{font-style:normal;color:var(--ink3)}
 .bwcase .bwwhy,.bwprecols .bwwhy{color:#e0553f;font-size:11.5px}
 .bwpin{background:none;border:1px solid var(--line);color:var(--ink2);
-  border-radius:3px;font-size:10.5px;padding:2px 6px;cursor:pointer}
+  border-radius:3px;font-size:11px;padding:2px 6px;cursor:pointer}
 .bwpin.on{color:#e8b13a;border-color:#e8b13a}
 .bwpre{margin:10px 0 14px;border:1px solid #e8b13a;border-radius:4px;
   background:rgba(232,177,58,.05)}
@@ -6149,12 +6141,12 @@ b.kres{color:#F2B441}
 .bwprecols{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
 .bwprecols>div{padding:10px 12px;border-right:1px solid var(--line)}
 .bwprecols>div:last-child{border-right:0}
-.bwprecols h4{margin:0 0 6px;font:600 10px/1.3 var(--disp);letter-spacing:.08em;
+.bwprecols h4{margin:0 0 6px;font:600 11px/1.3 var(--disp);letter-spacing:.08em;
   text-transform:uppercase;color:var(--ink2)}
 .bwprecols ul{margin:0;padding-left:15px;font-size:12.5px;line-height:1.7}
 .bwprecols .none{color:var(--ink3);font-size:12.5px}
 .bwcmp{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
-.bwh4{margin:0 0 6px;font:600 10px/1.3 var(--disp);letter-spacing:.08em;
+.bwh4{margin:0 0 6px;font:600 11px/1.3 var(--disp);letter-spacing:.08em;
   text-transform:uppercase;color:var(--ink2)}
 .bwcmprow{display:flex;align-items:center;gap:6px;font-size:11.5px}
 .bwcmprow select{flex:1;min-width:0}
@@ -6185,7 +6177,7 @@ b.kres{color:#F2B441}
   border:1px solid var(--line2);border-radius:4px;font:12.5px var(--sans);
   color:var(--ink)}
 .bwchip button{appearance:none;border:0;background:transparent;cursor:pointer;
-  color:var(--ink2);font:700 10px var(--sans)}
+  color:var(--ink2);font:700 11px var(--sans)}
 .bwchip button:hover{color:#31D07E}
 .bwnone,.bwempty{color:var(--ink2);font:13px var(--sans)}
 .bwlink{appearance:none;border:0;background:none;color:var(--navy);cursor:pointer;
@@ -6202,13 +6194,13 @@ b.kres{color:#F2B441}
   font:12.5px/1.5 var(--sans);resize:vertical}
 .bwdl{display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
 .bwdrow{font:12.5px var(--sans);color:var(--ink)}
-.bwdrow i{font-style:normal;font:700 10px var(--mono)}
+.bwdrow i{font-style:normal;font:700 11px var(--mono)}
 .bwdrow i.up{color:#31D07E}
 .bwdrow i.dn{color:#FF6B6B}
 .bwhrow{display:flex;align-items:baseline;gap:8px;padding:5px 0;
   border-bottom:1px solid var(--line2);font:12px var(--mono);color:var(--ink)}
 .bwhrow:last-child{border-bottom:0}
-.bwlatest{font:700 9px/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;
+.bwlatest{font:700 11px/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;
   color:#31D07E;margin-left:auto}
 /* ⚠ A GRID ITEM'S DEFAULT min-width IS auto, NOT 0, so collapsing to one
    column is not enough: the column still cannot shrink below its content's
@@ -6250,9 +6242,9 @@ b.kres{color:#F2B441}
   border-radius:4px;overflow:hidden;margin:0 0 18px}
 .bwstatus>div{background:var(--sheet);padding:10px 13px;display:flex;
   flex-direction:column;gap:3px;min-width:0}
-.bwstatus i{font-style:normal;font:700 9px/1.4 var(--disp);letter-spacing:.12em;
+.bwstatus i{font-style:normal;font:700 11px/1.4 var(--disp);letter-spacing:.12em;
   text-transform:uppercase;color:var(--slate)}
-.bwstatus b{font:700 14px/1.2 var(--disp);color:var(--chalk);
+.bwstatus b{font:700 14px/1.2 var(--disp);color:var(--ink);
   overflow-wrap:anywhere}
 .bwstatus b.dim{color:var(--ink3);font-weight:600}
 .bwstatus b.warn{color:#F2B441}
@@ -6262,7 +6254,7 @@ b.kres{color:#F2B441}
 .bwrulers{display:flex;flex-wrap:wrap;gap:6px 18px;margin:0 0 16px;
   padding:0 0 14px;border-bottom:1px solid var(--vx-rule)}
 .bwrulers .bwr{display:inline-flex;align-items:center;gap:7px;
-  font:700 10px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase;
+  font:700 11px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase;
   color:var(--ink2);background:none;border:0;padding:0}
 .bwrulers .bwsw{width:8px;height:8px;border-radius:1px;flex:0 0 8px}
 .bwrulers .mine .bwsw{background:var(--vx-ballot)}
@@ -6273,7 +6265,7 @@ b.kres{color:#F2B441}
 
 /* finishing block */
 .bwfinish{margin:22px 0 0;padding:14px 0 0;border-top:1px solid var(--vx-rule)}
-.bwfinlab{font:700 10px/1 var(--disp);letter-spacing:.16em;text-transform:uppercase;
+.bwfinlab{font:700 11px/1 var(--disp);letter-spacing:.16em;text-transform:uppercase;
   color:var(--slate);margin:0 0 9px}
 .bwfinish .bwbar{margin:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 /* ⚠ THE DESTRUCTIVE ONE IS QUIET AND LAST. Reset replaces all 25 slots; it
@@ -6302,7 +6294,7 @@ b.kres{color:#F2B441}
 #v-rankings .panel{background:var(--sheet);border:0;border-top:2px solid var(--line2);
   border-radius:0}
 #v-rankings .rk3{border-collapse:collapse}
-.rk3 thead tr.grp th{font:600 9.5px/1 var(--disp);letter-spacing:.16em;
+.rk3 thead tr.grp th{font:600 11px/1 var(--disp);letter-spacing:.16em;
   text-transform:uppercase;padding:11px 10px 7px;color:var(--slate);
   border-bottom:1px solid var(--line)}
 .rk3 thead tr.grp th.g-ours{color:var(--good);
@@ -6312,7 +6304,7 @@ b.kres{color:#F2B441}
 .rk3 thead tr.grp th.g-proj{color:var(--navy);
   box-shadow:inset 2px 0 0 color-mix(in oklab,var(--navy) 55%,transparent)}
 /* the rank numeral is the anchor of the row */
-.rk3 tbody td.rk{font:700 19px/1 var(--disp);color:var(--chalk)}
+.rk3 tbody td.rk{font:700 19px/1 var(--disp);color:var(--ink)}
 /* zebra by READING GROUP, five rows at a time, so the eye can track across
    thirteen columns without a border round every cell */
 .rk3 tbody tr:nth-child(10n+1) td,.rk3 tbody tr:nth-child(10n+2) td,
@@ -6332,13 +6324,13 @@ b.kres{color:#F2B441}
 #teamcard>div{border-radius:0}
 #teamcard .tcols{border-top:1px solid var(--line);padding-top:4px}
 #teamcard .thead h2{font:700 42px/.94 var(--disp);letter-spacing:-.012em;
-  color:var(--chalk);text-transform:uppercase;display:flex;align-items:center;
+  color:var(--ink);text-transform:uppercase;display:flex;align-items:center;
   gap:12px;margin:0}
 #teamcard .thead h2 .lg{width:44px;height:44px;flex:none}
 #teamcard .thead .sub{font:12.5px/1.6 var(--sans);color:var(--slate)}
 /* the three rulers sit on one quiet line; the tier labels name them */
 #teamcard .chiptiers{margin-top:12px}
-#teamcard .tierlab{font:600 9px/1 var(--disp);letter-spacing:.16em;
+#teamcard .tierlab{font:600 11px/1 var(--disp);letter-spacing:.16em;
   text-transform:uppercase;color:var(--slate)}
 #teamcard .chip{border-radius:3px}
 #teamcard .chip.ours{border-color:color-mix(in oklab,var(--good) 45%,transparent)}
@@ -6353,14 +6345,14 @@ b.kres{color:#F2B441}
   border-radius:0;padding:2px 18px;border-left:1px solid var(--line)!important}
 #teamcard .gl:first-child{padding-left:0;border-left:0!important}
 #teamcard .glance .gl:nth-child(2){flex:1.3}
-#teamcard .glbig{font:700 26px/1 var(--disp);color:var(--chalk)}
-#teamcard .gll{font:600 9px/1 var(--disp);letter-spacing:.14em;
+#teamcard .glbig{font:700 26px/1 var(--disp);color:var(--ink)}
+#teamcard .gll{font:600 11px/1 var(--disp);letter-spacing:.14em;
   text-transform:uppercase;color:var(--slate)}
 /* every later section is a SECTION on one working surface -- a rule and a
    label, not a box inside a box */
 #teamcard .tsec{background:transparent;border:0;border-top:1px solid var(--line);
   border-radius:0;padding:15px 0 6px}
-#teamcard .tsec h4,#teamcard .tsec .wh2{font:600 10px/1 var(--disp);
+#teamcard .tsec h4,#teamcard .tsec .wh2{font:600 11px/1 var(--disp);
   letter-spacing:.15em;text-transform:uppercase;color:var(--slate)}
 
 /* ── FOCUS AND MOTION ─────────────────────────────────────────────────────
@@ -6384,8 +6376,8 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
 .digbox{display:flex;align-items:flex-start;gap:16px;padding:18px 0 6px}
 .digbox .digby-art{flex:none;width:76px;height:76px;opacity:.88}
 .digbox .dsay{font:15px/1.6 var(--sans);color:var(--ink2);max-width:52ch}
-.digbox .dsay b{color:var(--chalk);font-weight:600}
-.digbox .dwho{font:600 9.5px/1 var(--disp);letter-spacing:.16em;
+.digbox .dsay b{color:var(--ink);font-weight:600}
+.digbox .dwho{font:600 11px/1 var(--disp);letter-spacing:.16em;
   text-transform:uppercase;color:var(--gold);margin-bottom:7px}
 @media (max-width:560px){
   .digbox{gap:12px}
@@ -6398,9 +6390,9 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
 .mstory{border-top:1px solid var(--line);border-bottom:1px solid var(--line);
   margin:12px 0 4px;padding:11px 0;display:flex;flex-wrap:wrap;
   align-items:center;gap:10px 22px}
-.mstory .msl{font:600 9px/1 var(--disp);letter-spacing:.15em;
+.mstory .msl{font:600 11px/1 var(--disp);letter-spacing:.15em;
   text-transform:uppercase;color:var(--slate);display:block;margin-bottom:5px}
-.mstory .msv{font:600 15px/1 var(--mono);color:var(--chalk)}
+.mstory .msv{font:600 15px/1 var(--mono);color:var(--ink)}
 .mstory .msv small{font-size:11.5px;color:var(--ink3);font-weight:400}
 .mstory .msets{display:flex;gap:5px}
 .mstory .msets span{font:600 12px/1 var(--mono);color:var(--ink2);
@@ -6417,8 +6409,8 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
   cursor:pointer;font:inherit;padding:0;text-decoration:underline}
 .statline{display:flex;flex-wrap:wrap;align-items:baseline;gap:7px;
   font:var(--mono);margin:2px 0 6px}
-.statline .sv{font:600 15px/1 var(--mono);color:var(--chalk)}
-.statline .sl{font:600 9.5px/1 var(--disp);letter-spacing:.12em;color:var(--slate)}
+.statline .sv{font:600 15px/1 var(--mono);color:var(--ink)}
+.statline .sl{font:600 11px/1 var(--disp);letter-spacing:.12em;color:var(--slate)}
 .statline .sd{color:var(--line2);font-style:normal;margin:0 3px}
 @media (max-width:560px){.statline .sv{font-size:14px}}
 
@@ -6454,15 +6446,15 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
 .gd-panel{border:1px solid var(--vx-rule);border-left:3px solid var(--gold);
   border-radius:4px;padding:13px 15px;margin:0 0 20px;background:var(--alt)}
 .gd-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:0 0 10px}
-.gd-head b{font:700 16px/1.2 var(--disp);color:var(--chalk)}
+.gd-head b{font:700 16px/1.2 var(--disp);color:var(--ink)}
 .gd-head span{font:12px/1 var(--mono);color:var(--ink2)}
-.gd-head a{font:700 9px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase;
+.gd-head a{font:700 11px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase;
   color:var(--vx-avca);text-decoration:none}
 .gd-steps{list-style:none;margin:0 0 10px;padding:0;display:grid;
   grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
 .gd-step{display:flex;flex-direction:column;gap:2px;padding:7px 9px;
   border:1px solid var(--vx-rule);border-radius:3px}
-.gd-step i{font-style:normal;font:700 9px/1.4 var(--disp);letter-spacing:.11em;
+.gd-step i{font-style:normal;font:700 11px/1.4 var(--disp);letter-spacing:.11em;
   text-transform:uppercase;color:var(--slate)}
 .gd-step b{font:600 11.5px/1.3 var(--mono);color:var(--ink3)}
 .gd-step.done{border-color:var(--vx-power)}
@@ -6483,20 +6475,20 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
    from the public build -- markup, styles and the host list alike. */
 .in-lead{display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);
   gap:18px;align-items:start;padding:0 0 18px;
-  border-bottom:2px solid var(--cs-edge2);margin-bottom:16px}
+  border-bottom:2px solid var(--line2);margin-bottom:16px}
 .in-lead.read{opacity:.72}
 .in-leadtext{min-width:0;display:flex;flex-direction:column;gap:9px}
 .in-leadtitle{font:700 27px/1.14 var(--disp);letter-spacing:-.004em;
-  color:var(--cs-white);text-decoration:none;text-transform:uppercase;
+  color:var(--ink);text-decoration:none;text-transform:uppercase;
   overflow-wrap:anywhere}
 .in-leadtitle:hover{color:var(--cs-gold)}
 .in-leadtitle:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:3px}
 .in-out{font:600 12px/1 var(--sans);color:var(--navy);text-decoration:none;
-  border:1px solid var(--cs-edge2);border-radius:2px;padding:8px 11px}
-.in-out:hover{color:var(--cs-white);border-color:var(--navy)}
+  border:1px solid var(--line2);border-radius:2px;padding:8px 11px}
+.in-out:hover{color:var(--ink);border-color:var(--navy)}
 .in-out:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
-.in-fmt{font:600 9.5px/1 var(--disp);letter-spacing:.14em;text-transform:uppercase;
-  color:var(--ink3);border:1px solid var(--cs-edge);padding:3px 5px;
+.in-fmt{font:600 11px/1 var(--disp);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink3);border:1px solid var(--line);padding:3px 5px;
   border-radius:2px}
 
 /* ── the three media states ────────────────────────────────────────────── */
@@ -6531,7 +6523,7 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
    no-layout-shift guarantee, no dependence on the property that suppresses
    the paint. */
 .in-media{position:relative;height:0;padding-top:56.25%;overflow:hidden;
-  border:1px solid var(--cs-edge2);background:#0B1D33}
+  border:1px solid var(--line2);background:#0B1D33}
 .in-media img{position:absolute;inset:0;width:100%;height:100%;
   object-fit:cover;display:block}
 /* ⚠ NO opacity:0 START. An earlier attempt began the image transparent and
@@ -6546,33 +6538,33 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
    able to read as ours, and a credit that lives only in a caption gets lost
    the moment anything is rearranged. */
 .in-credit{position:absolute;right:0;bottom:0;z-index:3;
-  font:600 9px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;
+  font:600 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;
   color:var(--chalk);background:rgba(7,23,43,.82);padding:4px 6px}
 .in-nomedia{display:flex;align-items:center;
   justify-content:center;text-align:center;
-  border:1px dashed var(--cs-edge2);background:rgba(245,241,232,.02)}
+  border:1px dashed var(--line2);background:rgba(245,241,232,.02)}
 .in-nomedia span{font:500 11.5px/1.5 var(--mono);color:var(--ink3);
   letter-spacing:.05em;max-width:70%}
 
 /* ── the rail ──────────────────────────────────────────────────────────── */
-.in-railhd{font:700 10px/1 var(--disp);letter-spacing:.2em;text-transform:uppercase;
-  color:var(--slate);padding-bottom:8px;border-bottom:1px solid var(--cs-edge);
+.in-railhd{font:700 11px/1 var(--disp);letter-spacing:.2em;text-transform:uppercase;
+  color:var(--slate);padding-bottom:8px;border-bottom:1px solid var(--line);
   margin-bottom:2px}
-.in-rail .in-row{border-bottom:1px solid var(--cs-edge);padding:11px 0}
+.in-rail .in-row{border-bottom:1px solid var(--line);padding:11px 0}
 .in-rail .in-row:last-child{border-bottom:0}
 .in-also{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;
   font:11.5px/1.4 var(--sans)}
 .in-also i{font-style:normal;color:var(--ink3);
-  font:600 9.5px/1 var(--disp);letter-spacing:.13em;text-transform:uppercase}
+  font:600 11px/1 var(--disp);letter-spacing:.13em;text-transform:uppercase}
 .in-also a{color:var(--navy);text-decoration:none;
-  border:1px solid var(--cs-edge);border-radius:2px;padding:3px 6px;
-  font:600 10px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase}
-.in-also a:hover{color:var(--cs-white);border-color:var(--navy)}
+  border:1px solid var(--line);border-radius:2px;padding:3px 6px;
+  font:600 11px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase}
+.in-also a:hover{color:var(--ink);border-color:var(--navy)}
 .in-also a:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .in-more{appearance:none;background:transparent;border:0;
-  border-top:1px solid var(--cs-edge);width:100%;text-align:left;
+  border-top:1px solid var(--line);width:100%;text-align:left;
   padding:11px 2px;color:var(--navy);font:600 12px/1 var(--sans);cursor:pointer}
-.in-more:hover{color:var(--cs-white)}
+.in-more:hover{color:var(--ink)}
 .in-more:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:-2px}
 
 @media (max-width:700px){
@@ -6592,8 +6584,8 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
 }
 /* ── INTEL: the same treatment one distance out -- a wire ──────────────── */
 #v-intel{position:relative}
-#v-intel .in-bar{border-top:1px solid var(--cs-edge);
-  border-bottom:1px solid var(--cs-edge);padding:9px 0}
+#v-intel .in-bar{border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);padding:9px 0}
 #v-intel .in-state{font:11px/1.5 var(--mono);letter-spacing:.05em;
   color:var(--slate);text-transform:uppercase}
 #v-intel .privtag{vertical-align:.22em}
@@ -6602,24 +6594,24 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
 .in-row{border-bottom:1px solid var(--vx-rule);padding:11px 0 12px}
 .in-row.read{opacity:.55}
 .in-meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:0 0 4px}
-.in-src{font:700 9px/1.5 var(--disp);letter-spacing:.11em;text-transform:uppercase;
+.in-src{font:700 11px/1.5 var(--disp);letter-spacing:.11em;text-transform:uppercase;
   color:var(--vx-avca);background:var(--vx-avca-dim);padding:2px 7px;border-radius:3px}
 .in-meta time{font:11.5px/1 var(--mono);color:var(--ink3)}
 .in-teams{display:inline-flex;align-items:center;gap:5px}
 .in-teams img{width:16px;height:16px}
 .in-teams b{font:600 11px/1 var(--sans);color:var(--gold)}
-.in-title{display:block;font:700 16px/1.3 var(--disp);color:var(--chalk);
+.in-title{display:block;font:700 16px/1.3 var(--disp);color:var(--ink);
   text-decoration:none;overflow-wrap:anywhere}
 .in-title:hover{color:var(--gold)}
 .in-acts{display:flex;gap:8px;margin:7px 0 0}
-.in-acts button{font:700 9px/1 var(--disp);letter-spacing:.09em;
+.in-acts button{font:700 11px/1 var(--disp);letter-spacing:.09em;
   text-transform:uppercase;color:var(--ink3);background:none;border:0;
   padding:3px 0;cursor:pointer}
 .in-acts button:hover{color:var(--gold)}
 .in-note{border-left:2px solid var(--line2);padding:8px 0 8px 12px;margin:0 0 14px;
   font-size:12.5px;color:var(--ink2)}
 .in-note.warn{border-left-color:#F2B441}
-.in-note b{color:var(--chalk)}
+.in-note b{color:var(--ink)}
 .in-foot{margin:18px 0 0;font-size:11.5px;color:var(--ink3);max-width:70ch}
 @media (max-width:560px){
   .in-bar{gap:8px}
@@ -6632,8 +6624,8 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
 /* FILMROOM-CSS-BEGIN */
 /* ── FILM ROOM: a scouting notebook, not a generic private tool ────────── */
 #v-film{position:relative}
-#v-film .fr-bar{border-top:1px solid var(--cs-edge);
-  border-bottom:1px solid var(--cs-edge);padding:9px 0}
+#v-film .fr-bar{border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);padding:9px 0}
 #v-film .fr-new{border-left:3px solid var(--cs-gold);padding-left:14px}
 #v-film .privtag{vertical-align:.22em}
 /* ── FILM ROOM: a notebook, ruled and dated ────────────────────────────────
@@ -6642,21 +6634,21 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
 .fr-new{margin:0 0 20px;padding:0 0 18px;border-bottom:1px solid var(--vx-rule)}
 .fr-form{display:flex;flex-direction:column;gap:11px}
 .fr-form label{display:flex;flex-direction:column;gap:4px;
-  font:700 9px/1.4 var(--disp);letter-spacing:.12em;text-transform:uppercase;
+  font:700 11px/1.4 var(--disp);letter-spacing:.12em;text-transform:uppercase;
   color:var(--slate);min-width:0}
 .fr-form input,.fr-form select,.fr-form textarea{font:13px/1.5 var(--sans);
-  color:var(--chalk);background:var(--alt);border:1px solid var(--line2);
+  color:var(--ink);background:var(--alt);border:1px solid var(--line2);
   border-radius:3px;padding:8px 10px;letter-spacing:0;text-transform:none;
   min-width:0;width:100%}
 .fr-form textarea{resize:vertical}
 .fr-row{display:grid;grid-template-columns:1fr 1fr;gap:11px}
 .fr-full{width:100%}
 .fr-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.fr-btn{font:700 10px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
+.fr-btn{font:700 11px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
   padding:10px 15px;border-radius:3px;border:1px solid var(--line2);
   background:none;color:var(--ink2);cursor:pointer}
 .fr-btn.primary{border-color:var(--gold);color:var(--gold)}
-.fr-btn:hover{color:var(--chalk);border-color:var(--chalk)}
+.fr-btn:hover{color:var(--ink);border-color:var(--ink)}
 .fr-freeze{flex-direction:row!important;align-items:center;gap:6px!important;
   text-transform:none!important;letter-spacing:0!important;font:12px/1.4 var(--sans)!important;
   color:var(--ink2)!important}
@@ -6665,7 +6657,7 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
 
 .fr-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 16px}
 .fr-bar input[type=search]{flex:1 1 200px;min-width:0}
-.fr-bar input,.fr-bar select{font:13px/1.4 var(--sans);color:var(--chalk);
+.fr-bar input,.fr-bar select{font:13px/1.4 var(--sans);color:var(--ink);
   background:var(--alt);border:1px solid var(--line2);border-radius:3px;
   padding:8px 10px}
 
@@ -6675,7 +6667,7 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
 .fr-entry:hover{border-left-color:var(--gold)}
 .fr-meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:0 0 5px}
 .fr-meta time{font:12px/1 var(--mono);color:var(--ink3)}
-.fr-ctx{font:700 9px/1.5 var(--disp);letter-spacing:.1em;text-transform:uppercase;
+.fr-ctx{font:700 11px/1.5 var(--disp);letter-spacing:.1em;text-transform:uppercase;
   padding:2px 7px;border-radius:3px;background:var(--line);color:var(--ink2)}
 .fr-ctx.pre{color:var(--vx-avca);background:var(--vx-avca-dim)}
 .fr-ctx.during{color:#FF9E5A;background:rgba(255,158,90,.14)}
@@ -6684,7 +6676,7 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
 .fr-del{margin-left:auto;background:none;border:0;color:var(--ink3);
   cursor:pointer;font-size:13px;padding:2px 5px}
 .fr-del:hover{color:#FF7A7A}
-.fr-entry h4{margin:0 0 4px;font:700 15px/1.25 var(--disp);color:var(--chalk)}
+.fr-entry h4{margin:0 0 4px;font:700 15px/1.25 var(--disp);color:var(--ink)}
 .fr-body{margin:0 0 7px;font-size:13.5px;line-height:1.6;color:var(--ink2);
   white-space:pre-wrap;overflow-wrap:anywhere}
 .fr-tags{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 6px}
@@ -6695,23 +6687,23 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
 /* ⚠ A FROZEN CHIP CARRIES ITS DATE. Without the stamp it reads as a live
    value, and a note kept for a month would quietly become wrong. */
 .fr-facts{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:0 0 6px}
-.fr-facts>i{font-style:normal;font:700 9px/1.4 var(--disp);letter-spacing:.11em;
+.fr-facts>i{font-style:normal;font:700 11px/1.4 var(--disp);letter-spacing:.11em;
   text-transform:uppercase;color:var(--slate)}
 .fr-chip{font:11px/1 var(--mono);color:var(--ink2);background:var(--alt);
   border:1px solid var(--line2);border-radius:3px;padding:3px 7px;
   display:inline-flex;align-items:center;gap:5px}
-.fr-chip b{color:var(--slate);font-weight:700;font-size:9px;
+.fr-chip b{color:var(--slate);font-weight:700;font-size:11px;
   letter-spacing:.06em;text-transform:uppercase}
-.fr-chip em{font-style:normal;color:var(--ink3);font-size:10px}
+.fr-chip em{font-style:normal;color:var(--ink3);font-size:11px}
 .fr-link{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;
   font-size:11.5px;margin:0 0 4px}
 .fr-link a{color:var(--vx-avca)}
 .fr-link span{color:var(--ink3)}
-.fr-open{font:700 9px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase;
+.fr-open{font:700 11px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase;
   color:var(--gold);text-decoration:none}
 
 /* the restrained count on a team or match page */
-.fr-count{font:700 9px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase;
+.fr-count{font:700 11px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase;
   color:var(--ink3);text-decoration:none;border:1px solid var(--line2);
   border-radius:3px;padding:5px 9px;display:inline-block}
 .fr-count.has{color:var(--gold);border-color:var(--gold)}
@@ -6751,23 +6743,23 @@ label.fr-btn{cursor:pointer;display:inline-block}
 .fr-prevhd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
   margin:0 0 11px}
 .fr-prevhd b{font:700 13px/1 var(--disp);letter-spacing:.06em;
-  text-transform:uppercase;color:var(--chalk)}
+  text-transform:uppercase;color:var(--ink)}
 .fr-prevhd span{font:12px/1 var(--mono);color:var(--ink3)}
 .fr-prevnums{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
   gap:10px;margin:0 0 12px}
 .fr-prevnums>div{display:flex;flex-direction:column;gap:2px}
-.fr-prevnums i{font-style:normal;font:700 9px/1.4 var(--disp);letter-spacing:.11em;
+.fr-prevnums i{font-style:normal;font:700 11px/1.4 var(--disp);letter-spacing:.11em;
   text-transform:uppercase;color:var(--slate)}
 .fr-prevnums b{font:700 20px/1 var(--disp);color:var(--ink2)}
 .fr-prevnums b.fr-ok{color:var(--vx-power)}
 .fr-prevnums b.fr-warn{color:#F2B441}
 .fr-prevlist{margin:0 0 11px}
-.fr-prevlist>i{font-style:normal;font:700 9px/1.4 var(--disp);letter-spacing:.11em;
+.fr-prevlist>i{font-style:normal;font:700 11px/1.4 var(--disp);letter-spacing:.11em;
   text-transform:uppercase;color:var(--slate)}
 .fr-prevlist ul{list-style:none;margin:5px 0 0;padding:0;display:flex;
   flex-direction:column;gap:3px}
 .fr-prevlist li{font-size:12.5px;color:var(--ink2);overflow-wrap:anywhere}
-.fr-prevlist li i{font-style:normal;font:700 9px/1 var(--disp);letter-spacing:.09em;
+.fr-prevlist li i{font-style:normal;font:700 11px/1 var(--disp);letter-spacing:.09em;
   text-transform:uppercase;color:var(--slate);margin-right:7px}
 .fr-prevlist li.more{color:var(--ink3)}
 .fr-prevacts{display:flex;gap:9px;flex-wrap:wrap;align-items:center;
@@ -6793,13 +6785,13 @@ label.fr-btn{cursor:pointer;display:inline-block}
 .mbhd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px}
 .mbhd b{font:700 11px/1 var(--disp);letter-spacing:.18em;text-transform:uppercase;
   color:var(--gold)}
-.mbhd .mbpriv{font:600 9px/1 var(--disp);letter-spacing:.14em;
+.mbhd .mbpriv{font:600 11px/1 var(--disp);letter-spacing:.14em;
   text-transform:uppercase;color:var(--slate);border:1px solid var(--line2);
   border-radius:2px;padding:3px 5px}
 .mbhd .mbn{font:11.5px/1 var(--mono);color:var(--slate)}
 .mbhd .mbclear{margin-left:auto}
 .mblane{margin-top:9px}
-.mblane>i{display:block;font:600 9px/1 var(--disp);letter-spacing:.15em;
+.mblane>i{display:block;font:600 11px/1 var(--disp);letter-spacing:.15em;
   text-transform:uppercase;color:var(--slate);font-style:normal;
   padding-bottom:5px;border-bottom:1px solid var(--line)}
 .mbrow{display:grid;grid-template-columns:118px 1fr auto;align-items:center;
@@ -6810,12 +6802,12 @@ label.fr-btn{cursor:pointer;display:inline-block}
 .mbrow:last-child{border-bottom:0}
 .mbrow .mbteam{display:flex;align-items:center;gap:7px;min-width:0}
 .mbrow .mbteam img{width:20px;height:20px;flex:none;object-fit:contain}
-.mbrow .mbteam b{font:600 14px/1.2 var(--disp);color:var(--chalk);
+.mbrow .mbteam b{font:600 14px/1.2 var(--disp);color:var(--ink);
   overflow-wrap:anywhere}
 .mbrow .mbwhat{font-size:12.5px;color:var(--ink2);min-width:0;line-height:1.5}
 .mbrow .mbwhat em{font-style:normal;color:var(--slate)}
 .mbrow .mbwhen{font:11px/1.5 var(--mono);color:var(--ink3);text-align:right}
-.mbrow .mbsc{font:700 15px/1 var(--mono);color:var(--chalk)}
+.mbrow .mbsc{font:700 15px/1 var(--mono);color:var(--ink)}
 .mbrow .mbnone{color:var(--slate);font-style:italic}
 .mbrow.mbgone{cursor:default;opacity:.85}
 .mbrow.mbgone:hover{background:none}
@@ -6824,10 +6816,10 @@ label.fr-btn{cursor:pointer;display:inline-block}
 .rbside .mbslot{grid-column:3 / -1;justify-self:start;margin-top:4px}
 /* the add/remove control, wherever a team is already named */
 .mbbtn{appearance:none;background:transparent;border:1px solid var(--line2);
-  border-radius:3px;color:var(--slate);font:600 9.5px/1 var(--disp);
+  border-radius:3px;color:var(--slate);font:600 11px/1 var(--disp);
   letter-spacing:.1em;text-transform:uppercase;padding:4px 7px;cursor:pointer;
   white-space:nowrap}
-.mbbtn:hover{color:var(--chalk);border-color:var(--navy)}
+.mbbtn:hover{color:var(--ink);border-color:var(--navy)}
 .mbbtn[aria-pressed=true]{color:var(--gold);border-color:var(--gold)}
 .mbwarn{font-size:12px;color:var(--slate);line-height:1.6;margin:6px 0 0}
 @media (max-width:560px){
@@ -6885,45 +6877,45 @@ label.fr-btn{cursor:pointer;display:inline-block}
 .ribbon.final{border-top-color:var(--line2)}
 .ribbon.upcoming{border-top-color:var(--navy)}
 .rbtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-.rbstate{font:700 9.5px/1 var(--disp);letter-spacing:.16em;text-transform:uppercase;
+.rbstate{font:700 11px/1 var(--disp);letter-spacing:.16em;text-transform:uppercase;
   padding:4px 8px;border:1px solid currentColor;border-radius:2px}
 .rbstate.live{color:var(--coral)} .rbstate.final{color:var(--ink2)}
 .rbstate.upcoming{color:var(--navy)}
 .rbwhen{font:600 12px/1 var(--mono);color:var(--slate)}
 .rbwhy{flex:1 1 100%;font:12.5px/1.5 var(--sans);color:var(--ink2);margin-top:2px}
-.rbwhy b{color:var(--chalk);font-weight:600}
+.rbwhy b{color:var(--ink);font-weight:600}
 .rbside{display:grid;grid-template-columns:26px 34px 1fr auto;align-items:center;
   gap:12px;padding:7px 0}
 .rbside+.rbside{border-top:1px solid var(--line)}
-.rbside .rbrk{font:600 10px/1 var(--disp);color:var(--gold);text-align:right}
+.rbside .rbrk{font:600 11px/1 var(--disp);color:var(--gold);text-align:right}
 /* holds the crest column open when a team has no crest -- see the note in
    ribbonHTML: without it every cell in the row shifts one column left */
 .rbside .rbnologo{display:block;width:34px;height:1px}
 .rbside .rbnm{min-width:0;overflow-wrap:anywhere}
 .rbside .rbnm{font:700 30px/1 var(--disp);letter-spacing:-.01em;color:var(--ink2);
   text-transform:uppercase}
-.rbside.won .rbnm{color:var(--chalk)}
+.rbside.won .rbnm{color:var(--ink)}
 .rbside .rbsc{font:700 34px/1 var(--mono);color:var(--ink3);
   font-variant-numeric:tabular-nums}
-.rbside.won .rbsc{color:var(--chalk)}
-.ribbon.live .rbside .rbsc{color:var(--chalk)}
+.rbside.won .rbsc{color:var(--ink)}
+.ribbon.live .rbside .rbsc{color:var(--ink)}
 .rbside img{width:34px;height:34px;object-fit:contain}
 /* the rally ledger: one cell per completed set */
 /* the day view's lane heading carries which day it is about, quietly */
 .dayhn{font:500 11px/1 var(--mono);color:var(--slate);letter-spacing:.05em;
   text-transform:none;margin-left:9px}
-.dayhc{margin-left:auto;font:600 10px/1 var(--mono);color:var(--ink3)}
+.dayhc{margin-left:auto;font:600 11px/1 var(--mono);color:var(--ink3)}
 /* ── FIXTURE TRUTH ────────────────────────────────────────────────────── */
 /* a fixture whose sources disagree says so instead of picking one */
 .wconf{color:var(--gold);font:600 11.5px/1.4 var(--sans);
   border:1px dashed color-mix(in oklab,var(--gold) 55%,transparent);
   border-radius:2px;padding:2px 6px;white-space:nowrap}
 /* a corrected fact names the school that confirmed it */
-.wsrc{margin-left:8px;font:600 9.5px/1 var(--disp);letter-spacing:.11em;
+.wsrc{margin-left:8px;font:600 11px/1 var(--disp);letter-spacing:.11em;
   text-transform:uppercase;color:var(--good);text-decoration:none;
   border:1px solid color-mix(in oklab,var(--good) 45%,transparent);
   border-radius:2px;padding:3px 5px;white-space:nowrap}
-.wsrc:hover{color:var(--chalk);border-color:var(--good)}
+.wsrc:hover{color:var(--ink);border-color:var(--good)}
 .wsrc:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 td.at{white-space:nowrap}
 /* the scouting note, now BELOW the identity and compressed */
@@ -6936,7 +6928,7 @@ td.at{white-space:nowrap}
 .scoutmore summary::before{content:"\25B8";display:inline-block;
   margin-right:6px;transition:transform .15s ease}
 .scoutmore[open] summary::before{content:"\25BE"}
-.scoutmore summary:hover{color:var(--chalk)}
+.scoutmore summary:hover{color:var(--ink)}
 .scoutmore summary:focus-visible{outline:2px solid var(--cs-cyan);
   outline-offset:2px}
 .scoutmore p{margin:2px 0 0}
@@ -6945,14 +6937,14 @@ td.at{white-space:nowrap}
 .lanemore{appearance:none;background:transparent;border:0;
   border-top:1px solid var(--line);width:100%;text-align:left;padding:9px 2px;
   color:var(--navy);font:600 12px/1 var(--sans);cursor:pointer}
-.lanemore:hover{color:var(--chalk)}
+.lanemore:hover{color:var(--ink)}
 .lanemore:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:-2px}
 .rledger{display:flex;gap:5px;margin-top:12px;flex-wrap:wrap}
 .rledger .rl{min-width:46px;border:1px solid var(--line2);border-radius:2px;
   padding:5px 7px;text-align:center;font:600 12px/1.35 var(--mono);color:var(--ink2)}
-.rledger .rl i{display:block;font:600 9px/1 var(--disp);letter-spacing:.12em;
+.rledger .rl i{display:block;font:600 11px/1 var(--disp);letter-spacing:.12em;
   color:var(--slate);font-style:normal;margin-bottom:3px}
-.rledger .rl.aw{color:var(--chalk)}
+.rledger .rl.aw{color:var(--ink)}
 /* ── LANES ──────────────────────────────────────────────────────────────── */
 .lane{margin:22px 0 0}
 .lanehd{display:flex;align-items:baseline;gap:10px;padding-bottom:7px;
@@ -6986,12 +6978,12 @@ td.at{white-space:nowrap}
 .mrow .mrt{display:flex;align-items:center;gap:7px;min-width:0}
 .mrow .mrt img{width:19px;height:19px;flex:none;object-fit:contain}
 .mrow .mrt b{font:600 15px/1.15 var(--disp);color:var(--ink2);overflow-wrap:anywhere}
-.mrow .mrt.won b{color:var(--chalk)}
-.mrow .mrt .mrk{font:600 9.5px/1 var(--disp);color:var(--gold);flex:none}
+.mrow .mrt.won b{color:var(--ink)}
+.mrow .mrt .mrk{font:600 11px/1 var(--disp);color:var(--gold);flex:none}
 
 .mrow .msc{font:700 17px/1.2 var(--mono);color:var(--ink3);text-align:right;
   font-variant-numeric:tabular-nums}
-.mrow .mrt.won .msc,.mrow.islive .msc{color:var(--chalk)}
+.mrow .mrt.won .msc,.mrow.islive .msc{color:var(--ink)}
 .mrow .mmeta{display:flex;flex-direction:column;align-items:flex-end;gap:3px;
   min-width:0;overflow:hidden;text-align:right}
 .mvn{font:11px/1.4 var(--sans);color:var(--slate);white-space:nowrap;
@@ -7027,15 +7019,15 @@ td.at{white-space:nowrap}
 a.card.morecard{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;text-decoration:none;border-style:dashed}
 a.card.morecard b{font:700 17px/1 var(--disp);color:var(--ink2)}
 a.card.morecard span{font:11px/1 var(--sans);color:var(--slate)}
-a.card.morecard:hover b{color:var(--chalk)}
+a.card.morecard:hover b{color:var(--ink)}
 h4.sbtime{display:flex;align-items:baseline;gap:8px;margin:16px 0 0;padding:0 2px 6px;border-bottom:1px solid var(--line);font:700 11px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;color:var(--slate)}
-h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
+h4.sbtime span{font:600 11px/1 var(--mono);color:var(--ink3)}
 /* THE BOX: the set in progress, one live accent (Cody: "boxing things makes
    it cleaner"). Two stacked grid cells drawn as one box -- top cell carries
    the top and sides, bottom cell the bottom and sides. Larger numerals (they
    are the ones moving); the side ahead in the set reads gold; no winner-bold,
    because nobody has won a set still being played. */
-.mlc.cur{font:700 15.5px/1.2 var(--mono);color:var(--chalk);
+.mlc.cur{font:700 15.5px/1.2 var(--mono);color:var(--ink);
   border:1px solid color-mix(in oklab,var(--cs-gold) 55%,transparent);
   padding:1px 5px}
 .mlc.cur.ca{border-bottom:0;border-radius:3px 3px 0 0}
@@ -7049,11 +7041,11 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
 .mls.hastally{grid-template-columns:auto repeat(var(--mlsn,0),minmax(25px,auto))}
 .mlc{font:600 13.5px/1.2 var(--mono);color:var(--slate);text-align:center;
   padding:0 4px;font-variant-numeric:tabular-nums;font-style:normal}
-.mlc.w{color:var(--chalk);font-weight:700}
+.mlc.w{color:var(--ink);font-weight:700}
 .mlt{font:700 15px/1.1 var(--mono);color:var(--ink2);text-align:center;
-  margin-right:9px;padding-right:11px;border-right:1px solid var(--cs-edge2);
+  margin-right:9px;padding-right:11px;border-right:1px solid var(--line2);
   font-variant-numeric:tabular-nums}
-.mlt.w{color:var(--chalk)}
+.mlt.w{color:var(--ink)}
 /* THE DETAIL LINESCORE -- the reference table, drawn as a table */
 .dlswrap{overflow-x:auto;margin:12px 0 2px}
 /* width:auto beats the page-wide `table{width:100%}` -- the reference is
@@ -7066,15 +7058,15 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
   padding:5px 0 7px;text-align:center;min-width:40px}
 .dls td{font:600 16px/1.2 var(--mono);color:var(--slate);text-align:center;
   padding:8px 0;min-width:40px;font-variant-numeric:tabular-nums;
-  border-top:1px solid var(--cs-edge)}
-.dls td.w{color:var(--chalk);font-weight:700}
+  border-top:1px solid var(--line)}
+.dls td.w{color:var(--ink);font-weight:700}
 .dls .dtm{min-width:44px}
 .dls .dtm img{width:22px;height:22px;object-fit:contain;vertical-align:middle}
-.dls .dst{border-left:1px solid var(--cs-edge2);font-weight:700;
+.dls .dst{border-left:1px solid var(--line2);font-weight:700;
   color:var(--ink2);min-width:44px}
-.dls td.dst.w{color:var(--chalk)}
+.dls td.dst.w{color:var(--ink)}
 /* the one live accent: the current column boxed, same as the rows */
-.dls td.cur{font-weight:700;color:var(--chalk);
+.dls td.cur{font-weight:700;color:var(--ink);
   border-left:1px solid color-mix(in oklab,var(--cs-gold) 55%,transparent);
   border-right:1px solid color-mix(in oklab,var(--cs-gold) 55%,transparent)}
 .dls td.cur.ca{border-top:1px solid color-mix(in oklab,var(--cs-gold) 55%,transparent)}
@@ -7082,11 +7074,11 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
 .dls td.cur.up{color:var(--cs-gold)}
 .dls th.ct{color:var(--cs-gold)}
 .mrow .mctx{display:flex;flex-direction:column;gap:2px;min-width:0;overflow:hidden}
-.mctxe{font:600 10.5px/1.3 var(--disp);letter-spacing:.04em;text-transform:uppercase;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mctxe{font:600 11px/1.3 var(--disp);letter-spacing:.04em;text-transform:uppercase;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 .mrow .mtags{display:flex;gap:5px;justify-content:flex-end;flex-wrap:wrap;
   margin-top:3px}
-.mrow .mtg{font:600 9px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
+.mrow .mtg{font:600 11px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
   color:var(--slate);border:1px solid var(--line);border-radius:2px;padding:3px 5px}
 .mrow .mtg.rv{color:var(--gold);border-color:color-mix(in oklab,var(--gold) 40%,transparent)}
 .mrow .mtg.lv{color:var(--coral);border-color:color-mix(in oklab,var(--coral) 45%,transparent)}
@@ -7099,7 +7091,7 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
 .mrow.islive .mtg.lv{display:none}
 /* ── THE STATE CONTROL AND DAY GROUPS ON SCORES ─────────────────────────── */
 .daygrp{margin:20px 0 0}
-.dayhd{font:700 10.5px/1 var(--disp);letter-spacing:.17em;text-transform:uppercase;
+.dayhd{font:700 11px/1 var(--disp);letter-spacing:.17em;text-transform:uppercase;
   color:var(--slate);padding-bottom:6px;border-bottom:1px solid var(--line2)}
 .emptylane{font:13px/1.6 var(--sans);color:var(--slate);padding:14px 0 2px;
   max-width:70ch}
@@ -7110,18 +7102,18 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
 #v-desk.detailopen .vh,#v-desk.detailopen #desklead,
 #v-desk.detailopen .livehead,#v-desk.detailopen #desksoon{display:none}
 .mdet .msec{border-top:1px solid var(--line);padding:15px 0 6px;margin-top:14px}
-.mdet .msec h3{margin:0 0 9px;font:600 10px/1 var(--disp);letter-spacing:.16em;
+.mdet .msec h3{margin:0 0 9px;font:600 11px/1 var(--disp);letter-spacing:.16em;
   text-transform:uppercase;color:var(--slate)}
 .mdet .mfact{display:flex;flex-wrap:wrap;gap:8px 26px;font-size:13px;
   color:var(--ink2);line-height:1.65}
 .mdet .mfact em{font-style:normal;color:var(--slate);margin-right:6px;
-  font:600 9.5px/1 var(--disp);letter-spacing:.12em;text-transform:uppercase}
+  font:600 11px/1 var(--disp);letter-spacing:.12em;text-transform:uppercase}
 .mdet .munk{color:var(--slate);font-style:italic}
 .lmcbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:4px}
 .lmcbtn{appearance:none;background:transparent;border:1px solid var(--line2);
-  border-radius:3px;color:var(--ink2);font:600 10.5px/1 var(--disp);
+  border-radius:3px;color:var(--ink2);font:600 11px/1 var(--disp);
   letter-spacing:.1em;text-transform:uppercase;padding:7px 10px;cursor:pointer}
-.lmcbtn:hover{color:var(--chalk);border-color:var(--navy)}
+.lmcbtn:hover{color:var(--ink);border-color:var(--navy)}
 .lmcnote{font:11.5px/1.5 var(--mono);color:var(--slate)}
 @media (max-width:560px){.lmcbar{gap:8px}.lmcnote{flex:1 1 100%}}
 @media (max-width:560px){
@@ -7148,7 +7140,7 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
   .mrow{grid-template-columns:1fr;
     grid-template-areas:"when" "teams" "mls" "meta";
     gap:4px;padding:12px 2px}
-  .mrow .mwhen{grid-area:when;display:none;font-size:10px}
+  .mrow .mwhen{grid-area:when;display:none;font-size:11px}
   .mrow.islive .mwhen{display:block}
   .mrow .mteams{grid-area:teams}
   .mrow .mls{grid-area:mls;justify-content:start;margin-left:27px;row-gap:2px}
@@ -7164,7 +7156,7 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
   .mrow .mrt b.tn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
     overflow-wrap:normal}
   /* an upcoming match card: time left of the names on one line */
-  .mrow:not(.islive) .mwhen{display:block;font-size:10px;color:var(--slate)}
+  .mrow:not(.islive) .mwhen{display:block;font-size:11px;color:var(--slate)}
   .mrow .mctx{display:none}
   .mrow .mrt b{font-size:14px}
   .mrow .msc{font-size:15px}
@@ -7190,7 +7182,7 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
   background:transparent;border:0;color:var(--ink2);font:600 13px/1 var(--sans);
   padding:10px 11px;border-radius:3px;cursor:pointer}
 .moremenu button:hover,.moremenu button:focus-visible{background:var(--sheet2);
-  color:var(--chalk)}
+  color:var(--ink)}
 .moremenu button[aria-current=page]{color:var(--gold)}
 @media (max-width:560px){
   .moremenu{right:auto;left:0;min-width:min(74vw,240px)}
@@ -7201,14 +7193,14 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
 .crumb{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 12px;
   font:12px/1.4 var(--sans);color:var(--slate)}
 .crumb a{color:var(--ink2);text-decoration:none;border-bottom:1px solid var(--line2)}
-.crumb a:hover{color:var(--chalk);border-bottom-color:var(--navy)}
+.crumb a:hover{color:var(--ink);border-bottom-color:var(--navy)}
 .crumb .sep{opacity:.5}
-.crumb b{color:var(--chalk);font-weight:600}
+.crumb b{color:var(--ink);font-weight:600}
 .backlink{display:inline-flex;align-items:center;gap:6px;appearance:none;
   background:transparent;border:1px solid var(--line2);border-radius:3px;
   color:var(--ink2);font:600 11.5px/1 var(--sans);padding:7px 10px;cursor:pointer;
   margin-bottom:14px}
-.backlink:hover{color:var(--chalk);border-color:var(--navy)}
+.backlink:hover{color:var(--ink);border-color:var(--navy)}
 .parentlink{color:inherit;text-decoration:none;border-bottom:1px solid transparent}
 .parentlink:hover{border-bottom-color:var(--navy)}
 
@@ -7232,7 +7224,7 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
   *{scroll-behavior:auto!important}
 }
 /* a directional tick beside a rank change -- same ranking's prior state only */
-.tick{font:600 10px/1 var(--disp);letter-spacing:.04em}
+.tick{font:600 11px/1 var(--disp);letter-spacing:.04em}
 .tick.up{color:var(--good)} .tick.dn{color:var(--bad)} .tick.flat{color:var(--ink3)}
 
 /* ══ MATCH DESK ═══════════════════════════════════════════════════════════
@@ -7253,7 +7245,7 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
 .dboard{border-top:1px solid var(--line)}
 .dboard .dcard{padding:11px 2px 12px}
 .dboard .dside b{font-size:18px}
-.dboard .dtag{font-size:9px;padding:3px 6px}
+.dboard .dtag{font-size:11px;padding:3px 6px}
 .dboard .dwhy{display:none}          /* context is one line on a board row */
 .dcard{border-bottom:1px solid var(--line2);padding:15px 2px 16px}
 .dcard:last-child{border-bottom:0}
@@ -7262,14 +7254,14 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
 .dcard.isfinal{border-left:3px solid var(--line);padding-left:13px}
 .dhead{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:9px}
 .dwhen{font:600 12px/1 var(--mono);color:var(--ink2);letter-spacing:.02em}
-.dtag{font:700 9.5px/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;
+.dtag{font:700 11px/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;
   padding:4px 7px;border-radius:3px;border:1px solid var(--line2);color:var(--ink2)}
 .dtag.rv{color:#F2B441;border-color:color-mix(in oklab,#F2B441 40%,transparent);
   background:color-mix(in oklab,#F2B441 10%,transparent)}
 .dtag.rk{color:var(--navy);border-color:color-mix(in oklab,var(--navy) 40%,transparent)}
 .dtag.cl{color:#31D07E;border-color:color-mix(in oklab,#31D07E 38%,transparent)}
 .dtag.lv{color:#fff;background:var(--live);border-color:var(--live)}
-.dtag.ev{text-transform:none;letter-spacing:.02em;font-size:10.5px}
+.dtag.ev{text-transform:none;letter-spacing:.02em;font-size:11px}
 .dteams{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .dside{display:flex;align-items:center;gap:7px;font:600 19px/1.15 var(--disp)}
 .dside b{font-weight:600}
@@ -7278,12 +7270,12 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
 .dcard.isfinal .dside:not(.won) b{color:var(--ink2);font-weight:500}
 .dat{font:600 11px/1 var(--sans);color:var(--ink3,var(--ink2));text-transform:uppercase;
   letter-spacing:.12em}
-.dpow{font:700 9.5px/1 var(--mono);color:#31D07E;
+.dpow{font:700 11px/1 var(--mono);color:#31D07E;
   background:color-mix(in oklab,#31D07E 12%,transparent);padding:3px 5px;border-radius:3px}
 .dfc{display:flex;align-items:baseline;gap:8px;margin-top:11px;
   font:13.5px/1 var(--sans);color:var(--ink)}
 .dfc b{font:700 15px/1 var(--disp)}
-.dfcl{font:700 9px/1 var(--sans);letter-spacing:.13em;text-transform:uppercase;
+.dfcl{font:700 11px/1 var(--sans);letter-spacing:.13em;text-transform:uppercase;
   color:var(--ink3,var(--ink2))}
 .dfcs{font:11px/1 var(--mono);color:var(--ink3,var(--ink2));opacity:.75}
 .dfc.none{color:var(--ink2);font-style:italic}
@@ -7302,26 +7294,26 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
 /* the loud marker for a rank rendered with no ruler named -- it must be
    impossible to mistake for a real badge, and it must never reach a build */
 .rnkbad{color:var(--bad);border:1px dashed var(--bad);padding:0 4px;
-  font:700 10px/1.5 var(--mono);text-transform:uppercase}
+  font:700 11px/1.5 var(--mono);text-transform:uppercase}
 /* the tape and the ribbon carry the label at their own scale */
 .cs-trk .rank-label,.rbrk .rank-label,.mrk .rank-label{font-size:max(9px,.62em);
   opacity:.8;margin-right:1px;display:inline}
 .cs-trk .rnk,.rbrk .rnk,.mrk .rnk{color:inherit}
 .dlive{margin-top:11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
-.dopen{margin-left:auto;font:600 10px/1 var(--disp);letter-spacing:.09em;
+.dopen{margin-left:auto;font:600 11px/1 var(--disp);letter-spacing:.09em;
   text-transform:uppercase;color:var(--ink2);background:transparent;
   border:1px solid var(--line);border-radius:3px;padding:5px 9px;cursor:pointer}
 .dopen:hover{color:var(--ink);border-color:var(--ink2)}
 .lmc{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
 .lmc .lhd{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;
-  font:600 10px/1.3 var(--disp);letter-spacing:.08em;text-transform:uppercase;
+  font:600 11px/1.3 var(--disp);letter-spacing:.08em;text-transform:uppercase;
   color:var(--ink2)}
 .lmc .lhd .ldot{width:6px;height:6px;border-radius:50%;background:#e0553f;
   display:inline-block}
 .lmc .lnote{margin:7px 0 0;font-size:12.5px;color:var(--ink2);line-height:1.5}
 .lmc table{width:100%;max-width:520px;border-collapse:collapse;margin-top:9px}
 .lmc th,.lmc td{padding-left:10px}
-.lmc th{font:600 9.5px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase;
+.lmc th{font:600 11px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase;
   color:var(--ink3);text-align:right;padding:0 0 6px}
 .lmc th:first-child{text-align:left}
 .lmc td{padding:5px 0;font-size:13px;text-align:right;
@@ -7334,7 +7326,7 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
   .lmc td:first-child{font-size:13px}
   .dopen{margin-left:0;margin-top:6px}
 }
-.dlv{font:700 9px/1 var(--sans);letter-spacing:.13em;color:#fff;background:var(--live);
+.dlv{font:700 11px/1 var(--sans);letter-spacing:.13em;color:#fff;background:var(--live);
   padding:4px 6px;border-radius:3px}
 .dlive b{font:700 16px/1 var(--disp)}
 .dper{font:11px/1 var(--mono);color:var(--ink2)}
@@ -7344,7 +7336,7 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
   border:1px solid var(--line2);border-radius:3px;padding:3px 6px}
 .dstory{margin-top:11px}
 .dfinal{display:flex;align-items:baseline;gap:8px;font:15px/1 var(--sans)}
-.dfl{font:700 9px/1 var(--sans);letter-spacing:.13em;color:var(--ink3,var(--ink2))}
+.dfl{font:700 11px/1 var(--sans);letter-spacing:.13em;color:var(--ink3,var(--ink2))}
 .dfinal b{font:700 17px/1 var(--disp);color:var(--ink)}
 .dsaid{margin:8px 0 0;font:13px/1.55 var(--sans);color:var(--ink2)}
 .dsaid b{color:#F2B441}
@@ -7384,7 +7376,7 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
 .chgc .w{font-weight:700;color:var(--ink);display:flex;align-items:center;gap:5px}
 .chgc .l{color:var(--ink2);display:flex;align-items:center;gap:5px}
 .chgc .sc{font:700 15px/1 var(--disp);color:var(--ink);letter-spacing:.02em}
-.chgc .pwr{font:700 10px/1 var(--mono);font-style:normal;color:#31D07E;
+.chgc .pwr{font:700 11px/1 var(--mono);font-style:normal;color:#31D07E;
   padding:2px 4px;border-radius:3px;
   background:color-mix(in oklab,#31D07E 14%,transparent)}
 @media (max-width:560px){
@@ -7397,7 +7389,7 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
   .chips.tier1 .chip b{font-size:15px}
 }
 
-.t25 td.poll i{font:700 10.5px/1 var(--mono);font-style:normal;margin-left:4px;
+.t25 td.poll i{font:700 11px/1 var(--mono);font-style:normal;margin-left:4px;
   padding:1px 3px;border-radius:3px}
 .t25 td.poll .pgup{color:#31D07E;background:color-mix(in oklab,#31D07E 14%,transparent)}
 .t25 td.poll .pgdn{color:#FF6B6B;background:color-mix(in oklab,#FF6B6B 14%,transparent)}
@@ -7433,7 +7425,7 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
    what makes a bracket read as a bracket instead of five unrelated lists. */
 .bgames{display:flex;flex-direction:column;justify-content:space-around;
   height:calc(16 * (var(--bgame-h) + var(--bgame-gap)))}
-.bhd{font:700 9.5px/1 var(--sans);letter-spacing:.09em;text-transform:uppercase;
+.bhd{font:700 11px/1 var(--sans);letter-spacing:.09em;text-transform:uppercase;
   color:var(--ink2);padding:0 0 7px 2px}
 .bgame{background:var(--card);border:1px solid var(--line);border-radius:4px;
   overflow:hidden;height:var(--bgame-h);box-sizing:border-box}
@@ -7445,14 +7437,14 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
 .bside.lost .bnm{color:var(--ink3)}
 .bside.lost .bsc{color:var(--ink3)}
 .bside.empty{opacity:.45}
-.bsd{font:700 9.5px/1 var(--mono);color:var(--ink3);width:14px;text-align:right;
+.bsd{font:700 11px/1 var(--mono);color:var(--ink3);width:14px;text-align:right;
   flex:none}
 .bnm{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bsc{font:700 12px/1 var(--mono);color:var(--navy);flex:none;min-width:10px;
   text-align:right}
 .bfinal{min-width:210px;padding:0 12px;align-self:center;text-align:center}
 .bfinal .bhd{text-align:center;padding-left:0}
-.bchamp{font:700 9.5px/1 var(--sans);letter-spacing:.09em;text-transform:uppercase;
+.bchamp{font:700 11px/1 var(--sans);letter-spacing:.09em;text-transform:uppercase;
   color:var(--ink2);margin:14px 0 7px}
 .bcbox{background:var(--card);border:1px solid var(--line2);border-radius:4px;
   padding:14px 10px;font:700 14px/1 var(--sans);color:var(--ink3)}
@@ -7462,7 +7454,7 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
 .tsec--wide{margin-top:14px}
 /* 5-1 / 6-2: how many setters the team actually starts. Shown only when its
    lineups agree; a team with thin position data gets no badge, not a guess. */
-.wentto{display:block;font:600 10.5px/1 var(--sans);color:var(--ink3);margin-top:3px}
+.wentto{display:block;font:600 11px/1 var(--sans);color:var(--ink3);margin-top:3px}
 .tabhint{margin:0 0 12px;font-size:12.5px;color:var(--ink2)}
 /* Digby speaks in his own box, never inline with measured numbers -- a reader
    should always be able to see which words were written and which were counted. */
@@ -7498,12 +7490,12 @@ h4.sbtime span{font:600 10px/1 var(--mono);color:var(--ink3)}
 /* An All-America badge. Sized like a footnote, not a trophy -- it sits beside a
    name, and a loud chip next to every good player is noise. */
 .aa{display:inline-block;margin-left:7px;padding:2px 5px;border-radius:2px;
-  font:700 9px/1 var(--mono);letter-spacing:.06em;vertical-align:2px;
+  font:700 11px/1 var(--mono);letter-spacing:.06em;vertical-align:2px;
   background:var(--alt);color:var(--ink2);border:1px solid var(--line)}
 /* A national award is a different order of thing from a team selection. */
 .aaNat{background:var(--navy);color:var(--ink-on-accent);border-color:var(--navy)}
 .aaFirst{background:var(--amber);color:var(--ink-on-accent);border-color:#FFC72C}
-.aaSecon{background:#12233C;color:var(--navy);border-color:#2A4570}
+.aaSecon{background:var(--alt);color:var(--ink2);border-color:var(--line2)}
 .aaThird{background:var(--alt);color:var(--ink2)}
 .pcell .pmug{border-radius:50%;object-fit:cover;object-position:50% 18%;flex:none;background:var(--alt)}
 .pcell svg{flex:none}
@@ -7539,7 +7531,7 @@ img.mug,img.pmug,img.phero{cursor:zoom-in}
 .pnm{font:600 15px/1.2 var(--disp);letter-spacing:.01em;color:var(--ink);
   overflow-wrap:anywhere;min-width:0}
 .pinfo{flex:1 1 auto}
-.pmeta{font:600 10.5px/1 var(--mono);color:var(--ink3);margin-top:3px;letter-spacing:.03em}
+.pmeta{font:600 11px/1 var(--mono);color:var(--ink3);margin-top:3px;letter-spacing:.03em}
 /* SHARED TABLE TREATMENT. Applied to every data table so the site reads as one
    design -- the Top 25 was restyled first and everything else kept the old
    look, which is the worst of both. */
@@ -7589,7 +7581,7 @@ td.tm{font-size:15px}
    .tvnet, and the network now reads as a chip. */
 td.tvnet{text-align:left}
 .netchip{display:inline-block;white-space:nowrap;padding:3px 8px;border-radius:4px;
-  font:700 10.5px/1.4 var(--mono);letter-spacing:.04em;
+  font:700 11px/1.4 var(--mono);letter-spacing:.04em;
   color:var(--blue);background:color-mix(in oklab,var(--navy) 16%,transparent);
   border:1px solid color-mix(in oklab,var(--navy) 34%,transparent)}
 /* ---- RANKINGS: the school's colour on the row edge --------------------
@@ -7610,15 +7602,15 @@ td.tvnet{text-align:left}
 tr.tvearlier td{padding:6px 0 10px;border:0}
 #tvpastbtn{appearance:none;background:none;border:1px dashed var(--line2);
   border-radius:4px;color:var(--slate);cursor:pointer;padding:6px 11px;
-  font:700 10px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase}
-#tvpastbtn:hover{color:var(--chalk);border-color:var(--cs-edge2)}
+  font:700 11px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase}
+#tvpastbtn:hover{color:var(--ink);border-color:var(--line2)}
 .cstrip{padding:6px 15px 4px}
 /* the head mirrors .crow's grid so the labels land over their columns */
 /* ⚠ THE SAME TRACK LIST AS .crow, or the labels sit over the wrong
    columns -- 118px name, 1fr track, 34px median, 26px count. */
 .chead{display:grid;grid-template-columns:118px 1fr 34px 26px;gap:10px;
   align-items:end;padding:0 15px 4px;
-  font:700 9px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
+  font:700 11px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
   color:var(--ink3)}
 .chead .chlab{grid-column:3 / span 2;text-align:right;white-space:nowrap}
 
@@ -7680,7 +7672,7 @@ tr.tvearlier td{padding:6px 0 10px;border:0}
    under the name, above everything else. */
 /* the previous meeting, on a fixture line */
 .h2h{margin-left:auto;padding:2px 7px;border-radius:4px;white-space:nowrap;
-  font:700 10px/1.5 var(--mono);letter-spacing:.03em}
+  font:700 11px/1.5 var(--mono);letter-spacing:.03em}
 .h2h.w{background:rgba(49,208,126,.14);color:var(--good)}
 .h2h.l{background:rgba(255,95,110,.14);color:var(--bad)}
 /* the head coach, directly under the programme's name -- where a team's
@@ -7689,7 +7681,7 @@ tr.tvearlier td{padding:6px 0 10px;border:0}
   margin:12px 0 0;padding:9px 14px;border-radius:4px;
   background:linear-gradient(90deg,rgba(120,180,255,.10),rgba(120,180,255,.02));
   border-left:3px solid var(--amber)}
-.coachline .cl{font:700 9.5px/1 var(--mono);letter-spacing:.18em;
+.coachline .cl{font:700 11px/1 var(--mono);letter-spacing:.18em;
   text-transform:uppercase;color:var(--ink3)}
 .coachline b{font:600 16px/1.2 var(--disp);color:var(--ink);letter-spacing:.01em}
 .coachline .ct{font:11.5px/1.3 var(--mono);color:var(--ink3)}
@@ -7709,7 +7701,7 @@ tr.tvearlier td{padding:6px 0 10px;border:0}
     linear-gradient(170deg,rgba(26,38,62,.94),rgba(12,19,33,.95)),
     linear-gradient(150deg,rgba(120,180,255,.36),rgba(255,199,44,.12) 48%,rgba(255,255,255,.03) 76%);
   display:flex;flex-direction:column;gap:5px;min-width:0}
-.gll{font:700 9.5px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;
+.gll{font:700 11px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;
   color:var(--ink3)}
 .glbig{font:600 27px/1 var(--disp);color:var(--ink);letter-spacing:.01em}
 .glbig.glw{color:var(--good)}
@@ -7727,7 +7719,7 @@ tr.tvearlier td{padding:6px 0 10px;border:0}
 .upc.clipped .gline:nth-of-type(n+7){display:none}
 h3 .cnt{margin-left:8px;padding:2px 7px;border-radius:4px;
   background:rgba(120,180,255,.14);color:var(--ink2);
-  font:700 10px/1.5 var(--mono)}
+  font:700 11px/1.5 var(--mono)}
 .moreb{display:block;width:calc(100% - 30px);margin:2px 15px 12px;padding:9px;
   border-radius:4px;border:1px solid var(--line2);cursor:pointer;
   background:rgba(120,180,255,.07);color:var(--ink2);
@@ -7858,7 +7850,7 @@ tbody tr:nth-child(1) td.rk{color:var(--amber);
 /* the hero's own content has to sit above the floor it is standing on */
 .heroL,.heroR{position:relative;z-index:2}
 .heroL{position:relative;z-index:1;min-width:min(100%,320px);flex:1 1 340px}
-.eyebrow{display:flex;align-items:center;gap:8px;font:700 10.5px/1 var(--mono);
+.eyebrow{display:flex;align-items:center;gap:8px;font:700 11px/1 var(--mono);
   letter-spacing:.22em;text-transform:uppercase;color:var(--ink3)}
 .pulse{width:7px;height:7px;border-radius:50%;background:var(--good);
   box-shadow:0 0 0 0 rgba(49,208,126,.6);animation:pl 1.8s ease-in-out infinite}
@@ -7887,7 +7879,7 @@ tbody tr:nth-child(1) td.rk{color:var(--amber);
 .podv.pos{color:var(--good)}
 .podv.neg{color:var(--bad)}
 .podv.nil{color:var(--ink3)}
-.podl{font:600 9px/1 var(--mono);color:var(--ink3);letter-spacing:.1em;
+.podl{font:600 11px/1 var(--mono);color:var(--ink3);letter-spacing:.1em;
   text-transform:uppercase}
 @media (prefers-reduced-motion:reduce){.pulse{animation:none}}
 /* ⚠ THE HERO WAS BROKEN AT 390px AND THIS RULE WAS WHY IT LOOKED HANDLED.
@@ -7940,7 +7932,7 @@ td.wh b{display:block;font-weight:650;color:var(--ink);font-size:12.5px}
 td.wh .wc{display:block;color:var(--ink3);font:11.5px/1.3 var(--mono)}
 td.wh .wu{color:var(--ink3);font-style:italic}
 .kind{display:inline-block;white-space:nowrap;margin-right:7px;padding:2px 6px;border-radius:3px;
-  font:700 9.5px/1.5 var(--mono);letter-spacing:.06em;text-transform:uppercase;
+  font:700 11px/1.5 var(--mono);letter-spacing:.06em;text-transform:uppercase;
   vertical-align:2px}
 .kind.cf{background:color-mix(in oklab,var(--navy) 12%,transparent);color:var(--navy)}
 .kind.nc{background:var(--sand);color:var(--ink2)}
@@ -7957,7 +7949,7 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 #sbody tr.both .tm{font-weight:700}
 .t25 td.form{white-space:nowrap;padding-left:14px}
 .fw,.fl{display:inline-block;width:19px;height:19px;line-height:19px;text-align:center;
-  border-radius:2px;font:700 10.5px/19px var(--mono);margin-right:3px}
+  border-radius:2px;font:700 11px/19px var(--mono);margin-right:3px}
 .fw{background:#0C2A1C;color:#31D07E;border:1px solid #1F5B3C}
 .fl{background:#2B1114;color:#FF5F6E;border:1px solid #5E2229}
 /* A result against a ranked side is marked -- it is stronger evidence. */
@@ -7987,13 +7979,13 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 .mv-up{color:#31D07E;font:700 11px/1 var(--mono)}
 .mv-dn{color:#FF5F6E;font:700 11px/1 var(--mono)}
 .mv-flat{color:var(--ink3);font:700 11px/1 var(--mono)}
-.t25h{font:700 10.5px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;
+.t25h{font:700 11px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;
   color:var(--ink3);margin:18px 0 8px}
 .alsorx{font-size:13px;line-height:1.9;color:var(--ink);max-width:900px}
 .arv{font:600 11px/1 var(--mono);color:var(--ink3)}
 {{DIGBY_CSS}}.digby-tag svg{width:18px;height:18px;margin-right:5px}
 .digby-tag{display:inline-flex;align-items:center}
-.digby-tag{font:700 9.5px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;
+.digby-tag{font:700 11px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;
   color:var(--ink3);margin-bottom:7px}
 .digby p{margin:0;font-size:14px;line-height:1.55;color:var(--ink)}
 .digby-note{margin-top:8px;font-size:11.5px;color:var(--ink2)}
@@ -8002,9 +7994,9 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 .rotgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:2px 0 10px;max-width:760px}
 .rotcell{background:var(--alt);border:1px solid var(--line);border-top:2px solid var(--amber);
   border-radius:2px;padding:7px 6px;min-width:0}
-.rotn{font:700 9px/1 var(--sans);color:var(--ink3);letter-spacing:.1em;margin-bottom:4px}
+.rotn{font:700 11px/1 var(--sans);color:var(--ink3);letter-spacing:.1em;margin-bottom:4px}
 .rotnm{font:600 11.5px/1.25 var(--sans);color:var(--ink);overflow-wrap:anywhere}
-.rotpos{font:600 9.5px/1 var(--sans);color:var(--ink3);margin-top:3px;letter-spacing:.06em}
+.rotpos{font:600 11px/1 var(--sans);color:var(--ink3);margin-top:3px;letter-spacing:.06em}
 @media (max-width:560px){.rotgrid{grid-template-columns:repeat(3,1fr)}}
 {{ASK_CSS}}/* A season mismatch is the loudest thing on the view, because a 2025 table
    under a 2026 heading is the error that looks completely correct. */
@@ -8019,11 +8011,11 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 .segb:hover{color:var(--ink)}
 .segb.on{background:var(--navy);color:var(--ink-on-accent)}
 .segb:focus-visible{outline:2px solid var(--amber);outline-offset:-2px}
-.mv{display:inline-block;margin-left:5px;font:700 9.5px/1 var(--mono);vertical-align:1px}
+.mv{display:inline-block;margin-left:5px;font:700 11px/1 var(--mono);vertical-align:1px}
 .mv.up{color:#31D07E}
 .mv.dn{color:#FF5F6E}
 .mv.sm{color:var(--ink3)}
-.sysbadge{font:700 10px/1 var(--mono);color:var(--ink-on-accent);background:var(--navy);
+.sysbadge{font:700 11px/1 var(--mono);color:var(--ink-on-accent);background:var(--navy);
   border-radius:4px;padding:4px 8px;margin-left:8px;vertical-align:2px;
   letter-spacing:.04em}
 .tsec{scroll-margin-top:calc(var(--navh,0px) + 10px)}
@@ -8039,10 +8031,10 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 }
 .rgrp{margin-bottom:15px;break-inside:avoid;page-break-inside:avoid}
 .rgrp:last-child{margin-bottom:0}
-.rgrp-h{display:flex;align-items:center;gap:8px;font:700 10.5px/1 var(--sans);
+.rgrp-h{display:flex;align-items:center;gap:8px;font:700 11px/1 var(--sans);
   letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);
   padding:0 0 6px;border-bottom:1px solid var(--line2);margin-bottom:2px}
-.rgrp-n{font:700 10px/1 var(--mono);color:var(--ink3);background:var(--alt);
+.rgrp-n{font:700 11px/1 var(--mono);color:var(--ink3);background:var(--alt);
   border-radius:4px;padding:3px 7px}
 .rrow{display:grid;grid-template-columns:1fr auto;grid-template-areas:
   "av stat" "meta stat";align-items:center;gap:0 10px;
@@ -8075,7 +8067,7 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 .rmeta{grid-area:meta;font-size:11.5px;color:var(--ink2);margin-top:3px;padding-left:50px}
 .rstat{grid-area:stat;font:700 14px/1 var(--mono);color:var(--navy);text-align:right;
   white-space:nowrap;padding-left:10px}
-.rstat em{display:block;font:600 9px/1 var(--sans);letter-spacing:.05em;
+.rstat em{display:block;font:600 11px/1 var(--sans);letter-spacing:.05em;
   text-transform:uppercase;color:var(--ink3);font-style:normal;margin-top:3px}
 .rstat .none{color:var(--ink3);font-weight:400}
 /* A form pill for a result the Division-I record excludes. Outlined, not
@@ -8090,10 +8082,10 @@ td.wh .wu{color:var(--ink3);font-style:italic}
    it; only the width grows. */
 .fw.fnd,.fl.fnd{width:auto;min-width:19px;padding:0 4px;
   background:transparent;border:1px dashed currentColor}
-.fndt{font-style:normal;font-weight:700;font-size:9px;letter-spacing:.03em;
+.fndt{font-style:normal;font-weight:700;font-size:11px;letter-spacing:.03em;
   margin-left:3px;opacity:.9}
 @media (max-width:560px){.fw.fnd,.fl.fnd{padding:0 3px}
-  .fndt{font-size:9px;margin-left:2px}}
+  .fndt{font-size:11px;margin-left:2px}}
 
 /* ---- WEEKLY RANKING CALENDAR ----------------------------------------------
    Three tracks that must never look like one table. Each carries a tag saying
@@ -8109,11 +8101,11 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 .calnow.ok{border-left-color:#31D07E}
 .calnowhead{display:flex;align-items:center;gap:9px;flex-wrap:wrap;
   margin-bottom:7px}
-.calnowhead b{font:700 17px/1.2 var(--disp);color:var(--chalk)}
+.calnowhead b{font:700 17px/1.2 var(--disp);color:var(--ink)}
 .calnow p{margin:0 0 6px;font-size:13px;color:var(--ink2);line-height:1.55}
 .calnow p:last-child{margin-bottom:0}
 .calfine{font-size:12px;color:var(--ink3)}
-.caltag{font:700 9px/1.5 var(--disp);letter-spacing:.1em;text-transform:uppercase;
+.caltag{font:700 11px/1.5 var(--disp);letter-spacing:.1em;text-transform:uppercase;
   padding:3px 7px;border-radius:3px;white-space:nowrap}
 .caltag.derived{color:#8FD3FF;background:rgba(91,168,245,.14)}
 .caltag.official{color:#FFD98A;background:rgba(242,180,65,.14)}
@@ -8122,15 +8114,15 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 .calhead{display:flex;align-items:center;gap:10px;margin:0 0 9px}
 .calhead h3{margin:0;font:700 13px/1 var(--disp);letter-spacing:.06em;
   text-transform:uppercase;color:var(--ink2)}
-.caltbl th{font:700 9px/1.4 var(--disp);letter-spacing:.08em;
+.caltbl th{font:700 11px/1.4 var(--disp);letter-spacing:.08em;
   text-transform:uppercase;color:var(--slate);text-align:left;white-space:nowrap}
 .caltbl td{font-size:13px;vertical-align:top}
-.caltbl td:first-child{font-weight:600;color:var(--chalk)}
-.calstate{font:700 9px/1.5 var(--mono);letter-spacing:.03em;padding:2px 6px;
+.caltbl td:first-child{font-weight:600;color:var(--ink)}
+.calstate{font:700 11px/1.5 var(--mono);letter-spacing:.03em;padding:2px 6px;
   border-radius:3px;white-space:nowrap;background:var(--line);color:var(--ink3)}
 .calstate.complete{color:#31D07E;background:rgba(49,208,126,.12)}
 .calstate.forced{color:#F2B441;background:rgba(242,180,65,.12)}
-.calwarn{font:700 9px/1.4 var(--mono);letter-spacing:.03em;color:#F2B441;
+.calwarn{font:700 11px/1.4 var(--mono);letter-spacing:.03em;color:#F2B441;
   background:rgba(242,180,65,.12);padding:1px 5px;border-radius:3px;
   margin-left:5px}
 .caltbl .dim{color:var(--ink3)}
@@ -8191,7 +8183,7 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 /* The old heading was a gradient strip on every section, which made twelve
    sections look like twelve equally important things. A hairline rule and a
    small caps label give the same structure without the shouting. */
-.tsec h3{margin:0;padding:11px 15px 9px;font:700 10px/1 var(--disp);
+.tsec h3{margin:0;padding:11px 15px 9px;font:700 11px/1 var(--disp);
   letter-spacing:.16em;text-transform:uppercase;color:var(--slate);
   background:none;border-bottom:1px solid var(--vx-rule);position:relative}
 .tsec h3 .cnt,.tsec h3 .h3n{color:var(--ink3)}
@@ -8243,20 +8235,20 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
      have been a fresh inconsistency introduced by the very system meant to
      remove them. Digby's Top 25 takes the amber instead: it is ours and it is
      the editorial one. */
-  --vx-power:#31D07E;   --vx-power-dim:rgba(49,208,126,.14);
-  --vx-avca:#7AA7FF;    --vx-avca-dim:rgba(122,167,255,.14);
-  --vx-digby:#E9A93D;   --vx-digby-dim:rgba(233,169,61,.14);
-  --vx-ballot:#A98BE8;  --vx-ballot-dim:rgba(169,139,232,.14);
-  --vx-rule:rgba(255,255,255,.10);
-  --vx-rule-strong:rgba(255,255,255,.20);
+  --vx-power:#1D7D4F;   --vx-power-dim:rgba(29,125,79,.12);
+  --vx-avca:#1D5FC2;    --vx-avca-dim:rgba(29,95,194,.12);
+  --vx-digby:#8A6508;   --vx-digby-dim:rgba(138,101,8,.12);
+  --vx-ballot:#6D4FC2;  --vx-ballot-dim:rgba(109,79,194,.12);
+  --vx-rule:rgba(18,41,75,.12);
+  --vx-rule-strong:rgba(18,41,75,.24);
 }
 
 /* ── section label: a rule line with a name on it ──────────────────────── */
 .vx-label{display:flex;align-items:center;gap:10px;margin:0 0 10px;
-  font:700 10px/1 var(--disp);letter-spacing:.16em;text-transform:uppercase;
+  font:700 11px/1 var(--disp);letter-spacing:.16em;text-transform:uppercase;
   color:var(--slate)}
 .vx-label::after{content:"";flex:1;height:1px;background:var(--vx-rule)}
-.vx-label b{font-weight:700;color:var(--chalk);letter-spacing:.16em}
+.vx-label b{font-weight:700;color:var(--ink);letter-spacing:.16em}
 .vx-label .vx-key{width:8px;height:8px;border-radius:1px;flex:0 0 8px}
 
 /* the key swatch, wherever a ruler is named */
@@ -8277,9 +8269,9 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 /* ── fact strip: label over value, in a row, no chips ──────────────────── */
 .vx-facts{display:flex;flex-wrap:wrap;gap:2px 26px;margin:0}
 .vx-facts>div{display:flex;flex-direction:column;gap:2px;min-width:0}
-.vx-facts i{font-style:normal;font:700 9px/1.4 var(--disp);
+.vx-facts i{font-style:normal;font:700 11px/1.4 var(--disp);
   letter-spacing:.12em;text-transform:uppercase;color:var(--slate)}
-.vx-facts b{font:700 15px/1.15 var(--disp);color:var(--chalk);
+.vx-facts b{font:700 15px/1.15 var(--disp);color:var(--ink);
   overflow-wrap:anywhere}
 .vx-facts b.sm{font-size:13px;font-weight:600;color:var(--ink2)}
 
@@ -8291,20 +8283,20 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 .vx-idrow .vx-crest{width:30px;height:30px;display:flex;align-items:center;
   justify-content:center}
 .vx-idrow .vx-crest img{max-width:30px;max-height:30px}
-.vx-idrow .vx-nm{font:700 17px/1.1 var(--disp);color:var(--chalk);
+.vx-idrow .vx-nm{font:700 17px/1.1 var(--disp);color:var(--ink);
   min-width:0;overflow-wrap:anywhere}
 
 /* ── empty state: a deliberate page, not a blank one ───────────────────── */
 .vx-empty{border:1px solid var(--vx-rule);border-radius:5px;
   padding:26px 24px;text-align:center;background:var(--alt)}
-.vx-empty h4{margin:0 0 6px;font:700 17px/1.2 var(--disp);color:var(--chalk);
+.vx-empty h4{margin:0 0 6px;font:700 17px/1.2 var(--disp);color:var(--ink);
   letter-spacing:.01em}
 .vx-empty p{margin:0 auto 14px;max-width:52ch;font-size:13px;color:var(--ink2);
   line-height:1.55}
 .vx-empty .vx-emptyacts{display:flex;gap:10px;justify-content:center;
   flex-wrap:wrap}
-.vx-empty a{font:700 10px/1 var(--disp);letter-spacing:.1em;
-  text-transform:uppercase;color:var(--chalk);text-decoration:none;
+.vx-empty a{font:700 11px/1 var(--disp);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink);text-decoration:none;
   border:1px solid var(--vx-rule-strong);border-radius:3px;padding:9px 13px}
 .vx-empty a:hover{border-color:var(--gold);color:var(--gold)}
 
@@ -8314,10 +8306,10 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 .vx-read .vx-readrow{display:grid;grid-template-columns:104px minmax(0,1fr);
   gap:14px;align-items:baseline;padding:9px 0}
 .vx-read .vx-readrow+.vx-readrow{border-top:1px solid var(--vx-rule)}
-.vx-read i{font-style:normal;font:700 9px/1.5 var(--disp);letter-spacing:.12em;
+.vx-read i{font-style:normal;font:700 11px/1.5 var(--disp);letter-spacing:.12em;
   text-transform:uppercase;color:var(--slate)}
 .vx-read .vx-readv{font-size:13.5px;color:var(--ink2);min-width:0}
-.vx-read .vx-readv b{color:var(--chalk);font-weight:700}
+.vx-read .vx-readv b{color:var(--ink);font-weight:700}
 .vx-read a.vx-readv{text-decoration:none}
 .vx-read a.vx-readv:hover b{color:var(--gold)}
 
@@ -8345,11 +8337,11 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 /* the honest "not yet" state, where a table would otherwise be */
 /* ── THE LIVE TICKER ─────────────────────────────────────────────────── */
 #livetick{display:flex;align-items:stretch;gap:0;overflow-x:auto;
-  border-bottom:1px solid var(--line);background:color-mix(in oklab,var(--navy) 24%,black);
+  border-bottom:1px solid var(--line2);background:var(--card);
   scrollbar-width:none}
 #livetick::-webkit-scrollbar{display:none}
 #livetick .tklab{display:flex;align-items:center;gap:6px;flex:0 0 auto;
-  padding:0 12px;font:700 9.5px/1 var(--disp);letter-spacing:.14em;color:var(--coral);
+  padding:0 12px;font:700 11px/1 var(--disp);letter-spacing:.14em;color:var(--coral);
   border-right:1px solid var(--line);position:sticky;left:0;z-index:2;
   background:inherit}
 #livetick .tkdot{width:6px;height:6px;border-radius:50%;background:var(--coral);
@@ -8362,15 +8354,15 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 #livetick .tkm:hover{background:color-mix(in oklab,var(--line) 40%,transparent)}
 #livetick .tkm:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:-2px}
 #livetick .tkm img{width:15px;height:15px;object-fit:contain}
-#livetick .tkm b{color:var(--chalk);font-weight:700}
+#livetick .tkm b{color:var(--ink);font-weight:700}
 #livetick .tkm .tkset{color:var(--gold);font-weight:700}
-#livetick .tkm .tkrk{font:600 9px/1 var(--disp);color:var(--gold)}
+#livetick .tkm .tkrk{font:600 11px/1 var(--disp);color:var(--gold)}
 /* AVAIL-CSS-BEGIN */
 .avrow{border:1px solid var(--line);border-radius:3px;padding:9px 12px;
   margin:0 0 7px;font-size:12.5px;color:var(--ink2)}
-.avrow b{color:var(--chalk)}
+.avrow b{color:var(--ink)}
 .avrow.avsg{border-style:dashed}
-.avkind{font:600 9.5px/1 var(--disp);letter-spacing:.09em;
+.avkind{font:600 11px/1 var(--disp);letter-spacing:.09em;
   text-transform:uppercase;color:var(--gold);font-style:normal}
 .avq{font-style:italic;color:var(--ink2)}
 .avmeta{display:block;margin-top:4px;font-size:11.5px;color:var(--ink3)}
@@ -8382,7 +8374,7 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 .avtl em{font:600 11px/1 var(--disp);letter-spacing:.06em;
   text-transform:uppercase;color:var(--ink2);font-style:normal;
   margin-right:6px}
-.avtlc{font:600 10.5px/1 var(--mono);padding:5px 8px;border-radius:2px;
+.avtlc{font:600 11px/1 var(--mono);padding:5px 8px;border-radius:2px;
   border:1px solid var(--line);background:none;color:var(--ink2);cursor:pointer}
 .avtlc.av-zero_action{color:var(--gold);border-color:color-mix(in oklab,var(--gold) 45%,transparent)}
 .avtlc.av-not_listed{color:var(--ink3);border-style:dashed}
@@ -8390,13 +8382,13 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 .avside > b{display:block;margin-bottom:5px;font:700 12px/1 var(--disp);
   letter-spacing:.07em;text-transform:uppercase;color:var(--ink2)}
 .avhistrow{opacity:.85}
-.avhistlab{font:600 9px/1 var(--disp);letter-spacing:.1em;
+.avhistlab{font:600 11px/1 var(--disp);letter-spacing:.1em;
   text-transform:uppercase;color:var(--ink3);
   border:1px dashed var(--line2);border-radius:2px;padding:2px 5px}
 details.avhist{margin:14px 0}
 /* AVAIL-CSS-END */
 /* ── RESULT CONFIDENCE LEDGER ───────────────────────────────────────── */
-.rcstate{font:600 10px/1.2 var(--disp);letter-spacing:.07em;
+.rcstate{font:600 11px/1.2 var(--disp);letter-spacing:.07em;
   text-transform:uppercase;padding:3px 7px;border-radius:2px;
   border:1px solid var(--line);color:var(--ink2);white-space:nowrap}
 .rc-confirmed{color:var(--good);border-color:color-mix(in oklab,var(--good) 45%,transparent)}
@@ -8405,50 +8397,50 @@ details.avhist{margin:14px 0}
 .rc-corrected{color:var(--gold);border-color:color-mix(in oklab,var(--gold) 50%,transparent)}
 .rccorr{border-style:solid;border-color:color-mix(in oklab,var(--gold) 40%,transparent)}
 .rchd{font-size:14px;color:var(--ink2);margin:0 0 10px}
-.rchd b{color:var(--chalk);font:700 15px/1.2 var(--disp);letter-spacing:.02em}
+.rchd b{color:var(--ink);font:700 15px/1.2 var(--disp);letter-spacing:.02em}
 .rcsets{font:600 12px/1 var(--mono);color:var(--ink3)}
-.rcsrctag{font:600 9px/1 var(--disp);letter-spacing:.1em;
+.rcsrctag{font:600 11px/1 var(--disp);letter-spacing:.1em;
   text-transform:uppercase;color:var(--ink3);font-style:normal;
   border:1px solid var(--line);border-radius:2px;padding:2px 4px;
   margin-left:6px;white-space:nowrap}
 .lpstate{font:600 12.5px/1 var(--mono);color:var(--ink2);margin:0 0 8px}
 .lpldrs{margin:8px 0}
-.lpcat{font:600 9px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
+.lpcat{font:600 11px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
   color:var(--gold);font-style:normal;margin-right:8px}
 /* ── TEAM DOSSIER DASHBOARD ─────────────────────────────────────────── */
 .tddash{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:0 0 16px}
 .tddcol{display:flex;flex-direction:column;gap:12px;min-width:0}
 .tddb{border:1px solid var(--line);border-radius:3px;padding:11px 13px}
-.tddb > em{display:block;font:600 9.5px/1 var(--disp);letter-spacing:.11em;
+.tddb > em{display:block;font:600 11px/1 var(--disp);letter-spacing:.11em;
   text-transform:uppercase;color:var(--ink3);font-style:normal;
   margin-bottom:8px}
-.tddbnote{font:600 9px/1 var(--disp);letter-spacing:.06em;color:var(--ink3);
+.tddbnote{font:600 11px/1 var(--disp);letter-spacing:.06em;color:var(--ink3);
   font-style:normal;text-transform:none;margin-left:7px}
 .tddbrow{display:block;width:100%;text-align:left;background:none;border:0;
   border-bottom:1px solid var(--line);padding:6px 0;font-size:13px;
   color:var(--ink2);cursor:pointer}
 .tddbrow:last-of-type{border-bottom:0}
-.tddbrow b{color:var(--chalk)}
-.tddbrow:hover{color:var(--chalk)}
+.tddbrow b{color:var(--ink)}
+.tddbrow:hover{color:var(--ink)}
 .tddbsets{font:600 11px/1 var(--mono);color:var(--ink3);margin-left:7px}
 .tddbquiet{font-size:12.5px;color:var(--ink3)}
-.tddblink{display:inline-block;margin-top:7px;font:600 10px/1 var(--disp);
+.tddblink{display:inline-block;margin-top:7px;font:600 11px/1 var(--disp);
   letter-spacing:.09em;text-transform:uppercase;color:var(--gold)}
 .avrowline{display:block;font-size:12.5px;color:var(--ink2);padding:3px 0}
 .tddbldr{display:flex;align-items:baseline;gap:8px;padding:4px 0;
   font-size:13px;color:var(--ink2)}
-.tddbldr b{color:var(--chalk)}
+.tddbldr b{color:var(--ink)}
 .tddbplink{text-decoration:none}
 .tddbplink:hover b,.tddbplink:focus-visible b{color:var(--gold)}
 .tddbplink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .pdranks{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
-.pdranks .chip i{font-style:normal;font:600 9px/1 var(--disp);
+.pdranks .chip i{font-style:normal;font:600 11px/1 var(--disp);
   letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);
   margin-left:4px}
 .pdlog{width:100%;text-align:left;background:none;border:0;cursor:pointer}
 .tsec .tddbnote{font-weight:600}
 .tddbldr .lpcat{min-width:74px;margin-right:0}
-.fp{font:700 10px/1 var(--disp);border-radius:2px;padding:2px 5px;
+.fp{font:700 11px/1 var(--disp);border-radius:2px;padding:2px 5px;
   font-style:normal;margin-right:2px}
 .fp.fw{color:var(--good);border:1px solid color-mix(in oklab,var(--good) 45%,transparent)}
 .fp.fl{color:var(--coral);border:1px solid color-mix(in oklab,var(--coral) 40%,transparent)}
@@ -8456,32 +8448,32 @@ details.avhist{margin:14px 0}
   .tddash{grid-template-columns:1fr}
 }
 .rccmp{margin:4px 0 10px}
-.rccmp > em{display:block;font:600 9.5px/1 var(--disp);letter-spacing:.1em;
+.rccmp > em{display:block;font:600 11px/1 var(--disp);letter-spacing:.1em;
   text-transform:uppercase;color:var(--ink3);font-style:normal;
   margin-bottom:6px}
 .rccols,.rcline{display:grid;grid-template-columns:110px 64px 14px 64px;
   gap:0 8px;align-items:baseline}
-.rccols .rctm{font:600 9px/1.2 var(--disp);letter-spacing:.07em;
+.rccols .rctm{font:600 11px/1.2 var(--disp);letter-spacing:.07em;
   text-transform:uppercase;color:var(--ink3);text-align:right}
 .rcline{font-size:13px;color:var(--ink2);padding:2px 0}
-.rcline .rcm{font:600 10px/1.4 var(--disp);letter-spacing:.07em;
+.rcline .rcm{font:600 11px/1.4 var(--disp);letter-spacing:.07em;
   text-transform:uppercase;color:var(--ink3)}
 .rcline b{text-align:right;color:var(--ink2);font-variant-numeric:tabular-nums}
-.rcline b.rchi{color:var(--chalk);font-weight:700}
+.rcline b.rchi{color:var(--ink);font-weight:700}
 .rcline .rcvs{color:var(--ink3);font-style:normal;text-align:center}
 .rcldrs{margin:8px 0}
 .rcldr{font-size:12.5px;color:var(--ink2);margin:0 0 4px}
-.rcldr b{color:var(--chalk)}
-.rcbasis{font:600 10px/1 var(--mono);color:var(--ink3);margin-left:6px}
-.rcline b{color:var(--chalk)}
+.rcldr b{color:var(--ink)}
+.rcbasis{font:600 11px/1 var(--mono);color:var(--ink3);margin-left:6px}
+.rcline b{color:var(--ink)}
 .rcdup{border:1px dashed var(--line2);border-radius:3px;padding:12px 14px;
   margin:0 0 12px;font-size:13px;color:var(--ink2)}
-.rcdup b{color:var(--chalk)}
+.rcdup b{color:var(--ink)}
 .rcdup a{color:var(--gold)}
-.rcsrc{font:600 10.5px/1 var(--mono);color:var(--ink3);white-space:nowrap}
+.rcsrc{font:600 11px/1 var(--mono);color:var(--ink3);white-space:nowrap}
 .rcrow{display:flex;align-items:center;gap:14px}
 .rcfields{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px}
-.rcf{font:600 10px/1 var(--disp);letter-spacing:.07em;text-transform:uppercase;
+.rcf{font:600 11px/1 var(--disp);letter-spacing:.07em;text-transform:uppercase;
   padding:3px 7px;border:1px solid var(--line);border-radius:2px;color:var(--ink3)}
 .rcf.rc-confirmed{color:var(--good)}
 .rcf.rc-disputed{color:var(--coral)}
@@ -8489,12 +8481,12 @@ details.avhist{margin:14px 0}
 .rcsource{border:1px solid var(--line);border-radius:3px;padding:10px 12px;
   margin:0 0 8px;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline;
   font-size:12.5px;color:var(--ink2)}
-.rck{font:600 9.5px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase;
+.rck{font:600 11px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase;
   color:var(--ink3)}
 .rcq{flex:1 1 100%;font-style:italic;color:var(--ink2)}
 .rcnote{color:var(--ink3)}
 .rcu{color:var(--gold);font:600 11px/1 var(--mono);text-decoration:underline}
-.rct{font:600 10px/1 var(--mono);color:var(--ink3)}
+.rct{font:600 11px/1 var(--mono);color:var(--ink3)}
 .rcmatch{display:inline-block;margin-top:8px;font:600 11px/1 var(--disp);
   letter-spacing:.08em;text-transform:uppercase;color:var(--gold)}
 @media (max-width:560px){
@@ -8505,28 +8497,28 @@ details.avhist{margin:14px 0}
   gap:10px;margin:0 0 16px}
 .cfcard{border:1px solid var(--line);border-radius:3px;padding:11px 13px;
   display:flex;flex-direction:column;gap:5px}
-.cfcard em{font:600 9.5px/1 var(--disp);letter-spacing:.12em;
+.cfcard em{font:600 11px/1 var(--disp);letter-spacing:.12em;
   text-transform:uppercase;font-style:normal;color:var(--ink3)}
-.cfcard b{font:700 17px/1.2 var(--disp);color:var(--chalk);
+.cfcard b{font:700 17px/1.2 var(--disp);color:var(--ink);
   text-transform:uppercase}
 .cfcard span{font-size:12px;color:var(--ink2)}
 .cftab{width:100%;border-collapse:collapse}
-.cftab th{font:600 9.5px/1.2 var(--disp);letter-spacing:.09em;
+.cftab th{font:600 11px/1.2 var(--disp);letter-spacing:.09em;
   text-transform:uppercase;color:var(--ink3);padding:7px 8px;cursor:pointer;
   white-space:nowrap}
 .cftab th.on{color:var(--gold)}
 .cftab th.l{text-align:left}.cftab th.n{text-align:right}
 .cftab td{padding:6px 8px;border-bottom:1px solid var(--line);font-size:12.5px;
   text-align:right;font-variant-numeric:tabular-nums}
-.cftab td.tm{text-align:left;font-weight:600;color:var(--chalk)}
-.cfearly{font:600 9px/1 var(--disp);letter-spacing:.1em;color:var(--gold);
+.cftab td.tm{text-align:left;font-weight:600;color:var(--ink)}
+.cfearly{font:600 11px/1 var(--disp);letter-spacing:.1em;color:var(--gold);
   border:1px solid color-mix(in oklab,var(--gold) 50%,transparent);
   border-radius:2px;padding:2px 4px;font-style:normal;margin-left:6px}
-.cfroad{font-size:10px;color:var(--ink3);font-style:normal}
+.cfroad{font-size:11px;color:var(--ink3);font-style:normal}
 .cfh{font:700 13px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
   color:var(--ink2);margin:22px 0 8px}
 .cfmat{border-collapse:collapse}
-.cfmat th{font:600 9px/1.2 var(--disp);letter-spacing:.06em;color:var(--ink3);
+.cfmat th{font:600 11px/1.2 var(--disp);letter-spacing:.06em;color:var(--ink3);
   padding:5px 6px;text-transform:uppercase}
 .cfmat th.l{text-align:left;white-space:nowrap}
 .cfmat td{padding:2px;text-align:center}
@@ -8550,7 +8542,7 @@ details.avhist{margin:14px 0}
 #livetick .tkall{color:var(--gold);font-weight:700}
 #livetick .tklab.tkquiet{color:var(--slate)}
 #livetick .tklab.tkquiet ~ .tkm .tkper{color:var(--ink3)}
-#livetick .tkm .tkper{font:600 9px/1 var(--disp);letter-spacing:.08em;
+#livetick .tkm .tkper{font:600 11px/1 var(--disp);letter-spacing:.08em;
   color:var(--ink3);text-transform:uppercase}
 @media (max-width:560px){
   #livetick .tkm{padding:9px 12px}
@@ -8561,7 +8553,7 @@ details.avhist{margin:14px 0}
 .mpend{display:flex;flex-direction:column;gap:4px;padding:12px 14px;
   border:1px dashed var(--line2);border-radius:4px;background:var(--alt)}
 .mpend b{font:700 12px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase;
-  color:var(--chalk)}
+  color:var(--ink)}
 .mpend span{font-size:12.5px;color:var(--ink2)}
 .mpend .mfine{font-size:12px;color:var(--ink3)}
 .msrc{margin:10px 0 0;font-size:11.5px;color:var(--ink3)}
@@ -8569,18 +8561,18 @@ details.avhist{margin:14px 0}
 /* the active week's counts, read at a glance */
 .calcounts{display:flex;flex-wrap:wrap;gap:6px 18px;margin:2px 0 10px;
   font-size:12.5px;color:var(--ink2)}
-.calcounts b{font:700 15px/1 var(--disp);color:var(--chalk);margin-right:4px}
+.calcounts b{font:700 15px/1 var(--disp);color:var(--ink);margin-right:4px}
 .calcounts .bad b{color:#F2B441}
 .calnow.okw{border-left-color:#8FD3FF}
 .calblock{list-style:none;margin:0 0 10px;padding:0;display:flex;
   flex-direction:column;gap:5px}
 .calblock li{display:flex;align-items:center;gap:7px;flex-wrap:wrap;
   font-size:12px;color:var(--ink2)}
-.calblock b{font:700 12px/1 var(--mono);color:var(--chalk)}
+.calblock b{font:700 12px/1 var(--mono);color:var(--ink)}
 .calblock i{font-style:normal;font-size:11px;color:var(--ink3);
   background:var(--line);padding:1px 6px;border-radius:3px;white-space:nowrap}
 .calblock i.more{background:none;padding-left:0}
-.calwhy{font:700 9px/1.5 var(--disp);letter-spacing:.09em;
+.calwhy{font:700 11px/1.5 var(--disp);letter-spacing:.09em;
   text-transform:uppercase;padding:2px 6px;border-radius:3px;
   background:var(--line);color:var(--ink3)}
 .calwhy.live{color:#F2B441;background:rgba(242,180,65,.14)}
@@ -8589,7 +8581,7 @@ details.avhist{margin:14px 0}
 @media (max-width:560px){
   .calcounts{gap:4px 14px;font-size:12px}
   .calcounts b{font-size:14px}
-  .calblock i{font-size:10.5px}
+  .calblock i{font-size:11px}
 }
 
 /* ⚠ PHONE: the calendar is the surface a voter checks ON A PHONE on a Monday,
@@ -8606,7 +8598,7 @@ details.avhist{margin:14px 0}
   /* the column name in front of the value -- without it a stacked cell is a
      bare "-" with nothing saying which column it came from */
   .caltbl td[data-l]:not(:first-child)::before{content:attr(data-l) " ";
-    font:700 9px/1 var(--disp);letter-spacing:.08em;color:var(--slate);
+    font:700 11px/1 var(--disp);letter-spacing:.08em;color:var(--slate);
     text-transform:uppercase;margin-right:4px}
   .caltrack .panel,.caltrack .scroll{overflow:visible}
 }
@@ -8619,13 +8611,13 @@ details.avhist{margin:14px 0}
    reference columns are one checkbox away, and every rank carries its label
    the moment the table stops being a table. */
 .rulerbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:0 0 10px}
-.refsel{display:flex;align-items:center;gap:7px;font:600 10px/1 var(--disp);
+.refsel{display:flex;align-items:center;gap:7px;font:600 11px/1 var(--disp);
   letter-spacing:.1em;text-transform:uppercase;color:var(--slate)}
 .refsel select{font:inherit;letter-spacing:0;text-transform:none;
   font-size:12px;padding:5px 8px}
 .rulerwhat{margin:0 0 14px;max-width:66ch;font-size:13px;color:var(--ink2);
   line-height:1.5}
-.rulerwhat b{color:var(--chalk)}
+.rulerwhat b{color:var(--ink)}
 .refcols{display:flex;align-items:center;gap:6px;font-size:12px;
   color:var(--ink2);white-space:nowrap;cursor:pointer}
 /* ⚠ THE GROUP ROW SPANS THE COLUMNS IT LABELS, so hiding columns without
@@ -8646,10 +8638,10 @@ details.avhist{margin:14px 0}
 .gaptbl tr[data-team]{cursor:pointer}
 .gaptbl tr[data-team]:hover td{background:rgba(91,168,245,.06)}
 .gaptbl tr[data-team]:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
-.gaptbl .rl{display:block;font:700 9px/1.4 var(--disp);letter-spacing:.09em;
+.gaptbl .rl{display:block;font:700 11px/1.4 var(--disp);letter-spacing:.09em;
   color:var(--slate);font-style:normal}
-.gaptbl .gapn{font:700 17px/1 var(--disp);color:var(--chalk)}
-.nrtag{font:700 9px/1.5 var(--mono);letter-spacing:.04em;color:var(--ink3);
+.gaptbl .gapn{font:700 17px/1 var(--disp);color:var(--ink)}
+.nrtag{font:700 11px/1.5 var(--mono);letter-spacing:.04em;color:var(--ink3);
   background:var(--alt);padding:2px 5px;border-radius:3px}
 .gapwrap .tsec{margin-top:18px}
 
@@ -8687,7 +8679,7 @@ details.avhist{margin:14px 0}
   .rk3 tr.row td.c-ref{display:none}
   /* the label rides in front of the value, so no number is anonymous */
   .rk3 tr.row td[data-l]::before{content:attr(data-l) " ";
-    font:700 9px/1 var(--disp);letter-spacing:.08em;color:var(--slate);
+    font:700 11px/1 var(--disp);letter-spacing:.08em;color:var(--slate);
     text-transform:uppercase;margin-right:3px}
   .rulerbar{gap:10px}
   .refcols{display:none}
@@ -8696,22 +8688,22 @@ details.avhist{margin:14px 0}
 
 /* The basis, stamped on the column header itself so the number cannot be
    read as something wider than it is. */
-.thb{display:block;font:700 9px/1.4 var(--mono);letter-spacing:.06em;
+.thb{display:block;font:700 11px/1.4 var(--mono);letter-spacing:.06em;
   color:var(--ink3);font-weight:700}
 
 /* The non-D-I record, shown beside the record it is excluded from. Quiet:
    it is a footnote to the number, not a competing number. */
-.nvd{display:block;font:600 9px/1.4 var(--mono);color:var(--ink3);
+.nvd{display:block;font:600 11px/1.4 var(--mono);color:var(--ink3);
   font-style:normal;letter-spacing:.02em;white-space:nowrap}
 
 /* The division caveat, wherever a rate is read. Emphatic but not an error
    state: this is a fact about the schedule, not a fault. */
-.dicaveat{color:var(--chalk);font-weight:700}
+.dicaveat{color:var(--ink);font-weight:700}
 .tm .nondi,
 .gline .nondi{margin-left:6px;padding:1px 5px;border-radius:3px;
-  font:700 9px/1.5 var(--mono);letter-spacing:.04em;text-transform:uppercase;
+  font:700 11px/1.5 var(--mono);letter-spacing:.04em;text-transform:uppercase;
   color:var(--ink3);background:var(--alt);vertical-align:middle;}
-h3 .h3n{font:700 10px/1 var(--mono);color:var(--ink3);background:var(--alt);
+h3 .h3n{font:700 11px/1 var(--mono);color:var(--ink3);background:var(--alt);
   border-radius:4px;padding:3px 7px;margin-left:7px;vertical-align:2px}
 @media (max-width:560px){
   .rrow{grid-template-columns:1fr auto;padding-right:4px}
@@ -8736,9 +8728,9 @@ tr.det td{background:var(--alt);padding:13px 15px}
   margin-bottom:8px;overflow:hidden}
 .brkside{display:flex;align-items:center;gap:7px;padding:7px 10px;font-size:13px}
 .brkside+.brkside{border-top:1px solid var(--line)}
-.brkside .sd{font:700 10px/1 var(--mono);color:var(--ink3);width:18px}
+.brkside .sd{font:700 11px/1 var(--mono);color:var(--ink3);width:18px}
 .brkside .nmm{flex:1;font-weight:600}
-.brkside.fav{background:#12233C}
+.brkside.fav{background:var(--alt)}
 .brkside .pc{font:700 11.5px/1 var(--mono);color:var(--navy)}
 .tlogo{width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-right:7px}
 .tlogo.lg{width:44px;height:44px;vertical-align:-10px;margin-right:12px}
@@ -8754,7 +8746,7 @@ table.box td.pn{white-space:nowrap}
   color:var(--ink2);margin:10px 0 6px}
 table.box{width:100%;border-collapse:collapse;font-size:12.5px}
 table.box th{position:static;background:transparent;border-bottom:1px solid var(--line2);
-  padding:5px 6px;font-size:10px}
+  padding:5px 6px;font-size:11px}
 table.box td{padding:5px 6px;border-bottom:1px solid var(--line);font-size:12.5px}
 table.box td.pn{text-align:left;font-weight:600}
 .pgl{font-size:12.5px}
@@ -8775,7 +8767,7 @@ table.box td.pn{text-align:left;font-weight:600}
 .pl b{display:block;font-size:13.5px}
 .pl span{display:block;font-size:11.5px;color:var(--ink2);text-transform:capitalize}
 .pl i{font-style:normal;font:700 12px/1.5 var(--mono);color:var(--navy)}
-.pl i em{font-style:normal;color:var(--ink3);font-size:10px;margin:0 4px 0 2px}
+.pl i em{font-style:normal;color:var(--ink3);font-size:11px;margin:0 4px 0 2px}
 
 /* ---- team page ---- */
 .thead{background:var(--card);border:1px solid var(--line);border-radius:4px;
@@ -8786,7 +8778,7 @@ table.box td.pn{text-align:left;font-weight:600}
 .chip{font:700 11.5px/1 var(--mono);border:1px solid var(--line2);border-radius:4px;
   padding:6px 11px;color:var(--ink2);background:var(--alt)}
 .chip b{color:var(--navy)}
-.chip.ours{background:#12233C;border-color:#2A4570;color:var(--navy)}
+.chip.ours{background:var(--navy);border-color:var(--navy);color:#B9C6DA}
 .tcols{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;align-items:start}
 @media(max-width:900px){.tcols{grid-template-columns:1fr}}
 .tsec{background-image:
@@ -9146,7 +9138,6 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
        this tab -- in the group header above the columns, in RANK_BASIS, and
        again here. Repeating a caveat does not make it more believed; it makes
        the page read as anxious. The group row carries it now. -->
-  <p class="histnote">{{TREND_NOTE}}</p>
   <p class="lead" id="ranklead">{{RANK_BASIS}}
   <!-- ⚠ THE HINT MUST DESCRIBE WHAT THE ROW ACTUALLY DOES. It said "click a
        team to see the six players the number is built from", which described
@@ -9215,6 +9206,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <summary><b>Methodology</b> &mdash; how this ranking is built, what it
         cannot see, and why it barely moves in August</summary>
     <div class="note">
+      <p class="histnote">{{TREND_NOTE}}</p>
       <p><b>Why it barely moves in August.</b> A result is weighted
       <code>n/(n+k)</code> with <b>k measured, not chosen</b>, so a team needs
       about k matches before this season counts as much as the projection does.
@@ -18587,6 +18579,20 @@ const TEAMS = {{TEAMS_JSON}};
    definition -- see the temporal-dead-zone note on bwWire() */
 if (typeof bwWire === 'function') bwWire();
 /* the desk reads DESK and TEAMS; both are initialised by here */
+/* ── ARENA DAYLIGHT: the rally tape is TODAY'S marquee, not global
+   chrome. Relocated once at boot -- csTape() renders by id, and the id
+   travels with the node, so the poller keeps working. Every other route
+   gets the compact masthead + slim ticker only. */
+(function(){
+  const tape = document.getElementById('cstape');
+  const today = document.getElementById('v-desk');
+  if (tape && today) today.insertBefore(tape, today.firstChild);
+})();
+(function(){
+  const b = document.getElementById('asklaunch');
+  const inner = document.querySelector('nav .inner');
+  if (b && inner) inner.appendChild(b);
+})();
 if (typeof deskLive === 'function') deskLive();
 /* BALLOT-INIT-END */
 /* ⚠ THE ROUTER BOOTS HERE, NOT AT ITS DEFINITION, AND THIS WAS A LIVE BUG.
@@ -20595,10 +20601,15 @@ body[data-view=scores] .asklaunch{display:none}
    routed in, and :has() lifts that to the body -- no JS bookkeeping to fall
    out of step with the route. */
 body:has(section.detailopen) .asklaunch{display:none}
-.asklaunch{position:fixed;right:16px;bottom:16px;z-index:60;border:1px solid var(--line);
-  background:var(--card);color:var(--ink);border-left:3px solid var(--amber);
-  border-radius:2px;padding:10px 14px;cursor:pointer;box-shadow:0 3px 14px rgba(0,0,0,.16);
-  font:700 11px/1 var(--sans);letter-spacing:.1em;text-transform:uppercase}
+/* ── ARENA DAYLIGHT: Digby is an in-layout nav utility, never a float
+   over content (Cody's review: the pill sat on top of primary
+   information). The button is relocated into the nav's right side at
+   boot; the chat panel still opens as a deliberate overlay. ── */
+.asklaunch{margin-left:auto;border:1px solid var(--line2);
+  background:var(--card);color:var(--ink2);
+  border-radius:3px;padding:9px 12px;cursor:pointer;
+  font:700 11px/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;
+  min-height:40px}
 .asklaunch:hover{background:var(--alt)}
 .askwrap{position:fixed;right:16px;bottom:16px;z-index:61;width:min(420px,calc(100vw - 32px));
   background:var(--card);border:1px solid var(--line);border-top:3px solid var(--amber);
@@ -20606,7 +20617,7 @@ body:has(section.detailopen) .asklaunch{display:none}
 .askwrap.on{display:block}
 .askhead{display:flex;align-items:center;justify-content:space-between;
   padding:10px 12px;border-bottom:1px solid var(--line)}
-.askhead .t{font:700 9.5px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;
+.askhead .t{font:700 11px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;
   color:var(--ink3)}
 .askx{border:0;background:none;font-size:17px;line-height:1;cursor:pointer;color:var(--ink3)}
 .askbody{padding:12px;max-height:min(52vh,420px);overflow:auto}

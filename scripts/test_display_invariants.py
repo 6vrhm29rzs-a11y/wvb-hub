@@ -1796,7 +1796,11 @@ def check_net_matches_the_rulebook():
         # IDENTITY, which is now carried on every page by the masthead net and
         # the Court Signal court texture rather than by one hero. Assert those
         # and stop, rather than parsing a rulebook out of a CSS gradient.
-        ident = (re.search(r'\.net\{[^}]*repeating-linear-gradient', src)
+        # ⚠ ARENA DAYLIGHT: the net is a clean 3px court-gold ATTACK LINE
+        # now, not the glowing mesh -- the identity is the gold court line
+        # plus the Court Signal texture, and that is what is asserted.
+        ident = (re.search(r'\.net\{[^}]*border-top:3px solid var\(--gold',
+                           src)
                  and '.cs-court::before' in src)
         if ident:
             ok("the court identity is carried by the masthead net and the "

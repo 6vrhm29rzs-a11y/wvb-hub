@@ -2,34 +2,34 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 410,
+  "scored": 420,
   "logged_after_tipoff_excluded": 8,
   "team_mismatch_excluded": 13,
   "predictions_on_record": 4769,
-  "results_available": 442,
-  "brier": 0.1818,
+  "results_available": 452,
+  "brier": 0.1814,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 299,
-  "favourite_correct_pct": 72.9
+  "favourite_correct": 307,
+  "favourite_correct_pct": 73.1
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 59,
-   "said": 55.5,
-   "happened": 52.5
+   "n": 61,
+   "said": 55.4,
+   "happened": 54.1
   },
   {
    "range": "60-70%",
-   "n": 81,
+   "n": 83,
    "said": 65.1,
-   "happened": 59.3
+   "happened": 59.0
   },
   {
    "range": "70-80%",
-   "n": 59,
-   "said": 75.4,
-   "happened": 69.5
+   "n": 63,
+   "said": 75.2,
+   "happened": 69.8
   },
   {
    "range": "80-90%",
@@ -39,9 +39,9 @@
   },
   {
    "range": "90-101%",
-   "n": 131,
-   "said": 95.5,
-   "happened": 90.1
+   "n": 133,
+   "said": 95.4,
+   "happened": 90.2
   }
  ],
  "matches": [
@@ -469,6 +469,15 @@
    "brier": 0.52403121
   },
   {
+   "game_id": "6626506",
+   "date": "2026-08-30",
+   "away": "Pacific",
+   "home": "Southern Utah",
+   "p_home": 0.278,
+   "home_won": true,
+   "brier": 0.521284
+  },
+  {
    "game_id": "6626781",
    "date": "2026-08-28",
    "away": "Mercyhurst",
@@ -485,15 +494,6 @@
    "p_home": 0.7089,
    "home_won": false,
    "brier": 0.50253921
-  },
-  {
-   "game_id": "6625235",
-   "date": "2026-08-28",
-   "away": "UC San Diego",
-   "home": "Saint Mary's (CA)",
-   "p_home": 0.7048,
-   "home_won": false,
-   "brier": 0.49674303999999997
   }
  ]
 }

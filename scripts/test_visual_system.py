@@ -84,13 +84,16 @@ def main():
     # ⚠ THE KEY MUST MATCH THE COLOURS ALREADY ON THE PAGE, or it introduces
     # the inconsistency it exists to remove. POWER has been green since the
     # rating shipped -- including the heat scale on the POWER column itself.
-    check("POWER's key is the green the site already uses",
-          "--vx-power:#31D07E" in src)
+    # ⚠ ARENA DAYLIGHT (2026-08-30): the values are light-surface grades
+    # now; the INVARIANT is that each key is a token consumed by its
+    # labels, not a pinned hex from the dark theme.
+    check("POWER's key is a defined green token",
+          "--vx-power:#1D7D4F" in src)
     check("...and the existing POWER labels use the token, not a literal",
           "b.kpow{color:var(--vx-power)}" in src
           and ".bwv.pw{color:var(--vx-power)}" in src)
-    check("AVCA's key is the blue the site already uses",
-          "--vx-avca:#7AA7FF" in src)
+    check("AVCA's key is a defined blue token",
+          "--vx-avca:#1D5FC2" in src)
     check("the three rulers each carry a swatch on the selector",
           h.count('class="vx-key vx-k-') >= 3,
           "%d" % h.count('class="vx-key vx-k-'))
