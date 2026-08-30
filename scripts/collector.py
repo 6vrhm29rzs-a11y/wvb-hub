@@ -30,6 +30,15 @@ Respect, mechanically enforced:
   * a page that is blocked, JS-only, or unsupported is RECORDED as such
     -- never silently counted as checked.
 
+WRITE BOUNDARY (reviewed and guarded): the collector may write exactly
+three things -- its registry, schedule OBSERVATIONS, and result-evidence
+captures. It has NO write authority over duplicate_listings, exhibitions,
+result corrections, the raw game log, rating inputs, or count
+membership. The five duplicate decisions of 2026-08-30 were EVIDENCE-
+BACKED CURATION performed during development (both schools' pages read
+and quoted, per the no-heuristic protocol) -- not an automated collector
+action, and the daily job cannot repeat them.
+
 Binding, the ASU lesson (R8-scrape): evidence binds to its OWN card's DOM
 boundary; the opponent must resolve to the exact canonical team through
 the project's resolver + the State/Saint folds; the (team, opponent,
@@ -256,30 +265,50 @@ def _fold_tokens(name):
     return _fold(name)
 
 
-def bind_opponent(raw, teams):
+# Source-scoped short labels: (source school, exact label) -> team.
+# Each entry needs a documented reason and a fixture in test_collector.py,
+# and binds ONLY when reading that school's own page -- the label carries
+# no meaning on any other source, and the (team, opponent, date) unique-
+# fixture requirement still applies on top.
+SOURCE_ALIASES = {
+    # jaxstatesports.com prints Southern University as the bare word
+    # 'Southern' (measured 2026-08-30, beside a distinct 'Southern Miss'
+    # row); on Jacksonville St.'s own schedule that label is unambiguous.
+    ("Jacksonville St.", "Southern"): "Southern U.",
+}
+
+
+def bind_opponent(raw, teams, source_school=None):
     """raw opponent text -> exactly one canonical team, else None.
 
     Whole folded token sequence through the project resolver -- never a
-    shared first word (the Kentucky/Kent St. rule)."""
+    shared first word (the Kentucky/Kent St. rule). `source_school` is
+    the school whose OWN page is being read; it unlocks only that
+    source's documented short labels (SOURCE_ALIASES)."""
     if not raw:
         return None
     # a school page says "Gardner-Webb University" / "University of
     # Dayton" where the hub says "Gardner-Webb" -- try the raw text and
     # its institutional-suffix strips, still EXACT fold equality each time
     cands = [raw]
-    # explicit official short forms, each verified on a real page --
-    # 'Southern' is how SWAC pages print Southern University (seen on
-    # jsugamecocks.com beside 'Southern Miss', which stays distinct).
-    # NEVER fuzzy: an alias maps one exact string to one exact team.
-    ALIASES = {"Southern": "Southern U."}
-    if raw.strip() in ALIASES:
-        cands.insert(0, ALIASES[raw.strip()])
+    # ⚠ NO GLOBAL SHORT-FORM ALIASES. A bare 'Southern' briefly lived here
+    # and was removed on review: it is the Arizona/Arizona St. and
+    # Kentucky/Kent St. class of bug -- a one-word label is not a global
+    # team identity, however convenient it was on one page. Short labels
+    # are honoured only through SOURCE_ALIASES below: scoped to the ONE
+    # source school whose page demonstrably prints them, and still subject
+    # to the unique-fixture bind.
+    if source_school and (source_school, raw.strip()) in SOURCE_ALIASES:
+        cands.insert(0, SOURCE_ALIASES[(source_school, raw.strip())])
     m = re.match(r"(?i)^university of (.+)$", raw.strip())
     if m:
         cands.append(m.group(1))
     m = re.match(r"(?i)^(.+?)\s+(university|college)$", raw.strip())
     if m:
         cands.append(m.group(1))
+        # 'Southern University' must reach our 'Southern U.' -- the
+        # stripped form alone loses the U token
+        cands.append(m.group(1) + " U.")
     tgt = None
     for cand in cands:
         raw_tokens = _fold_tokens(cand)
@@ -568,7 +597,8 @@ def run(cap=QUEUE_CAP, now=None):
                  if tpl == "sidearm_cards" else [])
         n_new = 0
         for c in cards:
-            opp = bind_opponent(c["opponent"], all_teams)
+            opp = bind_opponent(c["opponent"], all_teams,
+                                source_school=team)
             if not opp:
                 if c.get("result"):
                     stats["pending_unbound"] += 1

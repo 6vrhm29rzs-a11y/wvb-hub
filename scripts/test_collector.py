@@ -67,9 +67,36 @@ def main():
     check("'Gardner-Webb University' binds Gardner-Webb",
           C.bind_opponent("Gardner-Webb University", teams)
           == "Gardner-Webb")
-    check("the explicit 'Southern' alias binds Southern U., not "
-          "Southern Miss.",
-          C.bind_opponent("Southern", teams) == "Southern U.")
+    # ⚠ THE GLOBAL 'Southern' ALIAS WAS REMOVED ON REVIEW -- a one-word
+    # label is not a global team identity (the Arizona/Kentucky class of
+    # bug). The label binds ONLY on the one source whose page demonstrably
+    # prints it, and nowhere else.
+    check("[NEG] bare 'Southern' binds NOTHING generically",
+          C.bind_opponent("Southern", teams) is None)
+    check("[NEG] bare 'Southern' with a DIFFERENT source binds nothing",
+          C.bind_opponent("Southern", teams,
+                          source_school="Southern Miss.") is None)
+    check("the source-scoped label binds only on Jacksonville St.'s page",
+          C.bind_opponent("Southern", teams,
+                          source_school="Jacksonville St.")
+          == "Southern U.")
+    check("'Southern Miss' stays distinct even on that source",
+          C.bind_opponent("Southern Miss", teams,
+                          source_school="Jacksonville St.")
+          == "Southern Miss.")
+    _utah = ["Southern U.", "Southern Utah", "Southern Ind."]
+    check("[NEG] Southern Utah and Southern Indiana cannot collide",
+          C.bind_opponent("Southern Utah", _utah) == "Southern Utah"
+          # 'Southern Indiana' vs our abbreviated 'Southern Ind.' does not
+          # fold-match, so it stays PENDING -- the safe direction; what it
+          # must never do is bind Southern U. or Southern Utah
+          and C.bind_opponent("Southern Indiana", _utah) is None
+          and C.bind_opponent("Southern", _utah) is None)
+    check("a correctly full-bound Southern U. source still works",
+          C.bind_opponent("Southern University", teams) == "Southern U.")
+    check("[NEG] an ambiguous short form stays pending, never guessed",
+          C.bind_opponent("Southern", _utah,
+                          source_school="Nobody") is None)
     check("an ambiguous name binds NOTHING",
           C.bind_opponent("State University",
                           ["A State", "B State"]) is None)
@@ -110,6 +137,56 @@ def main():
     check("...and never touches the raw game log",
           "games.jsonl" not in src.replace(
               'load_games_jsonl', '').replace("gamelog", ""))
+
+    print("\n4b. THE WRITE BOUNDARY, AT BEHAVIOUR LEVEL")
+    # the collector's ONLY writers are its three sanctioned files; prove
+    # it by intercepting _save during the writer helpers and by scanning
+    # for any other write path in the module
+    _writes = []
+    real_save = C._save
+
+    def spy(path, doc):
+        _writes.append(path)
+    C._save = spy
+    try:
+        C.append_result_evidence("999999", "T", "https://x.edu", "q",
+                                 True, "2026-08-30T00:00:00Z")
+        C.record_observation("999999", "T", ["venue"], "https://x.edu",
+                             "q", "2026-08-30T00:00:00Z", {"venue": "V"})
+    finally:
+        C._save = real_save
+    import os as _os
+    _names = {_os.path.basename(p) for p in _writes}
+    check("the writer helpers touch only result_evidence and "
+          "observations", _names <= {"result_evidence.json",
+                                     "collector_observations.json"},
+          str(_names))
+    # ⚠ THE WRITE SET IS CLOSED: every _save() call site in the module
+    # names one of the three sanctioned path constants, and json.dump
+    # exists nowhere else. A duplicate-ledger write is structurally
+    # impossible -- there is no code path that could make one.
+    _sites = re.findall(r"_save\((\w+)", src)
+    check("[NEG] every write site targets a sanctioned constant "
+          "(duplicate-ledger write structurally impossible)",
+          _sites and set(_sites) <= {"REGISTRY", "OBS", "REVID", "path",
+                                     "doc"}
+          and set(re.findall(r"_save\((REGISTRY|OBS|REVID)", src))
+          == {"REGISTRY", "OBS", "REVID"},
+          str(set(_sites)))
+    check("...and json.dump lives only inside _save",
+          src.count("json.dump(") == 1)
+    for banned in ("duplicate_listings", "result_corrections.json",
+                   "exhibitions.json", "rating_", "digby_top25",
+                   "resume_"):
+        check("no runtime write target touches %s" % banned,
+              not any(banned in p for p in _writes))
+    # cleanup: the spy prevented the test rows from ever reaching disk
+    import json as _json
+    rev = _json.load(io.open(os.path.join(
+        REPO, "data", "raw", "2026", "result_evidence.json"),
+        encoding="utf-8"))
+    check("...and the intercepted test rows never reached disk",
+          "999999" not in rev["evidence"])
 
     print("\n5. THE REGISTRY TELLS THE TRUTH ABOUT COVERAGE")
     reg = json.load(io.open(os.path.join(
