@@ -1388,6 +1388,18 @@ def check_phantom_sets_are_harmless():
     # feed-corruption (nameclean); the auditor must speak the same key or it
     # is auditing a different question.
     recs = [json.loads(l) for l in open(pb) if l.strip()]
+    # ⚠ SKIP EXHIBITIONS, EXACTLY AS THE AGGREGATOR DOES (CI, 2026-08-30):
+    # Lexi Gin's gp=2 line is from the SMU-Penn St. exhibition, which the
+    # aggregate rightly excludes -- a recount that counts it reports
+    # "aggregate 3 vs 5 justified" against a correct number. An auditor
+    # must apply every exclusion the audited pipeline applies, or the
+    # difference it finds is its own.
+    try:
+        import exhibitions as _EXHA
+        _exh_gids = _EXHA.resolved_gids(live)
+    except Exception:
+        _exh_gids = set()
+    recs = [r for r in recs if str(r.get("game_id")) not in _exh_gids]
     phantom, real = set(), {}
     for rec in recs:
         rows = rec.get("rows") or []
@@ -1504,10 +1516,19 @@ def check_aggregate_excludes_phantom_sets():
         return any(n(r.get(k)) for k in COUNTS)
 
     want = {}
+    try:
+        import exhibitions as _EXHB
+        _exh_gids2 = _EXHB.resolved_gids(live)
+    except Exception:
+        _exh_gids2 = set()
     for line in open(pb, encoding="utf-8"):
         if not line.strip():
             continue
-        rows = (json.loads(line).get("rows") or [])
+        _rec2 = json.loads(line)
+        # same exhibition exclusion the aggregator applies (see block above)
+        if str(_rec2.get("game_id")) in _exh_gids2:
+            continue
+        rows = (_rec2.get("rows") or [])
         if not rows:
             continue
         broken = (len(set(str(x.get("gp")) for x in rows)) == 1
