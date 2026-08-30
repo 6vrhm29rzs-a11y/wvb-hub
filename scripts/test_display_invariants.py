@@ -3042,11 +3042,24 @@ def check_column_identity_survives_a_missing_value():
             "some rows and not others" % (with_id, len(rows)))
     else:
         ok("every row's net/set cell keeps its column class", len(rows))
-    if painted >= len(rows):
+    # ⚠ SEASON-PHASE PIN REMOVED (2026-08-30): `painted >= len(rows)` was
+    # written when some ranked team always lacked a net/set value; the
+    # first full weekend gave all 25 a real one and the guard failed a
+    # correct page. The invariant is the R5 one directly: a cell showing
+    # the em dash must never carry the paint class. All painted is fine --
+    # a painted DASH never is.
+    dash_painted = 0
+    for row in rows:
+        for m in re.finditer(r'<td class="([^"]*)"[^>]*>([^<]*)</td>', row):
+            if re.search(r"\bhx\b", m.group(1)) and \
+                    ("\u2014" in m.group(2) or "&mdash;" in m.group(2)):
+                dash_painted += 1
+    if dash_painted:
         bad("an absent measurement is being painted",
-            "hx marks 'there is a value' and must not appear on an em dash (R5)")
+            "hx on an em dash in %d cell(s) (R5)" % dash_painted)
     else:
-        ok("only rows WITH a value are painted", painted)
+        ok("no absent measurement is painted (painted cells: %d)" % painted,
+           True)
 
 
 def check_power_score_agrees_with_the_rank():

@@ -5060,6 +5060,7 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .si-expired,.si-inaccessible{color:var(--ink3)}
 .sidrill{padding:2px 11px 10px;display:flex;flex-direction:column;gap:6px}
 .siwhy{font:italic 11.5px/1.5 var(--sans);color:var(--ink2)}
+.siscope{font:600 10px/1.4 var(--mono);color:var(--ink3);letter-spacing:.04em}
 .sisrc{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;
   border-left:2px solid var(--line2);padding-left:8px}
 .siq{font:11.5px/1.5 var(--sans);color:var(--ink);flex-basis:100%}
@@ -17426,6 +17427,10 @@ function intelItem(c, i) {
   return '<details class="siitem"><summary>' + intelChip(c.state) +
     '<span class="siwhat">' + esc(c.what) + '</span></summary>' +
     '<div class="sidrill"><span class="siwhy">' + esc(c.why) + '</span>' +
+    /* the citation's LIMIT is part of the evidence: say what it
+       establishes so nobody reads a schedule row as an injury report */
+    (c.scope ? '<span class="siscope">establishes: ' + esc(c.scope) +
+      ' — nothing beyond that</span>' : '') +
     srcs +
     (route ? '<a class="sigo" href="' + route + '">open the ' +
       (c.route && c.route.ledger ? 'Result Ledger' : 'match') +

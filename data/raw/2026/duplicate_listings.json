@@ -54,6 +54,141 @@
      "establishes": "exactly one played meeting; MT won 3-2"
     }
    ]
+  },
+  "6640356": {
+   "duplicate_of": "6628586",
+   "teams": [
+    "Lehigh",
+    "Cleveland St."
+   ],
+   "established": "The feed lists this match twice: 6628586 carries the real set line and 6640356 is a zero-scaffold copy (state F, every linescore 0-0, midnight-placeholder epoch). Both schools' official schedules show exactly ONE meeting. Discovered by the official-source collector's strict binding refusing an ambiguous (team, opponent, date) match; verified per the no-heuristic protocol before ledgering.",
+   "quality_asymmetry": "canonical has a real per-set line; the duplicate's linescores are all 0-0",
+   "evidence": [
+    {
+     "url": "https://lehighsports.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Lehigh",
+     "retrieved": "2026-08-30T19:37:47Z",
+     "text": "'vs Cleveland State University | Grace Hall | Bethlehem, Pa. | Steel Classic | W, 3-0 | Aug 28 (Fri) 11:00 AM' -- the only Cleveland State row on the schedule",
+     "establishes": "exactly one Lehigh-Cleveland St. meeting, Aug 28, Lehigh won 3-0"
+    },
+    {
+     "url": "https://csuvikings.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Cleveland St.",
+     "retrieved": "2026-08-30T19:37:47Z",
+     "text": "schema.org SportsEvent 'Cleveland State University At Lehigh', startDate 2026-08-28T18:30:00, Bethlehem PA -- the only Lehigh event on the page",
+     "establishes": "exactly one meeting on 2026-08-28"
+    }
+   ]
+  },
+  "6640361": {
+   "duplicate_of": "6625757",
+   "teams": [
+    "Louisiana Tech",
+    "Iona"
+   ],
+   "established": "The feed lists this match twice: 6625757 carries the real set line and 6640361 is a zero-scaffold copy (state F, every linescore 0-0, midnight-placeholder epoch). Both schools' official schedules show exactly ONE meeting. Discovered by the official-source collector's strict binding refusing an ambiguous (team, opponent, date) match; verified per the no-heuristic protocol before ledgering.",
+   "quality_asymmetry": "canonical has a real per-set line; the duplicate's linescores are all 0-0",
+   "evidence": [
+    {
+     "url": "https://latechsports.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Louisiana Tech",
+     "retrieved": "2026-08-30T19:37:47Z",
+     "text": "'Iona ... W, 3-0 ... Aug 28' -- the only Iona row on the schedule",
+     "establishes": "exactly one Louisiana Tech-Iona meeting, Aug 28, La. Tech won 3-0"
+    },
+    {
+     "url": "https://icgaels.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Iona",
+     "retrieved": "2026-08-30T19:37:47Z",
+     "text": "schema.org SportsEvent for the Louisiana Tech meeting, startDate 2026-08-28T19:30:00 -- the only such event on the page",
+     "establishes": "exactly one meeting on 2026-08-28"
+    }
+   ]
+  },
+  "6640365": {
+   "duplicate_of": "6625050",
+   "teams": [
+    "Norfolk St.",
+    "USC Upstate"
+   ],
+   "established": "The feed lists this match twice: 6625050 carries the real set line and 6640365 is a zero-scaffold copy (state F, every linescore 0-0, midnight-placeholder epoch). Both schools' official schedules show exactly ONE meeting. Discovered by the official-source collector's strict binding refusing an ambiguous (team, opponent, date) match; verified per the no-heuristic protocol before ledgering.",
+   "quality_asymmetry": "canonical has a real per-set line; the duplicate's linescores are all 0-0",
+   "evidence": [
+    {
+     "url": "https://upstatespartans.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "USC Upstate",
+     "retrieved": "2026-08-30T19:37:47Z",
+     "text": "'Norfolk State ... W, 3-1 ... Aug 28' -- the only Norfolk State row on the schedule",
+     "establishes": "exactly one meeting, Aug 28, USC Upstate won 3-1 (matches the canonical listing's 4-set line)"
+    },
+    {
+     "url": "https://nsuspartans.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Norfolk St.",
+     "retrieved": "2026-08-30T19:37:47Z",
+     "text": "schema.org SportsEvent for the USC Upstate meeting, startDate 2026-08-28T17:00:00 -- the only such event on the page",
+     "establishes": "exactly one meeting on 2026-08-28"
+    }
+   ]
+  },
+  "6640427": {
+   "duplicate_of": "6640391",
+   "teams": [
+    "Jacksonville St.",
+    "Southern U."
+   ],
+   "established": "The feed lists this match twice: 6640391 carries the real set line and 6640427 is a zero-scaffold copy (state F, every linescore 0-0, midnight-placeholder epoch). Both schools' official schedules show exactly ONE meeting. Discovered by the official-source collector's strict binding refusing an ambiguous (team, opponent, date) match; verified per the no-heuristic protocol before ledgering.",
+   "quality_asymmetry": "canonical has a real per-set line; the duplicate's linescores are all 0-0",
+   "evidence": [
+    {
+     "url": "https://jaxstatesports.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Jacksonville St.",
+     "retrieved": "2026-08-30T19:37:47Z",
+     "text": "'Southern ... W, 3-1 ... Aug 29' -- one Aug 29 Southern row (a second meeting is scheduled Sep 18, its own fixture)",
+     "establishes": "exactly one Aug-29 meeting, Jacksonville St. won 3-1"
+    },
+    {
+     "url": "https://gojagsports.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Southern U.",
+     "retrieved": "2026-08-30T19:37:47Z",
+     "text": "schema.org SportsEvent for the Jacksonville St. meeting, startDate 2026-08-29T14:00:00 -- one Aug-29 event (Sep 18 is a separate scheduled fixture)",
+     "establishes": "exactly one meeting on 2026-08-29"
+    }
+   ]
+  },
+  "6640466": {
+   "duplicate_of": "6625557",
+   "teams": [
+    "Jacksonville St.",
+    "Southern Miss."
+   ],
+   "established": "The feed lists this match twice: 6625557 carries the real set line and 6640466 is a zero-scaffold copy (state F, every linescore 0-0, midnight-placeholder epoch). Both schools' official schedules show exactly ONE meeting. Discovered by the official-source collector's strict binding refusing an ambiguous (team, opponent, date) match; verified per the no-heuristic protocol before ledgering.",
+   "quality_asymmetry": "canonical has a real per-set line; the duplicate's linescores are all 0-0",
+   "evidence": [
+    {
+     "url": "https://jaxstatesports.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Jacksonville St.",
+     "retrieved": "2026-08-30T19:37:47Z",
+     "text": "'Southern Miss ... L, 0-3 ... Aug 29' -- the only Southern Miss row on the schedule",
+     "establishes": "exactly one meeting, Aug 29, Southern Miss. won 3-0"
+    },
+    {
+     "url": "https://southernmiss.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Southern Miss.",
+     "retrieved": "2026-08-30T19:37:47Z",
+     "text": "'Jacksonville State ... W, 3-0 ... Aug 29' -- the only Jacksonville State row on the schedule",
+     "establishes": "both schools agree: one meeting, Southern Miss. 3-0"
+    }
+   ]
   }
  }
 }

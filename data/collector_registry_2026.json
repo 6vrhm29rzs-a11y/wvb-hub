@@ -1,0 +1,258 @@
+{
+ "_doc": "Official-source collector registry: per school -- url, template, access status, last attempt, per-field capability. An entry only exists for a school actually ATTEMPTED; absence means untried, never 'checked'.",
+ "sources": {
+  "Lehigh": {
+   "path": "/sports/womens-volleyball/schedule",
+   "http_meta": {
+    "etag": "W/\"UAghNqpbTX\"",
+    "last_modified": "Sun, 30 Aug 2026 19:37:56 GMT"
+   },
+   "url": "https://lehighsports.com/sports/womens-volleyball/schedule",
+   "school": "Lehigh",
+   "last_attempt_utc": "2026-08-30T19:37:55Z",
+   "last_status": "200",
+   "why": "official-only final 6640356",
+   "template": "sidearm_cards",
+   "access": "readable",
+   "fields_supported": [
+    "result",
+    "date",
+    "time",
+    "venue",
+    "event"
+   ],
+   "last_new_claims": 3
+  },
+  "Cleveland St.": {
+   "path": "/sports/womens-volleyball/schedule",
+   "http_meta": {
+    "etag": null,
+    "last_modified": "Sun, 30 Aug 2026 19:34:12 GMT"
+   },
+   "url": "https://csuvikings.com/sports/womens-volleyball/schedule",
+   "school": "Cleveland St.",
+   "last_attempt_utc": "2026-08-30T19:37:55Z",
+   "last_status": "200",
+   "why": "official-only final 6640356",
+   "template": "schema_events",
+   "access": "readable",
+   "fields_supported": [
+    "date",
+    "time",
+    "venue"
+   ],
+   "last_new_claims": 0
+  },
+  "Norfolk St.": {
+   "path": "/sports/womens-volleyball/schedule",
+   "http_meta": {
+    "etag": null,
+    "last_modified": "Sun, 30 Aug 2026 19:32:59 GMT"
+   },
+   "url": "https://nsuspartans.com/sports/womens-volleyball/schedule",
+   "school": "Norfolk St.",
+   "last_attempt_utc": "2026-08-30T19:37:55Z",
+   "last_status": "200",
+   "why": "official-only final 6640365",
+   "template": "schema_events",
+   "access": "readable",
+   "fields_supported": [
+    "date",
+    "time",
+    "venue"
+   ],
+   "last_new_claims": 0
+  },
+  "USC Upstate": {
+   "path": "/sports/womens-volleyball/schedule",
+   "http_meta": {
+    "etag": "W/\"7jWoXO7c1C\"",
+    "last_modified": "Sun, 30 Aug 2026 19:38:03 GMT"
+   },
+   "url": "https://upstatespartans.com/sports/womens-volleyball/schedule",
+   "school": "USC Upstate",
+   "last_attempt_utc": "2026-08-30T19:37:55Z",
+   "last_status": "200",
+   "why": "official-only final 6640365",
+   "template": "sidearm_cards",
+   "access": "readable",
+   "fields_supported": [
+    "result",
+    "date",
+    "time",
+    "venue",
+    "event"
+   ],
+   "last_new_claims": 2
+  },
+  "Louisiana Tech": {
+   "path": "/sports/womens-volleyball/schedule",
+   "http_meta": {
+    "etag": "W/\"VHQbMQ3LAc\"",
+    "last_modified": "Sun, 30 Aug 2026 19:38:06 GMT"
+   },
+   "url": "https://latechsports.com/sports/womens-volleyball/schedule",
+   "school": "Louisiana Tech",
+   "last_attempt_utc": "2026-08-30T19:37:55Z",
+   "last_status": "200",
+   "why": "official-only final 6640361",
+   "template": "sidearm_cards",
+   "access": "readable",
+   "fields_supported": [
+    "result",
+    "date",
+    "time",
+    "venue",
+    "event"
+   ],
+   "last_new_claims": 2
+  },
+  "Iona": {
+   "path": "/sports/womens-volleyball/schedule",
+   "http_meta": {
+    "etag": null,
+    "last_modified": "Sun, 30 Aug 2026 19:32:28 GMT"
+   },
+   "url": "https://icgaels.com/sports/womens-volleyball/schedule",
+   "school": "Iona",
+   "last_attempt_utc": "2026-08-30T19:37:55Z",
+   "last_status": "200",
+   "why": "official-only final 6640361",
+   "template": "schema_events",
+   "access": "readable",
+   "fields_supported": [
+    "date",
+    "time",
+    "venue"
+   ],
+   "last_new_claims": 0
+  },
+  "Jacksonville St.": {
+   "path": "/sports/womens-volleyball/schedule",
+   "http_meta": {
+    "etag": "W/\"4bkYiYE9ci\"",
+    "last_modified": "Sun, 30 Aug 2026 19:38:10 GMT"
+   },
+   "url": "https://jaxstatesports.com/sports/womens-volleyball/schedule",
+   "school": "Jacksonville St.",
+   "last_attempt_utc": "2026-08-30T19:37:55Z",
+   "last_status": "200",
+   "why": "official-only final 6640427",
+   "template": "sidearm_cards",
+   "access": "readable",
+   "fields_supported": [
+    "result",
+    "date",
+    "time",
+    "venue",
+    "event"
+   ],
+   "last_new_claims": 3
+  },
+  "Southern U.": {
+   "path": "/sports/womens-volleyball/schedule",
+   "http_meta": {
+    "etag": null,
+    "last_modified": "Sun, 30 Aug 2026 19:37:50 GMT"
+   },
+   "url": "https://gojagsports.com/sports/womens-volleyball/schedule",
+   "school": "Southern U.",
+   "last_attempt_utc": "2026-08-30T19:37:55Z",
+   "last_status": "200",
+   "why": "official-only final 6640427",
+   "template": "schema_events",
+   "access": "readable",
+   "fields_supported": [
+    "date",
+    "time",
+    "venue"
+   ],
+   "last_new_claims": 0
+  },
+  "Southern Miss.": {
+   "path": "/sports/womens-volleyball/schedule",
+   "http_meta": {
+    "etag": "W/\"QXuJSBrzVk\"",
+    "last_modified": "Sun, 30 Aug 2026 19:38:16 GMT"
+   },
+   "url": "https://southernmiss.com/sports/womens-volleyball/schedule",
+   "school": "Southern Miss.",
+   "last_attempt_utc": "2026-08-30T19:37:55Z",
+   "last_status": "200",
+   "why": "official-only final 6640466",
+   "template": "sidearm_cards",
+   "access": "readable",
+   "fields_supported": [
+    "result",
+    "date",
+    "time",
+    "venue",
+    "event"
+   ],
+   "last_new_claims": 3
+  },
+  "Delaware St.": {
+   "path": "/sports/womens-volleyball/schedule",
+   "http_meta": {
+    "etag": null,
+    "last_modified": "Sun, 30 Aug 2026 19:34:37 GMT"
+   },
+   "url": "https://dsuhornets.com/sports/womens-volleyball/schedule",
+   "school": "Delaware St.",
+   "last_attempt_utc": "2026-08-30T19:37:55Z",
+   "last_status": "200",
+   "why": "official-only final 6625090",
+   "template": "schema_events",
+   "access": "readable",
+   "fields_supported": [
+    "date",
+    "time",
+    "venue"
+   ],
+   "last_new_claims": 0
+  },
+  "Mississippi Val.": {
+   "path": "/sports/womens-volleyball/schedule",
+   "http_meta": {
+    "etag": null,
+    "last_modified": "Sun, 30 Aug 2026 19:34:39 GMT"
+   },
+   "url": "https://mvsusports.com/sports/womens-volleyball/schedule",
+   "school": "Mississippi Val.",
+   "last_attempt_utc": "2026-08-30T19:37:55Z",
+   "last_status": "200",
+   "why": "official-only final 6625090",
+   "template": "schema_events",
+   "access": "readable",
+   "fields_supported": [
+    "date",
+    "time",
+    "venue"
+   ],
+   "last_new_claims": 0
+  },
+  "Gardner-Webb": {
+   "path": "/sports/womens-volleyball/schedule",
+   "http_meta": {
+    "etag": "W/\"ob7erx9Dxs\"",
+    "last_modified": "Sun, 30 Aug 2026 19:38:23 GMT"
+   },
+   "url": "https://gwusports.com/sports/womens-volleyball/schedule",
+   "school": "Gardner-Webb",
+   "last_attempt_utc": "2026-08-30T19:37:55Z",
+   "last_status": "200",
+   "why": "official-only final 6626243",
+   "template": "sidearm_cards",
+   "access": "readable",
+   "fields_supported": [
+    "result",
+    "date",
+    "time",
+    "venue",
+    "event"
+   ],
+   "last_new_claims": 2
+  }
+ },
+ "last_run_utc": "2026-08-30T19:37:55Z"
+}

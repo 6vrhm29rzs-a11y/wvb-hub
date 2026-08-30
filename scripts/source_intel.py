@@ -86,11 +86,28 @@ def _src(url, excerpt, retrieved, source_class):
             "retrieved": retrieved, "source_class": source_class}
 
 
+# what each claim TYPE establishes -- and therefore what its sources do
+# NOT establish, said on the drill so a reader cannot over-read a citation
+SCOPE = {
+    "result_correction": "the winner and set line of this one match",
+    "result_confirmation": "the result of this one match",
+    "result_conflict": "that sources disagree about this result",
+    "fixture_update": "the corrected schedule fields only",
+    "fixture_conflict": "that official sources disagree on one field",
+    "fixture_evidence": "a schedule reading, now past its review date",
+    "duplicate_listing": "that the feed listed one meeting twice",
+    "classification": "that this match is an exhibition",
+    "availability": "one player's availability for the stated dates",
+    "verification_attempt": "nothing -- the attempt is recorded",
+}
+
+
 def _claim(cid, ctype, subject, what, state, why, sources,
            public, priority, route=None, effective=None, review_by=None):
     assert state in STATES, state
     return {"id": cid, "type": ctype, "subject": subject, "what": what,
             "state": state, "state_label": STATE_LABEL[state], "why": why,
+            "scope": SCOPE.get(ctype),
             "sources": sources, "public": bool(public),
             "priority": int(priority), "route": route,
             "effective": effective, "review_by": review_by}
@@ -175,11 +192,14 @@ def _from_duplicates(season):
         srcs = [_src(e.get("url"), e.get("text"), e.get("retrieved"),
                      "official_school")
                 for e in (d.get("evidence") or []) if e.get("text")]
+        _teams = d.get("teams") or []
+        _who = ("%s v %s" % tuple(_teams[:2])) if len(_teams) == 2 \
+            else "a match"
         out.append(_claim(
             _cid("dup", gid), "duplicate_listing",
-            {"kind": "match", "gid": str(gid)},
-            "Duplicate feed listing excluded (canonical: %s)"
-            % d.get("duplicate_of"),
+            {"kind": "match", "gid": str(gid), "teams": _teams},
+            "%s was listed twice by the feed; the copy is excluded "
+            "from every count" % _who,
             "corroborated" if len(srcs) >= 2 else "confirmed_official",
             "both schools' official schedules establish exactly one "
             "meeting" if len(srcs) >= 2 else
@@ -387,8 +407,26 @@ def what_changed(all_claims, seen, now=None, cap=FEED_CAP,
         age_h = (now_dt - dt).total_seconds() / 3600.0
         if 0 <= age_h <= recent_hours:
             out.append(dict(c, first_seen=fs))
-    out.sort(key=lambda c: (-c["priority"], c["first_seen"]), reverse=False)
-    return out[:cap]
+    # ⚠ NEWEST DAY FIRST, THEN PRIORITY. Priority alone buried five
+    # freshly-discovered duplicate listings (a records fix) under two-day-
+    # old result corrections -- "what changed" answers SINCE WHEN before
+    # it answers HOW MUCH.
+    out.sort(key=lambda c: (c["first_seen"][:10], c["priority"],
+                            c["first_seen"]), reverse=True)
+    # ⚠ AT MOST TWO PER CLAIM TYPE: five result corrections must not crowd
+    # five freshly-evidenced duplicate listings out of a five-slot feed --
+    # a bounded feed earns its bound by being REPRESENTATIVE, not by
+    # showing one class of news
+    picked, per_type = [], {}
+    for c in out:
+        t = c["type"]
+        if per_type.get(t, 0) >= 2:
+            continue
+        per_type[t] = per_type.get(t, 0) + 1
+        picked.append(c)
+        if len(picked) >= cap:
+            break
+    return picked
 
 
 def build(season=SEASON, today=None, now=None):

@@ -2,14 +2,14 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-08-30T19:01:13Z",
+  "generated_at_utc": "2026-08-30T19:43:36Z",
   "counts": {
-   "finals": 429,
+   "finals": 438,
    "official_only": 10,
-   "reconciled": 414,
-   "confirmed": 2,
+   "reconciled": 410,
+   "confirmed": 15,
    "disputed": 0,
-   "pending_second": 427,
+   "pending_second": 423,
    "corrected": 3,
    "duplicate_listings": 2,
    "duplicate_candidates_pending": 0
@@ -373,9 +373,22 @@
    "corr_feed_said": null,
    "corr_evidence": [],
    "duplicate_of": null,
-   "dup_reason": null,
-   "dup_asym": null,
-   "dup_evidence": [],
+   "dup_reason": "The feed lists this match twice: 6628586 carries the real set line and 6640356 is a zero-scaffold copy (state F, every linescore 0-0, midnight-placeholder epoch). Both schools' official schedules show exactly ONE meeting. Discovered by the official-source collector's strict binding refusing an ambiguous (team, opponent, date) match; verified per the no-heuristic protocol before ledgering.",
+   "dup_asym": "canonical has a real per-set line; the duplicate's linescores are all 0-0",
+   "dup_evidence": [
+    {
+     "school": "Lehigh",
+     "url": "https://lehighsports.com/sports/womens-volleyball/schedule",
+     "text": "'vs Cleveland State University | Grace Hall | Bethlehem, Pa. | Steel Classic | W, 3-0 | Aug 28 (Fri) 11:00 AM' -- the only Cleveland State row on the schedule",
+     "retrieved": "2026-08-30"
+    },
+    {
+     "school": "Cleveland St.",
+     "url": "https://csuvikings.com/sports/womens-volleyball/schedule",
+     "text": "schema.org SportsEvent 'Cleveland State University At Lehigh', startDate 2026-08-28T18:30:00, Bethlehem PA -- the only Lehigh event on the page",
+     "retrieved": "2026-08-30"
+    }
+   ],
    "gid": "6640356",
    "a": "Cleveland St.",
    "h": "Lehigh",
@@ -440,9 +453,22 @@
    "corr_feed_said": null,
    "corr_evidence": [],
    "duplicate_of": null,
-   "dup_reason": null,
-   "dup_asym": null,
-   "dup_evidence": [],
+   "dup_reason": "The feed lists this match twice: 6625050 carries the real set line and 6640365 is a zero-scaffold copy (state F, every linescore 0-0, midnight-placeholder epoch). Both schools' official schedules show exactly ONE meeting. Discovered by the official-source collector's strict binding refusing an ambiguous (team, opponent, date) match; verified per the no-heuristic protocol before ledgering.",
+   "dup_asym": "canonical has a real per-set line; the duplicate's linescores are all 0-0",
+   "dup_evidence": [
+    {
+     "school": "USC Upstate",
+     "url": "https://upstatespartans.com/sports/womens-volleyball/schedule",
+     "text": "'Norfolk State ... W, 3-1 ... Aug 28' -- the only Norfolk State row on the schedule",
+     "retrieved": "2026-08-30"
+    },
+    {
+     "school": "Norfolk St.",
+     "url": "https://nsuspartans.com/sports/womens-volleyball/schedule",
+     "text": "schema.org SportsEvent for the USC Upstate meeting, startDate 2026-08-28T17:00:00 -- the only such event on the page",
+     "retrieved": "2026-08-30"
+    }
+   ],
    "gid": "6640365",
    "a": "USC Upstate",
    "h": "Norfolk St.",
@@ -467,9 +493,22 @@
    "corr_feed_said": null,
    "corr_evidence": [],
    "duplicate_of": null,
-   "dup_reason": null,
-   "dup_asym": null,
-   "dup_evidence": [],
+   "dup_reason": "The feed lists this match twice: 6625757 carries the real set line and 6640361 is a zero-scaffold copy (state F, every linescore 0-0, midnight-placeholder epoch). Both schools' official schedules show exactly ONE meeting. Discovered by the official-source collector's strict binding refusing an ambiguous (team, opponent, date) match; verified per the no-heuristic protocol before ledgering.",
+   "dup_asym": "canonical has a real per-set line; the duplicate's linescores are all 0-0",
+   "dup_evidence": [
+    {
+     "school": "Louisiana Tech",
+     "url": "https://latechsports.com/sports/womens-volleyball/schedule",
+     "text": "'Iona ... W, 3-0 ... Aug 28' -- the only Iona row on the schedule",
+     "retrieved": "2026-08-30"
+    },
+    {
+     "school": "Iona",
+     "url": "https://icgaels.com/sports/womens-volleyball/schedule",
+     "text": "schema.org SportsEvent for the Louisiana Tech meeting, startDate 2026-08-28T19:30:00 -- the only such event on the page",
+     "retrieved": "2026-08-30"
+    }
+   ],
    "gid": "6640361",
    "a": "Iona",
    "h": "Louisiana Tech",
@@ -556,17 +595,29 @@
    "h": "Old Dominion",
    "exh": false,
    "d": "2026-08-28",
-   "overall": "reconciled",
+   "overall": "confirmed",
    "states": {
-    "result": "reconciled",
+    "result": "confirmed",
     "sets": "reconciled",
     "box": "reconciled",
     "venue": "unavailable"
    },
-   "n_indep": 0,
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-08-30T19:37:55Z",
+   "sources": [
+    {
+     "url": "https://upstatespartans.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "USC Upstate",
+     "text": "class=\"s-game-card s-game-card--standard bg-theme-background-light shadow-level-1 @container/s-game-card-standard w-full rounded-[10px]\" role=\"group\" compact=\"false\" data-v-03a7b599 data-v-df670654>|at|Old Dominion|Norfolk, Va.| TV: ESPN+|Old Dominion Tournament|W, |3-2|Aug 28|(Fri)| 10:00 a.m.|Box ",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-08-30T19:37:55Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -934,17 +985,40 @@
    "h": "Lehigh",
    "exh": false,
    "d": "2026-08-28",
-   "overall": "reconciled",
+   "overall": "confirmed",
    "states": {
-    "result": "reconciled",
+    "result": "confirmed",
     "sets": "reconciled",
     "box": "reconciled",
     "venue": "unavailable"
    },
-   "n_indep": 0,
+   "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-08-30T19:37:55Z",
+   "sources": [
+    {
+     "url": "https://lehighsports.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Lehigh",
+     "text": "class=\"s-game-card s-game-card--standard bg-theme-background-light shadow-level-1 @container/s-game-card-standard w-full rounded-[10px]\" role=\"group\" compact=\"false\" data-v-03a7b599 data-v-df670654>|vs|Gardner-Webb University|Grace Hall|Bethlehem, Pa.|Steel Classic |W, |3-0|Aug 28|(Fri)| 11:00 AM|Bo",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-08-30T19:37:55Z"
+    },
+    {
+     "url": "https://gwusports.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Gardner-Webb",
+     "text": "class=\"s-game-card s-game-card--standard bg-theme-background-light shadow-level-1 @container/s-game-card-standard w-full rounded-[10px]\" role=\"group\" compact=\"false\" data-v-03a7b599 data-v-df670654>|at|Lehigh|Bethlehem, PA|Lehigh Tournament|L, |0-3|Aug 28|(Fri)| 11 AM|Box Score|Recap|History|Game In",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-08-30T19:37:55Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -2473,17 +2547,29 @@
    "h": "Southern U.",
    "exh": false,
    "d": "2026-08-28",
-   "overall": "reconciled",
+   "overall": "confirmed",
    "states": {
-    "result": "reconciled",
+    "result": "confirmed",
     "sets": "reconciled",
     "box": "reconciled",
     "venue": "official"
    },
-   "n_indep": 0,
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-08-30T19:37:55Z",
+   "sources": [
+    {
+     "url": "https://southernmiss.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Southern Miss.",
+     "text": "class=\"s-game-card s-game-card--standard bg-theme-background-light shadow-level-1 @container/s-game-card-standard w-full rounded-[10px]\" role=\"group\" compact=\"false\" data-v-03a7b599 data-v-df670654>|vs|Southern|Jacksonville, Ala. / Pete Mathews Coliseum| TV: ESPN+|Cocky Classic|W, |3-0|Aug 28|(Fri)|",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-08-30T19:37:55Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -2824,17 +2910,29 @@
    "h": "Norfolk St.",
    "exh": false,
    "d": "2026-08-28",
-   "overall": "reconciled",
+   "overall": "confirmed",
    "states": {
-    "result": "reconciled",
+    "result": "confirmed",
     "sets": "reconciled",
     "box": "reconciled",
     "venue": "unavailable"
    },
-   "n_indep": 0,
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-08-30T19:37:55Z",
+   "sources": [
+    {
+     "url": "https://upstatespartans.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "USC Upstate",
+     "text": "class=\"s-game-card s-game-card--standard bg-theme-background-light shadow-level-1 @container/s-game-card-standard w-full rounded-[10px]\" role=\"group\" compact=\"false\" data-v-03a7b599 data-v-df670654>|at|Norfolk State|Norfolk, Va.|Old Dominion Tournament|W, |3-1|Aug 28|(Fri)| 5:00 p.m.|Box Score|Recap",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-08-30T19:37:55Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -3985,17 +4083,29 @@
    "h": "Lehigh",
    "exh": false,
    "d": "2026-08-28",
-   "overall": "reconciled",
+   "overall": "confirmed",
    "states": {
-    "result": "reconciled",
+    "result": "confirmed",
     "sets": "reconciled",
     "box": "reconciled",
     "venue": "unavailable"
    },
-   "n_indep": 0,
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-08-30T19:37:55Z",
+   "sources": [
+    {
+     "url": "https://lehighsports.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Lehigh",
+     "text": "class=\"s-game-card s-game-card--standard bg-theme-background-light shadow-level-1 @container/s-game-card-standard w-full rounded-[10px]\" role=\"group\" compact=\"false\" data-v-03a7b599 data-v-df670654>|vs|Cleveland State University|Grace Hall|Bethlehem, Pa.|Steel Classic |W, |3-0|Aug 28|(Fri)| 6:30 PM|",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-08-30T19:37:55Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -4886,17 +4996,29 @@
    "h": "Louisiana Tech",
    "exh": false,
    "d": "2026-08-28",
-   "overall": "reconciled",
+   "overall": "confirmed",
    "states": {
-    "result": "reconciled",
+    "result": "confirmed",
     "sets": "reconciled",
     "box": "reconciled",
     "venue": "official"
    },
-   "n_indep": 0,
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-08-30T19:37:55Z",
+   "sources": [
+    {
+     "url": "https://latechsports.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Louisiana Tech",
+     "text": "class=\"s-game-card s-game-card--standard bg-theme-background-light shadow-level-1 @container/s-game-card-standard w-full rounded-[10px]\" role=\"group\" compact=\"false\" data-v-03a7b599 data-v-df670654>|vs|Iona|Thomas Assembly Center|Ruston, LA|Jambalaya Jam|W, |3-0|Aug 28|(Fri)| 6:30 p.m.|Box Score|Rec",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-08-30T19:37:55Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -5102,17 +5224,29 @@
    "h": "Jacksonville St.",
    "exh": false,
    "d": "2026-08-28",
-   "overall": "reconciled",
+   "overall": "confirmed",
    "states": {
-    "result": "reconciled",
+    "result": "confirmed",
     "sets": "reconciled",
     "box": "reconciled",
     "venue": "official"
    },
-   "n_indep": 0,
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-08-30T19:37:55Z",
+   "sources": [
+    {
+     "url": "https://jaxstatesports.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Jacksonville St.",
+     "text": "class=\"s-game-card s-game-card--standard bg-theme-background-light shadow-level-1 @container/s-game-card-standard w-full rounded-[10px]\" role=\"group\" compact=\"false\" data-v-03a7b599 data-v-df670654>|vs|Jacksonville|Pete Mathews Coliseum|JACKSONVILLE|Gamecock Classic|L, |0-3|Aug 28|(Fri)| 7 PM|Box Sc",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-08-30T19:37:55Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -5808,9 +5942,22 @@
    "corr_feed_said": null,
    "corr_evidence": [],
    "duplicate_of": null,
-   "dup_reason": null,
-   "dup_asym": null,
-   "dup_evidence": [],
+   "dup_reason": "The feed lists this match twice: 6640391 carries the real set line and 6640427 is a zero-scaffold copy (state F, every linescore 0-0, midnight-placeholder epoch). Both schools' official schedules show exactly ONE meeting. Discovered by the official-source collector's strict binding refusing an ambiguous (team, opponent, date) match; verified per the no-heuristic protocol before ledgering.",
+   "dup_asym": "canonical has a real per-set line; the duplicate's linescores are all 0-0",
+   "dup_evidence": [
+    {
+     "school": "Jacksonville St.",
+     "url": "https://jaxstatesports.com/sports/womens-volleyball/schedule",
+     "text": "'Southern ... W, 3-1 ... Aug 29' -- one Aug 29 Southern row (a second meeting is scheduled Sep 18, its own fixture)",
+     "retrieved": "2026-08-30"
+    },
+    {
+     "school": "Southern U.",
+     "url": "https://gojagsports.com/sports/womens-volleyball/schedule",
+     "text": "schema.org SportsEvent for the Jacksonville St. meeting, startDate 2026-08-29T14:00:00 -- one Aug-29 event (Sep 18 is a separate scheduled fixture)",
+     "retrieved": "2026-08-30"
+    }
+   ],
    "gid": "6640427",
    "a": "Southern U.",
    "h": "Jacksonville St.",
@@ -5835,9 +5982,22 @@
    "corr_feed_said": null,
    "corr_evidence": [],
    "duplicate_of": null,
-   "dup_reason": null,
-   "dup_asym": null,
-   "dup_evidence": [],
+   "dup_reason": "The feed lists this match twice: 6625557 carries the real set line and 6640466 is a zero-scaffold copy (state F, every linescore 0-0, midnight-placeholder epoch). Both schools' official schedules show exactly ONE meeting. Discovered by the official-source collector's strict binding refusing an ambiguous (team, opponent, date) match; verified per the no-heuristic protocol before ledgering.",
+   "dup_asym": "canonical has a real per-set line; the duplicate's linescores are all 0-0",
+   "dup_evidence": [
+    {
+     "school": "Jacksonville St.",
+     "url": "https://jaxstatesports.com/sports/womens-volleyball/schedule",
+     "text": "'Southern Miss ... L, 0-3 ... Aug 29' -- the only Southern Miss row on the schedule",
+     "retrieved": "2026-08-30"
+    },
+    {
+     "school": "Southern Miss.",
+     "url": "https://southernmiss.com/sports/womens-volleyball/schedule",
+     "text": "'Jacksonville State ... W, 3-0 ... Aug 29' -- the only Jacksonville State row on the schedule",
+     "retrieved": "2026-08-30"
+    }
+   ],
    "gid": "6640466",
    "a": "Southern Miss.",
    "h": "Jacksonville St.",
@@ -5897,17 +6057,29 @@
    "h": "Morgan St.",
    "exh": false,
    "d": "2026-08-29",
-   "overall": "reconciled",
+   "overall": "confirmed",
    "states": {
-    "result": "reconciled",
+    "result": "confirmed",
     "sets": "reconciled",
     "box": "reconciled",
     "venue": "unavailable"
    },
-   "n_indep": 0,
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-08-30T19:37:55Z",
+   "sources": [
+    {
+     "url": "https://gwusports.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Gardner-Webb",
+     "text": "class=\"s-game-card s-game-card--standard bg-theme-background-light shadow-level-1 @container/s-game-card-standard w-full rounded-[10px]\" role=\"group\" compact=\"false\" data-v-03a7b599 data-v-df670654>|vs|Morgan State|Bethlehem, PA|Lehigh Tournament|W, |3-0|Aug 29|(Sat)| 10 AM|Box Score|Recap|History|G",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-08-30T19:37:55Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -6481,17 +6653,29 @@
    "h": "Jacksonville",
    "exh": false,
    "d": "2026-08-29",
-   "overall": "reconciled",
+   "overall": "confirmed",
    "states": {
-    "result": "reconciled",
+    "result": "confirmed",
     "sets": "reconciled",
     "box": "reconciled",
     "venue": "official"
    },
-   "n_indep": 0,
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-08-30T19:37:55Z",
+   "sources": [
+    {
+     "url": "https://southernmiss.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Southern Miss.",
+     "text": "class=\"s-game-card s-game-card--standard bg-theme-background-light shadow-level-1 @container/s-game-card-standard w-full rounded-[10px]\" role=\"group\" compact=\"false\" data-v-03a7b599 data-v-df670654>|vs|Jacksonville|Jacksonville, Ala. / Pete Mathews Coliseum| TV: ESPN+|Cocky Classic|W, |3-2|Aug 29|(S",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-08-30T19:37:55Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -8415,17 +8599,29 @@
    "h": "Jacksonville St.",
    "exh": false,
    "d": "2026-08-29",
-   "overall": "reconciled",
+   "overall": "confirmed",
    "states": {
-    "result": "reconciled",
+    "result": "confirmed",
     "sets": "reconciled",
     "box": "reconciled",
     "venue": "official"
    },
-   "n_indep": 0,
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-08-30T19:37:55Z",
+   "sources": [
+    {
+     "url": "https://jaxstatesports.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Jacksonville St.",
+     "text": "class=\"s-game-card s-game-card--standard bg-theme-background-light shadow-level-1 @container/s-game-card-standard w-full rounded-[10px]\" role=\"group\" compact=\"false\" data-v-03a7b599 data-v-df670654>|vs|Southern|Pete Mathews Coliseum|JACKSONVILLE|Gamecock Classic|W, |3-1|Aug 29|(Sat)| 2 PM|Box Score|",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-08-30T19:37:55Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -8901,17 +9097,29 @@
    "h": "Lehigh",
    "exh": false,
    "d": "2026-08-29",
-   "overall": "reconciled",
+   "overall": "confirmed",
    "states": {
-    "result": "reconciled",
+    "result": "confirmed",
     "sets": "reconciled",
     "box": "reconciled",
     "venue": "unavailable"
    },
-   "n_indep": 0,
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-08-30T19:37:55Z",
+   "sources": [
+    {
+     "url": "https://lehighsports.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Lehigh",
+     "text": "class=\"s-game-card s-game-card--standard bg-theme-background-light shadow-level-1 @container/s-game-card-standard w-full rounded-[10px]\" role=\"group\" compact=\"false\" data-v-03a7b599 data-v-df670654>|vs|Morgan State University|Grace Hall|Bethlehem, Pa.|Steel Classic |W, |3-0|Aug 29|(Sat)| 4:00 PM|Box",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-08-30T19:37:55Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -9431,17 +9639,29 @@
    "h": "Louisiana Tech",
    "exh": false,
    "d": "2026-08-29",
-   "overall": "reconciled",
+   "overall": "confirmed",
    "states": {
-    "result": "reconciled",
+    "result": "confirmed",
     "sets": "reconciled",
     "box": "reconciled",
     "venue": "official"
    },
-   "n_indep": 0,
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-08-30T19:37:55Z",
+   "sources": [
+    {
+     "url": "https://latechsports.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Louisiana Tech",
+     "text": "class=\"s-game-card s-game-card--standard bg-theme-background-light shadow-level-1 @container/s-game-card-standard w-full rounded-[10px]\" role=\"group\" compact=\"false\" data-v-03a7b599 data-v-df670654>|vs|Houston Christian|Thomas Assembly Center|Ruston, LA|Jambalaya Jam|W, |3-2|Aug 29|(Sat)| 4 p.m.|Box",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-08-30T19:37:55Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -9890,17 +10110,40 @@
    "h": "Jacksonville St.",
    "exh": false,
    "d": "2026-08-29",
-   "overall": "reconciled",
+   "overall": "confirmed",
    "states": {
-    "result": "reconciled",
+    "result": "confirmed",
     "sets": "reconciled",
     "box": "reconciled",
     "venue": "official"
    },
-   "n_indep": 0,
+   "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-08-30T19:37:55Z",
+   "sources": [
+    {
+     "url": "https://jaxstatesports.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Jacksonville St.",
+     "text": "class=\"s-game-card s-game-card--standard bg-theme-background-light shadow-level-1 @container/s-game-card-standard w-full rounded-[10px]\" role=\"group\" compact=\"false\" data-v-03a7b599 data-v-df670654>|vs|Southern Miss|Pete Mathews Coliseum|JACKSONVILLE|Gamecock Classic|L, |0-3|Aug 29|(Sat)| 5:30 PM|Bo",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-08-30T19:37:55Z"
+    },
+    {
+     "url": "https://southernmiss.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Southern Miss.",
+     "text": "class=\"s-game-card s-game-card--standard bg-theme-background-light shadow-level-1 @container/s-game-card-standard w-full rounded-[10px]\" role=\"group\" compact=\"false\" data-v-03a7b599 data-v-df670654>|at|Jacksonville State|Jacksonville, Ala. / Pete Mathews Coliseum| TV: ESPN+|Cocky Classic|W, |3-0|Aug",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-08-30T19:37:55Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -11559,9 +11802,90 @@
    "dup_reason": null,
    "dup_asym": null,
    "dup_evidence": [],
+   "gid": "6626322",
+   "a": "Xavier",
+   "h": "Notre Dame",
+   "exh": false,
+   "d": "2026-08-30",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6626383",
+   "a": "Villanova",
+   "h": "South Dakota St.",
+   "exh": false,
+   "d": "2026-08-30",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6626911",
    "a": "Missouri St.",
    "h": "Wichita St.",
+   "exh": false,
+   "d": "2026-08-30",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6626976",
+   "a": "Southern California",
+   "h": "Creighton",
    "exh": false,
    "d": "2026-08-30",
    "overall": "reconciled",
@@ -11667,6 +11991,60 @@
    "dup_reason": null,
    "dup_asym": null,
    "dup_evidence": [],
+   "gid": "6627812",
+   "a": "Stony Brook",
+   "h": "Florida",
+   "exh": false,
+   "d": "2026-08-30",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6627990",
+   "a": "Queens (NC)",
+   "h": "Coastal Carolina",
+   "exh": false,
+   "d": "2026-08-30",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628084",
    "a": "Quinnipiac",
    "h": "Boston College",
@@ -11694,9 +12072,117 @@
    "dup_reason": null,
    "dup_asym": null,
    "dup_evidence": [],
+   "gid": "6628190",
+   "a": "Florida St.",
+   "h": "FGCU",
+   "exh": false,
+   "d": "2026-08-30",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6638573",
    "a": "CSUN",
    "h": "Central Ark.",
+   "exh": false,
+   "d": "2026-08-30",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6627511",
+   "a": "Campbell",
+   "h": "Kansas St.",
+   "exh": false,
+   "d": "2026-08-30",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "unavailable"
+   },
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6624750",
+   "a": "Louisiana",
+   "h": "Texas St.",
+   "exh": false,
+   "d": "2026-08-30",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6637640",
+   "a": "Northwestern",
+   "h": "Georgetown",
    "exh": false,
    "d": "2026-08-30",
    "overall": "reconciled",

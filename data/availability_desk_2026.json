@@ -2,12 +2,12 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-08-30T19:01:13Z",
+  "generated_at_utc": "2026-08-30T19:43:36Z",
   "counts": {
    "statuses": 0,
    "signals": 0,
    "expired": 1,
-   "anomalies": 5
+   "anomalies": 9
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -99,6 +99,58 @@
     }
    ],
    "points_per_set_missing": 3.071
+  },
+  {
+   "game_id": "6627385",
+   "team_id": "46753",
+   "team": "Stony Brook",
+   "absent": [
+    {
+     "name": "Ayanna Pierre Louis",
+     "rate": 2.438,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 2.438
+  },
+  {
+   "game_id": "6626847",
+   "team_id": "46753",
+   "team": "Stony Brook",
+   "absent": [
+    {
+     "name": "Ayanna Pierre Louis",
+     "rate": 2.438,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 2.438
+  },
+  {
+   "game_id": "6627811",
+   "team_id": "46753",
+   "team": "Stony Brook",
+   "absent": [
+    {
+     "name": "Ayanna pierre Louis",
+     "rate": 1.583,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 1.583
+  },
+  {
+   "game_id": "6627812",
+   "team_id": "46753",
+   "team": "Stony Brook",
+   "absent": [
+    {
+     "name": "Ayanna pierre Louis",
+     "rate": 1.583,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 1.583
   },
   {
    "game_id": "6639889",
@@ -222,16 +274,19 @@
    ]
   },
   "Xavier": {
-   "gid": "6628569",
-   "d": "2026-08-29",
-   "appeared": 12,
+   "gid": "6626322",
+   "d": "2026-08-30",
+   "appeared": 9,
    "zero_action": [
     "Cameron Sher",
     "Gabrielle Semona",
+    "Iyanna Battle",
     "Addison Haberthy",
+    "Julia Grace",
     "Jamison Gordon",
     "Sadie Kroeger",
-    "Quinci Thomas"
+    "Quinci Thomas",
+    "Macy Hatkevich"
    ]
   },
   "Marquette": {
@@ -247,6 +302,14 @@
    "d": "2026-08-29",
    "appeared": 13,
    "zero_action": []
+  },
+  "Florida": {
+   "gid": "6627812",
+   "d": "2026-08-30",
+   "appeared": 14,
+   "zero_action": [
+    "Olivia Klimis"
+   ]
   },
   "Penn St.": {
    "gid": "6626350",
@@ -707,15 +770,11 @@
    ]
   },
   "Stony Brook": {
-   "gid": "6626847",
-   "d": "2026-08-29",
+   "gid": "6627812",
+   "d": "2026-08-30",
    "appeared": 11,
    "zero_action": [
-    "Ellery Singleton",
-    "Mopelola Ojo",
-    "Aajaylah Zeno",
-    "Hanna Berkefelt",
-    "Leimaile Lasike"
+    "Hanna Berkefelt"
    ]
   },
   "Ohio": {
@@ -1622,14 +1681,16 @@
    ]
   },
   "Florida St.": {
-   "gid": "6628189",
-   "d": "2026-08-29",
+   "gid": "6628190",
+   "d": "2026-08-30",
    "appeared": 12,
    "zero_action": [
-    "Julieta Portillo",
-    "Gabby Lapata",
-    "Lara Del core",
-    "Akire Jones"
+    "Ryan Murphy",
+    "Payton Whalen",
+    "Ava Lambert",
+    "Nicole Mauser",
+    "Kelsey Perry",
+    "Caylan Russ"
    ]
   },
   "BYU": {
@@ -2086,14 +2147,17 @@
    ]
   },
   "Northwestern": {
-   "gid": "6627792",
-   "d": "2026-08-29",
-   "appeared": 12,
+   "gid": "6637640",
+   "d": "2026-08-30",
+   "appeared": 9,
    "zero_action": [
     "Gabrielle Gerry",
     "Ava Pratt",
     "Cate Schnell",
+    "Clara Schramm",
     "Kayla Kauffman",
+    "Lily Wagner",
+    "Kaitlyn Bodnar",
     "Simone Huarte"
    ]
   },
@@ -2148,13 +2212,12 @@
    ]
   },
   "Coastal Carolina": {
-   "gid": "6625896",
-   "d": "2026-08-28",
+   "gid": "6627990",
+   "d": "2026-08-30",
    "appeared": 11,
    "zero_action": [
     "Elin Andersson",
-    "Talia Johnson",
-    "Anna Rita"
+    "Viara Parapunova"
    ]
   },
   "Duke": {
@@ -2263,11 +2326,17 @@
    ]
   },
   "South Dakota St.": {
-   "gid": "6627343",
-   "d": "2026-08-29",
-   "appeared": 11,
+   "gid": "6626383",
+   "d": "2026-08-30",
+   "appeared": 9,
    "zero_action": [
-    "Kennedey Whitford"
+    "Mallory Hartwig",
+    "Patrycja Labucka",
+    "Katelyn Van kirk",
+    "Brooklyn Meyer",
+    "Anna Johannson",
+    "Madison Burr",
+    "Taylor Byl"
    ]
   },
   "Sacramento St.": {
@@ -2334,10 +2403,17 @@
    ]
   },
   "Georgetown": {
-   "gid": "6624442",
-   "d": "2026-08-29",
-   "appeared": 10,
-   "zero_action": []
+   "gid": "6637640",
+   "d": "2026-08-30",
+   "appeared": 11,
+   "zero_action": [
+    "Jessica Lee",
+    "Addie Lloyd",
+    "Alexis Anderson",
+    "Taylor Mercado",
+    "Olivia Penske",
+    "Sydney Mercado"
+   ]
   },
   "Oregon St.": {
    "gid": "6624303",
@@ -2346,11 +2422,14 @@
    "zero_action": []
   },
   "FGCU": {
-   "gid": "6626876",
-   "d": "2026-08-29",
-   "appeared": 9,
+   "gid": "6628190",
+   "d": "2026-08-30",
+   "appeared": 7,
    "zero_action": [
+    "Erica Muhizi",
+    "Eliska Vytiskova",
     "Ava Theiller",
+    "Camila Soto",
     "Catharina Scorza",
     "Devynn Schulze",
     "Katie Gielas"
@@ -2446,13 +2525,14 @@
    ]
   },
   "Notre Dame": {
-   "gid": "6626321",
-   "d": "2026-08-28",
-   "appeared": 12,
+   "gid": "6626322",
+   "d": "2026-08-30",
+   "appeared": 11,
    "zero_action": [
-    "Portia Zeidler",
     "Kailyn Greene- gordon",
-    "Angie Desamours"
+    "Carla Mercado",
+    "Mia Radeff",
+    "Hailie Vaughn"
    ]
   },
   "Ball St.": {
@@ -2629,11 +2709,16 @@
    ]
   },
   "Texas St.": {
-   "gid": "6627659",
-   "d": "2026-08-28",
-   "appeared": 14,
+   "gid": "6624750",
+   "d": "2026-08-30",
+   "appeared": 9,
    "zero_action": [
+    "Caelyn Emmerling",
+    "Janet Onuorah",
+    "Naara Tanco",
     "Camryn Kimes",
+    "Dylan Gilkey",
+    "Izzy Scholvin",
     "Emma Elsasser",
     "Ameena Campbell"
    ]
@@ -2679,8 +2764,8 @@
    ]
   },
   "Kansas St.": {
-   "gid": "6627510",
-   "d": "2026-08-28",
+   "gid": "6627511",
+   "d": "2026-08-30",
    "appeared": 13,
    "zero_action": [
     "Alex Klukvin",
@@ -2885,8 +2970,8 @@
    ]
   },
   "Creighton": {
-   "gid": "6624827",
-   "d": "2026-08-29",
+   "gid": "6626976",
+   "d": "2026-08-30",
    "appeared": 11,
    "zero_action": [
     "Ava Testrake",
@@ -3319,15 +3404,15 @@
    ]
   },
   "Villanova": {
-   "gid": "6626382",
-   "d": "2026-08-29",
+   "gid": "6626383",
+   "d": "2026-08-30",
    "appeared": 11,
    "zero_action": [
     "Abby Harrell",
     "Michelle Eburuoh",
+    "Marly Smith",
     "Annika Veurink",
     "Selah O'connor",
-    "Mina Diggs",
     "Sophia Stalcup",
     "Margot Randall"
    ]
@@ -3587,15 +3672,15 @@
    ]
   },
   "Campbell": {
-   "gid": "6628133",
-   "d": "2026-08-29",
-   "appeared": 14,
+   "gid": "6627511",
+   "d": "2026-08-30",
+   "appeared": 12,
    "zero_action": [
-    "Erin Herrmann",
-    "Simone Grieser",
-    "Ella Loges",
-    "Jaeda Rawls-fletcher",
-    "Jordyn Smith"
+    "Aubree Fernandez",
+    "Cayla Prohaska",
+    "Ashley Artura",
+    "Ava Bassett",
+    "Marlena Lee"
    ]
   },
   "North Carolina": {
@@ -3641,18 +3726,17 @@
    ]
   },
   "Queens (NC)": {
-   "gid": "6626124",
-   "d": "2026-08-29",
-   "appeared": 9,
+   "gid": "6627990",
+   "d": "2026-08-30",
+   "appeared": 11,
    "zero_action": [
-    "Lauren Ingram",
-    "Sara Lozano",
-    "Riley Copenhaver",
-    "Charlotte Glass",
-    "Alyce Donoghue",
-    "Olivia Wayne",
-    "Carlyle Johnson",
-    "Grace Thrower"
+    "Brooke Thuss",
+    "Grace Hargis",
+    "Tyler Peluso",
+    "Riley Ellison",
+    "Josephine Seekford",
+    "Kyla Coffey",
+    "Lydia Chambers"
    ]
   },
   "Quinnipiac": {
@@ -3680,14 +3764,14 @@
    ]
   },
   "Louisiana": {
-   "gid": "6624749",
-   "d": "2026-08-29",
+   "gid": "6624750",
+   "d": "2026-08-30",
    "appeared": 11,
    "zero_action": [
     "Brooklyn Vigil",
-    "Sophia Armstrong",
-    "Jazmine Gaston",
-    "Gigi Smith"
+    "Rhyan Miciotto",
+    "Gigi Smith",
+    "Marlee Ervin"
    ]
   },
   "UAlbany": {
@@ -3767,12 +3851,17 @@
    ]
   },
   "Southern California": {
-   "gid": "6627523",
-   "d": "2026-08-29",
-   "appeared": 9,
+   "gid": "6626976",
+   "d": "2026-08-30",
+   "appeared": 10,
    "zero_action": [
+    "Milly Mcgee",
+    "Quinn Loper",
     "Elena Baic",
-    "Brooklyn Tealer"
+    "Riley Malloy",
+    "Addison Townsend",
+    "Brooklyn Tealer",
+    "Addison Coady"
    ]
   },
   "UTEP": {

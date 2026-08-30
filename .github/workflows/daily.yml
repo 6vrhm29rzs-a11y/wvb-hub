@@ -228,6 +228,9 @@ jobs:
           python3 scripts/resume_2025.py || echo "resume needs a rating or a blend; skipping"
           python3 scripts/confidence.py || echo "confidence ledger skipped"
           python3 scripts/availability_desk.py || echo "availability desk skipped"
+          # bounded official-source collector: 12 schools max, rate-limited,
+          # robots-respecting; daily cadence ONLY -- never the half-hourly job
+          python3 scripts/collector.py || echo "collector skipped"
           python3 scripts/source_intel.py || echo "source intel skipped"
           # PLAYER RATINGS -- position boards, POWER and RESUME. Cheap and
           # offline: it reads the crawled box scores already on disk. It must
