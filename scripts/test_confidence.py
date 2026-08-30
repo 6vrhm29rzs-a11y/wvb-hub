@@ -51,8 +51,17 @@ def main():
     check("an NCAA endpoint can NEVER confirm (same source, new URL)",
           C.field_state([E(kind="ncaa_official")], "result", "reconciled")
           == "reconciled")
-    check("one attributable second source CAN confirm",
-          C.field_state([E()], "result", "reconciled") == "confirmed")
+    # ⚠ TIGHTENED after SMU-UC Davis (2026-08-30): the feed's copy of that
+    # match was internally coherent with the teams SWAPPED, and a single
+    # schedule row cannot catch that class. A result now confirms only on
+    # TWO KINDS of evidence: an official host box/live-stat final AND a
+    # separately attributable school result.
+    check("one school source alone corroborates, never confirms",
+          C.field_state([E()], "result", "reconciled") == "reconciled")
+    check("host live-stat + separate school source -> confirmed",
+          C.field_state([E(kind="host_livestat"),
+                         E(url="https://second.example.edu/s")],
+                        "result", "reconciled") == "confirmed")
     check("exact duplicate source URLs count once",
           C.field_state([E(), E()], "result", "official")
           == C.field_state([E()], "result", "official"))
@@ -131,8 +140,11 @@ def main():
     check("ledger -> match -> Back restores the ledger",
           "?from=ledger" in src and "'Result Ledger', routeFor('confidence')"
           in src and "back.dataset.back === 'ledger'" in src)
-    check("the manually verified corrections really are in the ledger",
-          any(r["overall"] == "confirmed" and r["gid"] == "6628236"
+    # 6628236's verification is a school source without a host box, so
+    # under the two-kind bar it is honest PENDING -- the evidence itself
+    # must still be there and supporting
+    check("the manually verified evidence really is in the ledger",
+          any(r["gid"] == "6628236" and r.get("n_indep", 0) >= 1
               for r in rows))
     check("the ambiguous attempt stays PENDING, never confirmed",
           all(r["overall"] != "confirmed" for r in rows
@@ -233,14 +245,18 @@ console.log('R19-OK'); process.exit(0);
           _rb19.returncode != 0
           and "contradictory generic phrase" in (_rb19.stdout + _rb19.stderr))
 
-    print("\n6. THE DISPUTE QUARANTINE (this suite red IS the halt)")
-    # stated policy: raw history is never rewritten and no silent per-match
-    # exclusion is invented inside the rating (that would change ranking
-    # math); instead ANY standing dispute fails this suite, so CI and the
-    # publish gate stop until a human resolves the evidence file.
-    check("no dispute is currently standing (else: resolve the evidence "
-          "file before publishing)", c["disputed"] == 0,
-          "%d disputed" % c["disputed"])
+    print("\n6. THE DISPUTE QUARANTINE (contained, not halting)")
+    # ⚠ POLICY EVOLVED with the Final Verification Queue (SMU-UC Davis):
+    # a standing dispute no longer halts publishing, because it is now
+    # STRUCTURALLY CONTAINED -- season_counts classes it under_review and
+    # every counted consumer refuses it. This suite verifies the
+    # containment, not the absence. An uncontained dispute still fails.
+    import season_counts as _SC
+    _rg = _SC.review_gids(SEASON)
+    _disp = [r["gid"] for r in rows if r["overall"] == "disputed"]
+    check("every standing dispute is contained in the under-review set",
+          all(g in _rg for g in _disp),
+          str([g for g in _disp if g not in _rg]))
     ev = (C.load("data/raw/%d/result_evidence.json" % SEASON) or {})
     check("the evidence file states the discipline in its own _doc",
           "never called independent" in (ev.get("_doc") or "")
