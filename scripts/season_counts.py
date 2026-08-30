@@ -23,6 +23,16 @@ Classes (mutually exclusive, in precedence order):
   empty        a final asserting no result at all (no winner, no set
                counts, no set line) with no ledgered correction --
                visible only in the Result Ledger as official-only
+  under_review a completed match whose result is DISPUTED: an independent
+               official source conflicts with the feed and no curated
+               correction resolves it yet (result_evidence.json entries
+               with status 'conflicts', minus gids with a correction).
+               Inspectable in the Result Ledger; counted NOWHERE -- not
+               in records, ratings, resume, form, aggregates, Conference
+               Lab, recaps or snapshots. A wrong result flowing into
+               everything is worse than a late one (SMU-UC Davis,
+               2026-08-30: the feed carried the true set sequence with
+               the TEAMS SWAPPED, internally coherent and wrong).
   ok           a completed match that counts (result corrections from
                data/raw/{s}/result_corrections.json are applied BEFORE
                classification, so a corrected empty final is ok)
@@ -51,9 +61,10 @@ DEFINITIONS = {
     "feed_records": ("every completed record the NCAA feed served, "
                      "including duplicate listings, exhibitions and "
                      "finals that assert no result"),
-    "results_on_display": ("completed matches with a result a reader can "
-                           "open -- exhibitions included and badged, "
-                           "duplicates and empty records excluded"),
+    "results_on_display": ("completed matches a reader can open -- "
+                           "exhibitions and under-review results included "
+                           "and badged, duplicates and empty records "
+                           "excluded"),
     "rating_eligible": ("completed D-I v D-I matches with a per-set "
                         "line, exhibitions and duplicates excluded -- "
                         "the matches a rating can be computed from"),
@@ -110,6 +121,23 @@ def apply_correction(g, corr):
     return g
 
 
+def review_gids(season):
+    # type: (int) -> set
+    """Gids under result review: an unresolved official conflict."""
+    ev = (_load(os.path.join(
+        REPO, "data/raw/%d/result_evidence.json" % season))
+        .get("evidence") or {})
+    corr = corrections(season)
+    out = set()
+    for gid, entries in ev.items():
+        if str(gid) in corr:
+            continue                       # a curated correction resolves it
+        if any(isinstance(e, dict) and e.get("status") == "conflicts"
+               for e in entries):
+            out.add(str(gid))
+    return out
+
+
 def is_empty_final(g):
     # type: (Dict) -> bool
     """A final that asserts no result: no winner, no set counts, no line."""
@@ -129,6 +157,7 @@ def classify(games, season):
     dup = dupes.duplicate_gids(season)
     exh = EXH.resolved_gids(season)
     corr = corrections(season)
+    review = review_gids(season)
     out = {}
     for g in games:
         state = g.get("game_state") or g.get("state")
@@ -139,6 +168,8 @@ def classify(games, season):
             out[gid] = "duplicate"
         elif gid in exh:
             out[gid] = "exhibition"
+        elif gid in review:
+            out[gid] = "under_review"
         elif is_empty_final(apply_correction(g, corr)):
             out[gid] = "empty"
         else:
@@ -166,9 +197,13 @@ def totals(games, season):
     n = {"feed_records": len(cls),
          "duplicate": sum(1 for v in cls.values() if v == "duplicate"),
          "exhibition": sum(1 for v in cls.values() if v == "exhibition"),
+         "under_review": sum(1 for v in cls.values()
+                             if v == "under_review"),
          "empty": sum(1 for v in cls.values() if v == "empty"),
          "ok": sum(1 for v in cls.values() if v == "ok")}
-    n["results_on_display"] = n["ok"] + n["exhibition"]
+    # under_review stays ON DISPLAY (badged, inspectable) while counting
+    # nowhere -- hiding a disputed row would bury the dispute
+    n["results_on_display"] = n["ok"] + n["exhibition"] + n["under_review"]
     n["rating_eligible"] = sum(
         1 for gid, v in cls.items()
         if v == "ok"

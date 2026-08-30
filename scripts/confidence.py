@@ -88,7 +88,8 @@ def field_state(entries, field, base, today=None):
     field-specific evidence. One source can never confirm; a conflict
     outranks everything."""
     seen = set()
-    confirms = conflicts = 0
+    conflicts = 0
+    kinds_confirming = set()
     for e in entries or []:
         if not entry_supports(e, field, today):
             continue
@@ -99,10 +100,24 @@ def field_state(entries, field, base, today=None):
         if e.get("status") == "conflicts":
             conflicts += 1
         else:
-            confirms += 1
+            kinds_confirming.add(
+                "box" if (e.get("kind") or "") in
+                ("host_livestat", "host_box", "official_box", "gamebook")
+                else "school")
     if conflicts:
         return "disputed"
-    if confirms >= 1:
+    # ⚠ INDEPENDENTLY CONFIRMED NEEDS TWO KINDS OF EVIDENCE (SMU-UC Davis,
+    # 2026-08-30): an official host box/live-stat final AND a separately
+    # attributable school result/recap. The feed can never be either
+    # (entry_supports already refuses ncaa_official). One school schedule
+    # row alone corroborates -- it no longer confirms: the feed's
+    # inverted-attribution copy of this match was internally coherent,
+    # and only the two-kind bar catches that class.
+    if field == "result":
+        if {"box", "school"} <= kinds_confirming:
+            return "confirmed"
+        return base
+    if kinds_confirming:
         return "confirmed"
     return base
 

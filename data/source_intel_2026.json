@@ -1,8 +1,8 @@
 {
  "meta": {
   "season": 2026,
-  "generated_at_utc": "2026-08-30T22:12:37Z",
-  "n_claims": 20,
+  "generated_at_utc": "2026-08-30T22:37:07Z",
+  "n_claims": 21,
   "feed_cap": 5,
   "recent_hours": 72,
   "states": {
@@ -10,7 +10,7 @@
    "corroborated": 9,
    "official_unconfirmed": 0,
    "community_signal": 0,
-   "conflicting": 0,
+   "conflicting": 1,
    "expired": 3,
    "inaccessible": 1
   }
@@ -660,6 +660,35 @@
    "review_by": null
   },
   {
+   "id": "333c4d178c77",
+   "type": "result_conflict",
+   "subject": {
+    "kind": "match",
+    "gid": "6626259"
+   },
+   "what": "An attributable source disputes this result",
+   "state": "conflicting",
+   "state_label": "sources conflict — shown, not chosen",
+   "why": "shown, never chosen; the Result Ledger holds both claims",
+   "scope": "that sources disagree about this result",
+   "sources": [
+    {
+     "url": "https://smumustangs.com/sports/womens-volleyball/stats/2026/uc-davis/boxscore/14553",
+     "excerpt": "SMU's own SidearmStats result data for game 14553: 'status':'W','team_score':'3','opponent_score':'2' ... 'game_winner':'H','home_full_name':'SMU','away_full_name':'UC Davis','period_home_score':['27','25','20','23','15','3'],'period_away_score':['25','20','25','25','12','2']",
+     "retrieved": "2026-08-30T22:32:10Z",
+     "source_class": "host_livestat"
+    }
+   ],
+   "public": true,
+   "priority": 95,
+   "route": {
+    "match": "6626259",
+    "ledger": true
+   },
+   "effective": null,
+   "review_by": null
+  },
+  {
    "id": "7e5d6a47bcb2",
    "type": "availability",
    "subject": {
@@ -693,6 +722,36 @@
   }
  ],
  "feed": [
+  {
+   "id": "333c4d178c77",
+   "type": "result_conflict",
+   "subject": {
+    "kind": "match",
+    "gid": "6626259"
+   },
+   "what": "An attributable source disputes this result",
+   "state": "conflicting",
+   "state_label": "sources conflict — shown, not chosen",
+   "why": "shown, never chosen; the Result Ledger holds both claims",
+   "scope": "that sources disagree about this result",
+   "sources": [
+    {
+     "url": "https://smumustangs.com/sports/womens-volleyball/stats/2026/uc-davis/boxscore/14553",
+     "excerpt": "SMU's own SidearmStats result data for game 14553: 'status':'W','team_score':'3','opponent_score':'2' ... 'game_winner':'H','home_full_name':'SMU','away_full_name':'UC Davis','period_home_score':['27','25','20','23','15','3'],'period_away_score':['25','20','25','25','12','2']",
+     "retrieved": "2026-08-30T22:32:10Z",
+     "source_class": "host_livestat"
+    }
+   ],
+   "public": true,
+   "priority": 95,
+   "route": {
+    "match": "6626259",
+    "ledger": true
+   },
+   "effective": null,
+   "review_by": null,
+   "first_seen": "2026-08-30T22:37:07Z"
+  },
   {
    "id": "27790879126a",
    "type": "result_correction",
@@ -840,46 +899,6 @@
    "effective": null,
    "review_by": "2026-09-05",
    "first_seen": "2026-08-30T18:56:13Z"
-  },
-  {
-   "id": "09aaf7317ced",
-   "type": "duplicate_listing",
-   "subject": {
-    "kind": "match",
-    "gid": "6640356",
-    "teams": [
-     "Lehigh",
-     "Cleveland St."
-    ]
-   },
-   "what": "Lehigh v Cleveland St. was listed twice by the feed; the copy is excluded from every count",
-   "state": "corroborated",
-   "state_label": "corroborated by independent sources",
-   "why": "both schools' official schedules establish exactly one meeting",
-   "scope": "that the feed listed one meeting twice",
-   "sources": [
-    {
-     "url": "https://lehighsports.com/sports/womens-volleyball/schedule",
-     "excerpt": "'vs Cleveland State University | Grace Hall | Bethlehem, Pa. | Steel Classic | W, 3-0 | Aug 28 (Fri) 11:00 AM' -- the only Cleveland State row on the schedule",
-     "retrieved": "2026-08-30T19:37:47Z",
-     "source_class": "official_school"
-    },
-    {
-     "url": "https://csuvikings.com/sports/womens-volleyball/schedule",
-     "excerpt": "schema.org SportsEvent 'Cleveland State University At Lehigh', startDate 2026-08-28T18:30:00, Bethlehem PA -- the only Lehigh event on the page",
-     "retrieved": "2026-08-30T19:37:47Z",
-     "source_class": "official_school"
-    }
-   ],
-   "public": true,
-   "priority": 60,
-   "route": {
-    "match": "6628586",
-    "ledger": true
-   },
-   "effective": null,
-   "review_by": null,
-   "first_seen": "2026-08-30T19:38:44Z"
   }
  ]
 }

@@ -62,7 +62,8 @@ def main():
     check("results() carries an exhibition flag",
           '"exhibition": bool(_exh_hit)' in src)
     check("the build splits counting results from displayable ones",
-          'res_cnt = [r for r in res if not r.get("exhibition")]' in src)
+          'res_cnt = [r for r in res' in src
+          and 'not r.get("exhibition") and not r.get("under_review")' in src)
     # ⚠ box_and_players IS DELIBERATELY NOT ON THIS LIST. It takes the FULL
     # list, because its box scores are the log; only its season aggregate is
     # restricted, via count_gids. Section 2b checks that half.

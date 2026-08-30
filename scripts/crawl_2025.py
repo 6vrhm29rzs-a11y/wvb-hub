@@ -780,6 +780,12 @@ def crawl_players():
         _skip_gids |= _dup_gids
     except Exception:
         pass
+    # a result under review counts nowhere -- including per-player lines
+    try:
+        from season_counts import review_gids as _rg
+        _skip_gids |= set(_rg(SEASON))
+    except Exception:
+        pass
     _skipped_exh = 0
     _skipped_dup = 0
     for gid_key, rec in load_records_jsonl(PLAYERBOX_JSONL, key="game_id").items():

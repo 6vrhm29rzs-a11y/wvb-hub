@@ -432,8 +432,10 @@ def main():
         missing = [f for f in need if f not in L[0]]
         check("every ledger row carries what a row needs", not missing,
               str(missing))
-        check("...and each is marked final (res is the FINAL-only crawl)",
-              all(r.get("state") == "final" for r in L))
+        # a disputed result rides in state 'review' (SMU-UC Davis): still
+        # a crawled final, shown unlabelled-as-fact and counted nowhere
+        check("...and each is marked final or review (final-only crawl)",
+              all(r.get("state") in ("final", "review") for r in L))
         check("...with a game id to route to",
               all(r.get("gid") for r in L))
     for st in ("all", "live", "final", "upcoming"):

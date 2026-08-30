@@ -316,6 +316,24 @@
     "review_by": null,
     "collector": true
    }
+  ],
+  "6626259": [
+   {
+    "url": "https://smumustangs.com/sports/womens-volleyball/stats/2026/uc-davis/boxscore/14553",
+    "kind": "host_livestat",
+    "school": "SMU",
+    "retrieved": "2026-08-30T22:32:10Z",
+    "text": "SMU's own SidearmStats result data for game 14553: 'status':'W','team_score':'3','opponent_score':'2' ... 'game_winner':'H','home_full_name':'SMU','away_full_name':'UC Davis','period_home_score':['27','25','20','23','15','3'],'period_away_score':['25','20','25','25','12','2']",
+    "fields": [
+     "result"
+    ],
+    "value": {
+     "result": "SMU won 3-2 (27-25, 25-20, 20-25, 23-25, 15-12). The NCAA feed carries the IDENTICAL set sequence with the teams swapped -- home/visit attribution inverted, so the feed is internally coherent and wrong."
+    },
+    "status": "conflicts",
+    "review_by": "2026-09-06",
+    "note": "Cody flagged the result as wrong. UC Davis's own schedule and box pages carry no result data yet (checked 2026-08-30T22:31Z -- schema-events schedule entries only), so this is ONE independent official source against the feed: a conflict to review, not yet a correction. Recheck UC Davis for the second source."
+   }
   ]
  }
 }

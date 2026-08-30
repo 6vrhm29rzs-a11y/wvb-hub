@@ -209,6 +209,11 @@ def results() -> List[Dict]:
         _dup_gids = set(_dgf(SEASON))
     except Exception:                                  # noqa: BLE001
         _dup_gids = set()
+    try:
+        import season_counts as _SCR
+        _review_gids = _SCR.review_gids(SEASON)
+    except Exception:                                  # noqa: BLE001
+        _review_gids = set()
     # result corrections apply HERE TOO -- this loop reads the RAW log, the
     # same seam the duplicate skip already paid for once (round 18:
     # Kent St.-W&M, the feed's winner/sets_won contradicting its own
@@ -254,6 +259,12 @@ def results() -> List[Dict]:
         # aggregates and the scores views.
         if str(g.get("game_id")) in _dup_gids:
             continue
+        # ⚠ RESULT UNDER REVIEW: an independent official source conflicts
+        # with the feed and no correction resolves it. The row stays in
+        # the DISPLAY list wearing the review flag (the Ledger and Scores
+        # must show the state), but it is dropped from res_cnt below --
+        # records, form, standings, aggregates never see it.
+        _urv = str(g.get("game_id")) in _review_gids
         # ⚠ A "FINAL" THAT ASSERTS NO RESULT COUNTS NOWHERE (2026-08-29).
         # Game 6625090 (Delaware St. v Mississippi Val.) came back state F
         # with winner_team_id null, sets_won null on both sides and zero
@@ -312,6 +323,7 @@ def results() -> List[Dict]:
                     break
         out.append({
             "exhibition": bool(_exh_hit),
+            "under_review": _urv,
             "exhibition_event": (_exh_hit or {}).get("event"),
             "date": (_pt_date(ep) if ep else None),
             "epoch": int(ep) if ep else 0,
@@ -3264,6 +3276,8 @@ def conference_lab(bteams, tj):
         gid = str(g.get("game_id"))
         if g.get("duplicate_of"):
             continue                       # ledgered duplicate: counts nowhere
+        if g.get("under_review"):
+            continue                       # disputed result: counts nowhere
         if gid in exh:
             n_exh += 1
             continue
@@ -3459,8 +3473,10 @@ def build():
     # SMU and Penn St. -- four of the best teams in the country -- and nothing
     # on the page would look wrong. It would also invent wins and losses that
     # the NCAA does not recognise.
-    res_cnt = [r for r in res if not r.get("exhibition")]
-    _n_exh = len(res) - len(res_cnt)
+    res_cnt = [r for r in res
+               if not r.get("exhibition") and not r.get("under_review")]
+    _n_exh = sum(1 for r in res if r.get("exhibition"))
+    _n_review = sum(1 for r in res if r.get("under_review"))
     # ⚠ RESULTS_JSON TAKES res_cnt TOO. That payload is what the form pills and
     # the Top 25's W/L strip read, so an exhibition there would put a result in
     # a team's form that its own record does not contain -- the two would
@@ -3864,7 +3880,8 @@ def build():
             "venue": (loc.get("venue") or None),
             "city": (loc.get("city") or None), "st": (loc.get("state") or None),
             "site": site, "event": ev,
-            "state": "final",          # `res` is the FINAL-only crawl (R2)
+            "state": "review" if r.get("under_review") else "final",
+            "under_review": bool(r.get("under_review")) or None,
         })
 
     # ---- bracket ---------------------------------------------------------
@@ -4900,6 +4917,8 @@ h1 em{font-style:normal;color:var(--gold)}
    same treatment on a list that merely happens to have rows would be the
    generic move. The rule sizes already shipped; this adds the court ground
    under the table head so the board reads as a board. */
+.mtag.rvw,.tdtag.rvw{color:var(--chalk);background:var(--live);
+  border-color:var(--live);font-weight:700}
 .ldrfloor{font:600 11px/1 var(--mono);color:var(--ink2);
   background:var(--alt);border:1px solid var(--line);border-radius:3px;
   padding:6px 9px;white-space:nowrap}
@@ -9656,15 +9675,17 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 <section id="v-confidence" hidden>
   <h2>Result Confidence Ledger</h2>
   <p class="lead">The <b>2026</b> season&rsquo;s evidence, per final, per field.
-    <b>Official final</b> is the canonical scoreboard&rsquo;s claim &mdash;
-    true of every final here, the floor not a boast. <b>Internally
-    reconciled</b> means the held records agree with each other: set line,
-    winner and tally are coherent. <b>Cross-source confirmed</b> requires a
-    second <i>attributable</i> public source for the specific field &mdash;
-    a second NCAA endpoint is the same source wearing a different URL and
-    never counts. A source confirming the 3&ndash;1 confirms nothing about
-    the box score. <b>&ldquo;Official final; independent confirmation
-    pending&rdquo; is an honest, normal state</b> &mdash; not an alarm.</p>
+    <b>Official scoreboard</b> is the feed&rsquo;s claim &mdash; true of every
+    final here, the floor not a boast; internal coherence is NOT proof (a
+    result with the teams swapped is coherent and wrong). <b>Independently
+    confirmed</b> requires an official host box or live-stat final AND a
+    separately attributable school result &mdash; the NCAA feed never counts
+    as the second source, and a source confirming the 3&ndash;1 confirms
+    nothing about the box score or venue. A conflict makes the result
+    <b>UNDER REVIEW</b>: both claims are kept, and the match counts nowhere
+    until an official correction resolves it. <b>&ldquo;Independent
+    confirmation pending&rdquo; is an honest, normal state</b> &mdash; not
+    an alarm.</p>
   <div id="rcsummary"></div>
   <div class="seg" id="rcfilters" role="group" aria-label="confidence filter">
     <button class="segb on" data-rcf="all" type="button">All</button>
@@ -15296,8 +15317,15 @@ function matchRow(m, live, dest) {
   const st = matchState(m, live);
   const sc = matchScore(m, live);
   const done = sc[0] !== null && sc[0] !== undefined;
-  const aw = done && +sc[0] > +sc[1], hw = done && +sc[1] > +sc[0];
+  /* ⚠ A RESULT UNDER REVIEW CROWNS NOBODY (SMU-UC Davis, 2026-08-30):
+     an independent official source disputes the feed's winner, so the
+     row shows the feed's numbers UNLABELLED as fact -- no winner
+     emphasis, and a review tag that routes to the Result Ledger. */
+  const urv = !!m.under_review;
+  const aw = !urv && done && +sc[0] > +sc[1],
+        hw = !urv && done && +sc[1] > +sc[0];
   const tags = [];
+  if (urv) tags.push(['rvw', 'UNDER REVIEW']);
   if (m.ar && m.hr) tags.push(['rv', 'ranked v ranked']);
   if (st === 'live') tags.push(['lv', 'live']);
   if (m.site === 'neutral') tags.push(['', 'neutral']);
@@ -15884,13 +15912,14 @@ function cfDrill(key) {
 const CONFIDENCE = {{CONFIDENCE_JSON}};
 const INTEL = {{INTEL_JSON}};
 let RC_FILTER = 'all';
-const RC_LABEL = { official: 'Official final \u00b7 confirmation pending',
-  reconciled: 'Reconciled \u00b7 confirmation pending',
+const RC_LABEL = { official: 'Official scoreboard \u00b7 independent confirmation pending',
+  reconciled: 'Official scoreboard, reconciled \u00b7 independent confirmation pending',
   /* corrected: the feed's record was incomplete or wrong and the counted
      result comes from named official evidence. Deliberately NOT the
      confirmed label -- a correction never rides the confirmation ladder. */
   corrected: 'Corrected from official evidence',
-  confirmed: 'Cross-source confirmed', disputed: 'Result under review' };
+  confirmed: 'Independently confirmed',
+  disputed: 'RESULT UNDER REVIEW \u2014 independent confirmation pending' };
 
 function renderConfidence() {
   const sumEl = document.getElementById('rcsummary');
@@ -15900,7 +15929,7 @@ function renderConfidence() {
     [['Completed feed records', c.finals,
       'every completed record the feed served -- duplicate listings, ' +
       'exhibitions and empty finals included, each labelled'],
-     ['Cross-source confirmed', c.confirmed,
+     ['Independently confirmed', c.confirmed,
       'a second attributable public source'],
      ['Internally reconciled', c.reconciled,
       'set line, winner and tally agree; one source'],

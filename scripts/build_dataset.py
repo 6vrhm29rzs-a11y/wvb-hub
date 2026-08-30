@@ -214,6 +214,8 @@ def main():
             g["linescores"] = [dict(r) for r in fix["linescores"]]
         return g
     games = [_apply_result_correction(g) for g in games]
+    import season_counts as _SCC
+    _review_gids = _SCC.review_gids(SEASON)
     for g in games:
         if g.get("game_state") != "F":
             continue
@@ -235,6 +237,14 @@ def main():
         # would also have deflated every per-set rate it touched.
         if _EXH.is_exhibition(g, SEASON, _local_date(g)):
             _skipped_exhibitions.add(str(g.get("game_id")))
+            continue
+        # ⚠ A DISPUTED RESULT COUNTS NOWHERE while under review (SMU-UC
+        # Davis, 2026-08-30: the feed's copy was internally coherent with
+        # the TEAMS SWAPPED). season_counts.review_gids is the one
+        # definition; the game stays in the dataset for the Result Ledger
+        # but enters no tally.
+        if str(g.get("game_id")) in _review_gids:
+            g["under_review"] = True
             continue
         teams = g.get("teams") or []
         if len(teams) != 2:
@@ -357,6 +367,7 @@ def main():
             "duplicate_of": _dup_of.get(str(g.get("game_id"))) or None,
             "result_corrected": bool(g.get("result_corrected")) or None,
             "result_corrected_kind": g.get("result_corrected_kind"),
+            "under_review": g.get("under_review") or None,
             # ⚠ location was dropped here, which made the Result Ledger's
             # venue state read "unavailable" on all 310 finals -- the feed
             # DOES carry a venue on most of them; the state was vacuous
