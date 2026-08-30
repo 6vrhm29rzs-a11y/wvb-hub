@@ -2,15 +2,15 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 377,
+  "scored": 379,
   "logged_after_tipoff_excluded": 8,
   "team_mismatch_excluded": 13,
   "predictions_on_record": 4769,
-  "results_available": 409,
-  "brier": 0.1835,
+  "results_available": 411,
+  "brier": 0.1847,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 274,
-  "favourite_correct_pct": 72.7
+  "favourite_correct": 275,
+  "favourite_correct_pct": 72.6
  },
  "calibration": [
   {
@@ -21,9 +21,9 @@
   },
   {
    "range": "60-70%",
-   "n": 75,
+   "n": 76,
    "said": 65.0,
-   "happened": 58.7
+   "happened": 59.2
   },
   {
    "range": "70-80%",
@@ -33,9 +33,9 @@
   },
   {
    "range": "80-90%",
-   "n": 70,
+   "n": 71,
    "said": 85.0,
-   "happened": 75.7
+   "happened": 74.6
   },
   {
    "range": "90-101%",
@@ -280,6 +280,15 @@
    "brier": 0.72029169
   },
   {
+   "game_id": "6625759",
+   "date": "2026-08-30",
+   "away": "Iona",
+   "home": "Houston Christian",
+   "p_home": 0.8401,
+   "home_won": false,
+   "brier": 0.7057680099999999
+  },
+  {
    "game_id": "6624352",
    "date": "2026-08-28",
    "away": "Miami (FL)",
@@ -485,15 +494,6 @@
    "p_home": 0.312,
    "home_won": true,
    "brier": 0.47334399999999993
-  },
-  {
-   "game_id": "6625328",
-   "date": "2026-08-29",
-   "away": "Ga. Southern",
-   "home": "Hawaii",
-   "p_home": 0.3252,
-   "home_won": true,
-   "brier": 0.4553550400000001
   }
  ]
 }
