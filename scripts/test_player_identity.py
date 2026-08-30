@@ -134,15 +134,19 @@ def main():
     # page, so this was robustness rather than the nightly rescue I claimed.)
     prim = re.findall(r'<button role="tab"[^>]*data-v="([a-z0-9]+)"', h)
     private = "START-HERE" in (which or "")
-    want = (["desk", "scores", "rankings", "teams", "ballot"] if private
-            else ["desk", "scores", "rankings", "teams"])
-    check("the primary destinations are the daily %d" % len(want),
+    # core-data pass 2026-08-31: Stats (leaders) is a PRIMARY now -- a
+    # rankings/scores/stats site leads with its stats. Six on the private
+    # page, five public (the ballot strips).
+    want = (["desk", "scores", "rankings", "leaders", "teams", "ballot"]
+            if private
+            else ["desk", "scores", "rankings", "leaders", "teams"])
+    check("the primary destinations are the core %d" % len(want),
           prim == want, "%s (expected %s)" % (prim, want))
-    check("[-] the nav has not grown back into a tab maze", len(prim) <= 5,
+    check("[-] the nav has not grown back into a tab maze", len(prim) <= 6,
           str(prim))
     more = re.findall(r'<button role="menuitem"[^>]*data-v="([a-z0-9]+)"', h)
-    check("the reference tools moved to More, none lost",
-          set(more) >= {"leaders", "players", "standings", "bracket", "schedule"},
+    check("the reference tools stay reachable in More, none lost",
+          set(more) >= {"players", "standings", "bracket", "schedule"},
           str(more))
     check("Digby's Top 25 is a RANKINGS view, not a top-level tab",
           "top25" not in prim and 'data-r="digby"' in h)
@@ -217,8 +221,12 @@ def main():
     print("\n8. DEAD UI REMOVED")
     check("no per-team 'trend unavailable' block renders",
           h.count('class="trend') == 0, "%d found" % h.count('class="trend'))
-    check("the archive states its limit ONCE instead",
-          h.count('class="histnote"') == 1)
+    # the trend note moved inside the Methodology disclosure (core-data
+    # pass) and gained a row-hint sibling there; the invariant is that the
+    # limit is stated in ONE place, not scattered per team -- two notes
+    # inside one collapsed disclosure still satisfies it
+    check("the archive states its limit in one collapsed place",
+          1 <= h.count('class="histnote"') <= 2)
     check("search counts use singular/plural language",
           "' matching player'" in h and "' matching players'" in h)
 

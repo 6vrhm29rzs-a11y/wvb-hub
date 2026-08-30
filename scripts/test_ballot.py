@@ -1007,7 +1007,12 @@ console.log(JSON.stringify(out));
     if os.path.exists(priv):
         prim2 = re.findall(r'<button role="tab"[^>]*data-v="([a-z0-9]+)"',
                            open(priv, encoding="utf-8").read())
-        check("no sixth primary tab was added", len(prim2) == 5, str(prim2))
+        # core-data pass 2026-08-31: Stats was promoted to a primary --
+        # this is a rankings/scores/STATS site first. Six primaries now,
+        # and the set is pinned so a seventh still trips.
+        check("the primary set is exactly the six core destinations",
+              prim2 == ["desk", "scores", "rankings", "leaders",
+                        "teams", "ballot"], str(prim2))
         check("...and My Board is not a route",
               "'myboard'" not in src.split("ROUTE_OF_VIEW")[1][:400])
 

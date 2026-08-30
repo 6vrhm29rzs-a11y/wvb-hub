@@ -2,12 +2,12 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-08-30T21:08:56Z",
+  "generated_at_utc": "2026-08-30T21:51:34Z",
   "counts": {
    "statuses": 0,
    "signals": 0,
    "expired": 1,
-   "anomalies": 9
+   "anomalies": 12
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -33,6 +33,29 @@
   }
  ],
  "anomalies": [
+  {
+   "game_id": "6626259",
+   "team_id": "46250",
+   "team": "SMU",
+   "absent": [
+    {
+     "name": "Suli Davis",
+     "rate": 5.667,
+     "played_share": 1.0
+    },
+    {
+     "name": "Gabi Placide",
+     "rate": 3.0,
+     "played_share": 1.0
+    },
+    {
+     "name": "Favor Anyanwu",
+     "rate": 3.0,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 11.667
+  },
   {
    "game_id": "6625823",
    "team_id": "46366",
@@ -125,6 +148,32 @@
     }
    ],
    "points_per_set_missing": 2.438
+  },
+  {
+   "game_id": "6639890",
+   "team_id": "46755",
+   "team": "Texas",
+   "absent": [
+    {
+     "name": "Abby Vander wal",
+     "rate": 2.125,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 2.125
+  },
+  {
+   "game_id": "6628592",
+   "team_id": "46755",
+   "team": "Texas",
+   "absent": [
+    {
+     "name": "Abby Vander wal",
+     "rate": 2.125,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 2.125
   },
   {
    "game_id": "6627811",
@@ -238,11 +287,18 @@
    ]
   },
   "Texas": {
-   "gid": "6628592",
-   "d": "2026-08-29",
-   "appeared": 11,
+   "gid": "6628594",
+   "d": "2026-08-30",
+   "appeared": 8,
    "zero_action": [
-    "Anja Kujundzic"
+    "Camille Presley",
+    "Ella Swindle",
+    "Addy Gaido",
+    "Callie Krueger",
+    "Genevieve Harris",
+    "Emma Cugino",
+    "Mackenzie Collins",
+    "Abby Vander wal"
    ]
   },
   "Arizona St.": {
@@ -255,10 +311,17 @@
    ]
   },
   "SMU": {
-   "gid": "6626258",
-   "d": "2026-08-29",
+   "gid": "6626259",
+   "d": "2026-08-30",
    "appeared": 11,
-   "zero_action": []
+   "zero_action": [
+    "Ana Stojanovic",
+    "Katelyn Sentous",
+    "Reese Diersbock",
+    "Jada Johnson",
+    "Laela Burgess",
+    "Faith Rabb-patterson"
+   ]
   },
   "Pittsburgh": {
    "gid": "6628318",
@@ -298,10 +361,18 @@
    ]
   },
   "Nebraska": {
-   "gid": "6628315",
-   "d": "2026-08-29",
-   "appeared": 13,
-   "zero_action": []
+   "gid": "6628594",
+   "d": "2026-08-30",
+   "appeared": 9,
+   "zero_action": [
+    "Keoni Williams",
+    "Ryan Hunter",
+    "Keri Leimbach",
+    "Jayden Robinson",
+    "Campbell Flynn",
+    "Gabby Divita",
+    "Kenna Cogill"
+   ]
   },
   "Florida": {
    "gid": "6627812",
@@ -884,14 +955,14 @@
    ]
   },
   "UNCW": {
-   "gid": "6625810",
-   "d": "2026-08-29",
+   "gid": "6627065",
+   "d": "2026-08-30",
    "appeared": 11,
    "zero_action": [
+    "Macon Butler",
     "Lily Goyer",
-    "Maris Grant",
-    "Addi Vaughn",
-    "Lora Cole"
+    "Meredith Keefer",
+    "Maris Grant"
    ]
   },
   "Le Moyne": {
@@ -1551,13 +1622,12 @@
    ]
   },
   "LMU (CA)": {
-   "gid": "6625785",
-   "d": "2026-08-29",
+   "gid": "6625787",
+   "d": "2026-08-30",
    "appeared": 10,
    "zero_action": [
     "Gianna Perez",
-    "Melania Katsitadze",
-    "Ayanna Henry",
+    "Zaria Thornton",
     "Amanda Mikuzis",
     "Kayla Lopez"
    ]
@@ -1658,16 +1728,12 @@
    ]
   },
   "ULM": {
-   "gid": "6639365",
-   "d": "2026-08-29",
-   "appeared": 10,
+   "gid": "6627367",
+   "d": "2026-08-30",
+   "appeared": 12,
    "zero_action": [
+    "Zharia Alleyne",
     "Olivia Anderson",
-    "Taylor Reid",
-    "Kennedy Scott",
-    "Abby Cunningham",
-    "Marissa Kobelski",
-    "Amelia Colon",
     "Gracie Dinardo"
    ]
   },
@@ -1788,8 +1854,8 @@
    "zero_action": []
   },
   "Lindenwood": {
-   "gid": "6624403",
-   "d": "2026-08-29",
+   "gid": "6624404",
+   "d": "2026-08-30",
    "appeared": 11,
    "zero_action": [
     "Meghan Donoughue",
@@ -1951,12 +2017,13 @@
    ]
   },
   "Little Rock": {
-   "gid": "6625758",
-   "d": "2026-08-29",
-   "appeared": 12,
+   "gid": "6639463",
+   "d": "2026-08-30",
+   "appeared": 11,
    "zero_action": [
+    "Polianna Hernandez",
     "Juliana Laguado raigosa",
-    "Alayna Vaeth",
+    "Miranda Bledsoe",
     "Kenzie Smith"
    ]
   },
@@ -1990,13 +2057,12 @@
    ]
   },
   "UNI": {
-   "gid": "6624988",
-   "d": "2026-08-29",
+   "gid": "6624989",
+   "d": "2026-08-30",
    "appeared": 10,
    "zero_action": [
     "Kamryn Vogt",
     "Kaitlyn Sellner",
-    "Kiana Landers",
     "Payton Askelsen",
     "Maggie Michaels"
    ]
@@ -2317,15 +2383,13 @@
    "zero_action": []
   },
   "East Texas A&M": {
-   "gid": "6627366",
-   "d": "2026-08-29",
-   "appeared": 10,
+   "gid": "6627367",
+   "d": "2026-08-30",
+   "appeared": 11,
    "zero_action": [
+    "Skylar Lambert",
     "Katelyn Pritchard",
-    "Semaj Cox",
-    "Jordyn Wacaster",
-    "Ellie Thurman",
-    "Giana Brown"
+    "Jordyn Wacaster"
    ]
   },
   "Texas Southern": {
@@ -2525,13 +2589,16 @@
    ]
   },
   "UC Santa Barbara": {
-   "gid": "6624517",
-   "d": "2026-08-29",
-   "appeared": 14,
+   "gid": "6624518",
+   "d": "2026-08-30",
+   "appeared": 11,
    "zero_action": [
     "Ava Zamora",
     "Emery Tubbs",
-    "Kate Martin"
+    "Avery Gibbs",
+    "Kate Martin",
+    "Reilly Goueth",
+    "Selah Wadsworth"
    ]
   },
   "Kansas": {
@@ -2626,11 +2693,12 @@
    ]
   },
   "Saint Louis": {
-   "gid": "6626484",
-   "d": "2026-08-29",
-   "appeared": 10,
+   "gid": "6624404",
+   "d": "2026-08-30",
+   "appeared": 9,
    "zero_action": [
     "Athena Tsalapatanis",
+    "Avery Boehm",
     "J'la Sparks",
     "Justina Asamoa"
    ]
@@ -2759,8 +2827,8 @@
    ]
   },
   "Iowa St.": {
-   "gid": "6628328",
-   "d": "2026-08-29",
+   "gid": "6624989",
+   "d": "2026-08-30",
    "appeared": 10,
    "zero_action": [
     "Annalise Grant",
@@ -3069,10 +3137,17 @@
    ]
   },
   "Ole Miss": {
-   "gid": "6638154",
-   "d": "2026-08-29",
+   "gid": "6625787",
+   "d": "2026-08-30",
    "appeared": 10,
-   "zero_action": []
+   "zero_action": [
+    "Sophie Taylor",
+    "Rileigh Butler",
+    "Tenesyn Frye",
+    "Caroline Ellis",
+    "Coco Natarajan",
+    "Tessa Jones"
+   ]
   },
   "Southeastern La.": {
    "gid": "6637575",
@@ -3109,11 +3184,13 @@
    "zero_action": []
   },
   "Louisiana Tech": {
-   "gid": "6628275",
-   "d": "2026-08-29",
-   "appeared": 13,
+   "gid": "6639463",
+   "d": "2026-08-30",
+   "appeared": 12,
    "zero_action": [
-    "Jenna Hehman"
+    "Zari Gillispie",
+    "Abbi Sells",
+    "Grace Krohn"
    ]
   },
   "Iona": {
@@ -3210,10 +3287,18 @@
    ]
   },
   "UC Davis": {
-   "gid": "6627087",
-   "d": "2026-08-29",
-   "appeared": 10,
-   "zero_action": []
+   "gid": "6626259",
+   "d": "2026-08-30",
+   "appeared": 9,
+   "zero_action": [
+    "Brooke Gilmour",
+    "Bojana Ambulija",
+    "Mia Silva",
+    "Ellie Moore",
+    "Christa Wilburn",
+    "Jadyn Livings",
+    "Victoria Shupe"
+   ]
   },
   "Weber St.": {
    "gid": "6625162",
@@ -3232,11 +3317,19 @@
    ]
   },
   "Colorado": {
-   "gid": "6628225",
-   "d": "2026-08-29",
-   "appeared": 11,
+   "gid": "6626304",
+   "d": "2026-08-30",
+   "appeared": 9,
    "zero_action": [
-    "Peyton Neal"
+    "Nikki Ott",
+    "Kensley Hennessy",
+    "Peyton Neal",
+    "In\u00e3\u00a9s Losada",
+    "Gwen Schiff",
+    "Maria Sp\u00e5\u0082awska",
+    "Audrey Asleson",
+    "Elle Richardson",
+    "Dumebi Okoye"
    ]
   },
   "CSUN": {
@@ -3300,11 +3393,12 @@
    "zero_action": []
   },
   "Wyoming": {
-   "gid": "6627471",
-   "d": "2026-08-28",
-   "appeared": 11,
+   "gid": "6627472",
+   "d": "2026-08-30",
+   "appeared": 10,
    "zero_action": [
     "Anna Williams",
+    "Kristina Bozovic",
     "Senna Roberts-navarro",
     "Peyton Carruth",
     "Emerson Macias",
@@ -3425,15 +3519,15 @@
    "zero_action": []
   },
   "Arizona": {
-   "gid": "6627010",
-   "d": "2026-08-29",
+   "gid": "6624518",
+   "d": "2026-08-30",
    "appeared": 12,
    "zero_action": [
-    "Payton Woods",
     "Britt Carlson",
     "Shea Davis",
     "Brookelyn Hatton",
-    "Hayden Reeder"
+    "Hayden Reeder",
+    "Maya Flemister"
    ]
   },
   "Prairie View": {
@@ -3573,14 +3667,16 @@
    ]
   },
   "Denver": {
-   "gid": "6626303",
-   "d": "2026-08-29",
-   "appeared": 12,
+   "gid": "6626304",
+   "d": "2026-08-30",
+   "appeared": 10,
    "zero_action": [
     "Abigail Conklin",
-    "Romi Chlebecek",
+    "Katelyn Landis",
+    "Quinlan Jones",
     "Alize Flores",
-    "Raeanna Knapp"
+    "Raeanna Knapp",
+    "Emersen Werger"
    ]
   },
   "Saint Mary's (CA)": {
@@ -3740,17 +3836,11 @@
    ]
   },
   "North Carolina": {
-   "gid": "6637450",
-   "d": "2026-08-29",
-   "appeared": 11,
+   "gid": "6627065",
+   "d": "2026-08-30",
+   "appeared": 16,
    "zero_action": [
-    "Addison West",
-    "Mackenzie Boyer",
-    "Erin Curtis",
-    "Meghan Clifford",
-    "Sadie Swift",
-    "Sienna Cozza",
-    "Lindley Miller"
+    "Sadie Swift"
    ]
   },
   "Lafayette": {
@@ -3848,15 +3938,16 @@
    ]
   },
   "St. Thomas (MN)": {
-   "gid": "6628023",
-   "d": "2026-08-29",
-   "appeared": 11,
+   "gid": "6627472",
+   "d": "2026-08-30",
+   "appeared": 10,
    "zero_action": [
     "Camryn Overton",
     "Madison Jones",
     "Addison Menefee",
     "Sophia Del valle",
     "Heidi Wingate",
+    "Maddy Benka",
     "Ella Thorson",
     "Miriam Unongo"
    ]

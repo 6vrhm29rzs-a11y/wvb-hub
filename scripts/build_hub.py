@@ -4888,6 +4888,7 @@ h1 em{font-style:normal;color:var(--gold)}
    same treatment on a list that merely happens to have rows would be the
    generic move. The rule sizes already shipped; this adds the court ground
    under the table head so the board reads as a board. */
+.thu{font:600 11px/1 var(--mono);letter-spacing:.02em;color:#8DA2BF;font-style:normal;text-transform:none}
 .t25 thead th{background:rgba(31,102,209,.09);
   border-bottom:2px solid var(--cs-edge2);
   font:700 11px/1 var(--disp);letter-spacing:.15em;text-transform:uppercase}
@@ -5534,12 +5535,10 @@ section[hidden]{display:none}
   border:1px solid transparent;border-radius:4px;
   background-origin:border-box;
   background-clip:padding-box,border-box}
-.panel{background-image:
-    linear-gradient(176deg,rgba(26,38,62,.94) 0%,rgba(14,21,36,.94) 55%,rgba(10,16,28,.96) 100%),
-    linear-gradient(150deg,rgba(120,180,255,.42),rgba(255,199,44,.16) 42%,rgba(255,255,255,.04) 70%);
+.panel{background:var(--card);
   overflow:hidden;
-  box-shadow:0 1px 0 rgba(255,255,255,.06) inset,
-             0 24px 60px -32px rgba(0,0,0,.95)}
+  border:1px solid var(--line);
+  box-shadow:0 10px 30px -24px rgba(18,41,75,.25)}
 /* ---- THE VALUE SCALE. ONE DEFINITION, BOTH RENDERERS. -----------------
    Python and JS each emit nothing but `style="--t:.73"`. Every colour and
    every dimension is decided here, so the server-rendered views and the
@@ -5558,8 +5557,10 @@ section[hidden]{display:none}
    without hue -- and the number itself is always printed, so colour is never
    the only channel carrying the value. */
 td.hx{position:relative;isolation:isolate}
-td.hx.seq{--hc:color-mix(in oklab,var(--mid),var(--good) calc(var(--t,0)*100%))}
-td.hx.dv{--hc:color-mix(in oklab,var(--bad),var(--good) calc(var(--t,.5)*100%))}
+/* ARENA DAYLIGHT: heat is a light tint under dark numerals -- the old
+   mix ran between two INKS and painted near-black bars across the row */
+td.hx.seq{--hc:color-mix(in oklab,var(--alt),#8FD3AC calc(var(--t,0)*100%))}
+td.hx.dv{--hc:color-mix(in oklab,#F3C2C6,#8FD3AC calc(var(--t,.5)*100%))}
 td.hx::before{content:"";position:absolute;z-index:-1;top:3px;bottom:3px;right:3px;
   width:calc((.08 + var(--w,var(--t,0))*.92) * 100%);
   border-radius:1px 4px 4px 1px;
@@ -6980,6 +6981,10 @@ td.at{white-space:nowrap}
   gap:12px;padding:10px 2px;border-bottom:1px solid var(--line);cursor:pointer;
   background:none;border-left:0;border-right:0;border-top:0;width:100%;
   text-align:left;color:inherit;font:inherit}
+.mrow{position:relative}
+.mrow::after{content:'\203A';position:absolute;right:10px;top:50%;
+  transform:translateY(-50%);font:600 16px/1 var(--sans);color:var(--line2)}
+.mrow:hover::after{color:var(--rally)}
 .mrow:hover{background:var(--sheet)}
 .mrow:last-child{border-bottom:0}
 .mrow .mwhen{font:600 11px/1.4 var(--mono);color:var(--slate)}
@@ -7713,9 +7718,7 @@ tr.tvearlier td{padding:6px 0 10px;border:0}
 .glance{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:14px 0 18px}
 .gl{padding:13px 15px;border-radius:4px;border:1px solid transparent;
   background-origin:border-box;background-clip:padding-box,border-box;
-  background-image:
-    linear-gradient(170deg,rgba(26,38,62,.94),rgba(12,19,33,.95)),
-    linear-gradient(150deg,rgba(120,180,255,.36),rgba(255,199,44,.12) 48%,rgba(255,255,255,.03) 76%);
+  background:var(--card);border:1px solid var(--line);
   display:flex;flex-direction:column;gap:5px;min-width:0}
 .gll{font:700 11px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;
   color:var(--ink3)}
@@ -8797,9 +8800,7 @@ table.box td.pn{text-align:left;font-weight:600}
 .chip.ours{background:var(--navy);border-color:var(--navy);color:#B9C6DA}
 .tcols{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;align-items:start}
 @media(max-width:900px){.tcols{grid-template-columns:1fr}}
-.tsec{background-image:
-    linear-gradient(176deg,rgba(26,38,62,.92),rgba(11,17,30,.94)),
-    linear-gradient(150deg,rgba(120,180,255,.34),rgba(255,199,44,.12) 46%,rgba(255,255,255,.03) 72%);
+.tsec{background:var(--card);border:1px solid var(--line);
   overflow:hidden;
   box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 18px 40px -28px rgba(0,0,0,.9)}
 .tsec h3{margin:0;padding:12px 15px;font:700 11.5px/1 var(--sans);letter-spacing:.08em;
@@ -8913,6 +8914,10 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <button role="tab" aria-selected="true" data-v="desk" class="pri">Today</button>
     <button role="tab" aria-selected="false" data-v="scores" class="pri">Scores</button>
     <button role="tab" aria-selected="false" data-v="rankings" class="pri">Rankings</button>
+    <!-- Stats promoted to a primary (core-data pass, 2026-08-31): this is a
+         rankings/scores/STATS site first; the leaders surface is not a
+         reference tool. -->
+    <button role="tab" aria-selected="false" data-v="leaders" class="pri">Stats</button>
     <button role="tab" aria-selected="false" data-v="teams" class="pri">Teams</button>
     <!-- PRIVATE. Cody's own weekly VolleyTalk ballot, not a ranking this site
          publishes. Stripped from the public build. -->
@@ -8928,7 +8933,6 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
              The strip removes any PRIVATE-commented ballot button, this one
              included. -->
         <button role="menuitem" data-v="ballot" class="phoneonly">My Ballot</button>
-        <button role="menuitem" data-v="leaders">Stats</button>
         <button role="menuitem" data-v="players">Players</button>
         <button role="menuitem" data-v="prank">Player ratings</button>
         <button role="menuitem" data-v="standings">Standings</button>
@@ -9110,7 +9114,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <div class="scroll"><table class="t25">
     <thead><tr>
       <th>#</th><th>Team</th><th title="how the rank changed">{{T25_MOVEHEAD}}</th>
-      <th class="n" title="POWER: 50 is an average Division-I team and every 12.5 points is one standard deviation. Same scale as the Rankings tab.">Power</th>
+      <th class="n" title="POWER: 50 is an average Division-I team and every 12.5 points is one standard deviation. Same scale as the Rankings tab.">Power <i class="thu">0&ndash;100</i></th>
       <th class="n" title="the AVCA coaches poll rank, and how far our rating differs from it">AVCA</th>
       <th>Conf</th><th>Record</th><th class="l" title="most recent results, newest last">Form</th>
       <th class="n" title="net points per set this season">Net/set</th>
@@ -9160,8 +9164,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
        the in-place expansion this view no longer has -- the projected six
        lives on the team page, which is where a row now goes. An instruction
        that no longer works is worse than none. -->
-  <span class="leadhint">Open a team for its full dossier &mdash; including the
-  six players this projection is built from.</span></p>
+</p>
   <div class="ctl">
     <input type="search" id="q" placeholder="Search a team&hellip;">
     <select id="conf"><option value="">All conferences</option></select>
@@ -9200,8 +9203,8 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     </tr>
     <tr>
       <th>#</th><th class="l">Team</th><th class="l">Conf</th>
-      <th class="n c-pow" title="POWER &mdash; how strong a team is; who would win tomorrow. 50 is an average Division-I team and every 12.5 points is one standard deviation. A monotone rescaling of the rating that produces the rank beside it, not a blend of hand-picked components.">Power</th>
-      <th class="n c-res" title="R&Eacute;SUM&Eacute; &mdash; what a team has EARNED. Ranked by RPI, which beat every alternative against the 64 teams the committee actually selected in 2025. Margin is ignored on purpose: a win is a win. A different question from Power, and the two are meant to disagree.">R&eacute;sum&eacute;</th>
+      <th class="n c-pow" title="POWER &mdash; how strong a team is; who would win tomorrow. 50 is an average Division-I team and every 12.5 points is one standard deviation. A monotone rescaling of the rating that produces the rank beside it, not a blend of hand-picked components.">Power <i class="thu">0&ndash;100</i></th>
+      <th class="n c-res" title="R&Eacute;SUM&Eacute; &mdash; what a team has EARNED. Ranked by RPI, which beat every alternative against the 64 teams the committee actually selected in 2025. Margin is ignored on purpose: a win is a win. A different question from Power, and the two are meant to disagree.">R&eacute;sum&eacute; <i class="thu">rank</i></th>
       <th class="n rec" title="Won-lost against DIVISION-I opponents this season, the NCAA&rsquo;s own convention. A non-Division-I result is shown beside it and is not counted in the record.">Record</th>
       <th class="n c-avca" title="AVCA coaches poll &mdash; the official poll, published by the American Volleyball Coaches Association. External reference: it does not feed our model.">AVCA&nbsp;Poll</th>
       <th class="c-ref" title="our fitted composite, final 2025">2025</th>
@@ -9223,6 +9226,8 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
         cannot see, and why it barely moves in August</summary>
     <div class="note">
       <p class="histnote">{{TREND_NOTE}}</p>
+      <p class="histnote">Every row opens the team&rsquo;s full dossier &mdash;
+        including the six players the projection is built from.</p>
       <p><b>Why it barely moves in August.</b> A result is weighted
       <code>n/(n+k)</code> with <b>k measured, not chosen</b>, so a team needs
       about k matches before this season counts as much as the projection does.
@@ -9524,14 +9529,19 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 </section>
 
 <section id="v-leaders" hidden>
-  <h2 class="vh">2026 stats</h2>
+  <h2 class="vh">Stats</h2>
+  <p class="tabhint">2026 season statistics &mdash; player leaders and team
+    rates, from the same box scores the records are built on &middot;
+    through <b>{{N_PLAYED}}</b> results &middot; built {{BUILT}}</p>
   <div class="seg" role="tablist" aria-label="Player or team stats">
     <button class="segb on" data-ls="player">Players</button>
     <button class="segb" data-ls="team">Teams</button>
   </div>
   <p class="lead" id="lplead"><b>2026 season</b> leaders, <b>per set</b> rather than totals &mdash; totals just rank
   whoever has played most. A player needs {{LDR_FLOOR}} sets to qualify; that minimum rises
-  with the season.</p>
+  with the season. Each category ranks a <b>job</b> &mdash; kills rank the
+  hitters, digs the defenders, assists the setters &mdash; so positions are
+  compared only where the number is their work.</p>
   <p class="lead" id="ltlead" hidden><b>2026 team stats</b>, per set, from the box scores.
   <b>Allowed</b> is the same count from the other side of the same matches &mdash; what this
   team's opponents managed against it. Everything here is a handful of matches so far;

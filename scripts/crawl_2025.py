@@ -755,6 +755,7 @@ def crawl_players():
     seen_names = {}
     ngames = 0
     dropped_lines = 0
+    dropped_nameless = 0
     # ⚠ AN EXHIBITION'S PLAYER LINES MUST NOT REACH THE SEASON AGGREGATE. This
     # file is what player_rating.py turns into per-set rates, and Spikes Under
     # the Lights plays its first two sets to 21 rather than 25 -- so folding it
@@ -764,9 +765,19 @@ def crawl_players():
     # evaluate a venue rule on its own.
     try:
         import exhibitions as _EXH
-        _skip_gids = _EXH.resolved_gids(SEASON)
+        _skip_gids = set(_EXH.resolved_gids(SEASON))
     except Exception:
         _skip_gids = set()
+    # ⚠ LEDGERED DUPLICATE LISTINGS COUNT NOWHERE -- including here. The
+    # aggregate skipped exhibitions but not duplicates, so the five
+    # zero-scaffold twins' boxes (which carry NAMELESS player rows) were
+    # folded in, and the blank names merged into per-team piles that
+    # crossed the leaderboard floor (2026-08-31).
+    try:
+        from dupes import duplicate_gids as _dg
+        _skip_gids |= set(_dg(SEASON))
+    except Exception:
+        pass
     _skipped_exh = 0
     for gid_key, rec in load_records_jsonl(PLAYERBOX_JSONL, key="game_id").items():
         if str(gid_key) in _skip_gids:
@@ -779,7 +790,23 @@ def crawl_players():
             if _broken and not _has_production(r):
                 dropped_lines += 1
                 continue
-            key = (r["team_id"], _canon(r.get("first"), r.get("last")))
+            # a line with NO name is not attributable to a person: it stays
+            # in the raw log but cannot enter a per-player season aggregate
+            if not ((r.get("first") or "") + (r.get("last") or "")).strip():
+                dropped_nameless += 1
+                continue
+            _ck = _canon(r.get("first"), r.get("last"))
+            # ⚠ AN EMPTY CANON KEY MUST NOT MERGE STRANGERS (found 2026-08-31
+            # at the TOP of the points/set leaderboard): a name written
+            # entirely outside the Latin alphabet folds to '', so every such
+            # player on a team collapsed into one per-team pile -- 13 rows,
+            # one carrying 26 "matches", and the merged sets crossed the
+            # leaderboard floor. No canon key -> the RAW spelling is the key:
+            # distinct people stay distinct, and case-variants of a
+            # non-Latin name simply stay unmerged (the safe direction).
+            if not _ck:
+                _ck = "raw:%s|%s" % (r.get("first") or "", r.get("last") or "")
+            key = (r["team_id"], _ck)
             # keep the most frequently served spelling as the display name
             import nameclean as _nc2
             nm = (_nc2.repair((r.get("first") or "").strip()),
@@ -802,6 +829,9 @@ def crawl_players():
                 except (TypeError, ValueError):
                     pass
 
+    if dropped_nameless:
+        print("  nameless lines left out of the per-player aggregate: %d"
+              % dropped_nameless)
     if dropped_lines:
         print("  phantom set lines skipped: %d "
               "(empty lines in games whose gp is not per-player)" % dropped_lines)

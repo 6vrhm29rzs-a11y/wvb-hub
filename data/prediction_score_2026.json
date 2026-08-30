@@ -2,46 +2,46 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 426,
+  "scored": 437,
   "logged_after_tipoff_excluded": 8,
   "team_mismatch_excluded": 13,
   "predictions_on_record": 4769,
-  "results_available": 458,
-  "brier": 0.1801,
+  "results_available": 469,
+  "brier": 0.1831,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 312,
-  "favourite_correct_pct": 73.2
+  "favourite_correct": 318,
+  "favourite_correct_pct": 72.8
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 62,
+   "n": 64,
    "said": 55.3,
-   "happened": 53.2
+   "happened": 53.1
   },
   {
    "range": "60-70%",
-   "n": 85,
+   "n": 87,
    "said": 65.2,
-   "happened": 60.0
+   "happened": 59.8
   },
   {
    "range": "70-80%",
-   "n": 63,
+   "n": 65,
    "said": 75.2,
-   "happened": 69.8
+   "happened": 69.2
   },
   {
    "range": "80-90%",
-   "n": 81,
+   "n": 82,
    "said": 85.0,
-   "happened": 76.5
+   "happened": 76.8
   },
   {
    "range": "90-101%",
-   "n": 135,
-   "said": 95.4,
-   "happened": 90.4
+   "n": 139,
+   "said": 95.3,
+   "happened": 89.2
   }
  ],
  "matches": [
@@ -152,6 +152,24 @@
    "p_home": 0.9348,
    "home_won": false,
    "brier": 0.8738510399999999
+  },
+  {
+   "game_id": "6626259",
+   "date": "2026-08-30",
+   "away": "SMU",
+   "home": "UC Davis",
+   "p_home": 0.0776,
+   "home_won": true,
+   "brier": 0.85082176
+  },
+  {
+   "game_id": "6625787",
+   "date": "2026-08-30",
+   "away": "LMU (CA)",
+   "home": "Ole Miss",
+   "p_home": 0.9156,
+   "home_won": false,
+   "brier": 0.83832336
   },
   {
    "game_id": "6628176",
@@ -406,6 +424,15 @@
    "brier": 0.58721569
   },
   {
+   "game_id": "6624404",
+   "date": "2026-08-30",
+   "away": "Lindenwood",
+   "home": "Saint Louis",
+   "p_home": 0.7625,
+   "home_won": false,
+   "brier": 0.5814062499999999
+  },
+  {
    "game_id": "6625710",
    "date": "2026-08-30",
    "away": "South Dakota",
@@ -467,33 +494,6 @@
    "p_home": 0.7239,
    "home_won": false,
    "brier": 0.52403121
-  },
-  {
-   "game_id": "6626506",
-   "date": "2026-08-30",
-   "away": "Pacific",
-   "home": "Southern Utah",
-   "p_home": 0.278,
-   "home_won": true,
-   "brier": 0.521284
-  },
-  {
-   "game_id": "6626781",
-   "date": "2026-08-28",
-   "away": "Mercyhurst",
-   "home": "Canisius",
-   "p_home": 0.7107,
-   "home_won": false,
-   "brier": 0.50509449
-  },
-  {
-   "game_id": "6627609",
-   "date": "2026-08-28",
-   "away": "Akron",
-   "home": "ETSU",
-   "p_home": 0.7089,
-   "home_won": false,
-   "brier": 0.50253921
   }
  ]
 }
