@@ -8820,7 +8820,7 @@ table.box td.pn{text-align:left;font-weight:600}
   box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 18px 40px -28px rgba(0,0,0,.9)}
 .tsec h3{margin:0;padding:12px 15px;font:700 11.5px/1 var(--sans);letter-spacing:.08em;
   text-transform:uppercase;color:var(--ink2);
-  background:linear-gradient(180deg,rgba(30,42,66,.9),rgba(16,24,40,.9));
+  background:var(--alt);
   border-bottom:1px solid var(--line);position:relative}
 /* A conference table earns a hairline of the ball's yellow at its head -- the
    one piece of chrome that says "this is a section" without a heavier device. */
