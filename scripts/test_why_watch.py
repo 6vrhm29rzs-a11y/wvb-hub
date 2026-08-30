@@ -133,6 +133,31 @@ def main():
     check("[NEG] filler prose on an empty reason list is caught",
           _wwbad != ww and "A big matchup!" in _wwbad)
 
+    # ── the watch card's ACTION CONTRACT (review, 2026-08-30) ──────────
+    # A card is ONE internal match route (its own <a>) plus AT MOST one
+    # clearly labelled outbound official-preview action per destination.
+    # "Preview →" beside a bare "ncaa.com" read as one doubled action.
+    import re as _re
+    _wc = _re.search(r"const watchCard = [\s\S]*?'</a>';", src)
+    check("the watch-card renderer is findable", bool(_wc))
+    if _wc:
+        _w = _wc.group(0)
+        check("exactly one action row per card", _w.count("wacts") == 1)
+        check("exactly one internal-route label per card",
+              _w.count("wgo") == 1)
+        check("at most one outbound official action, and it names its "
+              "destination", _w.count("wofficial") == 1
+              and "preview: ncaa.com" in _w)
+        check("the internal label does not say Preview (that word belongs "
+              "to the outbound action)", "wgo\">Preview" not in _w)
+        check("one outbound host only",
+              _w.count("ncaa.com/game/") == 1)
+    # and one card per match: the watches list is keyed by gid via
+    # allMatches(), so a gid cannot appear twice -- assert the keying holds
+    check("the watch list is built from the gid-keyed index",
+          "const by = allMatches();" in src
+          and "const every = Object.keys(by).map(k => by[k]);" in src)
+
     print()
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))

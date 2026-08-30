@@ -99,10 +99,23 @@ def load():
                 box[b["game_id"]] = b
 
     from gamelog import load_games_jsonl
+    # ⚠ THE FIT SEES ONLY WHAT THE CONTRACT COUNTS (2026-08-30). This loop
+    # read the raw log with NO exclusions: duplicates were fit twice, the
+    # 21-point-set exhibitions fed margins, and the two ledger-corrected
+    # inverted winners (Kent-W&M, Iona-Little Rock) entered at their wrong
+    # raw values. season_counts owns the classification and applies the
+    # result corrections; the raw log itself stays untouched.
+    import season_counts as _SC
+    _cls = _SC.classify(load_games_jsonl(os.path.join(RAW, "games.jsonl")),
+                        SEASON)
+    _corr = _SC.corrections(SEASON)
     matches = []
     for g in load_games_jsonl(os.path.join(RAW, "games.jsonl")):
             if g.get("game_state") != "F":
                 continue
+            if _cls.get(str(g.get("game_id"))) != "ok":
+                continue
+            g = _SC.apply_correction(g, _corr)
             t = g.get("teams") or []
             if len(t) != 2:
                 continue

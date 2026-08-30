@@ -66,24 +66,33 @@ def load(rel):
         return None
 
 
-def per_match_margins(doc):
-    # type: (Dict) -> Dict[str, List[float]]
-    """team_id -> [net points per set, one per completed D-I match]."""
-    out = collections.defaultdict(list)
-    for g in (doc or {}).get("games") or []:
-        if g.get("state") != "F" or g.get("duplicate_of"):
-            continue
+def _eligible(doc):
+    """The finals a rating may see -- season_counts.countable, exactly.
+
+    ⚠ ADDED 2026-08-30: both loops below skipped duplicates and hand-rolled
+    the D-I/line checks -- and never learned about the EXHIBITIONS ledger,
+    so the two 21-point-set Spikes matches were feeding margins into the
+    live blend: the exact per-set deflation the ledger exists to prevent,
+    invisible because the count merely read two high. One counting set,
+    from the contract, for every consumer."""
+    import season_counts as _SC
+    for g in _SC.countable((doc or {}).get("games") or [], SEASON,
+                           need_line=True, d1_only=True):
         ts = g.get("teams") or []
-        ls = [l for l in (g.get("linescores") or []) if l.get("home") is not None]
-        if len(ts) != 2 or not ls:
-            continue
+        ls = [l for l in (g.get("linescores") or [])
+              if l.get("home") is not None]
         home = [t for t in ts if t.get("is_home")]
         away = [t for t in ts if not t.get("is_home")]
         if not home or not away:
             continue
-        home, away = home[0], away[0]
-        if home.get("division") != 1 or away.get("division") != 1:
-            continue
+        yield g, home[0], away[0], ls
+
+
+def per_match_margins(doc):
+    # type: (Dict) -> Dict[str, List[float]]
+    """team_id -> [net points per set, one per completed D-I match]."""
+    out = collections.defaultdict(list)
+    for g, home, away, ls in _eligible(doc):
         hp = sum(l["home"] for l in ls)
         ap = sum(l["visit"] for l in ls)
         n = float(len(ls))
@@ -100,20 +109,7 @@ def per_match_detail(doc):
     season term to be scored as if every match were against an average team.
     """
     out = collections.defaultdict(list)
-    for g in (doc or {}).get("games") or []:
-        if g.get("state") != "F" or g.get("duplicate_of"):
-            continue
-        ts = g.get("teams") or []
-        ls = [l for l in (g.get("linescores") or []) if l.get("home") is not None]
-        if len(ts) != 2 or not ls:
-            continue
-        home = [t for t in ts if t.get("is_home")]
-        away = [t for t in ts if not t.get("is_home")]
-        if not home or not away:
-            continue
-        home, away = home[0], away[0]
-        if home.get("division") != 1 or away.get("division") != 1:
-            continue
+    for g, home, away, ls in _eligible(doc):
         hp = sum(l["home"] for l in ls)
         ap = sum(l["visit"] for l in ls)
         n = float(len(ls))

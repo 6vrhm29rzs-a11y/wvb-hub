@@ -3070,15 +3070,17 @@ def top25_view(avca=None):
         "the preseason projection and lets this season pull it, weighted "
         "<code>n/(n+%.1f)</code> &mdash; so a team needs <b>%.1f matches</b> "
         "before this season counts as much as the projection does. "
-        "%d D-I matches are in; %d of the 25 have played, and the most any team "
+        "%d rating-eligible finals are in; %d of the 25 have played, and the most any team "
         "is being judged on this season is <b>%d%%</b>."
         % (k, k, played, sum(1 for r in top if r.get("matches")),
            round(100 * maxw)))
     _st = rank_stamp_pt(m.get("generated_at_utc"))
     if _st:
         lead += (" <span class=\"rkstamp\">Last recomputed <b>%s</b>, from the "
-                 "%d finals in at that moment &mdash; a final folds in on the "
-                 "next recompute, not the instant a match ends.</span>"
+                 "%d rating-eligible finals in at that moment (D-I v D-I "
+                 "with a set line; exhibitions and duplicate listings "
+                 "excluded) &mdash; a final folds in on the next recompute, "
+                 "not the instant a match ends.</span>"
                  % (_st, played))
     foot = (
         mv_txt + poll_txt +
@@ -3516,6 +3518,20 @@ def build():
 
     first_played = res[0]["date"] if res else None
     played = len(res)
+    # ⚠ THE SEASON-COUNT CONTRACT, ENFORCED AT BUILD TIME (2026-08-30). One
+    # build showed three season totals at once (402 / 397 / 409) because
+    # each surface hand-rolled its own exclusions. The contract computes
+    # the named totals from THIS build's dataset; if the display list ever
+    # disagrees with the contract's results_on_display, the two derivations
+    # have drifted and the build stops rather than shipping a third number.
+    import season_counts as _SCC
+    _sc_totals = _SCC.totals((load("data/data_%d.json" % SEASON)
+                              or {}).get("games") or [], SEASON)
+    if _sc_totals["feed_records"] and played != _sc_totals["results_on_display"]:
+        raise SystemExit(
+            "season-count contract violated: display list has %d finals, "
+            "contract results_on_display says %d (%s)"
+            % (played, _sc_totals["results_on_display"], _sc_totals))
 
     # ---- rankings rows ---------------------------------------------------
     _bcolors = ((load("data/team_colors_%d.json" % SEASON) or {}).get("teams") or {})
@@ -3639,7 +3655,7 @@ def build():
             _rn = (meta.get("rank_stamp") or {}).get("matches_in")
             rank_basis += (
                 " <span class=\"rkstamp\">Last recomputed <b>%s</b>%s.</span>"
-                % (_rst, (", through %d finals" % _rn) if _rn else ""))
+                % (_rst, (", through %d rating-eligible finals" % _rn) if _rn else ""))
     else:
         _blend = [t for t in teams if t.get("rank_source") == "blend"]
         if _blend:
@@ -3676,7 +3692,7 @@ def build():
                     " <span class=\"rkstamp\">POWER last recomputed <b>%s</b>%s"
                     " &mdash; a final folds in on the next recompute, not the "
                     "instant a match ends.</span>"
-                    % (_rst, (", through %d finals" % _rn) if _rn else ""))
+                    % (_rst, (", through %d rating-eligible finals" % _rn) if _rn else ""))
         else:
             rank_basis = (
                 "<b>Still the preseason projection &mdash; not yet a "
@@ -4338,6 +4354,7 @@ def build():
         .replace("{{SCHED_ROWS}}", srows) \
         .replace("{{TV_ROWS}}", trows) \
         .replace("{{N_PLAYED}}", str(played)) \
+        .replace("{{N_PLAYED_DEF}}", esc(_SCC.DEFINITIONS["results_on_display"])) \
         .replace("{{N_AQ}}", str(n_aq)) \
         .replace("{{N_TEAMS}}", str(len(teams))) \
         .replace("{{HERO_EYEBROW}}", _hero["eyebrow"]) \
@@ -8801,7 +8818,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <h1>Volleyball <em>2026</em></h1>
     </div>
     <div class="meta">
-      <b>{{N_PLAYED}}</b> matches played &middot; <b>{{N_TEAMS}}</b> teams rated<br>
+      <b>{{N_PLAYED}}</b> <span title="{{N_PLAYED_DEF}}">results on the board</span> &middot; <b>{{N_TEAMS}}</b> teams rated<br>
       last result <b>{{LAST}}</b> &middot; built {{BUILT}}
     </div>
   </div>
@@ -15786,7 +15803,9 @@ function renderConfidence() {
   if (!sumEl || typeof CONFIDENCE === 'undefined') return;
   const c = (CONFIDENCE.meta || {}).counts || {};
   sumEl.innerHTML = '<div class="cfcards">' +
-    [['Completed finals', c.finals, ''],
+    [['Completed feed records', c.finals,
+      'every completed record the feed served -- duplicate listings, ' +
+      'exhibitions and empty finals included, each labelled'],
      ['Cross-source confirmed', c.confirmed,
       'a second attributable public source'],
      ['Internally reconciled', c.reconciled,
@@ -17470,9 +17489,16 @@ function renderDesk() {
             'coaches poll">our Top 25: ' + bits.join(' \u00b7 ') + '</div>'
           : '';
       })() +
-      '<span class="wacts"><span class="wgo">Preview &rarr;</span>' +
+      /* ⚠ TWO ACTIONS, TWO LABELS (review, 2026-08-30). "Preview →"
+         beside "ncaa.com" read as ONE action -- and reads doubled the
+         moment anything else on the screen links the same match. The
+         card's own <a> is the internal match page; the single outbound
+         official-preview action names its destination. A card carries
+         exactly one of each, and never two outbound actions for one
+         host -- guarded in test_why_watch. */
+      '<span class="wacts"><span class="wgo">Open match &rarr;</span>' +
         '<span class="wofficial" data-href="https://www.ncaa.com/game/' +
-        esc(m.gid) + '">ncaa.com</span></span>' +
+        esc(m.gid) + '">preview: ncaa.com</span></span>' +
     '</a>';
   };
 

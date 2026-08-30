@@ -2,22 +2,22 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 365,
+  "scored": 377,
   "logged_after_tipoff_excluded": 8,
-  "team_mismatch_excluded": 12,
+  "team_mismatch_excluded": 13,
   "predictions_on_record": 4769,
-  "results_available": 396,
-  "brier": 0.1867,
+  "results_available": 409,
+  "brier": 0.1835,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 263,
-  "favourite_correct_pct": 72.1
+  "favourite_correct": 274,
+  "favourite_correct_pct": 72.7
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 52,
-   "said": 55.3,
-   "happened": 51.9
+   "n": 54,
+   "said": 55.5,
+   "happened": 53.7
   },
   {
    "range": "60-70%",
@@ -27,21 +27,21 @@
   },
   {
    "range": "70-80%",
-   "n": 51,
+   "n": 53,
    "said": 75.4,
-   "happened": 68.6
+   "happened": 67.9
   },
   {
    "range": "80-90%",
-   "n": 67,
-   "said": 85.1,
-   "happened": 74.6
+   "n": 70,
+   "said": 85.0,
+   "happened": 75.7
   },
   {
    "range": "90-101%",
-   "n": 120,
-   "said": 95.6,
-   "happened": 89.2
+   "n": 125,
+   "said": 95.5,
+   "happened": 89.6
   }
  ],
  "matches": [
@@ -424,6 +424,15 @@
    "brier": 0.5511577599999999
   },
   {
+   "game_id": "6626372",
+   "date": "2026-08-30",
+   "away": "South Fla.",
+   "home": "Utah St.",
+   "p_home": 0.7306,
+   "home_won": false,
+   "brier": 0.5337763600000001
+  },
+  {
    "game_id": "6628405",
    "date": "2026-08-28",
    "away": "William & Mary",
@@ -485,15 +494,6 @@
    "p_home": 0.3252,
    "home_won": true,
    "brier": 0.4553550400000001
-  },
-  {
-   "game_id": "6626332",
-   "date": "2026-08-29",
-   "away": "High Point",
-   "home": "Hofstra",
-   "p_home": 0.6736,
-   "home_won": false,
-   "brier": 0.45373695999999997
   }
  ]
 }

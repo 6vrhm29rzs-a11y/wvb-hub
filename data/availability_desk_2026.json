@@ -2,12 +2,12 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-08-30T08:37:02Z",
+  "generated_at_utc": "2026-08-30T18:07:28Z",
   "counts": {
    "statuses": 0,
    "signals": 0,
    "expired": 1,
-   "anomalies": 4
+   "anomalies": 5
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -99,6 +99,19 @@
     }
    ],
    "points_per_set_missing": 3.071
+  },
+  {
+   "game_id": "6639889",
+   "team_id": "46580",
+   "team": "Wisconsin",
+   "absent": [
+    {
+     "name": "Natalie Wardlow",
+     "rate": 1.438,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.438
   }
  ],
  "latest": {
@@ -123,10 +136,11 @@
    ]
   },
   "Wisconsin": {
-   "gid": "6628236",
-   "d": "2026-08-28",
-   "appeared": 13,
+   "gid": "6628318",
+   "d": "2026-08-30",
+   "appeared": 12,
    "zero_action": [
+    "Grace Egan",
     "Decelise Champion",
     "Morgan Van wie",
     "Jane Manecke",
@@ -195,11 +209,13 @@
    "zero_action": []
   },
   "Pittsburgh": {
-   "gid": "6625717",
-   "d": "2026-08-28",
-   "appeared": 11,
+   "gid": "6628318",
+   "d": "2026-08-30",
+   "appeared": 9,
    "zero_action": [
+    "Haiti Tautua'a",
     "Sophia Gregoire",
+    "Jordyn Dailey",
     "Lola Sageer",
     "Jessica Smallwood",
     "Marina Pezelj"
@@ -233,13 +249,11 @@
    "zero_action": []
   },
   "Penn St.": {
-   "gid": "6626582",
-   "d": "2026-08-29",
-   "appeared": 13,
+   "gid": "6626350",
+   "d": "2026-08-30",
+   "appeared": 14,
    "zero_action": [
-    "Alexis Ewing",
-    "Ava Jurevicius",
-    "Lexi Gin"
+    "Ava Jurevicius"
    ]
   },
   "Old Dominion": {
@@ -849,9 +863,9 @@
    ]
   },
   "Temple": {
-   "gid": "6627101",
-   "d": "2026-08-29",
-   "appeared": 10,
+   "gid": "6628472",
+   "d": "2026-08-30",
+   "appeared": 9,
    "zero_action": [
     "Lily Smith",
     "Maddix Taniguchi",
@@ -860,6 +874,7 @@
     "Opeoluwa Aladetimi",
     "Sofia Vega",
     "Mickhaila Murray",
+    "Jaya Moore",
     "Sofia Hardy",
     "Sarah Quarells"
    ]
@@ -887,15 +902,19 @@
    ]
   },
   "FDU": {
-   "gid": "6624267",
-   "d": "2026-08-29",
-   "appeared": 15,
+   "gid": "6628663",
+   "d": "2026-08-30",
+   "appeared": 11,
    "zero_action": [
     "Jelena Jevtic",
+    "Madeline Joyce",
     "Katarina Trutina",
+    "Nihal Kocakara",
     "Regan Tanner",
     "Sirma Bayrakci",
-    "Szonja Csabai"
+    "Szonja Csabai",
+    "Kaylie Jensen",
+    "Brooke Kamelchuk"
    ]
   },
   "Stetson": {
@@ -1236,17 +1255,13 @@
    ]
   },
   "South Fla.": {
-   "gid": "6626369",
-   "d": "2026-08-29",
-   "appeared": 10,
+   "gid": "6626372",
+   "d": "2026-08-30",
+   "appeared": 12,
    "zero_action": [
-    "Emelyn Stettin",
-    "Rana Yamada",
-    "Anne Perez",
+    "Miya Thomas",
     "Cate Palmi",
-    "Samiyah Abdur-rahim",
-    "Riley Mccaughey",
-    "Duda Gomes"
+    "Samiyah Abdur-rahim"
    ]
   },
   "Eastern Ky.": {
@@ -1413,12 +1428,15 @@
    ]
   },
   "Illinois St.": {
-   "gid": "6628662",
-   "d": "2026-08-29",
-   "appeared": 16,
+   "gid": "6628663",
+   "d": "2026-08-30",
+   "appeared": 13,
    "zero_action": [
-    "Abby Reck",
-    "Ellie Burr"
+    "Addisyn Pohl",
+    "Alaina Kraemer",
+    "Madison Smith",
+    "Ella Kohnen",
+    "Sidney Wright"
    ]
   },
   "Chattanooga": {
@@ -1534,8 +1552,8 @@
    ]
   },
   "North Ala.": {
-   "gid": "6624768",
-   "d": "2026-08-29",
+   "gid": "6627456",
+   "d": "2026-08-30",
    "appeared": 9,
    "zero_action": [
     "Kennedy Bullins",
@@ -1561,17 +1579,14 @@
    ]
   },
   "Southern Ill.": {
-   "gid": "6627366",
-   "d": "2026-08-29",
-   "appeared": 9,
+   "gid": "6639612",
+   "d": "2026-08-30",
+   "appeared": 12,
    "zero_action": [
     "Dafne Sosa",
-    "Alexandria Arrington",
-    "Julia Laidig",
     "Una Stepic",
     "Ida Almkvist",
-    "Valentina Zevallos",
-    "Isabella Del real"
+    "Valentina Zevallos"
    ]
   },
   "ULM": {
@@ -1639,34 +1654,19 @@
    ]
   },
   "Rhode Island": {
-   "gid": "6624670",
-   "d": "2026-08-29",
-   "appeared": 11,
+   "gid": "6624671",
+   "d": "2026-08-30",
+   "appeared": 9,
    "zero_action": [
-    "Erika Bracey",
-    "Jessica Parker",
     "Cansu Kornosor",
-    "Sydney Houchens",
-    "Kiara Copeland",
-    "Autumn Tombline",
-    "Hannah Jonick",
-    "Ema Stermenska",
-    "Sophia Chinetti"
+    "Reagan Nisbet"
    ]
   },
   "App State": {
-   "gid": "6640242",
-   "d": "2026-08-29",
-   "appeared": 10,
-   "zero_action": [
-    "Lou Johnson",
-    "Bella Dafforn",
-    "Caroline Farthing",
-    "Charlotte Thompson",
-    "Eva Goodson",
-    "Amber Mcclain",
-    "Amelia Mancino"
-   ]
+   "gid": "6637170",
+   "d": "2026-08-30",
+   "appeared": 12,
+   "zero_action": []
   },
   "N.C. A&T": {
    "gid": "6627291",
@@ -1679,14 +1679,11 @@
    ]
   },
   "Navy": {
-   "gid": "6626608",
-   "d": "2026-08-29",
-   "appeared": 15,
+   "gid": "6627192",
+   "d": "2026-08-30",
+   "appeared": 14,
    "zero_action": [
-    "Madeline Bildeaux",
-    "Simone Lawson",
-    "Lillian Schultheis",
-    "Nicole Neal"
+    "Ally Alessio"
    ]
   },
   "Indiana St.": {
@@ -1825,12 +1822,10 @@
    ]
   },
   "Fresno St.": {
-   "gid": "6626201",
-   "d": "2026-08-29",
-   "appeared": 9,
-   "zero_action": [
-    "Aryam Munoz"
-   ]
+   "gid": "6626202",
+   "d": "2026-08-30",
+   "appeared": 13,
+   "zero_action": []
   },
   "Morehead St.": {
    "gid": "6625201",
@@ -1974,15 +1969,10 @@
    ]
   },
   "Iowa": {
-   "gid": "6639604",
-   "d": "2026-08-29",
-   "appeared": 11,
+   "gid": "6628652",
+   "d": "2026-08-30",
+   "appeared": 9,
    "zero_action": [
-    "Gabby Deery",
-    "Nikolija Bulatovic",
-    "Peyton Young",
-    "Makena Rumple",
-    "Emily Lavin",
     "Greta Schlichter"
    ]
   },
@@ -2002,14 +1992,10 @@
    ]
   },
   "High Point": {
-   "gid": "6626332",
-   "d": "2026-08-29",
-   "appeared": 10,
-   "zero_action": [
-    "Stella Becker",
-    "Brooke Wilson",
-    "Alyssa Kenol"
-   ]
+   "gid": "6626350",
+   "d": "2026-08-30",
+   "appeared": 11,
+   "zero_action": []
   },
   "Southern Utah": {
    "gid": "6625236",
@@ -2044,14 +2030,13 @@
    "zero_action": []
   },
   "Rider": {
-   "gid": "6627099",
-   "d": "2026-08-28",
-   "appeared": 13,
+   "gid": "6628472",
+   "d": "2026-08-30",
+   "appeared": 14,
    "zero_action": [
+    "Aubrey Baker",
     "Erynn Gotsch",
-    "Ella Mcdonald",
-    "Maisie Nawrocki",
-    "Tori Bonacci"
+    "Ella Mcdonald"
    ]
   },
   "Fordham": {
@@ -2178,16 +2163,10 @@
    ]
   },
   "Central Conn. St.": {
-   "gid": "6628506",
-   "d": "2026-08-29",
-   "appeared": 10,
-   "zero_action": [
-    "Isabella Aviles",
-    "Aubrey Stitcher",
-    "Victoria Sanabria",
-    "Danielle Caligiuri",
-    "Madison Fulgencio"
-   ]
+   "gid": "6624671",
+   "d": "2026-08-30",
+   "appeared": 12,
+   "zero_action": []
   },
   "Holy Cross": {
    "gid": "6624670",
@@ -2238,14 +2217,10 @@
    ]
   },
   "Green Bay": {
-   "gid": "6627191",
-   "d": "2026-08-29",
-   "appeared": 13,
+   "gid": "6627192",
+   "d": "2026-08-30",
+   "appeared": 9,
    "zero_action": [
-    "Taylor Neuenschwander",
-    "Victoria Kurilov",
-    "Riley Schmitz",
-    "Ambryn Aanonsen",
     "Eva Swenson"
    ]
   },
@@ -2268,16 +2243,15 @@
    ]
   },
   "Texas Southern": {
-   "gid": "6639365",
-   "d": "2026-08-29",
-   "appeared": 11,
+   "gid": "6639612",
+   "d": "2026-08-30",
+   "appeared": 12,
    "zero_action": [
-    "Keldri Young",
-    "Kaiulani Sherrow",
-    "Aliyah Spencer",
+    "Kadence Davison",
     "Keagan St. junious",
     "Morelia Lorenzo diaz",
-    "Kennedi Walker"
+    "Kennedi Walker",
+    "Emory Harper"
    ]
   },
   "South Dakota St.": {
@@ -2404,17 +2378,11 @@
    ]
   },
   "Bryant": {
-   "gid": "6627291",
-   "d": "2026-08-29",
-   "appeared": 11,
+   "gid": "6637170",
+   "d": "2026-08-30",
+   "appeared": 10,
    "zero_action": [
-    "Brookelyn Talmadge",
-    "Ruth Ochelli",
-    "Natalie Ricevuto",
-    "Nadine Abdat",
-    "Nina Gavin",
-    "Carrina Barron",
-    "Madison Koeller"
+    "Luiza Bergamaschi"
    ]
   },
   "Ohio St.": {
@@ -2426,19 +2394,11 @@
    ]
   },
   "Bowling Green": {
-   "gid": "6626537",
-   "d": "2026-08-29",
-   "appeared": 11,
+   "gid": "6626202",
+   "d": "2026-08-30",
+   "appeared": 10,
    "zero_action": [
-    "Vivian Jones",
-    "Katherine Eigner",
-    "Kendall Williams",
-    "Ania Magier",
-    "Marin Dunaway",
-    "Marija Tabak",
-    "Edyta Waclawczyk",
-    "Fetia Rovira",
-    "Makiaya Turner"
+    "Katherine Eigner"
    ]
   },
   "Tarleton St.": {
@@ -2544,13 +2504,15 @@
    ]
   },
   "Mercer": {
-   "gid": "6627455",
-   "d": "2026-08-29",
-   "appeared": 12,
+   "gid": "6627456",
+   "d": "2026-08-30",
+   "appeared": 10,
    "zero_action": [
     "Emily Matias",
+    "Ipek Ulukutlu",
     "Lexie Stotenbur",
-    "Jasmine Calton",
+    "Bella Pons",
+    "Taylor Timko",
     "Sydney Vancott",
     "Olivia Elliott",
     "Tracey Hemelings"
@@ -2649,16 +2611,15 @@
    "zero_action": []
   },
   "Utah St.": {
-   "gid": "6639570",
-   "d": "2026-08-29",
-   "appeared": 11,
+   "gid": "6626372",
+   "d": "2026-08-30",
+   "appeared": 12,
    "zero_action": [
-    "Addy Cook",
     "Ava Martin",
     "Madison Rich",
     "Solia Angilau",
     "Ava Gibbs",
-    "Taytum Nelson"
+    "Sophie Scott"
    ]
   },
   "Texas St.": {
@@ -3561,10 +3522,12 @@
    ]
   },
   "Montana St.": {
-   "gid": "6627766",
-   "d": "2026-08-29",
-   "appeared": 10,
-   "zero_action": []
+   "gid": "6627772",
+   "d": "2026-08-30",
+   "appeared": 12,
+   "zero_action": [
+    "Maggie Rhew"
+   ]
   },
   "Radford": {
    "gid": "6626919",
@@ -3595,11 +3558,11 @@
    ]
   },
   "Sacred Heart": {
-   "gid": "6628651",
-   "d": "2026-08-29",
-   "appeared": 10,
+   "gid": "6628652",
+   "d": "2026-08-30",
+   "appeared": 11,
    "zero_action": [
-    "Kelli Ennis"
+    "Ryleigh Short"
    ]
   },
   "Campbell": {
@@ -3635,17 +3598,10 @@
    "zero_action": []
   },
   "Marist": {
-   "gid": "6628454",
-   "d": "2026-08-29",
+   "gid": "6627772",
+   "d": "2026-08-30",
    "appeared": 10,
    "zero_action": [
-    "Mikayla Keefer",
-    "Savannah Smith",
-    "Trinity Woods",
-    "Gabby Flamish",
-    "Vallane Sneva",
-    "Taylor Miller",
-    "Emily Ernst",
     "Heidi Chambers",
     "Haylee Wenner"
    ]
@@ -3861,6 +3817,12 @@
     "gid": "6628236",
     "ep": 1787965200,
     "sets": 4,
+    "state": "zero_action"
+   },
+   {
+    "gid": "6628318",
+    "ep": 1788105600,
+    "sets": 3,
     "state": "zero_action"
    }
   ]

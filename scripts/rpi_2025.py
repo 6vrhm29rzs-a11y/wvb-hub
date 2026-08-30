@@ -91,13 +91,20 @@ def load_di_games():
 
     from gamelog import load_games_jsonl
     games = []
-    from dupes import duplicate_gids as _dg2
-    _dups2 = set(_dg2(SEASON))
+    # ⚠ THE CONTRACT, NOT A LOCAL DUP LIST (2026-08-30). The dup skip was
+    # here; the EXHIBITIONS ledger and the RESULT CORRECTIONS were not --
+    # so an exhibition win would have entered RPI as a real one and the
+    # two feed-inverted winners stood uncorrected in the W-L graph.
+    import season_counts as _SC
+    _cls = _SC.classify(load_games_jsonl(os.path.join(RAW, "games.jsonl")),
+                        SEASON)
+    _corr = _SC.corrections(SEASON)
     for g in load_games_jsonl(os.path.join(RAW, "games.jsonl")):
             if g.get("game_state") != "F":
                 continue
-            if str(g.get("game_id")) in _dups2:
+            if _cls.get(str(g.get("game_id"))) != "ok":
                 continue
+            g = _SC.apply_correction(g, _corr)
             t = g.get("teams") or []
             if len(t) != 2:
                 continue
