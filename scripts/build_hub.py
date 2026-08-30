@@ -5001,8 +5001,16 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .tdlivenow{display:inline-flex;align-items:center;gap:7px;margin-left:14px;
   font:700 12px/1 var(--disp);letter-spacing:.15em;text-transform:uppercase;
   color:var(--cs-gold)}
-.wgrid{display:grid;gap:14px;
-  grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+/* ⚠ A DELIBERATE COMPOSITION, NEVER AN ORPHAN (review, 2026-08-31).
+   auto-fill left a lone fifth card starting its own row. Six tracks and
+   computed spans instead: the renderer assigns w-half (span 3) to the two
+   lead cards and w-third (span 2) / w-full (span 6) to the rest so every
+   count 1-6 tiles the grid exactly -- 5 cards = 2 leads + 3; 4 = 2 + 2;
+   no hole, no accident. Narrow view collapses to one column below. */
+.wgrid{display:grid;gap:14px;grid-template-columns:repeat(6,1fr)}
+.wgrid .wcard{grid-column:span 3}
+.wgrid .wcard.w-third{grid-column:span 2}
+.wgrid .wcard.w-full{grid-column:span 6}
 .wcard{display:flex;flex-direction:column;gap:9px;min-width:0;padding:15px;
   text-decoration:none;border:1px solid var(--line);
   border-left:3px solid var(--gold-fill);
@@ -5470,6 +5478,7 @@ nav{position:sticky;top:0;z-index:6;
    move and it made twelve tabs shout equally. The active item is now marked by
    the gold rule alone, and RANK is carried by type size instead. */
 nav .inner{max-width:1280px;margin:0 auto;display:flex;gap:0;flex-wrap:wrap;
+  min-height:44px;
   padding:0 8px;align-items:center}
 nav button{appearance:none;border:0;background:transparent;color:var(--slate);
   font:600 12px/1 var(--disp);letter-spacing:.12em;padding:15px 13px;cursor:pointer;
@@ -6984,8 +6993,15 @@ td.at{white-space:nowrap}
 .mrow .msc{font:700 17px/1.2 var(--mono);color:var(--ink3);text-align:right;
   font-variant-numeric:tabular-nums}
 .mrow .mrt.won .msc,.mrow.islive .msc{color:var(--ink)}
-.mrow .mmeta{display:flex;flex-direction:column;align-items:flex-end;gap:3px;
-  min-width:0;overflow:hidden;text-align:right}
+/* ⚠ VENUE SITS BESIDE ITS MATCH, NOT AT THE FAR EDGE (review, 2026-08-31).
+   Right-aligning the 1fr column parked the metadata against the viewport
+   and left a dead centre. Left-anchored behind a hairline court divider,
+   it reads as part of the row; the slack now falls harmlessly at the row's
+   end. The column stays LAST and 1fr -- the guarded shape. */
+.mrow .mmeta{display:flex;flex-direction:column;align-items:flex-start;gap:3px;
+  min-width:0;overflow:hidden;text-align:left;
+  padding-left:14px;border-left:1px solid var(--line);align-self:stretch;
+  justify-content:center}
 .mvn{font:11px/1.4 var(--sans);color:var(--slate);white-space:nowrap;
   overflow:hidden;text-overflow:ellipsis;max-width:100%}
 /* the two numerals stack so they line up with the two team rows above */
@@ -9039,7 +9055,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
        pixels on a phone (Cody's screenshot). The view header names the
        view -- the product's own name for it -- and the section keeps
        the words, because it is the one carrying the note. -->
-  <h2 class="vh">Match desk</h2>
+  <h2 class="vh">Today</h2>
   <p class="tabhint" id="desklead"></p>
 
   <div id="desktoday">
@@ -17469,8 +17485,12 @@ function renderDesk() {
      What replaces it is a DATE and a COUNT, because that is the whole of what
      a landing page owes before its first row. */
   const _nlive = lanes.live.length;
+  /* the view title says Today; this line carries the DATE + live count,
+     so the word is never title, eyebrow and label at once (review) */
   document.getElementById('desklead').innerHTML =
-    '<span class="tdnow">' + esc(dayLabel(today)) + '</span>' +
+    '<span class="tdnow">' + esc(new Date(today + 'T12:00:00')
+      .toLocaleDateString('en-US', {weekday:'long', month:'long',
+                                    day:'numeric'})) + '</span>' +
     (_nlive ? '<span class="tdlivenow"><i class="cs-dot"></i>' + _nlive +
       ' live</span>' : '');
   document.getElementById('desktodaymeta').textContent = '';
@@ -17560,7 +17580,15 @@ function renderDesk() {
     return five || rankedLost;
   }).slice(0, 5);
 
-  const watchCard = x => {
+  /* span classes so any count 1-6 tiles the six-track grid exactly */
+  const wgridClass = (i, n) => {
+    if (n === 1) return 'w-full';
+    if (n === 2 || n === 4) return '';            /* halves all the way */
+    if (n === 3) return 'w-third';                /* one clean row of 3 */
+    if (n === 5) return i < 2 ? '' : 'w-third';   /* 2 leads + row of 3 */
+    return 'w-third';                             /* 6 -> two rows of 3 */
+  };
+  const watchCard = (x, extraCls) => {
     const m = x[0];
     const live = liveOf(m);
     /* ⚠ BEING IN THE LIVE FEED IS NOT THE SAME AS BEING IN PROGRESS, AND THIS
@@ -17573,7 +17601,8 @@ function renderDesk() {
        The codebase already resolves this once, centrally, exactly so three
        renderers do not each invent it. Ask it. */
     const isLive = matchState(m, live) === 'live';
-    return '<a class="wcard' + (isLive ? ' islive' : '') + '" href="' +
+    return '<a class="wcard' + (isLive ? ' islive' : '') +
+      (extraCls ? ' ' + extraCls : '') + '" href="' +
       matchRoute(m.gid, 'desk') + '">' +
       '<span class="wtop">' +
         /* ⚠ A LIVE CARD SAYS THE SCORE (Cody's phone screenshot: "LIVE -
@@ -17586,10 +17615,11 @@ function renderDesk() {
            feed carries no broadcast at all. An unmatched fixture says so
            rather than implying it is not televised. */
         (m.tv ? '<span class="wnet">' + esc(m.tv) + '</span>'
-              : '<span class="wnet none" title="No broadcast is listed in the '
-                + 'TV file for this fixture. The feed carries no broadcast '
-                + 'information at all, so this means unknown, not untelevised."'
-                + '>no listing</span>') +
+              : '<span class="wnet none" title="The hub holds no verified '
+                + 'TV/stream listing for this fixture. The feed carries no '
+                + 'broadcast information at all, so this means unknown, '
+                + 'never untelevised."'
+                + '>TV/stream listing not held</span>') +
       '</span>' +
       '<span class="wteams">' +
         rankHTML('avca', m.ar, true) + esc(mAway(m)) +
@@ -17639,7 +17669,8 @@ function renderDesk() {
             ? 'Watch now' : 'Your next watches',
           watches.length ? 'next 7 days &middot; why each is here' : '',
           watches.length
-            ? '<div class="wgrid">' + watches.map(watchCard).join('') + '</div>'
+            ? '<div class="wgrid">' + watches.map((x, i) =>
+                watchCard(x, wgridClass(i, watches.length))).join('') + '</div>'
             : '<p class="tdquiet">No ranked or televised match in the next seven '
               + 'days. Everything still being recorded is on the '
               + '<a href="' + routeFor('scores') + '">scoreboard</a>.</p>') +
@@ -20105,8 +20136,8 @@ function tdNextMatch(t, name) {
       (f.venue ? ' &middot; ' + esc(f.venue) : '') +
       (f.city ? ', ' + esc(f.city) : '') +
       (f.event ? ' &middot; ' + esc(f.event) : '') + '</p>' +
-    (tv ? '' : '<p class="munk tdnotv">No broadcast listed for this fixture ' +
-      '&mdash; that means unknown, not untelevised.</p>') +
+    (tv ? '' : '<p class="munk tdnotv">TV/stream listing not held for this ' +
+      'fixture &mdash; unknown, never untelevised.</p>') +
     '</div>';
 }
 

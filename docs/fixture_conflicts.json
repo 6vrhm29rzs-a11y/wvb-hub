@@ -84,6 +84,20 @@
    "matchup": "Washington St. / Oregon",
    "records": 2
   },
+  "6625330": {
+   "conflicts": [
+    {
+     "field": "start_time_epoch",
+     "records": 12,
+     "values": [
+      "1788112800",
+      "1788134400"
+     ]
+    }
+   ],
+   "matchup": "Ga. Southern / Baylor",
+   "records": 12
+  },
   "6625790": {
    "conflicts": [
     {
@@ -111,28 +125,6 @@
    ],
    "matchup": "Missouri / Nebraska",
    "records": 2
-  },
-  "6626471": {
-   "conflicts": [
-    {
-     "field": "game_state",
-     "records": 11,
-     "values": [
-      "P",
-      "I"
-     ]
-    },
-    {
-     "field": "city",
-     "records": 11,
-     "values": [
-      "Bryan-College Station",
-      "College Station"
-     ]
-    }
-   ],
-   "matchup": "Arkansas St. / Cal Poly",
-   "records": 11
   },
   "6627195": {
    "conflicts": [
@@ -248,9 +240,8 @@
   }
  },
  "by_field": {
-  "city": 1,
-  "game_state": 50,
-  "start_time_epoch": 16
+  "game_state": 45,
+  "start_time_epoch": 17
  },
  "corrections": {
   "6625717": {
@@ -384,7 +375,7 @@
  },
  "counts": {
   "blocked": 17,
-  "conflicted": 66,
+  "conflicted": 62,
   "corrected": 4,
   "fixtures": 4874
  },

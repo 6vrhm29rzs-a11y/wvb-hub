@@ -171,7 +171,7 @@ def main():
     # ⚠ brace-matched, never regexed -- a non-greedy [\s\S]*? swallowed
     # everything to the end of renderDesk on the first try (the documented
     # extractor lesson, again) and the harness died on a bare `return`
-    _wc = _blk(src, src.find("const watchCard = x =>"))
+    _wc = _blk(src, src.find("const watchCard = (x, extraCls) =>"))
     check("watchCard and the enforcement are extractable",
           bool(_wc) and bool(_enf) and "wacts" in _wc
           and "return" in _wc and len(_wc) < 8000, str(len(_wc or "")))

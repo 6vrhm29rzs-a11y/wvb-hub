@@ -258,7 +258,7 @@ def main():
               "live.state6 === 'live_with_team_stats' ||" not in body,
               "the old branch still decides before the new one")
         # and the renderers that consume it must ask, not test truthiness
-        wc = hub.find("const watchCard = x =>")
+        wc = hub.find("const watchCard = (x, extraCls) =>")
         wbody = hub[wc:wc + 1400] if wc >= 0 else ""
         check("a watch card asks the state model, not whether a feed row exists",
               "matchState(m, live) === 'live'" in wbody,

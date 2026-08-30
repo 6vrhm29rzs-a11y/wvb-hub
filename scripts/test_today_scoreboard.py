@@ -143,7 +143,9 @@ def main():
     # on hover. What must not change is that the card still SAYS SOMETHING:
     # silence would imply "not televised" when we mean "we do not know".
     check("[-] ...and says so when there is none, rather than implying not-on-TV",
-          'class="wnet none"' in src and "means unknown, not untelevised" in src)
+          'class="wnet none"' in src
+          and "TV/stream listing not held" in src
+          and "never untelevised" in src)
     check("[-] ...without dressing an unknown up as a badge",
           ".wnet.none{" in src and "border:0" in src,
           "a dashed border in the channel slot reads as a data point")
