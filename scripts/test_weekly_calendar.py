@@ -194,13 +194,29 @@ def main():
     if os.path.exists(real):
         rows = [json.loads(l) for l in open(real) if l.strip()]
         w35 = [r for r in rows if r.get("week") == "2026-W35"]
-        check("the incomplete W35 row is still present", len(w35) == 1)
-        if w35:
+        # ⚠ THIS USED TO PIN len(w35) == 1 -- true only BEFORE the first
+        # Monday freeze completed the week. On 2026-08-31 the CI freeze
+        # legitimately wrote the completed W35 row (cutoff Sunday Aug 30),
+        # this guard failed the build, the commit step never ran, AND THE
+        # FROZEN ROW WAS THROWN AWAY -- a calendar-phase pin destroying
+        # the freeze itself. The invariant is: the historical incomplete
+        # row is still there, unrewritten; anything further for W35 must
+        # be a completed cutoff freeze, appended, never a rewrite.
+        legacy = [r for r in w35 if "cutoff" not in r]
+        frozen = [r for r in w35 if "cutoff" in r]
+        check("the incomplete W35 row is still present (unrewritten)",
+              len(legacy) == 1, "%d legacy rows" % len(legacy))
+        if legacy:
             check("   ...still exactly as archived (35 teams)",
-                  len(w35[0].get("teams") or []) == 35,
-                  "%d teams" % len(w35[0].get("teams") or []))
-            check("   ...and was not back-filled with a cutoff",
-                  "cutoff" not in w35[0])
+                  len(legacy[0].get("teams") or []) == 35,
+                  "%d teams" % len(legacy[0].get("teams") or []))
+        check("   ...at most one completed W35 freeze beside it, on the "
+              "Sunday cutoff with the full field",
+              len(frozen) <= 1 and all(
+                  r.get("cutoff") == "2026-08-30"
+                  and len(r.get("teams") or []) >= 300 for r in frozen),
+              frozen and (frozen[0].get("cutoff"),
+                          len(frozen[0].get("teams") or [])))
         check("no row was rewritten to a new track",
               all(("track" not in r) or r.get("cutoff") for r in rows))
 

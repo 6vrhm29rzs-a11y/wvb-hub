@@ -498,7 +498,28 @@ def mean_opp_z(year, i2n, zmap):
             a = acc[k]
             a[0] += gp * zmap[other[0]]
             a[1] += gp
-    return dict((k, v[0] / v[1]) for k, v in acc.items() if v[1] > 0)
+    out = dict((k, v[0] / v[1]) for k, v in acc.items() if v[1] > 0)
+    # ⚠ CI HAS NO data/raw/{prior}/playerbox.jsonl (untracked, 25 MB), so
+    # the PRIOR year's schedule adjustment computed to {} there and every
+    # CI build shipped unadjusted priors -- the 'schedule-adjusted' guard
+    # has been red in CI since it was written. Same pattern as
+    # pbp_player_2025.json: derive locally, COMMIT the small derived map,
+    # and a checkout without the raw source loads it. The prior season is
+    # finished, so the map is stable; the CURRENT season recomputes from
+    # its tracked playerbox and never touches the artifact.
+    art = os.path.join(REPO, "data", "opp_z_%d.json" % year)
+    if year != SEASON:
+        if out:
+            try:
+                json.dump(dict(("|".join(k), round(v, 4))
+                               for k, v in out.items()),
+                          open(art, "w"), sort_keys=True)
+            except OSError:
+                pass
+        elif os.path.exists(art):
+            out = dict((tuple(k.split("|")), v) for k, v in
+                       json.load(open(art, encoding="utf-8")).items())
+    return out
 
 
 def adjust(r, pos, oz, faced_hit=None, league_hit=None):
