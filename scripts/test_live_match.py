@@ -327,9 +327,16 @@ def main():
         # standings table (Rk/Conf/Overall) and accused the inset of it.
         hdr = _re.search(
             r"function lmcBody.*?<table><thead><tr>(.*?)</tr>", h, _re.S)
-        cols = _re.findall(r"<th>(.*?)</th>", hdr.group(1)) if hdr else []
+        # attribute-tolerant AND concatenation-tolerant: the rate columns
+        # carry title="" definitions split across JS string literals, so
+        # the '...' + '...' seams are folded before the tags are parsed
+        _h = _re.sub(r"'\s*\+\s*\n\s*'", "", hdr.group(1)) \
+            if hdr else ""
+        cols = [_re.sub(r"<[^>]+>", "", c).strip() for c in
+                _re.findall(r"<th[^>]*>(.*?)</th>", _h)]
         check("%s: the inset shows counted stats only" % label,
-              cols == ["Team", "K", "E", "TA", "Hit%", "Digs", "Blk", "Aces"],
+              cols == ["Team", "K", "E", "TA", "Kill%", "Hit%", "Digs",
+                       "Blk", "Aces"],
               str(cols))
 
     # ── ONE LIVE-BOX STATE PER MATCH PAGE (outside review, 2026-08-28) ──

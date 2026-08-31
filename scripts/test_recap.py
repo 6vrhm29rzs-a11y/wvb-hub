@@ -101,7 +101,7 @@ console.log(JSON.stringify(html));
               "Final box-score comparison" in h
               and "match-aligned box" in h)
         check("every comparison line is one metric with BOTH values",
-              h.count('class="rcline"') == 5
+              h.count('class="rcline"') == 8
               and re.search(r'hitting %.*?<b[^>]*>\.\d{3}</b>.*?'
                             r'<b[^>]*>\.\d{3}</b>', h))
         check("the larger value is emphasised, never named an edge",

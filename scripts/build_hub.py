@@ -2161,6 +2161,11 @@ def team_season_stats(boxes, res):
                 "assists": d["ast"], "digs": d["digs"], "aces": d["aces"],
                 "blocks": d["bs"] + d["ba"] * 0.5,
                 "hit": (round((d["k"] - d["e"]) / d["ta"], 3) if d["ta"] else None),
+                # Kill % = kills / total attacks -- the share of swings that
+                # end the rally, errors NOT subtracted. A separate displayed
+                # fact from hitting %, never blended with it. None without
+                # attempts: a rate with no denominator is not a measurement.
+                "killpct": (round(d["k"] / d["ta"], 3) if d["ta"] else None),
                 "kps": (round(d["k"] / n, 2) if n else None),
                 "asps": (round(d["ast"] / n, 2) if n else None),
                 "dps": (round(d["digs"] / n, 2) if n else None),
@@ -9869,12 +9874,22 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <div class="seg" role="tablist" aria-label="Player or team stats">
     <button class="segb on" data-ls="player">Players</button>
     <button class="segb" data-ls="team">Teams</button>
+    <button class="segb" data-ls="off">Team offense</button>
   </div>
   <p class="lead" id="lplead"><b>2026 season</b> leaders, <b>per set</b> rather than totals &mdash; totals just rank
   whoever has played most. A player needs {{LDR_FLOOR}} sets to qualify; that minimum rises
   with the season. Each category ranks a <b>job</b> &mdash; kills rank the
   hitters, digs the defenders, assists the setters &mdash; so positions are
   compared only where the number is their work.</p>
+  <p class="lead" id="lolead" hidden><b>2026 team offense</b> &mdash; two
+  team rates from the same counted box scores, side by side with the raw
+  counts they come from. <b>Kill&nbsp;%</b> is kills &divide; total attacks:
+  how often a swing ends the rally, with errors <b>not</b> subtracted.
+  <b>Hit&nbsp;%</b> is (kills &minus; errors) &divide; attacks: the standard
+  box-score efficiency, where an error cancels a kill. They are two separate
+  facts about the same swings &mdash; a team can rank high on one and low on
+  the other through errors &mdash; and neither is combined into any score.
+  These are <b>team</b> rates, not player rates.</p>
   <p class="lead" id="ltlead" hidden><b>2026 team stats</b>, per set, from the box scores.
   <b>Allowed</b> is the same count from the other side of the same matches &mdash; what this
   team's opponents managed against it. Everything here is a handful of matches so far;
@@ -9907,6 +9922,21 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <div class="note">Hitting percentage needs at least 20 swings before it means
     anything, so a player below that shows an em dash rather than a number built on
     four attempts.</div>
+  </div>
+  <div class="panel" id="loffense" hidden><div class="scroll"><table>
+    <thead><tr><th>#</th><th class="l">Team</th><th class="l">Conf</th>
+      <th title="counted matches in this sample">M</th><th>Sets</th>
+      <th title="kills">K</th><th title="attack errors">E</th>
+      <th title="total attacks">TA</th>
+      <th title="kills divided by total attacks -- the share of swings that end the rally; errors are not subtracted">Kill&nbsp;%</th>
+      <th title="(kills minus errors) divided by attacks -- the standard box-score efficiency">Hit&nbsp;%</th></tr></thead>
+    <tbody id="lobody"></tbody></table></div>
+    <div class="note"><b>Team</b> rates, from each team&rsquo;s own counted
+    matches (exhibitions, duplicate listings and results under review are
+    excluded). A team with no recorded attacks is absent rather than shown
+    at a rate with no denominator. <b>Every opponent counts, including
+    non-Division-I ones</b> &mdash; the M column is the sample; read it
+    before the rate.</div>
   </div>
   <div class="panel" id="lteam" hidden><div class="scroll"><table>
     <thead><tr><th>#</th><th class="l">Team</th><th class="l">Conf</th>
@@ -10383,7 +10413,8 @@ function route() {
   }
   if (view === 'leaders' && parts[1]) {
     const b = document.querySelector('#v-leaders .segb[data-ls="' +
-      (parts[1] === 'teams' ? 'team' : 'player') + '"]');
+      (parts[1] === 'teams' ? 'team'
+       : parts[1] === 'offense' ? 'off' : 'player') + '"]');
     if (b) b.click();
   }
   if (view === 'players' && parts[1] && parts[2]) {
@@ -11217,6 +11248,7 @@ function teamTotals(rs) {
     t.sets = Math.max(t.sets, r.sets || 0);
   });
   t.hit = t.ta ? (t.k - t.e) / t.ta : null;
+  t.killpct = t.ta ? t.k / t.ta : null;
   t.blk = t.bs + t.ba * 0.5;
   return t;
 }
@@ -13436,10 +13468,16 @@ function lmcBody(d, gid) {
   }
   const t = d.teams || [];
   out += '<table><thead><tr><th>Team</th><th>K</th><th>E</th><th>TA</th>' +
-    '<th>Hit%</th><th>Digs</th><th>Blk</th><th>Aces</th></tr></thead><tbody>' +
+    '<th title="kills \u00f7 total attacks, from the live feed\u2019s ' +
+    'team totals \u2014 provisional, revised as the scorer corrects">' +
+    'Kill%</th>' +
+    '<th title="(kills \u2212 errors) \u00f7 attacks, from the live ' +
+    'feed\u2019s team totals \u2014 provisional">Hit%</th>' +
+    '<th>Digs</th><th>Blk</th><th>Aces</th></tr></thead><tbody>' +
     t.map(x => '<tr><td>' + esc(x.team || x.team_id) + '</td>' +
       '<td>' + lmcNum(x.kills) + '</td><td>' + lmcNum(x.attackErrors) + '</td>' +
       '<td>' + lmcNum(x.attackAttempts) + '</td>' +
+      '<td>' + lmcNum(x.killpct, 3) + '</td>' +
       '<td>' + lmcNum(x.hitpct, 3) + '</td><td>' + lmcNum(x.digs) + '</td>' +
       '<td>' + lmcNum(x.blocks) + '</td><td>' + lmcNum(x.serviceAces) + '</td>' +
       '</tr>').join('') + '</tbody></table>';
@@ -16764,11 +16802,17 @@ function recapHTML(m) {
      Each line is one metric, both teams' named values; the larger value
      on THAT metric is emphasised and nothing more is claimed. */
   const METRICS = [
+    ['kill %', t => t.killpct, fmtPct],
     ['hitting %', t => t.hit, fmtPct],
+    /* the raw inputs sit directly under the two rates -- a rate never
+       renders without its K / E / TA (kill % = K/TA, errors untouched;
+       hit % = (K-E)/TA) */
+    ['kills', t => t.k, String],
+    ['attack errors', t => t.e, String],
+    ['total attacks', t => t.ta, String],
     ['blocks', t => t.blk, String],
     ['aces', t => t.aces, String],
     ['digs', t => t.digs, String],
-    ['attack errors', t => t.e, String],
   ];
   const cmp = METRICS.map(mt => {
     const a = mt[1](A), b = mt[1](B);
@@ -19011,13 +19055,20 @@ function renderTeamStats() {
 let LSIDE = 'player';
 function renderStats() {
   const team = LSIDE === 'team';
-  document.getElementById('lplayer').hidden = team;
+  const off = LSIDE === 'off';
+  document.getElementById('lplayer').hidden = team || off;
   document.getElementById('lteam').hidden = !team;
-  document.getElementById('lplead').hidden = team;
+  document.getElementById('loffense').hidden = !off;
+  document.getElementById('lplead').hidden = team || off;
   document.getElementById('ltlead').hidden = !team;
+  document.getElementById('lolead').hidden = !off;
   document.getElementById('lside').hidden = !team;
+  /* the offense view is a fixed two-rate table -- the single-stat
+     selector does not apply to it */
+  document.getElementById('lstat').hidden = off;
   document.getElementById('lq').placeholder =
-    team ? 'Search team or conference\u2026' : 'Search player or team\u2026';
+    (team || off) ? 'Search team or conference\u2026'
+                  : 'Search player or team\u2026';
   /* ⚠ THIS CALLED ITSELF. renderStats is the DISPATCHER; the player table is
      drawn by renderLeaders. `else renderStats()` recursed until the stack blew,
      and because the hidden/visible toggle above runs FIRST, the panel appeared
@@ -19028,7 +19079,49 @@ function renderStats() {
      Kills/set left the header reading Pts/set and the rows untouched, and
      searching a team still returned all 48. An exception inside an event
      listener never reaches the caller, which is why nothing surfaced it. */
-  if (team) renderTeamStats(); else renderLeaders();
+  if (off) renderTeamOffense();
+  else if (team) renderTeamStats();
+  else renderLeaders();
+}
+
+/* TEAM OFFENSE -- Kill % and Hit % side by side, each beside the raw
+   K / E / TA they are computed from. Reads TSTATS: the same canonical
+   aggregate as every team rate (swap-applied boxes, counted matches
+   only). INVARIANT: a rate never renders without attempts -- a team
+   with ta == 0 or no attempts on file is ABSENT, not dashed into a
+   ranked row. Sorted by Kill %; the heat scale is per metric, within
+   the metric only -- neither rate is painted as better than the other. */
+function renderTeamOffense() {
+  const q = document.getElementById('lq').value.toLowerCase().trim();
+  const rows = TSTATS
+    .filter(r => r.own && r.own.attacks > 0
+                 && r.own.killpct !== null && r.own.killpct !== undefined
+                 && r.own.hit !== null && r.own.hit !== undefined)
+    .filter(r => !q || (r.team + ' ' + (r.conf || '')).toLowerCase().includes(q))
+    .sort((a, b) => b.own.killpct - a.own.killpct);
+  const kv = rows.map(r => r.own.killpct);
+  const hv = rows.map(r => r.own.hit);
+  const klo = Math.min.apply(null, kv), khi = Math.max.apply(null, kv);
+  const hlo = Math.min.apply(null, hv), hhi = Math.max.apply(null, hv);
+  const p3 = v => (v < 0 ? '-' : '') +
+    Math.abs(v).toFixed(3).replace(/^0/, '');
+  document.getElementById('lobody').innerHTML = rows.map((r, i) => {
+    const d = r.own;
+    return '<tr><td class="rk">' + (i + 1) + '</td>' +
+      '<td class="tm">' + logo(r.team) + esc(r.team) +
+      ((d.nondi || 0) > 0
+        ? '<b class="nondi" title="' +
+          nonDiPhrase(d.nondi, d.matches, 'in this sample') + '. ' +
+          NONDI_WHY + '">non-D-I</b>'
+        : '') + '</td>' +
+      '<td class="cf">' + (r.conf || '') + '</td>' +
+      '<td class="n">' + d.matches + '</td><td class="n">' + d.sets + '</td>' +
+      '<td class="n">' + d.kills + '</td><td class="n">' + d.errors + '</td>' +
+      '<td class="n">' + d.attacks + '</td>' +
+      hcell(d.killpct, p3(d.killpct), klo, khi, 'high', 'seq') +
+      hcell(d.hit, p3(d.hit), hlo, hhi, 'high', 'seq') + '</tr>';
+  }).join('');
+  document.getElementById('lcnt').textContent = rows.length + ' teams';
 }
 document.querySelectorAll('#v-leaders .segb').forEach(b =>
   b.addEventListener('click', () => {
@@ -20132,7 +20225,12 @@ function showTeam(name) {
     const rowsOf = [
       ['Points / set', O.pps, D.pps, 'n2',
        'kills + blocks + aces \u2014 the box-score definition'],
-      ['Hitting %',   O.hit,  D.hit,  'pct', 'higher is better; opponent lower is better'],
+      ['Kill %', O.killpct, D.killpct, 'pct',
+       'kills \u00f7 total attacks \u2014 the share of swings that end the ' +
+       'rally; errors are not subtracted. A separate fact from hitting %.'],
+      ['Hitting %',   O.hit,  D.hit,  'pct',
+       '(kills \u2212 errors) \u00f7 attacks \u2014 higher is better; ' +
+       'opponent lower is better'],
       ['Kills / set', O.kps,  D.kps,  'n2',  ''],
       ['Assists / set', O.asps, D.asps, 'n2',  ''],
       ['Digs / set',  O.dps,  D.dps,  'n2',  ''],
@@ -20182,7 +20280,16 @@ function showTeam(name) {
       'From the box scores of <b>' + O.matches +
       (O.matches === 1 ? ' match' : ' matches') + '</b> (' + O.sets +
       ' sets). Totals: ' + O.kills + ' kills on ' + O.attacks + ' attacks with ' +
-      O.errors + ' errors. <b>Opponents</b> is what this team allowed &mdash; ' +
+      O.errors + ' errors' +
+      ((O.killpct !== null && O.killpct !== undefined && O.hit !== null)
+        ? ' &mdash; <b>Kill % ' +
+          O.killpct.toFixed(3).replace(/^0/, '') + '</b> (kills &divide; ' +
+          'attacks, errors not subtracted) and <b>Hit % ' +
+          (O.hit < 0 ? '-' : '') +
+          Math.abs(O.hit).toFixed(3).replace(/^0/, '') +
+          '</b> (kills &minus; errors, &divide; attacks)'
+        : '') +
+      '. <b>Opponents</b> is what this team allowed &mdash; ' +
       'the same counts from the other side of the same box scores.' +
       /* ⚠ THE DIVISION OF THE OPPONENT, said where the rate is read. Stated
          only when it applies, and it names how much of the sample it is --

@@ -86,6 +86,10 @@ def team_line(stats):
     ta = out["attackAttempts"]
     out["hitpct"] = round((out["kills"] - out["attackErrors"]) / float(ta), 3) \
         if ta else None
+    # Kill % = kills / attempts, errors untouched -- a separate displayed
+    # fact from hitting %. None without attempts (live boxes arrive with
+    # zero TA early in set one); the renderer omits, never estimates.
+    out["killpct"] = round(out["kills"] / float(ta), 3) if ta else None
     # ⚠ RAW COUNTS, NEVER THE FEED'S `points` COLUMN. Blocks are solo + half
     # assist, the NCAA convention.
     out["points"] = (out["kills"] + out["serviceAces"] + out["blockSolos"]
