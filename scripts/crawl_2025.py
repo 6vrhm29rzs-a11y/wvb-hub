@@ -788,6 +788,11 @@ def crawl_players():
         pass
     _skipped_exh = 0
     _skipped_dup = 0
+    try:
+        from season_counts import box_team_swaps as _bts
+        _swaps = _bts(SEASON)
+    except Exception:
+        _swaps = {}
     for gid_key, rec in load_records_jsonl(PLAYERBOX_JSONL, key="game_id").items():
         if str(gid_key) in _skip_gids:
             # count the two exclusion classes separately -- the meta line
@@ -800,7 +805,11 @@ def crawl_players():
         ngames += 1
         _rows = rec.get("rows") or []
         _broken = _uniform_gp_game(_rows)
+        _swap = _swaps.get(str(gid_key)) or {}
         for r in _rows:
+            if _swap:
+                r = dict(r, team_id=_swap.get(str(r.get("team_id")),
+                                              r.get("team_id")))
             if _broken and not _has_production(r):
                 dropped_lines += 1
                 continue

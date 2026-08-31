@@ -2,12 +2,12 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-08-30T22:53:22Z",
+  "generated_at_utc": "2026-08-31T01:01:57Z",
   "counts": {
    "statuses": 0,
    "signals": 0,
    "expired": 1,
-   "anomalies": 12
+   "anomalies": 13
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -174,6 +174,19 @@
     }
    ],
    "points_per_set_missing": 2.125
+  },
+  {
+   "game_id": "6640218",
+   "team_id": "46614",
+   "team": "Penn St.",
+   "absent": [
+    {
+     "name": "Finley Krystkowiak",
+     "rate": 1.667,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.667
   },
   {
    "game_id": "6627811",
@@ -383,10 +396,14 @@
    ]
   },
   "Penn St.": {
-   "gid": "6626350",
+   "gid": "6626658",
    "d": "2026-08-30",
-   "appeared": 14,
+   "appeared": 11,
    "zero_action": [
+    "Danielle Whitmire",
+    "Alexis Ewing",
+    "Emmi Sellman",
+    "Caroline Jurevicius",
     "Ava Jurevicius"
    ]
   },
@@ -1674,8 +1691,8 @@
    ]
   },
   "Georgia St.": {
-   "gid": "6627268",
-   "d": "2026-08-29",
+   "gid": "6626589",
+   "d": "2026-08-30",
    "appeared": 11,
    "zero_action": [
     "Sigrun Jonsdottir",
@@ -2143,13 +2160,15 @@
    ]
   },
   "Gonzaga": {
-   "gid": "6626505",
-   "d": "2026-08-29",
-   "appeared": 12,
+   "gid": "6627895",
+   "d": "2026-08-30",
+   "appeared": 10,
    "zero_action": [
     "Gabby Vandal",
     "Brianna Martin",
-    "Hazel Murphy",
+    "Nia Damuni",
+    "Aurie Duncan",
+    "Carina Zaldivar",
     "Lucy Slavik"
    ]
   },
@@ -3033,12 +3052,12 @@
    ]
   },
   "South Alabama": {
-   "gid": "6626588",
-   "d": "2026-08-29",
-   "appeared": 10,
+   "gid": "6626589",
+   "d": "2026-08-30",
+   "appeared": 13,
    "zero_action": [
-    "Megan Smith",
-    "Elyse Heffner"
+    "Kathryn O'toole",
+    "Alivia Freeman"
    ]
   },
   "Rice": {
@@ -3106,10 +3125,18 @@
    ]
   },
   "IU Indy": {
-   "gid": "6627347",
-   "d": "2026-08-29",
+   "gid": "6627555",
+   "d": "2026-08-30",
    "appeared": 10,
-   "zero_action": []
+   "zero_action": [
+    "Maia Long",
+    "Kennedy Seputis",
+    "Brynn Zastrow",
+    "Morgan Begley",
+    "Kate White",
+    "Chloe Macias",
+    "Sophie Wischmeier"
+   ]
   },
   "Davidson": {
    "gid": "6626400",
@@ -3598,10 +3625,16 @@
    "zero_action": []
   },
   "California": {
-   "gid": "6628654",
-   "d": "2026-08-29",
-   "appeared": 11,
-   "zero_action": []
+   "gid": "6625237",
+   "d": "2026-08-30",
+   "appeared": 12,
+   "zero_action": [
+    "Maria Stirbu",
+    "Ashleigh Woodruff",
+    "Annemarie O'gara",
+    "Nicole Milosevic",
+    "Rania Chimonides"
+   ]
   },
   "Pacific": {
    "gid": "6626506",
@@ -3650,10 +3683,15 @@
    ]
   },
   "Washington": {
-   "gid": "6639894",
-   "d": "2026-08-29",
-   "appeared": 8,
-   "zero_action": []
+   "gid": "6627555",
+   "d": "2026-08-30",
+   "appeared": 11,
+   "zero_action": [
+    "Ava jo Berry",
+    "Hayden Conner",
+    "Addy Benefield",
+    "Rian Stephan"
+   ]
   },
   "UC Irvine": {
    "gid": "6627348",
@@ -3693,20 +3731,32 @@
    ]
   },
   "Saint Mary's (CA)": {
-   "gid": "6625236",
-   "d": "2026-08-29",
-   "appeared": 11,
+   "gid": "6625237",
+   "d": "2026-08-30",
+   "appeared": 10,
    "zero_action": [
-    "Lainey Day"
+    "Amanda Prior",
+    "Hadlee Gray",
+    "Kiana Johnson",
+    "Mikayla Haner",
+    "Lainey Day",
+    "Milani Billings",
+    "Tallulah Carney",
+    "Maddie Way"
    ]
   },
   "UC San Diego": {
-   "gid": "6628654",
-   "d": "2026-08-29",
-   "appeared": 12,
+   "gid": "6627895",
+   "d": "2026-08-30",
+   "appeared": 11,
    "zero_action": [
     "Jaedyn Houston",
-    "Kylie Parker"
+    "Hayden Shanafelt",
+    "Ahnika Smith",
+    "Marleena Catalan",
+    "Kaliya Ndiaye",
+    "Kylie Parker",
+    "Soraya Dennis"
    ]
   },
   "Long Beach St.": {
@@ -3808,7 +3858,7 @@
    ]
   },
   "Hofstra": {
-   "gid": "6626587",
+   "gid": "6626658",
    "d": "2026-08-30",
    "appeared": 10,
    "zero_action": [
@@ -4066,20 +4116,24 @@
    "zero_action": []
   },
   "UNLV": {
-   "gid": "6628315",
-   "d": "2026-08-29",
-   "appeared": 11,
+   "gid": "6628316",
+   "d": "2026-08-30",
+   "appeared": 13,
    "zero_action": [
-    "Julie Beckham",
+    "Natalie Monroe",
+    "Sloan Cleveland",
+    "Sanja Popovic",
     "Kaia Thiele"
    ]
   },
   "TCU": {
-   "gid": "6628592",
-   "d": "2026-08-29",
-   "appeared": 10,
+   "gid": "6628316",
+   "d": "2026-08-30",
+   "appeared": 14,
    "zero_action": [
-    "Lauren Murphy"
+    "Jaylen Clark",
+    "Mckenzie Berg",
+    "Josie Valgus"
    ]
   },
   "Virginia": {

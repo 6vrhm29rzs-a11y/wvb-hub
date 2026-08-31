@@ -210,7 +210,12 @@ def main():
         # if the feed DOES carry lines, they stand, even against the ledger,
         # because a disagreement there is a conflict to surface, not an
         # overwrite to make.
-        if fix.get("linescores") and not (g.get("linescores") or []):
+        if fix.get("linescores") and (
+                fix.get("linescores_replace")
+                or not (g.get("linescores") or [])):
+            # replace is allowed ONLY when the correction carries two-source
+            # evidence that the feed's lines are attributed to the wrong
+            # teams (SMU-UC Davis, 2026-08-30); otherwise fill-only stands
             g["linescores"] = [dict(r) for r in fix["linescores"]]
         return g
     games = [_apply_result_correction(g) for g in games]

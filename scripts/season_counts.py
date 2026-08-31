@@ -114,11 +114,29 @@ def apply_correction(g, corr):
             t["sets_won"] = fix["away_sets"]
         ts.append(t)
     g["teams"] = ts
-    if fix.get("linescores") and not [
+    if fix.get("linescores") and (
+            fix.get("linescores_replace") or not [
             l for l in (g.get("linescores") or [])
-            if l.get("home") is not None]:
+            if l.get("home") is not None]):
         g["linescores"] = [dict(r) for r in fix["linescores"]]
     return g
+
+
+def box_team_swaps(season):
+    # type: (int) -> Dict[str, Dict[str, str]]
+    """gid -> {team_id: corrected_team_id} from evidenced corrections.
+
+    SMU-UC Davis (2026-08-30): the feed swapped TEAM ATTRIBUTION wholesale
+    -- linescores AND all 33 player rows (verified: 16/16 rows under UC
+    Davis's id are SMU roster players, 17/17 the reverse). The raw log is
+    never rewritten; every derived consumer of player rows applies this
+    map at read."""
+    out = {}
+    for gid, c in corrections(season).items():
+        m = (c.get("correct") or {}).get("box_team_swap")
+        if m:
+            out[str(gid)] = {str(k): str(v) for k, v in m.items()}
+    return out
 
 
 def review_gids(season):

@@ -629,7 +629,55 @@ def run(cap=QUEUE_CAP, now=None):
     return stats, queue
 
 
+RECHECK_BACKOFF_MIN = (15, 45, 120)      # then daily
+
+
+def recheck_reviews(now=None):
+    """Bounded, throttled rechecks of HELD official URLs for finals under
+    review -- never a crawl. Backoff: 15m, 45m, 2h after the dispute is
+    ledgered, then daily, until a correction resolves it. Policy set by
+    the SMU-UC Davis incident: the resolving source (UC Davis's schedule)
+    posted ~90 minutes after the dispute, and waiting for the next daily
+    run would have left a wrong result under review for a day."""
+    import season_counts as SC
+    review = SC.review_gids(SEASON)
+    if not review:
+        return {"reviews": 0, "checked": 0}
+    reg = _load(REGISTRY, {"sources": {}})
+    rr = reg.setdefault("review_rechecks", {})
+    ev = _load(os.path.join(REPO, "data", "raw", str(SEASON),
+                            "result_evidence.json"), {})
+    checked = 0
+    now_dt = datetime.datetime.utcnow()
+    for gid in sorted(review):
+        st = rr.setdefault(gid, {"attempts": 0, "first_utc": _now()})
+        n = st.get("attempts", 0)
+        first = datetime.datetime.strptime(st["first_utc"],
+                                           "%Y-%m-%dT%H:%M:%SZ")
+        due_min = (RECHECK_BACKOFF_MIN[n] if n < len(RECHECK_BACKOFF_MIN)
+                   else RECHECK_BACKOFF_MIN[-1] + 1440 * (
+                       n - len(RECHECK_BACKOFF_MIN) + 1))
+        if (now_dt - first).total_seconds() / 60.0 < due_min:
+            continue
+        urls = sorted({e.get("url") for e in
+                       (ev.get("evidence") or {}).get(gid, [])
+                       if e.get("url")})[:3]
+        for u in urls:
+            status, html, _m = fetch(u)
+            checked += 1
+            st.setdefault("log", []).append(
+                {"url": u, "status": str(status), "at": _now()})
+            st["log"] = st["log"][-12:]
+        st["attempts"] = n + 1
+        st["last_utc"] = _now()
+    _save(REGISTRY, reg)
+    return {"reviews": len(review), "checked": checked}
+
+
 if __name__ == "__main__":
+    if "--recheck-reviews" in sys.argv:
+        print("review recheck:", json.dumps(recheck_reviews()))
+        sys.exit(0)
     stats, queue = run()
     print("collector queue (%d):" % len(queue))
     for q in queue:

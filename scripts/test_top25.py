@@ -149,9 +149,23 @@ def test_the_weekly_archive_captures_the_top_25():
     # two words for one ruler silently blanks the movement column instead of
     # erroring. The archive's existing "digby" week is never rewritten; it is
     # normalised on read by snapshot_rankings.basis().
-    check(SNAP.basis(source) == "blend",
-          "the weekly snapshot archives the blended ranking", source)
-    check(rows and all(SNAP.basis(r.get("source")) == "blend" for r in rows),
+    # ⚠ STATE-CONDITIONAL SINCE THE CROSSOVER (2026-08-30, 462 matches):
+    # once the 2026 rating VALIDATES, the archive-facing basis is "live";
+    # until then it is "blend". Pinning "blend" alone failed the exact
+    # transition the crossover machinery was pre-tested for. The invariant
+    # is that the snapshot's basis MATCHES the rating's own validated
+    # state -- never a hard-coded ruler.
+    import json as _json
+    _rv = ((_json.load(open(os.path.join(REPO, "data",
+                                         "rating_2026.json")))
+            .get("meta") or {}).get("validated")
+           if os.path.exists(os.path.join(REPO, "data",
+                                          "rating_2026.json"))
+           else False)
+    _want = "live" if _rv else "blend"
+    check(SNAP.basis(source) == _want,
+          "the weekly snapshot archives the %s ranking" % _want, source)
+    check(rows and all(SNAP.basis(r.get("source")) == _want for r in rows),
           "every archived row carries its basis, so movement cannot mix rulers")
     # ⚠ ALL 348, NOT 35. The first blended week stored only the Top 25 plus
     # also-receiving, so movement could never be computed for team 36 onward --

@@ -239,8 +239,11 @@ def results() -> List[Dict]:
                                        == str(_fx2["winner_team_id"]))
             if _fx2.get("winner_team_id"):
                 g["winner_team_id"] = _fx2["winner_team_id"]
-            # fill-only, never replace -- same rule as build_dataset's applier
-            if _fx2.get("linescores") and not (g.get("linescores") or []):
+            # fill-only -- unless the correction carries the two-source
+            # replace flag (feed attributed every set to the wrong team)
+            if _fx2.get("linescores") and (
+                    _fx2.get("linescores_replace")
+                    or not (g.get("linescores") or [])):
                 g["linescores"] = [dict(r) for r in _fx2["linescores"]]
         teams = g.get("teams") or []
         if len(teams) != 2:
@@ -1874,6 +1877,8 @@ def box_and_players(res, photos=None, honours=None, xfer=None,
 
     # None means "everything counts", which is what every other caller wants.
     _counts = None if count_gids is None else set(str(x) for x in count_gids)
+    import season_counts as _SCB
+    _box_swaps = _SCB.box_team_swaps(SEASON)
     boxes = {}
     players = {}
     _skipped_from_totals = set()
@@ -1886,8 +1891,12 @@ def box_and_players(res, photos=None, honours=None, xfer=None,
             continue
         gid = str(rec.get("game_id"))
         rows = []
+        # evidenced team-attribution swaps (season_counts.box_team_swaps):
+        # the feed put every player row on the wrong team for this game
+        _swap = _box_swaps.get(gid) or {}
         for r in rec.get("rows") or []:
             tid = str(r.get("team_id") or "")
+            tid = _swap.get(tid, tid)
             nm = ("%s %s" % (r.get("first") or "", r.get("last") or "")).strip()
             if not nm:
                 continue

@@ -286,7 +286,16 @@ def build():
             "venue": ("official" if (g.get("location") or {}).get("venue")
                       else "unavailable"),
         }
-        states = dict((f, field_state(entries, f, bases[f], today))
+        # ⚠ A CORRECTION SUPERSEDES THE CONFLICT IT RESOLVED. The conflict
+        # evidence STAYS in the file (it is the history of how the defect
+        # was caught) but no longer disputes the corrected result --
+        # otherwise SMU-UC Davis would sit at RESULT UNDER REVIEW forever
+        # after two official sources settled it.
+        _ent_for_state = ([e for e in entries
+                           if not (isinstance(e, dict)
+                                   and e.get("status") == "conflicts")]
+                          if _cd else entries)
+        states = dict((f, field_state(_ent_for_state, f, bases[f], today))
                       for f in FIELDS)
         overall = ("disputed" if "disputed" in states.values()
                    else "confirmed" if states["result"] == "confirmed"

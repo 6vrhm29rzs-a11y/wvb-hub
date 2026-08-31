@@ -71,6 +71,7 @@ REBUILD = [
     ({}, ["scripts/confidence.py"]),
     ({}, ["scripts/availability_desk.py"]),
     ({}, ["scripts/source_intel.py"]),
+    ({}, ["scripts/collector.py", "--recheck-reviews"]),
     ({}, ["scripts/provenance.py", "--check"]),
     ({}, ["scripts/build_hub.py"]),
 ]

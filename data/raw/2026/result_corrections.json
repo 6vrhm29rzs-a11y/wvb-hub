@@ -103,6 +103,66 @@
      "establishes": "Set-by-set line and that the result counts (records move)"
     }
    ]
+  },
+  "6626259": {
+   "field": "result",
+   "feed_said": "UC Davis (home) won 3-2 with the set line 27-25, 25-20, 20-25, 23-25, 15-12 attributed to UC Davis -- the TRUE sequence with the TEAMS SWAPPED. Internally coherent, and wrong.",
+   "correct": {
+    "winner_team_id": "46250",
+    "away_sets": 3,
+    "home_sets": 2,
+    "linescores": [
+     {
+      "period": "1",
+      "visit": "27",
+      "home": "25"
+     },
+     {
+      "period": "2",
+      "visit": "25",
+      "home": "20"
+     },
+     {
+      "period": "3",
+      "visit": "20",
+      "home": "25"
+     },
+     {
+      "period": "4",
+      "visit": "23",
+      "home": "25"
+     },
+     {
+      "period": "5",
+      "visit": "15",
+      "home": "12"
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46036": "46250",
+     "46250": "46036"
+    }
+   },
+   "established": "SMU (away) beat UC Davis 3-2: 27-25, 25-20, 20-25, 23-25, 15-12 from SMU's side. Two separately attributable official sources agree digit for digit: SMU's SidearmStats box data and UC Davis's own schedule row. The feed's linescores are REPLACED, not filled -- the only correction to do so, justified exactly because two official sources attribute every set to the opposite team from the feed. AUDITED: the per-player box rows are swapped the same way -- all 16 rows under UC Davis's team id are SMU roster players (16/16 roster-matched, 0 cross-matches) and all 17 under SMU's id are UC Davis players. box_team_swap re-attributes the rows at the derived layer; each player's own numbers are untouched and the raw log is never rewritten.",
+   "evidence": [
+    {
+     "url": "https://smumustangs.com/sports/womens-volleyball/stats/2026/uc-davis/boxscore/14553",
+     "kind": "host_livestat",
+     "school": "SMU",
+     "retrieved": "2026-08-30T22:32:10Z",
+     "text": "SidearmStats result for game 14553: 'status':'W','team_score':'3','opponent_score':'2','game_winner':'H','home_full_name':'SMU','away_full_name':'UC Davis','period_home_score':['27','25','20','23','15','3'],'period_away_score':['25','20','25','25','12','2']",
+     "establishes": "SMU won 3-2; SMU's set scores 27,25,20,23,15"
+    },
+    {
+     "url": "https://ucdavisaggies.com/sports/womens-volleyball/schedule/2026",
+     "kind": "school_site",
+     "school": "UC Davis",
+     "retrieved": "2026-08-31T00:58:47Z",
+     "text": "The SMU row (aria-label 'Box score of Women's Volleyball vs SMU on August 30, 2026'): 'Fort Collins, Colo. | L, 2-3 | (25-27, 20-25, 25-20, 25-23, 15-12)'",
+     "establishes": "UC Davis lost 2-3; the same set line from UC Davis's side, digit for digit"
+    }
+   ]
   }
  }
 }
