@@ -2,9 +2,10 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-08-31T01:15:54Z",
+  "generated_at_utc": "2026-08-31T01:45:26Z",
   "counts": {
-   "statuses": 0,
+   "statuses": 1,
+   "incidents": 1,
    "signals": 0,
    "expired": 1,
    "anomalies": 13
@@ -12,7 +13,42 @@
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
  },
- "statuses": [],
+ "statuses": [
+  {
+   "team": "Purdue",
+   "player": "Kenna Wollard",
+   "kind": "player_statement",
+   "quote": "Sometimes life changes in ways you could never imagine or prepare for. I'm currently dealing with an unexpected health issue that will keep me away fro a little while. While I'm not ready to share the details at this time, I hope you understand and respect my privacy until I am ready to share more.",
+   "url": "https://sports.yahoo.com/articles/purdues-kenna-wollard-releases-statement-185444853.html",
+   "retrieved": "2026-08-31T01:45:03Z",
+   "effective": {
+    "from": "2026-08-27",
+    "to": null
+   },
+   "review_by": "2026-09-13",
+   "incident_date": null,
+   "claim": "confirmed_unavailable",
+   "note": "Her own public Instagram statement, reported by Yahoo Sports / Purdue Boilermakers On SI (Dustin Schutte, 2026-08-27). The typo 'fro' is hers and is preserved -- the quote is verbatim. Coach Dave Shondell, same report: \"We don't know when for sure she'll be back. That's all I can say.\" NO diagnosis, hospital, season-ending status or return date is sourced, so none may render. Corroborating participation fact: Creighton's own Aug 28 recap says Purdue 'played without Second Team All-American Kenna Wollard (personal reasons)'."
+  }
+ ],
+ "incidents": [
+  {
+   "team": "Purdue",
+   "player": "Grace Heaney",
+   "kind": "school_site",
+   "quote": "The Boilermakers played without Second Team All-American Kenna Wollard (personal reasons), then lost Omaha native and Third Team All-American Grace Heaney midway through the second set due to injury.",
+   "url": "https://d2560u4h06m0te.cloudfront.net/news/2026/8/28/volleyball-vs-9-purdue",
+   "retrieved": "2026-08-31T01:45:03Z",
+   "effective": {
+    "from": "2026-08-28",
+    "to": null
+   },
+   "review_by": "2026-09-06",
+   "incident_date": "2026-08-28",
+   "claim": "match_incident",
+   "note": "Creighton University Athletics' own match recap ('Boiler Spoilers! #13 Volleyball Opens Season With Win Over #9 Purdue', 2026-08-28). A sourced MATCH INCIDENT only: she left the Aug 28 Creighton match midway through the second set due to injury. Her CURRENT availability is UNKNOWN pending a Purdue update -- this entry does not mark her out, name an injury, or project a return."
+  }
+ ],
  "signals": [],
  "expired": [
   {
@@ -27,6 +63,7 @@
     "to": "2026-08-28"
    },
    "review_by": "2026-09-04",
+   "incident_date": null,
    "claim": null,
    "note": "SIGNAL ONLY -- an eye-test observation during the live broadcast. Sets no status. Corroborating participation fact: the crawled box lists her gp=4 with zero recorded actions in every column; the live box carried setsPlayed:null mid-match. The Wisconsin-Stanford VolleyTalk thread was checked the same evening (in-browser): its Aug 26 preview projected her starting and asked for unavailability news; nobody answered -- no public pre-match signal existed there.",
    "expired_on": "effective range ended 2026-08-28"
@@ -4173,6 +4210,14 @@
     "ep": 1788105600,
     "sets": 3,
     "state": "zero_action"
+   }
+  ],
+  "Purdue|Grace Heaney": [
+   {
+    "gid": "6626974",
+    "ep": 1787958000,
+    "sets": 5,
+    "state": "appeared"
    }
   ]
  }

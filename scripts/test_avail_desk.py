@@ -123,8 +123,28 @@ def main():
 
     print("\n5. THE SHIPPED ARTIFACT AND PAGE")
     c = art["meta"]["counts"]
-    check("no sourced status exists on the shipped artifact",
-          c["statuses"] == 0, c)
+    # ⚠ NOT A ZERO-PIN. The original line asserted c["statuses"] == 0 --
+    # true only until the world produced one (Wollard, 2026-08-31), the
+    # same calendar-phase family as the exhibition badge and rsoff guards.
+    # The invariant is DISCIPLINE, not emptiness: every shipped status
+    # must be fully attributable with a closed-set claim, and every
+    # incident must be dated and carry the incident claim.
+    check("every shipped status is attributable, quoted, sourced and "
+          "closed-claim",
+          all(x.get("kind") in A.ATTRIBUTABLE and x.get("claim") in A.CLAIMS
+              and x.get("quote") and x.get("url") and x.get("review_by")
+              for x in art["statuses"]), art["statuses"])
+    check("every shipped incident is dated, attributable and claims only "
+          "match_incident",
+          all(x.get("kind") in A.ATTRIBUTABLE
+              and x.get("claim") == A.INCIDENT_CLAIM
+              and x.get("incident_date") and x.get("quote") and x.get("url")
+              for x in art.get("incidents", [])), art.get("incidents"))
+    check("counts reconcile with the shipped lists",
+          c["statuses"] == len(art["statuses"])
+          and c.get("incidents", 0) == len(art.get("incidents", []))
+          and c["signals"] == len(art["signals"])
+          and c["expired"] == len(art["expired"]), c)
     check("evidence is conserved: signals + expired == entries recorded",
           c["signals"] + c["expired"] >= 1)
     # ⚠ CLOCK-CONTROLLED, NOT CALENDAR-PINNED (round 10). The original
@@ -136,19 +156,21 @@ def main():
     _ev = json.load(open(os.path.join(
         REPO, "data", "raw", str(SEASON),
         "availability_evidence.json")))["players"]
-    _s28, _g28, _x28 = A.classify(_ev, "2026-08-28")
-    _s29, _g29, _x29 = A.classify(_ev, "2026-08-29")
+    _s28, _i28, _g28, _x28 = A.classify(_ev, "2026-08-28")
+    _s29, _i29, _g29, _x29 = A.classify(_ev, "2026-08-29")
     check("ON its effective date: the observation is an ACTIVE signal",
           any(s["kind"] == "cody_observation" and s["player"] ==
               "Jaela Auguste" for s in _g28))
-    check("...and sets no status on that date either", not _s28)
+    check("...and the observation itself sets no status on that date",
+          not any(s["player"] == "Jaela Auguste" for s in _s28))
     check("THE DAY AFTER: it is expired, not a current signal",
           not any(s["player"] == "Jaela Auguste" for s in _g29)
           and any(s["player"] == "Jaela Auguste" for s in _x29))
     check("...the expired row says WHY it expired",
           any("effective range ended" in (s.get("expired_on") or "")
               for s in _x29 if s["player"] == "Jaela Auguste"))
-    check("...and expiry creates no status", not _s29)
+    check("...and expiry creates no status for her",
+          not any(s["player"] == "Jaela Auguste" for s in _s29))
     check("the SHIPPED artifact holds it as signal OR history, never lost",
           any(s["player"] == "Jaela Auguste"
               for s in art["signals"] + art["expired"]))

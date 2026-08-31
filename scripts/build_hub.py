@@ -4926,6 +4926,8 @@ h1 em{font-style:normal;color:var(--gold)}
    same treatment on a list that merely happens to have rows would be the
    generic move. The rule sizes already shipped; this adds the court ground
    under the table head so the board reads as a board. */
+.rcsrctag.corrected{color:var(--chalk);background:var(--navy);border-radius:3px;
+  padding:2px 7px;font-style:normal}
 .mtag.rvw,.tdtag.rvw{color:var(--chalk);background:var(--live);
   border-color:var(--live);font-weight:700}
 .ldrfloor{font:600 11px/1 var(--mono);color:var(--ink2);
@@ -8448,6 +8450,9 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
   text-transform:uppercase;color:var(--ink3);
   border:1px dashed var(--line2);border-radius:2px;padding:2px 5px}
 details.avhist{margin:14px 0}
+.avrow.avinc{border-left:3px solid var(--rally)}
+.avinclab{font:600 11px/1.4 var(--mono,monospace);color:var(--ink2);
+  text-transform:uppercase;letter-spacing:.05em;display:block;margin:2px 0}
 /* AVAIL-CSS-END */
 /* ── RESULT CONFIDENCE LEDGER ───────────────────────────────────────── */
 .rcstate{font:600 11px/1.2 var(--disp);letter-spacing:.07em;
@@ -9659,11 +9664,17 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <b>Participation</b> is an observed match fact: recorded actions, a
     zero-action listing (the feed&rsquo;s DNP convention), or not in the box.
     A <b>participation anomaly</b> is a review signal against a stated
-    baseline. <b>None of these is a diagnosis</b>, and no reason is ever
+    baseline. A <b>sourced match incident</b> is a dated in-match event
+    from an attributable source &mdash; it sets no current status, and the
+    player&rsquo;s availability stays <b>unknown</b> pending a team update.
+    <b>None of these is a diagnosis</b>, and no reason is ever
     inferred from an absence.</p>
   <div id="avsummary"></div>
-  <h3 class="cfh">Sourced statuses</h3>
+  <h3 class="cfh">Current sourced availability</h3>
   <div id="avstatuses"></div>
+  <h3 class="cfh">Sourced match incidents &mdash; current availability
+    unknown</h3>
+  <div id="avincidents"></div>
   <h3 class="cfh">Labelled signals</h3>
   <p class="tnote">Eye-test notes and community items. A signal can never
     set a status &mdash; it is a reason to look, recorded with its source
@@ -16097,9 +16108,13 @@ function rcDrill(gid) {
     }).join('') + '</div>' +
     '<div class="rcsource rcofficial"><b>Official scoreboard</b>' +
       '<span class="rck">ncaa canonical record</span>' +
-      '<span class="rcnote">recorded \u2014 the claim every state here is ' +
-      'measured against; it is one source, and it is not independent of ' +
-      'itself</span></div>' +
+      (r.result_corrected
+        ? '<span class="rcnote">recorded \u2014 and SUPERSEDED for the ' +
+          'result: the feed\u2019s claim above was corrected on the ' +
+          'evidence cited here</span>'
+        : '<span class="rcnote">recorded \u2014 the claim every state ' +
+          'here is measured against; it is one source, and it is not ' +
+          'independent of itself</span>') + '</div>' +
     ((r.sources || []).length
       ? (r.sources || []).map(sr =>
         '<div class="rcsource"><b>' + esc(sr.school || sr.kind || 'source') +
@@ -16153,15 +16168,23 @@ function pdAvailability(p) {
   if (typeof AVAIL === 'undefined' || !AVAIL.meta) return '';
   const st = (AVAIL.statuses || []).filter(x =>
     x.player === p.name && x.team === p.team);
+  const inc = (AVAIL.incidents || []).filter(x =>
+    x.player === p.name && x.team === p.team);
   const sg = (AVAIL.signals || []).filter(x =>
     x.player === p.name && x.team === p.team);
   const hist = (AVAIL.expired || []).filter(x =>
     x.player === p.name && x.team === p.team);
   let body;
-  if (st.length || sg.length) {
+  if (st.length || inc.length || sg.length) {
     body = st.map(x => '<span class="avrowline">' +
         esc(x.claim === 'confirmed_unavailable'
-          ? 'Unavailable (sourced)' : 'Limited / game-time (sourced)') +
+          ? 'Away from team / unavailable (sourced)'
+          : 'Limited / game-time (sourced)') +
+        ' <span class="avq">\u201c' + esc(x.quote) + '\u201d</span>' +
+        '</span>').join('') +
+      inc.map(x => '<span class="avrowline">Sourced match incident, ' +
+        esc(x.incident_date || '?') +
+        ' \u2014 current availability unknown, pending a team update' +
         ' <span class="avq">\u201c' + esc(x.quote) + '\u201d</span>' +
         '</span>').join('') +
       sg.map(x => '<span class="avrowline"><i class="avkind">' +
@@ -16180,14 +16203,20 @@ function pdAvailability(p) {
 function tdAvailability(t, name) {
   if (typeof AVAIL === 'undefined' || !AVAIL.meta) return '';
   const st = (AVAIL.statuses || []).filter(x => x.team === name);
+  const inc = (AVAIL.incidents || []).filter(x => x.team === name);
   const sg = (AVAIL.signals || []).filter(x => x.team === name);
   const hist = (AVAIL.expired || []).filter(x => x.team === name);
   let body;
-  if (st.length || sg.length) {
+  if (st.length || inc.length || sg.length) {
     body = st.map(x => '<span class="avrowline"><b>' + esc(x.player) +
         '</b> \u2014 ' + esc(x.claim === 'confirmed_unavailable'
-          ? 'unavailable (sourced)' : 'limited / game-time (sourced)') +
+          ? 'away from team / unavailable (sourced)'
+          : 'limited / game-time (sourced)') +
         '</span>').join('') +
+      inc.map(x => '<span class="avrowline"><b>' + esc(x.player) +
+        '</b> \u2014 sourced match incident, ' +
+        esc(x.incident_date || '?') + ' \u00b7 current availability ' +
+        'unknown</span>').join('') +
       sg.map(x => '<span class="avrowline"><b>' + esc(x.player) +
         '</b> \u2014 <i class="avkind">' + esc(x.kind) +
         '</i> signal, sets no status</span>').join('');
@@ -16204,17 +16233,46 @@ function tdAvailability(t, name) {
 /* ── AVAILABILITY & PARTICIPATION DESK (private) ───────────────────────── */
 const AVAIL = {{AVAIL_JSON}};
 
+function avMeta(s) {
+  /* source, retrieval date, effective range, review-by -- every rendered
+     status or incident carries all of them (truth-pass requirement) */
+  const eff = s.effective || {};
+  return '<span class="avmeta">' + esc(s.kind) +
+    (s.url ? ' \u00b7 <a href="' + esc(s.url) +
+      '" target="_blank" rel="noopener">source</a>' : '') +
+    ' \u00b7 retrieved ' + esc(String(s.retrieved || '').slice(0, 10)) +
+    ' \u00b7 effective ' + esc(eff.from || '?') + ' \u2192 ' +
+    esc(eff.to || 'open') +
+    (s.review_by ? ' \u00b7 review by ' + esc(s.review_by) : '') +
+    '</span>';
+}
+
+function avStatusRow(s) {
+  return '<div class="avrow avst"><b>' + esc(s.player) + '</b> \u2014 ' +
+    esc(s.claim === 'confirmed_unavailable'
+      ? 'away from team / unavailable (sourced)'
+      : 'limited / game-time (sourced)') +
+    ' <span class="avq">\u201c' + esc(s.quote) + '\u201d</span>' +
+    avMeta(s) + '</div>';
+}
+
+function avIncidentRow(s) {
+  /* a dated event, NEVER a current-out designation: the label says what
+     is known (the incident) and what is not (her availability now) */
+  return '<div class="avrow avinc"><b>' + esc(s.player) + '</b> \u2014 ' +
+    'sourced match incident, ' + esc(s.incident_date || '?') +
+    ' <span class="avinclab">current availability unknown \u2014 ' +
+    'pending a team update</span>' +
+    ' <span class="avq">\u201c' + esc(s.quote) + '\u201d</span>' +
+    avMeta(s) + '</div>';
+}
+
 function avStatusLine(team) {
   const st = (AVAIL.statuses || []).filter(s => s.team === team);
+  const inc = (AVAIL.incidents || []).filter(s => s.team === team);
   const sg = (AVAIL.signals || []).filter(s => s.team === team);
-  if (!st.length && !sg.length) return '';
-  return st.map(s =>
-    '<div class="avrow avst"><b>' + esc(s.player) + '</b> \u2014 ' +
-    esc(s.claim === 'confirmed_unavailable' ? 'unavailable (sourced)'
-        : 'limited / game-time (sourced)') +
-    ' <span class="avq">\u201c' + esc(s.quote) + '\u201d</span>' +
-    '<span class="avmeta">' + esc(s.kind) + ' \u00b7 retrieved ' +
-    esc(String(s.retrieved || '').slice(0, 10)) + '</span></div>').join('') +
+  if (!st.length && !inc.length && !sg.length) return '';
+  return st.map(avStatusRow).join('') + inc.map(avIncidentRow).join('') +
   sg.map(s =>
     '<div class="avrow avsg"><b>' + esc(s.player) + '</b> \u2014 ' +
     '<i class="avkind">' + esc(s.kind) + '</i> signal, sets no status' +
@@ -16259,6 +16317,8 @@ function renderAvail() {
   el.innerHTML = '<div class="cfcards">' +
     [['Sourced statuses', c.statuses,
       'attributable public sources only'],
+     ['Sourced match incidents', c.incidents,
+      'dated events; current availability unknown'],
      ['Labelled signals', c.signals, 'observations; set no status'],
      ['Expired evidence', c.expired, 'fell back to unknown \u2014 visibly'],
      ['Baseline anomalies', c.anomalies,
@@ -16268,10 +16328,22 @@ function renderAvail() {
       '</span></div>').join('') + '</div>';
   document.getElementById('avstatuses').innerHTML =
     (AVAIL.statuses || []).length
-      ? (AVAIL.statuses || []).map(s => avStatusLine(s.team)).join('')
+      ? (AVAIL.statuses || []).map(avStatusRow).join('')
+      : (AVAIL.incidents || []).length
+      /* ⚠ the global "none currently" copy may NOT render while a recent
+         sourced incident exists -- it would read as "nothing is known"
+         when something attributable is */
+      ? '<p class="tnote">No current sourced status \u2014 but see the ' +
+        'sourced match incident' +
+        ((AVAIL.incidents || []).length === 1 ? '' : 's') + ' below.</p>'
       : '<p class="tnote">None. No attributable public source currently ' +
         'reports a player unavailable or limited \u2014 the honest ' +
         'default, not a gap.</p>';
+  const avInc = document.getElementById('avincidents');
+  if (avInc) avInc.innerHTML =
+    (AVAIL.incidents || []).length
+      ? (AVAIL.incidents || []).map(avIncidentRow).join('')
+      : '<p class="tnote">None on record.</p>';
   document.getElementById('avexpired').innerHTML =
     (AVAIL.expired || []).length
       ? (AVAIL.expired || []).map(s =>
@@ -16334,6 +16406,36 @@ function recapAligned(gid, nsets) {
   return byTeam;
 }
 
+function corrSchools(r) {
+  const schools = [];
+  ((r && r.corr_evidence) || []).forEach(e => {
+    if (e.school && schools.indexOf(e.school) < 0) schools.push(e.school);
+  });
+  return schools;
+}
+
+function provenanceTag(gid) {
+  /* ⚠ A CORRECTED RESULT MUST NOT WEAR THE FEED'S BADGE (SMU-UC Davis,
+     2026-08-31): the feed is the source whose team attribution was WRONG,
+     so "official scoreboard" over the corrected score misattributes the
+     very evidence that fixed it. The compact tag names the schools; the
+     Result Ledger stays the drill for quotations, URLs and retrieval
+     times. Field-level truth stays separate -- this tags the RESULT's
+     provenance only (venue, box, start time keep their own states). */
+  const r = (typeof CONFIDENCE !== 'undefined' && CONFIDENCE.finals || [])
+    .filter(x => String(x.gid) === String(gid))[0];
+  if (r && r.result_corrected) {
+    const schools = corrSchools(r);
+    return '<i class="rcsrctag corrected" title="the feed\u2019s record ' +
+      'was corrected on independently attributable official evidence \u2014 ' +
+      'quotations, URLs and retrieval times in the Result Ledger">' +
+      'CORRECTED \u00b7 ' +
+      esc(schools.length ? schools.join(' + ') + ' official evidence'
+                         : 'ledgered official evidence') + '</i>';
+  }
+  return '<i class="rcsrctag">official scoreboard</i>';
+}
+
 function recapHTML(m) {
   const gid = String(m.gid);
   if (DUP_GIDS.indexOf(gid) >= 0) return '';   /* ledger-only, by decision */
@@ -16351,7 +16453,7 @@ function recapHTML(m) {
     '<div class="rchd"><b>' + esc(mAway(m)) + ' ' + sc[0] + '\u2013' +
     sc[1] + ' ' + esc(mHome(m)) + '</b>' +
     (setline ? ' <span class="rcsets">' + setline + '</span>' : '') +
-    ' <i class="rcsrctag">official scoreboard</i></div>';
+    ' ' + provenanceTag(gid) + '</div>';
   const byTeam = recapAligned(gid, sets.length);
   if (!byTeam) {
     return '<div class="msec"><h3>Match recap</h3>' + head +
@@ -20244,6 +20346,13 @@ function tdLatestFinal(t, name) {
       String(g.gid))[0];
     if (r && r.overall === 'disputed') {
       conf = '<span class="rcstate rc-disputed">Result under review</span>';
+    } else if (r && r.result_corrected) {
+      /* a corrected latest final must not sit unlabelled beside ordinary
+         feed finals -- the score shown is NOT the feed's record */
+      const sch = corrSchools(r);
+      conf = '<span class="rcstate rc-corrected">CORRECTED \u00b7 ' +
+        esc(sch.length ? sch.join(' + ') + ' official evidence'
+                       : 'ledgered official evidence') + '</span>';
     } else if (r && r.overall === 'confirmed') {
       conf = '<span class="rcstate rc-confirmed">Cross-source ' +
         'confirmed</span>';

@@ -42,12 +42,19 @@ def main():
     recap, aligned, totals = fn("recapHTML"), fn("recapAligned"), \
         fn("teamTotals")
     score, msets, mnum = fn("matchScore"), fn("matchSets"), fn("mNum")
+    # the result badge moved into provenanceTag (truth pass, 2026-08-31):
+    # an uncorrected final still renders "official scoreboard", so every
+    # existing assertion holds; the corrected path has its own suite
+    # (test_provenance_truth.py)
+    prov = (fn("corrSchools") or "") + "\n" + (fn("provenanceTag") or "")
 
     def run(recap_src, case):
         js = """
 const esc = s => String(s == null ? '' : s);
 const mAway = m => m.a, mHome = m => m.h;
 const DUP_GIDS = ['DUPGID'];
+const CONFIDENCE = {finals: []};
+%s
 %s
 %s
 %s
@@ -75,7 +82,7 @@ const m = { ALIGNED: {gid:'ALIGNED', a:'Alpha', h:'Beta',
               final:{as:3, hs:1, sets:[[25,20],[23,25],[25,18],[25,21]]}} };
 const html = recapHTML(m['%s']);
 console.log(JSON.stringify(html));
-""" % (mnum, score, msets, totals, aligned, recap_src, case)
+""" % (prov, mnum, score, msets, totals, aligned, recap_src, case)
         r = subprocess.run(["node", "-e", js], capture_output=True, text=True)
         if r.returncode != 0:
             return None, (r.stdout + r.stderr).strip()
@@ -146,7 +153,11 @@ console.log(JSON.stringify(html));
     bogus2 = recap.replace(" <i class=\"rcsrctag\">match-aligned box</i>", "")
     bogus2 = bogus2.replace("'match-aligned box</span></div>'",
                             "'</span></div>'")
-    bogus2 = bogus2.replace(" <i class=\"rcsrctag\">official scoreboard</i>", "")
+    # the result badge now arrives via provenanceTag -- strip the CALL,
+    # not a literal the function no longer holds (a no-op mutation is a
+    # control that tests nothing)
+    bogus2 = bogus2.replace("' ' + provenanceTag(gid) + '</div>'",
+                            "'</div>'")
     h6, _ = run(bogus2, "ALIGNED")
     check("[NEG] stripping the source tags is caught",
           h6 is not None and "match-aligned box" not in (h6 or "")

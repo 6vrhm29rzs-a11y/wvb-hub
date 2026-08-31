@@ -43,9 +43,15 @@ def pt_date(ep):
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SEASON = int(os.environ.get("WVB_SEASON", "2026"))
-ATTRIBUTABLE = ("school_release", "school_site", "beat_report", "broadcast")
+ATTRIBUTABLE = ("school_release", "school_site", "beat_report", "broadcast",
+                "player_statement")   # the player's own public statement,
+                                      # reported by an attributable outlet
 SIGNAL_KINDS = ("community_forum", "cody_observation")
 CLAIMS = ("confirmed_unavailable", "limited_gtd")
+# A DATED in-match event from an attributable source. Sets NO current
+# status: the player's availability stays UNKNOWN pending a team update.
+# Renders in its own section and never in the sourced-status count.
+INCIDENT_CLAIM = "match_incident"
 
 
 def load(p, default=None):
@@ -64,13 +70,18 @@ def entry_state(e, today):
               (eff.get("to") and str(today) > str(eff["to"]))
     if e.get("kind") in SIGNAL_KINDS:
         return "expired" if expired else "signal"
-    if e.get("kind") in ATTRIBUTABLE and e.get("claim") in CLAIMS \
-            and e.get("quote") and e.get("url"):
-        if expired:
-            return "expired"
-        if eff.get("from") and str(today) < str(eff["from"]):
-            return "expired"               # not yet effective = not active
-        return "status"
+    if e.get("kind") in ATTRIBUTABLE and e.get("quote") and e.get("url"):
+        if e.get("claim") == INCIDENT_CLAIM and e.get("incident_date"):
+            # an incident is a historical fact; review_by only queues a
+            # re-check for a team update -- passing it does not erase the
+            # event, it moves the entry to history
+            return "expired" if expired else "incident"
+        if e.get("claim") in CLAIMS:
+            if expired:
+                return "expired"
+            if eff.get("from") and str(today) < str(eff["from"]):
+                return "expired"           # not yet effective = not active
+            return "status"
     return "invalid"
 
 
@@ -96,7 +107,7 @@ def participation(rows):
 
 
 def classify(ev, today):
-    """(statuses, signals, expired) for one evidence map at one DATE.
+    """(statuses, incidents, signals, expired) for one evidence map/DATE.
 
     Pure and clock-injectable (round 10): the Saturday-morning regression
     was a suite that let the LIVE calendar decide whether a shipped test
@@ -105,7 +116,7 @@ def classify(ev, today):
     Tests now call this with an explicit date and assert BOTH sides of the
     boundary; nothing here weakens expiry.
     """
-    statuses, signals, expired = [], [], []
+    statuses, incidents, signals, expired = [], [], [], []
     for key, entries in (ev or {}).items():
         team, _, player = key.partition("|")
         for e in entries or []:
@@ -115,9 +126,12 @@ def classify(ev, today):
                    "url": e.get("url"), "retrieved": e.get("retrieved"),
                    "effective": e.get("effective"),
                    "review_by": e.get("review_by"),
+                   "incident_date": e.get("incident_date"),
                    "claim": e.get("claim"), "note": e.get("note")}
             if st == "status":
                 statuses.append(row)
+            elif st == "incident":
+                incidents.append(row)
             elif st == "signal":
                 signals.append(row)
             elif st == "expired":
@@ -134,14 +148,14 @@ def classify(ev, today):
                     and str(today) > str(e.get("review_by"))
                     else "not yet effective")
                 expired.append(row)
-    return statuses, signals, expired
+    return statuses, incidents, signals, expired
 
 
 def build(today=None):
     today = today or datetime.date.today().isoformat()
     ev = (load("data/raw/%d/availability_evidence.json" % SEASON) or {}) \
         .get("players") or {}
-    statuses, signals, expired = classify(ev, today)
+    statuses, incidents, signals, expired = classify(ev, today)
 
     # participation, from the crawled boxes, most recent match per team
     doc = load("data/data_%d.json" % SEASON) or {}
@@ -159,7 +173,7 @@ def build(today=None):
     # participation history that explains why it was recorded vanished with
     # it. Evidence of any age keeps its player's observed facts.
     watch = set((s["team"], s["player"])
-                for s in signals + statuses + expired)
+                for s in signals + statuses + incidents + expired)
     path = os.path.join(REPO, "data", "raw", str(SEASON), "playerbox.jsonl")
     if os.path.exists(path):
         for ln in open(path, encoding="utf-8"):
@@ -208,7 +222,8 @@ def build(today=None):
         "season": SEASON, "source_tier": "DERIVED",
         "generated_at_utc": datetime.datetime.utcnow().replace(
             microsecond=0).isoformat() + "Z",
-        "counts": {"statuses": len(statuses), "signals": len(signals),
+        "counts": {"statuses": len(statuses), "incidents": len(incidents),
+                   "signals": len(signals),
                    "expired": len(expired), "anomalies": len(anomalies)},
         "anomaly_baseline": (av.get("meta") or {}).get("measures"),
         "anomaly_floor": ("availability.py needs %s completed team matches "
@@ -217,12 +232,14 @@ def build(today=None):
                           % ((av.get("meta") or {}).get("min_team_matches")
                              or 4)),
     },
-        "statuses": statuses, "signals": signals, "expired": expired,
+        "statuses": statuses, "incidents": incidents,
+        "signals": signals, "expired": expired,
         "anomalies": anomalies, "latest": latest, "timelines": timelines}
     dst = os.path.join(REPO, "data", "availability_desk_%d.json" % SEASON)
     json.dump(out, open(dst, "w"), indent=1)
     c = out["meta"]["counts"]
-    print("availability desk: %(statuses)d sourced status(es), %(signals)d "
+    print("availability desk: %(statuses)d sourced status(es), "
+          "%(incidents)d sourced match incident(s), %(signals)d "
           "labelled signal(s), %(expired)d expired, %(anomalies)d "
           "baseline anomalies" % c)
     return 0
