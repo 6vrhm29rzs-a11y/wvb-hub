@@ -167,3 +167,41 @@ The build emits `data/audit_manifest_{season}.json` from the exact
 dataset bytes it consumed: dataset sha256, the class totals, and a hash
 of the counted-gid set. Counted surfaces are checked against it at
 build time and the build FAILS CLOSED on divergence.
+
+## 6. Repairs executed (all from the inventory above) and results
+
+Every P0/P1/P2/P3 item above was repaired except the ones marked kept-
+by-design (desk participation facts, box_teams, weekly gate,
+collector's two-date net). Before/after, measured:
+  resume counted matches 478 -> 464 · digby records Nebraska 3-0 -> 2-0,
+  SMU 4-0 -> 3-0 · Top 25 exhibition pill now outlined EXH with the
+  full sentence in its title · player_rating consumes 468 of 482
+  playerbox records (the 14 non-ok excluded), swaps applied.
+Fixture corpus: 10/10 shapes hold (it FAILED 3 before season_counts.
+resolve()). Audit manifest emitted per build: 468 counted (464 D-I) of
+482 feed records, all counted surfaces agree; the build fails closed on
+divergence. 62/62 suites, both builds, public gate, fresh checkout.
+
+## 7. What remains structurally risky (report to Cody)
+
+1. build_hub.results() is still a parallel implementation of the chain
+   (its own dedup + ledger consultation), fenced by two build-time
+   gates (results_on_display + the manifest). Folding it onto
+   season_counts.countable is a larger refactor with display-shape
+   risk; deferred deliberately.
+2. Three scoreboard-file passes (schedule(), team_index fixtures,
+   sched_n) are independent loops over the same files; they agree
+   today and have no counting authority, but they can drift in
+   display terms.
+3. weekly.py's freeze gate counts exhibition finals as finals -- gate
+   semantics (completeness, not counting); stated, not changed.
+4. venues.py / freshness.py keep their own dedup rules -- harmless to
+   counting (venue inference, change fingerprint), but they are two
+   more copies of a rule gamelog owns.
+5. The JS layer trusts payload fields (nondi, mine/theirs, state) --
+   correct so long as payloads come from res_cnt; no independent JS
+   recount of records exists except the dossier's nondi filter, which
+   reads flags the server set.
+6. External snapshots remain manual browser reviews; staleness is
+   labelled, never inferred. FIG coverage 339/348 and Massey current
+   175/349 are described as partial where shown.
