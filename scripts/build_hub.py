@@ -5073,7 +5073,8 @@ h1 em{font-style:normal;color:var(--gold)}
 .extreftbl{width:100%;border-collapse:collapse;margin:8px 0}
 .extreftbl th{font:600 11px/1.4 var(--mono,monospace);text-transform:uppercase;
   letter-spacing:.05em;text-align:left;padding:6px 10px 6px 0;color:var(--ink);
-  white-space:nowrap;vertical-align:top}
+  white-space:nowrap;vertical-align:top;background:none;position:static;
+  border-top:1px solid var(--line)}
 .extreftbl td{font:13px/1.5 var(--body,sans-serif);color:var(--ink2);
   padding:6px 12px 6px 0;border-top:1px solid var(--line);vertical-align:top}
 .extreftbl td.xf{color:var(--ink)}
