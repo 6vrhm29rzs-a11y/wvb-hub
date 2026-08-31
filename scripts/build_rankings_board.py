@@ -270,11 +270,19 @@ def build():
     # the board. No new threshold is introduced here (R1): the board defers to
     # a validation the model already performs.
     _live_ok = bool((live.get("meta") or {}).get("validated"))
+    # ⚠ JOIN THROUGH THE NORMALISER (first live Sunday, 2026-08-30): the
+    # rating stores a team with no resolved display name under its
+    # lowercase norm key ('brown', 'penn'); an exact-name join missed 10
+    # teams and the per-team fallback quietly handed them BLEND ranks on
+    # a LIVE board -- two rulers, duplicate ranks.
+    from reconcile_2025 import norm as _n26
     live_by_team = {}
+    _live_all_norms = set()
     if _live_ok:
         for r in (live.get("teams") or []):
+            _live_all_norms.add(_n26(r["team"]))
             if r.get("composite_rank"):
-                live_by_team[r["team"]] = r
+                live_by_team[_n26(r["team"])] = r
 
     # ⚠ THE TAB CALLED "RANKINGS" USED TO BE UNABLE TO MOVE, AND THAT WAS THE
     # WHOLE OF Cody's objection ("texas looks a hot mess and is too high").
@@ -312,8 +320,16 @@ def build():
 
     for t in teams:
         r = pj.get(t["team"]) or {}
-        lr = live_by_team.get(t["team"])
+        lr = live_by_team.get(_n26(t["team"]))
         br = blend_by_team.get(t["team"])
+        # the invariant distinguishes a JOIN MISS (the team is in the
+        # rating file under another spelling -- two rulers would mix) from
+        # a team the rating GENUINELY declines to rank (Saint Francis: no
+        # fixtures, no rank; its page explains itself)
+        if live_by_team and not lr and _n26(t["team"]) in _live_all_norms:
+            raise SystemExit(
+                "live board join miss: %r has no live rank -- a per-team "
+                "fallback would put two rulers on one column" % t["team"])
         t["rank26"] = ((lr or {}).get("composite_rank")
                        or (br or {}).get("rank")
                        or r.get("talent_rank"))
@@ -371,7 +387,7 @@ def build():
     # the value behind rank26: the live composite once the rating fits, the
     # projection's own blend until then. Asserted monotone below.
     for t in teams:
-        lr = live_by_team.get(t["team"])
+        lr = live_by_team.get(_n26(t["team"]))
         br = blend_by_team.get(t["team"])
         r = pj.get(t["team"]) or {}
         # SAME PRECEDENCE AS rank26 ABOVE, and it has to be: scoring one

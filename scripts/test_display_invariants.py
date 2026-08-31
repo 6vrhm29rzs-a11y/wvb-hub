@@ -1400,6 +1400,20 @@ def check_phantom_sets_are_harmless():
     except Exception:
         _exh_gids = set()
     recs = [r for r in recs if str(r.get("game_id")) not in _exh_gids]
+    # ...and the evidenced team-attribution swaps (SMU-UC Davis): the
+    # aggregator re-attributes those rows, so the recount must as well
+    import season_counts as _SCsw
+    _swaps = _SCsw.box_team_swaps(2026)
+    def _apply_swap(rec):
+        sw = _swaps.get(str(rec.get("game_id")))
+        if not sw:
+            return rec
+        rec = dict(rec)
+        rec["rows"] = [dict(r, team_id=sw.get(str(r.get("team_id")),
+                                              r.get("team_id")))
+                       for r in rec.get("rows") or []]
+        return rec
+    recs = [_apply_swap(r) for r in recs]
     phantom, real = set(), {}
     for rec in recs:
         rows = rec.get("rows") or []
@@ -1528,6 +1542,17 @@ def check_aggregate_excludes_phantom_sets():
         # same exhibition exclusion the aggregator applies (see block above)
         if str(_rec2.get("game_id")) in _exh_gids2:
             continue
+        try:
+            import season_counts as _SCsw2
+            _sw2 = _SCsw2.box_team_swaps(live).get(
+                str(_rec2.get("game_id")))
+        except Exception:
+            _sw2 = None
+        if _sw2:
+            _rec2 = dict(_rec2, rows=[
+                dict(r, team_id=_sw2.get(str(r.get("team_id")),
+                                         r.get("team_id")))
+                for r in _rec2.get("rows") or []])
         rows = (_rec2.get("rows") or [])
         if not rows:
             continue

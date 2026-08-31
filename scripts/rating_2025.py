@@ -429,7 +429,17 @@ def main():
             # switched to it anyway, because "a rating file exists" was the
             # only test. A fit the script itself declined to validate must
             # not replace the blend, which is built for exactly this window.
-            "validated": bool(val),
+            # ⚠ TIGHTENED 2026-08-31, first live Sunday: "validated" must
+            # mean PASSED, not merely RAN. At 462 matches the validation
+            # produced delta_lo = -0.008 -- the CI for the composite's edge
+            # over RPI CROSSES ZERO, failing the project's own standing
+            # acceptance bar (the 2025 fit shipped because its CIs were
+            # clear of zero at every cutoff) -- while the flag still read
+            # True and the board flipped to an ordering with Nebraska #46.
+            # No new threshold (R1): the documented bar, finally enforced.
+            "validated": bool(val) and all(
+                (v.get("delta_lo") or 0) > 0
+                for v in (val or {}).values() if isinstance(v, dict)),
             "matches": len(matches),
             "disagreement_diagnostics": globals().get("_DIAG"),
             "use_caveat": "STRENGTH metric, not RESUME metric. corr(delta vs RPI, "
