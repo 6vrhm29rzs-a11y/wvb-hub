@@ -205,6 +205,42 @@ def main():
     d0 = ER.discrepancies(fig={}, hub={})
     check("[NEG] no snapshot -> no items, no invented freshness",
           d0["items"] == [] and d0["matched"] == 0)
+    # a MALFORMED snapshot file: garbage lines are skipped, a partial
+    # last record is ignored, and nothing crashes or invents rows
+    import tempfile
+    with tempfile.NamedTemporaryFile("w", suffix=".jsonl",
+                                     delete=False) as f:
+        f.write("not json at all\n{\"rows\": [{\"team\": \"SMU\", "
+                "\"record\": \"9-9\", \"rank\": 1}], "
+                "\"source_label\": \"FIGstats unofficial RPI\"}\n"
+                "{\"torn")
+        tmp = f.name
+    real_fig_path = ER.FIG_PATH
+    try:
+        ER.FIG_PATH = os.path.relpath(tmp, REPO)
+        mal = ER.fig_latest()
+        check("[NEG] malformed lines are skipped; the last VALID record "
+              "is used", mal is not None
+              and mal.get("rows", [{}])[0].get("record") == "9-9")
+        d_mal = ER.discrepancies(fig=mal, hub={"SMU": "3-0"})
+        check("[NEG] an adversarial snapshot yields only DISPLAY rows -- "
+              "hub record untouched by construction",
+              d_mal["items"] and d_mal["items"][0]["hub_record"] == "3-0")
+    finally:
+        ER.FIG_PATH = real_fig_path
+        os.unlink(tmp)
+    # an all-garbage file is honest absence
+    with tempfile.NamedTemporaryFile("w", suffix=".jsonl",
+                                     delete=False) as f:
+        f.write("junk\n{{{\n")
+        tmp2 = f.name
+    try:
+        ER.FIG_PATH = os.path.relpath(tmp2, REPO)
+        check("[NEG] an unreadable snapshot file -> None, never a stale "
+              "or invented record", ER.fig_latest() is None)
+    finally:
+        ER.FIG_PATH = real_fig_path
+        os.unlink(tmp2)
 
     print("\n3. MASSEY CAN NEVER RENDER AS CURRENT")
     mm = ER.massey_meta()
