@@ -44,6 +44,7 @@ SEASON = int(os.environ.get("WVB_SEASON", "2026"))
 
 MASSEY_PATH = "Cody/data/massey_2026_preseason.txt"
 FIG_PATH = "Cody/data/figstats_snapshots.jsonl"
+MASSEY_SNAP_PATH = "Cody/data/massey_snapshots.jsonl"
 
 ROLES = (
     ("Hub POWER / RÉSUMÉ", "the hub's own evidence-qualified "
@@ -81,6 +82,30 @@ def massey_meta():
     if m:
         out["truncated_at"] = int(m.group(1))
     return out
+
+
+def massey_latest():
+    """The most recent CURRENT Massey browser-reviewed snapshot, or None.
+
+    A different thing from massey_meta() (the preseason capture that
+    feeds the board's reference column): this is a dated, hashed,
+    browser-reviewed read of the live ratings page, disclosure-only.
+    The two states must never blur -- 'current browser-reviewed
+    snapshot' vs 'preseason snapshot' is the difference between a
+    Saturday data horizon and an August 15 one.
+    """
+    p = os.path.join(REPO, MASSEY_SNAP_PATH)
+    if not os.path.exists(p):
+        return None
+    last = None
+    for ln in io.open(p, encoding="utf-8"):
+        ln = ln.strip()
+        if ln:
+            try:
+                last = json.loads(ln)
+            except ValueError:
+                continue
+    return last
 
 
 def fig_latest():
@@ -156,6 +181,13 @@ FIG_ALIASES = {
     "incarnate word": "uiw",
     "miss valley": "miss val",
     "miami ohio": "miami oh",
+    # ⚠ NC STATE, THE COLLISION THE FALLBACK COMMENT SAID COULD NOT HAPPEN
+    # (caught 2026-08-31): the hub spells it 'NC State' -> 'nc st', so
+    # FIG's 'North Carolina State' missed directly and the trailing-st
+    # drop landed it on NORTH CAROLINA -- two FIG rows on one hub team,
+    # silently. The alias fixes the join; the fallback now also REFUSES
+    # to strip into a key another FIG row already owns.
+    "north caro st": "nc st",
 }
 
 
@@ -231,7 +263,17 @@ def discrepancies(fig=None, hub=None):
     hub_by_norm = {}
     for nm, rec in hub.items():
         hub_by_norm[_hub_norm(nm)] = (nm, rec)
+    # every FIG key up front, so the trailing-st fallback can refuse to
+    # strip into a key ANOTHER FIG row already owns (the NC State trap)
+    fig_keys = set()
+    for row in fig.get("rows") or []:
+        if row.get("team") and row.get("parse") != "failed":
+            k = _fig_norm(row["team"])
+            fig_keys.add(FIG_ALIASES.get(k, k))
     items, unmatched, matched = [], [], 0
+    taken = {}                       # hub team -> fig team that claimed it
+    collisions = []                  # two FIG rows on one hub team = a
+                                     # join error, surfaced, never absorbed
     for row in fig.get("rows") or []:
         team = row.get("team")
         if not team or row.get("parse") == "failed":
@@ -239,17 +281,21 @@ def discrepancies(fig=None, hub=None):
         key = _fig_norm(team)
         key = FIG_ALIASES.get(key, key)
         got = hub_by_norm.get(key)
-        if not got and key.endswith(" st"):
+        if not got and key.endswith(" st") and key[:-3] not in fig_keys:
             # FIG says 'Sam Houston State' where the hub says 'Sam
-            # Houston'. Safe ONLY because the st-ful key just missed --
-            # a team like Washington St. matches directly and never
-            # reaches this line.
+            # Houston'. Safe only when the stripped key is not itself a
+            # FIG team -- 'north caro st' stripping into North Carolina
+            # is exactly the wrong-team join R8 exists for.
             got = hub_by_norm.get(key[:-3])
         if not got:
             unmatched.append(team)
             continue
-        matched += 1
         hub_nm, hub_rec = got
+        if hub_nm in taken:
+            collisions.append((taken[hub_nm], team, hub_nm))
+            continue
+        taken[hub_nm] = team
+        matched += 1
         if (row.get("record") or "").strip() != hub_rec:
             items.append({
                 "team": hub_nm, "fig_team": team,
@@ -259,10 +305,27 @@ def discrepancies(fig=None, hub=None):
             })
     items.sort(key=lambda x: (x["fig_rank"] or 9999))
     return {"items": items, "matched": matched, "unmatched": unmatched,
+            "matched_names": sorted(taken),
+            "collisions": collisions,
             "fig": {k: fig.get(k) for k in
                     ("retrieved_utc", "publisher_generated", "url",
                      "source_label", "content_sha256", "n_rows",
                      "variant")}}
+
+
+def absent_from_fig(universe, d=None):
+    """Hub teams the held FIG snapshot does not list.
+
+    An absent team is 'not listed in held FIG snapshot' -- never an
+    unranked team, a bad RPI, or a reference mismatch. Computed against
+    the hub's own team universe (the board's 348), passed in so this
+    module invents no membership list of its own.
+    """
+    d = d if d is not None else discrepancies()
+    if not d.get("fig"):
+        return []
+    have = {_hub_norm(n) for n in d.get("matched_names") or []}
+    return [t for t in universe if _hub_norm(t) not in have]
 
 
 if __name__ == "__main__":

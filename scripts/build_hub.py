@@ -3483,18 +3483,41 @@ def extref_strip(meta, teams):
                  ("&ldquo;%s&rdquo; &middot; captured %s" % (av_stamp, av_cap))
                  if av_stamp else "no capture held"))
     f = d.get("fig")
+    absent = ER.absent_from_fig([t["team"] for t in teams], d) if f else []
+    coverage = ("FIGstats coverage: %d of %d hub teams &middot; %d teams "
+                "absent from this source snapshot"
+                % (d.get("matched") or 0, len(teams), len(absent))) if f \
+        else ""
     rows.append(("FIGstats unofficial RPI",
                  "external r&eacute;sum&eacute;-reference signal only "
                  "&mdash; never a result authority, correction source or "
                  "POWER input",
                  ("publisher&rsquo;s own stamp &ldquo;Generated: %s&rdquo; "
                   "&middot; fetched %s UTC &middot; manual browser snapshot "
-                  "(robots.txt permits no scripted fetch)"
+                  "(robots.txt permits no scripted fetch)<br>%s"
                   % (f["publisher_generated"],
                      (f["retrieved_utc"] or "").replace("T", " ")
-                     .replace("Z", ""))) if f else "no snapshot held"))
-    rows.append(("Massey", "external strength-reference snapshot only "
-                 "&mdash; never a POWER input or result source",
+                     .replace("Z", ""), coverage)) if f
+                 else "no snapshot held"))
+    # ⚠ TWO MASSEY STATES, NEVER BLURRED. The preseason capture feeds
+    # the board's MSY reference column and is NOT current; the
+    # browser-reviewed current snapshot is disclosure-only, with its own
+    # data horizon. One row each, labelled in full.
+    ms = ER.massey_latest()
+    rows.append(("Massey &mdash; current browser-reviewed snapshot",
+                 "external strength reference only &mdash; never a POWER "
+                 "input or result source; disclosure-only (the MSY column "
+                 "below is NOT this)",
+                 ("publisher&rsquo;s own header &ldquo;%s&rdquo; &middot; "
+                  "reviewed %s UTC &middot; %s"
+                  % (ms["publisher_through"],
+                     (ms["retrieved_utc"] or "").replace("T", " ")
+                     .replace("Z", ""), ms.get("coverage") or ""))
+                 if ms else "no current browser-reviewed snapshot held"))
+    rows.append(("Massey &mdash; preseason snapshot (feeds the MSY "
+                 "reference column)",
+                 "external strength-reference snapshot only &mdash; never "
+                 "a POWER input or result source",
                  ("<b>preseason snapshot</b> &middot; %s%s%s &middot; not "
                   "current" % (
                       mm["captured_display"],
@@ -3518,29 +3541,50 @@ def extref_strip(meta, teams):
     items = d.get("items") or []
     mm_html = ""
     if items:
-        lis = []
-        for it in items:
-            has_ev = it["team"] in ev_teams
-            lis.append(
-                '<li class="mmrow%s"><b class="mmtag">REFERENCE MISMATCH'
-                '</b> <a href="#/teams/%s">%s</a> &mdash; FIGstats %s; hub '
-                '%s &middot; external reference has not caught up / '
-                'differs.%s <a class="mmlink" href="#/result-ledger">'
-                'Result Ledger</a></li>'
-                % (" mmev" if has_ev else "", _pyslug(it["team"]),
-                   esc(it["team"]), esc(it["fig_record"]),
-                   esc(it["hub_record"]),
+        def _li(it, has_ev):
+            return (
+                '<li class="mmrow%s" data-mmteam="%s"><b class="mmtag">'
+                'REFERENCE MISMATCH</b> <a href="#/teams/%s">%s</a> '
+                '&mdash; FIGstats %s; hub %s &middot; external reference '
+                'has not caught up / differs.%s <a class="mmlink" '
+                'href="#/result-ledger">Result Ledger</a></li>'
+                % (" mmev" if has_ev else "", esc(it["team"].lower()),
+                   _pyslug(it["team"]), esc(it["team"]),
+                   esc(it["fig_record"]), esc(it["hub_record"]),
                    (' <i class="mmev-note">ledgered official evidence on '
                     'file for a result of this team &rarr;</i>')
                    if has_ev else ""))
+        ev_lis = [_li(i, True) for i in items if i["team"] in ev_teams]
+        lag_lis = [_li(i, False) for i in items
+                   if i["team"] not in ev_teams]
+        # ⚠ 46 ORDINARY LAG ROWS ARE NOT 46 BALLOT EMERGENCIES. The
+        # default is one summary line; evidence-context rows stay
+        # visible; ordinary lag opens on request, searchable.
         mm_html = (
-            '<div class="refmm"><p class="tnote">Where the FIGstats '
-            'snapshot&rsquo;s displayed W&ndash;L differs from the '
-            'hub&rsquo;s evidence-qualified counting record &mdash; a '
+            '<div class="refmm"><p class="mmsummary">External-reference '
+            'differences: <b>%d</b> &middot; <b>%d</b> with '
+            'official-evidence context. A difference is a '
             'source-comparison fact, not a claim the hub is right by '
-            'default. It demotes, quarantines and revises nothing. '
-            '%d of %d matched teams differ.</p><ul class="mmlist">%s</ul>'
-            '</div>' % (len(items), d.get("matched") or 0, "".join(lis)))
+            'default &mdash; it demotes, quarantines and revises '
+            'nothing.</p>'
+            '<ul class="mmlist">%s</ul>'
+            '<details class="mmlag"><summary>%d ordinary source-lag '
+            'differences (external reference not caught up)</summary>'
+            '<input type="search" class="mmfilter" placeholder="Filter '
+            'teams&hellip;" oninput="(function(q){var v=q.value.'
+            'toLowerCase();q.closest(\'.mmlag\').querySelectorAll('
+            '\'.mmrow\').forEach(function(r){r.hidden=v&&r.dataset.'
+            'mmteam.indexOf(v)<0;});})(this)">'
+            '<ul class="mmlist">%s</ul></details>%s</div>'
+            % (len(items), len(ev_lis), "".join(ev_lis), len(lag_lis),
+               "".join(lag_lis),
+               ('<p class="tnote mmabsent">Not listed in the held FIG '
+                'snapshot (%d): %s &mdash; absence from an external '
+                'snapshot is not a ranking, a record or a mismatch.</p>'
+                % (len(absent), ", ".join(
+                    '<span class="mmabs">%s &mdash; not listed in held '
+                    'FIG snapshot</span>' % esc(t) for t in
+                    sorted(absent)))) if absent else ""))
 
     return (
         '<!-- EXTREF-HTML-BEGIN -->\n'

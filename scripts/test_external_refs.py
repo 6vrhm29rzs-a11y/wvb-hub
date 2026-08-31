@@ -53,6 +53,10 @@ def main():
     try:
         B.load_pipe = lambda p: []          # no VT, no Massey snapshot
         t2, f2, u2, n2, m2 = B.build()
+        # a CHANGED snapshot -- every team pinned to Massey rank 1 -- must
+        # be exactly as invisible to hub-owned numbers as an absent one
+        B.load_pipe = lambda p: [["1", "Nebraska"], ["1", "Texas"]]
+        t3, f3, u3, n3, m3 = B.build()
     finally:
         B.load_pipe = real_lp
     REF_FIELDS = ("vt", "massey", "d_massey")
@@ -72,6 +76,9 @@ def main():
     check("the projected field is identical too",
           [t.get("team") for t in (f1 or [])] ==
           [t.get("team") for t in (f2 or [])])
+    check("a MUTATED snapshot changes nothing hub-owned either",
+          len(t1) == len(t3) and all(
+              strip_ref(a) == strip_ref(b) for a, b in zip(t1, t3)))
     if ER.massey_meta()["held"]:
         check("the snapshots DID feed the reference columns in the real "
               "build", any(t.get("massey") for t in t1)
@@ -100,10 +107,26 @@ def main():
               "robots.txt" in (fig.get("access") or ""))
         check("a content fingerprint is held",
               re.match(r"^[0-9a-f]{64}$", fig.get("content_sha256") or ""))
+    HUB_OWNED = ("data/raw/2026/result_corrections.json",
+                 "data/conference_lab_2026.json",
+                 "data/raw/2026/players_2026.json")
+    def _bytes():
+        out = {}
+        for rel in HUB_OWNED:
+            fp = os.path.join(REPO, rel)
+            if os.path.exists(fp):
+                out[rel] = io.open(fp, encoding="utf-8").read()
+        return out
+    before_all = _bytes()
     corr_path = os.path.join(REPO, "data/raw/2026/result_corrections.json")
-    before = io.open(corr_path, encoding="utf-8").read()
+    before = before_all.get("data/raw/2026/result_corrections.json", "")
     d = ER.discrepancies()
-    after = io.open(corr_path, encoding="utf-8").read()
+    ER.absent_from_fig([t["team"] for t in t1], d)
+    after_all = _bytes()
+    after = after_all.get("data/raw/2026/result_corrections.json", "")
+    check("corrections, Conference Lab and player aggregates are "
+          "byte-identical across the whole reference pipeline",
+          before_all == after_all)
     check("computing the queue wrote NO correction", before == after)
     hub = ER.hub_records()
     check("the hub's counting record for SMU is still 3-0 and UC Davis 1-2",
@@ -119,6 +142,52 @@ def main():
                   smu[0]["hub_record"] == "3-0")
         check("every FIG row resolves to a hub team (aliases complete)",
               not d["unmatched"], d["unmatched"][:6])
+        check("no two FIG rows resolve to one hub team (collision guard)",
+              not d.get("collisions"), d.get("collisions"))
+        # ⚠ THE NC STATE REGRESSION (caught by this pass): the hub spells
+        # it 'NC State', so FIG's 'North Carolina State' missed the
+        # direct key and the trailing-st fallback stripped it onto
+        # NORTH CAROLINA -- a silent wrong-team join.
+        ncs = [i["team"] for i in d["items"]
+               if i["fig_team"] == "North Carolina State"]
+        check("FIG's North Carolina State can only ever mean NC State",
+              all(t == "NC State" for t in ncs)
+              and "NC State" in (d.get("matched_names") or []))
+        # [NEG] without the alias, the fallback must REFUSE (unmatched),
+        # never rejoin North Carolina
+        real_alias = dict(ER.FIG_ALIASES)
+        try:
+            del ER.FIG_ALIASES["north caro st"]
+            d_no = ER.discrepancies()
+        finally:
+            ER.FIG_ALIASES.clear()
+            ER.FIG_ALIASES.update(real_alias)
+        check("[NEG] alias removed -> NC State goes honestly UNMATCHED, "
+              "never onto North Carolina",
+              "North Carolina State" in d_no["unmatched"]
+              and not d_no.get("collisions"))
+        # coverage + the nine absent teams
+        uni = [t["team"] for t in t1]
+        absent = ER.absent_from_fig(uni, d)
+        check("coverage: %d of %d, %d absent"
+              % (d["matched"], len(uni), len(absent)),
+              d["matched"] + len(absent) == len(uni))
+        check("the absent teams are the unplayed ones (Ivies + Saint "
+              "Francis), not mismatches",
+              set(absent) == {"Yale", "Princeton", "Cornell", "Brown",
+                              "Penn", "Harvard", "Dartmouth", "Columbia",
+                              "Saint Francis"}, absent)
+        check("an absent team NEVER appears in the mismatch queue",
+              not any(i["team"] in absent for i in d["items"]))
+        # fixture: a team absent from FIG is absent, not mismatched
+        fx_fig = {"rows": [{"rank": 1, "team": "SMU", "record": "3-0"}]}
+        fx_hub = {"SMU": "3-0", "Yale": "0-0"}
+        d_fx = ER.discrepancies(fig=fx_fig, hub=fx_hub)
+        a_fx = ER.absent_from_fig(["SMU", "Yale"], d_fx)
+        check("[FIXTURE] absent-from-FIG team -> absent list only, "
+              "no mismatch, no unmatched",
+              a_fx == ["Yale"] and d_fx["items"] == []
+              and d_fx["unmatched"] == [])
     src = io.open(os.path.join(REPO, "scripts/external_refs.py"),
                   encoding="utf-8").read()
     check("external_refs holds NO writer (no dump/write/open-for-write)",
@@ -174,13 +243,17 @@ def main():
         page = io.open(page_p, encoding="utf-8").read()
         check("the External references disclosure is on Rankings AND "
               "Ballot", page.count("EXTREF-HTML-BEGIN") == 2)
-        check("the Massey ruler tooltip says preseason snapshot, "
-              "never current/live/updated",
+        # 'current browser-reviewed snapshot' is the ONE sanctioned use
+        # of 'current' beside Massey -- a held, dated, hashed capture.
+        # Everything else near the name may never claim freshness.
+        scrub = page.replace("not current", "").replace(
+            "current browser-reviewed snapshot", "")
+        check("the Massey ruler tooltip says preseason snapshot; no "
+              "unsanctioned current/live/updated claim",
               "Massey preseason snapshot" in page
               and not re.search(
-                  r"Massey[^<]{0,60}\b(live|updated)\b", page)
-              and not re.search(r"Massey[^<]{0,40}\bcurrent\b",
-                                page.replace("not current", "")))
+                  r"Massey[^<]{0,60}\b(live|updated)\b", scrub)
+              and not re.search(r"Massey[^<]{0,40}\bcurrent\b", scrub))
         if HELD:
             check("both timestamps render, distinct",
                   "Generated:" in page and "fetched" in page)
@@ -193,9 +266,43 @@ def main():
             n_plain = page.count('class="mmrow"')
             check("ordinary source lag stays quiet (unaccented rows exist)",
                   n_plain > 0, n_plain)
+            check("coverage is stated: N of 348 with the absent count",
+                  re.search(r"FIGstats coverage: \d+ of 348 hub teams "
+                            r"&middot; \d+ teams absent", page))
+            check("the default is a compact summary line",
+                  re.search(r"External-reference differences: <b>\d+</b> "
+                            r"&middot; <b>\d+</b> with official-evidence "
+                            r"context", page))
+            check("ordinary lag sits behind an explicit disclosure, "
+                  "searchable", "ordinary source-lag" in page
+                  and 'class="mmfilter"' in page)
+            check("an absent team renders as 'not listed in held FIG "
+                  "snapshot', never a mismatch or a rank",
+                  "not listed in held FIG snapshot" in page
+                  and not re.search(
+                      r'data-mmteam="(yale|princeton|saint francis)"',
+                      page))
+            check("no urgent red styling on ordinary lag (accent is the "
+                  "gold evidence edge only)",
+                  ".mmrow.mmev{border-left-color:var(--gold-fill)" in page
+                  and "--live" not in page[page.index(".mmrow"):
+                                           page.index(".mmrow") + 400])
         else:
             check("the disclosure states 'no snapshot held' rather than "
                   "guessing", "no snapshot held" in page)
+        check("the two Massey states are both labelled, unmistakably",
+              "Massey &mdash; current browser-reviewed snapshot" in page
+              and "Massey &mdash; preseason snapshot" in page)
+        if ER.massey_latest():
+            check("the current Massey row carries the publisher's own "
+                  "through-games date AND our review time",
+                  "Using games thru Sat, Aug 29, 2026" in page
+                  and "reviewed 2026-" in page)
+            check("...and states the MSY column is NOT this",
+                  "the MSY column below is NOT this" in page)
+        else:
+            check("no current Massey capture -> the honest absence line",
+                  "no current browser-reviewed snapshot held" in page)
 
     print("\n5. RANKING SEPARATION AND THE FETCH BAN")
     for mod in ("rating_2025.py", "digby_top25.py", "bakeoff_2025.py",
