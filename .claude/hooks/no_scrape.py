@@ -45,6 +45,9 @@ BLOCKED = {
                       "MIT-licensed CSVs by ncaavolleyballr",
     "volleyballmag.com": "Cloudflare-blocked; getting past it means forging a browser",
     "masseyratings.com": "third-party ratings we hold no licence to republish",
+    "figstats.net": ("robots.txt disallows every non-named agent "
+                     "('User-agent: * / Disallow: /', measured 2026-08-31); "
+                     "snapshots are manual browser reviews only"),
 }
 
 # The command has to actually be a fetch. Matching a bare hostname is not

@@ -1,15 +1,15 @@
 {
  "meta": {
   "season": 2026,
-  "generated_at_utc": "2026-08-31T01:15:54Z",
-  "n_claims": 22,
+  "generated_at_utc": "2026-08-31T02:40:09Z",
+  "n_claims": 24,
   "feed_cap": 5,
   "recent_hours": 72,
   "states": {
    "confirmed_official": 8,
    "corroborated": 9,
-   "official_unconfirmed": 0,
-   "community_signal": 0,
+   "official_unconfirmed": 1,
+   "community_signal": 1,
    "conflicting": 1,
    "expired": 3,
    "inaccessible": 1
@@ -754,6 +754,70 @@
     "to": "2026-08-28"
    },
    "review_by": "2026-09-04"
+  },
+  {
+   "id": "4a931b9bc08a",
+   "type": "availability",
+   "subject": {
+    "kind": "player",
+    "team": "Purdue",
+    "player": "Kenna Wollard"
+   },
+   "what": "Kenna Wollard (Purdue): official availability news",
+   "state": "official_unconfirmed",
+   "state_label": "official record; confirmation pending",
+   "why": "official record; confirmation pending",
+   "scope": "one player's availability for the stated dates",
+   "sources": [
+    {
+     "url": "https://sports.yahoo.com/articles/purdues-kenna-wollard-releases-statement-185444853.html",
+     "excerpt": "Sometimes life changes in ways you could never imagine or prepare for. I'm currently dealing with an unexpected health issue that will keep me away fro a little while. While I'm not ready to share the details at this time, I hope you understand and respect my privacy until I am ready to share more.",
+     "retrieved": "2026-08-31T01:45:03Z",
+     "source_class": "official_school"
+    }
+   ],
+   "public": false,
+   "priority": 80,
+   "route": {
+    "team": "Purdue"
+   },
+   "effective": {
+    "from": "2026-08-27",
+    "to": null
+   },
+   "review_by": "2026-09-13"
+  },
+  {
+   "id": "6d2f5c34de3a",
+   "type": "availability",
+   "subject": {
+    "kind": "player",
+    "team": "Purdue",
+    "player": "Grace Heaney"
+   },
+   "what": "Grace Heaney (Purdue): availability signal",
+   "state": "community_signal",
+   "state_label": "community signal — a lead, not a fact",
+   "why": "community signal — a lead, not a fact",
+   "scope": "one player's availability for the stated dates",
+   "sources": [
+    {
+     "url": "https://d2560u4h06m0te.cloudfront.net/news/2026/8/28/volleyball-vs-9-purdue",
+     "excerpt": "The Boilermakers played without Second Team All-American Kenna Wollard (personal reasons), then lost Omaha native and Third Team All-American Grace Heaney midway through the second set due to injury.",
+     "retrieved": "2026-08-31T01:45:03Z",
+     "source_class": "community"
+    }
+   ],
+   "public": false,
+   "priority": 45,
+   "route": {
+    "team": "Purdue"
+   },
+   "effective": {
+    "from": "2026-08-28",
+    "to": null
+   },
+   "review_by": "2026-09-06"
   }
  ],
  "feed": [
@@ -792,6 +856,72 @@
    "effective": null,
    "review_by": null,
    "first_seen": "2026-08-31T01:01:57Z"
+  },
+  {
+   "id": "4a931b9bc08a",
+   "type": "availability",
+   "subject": {
+    "kind": "player",
+    "team": "Purdue",
+    "player": "Kenna Wollard"
+   },
+   "what": "Kenna Wollard (Purdue): official availability news",
+   "state": "official_unconfirmed",
+   "state_label": "official record; confirmation pending",
+   "why": "official record; confirmation pending",
+   "scope": "one player's availability for the stated dates",
+   "sources": [
+    {
+     "url": "https://sports.yahoo.com/articles/purdues-kenna-wollard-releases-statement-185444853.html",
+     "excerpt": "Sometimes life changes in ways you could never imagine or prepare for. I'm currently dealing with an unexpected health issue that will keep me away fro a little while. While I'm not ready to share the details at this time, I hope you understand and respect my privacy until I am ready to share more.",
+     "retrieved": "2026-08-31T01:45:03Z",
+     "source_class": "official_school"
+    }
+   ],
+   "public": false,
+   "priority": 80,
+   "route": {
+    "team": "Purdue"
+   },
+   "effective": {
+    "from": "2026-08-27",
+    "to": null
+   },
+   "review_by": "2026-09-13",
+   "first_seen": "2026-08-31T02:40:09Z"
+  },
+  {
+   "id": "6d2f5c34de3a",
+   "type": "availability",
+   "subject": {
+    "kind": "player",
+    "team": "Purdue",
+    "player": "Grace Heaney"
+   },
+   "what": "Grace Heaney (Purdue): availability signal",
+   "state": "community_signal",
+   "state_label": "community signal — a lead, not a fact",
+   "why": "community signal — a lead, not a fact",
+   "scope": "one player's availability for the stated dates",
+   "sources": [
+    {
+     "url": "https://d2560u4h06m0te.cloudfront.net/news/2026/8/28/volleyball-vs-9-purdue",
+     "excerpt": "The Boilermakers played without Second Team All-American Kenna Wollard (personal reasons), then lost Omaha native and Third Team All-American Grace Heaney midway through the second set due to injury.",
+     "retrieved": "2026-08-31T01:45:03Z",
+     "source_class": "community"
+    }
+   ],
+   "public": false,
+   "priority": 45,
+   "route": {
+    "team": "Purdue"
+   },
+   "effective": {
+    "from": "2026-08-28",
+    "to": null
+   },
+   "review_by": "2026-09-06",
+   "first_seen": "2026-08-31T02:40:09Z"
   },
   {
    "id": "333c4d178c77",
@@ -857,88 +987,6 @@
    },
    "effective": null,
    "review_by": null,
-   "first_seen": "2026-08-30T18:56:13Z"
-  },
-  {
-   "id": "e79084be3b35",
-   "type": "fixture_update",
-   "subject": {
-    "kind": "match",
-    "gid": "6626809"
-   },
-   "what": "city / event / site / state_usps / venue corrected for Kentucky vs Penn St.",
-   "state": "confirmed_official",
-   "state_label": "confirmed by an official source",
-   "why": "the school's own page contradicts the feed on city, event, site, state_usps, venue; every overridden field carries its own citation",
-   "scope": "the corrected schedule fields only",
-   "sources": [
-    {
-     "url": "https://gopsusports.com/sports/womens-volleyball/schedule",
-     "excerpt": "Big Ten/SEC Challenge neutral Sunday Sep 6 vs. Kentucky Chicago, Ill. / Wrigley Field 7:00 PM EDT",
-     "retrieved": "2026-08-26",
-     "source_class": "official_school"
-    },
-    {
-     "url": "https://gopsusports.com/sports/womens-volleyball/schedule",
-     "excerpt": "Sunday Sep 6 vs. Kentucky Chicago, Ill. / Wrigley Field 7:00 PM EDT",
-     "retrieved": "2026-08-26",
-     "source_class": "official_school"
-    },
-    {
-     "url": "https://ukathletics.com/schedule.aspx?path=wvball",
-     "excerpt": "Sun. Sep 6 vs. Penn State Wrigley Field (Chicago, Ill.) 7:00 pm Big Ten / SEC Challenge",
-     "retrieved": "2026-08-26",
-     "source_class": "official_school"
-    }
-   ],
-   "public": true,
-   "priority": 70,
-   "route": {
-    "match": "6626809"
-   },
-   "effective": null,
-   "review_by": "2026-09-06",
-   "first_seen": "2026-08-30T18:56:13Z"
-  },
-  {
-   "id": "bffff5caac58",
-   "type": "fixture_update",
-   "subject": {
-    "kind": "match",
-    "gid": "6627523"
-   },
-   "what": "city / event / site / start_time_epoch / state_usps / venue corrected for Southern California vs Arizona St.",
-   "state": "confirmed_official",
-   "state_label": "confirmed by an official source",
-   "why": "the school's own page contradicts the feed on city, event, site, start_time_epoch, state_usps, venue; every overridden field carries its own citation",
-   "scope": "the corrected schedule fields only",
-   "sources": [
-    {
-     "url": "https://usctrojans.com/sports/womens-volleyball/schedule",
-     "excerpt": "Scrimmage / Exhibition | State Farm Women's Volleyball Showcase | vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT",
-     "retrieved": "2026-08-29",
-     "source_class": "official_school"
-    },
-    {
-     "url": "https://usctrojans.com/sports/womens-volleyball/schedule",
-     "excerpt": "Scrimmage / Exhibition | State Farm Women's Volleyball Showcase | vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT",
-     "retrieved": "2026-08-29",
-     "source_class": "official_school"
-    },
-    {
-     "url": "https://usctrojans.com/sports/womens-volleyball/schedule",
-     "excerpt": "Scrimmage / Exhibition | State Farm Women's Volleyball Showcase | vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT",
-     "retrieved": "2026-08-29",
-     "source_class": "official_school"
-    }
-   ],
-   "public": true,
-   "priority": 70,
-   "route": {
-    "match": "6627523"
-   },
-   "effective": null,
-   "review_by": "2026-09-05",
    "first_seen": "2026-08-30T18:56:13Z"
   }
  ]

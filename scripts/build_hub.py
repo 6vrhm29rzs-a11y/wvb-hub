@@ -440,7 +440,9 @@ RULERS = {
     "rpi":       ("RPI", "RPI", "official NCAA RPI"),
     "ballot":    ("MY BALLOT", "MINE", "your own saved ballot"),
     "vt":        ("VT", "VT", "VolleyTalk community poll"),
-    "massey":    ("MASSEY", "MSY", "Massey Ratings"),
+    "massey":    ("MASSEY (PRE)", "MSY",
+                  "Massey preseason snapshot -- a manual browser capture, "
+                  "not current, never a Power input"),
     "power25":   ("2025", "2025", "final 2025 POWER rank"),
     "committee": ("TOP 16", "T16", "the DI Committee's in-season Top 16 "
                                    "reveal"),
@@ -3420,6 +3422,139 @@ def conference_lab(bteams, tj):
     }
 
 
+def _pyslug(name):
+    return re.sub(r"^-|-$", "", re.sub(r"[^a-z0-9]+", "-",
+                                       (name or "").lower()))
+
+
+def extref_strip(meta, teams):
+    """The External references disclosure (PRIVATE ONLY) -- what every
+    outside source IS, when it was taken, and where it disagrees.
+
+    Truth rules, from the 2026-08-31 audit: a source's own 'Generated'
+    stamp and our fetch time are two different facts and both render; a
+    snapshot that is not current says so; a W-L disagreement with an
+    external reference renders as a SOURCE-COMPARISON FACT that changes
+    nothing. Ordinary source lag is quiet -- the only accented rows are
+    teams whose result carries ledgered evidence (a real contradiction
+    that entered the Result Ledger).
+    """
+    import external_refs as ER
+    mm = ER.massey_meta()
+    d = ER.discrepancies()
+    rows = []
+
+    src = "preseason"
+    if any(t.get("rank_source") == "live" for t in teams):
+        src = "live (2026 results)"
+    elif any(t.get("rank_source") == "blend" for t in teams):
+        src = "blend (preseason projection + 2026 results)"
+    st = (meta.get("rank_stamp") or {})
+    stamp = rank_stamp_pt(st.get("generated_at_utc")) or "stamp not held"
+    rows.append(("POWER", "the hub&rsquo;s own rating &mdash; "
+                 "evidence-qualified counting corpus only",
+                 "basis: %s &middot; last recomputed %s%s" % (
+                     src, stamp,
+                     (" &middot; through %d rating-eligible finals"
+                      % st["matches_in"]) if st.get("matches_in") else "")))
+    res = meta.get("resume") or {}
+    rows.append(("R&Eacute;SUM&Eacute;", "the hub&rsquo;s own results "
+                 "ranking &mdash; same counting corpus",
+                 ("live &middot; %d counted D-I matches" % res["matches"])
+                 if (meta.get("resume_active") and res.get("matches"))
+                 else ("not live until %s D-I matches (%s so far)"
+                       % (res.get("min_matches") or 200,
+                          res.get("matches") or 0))))
+    # AVCA: the poll's own stamp + our capture date, from the jsonl
+    av_stamp, av_cap = None, None
+    _pl = os.path.join(REPO, "data", "raw", str(SEASON), "polls_avca.jsonl")
+    if os.path.exists(_pl):
+        for _ln in open(_pl, encoding="utf-8"):
+            _ln = _ln.strip()
+            if _ln:
+                try:
+                    _r = json.loads(_ln)
+                    av_stamp = _r.get("stamp")
+                    av_cap = (_r.get("captured_utc") or "")[:10]
+                except ValueError:
+                    pass
+    rows.append((RULERS["avca"][2], "official poll, captured from "
+                 "ncaa.com",
+                 ("&ldquo;%s&rdquo; &middot; captured %s" % (av_stamp, av_cap))
+                 if av_stamp else "no capture held"))
+    f = d.get("fig")
+    rows.append(("FIGstats unofficial RPI",
+                 "external r&eacute;sum&eacute;-reference signal only "
+                 "&mdash; never a result authority, correction source or "
+                 "POWER input",
+                 ("publisher&rsquo;s own stamp &ldquo;Generated: %s&rdquo; "
+                  "&middot; fetched %s UTC &middot; manual browser snapshot "
+                  "(robots.txt permits no scripted fetch)"
+                  % (f["publisher_generated"],
+                     (f["retrieved_utc"] or "").replace("T", " ")
+                     .replace("Z", ""))) if f else "no snapshot held"))
+    rows.append(("Massey", "external strength-reference snapshot only "
+                 "&mdash; never a POWER input or result source",
+                 ("<b>preseason snapshot</b> &middot; %s%s%s &middot; not "
+                  "current" % (
+                      mm["captured_display"],
+                      (" &middot; &ldquo;using games thru %s&rdquo;"
+                       % mm["thru"]) if mm.get("thru") else "",
+                      (" &middot; truncated at rank %d" % mm["truncated_at"])
+                      if mm.get("truncated_at") else ""))
+                 if mm["held"] else "no snapshot held"))
+
+    # ledgered evidence per team: only these rows get the accent
+    ev_teams = set()
+    _cfp = os.path.join(REPO, "data", "result_confidence_2026.json")
+    _cf = (json.load(open(_cfp, encoding="utf-8"))
+           if os.path.exists(_cfp) else {})
+    for r in _cf.get("finals") or []:
+        if r.get("result_corrected") or r.get("overall") in (
+                "disputed", "corrected"):
+            ev_teams.add(r.get("a"))
+            ev_teams.add(r.get("h"))
+
+    items = d.get("items") or []
+    mm_html = ""
+    if items:
+        lis = []
+        for it in items:
+            has_ev = it["team"] in ev_teams
+            lis.append(
+                '<li class="mmrow%s"><b class="mmtag">REFERENCE MISMATCH'
+                '</b> <a href="#/teams/%s">%s</a> &mdash; FIGstats %s; hub '
+                '%s &middot; external reference has not caught up / '
+                'differs.%s <a class="mmlink" href="#/result-ledger">'
+                'Result Ledger</a></li>'
+                % (" mmev" if has_ev else "", _pyslug(it["team"]),
+                   esc(it["team"]), esc(it["fig_record"]),
+                   esc(it["hub_record"]),
+                   (' <i class="mmev-note">ledgered official evidence on '
+                    'file for a result of this team &rarr;</i>')
+                   if has_ev else ""))
+        mm_html = (
+            '<div class="refmm"><p class="tnote">Where the FIGstats '
+            'snapshot&rsquo;s displayed W&ndash;L differs from the '
+            'hub&rsquo;s evidence-qualified counting record &mdash; a '
+            'source-comparison fact, not a claim the hub is right by '
+            'default. It demotes, quarantines and revises nothing. '
+            '%d of %d matched teams differ.</p><ul class="mmlist">%s</ul>'
+            '</div>' % (len(items), d.get("matched") or 0, "".join(lis)))
+
+    return (
+        '<!-- EXTREF-HTML-BEGIN -->\n'
+        '<details class="method extref"><summary>External references '
+        '&mdash; sources, roles &amp; freshness</summary>'
+        '<p class="tnote">Each row says what a source <b>is</b> and when '
+        'it was taken. An external ranking is reference only: it never '
+        'touches a hub number, record, rating or ballot suggestion.</p>'
+        '<table class="extreftbl"><tbody>%s</tbody></table>%s</details>\n'
+        '<!-- EXTREF-HTML-END -->'
+        % ("".join('<tr><th>%s</th><td class="xr">%s</td><td class="xf">'
+                   '%s</td></tr>' % r for r in rows), mm_html))
+
+
 def build():
     teams, field, unmatched, n_aq, meta = BOARD.build()
     if PUBLIC:
@@ -3681,7 +3816,10 @@ def build():
                c(t.get("avca")),
                c(t["rank25"]),
                "" if PUBLIC else ('<td class="n c-ref" data-l="VT">%s</td>'
-                                  '<td class="n c-ref" data-l="Massey">%s</td>'
+                                  '<td class="n c-ref" data-l="Massey preseason snapshot" '
+                                  'title="Massey preseason snapshot -- '
+                                  'not current; capture date in the '
+                                  'External references disclosure">%s</td>'
                                   % (c(t.get("vt")), c(t.get("massey")))),
                c(t.get("rpi")),
                "" if PUBLIC else ('<td class="n sp c-ref" data-l="Others">%s</td>'
@@ -4336,6 +4474,11 @@ def build():
     slope = level.get("recommended_slope")
     return TEMPLATE \
         .replace("{{POLLS_JSON}}", json.dumps(polls, separators=(",", ":"))) \
+        .replace("{{EXTREF_STRIP}}", "" if PUBLIC else extref_strip(meta, teams)) \
+        .replace("{{REF_CHIPS_JS}}", "" if PUBLIC else
+                 "          add('VT', t.vt ? '#' + t.vt : '');\n"
+                 "          add('Massey preseason snapshot', "
+                 "t.massey ? '#' + t.massey : '');") \
         .replace("{{ASK_CSS}}", "" if PUBLIC else ASK_CSS) \
         .replace("{{DIGBY_FACE_JS}}",
                  json.dumps("" if PUBLIC else DIGBY_SVG)) \
@@ -4926,6 +5069,21 @@ h1 em{font-style:normal;color:var(--gold)}
    same treatment on a list that merely happens to have rows would be the
    generic move. The rule sizes already shipped; this adds the court ground
    under the table head so the board reads as a board. */
+.extref{margin:10px 0 2px}
+.extreftbl{width:100%;border-collapse:collapse;margin:8px 0}
+.extreftbl th{font:600 11px/1.4 var(--mono,monospace);text-transform:uppercase;
+  letter-spacing:.05em;text-align:left;padding:6px 10px 6px 0;color:var(--ink);
+  white-space:nowrap;vertical-align:top}
+.extreftbl td{font:13px/1.5 var(--body,sans-serif);color:var(--ink2);
+  padding:6px 12px 6px 0;border-top:1px solid var(--line);vertical-align:top}
+.extreftbl td.xf{color:var(--ink)}
+.mmlist{list-style:none;margin:6px 0;padding:0;max-height:300px;overflow:auto}
+.mmrow{font:13px/1.6 var(--body,sans-serif);padding:4px 8px;border-left:3px solid var(--line2)}
+.mmrow.mmev{border-left-color:var(--gold-fill);background:var(--alt)}
+.mmtag{font:600 10px/1 var(--mono,monospace);letter-spacing:.06em;color:var(--ink2)}
+.mmrow.mmev .mmtag{color:var(--gold)}
+.mmev-note{color:var(--gold);font-style:normal;font-size:12px}
+.mmlink{font-size:12px}
 .rcsrctag.corrected{color:var(--chalk);background:var(--navy);border-radius:3px;
   padding:2px 7px;font-style:normal}
 .mtag.rvw,.tdtag.rvw{color:var(--chalk);background:var(--live);
@@ -9197,6 +9355,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       </select>
     </label>
   </div>
+  {{EXTREF_STRIP}}
   <!-- ⚠ ONE SENTENCE PER RULER, FROM ONE MAP. A rank means nothing without
        knowing whose ruler it is; this is the line that says so, and it is
        keyed by view so a new view cannot ship without one. -->
@@ -9421,6 +9580,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
        whether there are unsaved edits, and what they last submitted. The
        actions moved to the end of the flow, where finishing belongs. -->
   <div class="bwstatus" id="bwstatus"></div>
+  {{EXTREF_STRIP}}
 
   <!-- ⚠ NONE OF THESE THREE IS A RECOMMENDATION. Each is a difference between
        two orderings, stated so it can be looked at before saving. -->
@@ -20066,8 +20226,7 @@ function showTeam(name) {
           };
           add('2025', t.rank25 ? '#' + t.rank25 : '');
           add('AVCA poll', t.avca ? '#' + t.avca : '');
-          add('VT', t.vt ? '#' + t.vt : '');
-          add('Massey', t.massey ? '#' + t.massey : '');
+{{REF_CHIPS_JS}}
           add('RPI', t.rpi ? '#' + t.rpi : '');
           add('Returning', t.ret !== null && t.ret !== undefined
                 ? Math.round(t.ret * 100) + '%' : '');
@@ -20963,6 +21122,12 @@ ASK_JS = r"""
 """
 
 PRIVATE_MARKERS = ("VolleyTalk", "Massey Ratings", "Massey Ratings, 2026",
+                   # ── EXTERNAL REFERENCES (2026-08-31) ─────────────────
+                   # the FIG snapshot, the Massey snapshot labelling and
+                   # the discrepancy queue are all reference data that is
+                   # not ours to republish
+                   "FIGstats", "figstats", "Massey preseason snapshot",
+                   "REFERENCE MISMATCH", "EXTREF-HTML-BEGIN",
                    'data-v="tv"', 'id="v-tv"', "tv_listings",
                    "chip('Massey'", "chip('VT'",
                    # Digby: model-written text and an endpoint that only exists
