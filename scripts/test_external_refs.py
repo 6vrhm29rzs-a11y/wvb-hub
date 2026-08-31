@@ -38,6 +38,14 @@ def check(label, ok, detail=""):
 def main():
     import external_refs as ER
 
+    # ⚠ TWO ENVIRONMENTS, ONE SUITE. On Cody's machine the snapshots exist
+    # and every fixture is checked. In CI and the fresh-checkout sandbox
+    # Cody/data is absent BY DESIGN (gitignored; not ours to publish) --
+    # there the suite proves the HONEST-ABSENCE mode instead of failing on
+    # the world it is supposed to handle. A guard that fails wherever its
+    # optional input is absent is the calendar-pin family again.
+    HELD = ER.fig_latest() is not None
+
     print("1. THE PAYLOAD IS IDENTICAL WITH AND WITHOUT THE SNAPSHOTS")
     import build_rankings_board as B
     t1, f1, u1, n1, m1 = B.build()
@@ -64,13 +72,22 @@ def main():
     check("the projected field is identical too",
           [t.get("team") for t in (f1 or [])] ==
           [t.get("team") for t in (f2 or [])])
-    check("the snapshots DID feed the reference columns in the real build",
-          any(t.get("massey") for t in t1)
-          and not any(t.get("massey") for t in t2))
+    if ER.massey_meta()["held"]:
+        check("the snapshots DID feed the reference columns in the real "
+              "build", any(t.get("massey") for t in t1)
+              and not any(t.get("massey") for t in t2))
+    else:
+        print("  (no Massey snapshot in this checkout -- identity proven "
+              "on the empty case)")
 
     print("\n2. THE REAL SMU FIXTURE -- A MISMATCH IS A FACT, NOT A LEVER")
     fig = ER.fig_latest()
-    check("a FIG snapshot is held", bool(fig))
+    if not HELD:
+        print("  (no FIG snapshot in this checkout -- asserting the "
+              "honest-absence mode instead)")
+        d_abs = ER.discrepancies()
+        check("absent snapshot -> empty queue, nothing invented",
+              d_abs["items"] == [] and d_abs["fig"] is None)
     if fig:
         check("it is labelled '%s'" % "FIGstats unofficial RPI",
               fig.get("source_label") == "FIGstats unofficial RPI")
@@ -87,19 +104,21 @@ def main():
     before = io.open(corr_path, encoding="utf-8").read()
     d = ER.discrepancies()
     after = io.open(corr_path, encoding="utf-8").read()
-    smu = [i for i in d["items"] if i["team"] == "SMU"]
-    check("SMU renders as a reference mismatch", bool(smu), d["items"][:2])
-    if smu:
-        check("...FIG %s vs hub %s, and the hub record is untouched"
-              % (smu[0]["fig_record"], smu[0]["hub_record"]),
-              smu[0]["hub_record"] == "3-0")
     check("computing the queue wrote NO correction", before == after)
     hub = ER.hub_records()
     check("the hub's counting record for SMU is still 3-0 and UC Davis 1-2",
           hub.get("SMU") == "3-0" and hub.get("UC Davis") == "1-2",
           (hub.get("SMU"), hub.get("UC Davis")))
-    check("every FIG row resolves to a hub team (aliases complete)",
-          not d["unmatched"], d["unmatched"][:6])
+    if HELD:
+        smu = [i for i in d["items"] if i["team"] == "SMU"]
+        check("SMU renders as a reference mismatch", bool(smu),
+              d["items"][:2])
+        if smu:
+            check("...FIG %s vs hub %s, and the hub record is untouched"
+                  % (smu[0]["fig_record"], smu[0]["hub_record"]),
+                  smu[0]["hub_record"] == "3-0")
+        check("every FIG row resolves to a hub team (aliases complete)",
+              not d["unmatched"], d["unmatched"][:6])
     src = io.open(os.path.join(REPO, "scripts/external_refs.py"),
                   encoding="utf-8").read()
     check("external_refs holds NO writer (no dump/write/open-for-write)",
@@ -120,10 +139,15 @@ def main():
 
     print("\n3. MASSEY CAN NEVER RENDER AS CURRENT")
     mm = ER.massey_meta()
-    check("the held snapshot states its capture date",
-          mm["captured"] == "2026-08-18"
-          and mm["captured_display"] == "captured 2026-08-18")
-    check("...and its label is the preseason snapshot, in those words",
+    if mm["held"]:
+        check("the held snapshot states its capture date",
+              mm["captured"] == "2026-08-18"
+              and mm["captured_display"] == "captured 2026-08-18")
+    else:
+        check("no snapshot -> the honest state, not an invented date",
+              mm["captured"] is None
+              and mm["captured_display"] == "capture date not held")
+    check("its label is the preseason snapshot, in those words",
           mm["label"] == "Massey preseason snapshot")
     real_open = io.open
     import builtins
@@ -157,17 +181,21 @@ def main():
                   r"Massey[^<]{0,60}\b(live|updated)\b", page)
               and not re.search(r"Massey[^<]{0,40}\bcurrent\b",
                                 page.replace("not current", "")))
-        check("both timestamps render, distinct",
-              "Generated:" in page and "fetched" in page)
-        check("the SMU mismatch row renders with its ledger link",
-              re.search(r'REFERENCE MISMATCH</b> <a href="#/teams/smu">'
-                        r'SMU</a>[^<]*FIGstats 2-0; hub 3-0', page)
-              and 'href="#/result-ledger"' in page)
-        check("...accented ONLY as ledgered evidence, not alarm",
-              'class="mmrow mmev"' in page and "mmrow mmev" in page)
-        n_plain = page.count('class="mmrow"')
-        check("ordinary source lag stays quiet (unaccented rows exist)",
-              n_plain > 0, n_plain)
+        if HELD:
+            check("both timestamps render, distinct",
+                  "Generated:" in page and "fetched" in page)
+            check("the SMU mismatch row renders with its ledger link",
+                  re.search(r'REFERENCE MISMATCH</b> <a href="#/teams/smu">'
+                            r'SMU</a>[^<]*FIGstats 2-0; hub 3-0', page)
+                  and 'href="#/result-ledger"' in page)
+            check("...accented ONLY as ledgered evidence, not alarm",
+                  'class="mmrow mmev"' in page and "mmrow mmev" in page)
+            n_plain = page.count('class="mmrow"')
+            check("ordinary source lag stays quiet (unaccented rows exist)",
+                  n_plain > 0, n_plain)
+        else:
+            check("the disclosure states 'no snapshot held' rather than "
+                  "guessing", "no snapshot held" in page)
 
     print("\n5. RANKING SEPARATION AND THE FETCH BAN")
     for mod in ("rating_2025.py", "digby_top25.py", "bakeoff_2025.py",
