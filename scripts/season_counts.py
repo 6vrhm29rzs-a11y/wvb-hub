@@ -118,7 +118,12 @@ def apply_correction(g, corr):
             fix.get("linescores_replace") or not [
             l for l in (g.get("linescores") or [])
             if l.get("home") is not None]):
-        g["linescores"] = [dict(r) for r in fix["linescores"]]
+        # coerce to ints -- the dataset stores ints, and a correction
+        # written in the feed's string convention crashed digby's margin
+        # sum with int+str (2026-08-31)
+        g["linescores"] = [
+            {k: (int(v) if isinstance(v, str) and v.isdigit() else v)
+             for k, v in r.items()} for r in fix["linescores"]]
     return g
 
 
