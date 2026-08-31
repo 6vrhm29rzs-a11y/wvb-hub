@@ -174,6 +174,11 @@ def build(today=None):
     # it. Evidence of any age keeps its player's observed facts.
     watch = set((s["team"], s["player"])
                 for s in signals + statuses + incidents + expired)
+    # ⚠ AUDIT D8 (2026-08-31): rows were read unswapped, so a match with
+    # an evidenced box_team_swap would attribute participation to the
+    # wrong team. Same map every counting consumer applies.
+    import season_counts as _SC
+    _swaps = _SC.box_team_swaps(SEASON)
     path = os.path.join(REPO, "data", "raw", str(SEASON), "playerbox.jsonl")
     if os.path.exists(path):
         for ln in open(path, encoding="utf-8"):
@@ -184,7 +189,13 @@ def build(today=None):
             gid = str(rec.get("game_id"))
             if gid not in date_of:
                 continue
-            facts = participation(rec.get("rows") or [])
+            _sw = _swaps.get(gid) or {}
+            _rows = rec.get("rows") or []
+            if _sw:
+                _rows = [dict(r, team_id=_sw.get(str(r.get("team_id")),
+                                                 r.get("team_id")))
+                         for r in _rows]
+            facts = participation(_rows)
             for f in facts:
                 tn = id2n.get(f["team_id"], "")
                 if not tn:

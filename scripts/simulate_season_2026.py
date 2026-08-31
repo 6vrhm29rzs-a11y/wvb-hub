@@ -89,28 +89,28 @@ def build():
 
     # results already in the book
     played = collections.defaultdict(lambda: [0, 0])
+    # ⚠ AUDIT D5 (2026-08-31): this loop had its own FIRST-seen-wins
+    # dedup -- a stale record beating its own revision, the exact
+    # anti-pattern the append-only log exists to prevent -- plus no
+    # duplicate/exhibition/review exclusion, no result corrections, and
+    # a winnerless final scored the non-winner as a LOSS. One chain:
+    # gamelog's dedup + season_counts' classification + corrections.
     gpath = os.path.join(REPO, "data/raw/%d/games.jsonl" % SEASON)
-    seen = set()
     if os.path.exists(gpath):
-        for line in open(gpath):
-            try:
-                g = json.loads(line)
-            except ValueError:
-                continue
-            if not isinstance(g, dict) or g.get("game_state") != "F":
-                continue
-            gid = g.get("game_id")
-            if gid in seen:
-                continue
-            seen.add(gid)
+        import gamelog
+        import season_counts as _SC
+        for g in _SC.countable(gamelog.load_games_jsonl(gpath), SEASON):
             ts = g.get("teams") or []
             if len(ts) != 2:
                 continue
+            win = str(g.get("winner_team_id") or "")
+            if not win:
+                continue               # no asserted winner, no tally
             for t in ts:
                 nm = t.get("name_short")
                 if nm not in strength:
                     continue
-                if t.get("is_winner"):
+                if str(t.get("team_id")) == win:
                     played[nm][0] += 1
                 else:
                     played[nm][1] += 1

@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-08-31T03:21:15Z",
+  "generated_at_utc": "2026-08-31T05:02:58Z",
   "counts": {
    "statuses": 1,
    "incidents": 1,
    "signals": 0,
    "expired": 1,
-   "anomalies": 13
+   "anomalies": 14
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -70,29 +70,6 @@
   }
  ],
  "anomalies": [
-  {
-   "game_id": "6626259",
-   "team_id": "46250",
-   "team": "SMU",
-   "absent": [
-    {
-     "name": "Suli Davis",
-     "rate": 5.667,
-     "played_share": 1.0
-    },
-    {
-     "name": "Gabi Placide",
-     "rate": 3.0,
-     "played_share": 1.0
-    },
-    {
-     "name": "Favor Anyanwu",
-     "rate": 3.0,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 11.667
-  },
   {
    "game_id": "6625823",
    "team_id": "46366",
@@ -263,6 +240,32 @@
     }
    ],
    "points_per_set_missing": 1.438
+  },
+  {
+   "game_id": "6639886",
+   "team_id": "46250",
+   "team": "SMU",
+   "absent": [
+    {
+     "name": "Levariya Pinder",
+     "rate": 1.389,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 1.389
+  },
+  {
+   "game_id": "6640218",
+   "team_id": "46250",
+   "team": "SMU",
+   "absent": [
+    {
+     "name": "Levariya Pinder",
+     "rate": 1.389,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 1.389
   }
  ],
  "latest": {
@@ -363,14 +366,15 @@
   "SMU": {
    "gid": "6626259",
    "d": "2026-08-30",
-   "appeared": 11,
+   "appeared": 9,
    "zero_action": [
-    "Ana Stojanovic",
-    "Katelyn Sentous",
-    "Reese Diersbock",
-    "Jada Johnson",
-    "Laela Burgess",
-    "Faith Rabb-patterson"
+    "Brooke Gilmour",
+    "Bojana Ambulija",
+    "Mia Silva",
+    "Ellie Moore",
+    "Christa Wilburn",
+    "Jadyn Livings",
+    "Victoria Shupe"
    ]
   },
   "Pittsburgh": {
@@ -3354,15 +3358,14 @@
   "UC Davis": {
    "gid": "6626259",
    "d": "2026-08-30",
-   "appeared": 9,
+   "appeared": 11,
    "zero_action": [
-    "Brooke Gilmour",
-    "Bojana Ambulija",
-    "Mia Silva",
-    "Ellie Moore",
-    "Christa Wilburn",
-    "Jadyn Livings",
-    "Victoria Shupe"
+    "Ana Stojanovic",
+    "Katelyn Sentous",
+    "Reese Diersbock",
+    "Jada Johnson",
+    "Laela Burgess",
+    "Faith Rabb-patterson"
    ]
   },
   "Weber St.": {
@@ -3701,12 +3704,19 @@
    ]
   },
   "San Diego": {
-   "gid": "6625329",
-   "d": "2026-08-29",
+   "gid": "6628696",
+   "d": "2026-08-30",
    "appeared": 9,
    "zero_action": [
+    "Belle Groomes",
+    "Allie Dunnion",
+    "Jocelyn Guo",
+    "Ava Durgan",
+    "Addy Wiese",
     "Reese Bates",
-    "Ella Fulton"
+    "Ella Fulton",
+    "Tatum Lane",
+    "Eloise Mcgibben"
    ]
   },
   "Baylor": {
@@ -3839,12 +3849,11 @@
    ]
   },
   "Hawaii": {
-   "gid": "6625819",
-   "d": "2026-08-29",
-   "appeared": 10,
+   "gid": "6628696",
+   "d": "2026-08-30",
+   "appeared": 11,
    "zero_action": [
-    "Manon Baudrillard",
-    "Marnie Ursem",
+    "Kahea Moriwaki",
     "Leilani Lopez",
     "Mano Antiga",
     "Cameron Holcomb"

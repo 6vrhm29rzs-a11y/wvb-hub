@@ -153,7 +153,12 @@ def internally_reconciled(g):
 def box_teams():
     """gid -> (n_distinct_team_ids, max sets a row claims): enough to say a
     HELD box is internally coherent with the match -- presence alone is not
-    coherence."""
+    coherence.
+
+    ⚠ Deliberately UNSWAPPED (audit D9): a box_team_swap exchanges the
+    match's own two ids, so the distinct-id COUNT and the max-sets figure
+    are identical either way. If this function ever grows per-team
+    attribution, it must apply season_counts.box_team_swaps first."""
     out = {}
     path = os.path.join(REPO, "data", "raw", str(SEASON), "playerbox.jsonl")
     if not os.path.exists(path):

@@ -71,6 +71,10 @@ def load():
     by_team = collections.defaultdict(lambda: collections.defaultdict(dict))
     if not os.path.exists(PLAYERBOX):
         return by_team, {}
+    # ⚠ AUDIT D8: evidenced box-team swaps apply here too, or a swapped
+    # match attributes every appearance to the wrong roster.
+    import season_counts as _SC
+    _swaps = _SC.box_team_swaps(SEASON)
     for line in open(PLAYERBOX):
         try:
             rec = json.loads(line)
@@ -79,8 +83,10 @@ def load():
         if not isinstance(rec, dict):
             continue
         gid = str(rec.get("game_id"))
+        _sw = _swaps.get(gid) or {}
         for r in rec.get("rows") or []:
             tid = str(r.get("team_id") or "")
+            tid = _sw.get(tid, tid)
             nm = ("%s %s" % (r.get("first") or "", r.get("last") or "")).strip()
             if not tid or not nm:
                 continue

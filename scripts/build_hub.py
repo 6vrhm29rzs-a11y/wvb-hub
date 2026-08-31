@@ -209,8 +209,8 @@ def results() -> List[Dict]:
         _dup_gids = set(_dgf(SEASON))
     except Exception:                                  # noqa: BLE001
         _dup_gids = set()
+    import season_counts as _SCR
     try:
-        import season_counts as _SCR
         _review_gids = _SCR.review_gids(SEASON)
     except Exception:                                  # noqa: BLE001
         _review_gids = set()
@@ -226,25 +226,11 @@ def results() -> List[Dict]:
             continue
         _c = _rcorr.get(str(g.get("game_id")))
         if _c and (_c.get("correct") or {}):
-            _fx2 = _c["correct"]
-            g = dict(g)
-            g["teams"] = [dict(t) for t in (g.get("teams") or [])]
-            for _t in g["teams"]:
-                if _t.get("is_home") and _fx2.get("home_sets") is not None:
-                    _t["sets_won"] = _fx2["home_sets"]
-                if not _t.get("is_home") and _fx2.get("away_sets") is not None:
-                    _t["sets_won"] = _fx2["away_sets"]
-                if _fx2.get("winner_team_id"):
-                    _t["is_winner"] = (str(_t.get("team_id"))
-                                       == str(_fx2["winner_team_id"]))
-            if _fx2.get("winner_team_id"):
-                g["winner_team_id"] = _fx2["winner_team_id"]
-            # fill-only -- unless the correction carries the two-source
-            # replace flag (feed attributed every set to the wrong team)
-            if _fx2.get("linescores") and (
-                    _fx2.get("linescores_replace")
-                    or not (g.get("linescores") or [])):
-                g["linescores"] = [dict(r) for r in _fx2["linescores"]]
+            # ⚠ AUDIT D2: the THIRD copy of apply-a-correction lived here.
+            # One definition now (season_counts.apply_correction) -- same
+            # values, plus the int coercion and null-scaffold fill guard
+            # the inline copy lacked.
+            g = _SCR.apply_correction(g, _rcorr)
         teams = g.get("teams") or []
         if len(teams) != 2:
             continue
@@ -2587,10 +2573,20 @@ def form_strip(games, n=5):
     for g in games[-n:]:
         cls = "fw" if g["won"] else "fl"
         opp = ("#%d %s" % (g["opp_rank"], g["opp"])) if g.get("opp_rank") else g["opp"]
-        out.append('<span class="%s%s" title="%s %s %s">%s</span>'
-                   % (cls, " frk" if g.get("opp_rank") else "",
+        # ⚠ AUDIT D1: an exhibition pill must say so on its face -- it is
+        # form (it was played) and it counts toward nothing, and until
+        # 2026-08-31 the Nebraska-Florida exhibition wore a plain ranked-W
+        # pill here. Same convention as the non-D-I marker: outlined class
+        # + text marker + one unbroken sentence in the title.
+        _exh = bool(g.get("exh"))
+        out.append('<span class="%s%s%s" title="%s %s %s%s">%s%s</span>'
+                   % (cls, " frk" if (g.get("opp_rank") and not _exh) else "",
+                      " fexh" if _exh else "",
                       "beat" if g["won"] else "lost to", esc(opp), g["score"],
-                      "W" if g["won"] else "L"))
+                      (" \u2014 an exhibition. It was played, and it counts"
+                       " toward no record or rating.") if _exh else "",
+                      "W" if g["won"] else "L",
+                      '<i class="fndt">EXH</i>' if _exh else ""))
     return "".join(out)
 
 def hcell_py(v, txt, lo, hi, kind="seq"):
@@ -2924,6 +2920,15 @@ def top25_view(avca=None):
     # explain.
     _di_form = di_teams()
     for g in sorted(results() or [], key=lambda x: x.get("epoch") or 0):
+        # ⚠ AUDIT D1 (2026-08-31): this second results() read carried NO
+        # exhibition/under-review handling, so the Nebraska-Florida
+        # EXHIBITION rendered as `beat #21 Florida 2-0` -- a ranked-win
+        # pill on the ranking's own explanation column. A disputed
+        # result is not a fact to show as W/L: dropped. An exhibition
+        # was played and IS form -- kept, marked, same philosophy as the
+        # non-D-I pill.
+        if g.get("under_review"):
+            continue
         for me, them, mine, theirs in ((g["away"], g["home"], g["away_sets"], g["home_sets"]),
                                        (g["home"], g["away"], g["home_sets"], g["away_sets"])):
             if mine is None or theirs is None:
@@ -2932,6 +2937,7 @@ def top25_view(avca=None):
                 "won": mine > theirs, "score": "%s-%s" % (mine, theirs),
                 "opp": them, "opp_rank": ranked.get(them), "date": g.get("date"),
                 "nondi": bool(_di_form) and them not in _di_form,
+                "exh": bool(g.get("exhibition")) or None,
             })
     top = doc.get("top") or []
     if not top:
@@ -3268,7 +3274,13 @@ def conference_lab(bteams, tj):
     doc = load("data/data_%d.json" % SEASON) or {}
     id2n = dict((str(t["team_id"]), t.get("name_short"))
                 for t in (doc.get("teams") or []))
-    exh = set(str(k) for k in (exhibitions() or {}))
+    # ⚠ AUDIT G1: the id ledger alone misses venue+date RULE exhibitions;
+    # resolved_gids is the one definition that covers both.
+    try:
+        import exhibitions as _EXHM
+        exh = set(str(k) for k in _EXHM.resolved_gids(SEASON))
+    except Exception:                                  # noqa: BLE001
+        exh = set(str(k) for k in (exhibitions() or {}))
 
     def blank():
         return {"w": 0, "l": 0, "vs25w": 0, "vs25l": 0,
@@ -3766,6 +3778,62 @@ def build():
             "contract results_on_display says %d (%s)"
             % (played, _sc_totals["results_on_display"], _sc_totals))
 
+    # ── THE AUDIT MANIFEST (Reliability Architecture Audit §5, 2026-08-31).
+    # One machine-readable record of the EXACT derived snapshot this page
+    # was built from, and a fail-closed cross-check that every counted
+    # surface consumed the same one. DOM tests cannot prove this; the
+    # numbers are compared here, before anything is written.
+    import hashlib as _hl
+    _ds_path = os.path.join(REPO, "data", "data_%d.json" % SEASON)
+    _ds_bytes = open(_ds_path, "rb").read() if os.path.exists(_ds_path) \
+        else b""
+    _ds_games = (load("data/data_%d.json" % SEASON) or {}).get("games") or []
+    _cnt = _SCC.countable(_ds_games, SEASON)
+    _cnt_gids = sorted(str(g.get("game_id")) for g in _cnt)
+    _cnt_d1 = _SCC.countable(_ds_games, SEASON, d1_only=True)
+    _manifest = {
+        "season": SEASON,
+        "source_tier": "DERIVED",
+        "dataset_sha256": _hl.sha256(_ds_bytes).hexdigest(),
+        "counted_gids_sha256": _hl.sha256(
+            "\n".join(_cnt_gids).encode()).hexdigest(),
+        "totals": _sc_totals,
+        "n_counted": len(_cnt_gids),
+        "n_counted_d1": len(_cnt_d1),
+        "generated_at_utc": datetime.datetime.utcnow().replace(
+            microsecond=0).isoformat() + "Z",
+    }
+    _mm_fails = []
+    # every surface's denominator against the manifest, FAIL CLOSED
+    if len(res_cnt) != _sc_totals["ok"]:
+        _mm_fails.append("res_cnt %d != ok %d"
+                         % (len(res_cnt), _sc_totals["ok"]))
+    _dg_meta = (load("data/digby_top25_%d.json" % SEASON) or {}).get(
+        "meta") or {}
+    if _dg_meta.get("matches_counted") is not None and \
+            _dg_meta["matches_counted"] != _sc_totals["rating_eligible"]:
+        _mm_fails.append(
+            "digby matches_counted %s != rating_eligible %d -- a stale "
+            "artifact from a different snapshot"
+            % (_dg_meta["matches_counted"], _sc_totals["rating_eligible"]))
+    _rs_meta = (load("data/resume_%d.json" % SEASON) or {}).get("meta") or {}
+    if _rs_meta.get("matches") is not None and \
+            _rs_meta["matches"] != len(_cnt_d1):
+        _mm_fails.append(
+            "resume matches %s != counted D-I %d -- a stale artifact "
+            "from a different snapshot"
+            % (_rs_meta["matches"], len(_cnt_d1)))
+    if _mm_fails:
+        raise SystemExit("AUDIT MANIFEST violated -- a counted surface "
+                         "diverged from the build's own snapshot: "
+                         + "; ".join(_mm_fails))
+    json.dump(_manifest, open(os.path.join(
+        REPO, "data", "audit_manifest_%d.json" % SEASON), "w"), indent=1)
+    print("  audit manifest: %d counted (%d D-I) of %d feed records -- "
+          "all counted surfaces agree" % (
+              _manifest["n_counted"], _manifest["n_counted_d1"],
+              _sc_totals["feed_records"]))
+
     # ---- rankings rows ---------------------------------------------------
     _bcolors = ((load("data/team_colors_%d.json" % SEASON) or {}).get("teams") or {})
 
@@ -4175,6 +4243,8 @@ def build():
                 continue
             if _g.get("duplicate_of"):
                 continue
+            if _g.get("under_review"):
+                continue           # a disputed result bakes into no card
             _final_of[_gid] = _g
 
     def _desk_forecast(gid, is_final):
@@ -4284,6 +4354,10 @@ def build():
     _pr = dict((t["team"], t["rank26"]) for t in teams if t.get("rank26"))
     _chg = []
     for r in sorted(res, key=lambda x: -(x.get("epoch") or 0)):
+        # ⚠ AUDIT F5: "What changed" is about results that MOVE things --
+        # an exhibition moves nothing and a disputed result is not a fact
+        if r.get("exhibition") or r.get("under_review"):
+            continue
         aw = (r.get("away_sets") or 0) > (r.get("home_sets") or 0)
         win, lose = (r["away"], r["home"]) if aw else (r["home"], r["away"])
         ws, ls = ((r["away_sets"], r["home_sets"]) if aw
@@ -4437,7 +4511,10 @@ def build():
     # page contains. A day that does not parse is ALWAYS shown -- the file is
     # hand-transcribed prose, and an unreadable date must not make a listing
     # disappear.
-    _today_iso = datetime.date.today().isoformat()
+    # ⚠ AUDIT F8: this used the BUILDER's clock -- UTC in CI, so an
+    # evening build filed tonight's TV listings under "earlier" a day
+    # early. The page renders in Pacific; "today" is Pacific.
+    _today_iso = today_pt().isoformat()
     def _tv_iso(day):
         # "Fri, Aug 21" -> "2026-08-21"; None when it cannot be read
         m = re.search(r"([A-Z][a-z]{2})\w*\.?\s+(\d{1,2})", str(day or ""))
@@ -5122,6 +5199,7 @@ h1 em{font-style:normal;color:var(--gold)}
 .extreftbl td{font:13px/1.5 var(--body,sans-serif);color:var(--ink2);
   padding:6px 12px 6px 0;border-top:1px solid var(--line);vertical-align:top}
 .extreftbl td.xf{color:var(--ink)}
+.fexh{background:none!important;border:1px solid var(--gold-fill);color:var(--gold)!important}
 .mmlist{list-style:none;margin:6px 0;padding:0;max-height:300px;overflow:auto}
 .mmrow{font:13px/1.6 var(--body,sans-serif);padding:4px 8px;border-left:3px solid var(--line2)}
 .mmrow.mmev{border-left-color:var(--gold-fill);background:var(--alt)}
@@ -15813,9 +15891,14 @@ function tMinutes(t) {
 function sbDate() { return SB_DATE || todayPT(); }
 
 function sbShift(days) {
-  const d = new Date(sbDate() + 'T12:00:00');
-  d.setDate(d.getDate() + days);
-  SB_DATE = new Intl.DateTimeFormat('en-CA').format(d);
+  /* ⚠ AUDIT F9: this was the ONE date computation on the page in the
+     VIEWER's local zone -- a reader outside Pacific could land on the
+     wrong day. Anchored to noon UTC and formatted in the page's zone,
+     like every other date here. */
+  const d = new Date(sbDate() + 'T12:00:00Z');
+  d.setUTCDate(d.getUTCDate() + days);
+  SB_DATE = new Intl.DateTimeFormat('en-CA',
+    { timeZone: 'America/Los_Angeles' }).format(d);
   renderScoreboard();
 }
 
@@ -20574,7 +20657,7 @@ function tdForm(t, name) {
   const gs = (t.played || []).slice(0, 5);   /* newest first, stated */
   if (!gs.length) return '';
   return '<div class="tddb"><em>Recent form <i class="tddbnote">newest ' +
-    'first \u00b7 counted D-I finals only</i></em>' +
+    'first \u00b7 counted finals; a non-D-I opponent is marked and outside the D-I record</i></em>' +
     gs.map(g => {
       const won = g.mine > g.theirs;
       const line = (g.sets || []).map(p =>

@@ -170,53 +170,27 @@ def main():
         _res_corr = {}
 
     def _apply_result_correction(g):
-        c = _res_corr.get(str(g.get("game_id")))
-        if not c:
+        # ⚠ AUDIT D2 (2026-08-31): this used to be a SECOND full
+        # implementation of applying a correction (a third lived in
+        # build_hub.results). season_counts.apply_correction is now the
+        # one definition -- it also int-coerces linescores and treats a
+        # scaffold of null lines as empty for the fill guard, both of
+        # which this copy lacked. What stays here is the one thing only
+        # this call site can know: the KIND, decided from the
+        # PRE-correction record. "contradicted": the feed asserted a
+        # result its own evidence refutes. "incomplete": the feed
+        # asserted NOTHING and the values are supplied from cited
+        # official evidence.
+        if str(g.get("game_id")) not in _res_corr:
             return g
-        fix = c.get("correct") or {}
-        g = dict(g)
-        g["result_corrected"] = True
-        # ⚠ TWO KINDS OF WRONG, AND THE AUDIT SURFACE MUST NOT BLUR THEM.
-        # "contradicted": the feed asserted a result its own set line (or a
-        # school) refutes (Kent St.-W&M, Iona-Little Rock). "incomplete": the
-        # feed asserted NOTHING -- winner null, sets null, no lines (USC-
-        # Arizona St.) -- and the values are supplied from cited official
-        # evidence. Decided from the PRE-correction record, the only place
-        # the distinction exists.
         _had = (g.get("winner_team_id")
                 or any(t.get("sets_won") is not None
                        for t in (g.get("teams") or []))
                 or [l for l in (g.get("linescores") or [])
                     if l.get("home") is not None])
+        import season_counts as _SCA
+        g = _SCA.apply_correction(g, _res_corr)
         g["result_corrected_kind"] = "contradicted" if _had else "incomplete"
-        if fix.get("winner_team_id"):
-            g["winner_team_id"] = fix["winner_team_id"]
-        ts = []
-        for t in (g.get("teams") or []):
-            t = dict(t)
-            if fix.get("winner_team_id"):
-                t["is_winner"] = (str(t.get("team_id"))
-                                  == str(fix["winner_team_id"]))
-            if t.get("is_home") and fix.get("home_sets") is not None:
-                t["sets_won"] = fix["home_sets"]
-            if not t.get("is_home") and fix.get("away_sets") is not None:
-                t["sets_won"] = fix["away_sets"]
-            ts.append(t)
-        g["teams"] = ts
-        # ⚠ A CORRECTION MAY FILL AN EMPTY SET LINE, NEVER REPLACE ONE.
-        # USC-Arizona St. (6627523) went final with linescores [] -- the
-        # feed published no per-set scores at all -- and the official box
-        # carries them. Evidence-backed fill only where the feed is silent:
-        # if the feed DOES carry lines, they stand, even against the ledger,
-        # because a disagreement there is a conflict to surface, not an
-        # overwrite to make.
-        if fix.get("linescores") and (
-                fix.get("linescores_replace")
-                or not (g.get("linescores") or [])):
-            # replace is allowed ONLY when the correction carries two-source
-            # evidence that the feed's lines are attributed to the wrong
-            # teams (SMU-UC Davis, 2026-08-30); otherwise fill-only stands
-            g["linescores"] = [dict(r) for r in fix["linescores"]]
         return g
     games = [_apply_result_correction(g) for g in games]
     import season_counts as _SCC

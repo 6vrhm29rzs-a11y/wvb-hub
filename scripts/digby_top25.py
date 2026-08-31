@@ -294,10 +294,18 @@ def main():
         if nm not in zobs:
             zobs[nm] = v / tau
 
-    # W-L from the live dataset, so the poll can show a record beside the rank.
+    # W-L from the live dataset, so the poll can show a record beside the
+    # rank. ⚠ THIS LOOP DIVERGED FROM ITS OWN _eligible() (reliability
+    # audit, 2026-08-31): finals+duplicate only, so the two exhibitions
+    # inflated records (Nebraska 3-0, SMU 4-0 measured) and an empty
+    # final -- is_winner None on both sides -- scored BOTH teams a loss.
+    # One counting classification (season_counts), same as everything
+    # that counts.
+    import season_counts as _SCW
+    _wl_cls = _SCW.classify(live.get("games") or [], SEASON)
     wl = collections.defaultdict(lambda: [0, 0])
     for g in (live.get("games") or []):
-        if g.get("state") != "F" or g.get("duplicate_of"):
+        if _wl_cls.get(str(g.get("game_id"))) != "ok":
             continue
         for t in (g.get("teams") or []):
             nm = id2name.get(str(t.get("team_id")))

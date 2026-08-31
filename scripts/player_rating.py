@@ -281,6 +281,50 @@ def composite(r, pos, scale):
     return {"score": total, "components": comp, "missing": missing}
 
 
+_COUNTED_PB_CACHE = {}
+
+
+def _counted_playerbox(year):
+    # type: (int) -> list
+    """(gid, rows) for COUNTED matches only, box-team swaps applied.
+
+    ⚠ AUDIT D7 (2026-08-31): the three playerbox loops below each read
+    the raw file with no duplicate/exhibition/review eligibility and no
+    box_team_swap -- so the SMU-UC Davis swap entered opponent-defence,
+    faced-defence and schedule strength attributed to the wrong team,
+    and the two exhibitions' 21-point sets deflated defence rates. One
+    reader, the same chain as every counting consumer. Cached per year:
+    three loops, one classification."""
+    if year in _COUNTED_PB_CACHE:
+        return _COUNTED_PB_CACHE[year]
+    import gamelog
+    import season_counts as _SC
+    gpath = os.path.join(REPO, "data/raw/%d/games.jsonl" % year)
+    ok = set(str(g.get("game_id")) for g in _SC.countable(
+        gamelog.load_games_jsonl(gpath), year))
+    swaps = _SC.box_team_swaps(year)
+    out = []
+    pb = os.path.join(REPO, "data/raw/%d/playerbox.jsonl" % year)
+    if os.path.exists(pb):
+        for ln in io.open(pb, encoding="utf-8"):
+            try:
+                rec = json.loads(ln)
+            except Exception:
+                continue
+            gid = str(rec.get("game_id"))
+            if gid not in ok:
+                continue
+            sw = swaps.get(gid) or {}
+            rows = rec.get("rows") or []
+            if sw:
+                rows = [dict(r, team_id=sw.get(str(r.get("team_id")),
+                                               r.get("team_id")))
+                        for r in rows]
+            out.append((gid, rows))
+    _COUNTED_PB_CACHE[year] = out
+    return out
+
+
 def team_def_profile(year):
     # type: (int) -> Dict
     """team_id -> what this defence ALLOWS, from per-match box lines.
@@ -292,16 +336,9 @@ def team_def_profile(year):
     block rate varies by 46%.
     """
     agg = collections.defaultdict(lambda: collections.Counter())
-    f = os.path.join(REPO, "data/raw/%d/playerbox.jsonl" % year)
-    if not os.path.exists(f):
-        return {}, 0.0
-    for ln in io.open(f, encoding="utf-8"):
-        try:
-            rec = json.loads(ln)
-        except Exception:
-            continue
+    for gid, rows in _counted_playerbox(year):
         by = collections.defaultdict(list)
-        for r in (rec.get("rows") or []):
+        for r in rows:
             by[str(r.get("team_id"))].append(r)
         if len(by) != 2:
             continue
@@ -324,16 +361,9 @@ def faced_defence(year, defmap):
     """(team_id, nkey) -> mean hitting % those defences allow, weighted by the
     sets she was actually on court for."""
     acc = collections.defaultdict(lambda: [0.0, 0.0])
-    f = os.path.join(REPO, "data/raw/%d/playerbox.jsonl" % year)
-    if not os.path.exists(f):
-        return {}
-    for ln in io.open(f, encoding="utf-8"):
-        try:
-            rec = json.loads(ln)
-        except Exception:
-            continue
+    for gid, rows in _counted_playerbox(year):
         by = collections.defaultdict(list)
-        for r in (rec.get("rows") or []):
+        for r in rows:
             by[str(r.get("team_id"))].append(r)
         if len(by) != 2:
             continue
@@ -441,14 +471,8 @@ def mean_opp_z(year, i2n, zmap):
             if len(ids) == 2:
                 gp_of[str(g.get("game_id"))] = ids
     acc = collections.defaultdict(lambda: [0.0, 0.0])
-    pb = os.path.join(REPO, "data/raw/%d/playerbox.jsonl" % year)
-    if not os.path.exists(pb):
-        return {}
-    for ln in io.open(pb, encoding="utf-8"):
-        try:
-            rec = json.loads(ln)
-        except Exception:
-            continue
+    for _gid, _rows in _counted_playerbox(year):
+        rec = {"game_id": _gid, "rows": _rows}
         ids = gp_of.get(str(rec.get("game_id")))
         if not ids:
             continue

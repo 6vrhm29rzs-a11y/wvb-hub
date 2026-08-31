@@ -112,9 +112,18 @@ def matches():
     doc = load("data/data_%d.json" % SEASON) or {}
     id2 = dict((str(t.get("team_id")), t.get("name_short") or t.get("name_full"))
                for t in (doc.get("teams") or []))
+    # ⚠ THE RESUME COUNTED 14 NON-OK MATCHES (reliability audit,
+    # 2026-08-31): 2 exhibitions, 6 duplicate listings and 5 empty
+    # finals -- and the empty finals, having no sets, scored as AWAY
+    # wins through the sets comparison below. season_counts.classify is
+    # the one counting classification; only 'ok' matches are results.
+    import season_counts as _SC
+    _cls = _SC.classify(doc.get("games") or [], SEASON)
     out = []
     for g in (doc.get("games") or []):
         if g.get("state") != "F":
+            continue
+        if _cls.get(str(g.get("game_id"))) != "ok":
             continue
         ts = g.get("teams") or []
         if len(ts) != 2:

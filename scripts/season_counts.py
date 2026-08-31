@@ -172,11 +172,38 @@ def is_empty_final(g):
                 if l.get("home") is not None]
 
 
+def resolve(games):
+    # type: (List[Dict]) -> List[Dict]
+    """ONE record per gid: final beats non-final, then last-written wins.
+
+    The audit's fixture corpus (2026-08-31) falsified the old behaviour:
+    countable() fed a NON-deduped list passed a live record -- or a
+    second final revision -- through alongside the final. Every caller
+    happened to pass pre-deduped lists, which is exactly the kind of
+    luck a contract must not rest on. The rule is gamelog's, restated
+    here on an in-memory list (gamelog.load_games_jsonl owns the same
+    rule for the file)."""
+    best, order = {}, []
+    for g in games or []:
+        gid = str(g.get("game_id"))
+        if gid == "None":
+            continue
+        prev = best.get(gid)
+        if prev is None:
+            order.append(gid)
+            best[gid] = g
+        elif (g.get("game_state") or g.get("state")) == "F" or \
+                (prev.get("game_state") or prev.get("state")) != "F":
+            best[gid] = g
+    return [best[g] for g in order]
+
+
 def classify(games, season):
     # type: (List[Dict], int) -> Dict[str, str]
     """gid -> class, for every completed record. Corrections applied first."""
     import dupes
     import exhibitions as EXH
+    games = resolve(games)
     dup = dupes.duplicate_gids(season)
     exh = EXH.resolved_gids(season)
     corr = corrections(season)
@@ -213,6 +240,7 @@ def _has_line(g):
 def totals(games, season):
     # type: (List[Dict], int) -> Dict[str, int]
     """The named totals, from ONE list of game records (one snapshot)."""
+    games = resolve(games)
     cls = classify(games, season)
     corr = corrections(season)
     by = {str(g.get("game_id")): g for g in games
@@ -239,6 +267,7 @@ def countable(games, season, need_line=False, d1_only=False):
     # type: (List[Dict], int, bool, bool) -> List[Dict]
     """The 'ok' games, corrections applied -- THE list a counting consumer
     iterates. need_line/d1_only narrow to the rating-eligible subset."""
+    games = resolve(games)
     cls = classify(games, season)
     corr = corrections(season)
     out = []

@@ -107,7 +107,18 @@ def load(cutoff):
     meta = {norm(r["School"]): r for r in rows}
 
     played, allgames = [], []
-    for g in load_games_jsonl(os.path.join(RAW, "games.jsonl")):
+    # ⚠ AUDIT D6 (2026-08-31): this loader read the raw log with no
+    # duplicate/exhibition/review exclusion and no result corrections.
+    # No-op on finished 2025 (no ledgers exist), load-bearing the day
+    # this runs on a live season. One chain, same as everything counted.
+    import season_counts as _SC
+    _games = load_games_jsonl(os.path.join(RAW, "games.jsonl"))
+    _cls = _SC.classify(_games, SEASON)
+    _corr = _SC.corrections(SEASON)
+    for g in _games:
+        if _cls.get(str(g.get("game_id"))) != "ok":
+            continue
+        g = _SC.apply_correction(g, _corr)
         if g.get("game_state") != "F":
             continue
         ep = g.get("start_time_epoch")
