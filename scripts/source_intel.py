@@ -103,14 +103,22 @@ SCOPE = {
 
 
 def _claim(cid, ctype, subject, what, state, why, sources,
-           public, priority, route=None, effective=None, review_by=None):
+           public, priority, route=None, effective=None, review_by=None,
+           source_kind=None, source_kind_label=None):
     assert state in STATES, state
-    return {"id": cid, "type": ctype, "subject": subject, "what": what,
-            "state": state, "state_label": STATE_LABEL[state], "why": why,
-            "scope": SCOPE.get(ctype),
-            "sources": sources, "public": bool(public),
-            "priority": int(priority), "route": route,
-            "effective": effective, "review_by": review_by}
+    out = {"id": cid, "type": ctype, "subject": subject, "what": what,
+           "state": state, "state_label": STATE_LABEL[state], "why": why,
+           "scope": SCOPE.get(ctype),
+           "sources": sources, "public": bool(public),
+           "priority": int(priority), "route": route,
+           "effective": effective, "review_by": review_by}
+    if source_kind:
+        # the controlled source-kind vocabulary (availability_desk.
+        # KIND_LABEL): a player statement, a school source and a beat
+        # report are different kinds of evidence and the chip says which
+        out["source_kind"] = source_kind
+        out["source_kind_label"] = source_kind_label or source_kind
+    return out
 
 
 # ---- per-ledger derivations -------------------------------------------
@@ -312,10 +320,17 @@ def _from_availability(season, today):
     for c in AD.projection((doc.get("players") or {}), today):
         team, player = c["team"], c["player"]
         sup = c.get("supports") or []
+        lead_kind = (sup[0].get("kind") if sup else None)
+        kind_label = (sup[0].get("kind_label") if sup else None)
         if c["state"] == "status":
             state = "confirmed_official"
             title = "%s (%s): %s -- sourced availability status" % (
                 player, team, c.get("headline"))
+            if lead_kind == "player_statement":
+                # her own public statement, via a press report -- NOT a
+                # school athletics release, and the label must not imply one
+                title += (" (the player's own public statement, via press "
+                          "report -- not a school release)")
         elif c["state"] == "incident":
             state = "confirmed_official"
             title = ("%s (%s): sourced match incident -- %s; current "
@@ -339,7 +354,8 @@ def _from_availability(season, today):
             priority=80 if official else 45,
             route={"team": team},
             effective=(sup[0].get("effective") if sup else None),
-            review_by=(sup[0].get("review_by") if sup else None)))
+            review_by=(sup[0].get("review_by") if sup else None),
+            source_kind=lead_kind, source_kind_label=kind_label))
     # expired evidence keeps its history claim, one per entry, as before
     for key, evs in (doc.get("players") or {}).items():
         team, _, player = key.partition("|")

@@ -496,9 +496,85 @@ def main():
           "intact" in txs)
     check("the withheld Purdue note contained present-tense 'are back'",
           "are back" in pus or "all three" in pus)
-    check("the withheld note names WHY on the page (fenced helper)",
-          "availWithheldNote" in page
-          and "postdates this note" in page)
+    check("the withheld notice helper is fenced on the page",
+          "availWithheldNote" in page)
+
+    print("\n  SOURCE-KIND TRUTH + QUIET STALE NOTICE (2026-09-01)")
+    check("Kenna's intel chip: PLAYER STATEMENT, and the claim says it "
+          "is her own public statement via press report, not a school "
+          "release",
+          kw.get("source_kind_label") == "PLAYER STATEMENT"
+          and "not a school release" in (kw.get("what") or ""))
+    check("Grace's intel chip: SCHOOL SOURCE",
+          gh.get("source_kind_label") == "SCHOOL SOURCE")
+    check("Vander Wal's intel chip: BEAT REPORT, with the individual "
+          "supports on her status card",
+          vw_c.get("source_kind_label") == "BEAT REPORT"
+          and vcard["n_supports"] == 2)
+    check("the vocabulary is controlled and shared (desk KIND_LABEL)",
+          AD.KIND_LABEL.get("player_statement") == "PLAYER STATEMENT"
+          and AD.KIND_LABEL.get("school_site") == "SCHOOL SOURCE"
+          and AD.KIND_LABEL.get("beat_report") == "BEAT REPORT")
+    check("projection supports carry the same labels (avMeta reads them)",
+          all(x.get("kind_label") for x in vcard["supports"])
+          and (wcard["supports"][0].get("kind_label")
+               == "PLAYER STATEMENT"))
+    check("the leading support heads the card, so summaries agree on "
+          "the kind",
+          vcard["supports"][0].get("claim") == "out_for_season")
+    # match-log grammar
+    sp = jsfn(page, "showPlayer") or page
+    check("match log: labelled stat grammar, no zero-coded line",
+          "No player stats recorded" in page
+          and "tok.K = g.k + ' K'" in page
+          and "0k \u00b7" not in page)
+    js_ml = ("const esc=s=>String(s==null?'':s);"
+             "const pct=v=>(v==null?'\u2014':(v<0?'-':'')+Math.abs(v)"
+             ".toFixed(3).replace(/^0/,''));"
+             "function line(g){const blk=g.bs+g.ba*0.5;const parts=[];"
+             "if(g.k)parts.push(g.k+' K');if(g.e)parts.push(g.e+' E');"
+             "if(g.ta)parts.push(g.ta+' TA');"
+             "if(g.ta>=8&&g.hit!==null&&g.hit!==undefined)"
+             "parts.push(pct(g.hit)+' HIT');"
+             "if(g.ast)parts.push(g.ast+' AST');"
+             "if(g.digs)parts.push(g.digs+' D');if(blk)parts.push(blk+' B');"
+             "if(g.aces)parts.push(g.aces+' A');"
+             "return parts.length?parts.join(' \u00b7 ')"
+             ":'No player stats recorded';}"
+             "console.log(JSON.stringify({"
+             "normal: line({k:14,e:5,ta:36,hit:0.25,ast:0,digs:2,bs:0,"
+             "ba:2,aces:1}),"
+             "dnp: line({k:0,e:0,ta:0,hit:null,ast:0,digs:0,bs:0,ba:0,"
+             "aces:0}),"
+             "exit: line({k:2,e:1,ta:5,hit:0.2,ast:0,digs:0,bs:0,ba:0,"
+             "aces:0})}));")
+    rc, out, err = node(js_ml)
+    check("the grammar itself runs", rc == 0, err)
+    if rc == 0:
+        d3 = json.loads(out.strip().splitlines()[-1])
+        check("normal match: readable labelled fixed order",
+              d3["normal"] == "14 K \u00b7 5 E \u00b7 36 TA \u00b7 "
+              ".250 HIT \u00b7 2 D \u00b7 1 B \u00b7 1 A", d3["normal"])
+        check("no player stats -> the exact plain sentence",
+              d3["dnp"] == "No player stats recorded")
+        check("post-exit partial line: real values only, no zero "
+              "padding, no low-TA pseudo-HIT",
+              d3["exit"] == "2 K \u00b7 1 E \u00b7 5 TA", d3["exit"])
+    # quiet stale notice
+    check("the withheld notice is ONE compact line with the exact "
+          "wording, promising nothing",
+          "Preseason scout note hidden: newer availability evidence "
+          "may make its roster wording stale." in page
+          and "returns once regenerated" not in page)
+    check("...rendered near Sourced intel, not as a full-width module",
+          "avstale" in page and "dsr-note" not in
+          (jsfn(page, "availWithheldNote") or "x"))
+    check("scoutRead renders NOTHING when withheld (no empty module)",
+          "if (!t.digby) return '';" in page)
+    check("a team with no availability evidence keeps its scout note",
+          (json.loads(re.search(r"const TEAMS = (\{.*?\});\n", page,
+                                re.S).group(1).replace("<\\/", "</"))
+           .get("Nebraska") or {}).get("digby"))
 
     print("\n  the public page carries none of it")
     pub_p = os.path.join(REPO, "output", "vb_dashboard.html")

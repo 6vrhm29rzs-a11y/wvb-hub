@@ -11808,10 +11808,36 @@ function showPlayer(p) {
           (mine > theirs ? 'W' : 'L') + '</i> ' + mine + '\u2013' + theirs + ' ';
       }
     }
-    const lead = isSetter ? g.ast + ' ast'
-      : isLib ? g.digs + 'd'
-      : isMB ? ((g.bs + g.ba * 0.5) + 'b \u00b7 ' + g.k + 'k')
-      : g.k + 'k';
+    /* ⚠ READABLE STAT GRAMMAR (usability repair, 2026-09-01). The old
+       line printed every field zero-coded and machine-terse -- an
+       injured player's post-exit listing read "0k \u00b7 0k \u00b7 0e
+       \u00b7 0ta \u00b7 \u2014 \u00b7 0d \u00b7 0a", with the
+       position lead DUPLICATING its own field. Now: fixed label order,
+       zero fields omitted, and a row whose every action is zero says
+       plainly that no player stats were recorded -- the feed's DNP
+       convention, not a played-with-nothing line. */
+    const blk = g.bs + g.ba * 0.5;
+    const tok = {};
+    if (g.k) tok.K = g.k + ' K';
+    if (g.e) tok.E = g.e + ' E';
+    if (g.ta) tok.TA = g.ta + ' TA';
+    if (g.ta >= 8 && g.hit !== null && g.hit !== undefined)
+      tok.HIT = pct(g.hit) + ' HIT';
+    if (g.ast) tok.AST = g.ast + ' AST';
+    if (g.digs) tok.D = g.digs + ' D';
+    if (blk) tok.B = blk + ' B';
+    if (g.aces) tok.A = g.aces + ' A';
+    /* position-aware lead, readable fixed order after it: a setter's
+       match is her assists first, a libero's her digs, a middle's her
+       blocks -- the position-appropriate-headline rule, kept */
+    const order = isSetter ? ['AST', 'K', 'E', 'TA', 'HIT', 'D', 'B', 'A']
+      : isLib ? ['D', 'K', 'E', 'TA', 'HIT', 'AST', 'B', 'A']
+      : isMB ? ['B', 'K', 'E', 'TA', 'HIT', 'AST', 'D', 'A']
+      : ['K', 'E', 'TA', 'HIT', 'AST', 'D', 'B', 'A'];
+    const parts = order.filter(k2 => tok[k2]).map(k2 => tok[k2]);
+    const statline = parts.length
+      ? parts.join(' \u00b7 ')
+      : '<i class="pgnone">No player stats recorded</i>';
     return '<button type="button" class="gline gopen pdlog" data-match="' +
       esc(g.gid) + '"><span class="dt">' + dayLabel(g.d || '') + '</span>' +
       '<span class="op">' + res + esc(g.opp || '') +
@@ -11819,12 +11845,12 @@ function showPlayer(p) {
         'site does not filter these matches out -- filtering would change ' +
         'what every rate means without saying so -- so it is marked ' +
         'instead.">non-D-I</b>' : '') + '</span>' +
-      '<span class="ss pgl"><b>' + lead + '</b> \u00b7 ' + g.k + 'k \u00b7 ' +
-      g.e + 'e \u00b7 ' + g.ta + 'ta \u00b7 ' + pct(g.hit) + ' \u00b7 ' +
-      g.digs + 'd \u00b7 ' + g.aces + 'a' +
-      ((g.bs + g.ba * 0.5) ? ' \u00b7 ' + (g.bs + g.ba * 0.5) + 'b' : '') +
-      (g.ast && !isSetter ? ' \u00b7 ' + g.ast + ' ast' : '') + '</span>' +
-      '<span class="rs">' + g.sets + ' sets</span></button>';
+      '<span class="ss pgl" title="K kills \u00b7 E attack errors \u00b7 ' +
+      'TA total attacks \u00b7 HIT hitting % \u00b7 AST assists \u00b7 ' +
+      'D digs \u00b7 B blocks (solo + \u00bd assist) \u00b7 A aces">' +
+      statline + '</span>' +
+      '<span class="rs">' + (parts.length ? g.sets + ' sets' : '') +
+      '</span></button>';
   }).join('');
 
   document.getElementById('playercard').innerHTML =
@@ -16667,7 +16693,7 @@ function avMeta(s) {
   /* source, retrieval date, effective range, review-by -- every rendered
      status or incident carries all of them (truth-pass requirement) */
   const eff = s.effective || {};
-  return '<span class="avmeta">' + esc(s.kind) +
+  return '<span class="avmeta">' + esc(s.kind_label || s.kind) +
     (s.url ? ' \u00b7 <a href="' + esc(s.url) +
       '" target="_blank" rel="noopener">source</a>' : '') +
     ' \u00b7 retrieved ' + esc(String(s.retrieved || '').slice(0, 10)) +
@@ -16681,18 +16707,17 @@ function avMeta(s) {
    headline comes from the canonical projection; every evidence source
    is an attributed SUPPORT row beneath it, never a second status. */
 function availWithheldNote(t) {
-  /* WHY there is no scout's read: a sourced status postdates it, and
-     its present-tense roster claims ("all three are back", "core
-     intact") may no longer hold. Stated, never silently blank. */
+  /* ⚠ QUIET AND TRUTHFUL (usability repair, 2026-09-01): the old
+     full-width card was visually empty and promised the note "returns
+     once regenerated" -- an automated process that does not exist.
+     One compact line, rendered NEAR SOURCED INTEL, promising nothing. */
   if (!t || !t.digby_avail_withheld || !t.digby_avail_withheld.length) {
     return '';
   }
-  return '<div class="digby scoutread"><div class="dsr-note tnote">' +
-    'Scout&rsquo;s read withheld: a sourced availability status for ' +
-    '<b>' + t.digby_avail_withheld.map(esc).join('</b>, <b>') +
-    '</b> postdates this note, and its present-tense roster claims ' +
-    'may no longer hold. It returns once regenerated against the ' +
-    'current facts.</div></div>';
+  /* ⚠ ONE UNBROKEN STRING (the formPills lesson): a user-visible
+     sentence split across concatenated literals never appears
+     contiguously in the built page, so no guard can find it. */
+  return '<p class="tnote avstale">Preseason scout note hidden: newer availability evidence may make its roster wording stale.</p>';
 }
 
 function avSupportRow(s) {
@@ -18067,7 +18092,17 @@ function intelItem(c, i) {
       '<span class="sik">' + esc(s2.source_class || '') + '</span>' +
     '</div>').join('');
   const route = intelRoute(c);
-  return '<details class="siitem"><summary>' + intelChip(c.state) +
+  /* SOURCE-KIND TRUTH (usability repair, 2026-09-01): an availability
+     claim's chip names the KIND of evidence -- PLAYER STATEMENT, SCHOOL
+     SOURCE, BEAT REPORT -- from the desk's controlled vocabulary. One
+     generic OFFICIAL badge hid the difference between a player's own
+     words, a school page and a reporter's account. Non-availability
+     claims keep their state chip unchanged. */
+  const chip = c.source_kind_label
+    ? '<span class="sichip si-kind si-' + esc(c.state) + '">' +
+      esc(c.source_kind_label) + '</span>'
+    : intelChip(c.state);
+  return '<details class="siitem"><summary>' + chip +
     '<span class="siwhat">' + esc(c.what) + '</span></summary>' +
     '<div class="sidrill"><span class="siwhy">' + esc(c.why) + '</span>' +
     /* the citation's LIMIT is part of the evidence: say what it
@@ -19970,13 +20005,7 @@ function rotsoHTML(t) {
 }
 
 function scoutRead(t, team) {
-  if (!t.digby) {
-    /* AVAILS-HOOK-BEGIN */
-    return (typeof availWithheldNote === 'function')
-      ? availWithheldNote(t) : '';
-    /* AVAILS-HOOK-END */
-    return '';
-  }
+  if (!t.digby) return '';
   const parts = csSentences(String(t.digby));
   let lead = '', i = 0;
   /* two sentences, or three if the first two are very short -- a stated rule,
@@ -20966,11 +20995,21 @@ function tdIntel(t, name) {
       return true;
     return false;
   });
-  if (!mine.length) return '';
+  /* the fenced assignment leaves a safe default on the public build --
+     a fence that removes a declaration would leave a ReferenceError */
+  let stale = '';
+  /* AVAILS-HOOK-BEGIN */
+  stale = (typeof availWithheldNote === 'function')
+    ? availWithheldNote(t) : '';
+  /* AVAILS-HOOK-END */
+  if (!mine.length) return stale
+    ? '<div class="tdd-box tdintel"><h4>Sourced intel</h4>' + stale +
+      '</div>'
+    : '';
   mine.sort((a, b) => b.priority - a.priority);
   return '<div class="tdd-box tdintel"><h4>Sourced intel</h4>' +
     '<div class="silist">' + mine.slice(0, 4).map(intelItem).join('') +
-    '</div></div>';
+    '</div>' + stale + '</div>';
 }
 
 function tdDashboard(t, name) {

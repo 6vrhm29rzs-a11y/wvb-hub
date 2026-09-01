@@ -325,7 +325,9 @@ if (!/POWER <b>#12<\\/b> <i>preseason<\\/i>/.test(h)
 if (h.indexOf('data-match="M1"') < 0) bad.push('log row lacks a route');
 if (h.indexOf('>W</i>') < 0 && h.indexOf('>L</i>') < 0)
   bad.push('log row lacks the match result');
-if (!/36 ast<\\/b>/.test(h) && h.indexOf('36 ast') < 0)
+/* the statline opens immediately after the legend title's closing
+   quote, so a leading token renders as '">36 AST' */
+if (h.indexOf('">36 AST') < 0)
   bad.push('setter log does not lead with assists');
 showPlayer(Object.assign({}, base, { sets: 0, games: [] }));
 const h2 = els.playercard.innerHTML;

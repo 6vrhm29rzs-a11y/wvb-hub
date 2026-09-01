@@ -140,9 +140,15 @@ def main():
     check("the strip exists", "function todaysRead(" in src)
     body = src[src.index("function todaysRead("):src.index("function renderDesk()")]
     # ⚠ NO CHARACTERISATION. Every row is a fact already on the page.
+    # 'player statement' is the availability desk's SOURCE-KIND label --
+    # a kind of evidence, not hype -- and the slice between the two
+    # function anchors now crosses the intel chip code that names it.
+    # Scrub the sanctioned phrases, then ban the hype word as before.
+    _scrub = body.lower().replace("player statement", "").replace(
+        "public statement", "")
     for word in ("must-watch", "huge", "crucial", "showdown", "clash",
                  "don't miss", "biggest test", "statement"):
-        check("[-] it never says %r" % word, word not in body.lower())
+        check("[-] it never says %r" % word, word not in _scrub)
     check("every row links to the canonical match route",
           "matchRoute(gid, 'desk')" in body)
     check("an absent fact yields no row, rather than filler",

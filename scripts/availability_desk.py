@@ -126,7 +126,10 @@ def classify(ev, today):
         for e in entries or []:
             st = entry_state(e, today)
             row = {"team": team, "player": player,
-                   "kind": e.get("kind"), "quote": e.get("quote"),
+                   "kind": e.get("kind"),
+                   "kind_label": KIND_LABEL.get(e.get("kind"),
+                                                e.get("kind")),
+                   "quote": e.get("quote"),
                    "summary": e.get("summary"),
                    "url": e.get("url"), "retrieved": e.get("retrieved"),
                    "effective": e.get("effective"),
@@ -161,6 +164,21 @@ def classify(ev, today):
 # support. Never merged into stronger wording than any single source.
 _CLAIM_RANK = {"out_for_season": 3, "confirmed_unavailable": 2,
                "limited_gtd": 1}
+# the controlled SOURCE-KIND vocabulary (usability repair, 2026-09-01):
+# a player's own statement, a school's own page and a reporter's account
+# are different kinds of evidence, and one generic OFFICIAL badge hid
+# that. Rendered wherever a claim is summarized -- desk meta lines,
+# projection supports and the intel chips all read THIS map.
+KIND_LABEL = {
+    "player_statement": "PLAYER STATEMENT",
+    "school_release": "SCHOOL SOURCE",
+    "school_site": "SCHOOL SOURCE",
+    "beat_report": "BEAT REPORT",
+    "broadcast": "BROADCAST",
+    "cody_observation": "EYE TEST",
+    "community_forum": "COMMUNITY",
+}
+
 _CLAIM_HEADLINE = {
     "out_for_season": "Out for the 2026 season",
     "confirmed_unavailable": "Away from team / unavailable",
@@ -217,6 +235,9 @@ def projection(ev=None, today=None):
                       key=lambda x: _CLAIM_RANK.get(x.get("claim"), 0))
             c["claim"] = top.get("claim")
             c["headline"] = _CLAIM_HEADLINE.get(c["claim"], c["claim"])
+            # the headline support leads: every surface that shows one
+            # source kind shows THIS one
+            sup.sort(key=lambda x: 0 if x is top else 1)
         elif c["state"] == "incident":
             inc = [x for x in sup if x.get("incident_date")][0]
             c["claim"] = "match_incident"
