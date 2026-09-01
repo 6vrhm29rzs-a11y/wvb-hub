@@ -418,7 +418,9 @@ RANK_TITLE = "AVCA coaches poll rank"
 # reason to publish an ambiguous number.
 RULERS = {
     "avca":      ("AVCA", "AVCA", "AVCA coaches poll"),
-    "power":     ("POWER", "PWR", "our POWER rating -- how strong a team is"),
+    "power":     ("POWER", "PWR", "our POWER rating -- how strong a team "
+                                  "is. Sourced availability is not an "
+                                  "input."),
     "digby":     ("DIGBY", "DGB", "Digby's Top 25 -- this site's own "
                                   "in-season ranking"),
     "resume":    ("R\u00c9SUM\u00c9", "RES", "our r\u00e9sum\u00e9 rank -- "
@@ -3465,6 +3467,19 @@ def conference_lab(bteams, tj):
     }
 
 
+# ═══ THE AVAILABILITY-FORECAST CONTRACT (audit, 2026-09-01) ═══════════
+# Measured: NO forecast, probability, power rating or projection reads
+# availability evidence, participation or sourced status -- predict_2026,
+# simulate_season_2026, rating/bakeoff, digby_top25, project_field and
+# resume are all availability-free by construction (guarded). The
+# CONTRACT is therefore disclosure, not modelling: every surface that
+# renders one of those numbers carries this sentence, discoverable from
+# the number itself. No invented injury adjustment, ever, without its
+# own evidence/methodology phase.
+FORECAST_AVAIL_NOTE = "Forecast does not incorporate availability."
+RATING_AVAIL_NOTE = "Sourced availability is not an input."
+
+
 def _pyslug(name):
     return re.sub(r"^-|-$", "", re.sub(r"[^a-z0-9]+", "-",
                                        (name or "").lower()))
@@ -4621,6 +4636,7 @@ def build():
     slope = level.get("recommended_slope")
     return TEMPLATE \
         .replace("{{POLLS_JSON}}", json.dumps(polls, separators=(",", ":"))) \
+        .replace("{{FORECAST_NOTE_JSON}}", json.dumps(FORECAST_AVAIL_NOTE)) \
         .replace("{{EXTREF_STRIP}}", "" if PUBLIC else extref_strip(meta, teams)) \
         .replace("{{REF_CHIPS_JS}}", "" if PUBLIC else
                  "          add('VT', t.vt ? '#' + t.vt : '');\n"
@@ -9643,7 +9659,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <th class="c-ref" title="official NCAA RPI rank, final 2025">RPI</th>
       <th class="c-ref" title="range the other systems put this team in">Others</th>
       <th class="c-ref" title="share of 2025 production on the 2026 roster">Ret</th>
-      <th class="c-ref" title="simulated NCAA tournament odds; backtested at 42 of the real 64 from a preseason prior">Tourn</th>
+      <th class="c-ref" title="simulated NCAA tournament odds; backtested at 42 of the real 64 from a preseason prior. Forecast does not incorporate availability.">Tourn</th>
     </tr></thead>
     <tbody id="rbody">{{RANK_ROWS}}</tbody></table></div>
     {{EXTREF_STRIP}}
@@ -9668,6 +9684,13 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       to each result scored below ignoring results altogether. One Friday night
       genuinely is that little evidence. The fitted composite takes over
       automatically once 50 matches are in.</p>
+      <p><b>Availability is not an input.</b> Neither POWER, the
+      r&eacute;sum&eacute;, the win forecasts nor the projected bracket
+      reads any availability evidence: a sourced player status (an
+      out-for-season report included) changes none of these numbers.
+      Building a measured availability adjustment would be its own
+      methodology phase with its own validation; a hand-set haircut is
+      exactly the kind of invented coefficient this project refuses.</p>
       <p><b>Two rankings, and they are meant to disagree.</b> POWER answers who
       would win tomorrow and margin drives it. R&eacute;sum&eacute; answers who
       has earned a bid, ranked by RPI because that beat every alternative
@@ -10193,7 +10216,10 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   and placed four to a line, so the bracket carries four&nbsp;#1s down to
   four&nbsp;#8s &mdash; the format since 2022. The number on a row is that
   <b>seed line</b>; its national seed (1&ndash;32) is on the tooltip.</p>
-  <p class="lead"><b>What this bracket does not know: geography.</b> The
+  <p class="lead"><b>What this 2026 bracket does not know: availability
+  and geography.</b> Forecast does not incorporate availability &mdash; a
+  sourced player status, an out-for-season report included, changes
+  nothing in this projection. The
   committee brackets to NCAA travel rules &mdash; the top 16 seeds host the
   first two rounds, and a team inside the bus radius of its site travels by
   road rather than by air, which moves teams between pods. We hold each venue's
@@ -10293,6 +10319,9 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 {{ASK_HTML}}
 <script>
 const CONFS = {{CONF_JSON}};
+/* the availability-forecast contract, one definition (substituted from
+   the python constant so the two cannot drift) */
+const FORECAST_NOTE = {{FORECAST_NOTE_JSON}};
 const $ = s => document.querySelector(s);
 /* ⚠ A NODE THAT NO LONGER EXISTS MUST NOT TAKE THE PAGE WITH IT. The Scoreboard
    rebuild removed the old live / later-today / this-week / legacy-date stack,
@@ -13387,7 +13416,8 @@ function deskForecast(m) {
   const homeFav = m.hw >= 0.5;
   const fav = homeFav ? m.h : m.a;
   const p = homeFav ? m.hw : 1 - m.hw;
-  return '<div class="dfc"><span class="dfcl">forecast</span>' +
+  return '<div class="dfc" title="' + FORECAST_NOTE + '">' +
+    '<span class="dfcl">forecast</span>' +
     '<b>' + esc(fav) + ' ' + deskPct(p) + '</b>' +
     '<span class="dfcs">' + esc(m.fsrc || '') + '</span></div>';
 }
@@ -17247,7 +17277,8 @@ function renderMatchDetail(gid, dest) {
        exact thing the team card was already fixed for. A live match's facts are the score, the set, the
        totals and the stamp; the forecast returns on the final as the
        provably pre-serve record or not at all. (Outside review, round 2.) */
-    fc = _fcline() + ' <span class="munk">current forecast</span>';
+    fc = _fcline() + ' <span class="munk">current forecast \u00b7 ' +
+      FORECAST_NOTE.toLowerCase().replace(/\.$/, '') + '</span>';
   }
 
   /* ⚠ THE BOX SECTION IS DRAWN ONLY WHEN THE STATE PERMITS IT AND THE DATA
@@ -17300,7 +17331,9 @@ function renderMatchDetail(gid, dest) {
          simply the current forecast, and the two must not be labelled alike. */
       (fc ? '<div class="msec"><h3>' + (st === 'final'
               ? 'Forecast before first serve' : 'Forecast') + '</h3>' +
-            '<div class="mfact"><span>' + fc + '</span></div></div>' : '') +
+            '<div class="mfact"><span>' + fc + '</span>' +
+            '<span class="munk fcavail">' + FORECAST_NOTE + '</span>' +
+            '</div></div>' : '') +
       /* live stats sit UNDER the single score ribbon, and only while this
          match is actually live on this route */
       /* live statistics, only while this match is live AND the state says
@@ -20158,8 +20191,9 @@ function showTeam(name) {
     '<span class="op">' + f.opp + '</span>' +
     '<span class="ss">' + (f.t || '') + '</span>' +
     (fxPickable(f)
-      ? '<span class="rs ' + (f.pick >= 0.5 ? 'w' : 'l') + '">' +
-        deskPct(f.pick) + '</span>' : '') +
+      ? '<span class="rs ' + (f.pick >= 0.5 ? 'w' : 'l') + '" title="' +
+        'The season simulator\u2019s pre-match pick. ' + FORECAST_NOTE +
+        '">' + deskPct(f.pick) + '</span>' : '') +
     '<span class="wh2">' + tag +
       (place ? '<span class="pl">' + place + '</span>'
              : '<span class="pl u">venue not listed</span>') +
@@ -20380,7 +20414,11 @@ function showTeam(name) {
       '<b>Projected wins counts the ' + (t.sched_n || 0) + ' matches currently on ' +
       'the schedule</b> \u2014 not the conference tournament, and not a bracketed ' +
       'in-season tournament match whose opponent is undecided (those appear only ' +
-      'once the pairing is set). Read it as a floor.</div></div>';
+      'once the pairing is set). Read it as a floor. ' +
+      '<b>' + FORECAST_NOTE + '</b> A sourced status \u2014 an ' +
+      'out-for-season report included \u2014 changes no Power number, ' +
+      'win probability, r\u00e9sum\u00e9 rank or projected bracket ' +
+      'here.</div></div>';
   }
   const ts = t.tstats;
   let statHtml = '';
@@ -20864,8 +20902,8 @@ function tdNextMatch(t, name) {
            is the simulator's pre-match pick and says so. */
         (st === 'upcoming' && f.pick !== null && f.pick !== undefined
           ? ' &middot; <i class="tdpick" title="The season simulator\u2019s ' +
-            'pre-match pick for this fixture.">' + deskPct(f.pick) +
-            ' to win</i>' : '') + '</span>' +
+            'pre-match pick for this fixture. ' + FORECAST_NOTE + '">' +
+            deskPct(f.pick) + ' to win</i>' : '') + '</span>' +
       (tv ? '<span class="tdtv">' + esc(tv) + '</span>' : '') +
     '</a>' +
     '<p class="tdwhere">' + esc(where) +
