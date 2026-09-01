@@ -17277,8 +17277,7 @@ function renderMatchDetail(gid, dest) {
        exact thing the team card was already fixed for. A live match's facts are the score, the set, the
        totals and the stamp; the forecast returns on the final as the
        provably pre-serve record or not at all. (Outside review, round 2.) */
-    fc = _fcline() + ' <span class="munk">current forecast \u00b7 ' +
-      FORECAST_NOTE.toLowerCase().replace(/\.$/, '') + '</span>';
+    fc = _fcline() + ' <span class="munk">current forecast</span>';
   }
 
   /* ⚠ THE BOX SECTION IS DRAWN ONLY WHEN THE STATE PERMITS IT AND THE DATA

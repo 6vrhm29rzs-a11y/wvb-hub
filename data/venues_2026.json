@@ -6,13 +6,13 @@
   "min_home_games": 3,
   "note": "'unknown' means we do not yet have 3 home matches for that team, so no claim is made either way -- it is not a synonym for 'home'",
   "counts": {
-   "no-venue": 1671,
-   "neutral": 513,
-   "home": 2683,
+   "no-venue": 1677,
+   "neutral": 510,
+   "home": 2684,
    "unknown": 7
   },
   "teams_with_known_home": 263,
-  "teams_seen_at_home": 323
+  "teams_seen_at_home": 322
  },
  "home_venues": {
   "46006": "Reed Arena, College Station, TX",
@@ -189,8 +189,6 @@
   "45845": "McDougald-McLendon Arena, Durham, NC",
   "46302": "Rose Hill Gym, Bronx, NY",
   "46539": "Fifth Third Arena, Cincinnati, OH",
-  "46106": "Fant-Ewing Coliseum, Monroe, LA",
-  "46444": "Alumni Arena, Buffalo, NY",
   "46164": "McGuirk Arena, Mount Pleasant, MI",
   "45859": "Tudor Fieldhouse, Houston, TX",
   "46694": "Davey L. Whitney Health & Physical Education Complex, Lorman, MS",
@@ -239,6 +237,7 @@
   "46201": "Townsley Law Arena, Lake Charles, LA",
   "46648": "McDermott Center, San Antonio, TX",
   "46102": "Harrah's Cherokee Center, Asheville, NC",
+  "46106": "Fant-Ewing Coliseum, Monroe, LA",
   "45791": "Steinberg Wellness Center, Brooklyn, NY",
   "45886": "Burns Arena, St. George, UT",
   "45957": "Schar Center, Elon, NC",
@@ -271,6 +270,7 @@
   "46684": "Ted Grant Court, Syracuse, NY",
   "46546": "Ocean Bank Convocation Center, Miami, FL",
   "46322": "First National Bank Arena, Jonesboro, AR",
+  "46444": "Alumni Arena, Buffalo, NY",
   "46198": "Draddy Gymnasium, Riverdale, NY",
   "46633": "Western Hall, Macomb, IL",
   "45876": "Donald W. Reynolds Center, Tulsa, OK",
@@ -448,20 +448,6 @@
    "name": null
   },
   {
-   "venue": "Thomas Assembly Center, Ruston, LA",
-   "matches": 5,
-   "first_date": "2026-09-10",
-   "last_date": "2026-09-15",
-   "game_ids": [
-    "6625094",
-    "6628166",
-    "6625096",
-    "6627733",
-    "6628169"
-   ],
-   "name": null
-  },
-  {
    "venue": "T-Mobile Arena, Las Vegas, NV",
    "matches": 4,
    "first_date": "2026-08-29",
@@ -497,6 +483,19 @@
     "6624992",
     "6626983",
     "6624994"
+   ],
+   "name": null
+  },
+  {
+   "venue": "Thomas Assembly Center, Ruston, LA",
+   "matches": 4,
+   "first_date": "2026-09-10",
+   "last_date": "2026-09-15",
+   "game_ids": [
+    "6625094",
+    "6628166",
+    "6627733",
+    "6628169"
    ],
    "name": null
   },
@@ -1895,17 +1894,6 @@
    "game_ids": [
     "6624408",
     "6626454"
-   ],
-   "name": null
-  },
-  {
-   "venue": "Fitzgerald Field House, Pittsburgh, PA",
-   "matches": 2,
-   "first_date": "2026-09-11",
-   "last_date": "2026-09-13",
-   "game_ids": [
-    "6626356",
-    "6626360"
    ],
    "name": null
   },
@@ -6694,8 +6682,8 @@
   {
    "game_id": "6624828",
    "venue": null,
-   "home_team_id": "46301",
-   "home_venue_on_record": "Exactech Arena at Stephen C. O'Connell Center, Gainesville, FL",
+   "home_team_id": "46204",
+   "home_venue_on_record": "Maturi Pavilion, Minneapolis, MN",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -6855,12 +6843,12 @@
   },
   {
    "game_id": "6628154",
-   "venue": "Fant-Ewing Coliseum, Monroe, LA",
+   "venue": null,
    "home_team_id": "46106",
    "home_venue_on_record": "Fant-Ewing Coliseum, Monroe, LA",
-   "venue_owner": "46106",
+   "venue_owner": null,
    "event": null,
-   "site": "home"
+   "site": "no-venue"
   },
   {
    "game_id": "6624623",
@@ -6927,12 +6915,12 @@
   },
   {
    "game_id": "6624910",
-   "venue": "Alumni Arena, Buffalo, NY",
+   "venue": null,
    "home_team_id": "46444",
    "home_venue_on_record": "Alumni Arena, Buffalo, NY",
-   "venue_owner": "46444",
+   "venue_owner": null,
    "event": null,
-   "site": "home"
+   "site": "no-venue"
   },
   {
    "game_id": "6624937",
@@ -10483,8 +10471,8 @@
   {
    "game_id": "6624845",
    "venue": null,
-   "home_team_id": "46753",
-   "home_venue_on_record": null,
+   "home_team_id": "46045",
+   "home_venue_on_record": "Physical Education Complex, Baltimore, MD",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -11778,12 +11766,12 @@
   },
   {
    "game_id": "6627312",
-   "venue": "Fant-Ewing Coliseum, Monroe, LA",
+   "venue": null,
    "home_team_id": "46106",
    "home_venue_on_record": "Fant-Ewing Coliseum, Monroe, LA",
-   "venue_owner": "46106",
+   "venue_owner": null,
    "event": null,
-   "site": "home"
+   "site": "no-venue"
   },
   {
    "game_id": "6627438",
@@ -12723,12 +12711,12 @@
   },
   {
    "game_id": "6626356",
-   "venue": "Fitzgerald Field House, Pittsburgh, PA",
+   "venue": null,
    "home_team_id": "45818",
    "home_venue_on_record": null,
    "venue_owner": null,
    "event": null,
-   "site": "neutral"
+   "site": "no-venue"
   },
   {
    "game_id": "6626386",
@@ -14307,12 +14295,12 @@
   },
   {
    "game_id": "6625096",
-   "venue": "Thomas Assembly Center, Ruston, LA",
+   "venue": null,
    "home_team_id": "46106",
    "home_venue_on_record": "Fant-Ewing Coliseum, Monroe, LA",
-   "venue_owner": "46060",
+   "venue_owner": null,
    "event": null,
-   "site": "neutral"
+   "site": "no-venue"
   },
   {
    "game_id": "6626162",
@@ -15243,12 +15231,12 @@
   },
   {
    "game_id": "6626360",
-   "venue": "Fitzgerald Field House, Pittsburgh, PA",
+   "venue": null,
    "home_team_id": "45917",
    "home_venue_on_record": "Swisher Gymnasium, Jacksonville, FL",
    "venue_owner": null,
    "event": null,
-   "site": "neutral"
+   "site": "no-venue"
   },
   {
    "game_id": "6628410",
@@ -45928,6 +45916,42 @@
    "home_team_id": "45784",
    "home_venue_on_record": "Pete Mathews Coliseum, Jacksonville, AL",
    "venue_owner": "45784",
+   "event": null,
+   "site": "home"
+  },
+  {
+   "game_id": "6640504",
+   "venue": "University Credit Union Center, Davis, CA",
+   "home_team_id": "46036",
+   "home_venue_on_record": "University Credit Union Center, Davis, CA",
+   "venue_owner": "46036",
+   "event": null,
+   "site": "home"
+  },
+  {
+   "game_id": "6640394",
+   "venue": "L&N Federal Credit Union Arena, Louisville, KY",
+   "home_team_id": "46061",
+   "home_venue_on_record": "L&N Federal Credit Union Arena, Louisville, KY",
+   "venue_owner": "46061",
+   "event": null,
+   "site": "home"
+  },
+  {
+   "game_id": "6640395",
+   "venue": "Memorial Hall, Dover, DE",
+   "home_team_id": "46175",
+   "home_venue_on_record": "Memorial Hall, Dover, DE",
+   "venue_owner": "46175",
+   "event": null,
+   "site": "home"
+  },
+  {
+   "game_id": "6640392",
+   "venue": "Reed Gym, Pocatello, ID",
+   "home_team_id": "46680",
+   "home_venue_on_record": "Reed Gym, Pocatello, ID",
+   "venue_owner": "46680",
    "event": null,
    "site": "home"
   }

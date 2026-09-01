@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-01T05:18:13Z",
+  "generated_at_utc": "2026-09-01T23:03:14Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 0,
    "expired": 1,
-   "anomalies": 19
+   "anomalies": 20
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -270,6 +270,19 @@
     }
    ],
    "points_per_set_missing": 5.0
+  },
+  {
+   "game_id": "6628298",
+   "team_id": "46212",
+   "team": "Arkansas",
+   "absent": [
+    {
+     "name": "Lakin Laurendine",
+     "rate": 3.3,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 3.3
   },
   {
    "game_id": "6625817",
@@ -1001,14 +1014,15 @@
    ]
   },
   "Rutgers": {
-   "gid": "6639651",
-   "d": "2026-08-29",
-   "appeared": 11,
+   "gid": "6628677",
+   "d": "2026-09-01",
+   "appeared": 10,
    "zero_action": [
     "Ema Grubanov",
-    "Imani Howell",
+    "Avery Jesewitz",
     "Alleigh Dutton",
     "Addison Wiemann",
+    "Zharia Harris-waddy",
     "Mira Mccool",
     "Jenna Delamater",
     "Kami Dyrstad"
@@ -1778,18 +1792,11 @@
    "zero_action": []
   },
   "CSU Bakersfield": {
-   "gid": "6624644",
-   "d": "2026-08-29",
-   "appeared": 10,
+   "gid": "6628216",
+   "d": "2026-09-01",
+   "appeared": 15,
    "zero_action": [
-    "Ana Franca benjamin",
-    "Amyri Robinson",
-    "Torrin Higginbotham",
-    "Reese Jackson",
-    "Taly Acherboim",
-    "Josephine Rausch",
-    "Boden Liljedahl",
-    "Ella Pallagi"
+    "Torrin Higginbotham"
    ]
   },
   "Lamar University": {
@@ -3149,14 +3156,18 @@
    ]
   },
   "Michigan St.": {
-   "gid": "6624353",
-   "d": "2026-08-29",
-   "appeared": 12,
+   "gid": "6624354",
+   "d": "2026-09-01",
+   "appeared": 8,
    "zero_action": [
     "Colbie Mckenna",
     "Taylah Holdem",
+    "Breccan Scheck",
     "Cam Berger",
-    "Alanna Bankston",
+    "Kalea Norton",
+    "Ky Clayton",
+    "Madi Andrews",
+    "Bianca Mumcular",
     "Alana Whitfield"
    ]
   },
@@ -3273,10 +3284,15 @@
    ]
   },
   "LSU": {
-   "gid": "6625610",
-   "d": "2026-08-29",
-   "appeared": 13,
-   "zero_action": []
+   "gid": "6624354",
+   "d": "2026-09-01",
+   "appeared": 11,
+   "zero_action": [
+    "Djay Seaward",
+    "Hannah Lee",
+    "Aly Kirkhoff",
+    "Katie Raymer"
+   ]
   },
   "Wake Forest": {
    "gid": "6628518",
@@ -3587,13 +3603,11 @@
    "zero_action": []
   },
   "San Francisco": {
-   "gid": "6627308",
-   "d": "2026-08-30",
-   "appeared": 11,
+   "gid": "6628216",
+   "d": "2026-09-01",
+   "appeared": 12,
    "zero_action": [
-    "Talula Lenoir",
-    "Andjela Sojic",
-    "Simona Ivanova"
+    "Piper Justiss"
    ]
   },
   "Colorado": {
@@ -3625,16 +3639,14 @@
    ]
   },
   "Arkansas": {
-   "gid": "6639556",
-   "d": "2026-08-30",
-   "appeared": 9,
+   "gid": "6628677",
+   "d": "2026-09-01",
+   "appeared": 12,
    "zero_action": [
-    "Paisley Pavliska",
-    "Parker Duncan",
     "Journey Peppers",
-    "Elsie Law",
     "Maggie Mccarroll",
     "Livia Niu",
+    "Isabella Knoernschild",
     "Lily Dudley"
    ]
   },
