@@ -1,5 +1,5 @@
 {
- "_doc": "Field-scoped AVAILABILITY evidence, one entry per attributable source per player. Extends the result-evidence discipline. claim is one of confirmed_unavailable | limited_gtd -- nothing else may be asserted. Only an ATTRIBUTABLE PUBLIC source (school_release, school_site, beat_report, broadcast) can support a claim; kind community_forum and cody_observation are SIGNALS -- stored, labelled, and never able to set a status. Every entry carries the exact quoted wording, url, retrieved time, an effective date range and a review_by date; evidence past review_by or outside its effective range supports nothing and the player falls back to the honest default. Support never spills: one entry, one player, one claim, one date range. A DNP row, a zero-action listing, reduced minutes, a roster omission or a social post is NEVER promoted into out/injured/unavailable, and no diagnosis is ever shown unless an official public source used that exact language -- and then only as the source's own quoted words. ADDED 2026-08-30: claim match_incident records a DATED, SOURCED in-match event (left the match, did not return) and sets NO current status -- the player's current availability stays UNKNOWN pending a team update. An incident renders in its own section, never in the sourced-status count.",
+ "_doc": "Field-scoped AVAILABILITY evidence, one entry per attributable source per player. Extends the result-evidence discipline. claim is one of confirmed_unavailable | limited_gtd -- nothing else may be asserted. Only an ATTRIBUTABLE PUBLIC source (school_release, school_site, beat_report, broadcast) can support a claim; kind community_forum and cody_observation are SIGNALS -- stored, labelled, and never able to set a status. Every entry carries the exact quoted wording, url, retrieved time, an effective date range and a review_by date; evidence past review_by or outside its effective range supports nothing and the player falls back to the honest default. Support never spills: one entry, one player, one claim, one date range. A DNP row, a zero-action listing, reduced minutes, a roster omission or a social post is NEVER promoted into out/injured/unavailable, and no diagnosis is ever shown unless an official public source used that exact language -- and then only as the source's own quoted words. ADDED 2026-08-30: claim match_incident records a DATED, SOURCED in-match event (left the match, did not return) and sets NO current status -- the player's current availability stays UNKNOWN pending a team update. An incident renders in its own section, never in the sourced-status count. ADDED 2026-09-01: claim out_for_season -- a SOURCED season-ending status (attributable public report with exact wording). Never inferred from an incident; each supporting source is its own entry so attributions stay separate. An entry may carry a short `summary` -- reader-facing wording strictly supported by the quote.",
  "players": {
   "Wisconsin|Jaela Auguste": [
    {
@@ -33,18 +33,49 @@
   ],
   "Purdue|Grace Heaney": [
    {
-    "kind": "school_site",
-    "quote": "The Boilermakers played without Second Team All-American Kenna Wollard (personal reasons), then lost Omaha native and Third Team All-American Grace Heaney midway through the second set due to injury.",
-    "url": "https://d2560u4h06m0te.cloudfront.net/news/2026/8/28/volleyball-vs-9-purdue",
-    "retrieved": "2026-08-31T01:45:03Z",
+    "kind": "school_release",
+    "quote": "two of its three returning All-Americans and preseason Player of the Year Watch List honorees (Wollard: out and Heaney leaving the match in Set 2 due to a lower leg injury",
+    "summary": "Left Creighton match in Set 2 with a lower-leg injury",
+    "url": "https://purduesports.com/news/2026/08/31/big-tensec-challenge-descends-on-mackey-arena",
+    "retrieved": "2026-09-01T04:00:46Z",
     "incident_date": "2026-08-28",
     "effective": {
      "from": "2026-08-28",
      "to": null
     },
-    "review_by": "2026-09-06",
+    "review_by": "2026-09-07",
     "claim": "match_incident",
-    "note": "Creighton University Athletics' own match recap ('Boiler Spoilers! #13 Volleyball Opens Season With Win Over #9 Purdue', 2026-08-28). A sourced MATCH INCIDENT only: she left the Aug 28 Creighton match midway through the second set due to injury. Her CURRENT availability is UNKNOWN pending a Purdue update -- this entry does not mark her out, name an injury, or project a return."
+    "note": "Purdue's own Aug. 31 match preview ('Big Ten/SEC Challenge Descends on Mackey Arena') states the injury type and the set in its own words -- the school naming a lower-leg injury upgrades the earlier Creighton-recap sourcing. Her CURRENT availability remains UNKNOWN pending a Purdue update: the preview marks Wollard 'out' but assigns Heaney no status."
+   }
+  ],
+  "Texas|Abby Vander Wal": [
+   {
+    "kind": "beat_report",
+    "quote": "A Monday MRI confirmed the worst fears for Texas volleyball and outside hitter Abby Vander Wal. Vander Wal, a 6-foot-3 starting outside hitter, tore the ACL in her left knee during Saturday's win over TCU and will likely miss the remainder of the season.",
+    "summary": "Left ACL tear reported after Monday MRI",
+    "url": "https://sports.yahoo.com/articles/texas-volleyball-confirms-acl-tear-211105304.html",
+    "retrieved": "2026-09-01T04:00:46Z",
+    "effective": {
+     "from": "2026-08-31",
+     "to": null
+    },
+    "review_by": "2026-12-31",
+    "claim": "out_for_season",
+    "note": "Austin American-Statesman (Thomas Jones, 2026-08-31), read via its Yahoo syndication. This is a BEAT REPORT of the MRI result -- no Texas Athletics release is held and none is implied. The injury occurred 2026-08-29 v TCU at the Players Era Showcase (Las Vegas)."
+   },
+   {
+    "kind": "beat_report",
+    "quote": "Texas coach Jerritt Elliott said sophomore outside hitter Abby Vander Wal is out for the season with the knee injury that she suffered on Saturday night.",
+    "summary": "Coach-reported: expected to miss the remainder of 2026",
+    "url": "https://www.si.com/onsi/volleyball/injuries/texas-volleyball-loses-key-offensive-weapon-to-season-ending-knee-injury-abby-vander-wal-2026",
+    "retrieved": "2026-09-01T04:00:46Z",
+    "effective": {
+     "from": "2026-08-30",
+     "to": null
+    },
+    "review_by": "2026-12-31",
+    "claim": "out_for_season",
+    "note": "The coach-reported SEASON OUTLOOK, attributed separately from the MRI report: Sports Illustrated / On SI (Paige Durrenberger, 2026-08-30), quoting Lincoln Arneal's report of Jerritt Elliott's statement. Not a Texas Athletics release."
    }
   ]
  }

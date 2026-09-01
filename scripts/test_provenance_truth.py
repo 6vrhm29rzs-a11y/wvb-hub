@@ -216,13 +216,18 @@ def main():
     check("...so it can never join the sourced-status count",
           AD.entry_state(hean, today) != "status")
 
-    # Wollard cannot be escalated: the claim vocabulary is CLOSED
-    for rogue in ("season_ending", "out_for_season", "hospitalized",
-                  "injured", "done_for_year"):
+    # Wollard cannot be escalated: the claim vocabulary is CLOSED.
+    # (out_for_season joined the closed set 2026-09-01 for SOURCED
+    # season-ending reports -- Vander Wal below -- so it is no longer a
+    # rogue string; diagnosis words remain invalid.)
+    for rogue in ("season_ending", "hospitalized", "injured",
+                  "done_for_year", "acl_tear"):
         e = dict(woll, claim=rogue)
         check("[NEG] a rogue claim %r can never become a status" % rogue,
               AD.entry_state(e, today) == "invalid",
               AD.entry_state(e, today))
+    check("Wollard's own claim stays confirmed_unavailable, nothing "
+          "stronger", woll.get("claim") == "confirmed_unavailable")
     # Heaney cannot be silently promoted: an incident stripped of its date
     # is invalid, never a status
     check("[NEG] an incident without its date binds to nothing",
@@ -232,18 +237,43 @@ def main():
         REPO, "data/availability_desk_2026.json"), encoding="utf-8"))
     sts = [s["player"] for s in art["statuses"]]
     incs = [s["player"] for s in art["incidents"]]
-    check("artifact: Wollard is the status, Heaney the incident",
-          sts == ["Kenna Wollard"] and incs == ["Grace Heaney"],
+    check("artifact: Wollard a status, Heaney the ONLY incident",
+          "Kenna Wollard" in sts and incs == ["Grace Heaney"],
           (sts, incs))
+    check("Vander Wal: two separately-attributed season-ending sources, "
+          "both statuses",
+          sts.count("Abby Vander Wal") == 2
+          and all(s["claim"] == "out_for_season" for s in art["statuses"]
+                  if s["player"] == "Abby Vander Wal"))
+    check("...and she can NEVER render as merely a match incident",
+          "Abby Vander Wal" not in incs)
+    vw = [s for s in art["statuses"] if s["player"] == "Abby Vander Wal"]
+    check("the MRI report and the coach outlook are separate sources",
+          len({s["url"] for s in vw}) == 2)
+    check("...neither implies a Texas Athletics release",
+          all("beat_report" == s["kind"] for s in vw)
+          and all("release is held" in (s.get("note") or "")
+                  or "Not a Texas Athletics release" in (s.get("note") or "")
+                  for s in vw))
+    hean_art = [s for s in art["incidents"]
+                if s["player"] == "Grace Heaney"][0]
+    check("Heaney's incident carries the Purdue-preview wording",
+          hean_art.get("summary")
+          == "Left Creighton match in Set 2 with a lower-leg injury"
+          and "purduesports.com" in (hean_art.get("url") or ""))
     check("artifact counts agree",
-          art["meta"]["counts"]["statuses"] == 1
+          art["meta"]["counts"]["statuses"] == len(sts)
           and art["meta"]["counts"]["incidents"] == 1)
 
-    wrow = art["statuses"][0]
+    wrow = [x for x in art["statuses"]
+            if x["player"] == "Kenna Wollard"][0]
     hrow = art["incidents"][0]
+    vrows = [x for x in art["statuses"]
+             if x["player"] == "Abby Vander Wal"]
 
     print("\n  the page's own rows, under node")
-    avfns = (fns["esc"] + "\n" + fns["avMeta"] + "\n" +
+    avfns = (fns["esc"] + "\n" + (jsfn(page, "avClaimLabel") or "") +
+             "\n" + fns["avMeta"] + "\n" +
              fns["avStatusRow"] + "\n" + fns["avIncidentRow"] + "\n")
     js5 = (avfns +
            "const w = %s, h = %s;\n" % (json.dumps(wrow), json.dumps(hrow)) +
@@ -274,20 +304,50 @@ def main():
               "sourced match incident, 2026-08-28" in h
               and "current availability unknown" in h
               and "pending a team update" in h, h)
+        # 'season' as a bare substring would trip on the quote's own
+        # "preseason Player of the Year Watch List" -- ban the CLAIMS,
+        # not the letters (the Massey 'not current' scrub lesson)
         for banned in ("unavailable (sourced)", "away from team",
-                       "confirmed_unavailable", "ruled out", "season"):
+                       "confirmed_unavailable", "ruled out",
+                       "out for the season", "season-ending"):
             check("Heaney: %r cannot render on the incident row" % banned,
                   banned not in h.lower())
-        check("Heaney: the recap's exact sentence renders",
-              "midway through the second set due to injury" in h)
+        check("Heaney: Purdue's own preview wording renders",
+              "leaving the match in Set 2 due to a lower leg injury" in h)
         check("Heaney: source + retrieval + review-by render",
-              "cloudfront.net" in h and "review by 2026-09-06" in h)
+              "purduesports.com" in h and "review by" in h)
+        check("Heaney: the strengthened Purdue-preview wording renders",
+              "Left Creighton match in Set 2 with a lower-leg injury" in h)
+        check("Heaney: cannot render season-ending or diagnostic language",
+              not any(b in h.lower() for b in
+                      ("out for the season", "season-ending", "acl",
+                       "mri", "diagnos")))
+
+    js5b = (avfns +
+            "const rows = %s;\n" % json.dumps(vrows) +
+            "console.log(JSON.stringify(rows.map(avStatusRow).join('')));")
+    rc, out, err = node(js5b)
+    check("Vander Wal rows run under node", rc == 0, err)
+    if rc == 0:
+        v = json.loads(out.strip().splitlines()[-1])
+        check("Vander Wal renders OUT FOR THE SEASON (sourced), never a "
+              "mere incident",
+              v.count("out for the season (sourced)") == 2
+              and "sourced match incident" not in v)
+        check("...both summaries render: the MRI report and the coach "
+              "outlook, separately",
+              "Left ACL tear reported after Monday MRI" in v
+              and "Coach-reported: expected to miss the remainder of "
+                  "2026" in v)
+        check("...each with its own source link",
+              "sports.yahoo.com" in v and "si.com" in v)
 
     print("\n  the global 'none currently' copy is GATED on both")
     dom = ("const _els={};\n"
            "function el(id){return _els[id]=_els[id]||{innerHTML:''}}\n"
            "const document={getElementById:el};\n")
-    render_stub = (fns["esc"] + "\n" + fns["avMeta"] + "\n" +
+    render_stub = (fns["esc"] + "\n" + (jsfn(page, "avClaimLabel") or "")
+                   + "\n" + fns["avMeta"] + "\n" +
                    fns["avStatusRow"] + "\n" + fns["avIncidentRow"] + "\n" +
                    dom)
 
@@ -330,7 +390,8 @@ def main():
         check("[NEG] mutation target found in renderAvail", False)
 
     print("\n  the player dossier links the evidence")
-    js6 = (fns["esc"] + "\n" + "function routeFor(){return '#avail'}\n" +
+    js6 = (fns["esc"] + "\n" + (jsfn(page, "avClaimLabel") or "") +
+           "\nfunction routeFor(){return '#avail'}\n" +
            "const AVAIL = %s;\n" % json.dumps(
                {"meta": art["meta"], "statuses": art["statuses"],
                 "incidents": art["incidents"], "signals": [],
@@ -345,7 +406,7 @@ def main():
     if rc == 0:
         d = json.loads(out.strip().splitlines()[-1])
         check("Wollard's dossier shows the sourced status + desk link",
-              "Away from team / unavailable (sourced)" in d["w"]
+              "away from team / unavailable (sourced)" in d["w"]
               and "Availability Desk" in d["w"], d["w"])
         check("Heaney's dossier shows the incident, availability unknown",
               "Sourced match incident, 2026-08-28" in d["h"]

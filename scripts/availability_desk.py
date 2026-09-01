@@ -47,7 +47,11 @@ ATTRIBUTABLE = ("school_release", "school_site", "beat_report", "broadcast",
                 "player_statement")   # the player's own public statement,
                                       # reported by an attributable outlet
 SIGNAL_KINDS = ("community_forum", "cody_observation")
-CLAIMS = ("confirmed_unavailable", "limited_gtd")
+# ⚠ out_for_season joined 2026-09-01 (Vander Wal): a SOURCED season-
+# ending status. Still a closed set -- diagnosis words (hospitalized,
+# injured, season_ending-as-a-string) remain invalid; only these three
+# claims, each requiring an attributable quote+url, can set a status.
+CLAIMS = ("confirmed_unavailable", "limited_gtd", "out_for_season")
 # A DATED in-match event from an attributable source. Sets NO current
 # status: the player's availability stays UNKNOWN pending a team update.
 # Renders in its own section and never in the sourced-status count.
@@ -123,6 +127,7 @@ def classify(ev, today):
             st = entry_state(e, today)
             row = {"team": team, "player": player,
                    "kind": e.get("kind"), "quote": e.get("quote"),
+                   "summary": e.get("summary"),
                    "url": e.get("url"), "retrieved": e.get("retrieved"),
                    "effective": e.get("effective"),
                    "review_by": e.get("review_by"),

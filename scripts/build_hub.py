@@ -7524,6 +7524,12 @@ h4.sbtime span{font:600 11px/1 var(--mono);color:var(--ink3)}
   padding:15px 13px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;
   border-bottom:3px solid transparent}
 .morebtn:hover,.morebtn[aria-expanded=true]{color:var(--ink)}
+.rkhow>summary{display:none;cursor:pointer;
+  font:600 13px/1.4 var(--sans);color:var(--rally);padding:4px 0;
+  min-height:34px}
+@media (max-width:560px){
+  .rkhow>summary{display:list-item}
+}
 .moremenu .phoneonly{display:none}
 @media (max-width:560px){.moremenu .phoneonly{display:block}}
 .moremenu{position:absolute;top:100%;right:0;z-index:20;
@@ -7532,6 +7538,15 @@ h4.sbtime span{font:600 11px/1 var(--mono);color:var(--ink3)}
   column-count:2;column-gap:22px;width:380px}
 .moremenu[hidden]{display:none}
 .mgroup{break-inside:avoid;min-width:0;margin-bottom:8px}
+/* ⚠ .moremenu button (0,1,1) outweighs a bare class -- the Close
+   control needs the same parent to stay phone-only */
+.moremenu .msheetx{display:none}
+@media (max-width:560px){
+  .moremenu .msheetx{display:block;width:100%;min-height:44px;text-align:right;
+    appearance:none;border:0;border-bottom:1px solid var(--line);
+    background:transparent;color:var(--rally);cursor:pointer;
+    font:700 14px/1 var(--sans);padding:12px 10px}
+}
 .mglabel{display:block;font:700 11px/1 var(--mono,monospace);
   letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);
   padding:8px 10px 5px;border-bottom:1px solid var(--line);margin-bottom:3px}
@@ -8751,6 +8766,7 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
   border:1px dashed var(--line2);border-radius:2px;padding:2px 5px}
 details.avhist{margin:14px 0}
 .avrow.avinc{border-left:3px solid var(--rally)}
+.avsum{color:var(--ink)}
 .avinclab{font:600 11px/1.4 var(--mono,monospace);color:var(--ink2);
   text-transform:uppercase;letter-spacing:.05em;display:block;margin:2px 0}
 /* AVAIL-CSS-END */
@@ -8993,6 +9009,7 @@ details.avhist{margin:14px 0}
    (group "Our outlook") but they are reference-depth detail, so they hide with
    the rest and their group header hides with them. */
 .rk3.hideref .c-ref,
+.rk3.hideref th.c-res,.rk3.hideref td.rs,
 .rk3.hideref th.g-ref,
 .rk3.hideref th.g-proj{display:none}
 .rk3 tr.row{cursor:pointer}
@@ -9213,6 +9230,16 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   main{padding:16px 10px 50px}h1{font-size:22px}
   td,th{padding:8px 7px}.meta{text-align:left}
 }
+@media(max-width:560px){
+  /* ⚠ COMPACT MASTHEAD (usability finish, 2026-09-01): the counts /
+     built / feed rows cost ~140px of every phone screen before any
+     content. The title keeps the identity; the numbers all exist on
+     the pages themselves. */
+  .mast .meta{display:none}
+  .cs-status{padding:2px 10px;font-size:10px}
+  h1{font-size:20px;margin:2px 0}
+  .mast{padding-bottom:2px}
+}
 </style></head><body>
 
 <header>
@@ -9280,6 +9307,8 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
            Three groups, 14px ink on the card surface, two columns at
            desktop width. -->
       <div class="moremenu" id="moremenu" role="menu" aria-labelledby="morebtn" hidden>
+        <button type="button" class="msheetx" id="msheetx"
+          aria-label="Close menu">Close &times;</button>
         <div class="mgroup">
           <span class="mglabel" aria-hidden="true">Explore</span>
           <button role="menuitem" data-v="players">Players</button>
@@ -9512,6 +9541,8 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       </select>
     </label>
   </div>
+  <details class="rkhow" open id="rkhow">
+    <summary>How this ranking works &middot; basis &amp; freshness</summary>
   <!-- ⚠ ONE SENTENCE PER RULER, FROM ONE MAP. A rank means nothing without
        knowing whose ruler it is; this is the line that says so, and it is
        keyed by view so a new view cannot ship without one. -->
@@ -9528,6 +9559,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
        lives on the team page, which is where a row now goes. An instruction
        that no longer works is worse than none. -->
 </p>
+  </details>
   <div class="ctl">
     <input type="search" id="q" placeholder="Search a team&hellip;">
     <select id="conf"><option value="">All conferences</option></select>
@@ -10275,7 +10307,11 @@ function openMore() {
   const m = document.getElementById('moremenu'), b = document.getElementById('morebtn');
   if (!m) return;
   m.hidden = false; b.setAttribute('aria-expanded', 'true');
-  const f = m.querySelector('button'); if (f) f.focus();
+  /* ⚠ preventScroll: focusing into the sheet scrolled the PAGE to the
+     nav anchor (measured 450 -> 0 on open), so Close returned the
+     reader to the wrong place. Focus moves; the page must not. */
+  const f = m.querySelector('button');
+  if (f) f.focus({ preventScroll: true });
 }
 (function wireMore() {
   const m = document.getElementById('moremenu'), b = document.getElementById('morebtn');
@@ -10284,10 +10320,14 @@ function openMore() {
     e.stopPropagation();
     m.hidden ? openMore() : closeMore();
   });
+  const x = document.getElementById('msheetx');
+  if (x) x.addEventListener('click', e => {
+    e.stopPropagation(); closeMore(); b.focus({ preventScroll: true });
+  });
   m.addEventListener('keydown', e => {
     const items = [...m.querySelectorAll('button')];
     const i = items.indexOf(document.activeElement);
-    if (e.key === 'Escape') { e.preventDefault(); closeMore(); b.focus(); }
+    if (e.key === 'Escape') { e.preventDefault(); closeMore(); b.focus({ preventScroll: true }); }
     else if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus(); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
     else if (e.key === 'Home') { e.preventDefault(); items[0].focus(); }
@@ -10520,7 +10560,11 @@ function renderCrumbs(view, parts) {
   }
 }
 
-document.querySelectorAll('nav button[role=tab], #moremenu button').forEach(b =>
+/* ⚠ [data-v] ONLY: the Close control and non-navigation items live in
+   this menu too, and the unqualified selector routed them to the
+   default view (measured: Close navigated to the desk and lost the
+   reader's scroll position). */
+document.querySelectorAll('nav button[role=tab], #moremenu button[data-v]').forEach(b =>
   b.addEventListener('click', () => {
   closeMore();
   go(routeFor(b.dataset.v));
@@ -10584,9 +10628,15 @@ if (refpick) refpick.addEventListener('change', () => {
    click away. */
 const refcols = document.getElementById('refcols');
 if (refcols) {
+  /* ⚠ THE GROUP HEADER MUST SHRINK WITH ITS COLUMNS (usability finish,
+     2026-09-01): RESUME moved behind Compare sources, so "Our system"
+     spans 3 with it and 2 without -- a static colspan is exactly the
+     overlap class the header-geometry guard exists for. */
+  const gOurs = document.querySelector('.rk3 th.g-ours');
   const applyRef = () => {
     document.querySelector('#v-rankings table.rk3')
       .classList.toggle('hideref', !refcols.checked);
+    if (gOurs) gOurs.colSpan = refcols.checked ? 3 : 2;
   };
   refcols.addEventListener('change', applyRef); applyRef();
 }
@@ -16537,9 +16587,8 @@ function pdAvailability(p) {
   let body;
   if (st.length || inc.length || sg.length) {
     body = st.map(x => '<span class="avrowline">' +
-        esc(x.claim === 'confirmed_unavailable'
-          ? 'Away from team / unavailable (sourced)'
-          : 'Limited / game-time (sourced)') +
+        esc(avClaimLabel(x.claim)) +
+        (x.summary ? ' <b class="avsum">' + esc(x.summary) + '</b>' : '') +
         ' <span class="avq">\u201c' + esc(x.quote) + '\u201d</span>' +
         '</span>').join('') +
       inc.map(x => '<span class="avrowline">Sourced match incident, ' +
@@ -16569,9 +16618,8 @@ function tdAvailability(t, name) {
   let body;
   if (st.length || inc.length || sg.length) {
     body = st.map(x => '<span class="avrowline"><b>' + esc(x.player) +
-        '</b> \u2014 ' + esc(x.claim === 'confirmed_unavailable'
-          ? 'away from team / unavailable (sourced)'
-          : 'limited / game-time (sourced)') +
+        '</b> \u2014 ' + esc(avClaimLabel(x.claim)) +
+        (x.summary ? ' \u00b7 ' + esc(x.summary) : '') +
         '</span>').join('') +
       inc.map(x => '<span class="avrowline"><b>' + esc(x.player) +
         '</b> \u2014 sourced match incident, ' +
@@ -16593,6 +16641,16 @@ function tdAvailability(t, name) {
 /* ── AVAILABILITY & PARTICIPATION DESK (private) ───────────────────────── */
 const AVAIL = {{AVAIL_JSON}};
 
+function avClaimLabel(c) {
+  /* the CLOSED vocabulary. A claim outside it never reaches a status
+     (entry_state refuses upstream); this map is the only wording. */
+  return c === 'confirmed_unavailable'
+      ? 'away from team / unavailable (sourced)'
+      : c === 'out_for_season'
+      ? 'out for the season (sourced)'
+      : 'limited / game-time (sourced)';
+}
+
 function avMeta(s) {
   /* source, retrieval date, effective range, review-by -- every rendered
      status or incident carries all of them (truth-pass requirement) */
@@ -16609,9 +16667,8 @@ function avMeta(s) {
 
 function avStatusRow(s) {
   return '<div class="avrow avst"><b>' + esc(s.player) + '</b> \u2014 ' +
-    esc(s.claim === 'confirmed_unavailable'
-      ? 'away from team / unavailable (sourced)'
-      : 'limited / game-time (sourced)') +
+    esc(avClaimLabel(s.claim)) +
+    (s.summary ? ' <b class="avsum">' + esc(s.summary) + '</b>' : '') +
     ' <span class="avq">\u201c' + esc(s.quote) + '\u201d</span>' +
     avMeta(s) + '</div>';
 }
@@ -16621,6 +16678,7 @@ function avIncidentRow(s) {
      is known (the incident) and what is not (her availability now) */
   return '<div class="avrow avinc"><b>' + esc(s.player) + '</b> \u2014 ' +
     'sourced match incident, ' + esc(s.incident_date || '?') +
+    (s.summary ? ' <b class="avsum">' + esc(s.summary) + '</b>' : '') +
     ' <span class="avinclab">current availability unknown \u2014 ' +
     'pending a team update</span>' +
     ' <span class="avq">\u201c' + esc(s.quote) + '\u201d</span>' +
@@ -19212,17 +19270,14 @@ if (typeof bwWire === 'function') bwWire();
   const today = document.getElementById('v-desk');
   if (tape && today) today.insertBefore(tape, today.firstChild);
 })();
-/* ⚠ THE LAUNCHER NO LONGER RIDES IN THE PRIMARY NAV (usability repair,
-   2026-08-31): a secondary tool was consuming premium navigation space.
-   It stays a fixed, quiet bottom-right utility at every width, and the
-   More menu's private group carries an "Ask Digby" item too. */
+/* launcher wiring lives in the private ask script -- private code for a private feature */
+/* the ranking explainer is CLOSED on a phone (usability finish,
+   2026-09-01): the first ranked team must land within one screen. The
+   details ships open so desktop keeps its visible basis line. */
 (function(){
-  const mi = document.getElementById('askmenu');
-  const b = document.getElementById('asklaunch');
-  if (mi && b) mi.addEventListener('click', () => {
-    if (typeof closeMore === 'function') closeMore();
-    b.click();
-  });
+  const d = document.getElementById('rkhow');
+  if (d && matchMedia('(max-width:560px)').matches)
+    d.removeAttribute('open');
 })();
 if (typeof deskLive === 'function') deskLive();
 /* BALLOT-INIT-END */
@@ -21263,6 +21318,10 @@ body:has(section.detailopen) .asklaunch{display:none}
   font:700 11px/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;
   min-height:40px;box-shadow:0 4px 18px rgba(0,0,0,.18)}
 .asklaunch:hover{background:var(--alt)}
+.asklaunch.inmast{position:static;box-shadow:none;margin-top:7px;
+  background:transparent;border-color:rgba(245,247,250,.35);
+  color:var(--chalk);border-radius:3px}
+.asklaunch.inmast:hover{background:rgba(245,247,250,.12)}
 .askwrap{position:fixed;right:16px;bottom:16px;z-index:61;width:min(420px,calc(100vw - 32px));
   background:var(--card);border:1px solid var(--line);border-top:3px solid var(--amber);
   border-radius:2px;box-shadow:0 6px 30px rgba(0,0,0,.24);display:none}
@@ -21288,6 +21347,8 @@ body:has(section.detailopen) .asklaunch{display:none}
 .askform button{padding:8px 12px;border:1px solid var(--line);background:var(--alt);
   color:var(--ink);border-radius:2px;cursor:pointer;font:700 11px/1 var(--sans)}
 @media (max-width:560px){.askwrap{right:8px;left:8px;bottom:8px;width:auto}
+  /* clearance so the edge trigger never sits on the page's last row */
+  main{padding-bottom:88px}
   /* ⚠ ICON-ONLY ON A PHONE, AND IT LIVES HERE, NOT IN THE SHARED BLOCK.
      The first version put these two rules in the page-wide 560px block, and
      the public gate ABORTED the build: "asklaunch, digby-face" -- dead CSS
@@ -21322,6 +21383,25 @@ ASK_HTML = """<button class="asklaunch" id="asklaunch" aria-expanded="false"
 </div>"""
 
 ASK_JS = r"""
+(function(){
+  const mi = document.getElementById('askmenu');
+  const b = document.getElementById('asklaunch');
+  if (mi && b) mi.addEventListener('click', () => {
+    if (typeof closeMore === 'function') closeMore();
+    b.click();
+  });
+  /* IN-LAYOUT AT DESKTOP (usability finish, 2026-09-01): a fixed
+     bottom-right pill floats over table rows while scrolling. On a
+     desktop it docks into the masthead's meta cluster -- in flow,
+     overlapping nothing; the phone keeps the small edge circle with
+     bottom clearance. */
+  const meta = document.querySelector('.mast .meta');
+  if (b && meta && matchMedia('(min-width:561px)').matches) {
+    b.classList.add('inmast');
+    meta.appendChild(b);
+  }
+})();
+
 (function () {
   var wrap = document.getElementById('askwrap'),
       launch = document.getElementById('asklaunch'),

@@ -74,7 +74,7 @@ def main():
           re.search(r"\.moremenu button:hover,\.moremenu button:"
                     r"focus-visible\{background:var\(--alt\)", page))
     check("Escape, arrows and outside-click close are wired",
-          "closeMore(); b.focus()" in page
+          "closeMore(); b.focus({ preventScroll: true })" in page
           and "!m.contains(e.target)" in page)
     # ⚠ THE MULTICOL SPILL: column-count:1 + max-height fragments the
     # overflow into a phantom column OFF THE RIGHT EDGE (ballot measured
@@ -92,10 +92,43 @@ def main():
     check("[NEG] the desktop menu IS a two-column layout",
           re.search(r"\.moremenu\{[^}]*column-count:2", page))
 
+    print("\n1b. THE FINISH PASS (2026-09-01)")
+    check("phone masthead compacts (.mast .meta hidden at 560)",
+          re.search(r"@media\(max-width:560px\)\{[^@]*\.mast \.meta"
+                    r"\{display:none\}", page, re.S))
+    check("the ranking explainer is a real disclosure, closed on a "
+          "phone at boot",
+          'id="rkhow"' in page and "rkhow" in page
+          and "removeAttribute('open')" in page
+          and "max-width:560px" in page)
+    check("RESUME is compare-only: hidden with the reference set",
+          ".rk3.hideref th.c-res,.rk3.hideref td.rs" in page)
+    check("...and the group header shrinks with it (colspan sync)",
+          "gOurs.colSpan = refcols.checked ? 3 : 2" in page)
+    check("the sheet Close control exists, 44px, phone-only",
+          'id="msheetx"' in page
+          and ".moremenu .msheetx{display:none}" in page
+          and "min-height:44px" in page)
+    check("menu focus never scrolls the page (preventScroll on open "
+          "AND on every close-return)",
+          page.count("preventScroll: true") >= 3)
+    # ⚠ the unqualified '#moremenu button' selector routed the Close
+    # control and the Ask Digby item to the DEFAULT VIEW (measured:
+    # Close navigated to the desk and dumped the reader's scroll)
+    check("the router wires only [data-v] menu buttons",
+          "#moremenu button[data-v]" in page
+          and not re.search(r"querySelectorAll\('nav button\[role=tab\], "
+                            r"#moremenu button'\)", page))
+
     print("\n2. THE LAUNCHER LEFT THE NAV")
-    check("Ask Digby launcher is fixed bottom-right, not nav-appended",
+    check("Ask Digby: fixed edge trigger base + IN-LAYOUT dock at "
+          "desktop (masthead meta), never nav-appended",
           ".asklaunch{position:fixed" in page
+          and ".asklaunch.inmast{position:static" in page
+          and "meta.appendChild(b)" in page
           and "inner.appendChild(b)" not in page)
+    check("phone clearance under the edge trigger",
+          "main{padding-bottom:88px}" in page)
     check("the More menu carries an Ask Digby item (private group)",
           'id="askmenu"' in page and "mgpriv" in page)
 
