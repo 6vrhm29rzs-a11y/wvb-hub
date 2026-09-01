@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-08-31T05:02:58Z",
+  "generated_at_utc": "2026-09-01T03:16:30Z",
   "counts": {
    "statuses": 1,
    "incidents": 1,
    "signals": 0,
    "expired": 1,
-   "anomalies": 14
+   "anomalies": 19
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -138,6 +138,32 @@
    "points_per_set_missing": 3.071
   },
   {
+   "game_id": "6624296",
+   "team_id": "46047",
+   "team": "Dayton",
+   "absent": [
+    {
+     "name": "Gabriela Machin borges",
+     "rate": 2.562,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 2.562
+  },
+  {
+   "game_id": "6624297",
+   "team_id": "46047",
+   "team": "Dayton",
+   "absent": [
+    {
+     "name": "Gabriela Machin borges",
+     "rate": 2.562,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 2.562
+  },
+  {
    "game_id": "6627385",
    "team_id": "46753",
    "team": "Stony Brook",
@@ -188,6 +214,32 @@
     }
    ],
    "points_per_set_missing": 2.125
+  },
+  {
+   "game_id": "6624294",
+   "team_id": "46047",
+   "team": "Dayton",
+   "absent": [
+    {
+     "name": "Gabriela Machin Borges",
+     "rate": 1.75,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 1.75
+  },
+  {
+   "game_id": "6624295",
+   "team_id": "46047",
+   "team": "Dayton",
+   "absent": [
+    {
+     "name": "Gabriela Machin Borges",
+     "rate": 1.75,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 1.75
   },
   {
    "game_id": "6640218",
@@ -266,6 +318,19 @@
     }
    ],
    "points_per_set_missing": 1.389
+  },
+  {
+   "game_id": "6639844",
+   "team_id": "46061",
+   "team": "Louisville",
+   "absent": [
+    {
+     "name": "Addison Makun",
+     "rate": 1.357,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.357
   }
  ],
  "latest": {
@@ -278,15 +343,13 @@
    ]
   },
   "Louisville": {
-   "gid": "6624236",
-   "d": "2026-08-28",
+   "gid": "6624297",
+   "d": "2026-08-31",
    "appeared": 12,
    "zero_action": [
     "Jessica Drapp",
     "Elsi Karjanlahti",
-    "Molly Urban",
-    "Jordyn Gray",
-    "Amirra Bailey"
+    "Molly Urban"
    ]
   },
   "Wisconsin": {
@@ -2964,10 +3027,12 @@
    ]
   },
   "Dayton": {
-   "gid": "6624296",
-   "d": "2026-08-29",
-   "appeared": 15,
-   "zero_action": []
+   "gid": "6624297",
+   "d": "2026-08-31",
+   "appeared": 12,
+   "zero_action": [
+    "Emily Harden"
+   ]
   },
   "Alabama": {
    "gid": "6640135",

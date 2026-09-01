@@ -3983,25 +3983,20 @@ def build():
             # season leaked into a live one once already.
             _rst = rank_stamp_pt(
                 ((meta.get("rank_stamp") or {}).get("generated_at_utc")))
+            # ⚠ ONE COMPACT LINE (usability repair, 2026-08-31): the
+            # POWER-vs-RESUME explainer lives in Methodology below; the
+            # lead's job is basis + freshness, above the fold.
             rank_basis = (
-                "<b>Our %d ranking, and it moves with every result.</b> "
-                "<b>%d of %d teams have played</b>; the most any team is judged "
-                "on this season so far is <b>%d%%</b>. "
-                "<b class=\"kpow\">POWER</b> is how strong a team is. "
-                "<b class=\"kres\">R&Eacute;SUM&Eacute;</b> is what it has "
-                "earned &mdash; %s."
-                % (SEASON, len(_played), len(_blend), round(100 * _w),
-                   ("live" if _resume_active else
-                    "not live until %d D-I matches have been played (%d so far)"
-                    % ((meta.get("resume") or {}).get("min_matches") or 200,
-                       (meta.get("resume") or {}).get("matches") or 0))))
+                "<b>Our %d ranking</b> &mdash; moves with every result "
+                "&middot; %d of %d teams have played &middot; this season "
+                "is at most <b>%d%%</b> of any team&rsquo;s rating"
+                % (SEASON, len(_played), len(_blend), round(100 * _w)))
             if _rst:
                 _rn = (meta.get("rank_stamp") or {}).get("matches_in")
                 rank_basis += (
-                    " <span class=\"rkstamp\">POWER last recomputed <b>%s</b>%s"
-                    " &mdash; a final folds in on the next recompute, not the "
-                    "instant a match ends.</span>"
-                    % (_rst, (", through %d rating-eligible finals" % _rn) if _rn else ""))
+                    " <span class=\"rkstamp\">&middot; recomputed <b>%s</b>%s"
+                    "</span>"
+                    % (_rst, (", %d finals in" % _rn) if _rn else ""))
         else:
             rank_basis = (
                 "<b>Still the preseason projection &mdash; not yet a "
@@ -6215,7 +6210,11 @@ td.pick b{color:var(--navy)}
 .rk3 th.c-pow{color:#31D07E}
 .rk3 th.c-res{color:#F2B441}
 /* the reference block recedes -- present, checkable, and visibly not ours */
-.rk3 th.c-ref{color:var(--ink2);opacity:.7;font-weight:600}
+/* ⚠ HEADER CELLS SIT ON THE NAVY BAND: an ink-toned, .7-opacity label
+   there was the "faint mystery numerals" defect -- ~2:1 contrast.
+   Chalk at .85 keeps the reference columns visibly secondary while
+   staying readable (>= 7:1 on #12294B). */
+.rk3 th.c-ref{color:var(--chalk);opacity:.85;font-weight:600}
 .rk3 td.c-ref,.rk3 tbody tr td.c-ref{color:var(--ink2);opacity:.78}
 .rk3 th.c-avca{color:var(--ink2)}
 /* R\00c9SUM\00c9 gets its own ramp -- amber, so it can never be mistaken for the
@@ -7527,17 +7526,32 @@ h4.sbtime span{font:600 11px/1 var(--mono);color:var(--ink3)}
 .morebtn:hover,.morebtn[aria-expanded=true]{color:var(--ink)}
 .moremenu .phoneonly{display:none}
 @media (max-width:560px){.moremenu .phoneonly{display:block}}
-.moremenu{position:absolute;top:100%;right:0;z-index:20;min-width:206px;
-  background:var(--chrome2);border:1px solid var(--line2);border-radius:4px;
-  padding:5px;box-shadow:0 18px 40px -18px rgba(0,0,0,.85)}
+.moremenu{position:absolute;top:100%;right:0;z-index:20;
+  background:var(--card);border:1px solid var(--line2);border-radius:4px;
+  padding:10px 12px;box-shadow:0 18px 40px -18px rgba(0,0,0,.35);
+  column-count:2;column-gap:22px;width:380px}
+.moremenu[hidden]{display:none}
+.mgroup{break-inside:avoid;min-width:0;margin-bottom:8px}
+.mglabel{display:block;font:700 11px/1 var(--mono,monospace);
+  letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);
+  padding:8px 10px 5px;border-bottom:1px solid var(--line);margin-bottom:3px}
 .moremenu button{display:block;width:100%;text-align:left;appearance:none;
-  background:transparent;border:0;color:var(--ink2);font:600 13px/1 var(--sans);
-  padding:10px 11px;border-radius:3px;cursor:pointer}
-.moremenu button:hover,.moremenu button:focus-visible{background:var(--sheet2);
+  background:transparent;border:0;color:var(--ink);font:600 14px/1.15 var(--sans);
+  padding:9px 10px;border-radius:3px;cursor:pointer;min-height:36px}
+.moremenu button:hover,.moremenu button:focus-visible{background:var(--alt);
   color:var(--ink)}
 .moremenu button[aria-current=page]{color:var(--gold)}
 @media (max-width:560px){
-  .moremenu{right:auto;left:0;min-width:min(74vw,240px)}
+  /* a SHEET on a phone: fixed and inset, never anchored to the wrap --
+     the anchored dropdown overflowed the right edge (measured 301+380
+     at 390px) */
+  /* ⚠ column-count:1 is STILL a multicol: with max-height it fragments
+     overflow into a phantom column off the right edge (ballot measured
+     at x=391 in a 390 viewport) instead of scrolling. auto = no
+     multicol = a normal scrolling block. */
+  .moremenu{position:fixed;left:8px;right:8px;top:96px;width:auto;
+    column-count:auto;display:block;max-height:72vh;overflow:auto}
+  .mgroup{min-width:0}
 }
 /* ── BREADCRUMB AND RETURN PATH ───────────────────────────────────────────
    ⚠ THE ONLY ESCAPE USED TO BE "CLICK A TOP TAB AND HOPE". A detail page now
@@ -9259,31 +9273,46 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <div class="moreWrap">
       <button type="button" class="morebtn" id="morebtn" aria-haspopup="true"
         aria-expanded="false" aria-controls="moremenu">More<span aria-hidden="true">&#9662;</span></button>
+      <!-- ⚠ GROUPED, ON THE CARD SURFACE (usability repair, 2026-08-31).
+           The old menu kept the pre-Daylight navy chrome while the text
+           tokens flipped to light-theme inks: rgb(63,80,104) on
+           rgb(26,53,87) is 1.6:1 -- a 375px wall that read as DISABLED.
+           Three groups, 14px ink on the card surface, two columns at
+           desktop width. -->
       <div class="moremenu" id="moremenu" role="menu" aria-labelledby="morebtn" hidden>
-        <!-- PRIVATE. The ballot rides here on a PHONE ONLY (design review
-             via Cody, 2026-08-28): six text tabs across a phone is too
-             cramped, so four primaries stay visible and the nav's ballot
-             button hides at that width -- reachable exactly once either way.
-             The strip removes any PRIVATE-commented ballot button, this one
-             included. -->
-        <button role="menuitem" data-v="ballot" class="phoneonly">My Ballot</button>
-        <button role="menuitem" data-v="players">Players</button>
-        <button role="menuitem" data-v="prank">Player ratings</button>
-        <button role="menuitem" data-v="standings">Standings</button>
-        <button role="menuitem" data-v="conflab">Conference Lab</button>
-        <button role="menuitem" data-v="confidence">Result Ledger</button>
-        <!-- AVAIL-MENU-BEGIN -->
-        <button role="menuitem" data-v="avail">Availability</button>
-        <!-- AVAIL-MENU-END -->
-        <button role="menuitem" data-v="bracket">Projected bracket</button>
-        <button role="menuitem" data-v="schedule">Schedule</button>
-        <button role="menuitem" data-v="tv">On TV</button>
-        <!-- INTEL-MENU-BEGIN -->
-        <button role="menuitem" data-v="intel">Intel</button>
-        <!-- INTEL-MENU-END -->
-        <!-- FILMROOM-MENU-BEGIN -->
-        <button role="menuitem" data-v="film">Film Room</button>
-        <!-- FILMROOM-MENU-END -->
+        <div class="mgroup">
+          <span class="mglabel" aria-hidden="true">Explore</span>
+          <button role="menuitem" data-v="players">Players</button>
+          <button role="menuitem" data-v="prank">Player ratings</button>
+          <button role="menuitem" data-v="standings">Standings</button>
+          <button role="menuitem" data-v="conflab">Conference Lab</button>
+          <button role="menuitem" data-v="schedule">Schedule</button>
+        </div>
+        <div class="mgroup">
+          <span class="mglabel" aria-hidden="true">Reference</span>
+          <button role="menuitem" data-v="confidence">Result Ledger</button>
+          <button role="menuitem" data-v="bracket">Projected bracket</button>
+          <button role="menuitem" data-v="tv">On TV</button>
+        </div>
+        <!-- MOREPRIV-BEGIN. PRIVATE workspace group: every item in it is
+             Cody's own (ballot, availability, intel, film, Digby). The
+             public strip removes the WHOLE group, label included -- a
+             group header with no items is worse than no group. -->
+        <div class="mgroup mgpriv">
+          <span class="mglabel" aria-hidden="true">Private workspace</span>
+          <button role="menuitem" data-v="ballot" class="phoneonly">My Ballot</button>
+          <!-- AVAIL-MENU-BEGIN -->
+          <button role="menuitem" data-v="avail">Availability</button>
+          <!-- AVAIL-MENU-END -->
+          <!-- INTEL-MENU-BEGIN -->
+          <button role="menuitem" data-v="intel">Intel</button>
+          <!-- INTEL-MENU-END -->
+          <!-- FILMROOM-MENU-BEGIN -->
+          <button role="menuitem" data-v="film">Film Room</button>
+          <!-- FILMROOM-MENU-END -->
+          <button role="menuitem" data-act="ask" id="askmenu">Ask Digby</button>
+        </div>
+        <!-- MOREPRIV-END -->
       </div>
     </div>
   </div></nav>
@@ -9483,7 +9512,6 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       </select>
     </label>
   </div>
-  {{EXTREF_STRIP}}
   <!-- ⚠ ONE SENTENCE PER RULER, FROM ONE MAP. A rank means nothing without
        knowing whose ruler it is; this is the line that says so, and it is
        keyed by view so a new view cannot ship without one. -->
@@ -9507,8 +9535,13 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <option value="50">Top 50</option><option value="64">Top 64</option>
       <option value="100">Top 100</option><option value="0">All</option>
     </select>
-    <label class="refcols"><input type="checkbox" id="refcols">
-      <span>Reference columns</span></label>
+    <label class="refcols" title="show the reference columns beside ours:
+      the final 2025 order, outside reference systems, official RPI, the
+      range the other systems put a team in, returning production and
+      simulated tournament odds. Each column names itself; none of it
+      feeds our model.">
+      <input type="checkbox" id="refcols">
+      <span>Compare sources</span></label>
     <span class="count" id="cnt"></span>
   </div>
   <!-- ⚠ ADDRESSED BY ID, NOT BY ".panel". renderPoll() used to reach for
@@ -9551,6 +9584,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <th class="c-ref" title="simulated NCAA tournament odds; backtested at 42 of the real 64 from a preseason prior">Tourn</th>
     </tr></thead>
     <tbody id="rbody">{{RANK_ROWS}}</tbody></table></div>
+    {{EXTREF_STRIP}}
     <!-- ⚠ PROGRESSIVE DISCLOSURE, NOT DELETION. This methodology is the most
          valuable thing on the tab and it was also 1,250 characters of essay
          standing between a reader and the rankings. Collapsed, never cut: the
@@ -19178,10 +19212,17 @@ if (typeof bwWire === 'function') bwWire();
   const today = document.getElementById('v-desk');
   if (tape && today) today.insertBefore(tape, today.firstChild);
 })();
+/* ⚠ THE LAUNCHER NO LONGER RIDES IN THE PRIMARY NAV (usability repair,
+   2026-08-31): a secondary tool was consuming premium navigation space.
+   It stays a fixed, quiet bottom-right utility at every width, and the
+   More menu's private group carries an "Ask Digby" item too. */
 (function(){
+  const mi = document.getElementById('askmenu');
   const b = document.getElementById('asklaunch');
-  const inner = document.querySelector('nav .inner');
-  if (b && inner) inner.appendChild(b);
+  if (mi && b) mi.addEventListener('click', () => {
+    if (typeof closeMore === 'function') closeMore();
+    b.click();
+  });
 })();
 if (typeof deskLive === 'function') deskLive();
 /* BALLOT-INIT-END */
@@ -21215,11 +21256,12 @@ body:has(section.detailopen) .asklaunch{display:none}
    over content (Cody's review: the pill sat on top of primary
    information). The button is relocated into the nav's right side at
    boot; the chat panel still opens as a deliberate overlay. ── */
-.asklaunch{margin-left:auto;border:1px solid var(--line2);
+.asklaunch{position:fixed;right:14px;bottom:14px;z-index:60;
+  border:1px solid var(--line2);
   background:var(--card);color:var(--ink2);
-  border-radius:3px;padding:9px 12px;cursor:pointer;
+  border-radius:20px;padding:9px 14px;cursor:pointer;
   font:700 11px/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;
-  min-height:40px}
+  min-height:40px;box-shadow:0 4px 18px rgba(0,0,0,.18)}
 .asklaunch:hover{background:var(--alt)}
 .askwrap{position:fixed;right:16px;bottom:16px;z-index:61;width:min(420px,calc(100vw - 32px));
   background:var(--card);border:1px solid var(--line);border-top:3px solid var(--amber);
@@ -21363,6 +21405,8 @@ PRIVATE_MARKERS = ("VolleyTalk", "Massey Ratings", "Massey Ratings, 2026",
                    # not ours to republish
                    "FIGstats", "figstats", "Massey preseason snapshot",
                    "REFERENCE MISMATCH", "EXTREF-HTML-BEGIN",
+                   "MOREPRIV-BEGIN", "mgpriv", "askmenu",
+                   "Private workspace",
                    'data-v="tv"', 'id="v-tv"', "tv_listings",
                    "chip('Massey'", "chip('VT'",
                    # Digby: model-written text and an endpoint that only exists
@@ -21434,6 +21478,10 @@ def strip_private(html):
     # ⚠ THE NAV BECAME A MENU AND THIS REGEX DID NOT KNOW. It matched
     # role="tab" only, so the More menu's own On TV item survived and the
     # public build ABORTED on its marker -- the gate doing exactly its job.
+    # the whole private-workspace menu group, label included -- an empty
+    # labelled group on the public page would advertise what was removed
+    html = re.sub(r'\s*<!-- MOREPRIV-BEGIN.*?MOREPRIV-END -->', "", html,
+                  flags=re.S)
     html = re.sub(r'\s*<button role="menuitem"[^>]*data-v="tv"[^>]*>.*?</button>',
                   "", html, flags=re.S)
     html = re.sub(r'\s*<button role="tab"[^>]*data-v="tv"[^>]*>.*?</button>', "",
