@@ -2,7 +2,7 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-01T04:00:56Z",
+  "generated_at_utc": "2026-09-01T04:37:36Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
@@ -83,6 +83,107 @@
    "incident_date": "2026-08-28",
    "claim": "match_incident",
    "note": "Purdue's own Aug. 31 match preview ('Big Ten/SEC Challenge Descends on Mackey Arena') states the injury type and the set in its own words -- the school naming a lower-leg injury upgrades the earlier Creighton-recap sourcing. Her CURRENT availability remains UNKNOWN pending a Purdue update: the preview marks Wollard 'out' but assigns Heaney no status."
+  }
+ ],
+ "projection": [
+  {
+   "team": "Purdue",
+   "player": "Grace Heaney",
+   "state": "incident",
+   "supports": [
+    {
+     "team": "Purdue",
+     "player": "Grace Heaney",
+     "kind": "school_release",
+     "quote": "two of its three returning All-Americans and preseason Player of the Year Watch List honorees (Wollard: out and Heaney leaving the match in Set 2 due to a lower leg injury",
+     "summary": "Left Creighton match in Set 2 with a lower-leg injury",
+     "url": "https://purduesports.com/news/2026/08/31/big-tensec-challenge-descends-on-mackey-arena",
+     "retrieved": "2026-09-01T04:00:46Z",
+     "effective": {
+      "from": "2026-08-28",
+      "to": null
+     },
+     "review_by": "2026-09-07",
+     "incident_date": "2026-08-28",
+     "claim": "match_incident",
+     "note": "Purdue's own Aug. 31 match preview ('Big Ten/SEC Challenge Descends on Mackey Arena') states the injury type and the set in its own words -- the school naming a lower-leg injury upgrades the earlier Creighton-recap sourcing. Her CURRENT availability remains UNKNOWN pending a Purdue update: the preview marks Wollard 'out' but assigns Heaney no status."
+    }
+   ],
+   "claim": "match_incident",
+   "incident_date": "2026-08-28",
+   "headline": "Left Creighton match in Set 2 with a lower-leg injury",
+   "n_supports": 1
+  },
+  {
+   "team": "Purdue",
+   "player": "Kenna Wollard",
+   "state": "status",
+   "supports": [
+    {
+     "team": "Purdue",
+     "player": "Kenna Wollard",
+     "kind": "player_statement",
+     "quote": "Sometimes life changes in ways you could never imagine or prepare for. I'm currently dealing with an unexpected health issue that will keep me away fro a little while. While I'm not ready to share the details at this time, I hope you understand and respect my privacy until I am ready to share more.",
+     "summary": null,
+     "url": "https://sports.yahoo.com/articles/purdues-kenna-wollard-releases-statement-185444853.html",
+     "retrieved": "2026-08-31T01:45:03Z",
+     "effective": {
+      "from": "2026-08-27",
+      "to": null
+     },
+     "review_by": "2026-09-13",
+     "incident_date": null,
+     "claim": "confirmed_unavailable",
+     "note": "Her own public Instagram statement, reported by Yahoo Sports / Purdue Boilermakers On SI (Dustin Schutte, 2026-08-27). The typo 'fro' is hers and is preserved -- the quote is verbatim. Coach Dave Shondell, same report: \"We don't know when for sure she'll be back. That's all I can say.\" NO diagnosis, hospital, season-ending status or return date is sourced, so none may render. Corroborating participation fact: Creighton's own Aug 28 recap says Purdue 'played without Second Team All-American Kenna Wollard (personal reasons)'."
+    }
+   ],
+   "claim": "confirmed_unavailable",
+   "headline": "Away from team / unavailable",
+   "n_supports": 1
+  },
+  {
+   "team": "Texas",
+   "player": "Abby Vander Wal",
+   "state": "status",
+   "supports": [
+    {
+     "team": "Texas",
+     "player": "Abby Vander Wal",
+     "kind": "beat_report",
+     "quote": "A Monday MRI confirmed the worst fears for Texas volleyball and outside hitter Abby Vander Wal. Vander Wal, a 6-foot-3 starting outside hitter, tore the ACL in her left knee during Saturday's win over TCU and will likely miss the remainder of the season.",
+     "summary": "Left ACL tear reported after Monday MRI",
+     "url": "https://sports.yahoo.com/articles/texas-volleyball-confirms-acl-tear-211105304.html",
+     "retrieved": "2026-09-01T04:00:46Z",
+     "effective": {
+      "from": "2026-08-31",
+      "to": null
+     },
+     "review_by": "2026-12-31",
+     "incident_date": null,
+     "claim": "out_for_season",
+     "note": "Austin American-Statesman (Thomas Jones, 2026-08-31), read via its Yahoo syndication. This is a BEAT REPORT of the MRI result -- no Texas Athletics release is held and none is implied. The injury occurred 2026-08-29 v TCU at the Players Era Showcase (Las Vegas)."
+    },
+    {
+     "team": "Texas",
+     "player": "Abby Vander Wal",
+     "kind": "beat_report",
+     "quote": "Texas coach Jerritt Elliott said sophomore outside hitter Abby Vander Wal is out for the season with the knee injury that she suffered on Saturday night.",
+     "summary": "Coach-reported: expected to miss the remainder of 2026",
+     "url": "https://www.si.com/onsi/volleyball/injuries/texas-volleyball-loses-key-offensive-weapon-to-season-ending-knee-injury-abby-vander-wal-2026",
+     "retrieved": "2026-09-01T04:00:46Z",
+     "effective": {
+      "from": "2026-08-30",
+      "to": null
+     },
+     "review_by": "2026-12-31",
+     "incident_date": null,
+     "claim": "out_for_season",
+     "note": "The coach-reported SEASON OUTLOOK, attributed separately from the MRI report: Sports Illustrated / On SI (Paige Durrenberger, 2026-08-30), quoting Lincoln Arneal's report of Jerritt Elliott's statement. Not a Texas Athletics release."
+    }
+   ],
+   "claim": "out_for_season",
+   "headline": "Out for the 2026 season",
+   "n_supports": 2
   }
  ],
  "signals": [],

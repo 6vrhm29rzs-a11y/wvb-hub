@@ -1406,6 +1406,32 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
             if _bad:
                 print("  %d Digby summaries withheld -- their facts moved since "
                       "they were written; rerun scripts/digby.py" % _bad)
+            # ⚠ STALE PRESENT TENSE (truth repair, 2026-09-01): a stored
+            # note saying "all three are back" or "core intact" must not
+            # sit beside a CURRENT sourced availability status saying a
+            # named player is out. A note for a team with any current
+            # sourced status is WITHHELD with the reason stated -- never
+            # rewritten here (rewriting would mean new prose no gate has
+            # seen; a fresh note comes from digby.py through the gate).
+            try:
+                import availability_desk as _AD
+                _av_by_team = {}
+                for _c in _AD.projection():
+                    if _c.get("state") == "status":
+                        _av_by_team.setdefault(_c["team"], []).append(
+                            _c["player"])
+                _navw = 0
+                for _nm, _rec in out.items():
+                    _pls = _av_by_team.get(_nm)
+                    if _pls and _rec.get("digby"):
+                        _rec["digby"] = None
+                        _rec["digby_avail_withheld"] = sorted(_pls)
+                        _navw += 1
+                if _navw:
+                    print("  %d scout note(s) withheld -- a sourced "
+                          "availability status postdates them" % _navw)
+            except Exception:                            # noqa: BLE001
+                pass
         except Exception as _e:                          # noqa: BLE001
             print("  could not verify Digby summaries (%s); withholding all"
                   % type(_e).__name__)
@@ -8767,6 +8793,10 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 details.avhist{margin:14px 0}
 .avrow.avinc{border-left:3px solid var(--rally)}
 .avsum{color:var(--ink)}
+.avsupp{display:block;margin:6px 0 2px 14px;padding-left:10px;
+  border-left:2px solid var(--line2);font-size:13px}
+.avso{color:var(--ink3);font-style:normal;font-size:12px}
+.avnsup{color:var(--ink2);font-style:normal;font-size:12px;font-weight:700}
 .avinclab{font:600 11px/1.4 var(--mono,monospace);color:var(--ink2);
   text-transform:uppercase;letter-spacing:.05em;display:block;margin:2px 0}
 /* AVAIL-CSS-END */
@@ -16576,28 +16606,13 @@ function pdAvailability(p) {
   /* the player-scoped desk state: current sourced status, or a labelled
      signal that sets none, or the honest default -- never "healthy". */
   if (typeof AVAIL === 'undefined' || !AVAIL.meta) return '';
-  const st = (AVAIL.statuses || []).filter(x =>
-    x.player === p.name && x.team === p.team);
-  const inc = (AVAIL.incidents || []).filter(x =>
-    x.player === p.name && x.team === p.team);
-  const sg = (AVAIL.signals || []).filter(x =>
+  const cards = (AVAIL.projection || []).filter(x =>
     x.player === p.name && x.team === p.team);
   const hist = (AVAIL.expired || []).filter(x =>
     x.player === p.name && x.team === p.team);
   let body;
-  if (st.length || inc.length || sg.length) {
-    body = st.map(x => '<span class="avrowline">' +
-        esc(avClaimLabel(x.claim)) +
-        (x.summary ? ' <b class="avsum">' + esc(x.summary) + '</b>' : '') +
-        ' <span class="avq">\u201c' + esc(x.quote) + '\u201d</span>' +
-        '</span>').join('') +
-      inc.map(x => '<span class="avrowline">Sourced match incident, ' +
-        esc(x.incident_date || '?') +
-        ' \u2014 current availability unknown, pending a team update' +
-        ' <span class="avq">\u201c' + esc(x.quote) + '\u201d</span>' +
-        '</span>').join('') +
-      sg.map(x => '<span class="avrowline"><i class="avkind">' +
-        esc(x.kind) + '</i> signal, sets no status</span>').join('');
+  if (cards.length) {
+    body = cards.map(avCard).join('');
   } else {
     body = '<span class="tddbquiet">No availability information \u2014 no ' +
       'attributable public status is held' +
@@ -16611,23 +16626,20 @@ function pdAvailability(p) {
 
 function tdAvailability(t, name) {
   if (typeof AVAIL === 'undefined' || !AVAIL.meta) return '';
-  const st = (AVAIL.statuses || []).filter(x => x.team === name);
-  const inc = (AVAIL.incidents || []).filter(x => x.team === name);
-  const sg = (AVAIL.signals || []).filter(x => x.team === name);
+  const cards = (AVAIL.projection || []).filter(x => x.team === name);
   const hist = (AVAIL.expired || []).filter(x => x.team === name);
   let body;
-  if (st.length || inc.length || sg.length) {
-    body = st.map(x => '<span class="avrowline"><b>' + esc(x.player) +
-        '</b> \u2014 ' + esc(avClaimLabel(x.claim)) +
-        (x.summary ? ' \u00b7 ' + esc(x.summary) : '') +
-        '</span>').join('') +
-      inc.map(x => '<span class="avrowline"><b>' + esc(x.player) +
-        '</b> \u2014 sourced match incident, ' +
-        esc(x.incident_date || '?') + ' \u00b7 current availability ' +
-        'unknown</span>').join('') +
-      sg.map(x => '<span class="avrowline"><b>' + esc(x.player) +
-        '</b> \u2014 <i class="avkind">' + esc(x.kind) +
-        '</i> signal, sets no status</span>').join('');
+  if (cards.length) {
+    body = cards.map(c => '<span class="avrowline"><b>' +
+        esc(c.player) + '</b> \u2014 ' +
+        (c.state === 'status'
+          ? esc(c.headline) + ' (sourced' +
+            (c.n_supports > 1 ? ', ' + c.n_supports + ' reports' : '') + ')'
+          : c.state === 'incident'
+          ? 'sourced match incident, ' + esc(c.incident_date || '?') +
+            ' \u00b7 current availability unknown'
+          : esc(c.headline)) +
+        '</span>').join('');
   } else {
     body = '<span class="tddbquiet">No availability information \u2014 ' +
       'no attributable public status is held' +
@@ -16665,37 +16677,57 @@ function avMeta(s) {
     '</span>';
 }
 
-function avStatusRow(s) {
-  return '<div class="avrow avst"><b>' + esc(s.player) + '</b> \u2014 ' +
-    esc(avClaimLabel(s.claim)) +
-    (s.summary ? ' <b class="avsum">' + esc(s.summary) + '</b>' : '') +
-    ' <span class="avq">\u201c' + esc(s.quote) + '\u201d</span>' +
+/* ONE PLAYER, ONE CURRENT CARD (truth repair, 2026-09-01): the card's
+   headline comes from the canonical projection; every evidence source
+   is an attributed SUPPORT row beneath it, never a second status. */
+function availWithheldNote(t) {
+  /* WHY there is no scout's read: a sourced status postdates it, and
+     its present-tense roster claims ("all three are back", "core
+     intact") may no longer hold. Stated, never silently blank. */
+  if (!t || !t.digby_avail_withheld || !t.digby_avail_withheld.length) {
+    return '';
+  }
+  return '<div class="digby scoutread"><div class="dsr-note tnote">' +
+    'Scout&rsquo;s read withheld: a sourced availability status for ' +
+    '<b>' + t.digby_avail_withheld.map(esc).join('</b>, <b>') +
+    '</b> postdates this note, and its present-tense roster claims ' +
+    'may no longer hold. It returns once regenerated against the ' +
+    'current facts.</div></div>';
+}
+
+function avSupportRow(s) {
+  return '<div class="avsupp">' +
+    (s.summary ? '<b class="avsum">' + esc(s.summary) + '</b> ' : '') +
+    '<span class="avq">\u201c' + esc(s.quote) + '\u201d</span>' +
     avMeta(s) + '</div>';
 }
 
-function avIncidentRow(s) {
-  /* a dated event, NEVER a current-out designation: the label says what
-     is known (the incident) and what is not (her availability now) */
-  return '<div class="avrow avinc"><b>' + esc(s.player) + '</b> \u2014 ' +
-    'sourced match incident, ' + esc(s.incident_date || '?') +
-    (s.summary ? ' <b class="avsum">' + esc(s.summary) + '</b>' : '') +
-    ' <span class="avinclab">current availability unknown \u2014 ' +
-    'pending a team update</span>' +
-    ' <span class="avq">\u201c' + esc(s.quote) + '\u201d</span>' +
-    avMeta(s) + '</div>';
+function avCard(c) {
+  const n = c.n_supports || (c.supports || []).length;
+  let head;
+  if (c.state === 'status') {
+    head = esc(c.headline) + ' <i class="avso">(sourced)</i>' +
+      (n > 1 ? ' \u00b7 <i class="avnsup">' + n +
+               ' supporting reports</i>' : '');
+  } else if (c.state === 'incident') {
+    head = 'Sourced match incident, ' + esc(c.incident_date || '?') +
+      ' \u2014 <b class="avsum">' + esc(c.headline) + '</b>' +
+      ' <span class="avinclab">current availability unknown \u2014 ' +
+      'pending a team update</span>';
+  } else {
+    head = esc(c.headline);
+  }
+  return '<div class="avrow ' +
+    (c.state === 'incident' ? 'avinc' : 'avst') + '"><b>' +
+    esc(c.player) + '</b> \u2014 ' + head +
+    (c.supports || []).map(avSupportRow).join('') + '</div>';
 }
+
+
 
 function avStatusLine(team) {
-  const st = (AVAIL.statuses || []).filter(s => s.team === team);
-  const inc = (AVAIL.incidents || []).filter(s => s.team === team);
-  const sg = (AVAIL.signals || []).filter(s => s.team === team);
-  if (!st.length && !inc.length && !sg.length) return '';
-  return st.map(avStatusRow).join('') + inc.map(avIncidentRow).join('') +
-  sg.map(s =>
-    '<div class="avrow avsg"><b>' + esc(s.player) + '</b> \u2014 ' +
-    '<i class="avkind">' + esc(s.kind) + '</i> signal, sets no status' +
-    ' <span class="avq">\u201c' + esc(s.quote) + '\u201d</span></div>')
-    .join('');
+  const cs = (AVAIL.projection || []).filter(c => c.team === team);
+  return cs.map(avCard).join('');
 }
 
 function avTeamBlock(team) {
@@ -16744,9 +16776,10 @@ function renderAvail() {
       '<div class="cfcard"><em>' + x[0] + '</em><b>' +
       (x[1] === undefined ? '\u2014' : x[1]) + '</b><span>' + x[2] +
       '</span></div>').join('') + '</div>';
+  const _proj = AVAIL.projection || [];
   document.getElementById('avstatuses').innerHTML =
-    (AVAIL.statuses || []).length
-      ? (AVAIL.statuses || []).map(avStatusRow).join('')
+    _proj.some(c => c.state === 'status')
+      ? _proj.filter(c => c.state === 'status').map(avCard).join('')
       : (AVAIL.incidents || []).length
       /* ⚠ the global "none currently" copy may NOT render while a recent
          sourced incident exists -- it would read as "nothing is known"
@@ -16759,8 +16792,8 @@ function renderAvail() {
         'default, not a gap.</p>';
   const avInc = document.getElementById('avincidents');
   if (avInc) avInc.innerHTML =
-    (AVAIL.incidents || []).length
-      ? (AVAIL.incidents || []).map(avIncidentRow).join('')
+    _proj.some(c => c.state === 'incident')
+      ? _proj.filter(c => c.state === 'incident').map(avCard).join('')
       : '<p class="tnote">None on record.</p>';
   document.getElementById('avexpired').innerHTML =
     (AVAIL.expired || []).length
@@ -19937,7 +19970,13 @@ function rotsoHTML(t) {
 }
 
 function scoutRead(t, team) {
-  if (!t.digby) return '';
+  if (!t.digby) {
+    /* AVAILS-HOOK-BEGIN */
+    return (typeof availWithheldNote === 'function')
+      ? availWithheldNote(t) : '';
+    /* AVAILS-HOOK-END */
+    return '';
+  }
   const parts = csSentences(String(t.digby));
   let lead = '', i = 0;
   /* two sentences, or three if the first two are very short -- a stated rule,
@@ -21628,6 +21667,7 @@ def strip_private(html):
                    ("/* AVAIL-JS-BEGIN */", "/* AVAIL-JS-END */"),
                    ("/* AVAIL-HOOK-BEGIN */", "/* AVAIL-HOOK-END */"),
                    ("/* AVAILP-HOOK-BEGIN */", "/* AVAILP-HOOK-END */"),
+                   ("/* AVAILS-HOOK-BEGIN */", "/* AVAILS-HOOK-END */"),
                    ("/* AVAIL-ROUTE-BEGIN */", "/* AVAIL-ROUTE-END */"),
                    ("<!-- AVAIL-MENU-BEGIN -->", "<!-- AVAIL-MENU-END -->"),
                    ("/* AVAIL-MD-BEGIN */", "/* AVAIL-MD-END */"),

@@ -156,6 +156,82 @@ def classify(ev, today):
     return statuses, incidents, signals, expired
 
 
+# claim precedence for the ONE current card: the strongest sourced claim
+# wins the headline; every entry stays beneath it as an attributed
+# support. Never merged into stronger wording than any single source.
+_CLAIM_RANK = {"out_for_season": 3, "confirmed_unavailable": 2,
+               "limited_gtd": 1}
+_CLAIM_HEADLINE = {
+    "out_for_season": "Out for the 2026 season",
+    "confirmed_unavailable": "Away from team / unavailable",
+    "limited_gtd": "Limited / game-time decision",
+}
+
+
+def projection(ev=None, today=None):
+    """ONE current card per player -- THE canonical availability
+    projection. Every surface (Desk, team dossier, player dossier,
+    sourced-intel labels) renders from this and nothing else.
+
+    ⚠ TWO EVIDENCE SOURCES ARE NOT TWO STATUSES (repair, 2026-09-01):
+    Vander Wal's MRI report and the coach-reported outlook rendered as
+    two separate "out for the season" rows -- wrong UI semantics. A
+    player has one current state; the sources are supports under it.
+    Precedence inside one player: status > incident > signal. A claim
+    headline comes from the strongest RANKED claim among supports;
+    each support keeps its own quote, summary, url and kind."""
+    import datetime as _dt
+    today = today or _dt.date.today().isoformat()
+    if ev is None:
+        ev = (load("data/raw/%d/availability_evidence.json" % SEASON)
+              or {}).get("players") or {}
+    statuses, incidents, signals, expired = classify(ev, today)
+    proj = {}
+
+    def card(row, state):
+        key = (row["team"], row["player"])
+        c = proj.get(key)
+        rank = {"status": 3, "incident": 2, "signal": 1}[state]
+        if c is None or rank > c["_rank"]:
+            base = {"team": row["team"], "player": row["player"],
+                    "state": state, "_rank": rank, "supports": []}
+            if c:
+                base["supports"] = c["supports"]
+            proj[key] = c = base
+        c["supports"].append(row)
+        return c
+
+    for r in statuses:
+        card(r, "status")
+    for r in incidents:
+        card(r, "incident")
+    for r in signals:
+        card(r, "signal")
+
+    out = []
+    for (team, player), c in sorted(proj.items()):
+        sup = c["supports"]
+        if c["state"] == "status":
+            st_sup = [x for x in sup if x.get("claim") in _CLAIM_RANK]
+            top = max(st_sup,
+                      key=lambda x: _CLAIM_RANK.get(x.get("claim"), 0))
+            c["claim"] = top.get("claim")
+            c["headline"] = _CLAIM_HEADLINE.get(c["claim"], c["claim"])
+        elif c["state"] == "incident":
+            inc = [x for x in sup if x.get("incident_date")][0]
+            c["claim"] = "match_incident"
+            c["incident_date"] = inc.get("incident_date")
+            c["headline"] = (inc.get("summary")
+                             or "Sourced match incident")
+        else:
+            c["claim"] = None
+            c["headline"] = "Signal only -- sets no status"
+        c["n_supports"] = len(sup)
+        c.pop("_rank")
+        out.append(c)
+    return out
+
+
 def build(today=None):
     today = today or datetime.date.today().isoformat()
     ev = (load("data/raw/%d/availability_evidence.json" % SEASON) or {}) \
@@ -249,6 +325,7 @@ def build(today=None):
                              or 4)),
     },
         "statuses": statuses, "incidents": incidents,
+        "projection": projection(ev, today),
         "signals": signals, "expired": expired,
         "anomalies": anomalies, "latest": latest, "timelines": timelines}
     dst = os.path.join(REPO, "data", "availability_desk_%d.json" % SEASON)

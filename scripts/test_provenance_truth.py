@@ -100,8 +100,9 @@ def main():
     page = io.open(PAGE, encoding="utf-8").read()
     fns = {}
     for name in ("esc", "corrSchools", "provenanceTag", "tdLatestFinal",
-                 "avMeta", "avStatusRow", "avIncidentRow", "avStatusLine",
-                 "renderAvail", "pdAvailability", "recapHTML"):
+                 "avMeta", "avSupportRow", "avCard", "avStatusLine",
+                 "renderAvail", "pdAvailability", "recapHTML",
+                 "availWithheldNote"):
         fns[name] = jsfn(page, name)
         if not fns[name]:
             check("page function %s extracted" % name, False, "missing")
@@ -274,11 +275,16 @@ def main():
     print("\n  the page's own rows, under node")
     avfns = (fns["esc"] + "\n" + (jsfn(page, "avClaimLabel") or "") +
              "\n" + fns["avMeta"] + "\n" +
-             fns["avStatusRow"] + "\n" + fns["avIncidentRow"] + "\n")
+             fns["avSupportRow"] + "\n" + fns["avCard"] + "\n")
+    proj = {(c["team"], c["player"]): c for c in art["projection"]}
+    wcard = proj[("Purdue", "Kenna Wollard")]
+    hcard = proj[("Purdue", "Grace Heaney")]
+    vcard = proj[("Texas", "Abby Vander Wal")]
     js5 = (avfns +
-           "const w = %s, h = %s;\n" % (json.dumps(wrow), json.dumps(hrow)) +
-           "console.log(JSON.stringify({w: avStatusRow(w), "
-           "h: avIncidentRow(h)}));")
+           "const w = %s, h = %s;\n" % (json.dumps(wcard),
+                                         json.dumps(hcard)) +
+           "console.log(JSON.stringify({w: avCard(w), "
+           "h: avCard(h)}));")
     rc, out, err = node(js5)
     check("status/incident rows run under node", rc == 0, err)
     if rc == 0:
@@ -288,8 +294,8 @@ def main():
               "unexpected health issue that will keep me away fro a "
               "little while" in w)
         check("Wollard: away from team / unavailable, nothing stronger",
-              "away from team / unavailable (sourced)" in w.lower()
-              or "Away from team / unavailable (sourced)" in w)
+              "Away from team / unavailable" in w and "(sourced)" in w
+              and "Out for the" not in w)
         for banned in ("season-ending", "season ending", "hospital",
                        "surgery", "diagnos", "out for the season",
                        "torn", "acl"):
@@ -301,7 +307,7 @@ def main():
               and "effective 2026-08-27" in w and "review by 2026-09-13" in w,
               w)
         check("Heaney: dated incident, availability stated UNKNOWN",
-              "sourced match incident, 2026-08-28" in h
+              "Sourced match incident, 2026-08-28" in h
               and "current availability unknown" in h
               and "pending a team update" in h, h)
         # 'season' as a bare substring would trip on the quote's own
@@ -324,15 +330,16 @@ def main():
                        "mri", "diagnos")))
 
     js5b = (avfns +
-            "const rows = %s;\n" % json.dumps(vrows) +
-            "console.log(JSON.stringify(rows.map(avStatusRow).join('')));")
+            "const c = %s;\n" % json.dumps(vcard) +
+            "console.log(JSON.stringify(avCard(c)));")
     rc, out, err = node(js5b)
     check("Vander Wal rows run under node", rc == 0, err)
     if rc == 0:
         v = json.loads(out.strip().splitlines()[-1])
-        check("Vander Wal renders OUT FOR THE SEASON (sourced), never a "
-              "mere incident",
-              v.count("out for the season (sourced)") == 2
+        check("Vander Wal: ONE current status card -- never two rows, "
+              "never a mere incident",
+              v.count("Out for the 2026 season") == 1
+              and "2 supporting reports" in v
               and "sourced match incident" not in v)
         check("...both summaries render: the MRI report and the coach "
               "outlook, separately",
@@ -348,7 +355,7 @@ def main():
            "const document={getElementById:el};\n")
     render_stub = (fns["esc"] + "\n" + (jsfn(page, "avClaimLabel") or "")
                    + "\n" + fns["avMeta"] + "\n" +
-                   fns["avStatusRow"] + "\n" + fns["avIncidentRow"] + "\n" +
+                   fns["avSupportRow"] + "\n" + fns["avCard"] + "\n" +
                    dom)
 
     def run_render(avail_obj, fn_src=None):
@@ -362,19 +369,22 @@ def main():
                 if rc == 0 else {"err": err})
 
     r1 = run_render({"meta": {"counts": {}}, "statuses": [],
-                     "incidents": [hrow], "signals": [], "expired": []})
+                     "incidents": [hrow], "projection": [hcard],
+                     "signals": [], "expired": []})
     check("no status + a live incident -> the 'none' copy CANNOT render",
           "No attributable public source" not in r1.get("st", "X"),
           r1)
     check("...and the copy points at the incident section",
           "sourced match incident" in r1.get("st", ""))
     r2 = run_render({"meta": {"counts": {}}, "statuses": [],
-                     "incidents": [], "signals": [], "expired": []})
+                     "incidents": [], "projection": [], "signals": [],
+                     "expired": []})
     check("nothing at all -> the honest default renders",
           "No attributable public source currently" in r2.get("st", ""))
     r3 = run_render(dict({"meta": {"counts": {}}, "signals": [],
                           "expired": []},
-                         statuses=[wrow], incidents=[hrow]))
+                         statuses=[wrow], incidents=[hrow],
+                         projection=[wcard, hcard]))
     check("both exist -> both sections carry their rows",
           "Kenna Wollard" in r3.get("st", "")
           and "Grace Heaney" in r3.get("inc", ""))
@@ -390,11 +400,12 @@ def main():
         check("[NEG] mutation target found in renderAvail", False)
 
     print("\n  the player dossier links the evidence")
-    js6 = (fns["esc"] + "\n" + (jsfn(page, "avClaimLabel") or "") +
+    js6 = (avfns +
            "\nfunction routeFor(){return '#avail'}\n" +
            "const AVAIL = %s;\n" % json.dumps(
                {"meta": art["meta"], "statuses": art["statuses"],
-                "incidents": art["incidents"], "signals": [],
+                "incidents": art["incidents"],
+                "projection": art["projection"], "signals": [],
                 "expired": []}) +
            fns["pdAvailability"] + "\n" +
            "console.log(JSON.stringify({"
@@ -406,7 +417,8 @@ def main():
     if rc == 0:
         d = json.loads(out.strip().splitlines()[-1])
         check("Wollard's dossier shows the sourced status + desk link",
-              "away from team / unavailable (sourced)" in d["w"]
+              "Away from team / unavailable" in d["w"]
+              and "(sourced)" in d["w"]
               and "Availability Desk" in d["w"], d["w"])
         check("Heaney's dossier shows the incident, availability unknown",
               "Sourced match incident, 2026-08-28" in d["h"]
@@ -417,13 +429,86 @@ def main():
         check("an unmentioned player keeps the honest default",
               "No availability information" in d["o"])
 
+    print("\n  ONE PROJECTION, EVERY SURFACE (truth repair 2026-09-01)")
+    check("two evidence records -> ONE current card with two supports",
+          vcard["state"] == "status" and vcard["n_supports"] == 2
+          and vcard["headline"] == "Out for the 2026 season")
+    # a synthetic pair proves the grouping is structural, not data luck
+    synth = {"T|P": [
+        dict(wrow, team="T", player="P", claim="confirmed_unavailable",
+             kind="beat_report", url="https://a.example/1"),
+        dict(wrow, team="T", player="P", claim="out_for_season",
+             kind="beat_report", url="https://a.example/2")]}
+    pcards = AD.projection(synth, today)
+    check("...and the strongest ranked claim heads the single card",
+          len(pcards) == 1 and pcards[0]["headline"]
+          == "Out for the 2026 season" and pcards[0]["n_supports"] == 2)
+    import source_intel as SI
+    av_claims = [c for c in SI.claims(2026, today=today)
+                 if c["type"] == "availability"
+                 and c["state"] != "expired"]
+    by_player = {}
+    for c in av_claims:
+        by_player.setdefault(c["subject"].get("player"), []).append(c)
+    check("intel: exactly one availability claim per player",
+          all(len(v) == 1 for v in by_player.values()),
+          {k: len(v) for k, v in by_player.items()})
+    kw = (by_player.get("Kenna Wollard") or [{}])[0]
+    gh = (by_player.get("Grace Heaney") or [{}])[0]
+    vw_c = (by_player.get("Abby Vander Wal") or [{}])[0]
+    check("Kenna can NEVER downgrade to 'unconfirmed'",
+          kw.get("state") == "confirmed_official"
+          and "unconfirmed" not in (kw.get("what") or "").lower()
+          and "sourced availability status" in (kw.get("what") or ""))
+    check("Grace can NEVER downgrade to a generic signal",
+          gh.get("state") == "confirmed_official"
+          and "signal" not in (gh.get("what") or "").lower()
+          and "sourced match incident" in (gh.get("what") or ""))
+    check("Vander Wal's intel claim matches the Desk headline",
+          "Out for the 2026 season" in (vw_c.get("what") or "")
+          and len(vw_c.get("sources") or []) == 2)
+    # cross-surface wording agreement, from the built page payload
+    m2 = re.search(r"const TEAMS = (\{.*?\});\n", page, re.S)
+    if m2:
+        tp = json.loads(m2.group(1).replace("<\\/", "</"))
+        tx = tp.get("Texas") or {}
+        pu = tp.get("Purdue") or {}
+        check("STALE PRESENT TENSE: Texas's scout note is withheld while "
+              "Vander Wal is out for the season",
+              tx.get("digby") is None
+              and tx.get("digby_avail_withheld") == ["Abby Vander Wal"],
+              tx.get("digby_avail_withheld"))
+        check("...and Purdue's while Wollard is unavailable",
+              pu.get("digby") is None
+              and "Kenna Wollard" in (pu.get("digby_avail_withheld") or []))
+        check("...and the stored notes really did carry the stale claims "
+              "(the withhold caught real text)",
+              True)  # asserted below against the summaries file
+        neb = tp.get("Nebraska") or {}
+        check("a team with NO status keeps its scout note",
+              "digby_avail_withheld" not in neb)
+    import json as _j
+    dsum = _j.load(io.open(os.path.join(
+        REPO, "data/digby_summaries_2026.json"), encoding="utf-8"))
+    txs = ((dsum.get("teams") or {}).get("Texas") or {}).get("summary") or ""
+    pus = ((dsum.get("teams") or {}).get("Purdue") or {}).get("summary") or ""
+    check("the withheld Texas note contained present-tense 'intact'",
+          "intact" in txs)
+    check("the withheld Purdue note contained present-tense 'are back'",
+          "are back" in pus or "all three" in pus)
+    check("the withheld note names WHY on the page (fenced helper)",
+          "availWithheldNote" in page
+          and "postdates this note" in page)
+
     print("\n  the public page carries none of it")
     pub_p = os.path.join(REPO, "output", "vb_dashboard.html")
     if os.path.exists(pub_p):
         pub = io.open(pub_p, encoding="utf-8").read()
         for frag in ("unexpected health issue",
-                     "midway through the second set",
-                     "match incident", "avIncidentRow",
+                     "leaving the match in Set 2",
+                     "match incident", "avCard(", "availWithheldNote",
+                     "digby_avail_withheld",
+                     "Out for the 2026 season",
                      "current availability unknown"):
             check("public page lacks %r" % frag, frag not in pub)
 

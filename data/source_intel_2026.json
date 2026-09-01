@@ -1,15 +1,15 @@
 {
  "meta": {
   "season": 2026,
-  "generated_at_utc": "2026-09-01T03:16:30Z",
-  "n_claims": 24,
+  "generated_at_utc": "2026-09-01T04:38:57Z",
+  "n_claims": 25,
   "feed_cap": 5,
   "recent_hours": 72,
   "states": {
-   "confirmed_official": 8,
+   "confirmed_official": 11,
    "corroborated": 9,
-   "official_unconfirmed": 1,
-   "community_signal": 1,
+   "official_unconfirmed": 0,
+   "community_signal": 0,
    "conflicting": 1,
    "expired": 3,
    "inaccessible": 1
@@ -724,6 +724,108 @@
    "review_by": null
   },
   {
+   "id": "49195fadc4dd",
+   "type": "availability",
+   "subject": {
+    "kind": "player",
+    "team": "Purdue",
+    "player": "Grace Heaney"
+   },
+   "what": "Grace Heaney (Purdue): sourced match incident -- Left Creighton match in Set 2 with a lower-leg injury; current availability unknown",
+   "state": "confirmed_official",
+   "state_label": "confirmed by an official source",
+   "why": "confirmed by an official source",
+   "scope": "one player's availability for the stated dates",
+   "sources": [
+    {
+     "url": "https://purduesports.com/news/2026/08/31/big-tensec-challenge-descends-on-mackey-arena",
+     "excerpt": "two of its three returning All-Americans and preseason Player of the Year Watch List honorees (Wollard: out and Heaney leaving the match in Set 2 due to a lower leg injury",
+     "retrieved": "2026-09-01T04:00:46Z",
+     "source_class": "official_school"
+    }
+   ],
+   "public": false,
+   "priority": 80,
+   "route": {
+    "team": "Purdue"
+   },
+   "effective": {
+    "from": "2026-08-28",
+    "to": null
+   },
+   "review_by": "2026-09-07"
+  },
+  {
+   "id": "4a931b9bc08a",
+   "type": "availability",
+   "subject": {
+    "kind": "player",
+    "team": "Purdue",
+    "player": "Kenna Wollard"
+   },
+   "what": "Kenna Wollard (Purdue): Away from team / unavailable -- sourced availability status",
+   "state": "confirmed_official",
+   "state_label": "confirmed by an official source",
+   "why": "confirmed by an official source",
+   "scope": "one player's availability for the stated dates",
+   "sources": [
+    {
+     "url": "https://sports.yahoo.com/articles/purdues-kenna-wollard-releases-statement-185444853.html",
+     "excerpt": "Sometimes life changes in ways you could never imagine or prepare for. I'm currently dealing with an unexpected health issue that will keep me away fro a little while. While I'm not ready to share the details at this time, I hope you understand and respect my privacy until I am ready to share more.",
+     "retrieved": "2026-08-31T01:45:03Z",
+     "source_class": "official_school"
+    }
+   ],
+   "public": false,
+   "priority": 80,
+   "route": {
+    "team": "Purdue"
+   },
+   "effective": {
+    "from": "2026-08-27",
+    "to": null
+   },
+   "review_by": "2026-09-13"
+  },
+  {
+   "id": "eb06a881496b",
+   "type": "availability",
+   "subject": {
+    "kind": "player",
+    "team": "Texas",
+    "player": "Abby Vander Wal"
+   },
+   "what": "Abby Vander Wal (Texas): Out for the 2026 season -- sourced availability status",
+   "state": "confirmed_official",
+   "state_label": "confirmed by an official source",
+   "why": "confirmed by an official source",
+   "scope": "one player's availability for the stated dates",
+   "sources": [
+    {
+     "url": "https://sports.yahoo.com/articles/texas-volleyball-confirms-acl-tear-211105304.html",
+     "excerpt": "A Monday MRI confirmed the worst fears for Texas volleyball and outside hitter Abby Vander Wal. Vander Wal, a 6-foot-3 starting outside hitter, tore the ACL in her left knee during Saturday's win over TCU and will likely miss the remainder of the season.",
+     "retrieved": "2026-09-01T04:00:46Z",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://www.si.com/onsi/volleyball/injuries/texas-volleyball-loses-key-offensive-weapon-to-season-ending-knee-injury-abby-vander-wal-2026",
+     "excerpt": "Texas coach Jerritt Elliott said sophomore outside hitter Abby Vander Wal is out for the season with the knee injury that she suffered on Saturday night.",
+     "retrieved": "2026-09-01T04:00:46Z",
+     "source_class": "official_school"
+    }
+   ],
+   "public": false,
+   "priority": 80,
+   "route": {
+    "team": "Texas"
+   },
+   "effective": {
+    "from": "2026-08-31",
+    "to": null
+   },
+   "review_by": "2026-12-31"
+  },
+  {
    "id": "7e5d6a47bcb2",
    "type": "availability",
    "subject": {
@@ -754,25 +856,27 @@
     "to": "2026-08-28"
    },
    "review_by": "2026-09-04"
-  },
+  }
+ ],
+ "feed": [
   {
-   "id": "4a931b9bc08a",
+   "id": "49195fadc4dd",
    "type": "availability",
    "subject": {
     "kind": "player",
     "team": "Purdue",
-    "player": "Kenna Wollard"
+    "player": "Grace Heaney"
    },
-   "what": "Kenna Wollard (Purdue): official availability news",
-   "state": "official_unconfirmed",
-   "state_label": "official record; confirmation pending",
-   "why": "official record; confirmation pending",
+   "what": "Grace Heaney (Purdue): sourced match incident -- Left Creighton match in Set 2 with a lower-leg injury; current availability unknown",
+   "state": "confirmed_official",
+   "state_label": "confirmed by an official source",
+   "why": "confirmed by an official source",
    "scope": "one player's availability for the stated dates",
    "sources": [
     {
-     "url": "https://sports.yahoo.com/articles/purdues-kenna-wollard-releases-statement-185444853.html",
-     "excerpt": "Sometimes life changes in ways you could never imagine or prepare for. I'm currently dealing with an unexpected health issue that will keep me away fro a little while. While I'm not ready to share the details at this time, I hope you understand and respect my privacy until I am ready to share more.",
-     "retrieved": "2026-08-31T01:45:03Z",
+     "url": "https://purduesports.com/news/2026/08/31/big-tensec-challenge-descends-on-mackey-arena",
+     "excerpt": "two of its three returning All-Americans and preseason Player of the Year Watch List honorees (Wollard: out and Heaney leaving the match in Set 2 due to a lower leg injury",
+     "retrieved": "2026-09-01T04:00:46Z",
      "source_class": "official_school"
     }
    ],
@@ -782,45 +886,51 @@
     "team": "Purdue"
    },
    "effective": {
-    "from": "2026-08-27",
-    "to": null
-   },
-   "review_by": "2026-09-13"
-  },
-  {
-   "id": "6d2f5c34de3a",
-   "type": "availability",
-   "subject": {
-    "kind": "player",
-    "team": "Purdue",
-    "player": "Grace Heaney"
-   },
-   "what": "Grace Heaney (Purdue): availability signal",
-   "state": "community_signal",
-   "state_label": "community signal — a lead, not a fact",
-   "why": "community signal — a lead, not a fact",
-   "scope": "one player's availability for the stated dates",
-   "sources": [
-    {
-     "url": "https://d2560u4h06m0te.cloudfront.net/news/2026/8/28/volleyball-vs-9-purdue",
-     "excerpt": "The Boilermakers played without Second Team All-American Kenna Wollard (personal reasons), then lost Omaha native and Third Team All-American Grace Heaney midway through the second set due to injury.",
-     "retrieved": "2026-08-31T01:45:03Z",
-     "source_class": "community"
-    }
-   ],
-   "public": false,
-   "priority": 45,
-   "route": {
-    "team": "Purdue"
-   },
-   "effective": {
     "from": "2026-08-28",
     "to": null
    },
-   "review_by": "2026-09-06"
-  }
- ],
- "feed": [
+   "review_by": "2026-09-07",
+   "first_seen": "2026-09-01T04:38:57Z"
+  },
+  {
+   "id": "eb06a881496b",
+   "type": "availability",
+   "subject": {
+    "kind": "player",
+    "team": "Texas",
+    "player": "Abby Vander Wal"
+   },
+   "what": "Abby Vander Wal (Texas): Out for the 2026 season -- sourced availability status",
+   "state": "confirmed_official",
+   "state_label": "confirmed by an official source",
+   "why": "confirmed by an official source",
+   "scope": "one player's availability for the stated dates",
+   "sources": [
+    {
+     "url": "https://sports.yahoo.com/articles/texas-volleyball-confirms-acl-tear-211105304.html",
+     "excerpt": "A Monday MRI confirmed the worst fears for Texas volleyball and outside hitter Abby Vander Wal. Vander Wal, a 6-foot-3 starting outside hitter, tore the ACL in her left knee during Saturday's win over TCU and will likely miss the remainder of the season.",
+     "retrieved": "2026-09-01T04:00:46Z",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://www.si.com/onsi/volleyball/injuries/texas-volleyball-loses-key-offensive-weapon-to-season-ending-knee-injury-abby-vander-wal-2026",
+     "excerpt": "Texas coach Jerritt Elliott said sophomore outside hitter Abby Vander Wal is out for the season with the knee injury that she suffered on Saturday night.",
+     "retrieved": "2026-09-01T04:00:46Z",
+     "source_class": "official_school"
+    }
+   ],
+   "public": false,
+   "priority": 80,
+   "route": {
+    "team": "Texas"
+   },
+   "effective": {
+    "from": "2026-08-31",
+    "to": null
+   },
+   "review_by": "2026-12-31",
+   "first_seen": "2026-09-01T04:38:57Z"
+  },
   {
    "id": "c26dee36a2a6",
    "type": "result_correction",
@@ -856,72 +966,6 @@
    "effective": null,
    "review_by": null,
    "first_seen": "2026-08-31T01:01:57Z"
-  },
-  {
-   "id": "4a931b9bc08a",
-   "type": "availability",
-   "subject": {
-    "kind": "player",
-    "team": "Purdue",
-    "player": "Kenna Wollard"
-   },
-   "what": "Kenna Wollard (Purdue): official availability news",
-   "state": "official_unconfirmed",
-   "state_label": "official record; confirmation pending",
-   "why": "official record; confirmation pending",
-   "scope": "one player's availability for the stated dates",
-   "sources": [
-    {
-     "url": "https://sports.yahoo.com/articles/purdues-kenna-wollard-releases-statement-185444853.html",
-     "excerpt": "Sometimes life changes in ways you could never imagine or prepare for. I'm currently dealing with an unexpected health issue that will keep me away fro a little while. While I'm not ready to share the details at this time, I hope you understand and respect my privacy until I am ready to share more.",
-     "retrieved": "2026-08-31T01:45:03Z",
-     "source_class": "official_school"
-    }
-   ],
-   "public": false,
-   "priority": 80,
-   "route": {
-    "team": "Purdue"
-   },
-   "effective": {
-    "from": "2026-08-27",
-    "to": null
-   },
-   "review_by": "2026-09-13",
-   "first_seen": "2026-08-31T02:40:09Z"
-  },
-  {
-   "id": "6d2f5c34de3a",
-   "type": "availability",
-   "subject": {
-    "kind": "player",
-    "team": "Purdue",
-    "player": "Grace Heaney"
-   },
-   "what": "Grace Heaney (Purdue): availability signal",
-   "state": "community_signal",
-   "state_label": "community signal — a lead, not a fact",
-   "why": "community signal — a lead, not a fact",
-   "scope": "one player's availability for the stated dates",
-   "sources": [
-    {
-     "url": "https://d2560u4h06m0te.cloudfront.net/news/2026/8/28/volleyball-vs-9-purdue",
-     "excerpt": "The Boilermakers played without Second Team All-American Kenna Wollard (personal reasons), then lost Omaha native and Third Team All-American Grace Heaney midway through the second set due to injury.",
-     "retrieved": "2026-08-31T01:45:03Z",
-     "source_class": "community"
-    }
-   ],
-   "public": false,
-   "priority": 45,
-   "route": {
-    "team": "Purdue"
-   },
-   "effective": {
-    "from": "2026-08-28",
-    "to": null
-   },
-   "review_by": "2026-09-06",
-   "first_seen": "2026-08-31T02:40:09Z"
   },
   {
    "id": "333c4d178c77",

@@ -287,51 +287,76 @@ def _from_availability(season, today):
     """⚠ PRIVATE, ALL OF IT. Availability is an AVAIL-fenced feature and a
     community observation is Cody's own words -- none of it may reach the
     published page. public=False is the value-level filter the public
-    build applies."""
+    build applies.
+
+    ⚠ ONE CLAIM PER PLAYER, FROM THE CANONICAL PROJECTION (truth repair,
+    2026-09-01). The old per-entry loop predated match incidents and the
+    out_for_season claim: Wollard's sourced status rendered as
+    "UNCONFIRMED" and Heaney's school-sourced incident fell through to a
+    generic community "SIGNAL" -- two surfaces contradicting the Desk.
+    availability_desk.projection() is THE state; this function only
+    translates it into intel vocabulary:
+      status   -> confirmed_official ("PLAYER: <headline> -- sourced
+                  availability status")
+      incident -> confirmed_official ("sourced match incident; current
+                  availability unknown")
+      signal   -> community_signal, exactly as before."""
     out = []
     try:
         import availability_desk as AD
     except Exception:
         return out
-    doc = _load("data/raw/%d/availability_evidence.json" % season)
     if today is None:
         today = datetime.date.today().isoformat()
+    doc = _load("data/raw/%d/availability_evidence.json" % season)
+    for c in AD.projection((doc.get("players") or {}), today):
+        team, player = c["team"], c["player"]
+        sup = c.get("supports") or []
+        if c["state"] == "status":
+            state = "confirmed_official"
+            title = "%s (%s): %s -- sourced availability status" % (
+                player, team, c.get("headline"))
+        elif c["state"] == "incident":
+            state = "confirmed_official"
+            title = ("%s (%s): sourced match incident -- %s; current "
+                     "availability unknown" % (player, team,
+                                               c.get("headline")))
+        else:
+            state = "community_signal"
+            title = "%s (%s): availability signal" % (player, team)
+        official = state == "confirmed_official"
+        out.append(_claim(
+            _cid("avail", "%s|%s" % (team, player),
+                 (sup[0].get("retrieved") if sup else "")),
+            "availability",
+            {"kind": "player", "team": team, "player": player},
+            title, state, STATE_LABEL[state],
+            [_src(e.get("url"), e.get("quote") or e.get("note"),
+                  e.get("retrieved"),
+                  "official_school" if official else "community")
+             for e in sup],
+            public=False,
+            priority=80 if official else 45,
+            route={"team": team},
+            effective=(sup[0].get("effective") if sup else None),
+            review_by=(sup[0].get("review_by") if sup else None)))
+    # expired evidence keeps its history claim, one per entry, as before
     for key, evs in (doc.get("players") or {}).items():
         team, _, player = key.partition("|")
         for ev in evs or []:
-            es = AD.entry_state(ev, today)   # the desk's OWN rule (round 10)
-            if es == "invalid":
-                continue
-            if es == "expired":
-                state = "expired"
-            elif es == "status":
-                # an attributable status with url+quote: official school
-                # sources are confirmed; a reporter's is official_unconfirmed
-                state = ("confirmed_official"
-                         if (ev.get("kind") or "").startswith("official")
-                         or ev.get("kind") == "school_site"
-                         else "official_unconfirmed")
-            else:
-                state = "community_signal"
-            official = state in ("confirmed_official",
-                                 "official_unconfirmed")
-            out.append(_claim(
-                _cid("avail", key, ev.get("retrieved")), "availability",
-                {"kind": "player", "team": team, "player": player},
-                "%s (%s): %s" % (player, team,
-                                 "availability signal" if not official
-                                 else "official availability news"),
-                state,
-                STATE_LABEL[state],
-                [_src(ev.get("url"), ev.get("quote") or ev.get("note"),
-                      ev.get("retrieved"),
-                      "official_school" if official else "community")],
-                public=False,
-                priority=80 if official else
-                (20 if state == "expired" else 45),
-                route={"team": team},
-                effective=ev.get("effective"),
-                review_by=ev.get("review_by")))
+            if AD.entry_state(ev, today) == "expired":
+                out.append(_claim(
+                    _cid("avail", key, ev.get("retrieved")),
+                    "availability",
+                    {"kind": "player", "team": team, "player": player},
+                    "%s (%s): availability signal" % (player, team),
+                    "expired", STATE_LABEL["expired"],
+                    [_src(ev.get("url"), ev.get("quote") or ev.get("note"),
+                          ev.get("retrieved"), "community")],
+                    public=False, priority=20,
+                    route={"team": team},
+                    effective=ev.get("effective"),
+                    review_by=ev.get("review_by")))
     return out
 
 

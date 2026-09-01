@@ -232,7 +232,13 @@ const PLAYERS = [
   { team: 'X', name: 'C Bench', sets: 2, k: 9, ast: 0, digs: 1,
     bs: 0, ba: 0, aces: 0 }];
 const AVAIL = { meta: {}, statuses: [], expired: [],
-  signals: [{ team: 'X', player: 'A Hitter', kind: 'cody_observation' }] };
+  signals: [{ team: 'X', player: 'A Hitter', kind: 'cody_observation' }],
+  /* the canonical projection (truth repair 2026-09-01): every surface
+     renders from THIS; a signal-only player carries the sets-no-status
+     headline here */
+  projection: [{ team: 'X', player: 'A Hitter', state: 'signal',
+    claim: null, headline: 'Signal only -- sets no status',
+    n_supports: 1, supports: [] }] };
 %s
 %s
 %s
