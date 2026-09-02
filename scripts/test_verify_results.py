@@ -98,6 +98,24 @@ def main():
     check("opponent identity dominates the date (doubleheaders)",
           "team_norm(r[\"opponent\"]) == want" in src)
 
+    print("\n3b. THE PAGE RENDERS TRUST METADATA, NOT NOISE")
+    page = open(os.path.join(REPO, "Cody", "START-HERE.html"),
+                encoding="utf-8").read()
+    check("one wording map serves the drill and the row marks",
+          page.count("function rvWording") == 1)
+    check("an unchecked or unverifiable match renders NOTHING on the row "
+          "(a nightly batch means most of today is legitimately unchecked)",
+          "if (!v || v === 'UNVERIFIED') return '';" in page)
+    check("the mark lives INSIDE the meta cell, never a fifth grid child",
+          "rvMark(m.gid)" in page and
+          page.find('<span class="mmeta">') < page.find("rvMark(m.gid)"))
+    check("the drill has the verification section with per-school evidence",
+          'class="rcverify"' in page and "published schedule" in page)
+    check("a pending result says the check is nightly, without suspicion",
+          "verification runs nightly" in page)
+    check("conflict is the one loud row state",
+          "sources disagree" in page)
+
     print("\n4. [NEG] negative controls")
     # a doubled date: matching by date alone would take Georgia's row for
     # a Purdue query; the opponent anchor must pick the right one

@@ -7449,6 +7449,18 @@ td.at{white-space:nowrap}
   min-width:0;overflow:hidden;text-align:left;
   padding-left:14px;border-left:1px solid var(--line);align-self:stretch;
   justify-content:center}
+/* the verification mark: subdued, provenance-toned; loud only on a
+   conflict, which is the one state that changes what the row means */
+.mrow .rvmk{font:700 11px/1.4 var(--mono);color:var(--slate);
+  letter-spacing:.06em}
+.mrow .rvmk.bad{color:var(--coral);font:700 10.5px/1.3 var(--disp);
+  letter-spacing:.1em;text-transform:uppercase}
+.rcverify{margin:10px 0;padding:10px 12px;border:1px solid var(--line2)}
+.rcverify .rvh{display:block;font:700 11px/1 var(--disp);
+  letter-spacing:.14em;text-transform:uppercase;color:var(--slate);
+  margin-bottom:6px}
+.rcverify .rvline{display:block;font:600 12.5px/1.5 var(--sans);
+  color:var(--ink2);margin-bottom:4px}
 .mvn{font:11px/1.4 var(--sans);color:var(--slate);white-space:nowrap;
   overflow:hidden;text-overflow:ellipsis;max-width:100%}
 /* the two numerals stack so they line up with the two team rows above */
@@ -16008,6 +16020,7 @@ function matchRow(m, live, dest) {
       '</span>' +
     rowLinescore(m, live, st) +
     '<span class="mmeta">' +
+      (st === 'final' && typeof rvMark === 'function' ? rvMark(m.gid) : '') +
       (_mbits.length ? '<span class="mvn">' + _mbits.join(' \u00b7 ') +
         '</span>' : '') +
       ((st === 'live' && typeof ATTR_WATCH !== 'undefined' && ATTR_WATCH[m.gid])
@@ -16657,6 +16670,54 @@ function renderConfidence() {
     : '<p class="tdquiet">No final in this state.</p>';
 }
 
+/* ONE WORDING PER VERDICT -- the drill and the row marks share these. */
+function rvWording(v) {
+  return ({
+    VERIFIED_BOTH: '\u2713\u2713 Verified by both schools',
+    CORROBORATED_ONE: '\u2713 Confirmed by one school',
+    SCHOOL_CONFLICT: '\u26a0 Official sources disagree',
+    CONTRADICTED_BOTH: '\u26a0 Both schools contradict the recorded result',
+    CONTRADICTED_ONE: '\u26a0 A school source contradicts the recorded result',
+    UNVERIFIED: 'Not verifiable when checked',
+  })[v] || esc(v);
+}
+function rvSchoolNote(st) {
+  return ({
+    NOT_POSTED: 'Final result not posted when checked',
+    EVENT_NOT_FOUND: 'The match row was not found on the published schedule',
+    SITE_UNPARSED: 'Schedule page could not be read (JS-rendered)',
+    SITE_BLOCKED: 'Site refused the request',
+    SITE_HTTP_MISS: 'No schedule surface answered',
+    SITE_NETWORK_ERROR: 'Site unreachable when checked',
+    SITE_NOT_CONFIGURED: 'No athletics site on file',
+  })[st] || (st || 'no observation');
+}
+/* the quiet row mark: trust metadata, not a match fact. Verified states get
+   a subdued check INSIDE the meta cell (a fifth grid child would break the
+   row -- the four-children lesson); conflicts get the one loud treatment;
+   not-yet-checked renders NOTHING, because a nightly batch means most of
+   today is legitimately unchecked and a mark there would imply suspicion. */
+let RVQ = null;
+function rvMark(gid) {
+  if (typeof CONFIDENCE === 'undefined') return '';
+  if (RVQ === null) {
+    RVQ = {};
+    try {
+      (CONFIDENCE.finals || []).forEach(r => {
+        if (r.verify && r.verify.v) RVQ[r.gid] = r.verify.v;
+      });
+    } catch (e) { }
+  }
+  const v = RVQ[gid];
+  if (!v || v === 'UNVERIFIED') return '';
+  if (v === 'VERIFIED_BOTH' || v === 'CORROBORATED_ONE') {
+    return '<span class="rvmk" title="' + rvWording(v).replace(/^[^ ]+ /, '') +
+      ' \u2014 details in the Result Ledger">' +
+      (v === 'VERIFIED_BOTH' ? '\u2713\u2713' : '\u2713') + '</span>';
+  }
+  return '<span class="rvmk bad" title="' + rvWording(v) +
+    ' \u2014 details in the Result Ledger">\u26a0 sources disagree</span>';
+}
 function rcDrill(gid) {
   const r = (CONFIDENCE.finals || []).filter(x => x.gid === gid)[0];
   if (!r) return;
@@ -16737,6 +16798,32 @@ function rcDrill(gid) {
           'independently verified.'
         : '') + '">' + f + ': ' + lbl + '</span>';
     }).join('') + '</div>' +
+    /* NIGHTLY SCHOOL-SITE VERIFICATION (2026-09-01, per the trust-layer
+       consult): what each school's own published schedule said, with URL
+       and retrieval time. Display metadata only -- it lifts, counts and
+       corrects nothing. "Not posted when checked" is a fact about timing,
+       never suspicion. */
+    (r.verify && r.verify.v
+      ? '<div class="rcverify"><b class="rvh">Result verification</b>' +
+        '<span class="rvline">' + rvWording(r.verify.v) +
+        (r.verify.checked ? ' \u00b7 checked ' +
+          esc(String(r.verify.checked).replace('T', ' ').slice(0, 16)) +
+          ' UTC' : '') + '</span>' +
+        Object.keys(r.verify.schools || {}).map(sc => {
+          const e = r.verify.schools[sc];
+          return '<div class="rcsource"><b>' + esc(sc) + ' Athletics</b>' +
+            '<span class="rck">published schedule</span>' +
+            (e.assertion
+              ? '<span class="rcq">' + esc(e.assertion) + '</span>'
+              : '<span class="rcnote">' + esc(rvSchoolNote(e.state)) +
+                '</span>') +
+            (e.url ? '<a class="rcu" href="' + esc(e.url) +
+              '" target="_blank" rel="noopener noreferrer">' +
+              esc((e.url || '').replace(/^https?:\/\//, '').split('/')[0]) +
+              '</a>' : '') + '</div>';
+        }).join('') + '</div>'
+      : '<p class="tnote">School-site verification runs nightly; this ' +
+        'result has not been checked yet.</p>') +
     '<div class="rcsource rcofficial"><b>Official scoreboard</b>' +
       '<span class="rck">ncaa canonical record</span>' +
       (r.result_corrected

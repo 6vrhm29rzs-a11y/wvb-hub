@@ -227,6 +227,20 @@ def build():
     doc = load("data/data_%d.json" % SEASON) or {}
     ev = (load("data/raw/%d/result_evidence.json" % SEASON) or {}) \
         .get("evidence") or {}
+    # the nightly school-site verification reports (verify_results_daily.py)
+    # -- latest verdict per gid. Display metadata ONLY: it lifts nothing,
+    # counts nothing, corrects nothing; the drill renders it with both
+    # schools' assertions and URLs.
+    verify = {}
+    import glob as _glob
+    for _vp in sorted(_glob.glob(os.path.join(
+            REPO, "data", "result_verification_*.json"))):
+        _vd = load(os.path.relpath(_vp, REPO)) or {}
+        for _m in (_vd.get("matches") or []):
+            verify[str(_m.get("gid"))] = {
+                "v": _m.get("verdict"),
+                "checked": _vd.get("generated_utc"),
+                "schools": _m.get("schools") or {}}
     id2n = dict((str(t["team_id"]), t.get("name_short"))
                 for t in (doc.get("teams") or []))
     # exhibition team ids are not in the dataset's team table; their names
@@ -374,6 +388,7 @@ def build():
             # "every final is official" read as a contradiction (round 8).
             # n_attempted keeps "tried, unreadable" visibly separate from
             # "none tried".
+            "verify": verify.get(gid) or None,
             "n_indep": len(set(e.get("url") for e in srcs)),
             "n_attempted": attempted,
             "last_checked": checked or None,

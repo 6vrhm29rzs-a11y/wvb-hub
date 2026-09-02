@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-02T00:28:30Z",
+  "generated_at_utc": "2026-09-02T01:01:27Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 0,
    "expired": 1,
-   "anomalies": 36
+   "anomalies": 37
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -426,6 +426,19 @@
     }
    ],
    "points_per_set_missing": 2.125
+  },
+  {
+   "game_id": "6639364",
+   "team_id": "46106",
+   "team": "ULM",
+   "absent": [
+    {
+     "name": "Grace Troxell",
+     "rate": 2.045,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.045
   },
   {
    "game_id": "6628216",
@@ -1871,15 +1884,13 @@
    ]
   },
   "Northwestern St.": {
-   "gid": "6627723",
-   "d": "2026-08-29",
-   "appeared": 10,
+   "gid": "6628154",
+   "d": "2026-09-01",
+   "appeared": 12,
    "zero_action": [
     "Elizabeth Muguruza",
     "Addison Guy",
-    "Julia Whitfield",
     "Riley Schubert",
-    "Ana Gjorgjievska",
     "Camila Torquati",
     "Melis Ozipek"
    ]
@@ -2223,13 +2234,17 @@
    ]
   },
   "ULM": {
-   "gid": "6627367",
-   "d": "2026-08-30",
-   "appeared": 12,
+   "gid": "6628154",
+   "d": "2026-09-01",
+   "appeared": 10,
    "zero_action": [
     "Zharia Alleyne",
     "Olivia Anderson",
-    "Gracie Dinardo"
+    "Taylor Reid",
+    "Kennedy Scott",
+    "Amelia Colon",
+    "Gracie Dinardo",
+    "Myla Matavao"
    ]
   },
   "Southern Miss.": {
