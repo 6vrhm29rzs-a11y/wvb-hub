@@ -226,15 +226,18 @@ jobs:
           # played, so the page can state that rather than guess; it switches
           # itself on once the season is big enough.
           python3 scripts/resume_2025.py || echo "resume needs a rating or a blend; skipping"
-          python3 scripts/confidence.py || echo "confidence ledger skipped"
-          python3 scripts/availability_desk.py || echo "availability desk skipped"
           # NIGHTLY RESULT VERIFICATION (Cody, 2026-09-01, after the third
           # feed attribution inversion): every counted final checked against
-          # BOTH schools' published schedules. It can only ever write a
-          # report, an append-only fetch log, and REVIEW candidates -- never
-          # a correction. Tolerated: an unreachable school site must not
-          # block the pipeline.
+          # BOTH schools' published schedules. It writes a report, an
+          # append-only fetch log, the regenerable auto evidence projection,
+          # and REVIEW candidates -- never a correction. Tolerated: an
+          # unreachable school site must not block the pipeline.
+          # ⚠ MUST RUN BEFORE confidence.py, which merges the auto evidence
+          # and the day's verdicts into the payload the page embeds --
+          # ordered the other way, the ledger lags a day.
           python3 scripts/verify_results_daily.py || echo "result verification skipped; continuing"
+          python3 scripts/confidence.py || echo "confidence ledger skipped"
+          python3 scripts/availability_desk.py || echo "availability desk skipped"
           # bounded official-source collector: 12 schools max, rate-limited,
           # robots-respecting; daily cadence ONLY -- never the half-hourly job
           python3 scripts/collector.py || echo "collector skipped"

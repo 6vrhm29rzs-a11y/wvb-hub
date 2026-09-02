@@ -64,7 +64,10 @@ SELF = os.path.basename(__file__)
 # The network lives in the crawl steps, but crawl_polls.py is invoked from the
 # rebuild step. A guard must not depend on a live host, so it is skipped -- and
 # it carries a `|| echo` fallback, so the pipeline already declares it optional.
-SKIP = re.compile(r"scripts/crawl_")
+# verify_results_daily fetches ~348 school sites -- same rule, and running it
+# here would double the night's polite crawl (it is `|| echo`-tolerated too;
+# its own logic is covered offline by test_verify_results.py).
+SKIP = re.compile(r"scripts/(crawl_|verify_results_daily)")
 
 FAILURES = []
 
