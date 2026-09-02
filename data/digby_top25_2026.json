@@ -29,13 +29,13 @@
   "between_team_variance": 5.941,
   "caveat_schedule": "the opponent IS adjusted for from match one: a result is scored as the strength it implies (opponent's rating + margin, home court removed). What is still thin early is the opponent's own rating, which is the preseason projection until a schedule graph exists",
   "teams_with_a_result": 339,
-  "matches_counted": 485,
-  "score_mean": -0.0003,
-  "score_sd": 1.05647,
+  "matches_counted": 487,
+  "score_mean": -0.00022,
+  "score_sd": 1.05665,
   "score_scale_note": "mean and SD across ALL 348 teams, not just the ones shown -- a scale computed from the top 25 would measure the spread among the best",
   "shown": 25,
   "also_receiving": 10,
-  "generated_at_utc": "2026-09-02T02:30:28Z",
+  "generated_at_utc": "2026-09-02T03:01:23Z",
   "data_through_epoch": 1788307200
  },
  "top": [
@@ -137,27 +137,15 @@
   },
   {
    "team": "Purdue",
-   "score": 2.1074,
+   "score": 2.1559,
    "preseason_z": 2.018,
-   "season_z": 3.32,
-   "matches": 1,
-   "weight_on_season": 0.069,
-   "record": "0-1",
-   "net_pts_per_set": 2.2,
+   "season_z": 3.09,
+   "matches": 2,
+   "weight_on_season": 0.129,
+   "record": "1-1",
+   "net_pts_per_set": 2.6,
    "conf": "Big Ten",
    "rank": 9
-  },
-  {
-   "team": "Texas A&M",
-   "score": 2.0805,
-   "preseason_z": 2.076,
-   "season_z": 2.092,
-   "matches": 5,
-   "weight_on_season": 0.27,
-   "record": "3-2",
-   "net_pts_per_set": 2.5,
-   "conf": "SEC",
-   "rank": 10
   },
   {
    "team": "Tennessee",
@@ -168,6 +156,18 @@
    "weight_on_season": 0.228,
    "record": "4-0",
    "net_pts_per_set": 9.0,
+   "conf": "SEC",
+   "rank": 10
+  },
+  {
+   "team": "Texas A&M",
+   "score": 2.037,
+   "preseason_z": 2.076,
+   "season_z": 1.949,
+   "matches": 6,
+   "weight_on_season": 0.307,
+   "record": "3-3",
+   "net_pts_per_set": 1.58,
    "conf": "SEC",
    "rank": 11
   },
@@ -522,23 +522,23 @@
   {
    "team": "Purdue",
    "rank": 9,
-   "score": 2.1074,
-   "matches": 1,
-   "weight_on_season": 0.069
-  },
-  {
-   "team": "Texas A&M",
-   "rank": 10,
-   "score": 2.0805,
-   "matches": 5,
-   "weight_on_season": 0.27
+   "score": 2.1559,
+   "matches": 2,
+   "weight_on_season": 0.129
   },
   {
    "team": "Tennessee",
-   "rank": 11,
+   "rank": 10,
    "score": 2.0686,
    "matches": 4,
    "weight_on_season": 0.228
+  },
+  {
+   "team": "Texas A&M",
+   "rank": 11,
+   "score": 2.037,
+   "matches": 6,
+   "weight_on_season": 0.307
   },
   {
    "team": "Southern California",
@@ -1703,46 +1703,46 @@
    "weight_on_season": 0.0
   },
   {
-   "team": "Morehead St.",
+   "team": "Louisiana",
    "rank": 178,
+   "score": 0.0408,
+   "matches": 3,
+   "weight_on_season": 0.182
+  },
+  {
+   "team": "Morehead St.",
+   "rank": 179,
    "score": 0.0337,
    "matches": 3,
    "weight_on_season": 0.182
   },
   {
    "team": "Temple",
-   "rank": 179,
+   "rank": 180,
    "score": 0.0295,
    "matches": 3,
    "weight_on_season": 0.182
   },
   {
    "team": "Valparaiso",
-   "rank": 180,
+   "rank": 181,
    "score": 0.0267,
    "matches": 3,
    "weight_on_season": 0.182
   },
   {
    "team": "Missouri St.",
-   "rank": 181,
+   "rank": 182,
    "score": 0.0149,
    "matches": 3,
    "weight_on_season": 0.182
   },
   {
    "team": "Charlotte",
-   "rank": 182,
+   "rank": 183,
    "score": 0.0031,
    "matches": 3,
    "weight_on_season": 0.182
-  },
-  {
-   "team": "Louisiana",
-   "rank": 183,
-   "score": -0.0204,
-   "matches": 2,
-   "weight_on_season": 0.129
   },
   {
    "team": "Tulane",
@@ -2627,18 +2627,18 @@
    "weight_on_season": 0.228
   },
   {
-   "team": "McNeese",
+   "team": "Cal St. Fullerton",
    "rank": 310,
-   "score": -1.2871,
+   "score": -1.3219,
    "matches": 3,
    "weight_on_season": 0.182
   },
   {
-   "team": "Cal St. Fullerton",
+   "team": "McNeese",
    "rank": 311,
-   "score": -1.3219,
-   "matches": 3,
-   "weight_on_season": 0.182
+   "score": -1.3274,
+   "matches": 4,
+   "weight_on_season": 0.228
   },
   {
    "team": "Kansas City",
