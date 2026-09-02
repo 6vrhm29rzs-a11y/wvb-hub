@@ -136,11 +136,13 @@ def main():
         dg = json.load(io.open(os.path.join(
             REPO, "data", "digby_top25_2026.json"), encoding="utf-8"))
         n_dg = (dg.get("meta") or {}).get("matches_counted")
-        check("digby's matches_counted equals rating_eligible "
-              "(drift here means the artifacts are from different "
-              "snapshots -- rebuild the chain)",
-              n_dg == t["rating_eligible"],
-              "%s vs %s" % (n_dg, t["rating_eligible"]))
+        # digby is AS-OF THE PREVIOUS DAY (Cody, 2026-09-01): its count is
+        # checked against the cutoff-filtered eligible total
+        check("digby's matches_counted equals "
+              "rating_eligible_through_yesterday (drift here means the "
+              "artifacts are from different snapshots -- rebuild the chain)",
+              n_dg == t["rating_eligible_through_yesterday"],
+              "%s vs %s" % (n_dg, t["rating_eligible_through_yesterday"]))
 
         cf = json.load(io.open(os.path.join(
             REPO, "data", "result_confidence_2026.json"), encoding="utf-8"))

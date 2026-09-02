@@ -76,8 +76,14 @@ def _eligible(doc):
     invisible because the count merely read two high. One counting set,
     from the contract, for every consumer."""
     import season_counts as _SC
+    # ⚠ AS-OF THE PREVIOUS DAY (Cody, 2026-09-01): today's finals wait for
+    # tomorrow, so the blend holds still through a match day. Counting
+    # surfaces are untouched; this boundary is the rankings' own.
+    _cutoff = _SC.rating_cutoff_epoch()
     for g in _SC.countable((doc or {}).get("games") or [], SEASON,
                            need_line=True, d1_only=True):
+        if (g.get("start_time_epoch") or 0) >= _cutoff:
+            continue
         ts = g.get("teams") or []
         ls = [l for l in (g.get("linescores") or [])
               if l.get("home") is not None]

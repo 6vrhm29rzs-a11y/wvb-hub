@@ -172,6 +172,26 @@ def is_empty_final(g):
                 if l.get("home") is not None]
 
 
+def rating_cutoff_epoch(now=None):
+    # type: (Optional[datetime.datetime]) -> int
+    """Start of TODAY in Pacific, as an epoch: the boundary for RATING
+    inputs. Cody, 2026-09-01: "are power rankings as of previous day or to
+    the minute? As of previous day would be better" -- so POWER (the live
+    composite and the Digby blend) reads only finals from BEFORE today PT,
+    holds still through a match day, and advances overnight. COUNTING
+    surfaces (records, standings, scores) are untouched -- they stay
+    to-the-minute; this boundary is for the rankings only. On a completed
+    season every final predates today, so the filter is a no-op there."""
+    import datetime as _dt
+    try:
+        from zoneinfo import ZoneInfo
+        now = now or _dt.datetime.now(ZoneInfo("America/Los_Angeles"))
+    except Exception:                                  # pragma: no cover
+        now = now or _dt.datetime.now()
+    day = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    return int(day.timestamp())
+
+
 def resolve(games):
     # type: (List[Dict]) -> List[Dict]
     """ONE record per gid: final beats non-final, then last-written wins.
@@ -258,6 +278,17 @@ def totals(games, season):
     n["rating_eligible"] = sum(
         1 for gid, v in cls.items()
         if v == "ok"
+        and _d1_both(by[gid])
+        and _has_line(apply_correction(by[gid], corr)))
+    # what the RANKINGS may see: rating-eligible AND before today PT
+    # (the as-of-previous-day boundary, Cody 2026-09-01) -- the audit
+    # manifest checks digby against THIS, because holding today's finals
+    # back is the design, not a stale artifact
+    cut = rating_cutoff_epoch()
+    n["rating_eligible_through_yesterday"] = sum(
+        1 for gid, v in cls.items()
+        if v == "ok"
+        and (by[gid].get("start_time_epoch") or 0) < cut
         and _d1_both(by[gid])
         and _has_line(apply_correction(by[gid], corr)))
     return n

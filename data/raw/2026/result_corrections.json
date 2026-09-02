@@ -193,6 +193,515 @@
      "establishes": "nothing yet -- recheck; the nightly verifier will observe it"
     }
    ]
+  },
+  "6626302": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Central Ark. won 3-1 (winner_team_id 45955) with the box rows attributed the same way",
+   "correct": {
+    "winner_team_id": "46048",
+    "away_sets": 3,
+    "home_sets": 1,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 26,
+      "home": 24
+     },
+     {
+      "period": 2,
+      "visit": 25,
+      "home": 17
+     },
+     {
+      "period": 3,
+      "visit": 18,
+      "home": 25
+     },
+     {
+      "period": 4,
+      "visit": 25,
+      "home": 11
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "45955": "46048",
+     "46048": "45955"
+    }
+   },
+   "established": "Denver won 3-1 -- the feed's ENTIRE team attribution is inverted for this match (the SMU-UC Davis class, found by the attribution-suspicion detector). Both schools' published schedules confirm the swapped result, and the box rows fit the OPPOSITE rosters at ~1.00 while fitting their own at ~0.00 (both sides). The set counts are the feed's own, reattributed.",
+   "evidence": [
+    {
+     "url": "https://denverpioneers.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Denver",
+     "retrieved": "2026-09-02T03:49:19Z",
+     "text": "published schedule row for 2026-08-28: 'Denver W 3-1 vs Central Arkansas'",
+     "establishes": "Denver W 3-1 vs Central Arkansas"
+    },
+    {
+     "url": "https://ucasports.com/services/schedule_txt.ashx?schedule=1309",
+     "kind": "school_site",
+     "school": "Central Ark.",
+     "retrieved": "2026-09-02T03:49:19Z",
+     "text": "published schedule row for 2026-08-28: 'Central Ark. L 1-3 vs Denver'",
+     "establishes": "Central Ark. L 1-3 vs Denver"
+    }
+   ]
+  },
+  "6626332": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "High Point won 3-1 (winner_team_id 46635) with the box rows attributed the same way",
+   "correct": {
+    "winner_team_id": "45914",
+    "away_sets": 1,
+    "home_sets": 3,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 24,
+      "home": 26
+     },
+     {
+      "period": 2,
+      "visit": 25,
+      "home": 22
+     },
+     {
+      "period": 3,
+      "visit": 20,
+      "home": 25
+     },
+     {
+      "period": 4,
+      "visit": 15,
+      "home": 25
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46635": "45914",
+     "45914": "46635"
+    }
+   },
+   "established": "Hofstra won 3-1 -- the feed's ENTIRE team attribution is inverted for this match (the SMU-UC Davis class, found by the attribution-suspicion detector). Both schools' published schedules confirm the swapped result, and the box rows fit the OPPOSITE rosters at ~1.00 while fitting their own at ~0.00 (both sides). The set counts are the feed's own, reattributed.",
+   "evidence": [
+    {
+     "url": "https://gohofstra.com/services/schedule_txt.ashx?schedule=524",
+     "kind": "school_site",
+     "school": "Hofstra",
+     "retrieved": "2026-09-02T03:49:19Z",
+     "text": "published schedule row for 2026-08-29: 'Hofstra W 3-1 vs High Point'",
+     "establishes": "Hofstra W 3-1 vs High Point"
+    },
+    {
+     "url": "https://highpointpanthers.com/services/schedule_txt.ashx?schedule=628",
+     "kind": "school_site",
+     "school": "High Point",
+     "retrieved": "2026-09-02T03:49:19Z",
+     "text": "published schedule row for 2026-08-29: 'High Point L 1-3 vs Hofstra'",
+     "establishes": "High Point L 1-3 vs Hofstra"
+    }
+   ]
+  },
+  "6626423": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Tennessee St. won 3-0 (winner_team_id 45872) with the box rows attributed the same way",
+   "correct": {
+    "winner_team_id": "46757",
+    "away_sets": 3,
+    "home_sets": 0,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 25,
+      "home": 15
+     },
+     {
+      "period": 2,
+      "visit": 25,
+      "home": 19
+     },
+     {
+      "period": 3,
+      "visit": 25,
+      "home": 17
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "45872": "46757",
+     "46757": "45872"
+    }
+   },
+   "established": "Valparaiso won 3-0 -- the feed's ENTIRE team attribution is inverted for this match (the SMU-UC Davis class, found by the attribution-suspicion detector). Both schools' published schedules confirm the swapped result, and the box rows fit the OPPOSITE rosters at ~1.00 while fitting their own at ~0.00 (both sides). The set counts are the feed's own, reattributed.",
+   "evidence": [
+    {
+     "url": "https://valpoathletics.com/services/schedule_txt.ashx?schedule=455",
+     "kind": "school_site",
+     "school": "Valparaiso",
+     "retrieved": "2026-09-02T03:49:19Z",
+     "text": "published schedule row for 2026-08-29: 'Valparaiso W 3-0 vs Tennessee State'",
+     "establishes": "Valparaiso W 3-0 vs Tennessee State"
+    },
+    {
+     "url": "https://tsutigers.com/services/schedule_txt.ashx?schedule=265",
+     "kind": "school_site",
+     "school": "Tennessee St.",
+     "retrieved": "2026-09-02T03:49:19Z",
+     "text": "published schedule row for 2026-08-29: 'Tennessee St. L 0-3 vs Valparaiso'",
+     "establishes": "Tennessee St. L 0-3 vs Valparaiso"
+    }
+   ]
+  },
+  "6626884": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "UT Martin won 3-2 (winner_team_id 46506) with the box rows attributed the same way",
+   "correct": {
+    "winner_team_id": "46391",
+    "away_sets": 2,
+    "home_sets": 3,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 25,
+      "home": 16
+     },
+     {
+      "period": 2,
+      "visit": 19,
+      "home": 25
+     },
+     {
+      "period": 3,
+      "visit": 26,
+      "home": 28
+     },
+     {
+      "period": 4,
+      "visit": 26,
+      "home": 24
+     },
+     {
+      "period": 5,
+      "visit": 11,
+      "home": 15
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46506": "46391",
+     "46391": "46506"
+    }
+   },
+   "established": "Kansas City won 3-2 -- the feed's ENTIRE team attribution is inverted for this match (the SMU-UC Davis class, found by the attribution-suspicion detector). Both schools' published schedules confirm the swapped result, and the box rows fit the OPPOSITE rosters at ~1.00 while fitting their own at ~0.00 (both sides). The set counts are the feed's own, reattributed.",
+   "evidence": [
+    {
+     "url": "https://kcroos.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Kansas City",
+     "retrieved": "2026-09-02T03:49:19Z",
+     "text": "published schedule row for 2026-08-28: 'Kansas City W 3-2 vs UT Martin'",
+     "establishes": "Kansas City W 3-2 vs UT Martin"
+    },
+    {
+     "url": "https://utmsports.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "UT Martin",
+     "retrieved": "2026-09-02T03:49:19Z",
+     "text": "published schedule row for 2026-08-28: 'UT Martin L 2-3 vs Kansas City'",
+     "establishes": "UT Martin L 2-3 vs Kansas City"
+    }
+   ]
+  },
+  "6626937": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Butler won 3-2 (winner_team_id 46219) with the box rows attributed the same way",
+   "correct": {
+    "winner_team_id": "46074",
+    "away_sets": 2,
+    "home_sets": 3,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 27,
+      "home": 25
+     },
+     {
+      "period": 2,
+      "visit": 20,
+      "home": 25
+     },
+     {
+      "period": 3,
+      "visit": 25,
+      "home": 23
+     },
+     {
+      "period": 4,
+      "visit": 19,
+      "home": 25
+     },
+     {
+      "period": 5,
+      "visit": 12,
+      "home": 15
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46219": "46074",
+     "46074": "46219"
+    }
+   },
+   "established": "Charleston So. won 3-2 -- the feed's ENTIRE team attribution is inverted for this match (the SMU-UC Davis class, found by the attribution-suspicion detector). Both schools' published schedules confirm the swapped result, and the box rows fit the OPPOSITE rosters at ~1.00 while fitting their own at ~0.00 (both sides). The set counts are the feed's own, reattributed.",
+   "evidence": [
+    {
+     "url": "https://csusports.com/services/schedule_txt.ashx?schedule=465",
+     "kind": "school_site",
+     "school": "Charleston So.",
+     "retrieved": "2026-09-02T03:49:19Z",
+     "text": "published schedule row for 2026-08-30: 'Charleston So. W 3-2 vs Butler'",
+     "establishes": "Charleston So. W 3-2 vs Butler"
+    },
+    {
+     "url": "https://butlersports.com/services/schedule_txt.ashx?schedule=2372",
+     "kind": "school_site",
+     "school": "Butler",
+     "retrieved": "2026-09-02T03:49:19Z",
+     "text": "published schedule row for 2026-08-30: 'Butler L 2-3 vs Charleston Southern'",
+     "establishes": "Butler L 2-3 vs Charleston Southern"
+    }
+   ]
+  },
+  "6628050": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Niagara won 3-1 (winner_team_id 46476) with the box rows attributed the same way",
+   "correct": {
+    "winner_team_id": "45948",
+    "away_sets": 3,
+    "home_sets": 1,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 20,
+      "home": 25
+     },
+     {
+      "period": 2,
+      "visit": 25,
+      "home": 18
+     },
+     {
+      "period": 3,
+      "visit": 25,
+      "home": 21
+     },
+     {
+      "period": 4,
+      "visit": 25,
+      "home": 17
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46476": "45948",
+     "45948": "46476"
+    }
+   },
+   "established": "Bucknell won 3-1 -- the feed's ENTIRE team attribution is inverted for this match (the SMU-UC Davis class, found by the attribution-suspicion detector). Both schools' published schedules confirm the swapped result, and the box rows fit the OPPOSITE rosters at ~1.00 while fitting their own at ~0.00 (both sides). The set counts are the feed's own, reattributed.",
+   "evidence": [
+    {
+     "url": "https://bucknellbison.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Bucknell",
+     "retrieved": "2026-09-02T03:49:19Z",
+     "text": "published schedule row for 2026-08-29: 'Bucknell W 3-1 vs Niagara'",
+     "establishes": "Bucknell W 3-1 vs Niagara"
+    },
+    {
+     "url": "https://purpleeagles.com/services/schedule_txt.ashx?schedule=695",
+     "kind": "school_site",
+     "school": "Niagara",
+     "retrieved": "2026-09-02T03:49:19Z",
+     "text": "published schedule row for 2026-08-29: 'Niagara L 1-3 vs Bucknell'",
+     "establishes": "Niagara L 1-3 vs Bucknell"
+    }
+   ]
+  },
+  "6628133": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "A&M-Corpus Christi won 3-2 (winner_team_id 46137) with the box rows attributed the same way",
+   "correct": {
+    "winner_team_id": "46162",
+    "away_sets": 2,
+    "home_sets": 3,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 10,
+      "home": 25
+     },
+     {
+      "period": 2,
+      "visit": 23,
+      "home": 25
+     },
+     {
+      "period": 3,
+      "visit": 30,
+      "home": 28
+     },
+     {
+      "period": 4,
+      "visit": 25,
+      "home": 14
+     },
+     {
+      "period": 5,
+      "visit": 12,
+      "home": 15
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46137": "46162",
+     "46162": "46137"
+    }
+   },
+   "established": "Campbell won 3-2 -- the feed's ENTIRE team attribution is inverted for this match (the SMU-UC Davis class, found by the attribution-suspicion detector). Both schools' published schedules confirm the swapped result, and the box rows fit the OPPOSITE rosters at ~1.00 while fitting their own at ~0.00 (both sides). The set counts are the feed's own, reattributed.",
+   "evidence": [
+    {
+     "url": "https://gocamels.com/services/schedule_txt.ashx?schedule=394",
+     "kind": "school_site",
+     "school": "Campbell",
+     "retrieved": "2026-09-02T03:49:19Z",
+     "text": "published schedule row for 2026-08-29: 'Campbell W 3-2 vs Texas A&M - Corpus Christi'",
+     "establishes": "Campbell W 3-2 vs Texas A&M - Corpus Christi"
+    },
+    {
+     "url": "https://goislanders.com/services/schedule_txt.ashx?schedule=286",
+     "kind": "school_site",
+     "school": "A&M-Corpus Christi",
+     "retrieved": "2026-09-02T03:49:19Z",
+     "text": "published schedule row for 2026-08-29: 'A&M-Corpus Christi L 2-3 vs Campbell'",
+     "establishes": "A&M-Corpus Christi L 2-3 vs Campbell"
+    }
+   ]
+  },
+  "6628189": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "VCU won 3-1 (winner_team_id 46375) with the box rows attributed the same way",
+   "correct": {
+    "winner_team_id": "46674",
+    "away_sets": 3,
+    "home_sets": 1,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 25,
+      "home": 19
+     },
+     {
+      "period": 2,
+      "visit": 19,
+      "home": 25
+     },
+     {
+      "period": 3,
+      "visit": 25,
+      "home": 22
+     },
+     {
+      "period": 4,
+      "visit": 26,
+      "home": 24
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46375": "46674",
+     "46674": "46375"
+    }
+   },
+   "established": "Florida St. won 3-1 -- the feed's ENTIRE team attribution is inverted for this match (the SMU-UC Davis class, found by the attribution-suspicion detector). Both schools' published schedules confirm the swapped result, and the box rows fit the OPPOSITE rosters at ~1.00 while fitting their own at ~0.00 (both sides). The set counts are the feed's own, reattributed.",
+   "evidence": [
+    {
+     "url": "https://seminoles.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Florida St.",
+     "retrieved": "2026-09-02T03:49:19Z",
+     "text": "published schedule row for 2026-08-29: 'Florida St. W 3-1 vs VCU'",
+     "establishes": "Florida St. W 3-1 vs VCU"
+    },
+    {
+     "url": "https://vcuathletics.com/services/schedule_txt.ashx?schedule=314",
+     "kind": "school_site",
+     "school": "VCU",
+     "retrieved": "2026-09-02T03:49:19Z",
+     "text": "published schedule row for 2026-08-29: 'VCU L 1-3 vs Florida State'",
+     "establishes": "VCU L 1-3 vs Florida State"
+    }
+   ]
+  },
+  "6626124": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Queens (NC) won 3-0 (winner_team_id 46656) with the box rows attributed the same way",
+   "correct": {
+    "winner_team_id": "46409",
+    "away_sets": 3,
+    "home_sets": 0,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 25,
+      "home": 13
+     },
+     {
+      "period": 2,
+      "visit": 25,
+      "home": 14
+     },
+     {
+      "period": 3,
+      "visit": 25,
+      "home": 20
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46656": "46409",
+     "46409": "46656"
+    }
+   },
+   "established": "Duke won 3-0 -- the feed's entire team attribution is inverted (the SMU-UC Davis class, found by the attribution-suspicion detector). Queens (NC)'s own schedule says 'L 0-3 vs Duke' and Duke's says 'W 3-0 vs Queens University of Charlotte' (Neutral, Conway S.C.); the box rows fit the OPPOSITE rosters ~1.00/0.00 both sides.",
+   "evidence": [
+    {
+     "url": "https://goduke.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Duke",
+     "retrieved": "2026-09-02T03:50:22Z",
+     "text": "published schedule row for 2026-08-29: 'Duke W 3-0 vs Queens University of Charlotte'",
+     "establishes": "Duke W 3-0 vs Queens University of Charlotte"
+    },
+    {
+     "url": "https://queensathletics.com/services/schedule_txt.ashx?schedule=541",
+     "kind": "school_site",
+     "school": "Queens (NC)",
+     "retrieved": "2026-09-02T03:50:22Z",
+     "text": "published schedule row for 2026-08-29: 'Queens (NC) L 0-3 vs Duke'",
+     "establishes": "Queens (NC) L 0-3 vs Duke"
+    }
+   ]
   }
  }
 }

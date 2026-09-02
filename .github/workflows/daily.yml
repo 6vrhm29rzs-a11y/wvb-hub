@@ -236,6 +236,11 @@ jobs:
           # and the day's verdicts into the payload the page embeds --
           # ordered the other way, the ledger lags a day.
           python3 scripts/verify_results_daily.py || echo "result verification skipped; continuing"
+          # THE PERMUTATION DETECTOR (built 2026-09-01; found 13 real
+          # inversions on its first run): H0/H1 forensic feature table over
+          # every counted final. Offline, mutates nothing, writes its
+          # artifact + review-queue candidates only.
+          python3 scripts/attribution_suspicion.py || echo "attribution suspicion skipped; continuing"
           python3 scripts/confidence.py || echo "confidence ledger skipped"
           python3 scripts/availability_desk.py || echo "availability desk skipped"
           # bounded official-source collector: 12 schools max, rate-limited,

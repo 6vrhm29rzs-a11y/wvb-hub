@@ -3233,11 +3233,12 @@ def top25_view(avca=None):
            round(100 * maxw)))
     _st = rank_stamp_pt(m.get("generated_at_utc"))
     if _st:
-        lead += (" <span class=\"rkstamp\">Last recomputed <b>%s</b>, from the "
-                 "%d rating-eligible finals in at that moment (D-I v D-I "
-                 "with a set line; exhibitions and duplicate listings "
-                 "excluded) &mdash; a final folds in on the next recompute, "
-                 "not the instant a match ends.</span>"
+        lead += (" <span class=\"rkstamp\">Recomputed <b>%s</b> from the "
+                 "%d rating-eligible finals played <b>through yesterday</b> "
+                 "(D-I v D-I with a set line; exhibitions and duplicate "
+                 "listings excluded). The ranking is as-of the previous "
+                 "day: today\u2019s results fold in overnight, so it holds "
+                 "still through a match day.</span>"
                  % (_st, played))
     foot = (
         mv_txt + poll_txt +
@@ -3922,12 +3923,17 @@ def build():
                          % (len(res_cnt), _sc_totals["ok"]))
     _dg_meta = (load("data/digby_top25_%d.json" % SEASON) or {}).get(
         "meta") or {}
+    # digby is AS-OF THE PREVIOUS DAY (Cody, 2026-09-01), so its count is
+    # checked against the cutoff-filtered eligible total -- holding today's
+    # finals back is the design, not staleness
     if _dg_meta.get("matches_counted") is not None and \
-            _dg_meta["matches_counted"] != _sc_totals["rating_eligible"]:
+            _dg_meta["matches_counted"] != \
+            _sc_totals["rating_eligible_through_yesterday"]:
         _mm_fails.append(
-            "digby matches_counted %s != rating_eligible %d -- a stale "
-            "artifact from a different snapshot"
-            % (_dg_meta["matches_counted"], _sc_totals["rating_eligible"]))
+            "digby matches_counted %s != rating_eligible_through_yesterday "
+            "%d -- a stale artifact from a different snapshot"
+            % (_dg_meta["matches_counted"],
+               _sc_totals["rating_eligible_through_yesterday"]))
     _rs_meta = (load("data/resume_%d.json" % SEASON) or {}).get("meta") or {}
     if _rs_meta.get("matches") is not None and \
             _rs_meta["matches"] != len(_cnt_d1):
@@ -4070,8 +4076,11 @@ def build():
         if _rst:
             _rn = (meta.get("rank_stamp") or {}).get("matches_in")
             rank_basis += (
-                " <span class=\"rkstamp\">Last recomputed <b>%s</b>%s.</span>"
-                % (_rst, (", through %d rating-eligible finals" % _rn) if _rn else ""))
+                " <span class=\"rkstamp\">Recomputed <b>%s</b>%s &mdash; "
+                "as-of the previous day: today\u2019s results fold in "
+                "overnight.</span>"
+                % (_rst, (", through the %d rating-eligible finals played "
+                          "through yesterday" % _rn) if _rn else ""))
     else:
         _blend = [t for t in teams if t.get("rank_source") == "blend"]
         if _blend:

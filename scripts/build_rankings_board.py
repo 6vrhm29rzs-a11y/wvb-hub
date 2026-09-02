@@ -330,9 +330,18 @@ def build():
             raise SystemExit(
                 "live board join miss: %r has no live rank -- a per-team "
                 "fallback would put two rulers on one column" % t["team"])
+        # ⚠ NO PRESEASON NUMBER MAY INTERLEAVE A BLEND/LIVE BOARD (caught
+        # 2026-09-01: Saint Francis's preseason #239 collided with UC
+        # Davis's blend #239 after a corrections reshuffle -- two rulers,
+        # one column, a duplicate rank). The talent_rank fallback applies
+        # ONLY while the whole board is preseason; otherwise a team with no
+        # rank on the board's own basis joins the unranked tail, where its
+        # page already explains itself.
         t["rank26"] = ((lr or {}).get("composite_rank")
-                       or (br or {}).get("rank")
-                       or r.get("talent_rank"))
+                       or ((br or {}).get("rank")
+                           if not live_by_team else None)
+                       or (r.get("talent_rank")
+                           if not (live_by_team or blend_by_team) else None))
         t["rank_source"] = "live" if lr else ("blend" if br else "preseason")
         t["blend_matches"] = (br or {}).get("matches")
         t["blend_season_weight"] = (br or {}).get("weight_on_season")
@@ -394,12 +403,19 @@ def build():
         # quantity next to a rank built from another is exactly how #7 came to
         # sit above #6 earlier today. Guarded on the built page.
         t["_pv"] = (lr or {}).get("composite")
-        if t["_pv"] is None and br is not None:
+        # ⚠ SAME BASIS-PURITY AS rank26 (2026-09-01): on a live board a
+        # team the rating declines to rank sits in the unranked TAIL -- and
+        # must not wear a score from another ruler beside live scores
+        # (Saint Francis's preseason 48.4 rendered above #348's live 13.6).
+        # An unranked team shows no score; its page explains itself.
+        if live_by_team:
+            pass                       # live composite or nothing
+        elif t["_pv"] is None and br is not None:
             t["_pv"] = br.get("score")
-        if t["_pv"] is None:
+        elif t["_pv"] is None:
             t["_pv"] = r.get("blend")
-        if t["_pv"] is None:
-            t["_pv"] = r.get("talent")
+            if t["_pv"] is None:
+                t["_pv"] = r.get("talent")
     _cvals = [t["_pv"] for t in teams if t.get("_pv") is not None]
     if len(_cvals) > 30:
         _mu = sum(_cvals) / float(len(_cvals))

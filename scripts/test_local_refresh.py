@@ -111,7 +111,7 @@ def check_stamp_reaches_the_page():
         print("  no built hub -- skipping page-stamp check")
         return
     page = open(hub, encoding="utf-8").read()
-    if 'class="rkstamp"' not in page or "Last recomputed" not in page:
+    if 'class="rkstamp"' not in page or "Recomputed" not in page:
         bad("recompute stamp not on the page",
             "no rkstamp span -- the rankings do not say when they were "
             "last recomputed")

@@ -1,0 +1,98 @@
+{
+ "_doc": "HAND-labelled adjudications for attribution-suspicion candidates. Kept APART from the feature artifact (data/attribution_suspicion_2026.json) so that, once enough labels exist, weights can be fitted against frozen features without leakage -- features never absorb labels. label: confirmed_inversion | confirmed_correct | other_feed_error. basis cites the evidence that settled it. Label live_window_inversion_final_correct: the feed inverted attribution WHILE LIVE but self-corrected at final -- the final record is correct, so the final-record detector must NOT flag it; it is a positive only for live-window detection.",
+ "labels": {
+  "6626259": {
+   "label": "confirmed_inversion",
+   "reviewed_at": "2026-09-01",
+   "basis": [
+    "result_corrections.json entry (SMU-UC Davis): feed winner refuted by its own linescores + both schools; box_team_swap applied"
+   ]
+  },
+  "6624237": {
+   "label": "live_window_inversion_final_correct",
+   "reviewed_at": "2026-09-01",
+   "basis": [
+    "live-window inversion, feed self-corrected at final; live_attribution_watch.json entry resolved; StatBroadcast + FS1 scorebug cited"
+   ]
+  },
+  "6625272": {
+   "label": "other_feed_error",
+   "reviewed_at": "2026-09-01",
+   "basis": [
+    "set-count self-contradiction, winner NOT inverted; result_corrections.json corr_kind=contradicted (Oregon-Missouri)"
+   ]
+  },
+  "6626302": {
+   "label": "confirmed_inversion",
+   "reviewed_at": "2026-09-02",
+   "basis": [
+    "both schools' published schedules confirm the swapped result (result_corrections.json entry)",
+    "box rows fit opposite rosters ~1.00/0.00 both sides"
+   ]
+  },
+  "6626332": {
+   "label": "confirmed_inversion",
+   "reviewed_at": "2026-09-02",
+   "basis": [
+    "both schools' published schedules confirm the swapped result (result_corrections.json entry)",
+    "box rows fit opposite rosters ~1.00/0.00 both sides"
+   ]
+  },
+  "6626423": {
+   "label": "confirmed_inversion",
+   "reviewed_at": "2026-09-02",
+   "basis": [
+    "both schools' published schedules confirm the swapped result (result_corrections.json entry)",
+    "box rows fit opposite rosters ~1.00/0.00 both sides"
+   ]
+  },
+  "6626884": {
+   "label": "confirmed_inversion",
+   "reviewed_at": "2026-09-02",
+   "basis": [
+    "both schools' published schedules confirm the swapped result (result_corrections.json entry)",
+    "box rows fit opposite rosters ~1.00/0.00 both sides"
+   ]
+  },
+  "6626937": {
+   "label": "confirmed_inversion",
+   "reviewed_at": "2026-09-02",
+   "basis": [
+    "both schools' published schedules confirm the swapped result (result_corrections.json entry)",
+    "box rows fit opposite rosters ~1.00/0.00 both sides"
+   ]
+  },
+  "6628050": {
+   "label": "confirmed_inversion",
+   "reviewed_at": "2026-09-02",
+   "basis": [
+    "both schools' published schedules confirm the swapped result (result_corrections.json entry)",
+    "box rows fit opposite rosters ~1.00/0.00 both sides"
+   ]
+  },
+  "6628133": {
+   "label": "confirmed_inversion",
+   "reviewed_at": "2026-09-02",
+   "basis": [
+    "both schools' published schedules confirm the swapped result (result_corrections.json entry)",
+    "box rows fit opposite rosters ~1.00/0.00 both sides"
+   ]
+  },
+  "6628189": {
+   "label": "confirmed_inversion",
+   "reviewed_at": "2026-09-02",
+   "basis": [
+    "both schools' published schedules confirm the swapped result (result_corrections.json entry)",
+    "box rows fit opposite rosters ~1.00/0.00 both sides"
+   ]
+  },
+  "6626124": {
+   "label": "confirmed_inversion",
+   "reviewed_at": "2026-09-02",
+   "basis": [
+    "both schools' published schedules confirm the swapped result",
+    "box rows fit opposite rosters both sides"
+   ]
+  }
+ }
+}

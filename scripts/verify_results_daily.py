@@ -64,7 +64,22 @@ def team_norm(name):
         "North" if m.group(1) == "N" else "South") + " Carolina", name)
     n = _ref_norm(t)
     n = re.sub(r"\bcollege\b", " ", n)
-    return re.sub(r"\s+", " ", n).strip()
+    # "Charleston Southern" (page) vs "Charleston So." (hub) -- the same
+    # word folded the same way on both sides
+    n = re.sub(r"\bsouthern\b", "so", n)
+    n = re.sub(r"\s+", " ", n).strip()
+    # the residual pairs no general fold covers -- the FIG_ALIASES pattern,
+    # keyed on the FOLDED form, both directions where needed. A global
+    # parenthetical strip is banned: Miami (FL) and Miami (OH) would merge.
+    return _VERIFIER_ALIASES.get(n, n)
+
+
+_VERIFIER_ALIASES = {
+    "ucsb": "uc santa barbara",
+    "queens": "queens nc",
+    "queens university of charlotte": "queens nc",   # Duke's spelling
+    "texas a and m corpus christi": "a and m corpus christi",
+}
 
 SEASON = 2026
 RAW = os.path.join(REPO, "data", "raw", str(SEASON))
