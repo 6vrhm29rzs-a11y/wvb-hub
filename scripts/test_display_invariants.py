@@ -3340,13 +3340,26 @@ def check_week_names_whose_ranking():
         bad("the deleted week surface came back",
             "renderWeek/WEEK were removed on purpose; see round-5 notes")
         return
-    if "our Top 25: " not in src:
-        bad("our own ranking is never shown beside the official one",
-            "the watch cards must carry the disagreement note")
+    # 2026-09-01: the "our Top 25: Indiana 38" footnote is RETIRED -- Cody
+    # read it as a contradiction (a 38 under a top-25 heading). The invariant
+    # it protected -- our rank beside the official one, labelled as ours --
+    # now holds harder: teamRankChips puts a labelled PWR chip beside every
+    # team name, and the disagreement chip's label carries both numbers.
+    if "our Top 25: " in src.replace("our Top 25: Indiana 38", ""):
+        bad("the retired ourrk wording came back",
+            "the contradiction Cody named must stay gone")
         return
-    if "our POWER rating disagrees with the" not in src:
-        bad("the disagreement note lost its label",
-            "a second rank without a named basis is a bare numeral")
+    if "function teamRankChips" not in src:
+        bad("our own ranking is never shown beside the official one",
+            "teamRankChips must exist -- it is the one both-rulers component")
+        return
+    if "teamRankChips(mAway(m), m.ar)" not in src:
+        bad("the watch cards lost the both-rulers chips",
+            "wteams must route through teamRankChips")
+        return
+    if "\\u00b7 AVCA ' + x[1] + ' v PWR ' + x[2]" not in src:
+        bad("the disagreement chip lost its numbers",
+            "the chip label must state both ranks, not a category name")
         return
     gen = open(os.path.join(REPO, "scripts", "build_hub.py"),
                encoding="utf-8").read()

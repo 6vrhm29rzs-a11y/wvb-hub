@@ -1,0 +1,27 @@
+{
+  "_readme": "LIVE attribution-watch ledger. An entry here labels a match's LIVE display as 'score attribution under review' -- it never flips, corrects, or suppresses the feed's numbers, and no counting surface reads it. The final result of a listed match goes through the normal two-source correction path (result_corrections.json); this file is display-labelling only, for the window where the match is still in progress and no independent official source exists yet. Remove-by: entry is inert once the match is final (the ledgered under_review/correction machinery takes over).",
+  "6624237": {
+    "teams": [
+      "Indiana",
+      "Georgia"
+    ],
+    "date": "2026-09-01",
+    "claim": "feed team attribution suspected inverted while live",
+    "status": "watching",
+    "evidence": [
+      {
+        "kind": "cody_observation",
+        "observed_pt": "2026-09-01 ~13:50 PT",
+        "detail": "Principal-supplied FS1 broadcast screenshot (Mackey Arena scorebug): 'IU LEADS 1-0' after set one, while the feed reported Georgia up 1-0 with set one 24-26. Same defect class as SMU-UC Davis (gid 6628696, corrected via two official sources) and Boise St.-Middle Tenn.; consistent with the nominal-home-not-venue-host pattern -- Georgia is the nominal home team in Purdue's Holloway Gymnasium (B1G/SEC Challenge)."
+      },
+      {
+        "kind": "host_livestat",
+        "url": "https://stats.statbroadcast.com/broadcast/?id=675704",
+        "retrieved_utc": "2026-09-01T23:57:07Z",
+        "retrieved_via": "browser review in Cody's Chrome (no crawler -- StatBroadcast ToS)",
+        "detail": "Page title 'GA 0, IU 1 - SET 4'; Georgia Sets Won: 1, Indiana Sets Won: 2; set scores from Georgia's side 24-26, 22-25, 25-22. The NCAA feed at the same time reported Georgia up 2-0 with Indiana holding 24 and 22 -- a whole-side inversion of the same set scores. Player attribution on StatBroadcast is coherent (Jager/Snowbarger/Boersema under Indiana; Muoneke/Artiles/Elarton under Georgia)."
+      }
+    ],
+    "note": "A cody_observation is a review signal, never a correction basis. Verification plan: when final, fetch iuhoosiers.com and georgiadogs.com published results; if both contradict the feed, file result_corrections.json entry and box_team_swap audit. StatBroadcast observation added 2026-09-01 (supplied by Cody); it is attributable and counts as one of the two required sources for the eventual final-result correction. School-published results remain the planned second source."
+  }
+}

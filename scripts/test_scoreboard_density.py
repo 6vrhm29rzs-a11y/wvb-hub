@@ -137,9 +137,15 @@ def main():
           "' cur '" in strip)
     # the boxed cell may mark who is AHEAD (up) but never carries the
     # winner-bold class -- nobody has won a set still being played
+    # (2026-09-01: the emphasis is additionally suppressed when the match's
+    # feed attribution is under live review -- ATTR_WATCH -- because "who is
+    # ahead" is then exactly the fact in dispute)
     check("...and the boxed set is marked ahead, never won",
-          "(+v > +o ? ' up' : '')" in strip and
+          "(!disputed && +v > +o ? ' up' : '')" in strip and
           "cur ? ' cur '" in strip)
+    check("...and a disputed live attribution emphasises nobody",
+          "ATTR_WATCH[m.gid]" in strip and
+          "(!disputed && +v > +o ? ' w' : '')" in strip)
     check("...and the sets-won tally leads the line",
           strip.find("mlt") < strip.find("mlc"),
           "Cody: sets won on the LEFT of the set scores")

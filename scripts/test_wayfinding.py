@@ -115,10 +115,20 @@ def main():
           "a rank rendered with no ruler named is on the page")
     # THE KANSAS / PITTSBURGH CASE, BOTH SIDES
     print("\n2b. THE KANSAS / PITTSBURGH CASE")
-    check("the Rally Tape names its ruler at the number",
-          "rankHTML('avca', rk, true)" in C)
-    check("today's read names its ruler at the number",
-          "rankHTML('avca', m.ar, true)" in C)
+    # ⚠ REWRITTEN 2026-09-01 from literal pins to the behaviour: both
+    # surfaces now route through teamRankChips, the ONE component for
+    # both-rulers-beside-a-name. It renders AVCA bare BY GRANT (Cody,
+    # 2026-09-01) with the ruler still named in the title, and POWER always
+    # labelled -- so "names its ruler at the number" holds through the
+    # component, not through a pinned call shape.
+    check("the Rally Tape routes ranks through the shared chip component",
+          "teamRankChips(name, rk)" in C and "cs-trk" in C)
+    check("today's read routes ranks through the shared chip component",
+          "teamRankChips(mAway(m), m.ar)" in C)
+    check("the chip component itself names rulers (title on bare AVCA, "
+          "label on POWER)",
+          "rankHTML('avca', av, 'bare')" in C and
+          "rankHTML('power', pw, true)" in C)
     check("the readiness panel names ITS ruler -- and it is a different one",
           'rank_badge("digby", c["away_rank"]' in S,
           "preflight_live ranks by Digby's Top 25, not the AVCA poll")

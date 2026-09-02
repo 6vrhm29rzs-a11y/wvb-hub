@@ -171,6 +171,7 @@ def main():
           off and "attacks > 0" in off and "killpct !== null" in off)
     esc_f = jsfn(page, "esc")
     stub = ("function logo(){return ''}\n"
+            "function teamRankChips(){return ''}\n"
             "function hcell(v,txt){return '<td>'+txt+'</td>'}\n"
             "function nonDiPhrase(){return ''}\nconst NONDI_WHY='';\n"
             "const _els={};function el(id){return _els[id]=_els[id]||"

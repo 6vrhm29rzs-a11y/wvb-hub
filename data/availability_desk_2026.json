@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-01T23:03:14Z",
+  "generated_at_utc": "2026-09-01T23:45:49Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 0,
    "expired": 1,
-   "anomalies": 20
+   "anomalies": 27
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -278,11 +278,11 @@
    "absent": [
     {
      "name": "Lakin Laurendine",
-     "rate": 3.3,
+     "rate": 4.125,
      "played_share": 1.0
     }
    ],
-   "points_per_set_missing": 3.3
+   "points_per_set_missing": 4.125
   },
   {
    "game_id": "6625817",
@@ -374,6 +374,19 @@
     }
    ],
    "points_per_set_missing": 2.125
+  },
+  {
+   "game_id": "6628216",
+   "team_id": "46035",
+   "team": "CSU Bakersfield",
+   "absent": [
+    {
+     "name": "Jordyn Waite-ward",
+     "rate": 1.864,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.864
   },
   {
    "game_id": "6624294",
@@ -491,6 +504,84 @@
     }
    ],
    "points_per_set_missing": 1.357
+  },
+  {
+   "game_id": "6627234",
+   "team_id": "45781",
+   "team": "Purdue Fort Wayne",
+   "absent": [
+    {
+     "name": "Bella DiBuono",
+     "rate": 1.278,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 1.278
+  },
+  {
+   "game_id": "6627235",
+   "team_id": "45781",
+   "team": "Purdue Fort Wayne",
+   "absent": [
+    {
+     "name": "Bella DiBuono",
+     "rate": 1.278,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 1.278
+  },
+  {
+   "game_id": "6627900",
+   "team_id": "1387136",
+   "team": "Old Dominion",
+   "absent": [
+    {
+     "name": "Emma DiRocco",
+     "rate": 0.944,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 0.944
+  },
+  {
+   "game_id": "6625052",
+   "team_id": "1387136",
+   "team": "Old Dominion",
+   "absent": [
+    {
+     "name": "Emma DiRocco",
+     "rate": 0.944,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 0.944
+  },
+  {
+   "game_id": "6627232",
+   "team_id": "45781",
+   "team": "Purdue Fort Wayne",
+   "absent": [
+    {
+     "name": "Haiden Means",
+     "rate": 0.875,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 0.875
+  },
+  {
+   "game_id": "6627233",
+   "team_id": "45781",
+   "team": "Purdue Fort Wayne",
+   "absent": [
+    {
+     "name": "Haiden Means",
+     "rate": 0.875,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 0.875
   }
  ],
  "latest": {
@@ -541,16 +632,14 @@
    ]
   },
   "Norfolk St.": {
-   "gid": "6625051",
-   "d": "2026-08-29",
+   "gid": "6625052",
+   "d": "2026-09-01",
    "appeared": 11,
    "zero_action": [
-    "Mikayla Middleton",
     "Aliyah Torres",
     "Brooklyn Kostoff",
     "Erin Armstrong",
-    "Reagan Chisholm",
-    "Kailia Phillips",
+    "Kaden Sanders",
     "Amari Chaney"
    ]
   },
@@ -672,11 +761,16 @@
    ]
   },
   "Old Dominion": {
-   "gid": "6626953",
-   "d": "2026-08-29",
+   "gid": "6625052",
+   "d": "2026-09-01",
    "appeared": 8,
    "zero_action": [
-    "Adrienne Peji"
+    "Kyra Hampton",
+    "Wiktoria Zagumny",
+    "Weronika Urbanska",
+    "Atlyn Proctor",
+    "Abby Macmillan",
+    "Taylor Motes"
    ]
   },
   "USC Upstate": {
@@ -1018,25 +1112,19 @@
    "d": "2026-09-01",
    "appeared": 10,
    "zero_action": [
-    "Ema Grubanov",
-    "Avery Jesewitz",
-    "Alleigh Dutton",
-    "Addison Wiemann",
-    "Zharia Harris-waddy",
-    "Mira Mccool",
-    "Jenna Delamater",
     "Kami Dyrstad"
    ]
   },
   "Purdue Fort Wayne": {
-   "gid": "6627234",
-   "d": "2026-08-29",
-   "appeared": 10,
+   "gid": "6627235",
+   "d": "2026-09-01",
+   "appeared": 9,
    "zero_action": [
     "Kennedy Mccants",
     "Ellie Adams",
+    "Ava Tester",
     "Anna Cassidy",
-    "Avery Parris",
+    "Stephani Winzeler",
     "Alyssa Gumbel"
    ]
   },
@@ -2598,17 +2686,18 @@
    "zero_action": []
   },
   "Holy Cross": {
-   "gid": "6624670",
-   "d": "2026-08-29",
-   "appeared": 14,
+   "gid": "6625304",
+   "d": "2026-09-01",
+   "appeared": 12,
    "zero_action": [
-    "Keira Mullen",
-    "Emilia Powderly",
+    "Savannah Baron",
+    "Nora Benjamins",
     "Madelyn Blakey",
     "Adriana Aquino",
-    "Ava White",
+    "Kk Green",
     "Lily Eigner",
-    "Gabby Wold"
+    "Gabby Wold",
+    "Kyla Harris"
    ]
   },
   "West Virginia": {
@@ -2655,10 +2744,20 @@
    ]
   },
   "Toledo": {
-   "gid": "6624936",
-   "d": "2026-08-29",
-   "appeared": 14,
-   "zero_action": []
+   "gid": "6627235",
+   "d": "2026-09-01",
+   "appeared": 10,
+   "zero_action": [
+    "Audrey Dyas",
+    "Caylee Sharkey",
+    "Brooke Naniseni",
+    "Gabbi Leblanc",
+    "Meg Jarrett",
+    "Lucy Monahan",
+    "Jadyn Kennedy",
+    "Sydney Crowley",
+    "Mariah Gaines"
+   ]
   },
   "East Texas A&M": {
    "gid": "6627367",
@@ -3221,8 +3320,8 @@
    "zero_action": []
   },
   "New Haven": {
-   "gid": "6625303",
-   "d": "2026-08-29",
+   "gid": "6625304",
+   "d": "2026-09-01",
    "appeared": 10,
    "zero_action": [
     "Shaelyn Campbell",
@@ -3606,9 +3705,7 @@
    "gid": "6628216",
    "d": "2026-09-01",
    "appeared": 12,
-   "zero_action": [
-    "Piper Justiss"
-   ]
+   "zero_action": []
   },
   "Colorado": {
    "gid": "6626304",
@@ -3642,13 +3739,7 @@
    "gid": "6628677",
    "d": "2026-09-01",
    "appeared": 12,
-   "zero_action": [
-    "Journey Peppers",
-    "Maggie Mccarroll",
-    "Livia Niu",
-    "Isabella Knoernschild",
-    "Lily Dudley"
-   ]
+   "zero_action": []
   },
   "SIUE": {
    "gid": "6637939",

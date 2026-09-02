@@ -478,10 +478,63 @@ def rank_badge(basis, v, compact=False, text=False):
         # component owns both renderings rather than a second one existing
         # somewhere with its own idea of the labels (R4).
         return "%s #%s " % (label, v)
+    if compact == "bare":
+        # no visible label -- the ruler still names itself in the title.
+        # Granted for AVCA beside team names (Cody, 2026-09-01: "you don't
+        # need to spell out AVCA"); the basis parameter stays required, and
+        # the JS twin rankHTML carries the identical mode.
+        return '<i class="rnk" title="%s \u2014 #%s">#%s</i> ' % (r[2], v, v)
     # ⚠ AND THE TITLE SAID "ranking rank". The descriptions are already noun
     # phrases naming the ruler, so appending the word doubled it.
     return ('<i class="rnk" title="%s"><span class="rank-label">%s</span>'
             '#%s</i> ' % (r[2], label, v))
+
+
+def team_rank_chips(name, feed_avca, pr, av):
+    """Python twin of the page's teamRankChips: both rulers beside a name.
+
+    AVCA as the bare gold number, OUR power rank labelled PWR, for EVERY
+    team that has a board rank (Cody, 2026-09-01: "Power rank should be
+    shown on every page for every team ... All teams!"). The dated poll
+    capture outranks the feed's per-fixture rank, which lags a poll release
+    by hours (measured: Indiana 16 -> 21 while the feed still said 16).
+    """
+    a = av.get(name) or feed_avca
+    p = pr.get(name)
+    out = ""
+    if a:
+        out += '<span class="mrk">%s</span>' % rank_badge("avca", a, compact="bare")
+    if p:
+        out += '<span class="mrk pw">%s</span>' % rank_badge("power", p, compact=True)
+    return out
+
+
+def _attr_watch_public():
+    """gid -> one-line reason, from the live attribution-watch ledger.
+
+    Display-labelling ONLY (see the ledger's _readme): the page uses this to
+    say 'score attribution under review' on a LIVE match whose feed
+    attribution is disputed. It never flips numbers and no counting surface
+    reads it. Invalid file -> RAISE, same rule as exhibitions(): silently
+    dropping a review label would present disputed data as fact.
+    """
+    path = os.path.join(REPO, "data", "raw", str(SEASON),
+                        "live_attribution_watch.json")
+    if not os.path.exists(path):
+        return {}
+    doc = json.load(open(path))
+    out = {}
+    for gid, e in doc.items():
+        if gid.startswith("_"):
+            continue
+        if not (isinstance(e, dict) and e.get("claim") and e.get("evidence")):
+            raise SystemExit("live_attribution_watch.json: entry %s lacks "
+                             "claim/evidence" % gid)
+        out[gid] = ("The upstream feed's team attribution for this match is "
+                    "disputed. The numbers shown are what the feed reports; "
+                    "nothing here treats them as verified, and the final "
+                    "result goes through the two-source correction process.")
+    return out
 
 import digby_art as DIGBY_ART            # noqa: E402
 import icons as ICONS                    # noqa: E402
@@ -4532,10 +4585,10 @@ def build():
                # reason the table kept ISO in the first place -- while the cell
                # a person reads says "Fri Aug 28" like every other date here.
                r["d"], day_label(r["d"]), r["t"] or "&mdash;",
-               rank_badge("avca", r["ar"]),
+               team_rank_chips(r["a"], r["ar"], _pr, _av),
                logo_img(r["a"], logos), esc(r["a"]),
                connector,
-               rank_badge("avca", r["hr"]),
+               team_rank_chips(r["h"], r["hr"], _pr, _av),
                logo_img(r["h"], logos), esc(r["h"]),
                badge, where,
                cls, pick))
@@ -4726,6 +4779,8 @@ def build():
         .replace("{{N_SHOWN}}", "{:,}".format(min(600, len(sched)))) \
         .replace("{{N_TV}}", str(len(tvrows))) \
         .replace("{{STANDINGS_JSON}}", json.dumps(stand, separators=(",", ":"))) \
+        .replace("{{ATTR_WATCH_JSON}}", json.dumps(_attr_watch_public(),
+                                                   separators=(",", ":"))) \
         .replace("{{RESULTS_JSON}}", blob(
             [{"away": r["away"], "home": r["home"],
               "away_sets": r["away_sets"], "home_sets": r["home_sets"],
@@ -6084,8 +6139,7 @@ td.pick b{color:var(--navy)}
 /* OUR RANKING, WHERE IT DISAGREES. Deliberately quiet -- the AVCA number is the
    official one and keeps the prominent slot; this is the second opinion, and it
    should read as a footnote rather than compete with the matchup. */
-.ourrk{font:600 11px/1.3 var(--mono);color:var(--ink2);letter-spacing:.02em;
-  margin-top:6px;padding-top:6px;border-top:1px dotted var(--line)}
+/* (.ourrk retired 2026-09-01 -- the POWER rank rides beside the name now) */
 /* THE POLL COLUMN. Green where we are higher on a team than the coaches are,
    red where we are lower -- the same good/bad reading the rest of the page
    uses. The gap is deliberately smaller and quieter than the poll rank itself:
@@ -7365,7 +7419,10 @@ td.at{white-space:nowrap}
 .mrow .mrt img{width:19px;height:19px;flex:none;object-fit:contain}
 .mrow .mrt b{font:600 15px/1.15 var(--disp);color:var(--ink2);overflow-wrap:anywhere}
 .mrow .mrt.won b{color:var(--ink)}
-.mrow .mrt .mrk{font:600 11px/1 var(--disp);color:var(--gold);flex:none}
+.mrk{font:600 11px/1 var(--disp);color:var(--gold);flex:none}
+/* our POWER chip reads quieter than the gold AVCA number -- two rulers,
+   two voices, never mistakable for one poll */
+.mrk.pw{color:var(--slate)}
 
 .mrow .msc{font:700 17px/1.2 var(--mono);color:var(--ink3);text-align:right;
   font-variant-numeric:tabular-nums}
@@ -7400,14 +7457,19 @@ td.at{white-space:nowrap}
    crest-and-points cards. Cody's phone would have shown a scoreboard with no
    teams on it. Same selectors, media-scoped, declared after. */
 @media (max-width:560px){
+  /* ⚠ NAMES IN LINE WITH THEIR NUMBERS (Cody's phone screenshot,
+     2026-09-01: "Logos and names should be in line with their respective
+     set totals and individual set scores"). The stacked card put both
+     names above the whole linescore block, so neither row of numbers sat
+     beside the team it describes. Two columns now: the teams block and
+     the linescore block side by side, each an explicit two-row grid with
+     IDENTICAL row heights and gap, so away lines up with away and home
+     with home. */
   .mrow,.tdlist.bytime .mrow,.tdlist.bytime .mrow.islive{
-    grid-template-columns:1fr;
-    grid-template-areas:"when" "teams" "mls" "meta"}
+    grid-template-columns:minmax(0,1fr) auto;
+    grid-template-areas:"when when" "teams mls" "meta meta"}
   .tdlist.bytime .mrow .mwhen{display:none}
   .tdlist.bytime .mrow.islive .mwhen{display:block}
-}
-@media (max-width:560px){
-  .tdlist.bytime .mrow{grid-template-columns:minmax(0,1fr) auto}
 }
 a.card.morecard{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;text-decoration:none;border-style:dashed}
 a.card.morecard b{font:700 17px/1 var(--disp);color:var(--ink2)}
@@ -7490,6 +7552,10 @@ h4.sbtime span{font:600 11px/1 var(--mono);color:var(--ink3)}
   max-width:70ch}
 /* ── MATCH DETAIL ───────────────────────────────────────────────────────── */
 .mdet{margin-top:4px}
+.attrwatch{margin:10px 0 2px;padding:10px 12px;border:1px solid var(--coral);
+  border-left-width:4px;font:13px/1.55 var(--sans);color:var(--ink2);
+  background:color-mix(in oklab,var(--coral) 7%,transparent)}
+.attrwatch b{font:700 11px/1 var(--disp);letter-spacing:.12em;color:var(--coral)}
 #v-scores.detailopen .hero,#v-scores.detailopen #changed,
 #v-scores.detailopen .lead,#v-scores.detailopen .tabhint,
 #v-desk.detailopen .vh,#v-desk.detailopen #desklead,
@@ -7530,13 +7596,21 @@ h4.sbtime span{font:600 11px/1 var(--mono);color:var(--ink3)}
        home line
        completed sets, small and dim, left-aligned under the names
      Venue and network stay in the match detail at this width. */
-  .mrow{grid-template-columns:1fr;
-    grid-template-areas:"when" "teams" "mls" "meta";
-    gap:4px;padding:12px 2px}
+  .mrow{grid-template-columns:minmax(0,1fr) auto;
+    grid-template-areas:"when when" "teams mls" "meta meta";
+    gap:4px 10px;padding:12px 2px}
   .mrow .mwhen{grid-area:when;display:none;font-size:11px}
   .mrow.islive .mwhen{display:block}
-  .mrow .mteams{grid-area:teams}
-  .mrow .mls{grid-area:mls;justify-content:start;margin-left:27px;row-gap:2px}
+  /* both blocks: two rows of exactly 24px with a 4px gap, centred, so the
+     rows cannot drift apart -- alignment by construction, not by luck */
+  .mrow .mteams{grid-area:teams;display:grid;gap:0;
+    grid-template-rows:24px 24px;row-gap:4px;align-items:center}
+  .mrow .mls{grid-area:mls;justify-content:end;margin-left:0;
+    grid-template-rows:24px 24px;row-gap:4px;align-content:center;
+    align-items:center}
+  /* the chevron overlapped the right-anchored numbers; a card is obviously
+     tappable */
+  .mrow::after{display:none}
   /* venue and network as the card's quiet last line -- secondary, one line,
      ellipsized; the design review's sketch ends the card exactly this way */
   .mrow .mmeta{display:flex;grid-area:meta;align-items:center;gap:8px;
@@ -8777,7 +8851,7 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 #livetick .tkm img{width:15px;height:15px;object-fit:contain}
 #livetick .tkm b{color:var(--ink);font-weight:700}
 #livetick .tkm .tkset{color:var(--gold);font-weight:700}
-#livetick .tkm .tkrk{font:600 11px/1 var(--disp);color:var(--gold)}
+/* (.tkrk retired 2026-09-01 -- ticker chips come from teamRankChips now) */
 /* AVAIL-CSS-BEGIN */
 .avrow{border:1px solid var(--line);border-radius:3px;padding:9px 12px;
   margin:0 0 7px;font-size:12.5px;color:var(--ink2)}
@@ -10786,13 +10860,41 @@ function rankHTML(basis, v, compact) {
   if (v === null || v === undefined || v === '' || !v) return '';
   const r = RULERS[basis];
   if (!r) return '<i class="rnk rnkbad" title="no ruler named">rank basis?</i> ';
-  return '<i class="rnk" title="' + esc(r[2]) + '">' +
-    '<span class="rank-label">' + esc(compact ? r[1] : r[0]) + '</span>#' +
-    esc(String(v)) + '</i> ';
+  /* compact === 'bare': no visible label -- the ruler still names itself in
+     the title. Granted for AVCA beside scoreboard team names by Cody
+     (2026-09-01, "you don't need to spell out AVCA"); the basis parameter
+     stays required, and every other basis keeps its visible label (R4). */
+  const lbl = compact === 'bare' ? '' :
+    '<span class="rank-label">' + esc(compact ? r[1] : r[0]) + '</span>';
+  return '<i class="rnk" title="' + esc(r[2]) + ' \u2014 #' + esc(String(v)) +
+    '">' + lbl + '#' + esc(String(v)) + '</i> ';
 }
 /* Kept as the AVCA shorthand the scoreboard-feed views already read well with.
    It is a NAMED call through the component, not a second implementation. */
 function rank(v) { return rankHTML('avca', v); }
+/* BOTH RULERS BESIDE A NAME (Cody, 2026-09-01: "put power ranking and AVCA
+   ranking next to the team names, if applicable" ... then "Power rank should
+   be shown on every page for every team so I can always see how good each
+   and every team is 1-300+. All teams!"). So: PWR renders for EVERY team
+   that has a board rank, no cap -- his explicit call, superseding my
+   top-25-only noise guard. AVCA renders as the bare gold number -- the
+   broadcast convention, the one basis granted a bare form; POWER wears its
+   PWR label so the two rulers are never mistakable for one poll.
+   ⚠ OUR CAPTURE OUTRANKS THE FEED'S RANK FIELD -- measured 2026-09-01: the
+   Sep 1 poll (captured that morning) moved Indiana 16 -> 21, and the feed's
+   per-match rank still said 16 hours later. The page's own dated poll is
+   the authority; the feed rank is only a fallback for a team our capture
+   does not list. This also keeps the name chip and the disagreement chip on
+   one card from quoting two different weeks of the same poll. */
+function teamRankChips(name, feedAvca) {
+  const T = TEAMS[name] || {};
+  const av = T.avca || feedAvca || null;
+  const pw = T.rank || null;
+  let out = '';
+  if (av) out += '<span class="mrk">' + rankHTML('avca', av, 'bare') + '</span>';
+  if (pw) out += '<span class="mrk pw">' + rankHTML('power', pw, true) + '</span>';
+  return out;
+}
 /* ---- THE WEEK'S HEADLINE MATCHES -------------------------------------
    What a scoreboard puts at the top: not every fixture, the ones worth
    watching. Ranked-versus-ranked first, ordered by how good the pair is
@@ -10873,15 +10975,18 @@ function tkChip(g) {
   const cur = (g.sets && g.sets.length) ? g.sets[g.sets.length - 1] : null;
   const pts = (cur && cur[0] !== null && cur[0] !== undefined)
     ? ' <span class="tkset">' + cur[0] + '\u2013' + cur[1] + '</span>' : '';
-  const rk = n => n ? '<span class="tkrk">#' + n + '</span>' : '';
+  /* both rulers, via the shared helper -- and the page's dated poll capture
+     first, never the feed's rank field, which lags a poll release */
   const why = tkPriority(g).why;
   return '<button type="button" class="tkm" data-match="' + esc(String(g.id)) +
     '" title="' + esc(why) + '" aria-label="' +
     esc(g.away + ' ' + (mNum(g.away_sets) || 0) + ' ' + (mNum(g.home_sets) || 0) +
         ' ' + g.home + ', ' + (g.period || 'in progress')) + '">' +
-    rk(g.away_rank) + logo(g.away, 'sm') + '<b>' + esc(g.away) + '</b> ' +
+    teamRankChips(g.away, g.away_rank) + logo(g.away, 'sm') +
+    '<b>' + esc(g.away) + '</b> ' +
     mNum(g.away_sets) + '\u2013' + mNum(g.home_sets) +
-    ' <b>' + esc(g.home) + '</b>' + logo(g.home, 'sm') + rk(g.home_rank) +
+    ' <b>' + esc(g.home) + '</b>' + logo(g.home, 'sm') +
+    teamRankChips(g.home, g.home_rank) +
     pts +
     (g.period ? ' <span class="tkper">' + esc(g.period) + '</span>' : '') +
     '</button>';
@@ -10909,11 +11014,11 @@ function tkQuietChips() {
                      (tMinutes(b[0].t) === null ? 1e9 : tMinutes(b[0].t))));
   return scored.slice(0, TK_QUIET_CAP).map(x => {
     const m = x[0];
-    const rk = n => n ? '<span class="tkrk">#' + n + '</span>' : '';
     return '<button type="button" class="tkm" data-match="' +
       esc(String(m.gid)) + '">' +
-      rk(m.ar) + logo(m.a, 'sm') + '<b>' + esc(m.a) + '</b> ' +
-      connector(m) + ' <b>' + esc(m.h) + '</b>' + logo(m.h, 'sm') + rk(m.hr) +
+      teamRankChips(m.a, m.ar) + logo(m.a, 'sm') + '<b>' + esc(m.a) + '</b> ' +
+      connector(m) + ' <b>' + esc(m.h) + '</b>' + logo(m.h, 'sm') +
+      teamRankChips(m.h, m.hr) +
       ' <span class="tkper">' + esc(dayLabel(m.d)) +
       (m.t ? ' \u00b7 ' + esc(m.t) : '') + '</span></button>';
   }).join('');
@@ -11988,6 +12093,8 @@ renderPlayers();
 
 /* ---- standings --------------------------------------------------------- */
 const STANDINGS = {{STANDINGS_JSON}};
+/* LIVE attribution watch: gid -> reason. Labels only -- see the ledger. */
+const ATTR_WATCH = {{ATTR_WATCH_JSON}};
 const RESULTS = {{RESULTS_JSON}};
 /* ⚠ THE NON-DIVISION-I OPPONENTS THAT APPEAR IN THESE RESULTS, as an explicit
    list rather than "not in TEAMS". TEAMS is declared near the END of this
@@ -15669,7 +15776,7 @@ function ribbonHTML(m, live, why) {
       : esc((m.dl || m.d || '') + (m.t ? ' · ' + m.t : ''));
   const side = (name, rk, won, score) =>
     '<div class="rbside ' + (won ? 'won' : '') + '">' +
-      '<span class="rbrk">' + rankHTML('avca', rk, true) + '</span>' +
+      '<span class="rbrk">' + teamRankChips(name, rk) + '</span>' +
       /* ⚠ THE CREST SLOT IS ALWAYS EMITTED, EVEN WHEN THERE IS NO CREST.
          `.rbside` is a FOUR-column grid and logo() returns an empty string for
          a team we hold no crest for -- so the row had three children, every
@@ -15756,6 +15863,11 @@ function rowLinescore(m, live, st) {
   const tally = (sc && sc[0] !== null && sc[0] !== undefined) ? sc : null;
   if (!full && !tally) return '<span class="mls"></span>';
   const playing = st === 'live';
+  /* ⚠ A DISPUTED ATTRIBUTION EMPHASISES NOBODY (IU-Georgia, 2026-09-01):
+     with the feed's team assignment under review, "who is ahead" is exactly
+     the fact in dispute -- the numbers render, the emphasis does not. */
+  const disputed = playing && typeof ATTR_WATCH !== 'undefined' &&
+                   ATTR_WATCH[m.gid];
   const raw = full;
   const n = raw ? raw.length : 0;
   /* THE SHAPE, all of it Cody's (2026-08-28): sets-won FIRST, rule on its
@@ -15771,14 +15883,17 @@ function rowLinescore(m, live, st) {
       cells += '<b class="mlt' +
         (!playing && +tally[r] > +tally[1 - r] ? ' w' : '') +
         '" title="sets won">' + esc(String(tally[r])) + '</b>';
+      /* (final rows are never disputed here -- the ledgered under_review
+         machinery owns finals) */
     }
     for (let i = 0; i < n; i++) {
       const a = raw[i][0], h = raw[i][1];
       const v = r === 0 ? a : h, o = r === 0 ? h : a;
       const cur = playing && i === n - 1;
       cells += '<i class="mlc' +
-        (cur ? ' cur ' + (r === 0 ? 'ca' : 'ch') + (+v > +o ? ' up' : '')
-             : (+v > +o ? ' w' : '')) +
+        (cur ? ' cur ' + (r === 0 ? 'ca' : 'ch') +
+               (!disputed && +v > +o ? ' up' : '')
+             : (!disputed && +v > +o ? ' w' : '')) +
         '" title="set ' + (i + 1) + (cur ? ' (in progress)' : '') + '">' +
         esc(String(v)) + '</i>';
     }
@@ -15858,7 +15973,7 @@ function matchRow(m, live, dest) {
      text"); the current set lives in the linescore's boxed last column */
   const t = (name, rk, won) =>
     '<div class="mrt ' + (won ? 'won' : '') + '">' +
-      (rk ? '<span class="mrk">' + rankHTML('avca', rk, true) + '</span>' : '') +
+      teamRankChips(name, rk) +
       logo(name) + '<b class="tn">' + esc(name) + '</b></div>';
   /* venue as quiet metadata, not a badged shout: "Neutral · Rec Hall, State
      College". The one badge that changes what a result MEANS -- exhibition --
@@ -15882,6 +15997,10 @@ function matchRow(m, live, dest) {
     '<span class="mmeta">' +
       (_mbits.length ? '<span class="mvn">' + _mbits.join(' \u00b7 ') +
         '</span>' : '') +
+      ((st === 'live' && typeof ATTR_WATCH !== 'undefined' && ATTR_WATCH[m.gid])
+        ? '<span class="mtags"><span class="mtg rvw" title="' +
+          esc(ATTR_WATCH[m.gid]) + '">score attribution under review</span></span>'
+        : '') +
       (m.exh ? '<span class="mtags">' + exhTag(m) + '</span>' : '') +
     '</span></button>';
 }
@@ -17297,7 +17416,12 @@ function renderMatchDetail(gid, dest) {
       ((typeof ROUTE_ORIGIN !== 'undefined' && ROUTE_ORIGIN === 'ledger')
         ? 'ledger' : dest) + '">&larr; Back to ' +
       parent[0] + '</button>' +
-    '<div class="mdet">' + exhBanner(m) + ribbonHTML(m, live, null) +
+    '<div class="mdet">' +
+    ((typeof ATTR_WATCH !== 'undefined' && ATTR_WATCH[m.gid] && !m.under_review)
+      ? '<p class="attrwatch"><b>SCORE ATTRIBUTION UNDER REVIEW.</b> ' +
+        esc(ATTR_WATCH[m.gid]) + '</p>'
+      : '') +
+    exhBanner(m) + ribbonHTML(m, live, null) +
       /* WHY WATCH -- directly after the identity block, before the facts
          (review round 5): the decision module leads. At most three factual
          reason chips, then the watch line. ⚠ THE WATCH LINE NEVER IMPLIES
@@ -17478,9 +17602,9 @@ function todaysRead(mine, soon, liveOf) {
   /* ⚠ THIS IS THE LINE CODY NAMED. It read "#21 Kansas at #2 Pittsburgh"
      while the Rally Tape above it read "#15 Kansas" -- two valid rulers, one
      screen, and nothing on it saying which was which. */
-  const nm = m => rankHTML('avca', m.ar, true) + esc(mAway(m)) + ' ' +
+  const nm = m => teamRankChips(mAway(m), m.ar) + esc(mAway(m)) + ' ' +
                   connector(m) + ' ' +
-                  rankHTML('avca', m.hr, true) + esc(mHome(m));
+                  teamRankChips(mHome(m), m.hr) + esc(mHome(m));
 
   /* 1. what is live right now */
   const live = mine.filter(m => matchState(m, liveOf(m)) === 'live');
@@ -17609,7 +17733,7 @@ function csSide(name, rk, sets, won, serving, quiet) {
        context line, which is a footnote, not a label at the point of use --
        and the readiness panel four inches below it ranks the same match by
        Digby. The label travels with the number now. */
-    '<span class="cs-trk">' + rankHTML('avca', rk, true) + '</span>' +
+    '<span class="cs-trk">' + teamRankChips(name, rk) + '</span>' +
     (logo(name) || '<span class="cs-nologo"></span>') +
     '<a class="cs-nm" href="' + routeFor('teams', slug(name)) + '">' +
       esc(name) + '</a>' +
@@ -17877,7 +18001,7 @@ function momentHTML(m, live, opts) {
     '<div class="mm-side ' + cls + (won ? ' won' : '') + '">' +
       (logo(name) || '<span class="mm-nologo"></span>') +
       '<span class="mm-nm">' + esc(name) + '</span>' +
-      (rk ? '<span class="mm-rk">' + rankHTML('avca', rk, true) + '</span>' : '') +
+      '<span class="mm-rk">' + teamRankChips(name, rk) + '</span>' +
     '</div>';
 
   /* ⚠ THE SCORE ONLY EXISTS ONCE IT EXISTS. Before first serve the middle of
@@ -18006,8 +18130,15 @@ function todayReasons(m, live) {
      are shown with their basis so the reader sees the disagreement itself. */
   const dis = [[mAway(m), m.ao, m.ap], [mHome(m), m.ho, m.hp]]
     .filter(x => x[1] && x[2] && Math.abs(x[1] - x[2]) >= 8);
-  dis.forEach(x => out.push(['dg', 'ranking disagreement',
-    x[0] + ' is AVCA #' + x[1] + ' and POWER #' + x[2]]));
+  /* ⚠ THE CHIP TEXT IS THE FACT, NOT A CATEGORY NAME (Cody, 2026-09-01:
+     "wtf does ranking disagreement mean"). The label carried no numbers and
+     the explanation lived in a hover title, unreachable on a phone. */
+  /* label is plain text -- the chip renderer escapes it */
+  dis.forEach(x => out.push(['dg',
+    x[0] + ' \u00b7 AVCA ' + x[1] + ' v PWR ' + x[2],
+    x[0] + ' is AVCA #' + x[1] + ' but #' + x[2] + ' on our POWER rating -- ' +
+    'the two orders disagree by ' + Math.abs(x[1] - x[2]) + ' places, so ' +
+    'this result is evidence either way']));
   if (m.site === 'neutral' && m.event) out.push(['ev', esc(m.event),
     'Part of ' + m.event]);
   /* ⚠ SAME MISTAKE, SAME LINE OF REASONING: a feed entry exists for every
@@ -18324,9 +18455,9 @@ function renderDesk() {
                 + '>TV/stream listing not held</span>') +
       '</span>' +
       '<span class="wteams">' +
-        rankHTML('avca', m.ar, true) + esc(mAway(m)) +
+        teamRankChips(mAway(m), m.ar) + esc(mAway(m)) +
         '<i>' + connector(m) + '</i>' +
-        rankHTML('avca', m.hr, true) + esc(mHome(m)) +
+        teamRankChips(mHome(m), m.hr) + esc(mHome(m)) +
       '</span>' +
       '<span class="wmeta">' + (m.venue ? esc(m.venue) : '<span class="munk">venue TBA</span>') +
         (m.event ? ' &middot; ' + esc(m.event) : '') + '</span>' +
@@ -18334,20 +18465,10 @@ function renderDesk() {
          repeating it is the duplication Cody's screenshot showed */
       reasonChips(m, live, isLive ? ['lv'] : null) +
       starPeek(m) +
-      /* ⚠ OUR RANK BESIDE THE OFFICIAL ONE, where they disagree. Restored
-         from the deleted weekbox: a reader who sees "24 BYU" on a page that
-         ranks BYU 16th is owed the second number. ap/hp are OUR board rank
-         (rank26); ar/hr are the AVCA poll -- DESK's field names, one
-         meaning each. */
-      (function () {
-        const bits = [];
-        if (m.ap && m.ar && +m.ap !== +m.ar) bits.push(esc(m.a) + ' ' + m.ap);
-        if (m.hp && m.hr && +m.hp !== +m.hr) bits.push(esc(m.h) + ' ' + m.hp);
-        return bits.length
-          ? '<div class="ourrk" title="our POWER rating disagrees with the ' +
-            'coaches poll">our Top 25: ' + bits.join(' \u00b7 ') + '</div>'
-          : '';
-      })() +
+      /* our POWER rank now rides beside each name (teamRankChips), so the
+         old "our Top 25: Indiana 38" line -- which read as a contradiction,
+         a 38 under a top-25 heading (Cody, 2026-09-01) -- is retired. A wide
+         split still gets its own chip, with both numbers in the chip text. */
       /* ⚠ TWO ACTIONS, TWO LABELS (review, 2026-08-30). "Preview →"
          beside "ncaa.com" read as ONE action -- and reads doubled the
          moment anything else on the screen links the same match. The
@@ -19229,7 +19350,7 @@ function renderTeamStats() {
          opponents are not filtered out, but a blanket sentence under a sorted
          table does not say WHICH row it means, and the row is what a reader
          compares. */
-      '<td class="tm">' + logo(r.team) + esc(r.team) +
+      '<td class="tm">' + teamRankChips(r.team) + logo(r.team) + esc(r.team) +
       ((d.nondi || 0) > 0
         ? '<b class="nondi" title="' +
           nonDiPhrase(d.nondi, d.matches, 'in this sample') + '. ' +
@@ -19300,7 +19421,7 @@ function renderTeamOffense() {
   document.getElementById('lobody').innerHTML = rows.map((r, i) => {
     const d = r.own;
     return '<tr><td class="rk">' + (i + 1) + '</td>' +
-      '<td class="tm">' + logo(r.team) + esc(r.team) +
+      '<td class="tm">' + teamRankChips(r.team) + logo(r.team) + esc(r.team) +
       ((d.nondi || 0) > 0
         ? '<b class="nondi" title="' +
           nonDiPhrase(d.nondi, d.matches, 'in this sample') + '. ' +

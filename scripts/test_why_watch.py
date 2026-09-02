@@ -178,6 +178,7 @@ def main():
     _js = r"""
 const esc = s => String(s == null ? '' : s);
 const rankHTML = () => '';
+const teamRankChips = () => '';
 const logo = () => '';
 const mAway = m => m.a, mHome = m => m.h;
 const matchRoute = (g) => '#/m/' + g;
