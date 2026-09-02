@@ -61,6 +61,74 @@ def main():
     check("site classification survives",
           by.get(("2026-09-01", "Georgia"), {}).get("site") == "Neutral")
 
+    print("\n1b. THE MODERN-CARD ADAPTER (JS schedule pages)")
+    # synthetic page built from the REAL markup shapes measured 2026-09-01:
+    # WMT (virginiasports), WMT-variant (odusports), incl. the doubled
+    # mobile+desktop render and a promo token beside the opponent
+    MODERN = (
+      '<div><time class="schedule-event-date__day">Sep 1</time>(Tue)'
+      '<span>at</span><span>Norfolk State</span><span>Norfolk, Va.</span>'
+      '<span>W</span><span>Win</span><span> 3-0</span></div>'
+      '<div><time class="schedule-event-date__day">Sep 1</time>(Tue)'
+      '<span>at</span><span>Norfolk State</span>'
+      '<span>W</span><span>Win</span><span> 3-0</span></div>'
+      '<div class="x schedule-event-item__date-box">'
+      '<span>Tue</span><span>Sep 2</span><span>JPJ Takeover</span>'
+      '<span>vs.</span><span>Liberty</span><span>home</span></div>'
+      '<div class="s-game-card"><span>Aug 14</span>'
+      '<span>Kentucky (Exh.)</span><span>L, 0-3</span></div>')
+    mrows = V.parse_modern_cards(MODERN)
+    check("card blocks parse (doubled render included)", len(mrows) == 4,
+          len(mrows))
+    st, det = V._judge_rows(mrows, "t://m", "Old Dominion", "Norfolk St.",
+                            "2026-09-01",
+                            {"winner": "Old Dominion", "loser": "Norfolk St.",
+                             "w_sets": 3, "l_sets": 0})
+    check("WMT tokens judge: 'at|Norfolk State|W|Win|3-0' agrees",
+          st == "AGREE_COMPLETE", (st, det))
+    check("...with modern-card provenance on the evidence",
+          det.get("surface") == "modern_card")
+    st2, _ = V._judge_rows(mrows, "t://m", "Virginia", "Liberty",
+                           "2026-09-02",
+                           {"winner": "Virginia", "loser": "Liberty",
+                            "w_sets": 3, "l_sets": 1})
+    check("an upcoming card with no result is NOT_POSTED, never invented",
+          st2 == "NOT_POSTED", st2)
+    st3, _ = V._judge_rows(mrows, "t://m", "Dayton", "Kentucky",
+                           "2026-08-14",
+                           {"winner": "Kentucky", "loser": "Dayton",
+                            "w_sets": 3, "l_sets": 0})
+    check("[NEG] an exhibition card never matches a counted final",
+          st3 == "EVENT_NOT_FOUND", st3)
+    # ⚠ the real R8 control: the token match is EXACT-whole-token, so a
+    # partial name can never absorb a longer one ("Norfolk" must not match
+    # the "Norfolk State" token -- the Lauren Pyle/Lauren Malone class)
+    check("[NEG] a partial name never matches a longer token",
+          V._judge_rows(mrows, "t://m", "Old Dominion", "Norfolk",
+                        "2026-09-01", {"winner": "x", "loser": "y",
+                                       "w_sets": 3, "l_sets": 0}
+                        )[0] == "EVENT_NOT_FOUND")
+
+    print("\n1c. THE JOIN FOLDS -- both sides, and no two teams collide")
+    n = V.team_norm
+    for a, b in [("Norfolk State", "Norfolk St."),
+                 ("Michigan State", "Michigan St."),
+                 ("North Carolina Central", "N.C. Central"),
+                 ("Presbyterian College", "Presbyterian"),
+                 ("South Carolina State", "S.C. State")]:
+        check("  fold: %s == %s" % (a, b), n(a) == n(b), (n(a), n(b)))
+    dset = json.load(open(os.path.join(REPO, "data", "data_2026.json")))
+    seenk = {}
+    coll = []
+    for t in dset["teams"]:
+        k = n(t["name_short"])
+        if k in seenk:
+            coll.append((seenk[k], t["name_short"]))
+        seenk[k] = t["name_short"]
+    check("[NEG] the folds merge NO two real teams (the NC State-class "
+          "wrong-team join can never come back through this key)",
+          not coll, coll[:3])
+
     print("\n2. VERDICTS -- corroboration is never verification")
     v = V.verdict
     check("both agree COMPLETELY -> VERIFIED_BOTH",

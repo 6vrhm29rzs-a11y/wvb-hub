@@ -42,7 +42,29 @@ import urllib.error
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(REPO, "scripts"))
 import season_counts as SC                                   # noqa: E402
-from reconcile_2025 import norm as team_norm                 # noqa: E402
+from reconcile_2025 import norm as _norm_raw                 # noqa: E402
+from external_refs import _ref_norm                          # noqa: E402
+
+
+def team_norm(name):
+    """Join key for school-page opponents vs hub names.
+
+    external_refs._ref_norm underneath, NOT the bare reconcile norm: school
+    sites spell out "Norfolk State" / "Michigan State" where the hub says
+    "St." -- the Penn State lesson, again. Two further standard folds,
+    applied to BOTH sides so a key can never drift one-sided:
+    - the dotted "N.C."/"S.C." expands to the state name (hub "N.C.
+      Central" vs page "North Carolina Central"; undotted "NC State" is
+      untouched and keeps its existing behaviour);
+    - a bare "College" suffix folds away (page "Presbyterian College" vs
+      hub "Presbyterian"; "Boston College" folds identically on both
+      sides, so it still matches itself and collides with nobody).
+    """
+    t = re.sub(r"\b([NS])\.C\.", lambda m: (
+        "North" if m.group(1) == "N" else "South") + " Carolina", name)
+    n = _ref_norm(t)
+    n = re.sub(r"\bcollege\b", " ", n)
+    return re.sub(r"\s+", " ", n).strip()
 
 SEASON = 2026
 RAW = os.path.join(REPO, "data", "raw", str(SEASON))
@@ -205,6 +227,75 @@ def parse_schedule_txt_plain(body, season=SEASON):
     return rows
 
 
+# per-event boundary markers for the modern JS-rendered schedule pages --
+# one marker per rendered game card, across the template families measured
+# 2026-09-01: WMT/virginiasports ("schedule-event-item__date-box"),
+# WMT-variant/odusports ("schedule-event-date__day"), and modern SIDEARM
+# ("s-game-card", the class the USC incident already taught us to treat as
+# the card BOUNDARY -- evidence binds inside one card, never across).
+_CARD_MARKS = re.compile(
+    r'class="[^"]*(?:schedule-event-item__date-box|'
+    r'schedule-event-date__day|s-game-card)')
+
+
+def parse_modern_cards(page, season=SEASON):
+    """JS-rendered schedule pages -> normalized rows, by TOKEN SCHEMA.
+
+    The templates differ; the token stream rhymes: a month-day date, an
+    at/vs marker, the opponent, and a result shaped W/L + N-N ("W|Win|3-0"
+    on WMT, "W, 3-0" on SIDEARM cards). Discovery is by schema, not by
+    variable or class names (per the design consult) -- with one exception:
+    the block BOUNDARY is a card marker class, because token proximity
+    across card boundaries is exactly how the USC misread happened.
+    The opponent is NOT extracted here -- the judge knows who it expects,
+    and a block matches only if a single token normalizes to that name.
+    """
+    # slice from the marker tag's own '<' -- starting mid-attribute leaves
+    # an unstripped tag fragment glued to the first token (found on
+    # odusports.com, where the date text follows the class attr directly)
+    marks = [page.rfind("<", 0, m.start()) for m in _CARD_MARKS.finditer(page)]
+    marks = [m for m in marks if m >= 0]
+    rows = []
+    for k, st in enumerate(marks):
+        end = marks[k + 1] if k + 1 < len(marks) else min(len(page),
+                                                          st + 20000)
+        blk = page[st:end]
+        toks = [x.strip() for x in
+                re.sub(r"<[^>]+>", "|", _html.unescape(blk)).split("|")
+                if x.strip()]
+        date = None
+        for tk in toks:
+            mo, day = parse_sidearm_date(tk)
+            if mo:
+                year = season if mo >= 8 else season + 1
+                date = "%04d-%02d-%02d" % (year, mo, day)
+                break
+        if not date:
+            continue
+        exh = any(re.search(r"Exh|Intrasquad|Scrimmage", tk)
+                  for tk in toks)
+        res = None
+        for j, tk in enumerate(toks):
+            m1 = re.fullmatch(r"([WL])[,.]?\s*(\d)\s*-\s*(\d)", tk)
+            if m1:
+                res = (m1.group(1), int(m1.group(2)), int(m1.group(3)))
+                break
+            if re.fullmatch(r"[WL][,.]?", tk):
+                for tk2 in toks[j + 1:j + 4]:
+                    m2 = re.fullmatch(r"(\d)\s*-\s*(\d)", tk2)
+                    if m2:
+                        res = (tk[0], int(m2.group(1)), int(m2.group(2)))
+                        break
+                if res:
+                    break
+        site = next((tk.capitalize() for tk in toks
+                     if tk.lower() in ("home", "away", "neutral")), None)
+        rows.append({"date": date, "site": site, "opponent": None,
+                     "tokens": toks, "exhibition": exh, "result": res,
+                     "raw": toks[:14], "surface": "modern_card"})
+    return rows
+
+
 def legacy_txt_rows(base, log, team):
     """Find the schedule_txt.ashx link on the vendor schedule page and parse
     its plain-text export. Returns (rows, url) or (None, None)."""
@@ -238,12 +329,25 @@ def _judge_rows(rows, url, team, opponent, date, canonical):
     matches, and "first row of the date" is how the wrong match gets
     verified. R8's lesson, applied to scraping."""
     want = team_norm(opponent)
+
+    def _matches(r):
+        if r.get("opponent") is not None:
+            return team_norm(r["opponent"]) == want
+        # a token row (modern card): the judge knows who it expects, and a
+        # block matches only on an EXACT single-token normalization --
+        # never a substring, never across the card boundary (R8, and the
+        # USC misread)
+        return any(team_norm(re.sub(r"^(?:#\d+|No\.\s*\d+|RV)\s+", "",
+                                    tk)) == want
+                   for tk in (r.get("tokens") or []))
+
     cand = [r for r in rows if r["date"] == date
-            and team_norm(r["opponent"]) == want
-            and not r["exhibition"]]
+            and _matches(r) and not r["exhibition"]]
     if not cand:
         return "EVENT_NOT_FOUND", {"url": url, "rows_on_date": [
-            r["opponent"] for r in rows if r["date"] == date]}
+            (r["opponent"] if r.get("opponent") is not None
+             else " ".join((r.get("tokens") or [])[:6]))
+            for r in rows if r["date"] == date]}
     r = cand[0]
     if not r["result"]:
         return "NOT_POSTED", {"url": url, "row": r["raw"]}
@@ -253,8 +357,10 @@ def _judge_rows(rows, url, team, opponent, date, canonical):
     c_sets = (canonical["w_sets"], canonical["l_sets"]) if c_won \
         else (canonical["l_sets"], canonical["w_sets"])
     det = {"url": url, "assertion": "%s %s %d-%d vs %s"
-           % (team, wl, a, b, r["opponent"]),
+           % (team, wl, a, b, r["opponent"] or opponent),
            "site_says": r["site"]}
+    if r.get("surface"):
+        det["surface"] = r["surface"]
     if won == c_won and (a, b) == c_sets:
         return "AGREE_COMPLETE", det
     if won == c_won:
@@ -313,8 +419,20 @@ def school_evidence(team, opponent, date, canonical, sites, log):
         # successful row extraction, nothing weaker.
         rows = parse_schedule_text(body)
         if not rows:
+            # the modern JS page (often what /schedule/text silently
+            # redirected to) -- reuse THIS body rather than refetching
+            mrows = parse_modern_cards(body)
             entry["state"] = "unparsed"
+            entry["modern_blocks"] = len(mrows)
             log.append(entry)
+            if mrows:
+                st, det = _judge_rows(mrows, final_url, team, opponent,
+                                      date, canonical)
+                if st in ("AGREE_COMPLETE", "CONTRADICTS",
+                          "CONTRADICTS_SETS", "NOT_POSTED"):
+                    return st, det
+                best = better(st, det)
+                continue
             best = better("SITE_UNPARSED", {"url": final_url})
             continue
         entry["state"] = "parsed"
@@ -324,6 +442,28 @@ def school_evidence(team, opponent, date, canonical, sites, log):
                   "NOT_POSTED"):
             return st, det
         best = better(st, det)
+    # the modern schedule pages directly (WMT 404s every /text path, so the
+    # loop above never even saw a body for those schools)
+    for sport in ("womens-volleyball", "volleyball", "wvball", "wvb"):
+        murl = base + "/sports/%s/schedule" % sport
+        mstatus, mbody, mfinal = _fetch(murl)
+        time.sleep(0.5)
+        if mstatus != 200 or not mbody:
+            continue
+        mrows = parse_modern_cards(mbody)
+        log.append({"team": team, "url": murl, "http": mstatus,
+                    "retrieved_utc": datetime.datetime.utcnow()
+                    .strftime("%Y-%m-%dT%H:%M:%SZ"),
+                    "state": "modern_probe", "modern_blocks": len(mrows)})
+        if not mrows:
+            continue
+        st, det = _judge_rows(mrows, mfinal, team, opponent, date,
+                              canonical)
+        if st in ("AGREE_COMPLETE", "CONTRADICTS", "CONTRADICTS_SETS",
+                  "NOT_POSTED"):
+            return st, det
+        best = better(st, det)
+        break
     # the legacy plain-text export -- reached even when every path above
     # produced only observations
     rows2, turl = legacy_txt_rows(base, log, team)

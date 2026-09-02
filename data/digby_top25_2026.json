@@ -29,13 +29,13 @@
   "between_team_variance": 5.941,
   "caveat_schedule": "the opponent IS adjusted for from match one: a result is scored as the strength it implies (opponent's rating + margin, home court removed). What is still thin early is the opponent's own rating, which is the preseason projection until a schedule graph exists",
   "teams_with_a_result": 339,
-  "matches_counted": 484,
-  "score_mean": -0.00029,
-  "score_sd": 1.05661,
+  "matches_counted": 485,
+  "score_mean": -0.0003,
+  "score_sd": 1.05647,
   "score_scale_note": "mean and SD across ALL 348 teams, not just the ones shown -- a scale computed from the top 25 would measure the spread among the best",
   "shown": 25,
   "also_receiving": 10,
-  "generated_at_utc": "2026-09-02T01:43:40Z",
+  "generated_at_utc": "2026-09-02T02:30:28Z",
   "data_through_epoch": 1788307200
  },
  "top": [
@@ -438,18 +438,6 @@
    "rank": 33
   },
   {
-   "team": "Colorado St.",
-   "score": 1.3938,
-   "preseason_z": 1.227,
-   "season_z": 2.519,
-   "matches": 2,
-   "weight_on_season": 0.129,
-   "record": "1-1",
-   "net_pts_per_set": 3.29,
-   "conf": "Mountain West",
-   "rank": 34
-  },
-  {
    "team": "Iowa St.",
    "score": 1.3695,
    "preseason_z": 1.398,
@@ -459,6 +447,18 @@
    "record": "2-1",
    "net_pts_per_set": 1.67,
    "conf": "Big 12",
+   "rank": 34
+  },
+  {
+   "team": "Colorado St.",
+   "score": 1.3483,
+   "preseason_z": 1.227,
+   "season_z": 1.893,
+   "matches": 3,
+   "weight_on_season": 0.182,
+   "record": "2-1",
+   "net_pts_per_set": 2.86,
+   "conf": "Mountain West",
    "rank": 35
   }
  ],
@@ -695,16 +695,16 @@
    "weight_on_season": 0.182
   },
   {
-   "team": "Colorado St.",
+   "team": "Iowa St.",
    "rank": 34,
-   "score": 1.3938,
-   "matches": 2,
-   "weight_on_season": 0.129
+   "score": 1.3695,
+   "matches": 3,
+   "weight_on_season": 0.182
   },
   {
-   "team": "Iowa St.",
+   "team": "Colorado St.",
    "rank": 35,
-   "score": 1.3695,
+   "score": 1.3483,
    "matches": 3,
    "weight_on_season": 0.182
   },
@@ -1451,53 +1451,53 @@
    "weight_on_season": 0.182
   },
   {
-   "team": "San Diego St.",
+   "team": "Northern Colo.",
    "rank": 142,
+   "score": 0.2176,
+   "matches": 2,
+   "weight_on_season": 0.129
+  },
+  {
+   "team": "San Diego St.",
+   "rank": 143,
    "score": 0.2164,
    "matches": 3,
    "weight_on_season": 0.182
   },
   {
    "team": "Loyola Chicago",
-   "rank": 143,
+   "rank": 144,
    "score": 0.2022,
    "matches": 3,
    "weight_on_season": 0.182
   },
   {
    "team": "Denver",
-   "rank": 144,
+   "rank": 145,
    "score": 0.1879,
    "matches": 3,
    "weight_on_season": 0.182
   },
   {
    "team": "George Washington",
-   "rank": 145,
+   "rank": 146,
    "score": 0.1876,
    "matches": 3,
    "weight_on_season": 0.182
   },
   {
    "team": "Miami (OH)",
-   "rank": 146,
+   "rank": 147,
    "score": 0.1818,
    "matches": 3,
    "weight_on_season": 0.182
   },
   {
    "team": "UAB",
-   "rank": 147,
+   "rank": 148,
    "score": 0.1807,
    "matches": 3,
    "weight_on_season": 0.182
-  },
-  {
-   "team": "Northern Colo.",
-   "rank": 148,
-   "score": 0.1738,
-   "matches": 1,
-   "weight_on_season": 0.069
   },
   {
    "team": "Furman",
