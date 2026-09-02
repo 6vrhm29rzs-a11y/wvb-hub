@@ -32,7 +32,7 @@
    "conflicts": [
     {
      "field": "teams",
-     "records": 12,
+     "records": 17,
      "values": [
       "(('46204', False), ('46301', True))",
       "(('46204', True), ('46301', False))"
@@ -40,7 +40,7 @@
     },
     {
      "field": "start_time_epoch",
-     "records": 12,
+     "records": 17,
      "values": [
       "1788238800",
       "1788307200"
@@ -48,7 +48,7 @@
     },
     {
      "field": "game_state",
-     "records": 12,
+     "records": 17,
      "values": [
       "P",
       "I"
@@ -56,7 +56,7 @@
     },
     {
      "field": "site",
-     "records": 12,
+     "records": 17,
      "values": [
       "home/away flip across snapshots",
       "no venue owner on record"
@@ -64,21 +64,37 @@
     }
    ],
    "matchup": "Minnesota / Florida",
-   "records": 12
+   "records": 17
   },
   "6624829": {
    "conflicts": [
     {
+     "field": "teams",
+     "records": 4,
+     "values": [
+      "(('45808', True), ('46204', False))",
+      "(('45808', False), ('46204', True))"
+     ]
+    },
+    {
      "field": "start_time_epoch",
-     "records": 3,
+     "records": 4,
      "values": [
       "1788325200",
       "1788386400"
      ]
+    },
+    {
+     "field": "site",
+     "records": 4,
+     "values": [
+      "home/away flip across snapshots",
+      "no venue owner on record"
+     ]
     }
    ],
    "matchup": "Minnesota / Auburn",
-   "records": 3
+   "records": 4
   },
   "6624845": {
    "conflicts": [
@@ -115,28 +131,6 @@
    ],
    "matchup": "Saint Mary's (CA) / Sacramento St.",
    "records": 2
-  },
-  "6625272": {
-   "conflicts": [
-    {
-     "field": "start_time_epoch",
-     "records": 11,
-     "values": [
-      "1788238800",
-      "1788310800"
-     ]
-    },
-    {
-     "field": "game_state",
-     "records": 11,
-     "values": [
-      "P",
-      "I"
-     ]
-    }
-   ],
-   "matchup": "Oregon / Missouri",
-   "records": 11
   },
   "6625273": {
    "conflicts": [
@@ -476,10 +470,10 @@
   }
  },
  "by_field": {
-  "game_state": 31,
-  "site": 2,
-  "start_time_epoch": 30,
-  "teams": 2,
+  "game_state": 29,
+  "site": 3,
+  "start_time_epoch": 29,
+  "teams": 3,
   "teams (non-blocking)": 1
  },
  "corrections": {
@@ -613,8 +607,8 @@
   }
  },
  "counts": {
-  "blocked": 31,
-  "conflicted": 61,
+  "blocked": 30,
+  "conflicted": 59,
   "corrected": 4,
   "fixtures": 4878
  },

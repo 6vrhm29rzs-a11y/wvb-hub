@@ -163,6 +163,36 @@
      "establishes": "UC Davis lost 2-3; the same set line from UC Davis's side, digit for digit"
     }
    ]
+  },
+  "6625272": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Oregon won with sets_won 2-1 (winner_team_id 46613) beside FOUR completed linescores",
+   "correct": {
+    "winner_team_id": "46613",
+    "away_sets": 3,
+    "home_sets": 1
+   },
+   "established": "Oregon won 3-1. The feed's OWN linescores say so (16-25 set one to home Missouri, then 25-16, 25-20, 25-19 -- visiting Oregon takes sets 2, 3 and 4), against its sets_won field of 2-1. Missouri's official schedule confirms: 'L 1-3 vs #25 Oregon'. The winner field is NOT in dispute -- only the set count, which the feed's own record refutes.",
+   "evidence": [
+    {
+     "url": "https://mutigers.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Missouri",
+     "retrieved": "2026-09-02T03:21:11Z",
+     "text": "'(Tue)|vs.|#25 Oregon|...|L|Loss|1-3' -- the rendered schedule card for September 1, 2026",
+     "establishes": "Missouri lost 1-3"
+    },
+    {
+     "url": "https://goducks.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Oregon",
+     "retrieved": "2026-09-02T03:21:11Z",
+     "status": "attempted_unverifiable",
+     "text": "row present for Sep 1 vs Missouri, result column still blank when checked (~30 minutes after the final)",
+     "establishes": "nothing yet -- recheck; the nightly verifier will observe it"
+    }
+   ]
   }
  }
 }

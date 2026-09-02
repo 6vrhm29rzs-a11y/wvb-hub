@@ -330,25 +330,36 @@ def _judge_rows(rows, url, team, opponent, date, canonical):
     verified. R8's lesson, applied to scraping."""
     want = team_norm(opponent)
 
-    def _matches(r):
+    def _match_token(r):
+        """The SOURCE token that satisfied the match, or None.
+
+        ⚠ EVIDENCE QUOTES THE SOURCE, NOT OUR EXPECTATION (consult catch,
+        2026-09-01): the assertion used to say "vs Presbyterian" -- our
+        name -- when the page said "Presbyterian College". Matching may use
+        prior knowledge; the retained evidence text must be the page's own
+        words. A row that cannot hand back its source token cannot match.
+        """
         if r.get("opponent") is not None:
-            return team_norm(r["opponent"]) == want
-        # a token row (modern card): the judge knows who it expects, and a
-        # block matches only on an EXACT single-token normalization --
+            return r["opponent"] if team_norm(r["opponent"]) == want \
+                else None
+        # a token row (modern card): exact single-token normalization --
         # never a substring, never across the card boundary (R8, and the
         # USC misread)
-        return any(team_norm(re.sub(r"^(?:#\d+|No\.\s*\d+|RV)\s+", "",
-                                    tk)) == want
-                   for tk in (r.get("tokens") or []))
+        for tk in (r.get("tokens") or []):
+            bare = re.sub(r"^(?:#\d+|No\.\s*\d+|RV)\s+", "", tk)
+            if team_norm(bare) == want:
+                return tk
+        return None
 
-    cand = [r for r in rows if r["date"] == date
-            and _matches(r) and not r["exhibition"]]
+    cand = [(r, _match_token(r)) for r in rows if r["date"] == date
+            and not r["exhibition"]]
+    cand = [(r, tok) for r, tok in cand if tok]
     if not cand:
         return "EVENT_NOT_FOUND", {"url": url, "rows_on_date": [
             (r["opponent"] if r.get("opponent") is not None
              else " ".join((r.get("tokens") or [])[:6]))
             for r in rows if r["date"] == date]}
-    r = cand[0]
+    r, opp_src = cand[0]
     if not r["result"]:
         return "NOT_POSTED", {"url": url, "row": r["raw"]}
     wl, a, b = r["result"]
@@ -357,7 +368,8 @@ def _judge_rows(rows, url, team, opponent, date, canonical):
     c_sets = (canonical["w_sets"], canonical["l_sets"]) if c_won \
         else (canonical["l_sets"], canonical["w_sets"])
     det = {"url": url, "assertion": "%s %s %d-%d vs %s"
-           % (team, wl, a, b, r["opponent"] or opponent),
+           % (team, wl, a, b, opp_src),
+           "opponent_source": opp_src,
            "site_says": r["site"]}
     if r.get("surface"):
         det["surface"] = r["surface"]

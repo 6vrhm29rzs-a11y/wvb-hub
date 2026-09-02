@@ -1,8 +1,9 @@
 {
  "date": "2026-09-01",
- "generated_utc": "2026-09-02T02:42:39Z",
+ "generated_utc": "2026-09-02T03:08:41Z",
  "counts": {
-  "VERIFIED_BOTH": 13,
+  "VERIFIED_BOTH": 14,
+  "UNVERIFIED": 1,
   "CORROBORATED_ONE": 6
  },
  "matches": [
@@ -16,13 +17,33 @@
      "state": "AGREE_COMPLETE",
      "url": "https://utsports.com/sports/womens-volleyball/schedule/text",
      "assertion": "Tennessee W 3-0 vs Illinois",
+     "opponent_source": "Illinois",
      "site_says": "Home"
     },
     "Illinois": {
      "state": "AGREE_COMPLETE",
      "url": "https://fightingillini.com/sports/womens-volleyball/schedule/text",
      "assertion": "Illinois L 0-3 vs Tennessee",
+     "opponent_source": "Tennessee",
      "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6627169",
+   "date": "2026-09-01",
+   "canonical": "Purdue def. Texas A&M 3-0",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Purdue": {
+     "state": "SITE_HTTP_MISS",
+     "url": "https://purduesports.com/sports/womens-volleyball/schedule/text",
+     "http": 404
+    },
+    "Texas A&M": {
+     "state": "SITE_HTTP_MISS",
+     "url": "https://12thman.com/sports/womens-volleyball/schedule/text",
+     "http": 404
     }
    }
   },
@@ -36,6 +57,7 @@
      "state": "AGREE_COMPLETE",
      "url": "https://scarletknights.com/sports/womens-volleyball/schedule/text",
      "assertion": "Rutgers W 3-0 vs Arkansas",
+     "opponent_source": "Arkansas",
      "site_says": "Neutral"
     },
     "Arkansas": {
@@ -55,12 +77,14 @@
      "state": "AGREE_COMPLETE",
      "url": "https://iuhoosiers.com/sports/womens-volleyball/schedule/text",
      "assertion": "Indiana W 3-1 vs Georgia",
+     "opponent_source": "Georgia",
      "site_says": "Neutral"
     },
     "Georgia": {
      "state": "AGREE_COMPLETE",
      "url": "https://georgiadogs.com/sports/womens-volleyball/schedule/text",
      "assertion": "Georgia L 1-3 vs Indiana",
+     "opponent_source": "Indiana",
      "site_says": "Neutral"
     }
    }
@@ -75,12 +99,14 @@
      "state": "AGREE_COMPLETE",
      "url": "https://msuspartans.com/sports/womens-volleyball/schedule/text",
      "assertion": "Michigan St. W 3-0 vs LSU",
+     "opponent_source": "LSU",
      "site_says": "Neutral"
     },
     "LSU": {
      "state": "AGREE_COMPLETE",
      "url": "https://lsusports.net/sports/vb/schedule",
-     "assertion": "LSU L 0-3 vs Michigan St.",
+     "assertion": "LSU L 0-3 vs Michigan State",
+     "opponent_source": "Michigan State",
      "site_says": null,
      "surface": "modern_card"
     }
@@ -96,12 +122,14 @@
      "state": "AGREE_COMPLETE",
      "url": "https://usfdons.com/sports/womens-volleyball/schedule/text",
      "assertion": "San Francisco W 3-0 vs CSU Bakersfield",
+     "opponent_source": "CSU Bakersfield",
      "site_says": "Home"
     },
     "CSU Bakersfield": {
      "state": "AGREE_COMPLETE",
      "url": "https://gorunners.com/services/schedule_txt.ashx?schedule=349",
      "assertion": "CSU Bakersfield L 0-3 vs San Francisco",
+     "opponent_source": "San Francisco",
      "site_says": "Away"
     }
    }
@@ -115,7 +143,8 @@
     "Old Dominion": {
      "state": "AGREE_COMPLETE",
      "url": "https://odusports.com/sports/volleyball/schedule",
-     "assertion": "Old Dominion W 3-0 vs Norfolk St.",
+     "assertion": "Old Dominion W 3-0 vs Norfolk State",
+     "opponent_source": "Norfolk State",
      "site_says": null,
      "surface": "modern_card"
     },
@@ -123,6 +152,7 @@
      "state": "AGREE_COMPLETE",
      "url": "https://nsuspartans.com/services/schedule_txt.ashx?schedule=274",
      "assertion": "Norfolk St. L 0-3 vs Old Dominion",
+     "opponent_source": "Old Dominion",
      "site_says": "Home"
     }
    }
@@ -137,12 +167,14 @@
      "state": "AGREE_COMPLETE",
      "url": "https://goholycross.com/services/schedule_txt.ashx?schedule=562",
      "assertion": "Holy Cross W 3-0 vs New Haven",
+     "opponent_source": "New Haven",
      "site_says": "Away"
     },
     "New Haven": {
      "state": "AGREE_COMPLETE",
      "url": "https://newhavenchargers.com/services/schedule_txt.ashx?schedule=1553",
      "assertion": "New Haven L 0-3 vs Holy Cross",
+     "opponent_source": "Holy Cross",
      "site_says": "Home"
     }
    }
@@ -157,12 +189,14 @@
      "state": "AGREE_COMPLETE",
      "url": "https://athletics.wofford.edu/services/schedule_txt.ashx?schedule=538",
      "assertion": "Wofford W 3-1 vs Presbyterian College",
+     "opponent_source": "Presbyterian College",
      "site_says": "Home"
     },
     "Presbyterian": {
      "state": "AGREE_COMPLETE",
      "url": "https://gobluehose.com/services/schedule_txt.ashx?schedule=714",
      "assertion": "Presbyterian L 1-3 vs Wofford",
+     "opponent_source": "Wofford",
      "site_says": "Away"
     }
    }
@@ -177,12 +211,14 @@
      "state": "AGREE_COMPLETE",
      "url": "https://uncabulldogs.com/sports/womens-volleyball/schedule/text",
      "assertion": "UNC Asheville W 3-2 vs Elon",
+     "opponent_source": "Elon",
      "site_says": "Home"
     },
     "Elon": {
      "state": "AGREE_COMPLETE",
      "url": "https://elonphoenix.com/services/schedule_txt.ashx?schedule=627",
      "assertion": "Elon L 2-3 vs UNC Asheville",
+     "opponent_source": "UNC Asheville",
      "site_says": "Away"
     }
    }
@@ -204,6 +240,7 @@
      "state": "AGREE_COMPLETE",
      "url": "https://nccueaglepride.com/services/schedule_txt.ashx?schedule=345",
      "assertion": "N.C. Central L 1-3 vs Gardner-Webb",
+     "opponent_source": "Gardner-Webb",
      "site_says": "Home"
     }
    }
@@ -218,12 +255,14 @@
      "state": "AGREE_COMPLETE",
      "url": "https://fordhamsports.com/services/schedule_txt.ashx?schedule=1735",
      "assertion": "Fordham W 3-0 vs FDU",
+     "opponent_source": "FDU",
      "site_says": "Home"
     },
     "FDU": {
      "state": "AGREE_COMPLETE",
      "url": "https://fduknights.com/services/schedule_txt.ashx?schedule=386",
      "assertion": "FDU L 0-3 vs Fordham",
+     "opponent_source": "Fordham",
      "site_says": "Away"
     }
    }
@@ -238,12 +277,14 @@
      "state": "AGREE_COMPLETE",
      "url": "https://utrockets.com/sports/womens-volleyball/schedule/text",
      "assertion": "Toledo W 3-0 vs Purdue Fort Wayne",
+     "opponent_source": "Purdue Fort Wayne",
      "site_says": "Home"
     },
     "Purdue Fort Wayne": {
      "state": "AGREE_COMPLETE",
      "url": "https://gomastodons.com/sports/womens-volleyball/schedule/text",
      "assertion": "Purdue Fort Wayne L 0-3 vs Toledo",
+     "opponent_source": "Toledo",
      "site_says": "Away"
     }
    }
@@ -258,6 +299,7 @@
      "state": "AGREE_COMPLETE",
      "url": "https://virginiasports.com/sports/wvball/schedule",
      "assertion": "Virginia W 3-1 vs Liberty",
+     "opponent_source": "Liberty",
      "site_says": "Home",
      "surface": "modern_card"
     },
@@ -265,6 +307,7 @@
      "state": "AGREE_COMPLETE",
      "url": "https://libertyflames.com/sports/womens-volleyball/schedule/text",
      "assertion": "Liberty L 1-3 vs Virginia",
+     "opponent_source": "Virginia",
      "site_says": "Away"
     }
    }
@@ -283,6 +326,7 @@
      "state": "AGREE_COMPLETE",
      "url": "https://mgoblue.com/sports/womens-volleyball/schedule/text",
      "assertion": "Michigan L 2-3 vs South Carolina",
+     "opponent_source": "South Carolina",
      "site_says": "Home"
     }
    }
@@ -297,14 +341,38 @@
      "state": "AGREE_COMPLETE",
      "url": "https://santaclarabroncos.com/services/schedule_txt.ashx?schedule=364",
      "assertion": "Santa Clara W 3-0 vs Cincinnati",
+     "opponent_source": "Cincinnati",
      "site_says": "Away"
     },
     "Cincinnati": {
      "state": "AGREE_COMPLETE",
      "url": "https://gobearcats.com/sports/womens-volleyball/schedule",
      "assertion": "Cincinnati L 0-3 vs Santa Clara",
+     "opponent_source": "Santa Clara",
      "site_says": null,
      "surface": "modern_card"
+    }
+   }
+  },
+  {
+   "gid": "6624751",
+   "date": "2026-09-01",
+   "canonical": "Louisiana def. McNeese 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Louisiana": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://ragincajuns.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Louisiana W 3-0 vs McNeese",
+     "opponent_source": "McNeese",
+     "site_says": "Home"
+    },
+    "McNeese": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://mcneesesports.com/services/schedule_txt.ashx?schedule=1467",
+     "rows_on_date": [
+      "UL-Lafayette"
+     ]
     }
    }
   },
@@ -318,6 +386,7 @@
      "state": "AGREE_COMPLETE",
      "url": "https://semoredhawks.com/sports/womens-volleyball/schedule/text",
      "assertion": "Southeast Mo. St. W 3-1 vs Evansville",
+     "opponent_source": "Evansville",
      "site_says": "Away"
     },
     "Evansville": {
@@ -339,12 +408,14 @@
      "state": "AGREE_COMPLETE",
      "url": "https://ulmwarhawks.com/services/schedule_txt.ashx?schedule=2333",
      "assertion": "ULM W 3-0 vs Northwestern State",
+     "opponent_source": "Northwestern State",
      "site_says": "Home"
     },
     "Northwestern St.": {
      "state": "AGREE_COMPLETE",
      "url": "https://nsudemons.com/services/schedule_txt.ashx?schedule=477",
      "assertion": "Northwestern St. L 0-3 vs ULM",
+     "opponent_source": "ULM",
      "site_says": "Away"
     }
    }
@@ -364,6 +435,7 @@
      "state": "AGREE_COMPLETE",
      "url": "https://umterps.com/sports/womens-volleyball/schedule/text",
      "assertion": "Maryland L 0-3 vs Vanderbilt",
+     "opponent_source": "Vanderbilt",
      "site_says": "Away"
     }
    }
@@ -372,25 +444,20 @@
    "gid": "6627088",
    "date": "2026-09-01",
    "canonical": "Colorado St. def. Northern Colo. 3-1",
-   "verdict": "CORROBORATED_ONE",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "Colorado St.": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://csurams.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 1 (Tue)",
-      "6:00 PM",
-      "Home",
-      "Northern Colorado",
-      "Fort Collins, CO",
-      "",
-      "-"
-     ]
+     "assertion": "Colorado St. W 3-1 vs Northern Colorado",
+     "opponent_source": "Northern Colorado",
+     "site_says": "Home"
     },
     "Northern Colo.": {
      "state": "AGREE_COMPLETE",
      "url": "https://uncbears.com/sports/womens-volleyball/schedule/text",
      "assertion": "Northern Colo. L 1-3 vs Colorado State",
+     "opponent_source": "Colorado State",
      "site_says": "Away"
     }
    }

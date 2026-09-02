@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-02T03:01:24Z",
+  "generated_at_utc": "2026-09-02T03:12:31Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 0,
    "expired": 1,
-   "anomalies": 39
+   "anomalies": 42
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -327,6 +327,45 @@
     }
    ],
    "points_per_set_missing": 3.056
+  },
+  {
+   "game_id": "6626227",
+   "team_id": "45939",
+   "team": "Missouri",
+   "absent": [
+    {
+     "name": "Grace O'Reilly",
+     "rate": 2.833,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 2.833
+  },
+  {
+   "game_id": "6625272",
+   "team_id": "45939",
+   "team": "Missouri",
+   "absent": [
+    {
+     "name": "Grace O'Reilly",
+     "rate": 2.833,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 2.833
+  },
+  {
+   "game_id": "6626226",
+   "team_id": "45939",
+   "team": "Missouri",
+   "absent": [
+    {
+     "name": "Lauren Larkin",
+     "rate": 2.8,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.8
   },
   {
    "game_id": "6637949",
@@ -1454,11 +1493,17 @@
    ]
   },
   "Missouri": {
-   "gid": "6626228",
-   "d": "2026-08-29",
-   "appeared": 14,
+   "gid": "6625272",
+   "d": "2026-09-01",
+   "appeared": 11,
    "zero_action": [
-    "Tia Phinezy"
+    "Claire Morrissey",
+    "Piper Batie",
+    "Kaylen Rush",
+    "Kimani Johnson",
+    "Tia Phinezy",
+    "Lydia Stahley",
+    "Millie Bauer"
    ]
   },
   "Western Ill.": {
@@ -3306,10 +3351,17 @@
    ]
   },
   "Oregon": {
-   "gid": "6625271",
-   "d": "2026-08-29",
-   "appeared": 12,
-   "zero_action": []
+   "gid": "6625272",
+   "d": "2026-09-01",
+   "appeared": 10,
+   "zero_action": [
+    "Sjakkie Donkers",
+    "Lizzy Robinson",
+    "Kamden Mitchell",
+    "Alaina Pollard",
+    "Natalie Fukumoto",
+    "Holley Mcfadden"
+   ]
   },
   "South Carolina": {
    "gid": "6624319",

@@ -88,6 +88,14 @@ def main():
           st == "AGREE_COMPLETE", (st, det))
     check("...with modern-card provenance on the evidence",
           det.get("surface") == "modern_card")
+    # ⚠ EVIDENCE QUOTES THE SOURCE, NOT OUR EXPECTATION (consult catch):
+    # the page says "Norfolk State"; our name is "Norfolk St." -- the
+    # retained assertion must carry the PAGE's token.
+    check("the assertion quotes the page's own opponent token",
+          "Norfolk State" in det.get("assertion", "") and
+          det.get("opponent_source") == "Norfolk State")
+    check("[NEG] the assertion never substitutes our spelling",
+          "Norfolk St." not in det.get("assertion", ""))
     st2, _ = V._judge_rows(mrows, "t://m", "Virginia", "Liberty",
                            "2026-09-02",
                            {"winner": "Virginia", "loser": "Liberty",

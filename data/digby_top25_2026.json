@@ -29,14 +29,14 @@
   "between_team_variance": 5.941,
   "caveat_schedule": "the opponent IS adjusted for from match one: a result is scored as the strength it implies (opponent's rating + margin, home court removed). What is still thin early is the opponent's own rating, which is the preseason projection until a schedule graph exists",
   "teams_with_a_result": 339,
-  "matches_counted": 487,
-  "score_mean": -0.00022,
-  "score_sd": 1.05665,
+  "matches_counted": 488,
+  "score_mean": -0.0003,
+  "score_sd": 1.05661,
   "score_scale_note": "mean and SD across ALL 348 teams, not just the ones shown -- a scale computed from the top 25 would measure the spread among the best",
   "shown": 25,
   "also_receiving": 10,
-  "generated_at_utc": "2026-09-02T03:01:23Z",
-  "data_through_epoch": 1788307200
+  "generated_at_utc": "2026-09-02T03:12:30Z",
+  "data_through_epoch": 1788310800
  },
  "top": [
   {
@@ -438,6 +438,18 @@
    "rank": 33
   },
   {
+   "team": "Oregon",
+   "score": 1.3905,
+   "preseason_z": 1.076,
+   "season_z": 2.808,
+   "matches": 3,
+   "weight_on_season": 0.182,
+   "record": "3-0",
+   "net_pts_per_set": 3.67,
+   "conf": "Big Ten",
+   "rank": 34
+  },
+  {
    "team": "Iowa St.",
    "score": 1.3695,
    "preseason_z": 1.398,
@@ -447,18 +459,6 @@
    "record": "2-1",
    "net_pts_per_set": 1.67,
    "conf": "Big 12",
-   "rank": 34
-  },
-  {
-   "team": "Colorado St.",
-   "score": 1.3483,
-   "preseason_z": 1.227,
-   "season_z": 1.893,
-   "matches": 3,
-   "weight_on_season": 0.182,
-   "record": "2-1",
-   "net_pts_per_set": 2.86,
-   "conf": "Mountain West",
    "rank": 35
   }
  ],
@@ -695,30 +695,30 @@
    "weight_on_season": 0.182
   },
   {
-   "team": "Iowa St.",
+   "team": "Oregon",
    "rank": 34,
+   "score": 1.3905,
+   "matches": 3,
+   "weight_on_season": 0.182
+  },
+  {
+   "team": "Iowa St.",
+   "rank": 35,
    "score": 1.3695,
    "matches": 3,
    "weight_on_season": 0.182
   },
   {
    "team": "Colorado St.",
-   "rank": 35,
+   "rank": 36,
    "score": 1.3483,
    "matches": 3,
    "weight_on_season": 0.182
   },
   {
    "team": "UCLA",
-   "rank": 36,
-   "score": 1.3417,
-   "matches": 2,
-   "weight_on_season": 0.129
-  },
-  {
-   "team": "Oregon",
    "rank": 37,
-   "score": 1.32,
+   "score": 1.3417,
    "matches": 2,
    "weight_on_season": 0.129
   },
@@ -765,74 +765,74 @@
    "weight_on_season": 0.129
   },
   {
-   "team": "Missouri",
-   "rank": 44,
-   "score": 1.1867,
-   "matches": 3,
-   "weight_on_season": 0.182
-  },
-  {
    "team": "Arizona",
-   "rank": 45,
+   "rank": 44,
    "score": 1.1803,
    "matches": 3,
    "weight_on_season": 0.182
   },
   {
    "team": "Oklahoma",
-   "rank": 46,
+   "rank": 45,
    "score": 1.1774,
    "matches": 2,
    "weight_on_season": 0.129
   },
   {
    "team": "Kansas St.",
-   "rank": 47,
+   "rank": 46,
    "score": 1.1496,
    "matches": 2,
    "weight_on_season": 0.129
   },
   {
    "team": "Miami (FL)",
-   "rank": 48,
+   "rank": 47,
    "score": 1.1487,
    "matches": 2,
    "weight_on_season": 0.129
   },
   {
    "team": "Marquette",
-   "rank": 49,
+   "rank": 48,
    "score": 1.1456,
    "matches": 3,
    "weight_on_season": 0.182
   },
   {
    "team": "Washington",
-   "rank": 50,
+   "rank": 49,
    "score": 1.1344,
    "matches": 3,
    "weight_on_season": 0.182
   },
   {
    "team": "American",
-   "rank": 51,
+   "rank": 50,
    "score": 1.1113,
    "matches": 3,
    "weight_on_season": 0.182
   },
   {
    "team": "Florida St.",
-   "rank": 52,
+   "rank": 51,
    "score": 1.1081,
    "matches": 3,
    "weight_on_season": 0.182
   },
   {
    "team": "Vanderbilt",
-   "rank": 53,
+   "rank": 52,
    "score": 1.1002,
    "matches": 3,
    "weight_on_season": 0.182
+  },
+  {
+   "team": "Missouri",
+   "rank": 53,
+   "score": 1.0905,
+   "matches": 4,
+   "weight_on_season": 0.228
   },
   {
    "team": "UCF",
