@@ -53,13 +53,18 @@ def main():
           by.get(("2026-08-31", "Dayton"), {}).get("result") == ("W", 3, 0))
     check("January belongs to the NEXT calendar year",
           ("2027-01-05", "Somebody") in by)
+    check("'Sept. 1' and 'September 1' both parse",
+          V.parse_sidearm_date("Sept. 1") == (9, 1) and
+          V.parse_sidearm_date("September 1 (Tue)") == (9, 1))
+    check("an unrecognised date cell parses to nothing, never a guess",
+          V.parse_sidearm_date("9/1/2026") == (None, None))
     check("site classification survives",
           by.get(("2026-09-01", "Georgia"), {}).get("site") == "Neutral")
 
     print("\n2. VERDICTS -- corroboration is never verification")
     v = V.verdict
-    check("both agree -> VERIFIED_BOTH",
-          v("AGREE_COMPLETE", "AGREE_PARTIAL") == "VERIFIED_BOTH")
+    check("both agree COMPLETELY -> VERIFIED_BOTH",
+          v("AGREE_COMPLETE", "AGREE_COMPLETE") == "VERIFIED_BOTH")
     check("one agrees, one not posted -> CORROBORATED_ONE, never verified",
           v("AGREE_COMPLETE", "NOT_POSTED") == "CORROBORATED_ONE")
     check("both contradict -> CONTRADICTED_BOTH (the review candidate)",
@@ -68,6 +73,18 @@ def main():
           v("AGREE_COMPLETE", "CONTRADICTS") == "SCHOOL_CONFLICT")
     check("nothing usable -> UNVERIFIED",
           v("EVENT_NOT_FOUND", "SITE_UNPARSED") == "UNVERIFIED")
+    # ⚠ THE CONSULT'S CATCH (2026-09-01): the old AGREE_PARTIAL state let
+    # two schools that both said "3-1" VERIFY our 3-2. Winner-only agreement
+    # is a set-count CONTRADICTION and two of them are a review candidate.
+    check("[NEG] two schools agreeing on winner but contradicting our set "
+          "count NEVER verify",
+          v("CONTRADICTS_SETS", "CONTRADICTS_SETS") == "CONTRADICTED_BOTH")
+    check("[NEG] one set-count contradiction beside a full agreement is a "
+          "school conflict, not a verification",
+          v("AGREE_COMPLETE", "CONTRADICTS_SETS") == "SCHOOL_CONFLICT")
+    check("[NEG] AGREE_PARTIAL no longer exists as a state",
+          "AGREE_PARTIAL" not in open(os.path.join(
+              REPO, "scripts", "verify_results_daily.py")).read())
 
     print("\n3. THE VERIFIER CAN NEVER FILE A CORRECTION")
     src = open(os.path.join(REPO, "scripts",

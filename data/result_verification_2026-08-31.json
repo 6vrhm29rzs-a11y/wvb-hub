@@ -1,26 +1,27 @@
 {
  "date": "2026-08-31",
- "generated_utc": "2026-09-02T00:34:46Z",
+ "generated_utc": "2026-09-02T00:46:49Z",
  "counts": {
-  "UNVERIFIED": 1
+  "VERIFIED_BOTH": 1
  },
  "matches": [
   {
    "gid": "6624297",
    "date": "2026-08-31",
    "canonical": "Louisville def. Dayton 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "Louisville": {
-     "state": "EVENT_NOT_FOUND",
+     "state": "AGREE_COMPLETE",
      "url": "https://gocards.com/sports/womens-volleyball/schedule/text",
-     "rows_on_date": [
-      "RV Dayton"
-     ]
+     "assertion": "Louisville W 3-0 vs Dayton",
+     "site_says": "Home"
     },
     "Dayton": {
-     "state": "SITE_UNPARSED",
-     "url": "https://daytonflyers.com/sports/womens-volleyball/schedule/text"
+     "state": "AGREE_COMPLETE",
+     "url": "https://daytonflyers.com/services/schedule_txt.ashx?schedule=3377",
+     "assertion": "Dayton L 0-3 vs Louisville",
+     "site_says": "Away"
     }
    }
   }

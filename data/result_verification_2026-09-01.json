@@ -1,10 +1,9 @@
 {
  "date": "2026-09-01",
- "generated_utc": "2026-09-02T00:36:19Z",
+ "generated_utc": "2026-09-02T00:45:07Z",
  "counts": {
-  "CORROBORATED_ONE": 4,
-  "UNVERIFIED": 8,
-  "VERIFIED_BOTH": 1
+  "CORROBORATED_ONE": 8,
+  "VERIFIED_BOTH": 5
  },
  "matches": [
   {
@@ -29,7 +28,7 @@
    "gid": "6624237",
    "date": "2026-09-01",
    "canonical": "Indiana def. Georgia 3-1",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Indiana": {
      "state": "NOT_POSTED",
@@ -45,17 +44,10 @@
      ]
     },
     "Georgia": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://georgiadogs.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 1 (Tue)",
-      "6:00 p.m.",
-      "Neutral",
-      "#21 Indiana",
-      "West Lafayette, Ind.",
-      "Allstate Big Ten/SEC Volleyball Challenge Week",
-      "-"
-     ]
+     "assertion": "Georgia L 1-3 vs Indiana",
+     "site_says": "Neutral"
     }
    }
   },
@@ -81,7 +73,7 @@
    "gid": "6628216",
    "date": "2026-09-01",
    "canonical": "San Francisco def. CSU Bakersfield 3-0",
-   "verdict": "CORROBORATED_ONE",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "San Francisco": {
      "state": "AGREE_COMPLETE",
@@ -90,8 +82,10 @@
      "site_says": "Home"
     },
     "CSU Bakersfield": {
-     "state": "SITE_UNPARSED",
-     "url": "https://gorunners.com/sports/womens-volleyball/schedule/text"
+     "state": "AGREE_COMPLETE",
+     "url": "https://gorunners.com/services/schedule_txt.ashx?schedule=349",
+     "assertion": "CSU Bakersfield L 0-3 vs San Francisco",
+     "site_says": "Away"
     }
    }
   },
@@ -99,15 +93,17 @@
    "gid": "6625052",
    "date": "2026-09-01",
    "canonical": "Old Dominion def. Norfolk St. 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Old Dominion": {
      "state": "SITE_UNREACHABLE",
      "why": "no schedule surface answered"
     },
     "Norfolk St.": {
-     "state": "SITE_UNPARSED",
-     "url": "https://nsuspartans.com/sports/womens-volleyball/schedule/text"
+     "state": "AGREE_COMPLETE",
+     "url": "https://nsuspartans.com/services/schedule_txt.ashx?schedule=274",
+     "assertion": "Norfolk St. L 0-3 vs Old Dominion",
+     "site_says": "Home"
     }
    }
   },
@@ -115,15 +111,19 @@
    "gid": "6625304",
    "date": "2026-09-01",
    "canonical": "Holy Cross def. New Haven 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "Holy Cross": {
-     "state": "SITE_UNPARSED",
-     "url": "https://goholycross.com/sports/womens-volleyball/schedule/text"
+     "state": "AGREE_COMPLETE",
+     "url": "https://goholycross.com/services/schedule_txt.ashx?schedule=562",
+     "assertion": "Holy Cross W 3-0 vs New Haven",
+     "site_says": "Away"
     },
     "New Haven": {
-     "state": "SITE_UNPARSED",
-     "url": "https://newhavenchargers.com/sports/womens-volleyball/schedule/text"
+     "state": "AGREE_COMPLETE",
+     "url": "https://newhavenchargers.com/services/schedule_txt.ashx?schedule=1553",
+     "assertion": "New Haven L 0-3 vs Holy Cross",
+     "site_says": "Home"
     }
    }
   },
@@ -131,15 +131,20 @@
    "gid": "6626401",
    "date": "2026-09-01",
    "canonical": "Wofford def. Presbyterian 3-1",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Wofford": {
-     "state": "SITE_UNPARSED",
-     "url": "https://athletics.wofford.edu/sports/womens-volleyball/schedule/text"
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://athletics.wofford.edu/services/schedule_txt.ashx?schedule=538",
+     "rows_on_date": [
+      "Presbyterian College"
+     ]
     },
     "Presbyterian": {
-     "state": "SITE_UNPARSED",
-     "url": "https://gobluehose.com/sports/womens-volleyball/schedule/text"
+     "state": "AGREE_COMPLETE",
+     "url": "https://gobluehose.com/services/schedule_txt.ashx?schedule=714",
+     "assertion": "Presbyterian L 1-3 vs Wofford",
+     "site_says": "Away"
     }
    }
   },
@@ -147,24 +152,19 @@
    "gid": "6626954",
    "date": "2026-09-01",
    "canonical": "UNC Asheville def. Elon 3-2",
-   "verdict": "UNVERIFIED",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "UNC Asheville": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://uncabulldogs.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 1 (Tue)",
-      "6 PM",
-      "Home",
-      "Elon",
-      "Asheville, NC (Justice Center)",
-      "",
-      "-"
-     ]
+     "assertion": "UNC Asheville W 3-2 vs Elon",
+     "site_says": "Home"
     },
     "Elon": {
-     "state": "SITE_UNPARSED",
-     "url": "https://elonphoenix.com/sports/womens-volleyball/schedule/text"
+     "state": "AGREE_COMPLETE",
+     "url": "https://elonphoenix.com/services/schedule_txt.ashx?schedule=627",
+     "assertion": "Elon L 2-3 vs UNC Asheville",
+     "site_says": "Away"
     }
    }
   },
@@ -172,7 +172,7 @@
    "gid": "6626977",
    "date": "2026-09-01",
    "canonical": "Gardner-Webb def. N.C. Central 3-1",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Gardner-Webb": {
      "state": "EVENT_NOT_FOUND",
@@ -182,8 +182,10 @@
      ]
     },
     "N.C. Central": {
-     "state": "SITE_UNPARSED",
-     "url": "https://nccueaglepride.com/sports/womens-volleyball/schedule/text"
+     "state": "AGREE_COMPLETE",
+     "url": "https://nccueaglepride.com/services/schedule_txt.ashx?schedule=345",
+     "assertion": "N.C. Central L 1-3 vs Gardner-Webb",
+     "site_says": "Home"
     }
    }
   },
@@ -191,15 +193,19 @@
    "gid": "6627104",
    "date": "2026-09-01",
    "canonical": "Fordham def. FDU 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "Fordham": {
-     "state": "SITE_UNPARSED",
-     "url": "https://fordhamsports.com/sports/womens-volleyball/schedule/text"
+     "state": "AGREE_COMPLETE",
+     "url": "https://fordhamsports.com/services/schedule_txt.ashx?schedule=1735",
+     "assertion": "Fordham W 3-0 vs FDU",
+     "site_says": "Home"
     },
     "FDU": {
-     "state": "SITE_UNPARSED",
-     "url": "https://fduknights.com/sports/womens-volleyball/schedule/text"
+     "state": "AGREE_COMPLETE",
+     "url": "https://fduknights.com/services/schedule_txt.ashx?schedule=386",
+     "assertion": "FDU L 0-3 vs Fordham",
+     "site_says": "Away"
     }
    }
   },
@@ -245,11 +251,13 @@
    "gid": "6628526",
    "date": "2026-09-01",
    "canonical": "Santa Clara def. Cincinnati 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Santa Clara": {
-     "state": "SITE_UNPARSED",
-     "url": "https://santaclarabroncos.com/sports/womens-volleyball/schedule/text"
+     "state": "AGREE_COMPLETE",
+     "url": "https://santaclarabroncos.com/services/schedule_txt.ashx?schedule=364",
+     "assertion": "Santa Clara W 3-0 vs Cincinnati",
+     "site_says": "Away"
     },
     "Cincinnati": {
      "state": "SITE_UNREACHABLE",
