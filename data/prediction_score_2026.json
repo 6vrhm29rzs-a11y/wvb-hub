@@ -2,14 +2,14 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 458,
+  "scored": 461,
   "logged_after_tipoff_excluded": 8,
   "team_mismatch_excluded": 13,
   "predictions_on_record": 4773,
-  "results_available": 490,
-  "brier": 0.1804,
+  "results_available": 493,
+  "brier": 0.1813,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 334,
+  "favourite_correct": 336,
   "favourite_correct_pct": 72.9
  },
  "calibration": [
@@ -21,9 +21,9 @@
   },
   {
    "range": "60-70%",
-   "n": 90,
+   "n": 91,
    "said": 65.0,
-   "happened": 61.1
+   "happened": 61.5
   },
   {
    "range": "70-80%",
@@ -33,15 +33,15 @@
   },
   {
    "range": "80-90%",
-   "n": 85,
+   "n": 86,
    "said": 85.0,
-   "happened": 77.6
+   "happened": 76.7
   },
   {
    "range": "90-101%",
-   "n": 147,
+   "n": 148,
    "said": 95.3,
-   "happened": 89.8
+   "happened": 89.9
   }
  ],
  "matches": [
@@ -206,6 +206,15 @@
    "p_home": 0.8905,
    "home_won": false,
    "brier": 0.7929902499999999
+  },
+  {
+   "game_id": "6628526",
+   "date": "2026-09-01",
+   "away": "Santa Clara",
+   "home": "Cincinnati",
+   "p_home": 0.8888,
+   "home_won": false,
+   "brier": 0.78996544
   },
   {
    "game_id": "6626942",
@@ -485,15 +494,6 @@
    "p_home": 0.7424,
    "home_won": false,
    "brier": 0.5511577599999999
-  },
-  {
-   "game_id": "6626372",
-   "date": "2026-08-30",
-   "away": "South Fla.",
-   "home": "Utah St.",
-   "p_home": 0.7306,
-   "home_won": false,
-   "brier": 0.5337763600000001
   }
  ]
 }
