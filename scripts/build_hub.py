@@ -530,6 +530,10 @@ def _attr_watch_public():
         if not (isinstance(e, dict) and e.get("claim") and e.get("evidence")):
             raise SystemExit("live_attribution_watch.json: entry %s lacks "
                              "claim/evidence" % gid)
+        # a RESOLVED entry is history, not a live claim -- the banner would
+        # otherwise assert a correction the display no longer makes
+        if e.get("status") == "resolved":
+            continue
         if e.get("display_swap"):
             out[gid] = {"corrected": True,
                         "note": e.get("display_note") or

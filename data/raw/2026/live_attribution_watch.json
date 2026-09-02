@@ -7,7 +7,7 @@
     ],
     "date": "2026-09-01",
     "claim": "feed team attribution suspected inverted while live",
-    "status": "display_corrected_live",
+    "status": "resolved",
     "evidence": [
       {
         "kind": "cody_observation",
@@ -22,8 +22,13 @@
         "detail": "Page title 'GA 0, IU 1 - SET 4'; Georgia Sets Won: 1, Indiana Sets Won: 2; set scores from Georgia's side 24-26, 22-25, 25-22. The NCAA feed at the same time reported Georgia up 2-0 with Indiana holding 24 and 22 -- a whole-side inversion of the same set scores. Player attribution on StatBroadcast is coherent (Jager/Snowbarger/Boersema under Indiana; Muoneke/Artiles/Elarton under Georgia)."
       }
     ],
-    "note": "A cody_observation is a review signal, never a correction basis. Verification plan: when final, fetch iuhoosiers.com and georgiadogs.com published results; if both contradict the feed, file result_corrections.json entry and box_team_swap audit. StatBroadcast observation added 2026-09-01 (supplied by Cody); it is attributable and counts as one of the two required sources for the eventual final-result correction. School-published results remain the planned second source.",
+    "note": "A cody_observation is a review signal, never a correction basis. Verification plan: when final, fetch iuhoosiers.com and georgiadogs.com published results; if both contradict the feed, file result_corrections.json entry and box_team_swap audit. StatBroadcast observation added 2026-09-01 (supplied by Cody); it is attributable and counts as one of the two required sources for the eventual final-result correction. School-published results remain the planned second source. 2026-09-01 ~15:1x PT: at FINAL the feed SELF-CORRECTED by swapping the team names (now away Georgia, home Indiana) -- so the numeric swap, applied blindly, re-inverted a correct record for one poll cycle. applies_when added: the swap holds only while the feed shows the exact orientation the evidence described.",
     "display_swap": true,
-    "display_note": "Score attribution corrected: the NCAA feed has the sides inverted for this match. Corrected per the FS1 broadcast scorebug and the venue's official live stats (StatBroadcast), both cited in the ledger. The final result still goes through the two-source correction process."
+    "display_note": "Score attribution corrected: the NCAA feed has the sides inverted for this match. Corrected per the FS1 broadcast scorebug and the venue's official live stats (StatBroadcast), both cited in the ledger. The final result still goes through the two-source correction process.",
+    "applies_when": {
+      "away": "Indiana",
+      "home": "Georgia"
+    },
+    "resolution": "2026-09-01: the feed self-corrected at final (team names swapped back); the crawled canonical record is correct without any correction -- winner Indiana, 3-1, linescores 26-24/25-22/22-25/25-17, matching the StatBroadcast host livestat. No result_corrections entry needed. The live display carried the cited swap during the inverted window and the orientation gate retired it the moment the feed fixed itself."
   }
 }

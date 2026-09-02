@@ -38,10 +38,13 @@ def main():
     print("1. THE LOADER'S REFUSALS")
     sw = with_ledger({"_readme": "x",
                       "111": {"claim": "c", "evidence": [{"kind": "host_livestat"}],
-                              "display_swap": True},
+                              "display_swap": True,
+                              "applies_when": {"away": "A", "home": "B"}},
                       "222": {"claim": "c", "evidence": [{"kind": "x"}]},
                       "333": {"claim": "c", "display_swap": True}})
-    check("an evidenced display_swap entry swaps", "111" in sw)
+    check("an evidenced display_swap entry loads", "111" in sw)
+    check("...and carries its orientation condition",
+          (sw.get("111") or {}).get("applies_when") == {"away": "A", "home": "B"})
     check("a label-only entry never swaps", "222" not in sw)
     check("display_swap WITHOUT evidence never swaps", "333" not in sw)
     check("underscore keys are metadata, not matches", "_readme" not in sw)
@@ -50,9 +53,18 @@ def main():
     src = open(os.path.join(REPO, "scripts", "live_server.py")).read()
     check("the swap is applied before the state model",
           src.find('swaps = _attr_swaps()') < src.find('ONE STATE MODEL'))
+    # ⚠ PAID FOR LIVE (2026-09-01): the feed SELF-CORRECTED at final by
+    # swapping the team names, and a blind numeric swap re-inverted a correct
+    # record for one poll cycle. The swap must hold ONLY while the feed shows
+    # the exact orientation the evidence described.
+    check("the swap is conditioned on the evidenced feed orientation",
+          'if not sw or not sw.get("applies_when")' in src and
+          'row.get("away") == aw.get("away")' in src)
+    check("...at BOTH fills (scoreboard row and detail refill)",
+          src.count('_swap_applies(row)') >= 2)
     check("the detail refill re-applies the swap (the feed refills sets "
           "and away/home after the first swap)",
-          "re-apply the cited swap" in src and
+          "re-apply the cited" in src and
           '[[b, a] for a, b in row["sets"]]' in src)
     check("the payload names the correction",
           '"attribution_corrected"' in src)
@@ -70,6 +82,13 @@ def main():
     # a rogue entry claiming a swap with no evidence list at all
     sw2 = with_ledger({"999": {"display_swap": True}})
     check("[NEG] evidence-free swap request is refused", "999" not in sw2)
+    # an entry with no applies_when loads but can never fire the swap --
+    # exercise the gate the choke point uses
+    swx = with_ledger({"555": {"claim": "c", "evidence": [{}],
+                               "display_swap": True}})
+    e5 = swx.get("555") or {}
+    check("[NEG] no applies_when -> the orientation gate can never pass",
+          e5.get("applies_when") is None)
     # cache: an unreadable ledger must keep the last good copy, not blank it
     sw3 = with_ledger({"444": {"claim": "c", "evidence": [{}],
                                "display_swap": True}})

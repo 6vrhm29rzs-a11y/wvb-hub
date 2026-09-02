@@ -80,9 +80,17 @@ def _attr_swaps():
                 if gid.startswith("_") or not isinstance(e, dict):
                     continue
                 if e.get("display_swap") and e.get("evidence"):
-                    out[gid] = e.get("display_note") or (
-                        "Score attribution corrected from cited sources; "
-                        "the upstream feed has the sides inverted.")
+                    out[gid] = {
+                        "note": e.get("display_note") or (
+                            "Score attribution corrected from cited sources; "
+                            "the upstream feed has the sides inverted."),
+                        # ⚠ THE SWAP IS CONDITIONED ON THE FEED ORIENTATION
+                        # THE EVIDENCE DESCRIBED (paid for live, 2026-09-01:
+                        # the feed SELF-CORRECTED at final by swapping the
+                        # team names, and the blind numeric swap re-inverted
+                        # a correct record). No applies_when -> never swaps.
+                        "applies_when": e.get("applies_when") or None,
+                    }
             _attr_cache["swaps"] = out
             _attr_cache["mtime"] = mt
         except (ValueError, OSError):
@@ -247,12 +255,23 @@ class Cache(object):
         # still goes through the two-source correction ledger; this governs
         # only the live display.
         swaps = _attr_swaps()
-        for row in games:
+
+        def _swap_applies(row):
             sw = swaps.get(str(row.get("id") or ""))
+            if not sw or not sw.get("applies_when"):
+                return None
+            aw = sw["applies_when"]
+            if row.get("away") == aw.get("away") and \
+               row.get("home") == aw.get("home"):
+                return sw
+            return None
+
+        for row in games:
+            sw = _swap_applies(row)
             if not sw:
                 continue
             row["away_sets"], row["home_sets"] = row["home_sets"], row["away_sets"]
-            row["attribution_corrected"] = sw
+            row["attribution_corrected"] = sw["note"]
 
         # ⚠ ONE STATE MODEL, RESOLVED HERE. Every consumer of this payload --
         # the Match Desk band, the Scores ledger, the match detail -- reads
@@ -291,8 +310,9 @@ class Cache(object):
                     row["home_sets"] = str(t.get("score") or 0)
                 else:
                     row["away_sets"] = str(t.get("score") or 0)
-            # the detail call refills from the feed -- re-apply the cited swap
-            if swaps.get(str(row.get("id") or "")):
+            # the detail call refills from the feed -- re-apply the cited
+            # swap, under the same orientation condition
+            if _swap_applies(row):
                 row["away_sets"], row["home_sets"] = (row["home_sets"],
                                                       row["away_sets"])
                 row["sets"] = [[b, a] for a, b in row["sets"]]

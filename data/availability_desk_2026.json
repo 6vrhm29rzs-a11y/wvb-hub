@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-02T00:10:35Z",
+  "generated_at_utc": "2026-09-02T00:28:30Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 0,
    "expired": 1,
-   "anomalies": 30
+   "anomalies": 36
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -285,6 +285,19 @@
    "points_per_set_missing": 4.125
   },
   {
+   "game_id": "6640393",
+   "team_id": "45925",
+   "team": "Liberty",
+   "absent": [
+    {
+     "name": "Carly O'brien",
+     "rate": 3.154,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 3.154
+  },
+  {
    "game_id": "6625817",
    "team_id": "46366",
    "team": "Stonehill",
@@ -296,6 +309,19 @@
     }
    ],
    "points_per_set_missing": 3.071
+  },
+  {
+   "game_id": "6637949",
+   "team_id": "46102",
+   "team": "UNC Asheville",
+   "absent": [
+    {
+     "name": "Albertine Van der goot",
+     "rate": 2.625,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.625
   },
   {
    "game_id": "6624296",
@@ -413,6 +439,45 @@
     }
    ],
    "points_per_set_missing": 1.864
+  },
+  {
+   "game_id": "6626241",
+   "team_id": "45828",
+   "team": "Gardner-Webb",
+   "absent": [
+    {
+     "name": "Parker Lafontaine",
+     "rate": 1.857,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 1.857
+  },
+  {
+   "game_id": "6626243",
+   "team_id": "45828",
+   "team": "Gardner-Webb",
+   "absent": [
+    {
+     "name": "Parker Lafontaine",
+     "rate": 1.857,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 1.857
+  },
+  {
+   "game_id": "6628246",
+   "team_id": "45845",
+   "team": "N.C. Central",
+   "absent": [
+    {
+     "name": "Morgan Wingo",
+     "rate": 1.769,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.769
   },
   {
    "game_id": "6624294",
@@ -569,6 +634,19 @@
     }
    ],
    "points_per_set_missing": 1.278
+  },
+  {
+   "game_id": "6628259",
+   "team_id": "45845",
+   "team": "N.C. Central",
+   "absent": [
+    {
+     "name": "Tabitha Newlin",
+     "rate": 1.125,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.125
   },
   {
    "game_id": "6627900",
@@ -960,27 +1038,23 @@
    ]
   },
   "N.C. Central": {
-   "gid": "6625142",
-   "d": "2026-08-29",
-   "appeared": 11,
+   "gid": "6626977",
+   "d": "2026-09-01",
+   "appeared": 14,
    "zero_action": [
-    "Alex Fuller",
-    "Kayla Riley",
-    "Isabella Rodriguez",
-    "Tabitha Newlin"
+    "Isabella Rodriguez"
    ]
   },
   "UNC Asheville": {
-   "gid": "6637762",
-   "d": "2026-08-29",
-   "appeared": 10,
+   "gid": "6626954",
+   "d": "2026-09-01",
+   "appeared": 11,
    "zero_action": [
-    "Leah Okogbenin",
     "Riley Barr",
-    "Catherine Hubiak",
+    "Leah Okogbenin",
     "Cameron Owens",
     "Megan Oppegard",
-    "Lily Bannister"
+    "Maddie Connelly"
    ]
   },
   "Montreat": {
@@ -992,10 +1066,18 @@
    ]
   },
   "Georgia": {
-   "gid": "6625987",
-   "d": "2026-08-29",
+   "gid": "6624237",
+   "d": "2026-09-01",
    "appeared": 10,
-   "zero_action": []
+   "zero_action": [
+    "Arianna Muoneke",
+    "Ceci Gooch",
+    "Keira Steininger",
+    "Rylan Miller",
+    "Alex Richter",
+    "Taylor Bruce",
+    "Kate Yoshimoto"
+   ]
   },
   "North Florida": {
    "gid": "6627236",
@@ -1116,10 +1198,20 @@
    ]
   },
   "Gardner-Webb": {
-   "gid": "6626243",
-   "d": "2026-08-29",
-   "appeared": 16,
-   "zero_action": []
+   "gid": "6626977",
+   "d": "2026-09-01",
+   "appeared": 15,
+   "zero_action": [
+    "Madison Demink",
+    "Tatiana Besu",
+    "Samia Sayd",
+    "Brooke Rooney",
+    "Martha Turnure",
+    "Haedyn Crumbley",
+    "Annabelle Sims",
+    "Caroline Franklin",
+    "Gracyn Sanders"
+   ]
   },
   "Kansas City": {
    "gid": "6627815",
@@ -1491,10 +1583,15 @@
    ]
   },
   "Elon": {
-   "gid": "6626953",
-   "d": "2026-08-29",
-   "appeared": 10,
-   "zero_action": []
+   "gid": "6626954",
+   "d": "2026-09-01",
+   "appeared": 11,
+   "zero_action": [
+    "Camryn Kanell",
+    "Caroline Smith",
+    "Cecilia Christy",
+    "Ellen Hunt"
+   ]
   },
   "St. John's (NY)": {
    "gid": "6624503",
@@ -3079,17 +3176,19 @@
    ]
   },
   "Indiana": {
-   "gid": "6624236",
-   "d": "2026-08-28",
-   "appeared": 11,
+   "gid": "6624237",
+   "d": "2026-09-01",
+   "appeared": 9,
    "zero_action": [
-    "Spyridoula Komini",
     "Sade Ilawole",
     "Avry Tatum",
     "Ava Vickers",
     "Luca Fickell",
+    "Avery Freeman",
+    "Spyridoula Komini",
     "Isabel Clark",
-    "Ellie Hepler"
+    "Ellie Hepler",
+    "Avery Daum"
    ]
   },
   "Troy": {
@@ -4226,12 +4325,13 @@
    "zero_action": []
   },
   "Liberty": {
-   "gid": "6626418",
-   "d": "2026-08-29",
-   "appeared": 14,
+   "gid": "6628530",
+   "d": "2026-09-01",
+   "appeared": 13,
    "zero_action": [
+    "Keira Rosenmarkle",
     "Jana Thymes",
-    "Vb Trost"
+    "Addie Fielder"
    ]
   },
   "Delaware": {
@@ -4535,11 +4635,14 @@
    ]
   },
   "Virginia": {
-   "gid": "6627794",
-   "d": "2026-08-30",
-   "appeared": 14,
+   "gid": "6628530",
+   "d": "2026-09-01",
+   "appeared": 11,
    "zero_action": [
-    "Teagan Hogan",
+    "Zoey Dood",
+    "Marygrace Gonyeau",
+    "Ella Brodner",
+    "Ruby Mcdermott",
     "Vivian Miller",
     "Skyler Gates",
     "Sarah Brodner"
