@@ -1005,7 +1005,13 @@ def main():
     print("  ctrl-c to stop")
     # ---- optional second listener, on the tailnet interface only ---------
     ts_srv = None
-    if os.environ.get("WVB_TAILNET") == "1":
+    # ⚠ TAILNET IS ON BY DEFAULT (2026-09-01). It was opt-in via
+    # WVB_TAILNET=1, and a restart from a shell without that variable
+    # silently dropped the phone listener -- localhost kept working, so
+    # nothing looked broken from the machine, and Cody's iPhone link just
+    # died. Same failure class as the API key read at launch. The tailnet is
+    # his own devices only; opt OUT with WVB_TAILNET=0.
+    if os.environ.get("WVB_TAILNET", "1") != "0":
         info = tailscale_self()
         if not info:
             print("  tailnet: REQUESTED but Tailscale is not reachable "
