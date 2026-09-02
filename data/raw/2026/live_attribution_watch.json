@@ -7,7 +7,7 @@
     ],
     "date": "2026-09-01",
     "claim": "feed team attribution suspected inverted while live",
-    "status": "watching",
+    "status": "display_corrected_live",
     "evidence": [
       {
         "kind": "cody_observation",
@@ -22,6 +22,8 @@
         "detail": "Page title 'GA 0, IU 1 - SET 4'; Georgia Sets Won: 1, Indiana Sets Won: 2; set scores from Georgia's side 24-26, 22-25, 25-22. The NCAA feed at the same time reported Georgia up 2-0 with Indiana holding 24 and 22 -- a whole-side inversion of the same set scores. Player attribution on StatBroadcast is coherent (Jager/Snowbarger/Boersema under Indiana; Muoneke/Artiles/Elarton under Georgia)."
       }
     ],
-    "note": "A cody_observation is a review signal, never a correction basis. Verification plan: when final, fetch iuhoosiers.com and georgiadogs.com published results; if both contradict the feed, file result_corrections.json entry and box_team_swap audit. StatBroadcast observation added 2026-09-01 (supplied by Cody); it is attributable and counts as one of the two required sources for the eventual final-result correction. School-published results remain the planned second source."
+    "note": "A cody_observation is a review signal, never a correction basis. Verification plan: when final, fetch iuhoosiers.com and georgiadogs.com published results; if both contradict the feed, file result_corrections.json entry and box_team_swap audit. StatBroadcast observation added 2026-09-01 (supplied by Cody); it is attributable and counts as one of the two required sources for the eventual final-result correction. School-published results remain the planned second source.",
+    "display_swap": true,
+    "display_note": "Score attribution corrected: the NCAA feed has the sides inverted for this match. Corrected per the FS1 broadcast scorebug and the venue's official live stats (StatBroadcast), both cited in the ledger. The final result still goes through the two-source correction process."
   }
 }

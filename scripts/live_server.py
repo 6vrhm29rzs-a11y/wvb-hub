@@ -56,6 +56,40 @@ except Exception:                                    # pragma: no cover
     ET = None
 
 
+_ATTR_LEDGER = os.path.join(REPO, "data", "raw", "2026",
+                            "live_attribution_watch.json")
+_attr_cache = {"mtime": None, "swaps": {}}
+
+
+def _attr_swaps():
+    """gid -> one-line correction basis, for ledger entries with
+    display_swap: true. Hot-reloads on the ledger's mtime, same reasoning as
+    the digby module reload: a server left running must see a ledger edit.
+    Entries WITHOUT display_swap stay label-only and are not returned here.
+    An unreadable ledger returns the last good copy -- a syntax slip while
+    editing must not silently drop a correction mid-match."""
+    try:
+        mt = os.path.getmtime(_ATTR_LEDGER)
+    except OSError:
+        return {}
+    if mt != _attr_cache["mtime"]:
+        try:
+            doc = json.load(open(_ATTR_LEDGER))
+            out = {}
+            for gid, e in doc.items():
+                if gid.startswith("_") or not isinstance(e, dict):
+                    continue
+                if e.get("display_swap") and e.get("evidence"):
+                    out[gid] = e.get("display_note") or (
+                        "Score attribution corrected from cited sources; "
+                        "the upstream feed has the sides inverted.")
+            _attr_cache["swaps"] = out
+            _attr_cache["mtime"] = mt
+        except (ValueError, OSError):
+            pass
+    return _attr_cache["swaps"]
+
+
 def _get(path):
     req = urllib.request.Request(API + path, headers={"User-Agent": UA})
     try:
@@ -200,6 +234,26 @@ class Cache(object):
                     "venue": "",
                 })
 
+        # ⚠ CITED LIVE ATTRIBUTION CORRECTION, APPLIED AT THE ONE CHOKE
+        # POINT (Cody, 2026-09-01, IU-Georgia: "are you ignoring the fact
+        # that indiana is up 2-1"). The feed inverts team attribution on some
+        # matches -- real per-set scores, sides swapped. When the ledger
+        # (data/raw/2026/live_attribution_watch.json) carries an entry with
+        # display_swap: true and attributable evidence, the NUMBERS are
+        # reattributed here -- teams stay put, away/home payloads swap -- so
+        # every consumer (rows, ticker, cards, detail) gets the corrected
+        # score at once. Nothing is invented: these are the feed's own
+        # numbers under the attribution two cited sources report. The FINAL
+        # still goes through the two-source correction ledger; this governs
+        # only the live display.
+        swaps = _attr_swaps()
+        for row in games:
+            sw = swaps.get(str(row.get("id") or ""))
+            if not sw:
+                continue
+            row["away_sets"], row["home_sets"] = row["home_sets"], row["away_sets"]
+            row["attribution_corrected"] = sw
+
         # ⚠ ONE STATE MODEL, RESOLVED HERE. Every consumer of this payload --
         # the Match Desk band, the Scores ledger, the match detail -- reads
         # `state6` rather than deciding for itself what "live" or "over" means.
@@ -237,6 +291,11 @@ class Cache(object):
                     row["home_sets"] = str(t.get("score") or 0)
                 else:
                     row["away_sets"] = str(t.get("score") or 0)
+            # the detail call refills from the feed -- re-apply the cited swap
+            if swaps.get(str(row.get("id") or "")):
+                row["away_sets"], row["home_sets"] = (row["home_sets"],
+                                                      row["away_sets"])
+                row["sets"] = [[b, a] for a, b in row["sets"]]
 
         with self.lock:
             # Keep the last good payload on a failed cycle rather than blanking

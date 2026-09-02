@@ -530,10 +530,19 @@ def _attr_watch_public():
         if not (isinstance(e, dict) and e.get("claim") and e.get("evidence")):
             raise SystemExit("live_attribution_watch.json: entry %s lacks "
                              "claim/evidence" % gid)
-        out[gid] = ("The upstream feed's team attribution for this match is "
-                    "disputed. The numbers shown are what the feed reports; "
-                    "nothing here treats them as verified, and the final "
-                    "result goes through the two-source correction process.")
+        if e.get("display_swap"):
+            out[gid] = {"corrected": True,
+                        "note": e.get("display_note") or
+                        ("Score attribution corrected from cited sources; "
+                         "the upstream feed has the sides inverted.")}
+        else:
+            out[gid] = {"corrected": False,
+                        "note": ("The upstream feed's team attribution for "
+                                 "this match is disputed. The numbers shown "
+                                 "are what the feed reports; nothing here "
+                                 "treats them as verified, and the final "
+                                 "result goes through the two-source "
+                                 "correction process.")}
     return out
 
 import digby_art as DIGBY_ART            # noqa: E402
@@ -15867,7 +15876,7 @@ function rowLinescore(m, live, st) {
      with the feed's team assignment under review, "who is ahead" is exactly
      the fact in dispute -- the numbers render, the emphasis does not. */
   const disputed = playing && typeof ATTR_WATCH !== 'undefined' &&
-                   ATTR_WATCH[m.gid];
+                   ATTR_WATCH[m.gid] && !ATTR_WATCH[m.gid].corrected;
   const raw = full;
   const n = raw ? raw.length : 0;
   /* THE SHAPE, all of it Cody's (2026-08-28): sets-won FIRST, rule on its
@@ -15999,7 +16008,10 @@ function matchRow(m, live, dest) {
         '</span>' : '') +
       ((st === 'live' && typeof ATTR_WATCH !== 'undefined' && ATTR_WATCH[m.gid])
         ? '<span class="mtags"><span class="mtg rvw" title="' +
-          esc(ATTR_WATCH[m.gid]) + '">score attribution under review</span></span>'
+          esc(ATTR_WATCH[m.gid].note) + '">' +
+          (ATTR_WATCH[m.gid].corrected ? 'score corrected \u00b7 feed inverted'
+                                       : 'score attribution under review') +
+          '</span></span>'
         : '') +
       (m.exh ? '<span class="mtags">' + exhTag(m) + '</span>' : '') +
     '</span></button>';
@@ -17418,8 +17430,10 @@ function renderMatchDetail(gid, dest) {
       parent[0] + '</button>' +
     '<div class="mdet">' +
     ((typeof ATTR_WATCH !== 'undefined' && ATTR_WATCH[m.gid] && !m.under_review)
-      ? '<p class="attrwatch"><b>SCORE ATTRIBUTION UNDER REVIEW.</b> ' +
-        esc(ATTR_WATCH[m.gid]) + '</p>'
+      ? '<p class="attrwatch"><b>' +
+        (ATTR_WATCH[m.gid].corrected ? 'SCORE ATTRIBUTION CORRECTED.'
+                                     : 'SCORE ATTRIBUTION UNDER REVIEW.') +
+        '</b> ' + esc(ATTR_WATCH[m.gid].note) + '</p>'
       : '') +
     exhBanner(m) + ribbonHTML(m, live, null) +
       /* WHY WATCH -- directly after the identity block, before the facts
