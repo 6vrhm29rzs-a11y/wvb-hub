@@ -228,6 +228,13 @@ jobs:
           python3 scripts/resume_2025.py || echo "resume needs a rating or a blend; skipping"
           python3 scripts/confidence.py || echo "confidence ledger skipped"
           python3 scripts/availability_desk.py || echo "availability desk skipped"
+          # NIGHTLY RESULT VERIFICATION (Cody, 2026-09-01, after the third
+          # feed attribution inversion): every counted final checked against
+          # BOTH schools' published schedules. It can only ever write a
+          # report, an append-only fetch log, and REVIEW candidates -- never
+          # a correction. Tolerated: an unreachable school site must not
+          # block the pipeline.
+          python3 scripts/verify_results_daily.py || echo "result verification skipped; continuing"
           # bounded official-source collector: 12 schools max, rate-limited,
           # robots-respecting; daily cadence ONLY -- never the half-hourly job
           python3 scripts/collector.py || echo "collector skipped"
@@ -332,6 +339,7 @@ jobs:
           # check is not evidence. Same tolerant form: it does not exist until
           # the first run of a season.
           git add data/fixture_disposition_*.json 2>/dev/null || true
+          git add data/result_verification_*.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "nothing changed"
           else
