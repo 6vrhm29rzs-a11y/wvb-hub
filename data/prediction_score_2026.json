@@ -2,14 +2,14 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 465,
+  "scored": 469,
   "logged_after_tipoff_excluded": 8,
   "team_mismatch_excluded": 14,
   "predictions_on_record": 4773,
-  "results_available": 498,
-  "brier": 0.1804,
+  "results_available": 502,
+  "brier": 0.1803,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 340,
+  "favourite_correct": 343,
   "favourite_correct_pct": 73.1
  },
  "calibration": [
@@ -33,9 +33,9 @@
   },
   {
    "range": "80-90%",
-   "n": 87,
+   "n": 91,
    "said": 85.0,
-   "happened": 77.0
+   "happened": 76.9
   },
   {
    "range": "90-101%",
@@ -352,6 +352,15 @@
    "brier": 0.67322025
   },
   {
+   "game_id": "6624319",
+   "date": "2026-09-01",
+   "away": "South Carolina",
+   "home": "Michigan",
+   "p_home": 0.811,
+   "home_won": false,
+   "brier": 0.6577210000000001
+  },
+  {
    "game_id": "6627290",
    "date": "2026-08-28",
    "away": "N.C. A&T",
@@ -485,15 +494,6 @@
    "p_home": 0.7438,
    "home_won": false,
    "brier": 0.55323844
-  },
-  {
-   "game_id": "6628023",
-   "date": "2026-08-29",
-   "away": "Texas Tech",
-   "home": "St. Thomas (MN)",
-   "p_home": 0.7424,
-   "home_won": false,
-   "brier": 0.5511577599999999
   }
  ]
 }

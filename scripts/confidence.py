@@ -227,6 +227,21 @@ def build():
     doc = load("data/data_%d.json" % SEASON) or {}
     ev = (load("data/raw/%d/result_evidence.json" % SEASON) or {}) \
         .get("evidence") or {}
+    # the machine-derived projection (verify_results_daily.write_auto_evidence)
+    # merges at READ time -- the curated file stays pristine, the auto file
+    # is regenerable, and a verifier bug rolls back by deleting one file.
+    # ⚠ A curated entry OUTRANKS an auto observation of the same URL: when a
+    # human promotes an auto conflict into result_evidence.json, the auto
+    # copy must not render beside it as a second source.
+    auto_ev = (load("data/raw/%d/result_evidence_auto.json" % SEASON) or {}) \
+        .get("evidence") or {}
+    for _gid, _aes in auto_ev.items():
+        _curated_urls = set(e.get("url") for e in (ev.get(_gid) or [])
+                            if isinstance(e, dict))
+        _add = [e for e in _aes if isinstance(e, dict)
+                and e.get("url") not in _curated_urls]
+        if _add:
+            ev[_gid] = list(ev.get(_gid) or []) + _add
     # the nightly school-site verification reports (verify_results_daily.py)
     # -- latest verdict per gid. Display metadata ONLY: it lifts nothing,
     # counts nothing, corrects nothing; the drill renders it with both
@@ -321,7 +336,8 @@ def build():
                    else "corrected" if _cd
                    else "reconciled" if rec else "official")
         srcs = [e for e in entries if isinstance(e, dict)
-                and e.get("status") in ("confirms", "conflicts")]
+                and e.get("status") in ("confirms", "conflicts",
+                                        "conflict_observed")]
         attempted = sum(1 for e in entries if isinstance(e, dict)
                         and e.get("status") == "attempted_unverifiable")
         checked = max([e.get("retrieved") or "" for e in entries] or [""])

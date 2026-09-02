@@ -16811,12 +16811,16 @@ function rcDrill(gid) {
           ' UTC' : '') + '</span>' +
         Object.keys(r.verify.schools || {}).map(sc => {
           const e = r.verify.schools[sc];
+          /* an ASSERTIVE observation lives ONCE, in the evidence list
+             below (the auto projection feeds it) -- rendering it here too
+             put the same claim twice in one drill. Only the non-assertive
+             states, which evidence rightly excludes, are explained here. */
+          if (['AGREE_COMPLETE', 'CONTRADICTS',
+               'CONTRADICTS_SETS'].indexOf(e.state) >= 0) return '';
           return '<div class="rcsource"><b>' + esc(sc) + ' Athletics</b>' +
             '<span class="rck">published schedule</span>' +
-            (e.assertion
-              ? '<span class="rcq">' + esc(e.assertion) + '</span>'
-              : '<span class="rcnote">' + esc(rvSchoolNote(e.state)) +
-                '</span>') +
+            '<span class="rcnote">' + esc(rvSchoolNote(e.state)) +
+            '</span>' +
             (e.url ? '<a class="rcu" href="' + esc(e.url) +
               '" target="_blank" rel="noopener noreferrer">' +
               esc((e.url || '').replace(/^https?:\/\//, '').split('/')[0]) +
@@ -16840,7 +16844,12 @@ function rcDrill(gid) {
         (sr.status === 'attempted_unverifiable'
           ? '<span class="rcnote">attempted; the page could not be read ' +
             '(JS-rendered) \u2014 stays pending, never assumed</span>'
-          : '<span class="rcnote">supports: ' +
+          : sr.status === 'conflict_observed'
+            ? '<span class="rcnote"><b>School source disagrees \u2014 ' +
+              'under review.</b> A machine-read schedule row contradicts ' +
+              'the recorded result; it changes no state until a human ' +
+              'validates and promotes it.</span>'
+            : '<span class="rcnote">supports: ' +
             esc((sr.fields || []).join(', ') || '\u2014') +
             (sr.status === 'conflicts' ? ' \u2014 <b>CONFLICTS</b>' : '') +
             '</span>' +

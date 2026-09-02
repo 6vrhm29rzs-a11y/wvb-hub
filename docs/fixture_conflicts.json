@@ -32,7 +32,7 @@
    "conflicts": [
     {
      "field": "teams",
-     "records": 8,
+     "records": 9,
      "values": [
       "(('46204', False), ('46301', True))",
       "(('46204', True), ('46301', False))"
@@ -40,15 +40,23 @@
     },
     {
      "field": "start_time_epoch",
-     "records": 8,
+     "records": 9,
      "values": [
       "1788238800",
       "1788307200"
      ]
     },
     {
+     "field": "game_state",
+     "records": 9,
+     "values": [
+      "P",
+      "I"
+     ]
+    },
+    {
      "field": "site",
-     "records": 8,
+     "records": 9,
      "values": [
       "home/away flip across snapshots",
       "no venue owner on record"
@@ -56,7 +64,7 @@
     }
    ],
    "matchup": "Minnesota / Florida",
-   "records": 8
+   "records": 9
   },
   "6624829": {
    "conflicts": [
@@ -112,15 +120,23 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 7,
+     "records": 8,
      "values": [
       "1788238800",
       "1788310800"
      ]
+    },
+    {
+     "field": "game_state",
+     "records": 8,
+     "values": [
+      "P",
+      "I"
+     ]
     }
    ],
    "matchup": "Oregon / Missouri",
-   "records": 7
+   "records": 8
   },
   "6625273": {
    "conflicts": [
@@ -460,7 +476,7 @@
   }
  },
  "by_field": {
-  "game_state": 33,
+  "game_state": 34,
   "site": 2,
   "start_time_epoch": 30,
   "teams": 2,
@@ -598,7 +614,7 @@
  },
  "counts": {
   "blocked": 31,
-  "conflicted": 65,
+  "conflicted": 64,
   "corrected": 4,
   "fixtures": 4878
  },

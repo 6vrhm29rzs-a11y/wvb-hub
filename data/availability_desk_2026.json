@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-02T01:01:27Z",
+  "generated_at_utc": "2026-09-02T01:43:41Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 0,
    "expired": 1,
-   "anomalies": 37
+   "anomalies": 39
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -309,6 +309,24 @@
     }
    ],
    "points_per_set_missing": 3.071
+  },
+  {
+   "game_id": "6625924",
+   "team_id": "46496",
+   "team": "Southeast Mo. St.",
+   "absent": [
+    {
+     "name": "Paige Smith",
+     "rate": 2.056,
+     "played_share": 1.0
+    },
+    {
+     "name": "Katarina Miscevic",
+     "rate": 1.0,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 3.056
   },
   {
    "game_id": "6637949",
@@ -660,6 +678,19 @@
     }
    ],
    "points_per_set_missing": 1.125
+  },
+  {
+   "game_id": "6625271",
+   "team_id": "46496",
+   "team": "Southeast Mo. St.",
+   "absent": [
+    {
+     "name": "Katarina Miscevic",
+     "rate": 1.0,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 1.0
   },
   {
    "game_id": "6627900",
@@ -1705,11 +1736,16 @@
    ]
   },
   "Southeast Mo. St.": {
-   "gid": "6625271",
-   "d": "2026-08-29",
+   "gid": "6625926",
+   "d": "2026-09-01",
    "appeared": 11,
    "zero_action": [
-    "Harper Highfill"
+    "Alayna Christner",
+    "Sydney Miller",
+    "Ava Mathews",
+    "Brooklyn Ritter",
+    "Harper Highfill",
+    "Katherine St. john"
    ]
   },
   "Western Ky.": {
@@ -2497,11 +2533,11 @@
    ]
   },
   "Evansville": {
-   "gid": "6639404",
-   "d": "2026-08-29",
+   "gid": "6625926",
+   "d": "2026-09-01",
    "appeared": 12,
    "zero_action": [
-    "Aubry Dowling",
+    "Carlotta Pascual centelles",
     "Savannah Gogel",
     "Chloe Cline",
     "Holland Morris"
@@ -2713,12 +2749,11 @@
    ]
   },
   "Michigan": {
-   "gid": "6624317",
-   "d": "2026-08-29",
-   "appeared": 9,
+   "gid": "6624319",
+   "d": "2026-09-01",
+   "appeared": 10,
    "zero_action": [
     "Trixie Mcmillin",
-    "Ellie White",
     "Leni Stanton-parker",
     "Carly Greskovics",
     "Megan Ingersoll",
@@ -2781,14 +2816,12 @@
    ]
   },
   "Maryland": {
-   "gid": "6624622",
-   "d": "2026-08-28",
-   "appeared": 9,
+   "gid": "6624623",
+   "d": "2026-09-01",
+   "appeared": 11,
    "zero_action": [
     "Nikki Tawil",
-    "Brooklynne Brass",
     "Ioanna Dimitriou",
-    "Alex Mcgillivray",
     "Marlee Sivak",
     "Annika Sokol",
     "Ellis Crawford"
@@ -3242,14 +3275,18 @@
    ]
   },
   "Tennessee": {
-   "gid": "6625203",
-   "d": "2026-08-29",
-   "appeared": 12,
+   "gid": "6624379",
+   "d": "2026-09-01",
+   "appeared": 9,
    "zero_action": [
     "Alaina Jarrett",
+    "Mallory Matheny",
     "Morgan Williams",
     "Emma Frietch",
-    "Jade Williams"
+    "Mackenzie Plante",
+    "Jade Williams",
+    "Camille Perry",
+    "Nia Hall"
    ]
   },
   "Colgate": {
@@ -3270,12 +3307,11 @@
    "zero_action": []
   },
   "South Carolina": {
-   "gid": "6625631",
-   "d": "2026-08-30",
-   "appeared": 11,
+   "gid": "6624319",
+   "d": "2026-09-01",
+   "appeared": 13,
    "zero_action": [
-    "Elizabeth Mcelveen",
-    "Maggie Penn",
+    "Claire Payne",
     "Sydney Floyd",
     "Norunn Westersjo",
     "Anne Bing",
@@ -3797,16 +3833,16 @@
    ]
   },
   "Vanderbilt": {
-   "gid": "6625531",
-   "d": "2026-08-29",
-   "appeared": 11,
+   "gid": "6624623",
+   "d": "2026-09-01",
+   "appeared": 10,
    "zero_action": [
     "Taryn Dewese",
     "Kati Berezowitz",
-    "Ariel Chime",
-    "Mk Patten",
+    "Taylor Porter",
     "Madi Victoriano",
-    "Jordin Southall"
+    "Jordin Southall",
+    "Maddy Bowser"
    ]
   },
   "Col. of Charleston": {
@@ -3968,10 +4004,12 @@
    ]
   },
   "Illinois": {
-   "gid": "6624378",
-   "d": "2026-08-30",
-   "appeared": 14,
+   "gid": "6624379",
+   "d": "2026-09-01",
+   "appeared": 12,
    "zero_action": [
+    "Ava Wysocki",
+    "Gabby Dean",
     "Kenzie Cogan",
     "Gabriella Pitcel",
     "Devin Dzienny",

@@ -116,6 +116,96 @@ def main():
     check("conflict is the one loud row state",
           "sources disagree" in page)
 
+    print("\n3c. THE AUTO EVIDENCE PROJECTION")
+    import tempfile
+    td = tempfile.mkdtemp()
+    os.makedirs(os.path.join(td, "data"))
+    rep1 = {"date": "2026-08-30", "generated_utc": "2026-08-31T01:00:00Z",
+            "matches": [{"gid": "g1", "schools": {
+                "Alpha": {"state": "AGREE_COMPLETE", "url": "u1",
+                          "assertion": "Alpha W 3-0 vs Beta"},
+                "Beta": {"state": "NOT_POSTED", "url": "u2"}}}]}
+    rep2 = {"date": "2026-08-31", "generated_utc": "2026-09-01T01:00:00Z",
+            "matches": [{"gid": "g1", "schools": {
+                "Alpha": {"state": "CONTRADICTS", "url": "u1",
+                          "assertion": "Alpha L 1-3 vs Beta"},
+                "Beta": {"state": "SITE_UNPARSED", "url": "u2"}}}]}
+    json.dump(rep1, open(os.path.join(td, "data",
+              "result_verification_2026-08-30.json"), "w"))
+    json.dump(rep2, open(os.path.join(td, "data",
+              "result_verification_2026-08-31.json"), "w"))
+    _repo, _auto = V.REPO, V.AUTO_EVIDENCE
+    try:
+        V.REPO = td
+        V.AUTO_EVIDENCE = os.path.join(td, "auto.json")
+        V.write_auto_evidence()
+        first = open(V.AUTO_EVIDENCE).read()
+        auto = json.loads(first)["evidence"]
+        e = (auto.get("g1") or [])
+        check("latest projection: ONE entry per (gid, school)",
+              len(e) == 1, e)
+        check("...and the LATER observation wins",
+              e and e[0]["status"] == "conflict_observed" and
+              "L 1-3" in (e[0]["text"] or ""))
+        check("a machine contradiction is conflict_observed, NEVER the "
+              "dispositive 'conflicts'",
+              all(x["status"] in ("confirms", "conflict_observed")
+                  for x in e))
+        check("NOT_POSTED / SITE_* observations never enter evidence",
+              not any(x.get("school") == "Beta" for x in e))
+        check("every entry names its machine origin",
+              all(x.get("origin") == "nightly_verifier" for x in e))
+        V.write_auto_evidence()
+        check("regeneration is idempotent (deterministic bytes)",
+              open(V.AUTO_EVIDENCE).read() == first)
+    finally:
+        V.REPO, V.AUTO_EVIDENCE = _repo, _auto
+    # the real merged pipeline: conflict_observed must not lift or dispute
+    sys.path.insert(0, os.path.join(REPO, "scripts"))
+    import confidence as C
+    check("confidence.entry_supports IGNORES conflict_observed "
+          "(no lifting, no dispute)",
+          C.entry_supports({"status": "conflict_observed",
+                            "kind": "school_schedule",
+                            "fields": ["result"], "url": "x"},
+                           "result") is False)
+    check("...and field_state stays at base with only such entries",
+          C.field_state([{"status": "conflict_observed",
+                          "kind": "school_schedule",
+                          "fields": ["result"], "url": "x"}],
+                        "result", "reconciled") == "reconciled")
+    check("a school-kind confirm alone still cannot cross-source CONFIRM "
+          "a result (box+school bar intact)",
+          C.field_state([{"status": "confirms", "kind": "school_schedule",
+                          "fields": ["result"], "url": "x"}],
+                        "result", "reconciled") == "reconciled")
+    check("the curated ledger points at the auto file (amendment protocol)",
+          "result_evidence_auto.json" in json.load(open(os.path.join(
+              REPO, "data", "raw", "2026",
+              "result_evidence.json")))["_doc"])
+    # ⚠ COUNTING IMMUNITY: review_gids (which makes a match count NOWHERE)
+    # triggers only on a curated 'conflicts' entry -- a machine
+    # conflict_observed must never quarantine a match.
+    import season_counts as SCounts
+    _ld = SCounts._load
+    try:
+        SCounts._load = lambda pth: (
+            {"evidence": {"g9": [{"status": "conflict_observed",
+                                  "url": "x"}],
+                          "g8": [{"status": "conflicts", "url": "y"}]}}
+            if "result_evidence" in pth else _ld(pth))
+        rg = SCounts.review_gids(2026)
+        check("a machine conflict_observed can NEVER put a match under "
+              "review (counting immunity)", "g9" not in rg and "g8" in rg,
+              rg)
+    finally:
+        SCounts._load = _ld
+    check("confidence merges auto AT READ TIME, curated URL outranking",
+          "result_evidence_auto.json" in open(os.path.join(
+              REPO, "scripts", "confidence.py")).read() and
+          "_curated_urls" in open(os.path.join(
+              REPO, "scripts", "confidence.py")).read())
+
     print("\n4. [NEG] negative controls")
     # a doubled date: matching by date alone would take Georgia's row for
     # a Purdue query; the opponent anchor must pick the right one
