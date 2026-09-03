@@ -2,14 +2,14 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 488,
+  "scored": 491,
   "logged_after_tipoff_excluded": 8,
   "team_mismatch_excluded": 16,
   "predictions_on_record": 4773,
-  "results_available": 523,
-  "brier": 0.1818,
+  "results_available": 526,
+  "brier": 0.1823,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 355,
+  "favourite_correct": 357,
   "favourite_correct_pct": 72.7
  },
  "calibration": [
@@ -27,15 +27,15 @@
   },
   {
    "range": "70-80%",
-   "n": 69,
+   "n": 71,
    "said": 75.2,
-   "happened": 66.7
+   "happened": 67.6
   },
   {
    "range": "80-90%",
-   "n": 99,
+   "n": 100,
    "said": 84.9,
-   "happened": 75.8
+   "happened": 75.0
   },
   {
    "range": "90-101%",
@@ -388,6 +388,15 @@
    "brier": 0.6577210000000001
   },
   {
+   "game_id": "6626260",
+   "date": "2026-09-02",
+   "away": "SMU",
+   "home": "TCU",
+   "p_home": 0.1965,
+   "home_won": true,
+   "brier": 0.64561225
+  },
+  {
    "game_id": "6627290",
    "date": "2026-08-28",
    "away": "N.C. A&T",
@@ -485,15 +494,6 @@
    "p_home": 0.24,
    "home_won": true,
    "brier": 0.5776
-  },
-  {
-   "game_id": "6625896",
-   "date": "2026-08-28",
-   "away": "Duke",
-   "home": "Coastal Carolina",
-   "p_home": 0.7599,
-   "home_won": false,
-   "brier": 0.57744801
   }
  ]
 }

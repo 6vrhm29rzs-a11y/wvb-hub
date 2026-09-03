@@ -129,9 +129,32 @@ def main():
           before_all == after_all)
     check("computing the queue wrote NO correction", before == after)
     hub = ER.hub_records()
-    check("the hub's counting record for SMU is still 3-0 and UC Davis 1-2",
-          hub.get("SMU") == "3-0" and hub.get("UC Davis") == "1-2",
-          (hub.get("SMU"), hub.get("UC Davis")))
+    # ⚠ WORLD-PIN REMOVED (2026-09-02): this froze SMU at "3-0" and broke
+    # the first time SMU played again. The invariant is the MECHANISM: the
+    # reference module's record equals what the counting corpus derives at
+    # test time -- computed here independently, never a pasted value.
+    import season_counts as _SCc
+    from gamelog import load_games_jsonl as _lgj
+    _cls = _SCc.classify(_lgj(os.path.join(
+        REPO, "data/raw/2026/games.jsonl")), 2026)
+    _corr = _SCc.corrections(2026)
+    _w = _l = 0
+    for _g in _SCc.resolve(_lgj(os.path.join(
+            REPO, "data/raw/2026/games.jsonl"))):
+        if _cls.get(str(_g.get("game_id"))) != "ok":
+            continue
+        _g = _SCc.apply_correction(_g, _corr)
+        for _t in _g.get("teams") or []:
+            if _t.get("name_short") == "SMU" and \
+                    all((x.get("division") == 1) for x in _g["teams"]):
+                if _t.get("is_winner"):
+                    _w += 1
+                else:
+                    _l += 1
+    check("the hub's counting record for SMU equals the corpus-derived "
+          "record (mechanism, not a pinned value)",
+          hub.get("SMU") == "%d-%d" % (_w, _l),
+          (hub.get("SMU"), "%d-%d" % (_w, _l)))
     if HELD:
         smu = [i for i in d["items"] if i["team"] == "SMU"]
         check("SMU renders as a reference mismatch", bool(smu),
@@ -139,7 +162,7 @@ def main():
         if smu:
             check("...FIG %s vs hub %s, and the hub record is untouched"
                   % (smu[0]["fig_record"], smu[0]["hub_record"]),
-                  smu[0]["hub_record"] == "3-0")
+                  smu[0]["hub_record"] == hub.get("SMU"))
         check("every FIG row resolves to a hub team (aliases complete)",
               not d["unmatched"], d["unmatched"][:6])
         check("no two FIG rows resolve to one hub team (collision guard)",
@@ -293,9 +316,12 @@ def main():
         if HELD:
             check("both timestamps render, distinct",
                   "Generated:" in page and "fetched" in page)
+            # ⚠ the pinned "hub 3-0" broke the first time SMU played
+            # again (2026-09-02) -- assert the ROW and its ledger link,
+            # with the hub half matching whatever the corpus says now
             check("the SMU mismatch row renders with its ledger link",
                   re.search(r'REFERENCE MISMATCH</b> <a href="#/teams/smu">'
-                            r'SMU</a>[^<]*FIGstats 2-0; hub 3-0', page)
+                            r'SMU</a>[^<]*FIGstats 2-0; hub \d+-\d+', page)
                   and 'href="#/result-ledger"' in page)
             check("...accented ONLY as ledgered evidence, not alarm",
                   'class="mmrow mmev"' in page and "mmrow mmev" in page)

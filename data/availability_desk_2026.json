@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-03T01:42:48Z",
+  "generated_at_utc": "2026-09-03T02:38:08Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 0,
    "expired": 1,
-   "anomalies": 60
+   "anomalies": 59
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -825,6 +825,19 @@
    "points_per_set_missing": 1.583
   },
   {
+   "game_id": "6626260",
+   "team_id": "46250",
+   "team": "SMU",
+   "absent": [
+    {
+     "name": "Christa Wilburn",
+     "rate": 1.5,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.5
+  },
+  {
    "game_id": "6627637",
    "team_id": "46362",
    "team": "Santa Clara",
@@ -849,32 +862,6 @@
     }
    ],
    "points_per_set_missing": 1.438
-  },
-  {
-   "game_id": "6639886",
-   "team_id": "46250",
-   "team": "SMU",
-   "absent": [
-    {
-     "name": "Levariya Pinder",
-     "rate": 1.389,
-     "played_share": 0.667
-    }
-   ],
-   "points_per_set_missing": 1.389
-  },
-  {
-   "game_id": "6640218",
-   "team_id": "46250",
-   "team": "SMU",
-   "absent": [
-    {
-     "name": "Levariya Pinder",
-     "rate": 1.389,
-     "played_share": 0.667
-    }
-   ],
-   "points_per_set_missing": 1.389
   },
   {
    "game_id": "6639844",
@@ -1123,16 +1110,13 @@
    ]
   },
   "SMU": {
-   "gid": "6626259",
-   "d": "2026-08-30",
-   "appeared": 9,
+   "gid": "6626260",
+   "d": "2026-09-02",
+   "appeared": 11,
    "zero_action": [
     "Brooke Gilmour",
-    "Bojana Ambulija",
-    "Mia Silva",
-    "Ellie Moore",
-    "Christa Wilburn",
     "Jadyn Livings",
+    "Elle Vandeweghe",
     "Victoria Shupe"
    ]
   },
@@ -1565,10 +1549,15 @@
    ]
   },
   "Rutgers": {
-   "gid": "6628677",
-   "d": "2026-09-01",
-   "appeared": 10,
+   "gid": "6628670",
+   "d": "2026-09-02",
+   "appeared": 12,
    "zero_action": [
+    "Ema Grubanov",
+    "Addison Wiemann",
+    "Zharia Harris-waddy",
+    "Mira Mccool",
+    "Jenna Delamater",
     "Kami Dyrstad"
    ]
   },
@@ -2704,17 +2693,17 @@
    ]
   },
   "DePaul": {
-   "gid": "6625710",
-   "d": "2026-08-30",
-   "appeared": 11,
+   "gid": "6627122",
+   "d": "2026-09-02",
+   "appeared": 10,
    "zero_action": [
     "Caroline Wright",
-    "Morgan Stewart",
+    "Amanda Saeger",
+    "Yagmur Yavuz",
     "Luisa Juncu",
     "Ryan Gorski",
     "Sage Meidroth",
-    "Arden Billingsley",
-    "Jocelyn Paige"
+    "Arden Billingsley"
    ]
   },
   "Milwaukee": {
@@ -4095,12 +4084,13 @@
    ]
   },
   "Vanderbilt": {
-   "gid": "6624623",
-   "d": "2026-09-01",
-   "appeared": 10,
+   "gid": "6628670",
+   "d": "2026-09-02",
+   "appeared": 9,
    "zero_action": [
     "Taryn Dewese",
     "Kati Berezowitz",
+    "Ariel Chime",
     "Taylor Porter",
     "Madi Victoriano",
     "Jordin Southall",
@@ -4615,15 +4605,11 @@
    ]
   },
   "Portland St.": {
-   "gid": "6627120",
-   "d": "2026-08-30",
-   "appeared": 13,
+   "gid": "6627122",
+   "d": "2026-09-02",
+   "appeared": 17,
    "zero_action": [
-    "Xanthe Ocampo",
-    "Katie Brewer",
-    "Ashley Repetti",
-    "Asya Akbulut",
-    "Jordyn Romano"
+    "Alyssandra Ordona"
    ]
   },
   "Hawaii": {
@@ -4950,11 +4936,13 @@
    ]
   },
   "TCU": {
-   "gid": "6628316",
-   "d": "2026-08-30",
-   "appeared": 14,
+   "gid": "6626260",
+   "d": "2026-09-02",
+   "appeared": 11,
    "zero_action": [
-    "Jaylen Clark",
+    "Lauren Murphy",
+    "Blaykli Bobik",
+    "Morgan Holloman",
     "Mckenzie Berg",
     "Josie Valgus"
    ]

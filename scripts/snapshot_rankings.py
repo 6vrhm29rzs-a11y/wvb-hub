@@ -144,6 +144,14 @@ def current_ranking():
     # archived ruler either.
     if not (live.get("meta") or {}).get("validated"):
         live = {}
+    # ⚠ AND THE SAME MATURITY GATE (2026-09-02): validated-but-immature
+    # (median gp below the blend's measured crossover k) must not become
+    # the archived ruler either -- ONE definition, the board's.
+    if live:
+        import build_rankings_board as _B
+        _ok, _why = _B.live_rating_mature(live)
+        if not _ok:
+            live = {}
     for r in (live.get("teams") or []):
         if r.get("composite_rank"):
             rows.append({"team": r["team"], "rank": r["composite_rank"],

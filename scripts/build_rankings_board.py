@@ -110,6 +110,29 @@ def key(name: str) -> str:
     return ALIAS.get(k, k)
 
 
+def live_rating_mature(live):
+    """(ok, why_not) -- may the pure-season composite replace the blend?
+
+    True only when the MEDIAN team's counted matches >= the blend's own
+    measured k (digby meta k_matches: where season and prior weigh
+    equally). Below that, the typical team's season evidence is still the
+    minority voice and the blend keeps the board. k missing -> hold, and
+    say so; a gate that cannot read its constant must fail closed."""
+    teams = live.get("teams") or []
+    gp = sorted(int(t.get("games_played") or 0) for t in teams)
+    med = gp[len(gp) // 2] if gp else 0
+    k = ((load_json("data/digby_top25_%d.json" % SEASON) or {})
+         .get("meta") or {}).get("k_matches")
+    if k is None:
+        return False, ("blend k unavailable -- holding the blend "
+                       "(median gp %d)" % med)
+    if med >= k:
+        return True, None
+    return False, ("median team has %d counted matches against the "
+                   "measured crossover k=%.1f -- season evidence is still "
+                   "the minority voice; the blend holds" % (med, k))
+
+
 def load_json(p, default=None):
     path = os.path.join(REPO, p)
     if not os.path.exists(path):
@@ -270,6 +293,24 @@ def build():
     # the board. No new threshold is introduced here (R1): the board defers to
     # a validation the model already performs.
     _live_ok = bool((live.get("meta") or {}).get("validated"))
+    # ⚠⚠ VALIDATED IS STILL NOT MATURE (Cody, 2026-09-02: "what the actual
+    # F happened to the power rankings" -- Lehigh #3, Toledo #9, Weber St.
+    # #10 on a median of THREE games per team). meta.validated proves the
+    # incremental validation RAN; it says nothing about whether a
+    # pure-season ordering is yet better than the blend. The blend's own
+    # MEASURED constant answers that: k = the matches at which this season
+    # and the projection weigh equally (13.5, recomputed each run from
+    # measured variances). Until the MEDIAN team has played >= k counted
+    # matches, the season side has not earned majority weight for the
+    # typical team, and the pure-season composite must not replace the
+    # blend that is measured for exactly this window. No new threshold:
+    # the gate reuses the blend's own fitted crossover point.
+    if _live_ok:
+        _live_ok, _why_hold = live_rating_mature(live)
+    else:
+        _why_hold = None
+    if _why_hold:
+        print("  live fit HELD: %s" % _why_hold)
     # ⚠ JOIN THROUGH THE NORMALISER (first live Sunday, 2026-08-30): the
     # rating stores a team with no resolved display name under its
     # lowercase norm key ('brown', 'penn'); an exact-name join missed 10
@@ -496,6 +537,8 @@ def build():
     # place.
     if live_by_team:
         _why = "  (%d teams rated on 2026 results)" % len(live_by_team)
+    elif _why_hold:
+        _why = "  (a validated 2026 fit exists but is HELD: %s)" % _why_hold
     elif (live.get("meta") or {}).get("validated") is False:
         _why = ("  (a 2026 fit exists but has NOT validated yet -- "
                 "%s matches; the blend holds until it does)"

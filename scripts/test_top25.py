@@ -155,13 +155,16 @@ def test_the_weekly_archive_captures_the_top_25():
     # transition the crossover machinery was pre-tested for. The invariant
     # is that the snapshot's basis MATCHES the rating's own validated
     # state -- never a hard-coded ruler.
+    # ⚠ AND VALIDATED IS NOT MATURE (2026-09-02, "Lehigh #3"): the basis
+    # follows the board's ONE gate -- live_rating_mature -- never a
+    # reimplementation of it here (a guard that re-derives the gate is a
+    # guard that drifts from it).
     import json as _json
-    _rv = ((_json.load(open(os.path.join(REPO, "data",
-                                         "rating_2026.json")))
-            .get("meta") or {}).get("validated")
-           if os.path.exists(os.path.join(REPO, "data",
-                                          "rating_2026.json"))
-           else False)
+    import build_rankings_board as _BB
+    _rp = os.path.join(REPO, "data", "rating_2026.json")
+    _live_doc = _json.load(open(_rp)) if os.path.exists(_rp) else {}
+    _rv = bool((_live_doc.get("meta") or {}).get("validated")) and \
+        _BB.live_rating_mature(_live_doc)[0]
     _want = "live" if _rv else "blend"
     check(SNAP.basis(source) == _want,
           "the weekly snapshot archives the %s ranking" % _want, source)

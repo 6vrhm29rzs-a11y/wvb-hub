@@ -332,6 +332,51 @@ def main():
     check("[+] ...and the board still ranks on something", bool(_srcs),
           "no rank_source at all -- the stub broke the build")
 
+    # ⚠⚠ VALIDATED IS NOT MATURE (Cody, 2026-09-02: Lehigh #3 / Toledo #9 /
+    # Weber St. #10 on a median of THREE games). A fit whose validation RAN
+    # must still not take the board until the MEDIAN team's counted matches
+    # reach the blend's own measured crossover k. Stub: validated=True,
+    # median gp 3 -- must stay blend.
+    _fake_mature = {"meta": {"validated": True, "matches": 486},
+                    "teams": [{"team": "Lehigh", "composite_rank": 3,
+                               "games_played": 3}] * 5}
+    ok2, why2 = None, None
+    _real2 = BB.load_json
+    def _stub2(path, default=None):
+        if "rating_" in path:
+            return _fake_mature
+        return _real2(path, default) if default is not None else _real2(path)
+    BB.load_json = _stub2
+    try:
+        ok2, why2 = BB.live_rating_mature(_fake_mature)
+    finally:
+        BB.load_json = _real2
+    check("a VALIDATED fit at median gp 3 is HELD by the maturity gate",
+          ok2 is False and "minority voice" in (why2 or ""), (ok2, why2))
+    # positive control: at median gp >= k the gate opens
+    _rich = {"meta": {"validated": True},
+             "teams": [{"team": "X", "composite_rank": 1,
+                        "games_played": 20}] * 9}
+    ok3, _ = BB.live_rating_mature(_rich)
+    check("[+] ...and opens once the median team clears the measured k",
+          ok3 is True)
+    # fail-closed control: no k readable -> hold
+    def _stub3(path, default=None):
+        if "digby_top25" in path:
+            return {}
+        return _real2(path, default) if default is not None else _real2(path)
+    BB.load_json = _stub3
+    try:
+        ok4, why4 = BB.live_rating_mature(_rich)
+    finally:
+        BB.load_json = _real2
+    check("[NEG] a gate that cannot read its constant HOLDS the blend",
+          ok4 is False and "unavailable" in (why4 or ""), (ok4, why4))
+    # and the snapshot shares the ONE definition
+    _snap = open(os.path.join(REPO, "scripts", "snapshot_rankings.py")).read()
+    check("the weekly archive uses the SAME maturity gate",
+          "live_rating_mature" in _snap)
+
     print()
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))

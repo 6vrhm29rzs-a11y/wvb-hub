@@ -211,9 +211,16 @@ def check_snapshot_and_board_agree_on_the_basis():
     # low_confidence and a degenerate top, and the board ranked Missouri St.
     # #3 on it. The gate is the rating's own `meta.validated`; a fitted-but-
     # unvalidated file must archive as BLEND, exactly as the board shows.
+    # ⚠ FIVE STATES SINCE 2026-09-02 ("Lehigh #3"): validated is not
+    # MATURE -- a validated fit whose median team sits below the blend's
+    # measured crossover k archives as BLEND, exactly as the board shows.
     states = [
-        ("a VALIDATED rating exists", {"rating": True, "validated": True,
-                                       "blend": True, "proj": True}, "live"),
+        ("a VALIDATED and MATURE rating exists",
+         {"rating": True, "validated": True, "gp": 20,
+          "blend": True, "proj": True}, "live"),
+        ("a validated fit still below the maturity gate",
+         {"rating": True, "validated": True, "gp": 4,
+          "blend": True, "proj": True}, "blend"),
         ("a fit exists but has not validated", {"rating": True,
                                                 "validated": False,
                                                 "blend": True, "proj": True},
@@ -230,8 +237,8 @@ def check_snapshot_and_board_agree_on_the_basis():
             if "rating_" in path:
                 return ({"meta": {"validated": have.get("validated", False)},
                          "teams": [{"team": "A", "composite_rank": 1,
-                                    "games_played": 4}]} if have["rating"]
-                        else None)
+                                    "games_played": have.get("gp", 4)}]}
+                        if have["rating"] else None)
             if "digby_top25_" in path:
                 return ({"all": [{"team": "A", "rank": 1, "matches": 2}],
                          "top": [], "also_receiving": []} if have["blend"]
