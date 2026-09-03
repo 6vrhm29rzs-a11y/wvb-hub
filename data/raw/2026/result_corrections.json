@@ -865,6 +865,35 @@
      "establishes": "Florida A&M won 3-0"
     }
    ]
+  },
+  "6627674": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "South Carolina St. won 3-0 (winner_team_id 45866, sets_won 3-0 home)",
+   "correct": {
+    "winner_team_id": "46074",
+    "away_sets": 3,
+    "home_sets": 0
+   },
+   "established": "Charleston So. won 3-0. The feed's OWN linescores say so (visitor takes 25-23, 25-9, 25-22) against its winner/sets fields; the feed's own LIVE scoreboard also showed Charleston So. 3-0 at final; and both schools' schedule exports agree: CSU 'W 3-0 vs South Carolina State', SC State 'L 0-3 vs Charleston Southern University'. Winner/sets fields inverted; linescores and box rows are CORRECT (box fits own rosters 1.00/0.94) -- no line replace, no box swap. Caught mid-build by the score-vs-lines reconciliation guard, 13th confirmed feed result error.",
+   "evidence": [
+    {
+     "url": "https://csusports.com/services/schedule_txt.ashx?schedule=465",
+     "kind": "school_site",
+     "school": "Charleston So.",
+     "retrieved": "2026-09-03T21:54:10Z",
+     "text": "published schedule row for 2026-09-03: 'Charleston So. W 3-0 vs South Carolina State'",
+     "establishes": "Charleston So. won 3-0"
+    },
+    {
+     "url": "https://scsuathletics.com/services/schedule_txt.ashx?schedule=320",
+     "kind": "school_site",
+     "school": "South Carolina St.",
+     "retrieved": "2026-09-03T21:54:10Z",
+     "text": "published schedule row for 2026-09-03: 'South Carolina St. L 0-3 vs Charleston Southern University'",
+     "establishes": "South Carolina St. lost 0-3"
+    }
+   ]
   }
  }
 }

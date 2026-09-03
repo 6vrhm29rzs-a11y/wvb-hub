@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-03T21:41:15Z",
+  "generated_at_utc": "2026-09-03T21:55:53Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 0,
    "expired": 2,
-   "anomalies": 61
+   "anomalies": 62
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -660,6 +660,19 @@
     }
    ],
    "points_per_set_missing": 2.045
+  },
+  {
+   "game_id": "6627609",
+   "team_id": "46692",
+   "team": "Akron",
+   "absent": [
+    {
+     "name": "Jessie Musselman",
+     "rate": 1.95,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.95
   },
   {
    "game_id": "6628216",
@@ -2083,16 +2096,17 @@
    ]
   },
   "Marshall": {
-   "gid": "6626101",
-   "d": "2026-08-29",
-   "appeared": 11,
+   "gid": "6626102",
+   "d": "2026-09-03",
+   "appeared": 10,
    "zero_action": [
     "Peyton Sasse",
     "Maci Gerboth",
     "Shae Pearson",
+    "Maya Hunt",
     "Lia Beverly",
     "Addison Saunders",
-    "Kylie Wong"
+    "Carys Kerr"
    ]
   },
   "Niagara": {
@@ -2141,16 +2155,15 @@
    ]
   },
   "Akron": {
-   "gid": "6627964",
-   "d": "2026-08-29",
-   "appeared": 11,
+   "gid": "6626102",
+   "d": "2026-09-03",
+   "appeared": 12,
    "zero_action": [
+    "Jessie Musselman",
     "Ruby Klusman",
     "Masa Prascevic",
-    "Lyndi Wolf",
     "Noelle Aprati",
-    "Taylor Donovan",
-    "Delaney Gash"
+    "Taylor Donovan"
    ]
   },
   "Morgan St.": {
