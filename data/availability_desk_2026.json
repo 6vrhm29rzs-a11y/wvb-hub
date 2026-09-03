@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-03T19:35:18Z",
+  "generated_at_utc": "2026-09-03T21:41:15Z",
   "counts": {
    "statuses": 3,
-   "incidents": 0,
+   "incidents": 1,
    "signals": 0,
    "expired": 2,
-   "anomalies": 60
+   "anomalies": 61
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -69,8 +69,56 @@
    "note": "The coach-reported SEASON OUTLOOK, attributed separately from the MRI report: Sports Illustrated / On SI (Paige Durrenberger, 2026-08-30), quoting Lincoln Arneal's report of Jerritt Elliott's statement. Not a Texas Athletics release."
   }
  ],
- "incidents": [],
+ "incidents": [
+  {
+   "team": "Nebraska",
+   "player": "Andi Jackson",
+   "kind": "beat_report",
+   "kind_label": "BEAT REPORT",
+   "quote": "Nebraska coach Dani Busboom Kelly said Andi Jackson's ankle injury isn't serious after the All-American left Wednesday's sweep at South Dakota State during the third set.",
+   "summary": "Left the South Dakota St. match in Set 3 with an ankle injury; coach says it isn't serious",
+   "url": "https://omaha.com/sports/huskers/volleyball/article_4540f813-e074-4c67-9843-36fae025bdaa.html",
+   "retrieved": "2026-09-03T21:41:15Z",
+   "effective": {
+    "from": "2026-09-02",
+    "to": null
+   },
+   "review_by": "2026-09-09",
+   "incident_date": "2026-09-02",
+   "claim": "match_incident",
+   "note": "Omaha World-Herald, published 2026-09-03, quoting coach Dani Busboom Kelly. Matches our own box: 3 sets, 22 recorded actions on 2026-09-02 (gid 6627694) -- she played into Set 3. 'Isn't serious' is the COACH'S claim, quoted; the desk asserts the incident, never a fitness prediction. Surfaced by Cody's question 2026-09-03 ('is andi jackson hurt?')."
+  }
+ ],
  "projection": [
+  {
+   "team": "Nebraska",
+   "player": "Andi Jackson",
+   "state": "incident",
+   "supports": [
+    {
+     "team": "Nebraska",
+     "player": "Andi Jackson",
+     "kind": "beat_report",
+     "kind_label": "BEAT REPORT",
+     "quote": "Nebraska coach Dani Busboom Kelly said Andi Jackson's ankle injury isn't serious after the All-American left Wednesday's sweep at South Dakota State during the third set.",
+     "summary": "Left the South Dakota St. match in Set 3 with an ankle injury; coach says it isn't serious",
+     "url": "https://omaha.com/sports/huskers/volleyball/article_4540f813-e074-4c67-9843-36fae025bdaa.html",
+     "retrieved": "2026-09-03T21:41:15Z",
+     "effective": {
+      "from": "2026-09-02",
+      "to": null
+     },
+     "review_by": "2026-09-09",
+     "incident_date": "2026-09-02",
+     "claim": "match_incident",
+     "note": "Omaha World-Herald, published 2026-09-03, quoting coach Dani Busboom Kelly. Matches our own box: 3 sets, 22 recorded actions on 2026-09-02 (gid 6627694) -- she played into Set 3. 'Isn't serious' is the COACH'S claim, quoted; the desk asserts the incident, never a fitness prediction. Surfaced by Cody's question 2026-09-03 ('is andi jackson hurt?')."
+    }
+   ],
+   "claim": "match_incident",
+   "incident_date": "2026-09-02",
+   "headline": "Left the South Dakota St. match in Set 3 with an ankle injury; coach says it isn't serious",
+   "n_supports": 1
+  },
   {
    "team": "Purdue",
    "player": "Kenna Wollard",
@@ -807,6 +855,19 @@
     }
    ],
    "points_per_set_missing": 1.5
+  },
+  {
+   "game_id": "6628283",
+   "team_id": "45866",
+   "team": "South Carolina St.",
+   "absent": [
+    {
+     "name": "Jessika Martinez",
+     "rate": 1.455,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.455
   },
   {
    "game_id": "6639844",
@@ -2610,13 +2671,15 @@
    "zero_action": []
   },
   "N.C. A&T": {
-   "gid": "6627292",
-   "d": "2026-08-30",
-   "appeared": 12,
+   "gid": "6627293",
+   "d": "2026-09-03",
+   "appeared": 10,
    "zero_action": [
     "Eden Eyassu",
     "Kamryn Jackson",
-    "Cam Scott"
+    "Cam Scott",
+    "Daja Warren",
+    "Madison Curry"
    ]
   },
   "Navy": {
@@ -2640,16 +2703,17 @@
    ]
   },
   "South Carolina St.": {
-   "gid": "6639569",
-   "d": "2026-08-28",
-   "appeared": 11,
+   "gid": "6627674",
+   "d": "2026-09-03",
+   "appeared": 10,
    "zero_action": [
-    "Jade Robinson",
-    "Carra Pierre-louis",
+    "Jessika Martinez",
     "Autumn Culbreath",
+    "Hedia Lewis",
     "Jayden Mathis",
     "Kiyla Mighty",
-    "Lael Valdez"
+    "Lael Valdez",
+    "De'oni Mcphearson"
    ]
   },
   "Mississippi Val.": {
@@ -3061,15 +3125,13 @@
    ]
   },
   "Northwestern": {
-   "gid": "6637640",
-   "d": "2026-08-30",
-   "appeared": 9,
+   "gid": "6626632",
+   "d": "2026-09-03",
+   "appeared": 11,
    "zero_action": [
     "Gabrielle Gerry",
     "Ava Pratt",
     "Cate Schnell",
-    "Clara Schramm",
-    "Kayla Kauffman",
     "Lily Wagner",
     "Kaitlyn Bodnar",
     "Simone Huarte"
@@ -3128,18 +3190,17 @@
    ]
   },
   "Duke": {
-   "gid": "6626124",
-   "d": "2026-08-29",
-   "appeared": 9,
+   "gid": "6626125",
+   "d": "2026-09-03",
+   "appeared": 10,
    "zero_action": [
     "Lauren Ingram",
+    "Alyce Donoghue",
     "Sara Lozano",
     "Riley Copenhaver",
-    "Charlotte Glass",
-    "Alyce Donoghue",
-    "Olivia Wayne",
+    "Grace Thrower",
     "Carlyle Johnson",
-    "Grace Thrower"
+    "Olivia Wayne"
    ]
   },
   "Central Conn. St.": {
@@ -3286,14 +3347,10 @@
    ]
   },
   "Charleston So.": {
-   "gid": "6626937",
-   "d": "2026-08-30",
-   "appeared": 13,
+   "gid": "6627674",
+   "d": "2026-09-03",
+   "appeared": 17,
    "zero_action": [
-    "Ola Matusiak",
-    "Laila Hilton",
-    "Emma Bednarek",
-    "Braelynn Brewington",
     "Ava Pitzer"
    ]
   },
@@ -3733,14 +3790,18 @@
    ]
   },
   "Alabama": {
-   "gid": "6640135",
-   "d": "2026-08-29",
-   "appeared": 14,
+   "gid": "6626632",
+   "d": "2026-09-03",
+   "appeared": 10,
    "zero_action": [
+    "Kyla Dunaway",
+    "Audrey Simpson",
     "Josie Imes",
+    "Ashby Daniel",
     "Tea Simic",
     "Ava Wallis",
-    "Erin Clark"
+    "Maggie Kyriakides",
+    "Maddie Snider"
    ]
   },
   "Samford": {
@@ -4013,13 +4074,13 @@
    "zero_action": []
   },
   "Louisiana Tech": {
-   "gid": "6639463",
-   "d": "2026-08-30",
-   "appeared": 12,
+   "gid": "6639464",
+   "d": "2026-09-03",
+   "appeared": 11,
    "zero_action": [
-    "Zari Gillispie",
-    "Abbi Sells",
-    "Grace Krohn"
+    "Megan Cooley",
+    "Anaya Hairston",
+    "Ryan Rusher"
    ]
   },
   "Iona": {
@@ -4039,9 +4100,9 @@
    ]
   },
   "Tulane": {
-   "gid": "6626195",
-   "d": "2026-08-30",
-   "appeared": 10,
+   "gid": "6626125",
+   "d": "2026-09-03",
+   "appeared": 9,
    "zero_action": [
     "Zoe Rachow",
     "Amelia Haggins",
@@ -4049,6 +4110,7 @@
     "Millie Burgess",
     "Ziya Sista",
     "Charlotte Strickland",
+    "Bellamy Parker",
     "Mariel St john"
    ]
   },
@@ -4292,13 +4354,11 @@
    ]
   },
   "Chicago St.": {
-   "gid": "6639571",
-   "d": "2026-08-30",
-   "appeared": 9,
+   "gid": "6639464",
+   "d": "2026-09-03",
+   "appeared": 11,
    "zero_action": [
-    "Hailee Collins",
-    "Skye Riley",
-    "Tenese Buttry"
+    "Rayon Thigpen"
    ]
   },
   "Washington St.": {
@@ -4737,17 +4797,15 @@
    ]
   },
   "Queens (NC)": {
-   "gid": "6627990",
-   "d": "2026-08-30",
-   "appeared": 11,
+   "gid": "6627293",
+   "d": "2026-09-03",
+   "appeared": 13,
    "zero_action": [
-    "Brooke Thuss",
-    "Grace Hargis",
-    "Tyler Peluso",
+    "Camryn Teasley",
     "Riley Ellison",
     "Josephine Seekford",
-    "Kyla Coffey",
-    "Lydia Chambers"
+    "Destiny Wiggins",
+    "Kyla Coffey"
    ]
   },
   "Quinnipiac": {
@@ -4991,6 +5049,32 @@
     "gid": "6628592",
     "ep": 1788055200,
     "sets": 1,
+    "state": "appeared"
+   }
+  ],
+  "Nebraska|Andi Jackson": [
+   {
+    "gid": "6640217",
+    "ep": 1787875200,
+    "sets": 2,
+    "state": "appeared"
+   },
+   {
+    "gid": "6628315",
+    "ep": 1788048000,
+    "sets": 3,
+    "state": "appeared"
+   },
+   {
+    "gid": "6628594",
+    "ep": 1788118200,
+    "sets": 3,
+    "state": "appeared"
+   },
+   {
+    "gid": "6627694",
+    "ep": 1788393600,
+    "sets": 3,
     "state": "appeared"
    }
   ],

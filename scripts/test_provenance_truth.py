@@ -244,9 +244,12 @@ def main():
     _hclosed = any((e.get("effective") or {}).get("to")
                    for e in _hev0 if e.get("claim") == "match_incident")
     if _hclosed:
-        check("artifact: Wollard a status; Heaney resolved -> no current "
-              "incident", "Kenna Wollard" in sts and incs == [],
-              (sts, incs))
+        # Heaney gone from current incidents; OTHER players' incidents
+        # (Andi Jackson's Sep 2 ankle, OWH-sourced) are legitimate
+        check("artifact: Wollard a status; Heaney resolved -> not in any "
+              "current list",
+              "Kenna Wollard" in sts and "Grace Heaney" not in incs
+              and "Grace Heaney" not in sts, (sts, incs))
     else:
         check("artifact: Wollard a status, Heaney the ONLY incident",
               "Kenna Wollard" in sts and incs == ["Grace Heaney"],
@@ -290,9 +293,12 @@ def main():
               "asserting participation, never fitness",
               any("participation fact, not a health claim"
                   in (e.get("resolution") or "") for e in _hev))
+        # incidents count follows the LIVE ledger, not a frozen zero --
+        # Andi Jackson's Sep 2 ankle incident (OWH, coach quote) is a
+        # legitimate current incident while Heaney's stays resolved
         check("artifact counts agree",
               art["meta"]["counts"]["statuses"] == len(sts)
-              and art["meta"]["counts"]["incidents"] == 0)
+              and art["meta"]["counts"]["incidents"] == len(incs))
     else:
         hean_art = [s for s in art["incidents"]
                     if s["player"] == "Grace Heaney"][0]
