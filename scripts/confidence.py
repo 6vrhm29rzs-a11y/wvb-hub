@@ -439,6 +439,8 @@ def build():
                                 "duplicate_candidates_%d.json" % SEASON),
                    "w"), indent=1)
     out = {"meta": {"season": SEASON, "source_tier": "DERIVED",
+                    "corpus_fingerprint": __import__("season_counts")
+                    .corpus_fingerprint(SEASON),
                     "generated_at_utc": datetime.datetime.utcnow().replace(
                         microsecond=0).isoformat() + "Z",
                     "counts": counts},

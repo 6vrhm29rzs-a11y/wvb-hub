@@ -174,7 +174,7 @@ def main():
     ms = matches()
     if len(ms) < MIN_MATCHES:
         # Write the refusal down, so the page can state it rather than guess.
-        json.dump({"meta": {"season": SEASON, "active": False,
+        json.dump({"meta": {"corpus_fingerprint": __import__("season_counts").corpus_fingerprint(SEASON), "season": SEASON, "active": False,
                             "matches": len(ms), "min_matches": MIN_MATCHES,
                             "why": ("a resume measures what a team has earned "
                                     "against the schedule it has played; with "
@@ -266,6 +266,8 @@ def main():
 
     doc = {
         "meta": {
+            "corpus_fingerprint":
+                __import__("season_counts").corpus_fingerprint(SEASON),
             "season": SEASON,
             "active": True,
             "min_matches": MIN_MATCHES,

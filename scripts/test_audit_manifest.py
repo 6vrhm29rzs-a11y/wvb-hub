@@ -115,6 +115,8 @@ def main():
           "AUDIT MANIFEST violated" in io.open(
               os.path.join(REPO, "scripts/build_hub.py"),
               encoding="utf-8").read())
+    if not check_generation_fingerprints():
+        FAILS.append("generation fingerprints diverge or gate missing")
     return finish()
 
 
@@ -127,6 +129,38 @@ def finish():
         return 1
     print("AUDIT MANIFEST INVARIANT HOLDS")
     return 0
+
+
+def check_generation_fingerprints():
+    """Architect #2 (2026-09-03): truth-bearing artifacts share ONE corpus
+    generation, and the build fails closed when they do not."""
+    import season_counts as SC
+    fp = SC.corpus_fingerprint(2026)
+    bad = []
+    for name, pth in (("digby", "data/digby_top25_2026.json"),
+                      ("resume", "data/resume_2026.json"),
+                      ("rating", "data/rating_2026.json"),
+                      ("confidence", "data/result_confidence_2026.json")):
+        full = os.path.join(REPO, pth)
+        if not os.path.exists(full):
+            continue
+        st = ((json.load(open(full)).get("meta") or {})
+              .get("corpus_fingerprint"))
+        if st is None:
+            bad.append("%s carries NO corpus_fingerprint stamp" % name)
+        elif st != fp:
+            bad.append("%s stamped %s vs corpus %s" % (name, st, fp))
+    if bad:
+        print("  FAIL generation fingerprints: %s" % "; ".join(bad))
+        return False
+    print("  ok   all truth-bearing artifacts stamp THIS corpus generation "
+          "(%s)" % fp)
+    src = open(os.path.join(REPO, "scripts", "build_hub.py")).read()
+    ok = ("corpus_fingerprint %s != build's %s" in src
+          and "_mm_fails.append" in src)
+    print(("  ok   " if ok else "  FAIL ") +
+          "the build gate fails closed on a mismatched stamp")
+    return ok
 
 
 if __name__ == "__main__":

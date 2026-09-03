@@ -172,6 +172,35 @@ def is_empty_final(g):
                 if l.get("home") is not None]
 
 
+def corpus_fingerprint(season=None):
+    # type: (Optional[int]) -> str
+    """One hash naming the counted corpus a derived artifact was built from.
+
+    sha256 over the sorted counted gids PLUS the corrections ledger bytes
+    (a correction changes what those gids mean). Producers stamp it;
+    the build's manifest gate fails closed when truth-bearing neighbours
+    carry different generations -- the architect plan's #2: a page whose
+    masthead, records and rankings come from different corpus generations
+    lies as a whole even when each number is individually valid."""
+    import hashlib
+    season = season or 2026
+    p = os.path.join(REPO, "data/raw/%d/games.jsonl" % season)
+    try:
+        from gamelog import load_games_jsonl
+        games = load_games_jsonl(p)
+    except (OSError, ValueError):
+        return "no-corpus"
+    cls = classify(games, season)
+    gids = sorted(g for g, v in cls.items() if v == "ok")
+    h = hashlib.sha256("\n".join(gids).encode())
+    cp = os.path.join(REPO, "data/raw/%d/result_corrections.json" % season)
+    try:
+        h.update(open(cp, "rb").read())
+    except OSError:
+        pass
+    return h.hexdigest()[:16]
+
+
 def rating_cutoff_epoch(now=None):
     # type: (Optional[datetime.datetime]) -> int
     """Start of TODAY in Pacific, as an epoch: the boundary for RATING

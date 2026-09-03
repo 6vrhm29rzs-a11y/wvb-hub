@@ -408,6 +408,8 @@ def main():
             # ⚠ THE SEASON THIS FILE DESCRIBES, not the season the weights were
             # first fitted on. This was the literal 2025, so the first
             # rating_2026.json shipped stamped "season": 2025.
+            "corpus_fingerprint":
+                __import__("season_counts").corpus_fingerprint(SEASON),
             "season": SEASON,
             "source_tier": "DERIVED",
             "primary_margin_metric": PRIMARY,

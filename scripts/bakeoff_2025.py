@@ -609,6 +609,8 @@ def main():
 
     payload = {
         "meta": {
+            "corpus_fingerprint":
+                __import__("season_counts").corpus_fingerprint(SEASON),
             "season": 2025, "source_tier": "DERIVED",
             "pre_registered_expectation": "hitting-efficiency differential and "
                                           "net points/set lead among box-score "

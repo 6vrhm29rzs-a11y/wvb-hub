@@ -411,6 +411,8 @@ def main():
                                 "projection until a schedule graph exists"),
             "teams_with_a_result": len(nmatch),
             "matches_counted": sum(nmatch.values()) // 2,
+            "corpus_fingerprint": __import__("season_counts")
+            .corpus_fingerprint(SEASON),
             "score_mean": round(_smu, 5),
             "score_sd": round(_ssd, 5),
             "score_scale_note": ("mean and SD across ALL %d teams, not just the "

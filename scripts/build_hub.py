@@ -3971,6 +3971,25 @@ def build():
             "%d -- a stale artifact from a different snapshot"
             % (_dg_meta["matches_counted"],
                _sc_totals["rating_eligible_through_yesterday"]))
+    # ── GENERATION FINGERPRINTS (architect #2, 2026-09-03): every
+    # truth-bearing artifact that stamps a corpus_fingerprint must carry
+    # THIS build's -- a stamp from another generation means the artifact
+    # was built from a different counted corpus and the page as a whole
+    # would lie even with each number individually valid. Absent stamps
+    # are tolerated (older artifacts); present ones must agree.
+    _fp = _SCC.corpus_fingerprint(SEASON)
+    for _an, _ap in (("digby", "data/digby_top25_%d.json" % SEASON),
+                     ("resume", "data/resume_%d.json" % SEASON),
+                     ("rating", "data/rating_%d.json" % SEASON),
+                     ("confidence",
+                      "data/result_confidence_%d.json" % SEASON)):
+        _am = ((load(_ap) or {}).get("meta") or {})
+        _st = _am.get("corpus_fingerprint")
+        if _st and _st != _fp:
+            _mm_fails.append(
+                "%s corpus_fingerprint %s != build's %s -- artifact from "
+                "another corpus generation; rerun the chain"
+                % (_an, _st, _fp))
     _rs_meta = (load("data/resume_%d.json" % SEASON) or {}).get("meta") or {}
     if _rs_meta.get("matches") is not None and \
             _rs_meta["matches"] != len(_cnt_d1):
