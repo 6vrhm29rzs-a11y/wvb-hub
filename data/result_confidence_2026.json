@@ -2,16 +2,16 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "corpus_fingerprint": "55b59bdb813d40ef",
-  "generated_at_utc": "2026-09-03T18:59:26Z",
+  "corpus_fingerprint": "b4863e092b39d809",
+  "generated_at_utc": "2026-09-03T19:16:04Z",
   "counts": {
-   "finals": 531,
+   "finals": 532,
    "official_only": 10,
-   "reconciled": 502,
+   "reconciled": 503,
    "confirmed": 0,
-   "disputed": 3,
-   "pending_second": 528,
-   "corrected": 16,
+   "disputed": 2,
+   "pending_second": 530,
+   "corrected": 17,
    "duplicate_listings": 2,
    "duplicate_candidates_pending": 0
   }
@@ -7305,11 +7305,28 @@
    "sources": []
   },
   {
-   "result_corrected": null,
-   "corr_reason": null,
-   "corr_kind": null,
-   "corr_feed_said": null,
-   "corr_evidence": [],
+   "result_corrected": true,
+   "corr_reason": "Florida A&M won 3-0 -- the feed's entire team attribution is inverted (the SMU-UC Davis class; flagged by the attribution-suspicion detector, then UMES's own site reported the loss). Both schools' legacy schedule exports agree, same date and neutral site (Aug 29, Huntsville AL): UMES 'L 0-3 vs Florida A&M University', FAMU 'W 3-0 vs Maryland Eastern Shore'. Twelfth confirmed inversion; nominal-home-not-host again.",
+   "corr_kind": "contradicted",
+   "corr_feed_said": "UMES won 3-0 (winner_team_id 46563) with the box rows attributed the same way",
+   "corr_evidence": [
+    {
+     "school": "UMES",
+     "url": "https://easternshorehawks.com/services/schedule_txt.ashx?schedule=1306",
+     "text": "'Aug 29 (Sat) | 12:00 PM | Neutral | Florida A&M University | Huntsville, AL | L 0-3'",
+     "status": null,
+     "note": null,
+     "retrieved": "2026-09-03"
+    },
+    {
+     "school": "Florida A&M",
+     "url": "https://famuathletics.com/services/schedule_txt.ashx?schedule=214",
+     "text": "'Aug 29 (Sat) | 1:00 PM | Neutral | Maryland Eastern Shore | Huntsville, AL | W 3-0'",
+     "status": null,
+     "note": null,
+     "retrieved": "2026-09-03"
+    }
+   ],
    "duplicate_of": null,
    "dup_reason": null,
    "dup_asym": null,
@@ -7319,10 +7336,10 @@
    "h": "UMES",
    "exh": false,
    "d": "2026-08-29",
-   "overall": "disputed",
+   "overall": "corrected",
    "states": {
-    "result": "disputed",
-    "sets": "reconciled",
+    "result": "corrected",
+    "sets": "corrected",
     "box": "reconciled",
     "venue": "official"
    },
@@ -17193,6 +17210,34 @@
     "sets": "reconciled",
     "box": "reconciled",
     "venue": "official"
+   },
+   "verify": null,
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6624723",
+   "a": "Milwaukee",
+   "h": "UIC",
+   "exh": false,
+   "d": "2026-09-03",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "unavailable"
    },
    "verify": null,
    "n_indep": 0,

@@ -814,6 +814,57 @@
      "establishes": "North Dakota L 0-3 vs Eastern Washington"
     }
    ]
+  },
+  "6639598": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "UMES won 3-0 (winner_team_id 46563) with the box rows attributed the same way",
+   "correct": {
+    "winner_team_id": "46412",
+    "away_sets": 3,
+    "home_sets": 0,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 25,
+      "home": 18
+     },
+     {
+      "period": 2,
+      "visit": 25,
+      "home": 22
+     },
+     {
+      "period": 3,
+      "visit": 25,
+      "home": 19
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46563": "46412",
+     "46412": "46563"
+    }
+   },
+   "established": "Florida A&M won 3-0 -- the feed's entire team attribution is inverted (the SMU-UC Davis class; flagged by the attribution-suspicion detector, then UMES's own site reported the loss). Both schools' legacy schedule exports agree, same date and neutral site (Aug 29, Huntsville AL): UMES 'L 0-3 vs Florida A&M University', FAMU 'W 3-0 vs Maryland Eastern Shore'. Twelfth confirmed inversion; nominal-home-not-host again.",
+   "evidence": [
+    {
+     "url": "https://easternshorehawks.com/services/schedule_txt.ashx?schedule=1306",
+     "kind": "school_site",
+     "school": "UMES",
+     "retrieved": "2026-09-03T19:14:27Z",
+     "text": "'Aug 29 (Sat) | 12:00 PM | Neutral | Florida A&M University | Huntsville, AL | L 0-3'",
+     "establishes": "UMES lost 0-3"
+    },
+    {
+     "url": "https://famuathletics.com/services/schedule_txt.ashx?schedule=214",
+     "kind": "school_site",
+     "school": "Florida A&M",
+     "retrieved": "2026-09-03T19:14:27Z",
+     "text": "'Aug 29 (Sat) | 1:00 PM | Neutral | Maryland Eastern Shore | Huntsville, AL | W 3-0'",
+     "establishes": "Florida A&M won 3-0"
+    }
+   ]
   }
  }
 }

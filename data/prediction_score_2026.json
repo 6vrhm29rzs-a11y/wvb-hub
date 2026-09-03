@@ -2,15 +2,15 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 496,
+  "scored": 497,
   "logged_after_tipoff_excluded": 8,
   "team_mismatch_excluded": 16,
   "predictions_on_record": 4773,
-  "results_available": 531,
-  "brier": 0.1813,
+  "results_available": 532,
+  "brier": 0.1827,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
   "favourite_correct": 361,
-  "favourite_correct_pct": 72.8
+  "favourite_correct_pct": 72.6
  },
  "calibration": [
   {
@@ -39,9 +39,9 @@
   },
   {
    "range": "90-101%",
-   "n": 155,
+   "n": 156,
    "said": 95.3,
-   "happened": 90.3
+   "happened": 89.7
   }
  ],
  "matches": [
@@ -161,6 +161,15 @@
    "p_home": 0.0776,
    "home_won": true,
    "brier": 0.85082176
+  },
+  {
+   "game_id": "6624723",
+   "date": "2026-09-03",
+   "away": "Milwaukee",
+   "home": "UIC",
+   "p_home": 0.9222,
+   "home_won": false,
+   "brier": 0.85045284
   },
   {
    "game_id": "6625787",
@@ -485,15 +494,6 @@
    "p_home": 0.7625,
    "home_won": false,
    "brier": 0.5814062499999999
-  },
-  {
-   "game_id": "6625710",
-   "date": "2026-08-30",
-   "away": "South Dakota",
-   "home": "DePaul",
-   "p_home": 0.24,
-   "home_won": true,
-   "brier": 0.5776
   }
  ]
 }

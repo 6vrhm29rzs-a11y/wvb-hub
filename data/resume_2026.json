@@ -1,6 +1,6 @@
 {
  "meta": {
-  "corpus_fingerprint": "55b59bdb813d40ef",
+  "corpus_fingerprint": "b4863e092b39d809",
   "season": 2026,
   "active": true,
   "min_matches": 200,
@@ -19,15 +19,15 @@
   "circularity_caveat": "the committee looks at RPI, so predicting the committee with RPI is partly circular. It is still the best defensible answer: the committee's choices are the only ground truth for who had earned it.",
   "not_a_power_rating": "POWER answers who would win tomorrow and is driven by margin. This answers who has earned a bid. R3 keeps them apart.",
   "strength_basis": "live",
-  "fitted_beta": 4.3447,
-  "fitted_home_logit": -0.1395,
+  "fitted_beta": 4.3346,
+  "fitted_home_logit": -0.1628,
   "bubble_rank_band": [
    62,
    66
   ],
-  "bubble_strength_z": 0.9056,
+  "bubble_strength_z": 0.895,
   "teams": 339,
-  "matches": 510
+  "matches": 512
  },
  "teams": [
   {
@@ -46,10 +46,10 @@
    "wins": 2,
    "losses": 0,
    "matches": 2,
-   "bubble_expected_wins": 1.436,
-   "wab": 0.564,
+   "bubble_expected_wins": 1.433,
+   "wab": 0.567,
    "rpi": 0.76041667,
-   "wab_rank": 19,
+   "wab_rank": 20,
    "rank": 2
   },
   {
@@ -57,10 +57,10 @@
    "wins": 2,
    "losses": 0,
    "matches": 2,
-   "bubble_expected_wins": 1.913,
-   "wab": 0.087,
+   "bubble_expected_wins": 1.911,
+   "wab": 0.089,
    "rpi": 0.75,
-   "wab_rank": 52,
+   "wab_rank": 53,
    "rank": 3
   },
   {
@@ -68,10 +68,10 @@
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.152,
-   "wab": -0.152,
+   "bubble_expected_wins": 2.136,
+   "wab": -0.136,
    "rpi": 0.72222222,
-   "wab_rank": 101,
+   "wab_rank": 100,
    "rank": 4
   },
   {
@@ -79,43 +79,43 @@
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.496,
-   "wab": 0.504,
+   "bubble_expected_wins": 2.398,
+   "wab": 0.602,
    "rpi": 0.71296296,
-   "wab_rank": 22,
+   "wab_rank": 19,
    "rank": 5
-  },
-  {
-   "team": "North Ala.",
-   "wins": 4,
-   "losses": 0,
-   "matches": 4,
-   "bubble_expected_wins": 2.929,
-   "wab": 1.071,
-   "rpi": 0.70572917,
-   "wab_rank": 6,
-   "rank": 6
   },
   {
    "team": "North Carolina",
    "wins": 2,
    "losses": 0,
    "matches": 2,
-   "bubble_expected_wins": 1.515,
-   "wab": 0.485,
+   "bubble_expected_wins": 1.511,
+   "wab": 0.489,
    "rpi": 0.703125,
    "wab_rank": 23,
-   "rank": 7
+   "rank": 6
   },
   {
    "team": "Pittsburgh",
    "wins": 4,
    "losses": 0,
    "matches": 4,
-   "bubble_expected_wins": 0.431,
-   "wab": 3.569,
+   "bubble_expected_wins": 0.432,
+   "wab": 3.568,
    "rpi": 0.70104167,
    "wab_rank": 1,
+   "rank": 7
+  },
+  {
+   "team": "North Ala.",
+   "wins": 4,
+   "losses": 0,
+   "matches": 4,
+   "bubble_expected_wins": 3.339,
+   "wab": 0.661,
+   "rpi": 0.69791667,
+   "wab_rank": 14,
    "rank": 8
   },
   {
@@ -123,8 +123,8 @@
    "wins": 2,
    "losses": 3,
    "matches": 5,
-   "bubble_expected_wins": 0.563,
-   "wab": 1.437,
+   "bubble_expected_wins": 0.547,
+   "wab": 1.453,
    "rpi": 0.69770833,
    "wab_rank": 3,
    "rank": 9
@@ -134,8 +134,8 @@
    "wins": 3,
    "losses": 1,
    "matches": 4,
-   "bubble_expected_wins": 2.774,
-   "wab": 0.226,
+   "bubble_expected_wins": 2.759,
+   "wab": 0.241,
    "rpi": 0.69603175,
    "wab_rank": 31,
    "rank": 10
@@ -145,10 +145,10 @@
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.191,
-   "wab": 0.809,
+   "bubble_expected_wins": 2.17,
+   "wab": 0.83,
    "rpi": 0.69444444,
-   "wab_rank": 9,
+   "wab_rank": 8,
    "rank": 11
   },
   {
@@ -156,21 +156,21 @@
    "wins": 4,
    "losses": 0,
    "matches": 4,
-   "bubble_expected_wins": 3.27,
-   "wab": 0.73,
+   "bubble_expected_wins": 3.241,
+   "wab": 0.759,
    "rpi": 0.68958333,
-   "wab_rank": 13,
+   "wab_rank": 11,
    "rank": 12
   },
   {
-   "team": "Alabama A&M",
-   "wins": 3,
-   "losses": 1,
+   "team": "DePaul",
+   "wins": 4,
+   "losses": 0,
    "matches": 4,
-   "bubble_expected_wins": 3.026,
-   "wab": -0.026,
+   "bubble_expected_wins": 3.614,
+   "wab": 0.386,
    "rpi": 0.68315972,
-   "wab_rank": 88,
+   "wab_rank": 25,
    "rank": 13
   },
   {
@@ -178,10 +178,10 @@
    "wins": 4,
    "losses": 0,
    "matches": 4,
-   "bubble_expected_wins": 2.989,
-   "wab": 1.011,
+   "bubble_expected_wins": 2.966,
+   "wab": 1.034,
    "rpi": 0.67317708,
-   "wab_rank": 7,
+   "wab_rank": 6,
    "rank": 14
   },
   {
@@ -189,10 +189,10 @@
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.259,
-   "wab": 0.741,
+   "bubble_expected_wins": 2.228,
+   "wab": 0.772,
    "rpi": 0.67013889,
-   "wab_rank": 11,
+   "wab_rank": 10,
    "rank": 15
   },
   {
@@ -200,8 +200,8 @@
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.757,
-   "wab": 0.243,
+   "bubble_expected_wins": 2.752,
+   "wab": 0.248,
    "rpi": 0.66319444,
    "wab_rank": 29,
    "rank": 16
@@ -211,10 +211,10 @@
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.81,
-   "wab": 0.19,
+   "bubble_expected_wins": 2.766,
+   "wab": 0.234,
    "rpi": 0.66319444,
-   "wab_rank": 35,
+   "wab_rank": 32,
    "rank": 17
   },
   {
@@ -222,10 +222,10 @@
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.462,
-   "wab": 0.538,
+   "bubble_expected_wins": 2.458,
+   "wab": 0.542,
    "rpi": 0.65972222,
-   "wab_rank": 20,
+   "wab_rank": 21,
    "rank": 18
   },
   {
@@ -233,10 +233,10 @@
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.868,
-   "wab": -0.868,
+   "bubble_expected_wins": 2.858,
+   "wab": -0.858,
    "rpi": 0.65972222,
-   "wab_rank": 184,
+   "wab_rank": 183,
    "rank": 19
   },
   {
@@ -244,8 +244,8 @@
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.598,
-   "wab": 0.402,
+   "bubble_expected_wins": 2.584,
+   "wab": 0.416,
    "rpi": 0.65740741,
    "wab_rank": 24,
    "rank": 20
@@ -255,8 +255,8 @@
    "wins": 4,
    "losses": 0,
    "matches": 4,
-   "bubble_expected_wins": 3.364,
-   "wab": 0.636,
+   "bubble_expected_wins": 3.354,
+   "wab": 0.646,
    "rpi": 0.65104167,
    "wab_rank": 16,
    "rank": 21
@@ -266,10 +266,10 @@
    "wins": 3,
    "losses": 1,
    "matches": 4,
-   "bubble_expected_wins": 2.782,
-   "wab": 0.218,
+   "bubble_expected_wins": 2.778,
+   "wab": 0.222,
    "rpi": 0.65104167,
-   "wab_rank": 32,
+   "wab_rank": 33,
    "rank": 22
   },
   {
@@ -277,10 +277,10 @@
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.039,
-   "wab": 0.961,
+   "bubble_expected_wins": 2.024,
+   "wab": 0.976,
    "rpi": 0.64930556,
-   "wab_rank": 8,
+   "wab_rank": 7,
    "rank": 23
   },
   {
@@ -288,10 +288,10 @@
    "wins": 1,
    "losses": 1,
    "matches": 2,
-   "bubble_expected_wins": 1.26,
-   "wab": -0.26,
+   "bubble_expected_wins": 1.241,
+   "wab": -0.241,
    "rpi": 0.64583333,
-   "wab_rank": 108,
+   "wab_rank": 107,
    "rank": 24
   },
   {
@@ -299,8 +299,8 @@
    "wins": 4,
    "losses": 1,
    "matches": 5,
-   "bubble_expected_wins": 2.832,
-   "wab": 1.168,
+   "bubble_expected_wins": 2.823,
+   "wab": 1.177,
    "rpi": 0.64333333,
    "wab_rank": 5,
    "rank": 25
@@ -310,10 +310,10 @@
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.037,
-   "wab": -0.037,
+   "bubble_expected_wins": 2.005,
+   "wab": -0.005,
    "rpi": 0.63888889,
-   "wab_rank": 93,
+   "wab_rank": 83,
    "rank": 26
   },
   {
@@ -321,10 +321,10 @@
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.769,
-   "wab": -0.769,
+   "bubble_expected_wins": 2.762,
+   "wab": -0.762,
    "rpi": 0.63888889,
-   "wab_rank": 167,
+   "wab_rank": 166,
    "rank": 27
   },
   {
@@ -332,10 +332,10 @@
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.622,
-   "wab": 0.378,
+   "bubble_expected_wins": 2.619,
+   "wab": 0.381,
    "rpi": 0.63773148,
-   "wab_rank": 25,
+   "wab_rank": 26,
    "rank": 28
   },
   {
@@ -343,33 +343,22 @@
    "wins": 3,
    "losses": 2,
    "matches": 5,
-   "bubble_expected_wins": 3.335,
-   "wab": -0.335,
+   "bubble_expected_wins": 3.298,
+   "wab": -0.298,
    "rpi": 0.63611111,
-   "wab_rank": 121,
+   "wab_rank": 115,
    "rank": 29
-  },
-  {
-   "team": "DePaul",
-   "wins": 4,
-   "losses": 0,
-   "matches": 4,
-   "bubble_expected_wins": 3.628,
-   "wab": 0.372,
-   "rpi": 0.63541667,
-   "wab_rank": 26,
-   "rank": 30
   },
   {
    "team": "Texas St.",
    "wins": 1,
    "losses": 1,
    "matches": 2,
-   "bubble_expected_wins": 0.998,
-   "wab": 0.002,
+   "bubble_expected_wins": 0.997,
+   "wab": 0.003,
    "rpi": 0.63541667,
-   "wab_rank": 77,
-   "rank": 31
+   "wab_rank": 79,
+   "rank": 30
   },
   {
    "team": "Oral Roberts",
@@ -379,272 +368,272 @@
    "bubble_expected_wins": 2.997,
    "wab": 0.003,
    "rpi": 0.63125,
-   "wab_rank": 76,
-   "rank": 32
+   "wab_rank": 78,
+   "rank": 31
   },
   {
    "team": "Indiana",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.062,
-   "wab": -0.062,
+   "bubble_expected_wins": 2.061,
+   "wab": -0.061,
    "rpi": 0.63070437,
    "wab_rank": 98,
-   "rank": 33
+   "rank": 32
   },
   {
    "team": "Duquesne",
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.868,
-   "wab": 0.132,
+   "bubble_expected_wins": 2.866,
+   "wab": 0.134,
    "rpi": 0.62847222,
    "wab_rank": 44,
-   "rank": 34
+   "rank": 33
   },
   {
    "team": "Southern Miss.",
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.789,
-   "wab": 0.211,
+   "bubble_expected_wins": 2.787,
+   "wab": 0.213,
    "rpi": 0.625,
-   "wab_rank": 33,
-   "rank": 35
+   "wab_rank": 34,
+   "rank": 34
   },
   {
    "team": "Valparaiso",
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.838,
-   "wab": 0.162,
+   "bubble_expected_wins": 2.836,
+   "wab": 0.164,
    "rpi": 0.625,
-   "wab_rank": 37,
-   "rank": 36
+   "wab_rank": 38,
+   "rank": 35
   },
   {
    "team": "Baylor",
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.843,
-   "wab": 0.157,
+   "bubble_expected_wins": 2.841,
+   "wab": 0.159,
    "rpi": 0.625,
-   "wab_rank": 38,
-   "rank": 37
+   "wab_rank": 39,
+   "rank": 36
   },
   {
    "team": "UC San Diego",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 1.846,
-   "wab": 0.154,
+   "bubble_expected_wins": 1.844,
+   "wab": 0.156,
    "rpi": 0.625,
-   "wab_rank": 39,
-   "rank": 38
+   "wab_rank": 40,
+   "rank": 37
   },
   {
    "team": "Utah",
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.86,
-   "wab": 0.14,
+   "bubble_expected_wins": 2.852,
+   "wab": 0.148,
    "rpi": 0.625,
    "wab_rank": 41,
-   "rank": 39
+   "rank": 38
   },
   {
    "team": "Eastern Mich.",
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.866,
-   "wab": 0.134,
+   "bubble_expected_wins": 2.864,
+   "wab": 0.136,
    "rpi": 0.625,
    "wab_rank": 43,
-   "rank": 40
+   "rank": 39
   },
   {
    "team": "Ohio",
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.87,
-   "wab": 0.13,
+   "bubble_expected_wins": 2.868,
+   "wab": 0.132,
    "rpi": 0.625,
    "wab_rank": 45,
-   "rank": 41
+   "rank": 40
   },
   {
    "team": "Washington",
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.881,
-   "wab": 0.119,
+   "bubble_expected_wins": 2.874,
+   "wab": 0.126,
    "rpi": 0.625,
    "wab_rank": 46,
-   "rank": 42
+   "rank": 41
   },
   {
    "team": "Penn St.",
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.883,
-   "wab": 0.117,
+   "bubble_expected_wins": 2.875,
+   "wab": 0.125,
    "rpi": 0.625,
    "wab_rank": 47,
-   "rank": 43
+   "rank": 42
   },
   {
    "team": "Georgia Tech",
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.894,
-   "wab": 0.106,
+   "bubble_expected_wins": 2.892,
+   "wab": 0.108,
    "rpi": 0.625,
    "wab_rank": 48,
-   "rank": 44
+   "rank": 43
   },
   {
    "team": "Colorado",
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.901,
-   "wab": 0.099,
+   "bubble_expected_wins": 2.894,
+   "wab": 0.106,
    "rpi": 0.625,
    "wab_rank": 49,
-   "rank": 45
+   "rank": 44
   },
   {
    "team": "Eastern Wash.",
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.911,
-   "wab": 0.089,
+   "bubble_expected_wins": 2.908,
+   "wab": 0.092,
    "rpi": 0.625,
    "wab_rank": 51,
-   "rank": 46
+   "rank": 45
   },
   {
    "team": "Western Mich.",
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.913,
-   "wab": 0.087,
+   "bubble_expected_wins": 2.908,
+   "wab": 0.092,
    "rpi": 0.625,
-   "wab_rank": 53,
-   "rank": 47
+   "wab_rank": 52,
+   "rank": 46
   },
   {
    "team": "Iowa",
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.926,
-   "wab": 0.074,
+   "bubble_expected_wins": 2.924,
+   "wab": 0.076,
    "rpi": 0.625,
    "wab_rank": 54,
-   "rank": 48
+   "rank": 47
   },
   {
    "team": "Montana St.",
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.933,
-   "wab": 0.067,
+   "bubble_expected_wins": 2.931,
+   "wab": 0.069,
    "rpi": 0.625,
    "wab_rank": 57,
-   "rank": 49
+   "rank": 48
   },
   {
    "team": "Little Rock",
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.936,
-   "wab": 0.064,
+   "bubble_expected_wins": 2.934,
+   "wab": 0.066,
    "rpi": 0.625,
-   "wab_rank": 58,
-   "rank": 50
+   "wab_rank": 59,
+   "rank": 49
   },
   {
    "team": "North Dakota St.",
    "wins": 2,
    "losses": 0,
    "matches": 2,
-   "bubble_expected_wins": 1.948,
-   "wab": 0.052,
+   "bubble_expected_wins": 1.947,
+   "wab": 0.053,
    "rpi": 0.625,
    "wab_rank": 60,
-   "rank": 51
+   "rank": 50
   },
   {
    "team": "UMBC",
    "wins": 2,
    "losses": 0,
    "matches": 2,
-   "bubble_expected_wins": 1.956,
-   "wab": 0.044,
+   "bubble_expected_wins": 1.955,
+   "wab": 0.045,
    "rpi": 0.625,
    "wab_rank": 62,
-   "rank": 52
+   "rank": 51
   },
   {
    "team": "Duke",
    "wins": 2,
    "losses": 0,
    "matches": 2,
-   "bubble_expected_wins": 1.968,
-   "wab": 0.032,
+   "bubble_expected_wins": 1.967,
+   "wab": 0.033,
    "rpi": 0.625,
    "wab_rank": 64,
-   "rank": 53
+   "rank": 52
   },
   {
    "team": "Wyoming",
    "wins": 2,
    "losses": 0,
    "matches": 2,
-   "bubble_expected_wins": 1.976,
-   "wab": 0.024,
+   "bubble_expected_wins": 1.974,
+   "wab": 0.026,
    "rpi": 0.625,
-   "wab_rank": 66,
-   "rank": 54
+   "wab_rank": 67,
+   "rank": 53
   },
   {
    "team": "Kansas St.",
    "wins": 2,
    "losses": 0,
    "matches": 2,
-   "bubble_expected_wins": 1.981,
-   "wab": 0.019,
+   "bubble_expected_wins": 1.979,
+   "wab": 0.021,
    "rpi": 0.625,
    "wab_rank": 68,
-   "rank": 55
+   "rank": 54
   },
   {
    "team": "Alabama",
    "wins": 2,
    "losses": 0,
    "matches": 2,
-   "bubble_expected_wins": 1.989,
-   "wab": 0.011,
+   "bubble_expected_wins": 1.988,
+   "wab": 0.012,
    "rpi": 0.625,
-   "wab_rank": 71,
-   "rank": 56
+   "wab_rank": 74,
+   "rank": 55
   },
   {
    "team": "Tennessee",
@@ -654,18 +643,29 @@
    "bubble_expected_wins": 3.999,
    "wab": 0.001,
    "rpi": 0.625,
-   "wab_rank": 78,
-   "rank": 57
+   "wab_rank": 80,
+   "rank": 56
   },
   {
    "team": "Missouri",
    "wins": 3,
    "losses": 1,
    "matches": 4,
-   "bubble_expected_wins": 2.994,
-   "wab": 0.006,
+   "bubble_expected_wins": 2.993,
+   "wab": 0.007,
    "rpi": 0.62152778,
-   "wab_rank": 72,
+   "wab_rank": 75,
+   "rank": 57
+  },
+  {
+   "team": "Alabama A&M",
+   "wins": 3,
+   "losses": 1,
+   "matches": 4,
+   "bubble_expected_wins": 3.01,
+   "wab": -0.01,
+   "rpi": 0.62152778,
+   "wab_rank": 86,
    "rank": 58
   },
   {
@@ -684,8 +684,8 @@
    "wins": 1,
    "losses": 1,
    "matches": 2,
-   "bubble_expected_wins": 1.365,
-   "wab": -0.365,
+   "bubble_expected_wins": 1.364,
+   "wab": -0.364,
    "rpi": 0.61805556,
    "wab_rank": 126,
    "rank": 60
@@ -695,10 +695,10 @@
    "wins": 2,
    "losses": 2,
    "matches": 4,
-   "bubble_expected_wins": 2.854,
-   "wab": -0.854,
+   "bubble_expected_wins": 2.836,
+   "wab": -0.836,
    "rpi": 0.6171875,
-   "wab_rank": 181,
+   "wab_rank": 177,
    "rank": 61
   },
   {
@@ -706,10 +706,10 @@
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 1.195,
-   "wab": 0.805,
+   "bubble_expected_wins": 1.196,
+   "wab": 0.804,
    "rpi": 0.61574074,
-   "wab_rank": 10,
+   "wab_rank": 9,
    "rank": 62
   },
   {
@@ -717,8 +717,8 @@
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 1.267,
-   "wab": 0.733,
+   "bubble_expected_wins": 1.253,
+   "wab": 0.747,
    "rpi": 0.61574074,
    "wab_rank": 12,
    "rank": 63
@@ -728,10 +728,10 @@
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 1.312,
-   "wab": 0.688,
+   "bubble_expected_wins": 1.302,
+   "wab": 0.698,
    "rpi": 0.61574074,
-   "wab_rank": 14,
+   "wab_rank": 13,
    "rank": 64
   },
   {
@@ -739,8 +739,8 @@
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.93,
-   "wab": 0.07,
+   "bubble_expected_wins": 2.925,
+   "wab": 0.075,
    "rpi": 0.61458333,
    "wab_rank": 55,
    "rank": 65
@@ -750,10 +750,10 @@
    "wins": 3,
    "losses": 1,
    "matches": 4,
-   "bubble_expected_wins": 3.642,
-   "wab": -0.642,
+   "bubble_expected_wins": 3.638,
+   "wab": -0.638,
    "rpi": 0.6140873,
-   "wab_rank": 151,
+   "wab_rank": 152,
    "rank": 66
   },
   {
@@ -772,8 +772,8 @@
    "wins": 4,
    "losses": 0,
    "matches": 4,
-   "bubble_expected_wins": 3.767,
-   "wab": 0.233,
+   "bubble_expected_wins": 3.755,
+   "wab": 0.245,
    "rpi": 0.61197917,
    "wab_rank": 30,
    "rank": 68
@@ -783,10 +783,10 @@
    "wins": 1,
    "losses": 1,
    "matches": 2,
-   "bubble_expected_wins": 1.803,
-   "wab": -0.803,
+   "bubble_expected_wins": 1.797,
+   "wab": -0.797,
    "rpi": 0.61111111,
-   "wab_rank": 171,
+   "wab_rank": 168,
    "rank": 69
   },
   {
@@ -794,10 +794,10 @@
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.003,
-   "wab": -0.003,
+   "bubble_expected_wins": 2.002,
+   "wab": -0.002,
    "rpi": 0.60648148,
-   "wab_rank": 81,
+   "wab_rank": 82,
    "rank": 70
   },
   {
@@ -805,8 +805,8 @@
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.41,
-   "wab": 0.59,
+   "bubble_expected_wins": 2.395,
+   "wab": 0.605,
    "rpi": 0.60347222,
    "wab_rank": 18,
    "rank": 71
@@ -816,8 +816,8 @@
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.816,
-   "wab": 0.184,
+   "bubble_expected_wins": 2.806,
+   "wab": 0.194,
    "rpi": 0.60300926,
    "wab_rank": 36,
    "rank": 72
@@ -827,77 +827,88 @@
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.908,
-   "wab": 0.092,
+   "bubble_expected_wins": 2.906,
+   "wab": 0.094,
    "rpi": 0.60300926,
    "wab_rank": 50,
    "rank": 73
+  },
+  {
+   "team": "South Dakota",
+   "wins": 2,
+   "losses": 1,
+   "matches": 3,
+   "bubble_expected_wins": 2.202,
+   "wab": -0.202,
+   "rpi": 0.60300926,
+   "wab_rank": 103,
+   "rank": 74
   },
   {
    "team": "New Hampshire",
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.861,
-   "wab": 0.139,
+   "bubble_expected_wins": 2.824,
+   "wab": 0.176,
    "rpi": 0.59953704,
-   "wab_rank": 42,
-   "rank": 74
+   "wab_rank": 37,
+   "rank": 75
   },
   {
    "team": "Purdue",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.696,
-   "wab": -0.696,
+   "bubble_expected_wins": 2.689,
+   "wab": -0.689,
    "rpi": 0.59656085,
-   "wab_rank": 159,
-   "rank": 75
+   "wab_rank": 156,
+   "rank": 76
   },
   {
    "team": "USC Upstate",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.648,
-   "wab": -0.648,
+   "bubble_expected_wins": 2.634,
+   "wab": -0.634,
    "rpi": 0.59490741,
-   "wab_rank": 153,
-   "rank": 76
+   "wab_rank": 151,
+   "rank": 77
   },
   {
    "team": "Kansas",
    "wins": 0,
    "losses": 2,
    "matches": 2,
-   "bubble_expected_wins": 0.031,
-   "wab": -0.031,
+   "bubble_expected_wins": 0.032,
+   "wab": -0.032,
    "rpi": 0.59375,
-   "wab_rank": 91,
-   "rank": 77
+   "wab_rank": 92,
+   "rank": 78
   },
   {
    "team": "Ole Miss",
    "wins": 3,
    "losses": 1,
    "matches": 4,
-   "bubble_expected_wins": 3.081,
-   "wab": -0.081,
+   "bubble_expected_wins": 3.066,
+   "wab": -0.066,
    "rpi": 0.59288194,
    "wab_rank": 99,
-   "rank": 78
+   "rank": 79
   },
   {
    "team": "UCF",
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.722,
-   "wab": 0.278,
+   "bubble_expected_wins": 2.711,
+   "wab": 0.289,
    "rpi": 0.59259259,
    "wab_rank": 28,
-   "rank": 79
+   "rank": 80
   },
   {
    "team": "Maryland",
@@ -907,30 +918,30 @@
    "bubble_expected_wins": 2.03,
    "wab": -0.03,
    "rpi": 0.59131944,
-   "wab_rank": 89,
-   "rank": 80
+   "wab_rank": 90,
+   "rank": 81
   },
   {
    "team": "Dayton",
    "wins": 3,
    "losses": 1,
    "matches": 4,
-   "bubble_expected_wins": 3.053,
-   "wab": -0.053,
+   "bubble_expected_wins": 3.049,
+   "wab": -0.049,
    "rpi": 0.59071181,
    "wab_rank": 97,
-   "rank": 81
+   "rank": 82
   },
   {
    "team": "TCU",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.004,
-   "wab": -0.004,
+   "bubble_expected_wins": 1.987,
+   "wab": 0.013,
    "rpi": 0.58958333,
-   "wab_rank": 82,
-   "rank": 82
+   "wab_rank": 73,
+   "rank": 83
   },
   {
    "team": "East Carolina",
@@ -940,184 +951,184 @@
    "bubble_expected_wins": 2.997,
    "wab": 0.003,
    "rpi": 0.58912037,
-   "wab_rank": 75,
-   "rank": 83
-  },
-  {
-   "team": "St. John's (NY)",
-   "wins": 2,
-   "losses": 1,
-   "matches": 3,
-   "bubble_expected_wins": 2.748,
-   "wab": -0.748,
-   "rpi": 0.58217593,
-   "wab_rank": 164,
+   "wab_rank": 77,
    "rank": 84
-  },
-  {
-   "team": "East Texas A&M",
-   "wins": 2,
-   "losses": 1,
-   "matches": 3,
-   "bubble_expected_wins": 2.277,
-   "wab": -0.277,
-   "rpi": 0.57986111,
-   "wab_rank": 110,
-   "rank": 85
-  },
-  {
-   "team": "Arizona St.",
-   "wins": 2,
-   "losses": 1,
-   "matches": 3,
-   "bubble_expected_wins": 1.81,
-   "wab": 0.19,
-   "rpi": 0.57916667,
-   "wab_rank": 34,
-   "rank": 86
-  },
-  {
-   "team": "Rutgers",
-   "wins": 3,
-   "losses": 2,
-   "matches": 5,
-   "bubble_expected_wins": 3.744,
-   "wab": -0.744,
-   "rpi": 0.57736111,
-   "wab_rank": 163,
-   "rank": 87
   },
   {
    "team": "Gardner-Webb",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.0,
-   "wab": 0.0,
-   "rpi": 0.57638889,
-   "wab_rank": 79,
+   "bubble_expected_wins": 1.972,
+   "wab": 0.028,
+   "rpi": 0.58680556,
+   "wab_rank": 66,
+   "rank": 85
+  },
+  {
+   "team": "St. John's (NY)",
+   "wins": 2,
+   "losses": 1,
+   "matches": 3,
+   "bubble_expected_wins": 2.744,
+   "wab": -0.744,
+   "rpi": 0.58217593,
+   "wab_rank": 162,
+   "rank": 86
+  },
+  {
+   "team": "East Texas A&M",
+   "wins": 2,
+   "losses": 1,
+   "matches": 3,
+   "bubble_expected_wins": 2.262,
+   "wab": -0.262,
+   "rpi": 0.57986111,
+   "wab_rank": 110,
+   "rank": 87
+  },
+  {
+   "team": "Arizona St.",
+   "wins": 2,
+   "losses": 1,
+   "matches": 3,
+   "bubble_expected_wins": 1.788,
+   "wab": 0.212,
+   "rpi": 0.57916667,
+   "wab_rank": 35,
    "rank": 88
+  },
+  {
+   "team": "Rutgers",
+   "wins": 3,
+   "losses": 2,
+   "matches": 5,
+   "bubble_expected_wins": 3.733,
+   "wab": -0.733,
+   "rpi": 0.57736111,
+   "wab_rank": 160,
+   "rank": 89
   },
   {
    "team": "Bradley",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 1.938,
-   "wab": 0.062,
+   "bubble_expected_wins": 1.934,
+   "wab": 0.066,
    "rpi": 0.57523148,
-   "wab_rank": 59,
-   "rank": 89
+   "wab_rank": 58,
+   "rank": 90
   },
   {
    "team": "Illinois St.",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.152,
-   "wab": -0.152,
+   "bubble_expected_wins": 2.151,
+   "wab": -0.151,
    "rpi": 0.57407407,
    "wab_rank": 102,
-   "rank": 90
+   "rank": 91
   },
   {
    "team": "Kennesaw St.",
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.963,
-   "wab": 0.037,
+   "bubble_expected_wins": 2.962,
+   "wab": 0.038,
    "rpi": 0.57060185,
    "wab_rank": 63,
-   "rank": 91
+   "rank": 92
+  },
+  {
+   "team": "Delaware St.",
+   "wins": 3,
+   "losses": 0,
+   "matches": 3,
+   "bubble_expected_wins": 2.986,
+   "wab": 0.014,
+   "rpi": 0.57060185,
+   "wab_rank": 72,
+   "rank": 93
   },
   {
    "team": "Marquette",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.478,
-   "wab": -1.478,
+   "bubble_expected_wins": 2.474,
+   "wab": -1.474,
    "rpi": 0.56759259,
    "wab_rank": 239,
-   "rank": 92
+   "rank": 94
   },
   {
    "team": "Temple",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.8,
-   "wab": -0.8,
+   "bubble_expected_wins": 2.787,
+   "wab": -0.787,
    "rpi": 0.56712963,
-   "wab_rank": 168,
-   "rank": 93
+   "wab_rank": 167,
+   "rank": 95
   },
   {
    "team": "Southern California",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 1.921,
-   "wab": -0.921,
+   "bubble_expected_wins": 1.913,
+   "wab": -0.913,
    "rpi": 0.56527778,
    "wab_rank": 194,
-   "rank": 94
+   "rank": 96
   },
   {
    "team": "Bowling Green",
    "wins": 3,
    "losses": 0,
    "matches": 3,
-   "bubble_expected_wins": 2.95,
-   "wab": 0.05,
+   "bubble_expected_wins": 2.949,
+   "wab": 0.051,
    "rpi": 0.56365741,
    "wab_rank": 61,
-   "rank": 95
-  },
-  {
-   "team": "Lindenwood",
-   "wins": 2,
-   "losses": 1,
-   "matches": 3,
-   "bubble_expected_wins": 2.848,
-   "wab": -0.848,
-   "rpi": 0.56365741,
-   "wab_rank": 180,
-   "rank": 96
+   "rank": 97
   },
   {
    "team": "Saint Mary's (CA)",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 1.384,
-   "wab": 0.616,
+   "bubble_expected_wins": 1.371,
+   "wab": 0.629,
    "rpi": 0.5625,
    "wab_rank": 17,
-   "rank": 97
+   "rank": 98
   },
   {
    "team": "LSU",
    "wins": 2,
    "losses": 2,
    "matches": 4,
-   "bubble_expected_wins": 2.637,
-   "wab": -0.637,
+   "bubble_expected_wins": 2.625,
+   "wab": -0.625,
    "rpi": 0.56076389,
-   "wab_rank": 150,
-   "rank": 98
+   "wab_rank": 149,
+   "rank": 99
   },
   {
    "team": "Florida",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 1.488,
-   "wab": 0.512,
+   "bubble_expected_wins": 1.486,
+   "wab": 0.514,
    "rpi": 0.55833333,
-   "wab_rank": 21,
-   "rank": 99
+   "wab_rank": 22,
+   "rank": 100
   },
   {
    "team": "North Texas",
@@ -1127,129 +1138,140 @@
    "bubble_expected_wins": 2.996,
    "wab": 0.004,
    "rpi": 0.55671296,
-   "wab_rank": 73,
-   "rank": 100
+   "wab_rank": 76,
+   "rank": 101
   },
   {
    "team": "Northwestern",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.739,
-   "wab": -1.739,
+   "bubble_expected_wins": 2.733,
+   "wab": -1.733,
    "rpi": 0.55555556,
-   "wab_rank": 253,
-   "rank": 101
+   "wab_rank": 252,
+   "rank": 102
   },
   {
    "team": "UNCW",
    "wins": 2,
    "losses": 2,
    "matches": 4,
-   "bubble_expected_wins": 2.879,
-   "wab": -0.879,
+   "bubble_expected_wins": 2.871,
+   "wab": -0.871,
    "rpi": 0.55381944,
-   "wab_rank": 186,
-   "rank": 102
+   "wab_rank": 185,
+   "rank": 103
   },
   {
    "team": "Troy",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.025,
-   "wab": -0.025,
+   "bubble_expected_wins": 2.039,
+   "wab": -0.039,
    "rpi": 0.55208333,
-   "wab_rank": 87,
-   "rank": 103
+   "wab_rank": 95,
+   "rank": 104
+  },
+  {
+   "team": "Lindenwood",
+   "wins": 2,
+   "losses": 1,
+   "matches": 3,
+   "bubble_expected_wins": 2.846,
+   "wab": -0.846,
+   "rpi": 0.55208333,
+   "wab_rank": 181,
+   "rank": 105
   },
   {
    "team": "Davidson",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 1.031,
-   "wab": -0.031,
+   "bubble_expected_wins": 1.028,
+   "wab": -0.028,
    "rpi": 0.54861111,
-   "wab_rank": 90,
-   "rank": 104
+   "wab_rank": 89,
+   "rank": 106
+  },
+  {
+   "team": "N.C. Central",
+   "wins": 2,
+   "losses": 2,
+   "matches": 4,
+   "bubble_expected_wins": 3.346,
+   "wab": -1.346,
+   "rpi": 0.54861111,
+   "wab_rank": 227,
+   "rank": 107
   },
   {
    "team": "Michigan",
    "wins": 3,
    "losses": 1,
    "matches": 4,
-   "bubble_expected_wins": 3.253,
-   "wab": -0.253,
+   "bubble_expected_wins": 3.223,
+   "wab": -0.223,
    "rpi": 0.546875,
-   "wab_rank": 106,
-   "rank": 105
+   "wab_rank": 105,
+   "rank": 108
   },
   {
    "team": "Youngstown St.",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.318,
-   "wab": -0.318,
+   "bubble_expected_wins": 2.307,
+   "wab": -0.307,
    "rpi": 0.54513889,
-   "wab_rank": 116,
-   "rank": 106
+   "wab_rank": 118,
+   "rank": 109
   },
   {
    "team": "Lipscomb",
    "wins": 2,
    "losses": 0,
    "matches": 2,
-   "bubble_expected_wins": 1.932,
-   "wab": 0.068,
+   "bubble_expected_wins": 1.927,
+   "wab": 0.073,
    "rpi": 0.54166667,
    "wab_rank": 56,
-   "rank": 107
+   "rank": 110
   },
   {
    "team": "Florida St.",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.039,
-   "wab": -0.039,
+   "bubble_expected_wins": 2.037,
+   "wab": -0.037,
    "rpi": 0.54166667,
    "wab_rank": 94,
-   "rank": 108
+   "rank": 111
   },
   {
    "team": "Marshall",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.144,
-   "wab": -0.144,
+   "bubble_expected_wins": 2.138,
+   "wab": -0.138,
    "rpi": 0.54166667,
-   "wab_rank": 100,
-   "rank": 109
-  },
-  {
-   "team": "South Dakota",
-   "wins": 2,
-   "losses": 1,
-   "matches": 3,
-   "bubble_expected_wins": 2.202,
-   "wab": -0.202,
-   "rpi": 0.54166667,
-   "wab_rank": 103,
-   "rank": 110
+   "wab_rank": 101,
+   "rank": 112
   },
   {
    "team": "Seattle U",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.232,
-   "wab": -0.232,
+   "bubble_expected_wins": 2.221,
+   "wab": -0.221,
    "rpi": 0.54166667,
    "wab_rank": 104,
-   "rank": 111
+   "rank": 113
   },
   {
    "team": "Indiana St.",
@@ -1259,459 +1281,349 @@
    "bubble_expected_wins": 2.234,
    "wab": -0.234,
    "rpi": 0.54166667,
-   "wab_rank": 105,
-   "rank": 112
+   "wab_rank": 106,
+   "rank": 114
   },
   {
    "team": "Army West Point",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.259,
-   "wab": -0.259,
+   "bubble_expected_wins": 2.249,
+   "wab": -0.249,
    "rpi": 0.54166667,
-   "wab_rank": 107,
-   "rank": 113
+   "wab_rank": 109,
+   "rank": 115
   },
   {
    "team": "Louisiana Tech",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.276,
-   "wab": -0.276,
+   "bubble_expected_wins": 2.265,
+   "wab": -0.265,
    "rpi": 0.54166667,
-   "wab_rank": 109,
-   "rank": 114
+   "wab_rank": 111,
+   "rank": 116
   },
   {
    "team": "Iowa St.",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.286,
-   "wab": -0.286,
+   "bubble_expected_wins": 2.275,
+   "wab": -0.275,
    "rpi": 0.54166667,
-   "wab_rank": 111,
-   "rank": 115
+   "wab_rank": 112,
+   "rank": 117
   },
   {
    "team": "Jacksonville",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.308,
-   "wab": -0.308,
+   "bubble_expected_wins": 2.297,
+   "wab": -0.297,
    "rpi": 0.54166667,
-   "wab_rank": 115,
-   "rank": 116
+   "wab_rank": 114,
+   "rank": 118
   },
   {
    "team": "Hofstra",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.332,
-   "wab": -0.332,
+   "bubble_expected_wins": 2.331,
+   "wab": -0.331,
    "rpi": 0.54166667,
-   "wab_rank": 119,
-   "rank": 117
+   "wab_rank": 120,
+   "rank": 119
   },
   {
    "team": "Denver",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.337,
-   "wab": -0.337,
+   "bubble_expected_wins": 2.336,
+   "wab": -0.336,
    "rpi": 0.54166667,
    "wab_rank": 122,
-   "rank": 118
+   "rank": 120
   },
   {
    "team": "San Diego St.",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.367,
-   "wab": -0.367,
+   "bubble_expected_wins": 2.366,
+   "wab": -0.366,
    "rpi": 0.54166667,
    "wab_rank": 127,
-   "rank": 119
+   "rank": 121
   },
   {
    "team": "UAB",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.394,
-   "wab": -0.394,
+   "bubble_expected_wins": 2.381,
+   "wab": -0.381,
    "rpi": 0.54166667,
-   "wab_rank": 130,
-   "rank": 120
+   "wab_rank": 129,
+   "rank": 122
   },
   {
    "team": "Utah Tech",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.4,
-   "wab": -0.4,
+   "bubble_expected_wins": 2.398,
+   "wab": -0.398,
    "rpi": 0.54166667,
    "wab_rank": 131,
-   "rank": 121
+   "rank": 123
   },
   {
    "team": "San Diego",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.501,
-   "wab": -0.501,
+   "bubble_expected_wins": 2.487,
+   "wab": -0.487,
    "rpi": 0.54166667,
-   "wab_rank": 140,
-   "rank": 122
+   "wab_rank": 139,
+   "rank": 124
   },
   {
    "team": "Southern Ind.",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.528,
-   "wab": -0.528,
+   "bubble_expected_wins": 2.512,
+   "wab": -0.512,
    "rpi": 0.54166667,
-   "wab_rank": 143,
-   "rank": 123
+   "wab_rank": 142,
+   "rank": 125
   },
   {
    "team": "Lafayette",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.531,
-   "wab": -0.531,
+   "bubble_expected_wins": 2.514,
+   "wab": -0.514,
    "rpi": 0.54166667,
-   "wab_rank": 144,
-   "rank": 124
+   "wab_rank": 143,
+   "rank": 126
   },
   {
    "team": "Kansas City",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.727,
-   "wab": -0.727,
+   "bubble_expected_wins": 2.72,
+   "wab": -0.72,
    "rpi": 0.54166667,
-   "wab_rank": 161,
-   "rank": 125
+   "wab_rank": 159,
+   "rank": 127
   },
   {
    "team": "Jackson St.",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.739,
-   "wab": -0.739,
+   "bubble_expected_wins": 2.736,
+   "wab": -0.736,
    "rpi": 0.54166667,
-   "wab_rank": 162,
-   "rank": 126
+   "wab_rank": 161,
+   "rank": 128
   },
   {
    "team": "Charleston So.",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.823,
-   "wab": -0.823,
+   "bubble_expected_wins": 2.817,
+   "wab": -0.817,
    "rpi": 0.54166667,
-   "wab_rank": 172,
-   "rank": 127
+   "wab_rank": 171,
+   "rank": 129
   },
   {
    "team": "Idaho St.",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.827,
-   "wab": -0.827,
+   "bubble_expected_wins": 2.824,
+   "wab": -0.824,
    "rpi": 0.54166667,
    "wab_rank": 173,
-   "rank": 128
+   "rank": 130
   },
   {
    "team": "Butler",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.836,
-   "wab": -0.836,
+   "bubble_expected_wins": 2.833,
+   "wab": -0.833,
    "rpi": 0.54166667,
-   "wab_rank": 176,
-   "rank": 129
+   "wab_rank": 175,
+   "rank": 131
   },
   {
    "team": "Wake Forest",
    "wins": 1,
    "losses": 1,
    "matches": 2,
-   "bubble_expected_wins": 1.837,
-   "wab": -0.837,
+   "bubble_expected_wins": 1.835,
+   "wab": -0.835,
    "rpi": 0.54166667,
-   "wab_rank": 177,
-   "rank": 130
+   "wab_rank": 176,
+   "rank": 132
   },
   {
    "team": "Clemson",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.847,
-   "wab": -0.847,
+   "bubble_expected_wins": 2.837,
+   "wab": -0.837,
    "rpi": 0.54166667,
    "wab_rank": 178,
-   "rank": 131
+   "rank": 133
   },
   {
    "team": "Austin Peay",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.848,
-   "wab": -0.848,
+   "bubble_expected_wins": 2.838,
+   "wab": -0.838,
    "rpi": 0.54166667,
    "wab_rank": 179,
-   "rank": 132
+   "rank": 134
   },
   {
    "team": "Kent St.",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.874,
-   "wab": -0.874,
+   "bubble_expected_wins": 2.871,
+   "wab": -0.871,
    "rpi": 0.54166667,
-   "wab_rank": 185,
-   "rank": 133
+   "wab_rank": 184,
+   "rank": 135
   },
   {
    "team": "Virginia Tech",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.897,
-   "wab": -0.897,
+   "bubble_expected_wins": 2.89,
+   "wab": -0.89,
    "rpi": 0.54166667,
    "wab_rank": 191,
-   "rank": 134
+   "rank": 136
   },
   {
    "team": "Wichita St.",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.912,
-   "wab": -0.912,
+   "bubble_expected_wins": 2.906,
+   "wab": -0.906,
    "rpi": 0.54166667,
    "wab_rank": 193,
-   "rank": 135
-  },
-  {
-   "team": "Saint Louis",
-   "wins": 2,
-   "losses": 1,
-   "matches": 3,
-   "bubble_expected_wins": 2.665,
-   "wab": -0.665,
-   "rpi": 0.54050926,
-   "wab_rank": 155,
-   "rank": 136
+   "rank": 137
   },
   {
    "team": "Col. of Charleston",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 1.833,
-   "wab": -0.833,
+   "bubble_expected_wins": 1.832,
+   "wab": -0.832,
    "rpi": 0.53993056,
    "wab_rank": 174,
-   "rank": 137
+   "rank": 138
   },
   {
    "team": "Mississippi St.",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.511,
-   "wab": -0.511,
+   "bubble_expected_wins": 2.508,
+   "wab": -0.508,
    "rpi": 0.53819444,
-   "wab_rank": 142,
-   "rank": 138
+   "wab_rank": 141,
+   "rank": 139
   },
   {
    "team": "Virginia",
    "wins": 1,
    "losses": 1,
    "matches": 2,
-   "bubble_expected_wins": 1.762,
-   "wab": -0.762,
+   "bubble_expected_wins": 1.748,
+   "wab": -0.748,
    "rpi": 0.53645833,
-   "wab_rank": 166,
-   "rank": 139
+   "wab_rank": 164,
+   "rank": 140
   },
   {
    "team": "UNC Asheville",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 1.669,
-   "wab": 0.331,
+   "bubble_expected_wins": 1.65,
+   "wab": 0.35,
    "rpi": 0.53472222,
    "wab_rank": 27,
-   "rank": 140
+   "rank": 141
   },
   {
    "team": "San Francisco",
    "wins": 2,
    "losses": 2,
    "matches": 4,
-   "bubble_expected_wins": 2.47,
-   "wab": -0.47,
+   "bubble_expected_wins": 2.449,
+   "wab": -0.449,
    "rpi": 0.53211806,
-   "wab_rank": 135,
-   "rank": 141
+   "wab_rank": 134,
+   "rank": 142
   },
   {
    "team": "Miami (OH)",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.654,
-   "wab": -0.654,
+   "bubble_expected_wins": 2.651,
+   "wab": -0.651,
    "rpi": 0.53125,
    "wab_rank": 154,
-   "rank": 142
+   "rank": 143
   },
   {
    "team": "Arkansas",
    "wins": 3,
    "losses": 2,
    "matches": 5,
-   "bubble_expected_wins": 4.337,
-   "wab": -1.337,
+   "bubble_expected_wins": 4.313,
+   "wab": -1.313,
    "rpi": 0.53083333,
-   "wab_rank": 227,
-   "rank": 143
-  },
-  {
-   "team": "Belmont",
-   "wins": 1,
-   "losses": 2,
-   "matches": 3,
-   "bubble_expected_wins": 1.695,
-   "wab": -0.695,
-   "rpi": 0.52662037,
-   "wab_rank": 158,
+   "wab_rank": 224,
    "rank": 144
   },
   {
-   "team": "Purdue Fort Wayne",
+   "team": "Saint Louis",
    "wins": 2,
-   "losses": 2,
-   "matches": 4,
-   "bubble_expected_wins": 2.541,
-   "wab": -0.541,
-   "rpi": 0.52638889,
-   "wab_rank": 145,
+   "losses": 1,
+   "matches": 3,
+   "bubble_expected_wins": 2.649,
+   "wab": -0.649,
+   "rpi": 0.52893519,
+   "wab_rank": 153,
    "rank": 145
-  },
-  {
-   "team": "Boise St.",
-   "wins": 1,
-   "losses": 1,
-   "matches": 2,
-   "bubble_expected_wins": 1.041,
-   "wab": -0.041,
-   "rpi": 0.52430556,
-   "wab_rank": 95,
-   "rank": 146
-  },
-  {
-   "team": "Old Dominion",
-   "wins": 2,
-   "losses": 2,
-   "matches": 4,
-   "bubble_expected_wins": 3.452,
-   "wab": -1.452,
-   "rpi": 0.5234375,
-   "wab_rank": 237,
-   "rank": 147
-  },
-  {
-   "team": "Ball St.",
-   "wins": 2,
-   "losses": 0,
-   "matches": 2,
-   "bubble_expected_wins": 1.347,
-   "wab": 0.653,
-   "rpi": 0.52083333,
-   "wab_rank": 15,
-   "rank": 148
-  },
-  {
-   "team": "Eastern Ky.",
-   "wins": 2,
-   "losses": 0,
-   "matches": 2,
-   "bubble_expected_wins": 1.858,
-   "wab": 0.142,
-   "rpi": 0.52083333,
-   "wab_rank": 40,
-   "rank": 149
-  },
-  {
-   "team": "Portland",
-   "wins": 2,
-   "losses": 0,
-   "matches": 2,
-   "bubble_expected_wins": 1.981,
-   "wab": 0.019,
-   "rpi": 0.52083333,
-   "wab_rank": 69,
-   "rank": 150
-  },
-  {
-   "team": "Cleveland St.",
-   "wins": 1,
-   "losses": 1,
-   "matches": 2,
-   "bubble_expected_wins": 1.012,
-   "wab": -0.012,
-   "rpi": 0.52083333,
-   "wab_rank": 85,
-   "rank": 151
-  },
-  {
-   "team": "Xavier",
-   "wins": 1,
-   "losses": 2,
-   "matches": 3,
-   "bubble_expected_wins": 1.32,
-   "wab": -0.32,
-   "rpi": 0.52083333,
-   "wab_rank": 117,
-   "rank": 152
-  },
-  {
-   "team": "New Mexico St.",
-   "wins": 1,
-   "losses": 2,
-   "matches": 3,
-   "bubble_expected_wins": 1.898,
-   "wab": -0.898,
-   "rpi": 0.52083333,
-   "wab_rank": 192,
-   "rank": 153
   },
   {
    "team": "Portland St.",
@@ -1720,108 +1632,218 @@
    "matches": 3,
    "bubble_expected_wins": 2.193,
    "wab": -1.193,
-   "rpi": 0.52083333,
+   "rpi": 0.52777778,
    "wab_rank": 210,
+   "rank": 146
+  },
+  {
+   "team": "Belmont",
+   "wins": 1,
+   "losses": 2,
+   "matches": 3,
+   "bubble_expected_wins": 1.693,
+   "wab": -0.693,
+   "rpi": 0.52662037,
+   "wab_rank": 158,
+   "rank": 147
+  },
+  {
+   "team": "Purdue Fort Wayne",
+   "wins": 2,
+   "losses": 2,
+   "matches": 4,
+   "bubble_expected_wins": 2.539,
+   "wab": -0.539,
+   "rpi": 0.52638889,
+   "wab_rank": 144,
+   "rank": 148
+  },
+  {
+   "team": "Boise St.",
+   "wins": 1,
+   "losses": 1,
+   "matches": 2,
+   "bubble_expected_wins": 1.032,
+   "wab": -0.032,
+   "rpi": 0.52430556,
+   "wab_rank": 91,
+   "rank": 149
+  },
+  {
+   "team": "Old Dominion",
+   "wins": 2,
+   "losses": 2,
+   "matches": 4,
+   "bubble_expected_wins": 3.427,
+   "wab": -1.427,
+   "rpi": 0.5234375,
+   "wab_rank": 236,
+   "rank": 150
+  },
+  {
+   "team": "Ball St.",
+   "wins": 2,
+   "losses": 0,
+   "matches": 2,
+   "bubble_expected_wins": 1.349,
+   "wab": 0.651,
+   "rpi": 0.52083333,
+   "wab_rank": 15,
+   "rank": 151
+  },
+  {
+   "team": "Eastern Ky.",
+   "wins": 2,
+   "losses": 0,
+   "matches": 2,
+   "bubble_expected_wins": 1.857,
+   "wab": 0.143,
+   "rpi": 0.52083333,
+   "wab_rank": 42,
+   "rank": 152
+  },
+  {
+   "team": "Portland",
+   "wins": 2,
+   "losses": 0,
+   "matches": 2,
+   "bubble_expected_wins": 1.98,
+   "wab": 0.02,
+   "rpi": 0.52083333,
+   "wab_rank": 70,
+   "rank": 153
+  },
+  {
+   "team": "Cleveland St.",
+   "wins": 1,
+   "losses": 1,
+   "matches": 2,
+   "bubble_expected_wins": 1.011,
+   "wab": -0.011,
+   "rpi": 0.52083333,
+   "wab_rank": 87,
    "rank": 154
+  },
+  {
+   "team": "Xavier",
+   "wins": 1,
+   "losses": 2,
+   "matches": 3,
+   "bubble_expected_wins": 1.311,
+   "wab": -0.311,
+   "rpi": 0.52083333,
+   "wab_rank": 119,
+   "rank": 155
+  },
+  {
+   "team": "New Mexico St.",
+   "wins": 1,
+   "losses": 2,
+   "matches": 3,
+   "bubble_expected_wins": 1.882,
+   "wab": -0.882,
+   "rpi": 0.52083333,
+   "wab_rank": 187,
+   "rank": 156
   },
   {
    "team": "Villanova",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.372,
-   "wab": -0.372,
+   "bubble_expected_wins": 2.371,
+   "wab": -0.371,
    "rpi": 0.51967593,
-   "wab_rank": 129,
-   "rank": 155
+   "wab_rank": 128,
+   "rank": 157
   },
   {
    "team": "Arizona",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.646,
-   "wab": -0.646,
+   "bubble_expected_wins": 2.631,
+   "wab": -0.631,
    "rpi": 0.51967593,
-   "wab_rank": 152,
-   "rank": 156
+   "wab_rank": 150,
+   "rank": 158
+  },
+  {
+   "team": "Drake",
+   "wins": 1,
+   "losses": 2,
+   "matches": 3,
+   "bubble_expected_wins": 1.817,
+   "wab": -0.817,
+   "rpi": 0.51967593,
+   "wab_rank": 172,
+   "rank": 159
   },
   {
    "team": "Siena",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.047,
-   "wab": -1.047,
+   "bubble_expected_wins": 1.979,
+   "wab": -0.979,
    "rpi": 0.51967593,
-   "wab_rank": 203,
-   "rank": 157
+   "wab_rank": 198,
+   "rank": 160
   },
   {
    "team": "Providence",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.29,
-   "wab": -0.29,
+   "bubble_expected_wins": 2.246,
+   "wab": -0.246,
    "rpi": 0.5162037,
-   "wab_rank": 113,
-   "rank": 158
+   "wab_rank": 108,
+   "rank": 161
   },
   {
    "team": "Georgia",
    "wins": 3,
    "losses": 2,
    "matches": 5,
-   "bubble_expected_wins": 4.634,
-   "wab": -1.634,
+   "bubble_expected_wins": 4.628,
+   "wab": -1.628,
    "rpi": 0.51111111,
-   "wab_rank": 249,
-   "rank": 159
+   "wab_rank": 247,
+   "rank": 162
   },
   {
    "team": "LIU",
    "wins": 0,
    "losses": 2,
    "matches": 2,
-   "bubble_expected_wins": 0.803,
-   "wab": -0.803,
+   "bubble_expected_wins": 0.802,
+   "wab": -0.802,
    "rpi": 0.51041667,
    "wab_rank": 169,
-   "rank": 160
+   "rank": 163
   },
   {
    "team": "Miami (FL)",
    "wins": 0,
    "losses": 2,
    "matches": 2,
-   "bubble_expected_wins": 0.803,
-   "wab": -0.803,
+   "bubble_expected_wins": 0.802,
+   "wab": -0.802,
    "rpi": 0.51041667,
    "wab_rank": 170,
-   "rank": 161
-  },
-  {
-   "team": "Buffalo",
-   "wins": 3,
-   "losses": 1,
-   "matches": 4,
-   "bubble_expected_wins": 3.602,
-   "wab": -0.602,
-   "rpi": 0.50954861,
-   "wab_rank": 148,
-   "rank": 162
+   "rank": 164
   },
   {
    "team": "Ohio St.",
    "wins": 2,
    "losses": 2,
    "matches": 4,
-   "bubble_expected_wins": 3.527,
-   "wab": -1.527,
+   "bubble_expected_wins": 3.517,
+   "wab": -1.517,
    "rpi": 0.50954861,
-   "wab_rank": 243,
-   "rank": 163
+   "wab_rank": 241,
+   "rank": 165
   },
   {
    "team": "NC State",
@@ -1831,63 +1853,74 @@
    "bubble_expected_wins": 2.334,
    "wab": -0.334,
    "rpi": 0.50925926,
-   "wab_rank": 120,
-   "rank": 164
+   "wab_rank": 121,
+   "rank": 166
   },
   {
    "team": "San Jose St.",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 1.581,
-   "wab": -0.581,
+   "bubble_expected_wins": 1.568,
+   "wab": -0.568,
    "rpi": 0.50347222,
-   "wab_rank": 147,
-   "rank": 165
+   "wab_rank": 145,
+   "rank": 167
   },
   {
    "team": "Texas A&M",
    "wins": 3,
    "losses": 4,
    "matches": 7,
-   "bubble_expected_wins": 5.175,
-   "wab": -2.175,
+   "bubble_expected_wins": 5.144,
+   "wab": -2.144,
    "rpi": 0.50124008,
-   "wab_rank": 301,
-   "rank": 166
+   "wab_rank": 299,
+   "rank": 168
+  },
+  {
+   "team": "Buffalo",
+   "wins": 3,
+   "losses": 1,
+   "matches": 4,
+   "bubble_expected_wins": 3.589,
+   "wab": -0.589,
+   "rpi": 0.50086806,
+   "wab_rank": 147,
+   "rank": 169
   },
   {
    "team": "Boston College",
    "wins": 2,
    "losses": 0,
    "matches": 2,
-   "bubble_expected_wins": 1.971,
-   "wab": 0.029,
+   "bubble_expected_wins": 1.968,
+   "wab": 0.032,
    "rpi": 0.5,
    "wab_rank": 65,
-   "rank": 167
+   "rank": 170
   },
   {
    "team": "Fla. Atlantic",
    "wins": 2,
    "losses": 0,
    "matches": 2,
-   "bubble_expected_wins": 1.981,
-   "wab": 0.019,
+   "bubble_expected_wins": 1.98,
+   "wab": 0.02,
    "rpi": 0.5,
-   "wab_rank": 67,
-   "rank": 168
+   "wab_rank": 69,
+   "rank": 171
   },
   {
    "team": "FIU",
    "wins": 2,
    "losses": 0,
    "matches": 2,
-   "bubble_expected_wins": 1.986,
-   "wab": 0.014,
+   "bubble_expected_wins": 1.985,
+   "wab": 0.015,
    "rpi": 0.5,
-   "wab_rank": 70,
-   "rank": 169
+   "wab_rank": 71,
+   "rank": 172
   },
   {
    "team": "Montana",
@@ -1897,8 +1930,8 @@
    "bubble_expected_wins": 1.005,
    "wab": -0.005,
    "rpi": 0.5,
-   "wab_rank": 83,
-   "rank": 170
+   "wab_rank": 84,
+   "rank": 173
   },
   {
    "team": "Omaha",
@@ -1908,19 +1941,19 @@
    "bubble_expected_wins": 1.005,
    "wab": -0.005,
    "rpi": 0.5,
-   "wab_rank": 84,
-   "rank": 171
+   "wab_rank": 85,
+   "rank": 174
   },
   {
    "team": "Pacific",
    "wins": 1,
    "losses": 1,
    "matches": 2,
-   "bubble_expected_wins": 1.035,
-   "wab": -0.035,
+   "bubble_expected_wins": 1.036,
+   "wab": -0.036,
    "rpi": 0.5,
-   "wab_rank": 92,
-   "rank": 172
+   "wab_rank": 93,
+   "rank": 175
   },
   {
    "team": "UC Riverside",
@@ -1930,8 +1963,8 @@
    "bubble_expected_wins": 1.286,
    "wab": -0.286,
    "rpi": 0.5,
-   "wab_rank": 112,
-   "rank": 173
+   "wab_rank": 113,
+   "rank": 176
   },
   {
    "team": "Campbell",
@@ -1942,260 +1975,260 @@
    "wab": -0.343,
    "rpi": 0.5,
    "wab_rank": 123,
-   "rank": 174
+   "rank": 177
   },
   {
    "team": "Coastal Carolina",
    "wins": 1,
    "losses": 1,
    "matches": 2,
-   "bubble_expected_wins": 1.371,
-   "wab": -0.371,
+   "bubble_expected_wins": 1.359,
+   "wab": -0.359,
    "rpi": 0.5,
-   "wab_rank": 128,
-   "rank": 175
+   "wab_rank": 125,
+   "rank": 178
   },
   {
    "team": "West Virginia",
    "wins": 1,
    "losses": 1,
    "matches": 2,
-   "bubble_expected_wins": 1.406,
-   "wab": -0.406,
+   "bubble_expected_wins": 1.392,
+   "wab": -0.392,
    "rpi": 0.5,
-   "wab_rank": 132,
-   "rank": 176
+   "wab_rank": 130,
+   "rank": 179
   },
   {
    "team": "Texas Tech",
    "wins": 1,
    "losses": 1,
    "matches": 2,
-   "bubble_expected_wins": 1.446,
-   "wab": -0.446,
+   "bubble_expected_wins": 1.445,
+   "wab": -0.445,
    "rpi": 0.5,
-   "wab_rank": 134,
-   "rank": 177
+   "wab_rank": 133,
+   "rank": 180
   },
   {
    "team": "Tulane",
    "wins": 1,
    "losses": 1,
    "matches": 2,
-   "bubble_expected_wins": 1.486,
-   "wab": -0.486,
+   "bubble_expected_wins": 1.472,
+   "wab": -0.472,
    "rpi": 0.5,
-   "wab_rank": 139,
-   "rank": 178
+   "wab_rank": 137,
+   "rank": 181
   },
   {
    "team": "Air Force",
    "wins": 0,
    "losses": 1,
    "matches": 1,
-   "bubble_expected_wins": 0.892,
-   "wab": -0.892,
+   "bubble_expected_wins": 0.89,
+   "wab": -0.89,
    "rpi": 0.5,
    "wab_rank": 188,
-   "rank": 179
+   "rank": 182
   },
   {
    "team": "Quinnipiac",
    "wins": 0,
    "losses": 1,
    "matches": 1,
-   "bubble_expected_wins": 0.892,
-   "wab": -0.892,
+   "bubble_expected_wins": 0.89,
+   "wab": -0.89,
    "rpi": 0.5,
-   "wab_rank": 189,
-   "rank": 180
+   "wab_rank": 190,
+   "rank": 183
   },
   {
    "team": "Merrimack",
    "wins": 0,
    "losses": 2,
    "matches": 2,
-   "bubble_expected_wins": 1.816,
-   "wab": -1.816,
+   "bubble_expected_wins": 1.811,
+   "wab": -1.811,
    "rpi": 0.5,
-   "wab_rank": 262,
-   "rank": 181
+   "wab_rank": 263,
+   "rank": 184
   },
   {
    "team": "Stetson",
    "wins": 0,
    "losses": 2,
    "matches": 2,
-   "bubble_expected_wins": 1.816,
-   "wab": -1.816,
+   "bubble_expected_wins": 1.811,
+   "wab": -1.811,
    "rpi": 0.5,
-   "wab_rank": 263,
-   "rank": 182
+   "wab_rank": 265,
+   "rank": 185
   },
   {
    "team": "Fordham",
    "wins": 3,
    "losses": 1,
    "matches": 4,
-   "bubble_expected_wins": 3.753,
-   "wab": -0.753,
+   "bubble_expected_wins": 3.747,
+   "wab": -0.747,
    "rpi": 0.49913194,
-   "wab_rank": 165,
-   "rank": 183
-  },
-  {
-   "team": "N.C. Central",
-   "wins": 2,
-   "losses": 2,
-   "matches": 4,
-   "bubble_expected_wins": 3.064,
-   "wab": -1.064,
-   "rpi": 0.49739583,
-   "wab_rank": 206,
-   "rank": 184
+   "wab_rank": 163,
+   "rank": 186
   },
   {
    "team": "Central Conn. St.",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 1.978,
-   "wab": -0.978,
+   "bubble_expected_wins": 1.89,
+   "wab": -0.89,
    "rpi": 0.49652778,
-   "wab_rank": 198,
-   "rank": 185
+   "wab_rank": 189,
+   "rank": 187
   },
   {
    "team": "South Fla.",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 1.7,
-   "wab": -0.7,
+   "bubble_expected_wins": 1.689,
+   "wab": -0.689,
    "rpi": 0.49444444,
-   "wab_rank": 160,
-   "rank": 186
+   "wab_rank": 157,
+   "rank": 188
   },
   {
    "team": "Northern Ariz.",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 1.855,
-   "wab": -0.855,
+   "bubble_expected_wins": 1.845,
+   "wab": -0.845,
    "rpi": 0.49421296,
-   "wab_rank": 183,
-   "rank": 187
-  },
-  {
-   "team": "Delaware St.",
-   "wins": 3,
-   "losses": 0,
-   "matches": 3,
-   "bubble_expected_wins": 2.997,
-   "wab": 0.003,
-   "rpi": 0.49189815,
-   "wab_rank": 74,
-   "rank": 188
+   "wab_rank": 180,
+   "rank": 189
   },
   {
    "team": "Holy Cross",
    "wins": 2,
    "losses": 2,
    "matches": 4,
-   "bubble_expected_wins": 3.054,
-   "wab": -1.054,
+   "bubble_expected_wins": 2.991,
+   "wab": -0.991,
    "rpi": 0.49045139,
-   "wab_rank": 204,
-   "rank": 189
+   "wab_rank": 202,
+   "rank": 190
   },
   {
    "team": "Tarleton St.",
    "wins": 1,
    "losses": 3,
    "matches": 4,
-   "bubble_expected_wins": 3.108,
-   "wab": -2.108,
+   "bubble_expected_wins": 3.091,
+   "wab": -2.091,
    "rpi": 0.49045139,
    "wab_rank": 298,
-   "rank": 190
+   "rank": 191
   },
   {
    "team": "FDU",
    "wins": 1,
    "losses": 3,
    "matches": 4,
-   "bubble_expected_wins": 2.726,
-   "wab": -1.726,
+   "bubble_expected_wins": 2.712,
+   "wab": -1.712,
    "rpi": 0.48871528,
-   "wab_rank": 252,
-   "rank": 191
+   "wab_rank": 249,
+   "rank": 192
   },
   {
    "team": "ULM",
    "wins": 2,
    "losses": 2,
    "matches": 4,
-   "bubble_expected_wins": 3.176,
-   "wab": -1.176,
+   "bubble_expected_wins": 3.171,
+   "wab": -1.171,
    "rpi": 0.48784722,
-   "wab_rank": 208,
-   "rank": 192
+   "wab_rank": 206,
+   "rank": 193
   },
   {
    "team": "Bellarmine",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.322,
-   "wab": -0.322,
+   "bubble_expected_wins": 2.299,
+   "wab": -0.299,
    "rpi": 0.48715278,
-   "wab_rank": 118,
-   "rank": 193
+   "wab_rank": 116,
+   "rank": 194
   },
   {
    "team": "George Mason",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.897,
-   "wab": -0.897,
+   "bubble_expected_wins": 2.892,
+   "wab": -0.892,
    "rpi": 0.48611111,
-   "wab_rank": 190,
-   "rank": 194
+   "wab_rank": 192,
+   "rank": 195
   },
   {
    "team": "South Dakota St.",
    "wins": 1,
    "losses": 3,
    "matches": 4,
-   "bubble_expected_wins": 2.416,
-   "wab": -1.416,
+   "bubble_expected_wins": 2.401,
+   "wab": -1.401,
    "rpi": 0.484375,
-   "wab_rank": 233,
-   "rank": 195
+   "wab_rank": 231,
+   "rank": 196
   },
   {
    "team": "UNLV",
    "wins": 0,
    "losses": 2,
    "matches": 2,
-   "bubble_expected_wins": 0.882,
-   "wab": -0.882,
+   "bubble_expected_wins": 0.873,
+   "wab": -0.873,
    "rpi": 0.48263889,
-   "wab_rank": 187,
-   "rank": 196
+   "wab_rank": 186,
+   "rank": 197
   },
   {
    "team": "Auburn",
    "wins": 3,
    "losses": 1,
    "matches": 4,
-   "bubble_expected_wins": 3.475,
-   "wab": -0.475,
+   "bubble_expected_wins": 3.473,
+   "wab": -0.473,
    "rpi": 0.48177083,
-   "wab_rank": 137,
-   "rank": 197
+   "wab_rank": 138,
+   "rank": 198
+  },
+  {
+   "team": "Ark.-Pine Bluff",
+   "wins": 1,
+   "losses": 2,
+   "matches": 3,
+   "bubble_expected_wins": 2.768,
+   "wab": -1.768,
+   "rpi": 0.48032407,
+   "wab_rank": 257,
+   "rank": 199
+  },
+  {
+   "team": "Florida A&M",
+   "wins": 1,
+   "losses": 2,
+   "matches": 3,
+   "bubble_expected_wins": 2.811,
+   "wab": -1.811,
+   "rpi": 0.48032407,
+   "wab_rank": 262,
+   "rank": 200
   },
   {
    "team": "Idaho",
@@ -2205,165 +2238,165 @@
    "bubble_expected_wins": 2.303,
    "wab": -0.303,
    "rpi": 0.47800926,
-   "wab_rank": 114,
-   "rank": 198
+   "wab_rank": 117,
+   "rank": 201
   },
   {
    "team": "Grambling",
    "wins": 2,
    "losses": 2,
    "matches": 4,
-   "bubble_expected_wins": 3.552,
-   "wab": -1.552,
+   "bubble_expected_wins": 3.55,
+   "wab": -1.55,
    "rpi": 0.47569444,
-   "wab_rank": 245,
-   "rank": 199
+   "wab_rank": 243,
+   "rank": 202
   },
   {
    "team": "Mercer",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 1.678,
-   "wab": -0.678,
+   "bubble_expected_wins": 1.75,
+   "wab": -0.75,
    "rpi": 0.46875,
-   "wab_rank": 157,
-   "rank": 200
+   "wab_rank": 165,
+   "rank": 203
   },
   {
    "team": "CSU Bakersfield",
    "wins": 2,
    "losses": 2,
    "matches": 4,
-   "bubble_expected_wins": 3.834,
-   "wab": -1.834,
+   "bubble_expected_wins": 3.832,
+   "wab": -1.832,
    "rpi": 0.46788194,
-   "wab_rank": 267,
-   "rank": 201
+   "wab_rank": 270,
+   "rank": 204
   },
   {
    "team": "Colorado St.",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.503,
-   "wab": -0.503,
+   "bubble_expected_wins": 2.489,
+   "wab": -0.489,
    "rpi": 0.46643519,
-   "wab_rank": 141,
-   "rank": 202
+   "wab_rank": 140,
+   "rank": 205
   },
   {
    "team": "UT Arlington",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.986,
-   "wab": -0.986,
+   "bubble_expected_wins": 2.985,
+   "wab": -0.985,
    "rpi": 0.46342593,
    "wab_rank": 200,
-   "rank": 203
+   "rank": 206
   },
   {
    "team": "Mercyhurst",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.255,
-   "wab": -1.255,
+   "bubble_expected_wins": 2.252,
+   "wab": -1.252,
    "rpi": 0.46180556,
-   "wab_rank": 217,
-   "rank": 204
-  },
-  {
-   "team": "Drake",
-   "wins": 1,
-   "losses": 2,
-   "matches": 3,
-   "bubble_expected_wins": 1.835,
-   "wab": -0.835,
-   "rpi": 0.45833333,
-   "wab_rank": 175,
-   "rank": 205
+   "wab_rank": 215,
+   "rank": 207
   },
   {
    "team": "FGCU",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 1.949,
-   "wab": -0.949,
+   "bubble_expected_wins": 1.941,
+   "wab": -0.941,
    "rpi": 0.45833333,
    "wab_rank": 196,
-   "rank": 206
+   "rank": 208
   },
   {
    "team": "Jacksonville St.",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.055,
-   "wab": -1.055,
+   "bubble_expected_wins": 2.033,
+   "wab": -1.033,
    "rpi": 0.45833333,
-   "wab_rank": 205,
-   "rank": 207
+   "wab_rank": 204,
+   "rank": 209
   },
   {
    "team": "Bucknell",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.068,
-   "wab": -1.068,
+   "bubble_expected_wins": 2.067,
+   "wab": -1.067,
    "rpi": 0.45833333,
-   "wab_rank": 207,
-   "rank": 208
+   "wab_rank": 205,
+   "rank": 210
   },
   {
    "team": "Green Bay",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.184,
-   "wab": -1.184,
+   "bubble_expected_wins": 2.183,
+   "wab": -1.183,
    "rpi": 0.45833333,
-   "wab_rank": 209,
-   "rank": 209
+   "wab_rank": 207,
+   "rank": 211
   },
   {
    "team": "Sacred Heart",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.203,
-   "wab": -1.203,
+   "bubble_expected_wins": 2.192,
+   "wab": -1.192,
    "rpi": 0.45833333,
-   "wab_rank": 211,
-   "rank": 210
+   "wab_rank": 208,
+   "rank": 212
   },
   {
    "team": "Chattanooga",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.215,
-   "wab": -1.215,
+   "bubble_expected_wins": 2.193,
+   "wab": -1.193,
    "rpi": 0.45833333,
-   "wab_rank": 212,
-   "rank": 211
+   "wab_rank": 209,
+   "rank": 213
   },
   {
    "team": "North Dakota",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.239,
-   "wab": -1.239,
+   "bubble_expected_wins": 2.237,
+   "wab": -1.237,
    "rpi": 0.45833333,
-   "wab_rank": 214,
-   "rank": 212
+   "wab_rank": 213,
+   "rank": 214
   },
   {
    "team": "High Point",
+   "wins": 1,
+   "losses": 2,
+   "matches": 3,
+   "bubble_expected_wins": 2.251,
+   "wab": -1.251,
+   "rpi": 0.45833333,
+   "wab_rank": 214,
+   "rank": 215
+  },
+  {
+   "team": "CSUN",
    "wins": 1,
    "losses": 2,
    "matches": 3,
@@ -2371,501 +2404,468 @@
    "wab": -1.253,
    "rpi": 0.45833333,
    "wab_rank": 216,
-   "rank": 213
+   "rank": 216
   },
   {
    "team": "UNI",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.258,
-   "wab": -1.258,
+   "bubble_expected_wins": 2.256,
+   "wab": -1.256,
    "rpi": 0.45833333,
-   "wab_rank": 218,
-   "rank": 214
-  },
-  {
-   "team": "CSUN",
-   "wins": 1,
-   "losses": 2,
-   "matches": 3,
-   "bubble_expected_wins": 2.26,
-   "wab": -1.26,
-   "rpi": 0.45833333,
-   "wab_rank": 219,
-   "rank": 215
+   "wab_rank": 217,
+   "rank": 217
   },
   {
    "team": "Iona",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.281,
-   "wab": -1.281,
+   "bubble_expected_wins": 2.279,
+   "wab": -1.279,
    "rpi": 0.45833333,
-   "wab_rank": 221,
-   "rank": 216
+   "wab_rank": 219,
+   "rank": 218
   },
   {
    "team": "IU Indy",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.291,
-   "wab": -1.291,
+   "bubble_expected_wins": 2.288,
+   "wab": -1.288,
    "rpi": 0.45833333,
-   "wab_rank": 222,
-   "rank": 217
-  },
-  {
-   "team": "Oregon St.",
-   "wins": 1,
-   "losses": 2,
-   "matches": 3,
-   "bubble_expected_wins": 2.307,
-   "wab": -1.307,
-   "rpi": 0.45833333,
-   "wab_rank": 224,
-   "rank": 218
+   "wab_rank": 220,
+   "rank": 219
   },
   {
    "team": "Hawaii",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.321,
-   "wab": -1.321,
+   "bubble_expected_wins": 2.297,
+   "wab": -1.297,
    "rpi": 0.45833333,
-   "wab_rank": 225,
-   "rank": 219
+   "wab_rank": 222,
+   "rank": 220
+  },
+  {
+   "team": "Oregon St.",
+   "wins": 1,
+   "losses": 2,
+   "matches": 3,
+   "bubble_expected_wins": 2.303,
+   "wab": -1.303,
+   "rpi": 0.45833333,
+   "wab_rank": 223,
+   "rank": 221
   },
   {
    "team": "NIU",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.418,
-   "wab": -1.418,
+   "bubble_expected_wins": 2.401,
+   "wab": -1.401,
    "rpi": 0.45833333,
-   "wab_rank": 234,
-   "rank": 220
+   "wab_rank": 230,
+   "rank": 222
   },
   {
    "team": "Delaware",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.504,
-   "wab": -1.504,
+   "bubble_expected_wins": 2.487,
+   "wab": -1.487,
    "rpi": 0.45833333,
-   "wab_rank": 241,
-   "rank": 221
+   "wab_rank": 240,
+   "rank": 223
   },
   {
    "team": "SFA",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.767,
-   "wab": -1.767,
+   "bubble_expected_wins": 2.761,
+   "wab": -1.761,
    "rpi": 0.45833333,
    "wab_rank": 255,
-   "rank": 222
+   "rank": 224
   },
   {
    "team": "Missouri St.",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.771,
-   "wab": -1.771,
+   "bubble_expected_wins": 2.764,
+   "wab": -1.764,
    "rpi": 0.45833333,
    "wab_rank": 256,
-   "rank": 223
+   "rank": 225
   },
   {
    "team": "William & Mary",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.819,
-   "wab": -1.819,
+   "bubble_expected_wins": 2.815,
+   "wab": -1.815,
    "rpi": 0.45833333,
-   "wab_rank": 264,
-   "rank": 224
+   "wab_rank": 267,
+   "rank": 226
   },
   {
    "team": "Coppin St.",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.831,
-   "wab": -1.831,
+   "bubble_expected_wins": 2.828,
+   "wab": -1.828,
    "rpi": 0.45833333,
-   "wab_rank": 266,
-   "rank": 225
+   "wab_rank": 268,
+   "rank": 227
   },
   {
    "team": "Colgate",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.867,
-   "wab": -1.867,
+   "bubble_expected_wins": 2.864,
+   "wab": -1.864,
    "rpi": 0.45833333,
-   "wab_rank": 272,
-   "rank": 226
+   "wab_rank": 274,
+   "rank": 228
   },
   {
    "team": "Morehead St.",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.867,
-   "wab": -1.867,
+   "bubble_expected_wins": 2.864,
+   "wab": -1.864,
    "rpi": 0.45833333,
-   "wab_rank": 273,
-   "rank": 227
+   "wab_rank": 275,
+   "rank": 229
   },
   {
    "team": "Fairfield",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.868,
-   "wab": -1.868,
+   "bubble_expected_wins": 2.865,
+   "wab": -1.865,
    "rpi": 0.45833333,
-   "wab_rank": 274,
-   "rank": 228
+   "wab_rank": 276,
+   "rank": 230
   },
   {
    "team": "Memphis",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 1.786,
-   "wab": -1.786,
+   "bubble_expected_wins": 1.781,
+   "wab": -1.781,
    "rpi": 0.45659722,
-   "wab_rank": 257,
-   "rank": 229
-  },
-  {
-   "team": "Ark.-Pine Bluff",
-   "wins": 1,
-   "losses": 2,
-   "matches": 3,
-   "bubble_expected_wins": 2.955,
-   "wab": -1.955,
-   "rpi": 0.45601852,
-   "wab_rank": 278,
-   "rank": 230
+   "wab_rank": 258,
+   "rank": 231
   },
   {
    "team": "South Alabama",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.25,
-   "wab": -1.25,
+   "bubble_expected_wins": 2.227,
+   "wab": -1.227,
    "rpi": 0.45486111,
-   "wab_rank": 215,
-   "rank": 231
+   "wab_rank": 212,
+   "rank": 232
   },
   {
    "team": "Nicholls",
    "wins": 2,
    "losses": 2,
    "matches": 4,
-   "bubble_expected_wins": 3.839,
-   "wab": -1.839,
+   "bubble_expected_wins": 3.829,
+   "wab": -1.829,
    "rpi": 0.45260417,
-   "wab_rank": 268,
-   "rank": 232
+   "wab_rank": 269,
+   "rank": 233
   },
   {
    "team": "Wright St.",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.957,
-   "wab": -0.957,
+   "bubble_expected_wins": 2.954,
+   "wab": -0.954,
    "rpi": 0.4525463,
    "wab_rank": 197,
-   "rank": 233
+   "rank": 234
   },
   {
    "team": "Bryant",
    "wins": 1,
    "losses": 3,
    "matches": 4,
-   "bubble_expected_wins": 1.477,
-   "wab": -0.477,
+   "bubble_expected_wins": 1.47,
+   "wab": -0.47,
    "rpi": 0.45,
-   "wab_rank": 138,
-   "rank": 234
+   "wab_rank": 136,
+   "rank": 235
   },
   {
    "team": "Cal St. Fullerton",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.602,
-   "wab": -1.602,
+   "bubble_expected_wins": 2.598,
+   "wab": -1.598,
    "rpi": 0.44791667,
-   "wab_rank": 248,
-   "rank": 235
+   "wab_rank": 246,
+   "rank": 236
   },
   {
    "team": "Bethune-Cookman",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.814,
-   "wab": -1.814,
+   "bubble_expected_wins": 2.811,
+   "wab": -1.811,
    "rpi": 0.44560185,
-   "wab_rank": 260,
-   "rank": 236
+   "wab_rank": 261,
+   "rank": 237
   },
   {
    "team": "Norfolk St.",
    "wins": 2,
    "losses": 2,
    "matches": 4,
-   "bubble_expected_wins": 3.683,
-   "wab": -1.683,
+   "bubble_expected_wins": 3.667,
+   "wab": -1.667,
    "rpi": 0.44444444,
-   "wab_rank": 251,
-   "rank": 237
+   "wab_rank": 248,
+   "rank": 238
   },
   {
    "team": "Eastern Ill.",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.97,
-   "wab": -1.97,
+   "bubble_expected_wins": 2.969,
+   "wab": -1.969,
    "rpi": 0.44328704,
    "wab_rank": 283,
-   "rank": 238
+   "rank": 239
   },
   {
    "team": "Oakland",
    "wins": 2,
    "losses": 2,
    "matches": 4,
-   "bubble_expected_wins": 2.343,
-   "wab": -0.343,
+   "bubble_expected_wins": 2.344,
+   "wab": -0.344,
    "rpi": 0.44270833,
    "wab_rank": 124,
-   "rank": 239
+   "rank": 240
   },
   {
    "team": "Texas Southern",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.075,
-   "wab": -2.075,
+   "bubble_expected_wins": 2.057,
+   "wab": -2.057,
    "rpi": 0.43634259,
    "wab_rank": 296,
-   "rank": 240
+   "rank": 241
   },
   {
    "team": "Elon",
    "wins": 1,
    "losses": 3,
    "matches": 4,
-   "bubble_expected_wins": 3.478,
-   "wab": -2.478,
+   "bubble_expected_wins": 3.462,
+   "wab": -2.462,
    "rpi": 0.43229167,
    "wab_rank": 317,
-   "rank": 241
+   "rank": 242
   },
   {
    "team": "Binghamton",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 1.227,
-   "wab": -1.227,
+   "bubble_expected_wins": 1.215,
+   "wab": -1.215,
    "rpi": 0.43171296,
-   "wab_rank": 213,
-   "rank": 242
+   "wab_rank": 211,
+   "rank": 243
   },
   {
    "team": "North Florida",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.99,
-   "wab": -0.99,
+   "bubble_expected_wins": 2.989,
+   "wab": -0.989,
    "rpi": 0.43055556,
    "wab_rank": 201,
-   "rank": 243
+   "rank": 244
   },
   {
    "team": "West Ga.",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.484,
-   "wab": -1.484,
+   "bubble_expected_wins": 2.469,
+   "wab": -1.469,
    "rpi": 0.43055556,
-   "wab_rank": 240,
-   "rank": 244
+   "wab_rank": 238,
+   "rank": 245
   },
   {
    "team": "UNC Greensboro",
    "wins": 1,
    "losses": 1,
    "matches": 2,
-   "bubble_expected_wins": 1.579,
-   "wab": -0.579,
+   "bubble_expected_wins": 1.575,
+   "wab": -0.575,
    "rpi": 0.42708333,
    "wab_rank": 146,
-   "rank": 245
+   "rank": 246
   },
   {
    "team": "The Citadel",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.863,
-   "wab": -1.863,
+   "bubble_expected_wins": 2.86,
+   "wab": -1.86,
    "rpi": 0.42708333,
-   "wab_rank": 271,
-   "rank": 246
+   "wab_rank": 273,
+   "rank": 247
   },
   {
    "team": "Stony Brook",
    "wins": 1,
    "losses": 3,
    "matches": 4,
-   "bubble_expected_wins": 2.591,
-   "wab": -1.591,
+   "bubble_expected_wins": 2.58,
+   "wab": -1.58,
    "rpi": 0.42534722,
-   "wab_rank": 247,
-   "rank": 247
+   "wab_rank": 245,
+   "rank": 248
   },
   {
    "team": "Santa Clara",
    "wins": 1,
    "losses": 3,
    "matches": 4,
-   "bubble_expected_wins": 3.97,
-   "wab": -2.97,
+   "bubble_expected_wins": 3.969,
+   "wab": -2.969,
    "rpi": 0.42361111,
    "wab_rank": 330,
-   "rank": 248
+   "rank": 249
   },
   {
    "team": "Radford",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.815,
-   "wab": -1.815,
+   "bubble_expected_wins": 2.813,
+   "wab": -1.813,
    "rpi": 0.4224537,
-   "wab_rank": 261,
-   "rank": 249
+   "wab_rank": 266,
+   "rank": 250
   },
   {
    "team": "Northern Ky.",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.848,
-   "wab": -1.848,
+   "bubble_expected_wins": 2.846,
+   "wab": -1.846,
    "rpi": 0.42013889,
-   "wab_rank": 270,
-   "rank": 250
-  },
-  {
-   "team": "New Haven",
-   "wins": 1,
-   "losses": 3,
-   "matches": 4,
-   "bubble_expected_wins": 3.072,
-   "wab": -2.072,
-   "rpi": 0.41493056,
-   "wab_rank": 295,
+   "wab_rank": 272,
    "rank": 251
-  },
-  {
-   "team": "Abilene Christian",
-   "wins": 1,
-   "losses": 2,
-   "matches": 3,
-   "bubble_expected_wins": 2.965,
-   "wab": -1.965,
-   "rpi": 0.41319444,
-   "wab_rank": 282,
-   "rank": 252
-  },
-  {
-   "team": "Utah St.",
-   "wins": 0,
-   "losses": 3,
-   "matches": 3,
-   "bubble_expected_wins": 1.54,
-   "wab": -1.54,
-   "rpi": 0.41111111,
-   "wab_rank": 244,
-   "rank": 253
-  },
-  {
-   "team": "Southeastern La.",
-   "wins": 0,
-   "losses": 3,
-   "matches": 3,
-   "bubble_expected_wins": 1.821,
-   "wab": -1.821,
-   "rpi": 0.41087963,
-   "wab_rank": 265,
-   "rank": 254
-  },
-  {
-   "team": "Illinois",
-   "wins": 1,
-   "losses": 2,
-   "matches": 3,
-   "bubble_expected_wins": 2.868,
-   "wab": -1.868,
-   "rpi": 0.40972222,
-   "wab_rank": 275,
-   "rank": 255
   },
   {
    "team": "Saint Peter's",
    "wins": 0,
    "losses": 4,
    "matches": 4,
-   "bubble_expected_wins": 3.16,
-   "wab": -3.16,
-   "rpi": 0.40711806,
-   "wab_rank": 336,
+   "bubble_expected_wins": 2.945,
+   "wab": -2.945,
+   "rpi": 0.41753472,
+   "wab_rank": 328,
+   "rank": 252
+  },
+  {
+   "team": "New Haven",
+   "wins": 1,
+   "losses": 3,
+   "matches": 4,
+   "bubble_expected_wins": 2.97,
+   "wab": -1.97,
+   "rpi": 0.41493056,
+   "wab_rank": 284,
+   "rank": 253
+  },
+  {
+   "team": "Abilene Christian",
+   "wins": 1,
+   "losses": 2,
+   "matches": 3,
+   "bubble_expected_wins": 2.962,
+   "wab": -1.962,
+   "rpi": 0.41319444,
+   "wab_rank": 282,
+   "rank": 254
+  },
+  {
+   "team": "Utah St.",
+   "wins": 0,
+   "losses": 3,
+   "matches": 3,
+   "bubble_expected_wins": 1.522,
+   "wab": -1.522,
+   "rpi": 0.41111111,
+   "wab_rank": 242,
+   "rank": 255
+  },
+  {
+   "team": "Southeastern La.",
+   "wins": 0,
+   "losses": 3,
+   "matches": 3,
+   "bubble_expected_wins": 1.811,
+   "wab": -1.811,
+   "rpi": 0.41087963,
+   "wab_rank": 264,
    "rank": 256
+  },
+  {
+   "team": "Illinois",
+   "wins": 1,
+   "losses": 2,
+   "matches": 3,
+   "bubble_expected_wins": 2.865,
+   "wab": -1.865,
+   "rpi": 0.40972222,
+   "wab_rank": 277,
+   "rank": 257
   },
   {
    "team": "Louisiana",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 1.445,
-   "wab": -0.445,
+   "bubble_expected_wins": 1.443,
+   "wab": -0.443,
    "rpi": 0.40625,
-   "wab_rank": 133,
-   "rank": 257
-  },
-  {
-   "team": "Florida A&M",
-   "wins": 0,
-   "losses": 2,
-   "matches": 2,
-   "bubble_expected_wins": 1.962,
-   "wab": -1.962,
-   "rpi": 0.40625,
-   "wab_rank": 280,
+   "wab_rank": 132,
    "rank": 258
   },
   {
@@ -2873,10 +2873,10 @@
    "wins": 1,
    "losses": 3,
    "matches": 4,
-   "bubble_expected_wins": 3.811,
-   "wab": -2.811,
+   "bubble_expected_wins": 3.808,
+   "wab": -2.808,
    "rpi": 0.40190972,
-   "wab_rank": 324,
+   "wab_rank": 323,
    "rank": 259
   },
   {
@@ -2884,175 +2884,175 @@
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.981,
-   "wab": -0.981,
+   "bubble_expected_wins": 2.98,
+   "wab": -0.98,
    "rpi": 0.39748677,
    "wab_rank": 199,
    "rank": 260
-  },
-  {
-   "team": "UIC",
-   "wins": 0,
-   "losses": 3,
-   "matches": 3,
-   "bubble_expected_wins": 2.557,
-   "wab": -2.557,
-   "rpi": 0.39699074,
-   "wab_rank": 319,
-   "rank": 261
   },
   {
    "team": "Winthrop",
    "wins": 0,
    "losses": 2,
    "matches": 2,
-   "bubble_expected_wins": 0.603,
-   "wab": -0.603,
+   "bubble_expected_wins": 0.601,
+   "wab": -0.601,
    "rpi": 0.39583333,
-   "wab_rank": 149,
-   "rank": 262
+   "wab_rank": 148,
+   "rank": 261
   },
   {
    "team": "Northwestern St.",
    "wins": 1,
    "losses": 3,
    "matches": 4,
-   "bubble_expected_wins": 3.451,
-   "wab": -2.451,
+   "bubble_expected_wins": 3.436,
+   "wab": -2.436,
    "rpi": 0.39496528,
    "wab_rank": 316,
-   "rank": 263
+   "rank": 262
   },
   {
    "team": "Towson",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.295,
-   "wab": -1.295,
+   "bubble_expected_wins": 2.294,
+   "wab": -1.294,
    "rpi": 0.39467593,
-   "wab_rank": 223,
-   "rank": 264
+   "wab_rank": 221,
+   "rank": 263
   },
   {
    "team": "Morgan St.",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 1.511,
-   "wab": -1.511,
+   "bubble_expected_wins": 1.413,
+   "wab": -1.413,
    "rpi": 0.39351852,
-   "wab_rank": 242,
-   "rank": 265
-  },
-  {
-   "team": "UMES",
-   "wins": 1,
-   "losses": 1,
-   "matches": 2,
-   "bubble_expected_wins": 1.363,
-   "wab": -0.363,
-   "rpi": 0.390625,
-   "wab_rank": 125,
-   "rank": 266
+   "wab_rank": 233,
+   "rank": 264
   },
   {
    "team": "Stonehill",
    "wins": 2,
    "losses": 3,
    "matches": 5,
-   "bubble_expected_wins": 4.831,
-   "wab": -2.831,
+   "bubble_expected_wins": 4.828,
+   "wab": -2.828,
    "rpi": 0.38958333,
-   "wab_rank": 325,
-   "rank": 267
+   "wab_rank": 324,
+   "rank": 265
+  },
+  {
+   "team": "Milwaukee",
+   "wins": 1,
+   "losses": 3,
+   "matches": 4,
+   "bubble_expected_wins": 2.92,
+   "wab": -1.92,
+   "rpi": 0.38888889,
+   "wab_rank": 279,
+   "rank": 266
   },
   {
    "team": "Canisius",
    "wins": 0,
    "losses": 4,
    "matches": 4,
-   "bubble_expected_wins": 3.216,
-   "wab": -3.216,
+   "bubble_expected_wins": 3.212,
+   "wab": -3.212,
    "rpi": 0.38802083,
-   "wab_rank": 337,
-   "rank": 268
+   "wab_rank": 336,
+   "rank": 267
   },
   {
    "team": "Alabama St.",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 1.672,
-   "wab": -1.672,
+   "bubble_expected_wins": 1.744,
+   "wab": -1.744,
    "rpi": 0.38541667,
-   "wab_rank": 250,
-   "rank": 269
+   "wab_rank": 253,
+   "rank": 268
   },
   {
    "team": "LSU New Orleans ",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.843,
-   "wab": -1.843,
+   "bubble_expected_wins": 2.833,
+   "wab": -1.833,
    "rpi": 0.38472222,
-   "wab_rank": 269,
-   "rank": 270
+   "wab_rank": 271,
+   "rank": 269
   },
   {
    "team": "UC Davis",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.465,
-   "wab": -1.465,
+   "bubble_expected_wins": 2.45,
+   "wab": -1.45,
    "rpi": 0.38310185,
-   "wab_rank": 238,
-   "rank": 271
+   "wab_rank": 237,
+   "rank": 270
   },
   {
    "team": "NJIT",
    "wins": 1,
    "losses": 3,
    "matches": 4,
-   "bubble_expected_wins": 2.763,
-   "wab": -1.763,
+   "bubble_expected_wins": 2.749,
+   "wab": -1.749,
    "rpi": 0.3828125,
    "wab_rank": 254,
-   "rank": 272
+   "rank": 271
   },
   {
    "team": "Sacramento St.",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.222,
-   "wab": -2.222,
+   "bubble_expected_wins": 2.213,
+   "wab": -2.213,
    "rpi": 0.37615741,
    "wab_rank": 303,
-   "rank": 273
+   "rank": 272
   },
   {
    "team": "Prairie View",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.567,
-   "wab": -2.567,
+   "bubble_expected_wins": 2.551,
+   "wab": -2.551,
    "rpi": 0.37615741,
-   "wab_rank": 320,
-   "rank": 274
+   "wab_rank": 319,
+   "rank": 273
   },
   {
    "team": "Samford",
    "wins": 0,
    "losses": 2,
    "matches": 2,
-   "bubble_expected_wins": 1.278,
-   "wab": -1.278,
+   "bubble_expected_wins": 1.277,
+   "wab": -1.277,
    "rpi": 0.375,
-   "wab_rank": 220,
+   "wab_rank": 218,
+   "rank": 274
+  },
+  {
+   "team": "Queens (NC)",
+   "wins": 0,
+   "losses": 2,
+   "matches": 2,
+   "bubble_expected_wins": 1.326,
+   "wab": -1.326,
+   "rpi": 0.375,
+   "wab_rank": 225,
    "rank": 275
   },
   {
@@ -3060,32 +3060,32 @@
    "wins": 0,
    "losses": 2,
    "matches": 2,
-   "bubble_expected_wins": 1.33,
-   "wab": -1.33,
+   "bubble_expected_wins": 1.329,
+   "wab": -1.329,
    "rpi": 0.375,
    "wab_rank": 226,
    "rank": 276
-  },
-  {
-   "team": "Queens (NC)",
-   "wins": 0,
-   "losses": 2,
-   "matches": 2,
-   "bubble_expected_wins": 1.339,
-   "wab": -1.339,
-   "rpi": 0.375,
-   "wab_rank": 228,
-   "rank": 277
   },
   {
    "team": "UTRGV",
    "wins": 0,
    "losses": 2,
    "matches": 2,
-   "bubble_expected_wins": 1.362,
-   "wab": -1.362,
+   "bubble_expected_wins": 1.348,
+   "wab": -1.348,
    "rpi": 0.375,
-   "wab_rank": 231,
+   "wab_rank": 229,
+   "rank": 277
+  },
+  {
+   "team": "Tennessee Tech",
+   "wins": 0,
+   "losses": 2,
+   "matches": 2,
+   "bubble_expected_wins": 1.42,
+   "wab": -1.42,
+   "rpi": 0.375,
+   "wab_rank": 234,
    "rank": 278
   },
   {
@@ -3093,286 +3093,264 @@
    "wins": 0,
    "losses": 2,
    "matches": 2,
-   "bubble_expected_wins": 1.424,
-   "wab": -1.424,
+   "bubble_expected_wins": 1.421,
+   "wab": -1.421,
    "rpi": 0.375,
    "wab_rank": 235,
    "rank": 279
-  },
-  {
-   "team": "Tennessee Tech",
-   "wins": 0,
-   "losses": 2,
-   "matches": 2,
-   "bubble_expected_wins": 1.435,
-   "wab": -1.435,
-   "rpi": 0.375,
-   "wab_rank": 236,
-   "rank": 280
-  },
-  {
-   "team": "Milwaukee",
-   "wins": 0,
-   "losses": 3,
-   "matches": 3,
-   "bubble_expected_wins": 1.925,
-   "wab": -1.925,
-   "rpi": 0.375,
-   "wab_rank": 277,
-   "rank": 281
   },
   {
    "team": "Niagara",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.021,
-   "wab": -2.021,
+   "bubble_expected_wins": 2.014,
+   "wab": -2.014,
    "rpi": 0.375,
-   "wab_rank": 293,
-   "rank": 282
+   "wab_rank": 294,
+   "rank": 280
   },
   {
    "team": "Southern U.",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.101,
-   "wab": -2.101,
+   "bubble_expected_wins": 2.089,
+   "wab": -2.089,
    "rpi": 0.375,
    "wab_rank": 297,
-   "rank": 283
-  },
-  {
-   "team": "Navy",
-   "wins": 0,
-   "losses": 3,
-   "matches": 3,
-   "bubble_expected_wins": 2.157,
-   "wab": -2.157,
-   "rpi": 0.375,
-   "wab_rank": 299,
-   "rank": 284
+   "rank": 281
   },
   {
    "team": "Chicago St.",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.163,
-   "wab": -2.163,
+   "bubble_expected_wins": 2.151,
+   "wab": -2.151,
    "rpi": 0.375,
    "wab_rank": 300,
-   "rank": 285
+   "rank": 282
+  },
+  {
+   "team": "Navy",
+   "wins": 0,
+   "losses": 3,
+   "matches": 3,
+   "bubble_expected_wins": 2.152,
+   "wab": -2.152,
+   "rpi": 0.375,
+   "wab_rank": 301,
+   "rank": 283
   },
   {
    "team": "Utah Valley",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.205,
-   "wab": -2.205,
+   "bubble_expected_wins": 2.185,
+   "wab": -2.185,
    "rpi": 0.375,
    "wab_rank": 302,
-   "rank": 286
+   "rank": 284
   },
   {
    "team": "UConn",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.222,
-   "wab": -2.222,
+   "bubble_expected_wins": 2.215,
+   "wab": -2.215,
    "rpi": 0.375,
    "wab_rank": 304,
-   "rank": 287
+   "rank": 285
   },
   {
    "team": "Tennessee St.",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.244,
-   "wab": -2.244,
+   "bubble_expected_wins": 2.229,
+   "wab": -2.229,
    "rpi": 0.375,
    "wab_rank": 305,
-   "rank": 288
+   "rank": 286
   },
   {
    "team": "Central Ark.",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.248,
-   "wab": -2.248,
+   "bubble_expected_wins": 2.241,
+   "wab": -2.241,
    "rpi": 0.375,
    "wab_rank": 306,
-   "rank": 289
+   "rank": 287
   },
   {
    "team": "Loyola Chicago",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.251,
-   "wab": -2.251,
+   "bubble_expected_wins": 2.248,
+   "wab": -2.248,
    "rpi": 0.375,
    "wab_rank": 307,
-   "rank": 290
+   "rank": 288
   },
   {
    "team": "UAlbany",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.252,
-   "wab": -2.252,
+   "bubble_expected_wins": 2.249,
+   "wab": -2.249,
    "rpi": 0.375,
    "wab_rank": 308,
-   "rank": 291
+   "rank": 289
   },
   {
    "team": "Houston Christian",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.278,
-   "wab": -2.278,
+   "bubble_expected_wins": 2.276,
+   "wab": -2.276,
    "rpi": 0.375,
    "wab_rank": 310,
-   "rank": 292
+   "rank": 290
   },
   {
    "team": "UC Irvine",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.285,
-   "wab": -2.285,
+   "bubble_expected_wins": 2.282,
+   "wab": -2.282,
    "rpi": 0.375,
    "wab_rank": 311,
-   "rank": 293
+   "rank": 291
   },
   {
    "team": "Murray St.",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.409,
-   "wab": -2.409,
+   "bubble_expected_wins": 2.392,
+   "wab": -2.392,
    "rpi": 0.375,
    "wab_rank": 314,
-   "rank": 294
+   "rank": 292
   },
   {
    "team": "Ga. Southern",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.423,
-   "wab": -2.423,
+   "bubble_expected_wins": 2.418,
+   "wab": -2.418,
    "rpi": 0.375,
    "wab_rank": 315,
-   "rank": 295
+   "rank": 293
   },
   {
    "team": "Marist",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.488,
-   "wab": -2.488,
+   "bubble_expected_wins": 2.472,
+   "wab": -2.472,
    "rpi": 0.375,
    "wab_rank": 318,
-   "rank": 296
+   "rank": 294
   },
   {
    "team": "UT Martin",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.667,
-   "wab": -2.667,
+   "bubble_expected_wins": 2.659,
+   "wab": -2.659,
    "rpi": 0.375,
-   "wab_rank": 321,
-   "rank": 297
+   "wab_rank": 320,
+   "rank": 295
   },
   {
    "team": "Western Caro.",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.781,
-   "wab": -2.781,
+   "bubble_expected_wins": 2.777,
+   "wab": -2.777,
    "rpi": 0.375,
-   "wab_rank": 322,
-   "rank": 298
+   "wab_rank": 321,
+   "rank": 296
   },
   {
    "team": "Liberty",
    "wins": 2,
    "losses": 2,
    "matches": 4,
-   "bubble_expected_wins": 3.983,
-   "wab": -1.983,
+   "bubble_expected_wins": 3.982,
+   "wab": -1.982,
    "rpi": 0.37239583,
-   "wab_rank": 285,
-   "rank": 299
+   "wab_rank": 286,
+   "rank": 297
   },
   {
    "team": "Georgia St.",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.35,
-   "wab": -2.35,
+   "bubble_expected_wins": 2.346,
+   "wab": -2.346,
    "rpi": 0.37152778,
    "wab_rank": 313,
-   "rank": 300
+   "rank": 298
   },
   {
    "team": "Robert Morris",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.064,
-   "wab": -2.064,
+   "bubble_expected_wins": 2.054,
+   "wab": -2.054,
    "rpi": 0.36574074,
-   "wab_rank": 294,
-   "rank": 301
+   "wab_rank": 295,
+   "rank": 299
   },
   {
    "team": "Notre Dame",
    "wins": 0,
    "losses": 2,
    "matches": 2,
-   "bubble_expected_wins": 0.673,
-   "wab": -0.673,
+   "bubble_expected_wins": 0.656,
+   "wab": -0.656,
    "rpi": 0.36458333,
-   "wab_rank": 156,
-   "rank": 302
+   "wab_rank": 155,
+   "rank": 300
   },
   {
    "team": "Howard",
    "wins": 0,
    "losses": 2,
    "matches": 2,
-   "bubble_expected_wins": 1.801,
-   "wab": -1.801,
+   "bubble_expected_wins": 1.79,
+   "wab": -1.79,
    "rpi": 0.36458333,
-   "wab_rank": 258,
-   "rank": 303
+   "wab_rank": 259,
+   "rank": 301
   },
   {
    "team": "Nevada",
    "wins": 0,
    "losses": 2,
    "matches": 2,
-   "bubble_expected_wins": 1.962,
-   "wab": -1.962,
+   "bubble_expected_wins": 1.96,
+   "wab": -1.96,
    "rpi": 0.36458333,
    "wab_rank": 281,
-   "rank": 304
+   "rank": 302
   },
   {
    "team": "Cincinnati",
@@ -3382,8 +3360,8 @@
    "bubble_expected_wins": 3.0,
    "wab": -1.0,
    "rpi": 0.35763889,
-   "wab_rank": 202,
-   "rank": 305
+   "wab_rank": 203,
+   "rank": 303
   },
   {
    "team": "UTSA",
@@ -3393,8 +3371,8 @@
    "bubble_expected_wins": 3.985,
    "wab": -1.985,
    "rpi": 0.34930556,
-   "wab_rank": 287,
-   "rank": 306
+   "wab_rank": 288,
+   "rank": 304
   },
   {
    "team": "Furman",
@@ -3404,74 +3382,85 @@
    "bubble_expected_wins": 2.989,
    "wab": -1.989,
    "rpi": 0.34722222,
-   "wab_rank": 289,
-   "rank": 307
+   "wab_rank": 290,
+   "rank": 305
   },
   {
    "team": "Le Moyne",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.862,
-   "wab": -2.862,
+   "bubble_expected_wins": 2.859,
+   "wab": -2.859,
    "rpi": 0.34375,
-   "wab_rank": 328,
-   "rank": 308
+   "wab_rank": 327,
+   "rank": 306
   },
   {
    "team": "UCLA",
    "wins": 2,
    "losses": 1,
    "matches": 3,
-   "bubble_expected_wins": 2.018,
-   "wab": -0.018,
+   "bubble_expected_wins": 2.019,
+   "wab": -0.019,
    "rpi": 0.34166667,
-   "wab_rank": 86,
-   "rank": 309
+   "wab_rank": 88,
+   "rank": 307
   },
   {
    "team": "Southeast Mo. St.",
    "wins": 1,
    "losses": 3,
    "matches": 4,
-   "bubble_expected_wins": 1.473,
-   "wab": -0.473,
+   "bubble_expected_wins": 1.457,
+   "wab": -0.457,
    "rpi": 0.34027778,
-   "wab_rank": 136,
-   "rank": 310
+   "wab_rank": 135,
+   "rank": 308
   },
   {
    "team": "Fresno St.",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.847,
-   "wab": -2.847,
+   "bubble_expected_wins": 2.844,
+   "wab": -2.844,
    "rpi": 0.33680556,
-   "wab_rank": 327,
-   "rank": 311
+   "wab_rank": 326,
+   "rank": 309
   },
   {
    "team": "Akron",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.989,
-   "wab": -1.989,
+   "bubble_expected_wins": 2.988,
+   "wab": -1.988,
    "rpi": 0.33333333,
-   "wab_rank": 288,
-   "rank": 312
+   "wab_rank": 289,
+   "rank": 310
   },
   {
    "team": "Lamar University",
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.965,
-   "wab": -2.965,
+   "bubble_expected_wins": 2.963,
+   "wab": -2.963,
    "rpi": 0.32986111,
    "wab_rank": 329,
-   "rank": 313
+   "rank": 311
+  },
+  {
+   "team": "UIC",
+   "wins": 0,
+   "losses": 4,
+   "matches": 4,
+   "bubble_expected_wins": 3.539,
+   "wab": -3.539,
+   "rpi": 0.32118056,
+   "wab_rank": 338,
+   "rank": 312
   },
   {
    "team": "SIUE",
@@ -3482,40 +3471,29 @@
    "wab": -2.985,
    "rpi": 0.31990741,
    "wab_rank": 332,
-   "rank": 314
+   "rank": 313
   },
   {
    "team": "Grand Canyon",
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.98,
-   "wab": -1.98,
+   "bubble_expected_wins": 2.979,
+   "wab": -1.979,
    "rpi": 0.31415344,
-   "wab_rank": 284,
-   "rank": 315
+   "wab_rank": 285,
+   "rank": 314
   },
   {
    "team": "New Mexico",
    "wins": 0,
    "losses": 2,
    "matches": 2,
-   "bubble_expected_wins": 1.359,
-   "wab": -1.359,
+   "bubble_expected_wins": 1.346,
+   "wab": -1.346,
    "rpi": 0.3125,
-   "wab_rank": 229,
-   "rank": 316
-  },
-  {
-   "team": "South Carolina St.",
-   "wins": 1,
-   "losses": 2,
-   "matches": 3,
-   "bubble_expected_wins": 2.362,
-   "wab": -1.362,
-   "rpi": 0.31134259,
-   "wab_rank": 230,
-   "rank": 317
+   "wab_rank": 228,
+   "rank": 315
   },
   {
    "team": "Western Ill.",
@@ -3526,28 +3504,50 @@
    "wab": -2.296,
    "rpi": 0.31134259,
    "wab_rank": 312,
-   "rank": 318
+   "rank": 316
   },
   {
    "team": "Northeastern",
    "wins": 0,
    "losses": 2,
    "matches": 2,
-   "bubble_expected_wins": 1.578,
-   "wab": -1.578,
+   "bubble_expected_wins": 1.574,
+   "wab": -1.574,
    "rpi": 0.30208333,
-   "wab_rank": 246,
-   "rank": 319
+   "wab_rank": 244,
+   "rank": 317
   },
   {
    "team": "McNeese",
    "wins": 0,
    "losses": 4,
    "matches": 4,
-   "bubble_expected_wins": 3.597,
-   "wab": -3.597,
+   "bubble_expected_wins": 3.593,
+   "wab": -3.593,
    "rpi": 0.30208333,
    "wab_rank": 339,
+   "rank": 318
+  },
+  {
+   "team": "UMES",
+   "wins": 1,
+   "losses": 2,
+   "matches": 3,
+   "bubble_expected_wins": 2.718,
+   "wab": -1.718,
+   "rpi": 0.30092593,
+   "wab_rank": 250,
+   "rank": 319
+  },
+  {
+   "team": "South Carolina St.",
+   "wins": 1,
+   "losses": 2,
+   "matches": 3,
+   "bubble_expected_wins": 2.727,
+   "wab": -1.727,
+   "rpi": 0.30092593,
+   "wab_rank": 251,
    "rank": 320
   },
   {
@@ -3555,10 +3555,10 @@
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.803,
-   "wab": -2.803,
+   "bubble_expected_wins": 2.797,
+   "wab": -2.797,
    "rpi": 0.29976852,
-   "wab_rank": 323,
+   "wab_rank": 322,
    "rank": 321
   },
   {
@@ -3566,8 +3566,8 @@
    "wins": 0,
    "losses": 4,
    "matches": 4,
-   "bubble_expected_wins": 2.261,
-   "wab": -2.261,
+   "bubble_expected_wins": 2.258,
+   "wab": -2.258,
    "rpi": 0.29427083,
    "wab_rank": 309,
    "rank": 322
@@ -3577,8 +3577,8 @@
    "wins": 1,
    "losses": 2,
    "matches": 3,
-   "bubble_expected_wins": 2.407,
-   "wab": -1.407,
+   "bubble_expected_wins": 2.404,
+   "wab": -1.404,
    "rpi": 0.28472222,
    "wab_rank": 232,
    "rank": 323
@@ -3588,10 +3588,10 @@
    "wins": 0,
    "losses": 4,
    "matches": 4,
-   "bubble_expected_wins": 3.245,
-   "wab": -3.245,
+   "bubble_expected_wins": 3.221,
+   "wab": -3.221,
    "rpi": 0.28029514,
-   "wab_rank": 338,
+   "wab_rank": 337,
    "rank": 324
   },
   {
@@ -3599,8 +3599,8 @@
    "wins": 1,
    "losses": 1,
    "matches": 2,
-   "bubble_expected_wins": 1.923,
-   "wab": -0.923,
+   "bubble_expected_wins": 1.922,
+   "wab": -0.922,
    "rpi": 0.27083333,
    "wab_rank": 195,
    "rank": 325
@@ -3624,7 +3624,7 @@
    "bubble_expected_wins": 2.0,
    "wab": 0.0,
    "rpi": 0.25,
-   "wab_rank": 80,
+   "wab_rank": 81,
    "rank": 327
   },
   {
@@ -3632,10 +3632,10 @@
    "wins": 0,
    "losses": 2,
    "matches": 2,
-   "bubble_expected_wins": 1.89,
-   "wab": -1.89,
+   "bubble_expected_wins": 1.884,
+   "wab": -1.884,
    "rpi": 0.25,
-   "wab_rank": 276,
+   "wab_rank": 278,
    "rank": 328
   },
   {
@@ -3643,8 +3643,8 @@
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.989,
-   "wab": -2.989,
+   "bubble_expected_wins": 2.988,
+   "wab": -2.988,
    "rpi": 0.25,
    "wab_rank": 333,
    "rank": 329
@@ -3654,8 +3654,8 @@
    "wins": 1,
    "losses": 1,
    "matches": 2,
-   "bubble_expected_wins": 1.855,
-   "wab": -0.855,
+   "bubble_expected_wins": 1.847,
+   "wab": -0.847,
    "rpi": 0.23611111,
    "wab_rank": 182,
    "rank": 330
@@ -3665,8 +3665,8 @@
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.98,
-   "wab": -2.98,
+   "bubble_expected_wins": 2.979,
+   "wab": -2.979,
    "rpi": 0.23082011,
    "wab_rank": 331,
    "rank": 331
@@ -3679,7 +3679,7 @@
    "bubble_expected_wins": 1.955,
    "wab": -1.955,
    "rpi": 0.22222222,
-   "wab_rank": 279,
+   "wab_rank": 280,
    "rank": 332
   },
   {
@@ -3687,10 +3687,10 @@
    "wins": 0,
    "losses": 2,
    "matches": 2,
-   "bubble_expected_wins": 1.811,
-   "wab": -1.811,
+   "bubble_expected_wins": 1.808,
+   "wab": -1.808,
    "rpi": 0.20833333,
-   "wab_rank": 259,
+   "wab_rank": 260,
    "rank": 333
   },
   {
@@ -3701,7 +3701,7 @@
    "bubble_expected_wins": 2.0,
    "wab": -2.0,
    "rpi": 0.20833333,
-   "wab_rank": 292,
+   "wab_rank": 293,
    "rank": 334
   },
   {
@@ -3720,22 +3720,11 @@
    "wins": 0,
    "losses": 3,
    "matches": 3,
-   "bubble_expected_wins": 2.836,
-   "wab": -2.836,
+   "bubble_expected_wins": 2.834,
+   "wab": -2.834,
    "rpi": 0.1875,
-   "wab_rank": 326,
+   "wab_rank": 325,
    "rank": 336
-  },
-  {
-   "team": "Mississippi Val.",
-   "wins": 0,
-   "losses": 2,
-   "matches": 2,
-   "bubble_expected_wins": 1.999,
-   "wab": -1.999,
-   "rpi": 0.06944444,
-   "wab_rank": 291,
-   "rank": 337
   },
   {
    "team": "Long Beach St.",
@@ -3745,7 +3734,18 @@
    "bubble_expected_wins": 1.985,
    "wab": -1.985,
    "rpi": 0.0625,
-   "wab_rank": 286,
+   "wab_rank": 287,
+   "rank": 337
+  },
+  {
+   "team": "Mississippi Val.",
+   "wins": 0,
+   "losses": 2,
+   "matches": 2,
+   "bubble_expected_wins": 2.0,
+   "wab": -2.0,
+   "rpi": 0.05555556,
+   "wab_rank": 292,
    "rank": 338
   },
   {
@@ -3756,7 +3756,7 @@
    "bubble_expected_wins": 1.999,
    "wab": -1.999,
    "rpi": 0.0,
-   "wab_rank": 290,
+   "wab_rank": 291,
    "rank": 339
   }
  ]

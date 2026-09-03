@@ -1,11 +1,11 @@
 {
  "model_version": "v1.1-unweighted",
- "generated_utc": "2026-09-03T03:55:49Z",
+ "generated_utc": "2026-09-03T19:17:00Z",
  "queue_rule": {
   "description": "any component voting SUPPORTS_H1 queues the match for human review; ranking is by vote count. A display/ranking heuristic only -- not a truth claim, and nothing here corrects or counts."
  },
- "n_finals": 512,
- "n_queued": 16,
+ "n_finals": 516,
+ "n_queued": 17,
  "matches": [
   {
    "gid": "6624516",
@@ -386,8 +386,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 13,
-     "h1_error": 3,
+     "h0_error": 11,
+     "h1_error": 1,
      "vote": "SUPPORTS_H1"
     },
     "school_verification": {
@@ -2067,8 +2067,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 11,
-     "h1_error": 1,
+     "h0_error": 12,
+     "h1_error": 0,
      "vote": "SUPPORTS_H1"
     },
     "school_verification": {
@@ -2278,81 +2278,75 @@
    }
   },
   {
-   "gid": "6639624",
-   "epoch": 1788390000,
+   "gid": "6639598",
+   "epoch": 1788019200,
    "teams": [
-    "North Ala.",
-    "Alabama A&M"
+    "UMES",
+    "Florida A&M"
    ],
-   "already_corrected": false,
+   "already_corrected": true,
    "context": {
-    "venue": "CB&S Bank Arena at Flowers Hall",
-    "nominal_home_is_venue_host": false
+    "venue": "Elmore Gymnasium",
+    "nominal_home_is_venue_host": true
    },
    "components": {
     "feed_record_fit": {
      "available": true,
      "feed": [
       [
-       3,
-       0
+       2,
+       1
       ],
       [
-       3,
-       0
+       0,
+       2
       ]
      ],
      "ours": [
       [
-       3,
-       0
+       1,
+       1
       ],
       [
-       3,
-       0
+       0,
+       2
       ]
      ],
-     "h0_error": 0,
-     "h1_error": 0,
-     "delta_h1_better": 0,
-     "vote": "UNINFORMATIVE"
+     "h0_error": 1,
+     "h1_error": 5,
+     "delta_h1_better": -4,
+     "vote": "SUPPORTS_H0"
     },
     "box_roster_fit": {
-     "available": true,
-     "eligible_rows": 40,
-     "h0": [
-      1.0,
-      0.958
-     ],
-     "h1": [
-      0.0,
-      0.0
-     ],
-     "fit_gain": -1.0,
-     "unmatched_sample": [
-      "caitlynhollinquest"
-     ],
-     "vote": "SUPPORTS_H0"
+     "available": false,
+     "vote": "UNAVAILABLE",
+     "why": "roster missing for a side"
     },
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 10,
-     "h1_error": 10,
-     "vote": "UNINFORMATIVE"
+     "h0_error": 11,
+     "h1_error": 1,
+     "vote": "SUPPORTS_H1"
     },
     "school_verification": {
-     "available": true,
-     "verdict": "SCHOOL_CONFLICT",
-     "vote": "SUPPORTS_H1"
+     "available": false,
+     "vote": "UNAVAILABLE",
+     "why": "not yet verified"
     }
    },
    "n_h1_votes": 1,
-   "n_available": 4,
-   "queued": false,
-   "watch": true,
-   "adjudication": null,
-   "first_scored_utc": "2026-09-03T01:14:36Z",
+   "n_available": 2,
+   "queued": true,
+   "watch": false,
+   "adjudication": {
+    "label": "confirmed_inversion",
+    "reviewed_at": "2026-09-03",
+    "basis": [
+     "both schools' legacy exports contradict the feed and agree with each other (neutral site, Huntsville)"
+    ]
+   },
+   "first_scored_utc": "2026-09-03T19:17:00Z",
    "first_feature_version": "v1.1-unweighted",
    "first_score": {
     "components": {
@@ -2360,52 +2354,40 @@
       "available": true,
       "feed": [
        [
-        3,
-        0
+        2,
+        1
        ],
        [
-        3,
-        0
+        0,
+        2
        ]
       ],
       "ours": [
        [
-        3,
-        0
+        1,
+        1
        ],
        [
-        3,
-        0
+        0,
+        2
        ]
       ],
-      "h0_error": 0,
-      "h1_error": 0,
-      "delta_h1_better": 0,
-      "vote": "UNINFORMATIVE"
+      "h0_error": 1,
+      "h1_error": 5,
+      "delta_h1_better": -4,
+      "vote": "SUPPORTS_H0"
      },
      "box_roster_fit": {
-      "available": true,
-      "eligible_rows": 40,
-      "h0": [
-       1.0,
-       0.958
-      ],
-      "h1": [
-       0.0,
-       0.0
-      ],
-      "fit_gain": -1.0,
-      "unmatched_sample": [
-       "caitlynhollinquest"
-      ],
-      "vote": "SUPPORTS_H0"
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "roster missing for a side"
      },
      "record_continuity": {
       "available": true,
       "n_observations": 6,
-      "h0_error": 10,
-      "h1_error": 10,
-      "vote": "UNINFORMATIVE"
+      "h0_error": 11,
+      "h1_error": 1,
+      "vote": "SUPPORTS_H1"
      },
      "school_verification": {
       "available": false,
@@ -2413,7 +2395,7 @@
       "why": "not yet verified"
      }
     },
-    "n_h1_votes": 0,
+    "n_h1_votes": 1,
     "school_verification_available_at_scoring": false
    }
   },
@@ -2596,8 +2578,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 13,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -2742,7 +2724,7 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 7,
+     "h0_error": 1,
      "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
@@ -2892,9 +2874,9 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 8,
-     "h1_error": 8,
-     "vote": "UNINFORMATIVE"
+     "h0_error": 2,
+     "h1_error": 10,
+     "vote": "SUPPORTS_H0"
     },
     "school_verification": {
      "available": true,
@@ -3742,7 +3724,7 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 3,
+     "h0_error": 1,
      "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
@@ -4985,8 +4967,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 11,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -5126,8 +5108,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 5,
-     "h1_error": 15,
+     "h0_error": 1,
+     "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -5255,9 +5237,9 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 8,
-     "h1_error": 8,
-     "vote": "UNINFORMATIVE"
+     "h0_error": 1,
+     "h1_error": 11,
+     "vote": "SUPPORTS_H0"
     },
     "school_verification": {
      "available": true,
@@ -5803,7 +5785,7 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
+     "h0_error": 0,
      "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
@@ -5933,8 +5915,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 6,
-     "h1_error": 10,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -6059,9 +6041,9 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 8,
-     "h1_error": 8,
-     "vote": "UNINFORMATIVE"
+     "h0_error": 1,
+     "h1_error": 11,
+     "vote": "SUPPORTS_H0"
     },
     "school_verification": {
      "available": true,
@@ -6185,8 +6167,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 12,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -6313,8 +6295,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 4,
-     "h1_error": 8,
+     "h0_error": 3,
+     "h1_error": 9,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -6454,8 +6436,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 0,
-     "h1_error": 12,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -6583,7 +6565,7 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 4,
+     "h0_error": 2,
      "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
@@ -6955,8 +6937,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 13,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -7071,8 +7053,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 10,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -8177,7 +8159,7 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
+     "h0_error": 0,
      "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
@@ -8567,8 +8549,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 10,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -8811,7 +8793,7 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 3,
+     "h0_error": 1,
      "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
@@ -8939,8 +8921,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 7,
-     "h1_error": 11,
+     "h0_error": 1,
+     "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -9055,9 +9037,9 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 9,
-     "h1_error": 9,
-     "vote": "UNINFORMATIVE"
+     "h0_error": 2,
+     "h1_error": 10,
+     "vote": "SUPPORTS_H0"
     },
     "school_verification": {
      "available": true,
@@ -9873,8 +9855,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 11,
+     "h0_error": 2,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -10011,8 +9993,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 11,
+     "h0_error": 3,
+     "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -10078,6 +10060,146 @@
       "h0_error": 1,
       "h1_error": 11,
       "vote": "SUPPORTS_H0"
+     },
+     "school_verification": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "not yet verified"
+     }
+    },
+    "n_h1_votes": 0,
+    "school_verification_available_at_scoring": false
+   }
+  },
+  {
+   "gid": "6624723",
+   "epoch": 1788454800,
+   "teams": [
+    "UIC",
+    "Milwaukee"
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": null,
+    "nominal_home_is_venue_host": null
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       0,
+       3
+      ],
+      [
+       0,
+       3
+      ]
+     ],
+     "ours": [
+      [
+       0,
+       3
+      ],
+      [
+       0,
+       3
+      ]
+     ],
+     "h0_error": 0,
+     "h1_error": 0,
+     "delta_h1_better": 0,
+     "vote": "UNINFORMATIVE"
+    },
+    "box_roster_fit": {
+     "available": true,
+     "eligible_rows": 31,
+     "h0": [
+      0.938,
+      1.0
+     ],
+     "h1": [
+      0.0,
+      0.0
+     ],
+     "fit_gain": -1.0,
+     "unmatched_sample": [
+      "nathliasouzadasilva"
+     ],
+     "vote": "SUPPORTS_H0"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 6,
+     "h1_error": 6,
+     "vote": "UNINFORMATIVE"
+    },
+    "school_verification": {
+     "available": false,
+     "vote": "UNAVAILABLE",
+     "why": "not yet verified"
+    }
+   },
+   "n_h1_votes": 0,
+   "n_available": 3,
+   "queued": false,
+   "watch": false,
+   "adjudication": null,
+   "first_scored_utc": "2026-09-03T19:17:00Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        0,
+        3
+       ],
+       [
+        0,
+        3
+       ]
+      ],
+      "ours": [
+       [
+        0,
+        3
+       ],
+       [
+        0,
+        3
+       ]
+      ],
+      "h0_error": 0,
+      "h1_error": 0,
+      "delta_h1_better": 0,
+      "vote": "UNINFORMATIVE"
+     },
+     "box_roster_fit": {
+      "available": true,
+      "eligible_rows": 31,
+      "h0": [
+       0.938,
+       1.0
+      ],
+      "h1": [
+       0.0,
+       0.0
+      ],
+      "fit_gain": -1.0,
+      "unmatched_sample": [
+       "nathliasouzadasilva"
+      ],
+      "vote": "SUPPORTS_H0"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 6,
+      "h1_error": 6,
+      "vote": "UNINFORMATIVE"
      },
      "school_verification": {
       "available": false,
@@ -10966,7 +11088,7 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 3,
+     "h0_error": 1,
      "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
@@ -11249,7 +11371,7 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 3,
+     "h0_error": 1,
      "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
@@ -11678,8 +11800,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 11,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -11819,8 +11941,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 5,
-     "h1_error": 15,
+     "h0_error": 1,
+     "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -11959,9 +12081,9 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 10,
-     "h1_error": 10,
-     "vote": "UNINFORMATIVE"
+     "h0_error": 5,
+     "h1_error": 13,
+     "vote": "SUPPORTS_H0"
     },
     "school_verification": {
      "available": true,
@@ -12763,8 +12885,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 13,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -12879,9 +13001,9 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 9,
-     "h1_error": 9,
-     "vote": "UNINFORMATIVE"
+     "h0_error": 4,
+     "h1_error": 8,
+     "vote": "SUPPORTS_H0"
     },
     "school_verification": {
      "available": true,
@@ -13135,7 +13257,7 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 3,
+     "h0_error": 1,
      "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
@@ -13264,8 +13386,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 4,
-     "h1_error": 12,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -13406,9 +13528,9 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 10,
-     "h1_error": 10,
-     "vote": "UNINFORMATIVE"
+     "h0_error": 3,
+     "h1_error": 9,
+     "vote": "SUPPORTS_H0"
     },
     "school_verification": {
      "available": true,
@@ -14359,8 +14481,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 11,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -14500,8 +14622,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 10,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -14782,8 +14904,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 6,
-     "h1_error": 10,
+     "h0_error": 4,
+     "h1_error": 8,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -14925,8 +15047,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 7,
-     "h1_error": 15,
+     "h0_error": 4,
+     "h1_error": 16,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -15066,9 +15188,9 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 13,
-     "h1_error": 13,
-     "vote": "UNINFORMATIVE"
+     "h0_error": 7,
+     "h1_error": 9,
+     "vote": "SUPPORTS_H0"
     },
     "school_verification": {
      "available": true,
@@ -15195,8 +15317,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 9,
-     "h1_error": 17,
+     "h0_error": 6,
+     "h1_error": 18,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -15323,8 +15445,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 3,
-     "h1_error": 13,
+     "h0_error": 2,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -15451,8 +15573,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 3,
-     "h1_error": 11,
+     "h0_error": 2,
+     "h1_error": 10,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -18019,8 +18141,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 5,
-     "h1_error": 13,
+     "h0_error": 2,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -18401,8 +18523,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 10,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -20551,7 +20673,7 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
+     "h0_error": 0,
      "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
@@ -20694,8 +20816,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 4,
-     "h1_error": 12,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -20969,8 +21091,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 11,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -21645,8 +21767,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 10,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -21889,8 +22011,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 13,
+     "h0_error": 2,
+     "h1_error": 10,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -22160,8 +22282,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 3,
-     "h1_error": 11,
+     "h0_error": 2,
+     "h1_error": 10,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -22574,8 +22696,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 10,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -23539,8 +23661,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 14,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -24559,6 +24681,152 @@
       "n_observations": 6,
       "h0_error": 1,
       "h1_error": 11,
+      "vote": "SUPPORTS_H0"
+     },
+     "school_verification": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "not yet verified"
+     }
+    },
+    "n_h1_votes": 0,
+    "school_verification_available_at_scoring": false
+   }
+  },
+  {
+   "gid": "6625825",
+   "epoch": 1788390000,
+   "teams": [
+    "Bryant",
+    "Stonehill"
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": "Chace Athletic Center",
+    "nominal_home_is_venue_host": false
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       1,
+       3
+      ],
+      [
+       2,
+       2
+      ]
+     ],
+     "ours": [
+      [
+       0,
+       3
+      ],
+      [
+       2,
+       2
+      ]
+     ],
+     "h0_error": 1,
+     "h1_error": 5,
+     "delta_h1_better": -4,
+     "vote": "SUPPORTS_H0"
+    },
+    "box_roster_fit": {
+     "available": true,
+     "eligible_rows": 29,
+     "h0": [
+      1.0,
+      0.75
+     ],
+     "h1": [
+      0.0,
+      0.0
+     ],
+     "fit_gain": -1.0,
+     "unmatched_sample": [
+      "kristinabishop",
+      "samanthaloyd",
+      "catherinedetweiler",
+      "addisonkoontz"
+     ],
+     "vote": "SUPPORTS_H0"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 5,
+     "h1_error": 7,
+     "vote": "SUPPORTS_H0"
+    },
+    "school_verification": {
+     "available": false,
+     "vote": "UNAVAILABLE",
+     "why": "not yet verified"
+    }
+   },
+   "n_h1_votes": 0,
+   "n_available": 3,
+   "queued": false,
+   "watch": false,
+   "adjudication": null,
+   "first_scored_utc": "2026-09-03T19:17:00Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        1,
+        3
+       ],
+       [
+        2,
+        2
+       ]
+      ],
+      "ours": [
+       [
+        0,
+        3
+       ],
+       [
+        2,
+        2
+       ]
+      ],
+      "h0_error": 1,
+      "h1_error": 5,
+      "delta_h1_better": -4,
+      "vote": "SUPPORTS_H0"
+     },
+     "box_roster_fit": {
+      "available": true,
+      "eligible_rows": 29,
+      "h0": [
+       1.0,
+       0.75
+      ],
+      "h1": [
+       0.0,
+       0.0
+      ],
+      "fit_gain": -1.0,
+      "unmatched_sample": [
+       "kristinabishop",
+       "samanthaloyd",
+       "catherinedetweiler",
+       "addisonkoontz"
+      ],
+      "vote": "SUPPORTS_H0"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 5,
+      "h1_error": 7,
       "vote": "SUPPORTS_H0"
      },
      "school_verification": {
@@ -25797,8 +26065,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 13,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -25933,8 +26201,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 14,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -26069,14 +26337,14 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 6,
-     "h1_error": 6,
-     "vote": "UNINFORMATIVE"
+     "h0_error": 0,
+     "h1_error": 12,
+     "vote": "SUPPORTS_H0"
     },
     "school_verification": {
      "available": true,
-     "verdict": "UNVERIFIED",
-     "vote": "UNINFORMATIVE"
+     "verdict": "VERIFIED_BOTH",
+     "vote": "SUPPORTS_H0"
     }
    },
    "n_h1_votes": 0,
@@ -26631,8 +26899,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 14,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -27963,8 +28231,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 10,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -28246,8 +28514,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 10,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -29233,8 +29501,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 13,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -30361,8 +30629,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 13,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -30499,9 +30767,9 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 7,
-     "h1_error": 7,
-     "vote": "UNINFORMATIVE"
+     "h0_error": 1,
+     "h1_error": 11,
+     "vote": "SUPPORTS_H0"
     },
     "school_verification": {
      "available": true,
@@ -31763,8 +32031,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 3,
-     "h1_error": 11,
+     "h0_error": 1,
+     "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -32317,8 +32585,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 5,
-     "h1_error": 11,
+     "h0_error": 2,
+     "h1_error": 10,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -33987,8 +34255,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 13,
+     "h0_error": 3,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -34849,8 +35117,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 3,
-     "h1_error": 13,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -36357,8 +36625,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 11,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -36996,6 +37264,122 @@
    }
   },
   {
+   "gid": "6626708",
+   "epoch": 1788451200,
+   "teams": [
+    "UTSA",
+    "UIW"
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": "Convocation Center",
+    "nominal_home_is_venue_host": false
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       1,
+       2
+      ],
+      [
+       0,
+       2
+      ]
+     ],
+     "ours": [
+      [
+       1,
+       2
+      ],
+      [
+       0,
+       2
+      ]
+     ],
+     "h0_error": 0,
+     "h1_error": 2,
+     "delta_h1_better": -2,
+     "vote": "SUPPORTS_H0"
+    },
+    "box_roster_fit": {
+     "available": false,
+     "vote": "UNAVAILABLE",
+     "why": "roster missing for a side"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 6,
+     "h1_error": 6,
+     "vote": "UNINFORMATIVE"
+    },
+    "school_verification": {
+     "available": false,
+     "vote": "UNAVAILABLE",
+     "why": "not yet verified"
+    }
+   },
+   "n_h1_votes": 0,
+   "n_available": 2,
+   "queued": false,
+   "watch": false,
+   "adjudication": null,
+   "first_scored_utc": "2026-09-03T19:17:00Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        1,
+        2
+       ],
+       [
+        0,
+        2
+       ]
+      ],
+      "ours": [
+       [
+        1,
+        2
+       ],
+       [
+        0,
+        2
+       ]
+      ],
+      "h0_error": 0,
+      "h1_error": 2,
+      "delta_h1_better": -2,
+      "vote": "SUPPORTS_H0"
+     },
+     "box_roster_fit": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "roster missing for a side"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 6,
+      "h1_error": 6,
+      "vote": "UNINFORMATIVE"
+     },
+     "school_verification": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "not yet verified"
+     }
+    },
+    "n_h1_votes": 0,
+    "school_verification_available_at_scoring": false
+   }
+  },
+  {
    "gid": "6626717",
    "epoch": 1787947200,
    "teams": [
@@ -37043,8 +37427,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 0,
-     "h1_error": 12,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -37171,7 +37555,7 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
+     "h0_error": 0,
      "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
@@ -37800,8 +38184,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 11,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -38338,8 +38722,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 6,
-     "h1_error": 12,
+     "h0_error": 3,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -39031,8 +39415,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 3,
-     "h1_error": 9,
+     "h0_error": 2,
+     "h1_error": 10,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -39881,8 +40265,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 13,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -40023,8 +40407,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 10,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -40163,8 +40547,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 12,
+     "h0_error": 1,
+     "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -40303,9 +40687,9 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 8,
+     "h0_error": 4,
      "h1_error": 8,
-     "vote": "UNINFORMATIVE"
+     "vote": "SUPPORTS_H0"
     },
     "school_verification": {
      "available": true,
@@ -40443,7 +40827,7 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 4,
+     "h0_error": 2,
      "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
@@ -41932,7 +42316,7 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 4,
+     "h0_error": 2,
      "h1_error": 10,
      "vote": "SUPPORTS_H0"
     },
@@ -42071,8 +42455,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 4,
-     "h1_error": 12,
+     "h0_error": 1,
+     "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -42209,9 +42593,9 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 9,
+     "h0_error": 3,
      "h1_error": 9,
-     "vote": "UNINFORMATIVE"
+     "vote": "SUPPORTS_H0"
     },
     "school_verification": {
      "available": true,
@@ -42746,9 +43130,9 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 9,
-     "h1_error": 9,
-     "vote": "UNINFORMATIVE"
+     "h0_error": 0,
+     "h1_error": 12,
+     "vote": "SUPPORTS_H0"
     },
     "school_verification": {
      "available": true,
@@ -42889,8 +43273,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 4,
-     "h1_error": 8,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -44107,8 +44491,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 13,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -44381,8 +44765,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 11,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -44661,7 +45045,7 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 0,
+     "h0_error": 2,
      "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
@@ -45459,7 +45843,7 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 3,
+     "h0_error": 1,
      "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
@@ -46767,8 +47151,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 5,
-     "h1_error": 11,
+     "h0_error": 4,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -46903,8 +47287,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 13,
+     "h0_error": 2,
+     "h1_error": 14,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -47465,8 +47849,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 5,
-     "h1_error": 11,
+     "h0_error": 2,
+     "h1_error": 10,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -48252,8 +48636,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 7,
-     "h1_error": 7,
+     "h0_error": 6,
+     "h1_error": 6,
      "vote": "UNINFORMATIVE"
     },
     "school_verification": {
@@ -48394,8 +48778,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 4,
-     "h1_error": 12,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -48538,8 +48922,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 10,
+     "h0_error": 1,
+     "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -49378,8 +49762,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 3,
-     "h1_error": 11,
+     "h0_error": 2,
+     "h1_error": 10,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -50349,9 +50733,9 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 9,
-     "h1_error": 9,
-     "vote": "UNINFORMATIVE"
+     "h0_error": 2,
+     "h1_error": 10,
+     "vote": "SUPPORTS_H0"
     },
     "school_verification": {
      "available": true,
@@ -50773,8 +51157,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 3,
-     "h1_error": 15,
+     "h0_error": 2,
+     "h1_error": 14,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -50917,9 +51301,9 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 7,
-     "h1_error": 7,
-     "vote": "UNINFORMATIVE"
+     "h0_error": 3,
+     "h1_error": 9,
+     "vote": "SUPPORTS_H0"
     },
     "school_verification": {
      "available": true,
@@ -52271,8 +52655,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 12,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -53523,8 +53907,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 14,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -54489,8 +54873,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 4,
-     "h1_error": 12,
+     "h0_error": 5,
+     "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -54907,8 +55291,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 11,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -56599,8 +56983,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 13,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -57010,8 +57394,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 10,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -57687,8 +58071,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 11,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -57826,8 +58210,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 10,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -57965,8 +58349,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 14,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -58245,9 +58629,9 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 9,
-     "h1_error": 9,
-     "vote": "UNINFORMATIVE"
+     "h0_error": 4,
+     "h1_error": 8,
+     "vote": "SUPPORTS_H0"
     },
     "school_verification": {
      "available": true,
@@ -59073,8 +59457,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 10,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -59492,8 +59876,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 11,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -60857,14 +61241,14 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 6,
-     "h1_error": 6,
-     "vote": "UNINFORMATIVE"
+     "h0_error": 2,
+     "h1_error": 10,
+     "vote": "SUPPORTS_H0"
     },
     "school_verification": {
      "available": true,
-     "verdict": "UNVERIFIED",
-     "vote": "UNINFORMATIVE"
+     "verdict": "CORROBORATED_ONE",
+     "vote": "SUPPORTS_H0"
     }
    },
    "n_h1_votes": 0,
@@ -61135,8 +61519,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 7,
-     "h1_error": 13,
+     "h0_error": 6,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -61273,7 +61657,7 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
+     "h0_error": 0,
      "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
@@ -61413,7 +61797,7 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 4,
+     "h0_error": 0,
      "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
@@ -62243,7 +62627,7 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
+     "h0_error": 0,
      "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
@@ -62513,9 +62897,9 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 11,
-     "h1_error": 11,
-     "vote": "UNINFORMATIVE"
+     "h0_error": 2,
+     "h1_error": 10,
+     "vote": "SUPPORTS_H0"
     },
     "school_verification": {
      "available": true,
@@ -62745,8 +63129,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 6,
-     "h1_error": 10,
+     "h0_error": 1,
+     "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -62873,8 +63257,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 10,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -63435,8 +63819,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 0,
-     "h1_error": 12,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -63573,8 +63957,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 10,
+     "h0_error": 4,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -64277,9 +64661,9 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 6,
-     "h1_error": 6,
-     "vote": "UNINFORMATIVE"
+     "h0_error": 0,
+     "h1_error": 12,
+     "vote": "SUPPORTS_H0"
     },
     "school_verification": {
      "available": true,
@@ -64562,8 +64946,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 4,
-     "h1_error": 12,
+     "h0_error": 2,
+     "h1_error": 10,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -64845,9 +65229,9 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 6,
-     "h1_error": 6,
-     "vote": "UNINFORMATIVE"
+     "h0_error": 0,
+     "h1_error": 12,
+     "vote": "SUPPORTS_H0"
     },
     "school_verification": {
      "available": true,
@@ -64981,8 +65365,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 0,
-     "h1_error": 12,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -65373,8 +65757,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 11,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -65779,8 +66163,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 11,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -66729,8 +67113,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 13,
+     "h0_error": 2,
+     "h1_error": 14,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -66858,8 +67242,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 12,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -67546,8 +67930,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 11,
+     "h0_error": 0,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -67916,6 +68300,146 @@
    }
   },
   {
+   "gid": "6639624",
+   "epoch": 1788390000,
+   "teams": [
+    "North Ala.",
+    "Alabama A&M"
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": "CB&S Bank Arena at Flowers Hall",
+    "nominal_home_is_venue_host": false
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       3,
+       0
+      ],
+      [
+       3,
+       0
+      ]
+     ],
+     "ours": [
+      [
+       3,
+       0
+      ],
+      [
+       3,
+       0
+      ]
+     ],
+     "h0_error": 0,
+     "h1_error": 0,
+     "delta_h1_better": 0,
+     "vote": "UNINFORMATIVE"
+    },
+    "box_roster_fit": {
+     "available": true,
+     "eligible_rows": 40,
+     "h0": [
+      1.0,
+      0.958
+     ],
+     "h1": [
+      0.0,
+      0.0
+     ],
+     "fit_gain": -1.0,
+     "unmatched_sample": [
+      "caitlynhollinquest"
+     ],
+     "vote": "SUPPORTS_H0"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 4,
+     "h1_error": 8,
+     "vote": "SUPPORTS_H0"
+    },
+    "school_verification": {
+     "available": true,
+     "verdict": "VERIFIED_BOTH",
+     "vote": "SUPPORTS_H0"
+    }
+   },
+   "n_h1_votes": 0,
+   "n_available": 4,
+   "queued": false,
+   "watch": false,
+   "adjudication": null,
+   "first_scored_utc": "2026-09-03T01:14:36Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        3,
+        0
+       ],
+       [
+        3,
+        0
+       ]
+      ],
+      "ours": [
+       [
+        3,
+        0
+       ],
+       [
+        3,
+        0
+       ]
+      ],
+      "h0_error": 0,
+      "h1_error": 0,
+      "delta_h1_better": 0,
+      "vote": "UNINFORMATIVE"
+     },
+     "box_roster_fit": {
+      "available": true,
+      "eligible_rows": 40,
+      "h0": [
+       1.0,
+       0.958
+      ],
+      "h1": [
+       0.0,
+       0.0
+      ],
+      "fit_gain": -1.0,
+      "unmatched_sample": [
+       "caitlynhollinquest"
+      ],
+      "vote": "SUPPORTS_H0"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 10,
+      "h1_error": 10,
+      "vote": "UNINFORMATIVE"
+     },
+     "school_verification": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "not yet verified"
+     }
+    },
+    "n_h1_votes": 0,
+    "school_verification_available_at_scoring": false
+   }
+  },
+  {
    "gid": "6639642",
    "epoch": 1788026400,
    "teams": [
@@ -67977,7 +68501,7 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 4,
+     "h0_error": 2,
      "h1_error": 10,
      "vote": "SUPPORTS_H0"
     },
@@ -68117,8 +68641,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 3,
-     "h1_error": 11,
+     "h0_error": 2,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
