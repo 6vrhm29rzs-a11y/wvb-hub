@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-03T03:41:26Z",
+  "generated_at_utc": "2026-09-03T18:52:10Z",
   "counts": {
    "statuses": 3,
    "incidents": 0,
    "signals": 0,
    "expired": 2,
-   "anomalies": 58
+   "anomalies": 60
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -195,21 +195,21 @@
    "absent": [
     {
      "name": "Reegan Mishkin",
-     "rate": 4.125,
-     "played_share": 0.667
+     "rate": 3.0,
+     "played_share": 0.75
     },
     {
      "name": "Haley Herndon",
-     "rate": 3.286,
+     "rate": 3.0,
      "played_share": 1.0
     },
     {
      "name": "Catherine Detweiler",
-     "rate": 3.083,
-     "played_share": 0.667
+     "rate": 2.312,
+     "played_share": 0.75
     }
    ],
-   "points_per_set_missing": 10.494
+   "points_per_set_missing": 8.312
   },
   {
    "game_id": "6627542",
@@ -218,16 +218,16 @@
    "absent": [
     {
      "name": "Reegan Mishkin",
-     "rate": 4.125,
-     "played_share": 0.667
+     "rate": 3.0,
+     "played_share": 0.75
     },
     {
      "name": "Catherine Detweiler",
-     "rate": 3.083,
-     "played_share": 0.667
+     "rate": 2.312,
+     "played_share": 0.75
     }
    ],
-   "points_per_set_missing": 7.208
+   "points_per_set_missing": 5.312
   },
   {
    "game_id": "6639842",
@@ -362,19 +362,6 @@
    "points_per_set_missing": 3.154
   },
   {
-   "game_id": "6625817",
-   "team_id": "46366",
-   "team": "Stonehill",
-   "absent": [
-    {
-     "name": "Sammy Franco",
-     "rate": 3.071,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 3.071
-  },
-  {
    "game_id": "6625924",
    "team_id": "46496",
    "team": "Southeast Mo. St.",
@@ -469,6 +456,19 @@
     }
    ],
    "points_per_set_missing": 2.786
+  },
+  {
+   "game_id": "6625817",
+   "team_id": "46366",
+   "team": "Stonehill",
+   "absent": [
+    {
+     "name": "Sammy Franco",
+     "rate": 2.722,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.722
   },
   {
    "game_id": "6637949",
@@ -666,6 +666,19 @@
    "points_per_set_missing": 1.857
   },
   {
+   "game_id": "6637939",
+   "team_id": "46369",
+   "team": "UTSA",
+   "absent": [
+    {
+     "name": "Brooke Elliott",
+     "rate": 1.85,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.85
+  },
+  {
    "game_id": "6627402",
    "team_id": "46175",
    "team": "Delaware St.",
@@ -846,6 +859,19 @@
     }
    ],
    "points_per_set_missing": 1.125
+  },
+  {
+   "game_id": "6637170",
+   "team_id": "45813",
+   "team": "Bryant",
+   "absent": [
+    {
+     "name": "Brookelyn Talmadge",
+     "rate": 1.05,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.05
   },
   {
    "game_id": "6639842",
@@ -1426,11 +1452,11 @@
    ]
   },
   "Stonehill": {
-   "gid": "6627542",
-   "d": "2026-08-29",
-   "appeared": 12,
+   "gid": "6625825",
+   "d": "2026-09-02",
+   "appeared": 15,
    "zero_action": [
-    "Haley Herndon"
+    "Jess Barrett"
    ]
   },
   "SFA": {
@@ -2687,10 +2713,16 @@
    ]
   },
   "UIW": {
-   "gid": "6625610",
-   "d": "2026-08-29",
-   "appeared": 10,
-   "zero_action": []
+   "gid": "6626708",
+   "d": "2026-09-03",
+   "appeared": 11,
+   "zero_action": [
+    "Liliana Brisco",
+    "Ashley Go",
+    "Alana Kolb",
+    "Victoria Sanchez",
+    "Jadyn Molina"
+   ]
   },
   "NC State": {
    "gid": "6626848",
@@ -2948,14 +2980,12 @@
    ]
   },
   "UTSA": {
-   "gid": "6639556",
-   "d": "2026-08-30",
-   "appeared": 12,
+   "gid": "6626708",
+   "d": "2026-09-03",
+   "appeared": 13,
    "zero_action": [
     "Bailey Lechler",
     "Raegan Ramirez",
-    "Isabella Arroyave",
-    "Miranda Putnicki",
     "Maddie Angel",
     "Logan Mcginnis"
    ]
@@ -3348,10 +3378,11 @@
    ]
   },
   "Bryant": {
-   "gid": "6637170",
-   "d": "2026-08-30",
-   "appeared": 10,
+   "gid": "6625825",
+   "d": "2026-09-02",
+   "appeared": 11,
    "zero_action": [
+    "Alicia Johansen",
     "Luiza Bergamaschi"
    ]
   },
