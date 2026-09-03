@@ -305,8 +305,30 @@ def build():
     # typical team, and the pure-season composite must not replace the
     # blend that is measured for exactly this window. No new threshold:
     # the gate reuses the blend's own fitted crossover point.
+    # ── CERTIFIED PROPERTY (migration commit 3): the board no longer
+    # computes maturity -- it REQUIRES the named property from the
+    # certification step, paired to this build's corpus and to the exact
+    # generations of both inputs. Absence or a stale pairing raises: the
+    # build cannot cross a wrong-generation certificate. The legacy
+    # live_rating_mature stays ONLY for certify_rankings and the shadow
+    # guard -- never a runtime fallback here.
     if _live_ok:
-        _live_ok, _why_hold = live_rating_mature(live)
+        from properties import require_property
+        import season_counts as _SCG
+        _certs = load_json("data/ranking_certificates_%d.json" % SEASON)
+        _digby_doc = load_json("data/digby_top25_%d.json" % SEASON) or {}
+        _rec = require_property(
+            _certs, "ordering_mature_for_public_rank",
+            consumer="rankings_board", expected=None,
+            corpus_fingerprint=_SCG.corpus_fingerprint(SEASON),
+            dependency_fingerprints={
+                "rating_%d" % SEASON:
+                    (live.get("meta") or {}).get("corpus_fingerprint"),
+                "digby_top25_%d" % SEASON:
+                    (_digby_doc.get("meta") or {})
+                    .get("corpus_fingerprint")})
+        _live_ok = bool(_rec["value"])
+        _why_hold = (_rec.get("measurement") or {}).get("held_because")
     else:
         _why_hold = None
     if _why_hold:
