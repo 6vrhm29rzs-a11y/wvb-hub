@@ -102,6 +102,7 @@ _VERIFIER_ALIASES = {
     "queens": "queens nc",
     "queens university of charlotte": "queens nc",   # Duke's spelling
     "texas a and m corpus christi": "a and m corpus christi",
+    "usc": "so california",              # texassports' spelling
 }
 
 SEASON = 2026
@@ -273,7 +274,8 @@ def parse_schedule_txt_plain(body, season=SEASON):
 # the card BOUNDARY -- evidence binds inside one card, never across).
 _CARD_MARKS = re.compile(
     r'class="[^"]*(?:schedule-event-item__date-box|'
-    r'schedule-event-date__day|s-game-card)')
+    r'schedule-event-date__day|schedule-event-date__month-day|'
+    r's-game-card|schedule-item__date)')
 
 
 def parse_modern_cards(page, season=SEASON):
@@ -310,7 +312,7 @@ def parse_modern_cards(page, season=SEASON):
                 break
         if not date:
             continue
-        exh = any(re.search(r"Exh|Intrasquad|Scrimmage", tk)
+        exh = any(re.search(r"exh|intrasquad|scrimmage", tk, re.I)
                   for tk in toks)
         res = None
         for j, tk in enumerate(toks):
@@ -424,6 +426,13 @@ def _judge_rows(rows, url, team, opponent, date, canonical):
     if not r["result"]:
         return "NOT_POSTED", {"url": url, "row": r["raw"]}
     wl, a, b = r["result"]
+    # ⚠ SET-ORDER CONVENTION, MEASURED (Alabama A&M, 2026-09-02): some
+    # schools list a LOSS opponent-first -- "L 3-0" meaning lost nil-three.
+    # "L" with a>b (or "W" with a<b) is internally incoherent read own-
+    # first, and the LETTER is the school's authoritative claim; the
+    # numbers are the set counts, so orientation follows the letter.
+    if (wl == "L" and a > b) or (wl == "W" and a < b):
+        a, b = b, a
     won = wl == "W"
     c_won = canonical["winner"] == team
     c_sets = (canonical["w_sets"], canonical["l_sets"]) if c_won \

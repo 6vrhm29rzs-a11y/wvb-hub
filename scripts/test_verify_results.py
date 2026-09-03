@@ -137,6 +137,22 @@ def main():
           "wrong-team join can never come back through this key)",
           not coll, coll[:3])
 
+    print("\n1d. SET-ORDER CONVENTION -- the letter is authoritative")
+    rows_c = [{"date": "2026-09-02", "site": "Home", "opponent": "North Ala.",
+               "exhibition": False, "result": ("L", 3, 0), "raw": []}]
+    stc, detc = V._judge_rows(rows_c, "t://c", "Alabama A&M", "North Ala.",
+                              "2026-09-02",
+                              {"winner": "North Ala.", "loser": "Alabama A&M",
+                               "w_sets": 3, "l_sets": 0})
+    check("'L 3-0' (opponent-first loss) normalizes to the letter and "
+          "AGREES", stc == "AGREE_COMPLETE", (stc, detc))
+    stc2, _ = V._judge_rows(rows_c, "t://c", "Alabama A&M", "North Ala.",
+                            "2026-09-02",
+                            {"winner": "Alabama A&M", "loser": "North Ala.",
+                             "w_sets": 3, "l_sets": 0})
+    check("[NEG] ...and still CONTRADICTS a record where the letter "
+          "disagrees", stc2 == "CONTRADICTS", stc2)
+
     print("\n2. VERDICTS -- corroboration is never verification")
     v = V.verdict
     check("both agree COMPLETELY -> VERIFIED_BOTH",

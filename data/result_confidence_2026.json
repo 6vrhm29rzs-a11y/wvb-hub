@@ -2,7 +2,7 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-03T03:41:26Z",
+  "generated_at_utc": "2026-09-03T04:13:45Z",
   "counts": {
    "finals": 529,
    "official_only": 10,
@@ -15720,11 +15720,39 @@
     "box": "reconciled",
     "venue": "official"
    },
-   "verify": null,
-   "n_indep": 0,
+   "verify": {
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-03T04:08:34Z",
+    "schools": {
+     "Michigan St.": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://msuspartans.com/sports/womens-volleyball/schedule/text",
+      "assertion": "Michigan St. W 3-0 vs South Carolina",
+      "opponent_source": "South Carolina",
+      "site_says": "Neutral"
+     },
+     "South Carolina": {
+      "state": "SITE_UNPARSED",
+      "url": "https://gamecocksonline.com/news/2021/09/03/textforhelp/"
+     }
+    }
+   },
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-03T04:08:34Z",
+   "sources": [
+    {
+     "url": "https://msuspartans.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Michigan St.",
+     "text": "Michigan St. W 3-0 vs South Carolina",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -15748,11 +15776,40 @@
     "box": "reconciled",
     "venue": "official"
    },
-   "verify": null,
-   "n_indep": 0,
+   "verify": {
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-03T04:08:34Z",
+    "schools": {
+     "Maryland": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://umterps.com/sports/womens-volleyball/schedule/text",
+      "assertion": "Maryland W 3-1 vs Arkansas",
+      "opponent_source": "Arkansas",
+      "site_says": "Neutral"
+     },
+     "Arkansas": {
+      "state": "SITE_HTTP_MISS",
+      "url": "https://arkansasrazorbacks.com/sports/womens-volleyball/schedule/text",
+      "http": 404
+     }
+    }
+   },
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-03T04:08:34Z",
+   "sources": [
+    {
+     "url": "https://umterps.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Maryland",
+     "text": "Maryland W 3-1 vs Arkansas",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -15776,11 +15833,40 @@
     "box": "reconciled",
     "venue": "official"
    },
-   "verify": null,
-   "n_indep": 0,
+   "verify": {
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-03T04:08:34Z",
+    "schools": {
+     "Indiana": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://iuhoosiers.com/sports/womens-volleyball/schedule/text",
+      "assertion": "Indiana W 3-2 vs Texas A&M",
+      "opponent_source": "Texas A&M",
+      "site_says": "Neutral"
+     },
+     "Texas A&M": {
+      "state": "SITE_HTTP_MISS",
+      "url": "https://12thman.com/sports/womens-volleyball/schedule/text",
+      "http": 404
+     }
+    }
+   },
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-03T04:08:34Z",
+   "sources": [
+    {
+     "url": "https://iuhoosiers.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Indiana",
+     "text": "Indiana W 3-2 vs Texas A&M",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -15804,11 +15890,54 @@
     "box": "reconciled",
     "venue": "unavailable"
    },
-   "verify": null,
-   "n_indep": 0,
+   "verify": {
+    "v": "VERIFIED_BOTH",
+    "checked": "2026-09-03T04:08:34Z",
+    "schools": {
+     "Minnesota": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://gophersports.com/sports/womens-volleyball/schedule/text",
+      "assertion": "Minnesota W 3-1 vs Auburn",
+      "opponent_source": "Auburn",
+      "site_says": "Neutral"
+     },
+     "Auburn": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://auburntigers.com/sports/volleyball/schedule",
+      "assertion": "Auburn L 1-3 vs Minnesota",
+      "opponent_source": "Minnesota",
+      "site_says": null,
+      "surface": "modern_card"
+     }
+    }
+   },
+   "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-03T04:08:34Z",
+   "sources": [
+    {
+     "url": "https://auburntigers.com/sports/volleyball/schedule",
+     "kind": "school_schedule",
+     "school": "Auburn",
+     "text": "Auburn L 1-3 vs Minnesota",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    },
+    {
+     "url": "https://gophersports.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Minnesota",
+     "text": "Minnesota W 3-1 vs Auburn",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -15832,11 +15961,53 @@
     "box": "reconciled",
     "venue": "unavailable"
    },
-   "verify": null,
-   "n_indep": 0,
+   "verify": {
+    "v": "VERIFIED_BOTH",
+    "checked": "2026-09-03T04:08:34Z",
+    "schools": {
+     "Buffalo": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://ubbulls.com/sports/womens-volleyball/schedule/text",
+      "assertion": "Buffalo W 3-0 vs Canisius",
+      "opponent_source": "Canisius",
+      "site_says": "Home"
+     },
+     "Canisius": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://gogriffs.com/services/schedule_txt.ashx?schedule=485",
+      "assertion": "Canisius L 0-3 vs Buffalo",
+      "opponent_source": "Buffalo",
+      "site_says": "Away"
+     }
+    }
+   },
+   "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-03T04:08:34Z",
+   "sources": [
+    {
+     "url": "https://ubbulls.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Buffalo",
+     "text": "Buffalo W 3-0 vs Canisius",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    },
+    {
+     "url": "https://gogriffs.com/services/schedule_txt.ashx?schedule=485",
+     "kind": "school_schedule",
+     "school": "Canisius",
+     "text": "Canisius L 0-3 vs Buffalo",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -15860,11 +16031,53 @@
     "box": "reconciled",
     "venue": "official"
    },
-   "verify": null,
-   "n_indep": 0,
+   "verify": {
+    "v": "VERIFIED_BOTH",
+    "checked": "2026-09-03T04:08:34Z",
+    "schools": {
+     "Oakland": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://goldengrizzlies.com/services/schedule_txt.ashx?schedule=1366",
+      "assertion": "Oakland W 3-1 vs Central Michigan",
+      "opponent_source": "Central Michigan",
+      "site_says": "Away"
+     },
+     "Central Mich.": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://cmuchippewas.com/sports/womens-volleyball/schedule/text",
+      "assertion": "Central Mich. L 1-3 vs Oakland",
+      "opponent_source": "Oakland",
+      "site_says": "Home"
+     }
+    }
+   },
+   "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-03T04:08:34Z",
+   "sources": [
+    {
+     "url": "https://cmuchippewas.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Central Mich.",
+     "text": "Central Mich. L 1-3 vs Oakland",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    },
+    {
+     "url": "https://goldengrizzlies.com/services/schedule_txt.ashx?schedule=1366",
+     "kind": "school_schedule",
+     "school": "Oakland",
+     "text": "Oakland W 3-1 vs Central Michigan",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -15888,11 +16101,53 @@
     "box": "reconciled",
     "venue": "unavailable"
    },
-   "verify": null,
-   "n_indep": 0,
+   "verify": {
+    "v": "VERIFIED_BOTH",
+    "checked": "2026-09-03T04:08:34Z",
+    "schools": {
+     "Norfolk St.": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://nsuspartans.com/services/schedule_txt.ashx?schedule=274",
+      "assertion": "Norfolk St. W 3-2 vs Hampton",
+      "opponent_source": "Hampton",
+      "site_says": "Home"
+     },
+     "Hampton": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://hamptonpirates.com/sports/womens-volleyball/schedule/text",
+      "assertion": "Hampton L 2-3 vs Norfolk State",
+      "opponent_source": "Norfolk State",
+      "site_says": "Away"
+     }
+    }
+   },
+   "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-03T04:08:34Z",
+   "sources": [
+    {
+     "url": "https://hamptonpirates.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Hampton",
+     "text": "Hampton L 2-3 vs Norfolk State",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    },
+    {
+     "url": "https://nsuspartans.com/services/schedule_txt.ashx?schedule=274",
+     "kind": "school_schedule",
+     "school": "Norfolk St.",
+     "text": "Norfolk St. W 3-2 vs Hampton",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -15916,11 +16171,53 @@
     "box": "reconciled",
     "venue": "official"
    },
-   "verify": null,
-   "n_indep": 0,
+   "verify": {
+    "v": "VERIFIED_BOTH",
+    "checked": "2026-09-03T04:08:34Z",
+    "schools": {
+     "Delaware St.": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://dsuhornets.com/services/schedule_txt.ashx?schedule=388",
+      "assertion": "Delaware St. W 3-1 vs St. Peter's",
+      "opponent_source": "St. Peter's",
+      "site_says": "Neutral"
+     },
+     "Saint Peter's": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://saintpeterspeacocks.com/services/schedule_txt.ashx?schedule=1302",
+      "assertion": "Saint Peter's L 1-3 vs Delaware State",
+      "opponent_source": "Delaware State",
+      "site_says": "Home"
+     }
+    }
+   },
+   "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-03T04:08:34Z",
+   "sources": [
+    {
+     "url": "https://dsuhornets.com/services/schedule_txt.ashx?schedule=388",
+     "kind": "school_schedule",
+     "school": "Delaware St.",
+     "text": "Delaware St. W 3-1 vs St. Peter's",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    },
+    {
+     "url": "https://saintpeterspeacocks.com/services/schedule_txt.ashx?schedule=1302",
+     "kind": "school_schedule",
+     "school": "Saint Peter's",
+     "text": "Saint Peter's L 1-3 vs Delaware State",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -15944,11 +16241,53 @@
     "box": "reconciled",
     "venue": "official"
    },
-   "verify": null,
-   "n_indep": 0,
+   "verify": {
+    "v": "VERIFIED_BOTH",
+    "checked": "2026-09-03T04:08:34Z",
+    "schools": {
+     "NJIT": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://njithighlanders.com/services/schedule_txt.ashx?schedule=467",
+      "assertion": "NJIT W 3-2 vs Manhattan",
+      "opponent_source": "Manhattan",
+      "site_says": "Home"
+     },
+     "Manhattan": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://gojaspers.com/services/schedule_txt.ashx?schedule=443",
+      "assertion": "Manhattan L 2-3 vs NJIT",
+      "opponent_source": "NJIT",
+      "site_says": "Away"
+     }
+    }
+   },
+   "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-03T04:08:34Z",
+   "sources": [
+    {
+     "url": "https://gojaspers.com/services/schedule_txt.ashx?schedule=443",
+     "kind": "school_schedule",
+     "school": "Manhattan",
+     "text": "Manhattan L 2-3 vs NJIT",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    },
+    {
+     "url": "https://njithighlanders.com/services/schedule_txt.ashx?schedule=467",
+     "kind": "school_schedule",
+     "school": "NJIT",
+     "text": "NJIT W 3-2 vs Manhattan",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -15972,11 +16311,53 @@
     "box": "reconciled",
     "venue": "official"
    },
-   "verify": null,
-   "n_indep": 0,
+   "verify": {
+    "v": "VERIFIED_BOTH",
+    "checked": "2026-09-03T04:08:34Z",
+    "schools": {
+     "Ole Miss": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://olemisssports.com/sports/womens-volleyball/schedule/text",
+      "assertion": "Ole Miss W 3-1 vs Ohio State",
+      "opponent_source": "Ohio State",
+      "site_says": "Neutral"
+     },
+     "Ohio St.": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://ohiostatebuckeyes.com/sports/womens-volleyball/schedule/text",
+      "assertion": "Ohio St. L 1-3 vs Ole Miss",
+      "opponent_source": "Ole Miss",
+      "site_says": "Neutral"
+     }
+    }
+   },
+   "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-03T04:08:34Z",
+   "sources": [
+    {
+     "url": "https://ohiostatebuckeyes.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Ohio St.",
+     "text": "Ohio St. L 1-3 vs Ole Miss",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    },
+    {
+     "url": "https://olemisssports.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Ole Miss",
+     "text": "Ole Miss W 3-1 vs Ohio State",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -16000,11 +16381,54 @@
     "box": "reconciled",
     "venue": "official"
    },
-   "verify": null,
-   "n_indep": 0,
+   "verify": {
+    "v": "VERIFIED_BOTH",
+    "checked": "2026-09-03T04:08:34Z",
+    "schools": {
+     "Michigan": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://mgoblue.com/sports/womens-volleyball/schedule/text",
+      "assertion": "Michigan W 3-1 vs LSU",
+      "opponent_source": "LSU",
+      "site_says": "Home"
+     },
+     "LSU": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://lsusports.net/sports/vb/schedule",
+      "assertion": "LSU L 1-3 vs Michigan",
+      "opponent_source": "Michigan",
+      "site_says": null,
+      "surface": "modern_card"
+     }
+    }
+   },
+   "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-03T04:08:34Z",
+   "sources": [
+    {
+     "url": "https://lsusports.net/sports/vb/schedule",
+     "kind": "school_schedule",
+     "school": "LSU",
+     "text": "LSU L 1-3 vs Michigan",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    },
+    {
+     "url": "https://mgoblue.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Michigan",
+     "text": "Michigan W 3-1 vs LSU",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -16028,11 +16452,55 @@
     "box": "reconciled",
     "venue": "official"
    },
-   "verify": null,
-   "n_indep": 0,
+   "verify": {
+    "v": "VERIFIED_BOTH",
+    "checked": "2026-09-03T04:08:34Z",
+    "schools": {
+     "Kentucky": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://ukathletics.com/sports/wvball/schedule/",
+      "assertion": "Kentucky W 3-0 vs UCLA",
+      "opponent_source": "UCLA",
+      "site_says": null,
+      "surface": "modern_card"
+     },
+     "UCLA": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://uclabruins.com/sports/womens-volleyball/schedule",
+      "assertion": "UCLA L 0-3 vs Kentucky",
+      "opponent_source": "Kentucky",
+      "site_says": "Away",
+      "surface": "modern_card"
+     }
+    }
+   },
+   "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-03T04:08:34Z",
+   "sources": [
+    {
+     "url": "https://ukathletics.com/sports/wvball/schedule/",
+     "kind": "school_schedule",
+     "school": "Kentucky",
+     "text": "Kentucky W 3-0 vs UCLA",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    },
+    {
+     "url": "https://uclabruins.com/sports/womens-volleyball/schedule",
+     "kind": "school_schedule",
+     "school": "UCLA",
+     "text": "UCLA L 0-3 vs Kentucky",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -16056,11 +16524,42 @@
     "box": "reconciled",
     "venue": "official"
    },
-   "verify": null,
-   "n_indep": 0,
+   "verify": {
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-03T04:08:34Z",
+    "schools": {
+     "Rice": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://riceowls.com/sports/womens-volleyball/schedule/text",
+      "assertion": "Rice W 3-1 vs Tarleton State",
+      "opponent_source": "Tarleton State",
+      "site_says": "Home"
+     },
+     "Tarleton St.": {
+      "state": "EVENT_NOT_FOUND",
+      "url": "https://tarletonsports.com/services/schedule_txt.ashx?schedule=308",
+      "rows_on_date": [
+       "(RV) Rice"
+      ]
+     }
+    }
+   },
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-03T04:08:34Z",
+   "sources": [
+    {
+     "url": "https://riceowls.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Rice",
+     "text": "Rice W 3-1 vs Tarleton State",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -16084,11 +16583,54 @@
     "box": "reconciled",
     "venue": "official"
    },
-   "verify": null,
-   "n_indep": 0,
+   "verify": {
+    "v": "VERIFIED_BOTH",
+    "checked": "2026-09-03T04:08:34Z",
+    "schools": {
+     "Purdue": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://purduesports.com/sports/volleyball/schedule",
+      "assertion": "Purdue W 3-2 vs Georgia",
+      "opponent_source": "Georgia",
+      "site_says": null,
+      "surface": "modern_card"
+     },
+     "Georgia": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://georgiadogs.com/sports/womens-volleyball/schedule/text",
+      "assertion": "Georgia L 2-3 vs Purdue",
+      "opponent_source": "Purdue",
+      "site_says": "Away"
+     }
+    }
+   },
+   "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-03T04:08:34Z",
+   "sources": [
+    {
+     "url": "https://georgiadogs.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Georgia",
+     "text": "Georgia L 2-3 vs Purdue",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    },
+    {
+     "url": "https://purduesports.com/sports/volleyball/schedule",
+     "kind": "school_schedule",
+     "school": "Purdue",
+     "text": "Purdue W 3-2 vs Georgia",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -16112,11 +16654,53 @@
     "box": "reconciled",
     "venue": "unavailable"
    },
-   "verify": null,
-   "n_indep": 0,
+   "verify": {
+    "v": "VERIFIED_BOTH",
+    "checked": "2026-09-03T04:08:34Z",
+    "schools": {
+     "Grambling": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://gsutigers.com/services/schedule_txt.ashx?schedule=263",
+      "assertion": "Grambling W 3-1 vs Nicholls",
+      "opponent_source": "Nicholls",
+      "site_says": "Home"
+     },
+     "Nicholls": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://geauxcolonels.com/services/schedule_txt.ashx?schedule=458",
+      "assertion": "Nicholls L 1-3 vs Grambling",
+      "opponent_source": "Grambling",
+      "site_says": "Away"
+     }
+    }
+   },
+   "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-03T04:08:34Z",
+   "sources": [
+    {
+     "url": "https://gsutigers.com/services/schedule_txt.ashx?schedule=263",
+     "kind": "school_schedule",
+     "school": "Grambling",
+     "text": "Grambling W 3-1 vs Nicholls",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    },
+    {
+     "url": "https://geauxcolonels.com/services/schedule_txt.ashx?schedule=458",
+     "kind": "school_schedule",
+     "school": "Nicholls",
+     "text": "Nicholls L 1-3 vs Grambling",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -16140,11 +16724,53 @@
     "box": "reconciled",
     "venue": "official"
    },
-   "verify": null,
-   "n_indep": 0,
+   "verify": {
+    "v": "VERIFIED_BOTH",
+    "checked": "2026-09-03T04:08:34Z",
+    "schools": {
+     "North Ala.": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://roarlions.com/services/schedule_txt.ashx?schedule=171",
+      "assertion": "North Ala. W 3-0 vs Alabama A&M",
+      "opponent_source": "Alabama A&M",
+      "site_says": "Home"
+     },
+     "Alabama A&M": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://aamusports.com/services/schedule_txt.ashx?schedule=385",
+      "assertion": "Alabama A&M L 0-3 vs North Alabama",
+      "opponent_source": "North Alabama",
+      "site_says": "Away"
+     }
+    }
+   },
+   "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-03T04:08:34Z",
+   "sources": [
+    {
+     "url": "https://aamusports.com/services/schedule_txt.ashx?schedule=385",
+     "kind": "school_schedule",
+     "school": "Alabama A&M",
+     "text": "Alabama A&M L 0-3 vs North Alabama",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    },
+    {
+     "url": "https://roarlions.com/services/schedule_txt.ashx?schedule=171",
+     "kind": "school_schedule",
+     "school": "North Ala.",
+     "text": "North Ala. W 3-0 vs Alabama A&M",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -16168,11 +16794,48 @@
     "box": "reconciled",
     "venue": "official"
    },
-   "verify": null,
-   "n_indep": 0,
+   "verify": {
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-03T04:08:34Z",
+    "schools": {
+     "TCU": {
+      "state": "NOT_POSTED",
+      "url": "https://gofrogs.com/sports/womens-volleyball/schedule/text",
+      "row": [
+       "Sep 2 (Wed)",
+       "6:30 PM",
+       "Home",
+       "SMU",
+       "Fort Worth, Texas",
+       "",
+       "-"
+      ]
+     },
+     "SMU": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://smumustangs.com/services/schedule_txt.ashx?schedule=3379",
+      "assertion": "SMU L 2-3 vs TCU",
+      "opponent_source": "TCU",
+      "site_says": "Away"
+     }
+    }
+   },
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-03T04:08:34Z",
+   "sources": [
+    {
+     "url": "https://smumustangs.com/services/schedule_txt.ashx?schedule=3379",
+     "kind": "school_schedule",
+     "school": "SMU",
+     "text": "SMU L 2-3 vs TCU",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -16196,11 +16859,53 @@
     "box": "reconciled",
     "venue": "unavailable"
    },
-   "verify": null,
-   "n_indep": 0,
+   "verify": {
+    "v": "VERIFIED_BOTH",
+    "checked": "2026-09-03T04:08:34Z",
+    "schools": {
+     "DePaul": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://depaulbluedemons.com/sports/womens-volleyball/schedule/text",
+      "assertion": "DePaul W 3-1 vs Portland State",
+      "opponent_source": "Portland State",
+      "site_says": "Home"
+     },
+     "Portland St.": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://goviks.com/services/schedule_txt.ashx?schedule=224",
+      "assertion": "Portland St. L 1-3 vs DePaul",
+      "opponent_source": "DePaul",
+      "site_says": "Away"
+     }
+    }
+   },
+   "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-03T04:08:34Z",
+   "sources": [
+    {
+     "url": "https://depaulbluedemons.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "DePaul",
+     "text": "DePaul W 3-1 vs Portland State",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    },
+    {
+     "url": "https://goviks.com/services/schedule_txt.ashx?schedule=224",
+     "kind": "school_schedule",
+     "school": "Portland St.",
+     "text": "Portland St. L 1-3 vs DePaul",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -16224,11 +16929,40 @@
     "box": "reconciled",
     "venue": "official"
    },
-   "verify": null,
-   "n_indep": 0,
+   "verify": {
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-03T04:08:34Z",
+    "schools": {
+     "Nebraska": {
+      "state": "SITE_HTTP_MISS",
+      "url": "https://huskers.com/sports/womens-volleyball/schedule/text",
+      "http": 404
+     },
+     "South Dakota St.": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://gojacks.com/sports/womens-volleyball/schedule/text",
+      "assertion": "South Dakota St. L 0-3 vs Nebraska",
+      "opponent_source": "Nebraska",
+      "site_says": "Home"
+     }
+    }
+   },
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-03T04:08:34Z",
+   "sources": [
+    {
+     "url": "https://gojacks.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "South Dakota St.",
+     "text": "South Dakota St. L 0-3 vs Nebraska",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -16252,11 +16986,40 @@
     "box": "reconciled",
     "venue": "official"
    },
-   "verify": null,
-   "n_indep": 0,
+   "verify": {
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-03T04:08:34Z",
+    "schools": {
+     "Vanderbilt": {
+      "state": "SITE_HTTP_MISS",
+      "url": "https://vucommodores.com/sports/womens-volleyball/schedule/text",
+      "http": 404
+     },
+     "Rutgers": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://scarletknights.com/sports/womens-volleyball/schedule/text",
+      "assertion": "Rutgers L 1-3 vs Vanderbilt",
+      "opponent_source": "Vanderbilt",
+      "site_says": "Away"
+     }
+    }
+   },
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-03T04:08:34Z",
+   "sources": [
+    {
+     "url": "https://scarletknights.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Rutgers",
+     "text": "Rutgers L 1-3 vs Vanderbilt",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -16280,11 +17043,48 @@
     "box": "reconciled",
     "venue": "unavailable"
    },
-   "verify": null,
-   "n_indep": 0,
+   "verify": {
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-03T04:08:34Z",
+    "schools": {
+     "Wisconsin": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://uwbadgers.com/sports/womens-volleyball/schedule/text",
+      "assertion": "Wisconsin W 3-2 vs Florida",
+      "opponent_source": "Florida",
+      "site_says": "Home"
+     },
+     "Florida": {
+      "state": "NOT_POSTED",
+      "url": "https://floridagators.com/sports/womens-volleyball/schedule/text",
+      "row": [
+       "Sep 2 (Wed)",
+       "8 PM",
+       "Away",
+       "#5 Wisconsin",
+       "Madison, WI",
+       "Big Ten/SEC Volleyball Challenge",
+       "-"
+      ]
+     }
+    }
+   },
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-03T04:08:34Z",
+   "sources": [
+    {
+     "url": "https://uwbadgers.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Wisconsin",
+     "text": "Wisconsin W 3-2 vs Florida",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -16308,11 +17108,40 @@
     "box": "reconciled",
     "venue": "official"
    },
-   "verify": null,
-   "n_indep": 0,
+   "verify": {
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-03T04:08:34Z",
+    "schools": {
+     "Texas": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://texassports.com/sports/womens-volleyball/schedule/text",
+      "assertion": "Texas W 3-0 vs USC",
+      "opponent_source": "USC",
+      "site_says": "Home"
+     },
+     "Southern California": {
+      "state": "SITE_HTTP_MISS",
+      "url": "https://www.usctrojans.com/sports/womens-volleyball/schedule/text",
+      "http": 308
+     }
+    }
+   },
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-03T04:08:34Z",
+   "sources": [
+    {
+     "url": "https://texassports.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Texas",
+     "text": "Texas W 3-0 vs USC",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-03T04:08:34Z"
+    }
+   ]
   }
  ]
 }
