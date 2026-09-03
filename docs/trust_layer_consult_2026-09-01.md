@@ -77,3 +77,47 @@ Implemented same night: `scripts/verify_results_daily.py`,
 First live run: 13 finals, 1 VERIFIED_BOTH / 4 CORROBORATED_ONE /
 0 contradictions; per-school 6 agree · 3 not-posted · 11 unparsed (JS
 schedule pages — next adapter rung) · 5 unreachable · 1 event-not-found.
+
+## Consult 3 — the architect error-hunting plan (2026-09-02)
+
+Trigger: the live composite seized the board at median 3 games/team
+(meta.validated proves validation RAN — the wrong property). Fixed with the
+measured maturity gate (median gp ≥ blend k) before the consult; the plan
+targets the class.
+
+Ranked sweeps, with status:
+1. **Cross-surface truth reconciliation** — per-team TruthSnapshot from the
+   season_counts contract vs every reader-facing aggregate.
+   BUILT (`test_cross_surface.py`); first run found the fifth New Orleans
+   bite (res rows carried the feed's raw spelling; standings counted every
+   New Orleans match non-D-I for the opponent). Fixed via `_hub_name()`
+   against the membership authority.
+2. **Generation-fingerprint coherence** — fail publication when
+   truth-bearing artifacts disagree on the canonical games/corrections
+   fingerprint. PARTIAL (audit manifest holds totals); full per-artifact
+   stamping is open.
+3. **Lead-vs-table contradictions** — re-derive every generated summary
+   sentence from the rows rendered beneath it, never via the helper that
+   wrote it. BUILT (`test_lead_vs_table.py`), four leads covered; all hold.
+4. **One-record-log semantics** — classify every jsonl reader (event log /
+   snapshot / archive) and check the discipline. AUDITED: all seven
+   playerbox/boxscores/lineups readers key by gid last-wins. Clean.
+5. **Permutation beyond scores** — the swap-coherence question applied to
+   any two-sided structure (player rows, set lines, records_at_time,
+   starters). PARTIAL (detector covers teams[]/box/records); starters and
+   set-line orientation open.
+6. **Ledger/archive internal consistency** — each archive row consistent
+   with its own captured ruler, never current artifacts. OPEN.
+7. **Architecture** — named certified properties
+   (`certifies: {ordering_mature_for_public_rank: …}`) with
+   `require_property(consumer)`; no generic booleans crossing subsystem
+   boundaries, no property satisfying another by implication. OPEN — the
+   structural answer to the wrong-property-gate class; needs a design pass.
+
+Web finding worth its own line: **henrygd/ncaa-api v3 moved off the old
+Casablanca endpoints to NCAA's new GraphQL backend (sdataprod.ncaa.com),
+propagating upstream `team.isHome`/`team.isWinner` directly.** The
+inversion epidemic is therefore plausibly NCAA's own structured data — not
+established (no public issue reports it), but it reframes the defect as
+upstream-attribution, which is exactly what the school-site verification
+layer exists to catch.
