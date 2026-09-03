@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-03T00:25:58Z",
+  "generated_at_utc": "2026-09-03T00:36:31Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 0,
    "expired": 1,
-   "anomalies": 54
+   "anomalies": 56
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -932,6 +932,32 @@
    "points_per_set_missing": 0.875
   },
   {
+   "game_id": "6639575",
+   "team_id": "46679",
+   "team": "Hampton",
+   "absent": [
+    {
+     "name": "Ana luiza Matos",
+     "rate": 0.7,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 0.7
+  },
+  {
+   "game_id": "6626131",
+   "team_id": "46679",
+   "team": "Hampton",
+   "absent": [
+    {
+     "name": "Ana luiza Matos",
+     "rate": 0.7,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 0.7
+  },
+  {
    "game_id": "6637631",
    "team_id": "45938",
    "team": "Ole Miss",
@@ -991,13 +1017,13 @@
    ]
   },
   "Norfolk St.": {
-   "gid": "6625052",
-   "d": "2026-09-01",
-   "appeared": 11,
+   "gid": "6625053",
+   "d": "2026-09-02",
+   "appeared": 10,
    "zero_action": [
     "Aliyah Torres",
-    "Brooklyn Kostoff",
     "Erin Armstrong",
+    "Kailia Phillips",
     "Kaden Sanders",
     "Amari Chaney"
    ]
@@ -1102,7 +1128,7 @@
   "Florida": {
    "gid": "6624828",
    "d": "2026-09-01",
-   "appeared": 22,
+   "appeared": 11,
    "zero_action": [
     "Milica Vidacic",
     "Nadi'ya Shelby",
@@ -1893,16 +1919,14 @@
    ]
   },
   "Alabama A&M": {
-   "gid": "6625142",
-   "d": "2026-08-29",
-   "appeared": 11,
+   "gid": "6639624",
+   "d": "2026-09-02",
+   "appeared": 13,
    "zero_action": [
     "Madison Drummond",
     "Rhyan Holloway",
-    "Kinslee Carter",
     "Sage Jackson",
     "Jourdin Brooks",
-    "Kennedy Moss",
     "Isabella Fleurima",
     "Ivy Maxwell",
     "Shaylee Howard",
@@ -2249,10 +2273,18 @@
    "zero_action": []
   },
   "Hampton": {
-   "gid": "6626131",
-   "d": "2026-08-29",
-   "appeared": 8,
-   "zero_action": []
+   "gid": "6625053",
+   "d": "2026-09-02",
+   "appeared": 10,
+   "zero_action": [
+    "Kyndall Williams",
+    "Aliyah Millner",
+    "Leila Ricks",
+    "Maria clara Andrade",
+    "Lyrique Alteus",
+    "Antonia Vasquez",
+    "Olivia Bryant"
+   ]
   },
   "CSU Bakersfield": {
    "gid": "6628216",
@@ -2429,8 +2461,8 @@
    ]
   },
   "North Ala.": {
-   "gid": "6627456",
-   "d": "2026-08-30",
+   "gid": "6639624",
+   "d": "2026-09-02",
    "appeared": 9,
    "zero_action": [
     "Kennedy Bullins",
@@ -3493,10 +3525,8 @@
   "South Carolina": {
    "gid": "6624355",
    "d": "2026-09-02",
-   "appeared": 20,
+   "appeared": 10,
    "zero_action": [
-    "Maggie Penn",
-    "Madisyn Crnjac",
     "Maggie Penn",
     "Madisyn Crnjac"
    ]
@@ -3638,7 +3668,7 @@
   "Michigan St.": {
    "gid": "6624355",
    "d": "2026-09-02",
-   "appeared": 18,
+   "appeared": 9,
    "zero_action": []
   },
   "Miami (FL)": {
