@@ -1,17 +1,17 @@
 {
  "meta": {
   "season": 2026,
-  "generated_at_utc": "2026-09-03T02:59:16Z",
+  "generated_at_utc": "2026-09-03T03:41:26Z",
   "n_claims": 42,
   "feed_cap": 5,
   "recent_hours": 72,
   "states": {
-   "confirmed_official": 23,
+   "confirmed_official": 22,
    "corroborated": 9,
    "official_unconfirmed": 0,
    "community_signal": 0,
    "conflicting": 6,
-   "expired": 3,
+   "expired": 4,
    "inaccessible": 1
   }
  },
@@ -1289,40 +1289,6 @@
    "review_by": null
   },
   {
-   "id": "49195fadc4dd",
-   "type": "availability",
-   "subject": {
-    "kind": "player",
-    "team": "Purdue",
-    "player": "Grace Heaney"
-   },
-   "what": "Grace Heaney (Purdue): sourced match incident -- Left Creighton match in Set 2 with a lower-leg injury; current availability unknown",
-   "state": "confirmed_official",
-   "state_label": "confirmed by an official source",
-   "why": "confirmed by an official source",
-   "scope": "one player's availability for the stated dates",
-   "sources": [
-    {
-     "url": "https://purduesports.com/news/2026/08/31/big-tensec-challenge-descends-on-mackey-arena",
-     "excerpt": "two of its three returning All-Americans and preseason Player of the Year Watch List honorees (Wollard: out and Heaney leaving the match in Set 2 due to a lower leg injury",
-     "retrieved": "2026-09-01T04:00:46Z",
-     "source_class": "official_school"
-    }
-   ],
-   "public": false,
-   "priority": 80,
-   "route": {
-    "team": "Purdue"
-   },
-   "effective": {
-    "from": "2026-08-28",
-    "to": null
-   },
-   "review_by": "2026-09-07",
-   "source_kind": "school_release",
-   "source_kind_label": "SCHOOL SOURCE"
-  },
-  {
    "id": "4a931b9bc08a",
    "type": "availability",
    "subject": {
@@ -1427,6 +1393,38 @@
     "to": "2026-08-28"
    },
    "review_by": "2026-09-04"
+  },
+  {
+   "id": "49195fadc4dd",
+   "type": "availability",
+   "subject": {
+    "kind": "player",
+    "team": "Purdue",
+    "player": "Grace Heaney"
+   },
+   "what": "Grace Heaney (Purdue): availability signal",
+   "state": "expired",
+   "state_label": "evidence past its review date",
+   "why": "evidence past its review date",
+   "scope": "one player's availability for the stated dates",
+   "sources": [
+    {
+     "url": "https://purduesports.com/news/2026/08/31/big-tensec-challenge-descends-on-mackey-arena",
+     "excerpt": "two of its three returning All-Americans and preseason Player of the Year Watch List honorees (Wollard: out and Heaney leaving the match in Set 2 due to a lower leg injury",
+     "retrieved": "2026-09-01T04:00:46Z",
+     "source_class": "community"
+    }
+   ],
+   "public": false,
+   "priority": 20,
+   "route": {
+    "team": "Purdue"
+   },
+   "effective": {
+    "from": "2026-08-28",
+    "to": "2026-09-01"
+   },
+   "review_by": "2026-09-07"
   }
  ],
  "feed": [
@@ -1563,22 +1561,28 @@
    "first_seen": "2026-09-02T03:51:38Z"
   },
   {
-   "id": "49195fadc4dd",
+   "id": "eb06a881496b",
    "type": "availability",
    "subject": {
     "kind": "player",
-    "team": "Purdue",
-    "player": "Grace Heaney"
+    "team": "Texas",
+    "player": "Abby Vander Wal"
    },
-   "what": "Grace Heaney (Purdue): sourced match incident -- Left Creighton match in Set 2 with a lower-leg injury; current availability unknown",
+   "what": "Abby Vander Wal (Texas): Out for the 2026 season -- sourced availability status",
    "state": "confirmed_official",
    "state_label": "confirmed by an official source",
    "why": "confirmed by an official source",
    "scope": "one player's availability for the stated dates",
    "sources": [
     {
-     "url": "https://purduesports.com/news/2026/08/31/big-tensec-challenge-descends-on-mackey-arena",
-     "excerpt": "two of its three returning All-Americans and preseason Player of the Year Watch List honorees (Wollard: out and Heaney leaving the match in Set 2 due to a lower leg injury",
+     "url": "https://sports.yahoo.com/articles/texas-volleyball-confirms-acl-tear-211105304.html",
+     "excerpt": "A Monday MRI confirmed the worst fears for Texas volleyball and outside hitter Abby Vander Wal. Vander Wal, a 6-foot-3 starting outside hitter, tore the ACL in her left knee during Saturday's win over TCU and will likely miss the remainder of the season.",
+     "retrieved": "2026-09-01T04:00:46Z",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://www.si.com/onsi/volleyball/injuries/texas-volleyball-loses-key-offensive-weapon-to-season-ending-knee-injury-abby-vander-wal-2026",
+     "excerpt": "Texas coach Jerritt Elliott said sophomore outside hitter Abby Vander Wal is out for the season with the knee injury that she suffered on Saturday night.",
      "retrieved": "2026-09-01T04:00:46Z",
      "source_class": "official_school"
     }
@@ -1586,15 +1590,15 @@
    "public": false,
    "priority": 80,
    "route": {
-    "team": "Purdue"
+    "team": "Texas"
    },
    "effective": {
-    "from": "2026-08-28",
+    "from": "2026-08-31",
     "to": null
    },
-   "review_by": "2026-09-07",
-   "source_kind": "school_release",
-   "source_kind_label": "SCHOOL SOURCE",
+   "review_by": "2026-12-31",
+   "source_kind": "beat_report",
+   "source_kind_label": "BEAT REPORT",
    "first_seen": "2026-09-01T04:38:57Z"
   }
  ]

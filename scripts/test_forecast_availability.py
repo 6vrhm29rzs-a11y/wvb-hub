@@ -141,9 +141,21 @@ def main():
     # distinct in the canonical projection
     import availability_desk as AD
     proj = {(c["team"], c["player"]): c["state"] for c in AD.projection()}
-    check("controls stay distinct: Wollard status, Heaney incident",
+    # ⚠ STATE-CONDITIONAL (2026-09-02): Heaney's incident RESOLVED at her
+    # box-verified return, so she has no current card -- pinning her as a
+    # live incident is the calendar-pin class. Wollard's status is the
+    # standing control; Heaney's expectation follows the evidence file.
+    _hev = json.load(open(os.path.join(
+        REPO, "data", "raw", "2026",
+        "availability_evidence.json")))["players"]["Purdue|Grace Heaney"]
+    _hopen = not any((e.get("effective") or {}).get("to")
+                     for e in _hev if e.get("claim") == "match_incident")
+    check("controls stay distinct: Wollard status%s" %
+          (", Heaney incident" if _hopen else "; Heaney resolved, no card"),
           proj.get(("Purdue", "Kenna Wollard")) == "status"
-          and proj.get(("Purdue", "Grace Heaney")) == "incident")
+          and (proj.get(("Purdue", "Grace Heaney")) == "incident"
+               if _hopen else
+               ("Purdue", "Grace Heaney") not in proj))
 
     print("\n5. PUBLIC FENCES")
     pub_p = os.path.join(REPO, "output", "vb_dashboard.html")

@@ -238,9 +238,19 @@ def main():
         REPO, "data/availability_desk_2026.json"), encoding="utf-8"))
     sts = [s["player"] for s in art["statuses"]]
     incs = [s["player"] for s in art["incidents"]]
-    check("artifact: Wollard a status, Heaney the ONLY incident",
-          "Kenna Wollard" in sts and incs == ["Grace Heaney"],
-          (sts, incs))
+    _hev0 = json.load(open(os.path.join(
+        REPO, "data", "raw", "2026",
+        "availability_evidence.json")))["players"]["Purdue|Grace Heaney"]
+    _hclosed = any((e.get("effective") or {}).get("to")
+                   for e in _hev0 if e.get("claim") == "match_incident")
+    if _hclosed:
+        check("artifact: Wollard a status; Heaney resolved -> no current "
+              "incident", "Kenna Wollard" in sts and incs == [],
+              (sts, incs))
+    else:
+        check("artifact: Wollard a status, Heaney the ONLY incident",
+              "Kenna Wollard" in sts and incs == ["Grace Heaney"],
+              (sts, incs))
     check("Vander Wal: two separately-attributed season-ending sources, "
           "both statuses",
           sts.count("Abby Vander Wal") == 2
@@ -256,19 +266,55 @@ def main():
           and all("release is held" in (s.get("note") or "")
                   or "Not a Texas Athletics release" in (s.get("note") or "")
                   for s in vw))
-    hean_art = [s for s in art["incidents"]
-                if s["player"] == "Grace Heaney"][0]
-    check("Heaney's incident carries the Purdue-preview wording",
-          hean_art.get("summary")
-          == "Left Creighton match in Set 2 with a lower-leg injury"
-          and "purduesports.com" in (hean_art.get("url") or ""))
-    check("artifact counts agree",
-          art["meta"]["counts"]["statuses"] == len(sts)
-          and art["meta"]["counts"]["incidents"] == 1)
+    # ⚠ STATE-CONDITIONAL (2026-09-02, "heaney is back for purdue"): the
+    # incident's window CLOSED at her box-verified return (appeared Sep 1 v
+    # Texas A&M). A resolved incident lives in expired history with its
+    # wording intact and appears in NO current list -- pinning it as
+    # current is the calendar-pin class. The expectation is derived from
+    # the evidence file's own effective.to.
+    _hev = json.load(open(os.path.join(
+        REPO, "data", "raw", "2026",
+        "availability_evidence.json")))["players"]["Purdue|Grace Heaney"]
+    _closed = any((e.get("effective") or {}).get("to")
+                  for e in _hev if e.get("claim") == "match_incident")
+    if _closed:
+        hexp = [s for s in art["expired"]
+                if s.get("player") == "Grace Heaney"]
+        check("Heaney's RESOLVED incident lives in expired history, "
+              "wording intact",
+              hexp and "purduesports.com" in (hexp[0].get("url") or ""))
+        check("...and she is in NO current list",
+              not any(s.get("player") == "Grace Heaney"
+                      for s in art["incidents"] + art["statuses"]))
+        check("...and the resolution names the box-verified return, "
+              "asserting participation, never fitness",
+              any("participation fact, not a health claim"
+                  in (e.get("resolution") or "") for e in _hev))
+        check("artifact counts agree",
+              art["meta"]["counts"]["statuses"] == len(sts)
+              and art["meta"]["counts"]["incidents"] == 0)
+    else:
+        hean_art = [s for s in art["incidents"]
+                    if s["player"] == "Grace Heaney"][0]
+        check("Heaney's incident carries the Purdue-preview wording",
+              hean_art.get("summary")
+              == "Left Creighton match in Set 2 with a lower-leg injury"
+              and "purduesports.com" in (hean_art.get("url") or ""))
+        check("artifact counts agree",
+              art["meta"]["counts"]["statuses"] == len(sts)
+              and art["meta"]["counts"]["incidents"] == 1)
 
     wrow = [x for x in art["statuses"]
             if x["player"] == "Kenna Wollard"][0]
-    hrow = art["incidents"][0]
+    # a resolved incident empties the current list -- the render fixtures
+    # below still need an incident-shaped row, so take it from expired
+    # history (its wording is intact there by design)
+    # an expired row keeps its wording but drops projection fields like
+    # `state` -- resurrect the incident SHAPE for these renderer fixtures,
+    # which exercise renderAvail's branching with synthetic state
+    hrow = (art["incidents"] or [dict(s, state="incident")
+                                 for s in art["expired"]
+                                 if s.get("claim") == "match_incident"])[0]
     vrows = [x for x in art["statuses"]
              if x["player"] == "Abby Vander Wal"]
 
@@ -278,7 +324,17 @@ def main():
              fns["avSupportRow"] + "\n" + fns["avCard"] + "\n")
     proj = {(c["team"], c["player"]): c for c in art["projection"]}
     wcard = proj[("Purdue", "Kenna Wollard")]
-    hcard = proj[("Purdue", "Grace Heaney")]
+    # a resolved incident has no current projection card -- resurrect a
+    # synthetic one FROM THE EXPIRED ROW for the renderer fixtures (same
+    # shape as a live incident card: state + headline support), so the
+    # renderer's incident branches stay exercised
+    hcard = proj.get(("Purdue", "Grace Heaney"))
+    if hcard is None:
+        _hx = [x for x in art["expired"]
+               if x.get("claim") == "match_incident"][0]
+        hcard = {"team": "Purdue", "player": "Grace Heaney",
+                 "state": "incident", "claim": "match_incident",
+                 "n_supports": 1, "supports": [dict(_hx)]}
     vcard = proj[("Texas", "Abby Vander Wal")]
     js5 = (avfns +
            "const w = %s, h = %s;\n" % (json.dumps(wcard),
@@ -306,24 +362,35 @@ def main():
               "sports.yahoo.com" in w and "retrieved 2026-08-31" in w
               and "effective 2026-08-27" in w and "review by 2026-09-13" in w,
               w)
-        check("Heaney: dated incident, availability stated UNKNOWN",
-              "Sourced match incident, 2026-08-28" in h
-              and "current availability unknown" in h
-              and "pending a team update" in h, h)
-        # 'season' as a bare substring would trip on the quote's own
-        # "preseason Player of the Year Watch List" -- ban the CLAIMS,
-        # not the letters (the Massey 'not current' scrub lesson)
-        for banned in ("unavailable (sourced)", "away from team",
-                       "confirmed_unavailable", "ruled out",
-                       "out for the season", "season-ending"):
-            check("Heaney: %r cannot render on the incident row" % banned,
-                  banned not in h.lower())
-        check("Heaney: Purdue's own preview wording renders",
-              "leaving the match in Set 2 due to a lower leg injury" in h)
-        check("Heaney: source + retrieval + review-by render",
-              "purduesports.com" in h and "review by" in h)
-        check("Heaney: the strengthened Purdue-preview wording renders",
-              "Left Creighton match in Set 2 with a lower-leg injury" in h)
+        if _hclosed:
+            # resolved (box-verified return): there IS no current Heaney
+            # card -- h rendered a stand-in row for harness shape only,
+            # and the no-current-card fact is asserted at the artifact
+            # level above
+            print("  -- Heaney resolved; current-card render checks "
+                  "stand down by design")
+        else:
+            check("Heaney: dated incident, availability stated UNKNOWN",
+                  "Sourced match incident, 2026-08-28" in h
+                  and "current availability unknown" in h
+                  and "pending a team update" in h, h)
+            # 'season' as a bare substring would trip on the quote's own
+            # "preseason Player of the Year Watch List" -- ban the CLAIMS,
+            # not the letters (the Massey 'not current' scrub lesson)
+            for banned in ("unavailable (sourced)", "away from team",
+                           "confirmed_unavailable", "ruled out",
+                           "out for the season", "season-ending"):
+                check("Heaney: %r cannot render on the incident row"
+                      % banned, banned not in h.lower())
+            check("Heaney: Purdue's own preview wording renders",
+                  "leaving the match in Set 2 due to a lower leg injury"
+                  in h)
+        if not _hclosed:
+            check("Heaney: source + retrieval + review-by render",
+                  "purduesports.com" in h and "review by" in h)
+            check("Heaney: the strengthened Purdue-preview wording renders",
+                  "Left Creighton match in Set 2 with a lower-leg injury"
+                  in h)
         check("Heaney: cannot render season-ending or diagnostic language",
               not any(b in h.lower() for b in
                       ("out for the season", "season-ending", "acl",
@@ -420,12 +487,22 @@ def main():
               "Away from team / unavailable" in d["w"]
               and "(sourced)" in d["w"]
               and "Availability Desk" in d["w"], d["w"])
-        check("Heaney's dossier shows the incident, availability unknown",
-              "Sourced match incident, 2026-08-28" in d["h"]
-              and "current availability unknown" in d["h"], d["h"])
-        check("...never the no-information default",
-              "No availability information" not in d["w"]
-              and "No availability information" not in d["h"])
+        if _closed:
+            # resolved: she is back (box-verified); her dossier honestly
+            # carries no CURRENT availability claim
+            check("Heaney's dossier carries no current claim after the "
+                  "box-verified return",
+                  "Sourced match incident" not in d["h"], d["h"])
+            check("...never the no-information default for Wollard",
+                  "No availability information" not in d["w"])
+        else:
+            check("Heaney's dossier shows the incident, availability "
+                  "unknown",
+                  "Sourced match incident, 2026-08-28" in d["h"]
+                  and "current availability unknown" in d["h"], d["h"])
+            check("...never the no-information default",
+                  "No availability information" not in d["w"]
+                  and "No availability information" not in d["h"])
         check("an unmentioned player keeps the honest default",
               "No availability information" in d["o"])
 

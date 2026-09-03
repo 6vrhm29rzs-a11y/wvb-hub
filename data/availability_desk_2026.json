@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-03T02:59:16Z",
+  "generated_at_utc": "2026-09-03T03:41:26Z",
   "counts": {
    "statuses": 3,
-   "incidents": 1,
+   "incidents": 0,
    "signals": 0,
-   "expired": 1,
-   "anomalies": 57
+   "expired": 2,
+   "anomalies": 58
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -69,56 +69,8 @@
    "note": "The coach-reported SEASON OUTLOOK, attributed separately from the MRI report: Sports Illustrated / On SI (Paige Durrenberger, 2026-08-30), quoting Lincoln Arneal's report of Jerritt Elliott's statement. Not a Texas Athletics release."
   }
  ],
- "incidents": [
-  {
-   "team": "Purdue",
-   "player": "Grace Heaney",
-   "kind": "school_release",
-   "kind_label": "SCHOOL SOURCE",
-   "quote": "two of its three returning All-Americans and preseason Player of the Year Watch List honorees (Wollard: out and Heaney leaving the match in Set 2 due to a lower leg injury",
-   "summary": "Left Creighton match in Set 2 with a lower-leg injury",
-   "url": "https://purduesports.com/news/2026/08/31/big-tensec-challenge-descends-on-mackey-arena",
-   "retrieved": "2026-09-01T04:00:46Z",
-   "effective": {
-    "from": "2026-08-28",
-    "to": null
-   },
-   "review_by": "2026-09-07",
-   "incident_date": "2026-08-28",
-   "claim": "match_incident",
-   "note": "Purdue's own Aug. 31 match preview ('Big Ten/SEC Challenge Descends on Mackey Arena') states the injury type and the set in its own words -- the school naming a lower-leg injury upgrades the earlier Creighton-recap sourcing. Her CURRENT availability remains UNKNOWN pending a Purdue update: the preview marks Wollard 'out' but assigns Heaney no status."
-  }
- ],
+ "incidents": [],
  "projection": [
-  {
-   "team": "Purdue",
-   "player": "Grace Heaney",
-   "state": "incident",
-   "supports": [
-    {
-     "team": "Purdue",
-     "player": "Grace Heaney",
-     "kind": "school_release",
-     "kind_label": "SCHOOL SOURCE",
-     "quote": "two of its three returning All-Americans and preseason Player of the Year Watch List honorees (Wollard: out and Heaney leaving the match in Set 2 due to a lower leg injury",
-     "summary": "Left Creighton match in Set 2 with a lower-leg injury",
-     "url": "https://purduesports.com/news/2026/08/31/big-tensec-challenge-descends-on-mackey-arena",
-     "retrieved": "2026-09-01T04:00:46Z",
-     "effective": {
-      "from": "2026-08-28",
-      "to": null
-     },
-     "review_by": "2026-09-07",
-     "incident_date": "2026-08-28",
-     "claim": "match_incident",
-     "note": "Purdue's own Aug. 31 match preview ('Big Ten/SEC Challenge Descends on Mackey Arena') states the injury type and the set in its own words -- the school naming a lower-leg injury upgrades the earlier Creighton-recap sourcing. Her CURRENT availability remains UNKNOWN pending a Purdue update: the preview marks Wollard 'out' but assigns Heaney no status."
-    }
-   ],
-   "claim": "match_incident",
-   "incident_date": "2026-08-28",
-   "headline": "Left Creighton match in Set 2 with a lower-leg injury",
-   "n_supports": 1
-  },
   {
    "team": "Purdue",
    "player": "Kenna Wollard",
@@ -214,6 +166,25 @@
    "claim": null,
    "note": "SIGNAL ONLY -- an eye-test observation during the live broadcast. Sets no status. Corroborating participation fact: the crawled box lists her gp=4 with zero recorded actions in every column; the live box carried setsPlayed:null mid-match. The Wisconsin-Stanford VolleyTalk thread was checked the same evening (in-browser): its Aug 26 preview projected her starting and asked for unavailability news; nobody answered -- no public pre-match signal existed there.",
    "expired_on": "effective range ended 2026-08-28"
+  },
+  {
+   "team": "Purdue",
+   "player": "Grace Heaney",
+   "kind": "school_release",
+   "kind_label": "SCHOOL SOURCE",
+   "quote": "two of its three returning All-Americans and preseason Player of the Year Watch List honorees (Wollard: out and Heaney leaving the match in Set 2 due to a lower leg injury",
+   "summary": "Left Creighton match in Set 2 with a lower-leg injury",
+   "url": "https://purduesports.com/news/2026/08/31/big-tensec-challenge-descends-on-mackey-arena",
+   "retrieved": "2026-09-01T04:00:46Z",
+   "effective": {
+    "from": "2026-08-28",
+    "to": "2026-09-01"
+   },
+   "review_by": "2026-09-07",
+   "incident_date": "2026-08-28",
+   "claim": "match_incident",
+   "note": "Purdue's own Aug. 31 match preview ('Big Ten/SEC Challenge Descends on Mackey Arena') states the injury type and the set in its own words -- the school naming a lower-leg injury upgrades the earlier Creighton-recap sourcing. Her CURRENT availability remains UNKNOWN pending a Purdue update: the preview marks Wollard 'out' but assigns Heaney no status.",
+   "expired_on": "effective range ended 2026-09-01"
   }
  ],
  "anomalies": [
@@ -825,19 +796,6 @@
    "points_per_set_missing": 1.5
   },
   {
-   "game_id": "6639889",
-   "team_id": "46580",
-   "team": "Wisconsin",
-   "absent": [
-    {
-     "name": "Natalie Wardlow",
-     "rate": 1.438,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.438
-  },
-  {
    "game_id": "6639844",
    "team_id": "46061",
    "team": "Louisville",
@@ -888,6 +846,32 @@
     }
    ],
    "points_per_set_missing": 1.125
+  },
+  {
+   "game_id": "6639842",
+   "team_id": "46580",
+   "team": "Wisconsin",
+   "absent": [
+    {
+     "name": "Kymora Scott",
+     "rate": 1.0,
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 1.0
+  },
+  {
+   "game_id": "6639889",
+   "team_id": "46580",
+   "team": "Wisconsin",
+   "absent": [
+    {
+     "name": "Kymora Scott",
+     "rate": 1.0,
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 1.0
   },
   {
    "game_id": "6625271",
@@ -1012,11 +996,12 @@
    ]
   },
   "Wisconsin": {
-   "gid": "6628318",
-   "d": "2026-08-30",
-   "appeared": 12,
+   "gid": "6637934",
+   "d": "2026-09-02",
+   "appeared": 11,
    "zero_action": [
-    "Grace Egan",
+    "Halle Thompson",
+    "Natalie Wardlow",
     "Decelise Champion",
     "Morgan Van wie",
     "Jane Manecke",
@@ -1139,8 +1124,8 @@
    ]
   },
   "Florida": {
-   "gid": "6624828",
-   "d": "2026-09-01",
+   "gid": "6637934",
+   "d": "2026-09-02",
    "appeared": 11,
    "zero_action": [
     "Milica Vidacic",
@@ -1354,17 +1339,17 @@
    ]
   },
   "Georgia": {
-   "gid": "6624237",
-   "d": "2026-09-01",
+   "gid": "6627167",
+   "d": "2026-09-02",
    "appeared": 10,
    "zero_action": [
     "Arianna Muoneke",
-    "Ceci Gooch",
     "Keira Steininger",
-    "Rylan Miller",
-    "Alex Richter",
     "Taylor Bruce",
-    "Kate Yoshimoto"
+    "Marin Collins",
+    "Emma Bryson",
+    "Kate Yoshimoto",
+    "Rylan Miller"
    ]
   },
   "North Florida": {
@@ -3890,17 +3875,15 @@
    ]
   },
   "Purdue": {
-   "gid": "6627169",
-   "d": "2026-09-01",
-   "appeared": 9,
+   "gid": "6627167",
+   "d": "2026-09-02",
+   "appeared": 11,
    "zero_action": [
     "Lily Bosworth",
     "Sydni Vice",
     "Morgan Williams",
     "Rachel raye Williams",
-    "Bianka Lulic",
-    "Sienna Foster",
-    "Isabelle Bardin"
+    "Sienna Foster"
    ]
   },
   "San Diego St.": {
@@ -4959,6 +4942,12 @@
     "ep": 1788105600,
     "sets": 3,
     "state": "zero_action"
+   },
+   {
+    "gid": "6637934",
+    "ep": 1788393600,
+    "sets": 5,
+    "state": "zero_action"
    }
   ],
   "Texas|Abby Vander Wal": [
@@ -4986,6 +4975,12 @@
     "gid": "6627169",
     "ep": 1788307200,
     "sets": 3,
+    "state": "appeared"
+   },
+   {
+    "gid": "6627167",
+    "ep": 1788390000,
+    "sets": 5,
     "state": "appeared"
    }
   ]
