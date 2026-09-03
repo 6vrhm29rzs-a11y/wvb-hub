@@ -234,6 +234,18 @@ def check_snapshot_and_board_agree_on_the_basis():
 
     def fake(have):
         def _load(path):
+            if "ranking_certificates_" in path:
+                # the synthetic certificate mirrors what certify_rankings
+                # would emit for this state (no corpus/dependency stamps,
+                # so the pairing checks stand down in the harness)
+                _mature = bool(have.get("validated")) and \
+                    have.get("gp", 4) >= 13.52
+                return {"meta": {"certifies": {
+                    "ordering_mature_for_public_rank": {
+                        "value": _mature,
+                        "policy": "blend-crossover-v1",
+                        "measurement": {"held_because": None if _mature
+                                        else "held (harness)"}}}}}
             if "rating_" in path:
                 return ({"meta": {"validated": have.get("validated", False)},
                          "teams": [{"team": "A", "composite_rank": 1,

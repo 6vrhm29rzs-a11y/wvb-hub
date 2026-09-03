@@ -374,8 +374,13 @@ def main():
           ok4 is False and "unavailable" in (why4 or ""), (ok4, why4))
     # and the snapshot shares the ONE definition
     _snap = open(os.path.join(REPO, "scripts", "snapshot_rankings.py")).read()
-    check("the weekly archive uses the SAME maturity gate",
-          "live_rating_mature" in _snap)
+    # migration commit 4: the archive now requires the CERTIFICATE (the
+    # same named property the board consumes), not the board's function --
+    # two consumers of one certification, no more archive-imports-board
+    check("the weekly archive requires the same certified property",
+          "ordering_mature_for_public_rank" in _snap
+          and "require_property" in _snap
+          and "live_rating_mature" not in _snap)
 
     # ── SHADOW GUARD (certified properties, migration commit 2): the
     # certificate's decision must equal the old gate's decision on the

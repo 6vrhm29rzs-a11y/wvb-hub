@@ -144,13 +144,23 @@ def current_ranking():
     # archived ruler either.
     if not (live.get("meta") or {}).get("validated"):
         live = {}
-    # ⚠ AND THE SAME MATURITY GATE (2026-09-02): validated-but-immature
-    # (median gp below the blend's measured crossover k) must not become
-    # the archived ruler either -- ONE definition, the board's.
+    # ⚠ CERTIFIED PROPERTY (migration commit 4): the archive requires the
+    # SAME named certificate the board consumes -- two consumers of one
+    # certification, rather than the archive importing board logic and
+    # asking it what truth means. A stale or absent certificate raises:
+    # a week frozen under an uncertified ruler cannot be corrected later.
     if live:
-        import build_rankings_board as _B
-        _ok, _why = _B.live_rating_mature(live)
-        if not _ok:
+        from properties import require_property
+        import season_counts as _SCG
+        _certs = load("data/ranking_certificates_%d.json" % SEASON)
+        _rec = require_property(
+            _certs, "ordering_mature_for_public_rank",
+            consumer="weekly_archive", expected=None,
+            corpus_fingerprint=_SCG.corpus_fingerprint(SEASON),
+            dependency_fingerprints={
+                "rating_%d" % SEASON:
+                    (live.get("meta") or {}).get("corpus_fingerprint")})
+        if not _rec["value"]:
             live = {}
     for r in (live.get("teams") or []):
         if r.get("composite_rank"):

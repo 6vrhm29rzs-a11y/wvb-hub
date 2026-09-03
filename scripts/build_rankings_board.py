@@ -510,7 +510,18 @@ def build():
     # along as the readable form -- "+19.2 wins more than a bubble team would
     # have taken from this schedule".
     _res = load_json("data/resume_%d.json" % SEASON) or {}
-    resume_active = bool((_res.get("meta") or {}).get("active"))
+    # CERTIFIED PROPERTY (migration commit 5): the resume view consumes
+    # the producer's own certification. expected=None -- an inactive
+    # resume is a legitimate certified state early in a season; an
+    # artifact with NO certification falls back to the legacy boolean
+    # during the remaining migration window.
+    try:
+        from properties import require_property as _reqp
+        resume_active = bool(_reqp(_res, "resume_populated",
+                                   consumer="resume_view",
+                                   expected=None)["value"])
+    except Exception:
+        resume_active = bool((_res.get("meta") or {}).get("active"))
     resume_meta = _res.get("meta") or {}
     _rmap = dict((r["team"], r) for r in (_res.get("teams") or []))
     for t in teams:
