@@ -763,6 +763,57 @@
      "establishes": "UC Santa Barbara W 3-2 vs Tarleton State University"
     }
    ]
+  },
+  "6627747": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "North Dakota won 3-0 (winner_team_id 46236) with box rows attributed the same way",
+   "correct": {
+    "winner_team_id": "46180",
+    "away_sets": 0,
+    "home_sets": 3,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 17,
+      "home": 25
+     },
+     {
+      "period": 2,
+      "visit": 23,
+      "home": 25
+     },
+     {
+      "period": 3,
+      "visit": 17,
+      "home": 25
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46236": "46180",
+     "46180": "46236"
+    }
+   },
+   "established": "Eastern Wash. won 3-0 -- the feed's entire team attribution is inverted (the attribution-suspicion detector's record_continuity component flagged it at delta >= 2 with no box held; both schools' published schedules contradict the feed's version and confirm the swap.",
+   "evidence": [
+    {
+     "url": "https://goeags.com/services/schedule_txt.ashx?schedule=266",
+     "kind": "school_site",
+     "school": "Eastern Wash.",
+     "retrieved": "2026-09-03T01:40:06Z",
+     "text": "published schedule row for 2026-08-28: 'Eastern Wash. W 3-0 vs North Dakota'",
+     "establishes": "Eastern Wash. W 3-0 vs North Dakota"
+    },
+    {
+     "url": "https://fightinghawks.com/services/schedule_txt.ashx?schedule=1539",
+     "kind": "school_site",
+     "school": "North Dakota",
+     "retrieved": "2026-09-03T01:40:06Z",
+     "text": "published schedule row for 2026-08-28: 'North Dakota L 0-3 vs Eastern Washington'",
+     "establishes": "North Dakota L 0-3 vs Eastern Washington"
+    }
+   ]
   }
  }
 }

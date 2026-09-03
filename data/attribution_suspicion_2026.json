@@ -1,11 +1,11 @@
 {
  "model_version": "v1.1-unweighted",
- "generated_utc": "2026-09-03T01:14:36Z",
+ "generated_utc": "2026-09-03T01:43:01Z",
  "queue_rule": {
   "description": "any component voting SUPPORTS_H1 queues the match for human review; ranking is by vote count. A display/ranking heuristic only -- not a truth claim, and nothing here corrects or counts."
  },
- "n_finals": 504,
- "n_queued": 18,
+ "n_finals": 506,
+ "n_queued": 16,
  "matches": [
   {
    "gid": "6624516",
@@ -1949,7 +1949,13 @@
    "n_available": 4,
    "queued": true,
    "watch": false,
-   "adjudication": null,
+   "adjudication": {
+    "label": "confirmed_correct",
+    "reviewed_at": "2026-09-03",
+    "basis": [
+     "Gardner-Webb's schedule corroborates the feed result; swapped version contradicted -- the record_continuity vote was feed record drift"
+    ]
+   },
    "first_scored_utc": "2026-09-03T01:14:36Z",
    "first_feature_version": "v1.1-unweighted",
    "first_score": {
@@ -2020,7 +2026,7 @@
     "Eastern Wash.",
     "North Dakota"
    ],
-   "already_corrected": false,
+   "already_corrected": true,
    "context": {
     "venue": "Redhawk Center",
     "nominal_home_is_venue_host": true
@@ -2075,7 +2081,13 @@
    "n_available": 2,
    "queued": true,
    "watch": false,
-   "adjudication": null,
+   "adjudication": {
+    "label": "confirmed_inversion",
+    "reviewed_at": "2026-09-03",
+    "basis": [
+     "both schools contradict the feed and confirm the swap (no box held -- caught on records alone)"
+    ]
+   },
    "first_scored_utc": "2026-09-03T01:14:36Z",
    "first_feature_version": "v1.1-unweighted",
    "first_score": {
@@ -2253,238 +2265,6 @@
       "n_observations": 6,
       "h0_error": 12,
       "h1_error": 0,
-      "vote": "SUPPORTS_H1"
-     },
-     "school_verification": {
-      "available": false,
-      "vote": "UNAVAILABLE",
-      "why": "not yet verified"
-     }
-    },
-    "n_h1_votes": 1,
-    "school_verification_available_at_scoring": false
-   }
-  },
-  {
-   "gid": "6639571",
-   "epoch": 1788105600,
-   "teams": [
-    "Chicago St.",
-    "North Dakota"
-   ],
-   "already_corrected": false,
-   "context": {
-    "venue": "Redhawk Center",
-    "nominal_home_is_venue_host": true
-   },
-   "components": {
-    "feed_record_fit": {
-     "available": true,
-     "feed": [
-      [
-       0,
-       2
-      ],
-      [
-       0,
-       2
-      ]
-     ],
-     "ours": [
-      [
-       0,
-       2
-      ],
-      [
-       1,
-       1
-      ]
-     ],
-     "h0_error": 2,
-     "h1_error": 2,
-     "delta_h1_better": 0,
-     "vote": "UNINFORMATIVE"
-    },
-    "box_roster_fit": {
-     "available": false,
-     "vote": "UNAVAILABLE",
-     "why": "roster missing for a side"
-    },
-    "record_continuity": {
-     "available": true,
-     "n_observations": 6,
-     "h0_error": 9,
-     "h1_error": 7,
-     "vote": "SUPPORTS_H1"
-    },
-    "school_verification": {
-     "available": false,
-     "vote": "UNAVAILABLE",
-     "why": "not yet verified"
-    }
-   },
-   "n_h1_votes": 1,
-   "n_available": 2,
-   "queued": true,
-   "watch": false,
-   "adjudication": null,
-   "first_scored_utc": "2026-09-03T01:14:36Z",
-   "first_feature_version": "v1.1-unweighted",
-   "first_score": {
-    "components": {
-     "feed_record_fit": {
-      "available": true,
-      "feed": [
-       [
-        0,
-        2
-       ],
-       [
-        0,
-        2
-       ]
-      ],
-      "ours": [
-       [
-        0,
-        2
-       ],
-       [
-        1,
-        1
-       ]
-      ],
-      "h0_error": 2,
-      "h1_error": 2,
-      "delta_h1_better": 0,
-      "vote": "UNINFORMATIVE"
-     },
-     "box_roster_fit": {
-      "available": false,
-      "vote": "UNAVAILABLE",
-      "why": "roster missing for a side"
-     },
-     "record_continuity": {
-      "available": true,
-      "n_observations": 6,
-      "h0_error": 9,
-      "h1_error": 7,
-      "vote": "SUPPORTS_H1"
-     },
-     "school_verification": {
-      "available": false,
-      "vote": "UNAVAILABLE",
-      "why": "not yet verified"
-     }
-    },
-    "n_h1_votes": 1,
-    "school_verification_available_at_scoring": false
-   }
-  },
-  {
-   "gid": "6639598",
-   "epoch": 1788019200,
-   "teams": [
-    "UMES",
-    "Florida A&M"
-   ],
-   "already_corrected": false,
-   "context": {
-    "venue": "Elmore Gymnasium",
-    "nominal_home_is_venue_host": true
-   },
-   "components": {
-    "feed_record_fit": {
-     "available": true,
-     "feed": [
-      [
-       2,
-       1
-      ],
-      [
-       0,
-       2
-      ]
-     ],
-     "ours": [
-      [
-       1,
-       1
-      ],
-      [
-       0,
-       2
-      ]
-     ],
-     "h0_error": 1,
-     "h1_error": 5,
-     "delta_h1_better": -4,
-     "vote": "SUPPORTS_H0"
-    },
-    "box_roster_fit": {
-     "available": false,
-     "vote": "UNAVAILABLE",
-     "why": "roster missing for a side"
-    },
-    "record_continuity": {
-     "available": true,
-     "n_observations": 6,
-     "h0_error": 10,
-     "h1_error": 2,
-     "vote": "SUPPORTS_H1"
-    },
-    "school_verification": {
-     "available": false,
-     "vote": "UNAVAILABLE",
-     "why": "not yet verified"
-    }
-   },
-   "n_h1_votes": 1,
-   "n_available": 2,
-   "queued": true,
-   "watch": false,
-   "adjudication": null,
-   "first_scored_utc": "2026-09-03T01:14:36Z",
-   "first_feature_version": "v1.1-unweighted",
-   "first_score": {
-    "components": {
-     "feed_record_fit": {
-      "available": true,
-      "feed": [
-       [
-        2,
-        1
-       ],
-       [
-        0,
-        2
-       ]
-      ],
-      "ours": [
-       [
-        1,
-        1
-       ],
-       [
-        0,
-        2
-       ]
-      ],
-      "h0_error": 1,
-      "h1_error": 5,
-      "delta_h1_better": -4,
-      "vote": "SUPPORTS_H0"
-     },
-     "box_roster_fit": {
-      "available": false,
-      "vote": "UNAVAILABLE",
-      "why": "roster missing for a side"
-     },
-     "record_continuity": {
-      "available": true,
-      "n_observations": 6,
-      "h0_error": 10,
-      "h1_error": 2,
       "vote": "SUPPORTS_H1"
      },
      "school_verification": {
@@ -3822,8 +3602,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 11,
+     "h0_error": 3,
+     "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -5065,8 +4845,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 0,
-     "h1_error": 12,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -5206,8 +4986,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 3,
-     "h1_error": 13,
+     "h0_error": 5,
+     "h1_error": 15,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -5285,6 +5065,122 @@
     },
     "n_h1_votes": 0,
     "school_verification_available_at_scoring": true
+   }
+  },
+  {
+   "gid": "6624321",
+   "epoch": 1788390000,
+   "teams": [
+    "Michigan",
+    "LSU"
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": "Crisler Center",
+    "nominal_home_is_venue_host": false
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       2,
+       1
+      ],
+      [
+       2,
+       1
+      ]
+     ],
+     "ours": [
+      [
+       2,
+       1
+      ],
+      [
+       2,
+       1
+      ]
+     ],
+     "h0_error": 0,
+     "h1_error": 0,
+     "delta_h1_better": 0,
+     "vote": "UNINFORMATIVE"
+    },
+    "box_roster_fit": {
+     "available": false,
+     "vote": "UNAVAILABLE",
+     "why": "roster missing for a side"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 8,
+     "h1_error": 8,
+     "vote": "UNINFORMATIVE"
+    },
+    "school_verification": {
+     "available": false,
+     "vote": "UNAVAILABLE",
+     "why": "not yet verified"
+    }
+   },
+   "n_h1_votes": 0,
+   "n_available": 2,
+   "queued": false,
+   "watch": false,
+   "adjudication": null,
+   "first_scored_utc": "2026-09-03T01:43:01Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        2,
+        1
+       ],
+       [
+        2,
+        1
+       ]
+      ],
+      "ours": [
+       [
+        2,
+        1
+       ],
+       [
+        2,
+        1
+       ]
+      ],
+      "h0_error": 0,
+      "h1_error": 0,
+      "delta_h1_better": 0,
+      "vote": "UNINFORMATIVE"
+     },
+     "box_roster_fit": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "roster missing for a side"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 8,
+      "h1_error": 8,
+      "vote": "UNINFORMATIVE"
+     },
+     "school_verification": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "not yet verified"
+     }
+    },
+    "n_h1_votes": 0,
+    "school_verification_available_at_scoring": false
    }
   },
   {
@@ -5897,8 +5793,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 4,
-     "h1_error": 12,
+     "h0_error": 6,
+     "h1_error": 10,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -15160,7 +15056,7 @@
      "available": true,
      "n_observations": 6,
      "h0_error": 9,
-     "h1_error": 15,
+     "h1_error": 17,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -15415,8 +15311,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 4,
-     "h1_error": 12,
+     "h0_error": 3,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -21853,8 +21749,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 0,
-     "h1_error": 12,
+     "h0_error": 1,
+     "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -32141,8 +32037,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 3,
-     "h1_error": 9,
+     "h0_error": 5,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -41756,7 +41652,7 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
+     "h0_error": 4,
      "h1_error": 10,
      "vote": "SUPPORTS_H0"
     },
@@ -45001,8 +44897,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 10,
+     "h0_error": 3,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -46309,8 +46205,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 6,
-     "h1_error": 10,
+     "h0_error": 5,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -49834,6 +49730,142 @@
    }
   },
   {
+   "gid": "6627694",
+   "epoch": 1788393600,
+   "teams": [
+    "South Dakota St.",
+    "Nebraska"
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": "First Bank & Trust Arena",
+    "nominal_home_is_venue_host": false
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       1,
+       2
+      ],
+      [
+       2,
+       0
+      ]
+     ],
+     "ours": [
+      [
+       1,
+       2
+      ],
+      [
+       2,
+       0
+      ]
+     ],
+     "h0_error": 0,
+     "h1_error": 6,
+     "delta_h1_better": -6,
+     "vote": "SUPPORTS_H0"
+    },
+    "box_roster_fit": {
+     "available": true,
+     "eligible_rows": 32,
+     "h0": [
+      1.0,
+      1.0
+     ],
+     "h1": [
+      0.0,
+      0.0
+     ],
+     "fit_gain": -1.0,
+     "unmatched_sample": [],
+     "vote": "SUPPORTS_H0"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 9,
+     "h1_error": 9,
+     "vote": "UNINFORMATIVE"
+    },
+    "school_verification": {
+     "available": false,
+     "vote": "UNAVAILABLE",
+     "why": "not yet verified"
+    }
+   },
+   "n_h1_votes": 0,
+   "n_available": 3,
+   "queued": false,
+   "watch": false,
+   "adjudication": null,
+   "first_scored_utc": "2026-09-03T01:43:01Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        1,
+        2
+       ],
+       [
+        2,
+        0
+       ]
+      ],
+      "ours": [
+       [
+        1,
+        2
+       ],
+       [
+        2,
+        0
+       ]
+      ],
+      "h0_error": 0,
+      "h1_error": 6,
+      "delta_h1_better": -6,
+      "vote": "SUPPORTS_H0"
+     },
+     "box_roster_fit": {
+      "available": true,
+      "eligible_rows": 32,
+      "h0": [
+       1.0,
+       1.0
+      ],
+      "h1": [
+       0.0,
+       0.0
+      ],
+      "fit_gain": -1.0,
+      "unmatched_sample": [],
+      "vote": "SUPPORTS_H0"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 9,
+      "h1_error": 9,
+      "vote": "UNINFORMATIVE"
+     },
+     "school_verification": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "not yet verified"
+     }
+    },
+    "n_h1_votes": 0,
+    "school_verification_available_at_scoring": false
+   }
+  },
+  {
    "gid": "6627704",
    "epoch": 1787929200,
    "teams": [
@@ -50582,14 +50614,14 @@
        0
       ],
       [
-       1,
-       0
+       0,
+       1
       ]
      ],
-     "h0_error": 2,
-     "h1_error": 2,
-     "delta_h1_better": 0,
-     "vote": "UNINFORMATIVE"
+     "h0_error": 0,
+     "h1_error": 4,
+     "delta_h1_better": -4,
+     "vote": "SUPPORTS_H0"
     },
     "box_roster_fit": {
      "available": false,
@@ -50599,8 +50631,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 7,
-     "h1_error": 19,
+     "h0_error": 1,
+     "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -54284,12 +54316,12 @@
        0
       ],
       [
-       1,
-       1
+       2,
+       0
       ]
      ],
-     "h0_error": 2,
-     "h1_error": 2,
+     "h0_error": 0,
+     "h1_error": 0,
      "delta_h1_better": 0,
      "vote": "UNINFORMATIVE"
     },
@@ -54313,8 +54345,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 5,
-     "h1_error": 17,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -56416,8 +56448,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 4,
-     "h1_error": 8,
+     "h0_error": 2,
+     "h1_error": 10,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -57093,8 +57125,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 0,
-     "h1_error": 12,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -57582,6 +57614,142 @@
       "h0_error": 0,
       "h1_error": 12,
       "vote": "SUPPORTS_H0"
+     },
+     "school_verification": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "not yet verified"
+     }
+    },
+    "n_h1_votes": 0,
+    "school_verification_available_at_scoring": false
+   }
+  },
+  {
+   "gid": "6628346",
+   "epoch": 1788386400,
+   "teams": [
+    "NJIT",
+    "Manhattan"
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": "NJIT's Wellness & Events Center",
+    "nominal_home_is_venue_host": false
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       0,
+       3
+      ],
+      [
+       0,
+       2
+      ]
+     ],
+     "ours": [
+      [
+       0,
+       3
+      ],
+      [
+       0,
+       2
+      ]
+     ],
+     "h0_error": 0,
+     "h1_error": 2,
+     "delta_h1_better": -2,
+     "vote": "SUPPORTS_H0"
+    },
+    "box_roster_fit": {
+     "available": true,
+     "eligible_rows": 32,
+     "h0": [
+      1.0,
+      1.0
+     ],
+     "h1": [
+      0.0,
+      0.0
+     ],
+     "fit_gain": -1.0,
+     "unmatched_sample": [],
+     "vote": "SUPPORTS_H0"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 9,
+     "h1_error": 9,
+     "vote": "UNINFORMATIVE"
+    },
+    "school_verification": {
+     "available": false,
+     "vote": "UNAVAILABLE",
+     "why": "not yet verified"
+    }
+   },
+   "n_h1_votes": 0,
+   "n_available": 3,
+   "queued": false,
+   "watch": false,
+   "adjudication": null,
+   "first_scored_utc": "2026-09-03T01:43:01Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        0,
+        3
+       ],
+       [
+        0,
+        2
+       ]
+      ],
+      "ours": [
+       [
+        0,
+        3
+       ],
+       [
+        0,
+        2
+       ]
+      ],
+      "h0_error": 0,
+      "h1_error": 2,
+      "delta_h1_better": -2,
+      "vote": "SUPPORTS_H0"
+     },
+     "box_roster_fit": {
+      "available": true,
+      "eligible_rows": 32,
+      "h0": [
+       1.0,
+       1.0
+      ],
+      "h1": [
+       0.0,
+       0.0
+      ],
+      "fit_gain": -1.0,
+      "unmatched_sample": [],
+      "vote": "SUPPORTS_H0"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 9,
+      "h1_error": 9,
+      "vote": "UNINFORMATIVE"
      },
      "school_verification": {
       "available": false,
@@ -58762,8 +58930,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 0,
-     "h1_error": 12,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -60543,8 +60711,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 0,
-     "h1_error": 12,
+     "h0_error": 2,
+     "h1_error": 10,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -61373,8 +61541,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 11,
+     "h0_error": 2,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -65960,6 +66128,128 @@
    }
   },
   {
+   "gid": "6639571",
+   "epoch": 1788105600,
+   "teams": [
+    "Chicago St.",
+    "North Dakota"
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": "Redhawk Center",
+    "nominal_home_is_venue_host": true
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       0,
+       2
+      ],
+      [
+       0,
+       2
+      ]
+     ],
+     "ours": [
+      [
+       0,
+       2
+      ],
+      [
+       0,
+       2
+      ]
+     ],
+     "h0_error": 0,
+     "h1_error": 0,
+     "delta_h1_better": 0,
+     "vote": "UNINFORMATIVE"
+    },
+    "box_roster_fit": {
+     "available": false,
+     "vote": "UNAVAILABLE",
+     "why": "roster missing for a side"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 3,
+     "h1_error": 9,
+     "vote": "SUPPORTS_H0"
+    },
+    "school_verification": {
+     "available": false,
+     "vote": "UNAVAILABLE",
+     "why": "not yet verified"
+    }
+   },
+   "n_h1_votes": 0,
+   "n_available": 2,
+   "queued": false,
+   "watch": false,
+   "adjudication": {
+    "label": "confirmed_correct",
+    "reviewed_at": "2026-09-03",
+    "basis": [
+     "both schools corroborate the feed result; swapped version contradicted by both"
+    ]
+   },
+   "first_scored_utc": "2026-09-03T01:14:36Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        0,
+        2
+       ],
+       [
+        0,
+        2
+       ]
+      ],
+      "ours": [
+       [
+        0,
+        2
+       ],
+       [
+        1,
+        1
+       ]
+      ],
+      "h0_error": 2,
+      "h1_error": 2,
+      "delta_h1_better": 0,
+      "vote": "UNINFORMATIVE"
+     },
+     "box_roster_fit": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "roster missing for a side"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 9,
+      "h1_error": 7,
+      "vote": "SUPPORTS_H1"
+     },
+     "school_verification": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "not yet verified"
+     }
+    },
+    "n_h1_votes": 1,
+    "school_verification_available_at_scoring": false
+   }
+  },
+  {
    "gid": "6639575",
    "epoch": 1787940000,
    "teams": [
@@ -66270,14 +66560,14 @@
        1
       ],
       [
-       0,
-       1
+       1,
+       0
       ]
      ],
-     "h0_error": 2,
-     "h1_error": 2,
-     "delta_h1_better": 0,
-     "vote": "UNINFORMATIVE"
+     "h0_error": 0,
+     "h1_error": 4,
+     "delta_h1_better": -4,
+     "vote": "SUPPORTS_H0"
     },
     "box_roster_fit": {
      "available": true,
@@ -66302,8 +66592,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 5,
-     "h1_error": 17,
+     "h0_error": 1,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {

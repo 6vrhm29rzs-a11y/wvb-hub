@@ -2,15 +2,15 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-03T01:09:31Z",
+  "generated_at_utc": "2026-09-03T01:42:48Z",
   "counts": {
-   "finals": 520,
+   "finals": 523,
    "official_only": 10,
-   "reconciled": 493,
+   "reconciled": 494,
    "confirmed": 0,
-   "disputed": 2,
-   "pending_second": 518,
-   "corrected": 15,
+   "disputed": 3,
+   "pending_second": 520,
+   "corrected": 16,
    "duplicate_listings": 2,
    "duplicate_candidates_pending": 0
   }
@@ -2802,11 +2802,28 @@
    "sources": []
   },
   {
-   "result_corrected": null,
-   "corr_reason": null,
-   "corr_kind": null,
-   "corr_feed_said": null,
-   "corr_evidence": [],
+   "result_corrected": true,
+   "corr_reason": "Eastern Wash. won 3-0 -- the feed's entire team attribution is inverted (the attribution-suspicion detector's record_continuity component flagged it at delta >= 2 with no box held; both schools' published schedules contradict the feed's version and confirm the swap.",
+   "corr_kind": "contradicted",
+   "corr_feed_said": "North Dakota won 3-0 (winner_team_id 46236) with box rows attributed the same way",
+   "corr_evidence": [
+    {
+     "school": "Eastern Wash.",
+     "url": "https://goeags.com/services/schedule_txt.ashx?schedule=266",
+     "text": "published schedule row for 2026-08-28: 'Eastern Wash. W 3-0 vs North Dakota'",
+     "status": null,
+     "note": null,
+     "retrieved": "2026-09-03"
+    },
+    {
+     "school": "North Dakota",
+     "url": "https://fightinghawks.com/services/schedule_txt.ashx?schedule=1539",
+     "text": "published schedule row for 2026-08-28: 'North Dakota L 0-3 vs Eastern Washington'",
+     "status": null,
+     "note": null,
+     "retrieved": "2026-09-03"
+    }
+   ],
    "duplicate_of": null,
    "dup_reason": null,
    "dup_asym": null,
@@ -2816,10 +2833,10 @@
    "h": "Eastern Wash.",
    "exh": false,
    "d": "2026-08-28",
-   "overall": "reconciled",
+   "overall": "corrected",
    "states": {
-    "result": "reconciled",
-    "sets": "reconciled",
+    "result": "corrected",
+    "sets": "corrected",
     "box": "reconciled",
     "venue": "official"
    },
@@ -7301,18 +7318,30 @@
    "h": "UMES",
    "exh": false,
    "d": "2026-08-29",
-   "overall": "reconciled",
+   "overall": "disputed",
    "states": {
-    "result": "reconciled",
+    "result": "disputed",
     "sets": "reconciled",
     "box": "reconciled",
     "venue": "official"
    },
    "verify": null,
-   "n_indep": 0,
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-03T01:40:06Z",
+   "sources": [
+    {
+     "url": "https://easternshorehawks.com/services/schedule_txt.ashx?schedule=1306",
+     "kind": "school_site",
+     "school": "UMES",
+     "text": "published schedule row: 'UMES L 0-3 vs Florida A&M University' -- the feed says UMES won 3-0; UMES's own site reports the loss",
+     "fields": [
+      "result"
+     ],
+     "status": "conflicts",
+     "retrieved": "2026-09-03T01:40:06Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -15903,9 +15932,65 @@
    "dup_reason": null,
    "dup_asym": null,
    "dup_evidence": [],
+   "gid": "6628346",
+   "a": "Manhattan",
+   "h": "NJIT",
+   "exh": false,
+   "d": "2026-09-02",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "verify": null,
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6637631",
    "a": "Ohio St.",
    "h": "Ole Miss",
+   "exh": false,
+   "d": "2026-09-02",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "verify": null,
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6624321",
+   "a": "LSU",
+   "h": "Michigan",
    "exh": false,
    "d": "2026-09-02",
    "overall": "reconciled",
@@ -16018,6 +16103,34 @@
    "gid": "6639624",
    "a": "Alabama A&M",
    "h": "North Ala.",
+   "exh": false,
+   "d": "2026-09-02",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "verify": null,
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6627694",
+   "a": "Nebraska",
+   "h": "South Dakota St.",
    "exh": false,
    "d": "2026-09-02",
    "overall": "reconciled",

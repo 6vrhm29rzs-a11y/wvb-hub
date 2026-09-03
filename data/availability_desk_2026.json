@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-03T01:09:31Z",
+  "generated_at_utc": "2026-09-03T01:42:48Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 0,
    "expired": 1,
-   "anomalies": 58
+   "anomalies": 60
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -314,6 +314,24 @@
     }
    ],
    "points_per_set_missing": 4.125
+  },
+  {
+   "game_id": "6624354",
+   "team_id": "46059",
+   "team": "LSU",
+   "absent": [
+    {
+     "name": "Angelina Lee",
+     "rate": 2.0,
+     "played_share": 1.0
+    },
+    {
+     "name": "Lainee Pyles",
+     "rate": 1.857,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 3.857
   },
   {
    "game_id": "6624829",
@@ -683,6 +701,19 @@
    "absent": [
     {
      "name": "Parker Lafontaine",
+     "rate": 1.857,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 1.857
+  },
+  {
+   "game_id": "6624321",
+   "team_id": "46059",
+   "team": "LSU",
+   "absent": [
+    {
+     "name": "Lainee Pyles",
      "rate": 1.857,
      "played_share": 0.667
     }
@@ -1143,17 +1174,12 @@
    ]
   },
   "Nebraska": {
-   "gid": "6628594",
-   "d": "2026-08-30",
-   "appeared": 9,
+   "gid": "6627694",
+   "d": "2026-09-02",
+   "appeared": 14,
    "zero_action": [
-    "Keoni Williams",
     "Ryan Hunter",
-    "Keri Leimbach",
-    "Jayden Robinson",
-    "Campbell Flynn",
-    "Gabby Divita",
-    "Kenna Cogill"
+    "Campbell Flynn"
    ]
   },
   "Florida": {
@@ -1804,23 +1830,25 @@
    ]
   },
   "Manhattan": {
-   "gid": "6627107",
-   "d": "2026-08-29",
-   "appeared": 14,
+   "gid": "6628346",
+   "d": "2026-09-02",
+   "appeared": 13,
    "zero_action": [
-    "Julia Pfleger"
+    "Karsyn Harris",
+    "Mikalah Curran",
+    "Laura Hernandez"
    ]
   },
   "NJIT": {
-   "gid": "6624268",
-   "d": "2026-08-30",
-   "appeared": 11,
+   "gid": "6628346",
+   "d": "2026-09-02",
+   "appeared": 10,
    "zero_action": [
-    "Maria Kurnatowska",
-    "Ema Torres",
     "Ashlynn Berns",
     "Madison Mackaig",
+    "Kayden Campbell",
     "Joaneliz Maisonet",
+    "Martina Gonzalo cortes",
     "Giselle Parker"
    ]
   },
@@ -2812,6 +2840,14 @@
     "Holland Morris"
    ]
   },
+  "North Dakota": {
+   "gid": "6639571",
+   "d": "2026-08-30",
+   "appeared": 18,
+   "zero_action": [
+    "Katie Paez"
+   ]
+  },
   "Eastern Wash.": {
    "gid": "6628124",
    "d": "2026-08-30",
@@ -2825,14 +2861,6 @@
     "Cassandra Moeller",
     "Carlyn Rapozo-kamoku",
     "Stephanie Groswirt"
-   ]
-  },
-  "North Dakota": {
-   "gid": "6639571",
-   "d": "2026-08-30",
-   "appeared": 18,
-   "zero_action": [
-    "Katie Paez"
    ]
   },
   "Little Rock": {
@@ -3018,11 +3046,12 @@
    ]
   },
   "Michigan": {
-   "gid": "6624319",
-   "d": "2026-09-01",
-   "appeared": 10,
+   "gid": "6624321",
+   "d": "2026-09-02",
+   "appeared": 9,
    "zero_action": [
     "Trixie Mcmillin",
+    "Ellie White",
     "Leni Stanton-parker",
     "Carly Greskovics",
     "Megan Ingersoll",
@@ -3240,17 +3269,17 @@
    ]
   },
   "South Dakota St.": {
-   "gid": "6626383",
-   "d": "2026-08-30",
+   "gid": "6627694",
+   "d": "2026-09-02",
    "appeared": 9,
    "zero_action": [
     "Mallory Hartwig",
     "Patrycja Labucka",
+    "Kennedey Whitford",
     "Katelyn Van kirk",
+    "Claire Logeais",
     "Brooklyn Meyer",
-    "Anna Johannson",
-    "Madison Burr",
-    "Taylor Byl"
+    "Madison Burr"
    ]
   },
   "Sacramento St.": {
@@ -3819,10 +3848,11 @@
    ]
   },
   "LSU": {
-   "gid": "6624354",
-   "d": "2026-09-01",
+   "gid": "6624321",
+   "d": "2026-09-02",
    "appeared": 11,
    "zero_action": [
+    "Emilee Prochaska",
     "Djay Seaward",
     "Hannah Lee",
     "Aly Kirkhoff",
