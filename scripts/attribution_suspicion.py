@@ -50,7 +50,7 @@ SEASON = 2026
 RAW = os.path.join(REPO, "data", "raw", str(SEASON))
 OUT = os.path.join(REPO, "data", "attribution_suspicion_%d.json" % SEASON)
 ADJUDICATIONS = os.path.join(RAW, "attribution_adjudications.json")
-MODEL_VERSION = "v1-unweighted"
+MODEL_VERSION = "v1.1-unweighted"
 
 # v1 reliability gate for the box component -- a RELIABILITY floor for
 # voting eligibility, stated as such, never a truth threshold (R1)
@@ -296,7 +296,32 @@ def build():
         n_h1 = sum(1 for c in comps.values() if c.get("vote")
                    == "SUPPORTS_H1")
         n_av = sum(1 for c in comps.values() if c.get("available"))
-        rows.append({
+        # v1.1 TWO-TIER QUEUE (consult, 2026-09-02, calibrated on night
+        # one: double-vote candidates went 13/13 true; record_continuity
+        # ALONE at error-delta 1 produced ~7 false positives). Review
+        # thresholds, stated as such -- chosen to suppress the OBSERVED
+        # delta-1 noise, never a truth claim:
+        #   primary    n_h1_votes >= 2
+        #   secondary  a single record component only at delta >= 2;
+        #              box_roster_fit alone only on an unmistakable
+        #              reversal (fit_gain >= 0.5, reliability-gated)
+        # a single H1 vote below its gate stays in the artifact as
+        # watch: true -- preserved for training, not queued for a human.
+        def _delta(c, k):
+            return c.get(k) if c.get("available") else None
+        frf, rc, brf = (comps["feed_record_fit"],
+                        comps["record_continuity"],
+                        comps["box_roster_fit"])
+        strong = (
+            (frf.get("vote") == "SUPPORTS_H1"
+             and (frf.get("delta_h1_better") or 0) >= 2)
+            or (rc.get("vote") == "SUPPORTS_H1"
+                and ((rc.get("h0_error") or 0)
+                     - (rc.get("h1_error") or 0)) >= 2)
+            or (brf.get("vote") == "SUPPORTS_H1"
+                and (brf.get("fit_gain") or 0) >= 0.5))
+        queued = n_h1 >= 2 or strong
+        row = {
             "gid": gid, "epoch": graw.get("start_time_epoch"),
             "teams": [id2n.get(str(t.get("team_id")),
                                t.get("name_short")) for t in ts],
@@ -304,11 +329,42 @@ def build():
                                       .get("result_corrected")),
             "context": ctx, "components": comps,
             "n_h1_votes": n_h1, "n_available": n_av,
-            # queue heuristic, stated: ANY H1 vote queues in v1 -- this is
-            # a review-candidate generator, and the human adjudicates
-            "queued": n_h1 >= 1,
+            "queued": queued,
+            "watch": (not queued) and n_h1 >= 1,
             "adjudication": adjud.get(gid) or None,
-        })
+        }
+        rows.append(row)
+
+    # ⚠ FREEZE THE FIRST SCORE (consult, 2026-09-02): the artifact is
+    # regenerated nightly, and later corrections, later record
+    # observations, better rosters and arriving school verification all
+    # mutate current features -- training on those leaks the answer. Each
+    # gid keeps the components EXACTLY as first measured, immutable; the
+    # eventual fit joins first_score to human adjudications, never
+    # current features. (school_verification stays out of any future fit
+    # entirely -- it is the labelling mechanism, and a detector trained on
+    # it would only ever rediscover the verifier.)
+    prev = _load_json(OUT, {})
+    prev_first = {m.get("gid"): m for m in prev.get("matches") or []
+                  if m.get("first_score")}
+    now_utc = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+    for r in rows:
+        old = prev_first.get(r["gid"])
+        if old:
+            r["first_scored_utc"] = old["first_scored_utc"]
+            r["first_feature_version"] = old.get("first_feature_version",
+                                                 old.get("feature_version"))
+            r["first_score"] = old["first_score"]
+        else:
+            r["first_scored_utc"] = now_utc
+            r["first_feature_version"] = MODEL_VERSION
+            r["first_score"] = {
+                "components": r["components"],
+                "n_h1_votes": r["n_h1_votes"],
+                "school_verification_available_at_scoring":
+                    r["components"]["school_verification"].get("available",
+                                                              False),
+            }
 
     rows.sort(key=lambda r: (-r["n_h1_votes"], r["gid"]))
     queued = [r for r in rows if r["queued"]]
