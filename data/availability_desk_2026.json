@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-03T02:38:08Z",
+  "generated_at_utc": "2026-09-03T02:59:16Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 0,
    "expired": 1,
-   "anomalies": 59
+   "anomalies": 57
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -630,32 +630,6 @@
    "points_per_set_missing": 2.179
   },
   {
-   "game_id": "6639890",
-   "team_id": "46755",
-   "team": "Texas",
-   "absent": [
-    {
-     "name": "Abby Vander wal",
-     "rate": 2.125,
-     "played_share": 0.667
-    }
-   ],
-   "points_per_set_missing": 2.125
-  },
-  {
-   "game_id": "6628592",
-   "team_id": "46755",
-   "team": "Texas",
-   "absent": [
-    {
-     "name": "Abby Vander wal",
-     "rate": 2.125,
-     "played_share": 0.667
-    }
-   ],
-   "points_per_set_missing": 2.125
-  },
-  {
    "game_id": "6639364",
    "team_id": "46106",
    "team": "ULM",
@@ -1086,18 +1060,16 @@
    ]
   },
   "Texas": {
-   "gid": "6628594",
-   "d": "2026-08-30",
-   "appeared": 8,
+   "gid": "6628579",
+   "d": "2026-09-02",
+   "appeared": 9,
    "zero_action": [
     "Camille Presley",
-    "Ella Swindle",
     "Addy Gaido",
     "Callie Krueger",
     "Genevieve Harris",
     "Emma Cugino",
-    "Mackenzie Collins",
-    "Abby Vander wal"
+    "Mackenzie Collins"
    ]
   },
   "Arizona St.": {
@@ -4882,16 +4854,16 @@
    ]
   },
   "Southern California": {
-   "gid": "6626976",
-   "d": "2026-08-30",
+   "gid": "6628579",
+   "d": "2026-09-02",
    "appeared": 10,
    "zero_action": [
     "Milly Mcgee",
-    "Quinn Loper",
+    "Taliyah Hanks",
     "Elena Baic",
     "Riley Malloy",
+    "Layli Ostovar",
     "Addison Townsend",
-    "Brooklyn Tealer",
     "Addison Coady"
    ]
   },

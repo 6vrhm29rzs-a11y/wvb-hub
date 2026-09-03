@@ -178,6 +178,42 @@ def exhibition_rules():
     doc = load("data/raw/%d/exhibitions.json" % SEASON) or {}
     return doc.get("rules") or []
 
+_HUB_NAME_MAP = {}
+
+
+def _hub_name(raw):
+    """The hub's own spelling of a feed team name, or the feed's unchanged.
+
+    ⚠ FIFTH New Orleans bite (found by the cross-surface sweep, 2026-09-02):
+    the res rows carried the feed's 'LSU New Orleans ' -- trailing space and
+    all -- so standings' bare-name membership check counted every match
+    against New Orleans as NON-D-I for the opponent, and New Orleans's own
+    row never saw its games. Same rule as the fixture list: a name that
+    NORMALISES to a team we know renders as that team; a name we do not
+    know keeps exactly what the feed said."""
+    if not _HUB_NAME_MAP:
+        try:
+            from reconcile_2025 import norm as _rn
+            # ⚠ the AUTHORITY for hub spellings is the D-I membership
+            # table (rpi_official), NOT the dataset -- the dataset's own
+            # name_short for this team is the feed's 'LSU New Orleans '
+            # verbatim, so a dataset-keyed map maps the bad spelling to
+            # itself.
+            doc = json.load(open(os.path.join(
+                REPO, "data", "raw", "2025", "rpi_official.json")))
+            for r in doc.get("data") or []:
+                nm = r.get("School")
+                if nm:
+                    _HUB_NAME_MAP[_rn(nm)] = nm.strip()
+        except (OSError, ValueError, KeyError):
+            return raw
+    try:
+        from reconcile_2025 import norm as _rn
+        return _HUB_NAME_MAP.get(_rn(raw or ""), raw)
+    except Exception:
+        return raw
+
+
 def results() -> List[Dict]:
     """Every final 2026 match, newest first, with its per-set scores."""
     path = os.path.join(REPO, "data/raw/%d/games.jsonl" % SEASON)
@@ -316,7 +352,8 @@ def results() -> List[Dict]:
             "exhibition_event": (_exh_hit or {}).get("event"),
             "date": (_pt_date(ep) if ep else None),
             "epoch": int(ep) if ep else 0,
-            "away": away.get("name_short"), "home": home.get("name_short"),
+            "away": _hub_name(away.get("name_short")),
+            "home": _hub_name(home.get("name_short")),
             "away_sets": away.get("sets_won"), "home_sets": home.get("sets_won"),
             "away_rank": away.get("team_rank"), "home_rank": home.get("team_rank"),
             "away_d1": away.get("division") == 1, "home_d1": home.get("division") == 1,
