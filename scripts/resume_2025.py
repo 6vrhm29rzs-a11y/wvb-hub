@@ -268,6 +268,10 @@ def main():
         "meta": {
             "corpus_fingerprint":
                 __import__("season_counts").corpus_fingerprint(SEASON),
+            "certifies": {"resume_populated": {
+                "value": True,
+                "policy": __import__("properties")
+                .POLICY["RESUME_POPULATED"]}},
             "season": SEASON,
             "active": True,
             "min_matches": MIN_MATCHES,

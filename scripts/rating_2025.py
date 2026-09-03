@@ -439,6 +439,16 @@ def main():
             # clear of zero at every cutoff) -- while the flag still read
             # True and the board flipped to an ordering with Nebraska #46.
             # No new threshold (R1): the documented bar, finally enforced.
+            # ⚠ the certified value is the SAME expression as the legacy
+            # boolean below -- the shadow guard asserts old == new during
+            # migration, and two subtly different formulas here would be
+            # the wrong-property class reborn inside the contract layer
+            "certifies": {"out_of_sample_validated": {
+                "value": bool(val) and all(
+                    (v.get("delta_lo") or 0) > 0
+                    for v in (val or {}).values() if isinstance(v, dict)),
+                "policy": __import__("properties")
+                .POLICY["OOS_VALIDATION"]}},
             "validated": bool(val) and all(
                 (v.get("delta_lo") or 0) > 0
                 for v in (val or {}).values() if isinstance(v, dict)),

@@ -68,6 +68,7 @@ REBUILD = [
     ({}, ["scripts/conference_repair.py"]),
     ({}, ["scripts/digby_top25.py"]),
     ({}, ["scripts/resume_2025.py"]),
+    ({}, ["scripts/certify_rankings.py"]),
     ({}, ["scripts/confidence.py"]),
     ({}, ["scripts/availability_desk.py"]),
     ({}, ["scripts/source_intel.py"]),

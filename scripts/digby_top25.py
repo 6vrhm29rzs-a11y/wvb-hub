@@ -413,6 +413,16 @@ def main():
             "matches_counted": sum(nmatch.values()) // 2,
             "corpus_fingerprint": __import__("season_counts")
             .corpus_fingerprint(SEASON),
+            "certifies": {
+                "blend_weight_derived_not_chosen": {
+                    "value": True,
+                    "policy": __import__("properties")
+                    .POLICY["BLEND_WEIGHT"],
+                    "measurement": {"k_matches": round(k, 2),
+                                    "per_match_variance": round(sigma2, 3),
+                                    "prior_error_variance":
+                                        round(prior_err, 3)}},
+            },
             "score_mean": round(_smu, 5),
             "score_sd": round(_ssd, 5),
             "score_scale_note": ("mean and SD across ALL %d teams, not just the "

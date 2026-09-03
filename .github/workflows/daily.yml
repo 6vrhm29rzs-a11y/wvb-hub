@@ -226,6 +226,11 @@ jobs:
           # played, so the page can state that rather than guess; it switches
           # itself on once the season is big enough.
           python3 scripts/resume_2025.py || echo "resume needs a rating or a blend; skipping"
+          # the ranking-chain certification step (certified properties,
+          # 2026-09-03): certifies ordering_mature_for_public_rank against
+          # the exact generations of rating + digby; board and archive
+          # consume the certificate
+          python3 scripts/certify_rankings.py || echo "ranking certification skipped; continuing"
           # NIGHTLY RESULT VERIFICATION (Cody, 2026-09-01, after the third
           # feed attribution inversion): every counted final checked against
           # BOTH schools' published schedules. It writes a report, an

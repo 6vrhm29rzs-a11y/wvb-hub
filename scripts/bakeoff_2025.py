@@ -611,6 +611,13 @@ def main():
         "meta": {
             "corpus_fingerprint":
                 __import__("season_counts").corpus_fingerprint(SEASON),
+            # certified properties (architect commit 2): named contracts,
+            # emitted by the owner of the calculation
+            "certifies": {
+                "fit_completed": {
+                    "value": True,
+                    "policy": __import__("properties").POLICY["FIT"]},
+            },
             "season": 2025, "source_tier": "DERIVED",
             "pre_registered_expectation": "hitting-efficiency differential and "
                                           "net points/set lead among box-score "

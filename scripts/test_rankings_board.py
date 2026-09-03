@@ -377,6 +377,26 @@ def main():
     check("the weekly archive uses the SAME maturity gate",
           "live_rating_mature" in _snap)
 
+    # ── SHADOW GUARD (certified properties, migration commit 2): the
+    # certificate's decision must equal the old gate's decision on the
+    # REAL artifacts -- two subtly different answers here is the
+    # wrong-property class reborn inside the contract layer.
+    import json as _json
+    _cp = os.path.join(REPO, "data", "ranking_certificates_2026.json")
+    _rp2 = os.path.join(REPO, "data", "rating_2026.json")
+    if os.path.exists(_cp) and os.path.exists(_rp2):
+        _cert = ((_json.load(open(_cp)).get("meta") or {})
+                 .get("certifies") or {}).get(
+                     "ordering_mature_for_public_rank") or {}
+        _live_doc = _json.load(open(_rp2))
+        _old = bool((_live_doc.get("meta") or {}).get("validated")) and             BB.live_rating_mature(_live_doc)[0]
+        check("SHADOW: certificate decision == legacy gate decision",
+              _cert.get("value") == _old,
+              (_cert.get("value"), _old))
+        check("...and the certificate names both input generations",
+              set((_cert.get("dependencies") or {})) ==
+              {"rating_2026", "digby_top25_2026"})
+
     print()
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))
