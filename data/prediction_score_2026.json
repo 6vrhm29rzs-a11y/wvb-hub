@@ -2,22 +2,22 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 473,
+  "scored": 480,
   "logged_after_tipoff_excluded": 8,
-  "team_mismatch_excluded": 15,
+  "team_mismatch_excluded": 16,
   "predictions_on_record": 4773,
-  "results_available": 507,
-  "brier": 0.1809,
+  "results_available": 515,
+  "brier": 0.183,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 345,
-  "favourite_correct_pct": 72.9
+  "favourite_correct": 348,
+  "favourite_correct_pct": 72.5
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 70,
-   "said": 55.4,
-   "happened": 51.4
+   "n": 71,
+   "said": 55.3,
+   "happened": 50.7
   },
   {
    "range": "60-70%",
@@ -27,15 +27,15 @@
   },
   {
    "range": "70-80%",
-   "n": 67,
+   "n": 68,
    "said": 75.2,
-   "happened": 67.2
+   "happened": 66.2
   },
   {
    "range": "80-90%",
-   "n": 92,
-   "said": 85.0,
-   "happened": 77.2
+   "n": 97,
+   "said": 84.9,
+   "happened": 76.3
   },
   {
    "range": "90-101%",
@@ -334,6 +334,24 @@
    "brier": 0.702244
   },
   {
+   "game_id": "6624937",
+   "date": "2026-09-02",
+   "away": "Oakland",
+   "home": "Central Mich.",
+   "p_home": 0.8272,
+   "home_won": false,
+   "brier": 0.6842598400000001
+  },
+  {
+   "game_id": "6624238",
+   "date": "2026-09-02",
+   "away": "Indiana",
+   "home": "Texas A&M",
+   "p_home": 0.8261,
+   "home_won": false,
+   "brier": 0.6824412099999999
+  },
+  {
    "game_id": "6628050",
    "date": "2026-08-28",
    "away": "Bucknell",
@@ -476,24 +494,6 @@
    "p_home": 0.758,
    "home_won": false,
    "brier": 0.574564
-  },
-  {
-   "game_id": "6625786",
-   "date": "2026-08-28",
-   "away": "LMU (CA)",
-   "home": "Northern Ariz.",
-   "p_home": 0.7446,
-   "home_won": false,
-   "brier": 0.5544291600000001
-  },
-  {
-   "game_id": "6639890",
-   "date": "2026-08-22",
-   "away": "Arizona St.",
-   "home": "Texas",
-   "p_home": 0.7438,
-   "home_won": false,
-   "brier": 0.55323844
   }
  ]
 }
