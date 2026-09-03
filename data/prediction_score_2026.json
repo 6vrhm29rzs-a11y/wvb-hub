@@ -2,14 +2,14 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 482,
+  "scored": 485,
   "logged_after_tipoff_excluded": 8,
   "team_mismatch_excluded": 16,
   "predictions_on_record": 4773,
-  "results_available": 517,
-  "brier": 0.1822,
+  "results_available": 520,
+  "brier": 0.1825,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 350,
+  "favourite_correct": 352,
   "favourite_correct_pct": 72.6
  },
  "calibration": [
@@ -33,15 +33,15 @@
   },
   {
    "range": "80-90%",
-   "n": 98,
+   "n": 99,
    "said": 84.9,
-   "happened": 76.5
+   "happened": 75.8
   },
   {
    "range": "90-101%",
-   "n": 151,
+   "n": 153,
    "said": 95.3,
-   "happened": 90.1
+   "happened": 90.2
   }
  ],
  "matches": [
@@ -370,6 +370,15 @@
    "brier": 0.67322025
   },
   {
+   "game_id": "6627726",
+   "date": "2026-09-02",
+   "away": "Nicholls",
+   "home": "Grambling",
+   "p_home": 0.183,
+   "home_won": true,
+   "brier": 0.6674889999999999
+  },
+  {
    "game_id": "6624319",
    "date": "2026-09-01",
    "away": "South Carolina",
@@ -485,15 +494,6 @@
    "p_home": 0.7599,
    "home_won": false,
    "brier": 0.57744801
-  },
-  {
-   "game_id": "6628124",
-   "date": "2026-08-30",
-   "away": "Eastern Wash.",
-   "home": "Seattle U",
-   "p_home": 0.758,
-   "home_won": false,
-   "brier": 0.574564
   }
  ]
 }

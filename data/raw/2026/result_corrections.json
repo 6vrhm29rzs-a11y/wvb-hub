@@ -702,6 +702,67 @@
      "establishes": "Queens (NC) L 0-3 vs Duke"
     }
    ]
+  },
+  "6624516": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Tarleton St. won 3-2 (winner_team_id 46097) with the box rows attributed the same way",
+   "correct": {
+    "winner_team_id": "45895",
+    "away_sets": 3,
+    "home_sets": 2,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 22,
+      "home": 25
+     },
+     {
+      "period": 2,
+      "visit": 22,
+      "home": 25
+     },
+     {
+      "period": 3,
+      "visit": 25,
+      "home": 15
+     },
+     {
+      "period": 4,
+      "visit": 25,
+      "home": 22
+     },
+     {
+      "period": 5,
+      "visit": 15,
+      "home": 9
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46097": "45895",
+     "45895": "46097"
+    }
+   },
+   "established": "UC Santa Barbara won 3-2 -- the feed's entire team attribution is inverted (the SMU-UC Davis class, attribution-suspicion detector). Tarleton St.'s schedule says 'L 2-3 vs UC Santa Barbara'; UCSB's legacy schedule export says 'W 3-2 vs Tarleton State University' (second source, found once the export id and the University spelling folds were fixed). Box rows fit the OPPOSITE rosters ~1.00/0.00 both sides.",
+   "evidence": [
+    {
+     "url": "https://tarletonsports.com/services/schedule_txt.ashx?schedule=308",
+     "kind": "school_site",
+     "school": "Tarleton St.",
+     "retrieved": "2026-09-03T01:08:30Z",
+     "text": "published schedule row for 2026-08-28: 'Tarleton St. L 2-3 vs UC Santa Barbara'",
+     "establishes": "Tarleton St. L 2-3 vs UC Santa Barbara"
+    },
+    {
+     "url": "https://ucsbgauchos.com/services/schedule_txt.ashx?schedule=409",
+     "kind": "school_site",
+     "school": "UC Santa Barbara",
+     "retrieved": "2026-09-03T01:08:30Z",
+     "text": "published schedule row for 2026-08-28: 'UC Santa Barbara W 3-2 vs Tarleton State University'",
+     "establishes": "UC Santa Barbara W 3-2 vs Tarleton State University"
+    }
+   ]
   }
  }
 }

@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-03T00:36:31Z",
+  "generated_at_utc": "2026-09-03T01:09:31Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 0,
    "expired": 1,
-   "anomalies": 56
+   "anomalies": 58
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -265,11 +265,29 @@
    "absent": [
     {
      "name": "Brooklyn Deleye",
-     "rate": 5.0,
+     "rate": 5.154,
      "played_share": 1.0
     }
    ],
-   "points_per_set_missing": 5.0
+   "points_per_set_missing": 5.154
+  },
+  {
+   "game_id": "6625817",
+   "team_id": "46103",
+   "team": "Nicholls",
+   "absent": [
+    {
+     "name": "Zahahrah Edwards-wyllie",
+     "rate": 2.286,
+     "played_share": 1.0
+    },
+    {
+     "name": "Mckenzie Mitchell",
+     "rate": 2.214,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 4.5
   },
   {
    "game_id": "6628298",
@@ -579,6 +597,19 @@
     }
    ],
    "points_per_set_missing": 2.2
+  },
+  {
+   "game_id": "6627530",
+   "team_id": "46103",
+   "team": "Nicholls",
+   "absent": [
+    {
+     "name": "Tierney Terrell",
+     "rate": 2.179,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.179
   },
   {
    "game_id": "6639890",
@@ -1002,15 +1033,15 @@
    ]
   },
   "Kentucky": {
-   "gid": "6626369",
-   "d": "2026-08-29",
+   "gid": "6625953",
+   "d": "2026-09-02",
    "appeared": 9,
    "zero_action": [
     "Bellamie Beus",
-    "Gracison Saylors",
     "Caroline Prihoda",
     "Sidney Burley",
     "Georgia Watson",
+    "Kennedy Washington",
     "Molly Berezowitz",
     "Bryah Breaux",
     "Hannah Benjamin"
@@ -1236,13 +1267,12 @@
    ]
   },
   "Grambling": {
-   "gid": "6627723",
-   "d": "2026-08-29",
-   "appeared": 13,
+   "gid": "6627726",
+   "d": "2026-09-02",
+   "appeared": 14,
    "zero_action": [
-    "Jaida Gray",
+    "Kenya Lucas",
     "Chiara Mearelli",
-    "Jazmine Binion",
     "Piper Nelson",
     "Jocelyn Pargas"
    ]
@@ -1417,12 +1447,15 @@
    "zero_action": []
   },
   "Nicholls": {
-   "gid": "6627530",
-   "d": "2026-08-29",
-   "appeared": 11,
+   "gid": "6627726",
+   "d": "2026-09-02",
+   "appeared": 12,
    "zero_action": [
-    "Ava-claire Calais",
-    "Karina Smith"
+    "Madison Smith",
+    "Karina Smith",
+    "Molly Muller",
+    "Amelie Shalfoon",
+    "Tierney Terrell"
    ]
   },
   "Stonehill": {
@@ -3363,17 +3396,6 @@
     "Katherine Eigner"
    ]
   },
-  "Tarleton St.": {
-   "gid": "6627022",
-   "d": "2026-08-30",
-   "appeared": 12,
-   "zero_action": [
-    "Aubrey Acheson",
-    "Leila Paraoan",
-    "Laci Schoen",
-    "Peyton Fadal"
-   ]
-  },
   "UC Santa Barbara": {
    "gid": "6624518",
    "d": "2026-08-30",
@@ -3385,6 +3407,19 @@
     "Kate Martin",
     "Reilly Goueth",
     "Selah Wadsworth"
+   ]
+  },
+  "Tarleton St.": {
+   "gid": "6627013",
+   "d": "2026-09-02",
+   "appeared": 10,
+   "zero_action": [
+    "Aubrey Acheson",
+    "Leila Paraoan",
+    "Laci Schoen",
+    "Taylynn Biggs",
+    "Alexa Earle",
+    "Peyton Fadal"
    ]
   },
   "Kansas": {
@@ -3830,15 +3865,12 @@
    ]
   },
   "Rice": {
-   "gid": "6628442",
-   "d": "2026-08-30",
-   "appeared": 10,
+   "gid": "6627013",
+   "d": "2026-09-02",
+   "appeared": 13,
    "zero_action": [
-    "Bella Lopez",
-    "Zora Bello",
-    "Savannah Skopal",
-    "Ellie Schneider",
-    "Amalia Simmons"
+    "Campbell Love",
+    "Declan Eastman"
    ]
   },
   "UCF": {
@@ -4524,10 +4556,18 @@
    ]
   },
   "UCLA": {
-   "gid": "6625952",
-   "d": "2026-08-29",
-   "appeared": 10,
-   "zero_action": []
+   "gid": "6625953",
+   "d": "2026-09-02",
+   "appeared": 11,
+   "zero_action": [
+    "Ashton Nelson",
+    "Lauren Cortina",
+    "Jordyn Johnson",
+    "Kat Lutz",
+    "Sydney Breon",
+    "Sakura Codling",
+    "Presley Thompson"
+   ]
   },
   "Portland": {
    "gid": "6624571",

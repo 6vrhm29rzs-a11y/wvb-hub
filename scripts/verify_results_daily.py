@@ -60,8 +60,10 @@ def team_norm(name):
       hub "Presbyterian"; "Boston College" folds identically on both
       sides, so it still matches itself and collides with nobody).
     """
+    t = re.sub(r"^University of (the )?", "", name.strip(),
+               flags=re.IGNORECASE)
     t = re.sub(r"\b([NS])\.C\.", lambda m: (
-        "North" if m.group(1) == "N" else "South") + " Carolina", name)
+        "North" if m.group(1) == "N" else "South") + " Carolina", t)
     n = _ref_norm(t)
     n = re.sub(r"\bcollege\b", " ", n)
     # "Charleston Southern" (page) vs "Charleston So." (hub) -- the same
@@ -72,6 +74,27 @@ def team_norm(name):
     # keyed on the FOLDED form, both directions where needed. A global
     # parenthetical strip is banned: Miami (FL) and Miami (OH) would merge.
     return _VERIFIER_ALIASES.get(n, n)
+
+
+def _strip_inst(n):
+    """Trailing ' university' / ' u' removed from a NORMALIZED key."""
+    return re.sub(r"\s+(?:university|u)$", "", n).strip()
+
+
+_STRIPPED_HUB = {}
+
+
+def _stripped_hub_count(key):
+    if not _STRIPPED_HUB:
+        try:
+            d = json.load(open(os.path.join(
+                REPO, "data", "data_%d.json" % SEASON)))
+            for t in d.get("teams") or []:
+                k = _strip_inst(team_norm(t.get("name_short") or ""))
+                _STRIPPED_HUB[k] = _STRIPPED_HUB.get(k, 0) + 1
+        except (OSError, ValueError):
+            return 2          # cannot check -> refuse pass 2
+    return _STRIPPED_HUB.get(key, 0)
 
 
 _VERIFIER_ALIASES = {
@@ -320,20 +343,23 @@ def legacy_txt_rows(base, log, team):
         time.sleep(0.5)
         if status != 200 or not body:
             continue
-        m = re.search(r"/services/schedule_txt\.ashx\?schedule=\d+", body)
-        if not m:
-            continue
-        turl = base + m.group(0)
-        status2, txt, _fu2 = _fetch(turl)
-        time.sleep(0.5)
-        log.append({"team": team, "url": turl, "http": status2,
-                    "retrieved_utc": datetime.datetime.utcnow()
-                    .strftime("%Y-%m-%dT%H:%M:%SZ"),
-                    "state": "legacy_txt"})
-        if status2 == 200 and txt:
-            rows = parse_schedule_txt_plain(txt)
-            if rows:
-                return rows, turl
+        # ⚠ a page can carry SEVERAL schedule ids (other sports' footers,
+        # archived seasons) -- the first match was the wrong one on UCSB
+        # ("Schedule not found" / another sport). Try each distinct id.
+        ids = list(dict.fromkeys(re.findall(
+            r"/services/schedule_txt\.ashx\?schedule=\d+", body)))[:4]
+        for frag in ids:
+            turl = base + frag
+            status2, txt, _fu2 = _fetch(turl)
+            time.sleep(0.5)
+            log.append({"team": team, "url": turl, "http": status2,
+                        "retrieved_utc": datetime.datetime.utcnow()
+                        .strftime("%Y-%m-%dT%H:%M:%SZ"),
+                        "state": "legacy_txt"})
+            if status2 == 200 and txt:
+                rows = parse_schedule_txt_plain(txt)
+                if rows:
+                    return rows, turl
     return None, None
 
 
@@ -369,6 +395,26 @@ def _judge_rows(rows, url, team, opponent, date, canonical):
     cand = [(r, _match_token(r)) for r in rows if r["date"] == date
             and not r["exhibition"]]
     cand = [(r, tok) for r, tok in cand if tok]
+    if not cand:
+        # PASS 2 -- trailing-institution strip ("Tarleton State University"
+        # vs hub "Tarleton St."), gated on UNIQUENESS: if two hub teams
+        # share the stripped form (Boston U. / Boston College -> "boston"),
+        # this pass refuses rather than guess (R8).
+        want2 = _strip_inst(want)
+        if want2 != want and _stripped_hub_count(want2) > 1:
+            want2 = None
+        if want2:
+            def _match2(r):
+                toks = ([r["opponent"]] if r.get("opponent") is not None
+                        else (r.get("tokens") or []))
+                for tk in toks:
+                    bare = re.sub(r"^(?:#\d+|No\.\s*\d+|RV)\s+", "", tk)
+                    if _strip_inst(team_norm(bare)) == want2:
+                        return tk
+                return None
+            cand = [(r, _match2(r)) for r in rows if r["date"] == date
+                    and not r["exhibition"]]
+            cand = [(r, tok) for r, tok in cand if tok]
     if not cand:
         return "EVENT_NOT_FOUND", {"url": url, "rows_on_date": [
             (r["opponent"] if r.get("opponent") is not None
