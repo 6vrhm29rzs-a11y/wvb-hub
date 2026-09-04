@@ -1011,6 +1011,57 @@
      "establishes": "UNLV L 1-3 vs Idaho State"
     }
    ]
+  },
+  "6624697": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Howard (away) won 3-0 with the visit column taking every set 25-13/25-18/25-22",
+   "correct": {
+    "winner_team_id": "46126",
+    "away_sets": 0,
+    "home_sets": 3,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 13,
+      "home": 25
+     },
+     {
+      "period": 2,
+      "visit": 18,
+      "home": 25
+     },
+     {
+      "period": 3,
+      "visit": 22,
+      "home": 25
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46126": "45779",
+     "45779": "46126"
+    }
+   },
+   "established": "Syracuse won 3-0 -- the feed's F record inverted the visit/home attribution wholesale: its own LATER in-progress records show the home column (Syracuse) taking sets 25-13 and 25-18, the same point totals the F record hands to Howard's column flipped. Both schools contradict the feed's version and both assert the same alternative, each marking the match Neutral (Newman Arena, Ithaca -- Cornell's floor, so the home flag is nominal).",
+   "evidence": [
+    {
+     "url": "https://cuse.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Syracuse",
+     "retrieved": "2026-09-04T07:03:44Z",
+     "text": "published schedule row for 2026-09-03: 'Syracuse W 3-0 vs Howard' (Neutral)",
+     "establishes": "Syracuse W 3-0 vs Howard"
+    },
+    {
+     "url": "https://hubison.com/services/schedule_txt.ashx?schedule=357",
+     "kind": "school_site",
+     "school": "Howard",
+     "retrieved": "2026-09-04T07:03:44Z",
+     "text": "published schedule row for 2026-09-03: 'Howard L 0-3 vs Syracuse' (Neutral)",
+     "establishes": "Howard L 0-3 vs Syracuse"
+    }
+   ]
   }
  }
 }

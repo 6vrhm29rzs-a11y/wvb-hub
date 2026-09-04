@@ -2,46 +2,46 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 541,
-  "logged_after_tipoff_excluded": 1,
+  "scored": 568,
+  "logged_after_tipoff_excluded": 2,
   "team_mismatch_excluded": 16,
-  "predictions_on_record": 4773,
-  "results_available": 569,
-  "brier": 0.1662,
+  "predictions_on_record": 4774,
+  "results_available": 598,
+  "brier": 0.1696,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 405,
-  "favourite_correct_pct": 74.9
+  "favourite_correct": 421,
+  "favourite_correct_pct": 74.1
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 84,
-   "said": 55.5,
-   "happened": 53.6
+   "n": 92,
+   "said": 55.4,
+   "happened": 52.2
   },
   {
    "range": "60-70%",
-   "n": 102,
-   "said": 65.0,
-   "happened": 62.7
+   "n": 108,
+   "said": 65.1,
+   "happened": 63.0
   },
   {
    "range": "70-80%",
-   "n": 77,
+   "n": 81,
    "said": 75.2,
-   "happened": 66.2
+   "happened": 66.7
   },
   {
    "range": "80-90%",
-   "n": 111,
+   "n": 115,
    "said": 85.1,
-   "happened": 79.3
+   "happened": 79.1
   },
   {
    "range": "90-101%",
-   "n": 167,
-   "said": 95.4,
-   "happened": 94.0
+   "n": 172,
+   "said": 95.3,
+   "happened": 93.0
   }
  ],
  "matches": [
@@ -118,6 +118,15 @@
    "brier": 0.85045284
   },
   {
+   "game_id": "6625359",
+   "date": "2026-09-04",
+   "away": "Chattanooga",
+   "home": "UT Martin",
+   "p_home": 0.0838,
+   "home_won": true,
+   "brier": 0.83942244
+  },
+  {
    "game_id": "6625787",
    "date": "2026-08-30",
    "away": "LMU (CA)",
@@ -125,6 +134,15 @@
    "p_home": 0.9156,
    "home_won": false,
    "brier": 0.83832336
+  },
+  {
+   "game_id": "6627368",
+   "date": "2026-09-04",
+   "away": "East Texas A&M",
+   "home": "UAB",
+   "p_home": 0.9127,
+   "home_won": false,
+   "brier": 0.8330212899999999
   },
   {
    "game_id": "6628176",
@@ -280,6 +298,15 @@
    "brier": 0.702244
   },
   {
+   "game_id": "6627095",
+   "date": "2026-09-04",
+   "away": "Bradley",
+   "home": "Northern Ariz.",
+   "p_home": 0.8282,
+   "home_won": false,
+   "brier": 0.68591524
+  },
+  {
    "game_id": "6624937",
    "date": "2026-09-02",
    "away": "Oakland",
@@ -341,6 +368,15 @@
    "p_home": 0.8029,
    "home_won": false,
    "brier": 0.64464841
+  },
+  {
+   "game_id": "6637013",
+   "date": "2026-09-04",
+   "away": "Murray St.",
+   "home": "NIU",
+   "p_home": 0.7993,
+   "home_won": false,
+   "brier": 0.63888049
   },
   {
    "game_id": "6627489",
@@ -458,42 +494,6 @@
    "p_home": 0.758,
    "home_won": false,
    "brier": 0.574564
-  },
-  {
-   "game_id": "6625871",
-   "date": "2026-09-03",
-   "away": "Idaho St.",
-   "home": "UNLV",
-   "p_home": 0.7576,
-   "home_won": false,
-   "brier": 0.5739577600000001
-  },
-  {
-   "game_id": "6625786",
-   "date": "2026-08-28",
-   "away": "LMU (CA)",
-   "home": "Northern Ariz.",
-   "p_home": 0.7446,
-   "home_won": false,
-   "brier": 0.5544291600000001
-  },
-  {
-   "game_id": "6639890",
-   "date": "2026-08-22",
-   "away": "Arizona St.",
-   "home": "Texas",
-   "p_home": 0.7438,
-   "home_won": false,
-   "brier": 0.55323844
-  },
-  {
-   "game_id": "6628023",
-   "date": "2026-08-29",
-   "away": "Texas Tech",
-   "home": "St. Thomas (MN)",
-   "p_home": 0.7424,
-   "home_won": false,
-   "brier": 0.5511577599999999
   }
  ]
 }

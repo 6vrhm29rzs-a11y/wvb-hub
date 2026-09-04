@@ -82,7 +82,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 5,
+     "records": 6,
      "values": [
       "1788505200",
       "1788570000"
@@ -90,7 +90,7 @@
     }
    ],
    "matchup": "LIU / Oregon",
-   "records": 5
+   "records": 6
   },
   "6625274": {
    "conflicts": [
@@ -258,7 +258,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 5,
+     "records": 6,
      "values": [
       "1788562800",
       "1788543000"
@@ -266,7 +266,7 @@
     }
    ],
    "matchup": "Green Bay / Tennessee St.",
-   "records": 5
+   "records": 6
   },
   "6627242": {
    "conflicts": [
@@ -341,8 +341,17 @@
   "6628108": {
    "conflicts": [
     {
+     "field": "teams",
+     "non_blocking": "site is confirmed neutral, so no displayed fact depends on which side is nominally home",
+     "records": 6,
+     "values": [
+      "(('45886', False), ('46291', True))",
+      "(('45886', True), ('46291', False))"
+     ]
+    },
+    {
      "field": "start_time_epoch",
-     "records": 5,
+     "records": 6,
      "values": [
       "1788573600",
       "1788559200"
@@ -350,7 +359,7 @@
     }
    ],
    "matchup": "Utah Tech / UC San Diego",
-   "records": 5
+   "records": 6
   },
   "6628262": {
    "conflicts": [
@@ -384,7 +393,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 4,
+     "records": 5,
      "values": [
       "1788552000",
       "1788548400"
@@ -392,7 +401,7 @@
     }
    ],
    "matchup": "Marist / SIUE",
-   "records": 4
+   "records": 5
   },
   "6639126": {
    "conflicts": [
@@ -424,11 +433,11 @@
   }
  },
  "by_field": {
-  "game_state": 34,
+  "game_state": 30,
   "site": 2,
   "start_time_epoch": 27,
   "teams": 2,
-  "teams (non-blocking)": 4
+  "teams (non-blocking)": 5
  },
  "corrections": {
   "6625717": {
@@ -562,7 +571,7 @@
  },
  "counts": {
   "blocked": 29,
-  "conflicted": 67,
+  "conflicted": 63,
   "corrected": 4,
   "fixtures": 4879
  },

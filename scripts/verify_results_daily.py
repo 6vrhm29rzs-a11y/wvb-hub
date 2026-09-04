@@ -587,9 +587,17 @@ def finals_for(date):
                 continue
     out = []
     cls_of = SC.classify(games, SEASON)
+    _corr = SC.corrections(SEASON)
     for g in SC.resolve(games):
         if cls_of.get(str(g.get("game_id"))) != "ok":
             continue
+        # ⚠ VERIFY THE COUNTED RESULT, NOT THE FEED'S REFUTED CLAIM
+        # (2026-09-04): before this line, an already-corrected inversion
+        # reported CONTRADICTED_BOTH every night forever -- the schools
+        # were "contradicting" a canonical the ledger had already
+        # overturned. Both schools agreeing with the CORRECTION is the
+        # nightly proof the correction still holds.
+        g = SC.apply_correction(g, _corr)
         et = g.get("start_time_epoch")
         if not et:
             continue

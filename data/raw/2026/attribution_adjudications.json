@@ -166,6 +166,20 @@
    "basis": [
     "FGCU corroborates the feed; swapped version contradicted -- record_continuity drift"
    ]
+  },
+  "6624697": {
+   "label": "confirmed_inversion",
+   "reviewed_at": "2026-09-04",
+   "basis": [
+    "result_corrections.json entry (Howard-Syracuse): feed's F record flipped visit/home wholesale -- its own later in-progress records carry the same set points on the opposite columns; both schools contradict the feed and assert Syracuse W 3-0 (both marked Neutral, Newman Arena/Cornell). Caught by the nightly school-site verifier (CONTRADICTED_BOTH)."
+   ]
+  },
+  "6628317": {
+   "label": "confirmed_correct",
+   "reviewed_at": "2026-09-04",
+   "basis": [
+    "Nightly verifier 2026-09-03: VERIFIED_BOTH -- Boise St. W 3-0 asserted by broncosports.com and North Dakota St. L 0-3 by gobison.com, both matching the feed. The record_continuity vote was a false alarm."
+   ]
   }
  }
 }
