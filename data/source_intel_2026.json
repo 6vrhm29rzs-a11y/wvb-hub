@@ -1,8 +1,8 @@
 {
  "meta": {
   "season": 2026,
-  "generated_at_utc": "2026-09-04T01:34:42Z",
-  "n_claims": 45,
+  "generated_at_utc": "2026-09-04T01:56:07Z",
+  "n_claims": 41,
   "feed_cap": 5,
   "recent_hours": 72,
   "states": {
@@ -10,7 +10,7 @@
    "corroborated": 9,
    "official_unconfirmed": 0,
    "community_signal": 0,
-   "conflicting": 6,
+   "conflicting": 2,
    "expired": 4,
    "inaccessible": 1
   }
@@ -1185,100 +1185,13 @@
    "review_by": null
   },
   {
-   "id": "333c4d178c77",
-   "type": "result_conflict",
-   "subject": {
-    "kind": "match",
-    "gid": "6626259"
-   },
-   "what": "An attributable source disputes this result",
-   "state": "conflicting",
-   "state_label": "sources conflict — shown, not chosen",
-   "why": "shown, never chosen; the Result Ledger holds both claims",
-   "scope": "that sources disagree about this result",
-   "sources": [
-    {
-     "url": "https://smumustangs.com/sports/womens-volleyball/stats/2026/uc-davis/boxscore/14553",
-     "excerpt": "SMU's own SidearmStats result data for game 14553: 'status':'W','team_score':'3','opponent_score':'2' ... 'game_winner':'H','home_full_name':'SMU','away_full_name':'UC Davis','period_home_score':['27','25','20','23','15','3'],'period_away_score':['25','20','25','25','12','2']",
-     "retrieved": "2026-08-30T22:32:10Z",
-     "source_class": "host_livestat"
-    }
-   ],
-   "public": true,
-   "priority": 95,
-   "route": {
-    "match": "6626259",
-    "ledger": true
-   },
-   "effective": null,
-   "review_by": null
-  },
-  {
-   "id": "796962bfe81f",
-   "type": "result_conflict",
-   "subject": {
-    "kind": "match",
-    "gid": "6624516"
-   },
-   "what": "An attributable source disputes this result",
-   "state": "conflicting",
-   "state_label": "sources conflict — shown, not chosen",
-   "why": "shown, never chosen; the Result Ledger holds both claims",
-   "scope": "that sources disagree about this result",
-   "sources": [
-    {
-     "url": "https://tarletonsports.com/services/schedule_txt.ashx?schedule=308",
-     "excerpt": "published schedule row for 2026-08-28: 'Tarleton St. L 2-3 vs UC Santa Barbara' -- the feed says Tarleton St. won 3-2; the school says the reverse",
-     "retrieved": "2026-09-02T03:49:19Z",
-     "source_class": "school_site"
-    }
-   ],
-   "public": true,
-   "priority": 95,
-   "route": {
-    "match": "6624516",
-    "ledger": true
-   },
-   "effective": null,
-   "review_by": null
-  },
-  {
-   "id": "b2fe1bf985bd",
-   "type": "result_conflict",
-   "subject": {
-    "kind": "match",
-    "gid": "6626124"
-   },
-   "what": "An attributable source disputes this result",
-   "state": "conflicting",
-   "state_label": "sources conflict — shown, not chosen",
-   "why": "shown, never chosen; the Result Ledger holds both claims",
-   "scope": "that sources disagree about this result",
-   "sources": [
-    {
-     "url": "https://queensathletics.com/services/schedule_txt.ashx?schedule=541",
-     "excerpt": "published schedule row for 2026-08-29: 'Queens (NC) L 0-3 vs Duke' -- the feed says Queens (NC) won 3-0; the school says the reverse",
-     "retrieved": "2026-09-02T03:49:19Z",
-     "source_class": "school_site"
-    }
-   ],
-   "public": true,
-   "priority": 95,
-   "route": {
-    "match": "6626124",
-    "ledger": true
-   },
-   "effective": null,
-   "review_by": null
-  },
-  {
    "id": "daae0187b2d8",
    "type": "result_conflict",
    "subject": {
     "kind": "match",
     "gid": "6626506"
    },
-   "what": "An attributable source disputes this result",
+   "what": "An attributable source disputes this result — Southern Utah v Pacific",
    "state": "conflicting",
    "state_label": "sources conflict — shown, not chosen",
    "why": "shown, never chosen; the Result Ledger holds both claims",
@@ -1307,7 +1220,7 @@
     "kind": "match",
     "gid": "6628624"
    },
-   "what": "An attributable source disputes this result",
+   "what": "An attributable source disputes this result — Merrimack v Stetson",
    "state": "conflicting",
    "state_label": "sources conflict — shown, not chosen",
    "why": "shown, never chosen; the Result Ledger holds both claims",
@@ -1324,35 +1237,6 @@
    "priority": 95,
    "route": {
     "match": "6628624",
-    "ledger": true
-   },
-   "effective": null,
-   "review_by": null
-  },
-  {
-   "id": "06c0c9ea1fe6",
-   "type": "result_conflict",
-   "subject": {
-    "kind": "match",
-    "gid": "6639598"
-   },
-   "what": "An attributable source disputes this result",
-   "state": "conflicting",
-   "state_label": "sources conflict — shown, not chosen",
-   "why": "shown, never chosen; the Result Ledger holds both claims",
-   "scope": "that sources disagree about this result",
-   "sources": [
-    {
-     "url": "https://easternshorehawks.com/services/schedule_txt.ashx?schedule=1306",
-     "excerpt": "published schedule row: 'UMES L 0-3 vs Florida A&M University' -- the feed says UMES won 3-0; UMES's own site reports the loss",
-     "retrieved": "2026-09-03T01:40:06Z",
-     "source_class": "school_site"
-    }
-   ],
-   "public": true,
-   "priority": 95,
-   "route": {
-    "match": "6639598",
     "ledger": true
    },
    "effective": null,
@@ -1533,36 +1417,6 @@
  ],
  "feed": [
   {
-   "id": "06c0c9ea1fe6",
-   "type": "result_conflict",
-   "subject": {
-    "kind": "match",
-    "gid": "6639598"
-   },
-   "what": "An attributable source disputes this result",
-   "state": "conflicting",
-   "state_label": "sources conflict — shown, not chosen",
-   "why": "shown, never chosen; the Result Ledger holds both claims",
-   "scope": "that sources disagree about this result",
-   "sources": [
-    {
-     "url": "https://easternshorehawks.com/services/schedule_txt.ashx?schedule=1306",
-     "excerpt": "published schedule row: 'UMES L 0-3 vs Florida A&M University' -- the feed says UMES won 3-0; UMES's own site reports the loss",
-     "retrieved": "2026-09-03T01:40:06Z",
-     "source_class": "school_site"
-    }
-   ],
-   "public": true,
-   "priority": 95,
-   "route": {
-    "match": "6639598",
-    "ledger": true
-   },
-   "effective": null,
-   "review_by": null,
-   "first_seen": "2026-09-03T01:42:48Z"
-  },
-  {
    "id": "58d4ba619aee",
    "type": "result_correction",
    "subject": {
@@ -1670,21 +1524,21 @@
    "first_seen": "2026-09-03T21:55:53Z"
   },
   {
-   "id": "796962bfe81f",
+   "id": "daae0187b2d8",
    "type": "result_conflict",
    "subject": {
     "kind": "match",
-    "gid": "6624516"
+    "gid": "6626506"
    },
-   "what": "An attributable source disputes this result",
+   "what": "An attributable source disputes this result — Southern Utah v Pacific",
    "state": "conflicting",
    "state_label": "sources conflict — shown, not chosen",
    "why": "shown, never chosen; the Result Ledger holds both claims",
    "scope": "that sources disagree about this result",
    "sources": [
     {
-     "url": "https://tarletonsports.com/services/schedule_txt.ashx?schedule=308",
-     "excerpt": "published schedule row for 2026-08-28: 'Tarleton St. L 2-3 vs UC Santa Barbara' -- the feed says Tarleton St. won 3-2; the school says the reverse",
+     "url": "https://pacifictigers.com/services/schedule_txt.ashx?schedule=405",
+     "excerpt": "published schedule row for 2026-08-30: 'Pacific W 3-2 vs Southern Utah' -- the feed says Southern Utah won 3-2; the school says the reverse",
      "retrieved": "2026-09-02T03:49:19Z",
      "source_class": "school_site"
     }
@@ -1692,7 +1546,37 @@
    "public": true,
    "priority": 95,
    "route": {
-    "match": "6624516",
+    "match": "6626506",
+    "ledger": true
+   },
+   "effective": null,
+   "review_by": null,
+   "first_seen": "2026-09-02T03:51:38Z"
+  },
+  {
+   "id": "db2967c0c74a",
+   "type": "result_conflict",
+   "subject": {
+    "kind": "match",
+    "gid": "6628624"
+   },
+   "what": "An attributable source disputes this result — Merrimack v Stetson",
+   "state": "conflicting",
+   "state_label": "sources conflict — shown, not chosen",
+   "why": "shown, never chosen; the Result Ledger holds both claims",
+   "scope": "that sources disagree about this result",
+   "sources": [
+    {
+     "url": "https://gohatters.com/services/schedule_txt.ashx?schedule=555",
+     "excerpt": "published schedule row for 2026-08-29: 'Stetson W 3-1 vs Merrimack' -- the feed says Merrimack won 3-1; the school says the reverse",
+     "retrieved": "2026-09-02T03:49:19Z",
+     "source_class": "school_site"
+    }
+   ],
+   "public": true,
+   "priority": 95,
+   "route": {
+    "match": "6628624",
     "ledger": true
    },
    "effective": null,

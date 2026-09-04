@@ -117,8 +117,14 @@ def main():
           "=== ''" in spb and "isNaN" in spb,
           "an empty string coerces to 0 and would print a 0-0 nobody played")
 
-    check("...and an absent set renders a court dot, never a 0",
-          "cs-empty" in cells and "&middot;" in cells)
+    # ⚠ REVISED 2026-09-03 (QA pass): an absent set renders NOTHING now --
+    # the dotted placeholder cells sat as dead boxes on every three-set
+    # night. The invariant this check protected survives strengthened:
+    # an unplayed set must never print a number, and now it must not
+    # print a frame either.
+    check("...and an absent set renders NOTHING -- no dot, no frame, "
+          "and never a 0",
+          "cs-empty" not in cells and "continue" in cells)
     check("[+] there IS a numeric path to get wrong",
           "cs-cw" in cells, "the guard above is empty if numbers never render")
 

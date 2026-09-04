@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-04T01:34:42Z",
+  "generated_at_utc": "2026-09-04T01:56:07Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 0,
    "expired": 2,
-   "anomalies": 87
+   "anomalies": 88
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -663,6 +663,19 @@
    "points_per_set_missing": 2.786
   },
   {
+   "game_id": "6627966",
+   "team_id": "46580",
+   "team": "Wisconsin",
+   "absent": [
+    {
+     "name": "Grace Egan",
+     "rate": 2.639,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.639
+  },
+  {
    "game_id": "6637949",
    "team_id": "46102",
    "team": "UNC Asheville",
@@ -767,6 +780,24 @@
    "points_per_set_missing": 2.438
   },
   {
+   "game_id": "6639889",
+   "team_id": "46580",
+   "team": "Wisconsin",
+   "absent": [
+    {
+     "name": "Natalie Wardlow",
+     "rate": 1.344,
+     "played_share": 1.0
+    },
+    {
+     "name": "Halle Thompson",
+     "rate": 1.067,
+     "played_share": 0.8
+    }
+   ],
+   "points_per_set_missing": 2.411
+  },
+  {
    "game_id": "6627720",
    "team_id": "45966",
    "team": "Presbyterian",
@@ -791,19 +822,6 @@
     }
    ],
    "points_per_set_missing": 2.375
-  },
-  {
-   "game_id": "6640393",
-   "team_id": "45808",
-   "team": "Auburn",
-   "absent": [
-    {
-     "name": "Greer Chambless",
-     "rate": 2.364,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 2.364
   },
   {
    "game_id": "6624934",
@@ -869,6 +887,19 @@
     }
    ],
    "points_per_set_missing": 1.95
+  },
+  {
+   "game_id": "6640393",
+   "team_id": "45808",
+   "team": "Auburn",
+   "absent": [
+    {
+     "name": "Greer Chambless",
+     "rate": 1.929,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.929
   },
   {
    "game_id": "6628216",
@@ -1313,6 +1344,19 @@
    "points_per_set_missing": 1.125
   },
   {
+   "game_id": "6639842",
+   "team_id": "46580",
+   "team": "Wisconsin",
+   "absent": [
+    {
+     "name": "Halle Thompson",
+     "rate": 1.067,
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 1.067
+  },
+  {
    "game_id": "6637170",
    "team_id": "45813",
    "team": "Bryant",
@@ -1324,32 +1368,6 @@
     }
    ],
    "points_per_set_missing": 1.05
-  },
-  {
-   "game_id": "6639842",
-   "team_id": "46580",
-   "team": "Wisconsin",
-   "absent": [
-    {
-     "name": "Kymora Scott",
-     "rate": 1.0,
-     "played_share": 0.75
-    }
-   ],
-   "points_per_set_missing": 1.0
-  },
-  {
-   "game_id": "6639889",
-   "team_id": "46580",
-   "team": "Wisconsin",
-   "absent": [
-    {
-     "name": "Kymora Scott",
-     "rate": 1.0,
-     "played_share": 0.75
-    }
-   ],
-   "points_per_set_missing": 1.0
   },
   {
    "game_id": "6625271",
@@ -1461,15 +1479,16 @@
    ]
   },
   "Wisconsin": {
-   "gid": "6637934",
-   "d": "2026-09-02",
-   "appeared": 11,
+   "gid": "6627966",
+   "d": "2026-09-03",
+   "appeared": 9,
    "zero_action": [
-    "Halle Thompson",
-    "Natalie Wardlow",
+    "Kymora Scott",
+    "Grace Lopez",
     "Decelise Champion",
     "Morgan Van wie",
     "Jane Manecke",
+    "Isabelle Hoppe",
     "Jaela Auguste",
     "Alyssa Konrad"
    ]
@@ -2302,10 +2321,17 @@
    ]
   },
   "Utah Valley": {
-   "gid": "6624303",
-   "d": "2026-08-29",
-   "appeared": 12,
-   "zero_action": []
+   "gid": "6624304",
+   "d": "2026-09-03",
+   "appeared": 11,
+   "zero_action": [
+    "Kambri Kuhni",
+    "Lauren Feiler",
+    "Brooke Stauffer",
+    "Madi Standifird",
+    "Brighton Richards",
+    "London Armstrong"
+   ]
   },
   "Utah Tech": {
    "gid": "6628103",
@@ -3718,10 +3744,16 @@
    ]
   },
   "Auburn": {
-   "gid": "6624829",
-   "d": "2026-09-02",
-   "appeared": 11,
-   "zero_action": []
+   "gid": "6627966",
+   "d": "2026-09-03",
+   "appeared": 12,
+   "zero_action": [
+    "Chierika Okororie",
+    "Jasmine Okeoma",
+    "Reese Shugart",
+    "Eden Bower",
+    "Emma Gutke"
+   ]
   },
   "Clemson": {
    "gid": "6624264",
@@ -3912,11 +3944,15 @@
    "zero_action": []
   },
   "North Texas": {
-   "gid": "6624645",
-   "d": "2026-08-29",
+   "gid": "6625820",
+   "d": "2026-09-03",
    "appeared": 12,
    "zero_action": [
-    "Ryann Vik"
+    "Ryann Vik",
+    "Paige Hawkinson",
+    "Alyssa Young",
+    "Reese Watters",
+    "Kennedy Cooper"
    ]
   },
   "Indiana": {
@@ -4256,14 +4292,14 @@
    ]
   },
   "South Dakota": {
-   "gid": "6625710",
-   "d": "2026-08-30",
-   "appeared": 11,
+   "gid": "6624304",
+   "d": "2026-09-03",
+   "appeared": 9,
    "zero_action": [
     "Katherine Holthaus",
+    "Chloe Kmiecik",
     "Cate Legel",
     "Amelia Dugger",
-    "Katherine Thompson",
     "Ella Rogers",
     "Carly Ries"
    ]
@@ -4915,14 +4951,14 @@
    ]
   },
   "Baylor": {
-   "gid": "6625330",
-   "d": "2026-08-30",
-   "appeared": 13,
+   "gid": "6625820",
+   "d": "2026-09-03",
+   "appeared": 12,
    "zero_action": [
-    "Bailey Warren",
-    "Lacy Tinnell",
-    "Anastasiia Nikolnikova",
-    "Abigail Schoene"
+    "Taylor Crain",
+    "Abigail Schoene",
+    "Jules Hernandez",
+    "Halle Bills"
    ]
   },
   "Washington": {
@@ -5426,6 +5462,12 @@
     "gid": "6637934",
     "ep": 1788393600,
     "sets": 5,
+    "state": "zero_action"
+   },
+   {
+    "gid": "6627966",
+    "ep": 1788480000,
+    "sets": 3,
     "state": "zero_action"
    }
   ],

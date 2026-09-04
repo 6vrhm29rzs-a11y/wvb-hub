@@ -6022,7 +6022,7 @@ main section:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:4px}
 
 main{max-width:1280px;margin:0 auto;padding:22px 16px 70px}
 section[hidden]{display:none}
-.lead{color:var(--ink2);font-size:14px;max-width:74ch;margin:0 0 16px}
+.lead{color:var(--ink2);font-size:14px;max-width:88ch;margin:0 0 16px}
 .lead b{color:var(--ink)}
 .rkstamp{color:var(--ink3);font-size:12.5px}
 .rkstamp b{color:var(--ink2)}
@@ -9214,8 +9214,10 @@ details.avhist{margin:14px 0}
   letter-spacing:.1em;text-transform:uppercase;color:var(--slate)}
 .refsel select{font:inherit;letter-spacing:0;text-transform:none;
   font-size:12px;padding:5px 8px}
-.rulerwhat{margin:0 0 14px;max-width:66ch;font-size:13px;color:var(--ink2);
-  line-height:1.5}
+/* widened from 66ch (QA pass 2026-09-03): the ruler explainer wrapped at
+   ~426px inside a 1248px view, leaving two-thirds of the row empty */
+.rulerwhat{margin:0 0 14px;max-width:88ch;font-size:13.5px;
+  color:var(--ink2);line-height:1.55}
 .rulerwhat b{color:var(--ink)}
 .refcols{display:flex;align-items:center;gap:6px;font-size:12px;
   color:var(--ink2);white-space:nowrap;cursor:pointer}
@@ -16091,9 +16093,18 @@ function matchRow(m, live, dest) {
       '</span>' +
     rowLinescore(m, live, st) +
     '<span class="mmeta">' +
-      (st === 'final' && typeof rvMark === 'function' ? rvMark(m.gid) : '') +
-      (_mbits.length ? '<span class="mvn">' + _mbits.join(' \u00b7 ') +
-        '</span>' : '') +
+      /* the verification mark rides INSIDE the venue line -- as its own
+         flex child it stacked into a mysterious lone checkmark above the
+         venue (QA pass, 2026-09-03) */
+      (function () {
+        const mk = (st === 'final' && typeof rvMark === 'function')
+          ? rvMark(m.gid) : '';
+        if (_mbits.length) {
+          return '<span class="mvn">' + (mk ? mk + ' \u00b7 ' : '') +
+            _mbits.join(' \u00b7 ') + '</span>';
+        }
+        return mk;
+      })() +
       ((st === 'live' && typeof ATTR_WATCH !== 'undefined' && ATTR_WATCH[m.gid])
         ? '<span class="mtags"><span class="mtg rvw" title="' +
           esc(ATTR_WATCH[m.gid].note) + '">' +
@@ -17929,16 +17940,17 @@ function csSide(name, rk, sets, won, serving, quiet) {
 }
 
 function csCells(sets, playing) {
-  /* One cell per set of a best-of-five. A set that happened prints both
-     scores with the winner emphasised; a set that has not prints a dot. */
+  /* One cell per PLAYED set (plus the one in progress). Unplayed sets
+     render NOTHING -- the dotted placeholder cells for sets four and five
+     sat as dead boxes on every three-set night (QA pass, 2026-09-03:
+     "filling space" -- a frame for a set that may never happen is not
+     information). The same rule finals follow: no line, no frame. */
   const out = [];
   for (let i = 0; i < CS_SETS; i++) {
     const pair = setPair(sets[i]);
     const a = pair ? pair[0] : null;
     const h = pair ? pair[1] : null;
     if (!pair) {
-      out.push('<div class="cs-cell cs-empty" style="--cs-i:' + i + '">' +
-        '<i>&middot;</i><i>&middot;</i></div>');
       continue;
     }
     const now = playing && i === sets.length - 1;
@@ -17992,7 +18004,8 @@ function csCtx(m, kind, n) {
      directly below it ranks by Digby's Top 25. Kansas read #15 in one and #21
      in the other on the same match. Both are right. Neither said which it was,
      which is the R4 trap exactly -- one glyph, two meanings. */
-  if (m.ar || m.hr) bits.push('<span class="cs-unk">ranks: AVCA poll</span>');
+  if (m.ar || m.hr) bits.push(
+    '<span class="cs-unk">ranks: AVCA poll &middot; our POWER</span>');
   return '<div class="cs-ctx">' +
     bits.join('<span class="cs-sep">/</span>') + '</div>';
 }

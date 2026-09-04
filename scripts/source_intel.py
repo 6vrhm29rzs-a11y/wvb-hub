@@ -244,19 +244,55 @@ def _from_exhibitions(season):
     return out
 
 
+def _matchup_of(season):
+    """gid -> 'Away v Home', from the raw log -- so a conflict claim can
+    NAME its match (QA pass 2026-09-03: the wire showed 'An attributable
+    source disputes this result' with no subject at all)."""
+    names = {}
+    try:
+        import json as _j
+        p = os.path.join(REPO, "data/raw/%d/games.jsonl" % season)
+        for line in open(p):
+            try:
+                g = _j.loads(line)
+            except ValueError:
+                continue
+            ts = g.get("teams") or []
+            if len(ts) == 2:
+                names[str(g.get("game_id"))] = " v ".join(
+                    t.get("name_short") or "?" for t in ts)
+    except OSError:
+        pass
+    return names
+
+
 def _from_result_evidence(season):
     out = []
+    _mnames = _matchup_of(season)
+    # ⚠ A CORRECTION SUPERSEDES THE CONFLICT IT RESOLVED (same rule the
+    # Result Ledger applies): conflict evidence stays in the file as the
+    # history of the catch, but a SETTLED match must not keep wearing
+    # "an attributable source disputes this result" on the wire.
+    _settled = set()
+    try:
+        import season_counts as _SCw
+        _settled = set(_SCw.corrections(season))
+    except Exception:
+        pass
     doc = _load("data/raw/%d/result_evidence.json" % season)
     for gid, entries in (doc.get("evidence") or {}).items():
         ok = [e for e in entries if e.get("status") == "confirms"]
-        bad = [e for e in entries if e.get("status") == "conflicts"]
+        bad = ([] if str(gid) in _settled else
+               [e for e in entries if e.get("status") == "conflicts"])
         tried = [e for e in entries
                  if e.get("status") == "attempted_unverifiable"]
         if bad:
             out.append(_claim(
                 _cid("rev-c", gid), "result_conflict",
                 {"kind": "match", "gid": str(gid)},
-                "An attributable source disputes this result",
+                ("An attributable source disputes this result"
+                 + (" \u2014 " + _mnames[str(gid)]
+                    if str(gid) in _mnames else "")),
                 "conflicting",
                 "shown, never chosen; the Result Ledger holds both claims",
                 [_src(e.get("url"), e.get("text"), e.get("retrieved"),
