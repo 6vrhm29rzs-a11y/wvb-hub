@@ -45,7 +45,10 @@ def truth():
         if len(ts) != 2:
             continue
         d1_both = all(t.get("division") == 1 for t in ts)
-        for t in ts:
+        wi = SC.winner_index(g)   # the ONE derivation -- 6628428 went
+        if wi is None:            # final with is_winner False on BOTH
+            continue              # sides; the raw flag scored two losses
+        for ti, t in enumerate(ts):
             # the ONE hub-name resolution (build_hub._hub_name) -- the
             # dataset's own spelling for New Orleans is the feed's raw
             # 'LSU New Orleans ', and a truth keyed on that misses the page
@@ -60,9 +63,9 @@ def truth():
                                          "nw": 0, "nl": 0})
                 if d1_both:
                     r["m"] += 1
-                    r["w" if t.get("is_winner") else "l"] += 1
+                    r["w" if ti == wi else "l"] += 1
                 else:
-                    r["nw" if t.get("is_winner") else "nl"] += 1
+                    r["nw" if ti == wi else "nl"] += 1
     return full, cutoff
 
 

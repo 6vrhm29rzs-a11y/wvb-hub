@@ -313,11 +313,14 @@ def main():
     for g in (live.get("games") or []):
         if _wl_cls.get(str(g.get("game_id"))) != "ok":
             continue
-        for t in (g.get("teams") or []):
+        _wi = _SCW.winner_index(g)   # never the raw flag: a final can
+        if _wi is None:              # carry is_winner False on BOTH sides
+            continue                 # (6628428) -- sets decide, or nothing
+        for _ti, t in enumerate(g.get("teams") or []):
             nm = id2name.get(str(t.get("team_id")))
             if not nm:
                 continue
-            wl[nm][0 if t.get("is_winner") else 1] += 1
+            wl[nm][0 if _ti == _wi else 1] += 1
 
     rows = []
     for name, zp in zprior.items():

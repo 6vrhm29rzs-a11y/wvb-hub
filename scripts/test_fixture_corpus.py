@@ -124,6 +124,15 @@ def main():
                  "linescores": lines([(20, 25), (25, 22), (20, 25),
                                       (23, 25)]),
                  "start_time_epoch": 90000}
+    # 11. the FLAGLESS FINAL (2026-09-03, game 6628428): state F, a real
+    #     set line 3-0, and is_winner FALSE ON BOTH SIDES. Counters that
+    #     trusted the raw flag scored BOTH teams a loss. Class stays ok
+    #     (sets assert the result) and winner_index derives it.
+    G["F_NOFLAG"] = {"game_id": "900011", "game_state": "F",
+                     "teams": [team(16, sets=3), team(17, home=True, sets=0)],
+                     "linescores": lines([(25, 18), (25, 21), (25, 15)]),
+                     "start_time_epoch": 2000}
+
     games = list(G.values())
 
     # ── injected ledgers, at the module seams the real code uses ──────
@@ -147,7 +156,7 @@ def main():
         print("1. ONE CLASS EACH, THE RIGHT ONE")
         cls = SC.classify(games, SEASON)
         want = {"900001": "ok", "900002": "ok", "900003": "duplicate",
-                "900004": "exhibition", "900005": "empty",
+                "900004": "exhibition", "900005": "empty", "900011": "ok",
                 "900006": "under_review", "900007": "ok",
                 "900008": "ok", "900009": "ok", "900010": "ok"}
         for gid, w in sorted(want.items()):
@@ -158,12 +167,12 @@ def main():
         print("\n2. THE NAMED TOTALS ADD UP")
         t = SC.totals(games, SEASON)
         check("feed_records counts every completed record",
-              t["feed_records"] == 10, t)
+              t["feed_records"] == 11, t)  # +F_NOFLAG
         check("results_on_display = ok + exhibition + under_review",
               t["results_on_display"] == t["ok"] + t["exhibition"]
-              + t["under_review"] == 6 + 1 + 1)
+              + t["under_review"] == 7 + 1 + 1)  # +F_NOFLAG
         check("rating_eligible: ok, both D-I, with a line",
-              t["rating_eligible"] == 6, t)
+              t["rating_eligible"] == 7, t)  # +F_NOFLAG
 
         print("\n3. THE RESOLVED MATCH (corrections applied once)")
         cg = [g for g in SC.countable(games, SEASON)

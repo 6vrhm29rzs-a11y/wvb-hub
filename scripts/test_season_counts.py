@@ -172,6 +172,36 @@ def main():
     finally:
         E.resolved_gids = real_rg
 
+    # -- winner_index: the ONE winner derivation (2026-09-03, game 6628428
+    # went final with sets 3-0 and is_winner False on BOTH sides; every
+    # counter trusting the raw flag scored both teams a loss) --
+    def _g(fa, fb, sa=None, sb=None):
+        return {"teams": [{"is_winner": fa, "sets_won": sa},
+                          {"is_winner": fb, "sets_won": sb}]}
+    check("winner_index: exactly one flag decides",
+          SC.winner_index(_g(True, False)) == 0
+          and SC.winner_index(_g(False, True)) == 1)
+    check("winner_index: flag absent on both -> sets decide (6628428)",
+          SC.winner_index(_g(False, False, 3, 0)) == 0
+          and SC.winner_index(_g(None, None, 1, 3)) == 1)
+    check("winner_index: both flags true (incoherent) -> sets decide",
+          SC.winner_index(_g(True, True, 0, 3)) == 1)
+    check("winner_index: string sets still compare",
+          SC.winner_index(_g(False, False, "3", "1")) == 0)
+    check("winner_index: no flag, no sets -> None (counts NOWHERE)",
+          SC.winner_index(_g(False, False)) is None)
+    check("winner_index: level sets, no flag -> None, never a guess",
+          SC.winner_index(_g(False, False, 2, 2)) is None)
+    check("winner_index: not two teams -> None",
+          SC.winner_index({"teams": [{"is_winner": True}]}) is None)
+    # NEGATIVE CONTROL: the raw-flag reading really does differ on the
+    # 6628428 shape -- if it ever stops differing, this guard guards nothing.
+    _raw = [bool(t.get("is_winner")) for t in _g(False, False, 3, 0)["teams"]]
+    check("[NEG] the raw flag scores the 6628428 shape as two losses "
+          "(what winner_index exists to prevent)",
+          _raw == [False, False]
+          and SC.winner_index(_g(False, False, 3, 0)) == 0)
+
     print()
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))

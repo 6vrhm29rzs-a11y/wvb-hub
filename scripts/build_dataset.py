@@ -249,7 +249,9 @@ def main():
             if e["division"] is None:
                 e["division"] = t.get("division")
             e["games"] += 1
-            won = bool(t.get("is_winner"))
+            _wi = _SCC.winner_index(g)  # sets decide when is_winner is
+            won = (_wi is not None     # absent/incoherent (6628428)
+                   and teams[_wi] is t)
             if norm(other.get("name_short")) in di_names:
                 e["di_w" if won else "di_l"] += 1
             else:

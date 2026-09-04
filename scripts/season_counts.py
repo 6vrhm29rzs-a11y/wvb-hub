@@ -161,6 +161,33 @@ def review_gids(season):
     return out
 
 
+def winner_index(g):
+    # type: (Dict) -> Optional[int]
+    """The ONE winner derivation for a counted final: index into g["teams"].
+
+    is_winner decides when EXACTLY ONE side carries it (a flag contradicted
+    by its own set line is the corrections ledger's job, never a silent
+    override here). When the flag is absent or incoherent -- 2026-09-03:
+    game 6628428 went final with sets 3-0 and is_winner False on BOTH
+    sides, and every counter trusting the flag scored both teams a loss --
+    the sets_won comparison decides (a side with three sets has won by
+    rule). None when neither field asserts a result: that final counts
+    NOWHERE. Call on the record AFTER apply_correction()."""
+    ts = g.get("teams") or []
+    if len(ts) != 2:
+        return None
+    flags = [bool(t.get("is_winner")) for t in ts]
+    if flags[0] != flags[1]:
+        return 0 if flags[0] else 1
+    try:
+        a, b = int(ts[0].get("sets_won")), int(ts[1].get("sets_won"))
+    except (TypeError, ValueError):
+        return None
+    if a == b:
+        return None
+    return 0 if a > b else 1
+
+
 def is_empty_final(g):
     # type: (Dict) -> bool
     """A final that asserts no result: no winner, no set counts, no line."""

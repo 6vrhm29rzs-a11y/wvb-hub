@@ -6244,11 +6244,11 @@ td.pick b{color:var(--navy)}
    window.innerWidth stays ~1512 and this media query never matches -- which
    once cost five review cycles on four fixes that were never tested.  */
 @media (max-width:560px){
-  /* NAV: one scrolling row. Wrapping to three rows pushes every page's content
-     below the fold before it has said anything. */
-  /* ⚠ NO HORIZONTAL TAB STRIP ON A PHONE. Twelve tabs had to scroll sideways,
-     which hid destinations behind a gesture with no affordance. Five plus More
-     wrap onto two short rows and every destination is visible at once. */
+  /* ⚠ NO HORIZONTAL TAB STRIP ON A PHONE. Twelve tabs once scrolled sideways,
+     hiding destinations behind a gesture with no affordance; an earlier note
+     here arguing FOR one row was written against that twelve-tab shell and is
+     gone. Five primaries plus More wrap onto two short rows, every
+     destination visible at once. */
   nav .inner{flex-wrap:wrap;overflow-x:visible;scrollbar-width:none;
     -webkit-overflow-scrolling:touch;padding:0 6px;justify-content:center}
   nav .inner::-webkit-scrollbar{display:none}

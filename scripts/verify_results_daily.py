@@ -600,10 +600,10 @@ def finals_for(date):
         ts = g.get("teams") or []
         if len(ts) != 2:
             continue
-        w = next((t for t in ts if t.get("is_winner")), None)
-        l = next((t for t in ts if not t.get("is_winner")), None)
-        if not w or not l:
-            continue
+        _wi = SC.winner_index(g)   # sets decide when is_winner is absent/
+        if _wi is None:            # incoherent (6628428) -- the flagless
+            continue               # final NEEDS verification most of all
+        w, l = ts[_wi], ts[1 - _wi]
         out.append({"gid": str(g.get("game_id")),
                     "winner": w.get("name_short"),
                     "loser": l.get("name_short"),

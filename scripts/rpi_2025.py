@@ -111,9 +111,10 @@ def load_di_games():
             a, b = norm(t[0].get("name_short")), norm(t[1].get("name_short"))
             if a not in di or b not in di:
                 continue  # non-D-I games are excluded from Factors I-III
-            if t[0].get("is_winner"):
+            wi = _SC.winner_index(g)  # sets decide when the flag is
+            if wi == 0:               # absent/incoherent (6628428)
                 games.append((a, b, g["game_id"]))
-            elif t[1].get("is_winner"):
+            elif wi == 1:
                 games.append((b, a, g["game_id"]))
     return games, teams
 

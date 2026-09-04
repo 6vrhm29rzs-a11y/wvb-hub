@@ -2,67 +2,49 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 543,
-  "logged_after_tipoff_excluded": 8,
-  "team_mismatch_excluded": 17,
+  "scored": 541,
+  "logged_after_tipoff_excluded": 1,
+  "team_mismatch_excluded": 16,
   "predictions_on_record": 4773,
-  "results_available": 579,
-  "brier": 0.1824,
+  "results_available": 569,
+  "brier": 0.1662,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 393,
-  "favourite_correct_pct": 72.4
+  "favourite_correct": 405,
+  "favourite_correct_pct": 74.9
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 83,
-   "said": 55.4,
-   "happened": 50.6
+   "n": 84,
+   "said": 55.5,
+   "happened": 53.6
   },
   {
    "range": "60-70%",
-   "n": 103,
-   "said": 64.9,
-   "happened": 61.2
+   "n": 102,
+   "said": 65.0,
+   "happened": 62.7
   },
   {
    "range": "70-80%",
    "n": 77,
-   "said": 75.1,
+   "said": 75.2,
    "happened": 66.2
   },
   {
    "range": "80-90%",
-   "n": 112,
+   "n": 111,
    "said": 85.1,
-   "happened": 76.8
+   "happened": 79.3
   },
   {
    "range": "90-101%",
-   "n": 168,
+   "n": 167,
    "said": 95.4,
-   "happened": 89.9
+   "happened": 94.0
   }
  ],
  "matches": [
-  {
-   "game_id": "6626423",
-   "date": "2026-08-29",
-   "away": "Valparaiso",
-   "home": "Tennessee St.",
-   "p_home": 0.0002,
-   "home_won": true,
-   "brier": 0.99960004
-  },
-  {
-   "game_id": "6625090",
-   "date": "2026-08-28",
-   "away": "Mississippi Val.",
-   "home": "Delaware St.",
-   "p_home": 0.9984,
-   "home_won": false,
-   "brier": 0.9968025599999999
-  },
   {
    "game_id": "6627232",
    "date": "2026-08-28",
@@ -71,15 +53,6 @@
    "p_home": 0.993,
    "home_won": false,
    "brier": 0.986049
-  },
-  {
-   "game_id": "6627674",
-   "date": "2026-09-03",
-   "away": "Charleston So.",
-   "home": "South Carolina St.",
-   "p_home": 0.0221,
-   "home_won": true,
-   "brier": 0.95628841
   },
   {
    "game_id": "6639575",
@@ -109,33 +82,6 @@
    "brier": 0.93470224
   },
   {
-   "game_id": "6625596",
-   "date": "2026-08-29",
-   "away": "Middle Tenn.",
-   "home": "Boise St.",
-   "p_home": 0.9668,
-   "home_won": false,
-   "brier": 0.93470224
-  },
-  {
-   "game_id": "6625758",
-   "date": "2026-08-29",
-   "away": "Iona",
-   "home": "Little Rock",
-   "p_home": 0.9641,
-   "home_won": false,
-   "brier": 0.9294888099999999
-  },
-  {
-   "game_id": "6624516",
-   "date": "2026-08-28",
-   "away": "UC Santa Barbara",
-   "home": "Tarleton St.",
-   "p_home": 0.044,
-   "home_won": true,
-   "brier": 0.913936
-  },
-  {
    "game_id": "6625870",
    "date": "2026-08-29",
    "away": "Idaho St.",
@@ -161,15 +107,6 @@
    "p_home": 0.9348,
    "home_won": false,
    "brier": 0.8738510399999999
-  },
-  {
-   "game_id": "6626259",
-   "date": "2026-08-30",
-   "away": "SMU",
-   "home": "UC Davis",
-   "p_home": 0.0776,
-   "home_won": true,
-   "brier": 0.85082176
   },
   {
    "game_id": "6624723",
@@ -251,24 +188,6 @@
    "p_home": 0.8773,
    "home_won": false,
    "brier": 0.76965529
-  },
-  {
-   "game_id": "6628189",
-   "date": "2026-08-29",
-   "away": "Florida St.",
-   "home": "VCU",
-   "p_home": 0.1276,
-   "home_won": true,
-   "brier": 0.7610817600000002
-  },
-  {
-   "game_id": "6628624",
-   "date": "2026-08-29",
-   "away": "Stetson",
-   "home": "Merrimack",
-   "p_home": 0.1283,
-   "home_won": true,
-   "brier": 0.75986089
   },
   {
    "game_id": "6624596",
@@ -379,15 +298,6 @@
    "brier": 0.6824412099999999
   },
   {
-   "game_id": "6628050",
-   "date": "2026-08-28",
-   "away": "Bucknell",
-   "home": "Niagara",
-   "p_home": 0.1791,
-   "home_won": true,
-   "brier": 0.67387681
-  },
-  {
    "game_id": "6628213",
    "date": "2026-08-28",
    "away": "UT Arlington",
@@ -469,6 +379,15 @@
    "brier": 0.597529
   },
   {
+   "game_id": "6640504",
+   "date": "2026-09-03",
+   "away": "San Diego St.",
+   "home": "UC Davis",
+   "p_home": 0.7727,
+   "home_won": false,
+   "brier": 0.5970652900000001
+  },
+  {
    "game_id": "6625577",
    "date": "2026-08-29",
    "away": "DePaul",
@@ -487,13 +406,94 @@
    "brier": 0.59305401
   },
   {
-   "game_id": "6626884",
-   "date": "2026-08-28",
-   "away": "UT Martin",
-   "home": "Kansas City",
-   "p_home": 0.7693,
+   "game_id": "6626953",
+   "date": "2026-08-29",
+   "away": "Elon",
+   "home": "Old Dominion",
+   "p_home": 0.7671,
    "home_won": false,
-   "brier": 0.59182249
+   "brier": 0.58844241
+  },
+  {
+   "game_id": "6627233",
+   "date": "2026-08-28",
+   "away": "Purdue Fort Wayne",
+   "home": "Evansville",
+   "p_home": 0.7663,
+   "home_won": false,
+   "brier": 0.58721569
+  },
+  {
+   "game_id": "6624404",
+   "date": "2026-08-30",
+   "away": "Lindenwood",
+   "home": "Saint Louis",
+   "p_home": 0.7625,
+   "home_won": false,
+   "brier": 0.5814062499999999
+  },
+  {
+   "game_id": "6625710",
+   "date": "2026-08-30",
+   "away": "South Dakota",
+   "home": "DePaul",
+   "p_home": 0.24,
+   "home_won": true,
+   "brier": 0.5776
+  },
+  {
+   "game_id": "6625896",
+   "date": "2026-08-28",
+   "away": "Duke",
+   "home": "Coastal Carolina",
+   "p_home": 0.7599,
+   "home_won": false,
+   "brier": 0.57744801
+  },
+  {
+   "game_id": "6628124",
+   "date": "2026-08-30",
+   "away": "Eastern Wash.",
+   "home": "Seattle U",
+   "p_home": 0.758,
+   "home_won": false,
+   "brier": 0.574564
+  },
+  {
+   "game_id": "6625871",
+   "date": "2026-09-03",
+   "away": "Idaho St.",
+   "home": "UNLV",
+   "p_home": 0.7576,
+   "home_won": false,
+   "brier": 0.5739577600000001
+  },
+  {
+   "game_id": "6625786",
+   "date": "2026-08-28",
+   "away": "LMU (CA)",
+   "home": "Northern Ariz.",
+   "p_home": 0.7446,
+   "home_won": false,
+   "brier": 0.5544291600000001
+  },
+  {
+   "game_id": "6639890",
+   "date": "2026-08-22",
+   "away": "Arizona St.",
+   "home": "Texas",
+   "p_home": 0.7438,
+   "home_won": false,
+   "brier": 0.55323844
+  },
+  {
+   "game_id": "6628023",
+   "date": "2026-08-29",
+   "away": "Texas Tech",
+   "home": "St. Thomas (MN)",
+   "p_home": 0.7424,
+   "home_won": false,
+   "brier": 0.5511577599999999
   }
  ]
 }

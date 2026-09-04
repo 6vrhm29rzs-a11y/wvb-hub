@@ -131,7 +131,9 @@ def load(cutoff):
         if len(t) != 2:
             continue
         a, b = norm(t[0].get("name_short")), norm(t[1].get("name_short"))
-        w = a if t[0].get("is_winner") else (b if t[1].get("is_winner") else None)
+        _wi = _SC.winner_index(g)  # sets decide when is_winner is
+        w = ((a, b)[_wi]           # absent/incoherent (6628428)
+             if _wi is not None else None)
         if w is None:
             continue
         l = b if w == a else a

@@ -2990,7 +2990,10 @@ def check_mobile_rankings_are_a_list_not_a_clipped_table():
     # destinations. The invariant it states one line above is about the NAV.
     # Test the nav. A guard that fires on an unrelated rule teaches whoever
     # trips it to stop believing the suite.
-    navrules = "".join(b for sel, b in _rules(mob) if "nav" in sel)
+    # token-match the nav ELEMENT: "navigation" in prose and .tdnav (the
+    # dossier's tab strip, its own thing) must not count as the page nav.
+    navrules = "".join(b for sel, b in _rules(mob)
+                       if sel and re.search(r"(^|[\s,>])nav\b", sel))
     navflat = navrules.replace(" ", "")
     if "flex-wrap:wrap" not in flatmob or "overflow-x:auto" in navflat:
         bad("the mobile nav hides destinations behind a horizontal scroll",
@@ -3609,7 +3612,14 @@ def check_page_script_parses():
 
 
 def _rules(block):
-    """(selector, body) pairs from a CSS block. Linear scan, no backtracking."""
+    """(selector, body) pairs from a CSS block. Linear scan, no backtracking.
+
+    ⚠ COMMENT-AWARE (2026-09-03): comments are stripped FIRST. The parser
+    used to glue a /* comment */ onto the following selector, so a comment
+    reading "sports navigation" above the ledger's seg scroller made that
+    unrelated rule count as a NAV rule and the nav-scroller guard failed a
+    correct page. Same lesson as test_scoreboard_density's block()."""
+    block = re.sub(r"/\*.*?\*/", "", block, flags=re.S)
     out, buf, depth, sel = [], [], 0, None
     for c in block:
         if c == "{":

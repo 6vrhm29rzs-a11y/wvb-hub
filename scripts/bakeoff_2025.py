@@ -128,11 +128,8 @@ def load():
             ka, kb = norm(t[0].get("name_short")), norm(t[1].get("name_short"))
             if ka not in di or kb not in di:
                 continue
-            if t[0].get("is_winner"):
-                win = 0
-            elif t[1].get("is_winner"):
-                win = 1
-            else:
+            win = _SC.winner_index(g)  # sets decide when the flag is
+            if win is None:            # absent/incoherent (6628428)
                 continue
 
             ep = g.get("start_time_epoch")

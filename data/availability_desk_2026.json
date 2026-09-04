@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-04T02:39:07Z",
+  "generated_at_utc": "2026-09-04T03:43:18Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 0,
    "expired": 2,
-   "anomalies": 96
+   "anomalies": 102
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -271,6 +271,19 @@
     }
    ],
    "points_per_set_missing": 5.154
+  },
+  {
+   "game_id": "6624303",
+   "team_id": "46348",
+   "team": "Oregon St.",
+   "absent": [
+    {
+     "name": "Ac Froehlich",
+     "rate": 5.111,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 5.111
   },
   {
    "game_id": "6640390",
@@ -578,6 +591,19 @@
    "points_per_set_missing": 2.909
   },
   {
+   "game_id": "6627542",
+   "team_id": "46694",
+   "team": "Alcorn",
+   "absent": [
+    {
+     "name": "Jaylynn Mcneill",
+     "rate": 2.885,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.885
+  },
+  {
    "game_id": "6626227",
    "team_id": "45939",
    "team": "Missouri",
@@ -629,6 +655,19 @@
     {
      "name": "Gha'naye Whitfield-moss",
      "rate": 1.364,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.773
+  },
+  {
+   "game_id": "6627896",
+   "team_id": "46304",
+   "team": "Gonzaga",
+   "absent": [
+    {
+     "name": "Veronica kjaer Sorensen",
+     "rate": 2.773,
      "played_share": 1.0
     }
    ],
@@ -828,6 +867,19 @@
    "absent": [
     {
      "name": "Grace Cooney",
+     "rate": 2.2,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.2
+  },
+  {
+   "game_id": "6639894",
+   "team_id": "46360",
+   "team": "San Diego St.",
+   "absent": [
+    {
+     "name": "Annabelle De jager",
      "rate": 2.2,
      "played_share": 1.0
     }
@@ -1522,6 +1574,32 @@
     }
    ],
    "points_per_set_missing": 0.875
+  },
+  {
+   "game_id": "6625991",
+   "team_id": "45757",
+   "team": "Cal St. Fullerton",
+   "absent": [
+    {
+     "name": "Marisa Nakata",
+     "rate": 0.857,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 0.857
+  },
+  {
+   "game_id": "6627307",
+   "team_id": "45757",
+   "team": "Cal St. Fullerton",
+   "absent": [
+    {
+     "name": "Marisa Nakata",
+     "rate": 0.857,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 0.857
   },
   {
    "game_id": "6639575",
@@ -2716,11 +2794,13 @@
    ]
   },
   "Boise St.": {
-   "gid": "6625596",
-   "d": "2026-08-29",
-   "appeared": 12,
+   "gid": "6628317",
+   "d": "2026-09-03",
+   "appeared": 11,
    "zero_action": [
-    "Reese Hone"
+    "Hallee Heath",
+    "Reese Hone",
+    "Athena Cox"
    ]
   },
   "Middle Tenn.": {
@@ -2821,14 +2901,15 @@
    ]
   },
   "Cal St. Fullerton": {
-   "gid": "6628425",
-   "d": "2026-08-29",
-   "appeared": 12,
+   "gid": "6627894",
+   "d": "2026-09-03",
+   "appeared": 11,
    "zero_action": [
     "Elon Smith",
+    "Parys Taylor",
     "Neeva Gaine",
-    "Zariah Crosby",
-    "Marisa Nakata",
+    "Mia Feldhaus",
+    "Ava Pond",
     "Sibley Oster"
    ]
   },
@@ -3554,16 +3635,12 @@
    ]
   },
   "Gonzaga": {
-   "gid": "6627895",
-   "d": "2026-08-30",
-   "appeared": 10,
+   "gid": "6627894",
+   "d": "2026-09-03",
+   "appeared": 13,
    "zero_action": [
-    "Gabby Vandal",
     "Brianna Martin",
-    "Nia Damuni",
-    "Aurie Duncan",
-    "Carina Zaldivar",
-    "Lucy Slavik"
+    "Hazel Murphy"
    ]
   },
   "UTSA": {
@@ -3910,12 +3987,13 @@
    ]
   },
   "Oregon St.": {
-   "gid": "6627963",
-   "d": "2026-08-30",
-   "appeared": 12,
+   "gid": "6627490",
+   "d": "2026-09-03",
+   "appeared": 10,
    "zero_action": [
     "Bridget Gould",
-    "Amaya Tolentino",
+    "Aly Cox",
+    "Taray Tela",
     "Abby Lesagonicz"
    ]
   },
@@ -3989,15 +4067,15 @@
    ]
   },
   "UC Santa Barbara": {
-   "gid": "6624518",
-   "d": "2026-08-30",
+   "gid": "6624507",
+   "d": "2026-09-03",
    "appeared": 11,
    "zero_action": [
     "Ava Zamora",
-    "Emery Tubbs",
     "Avery Gibbs",
     "Kate Martin",
     "Reilly Goueth",
+    "Danica Rach",
     "Selah Wadsworth"
    ]
   },
@@ -4242,16 +4320,12 @@
    ]
   },
   "Iowa St.": {
-   "gid": "6624989",
-   "d": "2026-08-30",
-   "appeared": 10,
+   "gid": "6624507",
+   "d": "2026-09-03",
+   "appeared": 12,
    "zero_action": [
     "Annalise Grant",
-    "Baileigh Carlsen",
     "Layna Waselewsky",
-    "Reagan Hanfelt",
-    "Pam Mccune",
-    "Reese Naeve",
     "Ella Florez",
     "Katie Byergo",
     "Taylor Johnson"
@@ -4511,15 +4585,13 @@
    ]
   },
   "San Diego St.": {
-   "gid": "6627348",
-   "d": "2026-08-30",
-   "appeared": 8,
+   "gid": "6640504",
+   "d": "2026-09-03",
+   "appeared": 10,
    "zero_action": [
     "Annelise Rising",
-    "Logan Cary",
     "Lauranta Iyalekhue",
     "Gianna Bender",
-    "Mila Gehlen",
     "Chelsea Cocks",
     "Stephanie Gonzalez",
     "Haylee Brown",
@@ -4609,10 +4681,14 @@
    "zero_action": []
   },
   "Alcorn": {
-   "gid": "6627542",
-   "d": "2026-08-29",
-   "appeared": 12,
-   "zero_action": []
+   "gid": "6627546",
+   "d": "2026-09-03",
+   "appeared": 13,
+   "zero_action": [
+    "Ma'kayla Coats",
+    "De\u00e2\u0080\u0099nyla Harlan",
+    "Mariyah Young"
+   ]
   },
   "Louisiana Tech": {
    "gid": "6639464",
@@ -4656,8 +4732,8 @@
    ]
   },
   "North Dakota St.": {
-   "gid": "6637145",
-   "d": "2026-08-29",
+   "gid": "6628317",
+   "d": "2026-09-03",
    "appeared": 9,
    "zero_action": [
     "Allie Collins",
@@ -4715,16 +4791,17 @@
    ]
   },
   "UC Davis": {
-   "gid": "6626259",
-   "d": "2026-08-30",
-   "appeared": 11,
+   "gid": "6640504",
+   "d": "2026-09-03",
+   "appeared": 10,
    "zero_action": [
-    "Ana Stojanovic",
     "Katelyn Sentous",
-    "Reese Diersbock",
-    "Jada Johnson",
+    "Ana Stojanovic",
     "Laela Burgess",
-    "Faith Rabb-patterson"
+    "Breeze Czapinski",
+    "Faith Rabb-patterson",
+    "Jada Johnson",
+    "Reese Diersbock"
    ]
   },
   "Weber St.": {
@@ -4943,10 +5020,14 @@
    ]
   },
   "California Baptist": {
-   "gid": "6627126",
-   "d": "2026-08-29",
-   "appeared": 12,
-   "zero_action": []
+   "gid": "6627490",
+   "d": "2026-09-03",
+   "appeared": 11,
+   "zero_action": [
+    "Filippa Botcher",
+    "Emery Dejong",
+    "Ifeoma Okeke"
+   ]
   },
   "Arizona": {
    "gid": "6624518",
@@ -5547,6 +5628,19 @@
     "Vivian Miller",
     "Skyler Gates",
     "Sarah Brodner"
+   ]
+  },
+  "Dillard": {
+   "gid": "6627546",
+   "d": "2026-09-03",
+   "appeared": 14,
+   "zero_action": [
+    "Dillen Pritchett",
+    "Kendle Wright",
+    "Aysia Robinson",
+    "Nya St.cyr",
+    "Brianna Smith",
+    "Lakayla Riley"
    ]
   }
  },

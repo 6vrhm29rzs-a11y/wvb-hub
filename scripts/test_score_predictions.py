@@ -80,11 +80,16 @@ def pred(gid, home, away, p, logged="2026-08-20T00:00:00Z"):
 
 
 def game(gid, home, away, home_won, epoch=1787335200):   # 2026-08-21 18:00Z
+    # A fixture must look like a REAL final: the loader now runs the one
+    # counting classification (season_counts), and a final with no sets and
+    # no lines is the EMPTY class -- it counts nowhere, fixtures included.
     return {"game_id": gid, "game_state": "F", "start_time_epoch": epoch,
             "teams": [{"team_id": "1", "name_short": home, "is_home": True,
-                       "is_winner": home_won},
+                       "is_winner": home_won,
+                       "sets_won": 3 if home_won else 1},
                       {"team_id": "2", "name_short": away, "is_home": False,
-                       "is_winner": not home_won}]}
+                       "is_winner": not home_won,
+                       "sets_won": 1 if home_won else 3}]}
 
 
 def main():

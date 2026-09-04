@@ -36,6 +36,8 @@ import collections
 from typing import Dict, List, Optional
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(REPO, "scripts"))
+import season_counts as _SC  # noqa: E402
 SEASON = int(os.environ.get("WVB_SEASON", "2026"))
 LOG = os.path.join(REPO, "data", "raw", str(SEASON), "prediction_log.jsonl")
 GAMES = os.path.join(REPO, "data", "raw", str(SEASON), "games.jsonl")
@@ -60,16 +62,29 @@ def load_predictions() -> Dict[str, Dict]:
 
 
 def load_results() -> Dict[str, Dict]:
+    # ⚠ 2026-09-03: this loader read the RAW log -- no duplicate/exhibition/
+    # review exclusion, no result corrections -- so the Brier was scored
+    # against the feed's uncorrected winner for every ledgered inversion.
+    # One counting classification (season_counts), same as everything counted.
     out = {}
     if not os.path.exists(GAMES):
         return out
+    games = []
     for line in open(GAMES):
         try:
             g = json.loads(line)
         except ValueError:
             continue
-        if not isinstance(g, dict) or g.get("game_state") != "F":
+        if isinstance(g, dict):
+            games.append(g)
+    cls = _SC.classify(games, SEASON)
+    corr = _SC.corrections(SEASON)
+    for g in _SC.resolve(games):
+        if g.get("game_state") != "F":
             continue
+        if cls.get(str(g.get("game_id"))) != "ok":
+            continue
+        g = _SC.apply_correction(g, corr)
         ts = g.get("teams") or []
         if len(ts) != 2:
             continue
@@ -77,9 +92,12 @@ def load_results() -> Dict[str, Dict]:
         away = next((t for t in ts if not t.get("is_home")), None)
         if not home or not away:
             continue
+        wi = _SC.winner_index(g)   # sets decide when is_winner is
+        if wi is None:             # absent/incoherent (6628428) -- and a
+            continue               # final asserting no result scores nothing
         out[str(g.get("game_id"))] = {
             "home": home.get("name_short"), "away": away.get("name_short"),
-            "home_won": bool(home.get("is_winner")),
+            "home_won": ts[wi] is home,
             "epoch": g.get("start_time_epoch"),
         }
     return out
