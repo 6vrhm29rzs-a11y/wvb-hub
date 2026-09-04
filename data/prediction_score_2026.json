@@ -2,46 +2,46 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 503,
+  "scored": 530,
   "logged_after_tipoff_excluded": 8,
   "team_mismatch_excluded": 17,
   "predictions_on_record": 4773,
-  "results_available": 539,
-  "brier": 0.1842,
+  "results_available": 566,
+  "brier": 0.1852,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 363,
-  "favourite_correct_pct": 72.2
+  "favourite_correct": 381,
+  "favourite_correct_pct": 71.9
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 75,
-   "said": 55.3,
-   "happened": 49.3
+   "n": 80,
+   "said": 55.4,
+   "happened": 50.0
   },
   {
    "range": "60-70%",
-   "n": 95,
-   "said": 65.0,
-   "happened": 61.1
+   "n": 102,
+   "said": 64.9,
+   "happened": 60.8
   },
   {
    "range": "70-80%",
-   "n": 71,
-   "said": 75.2,
-   "happened": 67.6
+   "n": 76,
+   "said": 75.1,
+   "happened": 65.8
   },
   {
    "range": "80-90%",
-   "n": 103,
-   "said": 84.9,
-   "happened": 75.7
+   "n": 108,
+   "said": 85.1,
+   "happened": 75.9
   },
   {
    "range": "90-101%",
-   "n": 159,
+   "n": 164,
    "said": 95.4,
-   "happened": 89.3
+   "happened": 89.6
   }
  ],
  "matches": [
@@ -289,6 +289,15 @@
    "brier": 0.7458049600000001
   },
   {
+   "game_id": "6624896",
+   "date": "2026-09-03",
+   "away": "FIU",
+   "home": "North Florida",
+   "p_home": 0.1432,
+   "home_won": true,
+   "brier": 0.73410624
+  },
+  {
    "game_id": "6627101",
    "date": "2026-08-29",
    "away": "Fordham",
@@ -451,6 +460,15 @@
    "brier": 0.61246276
   },
   {
+   "game_id": "6627128",
+   "date": "2026-09-03",
+   "away": "New Mexico St.",
+   "home": "UC Irvine",
+   "p_home": 0.773,
+   "home_won": false,
+   "brier": 0.597529
+  },
+  {
    "game_id": "6625577",
    "date": "2026-08-29",
    "away": "DePaul",
@@ -476,24 +494,6 @@
    "p_home": 0.7693,
    "home_won": false,
    "brier": 0.59182249
-  },
-  {
-   "game_id": "6626953",
-   "date": "2026-08-29",
-   "away": "Elon",
-   "home": "Old Dominion",
-   "p_home": 0.7671,
-   "home_won": false,
-   "brier": 0.58844241
-  },
-  {
-   "game_id": "6627233",
-   "date": "2026-08-28",
-   "away": "Purdue Fort Wayne",
-   "home": "Evansville",
-   "p_home": 0.7663,
-   "home_won": false,
-   "brier": 0.58721569
   }
  ]
 }

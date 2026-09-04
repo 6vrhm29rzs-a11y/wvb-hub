@@ -4158,10 +4158,16 @@ def build():
             # ⚠ ONE COMPACT LINE (usability repair, 2026-08-31): the
             # POWER-vs-RESUME explainer lives in Methodology below; the
             # lead's job is basis + freshness, above the fold.
+            # ⚠ SAY WHAT THE OTHER SIDE OF THE SPLIT IS (Cody, 2026-09-03:
+            # "what does the 34% mean?"). A percentage of an unnamed whole
+            # reads as jargon; the sentence now names both halves and that
+            # the split is measured, growing with play -- not chosen.
             rank_basis = (
                 "<b>Our %d ranking</b> &mdash; moves with every result "
-                "&middot; %d of %d teams have played &middot; this season "
-                "is at most <b>%d%%</b> of any team&rsquo;s rating"
+                "&middot; %d of %d teams have played &middot; results so "
+                "far are at most <b>%d%%</b> of any team&rsquo;s rating; "
+                "the rest is still the preseason projection. The split is "
+                "measured, not chosen, and grows with every match played"
                 % (SEASON, len(_played), len(_blend), round(100 * _w)))
             if _rst:
                 _rn = (meta.get("rank_stamp") or {}).get("matches_in")
