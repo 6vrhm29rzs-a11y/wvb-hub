@@ -300,15 +300,23 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 21,
+     "records": 24,
      "values": [
       "1788483600",
       "1788485400"
      ]
+    },
+    {
+     "field": "game_state",
+     "records": 24,
+     "values": [
+      "P",
+      "I"
+     ]
     }
    ],
    "matchup": "Cal St. Fullerton / Gonzaga",
-   "records": 21
+   "records": 24
   },
   "6627931": {
    "conflicts": [
@@ -323,28 +331,6 @@
    ],
    "matchup": "Montana / California Baptist",
    "records": 5
-  },
-  "6627966": {
-   "conflicts": [
-    {
-     "field": "start_time_epoch",
-     "records": 26,
-     "values": [
-      "1788411600",
-      "1788480000"
-     ]
-    },
-    {
-     "field": "game_state",
-     "records": 26,
-     "values": [
-      "P",
-      "I"
-     ]
-    }
-   ],
-   "matchup": "Auburn / Wisconsin",
-   "records": 26
   },
   "6628053": {
    "conflicts": [
@@ -460,9 +446,9 @@
   }
  },
  "by_field": {
-  "game_state": 45,
+  "game_state": 40,
   "site": 2,
-  "start_time_epoch": 29,
+  "start_time_epoch": 28,
   "teams": 2,
   "teams (non-blocking)": 4
  },
@@ -597,8 +583,8 @@
   }
  },
  "counts": {
-  "blocked": 31,
-  "conflicted": 79,
+  "blocked": 30,
+  "conflicted": 73,
   "corrected": 4,
   "fixtures": 4879
  },

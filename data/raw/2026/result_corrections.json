@@ -894,6 +894,123 @@
      "establishes": "South Carolina St. lost 0-3"
     }
    ]
+  },
+  "6638233": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Ole Miss won 3-2 (winner_team_id 45938) with box and lineup rows attributed the same way",
+   "correct": {
+    "winner_team_id": "46759",
+    "away_sets": 2,
+    "home_sets": 3,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 14,
+      "home": 25
+     },
+     {
+      "period": 2,
+      "visit": 22,
+      "home": 25
+     },
+     {
+      "period": 3,
+      "visit": 28,
+      "home": 26
+     },
+     {
+      "period": 4,
+      "visit": 25,
+      "home": 23
+     },
+     {
+      "period": 5,
+      "visit": 5,
+      "home": 15
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "45938": "46759",
+     "46759": "45938"
+    }
+   },
+   "established": "Washington won 3-2 -- the feed's entire team attribution is inverted (the SMU-UC Davis class; caught the same evening by the LINEUP-attribution guard, then confirmed both ways: both schools contradict the feed's version and both confirm the swap). Box and lineup rows fit the OPPOSITE rosters ~0.9-1.0 / own 0.00, both sides.",
+   "evidence": [
+    {
+     "url": "https://gohuskies.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Washington",
+     "retrieved": "2026-09-04T02:23:33Z",
+     "text": "published schedule row for 2026-09-03: 'Washington W 3-2 vs Ole Miss'",
+     "establishes": "Washington W 3-2 vs Ole Miss"
+    },
+    {
+     "url": "https://olemisssports.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Ole Miss",
+     "retrieved": "2026-09-04T02:23:33Z",
+     "text": "published schedule row for 2026-09-03: 'Ole Miss L 2-3 vs Washington'",
+     "establishes": "Ole Miss L 2-3 vs Washington"
+    }
+   ]
+  },
+  "6625871": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "UNLV won 3-1 (winner_team_id 45973) with box and lineup rows attributed the same way",
+   "correct": {
+    "winner_team_id": "46680",
+    "away_sets": 3,
+    "home_sets": 1,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 30,
+      "home": 28
+     },
+     {
+      "period": 2,
+      "visit": 25,
+      "home": 21
+     },
+     {
+      "period": 3,
+      "visit": 29,
+      "home": 31
+     },
+     {
+      "period": 4,
+      "visit": 25,
+      "home": 21
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "45973": "46680",
+     "46680": "45973"
+    }
+   },
+   "established": "Idaho St. won 3-1 -- the feed's entire team attribution is inverted (the SMU-UC Davis class; caught the same evening by the LINEUP-attribution guard, then confirmed both ways: both schools contradict the feed's version and both confirm the swap). Box and lineup rows fit the OPPOSITE rosters ~0.9-1.0 / own 0.00, both sides.",
+   "evidence": [
+    {
+     "url": "https://www.isubengals.com/services/schedule_txt.ashx?schedule=352",
+     "kind": "school_site",
+     "school": "Idaho St.",
+     "retrieved": "2026-09-04T02:23:33Z",
+     "text": "published schedule row for 2026-09-03: 'Idaho St. W 3-1 vs UNLV'",
+     "establishes": "Idaho St. W 3-1 vs UNLV"
+    },
+    {
+     "url": "https://unlvrebels.com/services/schedule_txt.ashx?schedule=1503",
+     "kind": "school_site",
+     "school": "UNLV",
+     "retrieved": "2026-09-04T02:23:33Z",
+     "text": "published schedule row for 2026-09-03: 'UNLV L 1-3 vs Idaho State'",
+     "establishes": "UNLV L 1-3 vs Idaho State"
+    }
+   ]
   }
  }
 }

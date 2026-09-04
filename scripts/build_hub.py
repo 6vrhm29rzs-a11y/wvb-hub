@@ -5519,7 +5519,8 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .wgrid .wcard{grid-column:span 3}
 .wgrid .wcard.w-third{grid-column:span 2}
 .wgrid .wcard.w-full{grid-column:span 6}
-.wcard{display:flex;flex-direction:column;gap:9px;min-width:0;padding:15px;
+.wcard{display:flex;flex-direction:column;gap:7px;min-width:0;
+  padding:13px 15px 11px;
   text-decoration:none;border:1px solid var(--line);
   border-left:3px solid var(--gold-fill);
   background:var(--card)}
@@ -5575,7 +5576,8 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
   border-left:2px solid var(--line2);padding-left:8px}
 .siq{font:11.5px/1.5 var(--sans);color:var(--ink);flex-basis:100%}
 .siu{font:500 11px/1 var(--mono);color:var(--navy)}
-.sit,.sik{font:10px/1 var(--mono);color:var(--ink3);letter-spacing:.05em}
+.sit,.sik{font:11px/1.35 var(--mono);color:var(--ink3);
+  letter-spacing:.05em}
 .sigo{font:600 11px/1 var(--sans);color:var(--navy);text-decoration:none}
 .tdintel h4{margin:0 0 7px}
 
@@ -7486,9 +7488,13 @@ td.at{white-space:nowrap}
    the names it belongs to. The context column takes the slack instead,
    which is what the space is actually for. */
 .mrow{display:grid;
-  grid-template-columns:64px minmax(210px,300px) auto minmax(0,1fr);
+  /* widened per the design pass (2026-09-03): 300px teams + tight gaps
+     left the right half of every row empty; the teams column now
+     breathes to 400px and the venue column starts sooner */
+  grid-template-columns:64px minmax(240px,400px) auto minmax(200px,1fr);
   align-items:center;
-  gap:12px;padding:10px 2px;border-bottom:1px solid var(--line);cursor:pointer;
+  gap:12px 18px;padding:10px 2px;border-bottom:1px solid var(--line);
+  cursor:pointer;
   background:none;border-left:0;border-right:0;border-top:0;width:100%;
   text-align:left;color:inherit;font:inherit}
 .mrow{position:relative}
@@ -7538,13 +7544,13 @@ td.at{white-space:nowrap}
 /* under a time heading the row's own clock is redundant; hiding it takes
    .mwhen out of grid flow, so the remaining four cells map to four
    columns and the row reclaims the width */
-.tdlist.bytime .mrow{grid-template-columns:minmax(210px,300px) auto minmax(0,1fr)}
+.tdlist.bytime .mrow{grid-template-columns:minmax(240px,400px) auto minmax(200px,1fr)}
 .tdlist.bytime .mrow .mwhen{display:none}
 /* ⚠ A LIVE ROW'S "when" IS THE SET, NOT THE CLOCK -- hiding it under a time
    heading removed the one label that says where the match stands. Cody's
    desktop screenshot: live rows with no period anywhere. The clock is
    redundant under its heading; the period never is. */
-.tdlist.bytime .mrow.islive{grid-template-columns:64px minmax(210px,300px) auto minmax(0,1fr)}
+.tdlist.bytime .mrow.islive{grid-template-columns:64px minmax(240px,400px) auto minmax(200px,1fr)}
 .tdlist.bytime .mrow.islive .mwhen{display:block}
 /* ⚠ THE PHONE CARD MUST OUTRANK THE bytime DESKTOP TEMPLATES. Those two rules
    above are not media-scoped and carry three classes, so the 560px card
@@ -7676,7 +7682,13 @@ h4.sbtime span{font:600 11px/1 var(--mono);color:var(--ink3)}
      four state buttons plus a count plus a date picker measured 535px inside a
      370px column -- clipped, with no scrollbar to reveal it. The date jump
      drops to its own line rather than the states scrolling out of reach. */
-  #v-scores #ledgerwrap .seg{flex-wrap:wrap;row-gap:8px}
+  /* one horizontal scroll row (design pass 2026-09-03): the six-cell
+     wrap box gave the filters more visual weight than the scores --
+     "a settings panel, not sports navigation" */
+  #v-scores #ledgerwrap .seg{flex-wrap:nowrap;overflow-x:auto;
+    scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  #v-scores #ledgerwrap .seg::-webkit-scrollbar{display:none}
+  #v-scores #ledgerwrap .seg button{flex:0 0 auto}
   /* the count reads "today - none - showing either side" and was clipped at
      the seg's right edge once the buttons wrapped; give it its own line */
   #v-scores #ledgercnt{flex:1 0 100%;margin:0;padding-top:2px}
@@ -7711,7 +7723,7 @@ h4.sbtime span{font:600 11px/1 var(--mono);color:var(--ink3)}
      ellipsized; the design review's sketch ends the card exactly this way */
   .mrow .mmeta{display:flex;grid-area:meta;align-items:center;gap:8px;
     margin-left:27px}
-  .mrow .mvn{font:10.5px/1.3 var(--sans);color:var(--ink3)}
+  .mrow .mvn{font:11px/1.35 var(--sans);color:var(--ink3)}
   .mlc{font-size:11.5px;padding:0 3px;color:var(--ink3)}
   .mlt{font-size:12.5px;margin-right:6px;padding-right:8px}
   .mrt .mcur{font-size:21px}

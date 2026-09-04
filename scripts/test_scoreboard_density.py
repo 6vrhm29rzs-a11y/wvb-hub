@@ -219,16 +219,21 @@ def main():
     print("\n3. The row still fits, and the phone drops the extras first")
     # the composed row (design review, 2026-08-28): when | teams | linescore
     # ADJACENT | meta takes the slack at the right edge
-    grid = re.search(r"\.mrow\{display:grid;\s*grid-template-columns:([^;]+);",
-                     src)
+    # ⚠ the pin was a literal template (210px,300px) and a comment inside
+    # the rule broke the regex -- both rewritten to the INVARIANTS
+    # (2026-09-03 design pass widened the columns): the team column is a
+    # capped minmax (never bare 1fr), and the slack-taking 1fr stays LAST.
+    grid = re.search(r"\.mrow\{display:grid;.*?"
+                     r"grid-template-columns:([^;]+);", src, re.S)
     check("the row grid is declared", grid is not None)
     if grid:
         cols = grid.group(1)
         check("the team column is capped, not 1fr",
-              "minmax(210px,300px)" in cols,
+              re.search(r"minmax\(\d+px,\d+px\)", cols),
               "an uncapped team column pushes the linescore to the far edge")
-        check("the meta column takes the slack, keeping the linescore adjacent",
-              cols.strip().endswith("minmax(0,1fr)"),
+        check("the meta column takes the slack, keeping the linescore "
+              "adjacent",
+              cols.strip().endswith("1fr)"),
               "the 1fr must be LAST or the dead middle returns")
     # ⚠ THERE ARE FORTY-ODD @media (max-width:560px) BLOCKS IN THIS FILE, not
     # one. A guard that read `src.find(...)` inspected the first of them and
