@@ -1631,6 +1631,62 @@
      "establishes": "Purdue Fort Wayne L 1-3 vs Kansas City"
     }
    ]
+  },
+  "6624647": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Houston Christian (home) won 3-1 with box and lineup rows attributed the same way; the live window also lagged this match as in-progress for hours",
+   "correct": {
+    "winner_team_id": "45940",
+    "away_sets": 3,
+    "home_sets": 1,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 22,
+      "home": 25
+     },
+     {
+      "period": 2,
+      "visit": 25,
+      "home": 21
+     },
+     {
+      "period": 3,
+      "visit": 25,
+      "home": 18
+     },
+     {
+      "period": 4,
+      "visit": 25,
+      "home": 15
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "45940": "51287",
+     "51287": "45940"
+    }
+   },
+   "established": "Abilene Christian won 3-1 -- the feed's entire team attribution is inverted (lineup rows fit the OPPOSITE roster, surfaced by the fresh-checkout sandbox's rebuild; both schools contradict the feed and assert the same alternative). Linescores flipped column-for-column.",
+   "evidence": [
+    {
+     "url": "https://acusports.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Abilene Christian",
+     "retrieved": "2026-09-05T16:46:49Z",
+     "text": "published schedule row for 2026-09-04: 'Abilene Christian W 3-1 vs Houston Christian'",
+     "establishes": "Abilene Christian W 3-1 vs Houston Christian"
+    },
+    {
+     "url": "https://hbuhuskies.com/services/schedule_txt.ashx?schedule=252",
+     "kind": "school_site",
+     "school": "Houston Christian",
+     "retrieved": "2026-09-05T16:46:49Z",
+     "text": "published schedule row for 2026-09-04: 'Houston Christian L 1-3 vs Abilene Christian'",
+     "establishes": "Houston Christian L 1-3 vs Abilene Christian"
+    }
+   ]
   }
  }
 }

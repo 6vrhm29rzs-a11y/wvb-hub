@@ -44,7 +44,8 @@ def main():
 
     print("\n2. THE RAIL IS BOUNDED AND ITS ORDER IS DETERMINISTIC")
     tk = src[src.find("let TK_LAST"):src.find("async function pollLive")]
-    check("a cap exists and is six", "TK_CAP = 6" in tk)
+    check("a cap exists and is three (the fitted capsule rail)",
+          "TK_CAP = 3" in tk)
     check("overflow gets an explicit All-live control",
           "data-alllive" in tk and "live.length > TK_CAP" in tk)
     check("the control applies the Live filter on Scores",
@@ -60,8 +61,9 @@ def main():
           "csTicker(live);" in src and "justEnded" in src)
 
     print("\n3. THE QUIET STATE IS NEXT-TO-WATCH, NEVER A GIANT NOTHING")
-    check("quiet renders up to three upcoming priority fixtures",
-          "TK_QUIET_CAP = 3" in tk and "tkQuietChips" in tk)
+    check("quiet renders ONE next fixture plus a View schedule action",
+          "TK_QUIET_CAP = 1" in tk and "tkQuietChips" in tk
+          and "data-viewsched" in tk)
     check("the window is 72 hours", "3 * 86400000" in tk)
     check("no giant empty message in the ticker path",
           "No matches on the schedule" not in tk)

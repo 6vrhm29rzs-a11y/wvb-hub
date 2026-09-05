@@ -277,8 +277,12 @@ def main():
           and 'class="tkm"' in _tk)
     check("hidden when nothing is live",
           "el.hidden = true" in _tk and "TK_LAST = ''" in _tk)
-    check("scroll position survives a rebuild",
-          "el.scrollLeft" in _tk and "keep" in _tk)
+    # ⚠ WAS "scroll position survives a rebuild" -- the capsule rail
+    # (2026-09-05) does not scroll AT ALL, which retires the invariant it
+    # protected. Its replacement: whole capsules are dropped to fit.
+    check("the rail fits by dropping whole capsules, not by scrolling",
+          "caps[caps.length - 1].remove()" in _tk
+          and "el.scrollLeft" not in _tk)
     check("unchanged content skips the rebuild",
           "html === TK_LAST" in _tk)
     check("current-set points come from the feed, never invented",

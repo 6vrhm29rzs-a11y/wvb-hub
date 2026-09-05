@@ -1,9 +1,10 @@
 {
  "date": "2026-09-05",
- "generated_utc": "2026-09-05T15:46:13Z",
+ "generated_utc": "2026-09-05T17:02:23Z",
  "counts": {
   "UNVERIFIED": 1,
-  "CORROBORATED_ONE": 1
+  "CORROBORATED_ONE": 4,
+  "VERIFIED_BOTH": 4
  },
  "matches": [
   {
@@ -44,6 +45,172 @@
      "assertion": "UNCW L 0-3 vs West Florida",
      "opponent_source": "West Florida",
      "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6626980",
+   "date": "2026-09-05",
+   "canonical": "Gardner-Webb def. Alabama St. 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Gardner-Webb": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gwusports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Gardner-Webb W 3-0 vs Alabama State",
+     "opponent_source": "Alabama State",
+     "site_says": "Home"
+    },
+    "Alabama St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://bamastatesports.com/services/schedule_txt.ashx?schedule=434",
+     "assertion": "Alabama St. L 0-3 vs Gardner-Webb",
+     "opponent_source": "Gardner-Webb",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6628550",
+   "date": "2026-09-05",
+   "canonical": "UAB def. Rider 3-1",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "UAB": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://uabsports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "UAB W 3-1 vs Rider",
+     "opponent_source": "Rider",
+     "site_says": "Neutral"
+    },
+    "Rider": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gobroncs.com/services/schedule_txt.ashx?schedule=461",
+     "assertion": "Rider L 1-3 vs UAB",
+     "opponent_source": "UAB",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6626660",
+   "date": "2026-09-05",
+   "canonical": "Hofstra def. Santa Clara 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Hofstra": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gohofstra.com/services/schedule_txt.ashx?schedule=524",
+     "assertion": "Hofstra W 3-0 vs Santa Clara",
+     "opponent_source": "Santa Clara",
+     "site_says": "Neutral"
+    },
+    "Santa Clara": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://santaclarabroncos.com/services/schedule_txt.ashx?schedule=364",
+     "assertion": "Santa Clara L 0-3 vs Hofstra",
+     "opponent_source": "Hofstra",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6627411",
+   "date": "2026-09-05",
+   "canonical": "Delaware St. def. Quinnipiac 3-2",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Delaware St.": {
+     "state": "NOT_POSTED",
+     "url": "https://dsuhornets.com/services/schedule_txt.ashx?schedule=388",
+     "row": [
+      "Sep 5 (Sat)",
+      "10:00 A.M.",
+      "Home",
+      "Quinnipiac",
+      "Dover, DE (Memorial Hall / Bayhealth Court)",
+      "",
+      ""
+     ]
+    },
+    "Quinnipiac": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gobobcats.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Quinnipiac L 2-3 vs Delaware State",
+     "opponent_source": "Delaware State",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6624898",
+   "date": "2026-09-05",
+   "canonical": "Duke def. FIU 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Duke": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://goduke.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Duke W 3-0 vs FIU",
+     "opponent_source": "FIU",
+     "site_says": "Neutral"
+    },
+    "FIU": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://fiusports.com/services/schedule_txt.ashx?schedule=378",
+     "assertion": "FIU L 0-3 vs Duke",
+     "opponent_source": "Duke",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6625470",
+   "date": "2026-09-05",
+   "canonical": "Eastern Ky. def. Prairie View 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Eastern Ky.": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://ekusports.com/services/schedule_txt.ashx?schedule=350",
+     "rows_on_date": [
+      "Prairie View A&M"
+     ]
+    },
+    "Prairie View": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://pvpanthers.com/services/schedule_txt.ashx?schedule=334",
+     "assertion": "Prairie View L 1-3 vs Eastern Kentucky",
+     "opponent_source": "Eastern Kentucky",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6637099",
+   "date": "2026-09-05",
+   "canonical": "Lafayette def. FDU 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Lafayette": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://goleopards.com/services/schedule_txt.ashx?schedule=649",
+     "assertion": "Lafayette W 3-0 vs FDU",
+     "opponent_source": "FDU",
+     "site_says": "Away"
+    },
+    "FDU": {
+     "state": "NOT_POSTED",
+     "url": "https://fduknights.com/services/schedule_txt.ashx?schedule=386",
+     "row": [
+      "Sep 5 (Sat)",
+      "11 a.m.",
+      "Neutral",
+      "Lafayette",
+      "New York, N.Y. (Levien Gymnasium )",
+      "",
+      ""
+     ]
     }
    }
   }

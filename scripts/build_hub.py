@@ -6553,6 +6553,12 @@ td.pick b{color:var(--navy)}
      here arguing FOR one row was written against that twelve-tab shell and is
      gone. Five primaries plus More wrap onto two short rows, every
      destination visible at once. */
+  /* the rail on a phone: ONE fully-legible capsule + the count action,
+     max 72px. The 2nd and 3rd capsules yield; scores never clip. */
+  #livetick{max-height:72px}
+  #livetick .tkm:not(.tkall):nth-of-type(n+2){display:none}
+  #livetick .tkm b{max-width:11ch}
+  #livetick .tkall{margin-left:auto}
   nav .inner{flex-wrap:wrap;overflow-x:visible;scrollbar-width:none;
     -webkit-overflow-scrolling:touch;padding:0 6px;justify-content:center}
   nav .inner::-webkit-scrollbar{display:none}
@@ -9283,10 +9289,16 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 
 /* the honest "not yet" state, where a table would otherwise be */
 /* ── THE LIVE TICKER ─────────────────────────────────────────────────── */
-#livetick{display:flex;align-items:stretch;gap:0;overflow-x:auto;
-  border-bottom:1px solid var(--line2);background:var(--card);
-  scrollbar-width:none}
-#livetick::-webkit-scrollbar{display:none}
+/* ⚠ THE RAIL FITS; IT DOES NOT SCROLL (2026-09-05, the capsule-rail
+   brief Cody forwarded). The old strip carried six chips behind a
+   sideways gesture with no affordance -- team names clipped mid-word and
+   understanding one game meant hunting. Now: at most three capsules,
+   each fully readable (names ellipsize, scores never clip), and every
+   other live match is one explicit "All live" action. Height stays a
+   single rail: <=56px desktop, one capsule <=72px on a phone. */
+#livetick{display:flex;align-items:stretch;gap:0;overflow:hidden;
+  max-height:56px;
+  border-bottom:1px solid var(--line2);background:var(--card)}
 #livetick .tklab{display:flex;align-items:center;gap:6px;flex:0 0 auto;
   padding:0 12px;font:700 11px/1 var(--disp);letter-spacing:.14em;color:var(--coral);
   border-right:1px solid var(--line);position:sticky;left:0;z-index:2;
@@ -9297,7 +9309,8 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 #livetick .tkm{flex:0 0 auto;display:flex;align-items:center;gap:7px;
   padding:7px 13px;border-right:1px solid var(--line);cursor:pointer;
   font:600 11.5px/1 var(--mono);color:var(--ink2);background:none;border-top:0;
-  border-bottom:0;border-left:0}
+  border-bottom:0;border-left:0;white-space:nowrap}
+#livetick .tkall{flex:0 0 auto;color:var(--blue,#2456A6);font-weight:700}
 #livetick .tkm:hover{background:color-mix(in oklab,var(--line) 40%,transparent)}
 #livetick .tkm:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:-2px}
 #livetick .tkm img{width:15px;height:15px;object-fit:contain}
@@ -11412,7 +11425,7 @@ function slateFromSchedule() {
    reader's scroll position survives; a strip that snaps back to the left
    every 60 seconds is unusable. */
 let TK_LAST = '';
-const TK_CAP = 6, TK_QUIET_CAP = 3;
+const TK_CAP = 3, TK_QUIET_CAP = 1;   /* fitted rail: what shows, shows whole */
 
 function tkPriority(g) {
   /* deterministic, and stated: the tuple IS the explanation */
@@ -11511,20 +11524,35 @@ function csTicker(live) {
       (live.length > TK_CAP ? ' <i class="tkshown">\u00b7 ' + nshown +
         ' shown</i>' : '') +
       '</span>' + rows.slice(0, TK_CAP).map(tkChip).join('') +
-      (live.length > TK_CAP
+      (live.length > 1
         ? '<button type="button" class="tkm tkall" data-alllive>' +
-          'All live \u2014 ' + live.length + ' matches \u2192</button>' : '');
+          'All ' + live.length + ' live \u2192</button>' : '');
   } else {
     const q = tkQuietChips();
     if (!q) { el.hidden = true; TK_LAST = ''; return; }
-    html = '<span class="tklab tkquiet">NEXT TO WATCH</span>' + q;
+    html = '<span class="tklab tkquiet">NEXT TO WATCH</span>' + q +
+      '<button type="button" class="tkm tkall" data-viewsched>' +
+      'View schedule \u2192</button>';
   }
   if (html === TK_LAST) { el.hidden = false; return; }
-  const keep = el.scrollLeft;
   el.innerHTML = html;
   el.hidden = false;
-  el.scrollLeft = keep;
   TK_LAST = html;
+  /* ⚠ A CAPSULE SHOWS WHOLE OR NOT AT ALL (the capsule-rail brief): the
+     first fit pass shrank names to "S…", which is the old clipping wearing
+     a new class. Capsules never shrink; instead the rail drops whole
+     capsules from the END until everything left fits. The first capsule
+     and the All-live action always survive. */
+  let guard = 6;
+  while (guard-- > 0 && el.scrollWidth > el.clientWidth + 1) {
+    const caps = el.querySelectorAll('.tkm:not(.tkall)');
+    if (caps.length <= 1) break;
+    caps[caps.length - 1].remove();
+  }
+  /* the "N shown" label reports what SURVIVED the fit, not the render */
+  const lab = el.querySelector('.tkshown');
+  const left = el.querySelectorAll('.tkm:not(.tkall)').length;
+  if (lab) lab.textContent = '\u00b7 ' + left + ' shown';
 }
 
 async function pollLive() {
@@ -18173,6 +18201,8 @@ document.addEventListener('click', e => {
      only, so the Match Desk and the ledger routed while a team's own result
      did not. Any element carrying data-match now reaches the same canonical
      URL -- there is one way to open a match, not one per surface. */
+  const vs2 = e.target.closest && e.target.closest('[data-viewsched]');
+  if (vs2) { location.hash = routeFor('schedule'); return; }
   const al2 = e.target.closest && e.target.closest('[data-alllive]');
   if (al2) {
     /* the rail's cap control: Scores, with the Live filter already applied */
