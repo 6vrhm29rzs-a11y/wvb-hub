@@ -70,8 +70,11 @@ def main():
         REPO, "data", "raw", "2026", "players_2026.json"),
         encoding="utf-8")).get("meta") or {})
     n = meta.get("games_aggregated")
+    # wording moved 2026-09-05: "counted finals" implied the masthead's
+    # universe; the header now says "matches (the box universe)" and names
+    # how the two differ. The count itself must still be exact.
     check("the header names the aggregated-game count exactly",
-          ("held box scores of <b>%d</b> counted finals" % n) in h, n)
+          ("held box scores of <b>%d</b> matches" % n) in h, n)
     check("...and says what is excluded",
           "exhibitions and duplicate feed listings excluded" in h)
     check("...and that the team universe is per-team",

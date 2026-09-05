@@ -431,37 +431,6 @@
    "matchup": "Binghamton / Sacred Heart",
    "records": 4
   },
-  "6628108": {
-   "conflicts": [
-    {
-     "field": "teams",
-     "non_blocking": "site is confirmed neutral, so no displayed fact depends on which side is nominally home",
-     "records": 13,
-     "values": [
-      "(('45886', False), ('46291', True))",
-      "(('45886', True), ('46291', False))"
-     ]
-    },
-    {
-     "field": "start_time_epoch",
-     "records": 13,
-     "values": [
-      "1788573600",
-      "1788559200"
-     ]
-    },
-    {
-     "field": "game_state",
-     "records": 13,
-     "values": [
-      "P",
-      "I"
-     ]
-    }
-   ],
-   "matchup": "Utah Tech / UC San Diego",
-   "records": 13
-  },
   "6628262": {
    "conflicts": [
     {
@@ -534,11 +503,11 @@
   }
  },
  "by_field": {
-  "game_state": 31,
+  "game_state": 29,
   "site": 2,
-  "start_time_epoch": 32,
+  "start_time_epoch": 31,
   "teams": 3,
-  "teams (non-blocking)": 7
+  "teams (non-blocking)": 6
  },
  "corrections": {
   "6625717": {
@@ -671,8 +640,8 @@
   }
  },
  "counts": {
-  "blocked": 35,
-  "conflicted": 70,
+  "blocked": 34,
+  "conflicted": 68,
   "corrected": 4,
   "fixtures": 4883
  },

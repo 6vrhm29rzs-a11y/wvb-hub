@@ -1,6 +1,51 @@
 {
  "date": "2026-09-05",
- "generated_utc": "2026-09-05T04:44:01Z",
- "counts": {},
- "matches": []
+ "generated_utc": "2026-09-05T15:46:13Z",
+ "counts": {
+  "UNVERIFIED": 1,
+  "CORROBORATED_ONE": 1
+ },
+ "matches": [
+  {
+   "gid": "6625789",
+   "date": "2026-09-05",
+   "canonical": "Hawaii def. LMU (CA) 3-2",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Hawaii": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://hawaiiathletics.com/services/schedule_txt.ashx?schedule=4497",
+     "rows_on_date": []
+    },
+    "LMU (CA)": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://lmulions.com/services/schedule_txt.ashx?schedule=483",
+     "rows_on_date": []
+    }
+   }
+  },
+  {
+   "gid": "6627069",
+   "date": "2026-09-05",
+   "canonical": "West Florida def. UNCW 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "West Florida": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://goargos.com/services/schedule_txt.ashx?schedule=323",
+     "rows_on_date": [
+      "UNC Wilmington",
+      "USC Upstate"
+     ]
+    },
+    "UNCW": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://uncwsports.com/services/schedule_txt.ashx?schedule=390",
+     "assertion": "UNCW L 0-3 vs West Florida",
+     "opponent_source": "West Florida",
+     "site_says": "Neutral"
+    }
+   }
+  }
+ ]
 }

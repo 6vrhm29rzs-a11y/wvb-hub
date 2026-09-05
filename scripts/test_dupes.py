@@ -130,8 +130,24 @@ def main():
                                      "result_confidence_%d.json" % SEASON)))
     dups = dict((r["gid"], r["duplicate_of"]) for r in rc["finals"]
                 if r.get("duplicate_of"))
-    check("the Result Ledger carries both, marked duplicate_of",
-          dups == {"6640357": "6625089", "6640332": "6624350"})
+    # ⚠ WAS AN EXACT-DICT PIN and broke the night a THIRD legitimate
+    # duplicate was ledgered (Bradley-WIU, 2026-09-05). The invariant:
+    # every ledgered duplicate appears in the Result Ledger with its
+    # canonical, and the two founding pairs are still among them.
+    _ledger = json.load(open(os.path.join(
+        REPO, "data", "raw", "2026", "duplicate_listings.json")))
+    # two field spellings coexist in the ledger's history
+    _led = dict((g, v.get("canonical_gid") or v.get("duplicate_of"))
+                for g, v in (_ledger.get("duplicates") or {}).items())
+    # the page marks every ledgered duplicate THAT WENT FINAL; a ledgered
+    # placeholder that never resolved has no row to mark. Everything the
+    # page marks must be ledgered, and the founding pairs stay present.
+    _final_gids = set(r["gid"] for r in rc["finals"])
+    check("every FINAL ledgered duplicate is marked, and nothing unledgered is",
+          dups == dict((g, c) for g, c in _led.items()
+                       if g in _final_gids)
+          and {"6640357": "6625089",
+               "6640332": "6624350"}.items() <= dups.items())
     check("no pending candidate remains (both were verified, not assumed)",
           rc["meta"]["counts"]["duplicate_candidates_pending"] == 0)
     check("the evidence names BOTH schools' official schedules per pair",

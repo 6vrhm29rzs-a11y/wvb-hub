@@ -23,5 +23,12 @@ def duplicate_gids(season=None):
     if not os.path.exists(p):
         return {}
     doc = json.load(open(p, encoding="utf-8"))
-    return dict((str(k), str((v or {}).get("canonical_gid") or ""))
+    # ⚠ TWO FIELD SPELLINGS COEXIST IN THE LEDGER (found 2026-09-05):
+    # the founding pairs wrote "canonical_gid", the Aug-30 curation batch
+    # wrote "duplicate_of". This reader knew only the first, so five
+    # ledgered duplicates carried an EMPTY canonical pointer -- counting
+    # was safe (membership on the key), but the Result Ledger rendered
+    # them unmarked and their drills had no canonical route. Read both.
+    return dict((str(k), str((v or {}).get("canonical_gid")
+                             or (v or {}).get("duplicate_of") or ""))
                 for k, v in (doc.get("duplicates") or {}).items())

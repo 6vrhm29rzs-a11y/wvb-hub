@@ -1,15 +1,15 @@
 {
  "meta": {
   "season": 2026,
-  "generated_at_utc": "2026-09-05T04:44:50Z",
-  "n_claims": 61,
+  "generated_at_utc": "2026-09-05T15:47:02Z",
+  "n_claims": 64,
   "feed_cap": 5,
   "recent_hours": 72,
   "states": {
    "confirmed_official": 39,
-   "corroborated": 9,
+   "corroborated": 10,
    "official_unconfirmed": 0,
-   "community_signal": 4,
+   "community_signal": 6,
    "conflicting": 4,
    "expired": 4,
    "inaccessible": 1
@@ -1526,6 +1526,45 @@
    "review_by": null
   },
   {
+   "id": "e7247b01c23b",
+   "type": "duplicate_listing",
+   "subject": {
+    "kind": "match",
+    "gid": "6640649",
+    "teams": [
+     "Bradley",
+     "Western Ill."
+    ]
+   },
+   "what": "Bradley v Western Ill. was listed twice by the feed; the copy is excluded from every count",
+   "state": "corroborated",
+   "state_label": "corroborated by independent sources",
+   "why": "both schools' official schedules establish exactly one meeting",
+   "scope": "that the feed listed one meeting twice",
+   "sources": [
+    {
+     "url": "https://bradleybraves.com/sports/womens-volleyball/schedule",
+     "excerpt": "schema.org event: 'Bradley University Vs Western Illinois University', startDate 2026-09-04T16:30:00, Brookings, SD -- the ONLY Bradley-WIU meeting on the published schedule",
+     "retrieved": "2026-09-05T05:18:59Z",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://goleathernecks.com/sports/womens-volleyball/schedule",
+     "excerpt": "schema.org event: 'Western Illinois University Vs Bradley', startDate 2026-09-04T16:30:00, Brookings, SD -- the ONLY WIU-Bradley meeting on the published schedule",
+     "retrieved": "2026-09-05T05:18:59Z",
+     "source_class": "official_school"
+    }
+   ],
+   "public": true,
+   "priority": 60,
+   "route": {
+    "match": "6640649",
+    "ledger": true
+   },
+   "effective": null,
+   "review_by": null
+  },
+  {
    "id": "afcb40be5c14",
    "type": "classification",
    "subject": {
@@ -1865,6 +1904,40 @@
    "source_kind_label": "BEAT REPORT"
   },
   {
+   "id": "fa884968b9a3",
+   "type": "availability",
+   "subject": {
+    "kind": "player",
+    "team": "Penn St.",
+    "player": "Alexis Stucky"
+   },
+   "what": "Alexis Stucky (Penn St.): availability signal",
+   "state": "community_signal",
+   "state_label": "community signal — a lead, not a fact",
+   "why": "community signal — a lead, not a fact",
+   "scope": "one player's availability for the stated dates",
+   "sources": [
+    {
+     "url": "volleytalk.proboards.com (Cody's own W1 ballot post as vballvball, 2026-08-31)",
+     "excerpt": "'Stucky post-ACL and Big Whit don't fix your issues'",
+     "retrieved": "2026-09-05T05:48:32Z",
+     "source_class": "community"
+    }
+   ],
+   "public": false,
+   "priority": 45,
+   "route": {
+    "team": "Penn St."
+   },
+   "effective": {
+    "from": "2026-08-31",
+    "to": null
+   },
+   "review_by": "2026-09-14",
+   "source_kind": "cody_observation",
+   "source_kind_label": "EYE TEST"
+  },
+  {
    "id": "4a931b9bc08a",
    "type": "availability",
    "subject": {
@@ -1971,6 +2044,40 @@
    "review_by": "2026-12-31",
    "source_kind": "beat_report",
    "source_kind_label": "BEAT REPORT"
+  },
+  {
+   "id": "4ec1b59d9c2f",
+   "type": "availability",
+   "subject": {
+    "kind": "player",
+    "team": "Texas A&M",
+    "player": "Kyndal Stowers"
+   },
+   "what": "Kyndal Stowers (Texas A&M): availability signal",
+   "state": "community_signal",
+   "state_label": "community signal — a lead, not a fact",
+   "why": "community signal — a lead, not a fact",
+   "scope": "one player's availability for the stated dates",
+   "sources": [
+    {
+     "url": "volleytalk.proboards.com (Cody's own W1 ballot post as vballvball, 2026-08-31)",
+     "excerpt": "'a win over Stowers-less Texas A&M' ... 'they desperately need Stowers back'",
+     "retrieved": "2026-09-05T05:48:32Z",
+     "source_class": "community"
+    }
+   ],
+   "public": false,
+   "priority": 45,
+   "route": {
+    "team": "Texas A&M"
+   },
+   "effective": {
+    "from": "2026-08-29",
+    "to": null
+   },
+   "review_by": "2026-09-12",
+   "source_kind": "cody_observation",
+   "source_kind_label": "EYE TEST"
   },
   {
    "id": "445a07cb2394",
@@ -2239,39 +2346,44 @@
    "first_seen": "2026-09-05T03:48:19Z"
   },
   {
-   "id": "0f6bce5007d1",
-   "type": "availability",
+   "id": "e7247b01c23b",
+   "type": "duplicate_listing",
    "subject": {
-    "kind": "player",
-    "team": "Kentucky",
-    "player": "Kennedy Washington"
+    "kind": "match",
+    "gid": "6640649",
+    "teams": [
+     "Bradley",
+     "Western Ill."
+    ]
    },
-   "what": "Kennedy Washington (Kentucky): availability signal",
-   "state": "community_signal",
-   "state_label": "community signal — a lead, not a fact",
-   "why": "community signal — a lead, not a fact",
-   "scope": "one player's availability for the stated dates",
+   "what": "Bradley v Western Ill. was listed twice by the feed; the copy is excluded from every count",
+   "state": "corroborated",
+   "state_label": "corroborated by independent sources",
+   "why": "both schools' official schedules establish exactly one meeting",
+   "scope": "that the feed listed one meeting twice",
    "sources": [
     {
-     "url": null,
-     "excerpt": "are you keeping track of big players being unavailable or available like if/when jaidyn livings comes back for smu. if andi jackson's ankle sprain will keep her out for a bit, kenna wollard situation and updates, champion (6'6 puerto rican national team outside) getting to campus at wisconsin and assumably will play soon, grace egan and jaela auguste being out for wisconsin in the last few matches",
-     "retrieved": "2026-09-05T04:01:29Z",
-     "source_class": "community"
+     "url": "https://bradleybraves.com/sports/womens-volleyball/schedule",
+     "excerpt": "schema.org event: 'Bradley University Vs Western Illinois University', startDate 2026-09-04T16:30:00, Brookings, SD -- the ONLY Bradley-WIU meeting on the published schedule",
+     "retrieved": "2026-09-05T05:18:59Z",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://goleathernecks.com/sports/womens-volleyball/schedule",
+     "excerpt": "schema.org event: 'Western Illinois University Vs Bradley', startDate 2026-09-04T16:30:00, Brookings, SD -- the ONLY WIU-Bradley meeting on the published schedule",
+     "retrieved": "2026-09-05T05:18:59Z",
+     "source_class": "official_school"
     }
    ],
-   "public": false,
-   "priority": 45,
+   "public": true,
+   "priority": 60,
    "route": {
-    "team": "Kentucky"
+    "match": "6640649",
+    "ledger": true
    },
-   "effective": {
-    "from": "2026-09-02",
-    "to": null
-   },
-   "review_by": "2026-09-11",
-   "source_kind": "cody_observation",
-   "source_kind_label": "EYE TEST",
-   "first_seen": "2026-09-05T04:02:37Z"
+   "effective": null,
+   "review_by": null,
+   "first_seen": "2026-09-05T05:28:58Z"
   }
  ]
 }

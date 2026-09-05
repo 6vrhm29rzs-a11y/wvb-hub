@@ -750,6 +750,119 @@ def _tv_pt(t):
     mins = m.group(2)
     return "%d%s %s" % (h12, (":" + mins) if mins else "", ampm)
 
+def my_ballots():
+    # type: () -> str
+    """Cody's SUBMITTED VolleyTalk ballots, stored and tracked over time.
+
+    Private only (it lives inside the ballot section, which strip_private
+    removes whole). Each stored week renders his 25 beside where POWER and
+    the AVCA poll stood, with his verbatim commentary in a disclosure --
+    the record of his judgement against the two rulers, week by week.
+    Movement chips appear once a second week exists. Source file:
+    Cody/data/my_ballots.jsonl (append-only; his own posts)."""
+    if PUBLIC:
+        return ""
+    p = os.path.join(REPO, "Cody", "data", "my_ballots.jsonl")
+    if not os.path.exists(p):
+        return ""
+    entries = []
+    for line in open(p, encoding="utf-8"):
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            entries.append(json.loads(line))
+        except ValueError:
+            continue
+    if not entries:
+        return ""
+    entries.sort(key=lambda e: e.get("submitted_at") or "")
+    # where POWER and AVCA stand NOW, for the beside-columns
+    dg = load("data/digby_top25_%d.json" % SEASON) or {}
+    pow_of = {}
+    for r in (dg.get("all") or []):
+        if r.get("rank"):
+            pow_of[r["team"]] = r["rank"]
+    # the room's consolidated weekly poll (VolleyTalk; private capture),
+    # so his ballot reads against the community he voted in
+    vt_of = {}
+    _vtp = os.path.join(REPO, "Cody", "data", "vt_weekly_2026.jsonl")
+    if os.path.exists(_vtp):
+        _vts = [json.loads(x) for x in open(_vtp, encoding="utf-8")
+                if x.strip()]
+        if _vts:
+            for r in (_vts[-1].get("rows") or []):
+                vt_of[r.get("team")] = r.get("rank")
+    avca_of = {}
+    try:
+        _pl = [json.loads(x) for x in open(os.path.join(
+            REPO, "data", "raw", str(SEASON), "polls_avca.jsonl"),
+            encoding="utf-8") if x.strip()]
+        _cur = [x for x in _pl if x.get("season") == SEASON
+                and not x.get("is_previous_season")]
+        if _cur:
+            import re as _re
+            for r in (_cur[-1].get("rows") or _cur[-1].get("data") or []):
+                nm = _re.sub(r"\s*\(\d+\)\s*$", "",
+                             str(r.get("SCHOOL") or ""))
+                try:
+                    avca_of[_hub_name(nm)] = int(r.get("RANK"))
+                except (TypeError, ValueError):
+                    continue
+    except OSError:
+        pass
+    prev_ranks = {}
+    out = ['<div class="bwmyb"><h3>Your submitted ballots</h3>']
+    for i, e in enumerate(entries):
+        rows = []
+        for r in e.get("ranks") or []:
+            t = r.get("team") or r.get("as_written")
+            mv = ""
+            if i and t in prev_ranks:
+                d = prev_ranks[t] - r["rank"]
+                if d:
+                    mv = ('<i class="mv-%s">%s%d</i>'
+                          % ("up" if d > 0 else "dn",
+                             "\u25b2" if d > 0 else "\u25bc", abs(d)))
+            elif i:
+                mv = '<i class="mv-new">NEW</i>'
+            pw = pow_of.get(t)
+            avr = avca_of.get(t)
+            rows.append(
+                '<tr><td class="n">%d</td><td class="bwmybmv">%s</td>'
+                '<td class="tm">%s%s</td>'
+                '<td class="n">%s</td><td class="n">%s</td>'
+                '<td class="n">%s</td></tr>'
+                % (r["rank"], mv, logo_img(t, team_logos()), esc(t),
+                   ("#%d" % pw) if pw else "&mdash;",
+                   ("#%d" % avr) if avr else "NR",
+                   ("#%d" % vt_of[t]) if vt_of.get(t) else "NR"))
+        prev_ranks = dict((r.get("team"), r["rank"])
+                          for r in (e.get("ranks") or []) if r.get("team"))
+        cmt = e.get("comment_verbatim") or ""
+        out.append(
+            '<details class="bwmybwk"%s><summary><b>%s</b> &middot; submitted %s'
+            '</summary>'
+            '<table class="bwmybtab"><thead><tr><th>#</th><th></th>'
+            '<th class="l">Team</th>'
+            '<th class="n" title="our POWER rank as of this page build -- NOT '
+            'as of submission">PWR now</th>'
+            '<th class="n" title="AVCA poll rank as of this page build">AVCA'
+            '</th>'
+            '<th class="n" title="the VolleyTalk consolidated weekly poll -- '
+            'the room you voted in (private capture)">VT room</th>'
+            '</tr></thead><tbody>%s</tbody></table>'
+            '%s</details>'
+            % (' open' if i == len(entries) - 1 else '',
+               esc(e.get("label") or e.get("week") or "ballot"),
+               esc((e.get("submitted_at") or "")[:10]),
+               "".join(rows),
+               ('<details class="bwmybcmt"><summary>Your write-up, verbatim'
+                '</summary><p>%s</p></details>' % esc(cmt)) if cmt else ""))
+    out.append('</div>')
+    return "".join(out)
+
+
 def tv_index():
     # type: () -> Dict[str, Dict]
     """game_id -> where to watch it. Private only.
@@ -3404,8 +3517,15 @@ def top25_view(avca=None):
                  "an unverified result from today enters once a school "
                  "site confirms it, or at the overnight recompute.</span>"
                  % (_st, played, _vsent))
+    # ⚠ PROGRESSIVE DISCLOSURE (Cody's Safari capture, 2026-09-05): the
+    # foot had grown into ~25 phone lines of methodology below the votes
+    # line -- the same wall the Rankings and Schedule leads were cured of.
+    # Movers and the poll comparison are CONTENT and stay visible; the
+    # methodology folds behind the same "How this ranking works" grammar.
     foot = (
         mv_txt + poll_txt +
+        "<details class=\"t25how\"><summary>How this ranking works &middot; "
+        "why it moves so little</summary>"
         "<b>Why so little movement in August?</b> %.1f is not a preference "
         "&mdash; it is the per-match spread (%.2f points/set) divided by how "
         "much the projection still gets wrong (it predicts the next season at "
@@ -3427,6 +3547,7 @@ def top25_view(avca=None):
         "single factor the full-season bake-off found, mixed at a weight that "
         "beat margin-only at every 2025 checkpoint tested (paired bootstrap "
         "CI clear of zero). A match with no box counts on margin alone."
+        "</details>"
         % (k, (m.get("per_match_variance") or 0) ** 0.5,
            m.get("prior_rho_out_of_sample") or 0,
            m.get("home_advantage_pts_per_set") or 0.0))
@@ -5079,6 +5200,7 @@ def build():
         .replace("{{TSTATS_JSON}}", blob(
             [dict(team=k, conf=(tindex.get(k) or {}).get("conf"), **v)
              for k, v in sorted(tstats.items())])) \
+        .replace("{{MY_BALLOTS}}", my_ballots()) \
         .replace("{{LDR_FLOOR}}", str(ldr_floor)) \
         .replace("{{LDR_GAMES}}", str(
             ((load("data/raw/%d/players_%d.json" % (SEASON, SEASON)) or {})
@@ -6480,8 +6602,14 @@ td.pick b{color:var(--navy)}
      apart with fixed left margins -- which is a guess about how wide a number
      is, and it was wrong: "85.4" printed straight through the rank digit. Give
      each cell a real column and the browser does the arithmetic. */
+  /* ⚠ 32px HELD RANK + MOVEMENT. "20 ▲15" cannot fit a 32px track, so the
+     arrow WRAPPED UNDER the rank digit and crammed against the row's colour
+     tick -- Cody's screenshot read it as "arrows above ranks" and "lines
+     blocking rank numbers". The track is content-sized now and the cell
+     refuses to wrap: rank and its arrow sit on one line, always, the same
+     convention as every other board. */
   .rk3 tbody tr.row{display:grid;
-    grid-template-columns:32px auto auto 1fr;
+    grid-template-columns:minmax(46px,auto) auto auto 1fr;
     align-items:center;gap:3px 12px;padding:9px 11px 10px;
     border-bottom:1px solid var(--line2)}
   .rk3 tbody tr.row td{border:0;padding:0;background:none}
@@ -6491,7 +6619,7 @@ td.pick b{color:var(--navy)}
      measuring the rects, not by reading the CSS -- the computed padding was
      already 0, which made it look handled. */
   .rk3 tbody td.rk{grid-column:1;grid-row:1;width:auto;min-width:0;
-    font:700 17px/1 var(--disp)}
+    font:700 17px/1 var(--disp);white-space:nowrap}
   .rk3 tbody td.tm{grid-column:2 / -1;grid-row:1;font-size:15px;min-width:0;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .rk3 tbody td.pw{grid-column:2;grid-row:2;justify-self:start}
@@ -6533,26 +6661,33 @@ td.pick b{color:var(--navy)}
      those survive and conference / net-per-set / season-weight do not. */
   .t25 thead{display:none}
   .t25,.t25 tbody,.t25 tr{display:block;width:100%}
+  /* columns: rank | movement | name (takes the rest) | record. Row 2's
+     stat line spans from the left edge so its width cannot couple to the
+     movement column and shove the name mid-row (it did: "POWER 82.2"
+     sized column 2 and Pittsburgh started 100px from its own rank). */
   .t25 tbody tr.row{display:grid;
-    grid-template-columns:30px auto auto 1fr;
-    align-items:center;gap:4px 12px;padding:10px 11px 11px;
+    grid-template-columns:auto auto 1fr auto;
+    align-items:center;gap:4px 10px;padding:10px 11px 11px;
     border-bottom:1px solid var(--line2)}
   .t25 tbody tr.row td{border:0;padding:0;background:none}
+  /* ONE ARROW CONVENTION ACROSS BOTH BOARDS (Cody: "some arrows above
+     ranks and some to the right"): movement sits BESIDE the rank digit,
+     on its line, on the POWER board and this one alike. */
   .t25 td.rk{grid-column:1;grid-row:1;width:auto;min-width:0;
-    font:700 18px/1 var(--disp)}
-  .t25 td.tm{grid-column:2 / 4;grid-row:1;font-size:16px;min-width:0;
+    font:700 18px/1 var(--disp);white-space:nowrap}
+  .t25 td.tm{grid-column:3;grid-row:1;font-size:16px;min-width:0;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-left:0}
   /* ⚠ the desktop team-colour bar (absolute, left:6px in .tm's padding)
      lands ON the crest once the phone grid removes that padding -- Cody's
      screenshot showed a navy stripe through the Pitt logo reading as a
      stray "1". The row's left edge tick already carries the colour here. */
   .t25 .tm::before{content:none}
-  .t25 td.mvc{grid-column:4;grid-row:1;justify-self:end}
-  .t25 td.pw{grid-column:2;grid-row:2;justify-self:start}
+  .t25 td.mvc{grid-column:2;grid-row:1;justify-self:start;white-space:nowrap}
+  .t25 td.pw{grid-column:1 / 3;grid-row:2;justify-self:start}
   .t25 td.poll{grid-column:3;grid-row:2;justify-self:start}
   .t25 td.rec{grid-column:4;grid-row:2;justify-self:end;
     font:600 13px/1 var(--mono);color:var(--ink2)}
-  .t25 td.form{grid-column:2 / -1;grid-row:3;justify-self:start}
+  .t25 td.form{grid-column:1 / -1;grid-row:3;justify-self:start}
   .t25 td.cf,.t25 td.wt,.t25 td.dv{display:none}
   .t25 tbody td.pw::before{content:"POWER ";color:#31D07E;opacity:.9}
   .t25 tbody td.poll::before{content:"AVCA ";color:var(--ink3,var(--ink2));opacity:.8}
@@ -6946,6 +7081,20 @@ b.kres{color:#F2B441}
    names alone enumerate a private feature -- that is why the whole stylesheet
    is stripped from the public build, and why nothing below may drift outside
    these sentinels. */
+.bwmyb{margin:14px 0;padding:12px 14px;background:var(--card,#fff);
+  border:1px solid var(--line);border-radius:10px}
+.bwmyb h3{font:600 13px/1 var(--disp);letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink2);margin:0 0 8px}
+.bwmybwk{margin:6px 0}
+.bwmybwk summary{cursor:pointer;font:600 13px/1.4 var(--mono);color:var(--ink)}
+.bwmybtab{border-collapse:collapse;margin:8px 0;width:auto}
+.bwmybtab th,.bwmybtab td{padding:4px 9px;font:500 13px/1.3 var(--mono);text-align:left}
+.bwmybtab th.n,.bwmybtab td.n{text-align:right}
+.bwmybtab td.tm{font:600 14px/1.2 var(--disp)}
+.bwmybmv i{font-style:normal;font-size:11px}
+.bwmybcmt{margin:6px 0 2px}
+.bwmybcmt summary{cursor:pointer;font:600 12px/1.4 var(--mono);color:var(--blue,#2456A6)}
+.bwmybcmt p{max-width:78ch;font:400 13.5px/1.55 -apple-system,sans-serif;color:var(--ink)}
 .bwstatus{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
   gap:1px;background:var(--vx-rule);border:1px solid var(--vx-rule);
   border-radius:4px;overflow:hidden;margin:0 0 18px}
@@ -8248,6 +8397,9 @@ h4.sbtime span{font:600 11px/1 var(--mono);color:var(--ink3)}
 /* 5-1 / 6-2: how many setters the team actually starts. Shown only when its
    lineups agree; a team with thin position data gets no badge, not a guess. */
 .wentto{display:block;font:600 11px/1 var(--sans);color:var(--ink3);margin-top:3px}
+.t25how{margin-top:8px}
+.t25how summary{cursor:pointer;font:600 12px/1.4 var(--mono);color:var(--blue,#2456A6)}
+.t25how[open] summary{margin-bottom:6px}
 .tabhint{margin:0 0 12px;font-size:12.5px;color:var(--ink2)}
 /* Digby speaks in his own box, never inline with measured numbers -- a reader
    should always be able to see which words were written and which were counted. */
@@ -9945,7 +10097,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   </table></div>
   <h3 class="t25h">Also receiving votes</h3>
   <div class="alsorx">{{T25_ALSO}}</div>
-  <p class="tabhint">{{T25_FOOT}}</p>
+  <div class="tabhint">{{T25_FOOT}}</div>
 </section>
 
 <section id="v-rankings" hidden>
@@ -10211,6 +10363,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
        whether there are unsaved edits, and what they last submitted. The
        actions moved to the end of the flow, where finishing belongs. -->
   <div class="bwstatus" id="bwstatus"></div>
+  {{MY_BALLOTS}}
   {{EXTREF_STRIP}}
 
   <!-- ⚠ NONE OF THESE THREE IS A RECOMMENDATION. Each is a difference between
@@ -10370,7 +10523,13 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 <section id="v-leaders" hidden>
   <h2 class="vh">Stats</h2>
   <p class="tabhint">2026 season statistics &mdash; player leaders are built
-    from the held box scores of <b>{{LDR_GAMES}}</b> counted finals
+    from the held box scores of <b>{{LDR_GAMES}}</b> matches
+    <span title="the box universe: every match with a held box score, minus
+    exhibitions and duplicate listings. It can differ from the masthead's
+    results count both ways -- a few finals whose RESULT the feed never
+    published still carry real player boxes (they count here, nowhere else),
+    and a few finals hold no box at all; a result under review waits
+    outside both counts.">(the box universe)</span>
     (exhibitions and duplicate feed listings excluded); team rates come from
     each team&rsquo;s own counted matches, with the match count in every row
     &middot; built {{BUILT}}</p>
@@ -13510,7 +13669,11 @@ function bwStatusBar() {
       week = esc(String(w.label || '').replace('Digby Weekly \u00b7 ', ''));
       weekCls = '';
       if (w.blocking) {
-        settle = w.finals + ' finals in \u00b7 ' + w.blocking +
+        /* the GATE universe, named: every completed feed record in the
+           ballot window counts here (its job is "is the week's play done"),
+           so exhibitions and duplicate listings are IN -- unlike the
+           masthead's results count, which excludes them. */
+        settle = w.finals + ' completed records in \u00b7 ' + w.blocking +
           ' still to play';
         setCls = '';
       } else if (w.withdrawn) {
@@ -19451,7 +19614,10 @@ function renderCalendar() {
     const cls = w.blocking ? 'wait' : (w.withdrawn ? 'okw' : 'ok');
     const counts =
       '<div class="calcounts">' +
-      '<span><b>' + w.finals + '</b> final' + (w.finals === 1 ? '' : 's') +
+      '<span title="the settle gate counts every completed feed record in ' +
+      'the window -- exhibitions and duplicate listings included, unlike the ' +
+      'masthead\'s results count"><b>' + w.finals + '</b> completed record' +
+      (w.finals === 1 ? '' : 's') +
       ' included</span>' +
       (w.withdrawn
         ? '<span title="Fixtures the source itself no longer lists for their ' +

@@ -2,11 +2,11 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-05T04:44:50Z",
+  "generated_at_utc": "2026-09-05T15:47:02Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
-   "signals": 5,
+   "signals": 7,
    "expired": 2,
    "anomalies": 179
   },
@@ -166,6 +166,34 @@
    "n_supports": 2
   },
   {
+   "team": "Penn St.",
+   "player": "Alexis Stucky",
+   "state": "signal",
+   "supports": [
+    {
+     "team": "Penn St.",
+     "player": "Alexis Stucky",
+     "kind": "cody_observation",
+     "kind_label": "EYE TEST",
+     "quote": "'Stucky post-ACL and Big Whit don't fix your issues'",
+     "summary": null,
+     "url": "volleytalk.proboards.com (Cody's own W1 ballot post as vballvball, 2026-08-31)",
+     "retrieved": "2026-09-05T05:48:32Z",
+     "effective": {
+      "from": "2026-08-31",
+      "to": null
+     },
+     "review_by": "2026-09-14",
+     "incident_date": null,
+     "claim": null,
+     "note": "CONTEXT, not an absence: reads as PLAYING but post-ACL -- the exact prior-season-health class the DeLeye rule exists for (a prior-year rate understates a player recovering; a current-year rate may too). box name, TEAM-anchored per R8 -- three Stuckys play D-I (Penn St., Kansas St., Wyoming); Penn St.'s is Alexis Stucky, S (team 46614). Sets no status."
+    }
+   ],
+   "claim": null,
+   "headline": "Signal only -- sets no status",
+   "n_supports": 1
+  },
+  {
    "team": "Purdue",
    "player": "Kenna Wollard",
    "state": "status",
@@ -266,6 +294,34 @@
    "claim": "out_for_season",
    "headline": "Out for the 2026 season",
    "n_supports": 2
+  },
+  {
+   "team": "Texas A&M",
+   "player": "Kyndal Stowers",
+   "state": "signal",
+   "supports": [
+    {
+     "team": "Texas A&M",
+     "player": "Kyndal Stowers",
+     "kind": "cody_observation",
+     "kind_label": "EYE TEST",
+     "quote": "'a win over Stowers-less Texas A&M' ... 'they desperately need Stowers back'",
+     "summary": null,
+     "url": "volleytalk.proboards.com (Cody's own W1 ballot post as vballvball, 2026-08-31)",
+     "retrieved": "2026-09-05T05:48:32Z",
+     "effective": {
+      "from": "2026-08-29",
+      "to": null
+     },
+     "review_by": "2026-09-12",
+     "incident_date": null,
+     "claim": null,
+     "note": "SIGNAL ONLY -- Cody's own published ballot commentary. Names her absent from the Louisville match and still out at writing. No attributable school statement held; box name, team-anchored: Kyndal Stowers, OH, Texas A&M (team 46006). Sets no status."
+    }
+   ],
+   "claim": null,
+   "headline": "Signal only -- sets no status",
+   "n_supports": 1
   },
   {
    "team": "Wisconsin",
@@ -414,6 +470,42 @@
    "incident_date": null,
    "claim": null,
    "note": "SIGNAL ONLY -- Cody's read (2026-09-04, quoted in full; the part about this player: 'if/when jaidyn livings comes back for smu'). Sets no status. Corroborating participation: NOT in SMU's box for the first four matches (Aug 23-30); LISTED with zero recorded actions on Sep 2 -- the listed-but-not-playing shape that often precedes a return. No attributable public statement held; her current availability is UNKNOWN. Box name: Jadyn Livings, #42, OH (Cody wrote 'jaidyn'; SMU's box spells it Jadyn)."
+  },
+  {
+   "team": "Texas A&M",
+   "player": "Kyndal Stowers",
+   "kind": "cody_observation",
+   "kind_label": "EYE TEST",
+   "quote": "'a win over Stowers-less Texas A&M' ... 'they desperately need Stowers back'",
+   "summary": null,
+   "url": "volleytalk.proboards.com (Cody's own W1 ballot post as vballvball, 2026-08-31)",
+   "retrieved": "2026-09-05T05:48:32Z",
+   "effective": {
+    "from": "2026-08-29",
+    "to": null
+   },
+   "review_by": "2026-09-12",
+   "incident_date": null,
+   "claim": null,
+   "note": "SIGNAL ONLY -- Cody's own published ballot commentary. Names her absent from the Louisville match and still out at writing. No attributable school statement held; box name, team-anchored: Kyndal Stowers, OH, Texas A&M (team 46006). Sets no status."
+  },
+  {
+   "team": "Penn St.",
+   "player": "Alexis Stucky",
+   "kind": "cody_observation",
+   "kind_label": "EYE TEST",
+   "quote": "'Stucky post-ACL and Big Whit don't fix your issues'",
+   "summary": null,
+   "url": "volleytalk.proboards.com (Cody's own W1 ballot post as vballvball, 2026-08-31)",
+   "retrieved": "2026-09-05T05:48:32Z",
+   "effective": {
+    "from": "2026-08-31",
+    "to": null
+   },
+   "review_by": "2026-09-14",
+   "incident_date": null,
+   "claim": null,
+   "note": "CONTEXT, not an absence: reads as PLAYING but post-ACL -- the exact prior-season-health class the DeLeye rule exists for (a prior-year rate understates a player recovering; a current-year rate may too). box name, TEAM-anchored per R8 -- three Stuckys play D-I (Penn St., Kansas St., Wyoming); Penn St.'s is Alexis Stucky, S (team 46614). Sets no status."
   }
  ],
  "expired": [
@@ -578,22 +670,45 @@
    "points_per_set_missing": 8.577
   },
   {
+   "game_id": "6624647",
+   "team_id": "51287",
+   "team": "Houston Christian",
+   "absent": [
+    {
+     "name": "Katy Barger",
+     "rate": 2.977,
+     "played_share": 1.0
+    },
+    {
+     "name": "Sa'myah Medford",
+     "rate": 2.941,
+     "played_share": 0.8
+    },
+    {
+     "name": "Allana Archie",
+     "rate": 2.636,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 8.554
+  },
+  {
    "game_id": "6628654",
    "team_id": "46291",
    "team": "UC San Diego",
    "absent": [
     {
      "name": "Molly Mccluskey",
-     "rate": 4.625,
-     "played_share": 0.667
+     "rate": 4.538,
+     "played_share": 0.75
     },
     {
      "name": "Ireland Mcnees",
-     "rate": 3.5,
-     "played_share": 0.667
+     "rate": 3.846,
+     "played_share": 0.75
     }
    ],
-   "points_per_set_missing": 8.125
+   "points_per_set_missing": 8.384
   },
   {
    "game_id": "6625788",
@@ -602,52 +717,39 @@
    "absent": [
     {
      "name": "Molly Mccluskey",
-     "rate": 4.625,
-     "played_share": 0.667
+     "rate": 4.538,
+     "played_share": 0.75
     },
     {
      "name": "Ireland Mcnees",
-     "rate": 3.5,
-     "played_share": 0.667
+     "rate": 3.846,
+     "played_share": 0.75
     }
    ],
-   "points_per_set_missing": 8.125
+   "points_per_set_missing": 8.384
   },
   {
-   "game_id": "6625235",
-   "team_id": "46291",
-   "team": "UC San Diego",
+   "game_id": "6624647",
+   "team_id": "45940",
+   "team": "Abilene Christian",
    "absent": [
     {
-     "name": "Ireland McNees",
-     "rate": 4.0,
-     "played_share": 0.667
+     "name": "Alyssa Todd",
+     "rate": 3.194,
+     "played_share": 1.0
     },
     {
-     "name": "Molly McCluskey",
-     "rate": 3.812,
-     "played_share": 0.667
-    }
-   ],
-   "points_per_set_missing": 7.812
-  },
-  {
-   "game_id": "6627895",
-   "team_id": "46291",
-   "team": "UC San Diego",
-   "absent": [
-    {
-     "name": "Ireland McNees",
-     "rate": 4.0,
-     "played_share": 0.667
+     "name": "Hannah Gonzalez",
+     "rate": 2.643,
+     "played_share": 1.0
     },
     {
-     "name": "Molly McCluskey",
-     "rate": 3.812,
-     "played_share": 0.667
+     "name": "Hadlee Welch",
+     "rate": 2.286,
+     "played_share": 1.0
     }
    ],
-   "points_per_set_missing": 7.812
+   "points_per_set_missing": 8.123
   },
   {
    "game_id": "6626506",
@@ -957,24 +1059,6 @@
     }
    ],
    "points_per_set_missing": 4.3
-  },
-  {
-   "game_id": "6628274",
-   "team_id": "51287",
-   "team": "Houston Christian",
-   "absent": [
-    {
-     "name": "Sa'myah Medford",
-     "rate": 2.941,
-     "played_share": 1.0
-    },
-    {
-     "name": "Malaya Balina-ayers",
-     "rate": 1.353,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 4.294
   },
   {
    "game_id": "6640390",
@@ -1396,19 +1480,6 @@
    "points_per_set_missing": 3.167
   },
   {
-   "game_id": "6628109",
-   "team_id": "46419",
-   "team": "Hawaii",
-   "absent": [
-    {
-     "name": "Cha'lei Reid",
-     "rate": 3.167,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 3.167
-  },
-  {
    "game_id": "6640393",
    "team_id": "45925",
    "team": "Liberty",
@@ -1433,6 +1504,19 @@
     }
    ],
    "points_per_set_missing": 3.0
+  },
+  {
+   "game_id": "6628274",
+   "team_id": "51287",
+   "team": "Houston Christian",
+   "absent": [
+    {
+     "name": "Sa'myah Medford",
+     "rate": 2.941,
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 2.941
   },
   {
    "game_id": "6637939",
@@ -1916,6 +2000,19 @@
     }
    ],
    "points_per_set_missing": 2.25
+  },
+  {
+   "game_id": "6628109",
+   "team_id": "46419",
+   "team": "Hawaii",
+   "absent": [
+    {
+     "name": "Cha'lei Reid",
+     "rate": 2.235,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.235
   },
   {
    "game_id": "6628216",
@@ -3780,14 +3877,14 @@
    ]
   },
   "UNCW": {
-   "gid": "6626978",
-   "d": "2026-09-04",
+   "gid": "6627069",
+   "d": "2026-09-05",
    "appeared": 10,
    "zero_action": [
-    "Gaby Zovko",
+    "Macon Butler",
     "Lily Goyer",
-    "Meredith Keefer",
     "Maris Grant",
+    "Addi Vaughn",
     "Lora Cole"
    ]
   },
@@ -3909,12 +4006,16 @@
    ]
   },
   "Utah Tech": {
-   "gid": "6628109",
-   "d": "2026-09-03",
-   "appeared": 10,
+   "gid": "6628108",
+   "d": "2026-09-04",
+   "appeared": 11,
    "zero_action": [
-    "Kaleinani Watson",
-    "Mahealani Ikei"
+    "Mia Lundberg",
+    "Kennedi Knudsen",
+    "Casidy Fried",
+    "Addyson Mcarthur",
+    "Mahealani Ikei",
+    "Cass Klapp"
    ]
   },
   "Elon": {
@@ -4096,11 +4197,12 @@
    ]
   },
   "West Florida": {
-   "gid": "6627427",
-   "d": "2026-09-04",
-   "appeared": 11,
+   "gid": "6627069",
+   "d": "2026-09-05",
+   "appeared": 10,
    "zero_action": [
     "Liliana Gegovic",
+    "Madison Joyner",
     "Elizabeth Kwiatkowski",
     "Libby Tulip",
     "Rowan Kage",
@@ -4489,10 +4591,14 @@
    ]
   },
   "LMU (CA)": {
-   "gid": "6625788",
-   "d": "2026-09-03",
+   "gid": "6625789",
+   "d": "2026-09-04",
    "appeared": 12,
-   "zero_action": []
+   "zero_action": [
+    "Gianna Perez",
+    "Mariana Simao",
+    "Amanda Mikuzis"
+   ]
   },
   "Missouri St.": {
    "gid": "6627911",
@@ -6779,10 +6885,17 @@
    ]
   },
   "UC San Diego": {
-   "gid": "6625788",
-   "d": "2026-09-03",
-   "appeared": 11,
-   "zero_action": []
+   "gid": "6628108",
+   "d": "2026-09-04",
+   "appeared": 12,
+   "zero_action": [
+    "Jaedyn Houston",
+    "Hayden Shanafelt",
+    "Ahnika Smith",
+    "Katelyn Hernandez",
+    "Kaliya Ndiaye",
+    "Soraya Dennis"
+   ]
   },
   "Long Beach St.": {
    "gid": "6626679",
@@ -6835,11 +6948,15 @@
    ]
   },
   "Hawaii": {
-   "gid": "6628109",
-   "d": "2026-09-03",
-   "appeared": 9,
+   "gid": "6625789",
+   "d": "2026-09-04",
+   "appeared": 10,
    "zero_action": [
-    "Jaci Miyasaki"
+    "Manon Baudrillard",
+    "Marnie Ursem",
+    "Jaci Miyasaki",
+    "Mano Antiga",
+    "Cha'lei Reid"
    ]
   },
   "Ga. Southern": {
@@ -7501,6 +7618,32 @@
     "state": "zero_action"
    }
   ],
+  "Penn St.|Alexis Stucky": [
+   {
+    "gid": "6640218",
+    "ep": 1787878800,
+    "sets": 2,
+    "state": "appeared"
+   },
+   {
+    "gid": "6626582",
+    "ep": 1788033600,
+    "sets": 3,
+    "state": "appeared"
+   },
+   {
+    "gid": "6626350",
+    "ep": 1788098400,
+    "sets": 4,
+    "state": "appeared"
+   },
+   {
+    "gid": "6626658",
+    "ep": 1788127200,
+    "sets": 3,
+    "state": "appeared"
+   }
+  ],
   "Purdue|Grace Heaney": [
    {
     "gid": "6626974",
@@ -7565,6 +7708,20 @@
     "ep": 1788573600,
     "sets": 4,
     "state": "zero_action"
+   }
+  ],
+  "Texas A&M|Kyndal Stowers": [
+   {
+    "gid": "6627169",
+    "ep": 1788307200,
+    "sets": 3,
+    "state": "appeared"
+   },
+   {
+    "gid": "6624238",
+    "ep": 1788382800,
+    "sets": 5,
+    "state": "appeared"
    }
   ]
  }

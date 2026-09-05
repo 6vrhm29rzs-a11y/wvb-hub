@@ -1,10 +1,10 @@
 {
  "model_version": "v1.1-unweighted",
- "generated_utc": "2026-09-05T04:34:38Z",
+ "generated_utc": "2026-09-05T05:28:58Z",
  "queue_rule": {
   "description": "any component voting SUPPORTS_H1 queues the match for human review; ranking is by vote count. A display/ranking heuristic only -- not a truth claim, and nothing here corrects or counts."
  },
- "n_finals": 744,
+ "n_finals": 746,
  "n_queued": 42,
  "matches": [
   {
@@ -699,8 +699,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 12,
-     "h1_error": 0,
+     "h0_error": 11,
+     "h1_error": 1,
      "vote": "SUPPORTS_H1"
     },
     "school_verification": {
@@ -2107,13 +2107,13 @@
      "vote": "SUPPORTS_H1"
     },
     "school_verification": {
-     "available": false,
-     "vote": "UNAVAILABLE",
-     "why": "not yet verified"
+     "available": true,
+     "verdict": "VERIFIED_BOTH",
+     "vote": "SUPPORTS_H0"
     }
    },
    "n_h1_votes": 2,
-   "n_available": 3,
+   "n_available": 4,
    "queued": true,
    "watch": false,
    "adjudication": {
@@ -27000,8 +27000,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 13,
+     "h0_error": 2,
+     "h1_error": 14,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -34438,7 +34438,7 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
+     "h0_error": 3,
      "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
@@ -44186,8 +44186,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 14,
+     "h0_error": 4,
+     "h1_error": 16,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -44264,6 +44264,142 @@
     },
     "n_h1_votes": 0,
     "school_verification_available_at_scoring": true
+   }
+  },
+  {
+   "gid": "6626261",
+   "epoch": 1788573600,
+   "teams": [
+    "San Diego",
+    "SMU"
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": "Jenny Craig Pavilion",
+    "nominal_home_is_venue_host": false
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       2,
+       1
+      ],
+      [
+       3,
+       1
+      ]
+     ],
+     "ours": [
+      [
+       2,
+       1
+      ],
+      [
+       3,
+       1
+      ]
+     ],
+     "h0_error": 0,
+     "h1_error": 2,
+     "delta_h1_better": -2,
+     "vote": "SUPPORTS_H0"
+    },
+    "box_roster_fit": {
+     "available": true,
+     "eligible_rows": 30,
+     "h0": [
+      1.0,
+      1.0
+     ],
+     "h1": [
+      0.0,
+      0.0
+     ],
+     "fit_gain": -1.0,
+     "unmatched_sample": [],
+     "vote": "SUPPORTS_H0"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 10,
+     "h1_error": 10,
+     "vote": "UNINFORMATIVE"
+    },
+    "school_verification": {
+     "available": true,
+     "verdict": "VERIFIED_BOTH",
+     "vote": "SUPPORTS_H0"
+    }
+   },
+   "n_h1_votes": 0,
+   "n_available": 4,
+   "queued": false,
+   "watch": false,
+   "adjudication": null,
+   "first_scored_utc": "2026-09-05T04:51:47Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        2,
+        1
+       ],
+       [
+        3,
+        1
+       ]
+      ],
+      "ours": [
+       [
+        2,
+        1
+       ],
+       [
+        3,
+        1
+       ]
+      ],
+      "h0_error": 0,
+      "h1_error": 2,
+      "delta_h1_better": -2,
+      "vote": "SUPPORTS_H0"
+     },
+     "box_roster_fit": {
+      "available": true,
+      "eligible_rows": 30,
+      "h0": [
+       1.0,
+       1.0
+      ],
+      "h1": [
+       0.0,
+       0.0
+      ],
+      "fit_gain": -1.0,
+      "unmatched_sample": [],
+      "vote": "SUPPORTS_H0"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 10,
+      "h1_error": 10,
+      "vote": "UNINFORMATIVE"
+     },
+     "school_verification": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "not yet verified"
+     }
+    },
+    "n_h1_votes": 0,
+    "school_verification_available_at_scoring": false
    }
   },
   {
@@ -53824,13 +53960,13 @@
      "vote": "UNINFORMATIVE"
     },
     "school_verification": {
-     "available": false,
-     "vote": "UNAVAILABLE",
-     "why": "not yet verified"
+     "available": true,
+     "verdict": "VERIFIED_BOTH",
+     "vote": "SUPPORTS_H0"
     }
    },
    "n_h1_votes": 0,
-   "n_available": 3,
+   "n_available": 4,
    "queued": false,
    "watch": false,
    "adjudication": null,
@@ -71569,13 +71705,13 @@
      "vote": "UNINFORMATIVE"
     },
     "school_verification": {
-     "available": false,
-     "vote": "UNAVAILABLE",
-     "why": "not yet verified"
+     "available": true,
+     "verdict": "CORROBORATED_ONE",
+     "vote": "SUPPORTS_H0"
     }
    },
    "n_h1_votes": 0,
-   "n_available": 3,
+   "n_available": 4,
    "queued": false,
    "watch": false,
    "adjudication": null,
@@ -71979,13 +72115,13 @@
      "vote": "UNINFORMATIVE"
     },
     "school_verification": {
-     "available": false,
-     "vote": "UNAVAILABLE",
-     "why": "not yet verified"
+     "available": true,
+     "verdict": "VERIFIED_BOTH",
+     "vote": "SUPPORTS_H0"
     }
    },
    "n_h1_votes": 0,
-   "n_available": 3,
+   "n_available": 4,
    "queued": false,
    "watch": false,
    "adjudication": null,
@@ -76807,13 +76943,13 @@
      "vote": "UNINFORMATIVE"
     },
     "school_verification": {
-     "available": false,
-     "vote": "UNAVAILABLE",
-     "why": "not yet verified"
+     "available": true,
+     "verdict": "VERIFIED_BOTH",
+     "vote": "SUPPORTS_H0"
     }
    },
    "n_h1_votes": 0,
-   "n_available": 2,
+   "n_available": 3,
    "queued": false,
    "watch": false,
    "adjudication": null,
@@ -77074,8 +77210,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 12,
+     "h0_error": 3,
+     "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -80703,8 +80839,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 12,
+     "h0_error": 3,
+     "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -80785,6 +80921,146 @@
    }
   },
   {
+   "gid": "6628108",
+   "epoch": 1788573600,
+   "teams": [
+    "Utah Tech",
+    "UC San Diego"
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": "Bankoh Arena at Stan Sheriff Center",
+    "nominal_home_is_venue_host": true
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       2,
+       2
+      ],
+      [
+       2,
+       2
+      ]
+     ],
+     "ours": [
+      [
+       2,
+       2
+      ],
+      [
+       2,
+       2
+      ]
+     ],
+     "h0_error": 0,
+     "h1_error": 0,
+     "delta_h1_better": 0,
+     "vote": "UNINFORMATIVE"
+    },
+    "box_roster_fit": {
+     "available": true,
+     "eligible_rows": 35,
+     "h0": [
+      1.0,
+      0.944
+     ],
+     "h1": [
+      0.0,
+      0.0
+     ],
+     "fit_gain": -1.0,
+     "unmatched_sample": [
+      "jaedynhouston"
+     ],
+     "vote": "SUPPORTS_H0"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 9,
+     "h1_error": 9,
+     "vote": "UNINFORMATIVE"
+    },
+    "school_verification": {
+     "available": false,
+     "vote": "UNAVAILABLE",
+     "why": "not yet verified"
+    }
+   },
+   "n_h1_votes": 0,
+   "n_available": 3,
+   "queued": false,
+   "watch": false,
+   "adjudication": null,
+   "first_scored_utc": "2026-09-05T05:07:05Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        2,
+        2
+       ],
+       [
+        2,
+        2
+       ]
+      ],
+      "ours": [
+       [
+        2,
+        2
+       ],
+       [
+        2,
+        2
+       ]
+      ],
+      "h0_error": 0,
+      "h1_error": 0,
+      "delta_h1_better": 0,
+      "vote": "UNINFORMATIVE"
+     },
+     "box_roster_fit": {
+      "available": true,
+      "eligible_rows": 35,
+      "h0": [
+       1.0,
+       0.944
+      ],
+      "h1": [
+       0.0,
+       0.0
+      ],
+      "fit_gain": -1.0,
+      "unmatched_sample": [
+       "jaedynhouston"
+      ],
+      "vote": "SUPPORTS_H0"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 9,
+      "h1_error": 9,
+      "vote": "UNINFORMATIVE"
+     },
+     "school_verification": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "not yet verified"
+     }
+    },
+    "n_h1_votes": 0,
+    "school_verification_available_at_scoring": false
+   }
+  },
+  {
    "gid": "6628109",
    "epoch": 1788498000,
    "teams": [
@@ -80844,8 +81120,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 0,
-     "h1_error": 12,
+     "h0_error": 2,
+     "h1_error": 14,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -91934,8 +92210,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 0,
-     "h1_error": 12,
+     "h0_error": 2,
+     "h1_error": 14,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {

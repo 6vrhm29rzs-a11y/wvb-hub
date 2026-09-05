@@ -1,10 +1,10 @@
 {
  "date": "2026-09-04",
- "generated_utc": "2026-09-05T03:40:32Z",
+ "generated_utc": "2026-09-05T04:58:25Z",
  "counts": {
   "UNVERIFIED": 8,
-  "VERIFIED_BOTH": 106,
-  "CORROBORATED_ONE": 47,
+  "VERIFIED_BOTH": 111,
+  "CORROBORATED_ONE": 48,
   "CONTRADICTED_ONE": 2,
   "CONTRADICTED_BOTH": 5
  },
@@ -3794,6 +3794,139 @@
      "assertion": "CSU Bakersfield L 1-3 vs Weber State",
      "opponent_source": "Weber State",
      "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6627237",
+   "date": "2026-09-04",
+   "canonical": "Kansas City def. Purdue Fort Wayne 3-1",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Kansas City": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://kcroos.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Kansas City W 3-1 vs Purdue Fort Wayne",
+     "opponent_source": "Purdue Fort Wayne",
+     "site_says": "Neutral"
+    },
+    "Purdue Fort Wayne": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gomastodons.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Purdue Fort Wayne L 1-3 vs Kansas City",
+     "opponent_source": "Kansas City",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6626714",
+   "date": "2026-09-04",
+   "canonical": "UTEP def. A&M-Corpus Christi 3-1",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "UTEP": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://utepathletics.com/services/schedule_txt.ashx?schedule=1279",
+     "assertion": "UTEP W 3-1 vs Texas A&M - Corpus Christi",
+     "opponent_source": "Texas A&M - Corpus Christi",
+     "site_says": "Away"
+    },
+    "A&M-Corpus Christi": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://goislanders.com/services/schedule_txt.ashx?schedule=286",
+     "assertion": "A&M-Corpus Christi L 1-3 vs UTEP",
+     "opponent_source": "UTEP",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6627893",
+   "date": "2026-09-04",
+   "canonical": "Oral Roberts def. Gonzaga 3-2",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Oral Roberts": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://oruathletics.com/services/schedule_txt.ashx?schedule=338",
+     "assertion": "Oral Roberts W 3-2 vs Gonzaga",
+     "opponent_source": "Gonzaga",
+     "site_says": "Away"
+    },
+    "Gonzaga": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gozags.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Gonzaga L 2-3 vs Oral Roberts",
+     "opponent_source": "Oral Roberts",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6626261",
+   "date": "2026-09-04",
+   "canonical": "SMU def. San Diego 3-1",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "SMU": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://smumustangs.com/services/schedule_txt.ashx?schedule=3379",
+     "assertion": "SMU W 3-1 vs San Diego",
+     "opponent_source": "San Diego",
+     "site_says": "Away"
+    },
+    "San Diego": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://usdtoreros.com/services/schedule_txt.ashx?schedule=2440",
+     "assertion": "San Diego L 1-3 vs SMU",
+     "opponent_source": "SMU",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6627570",
+   "date": "2026-09-04",
+   "canonical": "Grand Canyon def. ULM 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Grand Canyon": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://gculopes.com/sports/womens-volleyball/schedule/text",
+     "rows_on_date": [
+      "Temple vs. San Francisco",
+      "Louisiana Monroe"
+     ]
+    },
+    "ULM": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://ulmwarhawks.com/services/schedule_txt.ashx?schedule=2333",
+     "assertion": "ULM L 0-3 vs Grand Canyon",
+     "opponent_source": "Grand Canyon",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6627597",
+   "date": "2026-09-04",
+   "canonical": "Sacramento St. def. Texas Tech 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Sacramento St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://hornetsports.com/services/schedule_txt.ashx?schedule=637",
+     "assertion": "Sacramento St. W 3-0 vs Texas Tech",
+     "opponent_source": "Texas Tech",
+     "site_says": "Home"
+    },
+    "Texas Tech": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://texastech.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Texas Tech L 0-3 vs Sacramento State",
+     "opponent_source": "Sacramento State",
+     "site_says": "Away"
     }
    }
   }
