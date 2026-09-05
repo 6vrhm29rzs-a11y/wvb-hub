@@ -106,28 +106,6 @@
    "matchup": "Saint Mary's (CA) / Sacramento St.",
    "records": 3
   },
-  "6625273": {
-   "conflicts": [
-    {
-     "field": "start_time_epoch",
-     "records": 21,
-     "values": [
-      "1788505200",
-      "1788570000"
-     ]
-    },
-    {
-     "field": "game_state",
-     "records": 21,
-     "values": [
-      "P",
-      "I"
-     ]
-    }
-   ],
-   "matchup": "LIU / Oregon",
-   "records": 21
-  },
   "6625274": {
    "conflicts": [
     {
@@ -387,7 +365,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 3,
+     "records": 4,
      "values": [
       "1788710400",
       "1788631200"
@@ -395,7 +373,7 @@
     }
    ],
    "matchup": "George Washington / Charlotte",
-   "records": 3
+   "records": 4
   },
   "6627311": {
    "conflicts": [
@@ -415,7 +393,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 4,
+     "records": 5,
      "values": [
       "1788627600",
       "1788631200"
@@ -423,7 +401,7 @@
     }
    ],
    "matchup": "Montana / California Baptist",
-   "records": 4
+   "records": 5
   },
   "6628053": {
    "conflicts": [
@@ -443,7 +421,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 3,
+     "records": 4,
      "values": [
       "1788559200",
       "1788624000"
@@ -451,14 +429,14 @@
     }
    ],
    "matchup": "Binghamton / Sacred Heart",
-   "records": 3
+   "records": 4
   },
   "6628108": {
    "conflicts": [
     {
      "field": "teams",
      "non_blocking": "site is confirmed neutral, so no displayed fact depends on which side is nominally home",
-     "records": 22,
+     "records": 11,
      "values": [
       "(('45886', False), ('46291', True))",
       "(('45886', True), ('46291', False))"
@@ -466,7 +444,7 @@
     },
     {
      "field": "start_time_epoch",
-     "records": 22,
+     "records": 11,
      "values": [
       "1788573600",
       "1788559200"
@@ -474,7 +452,7 @@
     },
     {
      "field": "game_state",
-     "records": 22,
+     "records": 11,
      "values": [
       "P",
       "I"
@@ -482,7 +460,7 @@
     }
    ],
    "matchup": "Utah Tech / UC San Diego",
-   "records": 22
+   "records": 11
   },
   "6628262": {
    "conflicts": [
@@ -497,44 +475,6 @@
    ],
    "matchup": "Arizona / Pepperdine",
    "records": 3
-  },
-  "6628285": {
-   "conflicts": [
-    {
-     "field": "teams",
-     "records": 19,
-     "values": [
-      "(('46646', False), ('46716', True))",
-      "(('46646', True), ('46716', False))"
-     ]
-    },
-    {
-     "field": "start_time_epoch",
-     "records": 19,
-     "values": [
-      "1788559200",
-      "1788566400"
-     ]
-    },
-    {
-     "field": "game_state",
-     "records": 19,
-     "values": [
-      "P",
-      "I"
-     ]
-    },
-    {
-     "field": "site",
-     "records": 19,
-     "values": [
-      "home/away flip across snapshots",
-      "no venue owner on record"
-     ]
-    }
-   ],
-   "matchup": "Ark.-Pine Bluff / Erskine",
-   "records": 19
   },
   "6628376": {
    "conflicts": [
@@ -594,11 +534,11 @@
   }
  },
  "by_field": {
-  "game_state": 46,
-  "site": 3,
-  "start_time_epoch": 34,
-  "teams": 4,
-  "teams (non-blocking)": 6
+  "game_state": 31,
+  "site": 2,
+  "start_time_epoch": 32,
+  "teams": 3,
+  "teams (non-blocking)": 7
  },
  "corrections": {
   "6625717": {
@@ -731,10 +671,10 @@
   }
  },
  "counts": {
-  "blocked": 37,
-  "conflicted": 84,
+  "blocked": 35,
+  "conflicted": 70,
   "corrected": 4,
-  "fixtures": 4882
+  "fixtures": 4883
  },
  "official_conflicts": {},
  "stale": {}

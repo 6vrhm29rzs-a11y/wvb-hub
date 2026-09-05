@@ -531,7 +531,8 @@ def main():
                test_the_move_column_states_which_comparison_it_makes,
                test_form_marks_ranked_opponents,
                test_form_shows_the_most_recent_last,
-               test_the_two_rankings_explain_their_relationship):
+               test_the_two_rankings_explain_their_relationship,
+               test_hit_channel_is_measured):
         print(fn.__name__)
         fn()
     print()
@@ -540,6 +541,32 @@ def main():
         return 1
     print("all Top 25 invariants pass")
     return 0
+
+
+
+def test_hit_channel_is_measured():
+    """The hitting-channel weight is the MEASURED winner, never a chosen one.
+
+    data/blend_hiteff_2025.json is the receipt: the shipped weight's paired
+    bootstrap verdict must be SHIPS (CI clear of zero). A weight with no
+    SHIPS verdict -- or no receipt at all -- fails; hand-retuning the
+    constant without re-measuring is exactly what this guard exists to stop.
+    """
+    import json as _json
+    import digby_top25 as D
+    w = D.HIT_CHANNEL_WEIGHT
+    p = os.path.join(REPO, "data", "blend_hiteff_2025.json")
+    assert os.path.exists(p), "no measurement receipt for the hit channel"
+    v = _json.load(open(p)).get("verdicts") or {}
+    key = {0.25: "V4_mix25", 0.5: "V4_mix50", 1.0: "V4_hitonly"}.get(w)
+    assert key and v.get(key, {}).get("verdict") == "SHIPS", \
+        "shipped weight %s has no SHIPS verdict: %s" % (w, v.get(key))
+    lo = v[key]["ci"][0]
+    assert lo > 0, "CI not clear of zero: %s" % v[key]["ci"]
+    # NEGATIVE CONTROL: hit-only did NOT ship, and must never pass this gate
+    assert v.get("V4_hitonly", {}).get("verdict") != "SHIPS", \
+        "[NEG] hit-only shows SHIPS -- the receipt file is not the real one"
+    print("  hit channel: weight %.2f measured, CI low %+.5f  ok" % (w, lo))
 
 
 if __name__ == "__main__":

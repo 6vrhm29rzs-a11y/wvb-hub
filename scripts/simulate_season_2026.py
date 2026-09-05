@@ -147,6 +147,12 @@ def build():
     conf_wins = np.zeros(n)
     win_counts = np.zeros((n, 40))          # histogram of final win totals
     conf_titles = np.zeros(n)
+    # PROJECTED FINAL RPI RANK (Cody, 2026-09-04: better than "RPI futures").
+    # The loop already computes an RPI-shaped resume per iteration for field
+    # selection; this keeps the RANK distribution instead of discarding it.
+    # It is the D-I approximation the field projector runs on (rated fixtures
+    # only; conference tournaments do not exist yet) and says so on the page.
+    rpi_rank_counts = np.zeros((n, n))
 
     # conference membership as index lists
     by_conf = collections.defaultdict(list)
@@ -233,6 +239,9 @@ def build():
 
         field = set(champions)
         order = np.argsort(-rpi)
+        ranks = np.empty(n, dtype=int)
+        ranks[order] = np.arange(n)
+        rpi_rank_counts[np.arange(n), ranks] += 1.0
         for i in order:
             if len(field) >= FIELD_SIZE:
                 break
@@ -276,6 +285,13 @@ def build():
             "conf_wins_mean": round(conf_wins[i] / ITERATIONS, 2),
             "conf_title_pct": round(100.0 * conf_titles[i] / ITERATIONS, 1),
             "tournament_pct": round(100.0 * bids[i] / ITERATIONS, 1),
+            # projected FINAL RPI rank: median and an 80% band, 1-indexed
+            "rpi_rank_p50": int(np.searchsorted(
+                np.cumsum(rpi_rank_counts[i]) / ITERATIONS, 0.50)) + 1,
+            "rpi_rank_p10": int(np.searchsorted(
+                np.cumsum(rpi_rank_counts[i]) / ITERATIONS, 0.10)) + 1,
+            "rpi_rank_p90": int(np.searchsorted(
+                np.cumsum(rpi_rank_counts[i]) / ITERATIONS, 0.90)) + 1,
         })
     rows.sort(key=lambda r: (r["proj_wins_mean"] is None,
                              -(r["proj_wins_mean"] or 0)))

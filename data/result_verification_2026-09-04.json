@@ -1,12 +1,12 @@
 {
  "date": "2026-09-04",
- "generated_utc": "2026-09-05T03:14:44Z",
+ "generated_utc": "2026-09-05T03:40:32Z",
  "counts": {
-  "UNVERIFIED": 7,
+  "UNVERIFIED": 8,
   "VERIFIED_BOTH": 106,
-  "CORROBORATED_ONE": 43,
+  "CORROBORATED_ONE": 47,
   "CONTRADICTED_ONE": 2,
-  "CONTRADICTED_BOTH": 4
+  "CONTRADICTED_BOTH": 5
  },
  "matches": [
   {
@@ -3643,6 +3643,157 @@
      "state": "SITE_HTTP_MISS",
      "url": "https://BYUcougars.com/sports/womens-volleyball/schedule/text",
      "http": 404
+    }
+   }
+  },
+  {
+   "gid": "6628285",
+   "date": "2026-09-04",
+   "canonical": "Ark.-Pine Bluff def. Erskine 3-1",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Ark.-Pine Bluff": {
+     "state": "NOT_POSTED",
+     "url": "https://uapblionsroar.com/services/schedule_txt.ashx?schedule=1280",
+     "row": [
+      "Sep 4 (Fri)",
+      "7:00 PM",
+      "Neutral",
+      "Erskine College",
+      "Arkadelphia, AR",
+      "",
+      ""
+     ]
+    },
+    "Erskine": {
+     "state": "SITE_NOT_CONFIGURED",
+     "why": "no athletics site on file"
+    }
+   }
+  },
+  {
+   "gid": "6626204",
+   "date": "2026-09-04",
+   "canonical": "New Mexico St. def. Fresno St. 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "New Mexico St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://nmstatesports.com/services/schedule_txt.ashx?schedule=3391",
+     "assertion": "New Mexico St. W 3-1 vs Fresno State",
+     "opponent_source": "Fresno State",
+     "site_says": "Away"
+    },
+    "Fresno St.": {
+     "state": "NOT_POSTED",
+     "url": "https://gobulldogs.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 4 (Fri)",
+      "6 p.m. PT",
+      "Home",
+      "New Mexico State",
+      "Fresno, CA (Save Mart Center)",
+      "Bulldog Invitational",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6626508",
+   "date": "2026-09-04",
+   "canonical": "San Jose St. def. Pacific 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "San Jose St.": {
+     "state": "SITE_HTTP_MISS",
+     "url": "https://sjsuspartans.com/sports/womens-volleyball/schedule/text",
+     "http": 404
+    },
+    "Pacific": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://pacifictigers.com/services/schedule_txt.ashx?schedule=405",
+     "assertion": "Pacific L 1-3 vs San Jose State",
+     "opponent_source": "San Jose State",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6627930",
+   "date": "2026-09-04",
+   "canonical": "Oregon St. def. Montana 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Oregon St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://osubeavers.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Oregon St. W 3-1 vs Montana",
+     "opponent_source": "Montana",
+     "site_says": "Home"
+    },
+    "Montana": {
+     "state": "NOT_POSTED",
+     "url": "https://gogriz.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 4 (Fri)",
+      "7:00 PM (MT)",
+      "Away",
+      "Oregon State",
+      "Corvallis, Ore.",
+      "Oregon State Tournament",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6628329",
+   "date": "2026-09-04",
+   "canonical": "Utah St. def. Iowa St. 3-1",
+   "verdict": "CONTRADICTED_BOTH",
+   "schools": {
+    "Utah St.": {
+     "state": "CONTRADICTS",
+     "url": "https://utahstateaggies.com/services/schedule_txt.ashx?schedule=613",
+     "assertion": "Utah St. L 1-3 vs Iowa State",
+     "opponent_source": "Iowa State",
+     "site_says": "Neutral"
+    },
+    "Iowa St.": {
+     "state": "CONTRADICTS",
+     "url": "https://cyclones.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Iowa St. W 3-1 vs Utah State",
+     "opponent_source": "Utah State",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6638776",
+   "date": "2026-09-04",
+   "canonical": "Weber St. def. CSU Bakersfield 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Weber St.": {
+     "state": "NOT_POSTED",
+     "url": "https://weberstatesports.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 4 (Fri)",
+      "7:00 p.m. MT",
+      "Away",
+      "CSU Bakersfield",
+      "Bakersfield, CA",
+      "CSUB Invitational",
+      "-"
+     ]
+    },
+    "CSU Bakersfield": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gorunners.com/services/schedule_txt.ashx?schedule=349",
+     "assertion": "CSU Bakersfield L 1-3 vs Weber State",
+     "opponent_source": "Weber State",
+     "site_says": "Home"
     }
    }
   }

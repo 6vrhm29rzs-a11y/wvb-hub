@@ -1522,5 +1522,80 @@
    }
   },
   "queued_utc": "2026-09-05T03:14:58Z"
+ },
+ "attr-6628285": {
+  "gid": "6628285",
+  "kind": "attribution_suspicion",
+  "teams": [
+   "Ark.-Pine Bluff",
+   "Erskine"
+  ],
+  "n_h1_votes": 1,
+  "components": {
+   "record_continuity": {
+    "available": true,
+    "n_observations": 3,
+    "h0_error": 7,
+    "h1_error": 5,
+    "vote": "SUPPORTS_H1"
+   }
+  },
+  "queued_utc": "2026-09-05T03:36:46Z"
+ },
+ "attr-6628329": {
+  "gid": "6628329",
+  "kind": "attribution_suspicion",
+  "teams": [
+   "Utah St.",
+   "Iowa St."
+  ],
+  "n_h1_votes": 1,
+  "components": {
+   "box_roster_fit": {
+    "available": true,
+    "eligible_rows": 35,
+    "h0": [
+     0.056,
+     0.059
+    ],
+    "h1": [
+     1.0,
+     0.882
+    ],
+    "fit_gain": 0.823,
+    "unmatched_sample": [
+     "mesaiyabettis",
+     "katiebyergo",
+     "abbibrenizer",
+     "lillywachholz",
+     "oliviaruy",
+     "silinadamuni"
+    ],
+    "vote": "SUPPORTS_H1"
+   }
+  },
+  "queued_utc": "2026-09-05T03:36:46Z"
+ },
+ "6628329": {
+  "gid": "6628329",
+  "date": "2026-09-04",
+  "canonical": "Utah St. def. Iowa St. 3-1",
+  "verdict": "CONTRADICTED_BOTH",
+  "schools": {
+   "Utah St.": {
+    "state": "CONTRADICTS",
+    "url": "https://utahstateaggies.com/services/schedule_txt.ashx?schedule=613",
+    "assertion": "Utah St. L 1-3 vs Iowa State",
+    "opponent_source": "Iowa State",
+    "site_says": "Neutral"
+   },
+   "Iowa St.": {
+    "state": "CONTRADICTS",
+    "url": "https://cyclones.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Iowa St. W 3-1 vs Utah State",
+    "opponent_source": "Utah State",
+    "site_says": "Neutral"
+   }
+  }
  }
 }

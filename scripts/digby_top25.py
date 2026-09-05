@@ -124,10 +124,13 @@ def per_match_detail(doc):
         hp = sum(l["home"] for l in ls)
         ap = sum(l["visit"] for l in ls)
         n = float(len(ls))
+        gid = str(g.get("game_id"))
         out[str(home["team_id"])].append(
-            {"margin": (hp - ap) / n, "opp": str(away["team_id"]), "is_home": True})
+            {"margin": (hp - ap) / n, "opp": str(away["team_id"]),
+             "is_home": True, "gid": gid})
         out[str(away["team_id"])].append(
-            {"margin": (ap - hp) / n, "opp": str(home["team_id"]), "is_home": False})
+            {"margin": (ap - hp) / n, "opp": str(home["team_id"]),
+             "is_home": False, "gid": gid})
     return out
 
 
@@ -199,6 +202,79 @@ def zscores(values):
     mu = st.mean(vals)
     sd = st.pstdev(vals) or 1.0
     return dict((k, (v - mu) / sd) for k, v in values.items())
+
+
+HIT_CHANNEL_WEIGHT = 0.25
+# ⚠ MEASURED, NOT CHOSEN (2026-09-04, data/blend_hiteff_2025.json): mixing a
+# hitting-efficiency-implied strength into the evidence term at 0.25 beats
+# margin-only at EVERY 2025 checkpoint from 6% of the season on, paired
+# bootstrap CI [+0.00030, +0.00089] AUC, clear of zero. 0.50 also ships but
+# with a wider CI; hit-eff ALONE is worse than margin. The bake-off's
+# full-season finding (adj hit-eff diff is the strongest single factor),
+# now carried into the early-season blend at its measured weight.
+
+
+def _hit_by_gid(season):
+    """gid -> team_id -> (K-E)/TA from that season's box scores."""
+    p = os.path.join(REPO, "data", "raw", str(season), "boxscores.jsonl")
+    out = {}
+    if not os.path.exists(p):
+        return out
+    for line in open(p, encoding="utf-8"):
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            rec = json.loads(line)
+        except ValueError:
+            continue
+        per = {}
+        for t in rec.get("teams") or []:
+            st_ = t.get("team_stats") or {}
+            try:
+                k = float(st_.get("kills") or 0)
+                e = float(st_.get("attackErrors") or 0)
+                ta = float(st_.get("attackAttempts") or 0)
+            except (TypeError, ValueError):
+                continue
+            if ta > 0:
+                per[str(t.get("team_id"))] = (k - e) / ta
+        if len(per) == 2:
+            out[str(rec.get("game_id"))] = per
+    return out
+
+
+def hit_scale_2025():
+    """(tau_hit, home_adv_hit) measured on the completed 2025 season --
+    the same recompute-from-2025 pattern as sigma2/tau2."""
+    hit = _hit_by_gid(2025)
+    doc = json.load(open(os.path.join(REPO, "data", "data_2025.json"),
+                         encoding="utf-8"))
+    series = {}
+    diffs = []
+    for g in doc.get("games") or []:
+        if g.get("state") != "F":
+            continue
+        ts = g.get("teams") or []
+        if len(ts) != 2:
+            continue
+        per = hit.get(str(g.get("game_id"))) or {}
+        home = next((t for t in ts if t.get("is_home")), None)
+        away = next((t for t in ts if not t.get("is_home")), None)
+        if not home or not away:
+            continue
+        hv = per.get(str(home.get("team_id")))
+        av = per.get(str(away.get("team_id")))
+        if hv is None or av is None:
+            continue
+        d = hv - av
+        diffs.append(d)
+        series.setdefault(str(home["team_id"]), []).append(d)
+        series.setdefault(str(away["team_id"]), []).append(-d)
+    if len(diffs) < 500:
+        return None, None
+    _, tau2h = variance_components(series)
+    return tau2h ** 0.5, sum(diffs) / float(len(diffs))
 
 
 def main():
@@ -285,6 +361,8 @@ def main():
     # at all of them -- +0.021 AUC at the shipped k (0.7998 -> 0.8205), and
     # +0.086 at k=0.5 where results dominate. It is four times larger than any
     # other change measured this session.
+    tauh, home_adv_h = hit_scale_2025()
+    hit26 = _hit_by_gid(SEASON) if tauh else {}
     zobs = {}
     for tid, recs in detail.items():
         nm = id2name.get(tid)
@@ -296,7 +374,24 @@ def main():
             zopp = zprior.get(opp_nm) if opp_nm else None
             if zopp is None:
                 continue
-            vals.append(zopp + (r["margin"] - home_adv * (1.0 if r["is_home"] else -1.0)) / tau)
+            m_impl = zopp + (r["margin"] - home_adv
+                             * (1.0 if r["is_home"] else -1.0)) / tau
+            # the hitting channel, at its measured weight, when this match's
+            # box carries both sides' attack counts; margin-only otherwise
+            h_impl = None
+            if tauh and r.get("gid") in hit26:
+                per = hit26[r["gid"]]
+                mine_h = per.get(tid)
+                opp_h = per.get(r["opp"])
+                if mine_h is not None and opp_h is not None:
+                    hd = (mine_h - opp_h) - home_adv_h * (
+                        1.0 if r["is_home"] else -1.0)
+                    h_impl = zopp + hd / tauh
+            if h_impl is not None:
+                vals.append((1.0 - HIT_CHANNEL_WEIGHT) * m_impl
+                            + HIT_CHANNEL_WEIGHT * h_impl)
+            else:
+                vals.append(m_impl)
         if vals:
             zobs[nm] = st.mean(vals)
     # A team whose opponents we cannot place falls back to the raw margin --
@@ -451,6 +546,9 @@ def main():
                  "weight_on_season": r["weight_on_season"]} for r in rows],
     }
     doc["meta"]["home_advantage_pts_per_set"] = round(home_adv, 4)
+    doc["meta"]["hit_channel_weight"] = HIT_CHANNEL_WEIGHT if tauh else 0.0
+    doc["meta"]["hit_channel_tau"] = round(tauh, 4) if tauh else None
+    doc["meta"]["hit_channel_evidence"] = "data/blend_hiteff_2025.json"
     # When was this ranking computed, and through what? Two different facts:
     # the run stamp moves every time the script runs, while data_through moves
     # only when a new final is actually in the dataset. Cody asked for exactly

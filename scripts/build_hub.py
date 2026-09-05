@@ -3420,7 +3420,13 @@ def top25_view(avca=None):
         "evidence. Tested on 2025 by predicting matches the model had not seen: "
         "it is worth <b>+0.021 AUC</b> at this blend weight, the largest single "
         "improvement measured, with the confidence interval clear of zero at "
-        "every reaction speed tried."
+        "every reaction speed tried. &nbsp;<b>How you won counts too:</b> when "
+        "a match&rsquo;s box score carries both sides&rsquo; attack counts, a "
+        "quarter of its evidence comes from the hitting-efficiency "
+        "differential rather than the scoreboard margin &mdash; the strongest "
+        "single factor the full-season bake-off found, mixed at a weight that "
+        "beat margin-only at every 2025 checkpoint tested (paired bootstrap "
+        "CI clear of zero). A match with no box counts on margin alone."
         % (k, (m.get("per_match_variance") or 0) ** 0.5,
            m.get("prior_rho_out_of_sample") or 0,
            m.get("home_advantage_pts_per_set") or 0.0))
@@ -3971,6 +3977,7 @@ def build():
     sim = load("data/season_sim_%d.json" % SEASON) or {}
     sim_of = {r["team"]: r for r in sim.get("teams", [])}
     tourn_of = {r["team"]: r.get("tournament_pct") for r in sim.get("teams", [])}
+    rpif_of = {r["team"]: r.get("rpi_rank_p50") for r in sim.get("teams", [])}
     preds = load("data/predictions_%d.json" % SEASON) or {}
     pred_by_pair = {}
     for r in preds.get("games", []):
@@ -4216,7 +4223,8 @@ def build():
             '<td class="n hi c-ref" data-l="2025">%s</td>%s'
             '<td class="n c-ref" data-l="RPI">%s</td>%s'
             '<td class="n c-ref" data-l="Ret">%s</td>'
-            '<td class="n hi c-ref" data-l="Tourn">%s</td></tr>'
+            '<td class="n hi c-ref" data-l="Tourn">%s</td>'
+            '<td class="n c-ref" data-l="RPI proj">%s</td></tr>'
             % (t["rank26"], esc(t["team"]),
                # the school's own colour, same source the Top 25 uses -- the two
                # tables of the same teams should not look like different sites
@@ -4241,7 +4249,9 @@ def build():
                                   % (spread or "&mdash;")),
                "&mdash;" if t["ret"] is None else "%.0f%%" % (100 * t["ret"]),
                "&mdash;" if tourn_of.get(t["team"]) is None
-               else "%.0f%%" % tourn_of[t["team"]]))
+               else "%.0f%%" % tourn_of[t["team"]],
+               "&mdash;" if rpif_of.get(t["team"]) is None
+               else "#%d" % rpif_of[t["team"]]))
 
     # State plainly WHICH ranking this is. A preseason projection and a
     # results-based rating are different claims, and a tab labelled "Rankings"
@@ -10018,7 +10028,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
            them under "none of it feeds our model" would be a false label on two
            columns this site computes itself. -->
       <th class="g-ref" colspan="5">Reference &mdash; none of it feeds our model</th>
-      <th class="g-proj" colspan="2">Our outlook</th>
+      <th class="g-proj" colspan="3">Our outlook</th>
     </tr>
     <tr>
       <th>#</th><th class="l">Team</th><th class="l">Conf</th>
@@ -10033,6 +10043,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <th class="c-ref" title="range the other systems put this team in">Others</th>
       <th class="c-ref" title="share of 2025 production on the 2026 roster">Ret</th>
       <th class="c-ref" title="simulated NCAA tournament odds; backtested at 42 of the real 64 from a preseason prior. Forecast does not incorporate availability.">Tourn</th>
+      <th class="c-ref" title="projected FINAL RPI rank: the median across simulated seasons, from the same calibrated simulator (win bands backtested at 87.3% coverage). A Division-I approximation over rated fixtures; conference tournaments do not exist yet. Forecast does not incorporate availability.">RPI&nbsp;proj</th>
     </tr></thead>
     <tbody id="rbody">{{RANK_ROWS}}</tbody></table></div>
     {{EXTREF_STRIP}}
@@ -20986,6 +20997,16 @@ function showTeam(name) {
           (tourn ? 'regular-season finish, not the tournament'
                  : 'which is the automatic bid here') + '</span></span>' +
           '<span class="rt">' + sim.conf_title_pct + '%</span></div>' : '') +
+      /* PROJECTED FINAL RPI (2026-09-04): the simulator already computed an
+         RPI-shaped resume per iteration for field selection -- this is the
+         RANK distribution it used to throw away. Median with an 80% band,
+         from the same calibrated sim whose win bands backtested at 87.3%.
+         D-I approximation over rated fixtures; the band says the rest. */
+      (sim.rpi_rank_p50 !== undefined && sim.rpi_rank_p50 !== null
+        ? '<div class="plrow"><span class="nm">Projected final RPI<span class="wentto">' +
+          'median across simulated seasons; 80% land #' + sim.rpi_rank_p10 +
+          '–#' + sim.rpi_rank_p90 + '</span></span>' +
+          '<span class="rt">#' + sim.rpi_rank_p50 + '</span></div>' : '') +
       '</div>' +
       '<div class="tnote">' +
       (aq.detail ? aq.detail.charAt(0).toUpperCase() + aq.detail.slice(1) + '. ' : '') +

@@ -1519,6 +1519,62 @@
      "establishes": "New Mexico W 3-1 vs Northern Colorado"
     }
    ]
+  },
+  "6628329": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Utah St. (home) won 3-1 -- 25-20, 17-25, 28-26, 25-23 from the home column -- with box and lineup rows attributed the same way",
+   "correct": {
+    "winner_team_id": "46190",
+    "away_sets": 3,
+    "home_sets": 1,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 25,
+      "home": 20
+     },
+     {
+      "period": 2,
+      "visit": 17,
+      "home": 25
+     },
+     {
+      "period": 3,
+      "visit": 28,
+      "home": 26
+     },
+     {
+      "period": 4,
+      "visit": 25,
+      "home": 23
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46190": "46756",
+     "46756": "46190"
+    }
+   },
+   "established": "Iowa St. won 3-1 -- the feed's entire team attribution is inverted (lineup rows fit the OPPOSITE roster; both schools contradict the feed and assert the same alternative). Linescores flipped column-for-column.",
+   "evidence": [
+    {
+     "url": "https://cyclones.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Iowa St.",
+     "retrieved": "2026-09-05T03:47:13Z",
+     "text": "published schedule row for 2026-09-04: 'Iowa St. W 3-1 vs Utah State'",
+     "establishes": "Iowa St. W 3-1 vs Utah State"
+    },
+    {
+     "url": "https://utahstateaggies.com/services/schedule_txt.ashx?schedule=613",
+     "kind": "school_site",
+     "school": "Utah St.",
+     "retrieved": "2026-09-05T03:47:13Z",
+     "text": "published schedule row for 2026-09-04: 'Utah St. L 1-3 vs Iowa State'",
+     "establishes": "Utah St. L 1-3 vs Iowa State"
+    }
+   ]
   }
  }
 }

@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-05T03:14:58Z",
+  "generated_at_utc": "2026-09-05T04:12:03Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
-   "signals": 0,
+   "signals": 5,
    "expired": 2,
-   "anomalies": 170
+   "anomalies": 175
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -91,6 +91,34 @@
  ],
  "projection": [
   {
+   "team": "Kentucky",
+   "player": "Kennedy Washington",
+   "state": "signal",
+   "supports": [
+    {
+     "team": "Kentucky",
+     "player": "Kennedy Washington",
+     "kind": "cody_observation",
+     "kind_label": "EYE TEST",
+     "quote": "are you keeping track of big players being unavailable or available like if/when jaidyn livings comes back for smu. if andi jackson's ankle sprain will keep her out for a bit, kenna wollard situation and updates, champion (6'6 puerto rican national team outside) getting to campus at wisconsin and assumably will play soon, grace egan and jaela auguste being out for wisconsin in the last few matches, etc etc. kennedy washington has been out for kentucky too",
+     "summary": null,
+     "url": null,
+     "retrieved": "2026-09-05T04:01:29Z",
+     "effective": {
+      "from": "2026-09-02",
+      "to": null
+     },
+     "review_by": "2026-09-11",
+     "incident_date": null,
+     "claim": null,
+     "note": "SIGNAL ONLY -- Cody's read (2026-09-04, quoted in full; the part about this player: 'kennedy washington has been out for kentucky too'). Sets no status. Corroborating participation: real recorded actions in Kentucky's first FOUR matches (Aug 21-29), then a zero-action listing on Sep 2 -- she played, then stopped. No attributable public statement held; the reason is NOT in the data and none is inferred."
+    }
+   ],
+   "claim": null,
+   "headline": "Signal only -- sets no status",
+   "n_supports": 1
+  },
+  {
    "team": "Nebraska",
    "player": "Andi Jackson",
    "state": "incident",
@@ -112,12 +140,30 @@
      "incident_date": "2026-09-02",
      "claim": "match_incident",
      "note": "Omaha World-Herald, published 2026-09-03, quoting coach Dani Busboom Kelly. Matches our own box: 3 sets, 22 recorded actions on 2026-09-02 (gid 6627694) -- she played into Set 3. 'Isn't serious' is the COACH'S claim, quoted; the desk asserts the incident, never a fitness prediction. Surfaced by Cody's question 2026-09-03 ('is andi jackson hurt?')."
+    },
+    {
+     "team": "Nebraska",
+     "player": "Andi Jackson",
+     "kind": "cody_observation",
+     "kind_label": "EYE TEST",
+     "quote": "are you keeping track of big players being unavailable or available like if/when jaidyn livings comes back for smu. if andi jackson's ankle sprain will keep her out for a bit, kenna wollard situation and updates, champion (6'6 puerto rican national team outside) getting to campus at wisconsin and assumably will play soon, grace egan and jaela auguste being out for wisconsin in the last few matches, etc etc. kennedy washington has been out for kentucky too",
+     "summary": null,
+     "url": null,
+     "retrieved": "2026-09-05T04:01:29Z",
+     "effective": {
+      "from": "2026-09-04",
+      "to": null
+     },
+     "review_by": "2026-09-11",
+     "incident_date": null,
+     "claim": null,
+     "note": "SIGNAL ONLY -- Cody's read (2026-09-04, quoted in full; the part about this player: 'if andi jackson's ankle sprain will keep her out for a bit'). Sets no status. Adds to the existing OWH-sourced ankle incident. Corroborating participation TONIGHT (Sep 4 vs DePaul): listed gp=3 with zero recorded actions -- she did not play. Prior four matches all carry real actions."
     }
    ],
    "claim": "match_incident",
    "incident_date": "2026-09-02",
    "headline": "Left the South Dakota St. match in Set 3 with an ankle injury; coach says it isn't serious",
-   "n_supports": 1
+   "n_supports": 2
   },
   {
    "team": "Purdue",
@@ -145,6 +191,34 @@
    ],
    "claim": "confirmed_unavailable",
    "headline": "Away from team / unavailable",
+   "n_supports": 1
+  },
+  {
+   "team": "SMU",
+   "player": "Jadyn Livings",
+   "state": "signal",
+   "supports": [
+    {
+     "team": "SMU",
+     "player": "Jadyn Livings",
+     "kind": "cody_observation",
+     "kind_label": "EYE TEST",
+     "quote": "are you keeping track of big players being unavailable or available like if/when jaidyn livings comes back for smu. if andi jackson's ankle sprain will keep her out for a bit, kenna wollard situation and updates, champion (6'6 puerto rican national team outside) getting to campus at wisconsin and assumably will play soon, grace egan and jaela auguste being out for wisconsin in the last few matches, etc etc. kennedy washington has been out for kentucky too",
+     "summary": null,
+     "url": null,
+     "retrieved": "2026-09-05T04:01:29Z",
+     "effective": {
+      "from": "2026-08-23",
+      "to": null
+     },
+     "review_by": "2026-09-11",
+     "incident_date": null,
+     "claim": null,
+     "note": "SIGNAL ONLY -- Cody's read (2026-09-04, quoted in full; the part about this player: 'if/when jaidyn livings comes back for smu'). Sets no status. Corroborating participation: NOT in SMU's box for the first four matches (Aug 23-30); LISTED with zero recorded actions on Sep 2 -- the listed-but-not-playing shape that often precedes a return. No attributable public statement held; her current availability is UNKNOWN. Box name: Jadyn Livings, #42, OH (Cody wrote 'jaidyn'; SMU's box spells it Jadyn)."
+    }
+   ],
+   "claim": null,
+   "headline": "Signal only -- sets no status",
    "n_supports": 1
   },
   {
@@ -192,9 +266,156 @@
    "claim": "out_for_season",
    "headline": "Out for the 2026 season",
    "n_supports": 2
+  },
+  {
+   "team": "Wisconsin",
+   "player": "Decelise Champion",
+   "state": "signal",
+   "supports": [
+    {
+     "team": "Wisconsin",
+     "player": "Decelise Champion",
+     "kind": "cody_observation",
+     "kind_label": "EYE TEST",
+     "quote": "are you keeping track of big players being unavailable or available like if/when jaidyn livings comes back for smu. if andi jackson's ankle sprain will keep her out for a bit, kenna wollard situation and updates, champion (6'6 puerto rican national team outside) getting to campus at wisconsin and assumably will play soon, grace egan and jaela auguste being out for wisconsin in the last few matches, etc etc. kennedy washington has been out for kentucky too",
+     "summary": null,
+     "url": null,
+     "retrieved": "2026-09-05T04:01:29Z",
+     "effective": {
+      "from": "2026-08-28",
+      "to": null
+     },
+     "review_by": "2026-09-18",
+     "incident_date": null,
+     "claim": null,
+     "note": "SIGNAL ONLY -- Cody's read (2026-09-04, quoted in full; the part about this player: 'champion (6'6 puerto rican national team outside) getting to campus at wisconsin and assumably will play soon'). Sets no status. An ARRIVAL note, not an absence: the crawled box already lists a Champion for Wisconsin as a zero-action listing in every match since Aug 28 -- rostered and with the team, no recorded actions yet. Box name: Decelise Champion, #16, OH. 'will play soon' is Cody's expectation, not a claim the desk asserts."
+    }
+   ],
+   "claim": null,
+   "headline": "Signal only -- sets no status",
+   "n_supports": 1
+  },
+  {
+   "team": "Wisconsin",
+   "player": "Grace Egan",
+   "state": "signal",
+   "supports": [
+    {
+     "team": "Wisconsin",
+     "player": "Grace Egan",
+     "kind": "cody_observation",
+     "kind_label": "EYE TEST",
+     "quote": "are you keeping track of big players being unavailable or available like if/when jaidyn livings comes back for smu. if andi jackson's ankle sprain will keep her out for a bit, kenna wollard situation and updates, champion (6'6 puerto rican national team outside) getting to campus at wisconsin and assumably will play soon, grace egan and jaela auguste being out for wisconsin in the last few matches, etc etc. kennedy washington has been out for kentucky too",
+     "summary": null,
+     "url": null,
+     "retrieved": "2026-09-05T04:01:29Z",
+     "effective": {
+      "from": "2026-08-30",
+      "to": null
+     },
+     "review_by": "2026-09-11",
+     "incident_date": null,
+     "claim": null,
+     "note": "SIGNAL ONLY -- Cody's read (2026-09-04, quoted in full; the part about this player: 'grace egan ... being out for wisconsin in the last few matches'). Sets no status. Corroborating participation: zero-action listing Aug 30, real actions in five sets Sep 2, then NOT IN THE BOX Sep 3 -- an in-and-out pattern, not a clean absence streak. No attributable public statement held."
+    }
+   ],
+   "claim": null,
+   "headline": "Signal only -- sets no status",
+   "n_supports": 1
   }
  ],
- "signals": [],
+ "signals": [
+  {
+   "team": "Nebraska",
+   "player": "Andi Jackson",
+   "kind": "cody_observation",
+   "kind_label": "EYE TEST",
+   "quote": "are you keeping track of big players being unavailable or available like if/when jaidyn livings comes back for smu. if andi jackson's ankle sprain will keep her out for a bit, kenna wollard situation and updates, champion (6'6 puerto rican national team outside) getting to campus at wisconsin and assumably will play soon, grace egan and jaela auguste being out for wisconsin in the last few matches, etc etc. kennedy washington has been out for kentucky too",
+   "summary": null,
+   "url": null,
+   "retrieved": "2026-09-05T04:01:29Z",
+   "effective": {
+    "from": "2026-09-04",
+    "to": null
+   },
+   "review_by": "2026-09-11",
+   "incident_date": null,
+   "claim": null,
+   "note": "SIGNAL ONLY -- Cody's read (2026-09-04, quoted in full; the part about this player: 'if andi jackson's ankle sprain will keep her out for a bit'). Sets no status. Adds to the existing OWH-sourced ankle incident. Corroborating participation TONIGHT (Sep 4 vs DePaul): listed gp=3 with zero recorded actions -- she did not play. Prior four matches all carry real actions."
+  },
+  {
+   "team": "Kentucky",
+   "player": "Kennedy Washington",
+   "kind": "cody_observation",
+   "kind_label": "EYE TEST",
+   "quote": "are you keeping track of big players being unavailable or available like if/when jaidyn livings comes back for smu. if andi jackson's ankle sprain will keep her out for a bit, kenna wollard situation and updates, champion (6'6 puerto rican national team outside) getting to campus at wisconsin and assumably will play soon, grace egan and jaela auguste being out for wisconsin in the last few matches, etc etc. kennedy washington has been out for kentucky too",
+   "summary": null,
+   "url": null,
+   "retrieved": "2026-09-05T04:01:29Z",
+   "effective": {
+    "from": "2026-09-02",
+    "to": null
+   },
+   "review_by": "2026-09-11",
+   "incident_date": null,
+   "claim": null,
+   "note": "SIGNAL ONLY -- Cody's read (2026-09-04, quoted in full; the part about this player: 'kennedy washington has been out for kentucky too'). Sets no status. Corroborating participation: real recorded actions in Kentucky's first FOUR matches (Aug 21-29), then a zero-action listing on Sep 2 -- she played, then stopped. No attributable public statement held; the reason is NOT in the data and none is inferred."
+  },
+  {
+   "team": "Wisconsin",
+   "player": "Grace Egan",
+   "kind": "cody_observation",
+   "kind_label": "EYE TEST",
+   "quote": "are you keeping track of big players being unavailable or available like if/when jaidyn livings comes back for smu. if andi jackson's ankle sprain will keep her out for a bit, kenna wollard situation and updates, champion (6'6 puerto rican national team outside) getting to campus at wisconsin and assumably will play soon, grace egan and jaela auguste being out for wisconsin in the last few matches, etc etc. kennedy washington has been out for kentucky too",
+   "summary": null,
+   "url": null,
+   "retrieved": "2026-09-05T04:01:29Z",
+   "effective": {
+    "from": "2026-08-30",
+    "to": null
+   },
+   "review_by": "2026-09-11",
+   "incident_date": null,
+   "claim": null,
+   "note": "SIGNAL ONLY -- Cody's read (2026-09-04, quoted in full; the part about this player: 'grace egan ... being out for wisconsin in the last few matches'). Sets no status. Corroborating participation: zero-action listing Aug 30, real actions in five sets Sep 2, then NOT IN THE BOX Sep 3 -- an in-and-out pattern, not a clean absence streak. No attributable public statement held."
+  },
+  {
+   "team": "Wisconsin",
+   "player": "Decelise Champion",
+   "kind": "cody_observation",
+   "kind_label": "EYE TEST",
+   "quote": "are you keeping track of big players being unavailable or available like if/when jaidyn livings comes back for smu. if andi jackson's ankle sprain will keep her out for a bit, kenna wollard situation and updates, champion (6'6 puerto rican national team outside) getting to campus at wisconsin and assumably will play soon, grace egan and jaela auguste being out for wisconsin in the last few matches, etc etc. kennedy washington has been out for kentucky too",
+   "summary": null,
+   "url": null,
+   "retrieved": "2026-09-05T04:01:29Z",
+   "effective": {
+    "from": "2026-08-28",
+    "to": null
+   },
+   "review_by": "2026-09-18",
+   "incident_date": null,
+   "claim": null,
+   "note": "SIGNAL ONLY -- Cody's read (2026-09-04, quoted in full; the part about this player: 'champion (6'6 puerto rican national team outside) getting to campus at wisconsin and assumably will play soon'). Sets no status. An ARRIVAL note, not an absence: the crawled box already lists a Champion for Wisconsin as a zero-action listing in every match since Aug 28 -- rostered and with the team, no recorded actions yet. Box name: Decelise Champion, #16, OH. 'will play soon' is Cody's expectation, not a claim the desk asserts."
+  },
+  {
+   "team": "SMU",
+   "player": "Jadyn Livings",
+   "kind": "cody_observation",
+   "kind_label": "EYE TEST",
+   "quote": "are you keeping track of big players being unavailable or available like if/when jaidyn livings comes back for smu. if andi jackson's ankle sprain will keep her out for a bit, kenna wollard situation and updates, champion (6'6 puerto rican national team outside) getting to campus at wisconsin and assumably will play soon, grace egan and jaela auguste being out for wisconsin in the last few matches, etc etc. kennedy washington has been out for kentucky too",
+   "summary": null,
+   "url": null,
+   "retrieved": "2026-09-05T04:01:29Z",
+   "effective": {
+    "from": "2026-08-23",
+    "to": null
+   },
+   "review_by": "2026-09-11",
+   "incident_date": null,
+   "claim": null,
+   "note": "SIGNAL ONLY -- Cody's read (2026-09-04, quoted in full; the part about this player: 'if/when jaidyn livings comes back for smu'). Sets no status. Corroborating participation: NOT in SMU's box for the first four matches (Aug 23-30); LISTED with zero recorded actions on Sep 2 -- the listed-but-not-playing shape that often precedes a return. No attributable public statement held; her current availability is UNKNOWN. Box name: Jadyn Livings, #42, OH (Cody wrote 'jaidyn'; SMU's box spells it Jadyn)."
+  }
+ ],
  "expired": [
   {
    "team": "Wisconsin",
@@ -481,21 +702,21 @@
    "absent": [
     {
      "name": "Nicole Zake",
-     "rate": 3.0,
+     "rate": 3.107,
      "played_share": 1.0
     },
     {
      "name": "Hannah Koester",
-     "rate": 2.7,
+     "rate": 2.143,
      "played_share": 1.0
     },
     {
      "name": "Julia Porath",
-     "rate": 1.95,
+     "rate": 2.107,
      "played_share": 1.0
     }
    ],
-   "points_per_set_missing": 7.65
+   "points_per_set_missing": 7.357
   },
   {
    "game_id": "6624595",
@@ -514,6 +735,24 @@
     }
    ],
    "points_per_set_missing": 6.559
+  },
+  {
+   "game_id": "6626875",
+   "team_id": "46575",
+   "team": "BYU",
+   "absent": [
+    {
+     "name": "Claire Little chambers",
+     "rate": 3.5,
+     "played_share": 1.0
+    },
+    {
+     "name": "Kelli jo Burgess",
+     "rate": 2.818,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 6.318
   },
   {
    "game_id": "6628624",
@@ -624,19 +863,6 @@
    "points_per_set_missing": 5.154
   },
   {
-   "game_id": "6624303",
-   "team_id": "46348",
-   "team": "Oregon St.",
-   "absent": [
-    {
-     "name": "Ac Froehlich",
-     "rate": 5.111,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 5.111
-  },
-  {
    "game_id": "6624442",
    "team_id": "46417",
    "team": "Georgetown",
@@ -653,6 +879,24 @@
     }
    ],
    "points_per_set_missing": 4.954
+  },
+  {
+   "game_id": "6628284",
+   "team_id": "46646",
+   "team": "Ark.-Pine Bluff",
+   "absent": [
+    {
+     "name": "Ashanti Butler",
+     "rate": 2.767,
+     "played_share": 1.0
+    },
+    {
+     "name": "Kennedy Adams",
+     "rate": 2.067,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 4.834
   },
   {
    "game_id": "6627402",
@@ -735,6 +979,19 @@
    "points_per_set_missing": 4.688
   },
   {
+   "game_id": "6624303",
+   "team_id": "46348",
+   "team": "Oregon St.",
+   "absent": [
+    {
+     "name": "Ac Froehlich",
+     "rate": 4.538,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 4.538
+  },
+  {
    "game_id": "6624987",
    "team_id": "46549",
    "team": "Georgia Tech",
@@ -782,6 +1039,19 @@
     }
    ],
    "points_per_set_missing": 4.212
+  },
+  {
+   "game_id": "6638776",
+   "team_id": "46011",
+   "team": "Weber St.",
+   "absent": [
+    {
+     "name": "Alexis Carlson",
+     "rate": 4.208,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 4.208
   },
   {
    "game_id": "6628298",
@@ -997,6 +1267,32 @@
     }
    ],
    "points_per_set_missing": 3.536
+  },
+  {
+   "game_id": "6624842",
+   "team_id": "46045",
+   "team": "Coppin St.",
+   "absent": [
+    {
+     "name": "Pamela De Jesus Tejedor",
+     "rate": 3.5,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 3.5
+  },
+  {
+   "game_id": "6624843",
+   "team_id": "46045",
+   "team": "Coppin St.",
+   "absent": [
+    {
+     "name": "Pamela De Jesus Tejedor",
+     "rate": 3.5,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 3.5
   },
   {
    "game_id": "6628059",
@@ -1229,6 +1525,19 @@
    "points_per_set_missing": 2.923
   },
   {
+   "game_id": "6625271",
+   "team_id": "46613",
+   "team": "Oregon",
+   "absent": [
+    {
+     "name": "Dalia V\u00e3\u00aerlan",
+     "rate": 2.9,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.9
+  },
+  {
    "game_id": "6625924",
    "team_id": "46634",
    "team": "Western Ky.",
@@ -1359,37 +1668,6 @@
    "points_per_set_missing": 2.8
   },
   {
-   "game_id": "6626588",
-   "team_id": "45937",
-   "team": "Mississippi St.",
-   "absent": [
-    {
-     "name": "Ava Anderson",
-     "rate": 1.409,
-     "played_share": 1.0
-    },
-    {
-     "name": "Gha'naye Whitfield-moss",
-     "rate": 1.364,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 2.773
-  },
-  {
-   "game_id": "6627896",
-   "team_id": "46304",
-   "team": "Gonzaga",
-   "absent": [
-    {
-     "name": "Veronica kjaer Sorensen",
-     "rate": 2.773,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 2.773
-  },
-  {
    "game_id": "6628011",
    "team_id": "45773",
    "team": "Fla. Atlantic",
@@ -1414,6 +1692,19 @@
     }
    ],
    "points_per_set_missing": 2.733
+  },
+  {
+   "game_id": "6627896",
+   "team_id": "46304",
+   "team": "Gonzaga",
+   "absent": [
+    {
+     "name": "Veronica kjaer Sorensen",
+     "rate": 2.719,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.719
   },
   {
    "game_id": "6628625",
@@ -1471,19 +1762,6 @@
     }
    ],
    "points_per_set_missing": 2.594
-  },
-  {
-   "game_id": "6628284",
-   "team_id": "46646",
-   "team": "Ark.-Pine Bluff",
-   "absent": [
-    {
-     "name": "Ashanti Butler",
-     "rate": 2.591,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 2.591
   },
   {
    "game_id": "6625808",
@@ -1562,6 +1840,19 @@
     }
    ],
    "points_per_set_missing": 2.474
+  },
+  {
+   "game_id": "6624671",
+   "team_id": "46242",
+   "team": "Rhode Island",
+   "absent": [
+    {
+     "name": "Kj Johnson",
+     "rate": 2.458,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.458
   },
   {
    "game_id": "6625162",
@@ -1658,6 +1949,19 @@
     }
    ],
    "points_per_set_missing": 2.25
+  },
+  {
+   "game_id": "6628216",
+   "team_id": "46035",
+   "team": "CSU Bakersfield",
+   "absent": [
+    {
+     "name": "Jordyn Waite-ward",
+     "rate": 2.233,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.233
   },
   {
    "game_id": "6637170",
@@ -1769,19 +2073,6 @@
    "points_per_set_missing": 2.05
   },
   {
-   "game_id": "6639364",
-   "team_id": "46106",
-   "team": "ULM",
-   "absent": [
-    {
-     "name": "Grace Troxell",
-     "rate": 2.045,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 2.045
-  },
-  {
    "game_id": "6626241",
    "team_id": "45828",
    "team": "Gardner-Webb",
@@ -1886,19 +2177,6 @@
    "points_per_set_missing": 1.9
   },
   {
-   "game_id": "6628216",
-   "team_id": "46035",
-   "team": "CSU Bakersfield",
-   "absent": [
-    {
-     "name": "Jordyn Waite-ward",
-     "rate": 1.864,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.864
-  },
-  {
    "game_id": "6624321",
    "team_id": "46059",
    "team": "LSU",
@@ -1936,32 +2214,6 @@
     }
    ],
    "points_per_set_missing": 1.769
-  },
-  {
-   "game_id": "6626201",
-   "team_id": "46660",
-   "team": "Fresno St.",
-   "absent": [
-    {
-     "name": "Brooke Jenkins",
-     "rate": 1.75,
-     "played_share": 0.667
-    }
-   ],
-   "points_per_set_missing": 1.75
-  },
-  {
-   "game_id": "6626202",
-   "team_id": "46660",
-   "team": "Fresno St.",
-   "absent": [
-    {
-     "name": "Brooke Jenkins",
-     "rate": 1.75,
-     "played_share": 0.667
-    }
-   ],
-   "points_per_set_missing": 1.75
   },
   {
    "game_id": "6624671",
@@ -2042,30 +2294,17 @@
    "points_per_set_missing": 1.667
   },
   {
-   "game_id": "6638585",
-   "team_id": "46480",
-   "team": "Oral Roberts",
+   "game_id": "6639364",
+   "team_id": "46106",
+   "team": "ULM",
    "absent": [
     {
-     "name": "Quincey McCoy",
-     "rate": 1.571,
-     "played_share": 0.667
+     "name": "Grace Troxell",
+     "rate": 1.607,
+     "played_share": 1.0
     }
    ],
-   "points_per_set_missing": 1.571
-  },
-  {
-   "game_id": "6639081",
-   "team_id": "46480",
-   "team": "Oral Roberts",
-   "absent": [
-    {
-     "name": "Quincey McCoy",
-     "rate": 1.571,
-     "played_share": 0.667
-    }
-   ],
-   "points_per_set_missing": 1.571
+   "points_per_set_missing": 1.607
   },
   {
    "game_id": "6628471",
@@ -2172,6 +2411,45 @@
    "points_per_set_missing": 1.464
   },
   {
+   "game_id": "6626201",
+   "team_id": "46660",
+   "team": "Fresno St.",
+   "absent": [
+    {
+     "name": "Brooke Jenkins",
+     "rate": 1.417,
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 1.417
+  },
+  {
+   "game_id": "6626202",
+   "team_id": "46660",
+   "team": "Fresno St.",
+   "absent": [
+    {
+     "name": "Brooke Jenkins",
+     "rate": 1.417,
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 1.417
+  },
+  {
+   "game_id": "6637170",
+   "team_id": "45813",
+   "team": "Bryant",
+   "absent": [
+    {
+     "name": "Brookelyn Talmadge",
+     "rate": 1.417,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.417
+  },
+  {
    "game_id": "6627811",
    "team_id": "46753",
    "team": "Stony Brook",
@@ -2248,6 +2526,19 @@
     }
    ],
    "points_per_set_missing": 1.318
+  },
+  {
+   "game_id": "6626588",
+   "team_id": "45937",
+   "team": "Mississippi St.",
+   "absent": [
+    {
+     "name": "Gha'naye Whitfield-moss",
+     "rate": 1.3,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.3
   },
   {
    "game_id": "6625689",
@@ -2510,19 +2801,6 @@
    "points_per_set_missing": 1.062
   },
   {
-   "game_id": "6637170",
-   "team_id": "45813",
-   "team": "Bryant",
-   "absent": [
-    {
-     "name": "Brookelyn Talmadge",
-     "rate": 1.05,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.05
-  },
-  {
    "game_id": "6625271",
    "team_id": "46496",
    "team": "Southeast Mo. St.",
@@ -2586,6 +2864,19 @@
     }
    ],
    "points_per_set_missing": 1.0
+  },
+  {
+   "game_id": "6625823",
+   "team_id": "46480",
+   "team": "Oral Roberts",
+   "absent": [
+    {
+     "name": "Ana Stojicic",
+     "rate": 0.975,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 0.975
   },
   {
    "game_id": "6627347",
@@ -3483,16 +3774,18 @@
    ]
   },
   "Grand Canyon": {
-   "gid": "6626470",
-   "d": "2026-08-29",
-   "appeared": 10,
+   "gid": "6627570",
+   "d": "2026-09-04",
+   "appeared": 11,
    "zero_action": [
     "Nika Zupanic",
+    "Macey Hughes",
     "Natalie Guerrero",
     "Logan Strong",
     "Mia Vukic",
+    "Ali Wiest",
+    "Hunter West",
     "Audrey Cook",
-    "Milica Zigic",
     "Kaela Jenkins"
    ]
   },
@@ -4049,11 +4342,17 @@
    ]
   },
   "CSU Bakersfield": {
-   "gid": "6628216",
-   "d": "2026-09-01",
-   "appeared": 15,
+   "gid": "6638776",
+   "d": "2026-09-04",
+   "appeared": 11,
    "zero_action": [
-    "Torrin Higginbotham"
+    "Amyri Robinson",
+    "Torrin Higginbotham",
+    "Reese Jackson",
+    "Nele Broszat",
+    "Josephine Rausch",
+    "Ella Pallagi",
+    "Ema Thompson"
    ]
   },
   "Lamar University": {
@@ -4122,13 +4421,15 @@
    ]
   },
   "Montana": {
-   "gid": "6627929",
-   "d": "2026-09-03",
-   "appeared": 11,
+   "gid": "6627930",
+   "d": "2026-09-04",
+   "appeared": 9,
    "zero_action": [
+    "Kaylee Paulson",
     "Alex Stone",
     "Avery Merritt",
-    "Halle Walker"
+    "Halle Walker",
+    "Elle Mccandless"
    ]
   },
   "Central Mich.": {
@@ -4266,17 +4567,15 @@
    ]
   },
   "ULM": {
-   "gid": "6628154",
-   "d": "2026-09-01",
-   "appeared": 10,
+   "gid": "6627570",
+   "d": "2026-09-04",
+   "appeared": 12,
    "zero_action": [
     "Zharia Alleyne",
-    "Olivia Anderson",
     "Taylor Reid",
     "Kennedy Scott",
-    "Amelia Colon",
-    "Gracie Dinardo",
-    "Myla Matavao"
+    "Bre Perrin",
+    "Gracie Dinardo"
    ]
   },
   "Southern Miss.": {
@@ -4491,27 +4790,28 @@
    ]
   },
   "Ark.-Pine Bluff": {
-   "gid": "6628284",
+   "gid": "6628285",
    "d": "2026-09-04",
-   "appeared": 13,
+   "appeared": 11,
    "zero_action": [
-    "Caroline Ashley",
-    "Gracie Trulson",
-    "Amari Clark",
-    "Faith Wilkins",
-    "Ava Collins",
-    "Mariah Mccoy",
-    "Mary Barnes"
+    "Desiree Kepler",
+    "Trinity Gibbs",
+    "J'nyah Odom",
+    "Ava Miller",
+    "Kaylen Robinson"
    ]
   },
   "Oral Roberts": {
-   "gid": "6639081",
-   "d": "2026-09-03",
-   "appeared": 11,
+   "gid": "6627893",
+   "d": "2026-09-04",
+   "appeared": 8,
    "zero_action": [
+    "Elyse Dube",
     "Molly Felkins",
+    "Ashlyn Aseltine",
     "Tarcy Mayah",
     "Ava Ewald",
+    "Libby Ryan",
     "Sienna Wnetrzak",
     "Jaya Tarver"
    ]
@@ -4527,13 +4827,11 @@
    ]
   },
   "Fresno St.": {
-   "gid": "6626203",
-   "d": "2026-09-03",
-   "appeared": 10,
+   "gid": "6626204",
+   "d": "2026-09-04",
+   "appeared": 12,
    "zero_action": [
-    "Alivia Schneider",
     "Jess Watanabe",
-    "Peyton Bitter",
     "Addison Williams",
     "Mya Sellers",
     "Michon Sailors"
@@ -4655,13 +4953,16 @@
    ]
   },
   "San Jose St.": {
-   "gid": "6627309",
-   "d": "2026-09-03",
-   "appeared": 14,
+   "gid": "6626508",
+   "d": "2026-09-04",
+   "appeared": 11,
    "zero_action": [
     "Florence Campeau",
-    "Kylee Sells",
-    "Ryleeh Tuaolo"
+    "Tatiana Robinson",
+    "Mariana Buchanan",
+    "Ryleeh Tuaolo",
+    "Eva Vostracka",
+    "Aniyah Hall"
    ]
   },
   "Belmont": {
@@ -4737,12 +5038,15 @@
    ]
   },
   "Gonzaga": {
-   "gid": "6627894",
-   "d": "2026-09-03",
-   "appeared": 13,
+   "gid": "6627893",
+   "d": "2026-09-04",
+   "appeared": 10,
    "zero_action": [
     "Brianna Martin",
-    "Hazel Murphy"
+    "Nia Damuni",
+    "Carina Zaldivar",
+    "Lydia Fisher",
+    "Lucy Slavik"
    ]
   },
   "UTSA": {
@@ -5046,10 +5350,15 @@
    ]
   },
   "Sacramento St.": {
-   "gid": "6627596",
-   "d": "2026-09-03",
-   "appeared": 12,
-   "zero_action": []
+   "gid": "6627597",
+   "d": "2026-09-04",
+   "appeared": 10,
+   "zero_action": [
+    "Cyniya Stewart",
+    "Kaylee Piepho",
+    "Kelsey Heffner",
+    "Addy Scheitlin"
+   ]
   },
   "Auburn": {
    "gid": "6627966",
@@ -5114,13 +5423,13 @@
    ]
   },
   "Oregon St.": {
-   "gid": "6627490",
-   "d": "2026-09-03",
+   "gid": "6627930",
+   "d": "2026-09-04",
    "appeared": 10,
    "zero_action": [
+    "Ivana Cvetkovic",
     "Bridget Gould",
     "Aly Cox",
-    "Taray Tela",
     "Abby Lesagonicz"
    ]
   },
@@ -5453,15 +5762,16 @@
    ]
   },
   "Utah St.": {
-   "gid": "6626372",
-   "d": "2026-08-30",
-   "appeared": 12,
+   "gid": "6628329",
+   "d": "2026-09-04",
+   "appeared": 11,
    "zero_action": [
+    "Addy Cook",
     "Ava Martin",
-    "Madison Rich",
+    "Taytum Nelson",
+    "Justyna Novakova",
     "Solia Angilau",
-    "Ava Gibbs",
-    "Sophie Scott"
+    "Ava Gibbs"
    ]
   },
   "Texas St.": {
@@ -5489,15 +5799,18 @@
    ]
   },
   "Iowa St.": {
-   "gid": "6624507",
-   "d": "2026-09-03",
-   "appeared": 12,
+   "gid": "6628329",
+   "d": "2026-09-04",
+   "appeared": 10,
    "zero_action": [
-    "Annalise Grant",
-    "Layna Waselewsky",
-    "Ella Florez",
     "Katie Byergo",
-    "Taylor Johnson"
+    "Abbi Brenizer",
+    "Layna Waselewsky",
+    "Baileigh Carlsen",
+    "Macie Lupkes",
+    "Taylor Johnson",
+    "Reagan Hanfelt",
+    "Ella Florez"
    ]
   },
   "Loyola Chicago": {
@@ -5526,15 +5839,19 @@
    ]
   },
   "A&M-Corpus Christi": {
-   "gid": "6628133",
-   "d": "2026-08-29",
-   "appeared": 14,
+   "gid": "6626714",
+   "d": "2026-09-04",
+   "appeared": 10,
    "zero_action": [
-    "Erin Herrmann",
-    "Simone Grieser",
+    "Kenrie Pruitt",
+    "Madison Morrow",
     "Ella Loges",
+    "Erin Herrmann",
     "Jaeda Rawls-fletcher",
-    "Jordyn Smith"
+    "Simone Grieser",
+    "Jordyn Smith",
+    "Virginia Van der werff",
+    "Abigail Huddleston"
    ]
   },
   "Michigan St.": {
@@ -6010,10 +6327,15 @@
    ]
   },
   "Weber St.": {
-   "gid": "6625162",
-   "d": "2026-08-29",
-   "appeared": 12,
-   "zero_action": []
+   "gid": "6638776",
+   "d": "2026-09-04",
+   "appeared": 13,
+   "zero_action": [
+    "Taliah Lee",
+    "Hailey Spencer",
+    "Maris Mauzey",
+    "Hailee Garcia"
+   ]
   },
   "San Francisco": {
    "gid": "6628217",
@@ -6072,9 +6394,9 @@
    ]
   },
   "New Mexico St.": {
-   "gid": "6627128",
-   "d": "2026-09-03",
-   "appeared": 11,
+   "gid": "6626204",
+   "d": "2026-09-04",
+   "appeared": 10,
    "zero_action": [
     "Zoe Ziegler",
     "Mia Mendoza",
@@ -6084,6 +6406,7 @@
     "Izzy Meneses",
     "Emmy Nicholas",
     "Katie Funk",
+    "Sadie Ross",
     "Ava Archibald",
     "Bella Castro"
    ]
@@ -6125,17 +6448,17 @@
    ]
   },
   "Texas Tech": {
-   "gid": "6625239",
-   "d": "2026-09-03",
-   "appeared": 11,
+   "gid": "6627597",
+   "d": "2026-09-04",
+   "appeared": 12,
    "zero_action": [
-    "Ashlyn Bellamy",
     "Ava Johnson",
+    "Taylor Cook",
+    "Reagan Engler",
     "Taylor Bahnub",
-    "Faith Jordan",
     "Allysa Fausett",
     "Aviya Russo",
-    "Madeleine Smotherman"
+    "Kayla Robertson"
    ]
   },
   "Illinois": {
@@ -6324,15 +6647,11 @@
    ]
   },
   "Pacific": {
-   "gid": "6626507",
-   "d": "2026-09-03",
-   "appeared": 11,
+   "gid": "6626508",
+   "d": "2026-09-04",
+   "appeared": 15,
    "zero_action": [
-    "Mia Alomia",
-    "Ellie Prindl",
-    "Gracie Armato",
-    "Olga Gergacz",
-    "Gwendolyn Hansen"
+    "Mia Alomia"
    ]
   },
   "Minnesota": {
@@ -6788,14 +7107,15 @@
    ]
   },
   "UTEP": {
-   "gid": "6626713",
-   "d": "2026-09-03",
-   "appeared": 13,
+   "gid": "6626714",
+   "d": "2026-09-04",
+   "appeared": 12,
    "zero_action": [
     "Lexee Salas",
     "Sydney Frazier",
     "Ella Meador",
     "Kaylynn Pardue",
+    "Laila Amos",
     "Elizabeth Pickett"
    ]
   },
@@ -6988,9 +7308,53 @@
     "Madeline Pankowski",
     "Nicole Cornell"
    ]
+  },
+  "Erskine": {
+   "gid": "6628285",
+   "d": "2026-09-04",
+   "appeared": 15,
+   "zero_action": [
+    "Carter Stephens",
+    "Jadyn Anderson",
+    "Kyleigh Upton",
+    "Bryce Bendig",
+    "Jordyn Autry"
+   ]
   }
  },
  "timelines": {
+  "Wisconsin|Grace Egan": [
+   {
+    "gid": "6639842",
+    "ep": 1787360400,
+    "sets": 3,
+    "state": "appeared"
+   },
+   {
+    "gid": "6639889",
+    "ep": 1787428800,
+    "sets": 3,
+    "state": "appeared"
+   },
+   {
+    "gid": "6628236",
+    "ep": 1787965200,
+    "sets": 4,
+    "state": "appeared"
+   },
+   {
+    "gid": "6628318",
+    "ep": 1788105600,
+    "sets": 3,
+    "state": "zero_action"
+   },
+   {
+    "gid": "6637934",
+    "ep": 1788393600,
+    "sets": 5,
+    "state": "appeared"
+   }
+  ],
   "Wisconsin|Jaela Auguste": [
    {
     "gid": "6639842",
@@ -7025,6 +7389,38 @@
    {
     "gid": "6627966",
     "ep": 1788480000,
+    "sets": 3,
+    "state": "zero_action"
+   }
+  ],
+  "Kentucky|Kennedy Washington": [
+   {
+    "gid": "6639842",
+    "ep": 1787360400,
+    "sets": 3,
+    "state": "appeared"
+   },
+   {
+    "gid": "6639888",
+    "ep": 1787515200,
+    "sets": 4,
+    "state": "appeared"
+   },
+   {
+    "gid": "6626806",
+    "ep": 1787958000,
+    "sets": 3,
+    "state": "appeared"
+   },
+   {
+    "gid": "6626369",
+    "ep": 1788040800,
+    "sets": 3,
+    "state": "appeared"
+   },
+   {
+    "gid": "6625953",
+    "ep": 1788390000,
     "sets": 3,
     "state": "zero_action"
    }
@@ -7093,6 +7489,46 @@
     "ep": 1788390000,
     "sets": 5,
     "state": "appeared"
+   }
+  ],
+  "Wisconsin|Decelise Champion": [
+   {
+    "gid": "6628236",
+    "ep": 1787965200,
+    "sets": 4,
+    "state": "zero_action"
+   },
+   {
+    "gid": "6628318",
+    "ep": 1788105600,
+    "sets": 3,
+    "state": "zero_action"
+   },
+   {
+    "gid": "6637934",
+    "ep": 1788393600,
+    "sets": 5,
+    "state": "zero_action"
+   },
+   {
+    "gid": "6627966",
+    "ep": 1788480000,
+    "sets": 3,
+    "state": "zero_action"
+   }
+  ],
+  "SMU|Jadyn Livings": [
+   {
+    "gid": "6626259",
+    "ep": 1788116400,
+    "sets": 5,
+    "state": "zero_action"
+   },
+   {
+    "gid": "6626260",
+    "ep": 1788391800,
+    "sets": 5,
+    "state": "zero_action"
    }
   ]
  }
