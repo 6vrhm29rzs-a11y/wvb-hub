@@ -1,9 +1,9 @@
 {
  "date": "2026-09-05",
- "generated_utc": "2026-09-05T22:39:54Z",
+ "generated_utc": "2026-09-05T23:03:33Z",
  "counts": {
-  "UNVERIFIED": 4,
-  "CORROBORATED_ONE": 53,
+  "UNVERIFIED": 5,
+  "CORROBORATED_ONE": 55,
   "VERIFIED_BOTH": 43,
   "SCHOOL_CONFLICT": 1,
   "CONTRADICTED_ONE": 5,
@@ -863,7 +863,7 @@
    "gid": "6637749",
    "date": "2026-09-05",
    "canonical": "Lehigh def. NJIT 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Lehigh": {
      "state": "EVENT_NOT_FOUND",
@@ -874,17 +874,11 @@
      ]
     },
     "NJIT": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://njithighlanders.com/services/schedule_txt.ashx?schedule=467",
-     "row": [
-      "Sep 5 (Sat)",
-      "12:30 PM",
-      "Neutral",
-      "Lehigh",
-      "Dover, DE",
-      "",
-      ""
-     ]
+     "assertion": "NJIT L 0-3 vs Lehigh",
+     "opponent_source": "Lehigh",
+     "site_says": "Neutral"
     }
    }
   },
@@ -2576,6 +2570,106 @@
      "assertion": "Ohio L 0-3 vs Butler",
      "opponent_source": "Butler",
      "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6625138",
+   "date": "2026-09-05",
+   "canonical": "Penn def. Navy 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Penn": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://pennathletics.com/services/schedule_txt.ashx?schedule=3124",
+     "assertion": "Penn W 3-1 vs Navy",
+     "opponent_source": "Navy",
+     "site_says": "Away"
+    },
+    "Navy": {
+     "state": "NOT_POSTED",
+     "url": "https://navysports.com/services/schedule_txt.ashx?schedule=2027",
+     "row": [
+      "Sep 5 (Sat)",
+      "4:00 p.m.",
+      "Home",
+      "Penn",
+      "Annapolis, Md. (Wesley A. Brown Field House)",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6624673",
+   "date": "2026-09-05",
+   "canonical": "Brown def. Rhode Island 3-2",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Brown": {
+     "state": "NOT_POSTED",
+     "url": "https://brownbears.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 5 (Sat)",
+      "4 p.m.",
+      "Away",
+      "Rhode Island",
+      "Kingston, R.I.",
+      "Ocean State Cup",
+      "-"
+     ]
+    },
+    "Rhode Island": {
+     "state": "NOT_POSTED",
+     "url": "https://gorhody.com/services/schedule_txt.ashx?schedule=455",
+     "row": [
+      "Sep 5 (Sat)",
+      "4:00 PM",
+      "Home",
+      "Brown",
+      "Kingston, R.I. (Keaney Gymnasium)",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6627965",
+   "date": "2026-09-05",
+   "canonical": "Oregon St. def. Seattle U 3-0",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Oregon St.": {
+     "state": "NOT_POSTED",
+     "url": "https://osubeavers.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 5 (Sat)",
+      "2:30 p.m.",
+      "Home",
+      "Seattle U",
+      "Corvallis, Ore. (Gill Coliseum)",
+      "ASICS Invitational",
+      "-"
+     ]
+    },
+    "Seattle U": {
+     "state": "NOT_POSTED",
+     "url": "https://goseattleu.com/sports/volleyball/schedule",
+     "row": [
+      "Sep 5",
+      "Seattle U",
+      "at",
+      "Oregon State",
+      "Gill Coliseum",
+      "Corvallis, Ore.",
+      "2:30 PM PDT",
+      "Watch on Pac-12",
+      "Opens in a new window",
+      "Live Stats",
+      "Opens in a new window"
+     ]
     }
    }
   }
