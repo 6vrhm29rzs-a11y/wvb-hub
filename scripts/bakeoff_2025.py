@@ -110,14 +110,16 @@ def load():
                         SEASON)
     _corr = _SC.corrections(SEASON)
     matches = []
-    # ⚠ RANKINGS ARE AS-OF THE PREVIOUS DAY (Cody, 2026-09-01): a final
-    # from TODAY (Pacific) does not enter the fit until tomorrow, so POWER
-    # holds still through a match day. No-op on a completed season.
+    # ⚠ THE TRUST CUTOFF (2026-09-04): a final enters the fit when a
+    # school site has verified it, or once it predates the midnight-PT
+    # boundary. Unverified same-day feed claims never move POWER.
+    # No-op on a completed season.
     _cutoff = _SC.rating_cutoff_epoch()
+    _verified = _SC.verified_result_gids()
     for g in load_games_jsonl(os.path.join(RAW, "games.jsonl")):
             if g.get("game_state") != "F":
                 continue
-            if (g.get("start_time_epoch") or 0) >= _cutoff:
+            if not _SC.rating_input_ok(g, _cutoff, _verified):
                 continue
             if _cls.get(str(g.get("game_id"))) != "ok":
                 continue

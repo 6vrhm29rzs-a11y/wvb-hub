@@ -145,6 +145,10 @@ jobs:
           # build_hub.py exited 1 with "no data/rating_2025.json". Measured at
           # 19.8s, which a 30-minute cadence can afford; predict, simulate and
           # build_hub all read rating_2025.json.
+          # Trust cutoff: verify today's new finals against school sites
+          # BEFORE the rating rebuilds -- a verified final enters POWER this
+          # cycle; an unverified feed claim waits for overnight.
+          python3 scripts/verify_results_daily.py --incremental || echo "incremental verification skipped; continuing"
           WVB_SEASON=2025 python3 scripts/build_dataset.py
           WVB_SEASON=2025 python3 scripts/rpi_2025.py
           WVB_SEASON=2025 python3 scripts/rating_2025.py

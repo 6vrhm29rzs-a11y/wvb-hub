@@ -2,46 +2,46 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 670,
+  "scored": 676,
   "logged_after_tipoff_excluded": 3,
   "team_mismatch_excluded": 16,
   "predictions_on_record": 4776,
-  "results_available": 703,
-  "brier": 0.1711,
+  "results_available": 709,
+  "brier": 0.1697,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 499,
-  "favourite_correct_pct": 74.5
+  "favourite_correct": 502,
+  "favourite_correct_pct": 74.3
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 110,
+   "n": 111,
    "said": 55.3,
-   "happened": 56.4
+   "happened": 55.0
   },
   {
    "range": "60-70%",
-   "n": 127,
-   "said": 65.1,
-   "happened": 63.8
+   "n": 128,
+   "said": 65.0,
+   "happened": 61.7
   },
   {
    "range": "70-80%",
    "n": 101,
-   "said": 75.3,
-   "happened": 64.4
+   "said": 75.2,
+   "happened": 65.3
   },
   {
    "range": "80-90%",
-   "n": 130,
+   "n": 129,
    "said": 85.1,
-   "happened": 78.5
+   "happened": 79.1
   },
   {
    "range": "90-101%",
-   "n": 202,
+   "n": 207,
    "said": 95.4,
-   "happened": 93.6
+   "happened": 93.7
   }
  ],
  "matches": [
@@ -316,15 +316,6 @@
    "brier": 0.702244
   },
   {
-   "game_id": "6627095",
-   "date": "2026-09-04",
-   "away": "Bradley",
-   "home": "Northern Ariz.",
-   "p_home": 0.8282,
-   "home_won": false,
-   "brier": 0.68591524
-  },
-  {
    "game_id": "6624937",
    "date": "2026-09-02",
    "away": "Oakland",
@@ -460,15 +451,6 @@
    "brier": 0.61246276
   },
   {
-   "game_id": "6627266",
-   "date": "2026-09-04",
-   "away": "Cal Poly",
-   "home": "San Diego St.",
-   "p_home": 0.2244,
-   "home_won": true,
-   "brier": 0.6015553600000001
-  },
-  {
    "game_id": "6627128",
    "date": "2026-09-03",
    "away": "New Mexico St.",
@@ -494,6 +476,24 @@
    "p_home": 0.7724,
    "home_won": false,
    "brier": 0.59660176
+  },
+  {
+   "game_id": "6626470",
+   "date": "2026-08-29",
+   "away": "Arkansas St.",
+   "home": "Grand Canyon",
+   "p_home": 0.2299,
+   "home_won": true,
+   "brier": 0.59305401
+  },
+  {
+   "game_id": "6626953",
+   "date": "2026-08-29",
+   "away": "Elon",
+   "home": "Old Dominion",
+   "p_home": 0.7671,
+   "home_won": false,
+   "brier": 0.58844241
   }
  ]
 }

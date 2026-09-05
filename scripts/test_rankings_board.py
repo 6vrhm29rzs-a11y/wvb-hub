@@ -422,13 +422,17 @@ def main():
         while _i != -1:
             _stamps.append(_page[_i:_page.find("</span>", _i)])
             _i = _page.find('class="rkstamp"', _i + 1)
+        # a stamp names its boundary either by date ("through Sep 3") or
+        # by the trust-cutoff rule ("once a school site confirms").
         check("every recompute stamp names its counted-through boundary",
-              _stamps and all(("through" in st) for st in _stamps),
+              _stamps and all(("through" in st
+                               or "school site confirms" in st)
+                              for st in _stamps),
               "%d stamps" % len(_stamps))
         # NEGATIVE CONTROL: a stamp with only the run time must fail this
         _bad = 'class="rkstamp">recomputed <b>5:38 PM PT today</b>, 570 finals in'
         check("[NEG] a run-time-only stamp would be caught",
-              not ("through" in _bad))
+              not ("through" in _bad or "school site confirms" in _bad))
     else:
         print("    (no cutoff in the shown ranking's meta -- stamp "
               "boundary check has no live subject)")

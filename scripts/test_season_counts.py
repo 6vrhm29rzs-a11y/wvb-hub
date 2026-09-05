@@ -136,13 +136,36 @@ def main():
         dg = json.load(io.open(os.path.join(
             REPO, "data", "digby_top25_2026.json"), encoding="utf-8"))
         n_dg = (dg.get("meta") or {}).get("matches_counted")
-        # digby is AS-OF THE PREVIOUS DAY (Cody, 2026-09-01): its count is
-        # checked against the cutoff-filtered eligible total
-        check("digby's matches_counted equals "
-              "rating_eligible_through_yesterday (drift here means the "
-              "artifacts are from different snapshots -- rebuild the chain)",
-              n_dg == t["rating_eligible_through_yesterday"],
-              "%s vs %s" % (n_dg, t["rating_eligible_through_yesterday"]))
+        # digby counts through-yesterday PLUS today's school-verified
+        # finals (the TRUST CUTOFF, 2026-09-04). Eligible-now MOVES
+        # intraday as finals verify, so equality is only meaningful
+        # within one corpus generation: same fingerprint -> must match;
+        # different -> the artifact is from an older corpus, which the
+        # build gate and fingerprint guards already refuse to PUBLISH.
+        _elig_now = t.get("rating_eligible_now",
+                          t["rating_eligible_through_yesterday"])
+        _fp_now = SC.corpus_fingerprint(2026)
+        _fp_dg = (dg.get("meta") or {}).get("corpus_fingerprint")
+        if _fp_dg and _fp_dg != _fp_now:
+            print("    (digby artifact is from corpus %s, current is %s "
+                  "-- intraday drift; equality is enforced at build time "
+                  "by the manifest gate)" % (_fp_dg[:8], _fp_now[:8]))
+        else:
+            # Within one corpus generation the VERIFICATION state still
+            # moves (the incremental verifier runs between rebuilds), so
+            # eligible_now can grow past an artifact that was correct
+            # when built. The stable invariants: digby's count is its
+            # through-yesterday base plus its OWN verified-intraday
+            # tally, and never exceeds the current eligible_now.
+            _nv_dg = (dg.get("meta") or {}).get(
+                "verified_intraday_counted") or 0
+            check("digby's matches_counted = through_yesterday + its own "
+                  "verified-intraday tally",
+                  n_dg == t["rating_eligible_through_yesterday"] + _nv_dg,
+                  "%s vs %s+%s" % (
+                      n_dg, t["rating_eligible_through_yesterday"], _nv_dg))
+            check("digby's matches_counted never exceeds eligible_now",
+                  n_dg <= _elig_now, "%s vs %s" % (n_dg, _elig_now))
 
         cf = json.load(io.open(os.path.join(
             REPO, "data", "result_confidence_2026.json"), encoding="utf-8"))
@@ -227,6 +250,22 @@ def main():
                                    "home_sets": 2}}}
     check("[NEG] without the flag the feed's lines are kept",
           len(SC.apply_correction(_tg, _tc2)["linescores"]) == 3)
+
+    # -- the trust cutoff (2026-09-04): a school-verified final enters
+    # the rating intraday; an unverified same-day feed claim never does --
+    _cut = 1000
+    _pre  = {"game_id": "800001", "start_time_epoch": 500}
+    _todv = {"game_id": "800002", "start_time_epoch": 2000}
+    _todu = {"game_id": "800003", "start_time_epoch": 2000}
+    _ver = {"800002"}
+    check("trust cutoff: before the boundary always counts",
+          SC.rating_input_ok(_pre, _cut, _ver))
+    check("trust cutoff: today + school-verified counts",
+          SC.rating_input_ok(_todv, _cut, _ver))
+    check("[NEG] trust cutoff: today + UNVERIFIED does not count",
+          not SC.rating_input_ok(_todu, _cut, _ver))
+    check("verified_result_gids returns a set and never raises",
+          isinstance(SC.verified_result_gids(), set))
 
     print()
     if FAILS:

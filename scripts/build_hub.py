@@ -1100,7 +1100,7 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
     as markup would quadruple the file for content nobody looks at at once.
     """
     played = {}
-    _di_pl = di_teams()
+    _di_pl = di_counting()
     for r in res:
         for side, opp, mine, theirs, home in (
                 ("away", r["home"], r["away_sets"], r["home_sets"], False),
@@ -1607,6 +1607,45 @@ def di_teams():
     doc = load("data/raw/2025/rpi_official.json") or {}
     return set(r["School"] for r in (doc.get("data") or []) if r.get("School"))
 
+_DI_COUNTING = None
+def di_counting():
+    # type: () -> set
+    """Membership for COUNTING an opponent as Division I.
+
+    The archived 348 PLUS programmes the CURRENT season's feed serves as
+    division 1 on EVERY record that carries a flag (unanimity, min 2
+    records). 2026-09-04: West Florida reclassified to D-I -- 13 of its
+    17 opponents are from the 348 and all 24 of its 2026 records read
+    div=1 -- so its results count as D-I games (the validated live-flag
+    precedence in membership.py), while the LISTING census stays
+    di_teams() until the first official 2026 RPI table exists. Counting
+    and listing may name different sets; a reclassifier counts before it
+    is listed, never the reverse."""
+    global _DI_COUNTING
+    if _DI_COUNTING is not None:
+        return _DI_COUNTING
+    base = set(di_teams())
+    flags = {}
+    gp = os.path.join(REPO, "data", "raw", str(SEASON), "games.jsonl")
+    if os.path.exists(gp):
+        for line in open(gp):
+            try:
+                g = json.loads(line)
+            except ValueError:
+                continue
+            for t in (g.get("teams") or []):
+                d = t.get("division")
+                nm = t.get("name_short")
+                if d is None or not nm:
+                    continue
+                flags.setdefault(nm, []).append(d)
+    for nm, ds in flags.items():
+        if len(ds) >= 2 and all(d == 1 for d in ds):
+            base.add(_hub_name(nm))
+    _DI_COUNTING = base
+    return base
+
+
 def leaders(photos=None, honours=None):
     """Season leaders from the per-player aggregate, per set.
 
@@ -1702,14 +1741,23 @@ def standings(teams, res):
                           # consumers, two answers (R4).
                           "nw": 0, "nl": 0,
                           "rank": t["rank26"]}
+    _di_cnt = di_counting()
     for r in res:
         h, a = r["home"], r["away"]
         hw = (r["home_sets"] or 0) > (r["away_sets"] or 0)
         # A match with a non-D-I side still HAPPENED to the D-I team in it.
+        # ⚠ "opponent not LISTED" is not "opponent not D-I" (2026-09-04):
+        # West Florida counts as D-I (di_counting -- unanimous live flags,
+        # 13 of 17 opponents from the 348) while holding no standings row
+        # until an official 2026 table lists it. A listed team's result
+        # against a counting-D-I unlisted side goes in its D-I record.
         if (h in rec) != (a in rec):
+            _other = a if h in rec else h
+            _key = "w" if _other in _di_cnt else "nw"
             for nm, won in ((h, hw), (a, not hw)):
                 if nm in rec:
-                    rec[nm]["nw" if won else "nl"] += 1
+                    rec[nm][("%s" % _key) if won else _key.replace("w", "l")
+                            ] += 1
             continue
         if h not in rec or a not in rec:
             continue                                # neither side is D-I
@@ -2192,7 +2240,7 @@ def team_season_stats(boxes, res):
     the players' percentages.
     """
     acc = {}                                            # type: Dict[str, Any]
-    _di_ms = di_teams()
+    _di_ms = di_counting()
 
     def blank():
         return {"k": 0.0, "e": 0.0, "ta": 0.0, "ast": 0.0, "digs": 0.0,
@@ -3054,7 +3102,7 @@ def top25_view(avca=None):
     # was played is form. The record beside it counts D-I only, so the pill
     # names the division rather than leaving a "W" that the record does not
     # explain.
-    _di_form = di_teams()
+    _di_form = di_counting()
     for g in sorted(results() or [], key=lambda x: x.get("epoch") or 0):
         # ⚠ AUDIT D1 (2026-08-31): this second results() read carried NO
         # exhibition/under-review handling, so the Nebraska-Florida
@@ -3270,13 +3318,18 @@ def top25_view(avca=None):
            round(100 * maxw)))
     _st = rank_stamp_pt(m.get("generated_at_utc"))
     if _st:
-        lead += (" <span class=\"rkstamp\">Recomputed <b>%s</b> from the "
-                 "%d rating-eligible finals played <b>through yesterday</b> "
-                 "(D-I v D-I with a set line; exhibitions and duplicate "
-                 "listings excluded). The ranking is as-of the previous "
-                 "day: today\u2019s results fold in overnight, so it holds "
-                 "still through a match day.</span>"
-                 % (_st, played))
+        # the TRUST CUTOFF (2026-09-04): today's finals join as school
+        # sites confirm them; unverified feed claims wait for overnight.
+        _nv = m.get("verified_intraday_counted")
+        _vsent = ((" <b>%d</b> of them are today\u2019s finals, counted "
+                   "because a school site has confirmed them;" % _nv)
+                  if _nv else "")
+        lead += (" <span class=\"rkstamp\">Recomputed <b>%s</b> from "
+                 "%d rating-eligible finals (D-I v D-I with a set line; "
+                 "exhibitions and duplicate listings excluded).%s "
+                 "an unverified result from today enters once a school "
+                 "site confirms it, or at the overnight recompute.</span>"
+                 % (_st, played, _vsent))
     foot = (
         mv_txt + poll_txt +
         "<b>Why so little movement in August?</b> %.1f is not a preference "
@@ -3851,7 +3904,7 @@ def build():
     logos = team_logos()
     # Division-I membership, once, for everything in this function that needs
     # to say whether an opponent qualifies.
-    _di_all = di_teams()
+    _di_all = di_counting()
     # ⚠ ALL the matches for the box scores, only the counting ones for the
     # season totals. Passing res_cnt for both kept the exhibition out of every
     # rate and also made it disappear entirely -- no box score, no line, as
@@ -3960,17 +4013,19 @@ def build():
                          % (len(res_cnt), _sc_totals["ok"]))
     _dg_meta = (load("data/digby_top25_%d.json" % SEASON) or {}).get(
         "meta") or {}
-    # digby is AS-OF THE PREVIOUS DAY (Cody, 2026-09-01), so its count is
-    # checked against the cutoff-filtered eligible total -- holding today's
-    # finals back is the design, not staleness
+    # digby counts through-yesterday PLUS today's school-verified finals
+    # (the TRUST CUTOFF, 2026-09-04, superseding the pure as-of-previous-
+    # day rule): checked against rating_eligible_now -- holding
+    # unverified same-day finals back is the design, not staleness
+    _dg_elig = _sc_totals.get(
+        "rating_eligible_now",
+        _sc_totals["rating_eligible_through_yesterday"])
     if _dg_meta.get("matches_counted") is not None and \
-            _dg_meta["matches_counted"] != \
-            _sc_totals["rating_eligible_through_yesterday"]:
+            _dg_meta["matches_counted"] != _dg_elig:
         _mm_fails.append(
-            "digby matches_counted %s != rating_eligible_through_yesterday "
+            "digby matches_counted %s != rating_eligible_now "
             "%d -- a stale artifact from a different snapshot"
-            % (_dg_meta["matches_counted"],
-               _sc_totals["rating_eligible_through_yesterday"]))
+            % (_dg_meta["matches_counted"], _dg_elig))
     # ── GENERATION FINGERPRINTS (architect #2, 2026-09-03): every
     # truth-bearing artifact that stamps a corpus_fingerprint must carry
     # THIS build's -- a stamp from another generation means the artifact
@@ -4133,10 +4188,10 @@ def build():
             _rn = (meta.get("rank_stamp") or {}).get("matches_in")
             rank_basis += (
                 " <span class=\"rkstamp\">Recomputed <b>%s</b>%s &mdash; "
-                "as-of the previous day: today\u2019s results fold in "
-                "overnight.</span>"
-                % (_rst, (", through the %d rating-eligible finals played "
-                          "through yesterday" % _rn) if _rn else ""))
+                "today\u2019s finals join once a school site confirms "
+                "them; unverified results wait for overnight.</span>"
+                % (_rst, (", from %d rating-eligible finals" % _rn)
+                   if _rn else ""))
     else:
         _blend = [t for t in teams if t.get("rank_source") == "blend"]
         if _blend:
@@ -4187,9 +4242,17 @@ def build():
                     # calendar day.
                     _thru = datetime.datetime.fromtimestamp(
                         _rcut - 1, PT).strftime("%b %d").replace(" 0", " ")
-                    _cutbit = (" counts finals through <b>%s</b>; "
-                               "today&rsquo;s results enter at the next "
-                               "midnight-PT recompute" % _thru)
+                    # the TRUST CUTOFF (2026-09-04): today's finals join as
+                    # school sites confirm them; the sentence says how many
+                    # have, so intraday movement is explained on the page.
+                    _nv = _rs.get("verified_intraday_counted")
+                    _vbit = ((" plus <b>%d</b> school-verified final%s from "
+                              "today" % (_nv, "" if _nv == 1 else "s"))
+                             if _nv else "")
+                    _cutbit = (" counts finals through <b>%s</b>%s; "
+                               "unverified results from today enter once a "
+                               "school site confirms them, or overnight"
+                               % (_thru, _vbit))
                 if _cutbit:
                     rank_basis += (
                         " <span class=\"rkstamp\">&middot; recomputed "

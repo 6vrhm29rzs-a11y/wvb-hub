@@ -53,6 +53,11 @@ CRAWL = [
 # The 2025 base is kept even though it exists locally: one sequence, one
 # definition (R4), and it measures at ~20s.
 REBUILD = [
+    # THE TRUST CUTOFF's intraday half (2026-09-04): verify today's new
+    # finals against school sites BEFORE the rating rebuilds, so a
+    # verified final enters POWER this cycle and an unverified feed claim
+    # does not. Incremental: already-settled verdicts are not re-fetched.
+    ({}, ["scripts/verify_results_daily.py", "--incremental"]),
     ({"WVB_SEASON": "2025"}, ["scripts/build_dataset.py"]),
     ({"WVB_SEASON": "2025"}, ["scripts/rpi_2025.py"]),
     ({"WVB_SEASON": "2025"}, ["scripts/rating_2025.py"]),

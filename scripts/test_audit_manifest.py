@@ -43,22 +43,24 @@ def verify(man, totals, cnt_gids, cnt_d1, digby_meta, resume_meta,
     gh = hashlib.sha256("\n".join(sorted(cnt_gids)).encode()).hexdigest()
     if man["counted_gids_sha256"] != gh:
         out.append("counted gid set moved since the manifest")
+    # the TRUST CUTOFF (2026-09-04): rankings count through-yesterday PLUS
+    # today's school-verified finals, so they reconcile against
+    # rating_eligible_now (falling back to through_yesterday for artifacts
+    # that predate the field).
+    _elig = totals.get("rating_eligible_now",
+                       totals["rating_eligible_through_yesterday"])
     if (digby_meta or {}).get("matches_counted") is not None and \
-            digby_meta["matches_counted"] != \
-            totals["rating_eligible_through_yesterday"]:
-        out.append("digby matches_counted %s != "
-                   "rating_eligible_through_yesterday %s"
-                   % (digby_meta["matches_counted"],
-                      totals["rating_eligible_through_yesterday"]))
+            digby_meta["matches_counted"] != _elig:
+        out.append("digby matches_counted %s != rating_eligible_now %s"
+                   % (digby_meta["matches_counted"], _elig))
     if (resume_meta or {}).get("matches") is not None and \
             resume_meta["matches"] != len(cnt_d1):
         out.append("resume matches %s != counted D-I %s"
                    % (resume_meta["matches"], len(cnt_d1)))
     if (rating_meta or {}).get("validated") and \
             (rating_meta.get("matches_in") is not None) and \
-            rating_meta["matches_in"] != \
-            totals["rating_eligible_through_yesterday"]:
-        out.append("validated rating matches_in != rating_eligible")
+            rating_meta["matches_in"] != _elig:
+        out.append("validated rating matches_in != rating_eligible_now")
     return out
 
 
@@ -105,7 +107,8 @@ def main():
     check("[NEG] a stale digby artifact is flagged",
           any("digby" in x for x in verify(
               man, totals, cnt_gids, cnt_d1,
-              {"matches_counted": totals["rating_eligible_through_yesterday"] + 5},
+              {"matches_counted": totals.get("rating_eligible_now",
+                   totals["rating_eligible_through_yesterday"]) + 5},
               None, None)))
     check("[NEG] a stale resume artifact is flagged",
           any("resume" in x for x in verify(

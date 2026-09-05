@@ -35,6 +35,7 @@ def truth():
     cls = SC.classify(games, 2026)
     corr = SC.corrections(2026)
     cut = SC.rating_cutoff_epoch()
+    ver = SC.verified_result_gids()          # the trust cutoff, 2026-09-04
     full, cutoff = {}, {}
     for g in SC.resolve(games):
         gid = str(g.get("game_id"))
@@ -44,13 +45,15 @@ def truth():
         ts = g.get("teams") or []
         if len(ts) != 2:
             continue
-        # ⚠ D-I MEMBERSHIP IS THE OFFICIAL RPI 348, NEVER THE FEED FLAG
-        # (2026-09-04): the feed serves West Florida division=1 (the known
-        # reclassifier trap), so a truth keyed on the flag counted Alabama
-        # St.'s loss to a D-II side as a D-I result while the page --
-        # correctly on membership -- did not. Same source as the page.
+        # ⚠ COUNTING MEMBERSHIP IS di_counting() -- the archived 348 plus
+        # unanimously-div1 reclassifiers (2026-09-04: West Florida moved
+        # to D-I; 13 of 17 opponents from the 348, div=1 on all 24
+        # records). The morning version of this comment pinned the 2025
+        # table as the whole answer and was stale by evening -- the
+        # validated precedence is live-flag membership for a live season.
+        # Same source as the page's counting sites, so they cannot split.
         import build_hub as _BHm
-        _di = _BHm.di_teams()
+        _di = _BHm.di_counting()
         d1_both = all(_BHm._hub_name(t.get("name_short")) in _di
                       for t in ts)
         wi = SC.winner_index(g)   # the ONE derivation -- 6628428 went
@@ -64,7 +67,7 @@ def truth():
             nm = _BH._hub_name(t.get("name_short"))
             for book, want in ((full, True),
                                (cutoff,
-                                (g.get("start_time_epoch") or 0) < cut)):
+                                SC.rating_input_ok(g, cut, ver))):
                 if not want:
                     continue
                 r = book.setdefault(nm, {"w": 0, "l": 0, "m": 0,
@@ -133,9 +136,9 @@ def main():
             if tr is None:
                 continue
             if int(t.get("games_played") or 0) != tr["m"]:
-                bad3.append("%s: rating gp %s vs through-yesterday truth %d"
+                bad3.append("%s: rating gp %s vs eligible-now truth %d"
                             % (nm, t.get("games_played"), tr["m"]))
-        check("rating games_played equals the through-yesterday truth",
+        check("rating games_played equals the eligible-now truth",
               not bad3, bad3[:6])
     else:
         print("  -- no rating file; boundary check stands down honestly")

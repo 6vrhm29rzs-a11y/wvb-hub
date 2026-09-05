@@ -76,13 +76,18 @@ def _eligible(doc):
     invisible because the count merely read two high. One counting set,
     from the contract, for every consumer."""
     import season_counts as _SC
-    # ⚠ AS-OF THE PREVIOUS DAY (Cody, 2026-09-01): today's finals wait for
-    # tomorrow, so the blend holds still through a match day. Counting
-    # surfaces are untouched; this boundary is the rankings' own.
+    # ⚠ THE TRUST CUTOFF (2026-09-04, superseding the pure as-of-previous-
+    # day rule of 2026-09-01 -- Cody: "I like looking at it through the
+    # day and see why teams move"): a final enters the blend when it is
+    # school-VERIFIED, or once it predates the midnight-PT boundary. The
+    # delay was standing in for trust; verification carries the trust
+    # directly, so verified results move the ranking intraday and an
+    # unverified feed claim never does.
     _cutoff = _SC.rating_cutoff_epoch()
+    _verified = _SC.verified_result_gids()
     for g in _SC.countable((doc or {}).get("games") or [], SEASON,
                            need_line=True, d1_only=True):
-        if (g.get("start_time_epoch") or 0) >= _cutoff:
+        if not _SC.rating_input_ok(g, _cutoff, _verified):
             continue
         ts = g.get("teams") or []
         ls = [l for l in (g.get("linescores") or [])
@@ -462,11 +467,20 @@ def main():
     # COUNTED final; the cutoff rides beside it so the page can say both.
     import season_counts as _SCm
     _cut = _SCm.rating_cutoff_epoch()
-    _fin = [g.get("start_time_epoch") for g in (live.get("games") or [])
-            if g.get("state") == "F" and g.get("start_time_epoch")
-            and g.get("start_time_epoch") < _cut]
+    _ver = _SCm.verified_result_gids()
+    _fin, _n_intraday = [], 0
+    for g in (live.get("games") or []):
+        if g.get("state") != "F" or not g.get("start_time_epoch"):
+            continue
+        if g.get("start_time_epoch") < _cut:
+            _fin.append(g.get("start_time_epoch"))
+        elif str(g.get("game_id")) in _ver:
+            _fin.append(g.get("start_time_epoch"))
+            _n_intraday += 1
     doc["meta"]["data_through_epoch"] = max(_fin) if _fin else None
     doc["meta"]["rating_cutoff_epoch"] = _cut
+    # today's school-verified finals already counted (the trust cutoff)
+    doc["meta"]["verified_intraday_counted"] = _n_intraday
     json.dump(doc, open(OUT, "w"), indent=1, sort_keys=False)
     m = doc["meta"]
     print("k = %.2f matches  (sigma^2 %.2f / tau^2 %.2f)"

@@ -382,6 +382,8 @@ def build():
         # the as-of-yesterday boundary, so the lead can say what "recomputed
         # today" actually counts (absent on artifacts that predate it)
         "rating_cutoff_epoch": _src_meta.get("rating_cutoff_epoch"),
+        "verified_intraday_counted": _src_meta.get(
+            "verified_intraday_counted"),
     }
 
     for t in teams:

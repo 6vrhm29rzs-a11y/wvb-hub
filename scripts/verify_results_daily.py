@@ -681,13 +681,37 @@ def write_auto_evidence():
 
 
 def main():
-    date = sys.argv[1] if len(sys.argv) > 1 else (
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    incremental = "--incremental" in sys.argv
+    date = args[0] if args else (
         datetime.datetime.now(datetime.timezone.utc)
         - datetime.timedelta(hours=4)).strftime("%Y-%m-%d")
     sites = _sites()
     finals = finals_for(date)
+    # --incremental (intraday, 2026-09-04): verify only finals with no
+    # settled verdict yet, and MERGE into the day's report. A settled
+    # verdict (VERIFIED_BOTH / CORROBORATED_ONE / CONTRADICTED_*) is not
+    # re-fetched every 20 minutes; NOT_POSTED-class outcomes are retried,
+    # because a school posting an hour after the final is the normal case.
+    prior = {}
+    if incremental:
+        _pp = os.path.join(REPO, "data",
+                           "result_verification_%s.json" % date)
+        if os.path.exists(_pp):
+            for r in json.load(open(_pp)).get("matches", []):
+                prior[str(r.get("gid"))] = r
+        settled = {g for g, r in prior.items()
+                   if r.get("verdict") in ("VERIFIED_BOTH",
+                                           "CORROBORATED_ONE",
+                                           "CONTRADICTED_BOTH",
+                                           "CONTRADICTED_ONE",
+                                           "SCHOOL_CONFLICT")}
+        finals = [f for f in finals if f["gid"] not in settled]
     print("verifying %d counted finals for %s against both schools' "
-          "published schedules" % (len(finals), date))
+          "published schedules%s" % (
+              len(finals), date,
+              " (incremental; %d already settled)" % len(prior)
+              if incremental else ""))
     log, report, queue_adds = [], [], []
     for f in finals:
         sa, da = school_evidence(f["winner"], f["loser"], date, f, sites, log)
@@ -708,7 +732,13 @@ def main():
     with open(os.path.join(RAW, "result_verification_log.jsonl"), "a") as f:
         for e in log:
             f.write(json.dumps(e) + "\n")
-    # the day's report (rewritten per run -- it is derived, the log is raw)
+    # the day's report (rewritten per run -- it is derived, the log is raw).
+    # In incremental mode, fresh rows replace their gid's prior row and
+    # settled prior rows are kept -- the report stays whole-day.
+    if incremental and prior:
+        fresh = {str(r["gid"]): r for r in report}
+        prior.update(fresh)
+        report = list(prior.values())
     outp = os.path.join(REPO, "data", "result_verification_%s.json" % date)
     counts = {}
     for r in report:

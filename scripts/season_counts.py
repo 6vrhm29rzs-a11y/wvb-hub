@@ -256,6 +256,49 @@ def rating_cutoff_epoch(now=None):
     return int(day.timestamp())
 
 
+def verified_result_gids(season=None):
+    # type: (Optional[int]) -> set
+    """Gids whose FINAL result a school site has confirmed today or
+    yesterday (VERIFIED_BOTH or CORROBORATED_ONE in the daily
+    verification reports).
+
+    ⚠ THE TRUST CUTOFF (Cody, 2026-09-04): "as of previous day" existed
+    because to-the-minute numbers from an UNVERIFIED feed felt wobbly --
+    the delay was standing in for trust. A final one or both schools have
+    already confirmed carries the trust directly, so it may enter the
+    rating INTRADAY; anything unverified still waits for the midnight-PT
+    boundary (where the nightly sweep will have checked it anyway).
+    Contradicted finals never appear here -- they are the corrections
+    ledger's and review queue's job. Report files are ET-dated (the
+    verifier's convention), so both today's and yesterday's are read to
+    cover the PT/ET boundary."""
+    import datetime as _dt
+    out = set()
+    now = _dt.datetime.utcnow() - _dt.timedelta(hours=4)
+    for d in (now.date(), now.date() - _dt.timedelta(days=1)):
+        p = os.path.join(REPO, "data",
+                         "result_verification_%s.json" % d.isoformat())
+        if not os.path.exists(p):
+            continue
+        try:
+            doc = json.load(open(p))
+        except ValueError:
+            continue
+        for r in doc.get("matches", []):
+            if r.get("verdict") in ("VERIFIED_BOTH", "CORROBORATED_ONE"):
+                out.add(str(r.get("gid")))
+    return out
+
+
+def rating_input_ok(g, cutoff, verified):
+    # type: (Dict, int, set) -> bool
+    """May this final enter a RATING? Before the midnight-PT boundary,
+    or school-verified today. The ONE intraday-eligibility predicate."""
+    if (g.get("start_time_epoch") or 0) < cutoff:
+        return True
+    return str(g.get("game_id")) in verified
+
+
 def resolve(games):
     # type: (List[Dict]) -> List[Dict]
     """ONE record per gid: final beats non-final, then last-written wins.
@@ -353,6 +396,16 @@ def totals(games, season):
         1 for gid, v in cls.items()
         if v == "ok"
         and (by[gid].get("start_time_epoch") or 0) < cut
+        and _d1_both(by[gid])
+        and _has_line(apply_correction(by[gid], corr)))
+    # what the RANKINGS may see NOW: through yesterday PLUS today's
+    # school-verified finals (the trust cutoff, 2026-09-04). The audit
+    # manifest checks digby against THIS.
+    ver = verified_result_gids()
+    n["rating_eligible_now"] = sum(
+        1 for gid, v in cls.items()
+        if v == "ok"
+        and rating_input_ok(by[gid], cut, ver)
         and _d1_both(by[gid])
         and _has_line(apply_correction(by[gid], corr)))
     return n

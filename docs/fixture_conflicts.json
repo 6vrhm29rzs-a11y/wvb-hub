@@ -110,15 +110,23 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 8,
+     "records": 19,
      "values": [
       "1788505200",
       "1788570000"
      ]
+    },
+    {
+     "field": "game_state",
+     "records": 19,
+     "values": [
+      "P",
+      "I"
+     ]
     }
    ],
    "matchup": "LIU / Oregon",
-   "records": 8
+   "records": 19
   },
   "6625274": {
    "conflicts": [
@@ -450,7 +458,7 @@
     {
      "field": "teams",
      "non_blocking": "site is confirmed neutral, so no displayed fact depends on which side is nominally home",
-     "records": 9,
+     "records": 20,
      "values": [
       "(('45886', False), ('46291', True))",
       "(('45886', True), ('46291', False))"
@@ -458,7 +466,7 @@
     },
     {
      "field": "start_time_epoch",
-     "records": 9,
+     "records": 20,
      "values": [
       "1788573600",
       "1788559200"
@@ -466,7 +474,7 @@
     }
    ],
    "matchup": "Utah Tech / UC San Diego",
-   "records": 9
+   "records": 20
   },
   "6628262": {
    "conflicts": [
@@ -482,6 +490,36 @@
    "matchup": "Arizona / Pepperdine",
    "records": 3
   },
+  "6628285": {
+   "conflicts": [
+    {
+     "field": "teams",
+     "records": 17,
+     "values": [
+      "(('46646', False), ('46716', True))",
+      "(('46646', True), ('46716', False))"
+     ]
+    },
+    {
+     "field": "start_time_epoch",
+     "records": 17,
+     "values": [
+      "1788559200",
+      "1788566400"
+     ]
+    },
+    {
+     "field": "site",
+     "records": 17,
+     "values": [
+      "home/away flip across snapshots",
+      "no venue owner on record"
+     ]
+    }
+   ],
+   "matchup": "Ark.-Pine Bluff / Erskine",
+   "records": 17
+  },
   "6628376": {
    "conflicts": [
     {
@@ -496,20 +534,6 @@
    "matchup": "Omaha / UC Riverside",
    "records": 3
   },
-  "6628455": {
-   "conflicts": [
-    {
-     "field": "start_time_epoch",
-     "records": 7,
-     "values": [
-      "1788552000",
-      "1788548400"
-     ]
-    }
-   ],
-   "matchup": "Marist / SIUE",
-   "records": 7
-  },
   "6637750": {
    "conflicts": [
     {
@@ -523,20 +547,6 @@
    ],
    "matchup": "Lehigh / Delaware St.",
    "records": 4
-  },
-  "6638111": {
-   "conflicts": [
-    {
-     "field": "start_time_epoch",
-     "records": 7,
-     "values": [
-      "1788568200",
-      "1788564600"
-     ]
-    }
-   ],
-   "matchup": "Kansas City / Miami (OH)",
-   "records": 7
   },
   "6639126": {
    "conflicts": [
@@ -568,10 +578,10 @@
   }
  },
  "by_field": {
-  "game_state": 54,
-  "site": 2,
-  "start_time_epoch": 35,
-  "teams": 3,
+  "game_state": 60,
+  "site": 3,
+  "start_time_epoch": 34,
+  "teams": 4,
   "teams (non-blocking)": 6
  },
  "corrections": {
@@ -705,10 +715,10 @@
   }
  },
  "counts": {
-  "blocked": 38,
-  "conflicted": 96,
+  "blocked": 37,
+  "conflicted": 100,
   "corrected": 4,
-  "fixtures": 4880
+  "fixtures": 4882
  },
  "official_conflicts": {},
  "stale": {}

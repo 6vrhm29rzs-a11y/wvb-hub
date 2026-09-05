@@ -1305,6 +1305,220 @@
      "establishes": "Kansas L 2-3 vs Florida State"
     }
    ]
+  },
+  "6626051": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Pepperdine def. Tulsa 3-1 with box and lineup rows attributed the same way",
+   "correct": {
+    "winner_team_id": "45876",
+    "away_sets": 3,
+    "home_sets": 1,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 26,
+      "home": 24
+     },
+     {
+      "period": 2,
+      "visit": 25,
+      "home": 22
+     },
+     {
+      "period": 3,
+      "visit": 16,
+      "home": 25
+     },
+     {
+      "period": 4,
+      "visit": 25,
+      "home": 20
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "45876": "46240",
+     "46240": "45876"
+    }
+   },
+   "established": "Tulsa won 3-1 -- the feed's entire team attribution is inverted (the SMU-UC Davis class). Caught by the FIRST INTRADAY verification sweep (the trust cutoff, 2026-09-04): both schools contradict the feed and assert the same alternative. Linescores flipped column-for-column.",
+   "evidence": [
+    {
+     "url": "https://pepperdinewaves.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Pepperdine",
+     "retrieved": "2026-09-05T01:49:04Z",
+     "text": "published schedule row for 2026-09-04: 'Pepperdine L 1-3 vs Tulsa'",
+     "establishes": "Pepperdine L 1-3 vs Tulsa"
+    },
+    {
+     "url": "https://tulsahurricane.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Tulsa",
+     "retrieved": "2026-09-05T01:49:04Z",
+     "text": "published schedule row for 2026-09-04: 'Tulsa W 3-1 vs Pepperdine'",
+     "establishes": "Tulsa W 3-1 vs Pepperdine"
+    }
+   ]
+  },
+  "6627666": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Texas St. def. UTRGV 3-0 with box and lineup rows attributed the same way",
+   "correct": {
+    "winner_team_id": "45984",
+    "away_sets": 0,
+    "home_sets": 3,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 19,
+      "home": 25
+     },
+     {
+      "period": 2,
+      "visit": 22,
+      "home": 25
+     },
+     {
+      "period": 3,
+      "visit": 18,
+      "home": 25
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "45984": "46124",
+     "46124": "45984"
+    }
+   },
+   "established": "UTRGV won 3-0 -- the feed's entire team attribution is inverted (the SMU-UC Davis class). Caught by the FIRST INTRADAY verification sweep (the trust cutoff, 2026-09-04): both schools contradict the feed and assert the same alternative. Linescores flipped column-for-column.",
+   "evidence": [
+    {
+     "url": "https://txstatebobcats.com/services/schedule_txt.ashx?schedule=360",
+     "kind": "school_site",
+     "school": "Texas St.",
+     "retrieved": "2026-09-05T01:49:04Z",
+     "text": "published schedule row for 2026-09-04: 'Texas St. L 0-3 vs UTRGV'",
+     "establishes": "Texas St. L 0-3 vs UTRGV"
+    },
+    {
+     "url": "https://goutrgv.com/services/schedule_txt.ashx?schedule=1068",
+     "kind": "school_site",
+     "school": "UTRGV",
+     "retrieved": "2026-09-05T01:49:04Z",
+     "text": "published schedule row for 2026-09-04: 'UTRGV W 3-0 vs Texas State'",
+     "establishes": "UTRGV W 3-0 vs Texas State"
+    }
+   ]
+  },
+  "6626802": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "UT Martin def. Jackson St. 3-0 with box and lineup rows attributed the same way",
+   "correct": {
+    "winner_team_id": "45783",
+    "away_sets": 3,
+    "home_sets": 0,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 25,
+      "home": 21
+     },
+     {
+      "period": 2,
+      "visit": 25,
+      "home": 16
+     },
+     {
+      "period": 3,
+      "visit": 25,
+      "home": 21
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "45783": "46506",
+     "46506": "45783"
+    }
+   },
+   "established": "Jackson St. won 3-0 -- the feed's entire team attribution is inverted (the SMU-UC Davis class). Caught by the FIRST INTRADAY verification sweep (the trust cutoff, 2026-09-04): both schools contradict the feed and assert the same alternative. Linescores flipped column-for-column.",
+   "evidence": [
+    {
+     "url": "https://utmsports.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "UT Martin",
+     "retrieved": "2026-09-05T01:49:04Z",
+     "text": "published schedule row for 2026-09-04: 'UT Martin L 0-3 vs Jackson State'",
+     "establishes": "UT Martin L 0-3 vs Jackson State"
+    },
+    {
+     "url": "https://gojsutigers.com/services/schedule_txt.ashx?schedule=172",
+     "kind": "school_site",
+     "school": "Jackson St.",
+     "retrieved": "2026-09-05T01:49:04Z",
+     "text": "published schedule row for 2026-09-04: 'Jackson St. W 3-0 vs UT Martin'",
+     "establishes": "Jackson St. W 3-0 vs UT Martin"
+    }
+   ]
+  },
+  "6627089": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Northern Colo. def. New Mexico 3-1 with box and lineup rows attributed the same way",
+   "correct": {
+    "winner_team_id": "46235",
+    "away_sets": 1,
+    "home_sets": 3,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 20,
+      "home": 25
+     },
+     {
+      "period": 2,
+      "visit": 25,
+      "home": 23
+     },
+     {
+      "period": 3,
+      "visit": 20,
+      "home": 25
+     },
+     {
+      "period": 4,
+      "visit": 16,
+      "home": 25
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46235": "46478",
+     "46478": "46235"
+    }
+   },
+   "established": "New Mexico won 3-1 -- the feed's entire team attribution is inverted (the SMU-UC Davis class). Caught by the FIRST INTRADAY verification sweep (the trust cutoff, 2026-09-04): both schools contradict the feed and assert the same alternative. Linescores flipped column-for-column.",
+   "evidence": [
+    {
+     "url": "https://uncbears.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Northern Colo.",
+     "retrieved": "2026-09-05T01:49:04Z",
+     "text": "published schedule row for 2026-09-04: 'Northern Colo. L 1-3 vs New Mexico'",
+     "establishes": "Northern Colo. L 1-3 vs New Mexico"
+    },
+    {
+     "url": "https://golobos.com/sports/wvball/schedule",
+     "kind": "school_site",
+     "school": "New Mexico",
+     "retrieved": "2026-09-05T01:49:04Z",
+     "text": "published schedule row for 2026-09-04: 'New Mexico W 3-1 vs Northern Colorado'",
+     "establishes": "New Mexico W 3-1 vs Northern Colorado"
+    }
+   ]
   }
  }
 }
