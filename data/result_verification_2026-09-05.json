@@ -1,12 +1,12 @@
 {
  "date": "2026-09-05",
- "generated_utc": "2026-09-05T23:25:03Z",
+ "generated_utc": "2026-09-05T23:54:16Z",
  "counts": {
-  "UNVERIFIED": 4,
-  "CORROBORATED_ONE": 59,
-  "VERIFIED_BOTH": 44,
+  "UNVERIFIED": 3,
+  "CORROBORATED_ONE": 64,
+  "VERIFIED_BOTH": 47,
   "SCHOOL_CONFLICT": 1,
-  "CONTRADICTED_ONE": 5,
+  "CONTRADICTED_ONE": 6,
   "CONTRADICTED_BOTH": 2
  },
  "matches": [
@@ -2656,7 +2656,7 @@
    "gid": "6625873",
    "date": "2026-09-05",
    "canonical": "Idaho St. def. Boise St. 3-2",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Idaho St.": {
      "state": "NOT_POSTED",
@@ -2672,17 +2672,11 @@
      ]
     },
     "Boise St.": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://broncosports.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 5 (Sat)",
-      "1 p.m.",
-      "Home",
-      "Idaho State",
-      "Boise, Idaho (ExtraMile Arena)",
-      "Boise State Classic",
-      "-"
-     ]
+     "assertion": "Boise St. L 2-3 vs Idaho State",
+     "opponent_source": "Idaho State",
+     "site_says": "Home"
     }
    }
   },
@@ -2750,6 +2744,207 @@
       "Away",
       "Harvard",
       "Cambridge, Mass.",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6625243",
+   "date": "2026-09-05",
+   "canonical": "Sacramento St. def. Saint Mary's (CA) 3-2",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Sacramento St.": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://hornetsports.com/services/schedule_txt.ashx?schedule=637",
+     "rows_on_date": [
+      "Saint Mary's"
+     ]
+    },
+    "Saint Mary's (CA)": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://smcgaels.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Saint Mary's (CA) L 2-3 vs Sacramento State",
+     "opponent_source": "Sacramento State",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6628626",
+   "date": "2026-09-05",
+   "canonical": "Stetson def. Bethune-Cookman 3-1",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Stetson": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gohatters.com/services/schedule_txt.ashx?schedule=555",
+     "assertion": "Stetson W 3-1 vs Bethune-Cookman",
+     "opponent_source": "Bethune-Cookman",
+     "site_says": "Home"
+    },
+    "Bethune-Cookman": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://bcuathletics.com/services/schedule_txt.ashx?schedule=2442",
+     "assertion": "Bethune-Cookman L 1-3 vs Stetson",
+     "opponent_source": "Stetson",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6627992",
+   "date": "2026-09-05",
+   "canonical": "Florida A&M def. Coastal Carolina 3-1",
+   "verdict": "CONTRADICTED_ONE",
+   "schools": {
+    "Florida A&M": {
+     "state": "CONTRADICTS",
+     "url": "https://famuathletics.com/services/schedule_txt.ashx?schedule=214",
+     "assertion": "Florida A&M L 1-3 vs Coastal Carolina",
+     "opponent_source": "Coastal Carolina",
+     "site_says": "Neutral"
+    },
+    "Coastal Carolina": {
+     "state": "NOT_POSTED",
+     "url": "https://goccusports.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 5 (Sat)",
+      "5:00 p.m.",
+      "Neutral",
+      "Florida A&M",
+      "Jacksonville, FL",
+      "Dolphin Volleyball Classic",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6625223",
+   "date": "2026-09-05",
+   "canonical": "Fairfield def. Northeastern 3-2",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Fairfield": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://fairfieldstags.com/services/schedule_txt.ashx?schedule=1530",
+     "assertion": "Fairfield W 3-2 vs Northeastern",
+     "opponent_source": "Northeastern",
+     "site_says": "Away"
+    },
+    "Northeastern": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gonu.com/services/schedule_txt.ashx?schedule=2466",
+     "assertion": "Northeastern L 2-3 vs Fairfield",
+     "opponent_source": "Fairfield",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6624356",
+   "date": "2026-09-05",
+   "canonical": "Michigan St. def. Central Mich. 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Michigan St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://msuspartans.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Michigan St. W 3-0 vs Central Michigan",
+     "opponent_source": "Central Michigan",
+     "site_says": "Away"
+    },
+    "Central Mich.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://cmuchippewas.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Central Mich. L 0-3 vs Michigan State",
+     "opponent_source": "Michigan State",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6639574",
+   "date": "2026-09-05",
+   "canonical": "Portland def. UC Riverside 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Portland": {
+     "state": "NOT_POSTED",
+     "url": "https://portlandpilots.com/services/schedule_txt.ashx?schedule=1469",
+     "row": [
+      "Sep 5 (Sat)",
+      "2:00 PM",
+      "Neutral",
+      "UC Riverside",
+      "San Jose, Calif. (Spartan Gym)",
+      "",
+      ""
+     ]
+    },
+    "UC Riverside": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gohighlanders.com/sports/womens-volleyball/schedule/text",
+     "assertion": "UC Riverside L 1-3 vs Portland",
+     "opponent_source": "Portland",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6625457",
+   "date": "2026-09-05",
+   "canonical": "Colgate def. Princeton 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Colgate": {
+     "state": "NOT_POSTED",
+     "url": "https://colgateathletics.com/services/schedule_txt.ashx?schedule=890",
+     "row": [
+      "Sep 5 (Sat)",
+      "6 p.m.",
+      "Home",
+      "Princeton",
+      "Hamilton, N.Y. (Cotterell Court)",
+      "",
+      ""
+     ]
+    },
+    "Princeton": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://goprincetontigers.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Princeton L 0-3 vs Colgate",
+     "opponent_source": "Colgate",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6639372",
+   "date": "2026-09-05",
+   "canonical": "Virginia def. VCU 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Virginia": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://virginiasports.com/sports/wvball/schedule",
+     "assertion": "Virginia W 3-0 vs VCU",
+     "opponent_source": "VCU",
+     "site_says": "Away",
+     "surface": "modern_card"
+    },
+    "VCU": {
+     "state": "NOT_POSTED",
+     "url": "https://vcuathletics.com/services/schedule_txt.ashx?schedule=314",
+     "row": [
+      "Sep 5 (Sat)",
+      "6 p.m.",
+      "Home",
+      "Virginia",
+      "TBD (Siegel Center)",
       "",
       ""
      ]

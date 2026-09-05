@@ -514,6 +514,96 @@
     "review_by": "2026-09-06",
     "note": "Feed's winner is contradicted by this school's own site; the other school was unavailable at review time (SDSU schedule/text 404). One attributable source is a conflict, not a correction -- the match counts nowhere until the second school publishes."
    }
+  ],
+  "6626268": [
+   {
+    "url": "https://friars.com/sports/womens-volleyball/schedule/text",
+    "kind": "school_site",
+    "school": "Providence",
+    "retrieved": "2026-09-05T23:16:41Z",
+    "text": "'Providence W 3-1 vs Bryant University' -- the Sep 5 row of Providence's own schedule (Neutral, Kingston RI / Keaney Gymnasium)",
+    "fields": [
+     "result"
+    ],
+    "value": {
+     "result": "Providence won 3-1. The feed says Bryant (home) won 3-1; the feed's own line tape leans Providence 2 sets to 1 with the fourth frozen 16-18, so the tape cannot settle it."
+    },
+    "status": "conflicts",
+    "review_by": "2026-09-08",
+    "note": "ONE official source against the feed's counted winner -- a conflict to review, not yet a correction. Bryant's schedule export had not posted the result (checked 2026-09-05T23:16:41Z). Recheck Bryant for the second source."
+   }
+  ],
+  "6628157": [
+   {
+    "url": "https://LRTrojans.com/sports/womens-volleyball/schedule",
+    "kind": "school_site",
+    "school": "Little Rock",
+    "retrieved": "2026-09-05T23:16:41Z",
+    "text": "'Little Rock W 3-0 vs Northwestern State' -- the Sep 5 card on Little Rock's own schedule page (modern card surface)",
+    "fields": [
+     "result"
+    ],
+    "value": {
+     "result": "Little Rock won 3-0. The feed says Northwestern St. won 3-0; the feed's line tape (25-8, 25-18, 15-10) is not three completed sets, so it corroborates nothing."
+    },
+    "status": "conflicts",
+    "review_by": "2026-09-08",
+    "note": "ONE official source against the feed's counted winner. Northwestern St.'s schedule export had not posted the result (checked 2026-09-05T23:16:41Z). Recheck NSU for the second source."
+   }
+  ],
+  "6640584": [
+   {
+    "url": "https://geauxcolonels.com/services/schedule_txt.ashx?schedule=458",
+    "kind": "school_site",
+    "school": "Nicholls",
+    "retrieved": "2026-09-05T23:16:41Z",
+    "text": "'Nicholls W 3-0 vs Wiley' -- the Sep 5 row of Nicholls' own schedule export (Neutral)",
+    "fields": [
+     "result"
+    ],
+    "value": {
+     "result": "Nicholls won 3-0. The feed says Wiley (non-D-I) won 3-0; its tape holds a single frozen partial (13-4), corroborating nothing."
+    },
+    "status": "conflicts",
+    "review_by": "2026-09-08",
+    "note": "ONE official source against the feed. Wiley is non-D-I with no athletics site on file, so a second school source may never exist; the feed's own later revisions or a Nicholls box score are the plausible second sources. Non-D-I result -- excluded from D-I tallies either way, but displayed."
+   }
+  ],
+  "6627437": [
+   {
+    "url": "https://msueagles.com/services/schedule_txt.ashx?schedule=291",
+    "kind": "school_site",
+    "school": "Morehead St.",
+    "retrieved": "2026-09-05T23:16:41Z",
+    "text": "'Morehead St. L 1-3 vs Siena' -- the Sep 5 row of Morehead State's own schedule export (Neutral)",
+    "fields": [
+     "result"
+    ],
+    "value": {
+     "result": "Siena won 3-1 per Morehead St.'s site -- while Siena's OWN site says 'Siena L 1-3 vs Morehead State'. The two schools contradict EACH OTHER; the feed sides with Siena's version (Morehead won 3-1)."
+    },
+    "status": "conflicts",
+    "review_by": "2026-09-08",
+    "note": "SCHOOL-vs-SCHOOL conflict: the sources disagree with each other, so neither corroborates a correction and the feed's version keeps exactly one school behind it. Held for review until one school revises. Do NOT correct on the current evidence."
+   }
+  ],
+  "6627992": [
+   {
+    "url": "https://famuathletics.com/services/schedule_txt.ashx?schedule=214",
+    "kind": "school_site",
+    "school": "Florida A&M",
+    "retrieved": "2026-09-05T23:16:41Z",
+    "text": "'Florida A&M L 1-3 vs Coastal Carolina' -- the Sep 5 row of FAMU's own schedule export (Neutral, Dolphin Volleyball Classic, Jacksonville FL)",
+    "fields": [
+     "result"
+    ],
+    "value": {
+     "result": "Coastal Carolina won 3-1. The feed says Florida A&M (home) won 3-1, internally coherent -- and the lineup rows fit the OPPOSITE roster (the SMU-UC Davis inversion signature)."
+    },
+    "status": "conflicts",
+    "review_by": "2026-09-08",
+    "note": "ONE official source against the feed's counted winner, corroborated by the lineup-attribution signal (which may corroborate, never correct alone). Coastal Carolina had not posted (checked 2026-09-05T23:16Z). Recheck Coastal for the second source; if it posts W 3-1, upgrade to a correction with box_team_swap."
+   }
   ]
  }
 }

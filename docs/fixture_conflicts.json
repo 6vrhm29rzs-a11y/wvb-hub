@@ -60,15 +60,23 @@
    "conflicts": [
     {
      "field": "teams",
-     "records": 7,
+     "records": 10,
      "values": [
       "(('46045', False), ('46753', True))",
       "(('46045', True), ('46753', False))"
      ]
     },
     {
+     "field": "game_state",
+     "records": 10,
+     "values": [
+      "P",
+      "I"
+     ]
+    },
+    {
      "field": "site",
-     "records": 7,
+     "records": 10,
      "values": [
       "home/away flip across snapshots",
       "no venue owner on record"
@@ -76,7 +84,7 @@
     }
    ],
    "matchup": "Coppin St. / Stony Brook",
-   "records": 7
+   "records": 10
   },
   "6625252": {
    "conflicts": [
@@ -385,7 +393,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 8,
+     "records": 11,
      "values": [
       "1788604200",
       "1788647400"
@@ -393,7 +401,7 @@
     },
     {
      "field": "game_state",
-     "records": 8,
+     "records": 11,
      "values": [
       "P",
       "I"
@@ -401,7 +409,7 @@
     }
    ],
    "matchup": "Lehigh / Delaware St.",
-   "records": 8
+   "records": 11
   },
   "6639126": {
    "conflicts": [
@@ -433,7 +441,7 @@
   }
  },
  "by_field": {
-  "game_state": 51,
+  "game_state": 54,
   "site": 1,
   "start_time_epoch": 28,
   "teams": 1,
@@ -571,7 +579,7 @@
  },
  "counts": {
   "blocked": 29,
-  "conflicted": 83,
+  "conflicted": 84,
   "corrected": 4,
   "fixtures": 4884
  },

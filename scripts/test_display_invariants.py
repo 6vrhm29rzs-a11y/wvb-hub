@@ -1461,9 +1461,32 @@ def check_phantom_sets_are_harmless():
             for pl in (json.load(open(aggp, encoding="utf-8")).get("players") or []):
                 key = _ckey(pl)
                 agg[key] = pl
-            # recompute each bitten player's justified sets from the raw lines
+            # recompute each bitten player's justified sets from the raw
+            # lines -- skipping the SAME gids the aggregator skips
+            # (exhibitions, ledgered duplicates, review holds). ⚠ The first
+            # version skipped none of them and went red the day a review
+            # hold landed on a game with a box: the aggregate correctly
+            # excluded the held match while this recompute counted it.
+            _skip = set()
+            try:
+                import exhibitions as _EXH
+                _skip |= set(str(x) for x in _EXH.resolved_gids(live))
+            except Exception:
+                pass
+            try:
+                from dupes import duplicate_gids as _dg
+                _skip |= set(str(x) for x in _dg(live))
+            except Exception:
+                pass
+            try:
+                from season_counts import review_gids as _rg
+                _skip |= set(str(x) for x in _rg(live))
+            except Exception:
+                pass
             justified = {}
             for rec in recs:
+                if str(rec.get("game_id") or rec.get("gid") or "") in _skip:
+                    continue
                 rows = rec.get("rows") or []
                 if not rows:
                     continue
