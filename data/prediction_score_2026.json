@@ -2,28 +2,28 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 814,
+  "scored": 818,
   "logged_after_tipoff_excluded": 3,
   "team_mismatch_excluded": 19,
   "predictions_on_record": 4778,
-  "results_available": 856,
-  "brier": 0.1705,
+  "results_available": 860,
+  "brier": 0.1704,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 604,
-  "favourite_correct_pct": 74.2
+  "favourite_correct": 606,
+  "favourite_correct_pct": 74.1
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 132,
-   "said": 55.3,
-   "happened": 56.8
+   "n": 133,
+   "said": 55.2,
+   "happened": 56.4
   },
   {
    "range": "60-70%",
    "n": 155,
    "said": 65.1,
-   "happened": 59.4
+   "happened": 58.7
   },
   {
    "range": "70-80%",
@@ -33,9 +33,9 @@
   },
   {
    "range": "80-90%",
-   "n": 149,
+   "n": 152,
    "said": 85.0,
-   "happened": 79.2
+   "happened": 79.6
   },
   {
    "range": "90-101%",
@@ -235,6 +235,15 @@
    "brier": 0.7873012899999999
   },
   {
+   "game_id": "6625873",
+   "date": "2026-09-05",
+   "away": "Idaho St.",
+   "home": "Boise St.",
+   "p_home": 0.8799,
+   "home_won": false,
+   "brier": 0.7742240100000001
+  },
+  {
    "game_id": "6626942",
    "date": "2026-08-29",
    "away": "Butler",
@@ -359,15 +368,6 @@
    "p_home": 0.162,
    "home_won": true,
    "brier": 0.702244
-  },
-  {
-   "game_id": "6627136",
-   "date": "2026-09-05",
-   "away": "Portland St.",
-   "home": "Murray St.",
-   "p_home": 0.1669,
-   "home_won": true,
-   "brier": 0.6940556099999999
   },
   {
    "game_id": "6624937",

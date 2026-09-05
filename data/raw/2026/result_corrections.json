@@ -1778,6 +1778,88 @@
      "establishes": "Sacred Heart L 2-3 vs Binghamton"
     }
    ]
+  },
+  "6627136": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Murray St. (home) won 3-0 -- 25-18, 25-19, 25-13 from the home column -- with box rows attributed the same way. Internally coherent, and wrong.",
+   "correct": {
+    "winner_team_id": "45987",
+    "away_sets": 3,
+    "home_sets": 0,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 25,
+      "home": 18
+     },
+     {
+      "period": 2,
+      "visit": 25,
+      "home": 19
+     },
+     {
+      "period": 3,
+      "visit": 25,
+      "home": 13
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46604": "45987",
+     "45987": "46604"
+    }
+   },
+   "established": "Portland St. won 3-0 -- the feed's entire team attribution is inverted (the SMU-UC Davis class). Caught by the intraday verification sweep on the Sept 5 slate: both schools contradict the feed and assert the same alternative, and the attribution-suspicion detector's box_roster_fit scores the rows on the OPPOSITE rosters at 1.00/0.786 while fitting their own at 0.00. Linescores flipped column-for-column.",
+   "evidence": [
+    {
+     "url": "https://goracers.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Murray St.",
+     "retrieved": "2026-09-05T23:16:41Z",
+     "text": "'Murray St. L 0-3 vs Portland State' -- the Sep 5 row of Murray State's own published schedule (Neutral)",
+     "establishes": "Murray St. lost 0-3"
+    },
+    {
+     "url": "https://goviks.com/services/schedule_txt.ashx?schedule=224",
+     "kind": "school_site",
+     "school": "Portland St.",
+     "retrieved": "2026-09-05T23:16:41Z",
+     "text": "'Portland St. W 3-0 vs Murray State' -- the Sep 5 row of Portland State's own schedule export (Neutral)",
+     "establishes": "Portland St. won 3-0 -- the second school source; both schools assert the same alternative against the feed"
+    }
+   ]
+  },
+  "6628429": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Cal St. Fullerton (away) won 3-1 (winner_team_id 45757, sets_won 3-1) -- the line tape truncates after two decided sets (25-20 CSF, 27-25 ORU) with the third frozen 3-4",
+   "correct": {
+    "winner_team_id": "46480",
+    "away_sets": 1,
+    "home_sets": 3,
+    "linescores": [],
+    "linescores_replace": true
+   },
+   "established": "Oral Roberts won 3-1 -- derived winner/sets inverted (the Chattanooga-UT Martin class: the in-record W-L records fit the feed's team attribution, so the names are right and the winner flag is wrong); both schools assert it. Caught by the intraday verification sweep on the Sept 5 slate. The feed's line tape froze mid-third, so the line score is withheld rather than shown partial (the Pacific-UCR rule); the raw rows remain in the log.",
+   "evidence": [
+    {
+     "url": "https://fullertontitans.com/services/schedule_txt.ashx?schedule=265",
+     "kind": "school_site",
+     "school": "Cal St. Fullerton",
+     "retrieved": "2026-09-05T23:16:41Z",
+     "text": "'Cal St. Fullerton L 1-3 vs Oral Roberts' -- the Sep 5 row of Fullerton's own schedule export (Neutral)",
+     "establishes": "Cal St. Fullerton lost 1-3"
+    },
+    {
+     "url": "https://oruathletics.com/services/schedule_txt.ashx?schedule=338",
+     "kind": "school_site",
+     "school": "Oral Roberts",
+     "retrieved": "2026-09-05T23:16:41Z",
+     "text": "'Oral Roberts W 3-1 vs Cal State Fullerton' -- the Sep 5 row of ORU's own schedule export (Neutral)",
+     "establishes": "Oral Roberts won 3-1 -- the second school source; both schools assert the same alternative against the feed"
+    }
+   ]
   }
  }
 }
