@@ -2365,7 +2365,11 @@ def team_season_stats(boxes, res):
     # it gave the D-I team it played -- those totals were built from the same
     # box score and Norfolk St. really did earn them that night. What it does
     # not get is a row of its own in a table that ranks Division I.
-    _di = _di_ms
+    # ⚠ THE ROW FILTER IS A LISTING DECISION -- di_teams(), the 348 -- while
+    # _di_ms above is the COUNTING set (di_counting: 348 + unanimously-div1
+    # reclassifiers). West Florida's games count for its opponents, but it
+    # holds no leaderboard row until an official 2026 table lists it.
+    _di = di_teams()
     if _di:
         out = dict((k, v) for k, v in out.items() if k in _di)
     return out
@@ -6227,7 +6231,12 @@ td.al{color:var(--ink2);font-size:12.5px}
 tr.row:hover td{background:var(--alt);cursor:pointer}
 i.rnk{font:800 11px/1 var(--mono);color:var(--amber);font-style:normal;vertical-align:1px}
 b.pl6{font:800 11px/1 var(--mono);color:var(--live);vertical-align:2px;margin-left:5px}
-.scroll{max-height:72vh;overflow:auto}
+/* ⚠ NO SCROLL-INSIDE-A-SCROLL (Cody, 2026-09-04: iPhone full-page
+   screenshot "just chops things off" -- Safari captures the document, not
+   an inner scroller's hidden rows). Tables flow in the page; only WIDTH
+   stays contained. Sticky headers inside these wrappers stop floating --
+   an accepted trade: a table you can capture beats a header that follows. */
+.scroll{overflow-x:auto}
 
 /* ---- score cards ---- */
 /* align-items:start, or a card that opens its box score drags every sibling in
@@ -8774,9 +8783,13 @@ td.wh .wu{color:var(--ink3);font-style:italic}
    it; only the width grows. */
 .fw.fnd,.fl.fnd{width:auto;min-width:19px;padding:0 4px;
   background:transparent;border:1px dashed currentColor}
+/* ⚠ .fexh CARRIES THE SAME EXH SUFFIX AND MISSED THE SAME FIX (Cody's
+   screenshot, 2026-09-04: Nebraska's exhibition pill overlapped the W
+   beside it). Two marker classes, one sized -- the R4 shape. */
+.fw.fexh,.fl.fexh{width:auto;min-width:19px;padding:0 4px}
 .fndt{font-style:normal;font-weight:700;font-size:11px;letter-spacing:.03em;
   margin-left:3px;opacity:.9}
-@media (max-width:560px){.fw.fnd,.fl.fnd{padding:0 3px}
+@media (max-width:560px){.fw.fnd,.fl.fnd,.fw.fexh,.fl.fexh{padding:0 3px}
   .fndt{font-size:11px;margin-left:2px}}
 
 /* ---- WEEKLY RANKING CALENDAR ----------------------------------------------
