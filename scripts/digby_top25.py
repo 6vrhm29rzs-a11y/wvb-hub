@@ -454,9 +454,19 @@ def main():
     # Same field names as rating_2025.py meta, so consumers read one shape.
     doc["meta"]["generated_at_utc"] = datetime.datetime.utcnow().replace(
         microsecond=0).isoformat() + "Z"
+    # ⚠ THROUGH WHAT THE RATING COUNTS, not through what the dataset holds
+    # (Cody, 2026-09-04: "recomputed 5:38 PM today" beside the as-of-
+    # yesterday cutoff read as if today's finals were in). The max epoch
+    # over ALL finals stamped data-through at 4 PM while _eligible() cut
+    # at midnight -- two rulers in one stamp. data_through is the latest
+    # COUNTED final; the cutoff rides beside it so the page can say both.
+    import season_counts as _SCm
+    _cut = _SCm.rating_cutoff_epoch()
     _fin = [g.get("start_time_epoch") for g in (live.get("games") or [])
-            if g.get("state") == "F" and g.get("start_time_epoch")]
+            if g.get("state") == "F" and g.get("start_time_epoch")
+            and g.get("start_time_epoch") < _cut]
     doc["meta"]["data_through_epoch"] = max(_fin) if _fin else None
+    doc["meta"]["rating_cutoff_epoch"] = _cut
     json.dump(doc, open(OUT, "w"), indent=1, sort_keys=False)
     m = doc["meta"]
     print("k = %.2f matches  (sigma^2 %.2f / tau^2 %.2f)"

@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-05T00:38:31Z",
+  "generated_at_utc": "2026-09-05T00:57:33Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 0,
    "expired": 2,
-   "anomalies": 167
+   "anomalies": 161
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -265,34 +265,6 @@
    "points_per_set_missing": 13.409
   },
   {
-   "game_id": "6625725",
-   "team_id": "46674",
-   "team": "Florida St.",
-   "absent": [
-    {
-     "name": "Kyleene Filimaua",
-     "rate": 3.923,
-     "played_share": 1.0
-    },
-    {
-     "name": "Sofia Moss",
-     "rate": 3.231,
-     "played_share": 1.0
-    },
-    {
-     "name": "Delaney Ewing",
-     "rate": 2.846,
-     "played_share": 1.0
-    },
-    {
-     "name": "Nenu Kpea",
-     "rate": 2.654,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 12.654
-  },
-  {
    "game_id": "6627266",
    "team_id": "46659",
    "team": "Cal Poly",
@@ -337,29 +309,6 @@
     }
    ],
    "points_per_set_missing": 11.61
-  },
-  {
-   "game_id": "6625725",
-   "team_id": "46422",
-   "team": "Kansas",
-   "absent": [
-    {
-     "name": "Taylor Stanley",
-     "rate": 5.125,
-     "played_share": 1.0
-    },
-    {
-     "name": "Reese Ptacek",
-     "rate": 3.542,
-     "played_share": 1.0
-    },
-    {
-     "name": "Grace Nelson",
-     "rate": 2.75,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 11.417
   },
   {
    "game_id": "6626051",
@@ -852,24 +801,6 @@
    "points_per_set_missing": 4.688
   },
   {
-   "game_id": "6628274",
-   "team_id": "51287",
-   "team": "Houston Christian",
-   "absent": [
-    {
-     "name": "Sa'myah Medford",
-     "rate": 3.143,
-     "played_share": 1.0
-    },
-    {
-     "name": "Malaya Balina-ayers",
-     "rate": 1.393,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 4.536
-  },
-  {
    "game_id": "6625817",
    "team_id": "46103",
    "team": "Nicholls",
@@ -899,6 +830,24 @@
     }
    ],
    "points_per_set_missing": 4.3
+  },
+  {
+   "game_id": "6628274",
+   "team_id": "51287",
+   "team": "Houston Christian",
+   "absent": [
+    {
+     "name": "Sa'myah Medford",
+     "rate": 2.941,
+     "played_share": 1.0
+    },
+    {
+     "name": "Malaya Balina-ayers",
+     "rate": 1.353,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 4.294
   },
   {
    "game_id": "6640390",
@@ -1160,32 +1109,6 @@
     }
    ],
    "points_per_set_missing": 3.429
-  },
-  {
-   "game_id": "6625236",
-   "team_id": "46490",
-   "team": "Saint Mary's (CA)",
-   "absent": [
-    {
-     "name": "Antonie Kelnarova",
-     "rate": 3.389,
-     "played_share": 0.667
-    }
-   ],
-   "points_per_set_missing": 3.389
-  },
-  {
-   "game_id": "6625239",
-   "team_id": "46490",
-   "team": "Saint Mary's (CA)",
-   "absent": [
-    {
-     "name": "Antonie Kelnarova",
-     "rate": 3.389,
-     "played_share": 0.667
-    }
-   ],
-   "points_per_set_missing": 3.389
   },
   {
    "game_id": "6624350",
@@ -1980,32 +1903,6 @@
     }
    ],
    "points_per_set_missing": 1.857
-  },
-  {
-   "game_id": "6627402",
-   "team_id": "46175",
-   "team": "Delaware St.",
-   "absent": [
-    {
-     "name": "Myracle Davis",
-     "rate": 1.8,
-     "played_share": 0.667
-    }
-   ],
-   "points_per_set_missing": 1.8
-  },
-  {
-   "game_id": "6625090",
-   "team_id": "46175",
-   "team": "Delaware St.",
-   "absent": [
-    {
-     "name": "Myracle Davis",
-     "rate": 1.8,
-     "played_share": 0.667
-    }
-   ],
-   "points_per_set_missing": 1.8
   },
   {
    "game_id": "6627126",
@@ -3151,10 +3048,18 @@
    ]
   },
   "Buffalo": {
-   "gid": "6624910",
-   "d": "2026-09-02",
-   "appeared": 15,
-   "zero_action": []
+   "gid": "6624911",
+   "d": "2026-09-04",
+   "appeared": 10,
+   "zero_action": [
+    "Ava Kanj",
+    "Tehya Shaw",
+    "Reese Collins",
+    "Michal Benaim",
+    "Soleil Rancourt",
+    "Sadie Gladhill",
+    "Abbie Willis"
+   ]
   },
   "Nicholls": {
    "gid": "6627726",
@@ -3468,12 +3373,12 @@
    ]
   },
   "Valparaiso": {
-   "gid": "6626423",
-   "d": "2026-08-29",
-   "appeared": 15,
+   "gid": "6626426",
+   "d": "2026-09-04",
+   "appeared": 12,
    "zero_action": [
-    "Drew Glaser",
-    "Kyla Bellich"
+    "Lindley Martin",
+    "Mia Liberti"
    ]
   },
   "UNCW": {
@@ -3517,17 +3422,17 @@
    ]
   },
   "Temple": {
-   "gid": "6628472",
-   "d": "2026-08-30",
+   "gid": "6628217",
+   "d": "2026-09-04",
    "appeared": 9,
    "zero_action": [
     "Lily Smith",
     "Maddix Taniguchi",
     "Makayla Batten",
+    "Daniella Gonzalez-murati",
     "Leah Hampson",
     "Opeoluwa Aladetimi",
     "Sofia Vega",
-    "Mickhaila Murray",
     "Jaya Moore",
     "Sofia Hardy",
     "Sarah Quarells"
@@ -3545,16 +3450,14 @@
    ]
   },
   "NJIT": {
-   "gid": "6628346",
-   "d": "2026-09-02",
-   "appeared": 10,
+   "gid": "6627408",
+   "d": "2026-09-04",
+   "appeared": 13,
    "zero_action": [
+    "Rowan Schreiber",
+    "Maria Kurnatowska",
     "Ashlynn Berns",
-    "Madison Mackaig",
-    "Kayden Campbell",
-    "Joaneliz Maisonet",
-    "Martina Gonzalo cortes",
-    "Giselle Parker"
+    "Madison Mackaig"
    ]
   },
   "FDU": {
@@ -4448,16 +4351,12 @@
    ]
   },
   "Houston": {
-   "gid": "6624646",
-   "d": "2026-09-03",
-   "appeared": 10,
+   "gid": "6628277",
+   "d": "2026-09-04",
+   "appeared": 14,
    "zero_action": [
     "Noemi Despaigne",
-    "Olivia Stringer",
     "Leah Robinson",
-    "Shannon Dworaczyk",
-    "Kaitlyn Evans",
-    "Aidan Conner",
     "Harmoni Dobbins",
     "Ava Wilkerson"
    ]
@@ -4483,15 +4382,12 @@
    ]
   },
   "Delaware St.": {
-   "gid": "6626856",
-   "d": "2026-09-02",
-   "appeared": 10,
+   "gid": "6627408",
+   "d": "2026-09-04",
+   "appeared": 13,
    "zero_action": [
-    "Haley Crawford",
     "Aubree Mon",
     "Emma Patmon",
-    "Autumn Richardson",
-    "Maria Cocco-lambia",
     "Mikayla Moore",
     "Lelaini Diggs",
     "Riley Parker"
@@ -4559,17 +4455,17 @@
    ]
   },
   "Fairfield": {
-   "gid": "6625203",
-   "d": "2026-08-29",
-   "appeared": 11,
+   "gid": "6625220",
+   "d": "2026-09-04",
+   "appeared": 12,
    "zero_action": [
-    "Natalie Carlin",
+    "Keyaira Limuel-washington",
     "Daniella Suarez",
     "Ella Paniagua",
+    "Nicole Macalintal",
     "Courtney Vines",
     "Mary kate Bradley",
-    "Lilly Guinane",
-    "Lindsey Healey"
+    "Lilly Guinane"
    ]
   },
   "Evansville": {
@@ -4617,8 +4513,8 @@
    ]
   },
   "Houston Christian": {
-   "gid": "6628276",
-   "d": "2026-09-03",
+   "gid": "6628277",
+   "d": "2026-09-04",
    "appeared": 10,
    "zero_action": [
     "Tobey Allen",
@@ -5660,12 +5556,11 @@
    ]
   },
   "Wake Forest": {
-   "gid": "6628518",
-   "d": "2026-08-29",
+   "gid": "6637451",
+   "d": "2026-09-04",
    "appeared": 13,
    "zero_action": [
     "Ava Roddey",
-    "Dhru Lalaji",
     "Camille Mccoy",
     "Elena Dragani"
    ]
@@ -5773,15 +5668,16 @@
    ]
   },
   "Davidson": {
-   "gid": "6626400",
-   "d": "2026-08-30",
-   "appeared": 11,
+   "gid": "6637451",
+   "d": "2026-09-04",
+   "appeared": 10,
    "zero_action": [
     "Angelique St. laurent",
     "Kate Whiteley",
     "Abigail Henson",
     "Peyton Garrick",
     "Myla Young",
+    "Mia Compas",
     "Melanie Tilles"
    ]
   },
@@ -5853,26 +5749,24 @@
    ]
   },
   "Louisiana Tech": {
-   "gid": "6639464",
-   "d": "2026-09-03",
+   "gid": "6628368",
+   "d": "2026-09-04",
    "appeared": 11,
    "zero_action": [
-    "Megan Cooley",
+    "Violet Morrandez",
     "Anaya Hairston",
     "Ryan Rusher"
    ]
   },
   "Iona": {
-   "gid": "6625760",
+   "gid": "6625761",
    "d": "2026-09-04",
-   "appeared": 13,
+   "appeared": 15,
    "zero_action": [
     "Olivia Filipowski",
-    "Grace Daniels",
     "Emma Koceja",
     "Gabby Taylor",
-    "Mija Jegers",
-    "Cassandra Rohan"
+    "Ava Reding"
    ]
   },
   "Tulane": {
@@ -5981,10 +5875,13 @@
    "zero_action": []
   },
   "San Francisco": {
-   "gid": "6628216",
-   "d": "2026-09-01",
-   "appeared": 12,
-   "zero_action": []
+   "gid": "6628217",
+   "d": "2026-09-04",
+   "appeared": 11,
+   "zero_action": [
+    "Hokulani Perez",
+    "True Takemoto"
+   ]
   },
   "Colorado": {
    "gid": "6626304",
@@ -6120,14 +6017,14 @@
    ]
   },
   "Cincinnati": {
-   "gid": "6628526",
-   "d": "2026-09-01",
-   "appeared": 11,
+   "gid": "6626426",
+   "d": "2026-09-04",
+   "appeared": 13,
    "zero_action": [
-    "Kayla Hostetler",
+    "Andi Spies",
+    "Lily Rolfes",
     "Julia Horan",
-    "Malayna Boyles",
-    "Tatjana Simeunovic",
+    "Kayla Edginton",
     "Elliott Mickelberry"
    ]
   },
@@ -6173,11 +6070,12 @@
    ]
   },
   "Omaha": {
-   "gid": "6626612",
-   "d": "2026-09-03",
-   "appeared": 10,
+   "gid": "6628368",
+   "d": "2026-09-04",
+   "appeared": 9,
    "zero_action": [
     "Cora Metcalf",
+    "Torrey Tkach",
     "Ella Tiarks"
    ]
   },
@@ -6382,14 +6280,15 @@
    ]
   },
   "Saint Mary's (CA)": {
-   "gid": "6625239",
-   "d": "2026-09-03",
-   "appeared": 12,
+   "gid": "6625241",
+   "d": "2026-09-04",
+   "appeared": 11,
    "zero_action": [
     "Amanda Prior",
     "Kiana Johnson",
     "Mikayla Haner",
     "Lainey Day",
+    "Natalie Peete",
     "Milani Billings",
     "Tallulah Carney"
    ]
@@ -6518,12 +6417,14 @@
    ]
   },
   "Hofstra": {
-   "gid": "6626658",
-   "d": "2026-08-30",
+   "gid": "6626659",
+   "d": "2026-09-04",
    "appeared": 10,
    "zero_action": [
     "Stella Becker",
+    "Valentina Lopez moya",
     "Alyssa Kenol",
+    "Melis Ba\u00e5\u009faran",
     "Brooke Wilson"
    ]
   },
@@ -6608,13 +6509,13 @@
    ]
   },
   "UMBC": {
-   "gid": "6625034",
-   "d": "2026-08-30",
+   "gid": "6624911",
+   "d": "2026-09-04",
    "appeared": 11,
    "zero_action": [
+    "Helen Frankovich",
     "Megan Hunter",
     "Jada James",
-    "Natalie Harris",
     "Elyse Vanlandingham",
     "Laura Fuehrer",
     "Ema Djordjevic"
@@ -6701,11 +6602,14 @@
    ]
   },
   "Nevada": {
-   "gid": "6627596",
-   "d": "2026-09-03",
-   "appeared": 11,
+   "gid": "6625241",
+   "d": "2026-09-04",
+   "appeared": 12,
    "zero_action": [
-    "Sabrina Jones"
+    "Sabrina Jones",
+    "Adriana Dorn",
+    "Ambri Hanohano",
+    "Alexa Ham"
    ]
   },
   "Northeastern": {
@@ -6835,12 +6739,12 @@
    ]
   },
   "Columbia": {
-   "gid": "6637098",
+   "gid": "6625761",
    "d": "2026-09-04",
    "appeared": 11,
    "zero_action": [
-    "Elise Hiemstra",
     "Kylee Eze",
+    "Alexia Cornea",
     "Evie Naumann",
     "Ava Wang",
     "Allie Abernathy",
@@ -6925,6 +6829,30 @@
     "Julia Gojcaj",
     "Madalin Hersman",
     "Annika Roberson"
+   ]
+  },
+  "Yale": {
+   "gid": "6626659",
+   "d": "2026-09-04",
+   "appeared": 12,
+   "zero_action": [
+    "Jaidynn Perkins-martin",
+    "Naya Salfiti",
+    "Callie Funk",
+    "Cara Lehmitz",
+    "Caroline Huseman"
+   ]
+  },
+  "Harvard": {
+   "gid": "6625220",
+   "d": "2026-09-04",
+   "appeared": 10,
+   "zero_action": [
+    "Alicia Guo",
+    "Bennett Trubey",
+    "Kayla Nwabueze",
+    "Madeline Pankowski",
+    "Nicole Cornell"
    ]
   }
  },

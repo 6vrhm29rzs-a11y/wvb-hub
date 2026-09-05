@@ -4170,11 +4170,37 @@ def build():
                 "measured, not chosen, and grows with every match played"
                 % (SEASON, len(_played), len(_blend), round(100 * _w)))
             if _rst:
-                _rn = (meta.get("rank_stamp") or {}).get("matches_in")
-                rank_basis += (
-                    " <span class=\"rkstamp\">&middot; recomputed <b>%s</b>%s"
-                    "</span>"
-                    % (_rst, (", %d finals in" % _rn) if _rn else ""))
+                # ⚠ TWO FACTS, NEVER COLLAPSED (Cody, 2026-09-04: "recomputed
+                # 5 PM today. Is that wrong?"): the stamp says when the math
+                # RAN; the cutoff says what it COUNTS. "recomputed 5:38 PM,
+                # 570 finals in" read as if the afternoon's finals were in the
+                # number -- they enter at the next midnight-PT cutoff, the
+                # as-of-yesterday rule Cody chose. Name both boundaries.
+                _rs = meta.get("rank_stamp") or {}
+                _rn = _rs.get("matches_in")
+                _rcut = _rs.get("rating_cutoff_epoch")
+                _cutbit = ""
+                if _rcut and PT is not None:
+                    # cutoff = start of a PT day; the last COUNTED moment is
+                    # one second before it. Convert in PT explicitly -- CI
+                    # runs in UTC, where naive fromtimestamp names the wrong
+                    # calendar day.
+                    _thru = datetime.datetime.fromtimestamp(
+                        _rcut - 1, PT).strftime("%b %d").replace(" 0", " ")
+                    _cutbit = (" counts finals through <b>%s</b>; "
+                               "today&rsquo;s results enter at the next "
+                               "midnight-PT recompute" % _thru)
+                if _cutbit:
+                    rank_basis += (
+                        " <span class=\"rkstamp\">&middot; recomputed "
+                        "<b>%s</b>%s &middot;%s</span>"
+                        % (_rst, (" from %d finals" % _rn) if _rn else "",
+                           _cutbit))
+                else:
+                    rank_basis += (
+                        " <span class=\"rkstamp\">&middot; recomputed "
+                        "<b>%s</b>%s</span>"
+                        % (_rst, (", %d finals in" % _rn) if _rn else ""))
         else:
             rank_basis = (
                 "<b>Still the preseason projection &mdash; not yet a "

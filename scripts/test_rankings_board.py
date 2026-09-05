@@ -402,6 +402,37 @@ def main():
               set((_cert.get("dependencies") or {})) ==
               {"rating_2026", "digby_top25_2026"})
 
+    # -- the recompute stamp names BOTH boundaries (Cody, 2026-09-04:
+    # "recomputed 5 PM today. Is that wrong?" -- the run time beside the
+    # as-of-yesterday cutoff read as if the afternoon's finals were in).
+    # Two facts, never collapsed: WHEN the math ran, and THROUGH WHAT it
+    # counts. State-conditional: only when the shown ranking's own meta
+    # carries a cutoff.
+    import json as _json
+    _dg = {}
+    _dgp = os.path.join(REPO, "data/digby_top25_2026.json")
+    if os.path.exists(_dgp):
+        _dg = (_json.load(open(_dgp)).get("meta") or {})
+    _pagep = os.path.join(REPO, "Cody", "START-HERE.html")
+    if _dg.get("rating_cutoff_epoch") and os.path.exists(_pagep):
+        import io as _io
+        _page = _io.open(_pagep, encoding="utf-8").read()
+        _i = _page.find('class="rkstamp"')
+        _stamps = []
+        while _i != -1:
+            _stamps.append(_page[_i:_page.find("</span>", _i)])
+            _i = _page.find('class="rkstamp"', _i + 1)
+        check("every recompute stamp names its counted-through boundary",
+              _stamps and all(("through" in st) for st in _stamps),
+              "%d stamps" % len(_stamps))
+        # NEGATIVE CONTROL: a stamp with only the run time must fail this
+        _bad = 'class="rkstamp">recomputed <b>5:38 PM PT today</b>, 570 finals in'
+        check("[NEG] a run-time-only stamp would be caught",
+              not ("through" in _bad))
+    else:
+        print("    (no cutoff in the shown ranking's meta -- stamp "
+              "boundary check has no live subject)")
+
     print()
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))

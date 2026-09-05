@@ -379,6 +379,9 @@ def build():
         "matches_in": (_src_meta.get("matches") if live_by_team
                        else _src_meta.get("matches_counted")),
         "data_through_epoch": _src_meta.get("data_through_epoch"),
+        # the as-of-yesterday boundary, so the lead can say what "recomputed
+        # today" actually counts (absent on artifacts that predate it)
+        "rating_cutoff_epoch": _src_meta.get("rating_cutoff_epoch"),
     }
 
     for t in teams:
