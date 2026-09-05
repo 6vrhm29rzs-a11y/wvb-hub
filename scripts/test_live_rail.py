@@ -47,6 +47,19 @@ def main():
     check("[NEG] no marching animation on the rail",
           "marquee" not in rail and "translate" not in rail and
           "animation" not in re.sub(r"animation:tkpulse[^;}]*", "", rail))
+    print("\n  ONE LIVE SNAPSHOT, ONE RULER (P0.1)")
+    check("the poller publishes the live gid SET",
+          "window.LIVE_GIDS = new Set(" in src)
+    check("liveState() is the one classifier",
+          "function liveState(" in src)
+    for site in ("lanes[st === 'live'", "rows.filter(m => liveState",
+                 "onDay.filter(m => liveState",
+                 "const st = m => liveState"):
+        check("lane classifier on the snapshot ruler: %s..." % site[:28],
+              site in src)
+    check("[NEG] a snapshot-stripped 'live' match reads as final",
+          "if (st === 'live') return 'final'" in src)
+
     print()
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))

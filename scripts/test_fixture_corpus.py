@@ -133,6 +133,18 @@ def main():
                      "linescores": lines([(25, 18), (25, 21), (25, 15)]),
                      "start_time_epoch": 2000}
 
+    # 12. the SELF-CONTRADICTORY final (2026-09-05, Providence-Bryant /
+    #     UIC-Montana St. / Central Ark.-Southern Miss., three in two
+    #     hours): complete lines name one winner, derived fields name the
+    #     other. Machine-nominated hold: counts NOWHERE, stays on display.
+    G["F_SELFCON"] = {"game_id": "900012", "game_state": "F",
+                      "winner_team_id": "19",
+                      "teams": [team(18, sets=1), team(19, home=True,
+                                                       sets=3, winner=True)],
+                      "linescores": lines([(25, 19), (23, 25), (25, 12),
+                                           (25, 16)]),
+                      "start_time_epoch": 3000}
+
     games = list(G.values())
 
     # ── injected ledgers, at the module seams the real code uses ──────
@@ -157,6 +169,7 @@ def main():
         cls = SC.classify(games, SEASON)
         want = {"900001": "ok", "900002": "ok", "900003": "duplicate",
                 "900004": "exhibition", "900005": "empty", "900011": "ok",
+                "900012": "self_contradictory",
                 "900006": "under_review", "900007": "ok",
                 "900008": "ok", "900009": "ok", "900010": "ok"}
         for gid, w in sorted(want.items()):
@@ -167,10 +180,11 @@ def main():
         print("\n2. THE NAMED TOTALS ADD UP")
         t = SC.totals(games, SEASON)
         check("feed_records counts every completed record",
-              t["feed_records"] == 11, t)  # +F_NOFLAG
+              t["feed_records"] == 12, t)  # +F_NOFLAG +F_SELFCON
         check("results_on_display = ok + exhibition + under_review",
               t["results_on_display"] == t["ok"] + t["exhibition"]
-              + t["under_review"] == 7 + 1 + 1)  # +F_NOFLAG
+              + t["under_review"] + t["self_contradictory"]
+              == 7 + 1 + 1 + 1)  # +F_NOFLAG; +F_SELFCON displays, held
         check("rating_eligible: ok, both D-I, with a line",
               t["rating_eligible"] == 7, t)  # +F_NOFLAG
 
@@ -215,6 +229,12 @@ def main():
         rev["winner_team_id"] = "2"
         rev["teams"] = [team(1, sets=2), team(2, home=True, sets=3,
                                               winner=True)]
+        # a real scorer revision revises the TAPE too -- keeping the old
+        # sweep lines beside a flipped 3-2 made this fixture
+        # self-contradictory the day that class was born (2026-09-05),
+        # and a held record is not a counted one
+        rev["linescores"] = lines([(25, 20), (18, 25), (25, 27),
+                                   (23, 25), (12, 15)])
         games2 = games + [rev]
         n = sum(1 for g in SC.countable(games2, SEASON)
                 if g["game_id"] == "900001")

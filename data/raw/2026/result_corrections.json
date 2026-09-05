@@ -1687,6 +1687,97 @@
      "establishes": "Houston Christian L 1-3 vs Abilene Christian"
     }
    ]
+  },
+  "6627779": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "UIC (home) won 3-0 -- refuted by the feed's OWN lines, whose visit column (Montana St.) leads every set with the third frozen mid-set at 17-15",
+   "correct": {
+    "winner_team_id": "46340",
+    "away_sets": 3,
+    "home_sets": 0,
+    "linescores": [],
+    "linescores_replace": true
+   },
+   "established": "Montana St. won 3-0 -- derived winner/sets inverted (the Chattanooga-UT Martin class); both schools assert it. The feed's line tape froze mid-third, so the line score is withheld rather than shown partial (the Pacific-UCR rule); the raw rows remain in the log.",
+   "evidence": [
+    {
+     "url": "https://msubobcats.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Montana St.",
+     "retrieved": "2026-09-05T19:25:20Z",
+     "text": "published schedule row for 2026-09-05: 'Montana St. W 3-0 vs UIC'",
+     "establishes": "Montana St. W 3-0 vs UIC"
+    },
+    {
+     "url": "https://uicflames.com/services/schedule_txt.ashx?schedule=3505",
+     "kind": "school_site",
+     "school": "UIC",
+     "retrieved": "2026-09-05T19:25:20Z",
+     "text": "published schedule row for 2026-09-05: 'UIC L 0-3 vs Montana State'",
+     "establishes": "UIC L 0-3 vs Montana State"
+    }
+   ]
+  },
+  "6625558": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Central Ark. (home) won 3-0 -- refuted by the feed's OWN complete linescores: the visit column (Southern Miss.) took 25-18, 25-17, 35-33",
+   "correct": {
+    "winner_team_id": "45868",
+    "away_sets": 3,
+    "home_sets": 0
+   },
+   "established": "Southern Miss. won 3-0 -- derived winner/sets inverted against the feed's own complete set line (a 35-33 deuce set is not scaffold junk); Central Ark.'s own site records the L 0-3. Southern Miss. had NOT_POSTED at review time -- the second evidence here is the feed's own internal refutation, the W&M-Kent St. precedent. Lines kept as served: they were right all along.",
+   "evidence": [
+    {
+     "url": "https://ucasports.com/services/schedule_txt.ashx?schedule=1309",
+     "kind": "school_site",
+     "school": "Central Ark.",
+     "retrieved": "2026-09-05T19:25:20Z",
+     "text": "published schedule row for 2026-09-05: 'Central Ark. L 0-3 vs Southern Miss'",
+     "establishes": "Central Ark. L 0-3 vs Southern Miss"
+    },
+    {
+     "url": null,
+     "kind": "internal_linescores",
+     "school": null,
+     "retrieved": "2026-09-05T19:25:20Z",
+     "text": "the feed's own complete linescores: visit column 25-18, 25-17, 35-33 -- three finished sets to Southern Miss., contradicting the feed's derived winner",
+     "establishes": "Southern Miss. W 3-0 by the feed's own set line"
+    }
+   ]
+  },
+  "6628062": {
+   "field": "linescores",
+   "corr_kind": "incomplete",
+   "feed_said": "Binghamton won 3-2 (correct, both schools agree) but the fifth-set line froze at 8-8 -- a set that cannot end tied",
+   "correct": {
+    "winner_team_id": "46443",
+    "away_sets": 3,
+    "home_sets": 2,
+    "linescores": [],
+    "linescores_replace": true
+   },
+   "established": "The RESULT stands exactly as the feed said -- Binghamton 3-2, both schools confirm. Only the tape is wrong: the fifth set's points are held in no source (frozen 8-8), so the line score is withheld whole rather than shown four-fifths real (the Pacific-UCR rule). The four real set lines remain in the raw log.",
+   "evidence": [
+    {
+     "url": "https://bubearcats.com/services/schedule_txt.ashx?schedule=1638",
+     "kind": "school_site",
+     "school": "Binghamton",
+     "retrieved": "2026-09-05T19:25:20Z",
+     "text": "published schedule row for 2026-09-05: 'Binghamton W 3-2 vs Sacred Heart University'",
+     "establishes": "Binghamton W 3-2 vs Sacred Heart"
+    },
+    {
+     "url": "https://sacredheartpioneers.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Sacred Heart",
+     "retrieved": "2026-09-05T19:25:20Z",
+     "text": "published schedule row for 2026-09-05: 'Sacred Heart L 2-3 vs Binghamton'",
+     "establishes": "Sacred Heart L 2-3 vs Binghamton"
+    }
+   ]
   }
  }
 }

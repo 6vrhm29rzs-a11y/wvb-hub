@@ -60,7 +60,7 @@
    "conflicts": [
     {
      "field": "teams",
-     "records": 25,
+     "records": 32,
      "values": [
       "(('46045', False), ('46753', True))",
       "(('46045', True), ('46753', False))"
@@ -68,7 +68,7 @@
     },
     {
      "field": "site",
-     "records": 25,
+     "records": 32,
      "values": [
       "home/away flip across snapshots",
       "no venue owner on record"
@@ -76,29 +76,7 @@
     }
    ],
    "matchup": "Coppin St. / Stony Brook",
-   "records": 25
-  },
-  "6625092": {
-   "conflicts": [
-    {
-     "field": "teams",
-     "records": 26,
-     "values": [
-      "(('45803', True), ('53141', False))",
-      "(('45803', True), ('52155', False))"
-     ]
-    },
-    {
-     "field": "game_state",
-     "records": 26,
-     "values": [
-      "P",
-      "I"
-     ]
-    }
-   ],
-   "matchup": "Southern-N.O. / Mississippi Val.",
-   "records": 26
+   "records": 32
   },
   "6625252": {
    "conflicts": [
@@ -141,36 +119,6 @@
    ],
    "matchup": "James Madison / Pepperdine",
    "records": 3
-  },
-  "6625578": {
-   "conflicts": [
-    {
-     "field": "teams",
-     "records": 25,
-     "values": [
-      "(('46177', False), ('46289', True))",
-      "(('46177', True), ('46289', False))"
-     ]
-    },
-    {
-     "field": "game_state",
-     "records": 25,
-     "values": [
-      "P",
-      "I"
-     ]
-    },
-    {
-     "field": "site",
-     "records": 25,
-     "values": [
-      "home/away flip across snapshots",
-      "no venue owner on record"
-     ]
-    }
-   ],
-   "matchup": "Drake / CSUN",
-   "records": 25
   },
   "6625580": {
    "conflicts": [
@@ -321,6 +269,20 @@
    "matchup": "Arkansas / Arkansas St.",
    "records": 2
   },
+  "6626657": {
+   "conflicts": [
+    {
+     "field": "start_time_epoch",
+     "records": 32,
+     "values": [
+      "1788636600",
+      "1788633000"
+     ]
+    }
+   ],
+   "matchup": "UConn / Jacksonville",
+   "records": 32
+  },
   "6626685": {
    "conflicts": [
     {
@@ -377,20 +339,6 @@
    "matchup": "Kansas St. / Creighton",
    "records": 2
   },
-  "6627242": {
-   "conflicts": [
-    {
-     "field": "start_time_epoch",
-     "records": 26,
-     "values": [
-      "1788710400",
-      "1788631200"
-     ]
-    }
-   ],
-   "matchup": "George Washington / Charlotte",
-   "records": 26
-  },
   "6627311": {
    "conflicts": [
     {
@@ -405,20 +353,6 @@
    "matchup": "San Jose St. / Utah Tech",
    "records": 3
   },
-  "6627931": {
-   "conflicts": [
-    {
-     "field": "start_time_epoch",
-     "records": 27,
-     "values": [
-      "1788627600",
-      "1788631200"
-     ]
-    }
-   ],
-   "matchup": "Montana / California Baptist",
-   "records": 27
-  },
   "6628053": {
    "conflicts": [
     {
@@ -432,28 +366,6 @@
    ],
    "matchup": "Bucknell / Siena",
    "records": 2
-  },
-  "6628062": {
-   "conflicts": [
-    {
-     "field": "start_time_epoch",
-     "records": 26,
-     "values": [
-      "1788559200",
-      "1788624000"
-     ]
-    },
-    {
-     "field": "game_state",
-     "records": 26,
-     "values": [
-      "P",
-      "I"
-     ]
-    }
-   ],
-   "matchup": "Binghamton / Sacred Heart",
-   "records": 26
   },
   "6628262": {
    "conflicts": [
@@ -487,7 +399,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 26,
+     "records": 33,
      "values": [
       "1788604200",
       "1788647400"
@@ -495,7 +407,7 @@
     }
    ],
    "matchup": "Lehigh / Delaware St.",
-   "records": 26
+   "records": 33
   },
   "6639126": {
    "conflicts": [
@@ -527,10 +439,10 @@
   }
  },
  "by_field": {
-  "game_state": 53,
-  "site": 2,
-  "start_time_epoch": 31,
-  "teams": 3,
+  "game_state": 57,
+  "site": 1,
+  "start_time_epoch": 29,
+  "teams": 1,
   "teams (non-blocking)": 7
  },
  "corrections": {
@@ -664,10 +576,10 @@
   }
  },
  "counts": {
-  "blocked": 34,
-  "conflicted": 90,
+  "blocked": 30,
+  "conflicted": 91,
   "corrected": 4,
-  "fixtures": 4883
+  "fixtures": 4884
  },
  "official_conflicts": {},
  "stale": {}

@@ -91,6 +91,26 @@ def main():
     check("upcoming keeps its time grouping",
           "in_.length >= 12" in src)
 
+    print("\n6. LINEAR VS STREAMING IS A CLASSIFIED FACT (P0.3)")
+    sys.path.insert(0, os.path.join(REPO, "scripts"))
+    import build_hub as BH
+    check("ESPN+ classifies as streaming", BH.tv_kind("ESPN+") == "streaming")
+    check("FS1 classifies as linear", BH.tv_kind("FS1") == "linear")
+    check("SEC Network+ is streaming; SEC Network is linear",
+          BH.tv_kind("SEC Network+") == "streaming"
+          and BH.tv_kind("SEC Network") == "linear")
+    check("[NEG] an unknown network classifies as NOTHING, never guessed",
+          BH.tv_kind("Podunk Sports Net") is None)
+    check("the Watch-Now reason is linear-only and says LINEAR",
+          "m.tvk === 'linear'" in src and "'linear TV'" in src)
+    check("[NEG] the old 'national TV' reason wording is gone from the "
+          "reason builder",
+          "out.push(['tv', 'national TV'" not in src)
+    check("streaming earns no Watch-Now priority weight",
+          "m.tvk === 'linear') w += 25" in src)
+    check("the watch line labels the kind",
+          "STREAMING \\u00b7" in src and "LINEAR TV \\u00b7" in src)
+
     print()
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))

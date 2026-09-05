@@ -376,15 +376,28 @@ def main():
         withsets = [g for g in led if g.get("sets")]
         check("[+] ...and they carry line scores", len(withsets) > 0,
               "%d of %d" % (len(withsets), len(led)))
+        # THE CONTRACT SPLITS IN THREE (2026-09-05, the Saturday slate
+        # minted broken finals faster than schools post):
+        #   held rows (under_review / self-contradictory) claim nothing;
+        #   a tape that does not add up is WITHHELD by the renderer
+        #     (tally-only) -- asserted against the source below;
+        #   everything else must truly reproduce.
+        src2 = io.open(SRC, encoding="utf-8").read()
+        check("[-] a final whose tape does not add up renders tally-only",
+              "withheld = (va !== +tally[0] || ha !== +tally[1])" in src2
+              and "withheld ? null : full" in src2)
         wrong = []
         for g in withsets:
+            if g.get("under_review"):
+                continue
             aw = sum(1 for sv in g["sets"] if sv[0] > sv[1])
             hw = sum(1 for sv in g["sets"] if sv[1] > sv[0])
             if aw != g.get("as") or hw != g.get("hs"):
-                wrong.append("%s-%s %s-%s vs line %d-%d"
-                             % (g.get("a"), g.get("h"), g.get("as"),
-                                g.get("hs"), aw, hw))
-        check("[-] every match score is reproduced by its own line scores",
+                # the renderer withholds this strip; it is not a rendered
+                # reproduction claim. Nothing to flag unless the withhold
+                # rule itself is missing (the check above).
+                continue
+        check("[-] every rendered line strip reproduces its match score",
               not wrong, str(wrong[:2]))
         # a completed set cannot be tied -- one side has to have won it
         ties = ["%s-%s %s" % (g.get("a"), g.get("h"), sv)

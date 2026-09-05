@@ -222,7 +222,8 @@ def main():
         # the TEAMS SWAPPED). season_counts.review_gids is the one
         # definition; the game stays in the dataset for the Result Ledger
         # but enters no tally.
-        if str(g.get("game_id")) in _review_gids:
+        if str(g.get("game_id")) in _review_gids \
+                or _SCC.is_self_contradictory(g):
             g["under_review"] = True
             continue
         teams = g.get("teams") or []

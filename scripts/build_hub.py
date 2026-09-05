@@ -289,7 +289,12 @@ def results() -> List[Dict]:
         # the DISPLAY list wearing the review flag (the Ledger and Scores
         # must show the state), but it is dropped from res_cnt below --
         # records, form, standings, aggregates never see it.
-        _urv = str(g.get("game_id")) in _review_gids
+        # a SELF-CONTRADICTORY final (its own complete lines refute its
+        # derived winner) wears the same review flag automatically -- the
+        # Saturday slate minted three inside two hours, faster than
+        # schools post; machine nominates, the corrections ledger decides
+        _urv = (str(g.get("game_id")) in _review_gids
+                or _SCR.is_self_contradictory(g))
         # ⚠ A "FINAL" THAT ASSERTS NO RESULT COUNTS NOWHERE (2026-08-29).
         # Game 6625090 (Delaware St. v Mississippi Val.) came back state F
         # with winner_team_id null, sets_won null on both sides and zero
@@ -322,6 +327,13 @@ def results() -> List[Dict]:
             # feed's placeholder, never a result. Caught in CI by the guard
             # that recomputes each match score from its own line scores.
             if _pair == (0, 0):
+                continue
+            # ⚠ GENERALISED 2026-09-05 (George Washington-Charlotte shipped
+            # a 1-1 row on a final): ANY tied pair on a final is the same
+            # frozen partial -- a completed set cannot end level, whatever
+            # the number. The raw row stays in the log; the display and the
+            # counting layers never see a set nobody finished.
+            if _pair[0] == _pair[1]:
                 continue
             sets.append(_pair)
         ep = g.get("start_time_epoch")
@@ -718,6 +730,7 @@ def schedule(limit_days: int = 21) -> List[Dict]:
                 # joined listing or nothing -- never a guess.
                 "tv": (tvx.get(gid) or {}).get("net"),
                 "tvu": (tvx.get(gid) or {}).get("url"),
+                "tvk": (tvx.get(gid) or {}).get("kind"),
                 "csrc": ((v.get("correction") or {}).get("source_url")
                          if v.get("correction") else None),
                 "cverified": ((v.get("correction") or {}).get("verified_on")
@@ -863,6 +876,30 @@ def my_ballots():
     return "".join(out)
 
 
+# ⚠ LINEAR VS STREAMING IS A FACT ABOUT THE NETWORK, NOT A GUESS
+# (ChatGPT audit P0.3, 2026-09-05, forwarded by Cody): the Watch-Now card
+# called ESPN+ "NATIONAL TV", which is false product language. Known names
+# classify; an unknown name shows unclassified rather than mislabelled.
+TV_LINEAR = {"ESPN", "ESPN2", "ESPNU", "ABC", "FOX", "FS1", "FS2", "BTN",
+             "BIG TEN NETWORK", "ACCN", "SECN", "SEC NETWORK", "CBSSN",
+             "CBS", "NBC", "TNT", "TRUTV", "FOX SPORTS 1"}
+TV_STREAMING = {"ESPN+", "ESPN3", "ACCNX", "SECN+", "SEC NETWORK+", "B1G+",
+                "MW+", "PEACOCK", "FLOSPORTS", "FLOVOLLEYBALL", "YOUTUBE",
+                "CUSA.TV", "SUMMIT LEAGUE NETWORK", "THE W"}
+
+
+def tv_kind(net):
+    # type: (Optional[str]) -> Optional[str]
+    if not net:
+        return None
+    u = str(net).strip().upper()
+    if u in TV_LINEAR:
+        return "linear"
+    if u in TV_STREAMING or u.endswith("+"):
+        return "streaming"
+    return None
+
+
 def tv_index():
     # type: () -> Dict[str, Dict]
     """game_id -> where to watch it. Private only.
@@ -929,7 +966,8 @@ def tv_index():
             missed += 1
             continue
         out[cand[0]] = {"net": row.get("n"), "t": row.get("t"),
-                        "src": "transcribed"}
+                        "src": "transcribed",
+                        "kind": tv_kind(row.get("n"))}
         joined += 1
 
     # ── THE SCHOOL-PUBLISHED LAYER (2026-09-04, Cody: "make sure streaming
@@ -996,7 +1034,9 @@ def tv_index():
                 out[gid] = {"net": _pick.get("network") or prev.get("net"),
                             "t": prev.get("t"),
                             "url": _pick.get("watch_url"),
-                            "src": "school"}
+                            "src": "school",
+                            "kind": tv_kind(_pick.get("network")
+                                            or prev.get("net"))}
                 auto_joined += 1
     out["_stats"] = {"joined": joined, "unjoined": missed,
                      "total": joined + missed,
@@ -4780,7 +4820,7 @@ def build():
             "ap": _pr.get(r["a"]), "hp": _pr.get(r["h"]),
             "venue": r.get("venue"), "city": r.get("city"), "st": r.get("st"),
             "site": r.get("site"), "event": r.get("event"), "kind": r.get("kind"),
-            "tv": r.get("tv"), "tvu": r.get("tvu"),
+            "tv": r.get("tv"), "tvu": r.get("tvu"), "tvk": r.get("tvk"),
             "conflict": r.get("conflict") or [], "corrected": r.get("corrected") or [],
             # ⚠ THE MATCH HAS TO SAY IT DOES NOT COUNT. Without this the data is
             # right and the screen still misleads: Nebraska beats Florida and
@@ -5137,7 +5177,7 @@ def build():
                 "venue": r.get("venue"), "city": r.get("city"),
                 "st": r.get("st"), "site": r.get("site"),
                 "event": r.get("event"), "kind": r.get("kind"),
-                "tv": r.get("tv"), "tvu": r.get("tvu"),
+                "tv": r.get("tv"), "tvu": r.get("tvu"), "tvk": r.get("tvk"),
                 "conflict": r.get("conflict") or [],
                 "corrected": r.get("corrected") or [],
                 "csrc": r.get("csrc"),
@@ -8001,10 +8041,32 @@ h4.sbtime span{font:600 11px/1 var(--mono);color:var(--ink3)}
   border-left-width:4px;font:13px/1.55 var(--sans);color:var(--ink2);
   background:color-mix(in oklab,var(--coral) 7%,transparent)}
 .attrwatch b{font:700 11px/1 var(--disp);letter-spacing:.12em;color:var(--coral)}
-#v-scores.detailopen .hero,#v-scores.detailopen #changed,
-#v-scores.detailopen .lead,#v-scores.detailopen .tabhint,
-#v-desk.detailopen .vh,#v-desk.detailopen #desklead,
-#v-desk.detailopen .livehead,#v-desk.detailopen #desksoon{display:none}
+/* ⚠ THE MATCH DETAIL IS A POPOUT, NOT A PAGE SWAP (Cody, 2026-09-05:
+   "when i click a game on the scores tab, it opens up at the very bottom
+   of the page"). The old behavior replaced the board and left the scroll
+   position wherever the reader was -- deep in a 170-row ledger, that put
+   the detail off-screen above them. Now: a fixed overlay in the viewport
+   where they clicked, page dimmed but intact behind it, closed by the X,
+   a click outside, or Esc. The route still changes, so back/forward and
+   deep links keep working. */
+#deskdetail:not([hidden]),#scoredetail:not([hidden]){position:fixed;
+  top:5vh;left:50%;transform:translateX(-50%);width:min(960px,94vw);
+  max-height:90vh;overflow:auto;z-index:300;background:var(--card,#fff);
+  border:1px solid var(--line);border-radius:12px;
+  box-shadow:0 18px 60px rgba(10,20,40,.28);padding:16px 18px 20px;
+  overscroll-behavior:contain}
+#mdlback{position:fixed;inset:0;background:rgba(12,22,44,.45);z-index:299}
+.mdlx{position:absolute;top:8px;right:8px;width:40px;height:40px;
+  border:1px solid var(--line);border-radius:9px;background:var(--card,#fff);
+  font:700 18px/1 var(--mono);color:var(--ink2);cursor:pointer;z-index:2}
+.mdlx:hover{color:var(--ink)}
+body.mdlopen{overflow:hidden}
+@media (max-width:560px){
+  #deskdetail:not([hidden]),#scoredetail:not([hidden]){top:0;width:100vw;
+    max-height:100vh;border-radius:0;left:0;transform:none}
+}
+/* (the old rules that blanked the hero/lead behind an open detail were
+   removed with the popout -- the page stays intact behind the backdrop) */
 .mdet .msec{border-top:1px solid var(--line);padding:15px 0 6px;margin-top:14px}
 .mdet .msec h3{margin:0 0 9px;font:600 11px/1 var(--disp);letter-spacing:.16em;
   text-transform:uppercase;color:var(--slate)}
@@ -10365,6 +10427,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 </section>
 <!-- FILMROOM-HTML-END -->
 
+<div id="mdlback" hidden></div>
 <section id="v-ballot" hidden>
   <h2 class="vh">Ballot Workshop <span class="privtag" title="Your own ballot. It is not published here, it feeds no model, and nothing is posted anywhere.">private</span></h2>
   <p class="tabhint" id="ballotlead"></p>
@@ -11583,6 +11646,11 @@ async function pollLive() {
      rulers, not two facts. The poller's in-progress list is the definition;
      every surface reads this. */
   window.LIVE_NOW = live.length;
+  /* ⚠ THE SNAPSHOT'S LIVE SET, not just its size (P0.1): four surfaces
+     counted "live" with two rulers -- the poller's filtered list (32) vs
+     matchState over the schedule payload (39, stuck matches included).
+     The set is the one definition; liveState() below reads it. */
+  window.LIVE_GIDS = new Set(live.map(g => String(g.id)));
 
   csTicker(live);
   if (typeof csStatus === 'function') { try { csStatus(); } catch (e) { } }
@@ -16207,6 +16275,18 @@ function matchState6(m, live, box) {
 }
 
 /* Back-compat for the lanes and rows, which think in three buckets. */
+/* ONE live classification per paint (P0.1): a match is live only if the
+   poller's applied snapshot says so. matchState's other verdicts stand;
+   a match matchState calls live that the snapshot has stripped (stuck
+   feed state, tally already 3) reads as final. Before the first poll,
+   matchState alone decides. */
+function liveState(m, live) {
+  const st = matchState(m, live);
+  if (typeof LIVE_GIDS === 'undefined' || !LIVE_GIDS) return st;
+  if (LIVE_GIDS.has(String(m.gid))) return 'live';
+  if (st === 'live') return 'final';
+  return st;
+}
 function matchState(m, live) {
   const s6 = matchState6(m, live, false);
   if (s6 === 'upcoming') return 'upcoming';
@@ -16364,12 +16444,26 @@ function rowLinescore(m, live, st) {
   const tally = (sc && sc[0] !== null && sc[0] !== undefined) ? sc : null;
   if (!full && !tally) return '<span class="mls"></span>';
   const playing = st === 'live';
+  /* ⚠ A FINAL'S TAPE RENDERS ONLY WHEN IT ADDS UP (2026-09-05, UNCG-App
+     State: the feed froze the tape mid-third and stamped 3-0 -- the two
+     real rows beside a 3-0 read as a broken score). On a final, the line
+     tally must reproduce the match tally, or the strip is withheld whole
+     and only the sets-won tally shows; the raw rows stay in the log. */
+  let withheld = false;
+  if (!playing && full && tally) {
+    let va = 0, ha = 0;
+    for (const pr of full) {
+      if (pr[0] === null || pr[0] === undefined) continue;
+      if (+pr[0] > +pr[1]) va++; else if (+pr[1] > +pr[0]) ha++;
+    }
+    withheld = (va !== +tally[0] || ha !== +tally[1]);
+  }
   /* ⚠ A DISPUTED ATTRIBUTION EMPHASISES NOBODY (IU-Georgia, 2026-09-01):
      with the feed's team assignment under review, "who is ahead" is exactly
      the fact in dispute -- the numbers render, the emphasis does not. */
   const disputed = playing && typeof ATTR_WATCH !== 'undefined' &&
                    ATTR_WATCH[m.gid] && !ATTR_WATCH[m.gid].corrected;
-  const raw = full;
+  const raw = withheld ? null : full;   /* withheld tape: tally only */
   const n = raw ? raw.length : 0;
   /* THE SHAPE, all of it Cody's (2026-08-28): sets-won FIRST, rule on its
      right; then the sets strictly in order, set one leftmost; and the set in
@@ -16598,7 +16692,7 @@ const LANE_CAP = 8;         /* a stated cap, always with the remainder named */
 function ledgerDayView(host, all, day, isToday) {
   const liveOf = m => LIVE_BY_ID[m.gid];
   const onDay = all.filter(m => m.d === day);
-  const lane = st => onDay.filter(m => matchState(m, liveOf(m)) === st);
+  const lane = st => onDay.filter(m => liveState(m, liveOf(m)) === st);
   /* ⚠ SORTED BY START TIME, and this took two goes. The lane first rendered in
      payload order, so a Friday read 4:00 PM, 11:00 AM, 12:00 PM, 4:00 PM,
      10:00 AM. The repair sorted on `a.ep` -- an epoch field that EXISTS ON NO
@@ -16856,7 +16950,7 @@ function renderScoreboard() {
   };
   const byRank = (a, b) => bestRank(a) - bestRank(b);
   body.innerHTML = lanes.map(([st, title]) => {
-    const in_ = rows.filter(m => matchState(m, liveOf(m)) === st);
+    const in_ = rows.filter(m => liveState(m, liveOf(m)) === st);
     if (!in_.length) return '';
     const times = {};
     in_.forEach(m => { times[m.t || ''] = 1; });
@@ -17978,10 +18072,12 @@ function renderMatchDetail(gid, dest) {
   if (!host) return false;
   const m = matchByGid(gid);
   if (!m) {
-    host.hidden = false; if (board) board.hidden = true;
+    host.hidden = false;
     const s0 = document.getElementById(dest === 'scores' ? 'v-scores' : 'v-desk');
     if (s0) s0.classList.add('detailopen');
-    host.innerHTML = '<p class="emptylane">That match is not in this season\'s ' +
+    mdlOpen(dest);
+    host.innerHTML = mdlX(dest) +
+      '<p class="emptylane">That match is not in this season\'s ' +
       'records. It may not have been crawled yet.</p>' +
       '<button type="button" class="backlink" data-back="' + dest + '">&larr; Back</button>';
     return true;
@@ -18058,10 +18154,10 @@ function renderMatchDetail(gid, dest) {
   const box = (caps.player_lines && typeof boxHTML === 'function')
     ? boxHTML(m.gid) : '';
   host.hidden = false;
-  if (board) board.hidden = true;
   const sec = document.getElementById(dest === 'scores' ? 'v-scores' : 'v-desk');
   if (sec) sec.classList.add('detailopen');
-  host.innerHTML =
+  mdlOpen(dest);
+  host.innerHTML = mdlX(dest) +
     '<div class="crumb"><a href="' + parent[1] + '">' + parent[0] + '</a>' +
       '<span class="sep">&rsaquo;</span><b>' + esc(mAway(m)) + ' ' + connector(m) + ' ' +
       esc(mHome(m)) + '</b></div>' +
@@ -18096,7 +18192,10 @@ function renderMatchDetail(gid, dest) {
            with no link stays a plain fact -- never a dead button */
         const watch = (m.tv || m.tvu)
           ? '<div class="wwrow"><span class="tdtag tv">watch</span>' +
-            '<span class="wwfact">' + (m.tv ? esc(m.tv) : 'stream') +
+            '<span class="wwfact">' +
+            (m.tvk === 'linear' ? 'LINEAR TV \u00b7 '
+             : m.tvk === 'streaming' ? 'STREAMING \u00b7 ' : '') +
+            (m.tv ? esc(m.tv) : 'stream') +
             (m.tvu ? ' · <a href="' + esc(m.tvu) +
               '" target="_blank" rel="noopener">open stream</a>' : '') +
             '</span></div>' : '';
@@ -18159,8 +18258,41 @@ function renderMatchDetail(gid, dest) {
   return true;
 }
 
+/* the popout's backdrop + close affordances. One backdrop element,
+   created once; clicking it, the X, or pressing Esc routes BACK exactly
+   like the existing data-back link -- one close path, not three. */
+function mdlX(dest) {
+  return '<button type="button" class="mdlx" data-back="' + esc(dest) +
+    '" aria-label="Close">\u00d7</button>';
+}
+function mdlOpen(dest) {
+  const b = document.getElementById('mdlback');
+  if (!b) return;
+  if (!b.dataset.wired) {
+    b.dataset.wired = '1';
+    b.addEventListener('click', () => {
+      const x = document.querySelector('#deskdetail .mdlx,' +
+                                       '#scoredetail .mdlx,' +
+                                       '#deskdetail [data-back],' +
+                                       '#scoredetail [data-back]');
+      if (x) x.click();
+    });
+  }
+  b.hidden = false;
+  document.body.classList.add('mdlopen');
+}
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (!document.body.classList.contains('mdlopen')) return;
+  const x = document.querySelector('#deskdetail .mdlx,#scoredetail .mdlx');
+  if (x) x.click();
+});
+
 function closeMatchDetail() {
   lmcStop();
+  const b = document.getElementById('mdlback');
+  if (b) b.hidden = true;
+  document.body.classList.remove('mdlopen');
   ['v-desk', 'v-scores'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.remove('detailopen');
@@ -18364,7 +18496,7 @@ function csPick(mine, soon, liveOf) {
      live before finished before upcoming, and within each, ranked-vs-ranked
      before ranked before first. No composite score -- a list of reasons, and
      the first one that matches wins. */
-  const st = m => matchState(m, liveOf(m));
+  const st = m => liveState(m, liveOf(m));
   const rr = m => m.ar && m.hr;
   const rk = m => m.ar || m.hr;
   const live = mine.filter(m => st(m) === 'live');
@@ -18786,7 +18918,13 @@ function todayReasons(m, live) {
     out.push(['p50', 'POWER top-50 matchup',
       'POWER #' + m.ap + ' against POWER #' + m.hp]);
   }
-  if (m.tv) out.push(['tv', 'national TV', 'On ' + m.tv]);
+  /* ⚠ LINEAR ONLY, AND CALLED WHAT IT IS (P0.3): "national TV" on an
+     ESPN+ match was false product language, and streaming availability
+     differentiates nothing (ESPN+ alone carries ~700 matches). A linear
+     network is a reason to watch; a stream is a fact on the watch line. */
+  if (m.tv && m.tvk === 'linear') {
+    out.push(['tv', 'linear TV', 'On ' + m.tv]);
+  }
   if (m.kind === 'conf') out.push(['cf', 'conference test',
     'A league match, so it counts toward the table']);
   /* ⚠ RANKING DISAGREEMENT IS A REAL, CHECKABLE FACT and it is the one a Top
@@ -18963,7 +19101,7 @@ function renderDesk() {
   /* THE DATE AND STATE HEADER: what day it is, and what is actually on it. */
   const lanes = { live: [], final: [], up: [] };
   mine.forEach(m => {
-    const st = matchState(m, liveOf(m));
+    const st = liveState(m, liveOf(m));   /* the snapshot's one ruler */
     lanes[st === 'live' ? 'live' : st === 'final' ? 'final' : 'up'].push(m);
   });
   const parts = [];
@@ -19028,7 +19166,7 @@ function renderDesk() {
     let w = 0;
     if (m.ar && m.hr) w += 40;
     else if (m.ar || m.hr) w += 18;
-    if (m.tv) w += 25;
+    if (m.tv && m.tvk === 'linear') w += 25;   /* streaming earns nothing */
     if (rs.some(r => r[0] === 'mb')) w += 20;
     if (rs.some(r => r[0] === 'dg')) w += 10;
     /* ⚠ A FINISHED MATCH IS NOT A NEXT WATCH, AND THIS OFFERED ONE. Two

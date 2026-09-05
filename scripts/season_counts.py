@@ -325,6 +325,46 @@ def resolve(games):
     return [best[g] for g in order]
 
 
+def is_self_contradictory(g):
+    # type: (Dict) -> bool
+    """A final whose OWN complete linescores name a winner its derived
+    fields deny (2026-09-05: the Saturday slate minted Providence-Bryant,
+    UIC-Montana St. and Central Ark.-Southern Miss. inside two hours --
+    faster than schools post). This is the feed refuting itself, readable
+    with no external judgment: every line pair decided, the line tally has
+    a STRICT winner, and it is not the side winner_index names. Such a
+    final counts NOWHERE until adjudicated -- machine nominates, the
+    corrections ledger decides. Call on the record AFTER apply_correction
+    (a ledgered correction resolves the contradiction and the game counts
+    again)."""
+    if (g.get("game_state") or g.get("state")) != "F":
+        return False
+    ls = [(l.get("visit"), l.get("home"))
+          for l in (g.get("linescores") or [])
+          if l.get("home") is not None and l.get("visit") is not None]
+    if len(ls) < 3:
+        return False
+    try:
+        ls = [(int(v), int(h)) for v, h in ls]
+    except (TypeError, ValueError):
+        return False
+    if any(v == h for v, h in ls):
+        return False                      # a frozen partial set: not this class
+    va = sum(1 for v, h in ls if v > h)
+    ha = len(ls) - va
+    if va == ha:
+        return False
+    line_winner = 0 if va > ha else 1     # index into teams: away is visit
+    ts = g.get("teams") or []
+    if len(ts) != 2:
+        return False
+    # orient: teams[i] with is_home matches the home column
+    home_i = next((i for i, t in enumerate(ts) if t.get("is_home")), 1)
+    line_idx = home_i if line_winner == 1 else 1 - home_i
+    wi = winner_index(g)
+    return wi is not None and wi != line_idx
+
+
 def classify(games, season):
     # type: (List[Dict], int) -> Dict[str, str]
     """gid -> class, for every completed record. Corrections applied first."""
@@ -349,6 +389,8 @@ def classify(games, season):
             out[gid] = "under_review"
         elif is_empty_final(apply_correction(g, corr)):
             out[gid] = "empty"
+        elif is_self_contradictory(apply_correction(g, corr)):
+            out[gid] = "self_contradictory"
         else:
             out[gid] = "ok"
     return out
@@ -378,10 +420,15 @@ def totals(games, season):
          "under_review": sum(1 for v in cls.values()
                              if v == "under_review"),
          "empty": sum(1 for v in cls.values() if v == "empty"),
+         "self_contradictory": sum(1 for v in cls.values()
+                                   if v == "self_contradictory"),
          "ok": sum(1 for v in cls.values() if v == "ok")}
-    # under_review stays ON DISPLAY (badged, inspectable) while counting
-    # nowhere -- hiding a disputed row would bury the dispute
-    n["results_on_display"] = n["ok"] + n["exhibition"] + n["under_review"]
+    # under_review and self_contradictory stay ON DISPLAY (badged,
+    # inspectable) while counting nowhere -- hiding a disputed row would
+    # bury the dispute
+    n["results_on_display"] = (n["ok"] + n["exhibition"]
+                               + n["under_review"]
+                               + n["self_contradictory"])
     n["rating_eligible"] = sum(
         1 for gid, v in cls.items()
         if v == "ok"

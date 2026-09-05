@@ -2,46 +2,46 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 720,
+  "scored": 783,
   "logged_after_tipoff_excluded": 3,
-  "team_mismatch_excluded": 17,
-  "predictions_on_record": 4777,
-  "results_available": 756,
-  "brier": 0.1688,
+  "team_mismatch_excluded": 19,
+  "predictions_on_record": 4778,
+  "results_available": 825,
+  "brier": 0.1692,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 536,
-  "favourite_correct_pct": 74.4
+  "favourite_correct": 581,
+  "favourite_correct_pct": 74.2
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 118,
-   "said": 55.2,
-   "happened": 55.1
+   "n": 126,
+   "said": 55.3,
+   "happened": 55.6
   },
   {
    "range": "60-70%",
-   "n": 140,
-   "said": 65.0,
-   "happened": 61.4
+   "n": 153,
+   "said": 65.1,
+   "happened": 59.5
   },
   {
    "range": "70-80%",
-   "n": 112,
-   "said": 75.3,
-   "happened": 67.9
+   "n": 123,
+   "said": 75.2,
+   "happened": 67.5
   },
   {
    "range": "80-90%",
-   "n": 135,
-   "said": 85.1,
-   "happened": 80.0
+   "n": 144,
+   "said": 85.0,
+   "happened": 79.2
   },
   {
    "range": "90-101%",
-   "n": 215,
-   "said": 95.4,
-   "happened": 93.5
+   "n": 237,
+   "said": 95.5,
+   "happened": 94.1
   }
  ],
  "matches": [
@@ -262,6 +262,15 @@
    "brier": 0.73410624
   },
   {
+   "game_id": "6627746",
+   "date": "2026-09-05",
+   "away": "Presbyterian",
+   "home": "Queens (NC)",
+   "p_home": 0.8568,
+   "home_won": false,
+   "brier": 0.73410624
+  },
+  {
    "game_id": "6627101",
    "date": "2026-08-29",
    "away": "Fordham",
@@ -307,6 +316,15 @@
    "brier": 0.72029169
   },
   {
+   "game_id": "6627779",
+   "date": "2026-09-05",
+   "away": "Montana St.",
+   "home": "UIC",
+   "p_home": 0.8459,
+   "home_won": false,
+   "brier": 0.71554681
+  },
+  {
    "game_id": "6625759",
    "date": "2026-08-30",
    "away": "Iona",
@@ -350,6 +368,15 @@
    "p_home": 0.8205,
    "home_won": false,
    "brier": 0.67322025
+  },
+  {
+   "game_id": "6624491",
+   "date": "2026-09-05",
+   "away": "East Texas A&M",
+   "home": "St. John's (NY)",
+   "p_home": 0.8182,
+   "home_won": false,
+   "brier": 0.6694512400000001
   },
   {
    "game_id": "6627726",
@@ -424,6 +451,15 @@
    "brier": 0.63888049
   },
   {
+   "game_id": "6627196",
+   "date": "2026-09-05",
+   "away": "Green Bay",
+   "home": "Austin Peay",
+   "p_home": 0.202,
+   "home_won": true,
+   "brier": 0.636804
+  },
+  {
    "game_id": "6627489",
    "date": "2026-08-28",
    "away": "California Baptist",
@@ -451,49 +487,13 @@
    "brier": 0.61355889
   },
   {
-   "game_id": "6625051",
-   "date": "2026-08-29",
-   "away": "Norfolk St.",
-   "home": "Elon",
-   "p_home": 0.7826,
-   "home_won": false,
-   "brier": 0.61246276
-  },
-  {
-   "game_id": "6627128",
-   "date": "2026-09-03",
-   "away": "New Mexico St.",
-   "home": "UC Irvine",
-   "p_home": 0.773,
-   "home_won": false,
-   "brier": 0.597529
-  },
-  {
-   "game_id": "6640504",
-   "date": "2026-09-03",
-   "away": "San Diego St.",
-   "home": "UC Davis",
-   "p_home": 0.7727,
-   "home_won": false,
-   "brier": 0.5970652900000001
-  },
-  {
-   "game_id": "6625577",
-   "date": "2026-08-29",
-   "away": "DePaul",
-   "home": "Drake",
-   "p_home": 0.7724,
-   "home_won": false,
-   "brier": 0.59660176
-  },
-  {
-   "game_id": "6626470",
-   "date": "2026-08-29",
-   "away": "Arkansas St.",
-   "home": "Grand Canyon",
-   "p_home": 0.2299,
+   "game_id": "6627612",
+   "date": "2026-09-05",
+   "away": "ETSU",
+   "home": "William & Mary",
+   "p_home": 0.2173,
    "home_won": true,
-   "brier": 0.59305401
+   "brier": 0.6126192899999999
   }
  ]
 }

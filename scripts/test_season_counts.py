@@ -159,11 +159,15 @@ def main():
             # tally, and never exceeds the current eligible_now.
             _nv_dg = (dg.get("meta") or {}).get(
                 "verified_intraday_counted") or 0
-            check("digby's matches_counted = through_yesterday + its own "
-                  "verified-intraday tally",
-                  n_dg == t["rating_eligible_through_yesterday"] + _nv_dg,
-                  "%s vs %s+%s" % (
-                      n_dg, t["rating_eligible_through_yesterday"], _nv_dg))
+            # equality mixed build-time and check-time state and failed
+            # on a late-crawled Friday straggler (770 vs 740+31): the
+            # through-yesterday base can GROW after digby builds. The
+            # robust bounds: the base never shrinks below digby's own,
+            # and digby never counts more than eligible-now.
+            check("digby's through-yesterday base never exceeds today's",
+                  t["rating_eligible_through_yesterday"] >= n_dg - _nv_dg,
+                  "%s vs %s-%s" % (
+                      t["rating_eligible_through_yesterday"], n_dg, _nv_dg))
             check("digby's matches_counted never exceeds eligible_now",
                   n_dg <= _elig_now, "%s vs %s" % (n_dg, _elig_now))
 

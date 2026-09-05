@@ -72,7 +72,7 @@ def main():
 
     print("\n1b. A TOP GAME EXPLAINS ITSELF")
     check("named reasons exist", "function todayReasons(" in src)
-    for tag in ("ranked v ranked", "national TV", "conference test"):
+    for tag in ("ranked v ranked", "linear TV", "conference test"):
         check("  reason: %s" % tag, "'%s'" % tag in src)
     # 2026-09-01: the disagreement chip's LABEL is the fact itself ("Indiana
     # · AVCA 21 v PWR 38"), not the category name -- Cody: "wtf does ranking
