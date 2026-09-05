@@ -194,6 +194,18 @@ def main():
                    "MOREPRIV", "Ask Digby")))
 
     print()
+
+    print("\nSTICKY RANKING HEADERS (phase C)")
+    check("rkscroll wrapper gives up its overflow context",
+          ".scroll.rkscroll{overflow:visible}" in src)
+    check("th offsets under the nav at page level",
+          ".scroll.rkscroll th{top:var(--navh,0px)}" in src)
+    check("the panel's clipping context is lifted (measured confiner)",
+          "#rankpanel.panel{overflow:visible}" in src)
+    check("both ranking tables ride the rkscroll wrapper",
+          'class="scroll rkscroll"><table class="t25">' in src
+          and 'class="scroll rkscroll"><table class="rk3">' in src)
+
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))
         for f in FAILS:
@@ -201,6 +213,7 @@ def main():
         return 1
     print("ALL RANKINGS-UX GUARDS PASS")
     return 0
+
 
 
 if __name__ == "__main__":

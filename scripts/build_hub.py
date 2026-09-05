@@ -336,6 +336,21 @@ def results() -> List[Dict]:
             if _pair[0] == _pair[1]:
                 continue
             sets.append(_pair)
+        # ⚠ WITHHELD AT THE SOURCE (Cody's Florida-Baylor shot: two set
+        # columns beside a 3-0 -- and a "24-23" row, a score no finished
+        # set can carry). If the surviving rows cannot reproduce the
+        # match tally, the payload ships NO tape: the scoreboard row, the
+        # detail's reference table and the recap all inherit the
+        # withhold from this one place instead of each learning it.
+        if sets:
+            _va = sum(1 for a, b in sets if a > b)
+            _ha = sum(1 for a, b in sets if b > a)
+            try:
+                if (_va, _ha) != (int(away.get("sets_won")),
+                                  int(home.get("sets_won"))):
+                    sets = []
+            except (TypeError, ValueError):
+                pass
         ep = g.get("start_time_epoch")
         # DATE IN EASTERN, NOT UTC. Kentucky beat Wisconsin at 9pm ET on the
         # 21st, which is 01:00 UTC on the 22nd -- bucketing by UTC filed a
@@ -4838,10 +4853,32 @@ def build():
             away = next((t for t in ts if not t.get("is_home")), None)
             ls = [l for l in (fin.get("linescores") or [])
                   if l.get("home") is not None]
+            _fsets = []
+            for l in ls:
+                try:
+                    _lpair = (int(l["visit"]), int(l["home"]))
+                except (TypeError, ValueError):
+                    continue
+                if _lpair[0] == _lpair[1]:
+                    continue              # tied pair on a final: frozen partial
+                _fsets.append(list(_lpair))
+            # the same source-level withhold as res: a tape that cannot
+            # reproduce the tally ships EMPTY (Cody's Florida-Baylor shot
+            # came from THIS emitter -- the desk payload read the raw
+            # linescores and bypassed the res builder's rule)
+            try:
+                _va = sum(1 for a2, b2 in _fsets if a2 > b2)
+                _ha = sum(1 for a2, b2 in _fsets if b2 > a2)
+                if _fsets and (_va, _ha) != (
+                        int((away or {}).get("sets_won")),
+                        int((home or {}).get("sets_won"))):
+                    _fsets = []
+            except (TypeError, ValueError):
+                pass
             row["final"] = {
                 "hs": (home or {}).get("sets_won"),
                 "as": (away or {}).get("sets_won"),
-                "sets": [[l["visit"], l["home"]] for l in ls],
+                "sets": _fsets,
             }
         _desk.append(row)
 
@@ -6459,6 +6496,20 @@ th{font:500 12px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase;
    top of row 1, and the #1 team vanished behind it ("Nebraska fell off the
    rankings"). Only page-level sticky headers need to clear the nav. */
 .scroll th{top:0}
+/* ⚠ THE RANKING TABLES ARE PAGE-STICKY AGAIN (phase C). Killing the inner
+   72vh scrollers (Cody's screenshot ask) also killed their floating
+   headers: sticky inside an overflow container anchors to the container,
+   and a container that no longer scrolls floats nothing. These two tables
+   FIT the desktop width, so their wrapper drops the overflow context
+   entirely and the th sticks to the PAGE, offset under the nav -- the
+   exact pairing the sticky-header saga established. Phone renders cards
+   (thead hidden), so nothing wide is lost. */
+.scroll.rkscroll{overflow:visible}
+.scroll.rkscroll th{top:var(--navh,0px)}
+/* the PANEL's overflow:hidden was the real confiner -- sticky anchors to
+   the nearest clipping ancestor, and a clipped panel that never scrolls
+   floats nothing (found by measuring the ancestor chain, not the th) */
+#rankpanel.panel{overflow:visible}
 th.l{text-align:left}
 td{padding:10px;border-bottom:1px solid var(--line);text-align:right;font-size:14px}
 tbody tr:nth-child(even of .row){background:var(--alt)}
@@ -6593,6 +6644,28 @@ td.pick b{color:var(--navy)}
      here arguing FOR one row was written against that twelve-tab shell and is
      gone. Five primaries plus More wrap onto two short rows, every
      destination visible at once. */
+  /* ⚠ STATS PLAYERS AS CARDS, NOT A SQUEEZED TABLE (phase C; Cody's
+     capture showed names breaking into letter fragments at 390px).
+     rank | player | metric on line one; team | sets on line two. Names
+     ellipsize as whole words; nothing fragments, nothing overflows. */
+  #lplayer tr.prow{display:grid;grid-template-columns:26px minmax(0,1fr) auto;
+    align-items:center;gap:2px 12px;padding:8px 10px;
+    border-bottom:1px solid var(--line2)}
+  #lplayer tr.prow td{border:0;padding:0;background:none}
+  #lplayer tr.prow td.rk{grid-column:1;grid-row:1 / 3;align-self:center;
+    font:700 15px/1 var(--disp);position:relative;z-index:2;
+    text-align:right;padding-right:2px}
+  #lplayer tr.prow td.tm{grid-column:2;grid-row:1;min-width:0;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #lplayer tr.prow td:last-child{grid-column:3;grid-row:1;
+    font-weight:700;text-align:right}
+  #lplayer tr.prow td.cf{grid-column:2;grid-row:2;min-width:0;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    font-size:11.5px;color:var(--ink2)}
+  #lplayer tr.prow td.n:not(:last-child){grid-column:3;grid-row:2;
+    text-align:right;font-size:11.5px;color:var(--ink2)}
+  #lplayer tr.prow td.n:not(:last-child)::after{content:" sets"}
+  #lplayer thead{display:none}
   /* the rail on a phone: ONE fully-legible capsule + the count action,
      max 72px. The 2nd and 3rd capsules yield; scores never clip. */
   #livetick{max-height:72px}
@@ -7186,6 +7259,17 @@ b.kres{color:#F2B441}
   .bwbtn.bwquiet{margin-left:0;width:100%}
 }
 
+@media (max-width:560px){
+  /* ballot controls at TOUCH size (phase C): 40px targets, spaced so a
+     thumb cannot hit two. ⚠ THESE LIVE INSIDE THE FENCE -- the first
+     version sat in the shared 560px block and the public gate caught
+     .bw* selectors shipping on the published page, the exact Ask-Digby
+     mistake this fence exists to prevent. */
+  .bwctl{gap:7px}
+  .bwctl button{width:40px;height:40px;font-size:14px;
+    box-shadow:0 1px 2px rgba(10,20,40,.12)}
+  .bwjump{width:52px;height:40px;font-size:14px}
+}
 /* BALLOT-CSS-END */
 
 .leadhint{color:var(--ink2);opacity:.8}
@@ -8056,7 +8140,14 @@ h4.sbtime span{font:600 11px/1 var(--mono);color:var(--ink3)}
   box-shadow:0 18px 60px rgba(10,20,40,.28);padding:16px 18px 20px;
   overscroll-behavior:contain}
 #mdlback{position:fixed;inset:0;background:rgba(12,22,44,.45);z-index:299}
-.mdlx{position:absolute;top:8px;right:8px;width:40px;height:40px;
+/* ⚠ MAIN IS A STACKING CONTEXT (header,nav,main all carry z-index:1), so
+   the popout's z:300 was only relative WITHIN main and the sticky nav (z:6,
+   a sibling context) painted over it -- Cody's Safari shot showed the X
+   buried under the tab bar, unpressable. While a modal is open, main
+   itself lifts above the nav; everything inside keeps its own order. */
+body.mdlopen main{z-index:40}
+.mdlx{position:sticky;top:6px;float:right;margin:-6px -6px 0 0;
+  width:40px;height:40px;
   border:1px solid var(--line);border-radius:9px;background:var(--card,#fff);
   font:700 18px/1 var(--mono);color:var(--ink2);cursor:pointer;z-index:2}
 .mdlx:hover{color:var(--ink)}
@@ -10159,7 +10250,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 <section id="v-top25" hidden>
   <h2 class="vh">Digby&rsquo;s Top 25 &mdash; {{T25_SEASON}}</h2>
   <p class="tabhint">{{T25_LEAD}}</p>
-  <div class="scroll"><table class="t25">
+  <div class="scroll rkscroll"><table class="t25">
     <thead><tr>
       <th>#</th><th>Team</th><th title="how the rank changed">{{T25_MOVEHEAD}}</th>
       <th class="n" title="POWER: 50 is an average Division-I team and every 12.5 points is one standard deviation. Same scale as the Rankings tab.">Power <i class="thu">0&ndash;100</i></th>
@@ -10239,7 +10330,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
        element and switching back to POWER toggled the comparison surface
        instead. Same shape as the duplicate-id bug that made the just-finished
        band query the schedule tbody. -->
-  <div class="panel" id="rankpanel"><div class="scroll"><table class="rk3">
+  <div class="panel" id="rankpanel"><div class="scroll rkscroll"><table class="rk3">
     <!-- ⚠ A GROUPED HEADER, BECAUSE THIRTEEN EQUAL COLUMNS SAY NOTHING ABOUT
          WHAT IS OURS AND WHAT IS SOMEBODY ELSE'S. POWER and R&eacute;sum&eacute;
          are two different questions this site answers; everything to their

@@ -1,11 +1,11 @@
 {
  "model_version": "v1.1-unweighted",
- "generated_utc": "2026-09-05T21:12:45Z",
+ "generated_utc": "2026-09-05T21:42:40Z",
  "queue_rule": {
   "description": "any component voting SUPPORTS_H1 queues the match for human review; ranking is by vote count. A display/ranking heuristic only -- not a truth claim, and nothing here corrects or counts."
  },
- "n_finals": 825,
- "n_queued": 43,
+ "n_finals": 838,
+ "n_queued": 45,
  "matches": [
   {
    "gid": "6626051",
@@ -228,8 +228,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 10,
-     "h1_error": 6,
+     "h0_error": 12,
+     "h1_error": 8,
      "vote": "SUPPORTS_H1"
     },
     "school_verification": {
@@ -384,8 +384,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 11,
-     "h1_error": 7,
+     "h0_error": 13,
+     "h1_error": 9,
      "vote": "SUPPORTS_H1"
     },
     "school_verification": {
@@ -1410,7 +1410,7 @@
    "already_corrected": true,
    "context": {
     "venue": "Moby Arena",
-    "nominal_home_is_venue_host": true
+    "nominal_home_is_venue_host": false
    },
    "components": {
     "feed_record_fit": {
@@ -1465,8 +1465,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 11,
-     "h1_error": 1,
+     "h0_error": 12,
+     "h1_error": 2,
      "vote": "SUPPORTS_H1"
     },
     "school_verification": {
@@ -2231,8 +2231,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 14,
-     "h1_error": 10,
+     "h0_error": 16,
+     "h1_error": 12,
      "vote": "SUPPORTS_H1"
     },
     "school_verification": {
@@ -2770,6 +2770,156 @@
    }
   },
   {
+   "gid": "6627136",
+   "epoch": 1788636600,
+   "teams": [
+    "Murray St.",
+    "Portland St."
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": null,
+    "nominal_home_is_venue_host": null
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       1,
+       3
+      ],
+      [
+       1,
+       4
+      ]
+     ],
+     "ours": [
+      [
+       1,
+       4
+      ],
+      [
+       1,
+       4
+      ]
+     ],
+     "h0_error": 1,
+     "h1_error": 1,
+     "delta_h1_better": 0,
+     "vote": "UNINFORMATIVE"
+    },
+    "box_roster_fit": {
+     "available": true,
+     "eligible_rows": 32,
+     "h0": [
+      0.0,
+      0.0
+     ],
+     "h1": [
+      1.0,
+      0.786
+     ],
+     "fit_gain": 0.786,
+     "unmatched_sample": [
+      "katelyndavey",
+      "marynhall",
+      "paigestepaniuk",
+      "alyssandraordona",
+      "alexawatts",
+      "burcugulomur"
+     ],
+     "vote": "SUPPORTS_H1"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 20,
+     "h1_error": 20,
+     "vote": "UNINFORMATIVE"
+    },
+    "school_verification": {
+     "available": true,
+     "verdict": "CONTRADICTED_BOTH",
+     "vote": "SUPPORTS_H1"
+    }
+   },
+   "n_h1_votes": 2,
+   "n_available": 4,
+   "queued": true,
+   "watch": false,
+   "adjudication": null,
+   "first_scored_utc": "2026-09-05T21:42:40Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        1,
+        3
+       ],
+       [
+        1,
+        4
+       ]
+      ],
+      "ours": [
+       [
+        1,
+        4
+       ],
+       [
+        1,
+        4
+       ]
+      ],
+      "h0_error": 1,
+      "h1_error": 1,
+      "delta_h1_better": 0,
+      "vote": "UNINFORMATIVE"
+     },
+     "box_roster_fit": {
+      "available": true,
+      "eligible_rows": 32,
+      "h0": [
+       0.0,
+       0.0
+      ],
+      "h1": [
+       1.0,
+       0.786
+      ],
+      "fit_gain": 0.786,
+      "unmatched_sample": [
+       "katelyndavey",
+       "marynhall",
+       "paigestepaniuk",
+       "alyssandraordona",
+       "alexawatts",
+       "burcugulomur"
+      ],
+      "vote": "SUPPORTS_H1"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 20,
+      "h1_error": 20,
+      "vote": "UNINFORMATIVE"
+     },
+     "school_verification": {
+      "available": true,
+      "verdict": "CONTRADICTED_BOTH",
+      "vote": "SUPPORTS_H1"
+     }
+    },
+    "n_h1_votes": 2,
+    "school_verification_available_at_scoring": true
+   }
+  },
+  {
    "gid": "6627237",
    "epoch": 1788543000,
    "teams": [
@@ -2834,8 +2984,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 12,
-     "h1_error": 8,
+     "h0_error": 13,
+     "h1_error": 9,
      "vote": "SUPPORTS_H1"
     },
     "school_verification": {
@@ -3147,8 +3297,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 12,
-     "h1_error": 2,
+     "h0_error": 13,
+     "h1_error": 3,
      "vote": "SUPPORTS_H1"
     },
     "school_verification": {
@@ -3757,8 +3907,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 8,
-     "h1_error": 6,
+     "h0_error": 10,
+     "h1_error": 8,
      "vote": "SUPPORTS_H1"
     },
     "school_verification": {
@@ -4029,8 +4179,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 11,
-     "h1_error": 3,
+     "h0_error": 12,
+     "h1_error": 4,
      "vote": "SUPPORTS_H1"
     },
     "school_verification": {
@@ -4279,8 +4429,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 12,
-     "h1_error": 6,
+     "h0_error": 13,
+     "h1_error": 7,
      "vote": "SUPPORTS_H1"
     },
     "school_verification": {
@@ -5263,8 +5413,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 12,
-     "h1_error": 2,
+     "h0_error": 13,
+     "h1_error": 3,
      "vote": "SUPPORTS_H1"
     },
     "school_verification": {
@@ -6384,6 +6534,122 @@
    }
   },
   {
+   "gid": "6639576",
+   "epoch": 1788634800,
+   "teams": [
+    "UMES",
+    "Hampton"
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": null,
+    "nominal_home_is_venue_host": null
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       1,
+       2
+      ],
+      [
+       1,
+       3
+      ]
+     ],
+     "ours": [
+      [
+       1,
+       3
+      ],
+      [
+       1,
+       3
+      ]
+     ],
+     "h0_error": 1,
+     "h1_error": 1,
+     "delta_h1_better": 0,
+     "vote": "UNINFORMATIVE"
+    },
+    "box_roster_fit": {
+     "available": false,
+     "vote": "UNAVAILABLE",
+     "why": "roster missing for a side"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 11,
+     "h1_error": 9,
+     "vote": "SUPPORTS_H1"
+    },
+    "school_verification": {
+     "available": false,
+     "vote": "UNAVAILABLE",
+     "why": "not yet verified"
+    }
+   },
+   "n_h1_votes": 1,
+   "n_available": 2,
+   "queued": true,
+   "watch": false,
+   "adjudication": null,
+   "first_scored_utc": "2026-09-05T21:42:40Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        1,
+        2
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "ours": [
+       [
+        1,
+        3
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "h0_error": 1,
+      "h1_error": 1,
+      "delta_h1_better": 0,
+      "vote": "UNINFORMATIVE"
+     },
+     "box_roster_fit": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "roster missing for a side"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 11,
+      "h1_error": 9,
+      "vote": "SUPPORTS_H1"
+     },
+     "school_verification": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "not yet verified"
+     }
+    },
+    "n_h1_votes": 1,
+    "school_verification_available_at_scoring": false
+   }
+  },
+  {
    "gid": "6639598",
    "epoch": 1788019200,
    "teams": [
@@ -6431,8 +6697,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 10,
-     "h1_error": 4,
+     "h0_error": 11,
+     "h1_error": 5,
      "vote": "SUPPORTS_H1"
     },
     "school_verification": {
@@ -8367,8 +8633,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 0,
-     "h1_error": 12,
+     "h0_error": 1,
+     "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -12143,8 +12409,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 7,
-     "h1_error": 11,
+     "h0_error": 8,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -12286,8 +12552,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 10,
-     "h1_error": 10,
+     "h0_error": 12,
+     "h1_error": 12,
      "vote": "UNINFORMATIVE"
     },
     "school_verification": {
@@ -17045,8 +17311,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 7,
-     "h1_error": 13,
+     "h0_error": 9,
+     "h1_error": 15,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -17127,6 +17393,148 @@
     },
     "n_h1_votes": 0,
     "school_verification_available_at_scoring": false
+   }
+  },
+  {
+   "gid": "6624699",
+   "epoch": 1788634800,
+   "teams": [
+    "UAlbany",
+    "Howard"
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": "Newman Arena",
+    "nominal_home_is_venue_host": true
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       0,
+       4
+      ],
+      [
+       0,
+       4
+      ]
+     ],
+     "ours": [
+      [
+       1,
+       4
+      ],
+      [
+       0,
+       4
+      ]
+     ],
+     "h0_error": 1,
+     "h1_error": 1,
+     "delta_h1_better": 0,
+     "vote": "UNINFORMATIVE"
+    },
+    "box_roster_fit": {
+     "available": true,
+     "eligible_rows": 33,
+     "h0": [
+      0.933,
+      0.944
+     ],
+     "h1": [
+      0.0,
+      0.0
+     ],
+     "fit_gain": -0.944,
+     "unmatched_sample": [
+      "nilozer",
+      "darynwatkins"
+     ],
+     "vote": "SUPPORTS_H0"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 19,
+     "h1_error": 19,
+     "vote": "UNINFORMATIVE"
+    },
+    "school_verification": {
+     "available": true,
+     "verdict": "UNVERIFIED",
+     "vote": "UNINFORMATIVE"
+    }
+   },
+   "n_h1_votes": 0,
+   "n_available": 4,
+   "queued": false,
+   "watch": false,
+   "adjudication": null,
+   "first_scored_utc": "2026-09-05T21:42:40Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        0,
+        4
+       ],
+       [
+        0,
+        4
+       ]
+      ],
+      "ours": [
+       [
+        1,
+        4
+       ],
+       [
+        0,
+        4
+       ]
+      ],
+      "h0_error": 1,
+      "h1_error": 1,
+      "delta_h1_better": 0,
+      "vote": "UNINFORMATIVE"
+     },
+     "box_roster_fit": {
+      "available": true,
+      "eligible_rows": 33,
+      "h0": [
+       0.933,
+       0.944
+      ],
+      "h1": [
+       0.0,
+       0.0
+      ],
+      "fit_gain": -0.944,
+      "unmatched_sample": [
+       "nilozer",
+       "darynwatkins"
+      ],
+      "vote": "SUPPORTS_H0"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 19,
+      "h1_error": 19,
+      "vote": "UNINFORMATIVE"
+     },
+     "school_verification": {
+      "available": true,
+      "verdict": "UNVERIFIED",
+      "vote": "UNINFORMATIVE"
+     }
+    },
+    "n_h1_votes": 0,
+    "school_verification_available_at_scoring": true
    }
   },
   {
@@ -22993,8 +23401,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 3,
-     "h1_error": 11,
+     "h0_error": 4,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -23133,8 +23541,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 5,
-     "h1_error": 9,
+     "h0_error": 7,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -23211,6 +23619,148 @@
     },
     "n_h1_votes": 0,
     "school_verification_available_at_scoring": false
+   }
+  },
+  {
+   "gid": "6624965",
+   "epoch": 1788634800,
+   "teams": [
+    "South Carolina St.",
+    "Col. of Charleston"
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": "McAlister Field House",
+    "nominal_home_is_venue_host": false
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       1,
+       4
+      ],
+      [
+       3,
+       2
+      ]
+     ],
+     "ours": [
+      [
+       1,
+       4
+      ],
+      [
+       3,
+       2
+      ]
+     ],
+     "h0_error": 0,
+     "h1_error": 8,
+     "delta_h1_better": -8,
+     "vote": "SUPPORTS_H0"
+    },
+    "box_roster_fit": {
+     "available": true,
+     "eligible_rows": 36,
+     "h0": [
+      0.941,
+      0.947
+     ],
+     "h1": [
+      0.0,
+      0.0
+     ],
+     "fit_gain": -0.947,
+     "unmatched_sample": [
+      "deonimcphearson",
+      "rosabrencic"
+     ],
+     "vote": "SUPPORTS_H0"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 15,
+     "h1_error": 15,
+     "vote": "UNINFORMATIVE"
+    },
+    "school_verification": {
+     "available": true,
+     "verdict": "CORROBORATED_ONE",
+     "vote": "SUPPORTS_H0"
+    }
+   },
+   "n_h1_votes": 0,
+   "n_available": 4,
+   "queued": false,
+   "watch": false,
+   "adjudication": null,
+   "first_scored_utc": "2026-09-05T21:42:40Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        1,
+        4
+       ],
+       [
+        3,
+        2
+       ]
+      ],
+      "ours": [
+       [
+        1,
+        4
+       ],
+       [
+        3,
+        2
+       ]
+      ],
+      "h0_error": 0,
+      "h1_error": 8,
+      "delta_h1_better": -8,
+      "vote": "SUPPORTS_H0"
+     },
+     "box_roster_fit": {
+      "available": true,
+      "eligible_rows": 36,
+      "h0": [
+       0.941,
+       0.947
+      ],
+      "h1": [
+       0.0,
+       0.0
+      ],
+      "fit_gain": -0.947,
+      "unmatched_sample": [
+       "deonimcphearson",
+       "rosabrencic"
+      ],
+      "vote": "SUPPORTS_H0"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 15,
+      "h1_error": 15,
+      "vote": "UNINFORMATIVE"
+     },
+     "school_verification": {
+      "available": true,
+      "verdict": "CORROBORATED_ONE",
+      "vote": "SUPPORTS_H0"
+     }
+    },
+    "n_h1_votes": 0,
+    "school_verification_available_at_scoring": true
    }
   },
   {
@@ -24680,8 +25230,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 6,
-     "h1_error": 10,
+     "h0_error": 8,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -30544,8 +31094,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 12,
-     "h1_error": 16,
+     "h0_error": 14,
+     "h1_error": 18,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -37864,8 +38414,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 3,
-     "h1_error": 9,
+     "h0_error": 4,
+     "h1_error": 10,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -38000,7 +38550,7 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 7,
+     "h0_error": 9,
      "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
@@ -38072,6 +38622,146 @@
       "available": true,
       "verdict": "VERIFIED_BOTH",
       "vote": "SUPPORTS_H0"
+     }
+    },
+    "n_h1_votes": 0,
+    "school_verification_available_at_scoring": true
+   }
+  },
+  {
+   "gid": "6625762",
+   "epoch": 1788636600,
+   "teams": [
+    "FDU",
+    "Iona"
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": null,
+    "nominal_home_is_venue_host": null
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       1,
+       5
+      ],
+      [
+       2,
+       3
+      ]
+     ],
+     "ours": [
+      [
+       1,
+       5
+      ],
+      [
+       2,
+       3
+      ]
+     ],
+     "h0_error": 0,
+     "h1_error": 6,
+     "delta_h1_better": -6,
+     "vote": "SUPPORTS_H0"
+    },
+    "box_roster_fit": {
+     "available": true,
+     "eligible_rows": 39,
+     "h0": [
+      0.95,
+      1.0
+     ],
+     "h1": [
+      0.0,
+      0.0
+     ],
+     "fit_gain": -1.0,
+     "unmatched_sample": [
+      "ixchelkiahuitllopezsanchez"
+     ],
+     "vote": "SUPPORTS_H0"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 19,
+     "h1_error": 19,
+     "vote": "UNINFORMATIVE"
+    },
+    "school_verification": {
+     "available": true,
+     "verdict": "UNVERIFIED",
+     "vote": "UNINFORMATIVE"
+    }
+   },
+   "n_h1_votes": 0,
+   "n_available": 4,
+   "queued": false,
+   "watch": false,
+   "adjudication": null,
+   "first_scored_utc": "2026-09-05T21:42:40Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        1,
+        5
+       ],
+       [
+        2,
+        3
+       ]
+      ],
+      "ours": [
+       [
+        1,
+        5
+       ],
+       [
+        2,
+        3
+       ]
+      ],
+      "h0_error": 0,
+      "h1_error": 6,
+      "delta_h1_better": -6,
+      "vote": "SUPPORTS_H0"
+     },
+     "box_roster_fit": {
+      "available": true,
+      "eligible_rows": 39,
+      "h0": [
+       0.95,
+       1.0
+      ],
+      "h1": [
+       0.0,
+       0.0
+      ],
+      "fit_gain": -1.0,
+      "unmatched_sample": [
+       "ixchelkiahuitllopezsanchez"
+      ],
+      "vote": "SUPPORTS_H0"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 19,
+      "h1_error": 19,
+      "vote": "UNINFORMATIVE"
+     },
+     "school_verification": {
+      "available": true,
+      "verdict": "UNVERIFIED",
+      "vote": "UNINFORMATIVE"
      }
     },
     "n_h1_votes": 0,
@@ -39236,8 +39926,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 6,
-     "h1_error": 10,
+     "h0_error": 8,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -46579,8 +47269,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 11,
+     "h0_error": 2,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -49949,8 +50639,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 11,
+     "h0_error": 3,
+     "h1_error": 9,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -50019,6 +50709,146 @@
       "h0_error": 1,
       "h1_error": 11,
       "vote": "SUPPORTS_H0"
+     },
+     "school_verification": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "not yet verified"
+     }
+    },
+    "n_h1_votes": 0,
+    "school_verification_available_at_scoring": false
+   }
+  },
+  {
+   "gid": "6626286",
+   "epoch": 1788638400,
+   "teams": [
+    "South Fla.",
+    "Marquette"
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": "Maples Pavilion",
+    "nominal_home_is_venue_host": false
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       1,
+       3
+      ],
+      [
+       1,
+       2
+      ]
+     ],
+     "ours": [
+      [
+       1,
+       3
+      ],
+      [
+       1,
+       2
+      ]
+     ],
+     "h0_error": 0,
+     "h1_error": 2,
+     "delta_h1_better": -2,
+     "vote": "SUPPORTS_H0"
+    },
+    "box_roster_fit": {
+     "available": true,
+     "eligible_rows": 31,
+     "h0": [
+      0.938,
+      1.0
+     ],
+     "h1": [
+      0.0,
+      0.0
+     ],
+     "fit_gain": -1.0,
+     "unmatched_sample": [
+      "ameliawassdeczege"
+     ],
+     "vote": "SUPPORTS_H0"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 9,
+     "h1_error": 9,
+     "vote": "UNINFORMATIVE"
+    },
+    "school_verification": {
+     "available": false,
+     "vote": "UNAVAILABLE",
+     "why": "not yet verified"
+    }
+   },
+   "n_h1_votes": 0,
+   "n_available": 3,
+   "queued": false,
+   "watch": false,
+   "adjudication": null,
+   "first_scored_utc": "2026-09-05T21:42:40Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        1,
+        3
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "ours": [
+       [
+        1,
+        3
+       ],
+       [
+        1,
+        2
+       ]
+      ],
+      "h0_error": 0,
+      "h1_error": 2,
+      "delta_h1_better": -2,
+      "vote": "SUPPORTS_H0"
+     },
+     "box_roster_fit": {
+      "available": true,
+      "eligible_rows": 31,
+      "h0": [
+       0.938,
+       1.0
+      ],
+      "h1": [
+       0.0,
+       0.0
+      ],
+      "fit_gain": -1.0,
+      "unmatched_sample": [
+       "ameliawassdeczege"
+      ],
+      "vote": "SUPPORTS_H0"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 9,
+      "h1_error": 9,
+      "vote": "UNINFORMATIVE"
      },
      "school_verification": {
       "available": false,
@@ -51352,8 +52182,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 12,
+     "h0_error": 3,
+     "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -51494,8 +52324,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 10,
+     "h0_error": 4,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -52323,8 +53153,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 13,
+     "h0_error": 2,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -54256,8 +55086,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 2,
-     "h1_error": 14,
+     "h0_error": 3,
+     "h1_error": 15,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -60258,8 +61088,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 4,
-     "h1_error": 12,
+     "h0_error": 5,
+     "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -60399,8 +61229,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 8,
-     "h1_error": 12,
+     "h0_error": 10,
+     "h1_error": 14,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -60650,8 +61480,8 @@
     },
     "school_verification": {
      "available": true,
-     "verdict": "UNVERIFIED",
-     "vote": "UNINFORMATIVE"
+     "verdict": "CORROBORATED_ONE",
+     "vote": "SUPPORTS_H0"
     }
    },
    "n_h1_votes": 0,
@@ -61932,8 +62762,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 8,
-     "h1_error": 12,
+     "h0_error": 9,
+     "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -62596,8 +63426,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 6,
-     "h1_error": 10,
+     "h0_error": 8,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -63507,6 +64337,142 @@
    }
   },
   {
+   "gid": "6626886",
+   "epoch": 1788638400,
+   "teams": [
+    "North Ala.",
+    "UT Martin"
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": "CB&S Bank Arena at Flowers Hall",
+    "nominal_home_is_venue_host": true
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       6,
+       0
+      ],
+      [
+       0,
+       5
+      ]
+     ],
+     "ours": [
+      [
+       6,
+       0
+      ],
+      [
+       0,
+       5
+      ]
+     ],
+     "h0_error": 0,
+     "h1_error": 22,
+     "delta_h1_better": -22,
+     "vote": "SUPPORTS_H0"
+    },
+    "box_roster_fit": {
+     "available": true,
+     "eligible_rows": 33,
+     "h0": [
+      1.0,
+      1.0
+     ],
+     "h1": [
+      0.0,
+      0.0
+     ],
+     "fit_gain": -1.0,
+     "unmatched_sample": [],
+     "vote": "SUPPORTS_H0"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 21,
+     "h1_error": 21,
+     "vote": "UNINFORMATIVE"
+    },
+    "school_verification": {
+     "available": false,
+     "vote": "UNAVAILABLE",
+     "why": "not yet verified"
+    }
+   },
+   "n_h1_votes": 0,
+   "n_available": 3,
+   "queued": false,
+   "watch": false,
+   "adjudication": null,
+   "first_scored_utc": "2026-09-05T21:42:40Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        6,
+        0
+       ],
+       [
+        0,
+        5
+       ]
+      ],
+      "ours": [
+       [
+        6,
+        0
+       ],
+       [
+        0,
+        5
+       ]
+      ],
+      "h0_error": 0,
+      "h1_error": 22,
+      "delta_h1_better": -22,
+      "vote": "SUPPORTS_H0"
+     },
+     "box_roster_fit": {
+      "available": true,
+      "eligible_rows": 33,
+      "h0": [
+       1.0,
+       1.0
+      ],
+      "h1": [
+       0.0,
+       0.0
+      ],
+      "fit_gain": -1.0,
+      "unmatched_sample": [],
+      "vote": "SUPPORTS_H0"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 21,
+      "h1_error": 21,
+      "vote": "UNINFORMATIVE"
+     },
+     "school_verification": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "not yet verified"
+     }
+    },
+    "n_h1_votes": 0,
+    "school_verification_available_at_scoring": false
+   }
+  },
+  {
    "gid": "6626911",
    "epoch": 1788109200,
    "teams": [
@@ -63567,8 +64533,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 13,
+     "h0_error": 2,
+     "h1_error": 14,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -66114,8 +67080,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 4,
-     "h1_error": 8,
+     "h0_error": 6,
+     "h1_error": 10,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -66184,6 +67150,146 @@
       "n_observations": 6,
       "h0_error": 6,
       "h1_error": 6,
+      "vote": "UNINFORMATIVE"
+     },
+     "school_verification": {
+      "available": true,
+      "verdict": "VERIFIED_BOTH",
+      "vote": "SUPPORTS_H0"
+     }
+    },
+    "n_h1_votes": 0,
+    "school_verification_available_at_scoring": true
+   }
+  },
+  {
+   "gid": "6627020",
+   "epoch": 1788634800,
+   "teams": [
+    "Northern Colo.",
+    "Wichita St."
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": "CU Events Center",
+    "nominal_home_is_venue_host": false
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       0,
+       3
+      ],
+      [
+       2,
+       2
+      ]
+     ],
+     "ours": [
+      [
+       0,
+       3
+      ],
+      [
+       2,
+       2
+      ]
+     ],
+     "h0_error": 0,
+     "h1_error": 6,
+     "delta_h1_better": -6,
+     "vote": "SUPPORTS_H0"
+    },
+    "box_roster_fit": {
+     "available": true,
+     "eligible_rows": 40,
+     "h0": [
+      1.0,
+      0.955
+     ],
+     "h1": [
+      0.0,
+      0.0
+     ],
+     "fit_gain": -1.0,
+     "unmatched_sample": [
+      "evakrakwoski"
+     ],
+     "vote": "SUPPORTS_H0"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 15,
+     "h1_error": 15,
+     "vote": "UNINFORMATIVE"
+    },
+    "school_verification": {
+     "available": true,
+     "verdict": "VERIFIED_BOTH",
+     "vote": "SUPPORTS_H0"
+    }
+   },
+   "n_h1_votes": 0,
+   "n_available": 4,
+   "queued": false,
+   "watch": false,
+   "adjudication": null,
+   "first_scored_utc": "2026-09-05T21:42:40Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        0,
+        3
+       ],
+       [
+        2,
+        2
+       ]
+      ],
+      "ours": [
+       [
+        0,
+        3
+       ],
+       [
+        2,
+        2
+       ]
+      ],
+      "h0_error": 0,
+      "h1_error": 6,
+      "delta_h1_better": -6,
+      "vote": "SUPPORTS_H0"
+     },
+     "box_roster_fit": {
+      "available": true,
+      "eligible_rows": 40,
+      "h0": [
+       1.0,
+       0.955
+      ],
+      "h1": [
+       0.0,
+       0.0
+      ],
+      "fit_gain": -1.0,
+      "unmatched_sample": [
+       "evakrakwoski"
+      ],
+      "vote": "SUPPORTS_H0"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 15,
+      "h1_error": 15,
       "vote": "UNINFORMATIVE"
      },
      "school_verification": {
@@ -67500,8 +68606,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 4,
-     "h1_error": 12,
+     "h0_error": 5,
+     "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -68983,8 +70089,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 10,
-     "h1_error": 14,
+     "h0_error": 12,
+     "h1_error": 16,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -71572,8 +72678,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 14,
-     "h1_error": 18,
+     "h0_error": 16,
+     "h1_error": 20,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -71638,6 +72744,122 @@
       "n_observations": 6,
       "h0_error": 15,
       "h1_error": 15,
+      "vote": "UNINFORMATIVE"
+     },
+     "school_verification": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "not yet verified"
+     }
+    },
+    "n_h1_votes": 0,
+    "school_verification_available_at_scoring": false
+   }
+  },
+  {
+   "gid": "6627239",
+   "epoch": 1788634800,
+   "teams": [
+    "Miami (OH)",
+    "Purdue Fort Wayne"
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": "Millett Hall",
+    "nominal_home_is_venue_host": true
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       4,
+       1
+      ],
+      [
+       3,
+       3
+      ]
+     ],
+     "ours": [
+      [
+       4,
+       1
+      ],
+      [
+       3,
+       3
+      ]
+     ],
+     "h0_error": 0,
+     "h1_error": 6,
+     "delta_h1_better": -6,
+     "vote": "SUPPORTS_H0"
+    },
+    "box_roster_fit": {
+     "available": false,
+     "vote": "UNAVAILABLE",
+     "why": "roster missing for a side"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 21,
+     "h1_error": 21,
+     "vote": "UNINFORMATIVE"
+    },
+    "school_verification": {
+     "available": false,
+     "vote": "UNAVAILABLE",
+     "why": "not yet verified"
+    }
+   },
+   "n_h1_votes": 0,
+   "n_available": 2,
+   "queued": false,
+   "watch": false,
+   "adjudication": null,
+   "first_scored_utc": "2026-09-05T21:42:40Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        4,
+        1
+       ],
+       [
+        3,
+        3
+       ]
+      ],
+      "ours": [
+       [
+        4,
+        1
+       ],
+       [
+        3,
+        3
+       ]
+      ],
+      "h0_error": 0,
+      "h1_error": 6,
+      "delta_h1_better": -6,
+      "vote": "SUPPORTS_H0"
+     },
+     "box_roster_fit": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "roster missing for a side"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 21,
+      "h1_error": 21,
       "vote": "UNINFORMATIVE"
      },
      "school_verification": {
@@ -72151,6 +73373,146 @@
       "h0_error": 1,
       "h1_error": 13,
       "vote": "SUPPORTS_H0"
+     },
+     "school_verification": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "not yet verified"
+     }
+    },
+    "n_h1_votes": 0,
+    "school_verification_available_at_scoring": false
+   }
+  },
+  {
+   "gid": "6627264",
+   "epoch": 1788634800,
+   "teams": [
+    "UC Davis",
+    "Cal Poly"
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": "University Credit Union Center",
+    "nominal_home_is_venue_host": true
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       1,
+       3
+      ],
+      [
+       3,
+       1
+      ]
+     ],
+     "ours": [
+      [
+       1,
+       3
+      ],
+      [
+       2,
+       1
+      ]
+     ],
+     "h0_error": 1,
+     "h1_error": 7,
+     "delta_h1_better": -6,
+     "vote": "SUPPORTS_H0"
+    },
+    "box_roster_fit": {
+     "available": true,
+     "eligible_rows": 35,
+     "h0": [
+      1.0,
+      0.944
+     ],
+     "h1": [
+      0.0,
+      0.0
+     ],
+     "fit_gain": -1.0,
+     "unmatched_sample": [
+      "noellevanacht"
+     ],
+     "vote": "SUPPORTS_H0"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 8,
+     "h1_error": 8,
+     "vote": "UNINFORMATIVE"
+    },
+    "school_verification": {
+     "available": false,
+     "vote": "UNAVAILABLE",
+     "why": "not yet verified"
+    }
+   },
+   "n_h1_votes": 0,
+   "n_available": 3,
+   "queued": false,
+   "watch": false,
+   "adjudication": null,
+   "first_scored_utc": "2026-09-05T21:42:40Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        1,
+        3
+       ],
+       [
+        3,
+        1
+       ]
+      ],
+      "ours": [
+       [
+        1,
+        3
+       ],
+       [
+        2,
+        1
+       ]
+      ],
+      "h0_error": 1,
+      "h1_error": 7,
+      "delta_h1_better": -6,
+      "vote": "SUPPORTS_H0"
+     },
+     "box_roster_fit": {
+      "available": true,
+      "eligible_rows": 35,
+      "h0": [
+       1.0,
+       0.944
+      ],
+      "h1": [
+       0.0,
+       0.0
+      ],
+      "fit_gain": -1.0,
+      "unmatched_sample": [
+       "noellevanacht"
+      ],
+      "vote": "SUPPORTS_H0"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 8,
+      "h1_error": 8,
+      "vote": "UNINFORMATIVE"
      },
      "school_verification": {
       "available": false,
@@ -73274,7 +74636,7 @@
    "already_corrected": false,
    "context": {
     "venue": "Johnson Coliseum",
-    "nominal_home_is_venue_host": true
+    "nominal_home_is_venue_host": false
    },
    "components": {
     "feed_record_fit": {
@@ -81881,6 +83243,148 @@
    }
   },
   {
+   "gid": "6627667",
+   "epoch": 1788634800,
+   "teams": [
+    "A&M-Corpus Christi",
+    "Texas St."
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": "Dugan Wellness Center",
+    "nominal_home_is_venue_host": true
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       0,
+       3
+      ],
+      [
+       1,
+       3
+      ]
+     ],
+     "ours": [
+      [
+       0,
+       3
+      ],
+      [
+       1,
+       3
+      ]
+     ],
+     "h0_error": 0,
+     "h1_error": 2,
+     "delta_h1_better": -2,
+     "vote": "SUPPORTS_H0"
+    },
+    "box_roster_fit": {
+     "available": true,
+     "eligible_rows": 36,
+     "h0": [
+      0.944,
+      0.944
+     ],
+     "h1": [
+      0.0,
+      0.0
+     ],
+     "fit_gain": -0.944,
+     "unmatched_sample": [
+      "abigailhuddleston",
+      "caelynemmerling"
+     ],
+     "vote": "SUPPORTS_H0"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 13,
+     "h1_error": 13,
+     "vote": "UNINFORMATIVE"
+    },
+    "school_verification": {
+     "available": true,
+     "verdict": "CORROBORATED_ONE",
+     "vote": "SUPPORTS_H0"
+    }
+   },
+   "n_h1_votes": 0,
+   "n_available": 4,
+   "queued": false,
+   "watch": false,
+   "adjudication": null,
+   "first_scored_utc": "2026-09-05T21:42:40Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        0,
+        3
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "ours": [
+       [
+        0,
+        3
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "h0_error": 0,
+      "h1_error": 2,
+      "delta_h1_better": -2,
+      "vote": "SUPPORTS_H0"
+     },
+     "box_roster_fit": {
+      "available": true,
+      "eligible_rows": 36,
+      "h0": [
+       0.944,
+       0.944
+      ],
+      "h1": [
+       0.0,
+       0.0
+      ],
+      "fit_gain": -0.944,
+      "unmatched_sample": [
+       "abigailhuddleston",
+       "caelynemmerling"
+      ],
+      "vote": "SUPPORTS_H0"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 13,
+      "h1_error": 13,
+      "vote": "UNINFORMATIVE"
+     },
+     "school_verification": {
+      "available": true,
+      "verdict": "CORROBORATED_ONE",
+      "vote": "SUPPORTS_H0"
+     }
+    },
+    "n_h1_votes": 0,
+    "school_verification_available_at_scoring": true
+   }
+  },
+  {
    "gid": "6627673",
    "epoch": 1787954400,
    "teams": [
@@ -84600,8 +86104,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 11,
-     "h1_error": 11,
+     "h0_error": 13,
+     "h1_error": 13,
      "vote": "UNINFORMATIVE"
     },
     "school_verification": {
@@ -85664,8 +87168,8 @@
     },
     "school_verification": {
      "available": true,
-     "verdict": "UNVERIFIED",
-     "vote": "UNINFORMATIVE"
+     "verdict": "CORROBORATED_ONE",
+     "vote": "SUPPORTS_H0"
     }
    },
    "n_h1_votes": 0,
@@ -87484,8 +88988,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 11,
+     "h0_error": 2,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -87624,8 +89128,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 5,
-     "h1_error": 11,
+     "h0_error": 7,
+     "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -87692,6 +89196,146 @@
       "n_observations": 6,
       "h0_error": 6,
       "h1_error": 6,
+      "vote": "UNINFORMATIVE"
+     },
+     "school_verification": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "not yet verified"
+     }
+    },
+    "n_h1_votes": 0,
+    "school_verification_available_at_scoring": false
+   }
+  },
+  {
+   "gid": "6627936",
+   "epoch": 1788638400,
+   "teams": [
+    "Binghamton",
+    "Le Moyne"
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": "William H. Pitt Center",
+    "nominal_home_is_venue_host": false
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       1,
+       3
+      ],
+      [
+       0,
+       4
+      ]
+     ],
+     "ours": [
+      [
+       2,
+       3
+      ],
+      [
+       0,
+       4
+      ]
+     ],
+     "h0_error": 1,
+     "h1_error": 5,
+     "delta_h1_better": -4,
+     "vote": "SUPPORTS_H0"
+    },
+    "box_roster_fit": {
+     "available": true,
+     "eligible_rows": 35,
+     "h0": [
+      1.0,
+      0.947
+     ],
+     "h1": [
+      0.0,
+      0.0
+     ],
+     "fit_gain": -1.0,
+     "unmatched_sample": [
+      "taliahbenson"
+     ],
+     "vote": "SUPPORTS_H0"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 16,
+     "h1_error": 16,
+     "vote": "UNINFORMATIVE"
+    },
+    "school_verification": {
+     "available": false,
+     "vote": "UNAVAILABLE",
+     "why": "not yet verified"
+    }
+   },
+   "n_h1_votes": 0,
+   "n_available": 3,
+   "queued": false,
+   "watch": false,
+   "adjudication": null,
+   "first_scored_utc": "2026-09-05T21:42:40Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        1,
+        3
+       ],
+       [
+        0,
+        4
+       ]
+      ],
+      "ours": [
+       [
+        2,
+        3
+       ],
+       [
+        0,
+        4
+       ]
+      ],
+      "h0_error": 1,
+      "h1_error": 5,
+      "delta_h1_better": -4,
+      "vote": "SUPPORTS_H0"
+     },
+     "box_roster_fit": {
+      "available": true,
+      "eligible_rows": 35,
+      "h0": [
+       1.0,
+       0.947
+      ],
+      "h1": [
+       0.0,
+       0.0
+      ],
+      "fit_gain": -1.0,
+      "unmatched_sample": [
+       "taliahbenson"
+      ],
+      "vote": "SUPPORTS_H0"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 16,
+      "h1_error": 16,
       "vote": "UNINFORMATIVE"
      },
      "school_verification": {
@@ -89569,8 +91213,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 6,
-     "h1_error": 10,
+     "h0_error": 7,
+     "h1_error": 11,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -89708,8 +91352,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 11,
-     "h1_error": 11,
+     "h0_error": 13,
+     "h1_error": 13,
      "vote": "UNINFORMATIVE"
     },
     "school_verification": {
@@ -96015,8 +97659,8 @@
     },
     "school_verification": {
      "available": true,
-     "verdict": "UNVERIFIED",
-     "vote": "UNINFORMATIVE"
+     "verdict": "CORROBORATED_ONE",
+     "vote": "SUPPORTS_H0"
     }
    },
    "n_h1_votes": 0,
@@ -96390,7 +98034,7 @@
    "already_corrected": false,
    "context": {
     "venue": "Johnson Coliseum",
-    "nominal_home_is_venue_host": true
+    "nominal_home_is_venue_host": false
    },
    "components": {
     "feed_record_fit": {
@@ -100726,8 +102370,8 @@
     },
     "school_verification": {
      "available": true,
-     "verdict": "UNVERIFIED",
-     "vote": "UNINFORMATIVE"
+     "verdict": "CORROBORATED_ONE",
+     "vote": "SUPPORTS_H0"
     }
    },
    "n_h1_votes": 0,
@@ -101142,8 +102786,8 @@
     },
     "school_verification": {
      "available": true,
-     "verdict": "UNVERIFIED",
-     "vote": "UNINFORMATIVE"
+     "verdict": "CORROBORATED_ONE",
+     "vote": "SUPPORTS_H0"
     }
    },
    "n_h1_votes": 0,
@@ -101226,7 +102870,7 @@
    "already_corrected": false,
    "context": {
     "venue": "Christl Arena",
-    "nominal_home_is_venue_host": true
+    "nominal_home_is_venue_host": false
    },
    "components": {
     "feed_record_fit": {
@@ -102746,8 +104390,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 5,
-     "h1_error": 13,
+     "h0_error": 6,
+     "h1_error": 14,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -103170,8 +104814,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 11,
-     "h1_error": 15,
+     "h0_error": 13,
+     "h1_error": 17,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -103998,8 +105642,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 4,
-     "h1_error": 8,
+     "h0_error": 6,
+     "h1_error": 10,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -104059,6 +105703,150 @@
      "school_verification": {
       "available": true,
       "verdict": "VERIFIED_BOTH",
+      "vote": "SUPPORTS_H0"
+     }
+    },
+    "n_h1_votes": 0,
+    "school_verification_available_at_scoring": true
+   }
+  },
+  {
+   "gid": "6637452",
+   "epoch": 1788634800,
+   "teams": [
+    "Georgetown",
+    "Davidson"
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": null,
+    "nominal_home_is_venue_host": null
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       2,
+       2
+      ],
+      [
+       2,
+       2
+      ]
+     ],
+     "ours": [
+      [
+       2,
+       2
+      ],
+      [
+       2,
+       2
+      ]
+     ],
+     "h0_error": 0,
+     "h1_error": 0,
+     "delta_h1_better": 0,
+     "vote": "UNINFORMATIVE"
+    },
+    "box_roster_fit": {
+     "available": true,
+     "eligible_rows": 35,
+     "h0": [
+      0.944,
+      0.882
+     ],
+     "h1": [
+      0.0,
+      0.0
+     ],
+     "fit_gain": -0.944,
+     "unmatched_sample": [
+      "alexisanderson",
+      "angeliquestlaurent",
+      "abigailhenson"
+     ],
+     "vote": "SUPPORTS_H0"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 16,
+     "h1_error": 16,
+     "vote": "UNINFORMATIVE"
+    },
+    "school_verification": {
+     "available": true,
+     "verdict": "CORROBORATED_ONE",
+     "vote": "SUPPORTS_H0"
+    }
+   },
+   "n_h1_votes": 0,
+   "n_available": 4,
+   "queued": false,
+   "watch": false,
+   "adjudication": null,
+   "first_scored_utc": "2026-09-05T21:42:40Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        2,
+        2
+       ],
+       [
+        2,
+        2
+       ]
+      ],
+      "ours": [
+       [
+        2,
+        2
+       ],
+       [
+        2,
+        2
+       ]
+      ],
+      "h0_error": 0,
+      "h1_error": 0,
+      "delta_h1_better": 0,
+      "vote": "UNINFORMATIVE"
+     },
+     "box_roster_fit": {
+      "available": true,
+      "eligible_rows": 35,
+      "h0": [
+       0.944,
+       0.882
+      ],
+      "h1": [
+       0.0,
+       0.0
+      ],
+      "fit_gain": -0.944,
+      "unmatched_sample": [
+       "alexisanderson",
+       "angeliquestlaurent",
+       "abigailhenson"
+      ],
+      "vote": "SUPPORTS_H0"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 16,
+      "h1_error": 16,
+      "vote": "UNINFORMATIVE"
+     },
+     "school_verification": {
+      "available": true,
+      "verdict": "CORROBORATED_ONE",
       "vote": "SUPPORTS_H0"
      }
     },
@@ -104690,8 +106478,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 3,
-     "h1_error": 13,
+     "h0_error": 4,
+     "h1_error": 14,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -105852,7 +107640,7 @@
    "already_corrected": false,
    "context": {
     "venue": "Millett Hall",
-    "nominal_home_is_venue_host": false
+    "nominal_home_is_venue_host": true
    },
    "components": {
     "feed_record_fit": {
@@ -105890,8 +107678,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 10,
-     "h1_error": 14,
+     "h0_error": 12,
+     "h1_error": 16,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -107316,7 +109104,7 @@
    "already_corrected": false,
    "context": {
     "venue": "Millett Hall",
-    "nominal_home_is_venue_host": false
+    "nominal_home_is_venue_host": true
    },
    "components": {
     "feed_record_fit": {
@@ -107354,8 +109142,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 7,
-     "h1_error": 13,
+     "h0_error": 8,
+     "h1_error": 14,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -109764,7 +111552,7 @@
    "already_corrected": false,
    "context": {
     "venue": "Newman Arena",
-    "nominal_home_is_venue_host": false
+    "nominal_home_is_venue_host": true
    },
    "components": {
     "feed_record_fit": {
@@ -109802,8 +111590,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 7,
-     "h1_error": 13,
+     "h0_error": 8,
+     "h1_error": 14,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -112658,7 +114446,7 @@
    "already_corrected": false,
    "context": {
     "venue": "University Credit Union Center",
-    "nominal_home_is_venue_host": false
+    "nominal_home_is_venue_host": true
    },
    "components": {
     "feed_record_fit": {
@@ -112706,8 +114494,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 11,
+     "h0_error": 3,
+     "h1_error": 13,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
