@@ -102,10 +102,20 @@ def main():
         check("  test case: a strong raw record can sit beside weak "
               "ranked evidence (SEC)",
               sec["w"] > sec["l"] and "vs25" in sec)
-    ivy = by.get("Ivy League")
-    if ivy is not None:
+    # ⚠ WAS A CALENDAR PIN (broke 2026-09-04, the day the Ivies opened
+    # their season 1-1): it asserted the Ivy League specifically at 0-0.
+    # The invariant is that ANY league without a sample renders 0-0 and
+    # EARLY, never an invented record -- testable only while such a
+    # league exists; once every league has played, say so and move on.
+    nosample = [c for c in confs if c["w"] + c["l"] == 0]
+    if nosample:
         check("  test case: a no-sample league carries 0-0, never invented",
-              ivy["w"] + ivy["l"] == 0 and ivy["early"])
+              all(c["early"] for c in nosample),
+              [c["conf"] for c in nosample if not c["early"]])
+    else:
+        print("    (every league now has a sample -- the no-sample case "
+              "has no live subject; its rendering branch is asserted "
+              "above via 'Evidence still missing')")
 
     print("\n5. SNAPSHOTS: COMPARABLE OR NOTHING")
     snap = io.open(os.path.join(REPO, "scripts",

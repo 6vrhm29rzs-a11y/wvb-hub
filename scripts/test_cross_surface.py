@@ -44,7 +44,15 @@ def truth():
         ts = g.get("teams") or []
         if len(ts) != 2:
             continue
-        d1_both = all(t.get("division") == 1 for t in ts)
+        # ⚠ D-I MEMBERSHIP IS THE OFFICIAL RPI 348, NEVER THE FEED FLAG
+        # (2026-09-04): the feed serves West Florida division=1 (the known
+        # reclassifier trap), so a truth keyed on the flag counted Alabama
+        # St.'s loss to a D-II side as a D-I result while the page --
+        # correctly on membership -- did not. Same source as the page.
+        import build_hub as _BHm
+        _di = _BHm.di_teams()
+        d1_both = all(_BHm._hub_name(t.get("name_short")) in _di
+                      for t in ts)
         wi = SC.winner_index(g)   # the ONE derivation -- 6628428 went
         if wi is None:            # final with is_winner False on BOTH
             continue              # sides; the raw flag scored two losses

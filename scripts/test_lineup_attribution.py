@@ -71,13 +71,43 @@ def main():
             flagged.append(gid)
     print("  measured %d lineup games; %d flagged" % (n, len(flagged)))
     check("[+] the sweep measures a real population", n >= 200, n)
-    new = [g for g in flagged if g not in swapped]
+    # A gid under RESULT REVIEW (an unresolved official conflict in
+    # result_evidence.json -- one school contradicts, the other not yet
+    # posted) is adjudicated: it counts nowhere and carries its own
+    # review_by. The flag and the review describe the same suspicion.
+    under_review = SC.review_gids(2026)
+    new = [g for g in flagged if g not in swapped
+           and g not in under_review]
     known = [g for g in flagged if g in swapped]
+    # A flagged final whose SCHOOLS have not posted yet may sit in the
+    # pending ledger (machine signal corroborates, never quarantines) --
+    # but only until its recheck_by date. An expired entry fails loud:
+    # pending must resolve into a correction or a confirmed_correct
+    # label, never rot into silence.
+    import datetime as _dt
+    _pend = {}
+    _pp = os.path.join(REPO, "data/raw/2026/attribution_pending.json")
+    if os.path.exists(_pp):
+        _pend = (json.load(open(_pp)).get("pending") or {})
+    _today = _dt.date.today().isoformat()
+    fresh_pending = {g for g, e in _pend.items()
+                     if str(e.get("recheck_by", "")) >= _today}
+    expired = [g for g in _pend
+               if str(_pend[g].get("recheck_by", "")) < _today]
     print("  %d flagged games carry a ledgered box_team_swap (the "
-          "confirmed inversions)" % len(known))
-    check("every lineup-swapped game is a LEDGERED inversion -- a new "
-          "flag is a new inversion candidate",
-          not new, new[:5])
+          "confirmed inversions); %d pending school evidence"
+          % (len(known), len(fresh_pending)))
+    check("every lineup-swapped game is a LEDGERED inversion or "
+          "PENDING school evidence (with an unexpired recheck_by)",
+          not [g for g in new if g not in fresh_pending],
+          [g for g in new if g not in fresh_pending][:5])
+    check("no pending entry has outlived its recheck_by",
+          not expired, expired[:5])
+    # NEGATIVE CONTROL: an expired pending entry must be caught.
+    _fake = {"g0": {"recheck_by": "2000-01-01"}}
+    check("[NEG] an expired pending entry would trip",
+          [g for g in _fake if str(_fake[g]["recheck_by"]) < _today]
+          == ["g0"])
     check("[+] the known inversions with held lineups DO flag (the sweep "
           "can see the defect)", len(known) >= 5, len(known))
     src = open(os.path.join(REPO, "scripts",

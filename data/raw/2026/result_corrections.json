@@ -1062,6 +1062,188 @@
      "establishes": "Howard L 0-3 vs Syracuse"
     }
    ]
+  },
+  "6626507": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "F at 2-0 Pacific with the third-set line frozen 22-21 -- the feed stamped the match final MID-THIRD-SET and never updated again (its box also stops at set 3). A best-of-5 has no 2-0 final.",
+   "correct": {
+    "winner_team_id": "46482",
+    "away_sets": 3,
+    "home_sets": 2,
+    "linescores": [],
+    "linescores_replace": true
+   },
+   "established": "Pacific won 3-2 in five -- both schools contradict the feed's 2-0 and assert the same five-set result (both marking the match Neutral). Winner unchanged, set count corrected. The per-set points for sets 3-5 exist in NO source we hold (feed lines and box both truncate at set 3), so the line score is withheld rather than partially shown -- three real rows beside a 3-2 result would read as a broken score (R5: never a stand-in).",
+   "evidence": [
+    {
+     "url": "https://pacifictigers.com/services/schedule_txt.ashx?schedule=405",
+     "kind": "school_site",
+     "school": "Pacific",
+     "retrieved": "2026-09-04T19:23:43Z",
+     "text": "published schedule row for 2026-09-03: 'Pacific W 3-2 vs UC Riverside' (Neutral)",
+     "establishes": "Pacific W 3-2 vs UC Riverside"
+    },
+    {
+     "url": "https://gohighlanders.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "UC Riverside",
+     "retrieved": "2026-09-04T19:23:43Z",
+     "text": "published schedule row for 2026-09-03: 'UC Riverside L 2-3 vs Pacific' (Neutral)",
+     "establishes": "UC Riverside L 2-3 vs Pacific"
+    }
+   ]
+  },
+  "6626656": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Coastal Carolina (home) won 3-2 with box and lineup rows attributed the same way",
+   "correct": {
+    "winner_team_id": "46408",
+    "away_sets": 3,
+    "home_sets": 2,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 20,
+      "home": 25
+     },
+     {
+      "period": 2,
+      "visit": 25,
+      "home": 22
+     },
+     {
+      "period": 3,
+      "visit": 25,
+      "home": 19
+     },
+     {
+      "period": 4,
+      "visit": 23,
+      "home": 25
+     },
+     {
+      "period": 5,
+      "visit": 17,
+      "home": 15
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46408": "46170",
+     "46170": "46408"
+    }
+   },
+   "established": "UConn won 3-2 -- the feed's entire team attribution is inverted (the SMU-UC Davis class; caught by the lineup-attribution guard: lineup rows fit the OPPOSITE roster, then confirmed both ways -- both schools contradict the feed's version and both assert the same 3-2 UConn result). Linescores flipped column-for-column to match.",
+   "evidence": [
+    {
+     "url": "https://uconnhuskies.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "UConn",
+     "retrieved": "2026-09-04T19:34:31Z",
+     "text": "published schedule row for 2026-09-04: 'UConn W 3-2 vs Coastal Carolina'",
+     "establishes": "UConn W 3-2 vs Coastal Carolina"
+    },
+    {
+     "url": "https://goccusports.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Coastal Carolina",
+     "retrieved": "2026-09-04T19:34:31Z",
+     "text": "published schedule row for 2026-09-04: 'Coastal Carolina L 2-3 vs UConn'",
+     "establishes": "Coastal Carolina L 2-3 vs UConn"
+    }
+   ]
+  },
+  "6625359": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "UT Martin (home) won 2-0 -- derived winner/sets refuted by the feed's OWN line scores, whose visit column (Chattanooga) took every set 25-15/25-14/25-21; the in-progress records correctly had Chattanooga up 2-0 before the final flipped",
+   "correct": {
+    "winner_team_id": "46505",
+    "away_sets": 3,
+    "home_sets": 0
+   },
+   "established": "Chattanooga won 3-0 -- the Charleston So.-SC State class (derived fields wrong, lines correct; lines kept as the feed served them). Both schools assert it: Chattanooga W 3-0, UT Martin L 0-3.",
+   "evidence": [
+    {
+     "url": "https://gomocs.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Chattanooga",
+     "retrieved": "2026-09-04T19:36:23Z",
+     "text": "published schedule row for 2026-09-04: 'Chattanooga W 3-0 vs UT Martin'",
+     "establishes": "Chattanooga W 3-0 vs UT Martin"
+    },
+    {
+     "url": "https://utmsports.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "UT Martin",
+     "retrieved": "2026-09-04T19:36:23Z",
+     "text": "published schedule row for 2026-09-04: 'UT Martin L 0-3 vs Chattanooga'",
+     "establishes": "UT Martin L 0-3 vs Chattanooga"
+    }
+   ]
+  },
+  "6628381": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Campbell (away) won 3-2 with box and lineup rows attributed the same way",
+   "correct": {
+    "winner_team_id": "46708",
+    "away_sets": 2,
+    "home_sets": 3,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 25,
+      "home": 21
+     },
+     {
+      "period": 2,
+      "visit": 16,
+      "home": 25
+     },
+     {
+      "period": 3,
+      "visit": 22,
+      "home": 25
+     },
+     {
+      "period": 4,
+      "visit": 25,
+      "home": 22
+     },
+     {
+      "period": 5,
+      "visit": 10,
+      "home": 15
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46708": "46162",
+     "46162": "46708"
+    }
+   },
+   "established": "Xavier won 3-2 at home -- the feed's entire team attribution is inverted (lineup rows fit the OPPOSITE roster; both schools contradict the feed and assert the same 3-2 Xavier result). Linescores flipped column-for-column.",
+   "evidence": [
+    {
+     "url": "https://goxavier.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Xavier",
+     "retrieved": "2026-09-04T20:13:41Z",
+     "text": "published schedule row for 2026-09-04: 'Xavier W 3-2 vs Campbell'",
+     "establishes": "Xavier W 3-2 vs Campbell"
+    },
+    {
+     "url": "https://gocamels.com/services/schedule_txt.ashx?schedule=394",
+     "kind": "school_site",
+     "school": "Campbell",
+     "retrieved": "2026-09-04T20:13:41Z",
+     "text": "published schedule row for 2026-09-04: 'Campbell L 2-3 vs Xavier'",
+     "establishes": "Campbell L 2-3 vs Xavier"
+    }
+   ]
   }
  }
 }

@@ -1,0 +1,14 @@
+{
+ "_doc": "Lineup-flagged games AWAITING school evidence. A machine signal (lineup rows fitting the opposite roster) may CORROBORATE but never quarantine or correct alone -- so a flagged final whose schools have not posted yet sits here, counted as the feed says, until the schools decide. Every entry carries recheck_by; test_lineup_attribution accepts a pending gid ONLY until that date, so an entry cannot rot into permanent silence. Resolution: file a result_corrections entry (confirmed inversion), or an attribution_adjudications label confirmed_correct (false alarm), then delete the entry here.",
+ "pending": {
+  "6626920": {
+   "teams": [
+    "Prairie View",
+    "Radford"
+   ],
+   "noticed": "2026-09-04",
+   "recheck_by": "2026-09-06",
+   "why": "Lineup rows fit the opposite roster (the inversion signature). Checked 2026-09-04 early AM: Prairie View schedule_txt has the event NOT_POSTED, Radford's schedule/text does not list it yet -- no school assertion exists to confirm or refute. Feed says Prairie View won 3-1 at home; counted as the feed says until the schools publish."
+  }
+ }
+}

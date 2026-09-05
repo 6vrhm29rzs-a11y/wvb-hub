@@ -32,7 +32,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 4,
+     "records": 2,
      "values": [
       "1789243200",
       "1789228800"
@@ -40,13 +40,27 @@
     }
    ],
    "matchup": "George Mason / Morgan St.",
-   "records": 4
+   "records": 2
+  },
+  "6624527": {
+   "conflicts": [
+    {
+     "field": "start_time_epoch",
+     "records": 2,
+     "values": [
+      "1789740000",
+      "1789779600"
+     ]
+    }
+   ],
+   "matchup": "UC Santa Barbara / Pepperdine",
+   "records": 2
   },
   "6624845": {
    "conflicts": [
     {
      "field": "teams",
-     "records": 5,
+     "records": 3,
      "values": [
       "(('46045', False), ('46753', True))",
       "(('46045', True), ('46753', False))"
@@ -54,7 +68,7 @@
     },
     {
      "field": "site",
-     "records": 5,
+     "records": 3,
      "values": [
       "home/away flip across snapshots",
       "no venue owner on record"
@@ -62,13 +76,27 @@
     }
    ],
    "matchup": "Coppin St. / Stony Brook",
-   "records": 5
+   "records": 3
+  },
+  "6625092": {
+   "conflicts": [
+    {
+     "field": "teams",
+     "records": 4,
+     "values": [
+      "(('45803', True), ('53141', False))",
+      "(('45803', True), ('52155', False))"
+     ]
+    }
+   ],
+   "matchup": "Southern-N.O. / Mississippi Val.",
+   "records": 4
   },
   "6625252": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 4,
+     "records": 3,
      "values": [
       "1789196400",
       "1789232400"
@@ -76,13 +104,13 @@
     }
    ],
    "matchup": "Saint Mary's (CA) / Sacramento St.",
-   "records": 4
+   "records": 3
   },
   "6625273": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 6,
+     "records": 8,
      "values": [
       "1788505200",
       "1788570000"
@@ -90,13 +118,13 @@
     }
    ],
    "matchup": "LIU / Oregon",
-   "records": 6
+   "records": 8
   },
   "6625274": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 5,
+     "records": 4,
      "values": [
       "1788678000",
       "1788721200"
@@ -104,13 +132,13 @@
     }
    ],
    "matchup": "Washington St. / Oregon",
-   "records": 5
+   "records": 4
   },
   "6625402": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 4,
+     "records": 3,
      "values": [
       "1789228800",
       "1789232400"
@@ -118,13 +146,13 @@
     }
    ],
    "matchup": "James Madison / Pepperdine",
-   "records": 4
+   "records": 3
   },
   "6625578": {
    "conflicts": [
     {
      "field": "teams",
-     "records": 4,
+     "records": 3,
      "values": [
       "(('46177', False), ('46289', True))",
       "(('46177', True), ('46289', False))"
@@ -132,7 +160,7 @@
     },
     {
      "field": "site",
-     "records": 4,
+     "records": 3,
      "values": [
       "home/away flip across snapshots",
       "no venue owner on record"
@@ -140,7 +168,49 @@
     }
    ],
    "matchup": "Drake / CSUN",
-   "records": 4
+   "records": 3
+  },
+  "6625580": {
+   "conflicts": [
+    {
+     "field": "start_time_epoch",
+     "records": 3,
+     "values": [
+      "1789149600",
+      "1789237800"
+     ]
+    }
+   ],
+   "matchup": "Drake / Kansas City",
+   "records": 3
+  },
+  "6625581": {
+   "conflicts": [
+    {
+     "field": "start_time_epoch",
+     "records": 3,
+     "values": [
+      "1789228800",
+      "1789162200"
+     ]
+    }
+   ],
+   "matchup": "Drake / Radford",
+   "records": 3
+  },
+  "6625615": {
+   "conflicts": [
+    {
+     "field": "start_time_epoch",
+     "records": 2,
+     "values": [
+      "1789761600",
+      "1789765200"
+     ]
+    }
+   ],
+   "matchup": "LSU / Tulsa",
+   "records": 2
   },
   "6625712": {
    "conflicts": [
@@ -159,8 +229,17 @@
   "6625790": {
    "conflicts": [
     {
+     "field": "teams",
+     "non_blocking": "site is confirmed neutral, so no displayed fact depends on which side is nominally home",
+     "records": 4,
+     "values": [
+      "(('45792', False), ('45886', True))",
+      "(('45792', True), ('45886', False))"
+     ]
+    },
+    {
      "field": "start_time_epoch",
-     "records": 5,
+     "records": 4,
      "values": [
       "1788739200",
       "1788724800"
@@ -168,7 +247,7 @@
     }
    ],
    "matchup": "LMU (CA) / Utah Tech",
-   "records": 5
+   "records": 4
   },
   "6625822": {
    "conflicts": [
@@ -188,7 +267,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 5,
+     "records": 6,
      "values": [
       "1789102800",
       "1789171200"
@@ -196,7 +275,7 @@
     }
    ],
    "matchup": "Baylor / Nebraska",
-   "records": 5
+   "records": 6
   },
   "6626229": {
    "conflicts": [
@@ -216,7 +295,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 2,
+     "records": 3,
      "values": [
       "1789621200",
       "1789689600"
@@ -224,6 +303,20 @@
     }
    ],
    "matchup": "Marquette / Wisconsin",
+   "records": 3
+  },
+  "6626477": {
+   "conflicts": [
+    {
+     "field": "start_time_epoch",
+     "records": 2,
+     "values": [
+      "1789772400",
+      "1789776000"
+     ]
+    }
+   ],
+   "matchup": "Arkansas / Arkansas St.",
    "records": 2
   },
   "6626685": {
@@ -240,11 +333,25 @@
    "matchup": "Long Beach St. / Washington St.",
    "records": 2
   },
+  "6626686": {
+   "conflicts": [
+    {
+     "field": "start_time_epoch",
+     "records": 2,
+     "values": [
+      "1789783200",
+      "1789779600"
+     ]
+    }
+   ],
+   "matchup": "Long Beach St. / Washington St.",
+   "records": 2
+  },
   "6626746": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 3,
+     "records": 4,
      "values": [
       "1789599600",
       "1789601400"
@@ -252,27 +359,27 @@
     }
    ],
    "matchup": "UTEP / TCU",
-   "records": 3
+   "records": 4
   },
-  "6627195": {
+  "6626993": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 6,
+     "records": 2,
      "values": [
-      "1788562800",
-      "1788543000"
+      "1789772400",
+      "1789776000"
      ]
     }
    ],
-   "matchup": "Green Bay / Tennessee St.",
-   "records": 6
+   "matchup": "Kansas St. / Creighton",
+   "records": 2
   },
   "6627242": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 5,
+     "records": 3,
      "values": [
       "1788710400",
       "1788631200"
@@ -280,13 +387,13 @@
     }
    ],
    "matchup": "George Washington / Charlotte",
-   "records": 5
+   "records": 3
   },
   "6627311": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 4,
+     "records": 3,
      "values": [
       "1789164000",
       "1789160400"
@@ -294,13 +401,13 @@
     }
    ],
    "matchup": "San Jose St. / Utah Tech",
-   "records": 4
+   "records": 3
   },
   "6627931": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 5,
+     "records": 4,
      "values": [
       "1788627600",
       "1788631200"
@@ -308,13 +415,13 @@
     }
    ],
    "matchup": "Montana / California Baptist",
-   "records": 5
+   "records": 4
   },
   "6628053": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 4,
+     "records": 2,
      "values": [
       "1789167600",
       "1789236000"
@@ -322,13 +429,13 @@
     }
    ],
    "matchup": "Bucknell / Siena",
-   "records": 4
+   "records": 2
   },
   "6628062": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 5,
+     "records": 3,
      "values": [
       "1788559200",
       "1788624000"
@@ -336,14 +443,14 @@
     }
    ],
    "matchup": "Binghamton / Sacred Heart",
-   "records": 5
+   "records": 3
   },
   "6628108": {
    "conflicts": [
     {
      "field": "teams",
      "non_blocking": "site is confirmed neutral, so no displayed fact depends on which side is nominally home",
-     "records": 6,
+     "records": 9,
      "values": [
       "(('45886', False), ('46291', True))",
       "(('45886', True), ('46291', False))"
@@ -351,7 +458,7 @@
     },
     {
      "field": "start_time_epoch",
-     "records": 6,
+     "records": 9,
      "values": [
       "1788573600",
       "1788559200"
@@ -359,13 +466,13 @@
     }
    ],
    "matchup": "Utah Tech / UC San Diego",
-   "records": 6
+   "records": 9
   },
   "6628262": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 5,
+     "records": 3,
      "values": [
       "1788721200",
       "1788714000"
@@ -373,13 +480,13 @@
     }
    ],
    "matchup": "Arizona / Pepperdine",
-   "records": 5
+   "records": 3
   },
   "6628376": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 5,
+     "records": 3,
      "values": [
       "1789110000",
       "1789164000"
@@ -387,13 +494,13 @@
     }
    ],
    "matchup": "Omaha / UC Riverside",
-   "records": 5
+   "records": 3
   },
   "6628455": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 5,
+     "records": 7,
      "values": [
       "1788552000",
       "1788548400"
@@ -401,13 +508,41 @@
     }
    ],
    "matchup": "Marist / SIUE",
-   "records": 5
+   "records": 7
+  },
+  "6637750": {
+   "conflicts": [
+    {
+     "field": "start_time_epoch",
+     "records": 4,
+     "values": [
+      "1788604200",
+      "1788647400"
+     ]
+    }
+   ],
+   "matchup": "Lehigh / Delaware St.",
+   "records": 4
+  },
+  "6638111": {
+   "conflicts": [
+    {
+     "field": "start_time_epoch",
+     "records": 7,
+     "values": [
+      "1788568200",
+      "1788564600"
+     ]
+    }
+   ],
+   "matchup": "Kansas City / Miami (OH)",
+   "records": 7
   },
   "6639126": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 5,
+     "records": 4,
      "values": [
       "1789016400",
       "1789083000"
@@ -415,13 +550,13 @@
     }
    ],
    "matchup": "New Mexico / Nebraska",
-   "records": 5
+   "records": 4
   },
   "6639127": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 5,
+     "records": 3,
      "values": [
       "1789102800",
       "1789160400"
@@ -429,15 +564,15 @@
     }
    ],
    "matchup": "New Mexico / Georgia Tech",
-   "records": 5
+   "records": 3
   }
  },
  "by_field": {
-  "game_state": 30,
+  "game_state": 54,
   "site": 2,
-  "start_time_epoch": 27,
-  "teams": 2,
-  "teams (non-blocking)": 5
+  "start_time_epoch": 35,
+  "teams": 3,
+  "teams (non-blocking)": 6
  },
  "corrections": {
   "6625717": {
@@ -570,10 +705,10 @@
   }
  },
  "counts": {
-  "blocked": 29,
-  "conflicted": 63,
+  "blocked": 38,
+  "conflicted": 96,
   "corrected": 4,
-  "fixtures": 4879
+  "fixtures": 4880
  },
  "official_conflicts": {},
  "stale": {}

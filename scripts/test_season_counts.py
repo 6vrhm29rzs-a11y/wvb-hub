@@ -202,6 +202,32 @@ def main():
           _raw == [False, False]
           and SC.winner_index(_g(False, False, 3, 0)) == 0)
 
+    # -- an explicit empty linescores_replace clears a truncated tape
+    # (2026-09-04, 6626507: feed went final mid-third-set; corrected 3-2
+    # has no per-set points in any source, so the correction withholds
+    # the line rather than showing three real rows beside a 3-2) --
+    _tg = {"game_id": "990001", "game_state": "F",
+           "teams": [{"team_id": "1", "is_home": False, "sets_won": 2,
+                      "is_winner": False},
+                     {"team_id": "2", "is_home": True, "sets_won": 0,
+                      "is_winner": False}],
+           "linescores": [{"period": 1, "visit": 25, "home": 22},
+                          {"period": 2, "visit": 25, "home": 21},
+                          {"period": 3, "visit": 22, "home": 21}]}
+    _tc = {"990001": {"correct": {"winner_team_id": "1", "away_sets": 3,
+                                  "home_sets": 2, "linescores": [],
+                                  "linescores_replace": True}}}
+    _tr = SC.apply_correction(_tg, _tc)
+    check("empty linescores_replace clears the truncated tape",
+          _tr["linescores"] == [] and
+          [t["sets_won"] for t in _tr["teams"]] == [3, 2] and
+          SC.winner_index(_tr) == 0)
+    # NEGATIVE CONTROL: without the replace flag the lines must be KEPT
+    _tc2 = {"990001": {"correct": {"winner_team_id": "1", "away_sets": 3,
+                                   "home_sets": 2}}}
+    check("[NEG] without the flag the feed's lines are kept",
+          len(SC.apply_correction(_tg, _tc2)["linescores"]) == 3)
+
     print()
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))

@@ -114,7 +114,15 @@ def apply_correction(g, corr):
             t["sets_won"] = fix["away_sets"]
         ts.append(t)
     g["teams"] = ts
-    if fix.get("linescores") and (
+    # ⚠ AN EXPLICIT EMPTY REPLACE IS A REAL INSTRUCTION (2026-09-04,
+    # 6626507): the feed stamped Pacific-UCR final mid-third-set, so its
+    # three line rows are TRUNCATED beside the corrected 3-2 -- a partial
+    # tape reads as a broken score, and no source holds sets 3-5. An
+    # empty list with linescores_replace clears the lines (renders as
+    # "no set line on file"); the old falsy guard silently kept them.
+    if fix.get("linescores_replace") and fix.get("linescores") == []:
+        g["linescores"] = []
+    elif fix.get("linescores") and (
             fix.get("linescores_replace") or not [
             l for l in (g.get("linescores") or [])
             if l.get("home") is not None]):
