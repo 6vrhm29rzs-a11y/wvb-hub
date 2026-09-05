@@ -1,10 +1,10 @@
 {
  "date": "2026-09-04",
- "generated_utc": "2026-09-05T02:22:10Z",
+ "generated_utc": "2026-09-05T02:48:16Z",
  "counts": {
-  "UNVERIFIED": 9,
-  "VERIFIED_BOTH": 101,
-  "CORROBORATED_ONE": 37,
+  "UNVERIFIED": 8,
+  "VERIFIED_BOTH": 103,
+  "CORROBORATED_ONE": 40,
   "CONTRADICTED_ONE": 2,
   "CONTRADICTED_BOTH": 4
  },
@@ -2831,7 +2831,7 @@
    "gid": "6627547",
    "date": "2026-09-04",
    "canonical": "Nicholls def. Alcorn 3-1",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Nicholls": {
      "state": "NOT_POSTED",
@@ -2847,17 +2847,11 @@
      ]
     },
     "Alcorn": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://alcornsports.com/services/schedule_txt.ashx?schedule=320",
-     "row": [
-      "Sep 4 (Fri)",
-      "6 p.m.",
-      "Home",
-      "Nicholls",
-      "Lorman, Miss.",
-      "",
-      ""
-     ]
+     "assertion": "Alcorn L 1-3 vs Nicholls",
+     "opponent_source": "Nicholls",
+     "site_says": "Home"
     }
    }
   },
@@ -3447,6 +3441,98 @@
      "url": "https://unlvrebels.com/services/schedule_txt.ashx?schedule=1503",
      "assertion": "UNLV L 0-3 vs Boise State",
      "opponent_source": "Boise State",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6627991",
+   "date": "2026-09-04",
+   "canonical": "Coastal Carolina def. Jacksonville 3-1",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Coastal Carolina": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://goccusports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Coastal Carolina W 3-1 vs Jacksonville",
+     "opponent_source": "Jacksonville",
+     "site_says": "Away"
+    },
+    "Jacksonville": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://judolphins.com/services/schedule_txt.ashx?schedule=337",
+     "assertion": "Jacksonville L 1-3 vs Coastal Carolina University",
+     "opponent_source": "Coastal Carolina University",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6627194",
+   "date": "2026-09-04",
+   "canonical": "Tennessee Tech def. Green Bay 3-2",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Tennessee Tech": {
+     "state": "SITE_HTTP_MISS",
+     "url": "https://ttusports.com/sports/womens-volleyball/schedule/text",
+     "http": 404
+    },
+    "Green Bay": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://greenbayphoenix.com/services/schedule_txt.ashx?schedule=448",
+     "assertion": "Green Bay L 2-3 vs Tennessee Tech",
+     "opponent_source": "Tennessee Tech",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6639645",
+   "date": "2026-09-04",
+   "canonical": "Southern Ill. def. Merrimack 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Southern Ill.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://siusalukis.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Southern Ill. W 3-1 vs Merrimack",
+     "opponent_source": "Merrimack",
+     "site_says": "Home"
+    },
+    "Merrimack": {
+     "state": "NOT_POSTED",
+     "url": "https://merrimackathletics.com/services/schedule_txt.ashx?schedule=554",
+     "row": [
+      "Sep 4 (Fri)",
+      "8:00 PM",
+      "Away",
+      "Southern Illinois University",
+      "Carbondale, IL",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6627473",
+   "date": "2026-09-04",
+   "canonical": "Utah def. Wyoming 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Utah": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://utahutes.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Utah W 3-0 vs Wyoming",
+     "opponent_source": "Wyoming",
+     "site_says": "Home"
+    },
+    "Wyoming": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gowyo.com/services/schedule_txt.ashx?schedule=1205",
+     "assertion": "Wyoming L 0-3 vs Utah",
+     "opponent_source": "Utah",
      "site_says": "Away"
     }
    }

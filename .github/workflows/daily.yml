@@ -215,6 +215,8 @@ jobs:
           # published is gone for good. Appends only when the poll's own
           # "Through Games" stamp moves, so daily runs do not pile up rows.
           python3 scripts/crawl_polls.py || echo "polls unavailable; continuing"
+          # School-published TV/streaming, from the Nuxt schedule payloads (~6 min)
+          python3 scripts/crawl_tv.py || echo "tv crawl unavailable; continuing"
           # A conference label can go stale mid-realignment (ncaa.com still
           # served UT Arlington as WAC after it joined the UAC). This reads the
           # team's own schedule and costs no network -- cheap insurance that a

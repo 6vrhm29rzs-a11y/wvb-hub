@@ -717,6 +717,7 @@ def schedule(limit_days: int = 21) -> List[Dict]:
                 # ⚠ WHERE TO WATCH. The feed carries none, so this is the
                 # joined listing or nothing -- never a guess.
                 "tv": (tvx.get(gid) or {}).get("net"),
+                "tvu": (tvx.get(gid) or {}).get("url"),
                 "csrc": ((v.get("correction") or {}).get("source_url")
                          if v.get("correction") else None),
                 "cverified": ((v.get("correction") or {}).get("verified_on")
@@ -771,11 +772,10 @@ def tv_index():
     they stay in the standalone table and are counted, never invented onto a
     fixture.
 
-    ⚠ PRIVATE. The listings are transcribed from a forum, so they are stripped
-    from the public build exactly as tv() already is.
+    ⚠ THE TRANSCRIBED LAYER IS PRIVATE (a forum transcription; tv()
+    itself returns [] on the public build). The SCHOOL layer is each
+    school's own published schedule payload and ships on BOTH builds.
     """
-    if PUBLIC:
-        return {}
     import datetime as _dt
     try:
         from reconcile_2025 import norm as _norm
@@ -815,9 +815,79 @@ def tv_index():
         if len(cand) != 1:
             missed += 1
             continue
-        out[cand[0]] = {"net": row.get("n"), "t": row.get("t")}
+        out[cand[0]] = {"net": row.get("n"), "t": row.get("t"),
+                        "src": "transcribed"}
         joined += 1
-    out["_stats"] = {"joined": joined, "unjoined": missed, "total": joined + missed}
+
+    # ── THE SCHOOL-PUBLISHED LAYER (2026-09-04, Cody: "make sure streaming
+    # or live tv viewing information is listed for each game. A lot are on
+    # ESPN or ESPN+"). data/raw/2026/tv_auto.json is each school's OWN
+    # schedule payload: media.tv / media.video.title + the watch link.
+    # Binding is R8-strict: the listing's own opponent must norm-fold to the
+    # fixture's other side, and the date must sit within one day (a school
+    # lists its LOCAL date; the fixture's day here is ET). The school's own
+    # claim OUTRANKS the forum transcription (primary source), so it is
+    # applied second and wins the slot; a transcribed net survives only
+    # where no school lists one. School entries are public-safe; the
+    # transcribed layer stays private.
+    _autop = os.path.join(REPO, "data", "raw", str(SEASON), "tv_auto.json")
+    auto_joined = 0
+    if os.path.exists(_autop):
+        try:
+            _auto = json.load(open(_autop))
+        except ValueError:
+            _auto = {}
+        # (norm(team), norm(opp), date) -> entry, from every school's list
+        _byteam = {}
+        for _school, _ent in _auto.items():
+            if _school.startswith("_") or not isinstance(_ent, dict):
+                continue
+            for _e in (_ent.get("events") or []):
+                _byteam.setdefault(
+                    (_norm(_school), _norm(_e.get("opponent"))),
+                    []).append(_e)
+        for gid, rec in FX.canonical_fixtures().items():
+            ts = rec.get("teams") or []
+            ep = rec.get("start_time_epoch")
+            if len(ts) != 2 or not ep:
+                continue
+            try:
+                _fd = _dt.date.fromtimestamp(int(ep) - 4 * 3600
+                                             ) if False else                     _dt.datetime.utcfromtimestamp(int(ep) - 4 * 3600).date()
+            except (ValueError, TypeError):
+                continue
+            _names = [t.get("name_short") for t in ts]
+            # home side first: the host produces the broadcast
+            _homefirst = sorted(
+                ts, key=lambda t: 0 if t.get("is_home") else 1)
+            _pick = None
+            for t in _homefirst:
+                me = _norm(t.get("name_short"))
+                you = [x for x in _names if _norm(x) != me]
+                if not you:
+                    continue
+                for _e in _byteam.get((me, _norm(you[0])), []):
+                    try:
+                        _ed = _dt.date.fromisoformat(_e.get("date") or "")
+                    except (ValueError, TypeError):
+                        continue
+                    if abs((_ed - _fd).days) > 1:
+                        continue
+                    if _e.get("network") or _e.get("watch_url"):
+                        _pick = _e
+                        break
+                if _pick:
+                    break
+            if _pick:
+                prev = out.get(gid) or {}
+                out[gid] = {"net": _pick.get("network") or prev.get("net"),
+                            "t": prev.get("t"),
+                            "url": _pick.get("watch_url"),
+                            "src": "school"}
+                auto_joined += 1
+    out["_stats"] = {"joined": joined, "unjoined": missed,
+                     "total": joined + missed,
+                     "school_joined": auto_joined}
     return out
 
 def tv() -> List[Dict]:
@@ -4579,7 +4649,7 @@ def build():
             "ap": _pr.get(r["a"]), "hp": _pr.get(r["h"]),
             "venue": r.get("venue"), "city": r.get("city"), "st": r.get("st"),
             "site": r.get("site"), "event": r.get("event"), "kind": r.get("kind"),
-            "tv": r.get("tv"),
+            "tv": r.get("tv"), "tvu": r.get("tvu"),
             "conflict": r.get("conflict") or [], "corrected": r.get("corrected") or [],
             # ⚠ THE MATCH HAS TO SAY IT DOES NOT COUNT. Without this the data is
             # right and the screen still misleads: Nebraska beats Florida and
@@ -4936,7 +5006,7 @@ def build():
                 "venue": r.get("venue"), "city": r.get("city"),
                 "st": r.get("st"), "site": r.get("site"),
                 "event": r.get("event"), "kind": r.get("kind"),
-                "tv": r.get("tv"),
+                "tv": r.get("tv"), "tvu": r.get("tvu"),
                 "conflict": r.get("conflict") or [],
                 "corrected": r.get("corrected") or [],
                 "csrc": r.get("csrc"),
@@ -5965,6 +6035,10 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
   font:600 15px/1 var(--sans);border-radius:2px}
 .sbnav:hover{border-color:var(--navy);color:var(--cs-gold)}
 .sbnav:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
+.sbconf select{font:600 12px/1.2 var(--mono);padding:6px 8px;border:1px solid var(--line);
+  border-radius:7px;background:var(--card,#fff);color:var(--ink);max-width:170px}
+.sbconfonly{font:600 11px/1.2 var(--mono);color:var(--ink2);display:inline-flex;
+  align-items:center;gap:4px;white-space:nowrap}
 .sbday{display:flex;flex-direction:column;gap:2px;min-width:150px}
 .sbday b{font:700 21px/1 var(--disp);letter-spacing:.01em;color:var(--ink);
   text-transform:uppercase}
@@ -6457,7 +6531,12 @@ td.pick b{color:var(--navy)}
   .t25 td.rk{grid-column:1;grid-row:1;width:auto;min-width:0;
     font:700 18px/1 var(--disp)}
   .t25 td.tm{grid-column:2 / 4;grid-row:1;font-size:16px;min-width:0;
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-left:0}
+  /* ⚠ the desktop team-colour bar (absolute, left:6px in .tm's padding)
+     lands ON the crest once the phone grid removes that padding -- Cody's
+     screenshot showed a navy stripe through the Pitt logo reading as a
+     stray "1". The row's left edge tick already carries the colour here. */
+  .t25 .tm::before{content:none}
   .t25 td.mvc{grid-column:4;grid-row:1;justify-self:end}
   .t25 td.pw{grid-column:2;grid-row:2;justify-self:start}
   .t25 td.poll{grid-column:3;grid-row:2;justify-self:start}
@@ -7642,14 +7721,14 @@ td.at{white-space:nowrap}
 /* under a time heading the row's own clock is redundant; hiding it takes
    .mwhen out of grid flow, so the remaining four cells map to four
    columns and the row reclaims the width */
-.tdlist.bytime .mrow{grid-template-columns:minmax(240px,400px) auto minmax(200px,1fr)}
-.tdlist.bytime .mrow .mwhen{display:none}
+.tdlist.bytime .mrow,.tdlist.byrank .mrow{grid-template-columns:minmax(240px,400px) auto minmax(200px,1fr)}
+.tdlist.bytime .mrow .mwhen,.tdlist.byrank .mrow .mwhen{display:none}
 /* ⚠ A LIVE ROW'S "when" IS THE SET, NOT THE CLOCK -- hiding it under a time
    heading removed the one label that says where the match stands. Cody's
    desktop screenshot: live rows with no period anywhere. The clock is
    redundant under its heading; the period never is. */
-.tdlist.bytime .mrow.islive{grid-template-columns:64px minmax(240px,400px) auto minmax(200px,1fr)}
-.tdlist.bytime .mrow.islive .mwhen{display:block}
+.tdlist.bytime .mrow.islive,.tdlist.byrank .mrow.islive{grid-template-columns:64px minmax(240px,400px) auto minmax(200px,1fr)}
+.tdlist.bytime .mrow.islive .mwhen,.tdlist.byrank .mrow.islive .mwhen{display:block}
 /* ⚠ THE PHONE CARD MUST OUTRANK THE bytime DESKTOP TEMPLATES. Those two rules
    above are not media-scoped and carry three classes, so the 560px card
    template (one class, earlier in the sheet) lost everywhere inside a time
@@ -7665,11 +7744,12 @@ td.at{white-space:nowrap}
      the linescore block side by side, each an explicit two-row grid with
      IDENTICAL row heights and gap, so away lines up with away and home
      with home. */
-  .mrow,.tdlist.bytime .mrow,.tdlist.bytime .mrow.islive{
+  .mrow,.tdlist.bytime .mrow,.tdlist.bytime .mrow.islive,
+  .tdlist.byrank .mrow,.tdlist.byrank .mrow.islive{
     grid-template-columns:minmax(0,1fr) auto;
     grid-template-areas:"when when" "teams mls" "meta meta"}
-  .tdlist.bytime .mrow .mwhen{display:none}
-  .tdlist.bytime .mrow.islive .mwhen{display:block}
+  .tdlist.bytime .mrow .mwhen,.tdlist.byrank .mrow .mwhen{display:none}
+  .tdlist.bytime .mrow.islive .mwhen,.tdlist.byrank .mrow.islive .mwhen{display:block}
 }
 a.card.morecard{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;text-decoration:none;border-style:dashed}
 a.card.morecard b{font:700 17px/1 var(--disp);color:var(--ink2)}
@@ -9730,6 +9810,13 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <button class="segb" data-sbf="live" type="button">Live</button>
       <button class="segb" data-sbf="final" type="button">Final</button>
       <button class="segb" data-sbf="upcoming" type="button">Upcoming</button>
+      <!-- Conference filter (Cody, 2026-09-04: "sort scores tab by
+           conference to see conference games", NCAA.com's dropdown as the
+           reference). Filters to matches with EITHER side in the chosen
+           league; the league-play-only toggle narrows to both sides. -->
+      <label class="sbconf"><select id="sbConf"></select></label>
+      <label class="sbconfonly" id="sbConfOnlyWrap" hidden>
+        <input type="checkbox" id="sbConfOnly"> league play only</label>
       <span class="count" id="sbCount"></span>
     </div>
   </div>
@@ -16420,6 +16507,14 @@ document.addEventListener('click', ev => {
    here can disagree with Today, the header rail, or the match detail. */
 let SB_DATE = null;      /* ISO string; null means "follow today" */
 let SB_FILTER = 'all';
+let SB_CONF = 'all', SB_CONF_ONLY = false;
+function sbConfOf(name) { return (TEAMS[name] || {}).conf || ''; }
+function sbConfPasses(m) {
+  if (SB_CONF === 'all') return true;
+  const a = sbConfOf(mAway(m)), h = sbConfOf(mHome(m));
+  if (SB_CONF_ONLY) return a === SB_CONF && h === SB_CONF;
+  return a === SB_CONF || h === SB_CONF;
+}
 
 /* Minutes since midnight for a rendered clock time like "4:00 PM PT".
 
@@ -16460,6 +16555,7 @@ function sbMatchesOn(iso) {
 }
 
 function sbPasses(m, live) {
+  if (!sbConfPasses(m)) return false;
   if (SB_FILTER === 'all') return true;
   const st = matchState(m, live);
   if (SB_FILTER === 'live') return st === 'live';
@@ -16542,11 +16638,34 @@ function renderScoreboard() {
     if (mb === null) return -1;
     return ma - mb;
   };
+  /* ⚠ LIVE AND FINAL SORT BY WHO IS IN THEM, NOT WHEN THEY STARTED
+     (Cody, 2026-09-04, with the NCAA site as reference): time-grouping the
+     live lane put #345 Erskine above #2 Pittsburgh because 5:00 PM comes
+     before 6:00 PM -- "I don't need to see a start time for a game that's
+     already in progress." Best AVCA rank in the match first, then best
+     POWER rank, so every team carries a key and the order never falls back
+     to the clock. UPCOMING keeps the time groups: start time is the one
+     planning fact a scheduled match has. */
+  const bestRank = m => {
+    const pa = (TEAMS[m.a] || {}).rank || 9999,
+          ph = (TEAMS[m.h] || {}).rank || 9999;
+    const av = Math.min(+m.ar || 999, +m.hr || 999);
+    return av * 100000 + Math.min(pa, ph);
+  };
+  const byRank = (a, b) => bestRank(a) - bestRank(b);
   body.innerHTML = lanes.map(([st, title]) => {
     const in_ = rows.filter(m => matchState(m, liveOf(m)) === st);
     if (!in_.length) return '';
     const times = {};
     in_.forEach(m => { times[m.t || ''] = 1; });
+    if (st === 'live' || st === 'final') {
+      return '<section class="tdblock"><h3>' + title +
+        '<span>' + in_.length + '</span></h3>' +
+        '<div class="tdlist byrank">' +
+        in_.slice().sort(byRank)
+          .map(m => matchRow(m, liveOf(m), 'scores')).join('') +
+        '</div></section>';
+    }
     /* ⚠ GROUP ONLY WHEN THERE IS SOMETHING TO GROUP. On the first Friday the
        slate is 196 matches across 23 start times, which as one list is 15.7
        screens of undifferentiated rows; on a Tuesday it is four. Splitting
@@ -17456,6 +17575,30 @@ function wireScoreboard() {
   const host = document.getElementById('v-scores');
   if (!host || host.dataset.sbwired) return;
   host.dataset.sbwired = '1';
+  /* conference dropdown: options from the teams payload, alphabetical */
+  const cs = document.getElementById('sbConf');
+  if (cs) {
+    const confs = {};
+    Object.keys(TEAMS).forEach(n => {
+      const c = (TEAMS[n] || {}).conf; if (c) confs[c] = 1; });
+    cs.innerHTML = '<option value="all">All conferences</option>' +
+      Object.keys(confs).sort().map(c =>
+        '<option value="' + esc(c) + '">' + esc(c) + '</option>').join('');
+    cs.addEventListener('change', () => {
+      SB_CONF = cs.value;
+      const w = document.getElementById('sbConfOnlyWrap');
+      if (w) w.hidden = SB_CONF === 'all';
+      if (SB_CONF === 'all') {
+        SB_CONF_ONLY = false;
+        const cb = document.getElementById('sbConfOnly');
+        if (cb) cb.checked = false;
+      }
+      renderScoreboard();
+    });
+    const cb = document.getElementById('sbConfOnly');
+    if (cb) cb.addEventListener('change', () => {
+      SB_CONF_ONLY = cb.checked; renderScoreboard(); });
+  }
   host.addEventListener('click', e => {
     const f = e.target.closest('[data-sbf]');
     if (f) {
@@ -17746,9 +17889,15 @@ function renderMatchDetail(gid, dest) {
            the exact dup the reasonChips skip convention exists for */
         const rs = todayReasons(m, null)
           .filter(r => !(m.tv && r[0] === 'tv')).slice(0, 3);
-        const watch = m.tv
+        /* the school-published watch link renders as a real action when it
+           exists (each school's own schedule payload carries it); a network
+           with no link stays a plain fact -- never a dead button */
+        const watch = (m.tv || m.tvu)
           ? '<div class="wwrow"><span class="tdtag tv">watch</span>' +
-            '<span class="wwfact">' + esc(m.tv) + '</span></div>' : '';
+            '<span class="wwfact">' + (m.tv ? esc(m.tv) : 'stream') +
+            (m.tvu ? ' · <a href="' + esc(m.tvu) +
+              '" target="_blank" rel="noopener">open stream</a>' : '') +
+            '</span></div>' : '';
         if (!rs.length && !watch) return '';
         return '<div class="msec"><h3>Why watch</h3>' +
           '<div class="wwlist">' + rs.map(r =>

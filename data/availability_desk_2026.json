@@ -2,7 +2,7 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-05T02:22:59Z",
+  "generated_at_utc": "2026-09-05T02:49:52Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
@@ -516,6 +516,24 @@
    "points_per_set_missing": 6.559
   },
   {
+   "game_id": "6628624",
+   "team_id": "46433",
+   "team": "Merrimack",
+   "absent": [
+    {
+     "name": "Mckenna Shotwell",
+     "rate": 3.462,
+     "played_share": 1.0
+    },
+    {
+     "name": "Jocelyn Hammerstrand",
+     "rate": 2.731,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 6.193
+  },
+  {
    "game_id": "6626920",
    "team_id": "46734",
    "team": "Prairie View",
@@ -537,24 +555,6 @@
     }
    ],
    "points_per_set_missing": 6.167
-  },
-  {
-   "game_id": "6628624",
-   "team_id": "46433",
-   "team": "Merrimack",
-   "absent": [
-    {
-     "name": "Mckenna Shotwell",
-     "rate": 3.389,
-     "played_share": 1.0
-    },
-    {
-     "name": "Jocelyn Hammerstrand",
-     "rate": 2.722,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 6.111
   },
   {
    "game_id": "6628225",
@@ -1229,19 +1229,6 @@
    "points_per_set_missing": 2.923
   },
   {
-   "game_id": "6639364",
-   "team_id": "46498",
-   "team": "Southern Ill.",
-   "absent": [
-    {
-     "name": "Mckenzie Moeller",
-     "rate": 2.917,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 2.917
-  },
-  {
    "game_id": "6625924",
    "team_id": "46634",
    "team": "Western Ky.",
@@ -1471,6 +1458,19 @@
     }
    ],
    "points_per_set_missing": 2.639
+  },
+  {
+   "game_id": "6639364",
+   "team_id": "46498",
+   "team": "Southern Ill.",
+   "absent": [
+    {
+     "name": "Mckenzie Moeller",
+     "rate": 2.594,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.594
   },
   {
    "game_id": "6628284",
@@ -2967,14 +2967,14 @@
    ]
   },
   "Merrimack": {
-   "gid": "6626485",
+   "gid": "6639645",
    "d": "2026-09-04",
    "appeared": 14,
    "zero_action": [
-    "Gabrielle Moore",
+    "Mia Izzo",
     "Maddy Fennessy",
     "Fabiola Betancourt",
-    "Kaitlyn Oxceus",
+    "Vaia Tsioutsioulas",
     "Ella Gizmunt"
    ]
   },
@@ -3384,11 +3384,11 @@
    ]
   },
   "Jacksonville": {
-   "gid": "6625556",
-   "d": "2026-08-29",
+   "gid": "6627991",
+   "d": "2026-09-04",
    "appeared": 12,
    "zero_action": [
-    "Daiangelie Gonzalez",
+    "Alija Heins",
     "Zoey Vandel",
     "Selah Simien",
     "Aaliyah Mixon"
@@ -4256,12 +4256,14 @@
    ]
   },
   "Southern Ill.": {
-   "gid": "6625927",
+   "gid": "6639645",
    "d": "2026-09-04",
-   "appeared": 13,
+   "appeared": 11,
    "zero_action": [
     "Dafne Sosa",
+    "Julia Laidig",
     "Una Stepic",
+    "Ida Almkvist",
     "Valentina Zevallos"
    ]
   },
@@ -4881,13 +4883,13 @@
    ]
   },
   "Coastal Carolina": {
-   "gid": "6626656",
+   "gid": "6627991",
    "d": "2026-09-04",
    "appeared": 11,
    "zero_action": [
-    "Anna Rita",
+    "Elin Andersson",
     "Viara Parapunova",
-    "Talia Johnson",
+    "Anna Rita",
     "Kayla Channell"
    ]
   },
@@ -4962,15 +4964,17 @@
    ]
   },
   "Green Bay": {
-   "gid": "6627195",
+   "gid": "6627194",
    "d": "2026-09-04",
-   "appeared": 13,
+   "appeared": 11,
    "zero_action": [
     "Taylor Neuenschwander",
+    "Jessica Kurpeikis",
     "Victoria Kurilov",
+    "Riley Schmitz",
     "Ambryn Aanonsen",
-    "Eva Swenson",
-    "Kendall Schara"
+    "Sari Marks",
+    "Eva Swenson"
    ]
   },
   "Toledo": {
@@ -6093,14 +6097,12 @@
    ]
   },
   "Wyoming": {
-   "gid": "6627472",
-   "d": "2026-08-30",
-   "appeared": 10,
+   "gid": "6627473",
+   "d": "2026-09-04",
+   "appeared": 13,
    "zero_action": [
+    "Evelyn Udezue",
     "Anna Williams",
-    "Kristina Bozovic",
-    "Senna Roberts-navarro",
-    "Peyton Carruth",
     "Emerson Macias",
     "Abi Milby"
    ]
@@ -6145,15 +6147,13 @@
    ]
   },
   "Utah": {
-   "gid": "6627963",
-   "d": "2026-08-30",
-   "appeared": 13,
+   "gid": "6627473",
+   "d": "2026-09-04",
+   "appeared": 15,
    "zero_action": [
-    "Allie Grossenbach",
-    "Suttyn Harris",
     "Olga Musial",
     "Langley Griffin",
-    "Dyborrah Johnson"
+    "Lana Mijacic"
    ]
   },
   "Seattle U": {
@@ -6664,14 +6664,11 @@
    ]
   },
   "Tennessee Tech": {
-   "gid": "6627817",
+   "gid": "6627194",
    "d": "2026-09-04",
-   "appeared": 11,
+   "appeared": 14,
    "zero_action": [
-    "Caroline Fruge",
-    "Bella Lineberger",
-    "Shelby Hannah",
-    "Ava Schubert"
+    "Caroline Fruge"
    ]
   },
   "Louisiana": {
