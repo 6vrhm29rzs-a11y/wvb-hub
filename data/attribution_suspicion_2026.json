@@ -1,11 +1,11 @@
 {
  "model_version": "v1.1-unweighted",
- "generated_utc": "2026-09-05T04:02:37Z",
+ "generated_utc": "2026-09-05T04:34:38Z",
  "queue_rule": {
   "description": "any component voting SUPPORTS_H1 queues the match for human review; ranking is by vote count. A display/ranking heuristic only -- not a truth claim, and nothing here corrects or counts."
  },
- "n_finals": 743,
- "n_queued": 43,
+ "n_finals": 744,
+ "n_queued": 42,
  "matches": [
   {
    "gid": "6624516",
@@ -1482,8 +1482,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 11,
-     "h1_error": 1,
+     "h0_error": 10,
+     "h1_error": 2,
      "vote": "SUPPORTS_H1"
     },
     "school_verification": {
@@ -2034,6 +2034,162 @@
      }
     },
     "n_h1_votes": 1,
+    "school_verification_available_at_scoring": false
+   }
+  },
+  {
+   "gid": "6627237",
+   "epoch": 1788543000,
+   "teams": [
+    "Kansas City",
+    "Purdue Fort Wayne"
+   ],
+   "already_corrected": true,
+   "context": {
+    "venue": "Millett Hall",
+    "nominal_home_is_venue_host": true
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       2,
+       1
+      ],
+      [
+       2,
+       2
+      ]
+     ],
+     "ours": [
+      [
+       2,
+       1
+      ],
+      [
+       2,
+       2
+      ]
+     ],
+     "h0_error": 0,
+     "h1_error": 2,
+     "delta_h1_better": -2,
+     "vote": "SUPPORTS_H0"
+    },
+    "box_roster_fit": {
+     "available": true,
+     "eligible_rows": 32,
+     "h0": [
+      0.0,
+      0.0
+     ],
+     "h1": [
+      1.0,
+      1.0
+     ],
+     "fit_gain": 1.0,
+     "unmatched_sample": [
+      "averyparris",
+      "rileyrosneck",
+      "myaplemons",
+      "mionadimitric",
+      "gizemeroglu",
+      "ryannewattree"
+     ],
+     "vote": "SUPPORTS_H1"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 13,
+     "h1_error": 9,
+     "vote": "SUPPORTS_H1"
+    },
+    "school_verification": {
+     "available": false,
+     "vote": "UNAVAILABLE",
+     "why": "not yet verified"
+    }
+   },
+   "n_h1_votes": 2,
+   "n_available": 3,
+   "queued": true,
+   "watch": false,
+   "adjudication": {
+    "label": "confirmed_inversion",
+    "reviewed_at": "2026-09-05",
+    "basis": [
+     "result_corrections.json entry (PFW-Kansas City): review-then-correct done right -- one school + machine signal held it out of every count; the second school's posting completed the two-source standard. box_team_swap applied."
+    ]
+   },
+   "first_scored_utc": "2026-09-05T04:34:38Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        2,
+        1
+       ],
+       [
+        2,
+        2
+       ]
+      ],
+      "ours": [
+       [
+        2,
+        1
+       ],
+       [
+        2,
+        2
+       ]
+      ],
+      "h0_error": 0,
+      "h1_error": 2,
+      "delta_h1_better": -2,
+      "vote": "SUPPORTS_H0"
+     },
+     "box_roster_fit": {
+      "available": true,
+      "eligible_rows": 32,
+      "h0": [
+       0.0,
+       0.0
+      ],
+      "h1": [
+       1.0,
+       1.0
+      ],
+      "fit_gain": 1.0,
+      "unmatched_sample": [
+       "averyparris",
+       "rileyrosneck",
+       "myaplemons",
+       "mionadimitric",
+       "gizemeroglu",
+       "ryannewattree"
+      ],
+      "vote": "SUPPORTS_H1"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 13,
+      "h1_error": 9,
+      "vote": "SUPPORTS_H1"
+     },
+     "school_verification": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "not yet verified"
+     }
+    },
+    "n_h1_votes": 2,
     "school_verification_available_at_scoring": false
    }
   },
@@ -4790,142 +4946,6 @@
    }
   },
   {
-   "gid": "6627238",
-   "epoch": 1788553800,
-   "teams": [
-    "Evansville",
-    "Purdue Fort Wayne"
-   ],
-   "already_corrected": false,
-   "context": {
-    "venue": "Millett Hall",
-    "nominal_home_is_venue_host": false
-   },
-   "components": {
-    "feed_record_fit": {
-     "available": true,
-     "feed": [
-      [
-       0,
-       4
-      ],
-      [
-       2,
-       2
-      ]
-     ],
-     "ours": [
-      [
-       0,
-       5
-      ],
-      [
-       2,
-       2
-      ]
-     ],
-     "h0_error": 1,
-     "h1_error": 9,
-     "delta_h1_better": -8,
-     "vote": "SUPPORTS_H0"
-    },
-    "box_roster_fit": {
-     "available": true,
-     "eligible_rows": 31,
-     "h0": [
-      1.0,
-      1.0
-     ],
-     "h1": [
-      0.0,
-      0.0
-     ],
-     "fit_gain": -1.0,
-     "unmatched_sample": [],
-     "vote": "SUPPORTS_H0"
-    },
-    "record_continuity": {
-     "available": true,
-     "n_observations": 6,
-     "h0_error": 13,
-     "h1_error": 11,
-     "vote": "SUPPORTS_H1"
-    },
-    "school_verification": {
-     "available": true,
-     "verdict": "VERIFIED_BOTH",
-     "vote": "SUPPORTS_H0"
-    }
-   },
-   "n_h1_votes": 1,
-   "n_available": 4,
-   "queued": true,
-   "watch": false,
-   "adjudication": null,
-   "first_scored_utc": "2026-09-05T00:38:31Z",
-   "first_feature_version": "v1.1-unweighted",
-   "first_score": {
-    "components": {
-     "feed_record_fit": {
-      "available": true,
-      "feed": [
-       [
-        0,
-        4
-       ],
-       [
-        2,
-        2
-       ]
-      ],
-      "ours": [
-       [
-        0,
-        5
-       ],
-       [
-        2,
-        2
-       ]
-      ],
-      "h0_error": 1,
-      "h1_error": 9,
-      "delta_h1_better": -8,
-      "vote": "SUPPORTS_H0"
-     },
-     "box_roster_fit": {
-      "available": true,
-      "eligible_rows": 31,
-      "h0": [
-       1.0,
-       1.0
-      ],
-      "h1": [
-       0.0,
-       0.0
-      ],
-      "fit_gain": -1.0,
-      "unmatched_sample": [],
-      "vote": "SUPPORTS_H0"
-     },
-     "record_continuity": {
-      "available": true,
-      "n_observations": 6,
-      "h0_error": 15,
-      "h1_error": 15,
-      "vote": "UNINFORMATIVE"
-     },
-     "school_verification": {
-      "available": false,
-      "vote": "UNAVAILABLE",
-      "why": "not yet verified"
-     }
-    },
-    "n_h1_votes": 0,
-    "school_verification_available_at_scoring": false
-   }
-  },
-  {
    "gid": "6627674",
    "epoch": 1788462000,
    "teams": [
@@ -5976,122 +5996,6 @@
      }
     },
     "n_h1_votes": 1,
-    "school_verification_available_at_scoring": false
-   }
-  },
-  {
-   "gid": "6638111",
-   "epoch": 1788564600,
-   "teams": [
-    "Miami (OH)",
-    "Kansas City"
-   ],
-   "already_corrected": false,
-   "context": {
-    "venue": "Millett Hall",
-    "nominal_home_is_venue_host": false
-   },
-   "components": {
-    "feed_record_fit": {
-     "available": true,
-     "feed": [
-      [
-       3,
-       1
-      ],
-      [
-       2,
-       1
-      ]
-     ],
-     "ours": [
-      [
-       3,
-       1
-      ],
-      [
-       2,
-       1
-      ]
-     ],
-     "h0_error": 0,
-     "h1_error": 2,
-     "delta_h1_better": -2,
-     "vote": "SUPPORTS_H0"
-    },
-    "box_roster_fit": {
-     "available": false,
-     "vote": "UNAVAILABLE",
-     "why": "roster missing for a side"
-    },
-    "record_continuity": {
-     "available": true,
-     "n_observations": 6,
-     "h0_error": 9,
-     "h1_error": 7,
-     "vote": "SUPPORTS_H1"
-    },
-    "school_verification": {
-     "available": true,
-     "verdict": "VERIFIED_BOTH",
-     "vote": "SUPPORTS_H0"
-    }
-   },
-   "n_h1_votes": 1,
-   "n_available": 3,
-   "queued": true,
-   "watch": false,
-   "adjudication": null,
-   "first_scored_utc": "2026-09-05T01:49:48Z",
-   "first_feature_version": "v1.1-unweighted",
-   "first_score": {
-    "components": {
-     "feed_record_fit": {
-      "available": true,
-      "feed": [
-       [
-        3,
-        1
-       ],
-       [
-        2,
-        1
-       ]
-      ],
-      "ours": [
-       [
-        3,
-        1
-       ],
-       [
-        2,
-        1
-       ]
-      ],
-      "h0_error": 0,
-      "h1_error": 2,
-      "delta_h1_better": -2,
-      "vote": "SUPPORTS_H0"
-     },
-     "box_roster_fit": {
-      "available": false,
-      "vote": "UNAVAILABLE",
-      "why": "roster missing for a side"
-     },
-     "record_continuity": {
-      "available": true,
-      "n_observations": 6,
-      "h0_error": 9,
-      "h1_error": 9,
-      "vote": "UNINFORMATIVE"
-     },
-     "school_verification": {
-      "available": false,
-      "vote": "UNAVAILABLE",
-      "why": "not yet verified"
-     }
-    },
-    "n_h1_votes": 0,
     "school_verification_available_at_scoring": false
    }
   },
@@ -63484,8 +63388,8 @@
     "record_continuity": {
      "available": true,
      "n_observations": 6,
-     "h0_error": 1,
-     "h1_error": 13,
+     "h0_error": 2,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -63623,7 +63527,7 @@
      "available": true,
      "n_observations": 6,
      "h0_error": 4,
-     "h1_error": 12,
+     "h1_error": 10,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -63807,6 +63711,142 @@
       "h0_error": 0,
       "h1_error": 12,
       "vote": "SUPPORTS_H0"
+     },
+     "school_verification": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "not yet verified"
+     }
+    },
+    "n_h1_votes": 0,
+    "school_verification_available_at_scoring": false
+   }
+  },
+  {
+   "gid": "6627238",
+   "epoch": 1788553800,
+   "teams": [
+    "Evansville",
+    "Purdue Fort Wayne"
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": "Millett Hall",
+    "nominal_home_is_venue_host": false
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       0,
+       4
+      ],
+      [
+       2,
+       2
+      ]
+     ],
+     "ours": [
+      [
+       0,
+       5
+      ],
+      [
+       2,
+       3
+      ]
+     ],
+     "h0_error": 2,
+     "h1_error": 8,
+     "delta_h1_better": -6,
+     "vote": "SUPPORTS_H0"
+    },
+    "box_roster_fit": {
+     "available": true,
+     "eligible_rows": 31,
+     "h0": [
+      1.0,
+      1.0
+     ],
+     "h1": [
+      0.0,
+      0.0
+     ],
+     "fit_gain": -1.0,
+     "unmatched_sample": [],
+     "vote": "SUPPORTS_H0"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 14,
+     "h1_error": 14,
+     "vote": "UNINFORMATIVE"
+    },
+    "school_verification": {
+     "available": true,
+     "verdict": "VERIFIED_BOTH",
+     "vote": "SUPPORTS_H0"
+    }
+   },
+   "n_h1_votes": 0,
+   "n_available": 4,
+   "queued": false,
+   "watch": false,
+   "adjudication": null,
+   "first_scored_utc": "2026-09-05T00:38:31Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        0,
+        4
+       ],
+       [
+        2,
+        2
+       ]
+      ],
+      "ours": [
+       [
+        0,
+        5
+       ],
+       [
+        2,
+        2
+       ]
+      ],
+      "h0_error": 1,
+      "h1_error": 9,
+      "delta_h1_better": -8,
+      "vote": "SUPPORTS_H0"
+     },
+     "box_roster_fit": {
+      "available": true,
+      "eligible_rows": 31,
+      "h0": [
+       1.0,
+       1.0
+      ],
+      "h1": [
+       0.0,
+       0.0
+      ],
+      "fit_gain": -1.0,
+      "unmatched_sample": [],
+      "vote": "SUPPORTS_H0"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 15,
+      "h1_error": 15,
+      "vote": "UNINFORMATIVE"
      },
      "school_verification": {
       "available": false,
@@ -76229,7 +76269,7 @@
      "available": true,
      "n_observations": 6,
      "h0_error": 4,
-     "h1_error": 10,
+     "h1_error": 12,
      "vote": "SUPPORTS_H0"
     },
     "school_verification": {
@@ -95131,6 +95171,122 @@
       "h0_error": 0,
       "h1_error": 6,
       "vote": "SUPPORTS_H0"
+     },
+     "school_verification": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "not yet verified"
+     }
+    },
+    "n_h1_votes": 0,
+    "school_verification_available_at_scoring": false
+   }
+  },
+  {
+   "gid": "6638111",
+   "epoch": 1788564600,
+   "teams": [
+    "Miami (OH)",
+    "Kansas City"
+   ],
+   "already_corrected": false,
+   "context": {
+    "venue": "Millett Hall",
+    "nominal_home_is_venue_host": false
+   },
+   "components": {
+    "feed_record_fit": {
+     "available": true,
+     "feed": [
+      [
+       3,
+       1
+      ],
+      [
+       2,
+       1
+      ]
+     ],
+     "ours": [
+      [
+       3,
+       1
+      ],
+      [
+       3,
+       1
+      ]
+     ],
+     "h0_error": 1,
+     "h1_error": 1,
+     "delta_h1_better": 0,
+     "vote": "UNINFORMATIVE"
+    },
+    "box_roster_fit": {
+     "available": false,
+     "vote": "UNAVAILABLE",
+     "why": "roster missing for a side"
+    },
+    "record_continuity": {
+     "available": true,
+     "n_observations": 6,
+     "h0_error": 10,
+     "h1_error": 10,
+     "vote": "UNINFORMATIVE"
+    },
+    "school_verification": {
+     "available": true,
+     "verdict": "VERIFIED_BOTH",
+     "vote": "SUPPORTS_H0"
+    }
+   },
+   "n_h1_votes": 0,
+   "n_available": 3,
+   "queued": false,
+   "watch": false,
+   "adjudication": null,
+   "first_scored_utc": "2026-09-05T01:49:48Z",
+   "first_feature_version": "v1.1-unweighted",
+   "first_score": {
+    "components": {
+     "feed_record_fit": {
+      "available": true,
+      "feed": [
+       [
+        3,
+        1
+       ],
+       [
+        2,
+        1
+       ]
+      ],
+      "ours": [
+       [
+        3,
+        1
+       ],
+       [
+        2,
+        1
+       ]
+      ],
+      "h0_error": 0,
+      "h1_error": 2,
+      "delta_h1_better": -2,
+      "vote": "SUPPORTS_H0"
+     },
+     "box_roster_fit": {
+      "available": false,
+      "vote": "UNAVAILABLE",
+      "why": "roster missing for a side"
+     },
+     "record_continuity": {
+      "available": true,
+      "n_observations": 6,
+      "h0_error": 9,
+      "h1_error": 9,
+      "vote": "UNINFORMATIVE"
      },
      "school_verification": {
       "available": false,

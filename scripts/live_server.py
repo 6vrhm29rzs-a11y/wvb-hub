@@ -516,9 +516,34 @@ _digby = {"last": 0.0, "count": 0, "index": None, "teams": None,
 _digby_lock = threading.Lock()
 
 
+def _digby_key():
+    """The Anthropic key, hot-read PER REQUEST -- env first, then the
+    gitignored drop file. The key used to be read only at server LAUNCH, so
+    a server started without it kept Digby dark for its whole life and the
+    fix required a restart timed with an export (Cody hit exactly this,
+    2026-09-05: "digby doesn't work on desktop or mobile"). Now: drop the
+    key in Cody/data/anthropic_key.txt (one line; the whole Cody/ tree is
+    gitignored, this repo is PUBLIC) and the NEXT question works, no
+    restart. The key value is never logged and never echoed to the page."""
+    k = (os.environ.get("ANTHROPIC_API_KEY") or "").strip()
+    if k.startswith("sk-ant-"):
+        return k
+    p = os.path.join(REPO, "Cody", "data", "anthropic_key.txt")
+    if os.path.exists(p):
+        try:
+            k = open(p, encoding="utf-8").read().strip()
+        except OSError:
+            return None
+        if k.startswith("sk-ant-"):
+            os.environ["ANTHROPIC_API_KEY"] = k   # digby's client reads env
+            return k
+    return None
+
+
 def _digby_answer(question):
     """One question -> a dict for the page. Never raises."""
     try:
+        _digby_key()
         sys.path.insert(0, os.path.join(REPO, "scripts"))
         import digby_chat
         import digby
@@ -598,7 +623,10 @@ def _digby_answer(question):
         # screen. The page states availability; how to change it is not the
         # chat's business.
         r["answer"] = ("Digby chat is not connected on this local build. "
-                       "Hub data remains available.")
+                       "Hub data remains available. (To connect it: put the "
+                       "API key on one line in Cody/data/anthropic_key.txt "
+                       "-- the private folder -- and ask again; no restart "
+                       "needed.)")
         r["unavailable"] = True
     return r
 
@@ -1000,7 +1028,9 @@ def main():
     if (os.environ.get("ANTHROPIC_API_KEY") or "").startswith("sk-ant-"):
         print("  Ask Digby: ready")
     else:
-        print("  Ask Digby: OFF -- no ANTHROPIC_API_KEY in this shell.")
+        print("  Ask Digby: OFF -- no ANTHROPIC_API_KEY in this shell. "
+              "Drop the key (one line) in Cody/data/anthropic_key.txt and "
+              "the next question connects -- no restart needed.")
         print("             Everything else on the page works without it.")
     print("  ctrl-c to stop")
     # ---- optional second listener, on the tailnet interface only ---------

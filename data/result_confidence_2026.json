@@ -2,16 +2,16 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "corpus_fingerprint": "7a540109588c4f06",
-  "generated_at_utc": "2026-09-05T04:03:02Z",
+  "corpus_fingerprint": "89baaadcdaabeeb3",
+  "generated_at_utc": "2026-09-05T04:44:50Z",
   "counts": {
-   "finals": 764,
+   "finals": 765,
    "official_only": 14,
-   "reconciled": 714,
+   "reconciled": 715,
    "confirmed": 0,
-   "disputed": 5,
-   "pending_second": 759,
-   "corrected": 31,
+   "disputed": 4,
+   "pending_second": 761,
+   "corrected": 32,
    "duplicate_listings": 2,
    "duplicate_candidates_pending": 0
   }
@@ -23677,11 +23677,28 @@
    ]
   },
   {
-   "result_corrected": null,
-   "corr_reason": null,
-   "corr_kind": null,
-   "corr_feed_said": null,
-   "corr_evidence": [],
+   "result_corrected": true,
+   "corr_reason": "Kansas City won 3-1 at home -- the feed's entire team attribution is inverted (lineup rows fit the OPPOSITE roster; held UNDER REVIEW from the first intraday sweep when only PFW's own site contradicted the feed, upgraded to a correction once Kansas City posted and both schools asserted the same alternative). Linescores flipped column-for-column.",
+   "corr_kind": "contradicted",
+   "corr_feed_said": "Purdue Fort Wayne (away) won 3-1 with box and lineup rows attributed the same way",
+   "corr_evidence": [
+    {
+     "school": "Kansas City",
+     "url": "https://kcroos.com/sports/womens-volleyball/schedule/text",
+     "text": "published schedule row for 2026-09-04: 'Kansas City W 3-1 vs Purdue Fort Wayne'",
+     "status": null,
+     "note": null,
+     "retrieved": "2026-09-05"
+    },
+    {
+     "school": "Purdue Fort Wayne",
+     "url": "https://gomastodons.com/sports/womens-volleyball/schedule/text",
+     "text": "published schedule row for 2026-09-04: 'Purdue Fort Wayne L 1-3 vs Kansas City'",
+     "status": null,
+     "note": null,
+     "retrieved": "2026-09-05"
+    }
+   ],
    "duplicate_of": null,
    "dup_reason": null,
    "dup_asym": null,
@@ -23691,10 +23708,10 @@
    "h": "Kansas City",
    "exh": false,
    "d": "2026-09-04",
-   "overall": "disputed",
+   "overall": "corrected",
    "states": {
-    "result": "disputed",
-    "sets": "reconciled",
+    "result": "corrected",
+    "sets": "corrected",
     "box": "reconciled",
     "venue": "official"
    },
@@ -32604,6 +32621,34 @@
      "retrieved": "2026-09-05T03:40:32Z"
     }
    ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6626261",
+   "a": "SMU",
+   "h": "San Diego",
+   "exh": false,
+   "d": "2026-09-04",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "verify": null,
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
   },
   {
    "result_corrected": null,

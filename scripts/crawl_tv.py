@@ -37,6 +37,88 @@ SCHEDULE_PATHS = ["/sports/womens-volleyball/schedule",
                   "/sports/wvball/schedule",
                   "/sports/womens-volleyball/schedule/season/2026"]
 
+# bump when a parser learns a new template family: entries that previously
+# parsed NOTHING are refetched, entries that parsed stay on their cadence
+PARSER_V = 2
+
+# the school's own network badge, from its coverage-image filename. Only
+# KNOWN network tokens map; an unrecognised badge stays unlabelled (the
+# watch link still counts). ESPN-vs-ESPN+ ambiguity resolves in favour of
+# what the badge itself shows.
+_BADGE = {
+    "espn": "ESPN", "espn2": "ESPN2", "espnu": "ESPNU", "espn3": "ESPN3",
+    "espnplus": "ESPN+", "espn_plus": "ESPN+", "accn": "ACCN",
+    "accnx": "ACCNX", "secn": "SECN", "sec_network": "SEC Network",
+    "fs1": "FS1", "fs2": "FS2", "btn": "BTN", "big_ten": "BTN",
+    "cbssn": "CBSSN", "nesn": "NESN", "cusa": "CUSA.tv", "flosports": "FloSports",
+    "flovolleyball": "FloVolleyball", "twesn": "The W", "peacock": "Peacock",
+}
+
+
+def _badge_label(src):
+    # type: (str) -> Optional[str]
+    base = re.sub(r"\.(png|jpe?g|svg|gif|webp)$", "",
+                  (src or "").rsplit("/", 1)[-1].lower())
+    base = re.sub(r"[_-]?crop\d*$", "", base)
+    base = re.sub(r"[_-]?\d+$", "", base).strip("_-")
+    return _BADGE.get(base) or _BADGE.get(base.replace("-", "_"))
+
+
+_MON = {"jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
+        "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12}
+
+
+def parse_sidearm_html(page):
+    # type: (str) -> Optional[List[Dict]]
+    """The server-rendered SIDEARM family: sidearm-schedule-game-row cards.
+
+    Per row: opponent-name div, opponent-date div ("Sep 8 (Tue) 6:00 PM"),
+    an optional coverage IMAGE whose filename is the school's own network
+    badge, and an optional per-row watch link."""
+    rows = [m.start() for m in
+            re.finditer(r'class="sidearm-schedule-game-row', page)]
+    if len(rows) < 5:
+        return None
+    rows.append(len(page))
+    events = []
+    for a, b in zip(rows, rows[1:]):
+        card = page[a:b]
+        opp = re.search(
+            r'sidearm-schedule-game-opponent-name[^>]*>(.*?)</div>',
+            card, re.S)
+        dt = re.search(
+            r'sidearm-schedule-game-opponent-date[^>]*>(.*?)</div>',
+            card, re.S)
+        if not opp or not dt:
+            continue
+        opp_t = re.sub(r"\s+", " ",
+                       re.sub(r"<[^>]+>", " ", opp.group(1))).strip()
+        dt_t = re.sub(r"\s+", " ",
+                      re.sub(r"<[^>]+>", " ", dt.group(1))).strip()
+        m = re.match(r"([A-Za-z]{3})[a-z]*\.?\s+(\d{1,2})", dt_t)
+        if not m or not opp_t:
+            continue
+        mon = _MON.get(m.group(1).lower())
+        if not mon:
+            continue
+        year = SEASON if mon >= 8 else SEASON + 1
+        date = "%04d-%02d-%02d" % (year, mon, int(m.group(2)))
+        net = None
+        cov = re.search(
+            r'sidearm-schedule-game-coverage.{0,800}?src="([^"]+)"',
+            card, re.S)
+        if cov:
+            net = _badge_label(cov.group(1))
+        url = None
+        vid = re.search(
+            r'aria-label="Watch[^"]*"[^>]*href="([^"]+)"', card) or             re.search(r'href="([^"]+)"[^>]*aria-label="Watch[^"]*"', card)
+        if vid:
+            url = vid.group(1)
+        if net or url:
+            events.append({"date": date, "opponent": opp_t,
+                           "network": net, "watch_url": url})
+    return events or None
+
 
 def fetch(url, timeout=25):
     # type: (str, int) -> Optional[str]
@@ -146,6 +228,10 @@ def main():
             break
         ent = doc.get(team) or {}
         prev = ent.get("retrieved")
+        # a parser upgrade refetches schools that previously parsed NOTHING
+        if ent.get("status") not in (None, "ok") and \
+                int(ent.get("parser_v") or 1) < PARSER_V:
+            prev = None
         if prev and not force:
             try:
                 age = (now - datetime.datetime.strptime(
@@ -159,7 +245,7 @@ def main():
         if isinstance(site, dict):
             site = site.get("url")
         if not site or not isinstance(site, str):
-            doc[team] = {"status": "no_site", "retrieved": now_s}
+            doc[team] = {"status": "no_site", "parser_v": PARSER_V, "retrieved": now_s}
             continue
         site = site.rstrip("/")
         events = None
@@ -170,23 +256,26 @@ def main():
             if not page:
                 continue
             events = parse_nuxt(page)
+            if not events:
+                events = parse_sidearm_html(page)
             if events:
                 used = site + path
                 break
-            # a page fetched but with no payload: remember we tried
+            # a page fetched but with neither payload: remember we tried
             used = used or (site + path)
-            if "__NUXT_DATA__" not in (page or ""):
-                break                    # not this template family; stop
+            if "__NUXT_DATA__" not in (page or "") and \
+                    "sidearm-schedule-game" not in (page or ""):
+                break                    # neither template family; stop
         fetched += 1
         if events:
             nets = sum(1 for e in events if e.get("network"))
-            doc[team] = {"status": "ok", "source_url": used,
+            doc[team] = {"status": "ok", "parser_v": PARSER_V, "source_url": used,
                          "retrieved": now_s, "events": events,
                          "events_with_network": nets}
             withtv += 1
             print("  %-24s %d events, %d with a network" % (team, len(events), nets))
         else:
-            doc[team] = {"status": "no_payload", "source_url": used,
+            doc[team] = {"status": "no_payload", "parser_v": PARSER_V, "source_url": used,
                          "retrieved": now_s}
     tmp = OUT + ".tmp"
     json.dump(doc, open(tmp, "w"), indent=1)
