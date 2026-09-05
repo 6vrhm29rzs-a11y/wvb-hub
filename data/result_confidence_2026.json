@@ -2,16 +2,16 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "corpus_fingerprint": "bf45bb9b30d1ea21",
-  "generated_at_utc": "2026-09-05T00:35:04Z",
+  "corpus_fingerprint": "ff67b87ce378e7fc",
+  "generated_at_utc": "2026-09-05T00:38:32Z",
   "counts": {
    "finals": 711,
    "official_only": 13,
-   "reconciled": 670,
+   "reconciled": 669,
    "confirmed": 0,
    "disputed": 3,
    "pending_second": 708,
-   "corrected": 25,
+   "corrected": 26,
    "duplicate_listings": 2,
    "duplicate_candidates_pending": 0
   }
@@ -23130,11 +23130,28 @@
    "sources": []
   },
   {
-   "result_corrected": null,
-   "corr_reason": null,
-   "corr_kind": null,
-   "corr_feed_said": null,
-   "corr_evidence": [],
+   "result_corrected": true,
+   "corr_reason": "Florida St. won 3-2 (neutral floor, Allen Arena, Nashville) -- the feed's entire team attribution is inverted. Cody watched the match live and flagged the hub's Kansas 3-2 within the hour; both schools contradict the feed and assert the same alternative, including Kansas' own site recording the LOSS. Linescores flipped column-for-column.",
+   "corr_kind": "contradicted",
+   "corr_feed_said": "Kansas (away) won 3-2 -- 26-24, 21-25, 19-25, 28-26, 15-13 -- with box and lineup rows attributed the same way",
+   "corr_evidence": [
+    {
+     "school": "Florida St.",
+     "url": "https://seminoles.com/sports/womens-volleyball/schedule/text",
+     "text": "published schedule row for 2026-09-04: 'Florida St. W 3-2 vs Kansas'",
+     "status": null,
+     "note": null,
+     "retrieved": "2026-09-05"
+    },
+    {
+     "school": "Kansas",
+     "url": "https://kuathletics.com/sports/womens-volleyball/schedule/text",
+     "text": "published schedule row for 2026-09-04: 'Kansas L 2-3 vs Florida State'",
+     "status": null,
+     "note": null,
+     "retrieved": "2026-09-05"
+    }
+   ],
    "duplicate_of": null,
    "dup_reason": null,
    "dup_asym": null,
@@ -23144,10 +23161,10 @@
    "h": "Florida St.",
    "exh": false,
    "d": "2026-09-04",
-   "overall": "reconciled",
+   "overall": "corrected",
    "states": {
-    "result": "reconciled",
-    "sets": "reconciled",
+    "result": "corrected",
+    "sets": "corrected",
     "box": "reconciled",
     "venue": "official"
    },

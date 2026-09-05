@@ -1244,6 +1244,67 @@
      "establishes": "Campbell L 2-3 vs Xavier"
     }
    ]
+  },
+  "6625725": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Kansas (away) won 3-2 -- 26-24, 21-25, 19-25, 28-26, 15-13 -- with box and lineup rows attributed the same way",
+   "correct": {
+    "winner_team_id": "46674",
+    "away_sets": 2,
+    "home_sets": 3,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 24,
+      "home": 26
+     },
+     {
+      "period": 2,
+      "visit": 25,
+      "home": 21
+     },
+     {
+      "period": 3,
+      "visit": 25,
+      "home": 19
+     },
+     {
+      "period": 4,
+      "visit": 26,
+      "home": 28
+     },
+     {
+      "period": 5,
+      "visit": 13,
+      "home": 15
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46674": "46422",
+     "46422": "46674"
+    }
+   },
+   "established": "Florida St. won 3-2 (neutral floor, Allen Arena, Nashville) -- the feed's entire team attribution is inverted. Cody watched the match live and flagged the hub's Kansas 3-2 within the hour; both schools contradict the feed and assert the same alternative, including Kansas' own site recording the LOSS. Linescores flipped column-for-column.",
+   "evidence": [
+    {
+     "url": "https://seminoles.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Florida St.",
+     "retrieved": "2026-09-05T00:37:50Z",
+     "text": "published schedule row for 2026-09-04: 'Florida St. W 3-2 vs Kansas'",
+     "establishes": "Florida St. W 3-2 vs Kansas"
+    },
+    {
+     "url": "https://kuathletics.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Kansas",
+     "retrieved": "2026-09-05T00:37:50Z",
+     "text": "published schedule row for 2026-09-04: 'Kansas L 2-3 vs Florida State'",
+     "establishes": "Kansas L 2-3 vs Florida State"
+    }
+   ]
   }
  }
 }
