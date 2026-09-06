@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-06T20:21:55Z",
+  "generated_at_utc": "2026-09-06T20:41:04Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 7,
    "expired": 2,
-   "anomalies": 202
+   "anomalies": 206
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -1003,7 +1003,20 @@
     {
      "name": "Kiera Hamilton",
      "rate": 4.692,
-     "played_share": 1.0
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 4.692
+  },
+  {
+   "game_id": "6624445",
+   "team_id": "45798",
+   "team": "George Mason",
+   "absent": [
+    {
+     "name": "Kiera Hamilton",
+     "rate": 4.692,
+     "played_share": 0.75
     }
    ],
    "points_per_set_missing": 4.692
@@ -1581,6 +1594,19 @@
    "points_per_set_missing": 3.333
   },
   {
+   "game_id": "6624324",
+   "team_id": "46539",
+   "team": "Cincinnati",
+   "absent": [
+    {
+     "name": "Andrea Simovski",
+     "rate": 3.1,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 3.1
+  },
+  {
    "game_id": "6625090",
    "team_id": "46175",
    "team": "Delaware St.",
@@ -1618,19 +1644,6 @@
     }
    ],
    "points_per_set_missing": 3.026
-  },
-  {
-   "game_id": "6624324",
-   "team_id": "46539",
-   "team": "Cincinnati",
-   "absent": [
-    {
-     "name": "Andrea Simovski",
-     "rate": 2.929,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 2.929
   },
   {
    "game_id": "6637939",
@@ -1955,17 +1968,22 @@
    "points_per_set_missing": 2.639
   },
   {
-   "game_id": "6624671",
-   "team_id": "46242",
-   "team": "Rhode Island",
+   "game_id": "6624939",
+   "team_id": "46539",
+   "team": "Cincinnati",
    "absent": [
     {
-     "name": "Kj Johnson",
-     "rate": 2.618,
+     "name": "Ligia Williams",
+     "rate": 1.441,
+     "played_share": 1.0
+    },
+    {
+     "name": "Audrey Rome",
+     "rate": 1.188,
      "played_share": 1.0
     }
    ],
-   "points_per_set_missing": 2.618
+   "points_per_set_missing": 2.629
   },
   {
    "game_id": "6624265",
@@ -2013,6 +2031,19 @@
    "absent": [
     {
      "name": "Rachel Mccollum",
+     "rate": 2.5,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.5
+  },
+  {
+   "game_id": "6624671",
+   "team_id": "46242",
+   "team": "Rhode Island",
+   "absent": [
+    {
+     "name": "Kj Johnson",
      "rate": 2.5,
      "played_share": 1.0
     }
@@ -2101,19 +2132,6 @@
     }
    ],
    "points_per_set_missing": 2.35
-  },
-  {
-   "game_id": "6625952",
-   "team_id": "46160",
-   "team": "Long Beach St.",
-   "absent": [
-    {
-     "name": "Reagan Hope",
-     "rate": 2.318,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 2.318
   },
   {
    "game_id": "6627092",
@@ -2454,6 +2472,19 @@
    "points_per_set_missing": 1.75
   },
   {
+   "game_id": "6624939",
+   "team_id": "46108",
+   "team": "Oakland",
+   "absent": [
+    {
+     "name": "Grace Cooney",
+     "rate": 1.75,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.75
+  },
+  {
    "game_id": "6628059",
    "team_id": "46039",
    "team": "Central Conn. St.",
@@ -2545,6 +2576,32 @@
    "points_per_set_missing": 1.667
   },
   {
+   "game_id": "6627811",
+   "team_id": "46753",
+   "team": "Stony Brook",
+   "absent": [
+    {
+     "name": "Ayanna pierre Louis",
+     "rate": 1.658,
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 1.658
+  },
+  {
+   "game_id": "6627812",
+   "team_id": "46753",
+   "team": "Stony Brook",
+   "absent": [
+    {
+     "name": "Ayanna pierre Louis",
+     "rate": 1.658,
+     "played_share": 0.833
+    }
+   ],
+   "points_per_set_missing": 1.658
+  },
+  {
    "game_id": "6628315",
    "team_id": "45973",
    "team": "UNLV",
@@ -2558,27 +2615,14 @@
    "points_per_set_missing": 1.607
   },
   {
-   "game_id": "6627811",
-   "team_id": "46753",
-   "team": "Stony Brook",
+   "game_id": "6625952",
+   "team_id": "46160",
+   "team": "Long Beach St.",
    "absent": [
     {
-     "name": "Ayanna pierre Louis",
+     "name": "Reagan Hope",
      "rate": 1.594,
-     "played_share": 0.75
-    }
-   ],
-   "points_per_set_missing": 1.594
-  },
-  {
-   "game_id": "6627812",
-   "team_id": "46753",
-   "team": "Stony Brook",
-   "absent": [
-    {
-     "name": "Ayanna pierre Louis",
-     "rate": 1.594,
-     "played_share": 0.8
+     "played_share": 1.0
     }
    ],
    "points_per_set_missing": 1.594
@@ -3410,6 +3454,19 @@
     {
      "name": "Ana luiza Matos",
      "rate": 0.692,
+     "played_share": 0.6
+    }
+   ],
+   "points_per_set_missing": 0.692
+  },
+  {
+   "game_id": "6624445",
+   "team_id": "46679",
+   "team": "Hampton",
+   "absent": [
+    {
+     "name": "Ana luiza Matos",
+     "rate": 0.692,
      "played_share": 0.75
     }
    ],
@@ -4102,13 +4159,16 @@
    ]
   },
   "Stony Brook": {
-   "gid": "6624845",
-   "d": "2026-09-05",
-   "appeared": 13,
+   "gid": "6627813",
+   "d": "2026-09-06",
+   "appeared": 10,
    "zero_action": [
     "Madison Cigna",
     "Ellery Singleton",
-    "Hanna Berkefelt"
+    "Mopelola Ojo",
+    "Avari Amstutz",
+    "Hanna Berkefelt",
+    "Leimaile Lasike"
    ]
   },
   "Ohio": {
@@ -4810,17 +4870,12 @@
    ]
   },
   "Hampton": {
-   "gid": "6639576",
-   "d": "2026-09-05",
-   "appeared": 8,
+   "gid": "6624445",
+   "d": "2026-09-06",
+   "appeared": 12,
    "zero_action": [
-    "Morgan Reeves",
-    "Aliyah Millner",
-    "Leila Ricks",
-    "Maria clara Andrade",
-    "Lyrique Alteus",
-    "Antonia Vasquez",
-    "Belen Ferrufino"
+    "Maria Clara Andrade",
+    "Jaya Rimm"
    ]
   },
   "CSU Bakersfield": {
@@ -4852,16 +4907,10 @@
    ]
   },
   "Oakland": {
-   "gid": "6624938",
-   "d": "2026-09-05",
-   "appeared": 12,
-   "zero_action": [
-    "Caroline Moore",
-    "Mya Kattula",
-    "Kamsi Iweajunwa",
-    "Olivia Rust",
-    "Kiley Gallagher"
-   ]
+   "gid": "6624939",
+   "d": "2026-09-06",
+   "appeared": 14,
+   "zero_action": []
   },
   "Seton Hall": {
    "gid": "6624271",
@@ -4964,14 +5013,16 @@
    ]
   },
   "Providence": {
-   "gid": "6626268",
-   "d": "2026-09-05",
-   "appeared": 11,
+   "gid": "6624674",
+   "d": "2026-09-06",
+   "appeared": 9,
    "zero_action": [
+    "Gwenyth Koss",
     "Ellie Chu",
     "Fielding Mayhugh",
     "Morgan Martin",
     "Lyla Buser",
+    "Kaia Easterbrook",
     "Megan Weldon",
     "Kelsey Holmes"
    ]
@@ -5124,9 +5175,9 @@
    ]
   },
   "Rhode Island": {
-   "gid": "6624673",
-   "d": "2026-09-05",
-   "appeared": 11,
+   "gid": "6624674",
+   "d": "2026-09-06",
+   "appeared": 12,
    "zero_action": [
     "Erika Bracey",
     "Jessica Parker",
@@ -5134,7 +5185,6 @@
     "Kiara Copeland",
     "Mckenna Melton",
     "Autumn Tombline",
-    "Hannah Jonick",
     "Ema Stermenska",
     "Sophia Chinetti"
    ]
@@ -5163,17 +5213,15 @@
    ]
   },
   "Navy": {
-   "gid": "6625138",
-   "d": "2026-09-05",
+   "gid": "6627813",
+   "d": "2026-09-06",
    "appeared": 13,
    "zero_action": [
+    "Hailey Jacobus",
     "Madeline Bildeaux",
     "Paige Buzzerio",
     "Simone Lawson",
-    "Mackenzie Palumbo",
-    "Lillian Schultheis",
-    "Baylee Doolan",
-    "Nicole Neal"
+    "Kinamoni Jerome"
    ]
   },
   "Indiana St.": {
@@ -5639,16 +5687,10 @@
    ]
   },
   "George Mason": {
-   "gid": "6624444",
-   "d": "2026-09-05",
+   "gid": "6624445",
+   "d": "2026-09-06",
    "appeared": 9,
-   "zero_action": [
-    "Gabriella Gelfound",
-    "Ava Cheney",
-    "Mckenna Reynolds",
-    "Mia Hazelett",
-    "Alexa Stutzman"
-   ]
+   "zero_action": []
   },
   "Northwestern": {
    "gid": "6628443",
@@ -6566,13 +6608,11 @@
    ]
   },
   "Rice": {
-   "gid": "6627310",
-   "d": "2026-09-04",
-   "appeared": 13,
+   "gid": "6624381",
+   "d": "2026-09-06",
+   "appeared": 14,
    "zero_action": [
-    "Zora Bello",
-    "Savannah Skopal",
-    "Maggie Croft"
+    "Zora Bello"
    ]
   },
   "UCF": {
@@ -6951,14 +6991,14 @@
    ]
   },
   "Wyoming": {
-   "gid": "6627474",
-   "d": "2026-09-05",
+   "gid": "6626682",
+   "d": "2026-09-06",
    "appeared": 12,
    "zero_action": [
-    "Addy Thorington",
     "Evelyn Udezue",
     "Anna Williams",
-    "Peyton Carruth",
+    "Anna Melgren",
+    "Emerson Macias",
     "Abi Milby"
    ]
   },
@@ -6976,8 +7016,8 @@
    ]
   },
   "Illinois": {
-   "gid": "6624380",
-   "d": "2026-09-05",
+   "gid": "6624381",
+   "d": "2026-09-06",
    "appeared": 9,
    "zero_action": [
     "Ava Wysocki",
@@ -6992,11 +7032,11 @@
    ]
   },
   "Cincinnati": {
-   "gid": "6624324",
-   "d": "2026-09-05",
-   "appeared": 10,
+   "gid": "6624939",
+   "d": "2026-09-06",
+   "appeared": 11,
    "zero_action": [
-    "Kayla Hostetler"
+    "Kayla Edginton"
    ]
   },
   "Utah": {
@@ -7276,10 +7316,18 @@
    ]
   },
   "Long Beach St.": {
-   "gid": "6626681",
-   "d": "2026-09-05",
-   "appeared": 13,
-   "zero_action": []
+   "gid": "6626682",
+   "d": "2026-09-06",
+   "appeared": 11,
+   "zero_action": [
+    "Dani Thomas-nathan",
+    "Reagan Hope",
+    "Preslie Yates",
+    "Haumea Marumoto",
+    "Anabel Kotzakov",
+    "Emma Gardner",
+    "Mia Halsey"
+   ]
   },
   "UCLA": {
    "gid": "6625900",
