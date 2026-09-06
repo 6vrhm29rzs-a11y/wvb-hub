@@ -1,17 +1,17 @@
 {
  "meta": {
   "season": 2026,
-  "generated_at_utc": "2026-09-05T23:55:10Z",
+  "generated_at_utc": "2026-09-06T16:43:00Z",
   "n_claims": 75,
   "feed_cap": 5,
   "recent_hours": 72,
   "states": {
-   "confirmed_official": 45,
+   "confirmed_official": 44,
    "corroborated": 10,
    "official_unconfirmed": 0,
    "community_signal": 6,
    "conflicting": 9,
-   "expired": 4,
+   "expired": 5,
    "inaccessible": 1
   }
  },
@@ -1381,46 +1381,6 @@
    "review_by": "2026-09-06"
   },
   {
-   "id": "bffff5caac58",
-   "type": "fixture_update",
-   "subject": {
-    "kind": "match",
-    "gid": "6627523"
-   },
-   "what": "city / event / site / start_time_epoch / state_usps / venue corrected for Southern California vs Arizona St.",
-   "state": "confirmed_official",
-   "state_label": "confirmed by an official source",
-   "why": "the school's own page contradicts the feed on city, event, site, start_time_epoch, state_usps, venue; every overridden field carries its own citation",
-   "scope": "the corrected schedule fields only",
-   "sources": [
-    {
-     "url": "https://usctrojans.com/sports/womens-volleyball/schedule",
-     "excerpt": "Scrimmage / Exhibition | State Farm Women's Volleyball Showcase | vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT",
-     "retrieved": "2026-08-29",
-     "source_class": "official_school"
-    },
-    {
-     "url": "https://usctrojans.com/sports/womens-volleyball/schedule",
-     "excerpt": "Scrimmage / Exhibition | State Farm Women's Volleyball Showcase | vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT",
-     "retrieved": "2026-08-29",
-     "source_class": "official_school"
-    },
-    {
-     "url": "https://usctrojans.com/sports/womens-volleyball/schedule",
-     "excerpt": "Scrimmage / Exhibition | State Farm Women's Volleyball Showcase | vs #12 Arizona State | Sanford Pentagon | Sioux Falls, S.D. | Aug 29 (Sat) 2:00 p.m. CT / 12:00 p.m. PT",
-     "retrieved": "2026-08-29",
-     "source_class": "official_school"
-    }
-   ],
-   "public": true,
-   "priority": 70,
-   "route": {
-    "match": "6627523"
-   },
-   "effective": null,
-   "review_by": "2026-09-05"
-  },
-  {
    "id": "1016a62c9316",
    "type": "fixture_evidence",
    "subject": {
@@ -1461,6 +1421,27 @@
    },
    "effective": null,
    "review_by": "2026-08-28"
+  },
+  {
+   "id": "175f8e97dbce",
+   "type": "fixture_evidence",
+   "subject": {
+    "kind": "match",
+    "gid": "6627523"
+   },
+   "what": "A schedule reading for Southern California vs Arizona St. passed its review date",
+   "state": "expired",
+   "state_label": "evidence past its review date",
+   "why": "a schedule claim is perishable; this one was not re-verified by its review date",
+   "scope": "a schedule reading, now past its review date",
+   "sources": [],
+   "public": true,
+   "priority": 20,
+   "route": {
+    "match": "6627523"
+   },
+   "effective": null,
+   "review_by": "2026-09-05"
   },
   {
    "id": "2765db9a1884",
@@ -2569,6 +2550,28 @@
  ],
  "feed": [
   {
+   "id": "175f8e97dbce",
+   "type": "fixture_evidence",
+   "subject": {
+    "kind": "match",
+    "gid": "6627523"
+   },
+   "what": "A schedule reading for Southern California vs Arizona St. passed its review date",
+   "state": "expired",
+   "state_label": "evidence past its review date",
+   "why": "a schedule claim is perishable; this one was not re-verified by its review date",
+   "scope": "a schedule reading, now past its review date",
+   "sources": [],
+   "public": true,
+   "priority": 20,
+   "route": {
+    "match": "6627523"
+   },
+   "effective": null,
+   "review_by": "2026-09-05",
+   "first_seen": "2026-09-06T16:43:00Z"
+  },
+  {
    "id": "9180add4c349",
    "type": "result_conflict",
    "subject": {
@@ -2699,46 +2702,6 @@
    "effective": null,
    "review_by": null,
    "first_seen": "2026-09-05T23:25:56Z"
-  },
-  {
-   "id": "e7247b01c23b",
-   "type": "duplicate_listing",
-   "subject": {
-    "kind": "match",
-    "gid": "6640649",
-    "teams": [
-     "Bradley",
-     "Western Ill."
-    ]
-   },
-   "what": "Bradley v Western Ill. was listed twice by the feed; the copy is excluded from every count",
-   "state": "corroborated",
-   "state_label": "corroborated by independent sources",
-   "why": "both schools' official schedules establish exactly one meeting",
-   "scope": "that the feed listed one meeting twice",
-   "sources": [
-    {
-     "url": "https://bradleybraves.com/sports/womens-volleyball/schedule",
-     "excerpt": "schema.org event: 'Bradley University Vs Western Illinois University', startDate 2026-09-04T16:30:00, Brookings, SD -- the ONLY Bradley-WIU meeting on the published schedule",
-     "retrieved": "2026-09-05T05:18:59Z",
-     "source_class": "official_school"
-    },
-    {
-     "url": "https://goleathernecks.com/sports/womens-volleyball/schedule",
-     "excerpt": "schema.org event: 'Western Illinois University Vs Bradley', startDate 2026-09-04T16:30:00, Brookings, SD -- the ONLY WIU-Bradley meeting on the published schedule",
-     "retrieved": "2026-09-05T05:18:59Z",
-     "source_class": "official_school"
-    }
-   ],
-   "public": true,
-   "priority": 60,
-   "route": {
-    "match": "6640649",
-    "ledger": true
-   },
-   "effective": null,
-   "review_by": null,
-   "first_seen": "2026-09-05T05:28:58Z"
   }
  ]
 }

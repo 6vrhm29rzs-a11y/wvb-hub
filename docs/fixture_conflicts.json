@@ -4,7 +4,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 5,
+     "records": 6,
      "values": [
       "1788670800",
       "1788721200"
@@ -12,7 +12,7 @@
     }
    ],
    "matchup": "Illinois / Rice",
-   "records": 5
+   "records": 6
   },
   "6624385": {
    "conflicts": [
@@ -56,36 +56,6 @@
    "matchup": "UC Santa Barbara / Pepperdine",
    "records": 2
   },
-  "6624845": {
-   "conflicts": [
-    {
-     "field": "teams",
-     "records": 10,
-     "values": [
-      "(('46045', False), ('46753', True))",
-      "(('46045', True), ('46753', False))"
-     ]
-    },
-    {
-     "field": "game_state",
-     "records": 10,
-     "values": [
-      "P",
-      "I"
-     ]
-    },
-    {
-     "field": "site",
-     "records": 10,
-     "values": [
-      "home/away flip across snapshots",
-      "no venue owner on record"
-     ]
-    }
-   ],
-   "matchup": "Coppin St. / Stony Brook",
-   "records": 10
-  },
   "6625252": {
    "conflicts": [
     {
@@ -104,7 +74,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 4,
+     "records": 5,
      "values": [
       "1788678000",
       "1788721200"
@@ -112,7 +82,7 @@
     }
    ],
    "matchup": "Washington St. / Oregon",
-   "records": 4
+   "records": 5
   },
   "6625402": {
    "conflicts": [
@@ -189,7 +159,7 @@
     {
      "field": "teams",
      "non_blocking": "site is confirmed neutral, so no displayed fact depends on which side is nominally home",
-     "records": 4,
+     "records": 5,
      "values": [
       "(('45792', False), ('45886', True))",
       "(('45792', True), ('45886', False))"
@@ -197,7 +167,7 @@
     },
     {
      "field": "start_time_epoch",
-     "records": 4,
+     "records": 5,
      "values": [
       "1788739200",
       "1788724800"
@@ -205,7 +175,7 @@
     }
    ],
    "matchup": "LMU (CA) / Utah Tech",
-   "records": 4
+   "records": 5
   },
   "6625822": {
    "conflicts": [
@@ -239,7 +209,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 5,
+     "records": 6,
      "values": [
       "1788670800",
       "1788742800"
@@ -247,7 +217,7 @@
     }
    ],
    "matchup": "Missouri / Nebraska",
-   "records": 5
+   "records": 6
   },
   "6626288": {
    "conflicts": [
@@ -365,7 +335,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 3,
+     "records": 4,
      "values": [
       "1788721200",
       "1788714000"
@@ -373,7 +343,7 @@
     }
    ],
    "matchup": "Arizona / Pepperdine",
-   "records": 3
+   "records": 4
   },
   "6628376": {
    "conflicts": [
@@ -388,28 +358,6 @@
    ],
    "matchup": "Omaha / UC Riverside",
    "records": 3
-  },
-  "6637750": {
-   "conflicts": [
-    {
-     "field": "start_time_epoch",
-     "records": 11,
-     "values": [
-      "1788604200",
-      "1788647400"
-     ]
-    },
-    {
-     "field": "game_state",
-     "records": 11,
-     "values": [
-      "P",
-      "I"
-     ]
-    }
-   ],
-   "matchup": "Lehigh / Delaware St.",
-   "records": 11
   },
   "6639126": {
    "conflicts": [
@@ -441,11 +389,9 @@
   }
  },
  "by_field": {
-  "game_state": 54,
-  "site": 1,
-  "start_time_epoch": 28,
-  "teams": 1,
-  "teams (non-blocking)": 5
+  "game_state": 33,
+  "start_time_epoch": 27,
+  "teams (non-blocking)": 4
  },
  "corrections": {
   "6625717": {
@@ -578,10 +524,10 @@
   }
  },
  "counts": {
-  "blocked": 29,
-  "conflicted": 84,
+  "blocked": 27,
+  "conflicted": 63,
   "corrected": 4,
-  "fixtures": 4884
+  "fixtures": 4886
  },
  "official_conflicts": {},
  "stale": {}

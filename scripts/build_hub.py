@@ -5300,7 +5300,7 @@ TEMPLATE = r"""<!doctype html><html lang="en"><head><meta charset="utf-8">
      degrades to something narrow rather than to a wide system sans. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&family=Roboto+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <title>NCAA Women's Volleyball 2026</title>
 <style>
 /* Legibility first. Cody asked for something that reads like a scores site --
@@ -5351,7 +5351,11 @@ TEMPLATE = r"""<!doctype html><html lang="en"><head><meta charset="utf-8">
      labels -- condensed type is fast in three words and slow in three
      sentences. Editorial is for anything anyone actually reads. Utility is
      for stamps, records and set lines, where the digits must line up. */
-  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+  --mono:"Roboto Mono",ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+  /* ⚠ NOT IBM Plex Mono: its default zero is SLASHED, and at 600-700
+     weight on a phone the slash closes the counter -- 0 read as 8 on
+     Cody's screenshots (scores, dates, the clock). Roboto Mono has a
+     plain open zero; every fallback here does too. */
   --sans:"Source Sans 3",-apple-system,BlinkMacSystemFont,"SF Pro Text",
          "Segoe UI",Roboto,sans-serif;
   --disp:"Barlow Condensed","Oswald","Avenir Next Condensed",
@@ -6264,6 +6268,7 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .sbpick input{background:var(--alt);border:1px solid var(--line2);
   color:var(--ink);border-radius:2px;padding:7px 8px;font:12px/1 var(--mono)}
 .sbfilters{flex-wrap:wrap}
+.sbfrow{display:contents}
 /* ⚠ SAME SPECIFICITY, LATER SOURCE WINS. `.tdmarq` sets three columns and is
    defined after this block, so `.sbtop` alone lost the tie and four cards
    wrapped 3+1. Qualified so it wins on class count rather than on position,
@@ -6272,15 +6277,25 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 @media (max-width:1100px){.tdmarq.sbtop{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:640px){
   .tdmarq.sbtop{grid-template-columns:minmax(0,1fr)}
-  .sbpick{margin-left:0;width:100%}
-  .sbday{min-width:0;flex:1 1 auto}
-  .sbday b{font-size:18px}
-  /* ⚠ TOUCH TARGETS. Measured in a real 384px viewport: the Today control came
-     out 31px tall, which is tappable but mean. Every control on this bar is
-     given a 40px floor on a phone -- the filters too, which were sized for a
-     mouse. */
-  .sbtoday,.sbnav,.sbfilters .segb{min-height:40px}
-  .sbpick input{min-height:40px}
+  /* ⚠ COMPACT, NOT GIANT (Cody's screenshot, 2026-09-06: "this giant
+     filters ... are not good looking"). The earlier 40px floor fixed a
+     31px Today button and then the whole bar grew to it: stacked
+     full-width rows of bordered boxes ate half the first screen. One row
+     now -- 36px controls (still a comfortable thumb target), the day
+     label inline instead of stacked, and the date input compact. */
+  .sbdate{gap:6px}
+  .sbday{min-width:0;flex:0 1 auto;flex-direction:row;align-items:baseline;gap:7px}
+  .sbday b{font-size:15px}
+  .sbday span{font-size:10px}
+  .sbnav{width:34px;height:36px;min-height:36px}
+  .sbtoday{min-height:36px;padding:7px 9px}
+  /* on today the day label already says TODAY -- a second, disabled TODAY
+     button beside it said the same word twice (Cody's screenshot) */
+  .sbtoday:disabled{display:none}
+  .sbpick{margin-left:auto;gap:5px}
+  .sbpick>span{display:none} /* the input shows the date; the caption doubled it */
+  .sbpick input{min-height:36px;padding:5px 6px;font-size:11px;max-width:132px}
+  .sbfilters .segb{min-height:36px}
 }
 .tdquiet{font:14.5px/1.6 var(--sans);color:var(--ink2);margin:0 0 20px;
   padding-bottom:16px;border-bottom:1px solid var(--line)}
@@ -6686,15 +6701,19 @@ td.pick b{color:var(--navy)}
   nav button{font-size:11px;padding:12px 6px}
   nav .morebtn{padding:12px 6px}
 
-  /* SCOREBOARD CONTROLS, phone shape (Cody's screenshots, 2026-08-28):
-     -- the six filters wrapped 5+1 with UPCOMING orphaned and the count
-        floating mid-control. A 3-per-row grid wraps 6 as two full rows (the
-        public build's five as 3+2), and the count gets its own line.
-     -- the date bar and lead ate half the first screen before a score. */
-  .seg.sbfilters{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-  .seg.sbfilters .segb{width:100%}
-  .sbfilters .count{grid-column:1/-1;text-align:right;padding-top:2px}
-  .sbbar{gap:8px;margin-bottom:14px;padding-bottom:10px}
+  /* SCOREBOARD CONTROLS, phone shape. ⚠ REWRITTEN 2026-09-06 (Cody:
+     "this giant filters ... are not good looking"): the 3-per-row grid of
+     full-width 40px slabs -- itself the fix for a 5+1 wrap -- read as a
+     settings panel and ate the first screen. Same cure the ledger seg got:
+     the six states are ONE horizontal scroll row of natural-width chips;
+     the conference select and the count share the line below. */
+  .seg.sbfilters .sbfrow{display:flex;flex:1 0 100%;gap:6px;
+    flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;
+    -webkit-overflow-scrolling:touch}
+  .seg.sbfilters .sbfrow::-webkit-scrollbar{display:none}
+  .seg.sbfilters .sbfrow .segb{flex:0 0 auto}
+  .sbfilters .count{margin-left:auto;padding-top:0}
+  .sbbar{gap:7px;margin-bottom:12px;padding-bottom:9px}
   #v-scores .lead{font-size:12.5px;line-height:1.5;margin-bottom:10px}
   .tdmarq.sbtop .tdcard{padding:10px 12px;gap:5px}
 
@@ -8208,9 +8227,9 @@ body.mdlopen{overflow:hidden}
   /* both blocks: two rows of exactly 24px with a 4px gap, centred, so the
      rows cannot drift apart -- alignment by construction, not by luck */
   .mrow .mteams{grid-area:teams;display:grid;gap:0;
-    grid-template-rows:24px 24px;row-gap:4px;align-items:center}
+    grid-template-rows:27px 27px;row-gap:4px;align-items:center}
   .mrow .mls{grid-area:mls;justify-content:end;margin-left:0;
-    grid-template-rows:24px 24px;row-gap:4px;align-content:center;
+    grid-template-rows:27px 27px;row-gap:4px;align-content:center;
     align-items:center}
   /* the chevron overlapped the right-anchored numbers; a card is obviously
      tappable */
@@ -8220,9 +8239,14 @@ body.mdlopen{overflow:hidden}
   .mrow .mmeta{display:flex;grid-area:meta;align-items:center;gap:8px;
     margin-left:27px}
   .mrow .mvn{font:11px/1.35 var(--sans);color:var(--ink3)}
-  .mlc{font-size:11.5px;padding:0 3px;color:var(--ink3)}
-  .mlt{font-size:12.5px;margin-right:6px;padding-right:8px}
-  .mrt .mcur{font-size:21px}
+  /* score cells a size up (Cody, 2026-09-06: the boxes read small next
+     to everything else on the card) -- the boxed current set most of all,
+     because it is the number that is moving */
+  .mlc{font-size:13px;padding:0 4px;color:var(--ink3)}
+  .mlc.cur{font:700 17px/1.1 var(--mono);padding:2px 6px}
+  .mlt{font-size:14px;margin-right:6px;padding-right:8px}
+  .mrow .mls{column-gap:3px}
+  .mrt .mcur{font-size:22px}
   .mrow .mrt{min-width:0}
   .mrow .mrt b.tn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
     overflow-wrap:normal}
@@ -10126,6 +10150,9 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
         <input type="date" id="sbDate" min="2026-08-21" max="2026-12-31"></label>
     </div>
     <div class="seg sbfilters" role="tablist" aria-label="Which matches">
+      <span class="sbfrow"><!-- display:contents on desktop; the phone turns
+        this into one horizontal scroll row (the ledger seg precedent:
+        "sports navigation, not a settings panel") -->
       <button class="segb on" data-sbf="all" type="button">All</button>
       <!-- MYBOARD-HTML-BEGIN -->
       <!-- ⚠ THIS FILTER NAMES A PRIVATE FEATURE, so it is fenced like the rest
@@ -10138,6 +10165,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <button class="segb" data-sbf="live" type="button">Live</button>
       <button class="segb" data-sbf="final" type="button">Final</button>
       <button class="segb" data-sbf="upcoming" type="button">Upcoming</button>
+      </span>
       <!-- Conference filter (Cody, 2026-09-04: "sort scores tab by
            conference to see conference games", NCAA.com's dropdown as the
            reference). Filters to matches with EITHER side in the chosen
