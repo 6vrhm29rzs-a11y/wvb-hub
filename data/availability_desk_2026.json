@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-06T17:18:46Z",
+  "generated_at_utc": "2026-09-06T18:08:29Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 7,
    "expired": 2,
-   "anomalies": 202
+   "anomalies": 204
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -650,6 +650,29 @@
     }
    ],
    "points_per_set_missing": 9.825
+  },
+  {
+   "game_id": "6626804",
+   "team_id": "45813",
+   "team": "Bryant",
+   "absent": [
+    {
+     "name": "Kaitlin Curran",
+     "rate": 3.842,
+     "played_share": 1.0
+    },
+    {
+     "name": "Layla Olatunde",
+     "rate": 2.895,
+     "played_share": 1.0
+    },
+    {
+     "name": "Hannah Jackson",
+     "rate": 2.816,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 9.553
   },
   {
    "game_id": "6627095",
@@ -2515,19 +2538,6 @@
    "points_per_set_missing": 1.692
   },
   {
-   "game_id": "6637170",
-   "team_id": "45813",
-   "team": "Bryant",
-   "absent": [
-    {
-     "name": "Brookelyn Talmadge",
-     "rate": 1.688,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.688
-  },
-  {
    "game_id": "6637631",
    "team_id": "45938",
    "team": "Ole Miss",
@@ -2630,6 +2640,32 @@
     }
    ],
    "points_per_set_missing": 1.553
+  },
+  {
+   "game_id": "6628592",
+   "team_id": "46755",
+   "team": "Texas",
+   "absent": [
+    {
+     "name": "Abby Vander wal",
+     "rate": 1.545,
+     "played_share": 0.6
+    }
+   ],
+   "points_per_set_missing": 1.545
+  },
+  {
+   "game_id": "6628579",
+   "team_id": "46755",
+   "team": "Texas",
+   "absent": [
+    {
+     "name": "Abby Vander wal",
+     "rate": 1.545,
+     "played_share": 0.6
+    }
+   ],
+   "points_per_set_missing": 1.545
   },
   {
    "game_id": "6624754",
@@ -2799,19 +2835,6 @@
     }
    ],
    "points_per_set_missing": 1.333
-  },
-  {
-   "game_id": "6640394",
-   "team_id": "46061",
-   "team": "Louisville",
-   "absent": [
-    {
-     "name": "Hannah Sherman",
-     "rate": 1.318,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.318
   },
   {
    "game_id": "6626588",
@@ -3113,6 +3136,19 @@
    "points_per_set_missing": 1.125
   },
   {
+   "game_id": "6639844",
+   "team_id": "46061",
+   "team": "Louisville",
+   "absent": [
+    {
+     "name": "Addison Makun",
+     "rate": 1.115,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.115
+  },
+  {
    "game_id": "6640218",
    "team_id": "46250",
    "team": "SMU",
@@ -3394,10 +3430,18 @@
    "zero_action": []
   },
   "Louisville": {
-   "gid": "6640394",
-   "d": "2026-09-04",
+   "gid": "6626866",
+   "d": "2026-09-06",
    "appeared": 10,
-   "zero_action": []
+   "zero_action": [
+    "Hannah Sherman",
+    "Jessica Drapp",
+    "Elsi Karjanlahti",
+    "Elli Strecker",
+    "Molly Urban",
+    "Jordyn Gray",
+    "Amirra Bailey"
+   ]
   },
   "Wisconsin": {
    "gid": "6627966",
@@ -3450,16 +3494,14 @@
    ]
   },
   "Texas": {
-   "gid": "6628579",
-   "d": "2026-09-02",
-   "appeared": 9,
+   "gid": "6626866",
+   "d": "2026-09-06",
+   "appeared": 12,
    "zero_action": [
     "Camille Presley",
-    "Addy Gaido",
-    "Callie Krueger",
-    "Genevieve Harris",
     "Emma Cugino",
-    "Mackenzie Collins"
+    "Mackenzie Collins",
+    "Abby Vander wal"
    ]
   },
   "Arizona St.": {
@@ -5944,17 +5986,18 @@
    ]
   },
   "Bryant": {
-   "gid": "6626268",
-   "d": "2026-09-05",
+   "gid": "6626804",
+   "d": "2026-09-06",
    "appeared": 11,
    "zero_action": [
-    "Ruth Ochelli",
-    "Natalie Ricevuto",
-    "Nadine Abdat",
-    "Nina Gavin",
-    "Alicia Johansen",
-    "Sophia Gonzalez",
-    "Madison Koeller"
+    "Yuna Yang",
+    "Gracie Griffin",
+    "Elizabeth Sessa",
+    "Morgan Sanders",
+    "Sarah Shaw",
+    "Frankie Jones",
+    "Elle Weaver",
+    "Madeline Van brederode"
    ]
   },
   "Ohio St.": {
@@ -7734,18 +7777,17 @@
    ]
   },
   "Brown": {
-   "gid": "6624673",
-   "d": "2026-09-05",
+   "gid": "6626804",
+   "d": "2026-09-06",
    "appeared": 11,
    "zero_action": [
-    "Yuna Yang",
-    "Gracie Griffin",
-    "Maddy Smith",
-    "Morgan Sanders",
-    "Frankie Jones",
-    "Lawson Monroe",
-    "Elle Weaver",
-    "Madeline Van brederode"
+    "Laura Rene-fraser",
+    "Ruth Ochelli",
+    "Natalie Ricevuto",
+    "Alicia Johansen",
+    "Nadine Abdat",
+    "Luiza Bergamaschi",
+    "Sophia Gonzalez"
    ]
   },
   "Cornell": {

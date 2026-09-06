@@ -1,10 +1,11 @@
 {
  "date": "2026-09-06",
- "generated_utc": "2026-09-06T17:17:54Z",
+ "generated_utc": "2026-09-06T18:07:35Z",
  "counts": {
   "VERIFIED_BOTH": 1,
-  "UNVERIFIED": 1,
-  "CORROBORATED_ONE": 1
+  "UNVERIFIED": 2,
+  "CORROBORATED_ONE": 1,
+  "CONTRADICTED_ONE": 1
  },
  "matches": [
   {
@@ -72,6 +73,68 @@
       "Wofford",
       "Raleigh, NC",
       "Summit Hospitality Tournament",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6626804",
+   "date": "2026-09-06",
+   "canonical": "Brown def. Bryant 3-1",
+   "verdict": "CONTRADICTED_ONE",
+   "schools": {
+    "Brown": {
+     "state": "CONTRADICTS",
+     "url": "https://brownbears.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Brown L 1-3 vs Bryant",
+     "opponent_source": "Bryant",
+     "site_says": "Neutral"
+    },
+    "Bryant": {
+     "state": "NOT_POSTED",
+     "url": "https://bryantbulldogs.com/services/schedule_txt.ashx?schedule=493",
+     "row": [
+      "Sep 6 (Sun)",
+      "12:00 PM",
+      "Neutral",
+      "Brown University",
+      "Kingston, RI / Keaney Gymnasium",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6626866",
+   "date": "2026-09-06",
+   "canonical": "Louisville def. Texas 3-0",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Louisville": {
+     "state": "NOT_POSTED",
+     "url": "https://gocards.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 6 (Sun)",
+      "12:00 p.m.",
+      "Neutral",
+      "#9 Texas",
+      "Nashville, TN | Bridgestone Arena",
+      "Broadway Block Party",
+      "-"
+     ]
+    },
+    "Texas": {
+     "state": "NOT_POSTED",
+     "url": "https://texassports.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 6 (Sun)",
+      "11 a.m. CT",
+      "Neutral",
+      "#6 Louisville",
+      "Nashville, Tenn. (Bridgestone Arena)",
+      "Broadway Block Party",
       "-"
      ]
     }

@@ -179,6 +179,8 @@ def main():
         FAILS.append("every CSS variable read is also defined")
     if not check_type_floor(h):
         FAILS.append("no type is set below the 9px floor")
+    if not check_flex_buttons_center(src):
+        FAILS.append("flex-display button rules declare justify-content")
 
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))
@@ -253,6 +255,38 @@ def check_ios_zoom(h):
         ok = False
     print("  %-64s %s" % ("form controls reach 16px at phone width",
                           "ok" if ok else "FAIL"))
+    return ok
+
+
+def check_flex_buttons_center(src):
+    """A flex-display BUTTON rule must declare its main-axis alignment.
+
+    ⚠ THE BUG THIS PINS (Cody's screenshot, 2026-09-06): `.seg .segb` became
+    inline-flex for the vx-key hints and declared no justify-content --
+    invisible while chips were content-width, and the day the phone stretched
+    them with flex:1 every label pinned LEFT in its box. text-align does
+    nothing inside a flex container, so "the text is centered" must come from
+    justify-content on the same rule. Scoped to button-ish selectors that turn
+    themselves into flex containers; row/bar CONTAINERS (.seg, .segbar, nav)
+    legitimately lay children at flex-start and are not matched.
+    """
+    import re as _re
+    bad = []
+    for m in _re.finditer(
+            r"([^{}]*?(?:\.segb|\bbutton)[^{}]*)\{([^{}]*display\s*:\s*"
+            r"(?:inline-)?flex[^{}]*)\}", src):
+        sel, body = m.group(1).strip(), m.group(2)
+        sel_last = sel.split(",")[-1].split()[-1]
+        # exact token: ".segb", ".segb.on", ".segb:hover" -- NOT ".segbar",
+        # which is a bar that CONTAINS buttons (the first draft flagged it)
+        import re as _re2
+        if not _re2.match(r"\.segb(?![\w-])|button(?![\w-])", sel_last):
+            continue
+        if "justify-content" not in body:
+            bad.append(sel[:50])
+    ok = not bad
+    print("  %-64s %s" % ("flex-display button rules declare justify-content",
+                          "ok" if ok else "FAIL %s" % bad[:3]))
     return ok
 
 

@@ -2,15 +2,15 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "corpus_fingerprint": "e8feb1f77bc23bb4",
-  "generated_at_utc": "2026-09-06T17:18:46Z",
+  "corpus_fingerprint": "964644cfc90f9740",
+  "generated_at_utc": "2026-09-06T18:08:29Z",
   "counts": {
-   "finals": 930,
+   "finals": 932,
    "official_only": 32,
-   "reconciled": 851,
+   "reconciled": 853,
    "confirmed": 0,
    "disputed": 9,
-   "pending_second": 921,
+   "pending_second": 923,
    "corrected": 38,
    "duplicate_listings": 8,
    "duplicate_candidates_pending": 0
@@ -43300,7 +43300,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-06T17:17:54Z",
+    "checked": "2026-09-06T18:07:35Z",
     "schools": {
      "UNC Asheville": {
       "state": "AGREE_COMPLETE",
@@ -43320,7 +43320,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-06T17:17:54Z",
+   "last_checked": "2026-09-06T18:07:35Z",
    "sources": [
     {
      "url": "https://jaxstatesports.com/sports/womens-volleyball/schedule/text",
@@ -43331,7 +43331,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-06T17:17:54Z"
+     "retrieved": "2026-09-06T18:07:35Z"
     },
     {
      "url": "https://uncabulldogs.com/sports/womens-volleyball/schedule/text",
@@ -43342,7 +43342,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-06T17:17:54Z"
+     "retrieved": "2026-09-06T18:07:35Z"
     }
    ]
   },
@@ -43370,7 +43370,7 @@
    },
    "verify": {
     "v": "UNVERIFIED",
-    "checked": "2026-09-06T17:17:54Z",
+    "checked": "2026-09-06T18:07:35Z",
     "schools": {
      "UCF": {
       "state": "SITE_HTTP_MISS",
@@ -43415,7 +43415,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-06T17:17:54Z",
+    "checked": "2026-09-06T18:07:35Z",
     "schools": {
      "Wofford": {
       "state": "AGREE_COMPLETE",
@@ -43441,7 +43441,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-06T17:17:54Z",
+   "last_checked": "2026-09-06T18:07:35Z",
    "sources": [
     {
      "url": "https://athletics.wofford.edu/services/schedule_txt.ashx?schedule=538",
@@ -43452,9 +43452,133 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-06T17:17:54Z"
+     "retrieved": "2026-09-06T18:07:35Z"
     }
    ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6626804",
+   "a": "Brown",
+   "h": "Bryant",
+   "exh": false,
+   "d": "2026-09-06",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "unavailable"
+   },
+   "verify": {
+    "v": "CONTRADICTED_ONE",
+    "checked": "2026-09-06T18:07:35Z",
+    "schools": {
+     "Brown": {
+      "state": "CONTRADICTS",
+      "url": "https://brownbears.com/sports/womens-volleyball/schedule/text",
+      "assertion": "Brown L 1-3 vs Bryant",
+      "opponent_source": "Bryant",
+      "site_says": "Neutral"
+     },
+     "Bryant": {
+      "state": "NOT_POSTED",
+      "url": "https://bryantbulldogs.com/services/schedule_txt.ashx?schedule=493",
+      "row": [
+       "Sep 6 (Sun)",
+       "12:00 PM",
+       "Neutral",
+       "Brown University",
+       "Kingston, RI / Keaney Gymnasium",
+       "",
+       ""
+      ]
+     }
+    }
+   },
+   "n_indep": 1,
+   "n_attempted": 0,
+   "last_checked": "2026-09-06T18:07:35Z",
+   "sources": [
+    {
+     "url": "https://brownbears.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Brown",
+     "text": "Brown L 1-3 vs Bryant",
+     "fields": [
+      "result"
+     ],
+     "status": "conflict_observed",
+     "retrieved": "2026-09-06T18:07:35Z"
+    }
+   ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6626866",
+   "a": "Louisville",
+   "h": "Texas",
+   "exh": false,
+   "d": "2026-09-06",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "verify": {
+    "v": "UNVERIFIED",
+    "checked": "2026-09-06T18:07:35Z",
+    "schools": {
+     "Louisville": {
+      "state": "NOT_POSTED",
+      "url": "https://gocards.com/sports/womens-volleyball/schedule/text",
+      "row": [
+       "Sep 6 (Sun)",
+       "12:00 p.m.",
+       "Neutral",
+       "#9 Texas",
+       "Nashville, TN | Bridgestone Arena",
+       "Broadway Block Party",
+       "-"
+      ]
+     },
+     "Texas": {
+      "state": "NOT_POSTED",
+      "url": "https://texassports.com/sports/womens-volleyball/schedule/text",
+      "row": [
+       "Sep 6 (Sun)",
+       "11 a.m. CT",
+       "Neutral",
+       "#6 Louisville",
+       "Nashville, Tenn. (Bridgestone Arena)",
+       "Broadway Block Party",
+       "-"
+      ]
+     }
+    }
+   },
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
   }
  ]
 }

@@ -5982,17 +5982,17 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .rpbar i{display:block;height:100%;background:rgba(245,241,232,.62)}
 .rppct{width:38px;font-weight:700}
 .rotgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;max-width:420px}
-.rotcell{border:1px solid var(--line2);border-radius:7px;padding:6px 4px;
+.rotcell{border:1px solid var(--line2);border-radius:4px;padding:6px 4px;
   text-align:center;display:flex;flex-direction:column;gap:1px}
 .rotcell .rotlab{font:700 11px/1 var(--disp);color:var(--ink3)}
 .rotcell .rotv{font:700 15px/1 var(--disp)}
 .rotcell.best{border-color:#3a7;background:rgba(60,180,120,.10)}
 .rotcell.worst{border-color:#a55;background:rgba(190,80,80,.10)}
-.ratingbox{border:1px solid var(--line2);border-radius:10px;
+.ratingbox{border:1px solid var(--line2);border-radius:4px;
   padding:11px 12px;margin-bottom:12px;background:rgba(255,255,255,.02)}
 .rchips{display:flex;flex-wrap:wrap;gap:8px}
 .rchip{display:flex;flex-direction:column;gap:1px;border:1px solid var(--line2);
-  border-radius:8px;padding:6px 10px;font:700 17px/1 var(--disp)}
+  border-radius:4px;padding:6px 10px;font:700 17px/1 var(--disp)}
 .rchip b{font:700 11px/1 var(--disp);letter-spacing:.08em;color:var(--ink3)}
 .rchip i{font-style:normal;font:400 11px/1.2 var(--sans);color:var(--ink3)}
 .rchip.pw{border-color:var(--gold,#c9a227)}
@@ -6003,7 +6003,7 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .rfoot{margin-top:8px;line-height:1.4}
 .starcols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media (max-width:560px){.starcols{grid-template-columns:1fr}}
-.starcol{border:1px solid var(--line2);border-radius:9px;padding:9px 10px}
+.starcol{border:1px solid var(--line2);border-radius:4px;padding:9px 10px}
 .stt{display:flex;align-items:center;gap:6px;font:700 12px/1 var(--disp);
   letter-spacing:.05em;text-transform:uppercase;margin-bottom:7px}
 .starrow{display:grid;grid-template-columns:34px 1fr;gap:6px;
@@ -6070,7 +6070,7 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .nyrow td{font-size:13px}
 .exhban{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;
   border:1px solid var(--line2);border-left:4px solid var(--gold,#c9a227);
-  border-radius:8px;padding:9px 12px;margin-bottom:12px;font-size:12.5px}
+  border-radius:4px;padding:9px 12px;margin-bottom:12px;font-size:12.5px}
 .exhban b{font:700 11px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase;
   color:var(--gold,#c9a227)}
 .exhtag{display:inline-block;flex:0 0 auto;align-self:center;width:auto;
@@ -6093,7 +6093,7 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
   text-transform:uppercase;color:var(--ink3);margin-bottom:8px}
 /* the next match: the single decision this page exists to serve */
 .tdnext{border:1px solid var(--line2);border-left:3px solid var(--cs-gold);
-  border-radius:10px;padding:12px 14px;margin-bottom:14px}
+  border-radius:4px;padding:12px 14px;margin-bottom:14px}
 .tdnextrow{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
   text-decoration:none;color:inherit}
 .tdnextrow:hover b{text-decoration:underline}
@@ -6112,7 +6112,7 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .tdpgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
   gap:10px}
 .tdpcard{display:grid;grid-template-columns:44px 1fr;gap:3px 11px;
-  align-items:center;border:1px solid var(--line2);border-radius:10px;
+  align-items:center;border:1px solid var(--line2);border-radius:4px;
   padding:10px 12px;text-decoration:none;color:inherit}
 .tdpcard:hover{background:rgba(255,255,255,.03)}
 .tdpcard:hover .tdpn{text-decoration:underline}
@@ -6137,7 +6137,7 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
   .tdvs{font-size:19px}
 }
 .prkctl{flex-wrap:wrap;gap:10px}
-.segbar{display:inline-flex;border:1px solid var(--line2);border-radius:8px;
+.segbar{display:inline-flex;border:1px solid var(--line2);border-radius:4px;
   overflow:hidden}
 .segbar button{font:600 11px/1 var(--disp);letter-spacing:.06em;
   text-transform:uppercase;background:none;border:0;color:var(--ink3);
@@ -6145,7 +6145,7 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .segbar button+button{border-left:1px solid var(--line2)}
 .segbar button.on{background:var(--line2);color:var(--ink)}
 .prksupport{margin:10px 0 4px}
-.prkcav{font-size:12.5px;line-height:1.45;padding:9px 11px;border-radius:8px;
+.prkcav{font-size:12.5px;line-height:1.45;padding:9px 11px;border-radius:4px;
   border:1px solid var(--line2);background:rgba(255,255,255,.02)}
 .prkbadge{font:700 11px/1 var(--disp);letter-spacing:.08em;padding:3px 6px;
   border-radius:4px;margin-right:6px;background:var(--line2);
@@ -6172,12 +6172,12 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
   background:var(--line2);color:var(--ink3);margin-left:4px}
 .prkh{font-family:var(--disp);font-size:19px;margin:22px 0 4px}
 .starteam{margin:12px 0;padding:11px 12px;border:1px solid var(--line2);
-  border-radius:10px}
+  border-radius:4px}
 .sthead{font:700 12px/1 var(--disp);letter-spacing:.07em;text-transform:uppercase;
   color:var(--ink);margin-bottom:9px}
 .stgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
   gap:8px}
-.star{border:1px solid var(--line2);border-radius:8px;padding:7px 9px;
+.star{border:1px solid var(--line2);border-radius:4px;padding:7px 9px;
   display:flex;flex-direction:column;gap:2px}
 .star.vac{opacity:.5}
 .spos{font:700 11px/1 var(--disp);letter-spacing:.08em;color:var(--ink3)}
@@ -6191,7 +6191,7 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .pname-brief{font:inherit;background:none;border:0;padding:0;cursor:pointer}
 .namepop{position:absolute;z-index:120;width:min(330px,calc(100vw - 20px));
   background:var(--cs-ink2,#111c2e);border:1px solid var(--line2);
-  border-radius:10px;box-shadow:0 14px 40px rgba(0,0,0,.55);padding:12px 13px}
+  border-radius:4px;box-shadow:0 14px 40px rgba(0,0,0,.55);padding:12px 13px}
 .namepop .nphead{display:flex;gap:10px;align-items:flex-start}
 .namepop .npname{font-family:var(--disp);font-size:17px;line-height:1.15;
   color:var(--ink)}
@@ -6248,8 +6248,13 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
   font:600 15px/1 var(--sans);border-radius:2px}
 .sbnav:hover{border-color:var(--navy);color:var(--cs-gold)}
 .sbnav:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
-.sbconf select{font:600 12px/1.2 var(--mono);padding:6px 8px;border:1px solid var(--line);
-  border-radius:7px;background:var(--card,#fff);color:var(--ink);max-width:170px}
+.sbconf select{font:600 12px/1.2 var(--mono);padding:6px 22px 6px 8px;
+  border:1px solid var(--line2);border-radius:2px;
+  appearance:none;-webkit-appearance:none;
+  background:var(--card,#fff)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='6'%3E%3Cpath d='M1 1l3.5 3.5L8 1' fill='none' stroke='%235c6b81' stroke-width='1.6'/%3E%3C/svg%3E")
+    no-repeat right 7px center;
+  color:var(--ink);max-width:170px}
 .sbconfonly{font:600 11px/1.2 var(--mono);color:var(--ink2);display:inline-flex;
   align-items:center;gap:4px;white-space:nowrap}
 .sbday{display:flex;flex-direction:column;gap:2px;min-width:150px}
@@ -7225,7 +7230,7 @@ b.kres{color:#F2B441}
    is stripped from the public build, and why nothing below may drift outside
    these sentinels. */
 .bwmyb{margin:14px 0;padding:12px 14px;background:var(--card,#fff);
-  border:1px solid var(--line);border-radius:10px}
+  border:1px solid var(--line);border-radius:4px}
 .bwmyb h3{font:600 13px/1 var(--disp);letter-spacing:.06em;
   text-transform:uppercase;color:var(--ink2);margin:0 0 8px}
 .bwmybwk{margin:6px 0}
@@ -8160,7 +8165,7 @@ h4.sbtime span{font:600 11px/1 var(--mono);color:var(--ink3)}
 #deskdetail:not([hidden]),#scoredetail:not([hidden]){position:fixed;
   top:5vh;left:50%;transform:translateX(-50%);width:min(960px,94vw);
   max-height:90vh;overflow:auto;z-index:300;background:var(--card,#fff);
-  border:1px solid var(--line);border-radius:12px;
+  border:1px solid var(--line);border-radius:4px;
   box-shadow:0 18px 60px rgba(10,20,40,.28);padding:16px 18px 20px;
   overscroll-behavior:contain}
 #mdlback{position:fixed;inset:0;background:rgba(12,22,44,.45);z-index:299}
@@ -8172,7 +8177,7 @@ h4.sbtime span{font:600 11px/1 var(--mono);color:var(--ink3)}
 body.mdlopen main{z-index:40}
 .mdlx{position:sticky;top:6px;float:right;margin:-6px -6px 0 0;
   width:40px;height:40px;
-  border:1px solid var(--line);border-radius:9px;background:var(--card,#fff);
+  border:1px solid var(--line);border-radius:3px;background:var(--card,#fff);
   font:700 18px/1 var(--mono);color:var(--ink2);cursor:pointer;z-index:2}
 .mdlx:hover{color:var(--ink)}
 body.mdlopen{overflow:hidden}
@@ -9270,7 +9275,7 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 /* the ruler key on the selector itself: the swatch answers "whose ranking is
    this" before the label is read */
 .seg .segb .vx-key{margin-right:7px}
-.seg .segb{display:inline-flex;align-items:center}
+.seg .segb{display:inline-flex;align-items:center;justify-content:center}
 /* and the underline of the ACTIVE ruler takes its colour */
 .seg .segb.on[data-r="ours"]{box-shadow:inset 0 -2px 0 var(--vx-power)}
 .seg .segb.on[data-r="avca"]{box-shadow:inset 0 -2px 0 var(--vx-avca)}
@@ -9422,7 +9427,7 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
   min-width:0;overflow-wrap:anywhere}
 
 /* ── empty state: a deliberate page, not a blank one ───────────────────── */
-.vx-empty{border:1px solid var(--vx-rule);border-radius:5px;
+.vx-empty{border:1px solid var(--vx-rule);border-radius:4px;
   padding:26px 24px;text-align:center;background:var(--alt)}
 .vx-empty h4{margin:0 0 6px;font:700 17px/1.2 var(--disp);color:var(--ink);
   letter-spacing:.01em}
@@ -9990,7 +9995,7 @@ input,select{font:inherit;font-size:14px;padding:8px 12px;border-radius:4px;
   border:1px solid var(--line2);background:var(--card);color:var(--ink)}
 input[type=search]{flex:1 1 220px}
 input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
-.count{font:12px/1 var(--mono);color:var(--ink2);margin-left:auto}
+.count{font:12px/1 var(--mono);color:var(--ink2);margin-left:auto;align-self:center}
 .note{font-size:13px;color:var(--ink2);line-height:1.65;padding:14px 16px;
   border-top:1px solid var(--line);background:var(--alt)}
 .note b{color:var(--ink)}
