@@ -87,7 +87,9 @@ def load():
         for r in rec.get("rows") or []:
             tid = str(r.get("team_id") or "")
             tid = _sw.get(tid, tid)
-            nm = ("%s %s" % (r.get("first") or "", r.get("last") or "")).strip()
+            import nameclean as _nc
+            nm = ("%s %s" % (_nc.repair(r.get("first") or ""),
+                             _nc.repair(r.get("last") or ""))).strip()
             if not tid or not nm:
                 continue
             by_team[tid][gid][nm] = {

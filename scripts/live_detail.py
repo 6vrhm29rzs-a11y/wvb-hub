@@ -179,9 +179,10 @@ def player_leaders(tb, names, top=3):
         for p in (t.get("playerStats") or []):
             if not isinstance(p, dict):
                 continue
-            name = (" ".join(x for x in ((p.get("firstName") or "").strip(),
-                                         (p.get("lastName") or "").strip())
-                             if x)).strip()
+            import nameclean as _nc
+            name = " ".join(x for x in (
+                _nc.repair((p.get("firstName") or "").strip()),
+                _nc.repair((p.get("lastName") or "").strip())) if x).strip()
             if not name:
                 continue
             rows.append({

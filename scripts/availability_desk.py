@@ -93,7 +93,9 @@ def participation(rows):
     """One box row list -> per-player participation facts. Facts only."""
     out = []
     for r in rows:
-        nm = ("%s %s" % (r.get("first") or "", r.get("last") or "")).strip()
+        import nameclean as _nc
+        nm = ("%s %s" % (_nc.repair(r.get("first") or ""),
+                         _nc.repair(r.get("last") or ""))).strip()
         if not nm:
             continue
         try:

@@ -1341,6 +1341,34 @@ def check_today_is_pacific():
         ok("today is derived in America/Los_Angeles")
 
 
+def check_no_feed_mojibake():
+    """NO FEED MOJIBAKE REACHES A PAGE (2026-09-06). The feed double-encodes
+    some player names (UTF-8 read back as Latin-1, then title-cased) --
+    Teodora Krickovic arrived as 'Kri\u00e4\u008dkovi\u00e4\u0087' and the
+    2025 starts map carried her twice, 28 + 5. nameclean repairs every
+    display path; this asserts the RESULT: the escaped-JSON signature is a
+    Latin-1 lead glyph immediately followed by a C1 control."""
+    import re as _re
+    moji = _re.compile(r"\\u00[c-f][0-9a-f]\\u00[89][0-9a-f]")
+    # in-process control first: a guard that cannot see the known-bad
+    # sequence is not a guard
+    if not moji.search('Kri\\u00e4\\u008dkovi\\u00e4\\u0087'):
+        bad("mojibake guard control", "the known-bad sequence did not match")
+        return
+    for path, nm in ((os.path.join(REPO, "Cody", "START-HERE.html"), "private"),
+                     (os.path.join(REPO, "output", "vb_dashboard.html"),
+                      "public")):
+        if not os.path.exists(path):
+            continue
+        hits = moji.findall(open(path, encoding="utf-8").read())
+        if hits:
+            bad("feed mojibake reached the %s page" % nm,
+                "%d escaped lead+continuation pairs, e.g. %s"
+                % (len(hits), hits[:3]))
+        else:
+            ok("no feed mojibake on the %s page" % nm)
+
+
 def check_phantom_sets_are_harmless():
     """A box score that credits EVERY player with the full match is watched.
 
@@ -3703,6 +3731,7 @@ def main():
     check_di_listings_but_not_di_data()
     check_head_coaches_are_head_coaches()
     check_phantom_sets_are_harmless()
+    check_no_feed_mojibake()
     check_aggregate_excludes_phantom_sets()
     print()
     check_transfer_reconciliation()

@@ -2,22 +2,22 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 864,
+  "scored": 875,
   "logged_after_tipoff_excluded": 3,
   "team_mismatch_excluded": 21,
   "predictions_on_record": 4780,
-  "results_available": 908,
-  "brier": 0.1749,
+  "results_available": 919,
+  "brier": 0.1753,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 632,
-  "favourite_correct_pct": 73.1
+  "favourite_correct": 641,
+  "favourite_correct_pct": 73.3
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 145,
+   "n": 149,
    "said": 55.2,
-   "happened": 55.2
+   "happened": 56.4
   },
   {
    "range": "60-70%",
@@ -27,19 +27,19 @@
   },
   {
    "range": "70-80%",
-   "n": 138,
+   "n": 140,
    "said": 74.9,
-   "happened": 65.9
+   "happened": 65.7
   },
   {
    "range": "80-90%",
-   "n": 159,
+   "n": 162,
    "said": 85.0,
-   "happened": 78.6
+   "happened": 78.4
   },
   {
    "range": "90-101%",
-   "n": 260,
+   "n": 262,
    "said": 95.6,
    "happened": 93.1
   }
@@ -307,6 +307,15 @@
    "brier": 0.7458049600000001
   },
   {
+   "game_id": "6637641",
+   "date": "2026-09-06",
+   "away": "Georgetown",
+   "home": "Wake Forest",
+   "p_home": 0.8631,
+   "home_won": false,
+   "brier": 0.7449416099999999
+  },
+  {
    "game_id": "6624896",
    "date": "2026-09-03",
    "away": "FIU",
@@ -485,15 +494,6 @@
    "p_home": 0.8069,
    "home_won": false,
    "brier": 0.6510876099999999
-  },
-  {
-   "game_id": "6624313",
-   "date": "2026-09-05",
-   "away": "Western Caro.",
-   "home": "Jacksonville St.",
-   "p_home": 0.8056,
-   "home_won": false,
-   "brier": 0.64899136
   }
  ]
 }

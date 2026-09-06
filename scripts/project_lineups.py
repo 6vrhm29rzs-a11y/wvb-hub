@@ -182,7 +182,15 @@ def main():
                 p["status_2026"] = "no_roster"
         # Every player who started at least once, not just the top six -- the
         # roster view needs "started 12 of 28" for depth players too.
-        all_starts = dict((v["name"], v["starts"]) for k, v in ranked)
+        # ⚠ FOLD FEED SPELLINGS BEFORE KEYING (2026-09-06): the 2025 feed
+        # spelled Teodora Krickovic two ways (mojibake in some games), so the
+        # display map carried her twice, 28 starts + 5. nameclean.repair is
+        # the one definition; colliding spellings SUM.
+        import nameclean as _nc
+        all_starts = {}
+        for k, v in ranked:
+            _nm = _nc.repair(v["name"])
+            all_starts[_nm] = all_starts.get(_nm, 0) + v["starts"]
         n_ret = sum(1 for p in six if p["status_2026"] == "returning")
         n_unk = sum(1 for p in six if p["status_2026"] == "unknown")
         stat["teams"] += 1

@@ -2369,7 +2369,12 @@ def box_and_players(res, photos=None, honours=None, xfer=None,
         for r in rec.get("rows") or []:
             tid = str(r.get("team_id") or "")
             tid = _swap.get(tid, tid)
-            nm = ("%s %s" % (r.get("first") or "", r.get("last") or "")).strip()
+            # the DISPLAY name gets the same feed-corruption repair the
+            # aggregate and the keys already run (nameclean, one definition)
+            # -- the box-score panel was still printing the feed's mojibake
+            import nameclean as _nc3
+            nm = ("%s %s" % (_nc3.repair(r.get("first") or ""),
+                             _nc3.repair(r.get("last") or ""))).strip()
             if not nm:
                 continue
             k, e, a = num(r.get("kills")), num(r.get("errors")), num(r.get("atts"))
@@ -8272,6 +8277,9 @@ h4.sbtime span{font:600 11px/1 var(--mono);color:var(--ink3)}
   top:5vh;left:50%;transform:translateX(-50%);width:min(960px,94vw);
   max-height:90vh;overflow:auto;z-index:300;background:var(--card,#fff);
   border:1px solid var(--line);border-radius:4px;
+  border-top:3px solid transparent;
+  background:linear-gradient(var(--card,#fff),var(--card,#fff)) padding-box,
+    linear-gradient(90deg,#1D2B66,#7A4FB0 55%,#FF7A55) border-box;
   box-shadow:0 18px 60px rgba(10,20,40,.28);padding:16px 18px 20px;
   overscroll-behavior:contain}
 #mdlback{position:fixed;inset:0;background:rgba(12,22,44,.45);z-index:299}
@@ -8964,6 +8972,7 @@ tr.tvearlier td{padding:6px 0 10px;border:0}
    four without either count being written down. */
 .glance{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:14px 0 18px}
 .gl{padding:13px 15px;border-radius:4px;border:1px solid transparent;
+  background:linear-gradient(150deg,#F5F3FA 0%,#F2F3F9 100%);
   background-origin:border-box;background-clip:padding-box,border-box;
   background:var(--card);border:1px solid var(--line);
   display:flex;flex-direction:column;gap:5px;min-width:0}

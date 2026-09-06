@@ -1,12 +1,12 @@
 {
  "date": "2026-09-06",
- "generated_utc": "2026-09-06T19:38:08Z",
+ "generated_utc": "2026-09-06T20:20:59Z",
  "counts": {
-  "VERIFIED_BOTH": 3,
-  "UNVERIFIED": 4,
-  "CORROBORATED_ONE": 6,
+  "VERIFIED_BOTH": 7,
+  "UNVERIFIED": 3,
+  "CORROBORATED_ONE": 13,
   "CONTRADICTED_ONE": 1,
-  "CONTRADICTED_BOTH": 1
+  "CONTRADICTED_BOTH": 2
  },
  "matches": [
   {
@@ -282,7 +282,7 @@
    "gid": "6625170",
    "date": "2026-09-06",
    "canonical": "Vanderbilt def. Samford 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Vanderbilt": {
      "state": "SITE_HTTP_MISS",
@@ -290,17 +290,11 @@
      "http": 404
     },
     "Samford": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://samfordsports.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 6 (Sun)",
-      "1 PM",
-      "Away",
-      "Vanderbilt",
-      "Nashville, TN",
-      "",
-      "-"
-     ]
+     "assertion": "Samford L 0-3 vs Vanderbilt",
+     "opponent_source": "Vanderbilt",
+     "site_says": "Away"
     }
    }
   },
@@ -308,7 +302,7 @@
    "gid": "6625579",
    "date": "2026-09-06",
    "canonical": "Kansas St. def. Drake 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Kansas St.": {
      "state": "SITE_HTTP_MISS",
@@ -316,17 +310,11 @@
      "http": 308
     },
     "Drake": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://godrakebulldogs.com/services/schedule_txt.ashx?schedule=550",
-     "row": [
-      "Sep 6 (Sun)",
-      "1 PM",
-      "Away",
-      "Kansas State",
-      "Manhattan, Kan.",
-      "",
-      ""
-     ]
+     "assertion": "Drake L 0-3 vs Kansas State",
+     "opponent_source": "Kansas State",
+     "site_says": "Away"
     }
    }
   },
@@ -334,33 +322,21 @@
    "gid": "6626597",
    "date": "2026-09-06",
    "canonical": "Lipscomb def. South Alabama 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "Lipscomb": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://lipscombsports.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 6 (Sun)",
-      "1 pm",
-      "Home",
-      "South Alabama",
-      "Nashville, Tenn. (Allen Arena)",
-      "",
-      "-"
-     ]
+     "assertion": "Lipscomb W 3-0 vs South Alabama",
+     "opponent_source": "South Alabama",
+     "site_says": "Home"
     },
     "South Alabama": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://usajaguars.com/services/schedule_txt.ashx?schedule=1394",
-     "row": [
-      "Sep 6 (Sun)",
-      "1 p.m.",
-      "Away",
-      "Lipscomb",
-      "Nashville, TN",
-      "",
-      ""
-     ]
+     "assertion": "South Alabama L 0-3 vs Lipscomb",
+     "opponent_source": "Lipscomb",
+     "site_says": "Away"
     }
    }
   },
@@ -388,6 +364,287 @@
       "Jacksonville, Fla.",
       "",
       ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6624271",
+   "date": "2026-09-06",
+   "canonical": "Seton Hall def. Western Caro. 3-2",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Seton Hall": {
+     "state": "NOT_POSTED",
+     "url": "https://shupirates.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 6 (Sun)",
+      "1:00 PM",
+      "Neutral",
+      "Western Carolina",
+      "Harrah's Cherokee Center / Asheville, N.C.",
+      "Blue Ridge Volleyball Classic",
+      "-"
+     ]
+    },
+    "Western Caro.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://catamountsports.com/services/schedule_txt.ashx?schedule=593",
+     "assertion": "Western Caro. L 2-3 vs Seton Hall",
+     "opponent_source": "Seton Hall",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6624300",
+   "date": "2026-09-06",
+   "canonical": "Wright St. def. Dayton 3-2",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Wright St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://wsuraiders.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Wright St. W 3-2 vs Dayton",
+     "opponent_source": "Dayton",
+     "site_says": "Home"
+    },
+    "Dayton": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://daytonflyers.com/services/schedule_txt.ashx?schedule=3377",
+     "assertion": "Dayton L 2-3 vs Wright State",
+     "opponent_source": "Wright State",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6627708",
+   "date": "2026-09-06",
+   "canonical": "Dartmouth def. Canisius 3-1",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Dartmouth": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://dartmouthsports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Dartmouth W 3-1 vs Canisius",
+     "opponent_source": "Canisius",
+     "site_says": "Neutral"
+    },
+    "Canisius": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gogriffs.com/services/schedule_txt.ashx?schedule=485",
+     "assertion": "Canisius L 1-3 vs Dartmouth",
+     "opponent_source": "Dartmouth",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6628031",
+   "date": "2026-09-06",
+   "canonical": "Loyola Maryland def. Saint Peter's 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Loyola Maryland": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://loyolagreyhounds.com/services/schedule_txt.ashx?schedule=3570",
+     "assertion": "Loyola Maryland W 3-0 vs Saint Peter's",
+     "opponent_source": "Saint Peter's",
+     "site_says": "Home"
+    },
+    "Saint Peter's": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://saintpeterspeacocks.com/services/schedule_txt.ashx?schedule=1302",
+     "rows_on_date": [
+      "Loyola (MD)"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6628218",
+   "date": "2026-09-06",
+   "canonical": "San Francisco def. ULM 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "San Francisco": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://usfdons.com/sports/womens-volleyball/schedule/text",
+     "assertion": "San Francisco W 3-0 vs ULM",
+     "opponent_source": "ULM",
+     "site_says": "Neutral"
+    },
+    "ULM": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://ulmwarhawks.com/services/schedule_txt.ashx?schedule=2333",
+     "assertion": "ULM L 0-3 vs San Francisco",
+     "opponent_source": "San Francisco",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6638582",
+   "date": "2026-09-06",
+   "canonical": "Florida def. North Texas 3-0",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Florida": {
+     "state": "NOT_POSTED",
+     "url": "https://floridagators.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 6 (Sun)",
+      "2 PM",
+      "Away",
+      "North Texas",
+      "Denton, TX",
+      "",
+      "-"
+     ]
+    },
+    "North Texas": {
+     "state": "NOT_POSTED",
+     "url": "https://meangreensports.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 6 (Sun)",
+      "1 PM CT",
+      "Home",
+      "No. 17 Florida",
+      "Denton, Texas (The Super Pit)",
+      "",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6639553",
+   "date": "2026-09-06",
+   "canonical": "Towson def. Morgan St. 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Towson": {
+     "state": "NOT_POSTED",
+     "url": "https://towsontigers.com/services/schedule_txt.ashx?schedule=6584",
+     "row": [
+      "Sep 6 (Sun)",
+      "2 p.m.",
+      "Away",
+      "Morgan State",
+      "Baltimore, Md.",
+      "",
+      ""
+     ]
+    },
+    "Morgan St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://morganstatebears.com/services/schedule_txt.ashx?schedule=326",
+     "assertion": "Morgan St. L 0-3 vs Towson University",
+     "opponent_source": "Towson University",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6628262",
+   "date": "2026-09-06",
+   "canonical": "Arizona def. Pepperdine 3-2",
+   "verdict": "CONTRADICTED_BOTH",
+   "schools": {
+    "Arizona": {
+     "state": "CONTRADICTS",
+     "url": "https://arizonawildcats.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Arizona L 2-3 vs Pepperdine",
+     "opponent_source": "Pepperdine",
+     "site_says": "Neutral"
+    },
+    "Pepperdine": {
+     "state": "CONTRADICTS",
+     "url": "https://pepperdinewaves.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Pepperdine W 3-2 vs Arizona",
+     "opponent_source": "Arizona",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6626353",
+   "date": "2026-09-06",
+   "canonical": "High Point def. Liberty 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "High Point": {
+     "state": "NOT_POSTED",
+     "url": "https://highpointpanthers.com/services/schedule_txt.ashx?schedule=628",
+     "row": [
+      "Sep 6 (Sun)",
+      "2:00 PM",
+      "Away",
+      "Liberty",
+      "Lynchburg, Va.",
+      "",
+      ""
+     ]
+    },
+    "Liberty": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://libertyflames.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Liberty L 1-3 vs High Point",
+     "opponent_source": "High Point",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6637641",
+   "date": "2026-09-06",
+   "canonical": "Georgetown def. Wake Forest 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Georgetown": {
+     "state": "NOT_POSTED",
+     "url": "https://guhoyas.com/services/schedule_txt.ashx?schedule=1666",
+     "row": [
+      "Sep 6 (Sun)",
+      "2:00 PM",
+      "Away",
+      "Wake Forest",
+      "Winston-Salem, N.C.",
+      "",
+      ""
+     ]
+    },
+    "Wake Forest": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://godeacs.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Wake Forest L 1-3 vs Georgetown",
+     "opponent_source": "Georgetown",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6624807",
+   "date": "2026-09-06",
+   "canonical": "South Carolina def. Troy 3-1",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "South Carolina": {
+     "state": "SITE_UNPARSED",
+     "url": "https://gamecocksonline.com/news/2021/09/03/textforhelp/"
+    },
+    "Troy": {
+     "state": "NOT_POSTED",
+     "url": "https://troytrojans.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 6 (Sun)",
+      "1 p.m.",
+      "Away",
+      "South Carolina",
+      "Columbia, S.C. (Carolina Volleyball Center)",
+      "",
+      "-"
      ]
     }
    }
