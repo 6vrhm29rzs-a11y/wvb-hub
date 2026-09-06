@@ -84,28 +84,6 @@
    "matchup": "Saint Mary's (CA) / Sacramento St.",
    "records": 4
   },
-  "6625274": {
-   "conflicts": [
-    {
-     "field": "start_time_epoch",
-     "records": 17,
-     "values": [
-      "1788678000",
-      "1788721200"
-     ]
-    },
-    {
-     "field": "game_state",
-     "records": 17,
-     "values": [
-      "P",
-      "I"
-     ]
-    }
-   ],
-   "matchup": "Washington St. / Oregon",
-   "records": 17
-  },
   "6625279": {
    "conflicts": [
     {
@@ -195,7 +173,7 @@
     {
      "field": "teams",
      "non_blocking": "site is confirmed neutral, so no displayed fact depends on which side is nominally home",
-     "records": 8,
+     "records": 13,
      "values": [
       "(('45792', False), ('45886', True))",
       "(('45792', True), ('45886', False))"
@@ -203,7 +181,7 @@
     },
     {
      "field": "start_time_epoch",
-     "records": 8,
+     "records": 13,
      "values": [
       "1788739200",
       "1788724800"
@@ -211,7 +189,7 @@
     }
    ],
    "matchup": "LMU (CA) / Utah Tech",
-   "records": 8
+   "records": 13
   },
   "6625822": {
    "conflicts": [
@@ -245,7 +223,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 9,
+     "records": 14,
      "values": [
       "1788670800",
       "1788742800"
@@ -253,7 +231,7 @@
     }
    ],
    "matchup": "Missouri / Nebraska",
-   "records": 9
+   "records": 14
   },
   "6626288": {
    "conflicts": [
@@ -439,8 +417,8 @@
   }
  },
  "by_field": {
-  "game_state": 42,
-  "start_time_epoch": 30,
+  "game_state": 38,
+  "start_time_epoch": 29,
   "teams (non-blocking)": 5
  },
  "corrections": {
@@ -473,6 +451,38 @@
      "retrieved": "2026-08-26",
      "text": "Opening Spike Classic vs #15 Kansas Petersen Events Center Pittsburgh, Pa. Aug 28 (Fri) 6:30 PM ESPN2",
      "url": "https://pittsburghpanthers.com/sports/womens-volleyball/schedule"
+    }
+   }
+  },
+  "6626229": {
+   "fields": [
+    "site",
+    "venue",
+    "city",
+    "state_usps"
+   ],
+   "matchup": "Missouri / Nebraska",
+   "review_by": "2026-09-09",
+   "support": {
+    "city": {
+     "retrieved": "2026-09-06",
+     "text": "Volleyball | #1 Nebraska | Wrigley Field | Chicago, Ill. -- the Sep 6 card on Missouri's own schedule page",
+     "url": "https://mutigers.com/sports/womens-volleyball/schedule"
+    },
+    "site": {
+     "retrieved": "2026-09-06",
+     "text": "Volleyball | #1 Nebraska | Wrigley Field | Chicago, Ill. -- the Sep 6 card on Missouri's own schedule page",
+     "url": "https://mutigers.com/sports/womens-volleyball/schedule"
+    },
+    "state_usps": {
+     "retrieved": "2026-09-06",
+     "text": "Volleyball | #1 Nebraska | Wrigley Field | Chicago, Ill. -- the Sep 6 card on Missouri's own schedule page",
+     "url": "https://mutigers.com/sports/womens-volleyball/schedule"
+    },
+    "venue": {
+     "retrieved": "2026-09-06",
+     "text": "Volleyball | #1 Nebraska | Wrigley Field | Chicago, Ill. -- the Sep 6 card on Missouri's own schedule page",
+     "url": "https://mutigers.com/sports/womens-volleyball/schedule"
     }
    }
   },
@@ -574,9 +584,9 @@
   }
  },
  "counts": {
-  "blocked": 30,
-  "conflicted": 75,
-  "corrected": 4,
+  "blocked": 29,
+  "conflicted": 71,
+  "corrected": 5,
   "fixtures": 4886
  },
  "official_conflicts": {},

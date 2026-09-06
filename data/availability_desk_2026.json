@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-06T21:50:58Z",
+  "generated_at_utc": "2026-09-06T22:13:37Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 7,
    "expired": 2,
-   "anomalies": 206
+   "anomalies": 208
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -870,6 +870,24 @@
    "points_per_set_missing": 5.619
   },
   {
+   "game_id": "6626376",
+   "team_id": "46501",
+   "team": "Stanford",
+   "absent": [
+    {
+     "name": "Ipar Kurt",
+     "rate": 3.25,
+     "played_share": 1.0
+    },
+    {
+     "name": "Erika Sayer",
+     "rate": 2.125,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 5.375
+  },
+  {
    "game_id": "6625970",
    "team_id": "46708",
    "team": "Xavier",
@@ -1693,6 +1711,19 @@
    "points_per_set_missing": 2.9
   },
   {
+   "game_id": "6625162",
+   "team_id": "46399",
+   "team": "Belmont",
+   "absent": [
+    {
+     "name": "Erin Mcmullen",
+     "rate": 2.88,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.88
+  },
+  {
    "game_id": "6626227",
    "team_id": "45939",
    "team": "Missouri",
@@ -1860,19 +1891,6 @@
     }
    ],
    "points_per_set_missing": 2.738
-  },
-  {
-   "game_id": "6625162",
-   "team_id": "46399",
-   "team": "Belmont",
-   "absent": [
-    {
-     "name": "Erin Mcmullen",
-     "rate": 2.725,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 2.725
   },
   {
    "game_id": "6624352",
@@ -2208,6 +2226,19 @@
     }
    ],
    "points_per_set_missing": 2.136
+  },
+  {
+   "game_id": "6626287",
+   "team_id": "46501",
+   "team": "Stanford",
+   "absent": [
+    {
+     "name": "Erika Sayer",
+     "rate": 2.125,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 2.125
   },
   {
    "game_id": "6624301",
@@ -3590,15 +3621,15 @@
    ]
   },
   "Marquette": {
-   "gid": "6626286",
-   "d": "2026-09-05",
+   "gid": "6626287",
+   "d": "2026-09-06",
    "appeared": 10,
    "zero_action": [
     "Aubrey Hicks",
     "Julia Stanev",
-    "Caydence Doolan",
     "Lauren Young",
-    "Berrak Sporeli"
+    "Berrak Sporeli",
+    "Annika Kowalski"
    ]
   },
   "Nebraska": {
@@ -4687,12 +4718,13 @@
    ]
   },
   "Middle Tenn.": {
-   "gid": "6625597",
-   "d": "2026-09-05",
+   "gid": "6625165",
+   "d": "2026-09-06",
    "appeared": 11,
    "zero_action": [
-    "Caroline Macander",
+    "Danielle Lee",
     "Danit Cohen",
+    "Trinniti Stevens",
     "Madison Wehr",
     "Sydnie Broom",
     "Ava Smith"
@@ -5507,13 +5539,14 @@
    ]
   },
   "Belmont": {
-   "gid": "6625164",
-   "d": "2026-09-05",
-   "appeared": 13,
+   "gid": "6625165",
+   "d": "2026-09-06",
+   "appeared": 12,
    "zero_action": [
+    "Sydnee Nelson",
     "Anna Supe",
+    "Teagan Brandsma",
     "Alex Fowler",
-    "Lucy Kay",
     "Campbell Onell"
    ]
   },
@@ -6227,12 +6260,13 @@
    ]
   },
   "Oregon": {
-   "gid": "6625273",
-   "d": "2026-09-04",
-   "appeared": 12,
+   "gid": "6625274",
+   "d": "2026-09-06",
+   "appeared": 11,
    "zero_action": [
     "Maila Ribeiro",
     "Alaina Pollard",
+    "Marlena Gracia",
     "Holley Mcfadden"
    ]
   },
@@ -7046,15 +7080,11 @@
    "zero_action": []
   },
   "Washington St.": {
-   "gid": "6637545",
-   "d": "2026-09-05",
-   "appeared": 10,
+   "gid": "6625274",
+   "d": "2026-09-06",
+   "appeared": 11,
    "zero_action": [
     "Julia Dickeson",
-    "Emerson Matthews",
-    "Maddy Joswick",
-    "Lauren Johnson",
-    "Madyn Cervellera",
     "Elma Bajraktarevic",
     "Ella Smith"
    ]
@@ -7151,10 +7181,16 @@
    ]
   },
   "Stanford": {
-   "gid": "6626376",
-   "d": "2026-09-03",
-   "appeared": 11,
+   "gid": "6626287",
+   "d": "2026-09-06",
+   "appeared": 9,
    "zero_action": [
+    "Lilly Wagner",
+    "Zaria Queen",
+    "Kaci Demaria",
+    "Joy Udoye",
+    "Sarah Hickman",
+    "Sidney Duncan",
     "Koko Kirsch"
    ]
   },

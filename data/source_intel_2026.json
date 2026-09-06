@@ -1,12 +1,12 @@
 {
  "meta": {
   "season": 2026,
-  "generated_at_utc": "2026-09-06T21:50:58Z",
-  "n_claims": 78,
+  "generated_at_utc": "2026-09-06T22:13:37Z",
+  "n_claims": 79,
   "feed_cap": 5,
   "recent_hours": 72,
   "states": {
-   "confirmed_official": 46,
+   "confirmed_official": 47,
    "corroborated": 10,
    "official_unconfirmed": 0,
    "community_signal": 6,
@@ -1451,6 +1451,46 @@
    "review_by": "2026-09-06"
   },
   {
+   "id": "6adab5d37b16",
+   "type": "fixture_update",
+   "subject": {
+    "kind": "match",
+    "gid": "6626229"
+   },
+   "what": "city / site / state_usps / venue corrected for Missouri vs Nebraska",
+   "state": "confirmed_official",
+   "state_label": "confirmed by an official source",
+   "why": "the school's own page contradicts the feed on city, site, state_usps, venue; every overridden field carries its own citation",
+   "scope": "the corrected schedule fields only",
+   "sources": [
+    {
+     "url": "https://mutigers.com/sports/womens-volleyball/schedule",
+     "excerpt": "Volleyball | #1 Nebraska | Wrigley Field | Chicago, Ill. -- the Sep 6 card on Missouri's own schedule page",
+     "retrieved": "2026-09-06",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://mutigers.com/sports/womens-volleyball/schedule",
+     "excerpt": "Volleyball | #1 Nebraska | Wrigley Field | Chicago, Ill. -- the Sep 6 card on Missouri's own schedule page",
+     "retrieved": "2026-09-06",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://mutigers.com/sports/womens-volleyball/schedule",
+     "excerpt": "Volleyball | #1 Nebraska | Wrigley Field | Chicago, Ill. -- the Sep 6 card on Missouri's own schedule page",
+     "retrieved": "2026-09-06",
+     "source_class": "official_school"
+    }
+   ],
+   "public": true,
+   "priority": 70,
+   "route": {
+    "match": "6626229"
+   },
+   "effective": null,
+   "review_by": "2026-09-09"
+  },
+  {
    "id": "1016a62c9316",
    "type": "fixture_evidence",
    "subject": {
@@ -2751,6 +2791,47 @@
    "first_seen": "2026-09-06T19:10:39Z"
   },
   {
+   "id": "6adab5d37b16",
+   "type": "fixture_update",
+   "subject": {
+    "kind": "match",
+    "gid": "6626229"
+   },
+   "what": "city / site / state_usps / venue corrected for Missouri vs Nebraska",
+   "state": "confirmed_official",
+   "state_label": "confirmed by an official source",
+   "why": "the school's own page contradicts the feed on city, site, state_usps, venue; every overridden field carries its own citation",
+   "scope": "the corrected schedule fields only",
+   "sources": [
+    {
+     "url": "https://mutigers.com/sports/womens-volleyball/schedule",
+     "excerpt": "Volleyball | #1 Nebraska | Wrigley Field | Chicago, Ill. -- the Sep 6 card on Missouri's own schedule page",
+     "retrieved": "2026-09-06",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://mutigers.com/sports/womens-volleyball/schedule",
+     "excerpt": "Volleyball | #1 Nebraska | Wrigley Field | Chicago, Ill. -- the Sep 6 card on Missouri's own schedule page",
+     "retrieved": "2026-09-06",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://mutigers.com/sports/womens-volleyball/schedule",
+     "excerpt": "Volleyball | #1 Nebraska | Wrigley Field | Chicago, Ill. -- the Sep 6 card on Missouri's own schedule page",
+     "retrieved": "2026-09-06",
+     "source_class": "official_school"
+    }
+   ],
+   "public": true,
+   "priority": 70,
+   "route": {
+    "match": "6626229"
+   },
+   "effective": null,
+   "review_by": "2026-09-09",
+   "first_seen": "2026-09-06T22:13:37Z"
+  },
+  {
    "id": "175f8e97dbce",
    "type": "fixture_evidence",
    "subject": {
@@ -2771,36 +2852,6 @@
    "effective": null,
    "review_by": "2026-09-05",
    "first_seen": "2026-09-06T16:43:00Z"
-  },
-  {
-   "id": "9180add4c349",
-   "type": "result_conflict",
-   "subject": {
-    "kind": "match",
-    "gid": "6627992"
-   },
-   "what": "An attributable source disputes this result — Florida A&M v Coastal Carolina",
-   "state": "conflicting",
-   "state_label": "sources conflict — shown, not chosen",
-   "why": "shown, never chosen; the Result Ledger holds both claims",
-   "scope": "that sources disagree about this result",
-   "sources": [
-    {
-     "url": "https://famuathletics.com/services/schedule_txt.ashx?schedule=214",
-     "excerpt": "'Florida A&M L 1-3 vs Coastal Carolina' -- the Sep 5 row of FAMU's own schedule export (Neutral, Dolphin Volleyball Classic, Jacksonville FL)",
-     "retrieved": "2026-09-05T23:16:41Z",
-     "source_class": "school_site"
-    }
-   ],
-   "public": true,
-   "priority": 95,
-   "route": {
-    "match": "6627992",
-    "ledger": true
-   },
-   "effective": null,
-   "review_by": null,
-   "first_seen": "2026-09-05T23:55:10Z"
   }
  ]
 }

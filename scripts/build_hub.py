@@ -6359,13 +6359,14 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
   background:transparent;color:var(--navy);border-radius:2px;padding:9px 12px;
   font:600 11px/1 var(--disp);letter-spacing:.13em;text-transform:uppercase}
 .sbtoday:disabled{opacity:.4;cursor:default}
-.sbtoday:not(:disabled):hover{color:var(--ink);border-color:var(--navy)}
+.sbtoday:not(:disabled):hover{color:#E0642F;border-color:#E0642F}
 .sbtoday:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .sbpick{display:flex;align-items:center;gap:7px;margin-left:auto;
   font:500 11px/1 var(--mono);color:var(--slate);letter-spacing:.07em;
   text-transform:uppercase}
 .sbpick input{background:var(--alt);border:1px solid var(--line2);
   color:var(--ink);border-radius:2px;padding:7px 8px;font:12px/1 var(--mono)}
+::selection{background:rgba(255,181,46,.30)}
 .sbfilters{flex-wrap:wrap}
 .sbfrow{display:contents}
 /* ⚠ .lx spans carry their own spaces; the flex button would otherwise eat
@@ -6420,6 +6421,10 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .tdcard{display:flex;flex-direction:column;gap:8px;min-width:0;
   padding:14px;text-decoration:none;
   border:1px solid var(--line);border-left:3px solid var(--gold-fill);
+  /* ⚠ NOT amber-to-coral at full strength: at 3px against white the coral
+     read as an ERROR red down every card. The fade quiets instead. */
+  border-image:linear-gradient(180deg,var(--amber),rgba(255,122,85,.28)) 1;
+  border-image-width:0 0 0 3px;
   background:var(--card)}
 .tdcard:hover{border-left-color:var(--ink)}
 .tdcard:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
@@ -6928,20 +6933,21 @@ td.pick b{color:var(--navy)}
   /* ONE ARROW CONVENTION ACROSS BOTH BOARDS (Cody: "some arrows above
      ranks and some to the right"): movement sits BESIDE the rank digit,
      on its line, on the POWER board and this one alike. */
-  .t25 td.rk{grid-column:1;grid-row:1;width:auto;min-width:0;
-    font:700 18px/1 var(--disp);white-space:nowrap}
-  .t25 td.tm{grid-column:3;grid-row:1;font-size:16px;min-width:0;
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-left:0}
+  .t25 td.rk{grid-column:1;grid-row:1 / 3;align-self:center;width:auto;
+    min-width:26px;font:700 24px/1 var(--disp);white-space:nowrap}
+  .t25 td.tm{grid-column:3;grid-row:1;font-size:17.5px;font-weight:700;
+    min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    padding-left:0}
   /* ⚠ the desktop team-colour bar (absolute, left:6px in .tm's padding)
      lands ON the crest once the phone grid removes that padding -- Cody's
      screenshot showed a navy stripe through the Pitt logo reading as a
      stray "1". The row's left edge tick already carries the colour here. */
   .t25 .tm::before{content:none}
   .t25 td.mvc{grid-column:2;grid-row:1;justify-self:start;white-space:nowrap}
-  .t25 td.pw{grid-column:1 / 3;grid-row:2;justify-self:start}
-  .t25 td.poll{grid-column:3;grid-row:2;justify-self:start}
-  .t25 td.rec{grid-column:4;grid-row:2;justify-self:end;
-    font:600 13px/1 var(--mono);color:var(--ink2)}
+  .t25 td.pw{grid-column:2 / 4;grid-row:2;justify-self:start}
+  .t25 td.poll{grid-column:4;grid-row:2;justify-self:end;white-space:nowrap}
+  .t25 td.rec{grid-column:4;grid-row:1;justify-self:end;
+    font:700 15px/1 var(--mono);color:var(--ink)}
   .t25 td.form{grid-column:1 / -1;grid-row:3;justify-self:start}
   .t25 td.cf,.t25 td.wt,.t25 td.dv{display:none}
   .t25 tbody td.pw::before{content:"POWER ";color:#31D07E;opacity:.9}
@@ -8065,7 +8071,7 @@ td.at{white-space:nowrap}
 .lanemore{appearance:none;background:transparent;border:0;
   border-top:1px solid var(--line);width:100%;text-align:left;padding:9px 2px;
   color:var(--navy);font:600 12px/1 var(--sans);cursor:pointer}
-.lanemore:hover{color:var(--ink)}
+.lanemore:hover{color:#E0642F}
 .lanemore:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:-2px}
 .rledger{display:flex;gap:5px;margin-top:12px;flex-wrap:wrap}
 .rledger .rl{min-width:46px;border:1px solid var(--line2);border-radius:2px;
@@ -9245,10 +9251,11 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 .t25 .tm .tlogo{margin-right:9px}
 .t25 tbody tr:hover{background:var(--alt);cursor:pointer}
 .t25 .rk{font:600 26px/1 var(--disp);color:var(--ink3);width:54px;font-variant-numeric:tabular-nums}
-@supports (-webkit-background-clip:text){
-  .t25 .rk{background:linear-gradient(165deg,#1D2B66 20%,#7A4FB0 95%);
-    -webkit-background-clip:text;background-clip:text;
-    -webkit-text-fill-color:transparent}}
+@media (min-width:641px){
+  @supports (-webkit-background-clip:text){
+    .t25 .rk{background:linear-gradient(165deg,#1D2B66 20%,#7A4FB0 95%);
+      -webkit-background-clip:text;background-clip:text;
+      -webkit-text-fill-color:transparent}}}
 .t25 tbody tr:hover .rk{color:var(--navy)}
 .t25 .tm{font:600 17px/1.1 var(--disp);letter-spacing:.01em}
 .t25 .cf{color:var(--ink2);font-size:12px}
@@ -9969,10 +9976,10 @@ details.avhist{margin:14px 0}
   .rk3 tr.row td{display:block;border:0;padding:0;font-size:12.5px;
     white-space:nowrap}
   .rk3 tr.row td.rk{grid-row:1/3;grid-column:1;align-self:center;
-    font:700 18px/1 var(--disp);text-align:right}
-  .rk3 tr.row td.tm{grid-row:1;grid-column:2/5;font-size:15px;min-width:0;
-    white-space:normal;overflow-wrap:anywhere}
-  .rk3 tr.row td.pw{grid-row:1;grid-column:5;font:700 16px/1 var(--disp);
+    font:700 22px/1 var(--disp);text-align:right}
+  .rk3 tr.row td.tm{grid-row:1;grid-column:2/5;font-size:16.5px;
+    font-weight:700;min-width:0;white-space:normal;overflow-wrap:anywhere}
+  .rk3 tr.row td.pw{grid-row:1;grid-column:5;font:700 17px/1 var(--disp);
     text-align:right}
   .rk3 tr.row td.cf{grid-row:2;grid-column:2}
   .rk3 tr.row td.rec{grid-row:2;grid-column:3}
@@ -10527,7 +10534,6 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
        knowing whose ruler it is; this is the line that says so, and it is
        keyed by view so a new view cannot ship without one. -->
   <p class="rulerwhat" id="rulerwhat"></p>
-  <div id="pollview" hidden></div>
   <!-- ⚠ SAID ONCE. "nothing here feeds the model" was appearing three times on
        this tab -- in the group header above the columns, in RANK_BASIS, and
        again here. Repeating a caveat does not make it more believed; it makes
@@ -10540,6 +10546,14 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
        that no longer works is worse than none. -->
 </p>
   </details>
+  <!-- ⚠ OUTSIDE THE FOLD. This div held three whole views (AVCA, POWER vs
+       AVCA, the weekly calendar) and sat INSIDE the rkhow details -- which
+       the phone closes at boot, so all three rendered blank on every phone
+       ("missing mystery mess", Cody's screenshots, 2026-09-06) while desktop,
+       where the details ships open, never showed it. A closed details hides
+       every child but its summary; content that IS a view can never live
+       inside an explainer fold. -->
+  <div id="pollview" hidden></div>
   <div class="ctl">
     <input type="search" id="q" placeholder="Search a team&hellip;">
     <select id="conf"><option value="">All conferences</option></select>

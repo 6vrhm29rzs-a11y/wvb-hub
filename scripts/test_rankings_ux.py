@@ -21,6 +21,35 @@ sys.path.insert(0, os.path.join(REPO, "scripts"))
 FAILS = []
 
 
+def check_no_view_inside_a_fold(h):
+    """VIEW CONTENT NEVER LIVES INSIDE AN EXPLAINER FOLD (2026-09-06).
+
+    #pollview -- the container three whole rankings views render into --
+    sat inside the rkhow <details>, which the phone closes at boot. A
+    closed details hides every child but its summary, so AVCA, POWER vs
+    AVCA and the weekly calendar rendered BLANK on every phone while
+    desktop (details open) never showed it: Cody's "missing mystery
+    mess". Checked structurally: walk from each view container's position
+    back through unclosed <details> tags."""
+    def inside_details(html, idx):
+        depth = 0
+        for m in re.finditer(r"<details\b|</details>", html[:idx]):
+            depth += 1 if m.group(0).startswith("<details") else -1
+        return depth > 0
+    for vid in ("pollview", "rankpanel", "v-top25"):
+        i = h.find('id="%s"' % vid)
+        if i < 0:
+            check("view container #%s exists" % vid, False)
+            continue
+        check("#%s is not inside a <details> fold" % vid,
+              not inside_details(h, i))
+    # negative control: a synthetic nesting must be caught
+    bad = "<details><summary>x</summary><div id=\"pollview\"></div></details>"
+    check("negative control: a folded pollview is caught",
+          inside_details(bad, bad.find('id="pollview"')))
+
+
+
 def check(label, ok, detail=""):
     print("  %-64s %s" % (label, "ok" if ok else "FAIL %s" % str(detail)[:90]))
     if not ok:
@@ -51,6 +80,8 @@ def main():
     page_p = os.path.join(REPO, "Cody", "START-HERE.html")
     page = io.open(page_p, encoding="utf-8").read() \
         if os.path.exists(page_p) else ""
+    if page:
+        check_no_view_inside_a_fold(page)
 
     print("1. THE MORE MENU")
     m = re.search(r"\.moremenu\{[^}]*background:var\(--(\w+)\)", page)

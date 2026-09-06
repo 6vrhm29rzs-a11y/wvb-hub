@@ -1,10 +1,10 @@
 {
  "date": "2026-09-06",
- "generated_utc": "2026-09-06T21:50:02Z",
+ "generated_utc": "2026-09-06T22:12:41Z",
  "counts": {
-  "VERIFIED_BOTH": 13,
+  "VERIFIED_BOTH": 14,
   "UNVERIFIED": 1,
-  "CORROBORATED_ONE": 21,
+  "CORROBORATED_ONE": 23,
   "CONTRADICTED_ONE": 1,
   "CONTRADICTED_BOTH": 2
  },
@@ -926,6 +926,83 @@
      "url": "https://unoprivateers.com/services/schedule_txt.ashx?schedule=410",
      "assertion": "LSU New Orleans  L 0-3 vs San Jose State",
      "opponent_source": "San Jose State",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6625274",
+   "date": "2026-09-06",
+   "canonical": "Oregon def. Washington St. 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Oregon": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://goducks.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Oregon W 3-1 vs Washington State",
+     "opponent_source": "Washington State",
+     "site_says": "Home"
+    },
+    "Washington St.": {
+     "state": "NOT_POSTED",
+     "url": "https://wsucougars.com/sports/womens-volleyball/schedule",
+     "row": [
+      "Sep 6",
+      "(Sun)",
+      "at",
+      "#25",
+      "Oregon",
+      "Eugene, Ore.",
+      "12:00 PM PDT",
+      "Preview",
+      "Opens in a new window",
+      "Watch Live",
+      "Opens in a new window",
+      "Live Stats",
+      "Opens in a new window",
+      "Game Notes (PDF)"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6625165",
+   "date": "2026-09-06",
+   "canonical": "Belmont def. Middle Tenn. 3-2",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Belmont": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://belmontbruins.com/services/schedule_txt.ashx?schedule=251",
+     "assertion": "Belmont W 3-2 vs Middle Tennessee",
+     "opponent_source": "Middle Tennessee",
+     "site_says": "Home"
+    },
+    "Middle Tenn.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://goblueraiders.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Middle Tenn. L 2-3 vs Belmont",
+     "opponent_source": "Belmont",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6626287",
+   "date": "2026-09-06",
+   "canonical": "Stanford def. Marquette 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Stanford": {
+     "state": "SITE_HTTP_MISS",
+     "url": "https://gostanford.com/sports/womens-volleyball/schedule/text",
+     "http": 404
+    },
+    "Marquette": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gomarquette.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Marquette L 1-3 vs Stanford",
+     "opponent_source": "Stanford",
      "site_says": "Away"
     }
    }
