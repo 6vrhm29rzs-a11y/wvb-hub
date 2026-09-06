@@ -5300,7 +5300,7 @@ TEMPLATE = r"""<!doctype html><html lang="en"><head><meta charset="utf-8">
      degrades to something narrow rather than to a wide system sans. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&family=Roboto+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&family=Roboto+Mono:wght@400;500;600;700&family=Yellowtail&display=swap" rel="stylesheet">
 <title>NCAA Women's Volleyball 2026</title>
 <style>
 /* Legibility first. Cody asked for something that reads like a scores site --
@@ -5467,7 +5467,9 @@ header .mast .meta b{color:var(--chalk)}
 header h1{color:var(--chalk)}
 body{margin:0;color:var(--ink);font:15px/1.55 var(--sans);
   font-feature-settings:"tnum" 1;
-  background:var(--page);
+  background:
+    linear-gradient(168deg,#F7F4FC 0%,#F4F3FA 26%,#F2F3F9 52%,#F4F6F9 100%)
+    fixed var(--page);
   background-repeat:no-repeat}
 /* THE FLOOR. Flat vertical stripes read as stripes; a court reads as a court
    only in perspective, so this is a grid rotated back in X and faded out as it
@@ -5492,18 +5494,35 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 header,nav,main{position:relative;z-index:1}
 
 header{color:var(--chalk);padding:10px 24px 0;position:relative;
-  background:linear-gradient(180deg,#0F2340,var(--chrome))}
+  background:
+    radial-gradient(80% 150% at 88% -30%,rgba(255,105,70,.30),transparent 55%),
+    radial-gradient(55% 130% at 8% 125%,rgba(72,150,255,.22),transparent 62%),
+    linear-gradient(160deg,#101A3D 0%,#1D2B66 40%,#33205C 78%,var(--chrome) 100%)}
 .mast{max-width:1280px;margin:0 auto;display:flex;align-items:center;
   justify-content:space-between;gap:20px;flex-wrap:wrap}
 /* ⚠ THE WORDMARK IS A LOCKUP, NOT A HEADING THAT HAPPENS TO BE BIG. A rule
    under the season line and a tighter, heavier condensed face make it read as
    a masthead; the previous 40px/.92 sat at the same weight as a section
    title, which is why the page opened like a dashboard. */
-h1{margin:0;font:700 26px/.9 var(--disp);letter-spacing:.01em;
-  color:var(--ink);text-transform:uppercase}
-h1 em{font-style:normal;color:var(--gold)}
-.season{font:600 11px/1 var(--mono);letter-spacing:.3em;
-  text-transform:uppercase;margin-bottom:4px;display:inline-block}
+h1{margin:0;display:flex;align-items:baseline;gap:10px;
+  font:400 40px/.9 "Yellowtail","Brush Script MT","Snell Roundhand",cursive;
+  letter-spacing:.01em;color:var(--cs-white,#fff);text-transform:none;
+  text-shadow:0 2px 14px rgba(255,120,80,.35)}
+/* year and ball scale WITH the script (em units): the phone masthead sets
+   h1 to 20-22px and fixed-px companions would outgrow their own wordmark */
+h1 em{font:700 .62em/1 var(--disp);font-style:normal;letter-spacing:.04em;
+  color:#FFB52E;align-self:center;transform:translateY(2px)}
+/* the ball: white-line volleyball, coral seams, a lean like it is mid-serve */
+.mball{width:.78em;height:.78em;align-self:center;flex:0 0 auto;
+  transform:rotate(14deg) translateY(1px)}
+.mball .mb-b{fill:none;stroke:var(--cs-white,#fff);stroke-width:3.6}
+.mball .mb-c{fill:var(--cs-white,#fff)}
+.mball .mbalt .mb-b{stroke:#FFB52E}
+.mball .mbalt .mb-c{fill:#FFB52E}
+.mball .mbrim{fill:none;stroke:rgba(255,255,255,.55);stroke-width:1.2}
+.season{font:700 10.5px/1 var(--disp);letter-spacing:.32em;
+  text-transform:uppercase;margin-bottom:4px;display:inline-block;
+  color:#B9C6E4}
 .meta{font:11.5px/1.7 var(--mono);color:var(--slate);text-align:right}
 .meta b{color:var(--ink);font-weight:600}
 /* The net: white mesh under a taut yellow tape. It is the one thing in the
@@ -5678,6 +5697,9 @@ h1 em{font-style:normal;color:var(--gold)}
 .cs-status b{color:#AFBED6;font-weight:600}
 .cs-status .cs-fresh{color:var(--cs-white)}
 .cs-status .cs-stale{color:var(--cs-gold)}
+.cs-status .cs-livec{color:#FFD9CB;background:rgba(255,110,74,.22);
+  border:1px solid rgba(255,122,85,.45);border-radius:999px;
+  padding:2px 9px;font-weight:700;letter-spacing:.08em}
 
 @media (max-width:860px){
   .cs-tape{grid-template-columns:minmax(0,1fr) auto}
@@ -9145,7 +9167,8 @@ td.wh .wu{color:var(--ink3);font-style:italic}
   cursor:pointer;border-right:1px solid var(--line)}
 .segb:last-child{border-right:0}
 .segb:hover{color:var(--ink)}
-.segb.on{background:var(--navy);color:var(--ink-on-accent)}
+.segb.on{background:linear-gradient(135deg,#1D2B66,#33205C);
+  color:var(--ink-on-accent)}
 .segb:focus-visible{outline:2px solid var(--amber);outline-offset:-2px}
 .mv{display:inline-block;margin-left:5px;font:700 11px/1 var(--mono);vertical-align:1px}
 .mv.up{color:#31D07E}
@@ -9835,11 +9858,31 @@ details.avhist{margin:14px 0}
   .rk3 tr.row td.c-avca{grid-row:2;grid-column:4}
   .rk3 tr.row td.rs{grid-row:2;grid-column:5;text-align:right}
   .rk3 tr.row td.c-ref{display:none}
+  /* ⚠ THE DECADE BANDS ARE A COLUMN DEVICE AND THERE IS NO COLUMN HERE
+     (Cody's screenshot, 2026-09-06: "a shadow background over the text ...
+     looks like a mistake"). On desktop tr:nth-child(10n+1..5) tints whole
+     rows to group ranks in bands; in this card grid each td hugs its text,
+     so the same rule painted scattered grey boxes behind names and numbers.
+     The band rule TIES the earlier phone reset at (0,2,3) and beats it on
+     source order -- this reset sits AFTER it in the file, so it wins the
+     same tie. ⚠ The R6 lift did NOT reproduce this: appending media rules
+     to the end of the head reorders the cascade, so a lifted page wins
+     ties the real phone loses. */
+  .rk3 tbody tr:nth-child(n) td{background:none}
   /* the label rides in front of the value, so no number is anonymous */
   .rk3 tr.row td[data-l]::before{content:attr(data-l) " ";
     font:700 11px/1 var(--disp);letter-spacing:.08em;color:var(--slate);
     text-transform:uppercase;margin-right:3px}
+  /* the ruler seg, phone shape (Cody's screenshot, 2026-09-06): five long
+     labels wrapped as two rows of big boxes -- same cure as the Scores
+     chips: one full-width line of short labels. The .lx spans carry the
+     words only a desktop has room for. */
   .rulerbar{gap:10px}
+  .rulerbar .seg{display:flex;width:100%}
+  .rulerbar .seg .segb{flex:1 1 auto;min-height:32px;padding:8px 2px;
+    font-size:10px;letter-spacing:.02em}
+  .rulerbar .seg .vx-key{display:none}
+  .segb .lx{display:none}
   .refcols{display:none}
   .gaptbl .gapn{font-size:15px}
 }
@@ -10001,7 +10044,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 .note b{color:var(--ink)}
 .note p{margin:0 0 9px}.note p:last-child{margin:0}
 @media(max-width:640px){
-  main{padding:16px 10px 50px}h1{font-size:22px}
+  main{padding:16px 10px 50px}h1{font-size:29px}
   td,th{padding:8px 7px}.meta{text-align:left}
 }
 @media(max-width:560px){
@@ -10011,7 +10054,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
      the pages themselves. */
   .mast .meta{display:none}
   .cs-status{padding:2px 10px;font-size:10px}
-  h1{font-size:20px;margin:2px 0}
+  h1{font-size:26px;margin:2px 0}
   .mast{padding-bottom:2px}
 }
 </style></head><body>
@@ -10020,7 +10063,38 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <div class="mast">
     <div>
       <div class="season">NCAA Division I &middot; Women&rsquo;s Indoor</div>
-      <h1>Volleyball <em>2026</em></h1>
+      <!-- the ball, panel construction (Cody's reference images): three
+           thirds, each a stack of curved panels with the header gradient
+           showing through the gaps. Each third = rings around a pole on the
+           rim, clipped to its own 120-degree wedge; one third in amber, the
+           Mikasa nod. -->
+      <h1>Volleyball <em>2026</em><svg class="mball" viewBox="0 0 36 36" aria-hidden="true">
+        <defs>
+          <clipPath id="mbclip"><circle cx="18" cy="18" r="15.4"/></clipPath>
+          <clipPath id="mbwedge"><path d="M18 18L-17-2.2L18-42L53-2.2Z"/></clipPath>
+        </defs>
+        <g clip-path="url(#mbclip)">
+          <g clip-path="url(#mbwedge)">
+            <circle class="mb-c" cx="18" cy="2.6" r="2.8"/>
+            <circle class="mb-b" cx="18" cy="2.6" r="5.2"/>
+            <circle class="mb-b" cx="18" cy="2.6" r="10.4"/>
+            <circle class="mb-b" cx="18" cy="2.6" r="15.6"/>
+          </g>
+          <g transform="rotate(120 18 18)" clip-path="url(#mbwedge)" class="mbalt">
+            <circle class="mb-c" cx="18" cy="2.6" r="2.8"/>
+            <circle class="mb-b" cx="18" cy="2.6" r="5.2"/>
+            <circle class="mb-b" cx="18" cy="2.6" r="10.4"/>
+            <circle class="mb-b" cx="18" cy="2.6" r="15.6"/>
+          </g>
+          <g transform="rotate(240 18 18)" clip-path="url(#mbwedge)">
+            <circle class="mb-c" cx="18" cy="2.6" r="2.8"/>
+            <circle class="mb-b" cx="18" cy="2.6" r="5.2"/>
+            <circle class="mb-b" cx="18" cy="2.6" r="10.4"/>
+            <circle class="mb-b" cx="18" cy="2.6" r="15.6"/>
+          </g>
+        </g>
+        <circle class="mbrim" cx="18" cy="18" r="15.4"/>
+      </svg></h1>
     </div>
     <div class="meta">
       <b>{{N_PLAYED}}</b> <span title="{{N_PLAYED_DEF}}">results on the board</span> &middot; <b>{{N_TEAMS}}</b> teams rated<br>
@@ -10313,10 +10387,10 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <div class="rulerbar">
     <div class="seg" role="tablist" aria-label="Which ranking">
       <button class="segb on" data-r="ours"><i class="vx-key vx-k-power"></i>POWER</button>
-      <button class="segb" data-r="avca"><i class="vx-key vx-k-avca"></i>AVCA coaches poll</button>
-      <button class="segb" data-r="digby"><i class="vx-key vx-k-digby"></i>Digby&rsquo;s Top 25</button>
-      <button class="segb" data-r="gap">POWER vs AVCA</button>
-      <button class="segb" data-r="cal">Weekly calendar</button>
+      <button class="segb" data-r="avca"><i class="vx-key vx-k-avca"></i>AVCA<span class="lx"> coaches poll</span></button>
+      <button class="segb" data-r="digby"><i class="vx-key vx-k-digby"></i>Digby<span class="lx">&rsquo;s Top</span> 25</button>
+      <button class="segb" data-r="gap"><span class="lx">POWER </span>vs AVCA</button>
+      <button class="segb" data-r="cal"><span class="lx">Weekly </span>calendar</button>
     </div>
     <label class="refsel"><span>Reference</span>
       <select id="refpick" aria-label="Reference ranking">
@@ -19010,7 +19084,7 @@ function csStatus() {
   el.innerHTML =
     '<span>' + esc(today) + ' PT</span>' +
     '<span>' + feed + '</span>' +
-    '<span>' + (nlive ? '<b class="cs-fresh">' + nlive + ' live</b>'
+    '<span>' + (nlive ? '<b class="cs-fresh cs-livec">' + nlive + ' live</b>'
                       : '<b>quiet</b>') + '</span>';
 }
 /* COURTSIGNAL-JS-END */

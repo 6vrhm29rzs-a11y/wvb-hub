@@ -748,6 +748,24 @@
     "review_by": null,
     "collector": true
    }
+  ],
+  "6626804": [
+   {
+    "url": "https://brownbears.com/sports/womens-volleyball/schedule/text",
+    "kind": "school_site",
+    "school": "Brown",
+    "retrieved": "2026-09-06T18:40:00Z",
+    "text": "'Brown L 1-3 vs Bryant' -- the Sep 6 row of Brown's own schedule (Neutral, Kingston RI / Keaney Gymnasium)",
+    "fields": [
+     "result"
+    ],
+    "value": {
+     "result": "Bryant won 3-1. The feed says Brown (away) won 3-1, internally coherent -- and the lineup rows fit the OPPOSITE roster (the inversion signature)."
+    },
+    "status": "conflicts",
+    "review_by": "2026-09-09",
+    "note": "ONE official source against the feed's counted winner, corroborated by the lineup-attribution signal (which corroborates, never corrects alone). Bryant had not posted (checked 2026-09-06T18:40:00Z). Recheck Bryant for the second source; if it posts W 3-1, upgrade to a correction with box_team_swap."
+   }
   ]
  }
 }

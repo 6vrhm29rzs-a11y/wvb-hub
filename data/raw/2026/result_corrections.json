@@ -1860,6 +1860,67 @@
      "establishes": "Oral Roberts won 3-1 -- the second school source; both schools assert the same alternative against the feed"
     }
    ]
+  },
+  "6626154": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "East Carolina (away) won 3-2 -- 25-21 home s1, then 25-17/21-25/25-21/15-10 -- with box and lineup rows attributed the same way. Internally coherent, and wrong.",
+   "correct": {
+    "winner_team_id": "46472",
+    "away_sets": 2,
+    "home_sets": 3,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 25,
+      "home": 21
+     },
+     {
+      "period": 2,
+      "visit": 17,
+      "home": 25
+     },
+     {
+      "period": 3,
+      "visit": 25,
+      "home": 21
+     },
+     {
+      "period": 4,
+      "visit": 21,
+      "home": 25
+     },
+     {
+      "period": 5,
+      "visit": 10,
+      "home": 15
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46472": "46668",
+     "46668": "46472"
+    }
+   },
+   "established": "UNC Greensboro won 3-2 -- the feed's entire team attribution is inverted (the SMU-UC Davis class; caught by the LINEUP-attribution guard the same afternoon, then confirmed both ways: both schools contradict the feed's version and assert the same alternative). Linescores flipped column-for-column.",
+   "evidence": [
+    {
+     "url": "https://ecupirates.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "East Carolina",
+     "retrieved": "2026-09-06T18:40:00Z",
+     "text": "'East Carolina L 2-3 vs UNC Greensboro' -- the Sep 6 row of ECU's own schedule (Neutral)",
+     "establishes": "East Carolina lost 2-3"
+    },
+    {
+     "url": "https://uncgspartans.com/services/schedule_txt.ashx?schedule=322",
+     "kind": "school_site",
+     "school": "UNC Greensboro",
+     "retrieved": "2026-09-06T18:40:00Z",
+     "text": "'UNC Greensboro W 3-2 vs East Carolina' -- the Sep 6 row of UNCG's own schedule export (Neutral)",
+     "establishes": "UNC Greensboro won 3-2 -- the second school source; both schools assert the same alternative against the feed"
+    }
+   ]
   }
  }
 }

@@ -1,16 +1,16 @@
 {
  "meta": {
   "season": 2026,
-  "generated_at_utc": "2026-09-06T18:08:30Z",
-  "n_claims": 75,
+  "generated_at_utc": "2026-09-06T19:10:39Z",
+  "n_claims": 77,
   "feed_cap": 5,
   "recent_hours": 72,
   "states": {
-   "confirmed_official": 44,
+   "confirmed_official": 45,
    "corroborated": 10,
    "official_unconfirmed": 0,
    "community_signal": 6,
-   "conflicting": 9,
+   "conflicting": 10,
    "expired": 5,
    "inaccessible": 1
   }
@@ -1341,6 +1341,41 @@
    "review_by": null
   },
   {
+   "id": "6dac86683b42",
+   "type": "result_correction",
+   "subject": {
+    "kind": "match",
+    "gid": "6626154"
+   },
+   "what": "Result corrected: UNC Greensboro won 3-2 -- the feed's entire team attribution is inverted (the SMU-UC Davis class; caught by …",
+   "state": "confirmed_official",
+   "state_label": "confirmed by an official source",
+   "why": "the feed's record was incomplete or wrong; 2 named official source(s) supply the result",
+   "scope": "the winner and set line of this one match",
+   "sources": [
+    {
+     "url": "https://ecupirates.com/sports/womens-volleyball/schedule/text",
+     "excerpt": "'East Carolina L 2-3 vs UNC Greensboro' -- the Sep 6 row of ECU's own schedule (Neutral)",
+     "retrieved": "2026-09-06T18:40:00Z",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://uncgspartans.com/services/schedule_txt.ashx?schedule=322",
+     "excerpt": "'UNC Greensboro W 3-2 vs East Carolina' -- the Sep 6 row of UNCG's own schedule export (Neutral)",
+     "retrieved": "2026-09-06T18:40:00Z",
+     "source_class": "official_school"
+    }
+   ],
+   "public": true,
+   "priority": 90,
+   "route": {
+    "match": "6626154",
+    "ledger": true
+   },
+   "effective": null,
+   "review_by": null
+  },
+  {
    "id": "e79084be3b35",
    "type": "fixture_update",
    "subject": {
@@ -2166,6 +2201,35 @@
    "review_by": null
   },
   {
+   "id": "c66bc0fab1dd",
+   "type": "result_conflict",
+   "subject": {
+    "kind": "match",
+    "gid": "6626804"
+   },
+   "what": "An attributable source disputes this result — Bryant v Brown",
+   "state": "conflicting",
+   "state_label": "sources conflict — shown, not chosen",
+   "why": "shown, never chosen; the Result Ledger holds both claims",
+   "scope": "that sources disagree about this result",
+   "sources": [
+    {
+     "url": "https://brownbears.com/sports/womens-volleyball/schedule/text",
+     "excerpt": "'Brown L 1-3 vs Bryant' -- the Sep 6 row of Brown's own schedule (Neutral, Kingston RI / Keaney Gymnasium)",
+     "retrieved": "2026-09-06T18:40:00Z",
+     "source_class": "school_site"
+    }
+   ],
+   "public": true,
+   "priority": 95,
+   "route": {
+    "match": "6626804",
+    "ledger": true
+   },
+   "effective": null,
+   "review_by": null
+  },
+  {
    "id": "0f6bce5007d1",
    "type": "availability",
    "subject": {
@@ -2550,6 +2614,72 @@
  ],
  "feed": [
   {
+   "id": "c66bc0fab1dd",
+   "type": "result_conflict",
+   "subject": {
+    "kind": "match",
+    "gid": "6626804"
+   },
+   "what": "An attributable source disputes this result — Bryant v Brown",
+   "state": "conflicting",
+   "state_label": "sources conflict — shown, not chosen",
+   "why": "shown, never chosen; the Result Ledger holds both claims",
+   "scope": "that sources disagree about this result",
+   "sources": [
+    {
+     "url": "https://brownbears.com/sports/womens-volleyball/schedule/text",
+     "excerpt": "'Brown L 1-3 vs Bryant' -- the Sep 6 row of Brown's own schedule (Neutral, Kingston RI / Keaney Gymnasium)",
+     "retrieved": "2026-09-06T18:40:00Z",
+     "source_class": "school_site"
+    }
+   ],
+   "public": true,
+   "priority": 95,
+   "route": {
+    "match": "6626804",
+    "ledger": true
+   },
+   "effective": null,
+   "review_by": null,
+   "first_seen": "2026-09-06T19:10:39Z"
+  },
+  {
+   "id": "6dac86683b42",
+   "type": "result_correction",
+   "subject": {
+    "kind": "match",
+    "gid": "6626154"
+   },
+   "what": "Result corrected: UNC Greensboro won 3-2 -- the feed's entire team attribution is inverted (the SMU-UC Davis class; caught by …",
+   "state": "confirmed_official",
+   "state_label": "confirmed by an official source",
+   "why": "the feed's record was incomplete or wrong; 2 named official source(s) supply the result",
+   "scope": "the winner and set line of this one match",
+   "sources": [
+    {
+     "url": "https://ecupirates.com/sports/womens-volleyball/schedule/text",
+     "excerpt": "'East Carolina L 2-3 vs UNC Greensboro' -- the Sep 6 row of ECU's own schedule (Neutral)",
+     "retrieved": "2026-09-06T18:40:00Z",
+     "source_class": "official_school"
+    },
+    {
+     "url": "https://uncgspartans.com/services/schedule_txt.ashx?schedule=322",
+     "excerpt": "'UNC Greensboro W 3-2 vs East Carolina' -- the Sep 6 row of UNCG's own schedule export (Neutral)",
+     "retrieved": "2026-09-06T18:40:00Z",
+     "source_class": "official_school"
+    }
+   ],
+   "public": true,
+   "priority": 90,
+   "route": {
+    "match": "6626154",
+    "ledger": true
+   },
+   "effective": null,
+   "review_by": null,
+   "first_seen": "2026-09-06T19:10:39Z"
+  },
+  {
    "id": "175f8e97dbce",
    "type": "fixture_evidence",
    "subject": {
@@ -2602,36 +2732,6 @@
    "first_seen": "2026-09-05T23:55:10Z"
   },
   {
-   "id": "b34be576b53e",
-   "type": "result_conflict",
-   "subject": {
-    "kind": "match",
-    "gid": "6626268"
-   },
-   "what": "An attributable source disputes this result — Bryant v Providence",
-   "state": "conflicting",
-   "state_label": "sources conflict — shown, not chosen",
-   "why": "shown, never chosen; the Result Ledger holds both claims",
-   "scope": "that sources disagree about this result",
-   "sources": [
-    {
-     "url": "https://friars.com/sports/womens-volleyball/schedule/text",
-     "excerpt": "'Providence W 3-1 vs Bryant University' -- the Sep 5 row of Providence's own schedule (Neutral, Kingston RI / Keaney Gymnasium)",
-     "retrieved": "2026-09-05T23:16:41Z",
-     "source_class": "school_site"
-    }
-   ],
-   "public": true,
-   "priority": 95,
-   "route": {
-    "match": "6626268",
-    "ledger": true
-   },
-   "effective": null,
-   "review_by": null,
-   "first_seen": "2026-09-05T23:32:51Z"
-  },
-  {
    "id": "c8a69fe4b35a",
    "type": "result_correction",
    "subject": {
@@ -2661,42 +2761,6 @@
    "priority": 90,
    "route": {
     "match": "6627136",
-    "ledger": true
-   },
-   "effective": null,
-   "review_by": null,
-   "first_seen": "2026-09-05T23:25:56Z"
-  },
-  {
-   "id": "7f827d93c1b5",
-   "type": "result_correction",
-   "subject": {
-    "kind": "match",
-    "gid": "6628429"
-   },
-   "what": "Result corrected: Oral Roberts won 3-1 -- derived winner/sets inverted (the Chattanooga-UT Martin class: the in-record W-L …",
-   "state": "confirmed_official",
-   "state_label": "confirmed by an official source",
-   "why": "the feed's record was incomplete or wrong; 2 named official source(s) supply the result",
-   "scope": "the winner and set line of this one match",
-   "sources": [
-    {
-     "url": "https://fullertontitans.com/services/schedule_txt.ashx?schedule=265",
-     "excerpt": "'Cal St. Fullerton L 1-3 vs Oral Roberts' -- the Sep 5 row of Fullerton's own schedule export (Neutral)",
-     "retrieved": "2026-09-05T23:16:41Z",
-     "source_class": "official_school"
-    },
-    {
-     "url": "https://oruathletics.com/services/schedule_txt.ashx?schedule=338",
-     "excerpt": "'Oral Roberts W 3-1 vs Cal State Fullerton' -- the Sep 5 row of ORU's own schedule export (Neutral)",
-     "retrieved": "2026-09-05T23:16:41Z",
-     "source_class": "official_school"
-    }
-   ],
-   "public": true,
-   "priority": 90,
-   "route": {
-    "match": "6628429",
     "ledger": true
    },
    "effective": null,

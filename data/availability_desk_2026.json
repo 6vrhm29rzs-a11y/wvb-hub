@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-06T18:08:29Z",
+  "generated_at_utc": "2026-09-06T19:10:38Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 7,
    "expired": 2,
-   "anomalies": 204
+   "anomalies": 206
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -884,16 +884,16 @@
    "absent": [
     {
      "name": "Mckinley Boehm",
-     "rate": 3.308,
-     "played_share": 0.75
+     "rate": 3.344,
+     "played_share": 0.8
     },
     {
      "name": "Margo Kemp",
-     "rate": 1.893,
+     "rate": 1.824,
      "played_share": 1.0
     }
    ],
-   "points_per_set_missing": 5.201
+   "points_per_set_missing": 5.168
   },
   {
    "game_id": "6639842",
@@ -927,6 +927,24 @@
    "points_per_set_missing": 4.857
   },
   {
+   "game_id": "6628225",
+   "team_id": "45955",
+   "team": "Central Ark.",
+   "absent": [
+    {
+     "name": "Mckinzee Haas",
+     "rate": 2.964,
+     "played_share": 1.0
+    },
+    {
+     "name": "Kennady Martindale",
+     "rate": 1.857,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 4.821
+  },
+  {
    "game_id": "6625817",
    "team_id": "46103",
    "team": "Nicholls",
@@ -943,24 +961,6 @@
     }
    ],
    "points_per_set_missing": 4.796
-  },
-  {
-   "game_id": "6628225",
-   "team_id": "45955",
-   "team": "Central Ark.",
-   "absent": [
-    {
-     "name": "Mckinzee Haas",
-     "rate": 3.409,
-     "played_share": 1.0
-    },
-    {
-     "name": "Kennady Martindale",
-     "rate": 1.364,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 4.773
   },
   {
    "game_id": "6624444",
@@ -1176,11 +1176,11 @@
    "absent": [
     {
      "name": "Laura Perugini bieleski",
-     "rate": 4.071,
+     "rate": 4.088,
      "played_share": 1.0
     }
    ],
-   "points_per_set_missing": 4.071
+   "points_per_set_missing": 4.088
   },
   {
    "game_id": "6624306",
@@ -1483,6 +1483,19 @@
    "points_per_set_missing": 3.346
   },
   {
+   "game_id": "6639891",
+   "team_id": "46708",
+   "team": "Xavier",
+   "absent": [
+    {
+     "name": "Mckinley Boehm",
+     "rate": 3.344,
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 3.344
+  },
+  {
    "game_id": "6627792",
    "team_id": "46071",
    "team": "American",
@@ -1507,19 +1520,6 @@
     }
    ],
    "points_per_set_missing": 3.333
-  },
-  {
-   "game_id": "6639891",
-   "team_id": "46708",
-   "team": "Xavier",
-   "absent": [
-    {
-     "name": "Mckinley Boehm",
-     "rate": 3.308,
-     "played_share": 0.75
-    }
-   ],
-   "points_per_set_missing": 3.308
   },
   {
    "game_id": "6640393",
@@ -2026,6 +2026,19 @@
    "points_per_set_missing": 2.5
   },
   {
+   "game_id": "6624624",
+   "team_id": "46686",
+   "team": "Maryland",
+   "absent": [
+    {
+     "name": "Duru G\u00e3\u00b6k\u00e3\u00a7en",
+     "rate": 2.5,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.5
+  },
+  {
    "game_id": "6628216",
    "team_id": "46035",
    "team": "CSU Bakersfield",
@@ -2246,7 +2259,20 @@
     {
      "name": "Ella Chaney",
      "rate": 2.136,
-     "played_share": 1.0
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 2.136
+  },
+  {
+   "game_id": "6638234",
+   "team_id": "45955",
+   "team": "Central Ark.",
+   "absent": [
+    {
+     "name": "Ella Chaney",
+     "rate": 2.136,
+     "played_share": 0.75
     }
    ],
    "points_per_set_missing": 2.136
@@ -2289,6 +2315,19 @@
     }
    ],
    "points_per_set_missing": 2.033
+  },
+  {
+   "game_id": "6637631",
+   "team_id": "45938",
+   "team": "Ole Miss",
+   "absent": [
+    {
+     "name": "Melia Johnson",
+     "rate": 2.023,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.023
   },
   {
    "game_id": "6624506",
@@ -2536,19 +2575,6 @@
     }
    ],
    "points_per_set_missing": 1.692
-  },
-  {
-   "game_id": "6637631",
-   "team_id": "45938",
-   "team": "Ole Miss",
-   "absent": [
-    {
-     "name": "Melia Johnson",
-     "rate": 1.684,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.684
   },
   {
    "game_id": "6640218",
@@ -3240,32 +3266,6 @@
    "points_per_set_missing": 1.067
   },
   {
-   "game_id": "6628592",
-   "team_id": "46507",
-   "team": "TCU",
-   "absent": [
-    {
-     "name": "De'andrea Mcmillian",
-     "rate": 1.062,
-     "played_share": 0.667
-    }
-   ],
-   "points_per_set_missing": 1.062
-  },
-  {
-   "game_id": "6640394",
-   "team_id": "46507",
-   "team": "TCU",
-   "absent": [
-    {
-     "name": "De'andrea Mcmillian",
-     "rate": 1.062,
-     "played_share": 0.667
-    }
-   ],
-   "points_per_set_missing": 1.062
-  },
-  {
    "game_id": "6628051",
    "team_id": "45948",
    "team": "Bucknell",
@@ -3290,6 +3290,32 @@
     }
    ],
    "points_per_set_missing": 1.056
+  },
+  {
+   "game_id": "6628592",
+   "team_id": "46507",
+   "team": "TCU",
+   "absent": [
+    {
+     "name": "De'andrea Mcmillian",
+     "rate": 1.045,
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 1.045
+  },
+  {
+   "game_id": "6640394",
+   "team_id": "46507",
+   "team": "TCU",
+   "absent": [
+    {
+     "name": "De'andrea Mcmillian",
+     "rate": 1.045,
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 1.045
   },
   {
    "game_id": "6625823",
@@ -3540,10 +3566,18 @@
    ]
   },
   "Xavier": {
-   "gid": "6625970",
-   "d": "2026-09-05",
-   "appeared": 14,
-   "zero_action": []
+   "gid": "6628636",
+   "d": "2026-09-06",
+   "appeared": 10,
+   "zero_action": [
+    "Cameron Sher",
+    "Gabrielle Semona",
+    "Iyanna Battle",
+    "Addison Haberthy",
+    "Elouise Czajkowski",
+    "Jamison Gordon",
+    "Sadie Kroeger"
+   ]
   },
   "Marquette": {
    "gid": "6626286",
@@ -4449,13 +4483,13 @@
    ]
   },
   "UMES": {
-   "gid": "6639576",
-   "d": "2026-09-05",
+   "gid": "6624625",
+   "d": "2026-09-06",
    "appeared": 11,
    "zero_action": [
     "Margarette Vasquez",
     "Gabrielle Mccoy",
-    "Jaelyn Stewart",
+    "Jaslyn Dawkins",
     "Kyra Bradford",
     "Jentle Brannon",
     "Jocelyn Torres"
@@ -5435,8 +5469,8 @@
    ]
   },
   "Georgia Tech": {
-   "gid": "6628383",
-   "d": "2026-09-05",
+   "gid": "6628636",
+   "d": "2026-09-06",
    "appeared": 9,
    "zero_action": [
     "Willow Weninger",
@@ -5675,10 +5709,17 @@
    ]
   },
   "Maryland": {
-   "gid": "6624624",
-   "d": "2026-09-02",
-   "appeared": 12,
-   "zero_action": []
+   "gid": "6624625",
+   "d": "2026-09-06",
+   "appeared": 10,
+   "zero_action": [
+    "Nikki Tawil",
+    "Addie Canady",
+    "Alex Mcgillivray",
+    "Marlee Sivak",
+    "Annika Sokol",
+    "Ellis Crawford"
+   ]
   },
   "James Madison": {
    "gid": "6625399",
@@ -6208,32 +6249,29 @@
    ]
   },
   "UNC Greensboro": {
-   "gid": "6627927",
-   "d": "2026-09-05",
-   "appeared": 9,
+   "gid": "6626154",
+   "d": "2026-09-06",
+   "appeared": 10,
    "zero_action": [
     "Aylin Baran",
+    "Lauren Janosy",
     "Gabby Seeds",
     "Siena Smiejek",
-    "Graylinn Serge",
-    "Molly scott Cottrell",
     "Beatriz Matos",
-    "Bloom Princell",
-    "Lauren Janosy"
+    "Graylinn Serge",
+    "Molly scott Cottrell"
    ]
   },
   "East Carolina": {
-   "gid": "6626155",
-   "d": "2026-09-05",
-   "appeared": 11,
+   "gid": "6626154",
+   "d": "2026-09-06",
+   "appeared": 13,
    "zero_action": [
-    "Lhogan Wright",
-    "Clara Cloninger",
-    "Melanie Pinales",
-    "Allison Butrum",
-    "Kanani Magee",
     "Sydney Buchanan",
+    "Melanie Pinales",
+    "\u00c2\u0080\u008btaryn Gilreath",
     "Kathryn Schuele",
+    "Kanani Magee",
     "Naala Kasunga"
    ]
   },
@@ -6598,15 +6636,17 @@
    ]
   },
   "Purdue": {
-   "gid": "6627167",
-   "d": "2026-09-02",
-   "appeared": 11,
+   "gid": "6627175",
+   "d": "2026-09-06",
+   "appeared": 9,
    "zero_action": [
     "Lily Bosworth",
     "Sydni Vice",
     "Morgan Williams",
     "Rachel raye Williams",
-    "Sienna Foster"
+    "Bianka Lulic",
+    "Sienna Foster",
+    "Isabelle Bardin"
    ]
   },
   "San Diego St.": {
@@ -6662,10 +6702,12 @@
    ]
   },
   "Ole Miss": {
-   "gid": "6625559",
-   "d": "2026-09-05",
-   "appeared": 12,
+   "gid": "6638234",
+   "d": "2026-09-06",
+   "appeared": 10,
    "zero_action": [
+    "Ryea Jackson",
+    "Sophie Taylor",
     "Rileigh Butler",
     "Caroline Ellis",
     "Coco Natarajan",
@@ -7233,14 +7275,13 @@
    ]
   },
   "Central Ark.": {
-   "gid": "6625558",
-   "d": "2026-09-05",
-   "appeared": 11,
+   "gid": "6638234",
+   "d": "2026-09-06",
+   "appeared": 12,
    "zero_action": [
-    "Annie Hopkins",
-    "Karlyn Frazier",
     "Berkley Bates",
-    "Vivian Spradlin"
+    "Vivian Spradlin",
+    "Fiona Vandyke"
    ]
   },
   "Saint Mary's (CA)": {
@@ -7695,11 +7736,15 @@
    ]
   },
   "TCU": {
-   "gid": "6640394",
-   "d": "2026-09-04",
-   "appeared": 11,
+   "gid": "6627175",
+   "d": "2026-09-06",
+   "appeared": 10,
    "zero_action": [
-    "Mia Lee"
+    "Mia Lee",
+    "Morgan Holloman",
+    "Mckenzie Berg",
+    "Molly Mccarthy",
+    "Josie Valgus"
    ]
   },
   "Virginia": {
@@ -8100,6 +8145,12 @@
     "gid": "6627167",
     "ep": 1788390000,
     "sets": 5,
+    "state": "appeared"
+   },
+   {
+    "gid": "6627175",
+    "ep": 1788714000,
+    "sets": 3,
     "state": "appeared"
    }
   ],

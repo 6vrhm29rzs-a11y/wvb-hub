@@ -1,11 +1,12 @@
 {
  "date": "2026-09-06",
- "generated_utc": "2026-09-06T18:07:35Z",
+ "generated_utc": "2026-09-06T19:09:42Z",
  "counts": {
-  "VERIFIED_BOTH": 1,
-  "UNVERIFIED": 2,
-  "CORROBORATED_ONE": 1,
-  "CONTRADICTED_ONE": 1
+  "VERIFIED_BOTH": 3,
+  "UNVERIFIED": 1,
+  "CORROBORATED_ONE": 4,
+  "CONTRADICTED_ONE": 1,
+  "CONTRADICTED_BOTH": 1
  },
  "matches": [
   {
@@ -110,33 +111,142 @@
    "gid": "6626866",
    "date": "2026-09-06",
    "canonical": "Louisville def. Texas 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "Louisville": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://gocards.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Louisville W 3-0 vs Texas",
+     "opponent_source": "Texas",
+     "site_says": "Neutral"
+    },
+    "Texas": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://texassports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Texas L 0-3 vs Louisville",
+     "opponent_source": "Louisville",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6626154",
+   "date": "2026-09-06",
+   "canonical": "East Carolina def. UNC Greensboro 3-2",
+   "verdict": "CONTRADICTED_BOTH",
+   "schools": {
+    "East Carolina": {
+     "state": "CONTRADICTS",
+     "url": "https://ecupirates.com/sports/womens-volleyball/schedule/text",
+     "assertion": "East Carolina L 2-3 vs UNC Greensboro",
+     "opponent_source": "UNC Greensboro",
+     "site_says": "Neutral"
+    },
+    "UNC Greensboro": {
+     "state": "CONTRADICTS",
+     "url": "https://uncgspartans.com/services/schedule_txt.ashx?schedule=322",
+     "assertion": "UNC Greensboro W 3-2 vs East Carolina",
+     "opponent_source": "East Carolina",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6624625",
+   "date": "2026-09-06",
+   "canonical": "Maryland def. UMES 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Maryland": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://umterps.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Maryland W 3-0 vs UMES",
+     "opponent_source": "UMES",
+     "site_says": "Home"
+    },
+    "UMES": {
+     "state": "NOT_POSTED",
+     "url": "https://easternshorehawks.com/services/schedule_txt.ashx?schedule=1306",
      "row": [
       "Sep 6 (Sun)",
-      "12:00 p.m.",
+      "1:00 PM",
       "Neutral",
-      "#9 Texas",
-      "Nashville, TN | Bridgestone Arena",
-      "Broadway Block Party",
+      "University of Maryland",
+      "College Park, MD",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6638234",
+   "date": "2026-09-06",
+   "canonical": "Ole Miss def. Central Ark. 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Ole Miss": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://olemisssports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Ole Miss W 3-0 vs Central Arkansas",
+     "opponent_source": "Central Arkansas",
+     "site_says": "Home"
+    },
+    "Central Ark.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://ucasports.com/services/schedule_txt.ashx?schedule=1309",
+     "assertion": "Central Ark. L 0-3 vs Ole Miss",
+     "opponent_source": "Ole Miss",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6627175",
+   "date": "2026-09-06",
+   "canonical": "TCU def. Purdue 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "TCU": {
+     "state": "NOT_POSTED",
+     "url": "https://gofrogs.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 6 (Sun)",
+      "12 PM",
+      "Away",
+      "Purdue",
+      "West Lafayette, In.",
+      "",
       "-"
      ]
     },
-    "Texas": {
-     "state": "NOT_POSTED",
-     "url": "https://texassports.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 6 (Sun)",
-      "11 a.m. CT",
-      "Neutral",
-      "#6 Louisville",
-      "Nashville, Tenn. (Bridgestone Arena)",
-      "Broadway Block Party",
-      "-"
-     ]
+    "Purdue": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://purduesports.com/sports/volleyball/schedule",
+     "assertion": "Purdue L 0-3 vs TCU",
+     "opponent_source": "TCU",
+     "site_says": null,
+     "surface": "modern_card"
+    }
+   }
+  },
+  {
+   "gid": "6628636",
+   "date": "2026-09-06",
+   "canonical": "Georgia Tech def. Xavier 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Georgia Tech": {
+     "state": "SITE_HTTP_MISS",
+     "url": "https://ramblinwreck.com/sports/womens-volleyball/schedule/text",
+     "http": 404
+    },
+    "Xavier": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://goxavier.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Xavier L 0-3 vs Georgia Tech",
+     "opponent_source": "Georgia Tech",
+     "site_says": "Away"
     }
    }
   }
