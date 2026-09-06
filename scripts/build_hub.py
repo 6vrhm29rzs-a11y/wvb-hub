@@ -6287,15 +6287,15 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
   .sbday{min-width:0;flex:0 1 auto;flex-direction:row;align-items:baseline;gap:7px}
   .sbday b{font-size:15px}
   .sbday span{font-size:10px}
-  .sbnav{width:34px;height:36px;min-height:36px}
-  .sbtoday{min-height:36px;padding:7px 9px}
+  .sbnav{width:30px;height:32px;min-height:32px}
+  .sbtoday{min-height:32px;padding:6px 8px}
   /* on today the day label already says TODAY -- a second, disabled TODAY
      button beside it said the same word twice (Cody's screenshot) */
   .sbtoday:disabled{display:none}
   .sbpick{margin-left:auto;gap:5px}
   .sbpick>span{display:none} /* the input shows the date; the caption doubled it */
-  .sbpick input{min-height:36px;padding:5px 6px;font-size:11px;max-width:132px}
-  .sbfilters .segb{min-height:36px}
+  .sbpick input{min-height:32px;padding:4px 6px;font-size:11px;max-width:142px;
+    appearance:none;-webkit-appearance:none} /* iOS ignores compact sizing otherwise */
 }
 .tdquiet{font:14.5px/1.6 var(--sans);color:var(--ink2);margin:0 0 20px;
   padding-bottom:16px;border-bottom:1px solid var(--line)}
@@ -6701,18 +6701,23 @@ td.pick b{color:var(--navy)}
   nav button{font-size:11px;padding:12px 6px}
   nav .morebtn{padding:12px 6px}
 
-  /* SCOREBOARD CONTROLS, phone shape. ⚠ REWRITTEN 2026-09-06 (Cody:
-     "this giant filters ... are not good looking"): the 3-per-row grid of
-     full-width 40px slabs -- itself the fix for a 5+1 wrap -- read as a
-     settings panel and ate the first screen. Same cure the ledger seg got:
-     the six states are ONE horizontal scroll row of natural-width chips;
-     the conference select and the count share the line below. */
-  .seg.sbfilters .sbfrow{display:flex;flex:1 0 100%;gap:6px;
-    flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;
-    -webkit-overflow-scrolling:touch}
-  .seg.sbfilters .sbfrow::-webkit-scrollbar{display:none}
-  .seg.sbfilters .sbfrow .segb{flex:0 0 auto}
-  .sbfilters .count{margin-left:auto;padding-top:0}
+  /* SCOREBOARD CONTROLS, phone shape. ⚠ REWRITTEN TWICE 2026-09-06, both
+     from Cody's screenshots: the 3-per-row grid of 40px slabs was "giant";
+     the scroll-row replacement failed the next review ("shouldn't have to
+     scroll left and right to see everything"). What fits: all six states on
+     ONE line at 10px/tight padding -- measured, they fit 390px with room --
+     sharing leftover width evenly, with the conference select and the count
+     on the tight line below. No scrolling, ~64px total. */
+  .seg.sbfilters{display:flex;width:100%;flex-wrap:wrap}
+  .seg.sbfilters .segb{flex:1 1 auto;min-height:32px;padding:8px 2px;
+    font-size:10px;letter-spacing:.03em;text-align:center}
+  .sbconf{flex:1 1 auto;display:flex;align-items:center;padding:3px 4px;
+    border-top:1px solid var(--line)}
+  .sbconf select{width:100%;max-width:none;min-height:26px;
+    font-size:11px;padding:3px 6px}
+  .sbfilters .count{flex:0 0 auto;align-self:center;margin-left:0;
+    padding:3px 8px 0 2px;border-top:1px solid var(--line);
+    align-self:stretch;display:inline-flex;align-items:center}
   .sbbar{gap:7px;margin-bottom:12px;padding-bottom:9px}
   #v-scores .lead{font-size:12.5px;line-height:1.5;margin-bottom:10px}
   .tdmarq.sbtop .tdcard{padding:10px 12px;gap:5px}

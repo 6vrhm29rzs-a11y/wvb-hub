@@ -1,10 +1,81 @@
 {
  "date": "2026-09-06",
-<<<<<<< HEAD
- "generated_utc": "2026-09-06T13:26:32Z",
-=======
- "generated_utc": "2026-09-06T16:42:12Z",
->>>>>>> 4d9b367 (Roboto Mono for numerals (Plex's slashed zero read as 8); compact phone filters; bigger score cells)
- "counts": {},
- "matches": []
+ "generated_utc": "2026-09-06T17:17:54Z",
+ "counts": {
+  "VERIFIED_BOTH": 1,
+  "UNVERIFIED": 1,
+  "CORROBORATED_ONE": 1
+ },
+ "matches": [
+  {
+   "gid": "6626193",
+   "date": "2026-09-06",
+   "canonical": "UNC Asheville def. Jacksonville St. 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "UNC Asheville": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://uncabulldogs.com/sports/womens-volleyball/schedule/text",
+     "assertion": "UNC Asheville W 3-0 vs Jacksonville State",
+     "opponent_source": "Jacksonville State",
+     "site_says": "Neutral"
+    },
+    "Jacksonville St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://jaxstatesports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Jacksonville St. L 0-3 vs UNC Asheville",
+     "opponent_source": "UNC Asheville",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6626851",
+   "date": "2026-09-06",
+   "canonical": "UCF def. Davidson 3-0",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "UCF": {
+     "state": "SITE_HTTP_MISS",
+     "url": "https://ucfknights.com/sports/womens-volleyball/schedule/text",
+     "http": 404
+    },
+    "Davidson": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://davidsonwildcats.com/sports/womens-volleyball/schedule/text",
+     "rows_on_date": [
+      "University of Central Florida"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6626404",
+   "date": "2026-09-06",
+   "canonical": "Wofford def. George Washington 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Wofford": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://athletics.wofford.edu/services/schedule_txt.ashx?schedule=538",
+     "assertion": "Wofford W 3-0 vs George Washington University",
+     "opponent_source": "George Washington University",
+     "site_says": "Neutral"
+    },
+    "George Washington": {
+     "state": "NOT_POSTED",
+     "url": "https://gwsports.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 6 (Sun)",
+      "12 p.m.",
+      "Neutral",
+      "Wofford",
+      "Raleigh, NC",
+      "Summit Hospitality Tournament",
+      "-"
+     ]
+    }
+   }
+  }
+ ]
 }
