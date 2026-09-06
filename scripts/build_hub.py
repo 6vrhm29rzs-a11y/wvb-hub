@@ -1634,6 +1634,72 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
               or {}).get("teams") or {}
     _stars = team_stars()
 
+    # OPPONENT CONTEXT (Cody, 2026-09-06): every match a team has played or
+    # will play carries the opponent's POWER rank -- rated AS OF NOW, the
+    # same honesty framing the what-changed cards use -- and, on a played
+    # match, the AVCA rank AT THE TIME of the match, from the poll archive.
+    _pow_of = dict((t["team"], t.get("power")) for t in teams
+                   if t.get("power") is not None)
+    _prk_of = dict((t["team"], t["rank26"]) for t in teams if t.get("rank26"))
+    _avca_polls = []          # [(capture_date, {hub_name: rank})]
+    try:
+        for _row in (json.loads(x) for x in open(os.path.join(
+                REPO, "data", "raw", str(SEASON), "polls_avca.jsonl"),
+                encoding="utf-8") if x.strip()):
+            if str(_row.get("season")) != str(SEASON) or                     _row.get("is_previous_season") in (True, "True"):
+                continue
+            _m = {}
+            for r in (_row.get("rows") or _row.get("data") or []):
+                _nm = re.sub(r"\s*\(\d+\)\s*$", "", str(r.get("SCHOOL") or ""))
+                try:
+                    _m[_hub_name(_nm)] = int(r.get("RANK"))
+                except (TypeError, ValueError):
+                    continue
+            if _m and _row.get("date"):
+                _avca_polls.append((str(_row.get("date")), _m))
+    except OSError:
+        pass
+    _avca_polls.sort()
+
+    def _avca_at(d):
+        """The AVCA poll in effect on date d: the latest capture on or before
+        it. Matches BEFORE the first capture get that first poll -- the
+        preseason poll was published before the season opened; our capture
+        lagging it must not render week-one opponents as unranked."""
+        if not _avca_polls:
+            return {}
+        best = _avca_polls[0][1]
+        for pd, m in _avca_polls:
+            if pd <= d:
+                best = m
+        return best
+
+    def _opp_ctx(g):
+        o = dict(g)
+        _r = _prk_of.get(g.get("opp"))
+        if _r:
+            o["opr"] = _r
+        _a = _avca_at(g.get("d") or "").get(g.get("opp"))
+        if _a:
+            o["oav"] = _a
+        return o
+
+    def _wl_quality(rows):
+        """Mean opponent POWER rating across wins and across losses. An
+        opponent with no rating (non-D-I, or outside the rated 348)
+        contributes NOTHING rather than a stand-in (R5); the counts say
+        what each average rests on."""
+        w, l = [], []
+        for g in rows:
+            v = _pow_of.get(g.get("opp"))
+            if v is None:
+                continue
+            (w if g.get("mine", 0) > g.get("theirs", 0) else l).append(v)
+        return {
+            "w": (round(sum(w) / len(w), 1) if w else None), "nw": len(w),
+            "l": (round(sum(l) / len(l), 1) if l else None), "nl": len(l),
+        }
+
     out = {}
     for t in teams:
         nm = t["team"]
@@ -1720,8 +1786,9 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
                     (str((lineup.get(nm) or {}).get("team_id")), nkey(d.get("name")))))
                 for d in sorted((rec.get("departed") or []),
                                 key=lambda x: -(x.get("pts") or 0))[:3]],
-            "played": played.get(nm, []),
-            "fixtures": [dict(f, pick=_fixture_pick(pred_by_pair, f, nm))
+            "played": [_opp_ctx(g) for g in played.get(nm, [])],
+            "wlq": _wl_quality(played.get(nm, [])),
+            "fixtures": [_opp_ctx(dict(f, pick=_fixture_pick(pred_by_pair, f, nm)))
                          for f in fixtures.get(team_norm(nm), [])
                          if f["d"] >= today][:40],
         }
@@ -8533,6 +8600,30 @@ body.mdlopen{overflow:hidden}
 .chgc .w{font-weight:700;color:var(--ink);display:flex;align-items:center;gap:5px}
 .chgc .l{color:var(--ink2);display:flex;align-items:center;gap:5px}
 .chgc .sc{font:700 15px/1 var(--disp);color:var(--ink);letter-spacing:.02em}
+/* opponent-context chips on team match lists */
+.oprk{font:700 9.5px/1 var(--mono);font-style:normal;color:var(--ink2);
+  background:var(--alt);border:1px solid var(--line);border-radius:2px;
+  padding:2px 4px;margin-left:6px;letter-spacing:.03em;vertical-align:1px;
+  white-space:nowrap}
+.oprk.av{color:var(--navy)}
+/* the quality-of-results scale: one 0-100 track, two dots. The track wears
+   the site's lavender-to-navy fade -- the identity doing WORK (left = weak
+   opposition, right = strong), not decoration. */
+.qual .qualbar{position:relative;height:22px;margin:10px 2px 4px;
+  border-radius:3px;
+  background:linear-gradient(90deg,#EDEBF5 0%,#C9CBE8 45%,#5C6BB0 80%,#1D2B66 100%)}
+.qual .qtick{position:absolute;top:100%;transform:translateX(-50%);
+  font:600 9.5px/1.6 var(--mono);color:var(--ink3)}
+.qual .qtick.qr{transform:translateX(-100%)}
+.qual .qd{position:absolute;top:50%;width:13px;height:13px;border-radius:50%;
+  transform:translate(-50%,-50%);border:2px solid #fff;
+  box-shadow:0 1px 3px rgba(10,20,40,.35)}
+.qual .qd.qw{background:#1FA766}
+.qual .qd.ql{background:#D45454}
+.qual .qleg{margin-top:16px;font:600 12px/1.5 var(--sans);color:var(--ink2)}
+.qual .qleg .qw{color:#1FA766}
+.qual .qleg .ql{color:#D45454}
+.qual .qleg .qn{color:var(--ink3);font-weight:500}
 .chgc .pwr{font:700 11px/1 var(--mono);font-style:normal;color:#31D07E;
   padding:2px 4px;border-radius:3px;
   background:color-mix(in oklab,#31D07E 14%,transparent)}
@@ -21202,6 +21293,17 @@ function scoutRead(t, team) {
     'than shown.</div></div>';
 }
 
+/* opponent-context chips: POWER rank as of NOW (same honesty framing as the
+   what-changed cards), AVCA as of the MATCH on a played row and as of now on
+   a fixture. Absent chips render nothing -- never "NR" invented. */
+function oppChips(g, past) {
+  return (g.opr ? ' <i class="oprk" title="opponent\u2019s POWER rank as of now, ' +
+      'not as of the match">PWR #' + g.opr + '</i>' : '') +
+    (g.oav ? ' <i class="oprk av" title="' +
+      (past ? 'AVCA rank at the time of the match'
+            : 'opponent\u2019s current AVCA rank') + '">AVCA #' + g.oav + '</i>' : '');
+}
+
 function showTeam(name) {
   const t = TEAMS[name];
   const box = document.getElementById('teamcard');
@@ -21218,7 +21320,7 @@ function showTeam(name) {
                ' tabindex="0" role="link"' : '') + '>' +
       '<span class="dt">' + dayLabel(g.d) + '</span>' +
       '<span class="va">' + (g.home ? 'vs' : '@') + '</span>' +
-      '<span class="op">' + esc(g.opp) +
+      '<span class="op">' + esc(g.opp) + oppChips(g, true) +
       (g.nondi ? '<b class="nondi" title="Not a Division-I opponent. This ' +
         'site does not filter these matches out -- filtering would change ' +
         'what every rate means without saying so -- so it is marked ' +
@@ -21317,7 +21419,7 @@ function showTeam(name) {
     return '<div class="gline gl2"><span class="dt">' + dayLabel(f.d) + '</span>' +
     '<span class="va' + (neutral ? ' nt' : '') + '"' +
       (neutral ? ' title="neutral site"' : '') + '>' + va + '</span>' +
-    '<span class="op">' + f.opp + '</span>' +
+    '<span class="op">' + f.opp + oppChips(f, false) + '</span>' +
     '<span class="ss">' + (f.t || '') + '</span>' +
     (fxPickable(f)
       ? '<span class="rs ' + (f.pick >= 0.5 ? 'w' : 'l') + '" title="' +
@@ -21658,7 +21760,7 @@ function showTeam(name) {
       const trs = games.map(g => {
         const mine = (BOXES[g.gid] || []).filter(r => r.team === name);
         const wl = (g.mine > g.theirs ? 'W' : 'L') + ' ' + g.mine + '\u2013' + g.theirs;
-        const opp = (g.home ? 'v ' : 'at ') + g.opp +
+        const opp = (g.home ? 'v ' : 'at ') + g.opp + oppChips(g, true) +
           (g.nondi ? ' <i class="dicaveat" title="not a Division-I opponent">non-D-I</i>' : '');
         if (!mine.length) {
           return '<tr><td class="pn">' + g.d.slice(5) + '</td>' +
@@ -21689,7 +21791,37 @@ function showTeam(name) {
           '<td>' + agg.aces + '</td><td>' + aPts + '</td>' +
           '<td><b>' + (agg.sets ? (aPts / agg.sets).toFixed(2) : '\u2014') + '</b></td></tr>'
         : '';
-      mbmHtml =
+      let qualHtml = '';
+      const q = t.wlq;
+      if (q && (q.nw || q.nl)) {
+        const dot = (v, cls, lab, n) => v == null ? '' :
+          '<i class="qd ' + cls + '" style="left:' + Math.max(0, Math.min(100, v)) +
+          '%" title="' + lab + ': average opponent POWER rating ' + v.toFixed(1) +
+          ' across ' + n + (n === 1 ? ' match' : ' matches') + '"></i>';
+        const leg = [];
+        if (q.w != null) leg.push('<b class="qw">\u25cf avg win</b> vs POWER ' +
+          q.w.toFixed(1) + ' <span class="qn">(' + q.nw + ')</span>');
+        if (q.l != null) leg.push('<b class="ql">\u25cf avg loss</b> vs POWER ' +
+          q.l.toFixed(1) + ' <span class="qn">(' + q.nl + ')</span>');
+        if (!q.nl) leg.push('<span class="qn">no losses yet</span>');
+        if (!q.nw) leg.push('<span class="qn">no wins yet</span>');
+        const nx = games.length - q.nw - q.nl;
+        qualHtml =
+          '<div class="tsec qual"><h3>Quality of results</h3>' +
+          '<div class="qualbar" role="img" aria-label="average opponent strength in wins and losses">' +
+          '<span class="qtick" style="left:0">0</span>' +
+          '<span class="qtick" style="left:50%">50</span>' +
+          '<span class="qtick qr" style="left:100%">100</span>' +
+          dot(q.w, 'qw', 'wins', q.nw) + dot(q.l, 'ql', 'losses', q.nl) +
+          '</div><div class="qleg">' + leg.join(' \u00b7 ') + '</div>' +
+          '<div class="tnote">Average opponent strength on our 0\u2013100 POWER ' +
+          'scale, wins and losses split \u2014 the same lens the committee uses ' +
+          'RPI for, on our ruler. Opponents are rated as of now, not as of the ' +
+          'match' + (nx > 0 ? '; ' + nx + (nx === 1 ? ' match' : ' matches') +
+          ' against unrated or non-D-I opponents contribute nothing rather ' +
+          'than a stand-in' : '') + '.</div></div>';
+      }
+      mbmHtml = qualHtml +
         '<div class="tsec" style="margin-top:14px"><h3>Match by match, 2026</h3>' +
         '<div class="scroll"><table class="box mbm"><thead><tr>' +
         '<th class="l">Date</th><th class="l">Opponent</th><th>Res</th>' +

@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-06T19:10:38Z",
+  "generated_at_utc": "2026-09-06T19:39:04Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 7,
    "expired": 2,
-   "anomalies": 206
+   "anomalies": 207
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -698,6 +698,29 @@
    "points_per_set_missing": 9.1
   },
   {
+   "game_id": "6627992",
+   "team_id": "46412",
+   "team": "Florida A&M",
+   "absent": [
+    {
+     "name": "Sydney Whitfield",
+     "rate": 3.158,
+     "played_share": 1.0
+    },
+    {
+     "name": "Iyonnie Sanford",
+     "rate": 2.947,
+     "played_share": 1.0
+    },
+    {
+     "name": "Ladonna Trantham",
+     "rate": 2.773,
+     "played_share": 0.6
+    }
+   ],
+   "points_per_set_missing": 8.878
+  },
+  {
    "game_id": "6627266",
    "team_id": "46360",
    "team": "San Diego St.",
@@ -773,24 +796,6 @@
     }
    ],
    "points_per_set_missing": 7.357
-  },
-  {
-   "game_id": "6627992",
-   "team_id": "46412",
-   "team": "Florida A&M",
-   "absent": [
-    {
-     "name": "Sydney Whitfield",
-     "rate": 3.344,
-     "played_share": 1.0
-    },
-    {
-     "name": "Iyonnie Sanford",
-     "rate": 3.156,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 6.5
   },
   {
    "game_id": "6624595",
@@ -1395,6 +1400,19 @@
    "points_per_set_missing": 3.7
   },
   {
+   "game_id": "6625330",
+   "team_id": "45910",
+   "team": "Ga. Southern",
+   "absent": [
+    {
+     "name": "Reagan Barth",
+     "rate": 3.688,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 3.688
+  },
+  {
    "game_id": "6624502",
    "team_id": "45995",
    "team": "St. John's (NY)",
@@ -1701,19 +1719,6 @@
    "points_per_set_missing": 2.9
   },
   {
-   "game_id": "6625330",
-   "team_id": "45910",
-   "team": "Ga. Southern",
-   "absent": [
-    {
-     "name": "Reagan Barth",
-     "rate": 2.864,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 2.864
-  },
-  {
    "game_id": "6626227",
    "team_id": "45939",
    "team": "Missouri",
@@ -1844,6 +1849,32 @@
    "points_per_set_missing": 2.8
   },
   {
+   "game_id": "6628259",
+   "team_id": "46412",
+   "team": "Florida A&M",
+   "absent": [
+    {
+     "name": "Ladonna Trantham",
+     "rate": 2.773,
+     "played_share": 0.6
+    }
+   ],
+   "points_per_set_missing": 2.773
+  },
+  {
+   "game_id": "6624961",
+   "team_id": "46768",
+   "team": "Lipscomb",
+   "absent": [
+    {
+     "name": "Anna claire Brown",
+     "rate": 2.767,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.767
+  },
+  {
    "game_id": "6626798",
    "team_id": "45783",
    "team": "Jackson St.",
@@ -1972,19 +2003,6 @@
     }
    ],
    "points_per_set_missing": 2.618
-  },
-  {
-   "game_id": "6624961",
-   "team_id": "46768",
-   "team": "Lipscomb",
-   "absent": [
-    {
-     "name": "Anna claire Brown",
-     "rate": 2.583,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 2.583
   },
   {
    "game_id": "6625991",
@@ -3783,15 +3801,15 @@
    ]
   },
   "Florida A&M": {
-   "gid": "6627992",
-   "d": "2026-09-05",
-   "appeared": 10,
+   "gid": "6628349",
+   "d": "2026-09-06",
+   "appeared": 12,
    "zero_action": [
-    "Anna Rita",
-    "Viara Parapunova",
-    "Elin Andersson",
-    "Kayla Channell",
-    "Isabella Loeswick"
+    "Kristen Moore",
+    "Brandi Boston",
+    "Alexandra Moore",
+    "Natalie Johnson",
+    "Aniyah Lewis"
    ]
   },
   "N.C. Central": {
@@ -4169,14 +4187,16 @@
    ]
   },
   "Jacksonville": {
-   "gid": "6626657",
-   "d": "2026-09-05",
-   "appeared": 12,
+   "gid": "6628349",
+   "d": "2026-09-06",
+   "appeared": 10,
    "zero_action": [
     "Daiangelie Gonzalez",
-    "Zoey Vandel",
     "Selah Simien",
-    "Aaliyah Mixon"
+    "Aaliyah Mixon",
+    "Ana Tobar",
+    "Haley Yount",
+    "Jade Cuya cobos"
    ]
   },
   "Southern U.": {
@@ -4728,13 +4748,12 @@
    ]
   },
   "Eastern Ky.": {
-   "gid": "6625470",
-   "d": "2026-09-05",
-   "appeared": 8,
+   "gid": "6625333",
+   "d": "2026-09-06",
+   "appeared": 9,
    "zero_action": [
     "Elissa Furlan",
     "Alexis Woolf",
-    "Emersyn Robbins",
     "Becca Rogers",
     "Emily Melton",
     "Josie Nichols",
@@ -6374,15 +6393,14 @@
    ]
   },
   "Kansas St.": {
-   "gid": "6627512",
-   "d": "2026-09-04",
-   "appeared": 11,
+   "gid": "6625579",
+   "d": "2026-09-06",
+   "appeared": 12,
    "zero_action": [
     "Alex Klukvin",
     "Tatum Tindall",
-    "Chandler Carter",
-    "Reese Resmer",
-    "Lauren Latham"
+    "Sydney Maue",
+    "Chandler Carter"
    ]
   },
   "A&M-Corpus Christi": {
@@ -6450,12 +6468,11 @@
    ]
   },
   "Samford": {
-   "gid": "6625164",
-   "d": "2026-09-05",
-   "appeared": 10,
+   "gid": "6625170",
+   "d": "2026-09-06",
+   "appeared": 11,
    "zero_action": [
-    "Amyra Burchik",
-    "Peytyn Pyle",
+    "Emma Sorensen",
     "Haley Robinson",
     "Isabella Gibbons"
    ]
@@ -6495,15 +6512,14 @@
    ]
   },
   "Lipscomb": {
-   "gid": "6628193",
-   "d": "2026-09-05",
-   "appeared": 9,
+   "gid": "6626597",
+   "d": "2026-09-06",
+   "appeared": 10,
    "zero_action": [
     "Allison Barrick",
     "Madyson Mccarthy",
     "Hallie Hendrickx",
-    "Luca Bredenberg",
-    "Charlotte Routh"
+    "Luca Bredenberg"
    ]
   },
   "Memphis": {
@@ -6522,8 +6538,8 @@
    ]
   },
   "Drake": {
-   "gid": "6625578",
-   "d": "2026-09-05",
+   "gid": "6625579",
+   "d": "2026-09-06",
    "appeared": 11,
    "zero_action": [
     "Emily Lisi",
@@ -6590,11 +6606,13 @@
    ]
   },
   "South Alabama": {
-   "gid": "6625597",
-   "d": "2026-09-05",
-   "appeared": 13,
+   "gid": "6626597",
+   "d": "2026-09-06",
+   "appeared": 11,
    "zero_action": [
     "Charlotte Pearce",
+    "Kathryn O'toole",
+    "Alivia Freeman",
     "Preslee Thompson",
     "Megan Smith"
    ]
@@ -6810,17 +6828,11 @@
    ]
   },
   "Vanderbilt": {
-   "gid": "6628670",
-   "d": "2026-09-02",
-   "appeared": 9,
+   "gid": "6625170",
+   "d": "2026-09-06",
+   "appeared": 15,
    "zero_action": [
-    "Taryn Dewese",
-    "Kati Berezowitz",
-    "Ariel Chime",
-    "Taylor Porter",
-    "Madi Victoriano",
-    "Jordin Southall",
-    "Maddy Bowser"
+    "Taylor Porter"
    ]
   },
   "Col. of Charleston": {
@@ -7370,11 +7382,10 @@
    ]
   },
   "Ga. Southern": {
-   "gid": "6625332",
-   "d": "2026-09-05",
-   "appeared": 10,
+   "gid": "6625333",
+   "d": "2026-09-06",
+   "appeared": 11,
    "zero_action": [
-    "Sam Bowron",
     "Amelia Robinson",
     "Ava Olsen"
    ]

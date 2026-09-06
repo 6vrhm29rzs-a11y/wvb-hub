@@ -1,10 +1,10 @@
 {
  "date": "2026-09-06",
- "generated_utc": "2026-09-06T19:09:42Z",
+ "generated_utc": "2026-09-06T19:38:08Z",
  "counts": {
   "VERIFIED_BOTH": 3,
-  "UNVERIFIED": 1,
-  "CORROBORATED_ONE": 4,
+  "UNVERIFIED": 4,
+  "CORROBORATED_ONE": 6,
   "CONTRADICTED_ONE": 1,
   "CONTRADICTED_BOTH": 1
  },
@@ -247,6 +247,148 @@
      "assertion": "Xavier L 0-3 vs Georgia Tech",
      "opponent_source": "Georgia Tech",
      "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6625333",
+   "date": "2026-09-06",
+   "canonical": "Ga. Southern def. Eastern Ky. 3-2",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Ga. Southern": {
+     "state": "NOT_POSTED",
+     "url": "https://gseagles.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 6 (Sun)",
+      "1 p.m.",
+      "Home",
+      "Eastern Kentucky",
+      "Statesboro, Ga. (Hanner Fieldhouse)",
+      "GATA Challenge",
+      "-"
+     ]
+    },
+    "Eastern Ky.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://ekusports.com/services/schedule_txt.ashx?schedule=350",
+     "assertion": "Eastern Ky. L 2-3 vs Georgia Southern",
+     "opponent_source": "Georgia Southern",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6625170",
+   "date": "2026-09-06",
+   "canonical": "Vanderbilt def. Samford 3-0",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Vanderbilt": {
+     "state": "SITE_HTTP_MISS",
+     "url": "https://vucommodores.com/sports/womens-volleyball/schedule/text",
+     "http": 404
+    },
+    "Samford": {
+     "state": "NOT_POSTED",
+     "url": "https://samfordsports.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 6 (Sun)",
+      "1 PM",
+      "Away",
+      "Vanderbilt",
+      "Nashville, TN",
+      "",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6625579",
+   "date": "2026-09-06",
+   "canonical": "Kansas St. def. Drake 3-0",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Kansas St.": {
+     "state": "SITE_HTTP_MISS",
+     "url": "https://kstatesports.com/sports/womens-volleyball/schedule/text",
+     "http": 308
+    },
+    "Drake": {
+     "state": "NOT_POSTED",
+     "url": "https://godrakebulldogs.com/services/schedule_txt.ashx?schedule=550",
+     "row": [
+      "Sep 6 (Sun)",
+      "1 PM",
+      "Away",
+      "Kansas State",
+      "Manhattan, Kan.",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6626597",
+   "date": "2026-09-06",
+   "canonical": "Lipscomb def. South Alabama 3-0",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Lipscomb": {
+     "state": "NOT_POSTED",
+     "url": "https://lipscombsports.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 6 (Sun)",
+      "1 pm",
+      "Home",
+      "South Alabama",
+      "Nashville, Tenn. (Allen Arena)",
+      "",
+      "-"
+     ]
+    },
+    "South Alabama": {
+     "state": "NOT_POSTED",
+     "url": "https://usajaguars.com/services/schedule_txt.ashx?schedule=1394",
+     "row": [
+      "Sep 6 (Sun)",
+      "1 p.m.",
+      "Away",
+      "Lipscomb",
+      "Nashville, TN",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6628349",
+   "date": "2026-09-06",
+   "canonical": "Jacksonville def. Florida A&M 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Jacksonville": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://judolphins.com/services/schedule_txt.ashx?schedule=337",
+     "assertion": "Jacksonville W 3-0 vs Florida A&M University",
+     "opponent_source": "Florida A&M University",
+     "site_says": "Home"
+    },
+    "Florida A&M": {
+     "state": "NOT_POSTED",
+     "url": "https://famuathletics.com/services/schedule_txt.ashx?schedule=214",
+     "row": [
+      "Sep 6 (Sun)",
+      "2 p.m.",
+      "Away",
+      "Jacksonville",
+      "Jacksonville, Fla.",
+      "",
+      ""
+     ]
     }
    }
   }
