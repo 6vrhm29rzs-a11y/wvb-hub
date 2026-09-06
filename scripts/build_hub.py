@@ -5584,6 +5584,10 @@ h1{margin:0;display:flex;align-items:baseline;gap:10px;
    h1 to 20-22px and fixed-px companions would outgrow their own wordmark */
 h1 em{font:700 .62em/1 var(--disp);font-style:normal;letter-spacing:.04em;
   color:#FFB52E;align-self:center;transform:translateY(2px)}
+@supports (-webkit-background-clip:text){
+  h1 em{background:linear-gradient(170deg,#FFD34D 10%,#FFB52E 45%,#F08A3C 95%);
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent}}
 /* the ball: white-line volleyball, coral seams, a lean like it is mid-serve */
 .mball{width:.78em;height:.78em;align-self:center;flex:0 0 auto;
   transform:rotate(14deg) translateY(1px)}
@@ -6182,7 +6186,7 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
   color:var(--ink3);padding:11px 14px;border-bottom:2px solid transparent;
   margin-bottom:-1px;white-space:nowrap}
 .tdnav button:hover{color:var(--ink2)}
-.tdnav button.on{color:var(--ink);border-bottom-color:var(--cs-gold)}
+.tdnav button.on{color:var(--ink);font-weight:800;border-bottom-color:var(--cs-gold)}
 .tdnav button:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:-3px}
 .tdpanel{padding-top:16px}
 .tdpanel[hidden]{display:none}
@@ -6370,6 +6374,11 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .sbpick input{background:var(--alt);border:1px solid var(--line2);
   color:var(--ink);border-radius:2px;padding:7px 8px;font:12px/1 var(--mono)}
 ::selection{background:rgba(255,181,46,.30)}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:#B7BCD9;border-radius:5px;
+  border:2px solid var(--page)}
+::-webkit-scrollbar-thumb:hover{background:#8F97C4}
+::-webkit-scrollbar-track{background:transparent}
 .sbfilters{flex-wrap:wrap}
 .sbfrow{display:contents}
 /* ⚠ .lx spans carry their own spaces; the flex button would otherwise eat
@@ -7482,7 +7491,12 @@ b.kres{color:#F2B441}
   border-radius:0;padding:2px 18px;border-left:1px solid var(--line)!important}
 #teamcard .gl:first-child{padding-left:0;border-left:0!important}
 #teamcard .glance .gl:nth-child(2){flex:1.3}
-#teamcard .glbig{font:700 26px/1 var(--disp);color:var(--ink)}
+#teamcard .glbig{font:700 30px/1 var(--disp);color:var(--ink);
+  font-variant-numeric:tabular-nums}
+@supports (-webkit-background-clip:text){
+  .glbig{background:linear-gradient(165deg,var(--ink) 30%,#4A3D8F 100%);
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent}}
 #teamcard .gll{font:600 11px/1 var(--disp);letter-spacing:.14em;
   text-transform:uppercase;color:var(--slate)}
 /* every later section is a SECTION on one working surface -- a rule and a
@@ -8202,6 +8216,7 @@ h4.sbtime span{font:600 11px/1 var(--mono);color:var(--ink3)}
    because nobody has won a set still being played. */
 .mlc.cur{font:700 15.5px/1.2 var(--mono);color:var(--ink);
   border:1px solid color-mix(in oklab,var(--cs-gold) 55%,transparent);
+  box-shadow:0 0 0 1px rgba(255,181,46,.18),0 2px 9px rgba(255,150,60,.22);
   padding:1px 5px}
 .mlc.cur.ca{border-bottom:0;border-radius:3px 3px 0 0}
 .mlc.cur.ch{border-top:0;border-radius:0 0 3px 3px}
@@ -9238,8 +9253,8 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 .t25 td.form{white-space:nowrap;padding-left:14px}
 .fw,.fl{display:inline-block;width:19px;height:19px;line-height:19px;text-align:center;
   border-radius:2px;font:700 11px/19px var(--mono);margin-right:3px}
-.fw{background:#0C2A1C;color:#31D07E;border:1px solid #1F5B3C}
-.fl{background:#2B1114;color:#FF5F6E;border:1px solid #5E2229}
+.fw{background:linear-gradient(160deg,#123B26,#0C2A1C);color:#3BE68C;border:1px solid #1F5B3C}
+.fl{background:linear-gradient(160deg,#3D181C,#2B1114);color:#FF7580;border:1px solid #5E2229}
 /* A result against a ranked side is marked -- it is stronger evidence. */
 .fw.frk{background:#31D07E;color:var(--ink-on-accent);border-color:#31D07E}
 .fl.frk{background:#FF5F6E;color:var(--ink-on-accent);border-color:#FF5F6E}
@@ -9469,6 +9484,13 @@ table.t25 tbody tr td.rk{padding-right:10px;font:700 26px/1 var(--disp);
 /* The podium idea is kept, in the direction it was meant to go: the top three
    are LARGER here, never smaller. */
 table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
+/* the podium: 1-2-3 wear their medals -- on the numeral, where it reads as
+   a fact about rank, not as row decoration */
+.t25 tbody tr:nth-child(1) td.rk,.rk3 tr.row[data-r="1"] td.rk{color:#C9A227}
+.t25 tbody tr:nth-child(2) td.rk,.rk3 tr.row[data-r="2"] td.rk{color:#8E9BB0}
+.t25 tbody tr:nth-child(3) td.rk,.rk3 tr.row[data-r="3"] td.rk{color:#B0713A}
+.t25 tbody tr:nth-child(-n+3){
+  background:linear-gradient(90deg,rgba(201,162,39,.09),transparent 55%)}
 .t25 tbody tr{border-left:3px solid transparent}
 .t25 tbody tr:hover{background:rgba(233,169,61,.05)}
 .t25 tbody tr td:first-child{position:relative}
@@ -22750,8 +22772,10 @@ body:has(section.detailopen) .asklaunch{display:none}
    information). The button is relocated into the nav's right side at
    boot; the chat panel still opens as a deliberate overlay. ── */
 .asklaunch{position:fixed;right:14px;bottom:14px;z-index:60;
-  border:1px solid var(--line2);
-  background:var(--card);color:var(--ink2);
+  border:1px solid transparent;
+  background:linear-gradient(var(--card),var(--card)) padding-box,
+    linear-gradient(135deg,#1D2B66,#7A4FB0 55%,#FF7A55) border-box;
+  color:var(--ink2);
   border-radius:20px;padding:9px 14px;cursor:pointer;
   font:700 11px/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;
   min-height:40px;box-shadow:0 4px 18px rgba(0,0,0,.18)}

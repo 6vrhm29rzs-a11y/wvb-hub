@@ -1,10 +1,10 @@
 {
  "date": "2026-09-06",
- "generated_utc": "2026-09-06T22:55:50Z",
+ "generated_utc": "2026-09-06T23:40:40Z",
  "counts": {
-  "VERIFIED_BOTH": 14,
+  "VERIFIED_BOTH": 18,
   "UNVERIFIED": 1,
-  "CORROBORATED_ONE": 24,
+  "CORROBORATED_ONE": 25,
   "CONTRADICTED_ONE": 1,
   "CONTRADICTED_BOTH": 2
  },
@@ -1023,6 +1023,114 @@
      "url": "https://appstatesports.com/services/schedule_txt.ashx?schedule=429",
      "assertion": "App State L 2-3 vs Clemson",
      "opponent_source": "Clemson",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6624326",
+   "date": "2026-09-06",
+   "canonical": "Michigan def. Valparaiso 3-1",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Michigan": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://mgoblue.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Michigan W 3-1 vs Valparaiso",
+     "opponent_source": "Valparaiso",
+     "site_says": "Away"
+    },
+    "Valparaiso": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://valpoathletics.com/services/schedule_txt.ashx?schedule=455",
+     "assertion": "Valparaiso L 1-3 vs Michigan",
+     "opponent_source": "Michigan",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6627090",
+   "date": "2026-09-06",
+   "canonical": "Colorado def. Northern Colo. 3-2",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Colorado": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://cubuffs.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Colorado W 3-2 vs Northern Colorado",
+     "opponent_source": "Northern Colorado",
+     "site_says": "Home"
+    },
+    "Northern Colo.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://uncbears.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Northern Colo. L 2-3 vs Colorado",
+     "opponent_source": "Colorado",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6639375",
+   "date": "2026-09-06",
+   "canonical": "Southern California def. San Diego 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Southern California": {
+     "state": "SITE_HTTP_MISS",
+     "url": "https://www.usctrojans.com/sports/womens-volleyball/schedule/text",
+     "http": 308
+    },
+    "San Diego": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://usdtoreros.com/services/schedule_txt.ashx?schedule=2440",
+     "assertion": "San Diego L 0-3 vs USC",
+     "opponent_source": "USC",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6626053",
+   "date": "2026-09-06",
+   "canonical": "Tulsa def. Creighton 3-2",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Tulsa": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://tulsahurricane.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Tulsa W 3-2 vs Creighton",
+     "opponent_source": "Creighton",
+     "site_says": "Away"
+    },
+    "Creighton": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gocreighton.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Creighton L 2-3 vs Tulsa",
+     "opponent_source": "Tulsa",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6627574",
+   "date": "2026-09-06",
+   "canonical": "Grand Canyon def. Temple 3-1",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Grand Canyon": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gculopes.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Grand Canyon W 3-1 vs Temple",
+     "opponent_source": "Temple",
+     "site_says": "Home"
+    },
+    "Temple": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://owlsports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Temple L 1-3 vs Grand Canyon",
+     "opponent_source": "Grand Canyon",
      "site_says": "Away"
     }
    }
