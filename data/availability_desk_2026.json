@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-06T16:43:00Z",
+  "generated_at_utc": "2026-09-06T17:06:14Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 7,
    "expired": 2,
-   "anomalies": 203
+   "anomalies": 202
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -2035,11 +2035,11 @@
    "absent": [
     {
      "name": "Albertine Van der goot",
-     "rate": 2.441,
+     "rate": 2.45,
      "played_share": 1.0
     }
    ],
-   "points_per_set_missing": 2.441
+   "points_per_set_missing": 2.45
   },
   {
    "game_id": "6639889",
@@ -3384,19 +3384,6 @@
     }
    ],
    "points_per_set_missing": 0.692
-  },
-  {
-   "game_id": "6625557",
-   "team_id": "45784",
-   "team": "Jacksonville St.",
-   "absent": [
-    {
-     "name": "D'yanna Spicer",
-     "rate": 0.526,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 0.526
   }
  ],
  "latest": {
@@ -3740,12 +3727,13 @@
    ]
   },
   "UNC Asheville": {
-   "gid": "6624270",
-   "d": "2026-09-05",
-   "appeared": 10,
+   "gid": "6626193",
+   "d": "2026-09-06",
+   "appeared": 9,
    "zero_action": [
     "Leah Okogbenin",
     "Riley Barr",
+    "Catherine Hubiak",
     "Olivia Philpot",
     "Cameron Owens",
     "Megan Oppegard",
@@ -6544,8 +6532,8 @@
    ]
   },
   "UCF": {
-   "gid": "6626850",
-   "d": "2026-09-05",
+   "gid": "6626851",
+   "d": "2026-09-06",
    "appeared": 11,
    "zero_action": [
     "Chloe Albiez",
@@ -6612,15 +6600,13 @@
    ]
   },
   "Davidson": {
-   "gid": "6637452",
-   "d": "2026-09-05",
-   "appeared": 12,
+   "gid": "6626851",
+   "d": "2026-09-06",
+   "appeared": 14,
    "zero_action": [
     "Angelique St. laurent",
     "Kate Whiteley",
-    "Abigail Henson",
-    "Peyton Garrick",
-    "Myla Young"
+    "Abigail Henson"
    ]
   },
   "Winthrop": {
@@ -6770,17 +6756,17 @@
    ]
   },
   "Jacksonville St.": {
-   "gid": "6624313",
-   "d": "2026-09-05",
+   "gid": "6626193",
+   "d": "2026-09-06",
    "appeared": 10,
    "zero_action": [
     "Riley Huff",
     "Chloe Mittelstadt",
     "Krista Kostoff",
     "Selin Sakiroglu",
-    "Sophia Schweikert",
     "Gemma Morris",
-    "Anna Ray",
+    "Izzy Whittaker",
+    "D'yanna Spicer",
     "Mia Duong"
    ]
   },
