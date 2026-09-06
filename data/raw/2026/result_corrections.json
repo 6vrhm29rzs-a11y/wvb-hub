@@ -1921,6 +1921,67 @@
      "establishes": "UNC Greensboro won 3-2 -- the second school source; both schools assert the same alternative against the feed"
     }
    ]
+  },
+  "6628262": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Arizona (away) won 3-2 -- 25-17, 24-26, 25-19, 22-25, 15-11 from the visit column -- with box rows attributed the same way. Internally coherent, and wrong.",
+   "correct": {
+    "winner_team_id": "46240",
+    "away_sets": 2,
+    "home_sets": 3,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 17,
+      "home": 25
+     },
+     {
+      "period": 2,
+      "visit": 26,
+      "home": 24
+     },
+     {
+      "period": 3,
+      "visit": 19,
+      "home": 25
+     },
+     {
+      "period": 4,
+      "visit": 25,
+      "home": 22
+     },
+     {
+      "period": 5,
+      "visit": 11,
+      "home": 15
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46240": "46211",
+     "46211": "46240"
+    }
+   },
+   "established": "Pepperdine won 3-2 -- the feed's entire team attribution is inverted (the SMU-UC Davis class). Caught by the intraday verification sweep on the Sunday slate: both schools contradict the feed's version and assert the same alternative. Linescores flipped column-for-column.",
+   "evidence": [
+    {
+     "url": "https://arizonawildcats.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Arizona",
+     "retrieved": "2026-09-07T01:20:00Z",
+     "text": "'Arizona L 2-3 vs Pepperdine' -- the Sep 6 row of Arizona's own schedule (Neutral)",
+     "establishes": "Arizona lost 2-3"
+    },
+    {
+     "url": "https://pepperdinewaves.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Pepperdine",
+     "retrieved": "2026-09-07T01:20:00Z",
+     "text": "'Pepperdine W 3-2 vs Arizona' -- the Sep 6 row of Pepperdine's own schedule (Neutral)",
+     "establishes": "Pepperdine won 3-2 -- the second school source; both schools assert the same alternative against the feed"
+    }
+   ]
   }
  }
 }

@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-06T20:41:04Z",
+  "generated_at_utc": "2026-09-06T20:46:29Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 7,
    "expired": 2,
-   "anomalies": 206
+   "anomalies": 204
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -675,29 +675,6 @@
    "points_per_set_missing": 9.553
   },
   {
-   "game_id": "6628262",
-   "team_id": "46240",
-   "team": "Pepperdine",
-   "absent": [
-    {
-     "name": "Ella Piskorz",
-     "rate": 3.725,
-     "played_share": 1.0
-    },
-    {
-     "name": "Chloe Pravednikov",
-     "rate": 3.675,
-     "played_share": 1.0
-    },
-    {
-     "name": "Maggie Beauer",
-     "rate": 2.15,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 9.55
-  },
-  {
    "game_id": "6627095",
    "team_id": "46729",
    "team": "Northern Ariz.",
@@ -819,24 +796,6 @@
     }
    ],
    "points_per_set_missing": 7.357
-  },
-  {
-   "game_id": "6628262",
-   "team_id": "46211",
-   "team": "Arizona",
-   "absent": [
-    {
-     "name": "Destiny Ndam-simpson",
-     "rate": 4.176,
-     "played_share": 1.0
-    },
-    {
-     "name": "Renee Jones",
-     "rate": 2.471,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 6.647
   },
   {
    "game_id": "6624595",
@@ -7116,20 +7075,13 @@
   "Arizona": {
    "gid": "6628262",
    "d": "2026-09-06",
-   "appeared": 8,
+   "appeared": 12,
    "zero_action": [
-    "Grace Jackson",
-    "Ryan Gilhooly",
-    "Alice Vigano",
-    "Ellie Sandoz",
-    "Eliya Dev",
-    "Reese Poerner",
-    "Isabella Rasi",
-    "Iva Popovic",
-    "Astrid Puig",
-    "Claire Mcneal",
-    "Nalani Muniz",
-    "Sullivan Leonard"
+    "Maya Flemister",
+    "Hayden Reeder",
+    "Britt Carlson",
+    "Shea Davis",
+    "Brookelyn Hatton"
    ]
   },
   "Prairie View": {
@@ -7146,13 +7098,20 @@
   "Pepperdine": {
    "gid": "6628262",
    "d": "2026-09-06",
-   "appeared": 12,
+   "appeared": 8,
    "zero_action": [
-    "Maya Flemister",
-    "Hayden Reeder",
-    "Britt Carlson",
-    "Shea Davis",
-    "Brookelyn Hatton"
+    "Grace Jackson",
+    "Ryan Gilhooly",
+    "Alice Vigano",
+    "Ellie Sandoz",
+    "Eliya Dev",
+    "Reese Poerner",
+    "Isabella Rasi",
+    "Iva Popovic",
+    "Astrid Puig",
+    "Claire Mcneal",
+    "Nalani Muniz",
+    "Sullivan Leonard"
    ]
   },
   "Villanova": {

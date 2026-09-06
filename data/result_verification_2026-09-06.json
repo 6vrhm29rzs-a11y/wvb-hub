@@ -1,10 +1,10 @@
 {
  "date": "2026-09-06",
- "generated_utc": "2026-09-06T20:40:07Z",
+ "generated_utc": "2026-09-06T20:45:32Z",
  "counts": {
-  "VERIFIED_BOTH": 8,
-  "UNVERIFIED": 6,
-  "CORROBORATED_ONE": 15,
+  "VERIFIED_BOTH": 9,
+  "UNVERIFIED": 3,
+  "CORROBORATED_ONE": 17,
   "CONTRADICTED_ONE": 1,
   "CONTRADICTED_BOTH": 2
  },
@@ -732,33 +732,21 @@
    "gid": "6626682",
    "date": "2026-09-06",
    "canonical": "Long Beach St. def. Wyoming 3-2",
-   "verdict": "UNVERIFIED",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "Long Beach St.": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://longbeachstate.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 6 (Sun)",
-      "Noon MT",
-      "Neutral",
-      "Wyoming",
-      "Salt Lake City, Utah",
-      "",
-      "-"
-     ]
+     "assertion": "Long Beach St. W 3-2 vs Wyoming",
+     "opponent_source": "Wyoming",
+     "site_says": "Neutral"
     },
     "Wyoming": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://gowyo.com/services/schedule_txt.ashx?schedule=1205",
-     "row": [
-      "Sep 6 (Sun)",
-      "Noon",
-      "Neutral",
-      "Long Beach State University",
-      "Salt Lake City, UT",
-      "",
-      ""
-     ]
+     "assertion": "Wyoming L 2-3 vs Long Beach State University",
+     "opponent_source": "Long Beach State University",
+     "site_says": "Neutral"
     }
    }
   },
@@ -766,20 +754,14 @@
    "gid": "6624674",
    "date": "2026-09-06",
    "canonical": "Providence def. Rhode Island 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Providence": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://friars.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 6 (Sun)",
-      "3:00 PM",
-      "Away",
-      "University of Rhode Island",
-      "Kingston, R.I.",
-      "Ocean State Cup",
-      "-"
-     ]
+     "assertion": "Providence W 3-0 vs University of Rhode Island",
+     "opponent_source": "University of Rhode Island",
+     "site_says": "Away"
     },
     "Rhode Island": {
      "state": "NOT_POSTED",
@@ -800,20 +782,14 @@
    "gid": "6627813",
    "date": "2026-09-06",
    "canonical": "Stony Brook def. Navy 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Stony Brook": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://stonybrookathletics.com/services/schedule_txt.ashx?schedule=486",
-     "row": [
-      "Sep 6 (Sun)",
-      "3:00 PM",
-      "Away",
-      "Navy",
-      "Annapolis, Md.",
-      "",
-      ""
-     ]
+     "assertion": "Stony Brook W 3-0 vs Navy",
+     "opponent_source": "Navy",
+     "site_says": "Away"
     },
     "Navy": {
      "state": "NOT_POSTED",
