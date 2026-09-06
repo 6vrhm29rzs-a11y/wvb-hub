@@ -1,10 +1,10 @@
 {
  "date": "2026-09-06",
- "generated_utc": "2026-09-06T20:45:32Z",
+ "generated_utc": "2026-09-06T21:50:02Z",
  "counts": {
-  "VERIFIED_BOTH": 9,
-  "UNVERIFIED": 3,
-  "CORROBORATED_ONE": 17,
+  "VERIFIED_BOTH": 13,
+  "UNVERIFIED": 1,
+  "CORROBORATED_ONE": 21,
   "CONTRADICTED_ONE": 1,
   "CONTRADICTED_BOTH": 2
  },
@@ -488,7 +488,7 @@
    "gid": "6638582",
    "date": "2026-09-06",
    "canonical": "Florida def. North Texas 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Florida": {
      "state": "NOT_POSTED",
@@ -504,17 +504,11 @@
      ]
     },
     "North Texas": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://meangreensports.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 6 (Sun)",
-      "1 PM CT",
-      "Home",
-      "No. 17 Florida",
-      "Denton, Texas (The Super Pit)",
-      "",
-      "-"
-     ]
+     "assertion": "North Texas L 0-3 vs Florida",
+     "opponent_source": "Florida",
+     "site_says": "Home"
     }
    }
   },
@@ -647,33 +641,21 @@
    "gid": "6624381",
    "date": "2026-09-06",
    "canonical": "Illinois def. Rice 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "Illinois": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://fightingillini.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 6 (Sun)",
-      "2 PM CT",
-      "Away",
-      "Rice",
-      "Houston, Texas",
-      "Rice Invitational",
-      "-"
-     ]
+     "assertion": "Illinois W 3-0 vs Rice",
+     "opponent_source": "Rice",
+     "site_says": "Away"
     },
     "Rice": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://riceowls.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 6 (Sun)",
-      "2 PM",
-      "Home",
-      "Illinois",
-      "Houston, Texas (Tudor Fieldhouse)",
-      "Rice Invitational I",
-      "-"
-     ]
+     "assertion": "Rice L 0-3 vs Illinois",
+     "opponent_source": "Illinois",
+     "site_says": "Home"
     }
    }
   },
@@ -803,6 +785,148 @@
       "",
       ""
      ]
+    }
+   }
+  },
+  {
+   "gid": "6625459",
+   "date": "2026-09-06",
+   "canonical": "Villanova def. Colgate 3-2",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Villanova": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://villanova.com/services/schedule_txt.ashx?schedule=660",
+     "assertion": "Villanova W 3-2 vs Colgate",
+     "opponent_source": "Colgate",
+     "site_says": "Away"
+    },
+    "Colgate": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://colgateathletics.com/services/schedule_txt.ashx?schedule=890",
+     "assertion": "Colgate L 2-3 vs Villanova",
+     "opponent_source": "Villanova",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6626573",
+   "date": "2026-09-06",
+   "canonical": "Harvard def. Northeastern 3-2",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Harvard": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gocrimson.com/services/schedule_txt.ashx?schedule=1800",
+     "assertion": "Harvard W 3-2 vs Northeastern University",
+     "opponent_source": "Northeastern University",
+     "site_says": "Away"
+    },
+    "Northeastern": {
+     "state": "NOT_POSTED",
+     "url": "https://gonu.com/services/schedule_txt.ashx?schedule=2466",
+     "row": [
+      "Sep 6 (Sun)",
+      "2 p.m.",
+      "Home",
+      "Harvard",
+      "Boston, Mass. (Cabot Center)",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6624239",
+   "date": "2026-09-06",
+   "canonical": "Tennessee def. Indiana 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Tennessee": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://utsports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Tennessee W 3-0 vs Indiana",
+     "opponent_source": "Indiana",
+     "site_says": "Neutral"
+    },
+    "Indiana": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://iuhoosiers.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Indiana L 0-3 vs Tennessee",
+     "opponent_source": "Tennessee",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6628156",
+   "date": "2026-09-06",
+   "canonical": "Illinois St. def. Eastern Mich. 3-2",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Illinois St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://goredbirds.com/services/schedule_txt.ashx?schedule=2797",
+     "assertion": "Illinois St. W 3-2 vs Eastern Michigan",
+     "opponent_source": "Eastern Michigan",
+     "site_says": "Away"
+    },
+    "Eastern Mich.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://emueagles.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Eastern Mich. L 2-3 vs Illinois State",
+     "opponent_source": "Illinois State",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6627387",
+   "date": "2026-09-06",
+   "canonical": "NC State def. Charlotte 3-2",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "NC State": {
+     "state": "NOT_POSTED",
+     "url": "https://gopack.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 6 (Sun)",
+      "3PM",
+      "Home",
+      "Charlotte",
+      "Raleigh, NC (James T. Valvano Arena at William Neal Reynolds Coliseum)",
+      "Summit Hospitality Tournament",
+      "-"
+     ]
+    },
+    "Charlotte": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://charlotte49ers.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Charlotte L 2-3 vs NC State",
+     "opponent_source": "NC State",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6625426",
+   "date": "2026-09-06",
+   "canonical": "San Jose St. def. LSU New Orleans  3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "San Jose St.": {
+     "state": "SITE_HTTP_MISS",
+     "url": "https://sjsuspartans.com/sports/womens-volleyball/schedule/text",
+     "http": 404
+    },
+    "LSU New Orleans ": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://unoprivateers.com/services/schedule_txt.ashx?schedule=410",
+     "assertion": "LSU New Orleans  L 0-3 vs San Jose State",
+     "opponent_source": "San Jose State",
+     "site_says": "Away"
     }
    }
   }

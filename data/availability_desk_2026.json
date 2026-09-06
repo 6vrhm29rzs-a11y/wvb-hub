@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-06T20:46:29Z",
+  "generated_at_utc": "2026-09-06T21:50:58Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 7,
    "expired": 2,
-   "anomalies": 204
+   "anomalies": 206
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -2288,19 +2288,6 @@
    "points_per_set_missing": 1.929
   },
   {
-   "game_id": "6625418",
-   "team_id": "46726",
-   "team": "LSU New Orleans ",
-   "absent": [
-    {
-     "name": "Olivia Bartrina",
-     "rate": 1.929,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.929
-  },
-  {
    "game_id": "6626241",
    "team_id": "45828",
    "team": "Gardner-Webb",
@@ -2465,6 +2452,19 @@
      "name": "Adele Macer",
      "rate": 1.75,
      "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 1.75
+  },
+  {
+   "game_id": "6625418",
+   "team_id": "46726",
+   "team": "LSU New Orleans ",
+   "absent": [
+    {
+     "name": "Olivia Bartrina",
+     "rate": 1.75,
+     "played_share": 1.0
     }
    ],
    "points_per_set_missing": 1.75
@@ -2780,6 +2780,32 @@
     }
    ],
    "points_per_set_missing": 1.409
+  },
+  {
+   "game_id": "6627240",
+   "team_id": "45846",
+   "team": "NC State",
+   "absent": [
+    {
+     "name": "Clara Vondran",
+     "rate": 1.393,
+     "played_share": 0.8
+    }
+   ],
+   "points_per_set_missing": 1.393
+  },
+  {
+   "game_id": "6626403",
+   "team_id": "45846",
+   "team": "NC State",
+   "absent": [
+    {
+     "name": "Clara Vondran",
+     "rate": 1.393,
+     "played_share": 0.8
+    }
+   ],
+   "points_per_set_missing": 1.393
   },
   {
    "game_id": "6626800",
@@ -3748,20 +3774,16 @@
    ]
   },
   "Eastern Mich.": {
-   "gid": "6626957",
-   "d": "2026-09-05",
-   "appeared": 10,
+   "gid": "6628156",
+   "d": "2026-09-06",
+   "appeared": 11,
    "zero_action": [
     "Kayla Ostrander",
-    "Bianca Salvador",
-    "Kaylin Schroeder",
     "Olivia Stewart",
     "Mya Eberlein",
-    "Arynn Randle el",
     "Julia Johnson",
     "Lily Spark",
-    "Ashleekay Christensen",
-    "Zaria Ragler"
+    "Ashleekay Christensen"
    ]
   },
   "Florida A&M": {
@@ -4885,10 +4907,11 @@
    ]
   },
   "Illinois St.": {
-   "gid": "6625497",
-   "d": "2026-09-05",
-   "appeared": 15,
+   "gid": "6628156",
+   "d": "2026-09-06",
+   "appeared": 14,
    "zero_action": [
+    "Alaina Kraemer",
     "Madison Smith",
     "Ellie Burr",
     "Sidney Wright"
@@ -5282,15 +5305,14 @@
    ]
   },
   "NC State": {
-   "gid": "6626403",
-   "d": "2026-09-05",
-   "appeared": 10,
+   "gid": "6627387",
+   "d": "2026-09-06",
+   "appeared": 12,
    "zero_action": [
     "Hailey Mcfadden",
     "Alyssa Forelli",
     "Sa'mya Dorsey",
-    "Laurna Kerr",
-    "Norah Busch"
+    "Laurna Kerr"
    ]
   },
   "Delaware St.": {
@@ -5476,16 +5498,12 @@
    ]
   },
   "San Jose St.": {
-   "gid": "6626508",
-   "d": "2026-09-04",
-   "appeared": 11,
+   "gid": "6625426",
+   "d": "2026-09-06",
+   "appeared": 15,
    "zero_action": [
-    "Florence Campeau",
-    "Tatiana Robinson",
-    "Mariana Buchanan",
-    "Ryleeh Tuaolo",
-    "Eva Vostracka",
-    "Aniyah Hall"
+    "Lolo Fonua",
+    "Ava Hewitt"
    ]
   },
   "Belmont": {
@@ -5987,13 +6005,13 @@
    ]
   },
   "Charlotte": {
-   "gid": "6627242",
-   "d": "2026-09-05",
+   "gid": "6627387",
+   "d": "2026-09-06",
    "appeared": 11,
    "zero_action": [
+    "Sara Marinkovic",
     "Kennedy Earls",
     "Jovana Antic",
-    "Dixie Gayden",
     "Cassidy Flakes"
    ]
   },
@@ -6133,11 +6151,17 @@
    ]
   },
   "Indiana": {
-   "gid": "6624238",
-   "d": "2026-09-02",
-   "appeared": 10,
+   "gid": "6624239",
+   "d": "2026-09-06",
+   "appeared": 9,
    "zero_action": [
-    "Avery Freeman"
+    "Avery Daum",
+    "Spyridoula Komini",
+    "Sade Ilawole",
+    "Emma Segal",
+    "Avry Tatum",
+    "Ava Vickers",
+    "Luca Fickell"
    ]
   },
   "Troy": {
@@ -6175,14 +6199,15 @@
    ]
   },
   "Tennessee": {
-   "gid": "6624379",
-   "d": "2026-09-01",
-   "appeared": 9,
+   "gid": "6624239",
+   "d": "2026-09-06",
+   "appeared": 8,
    "zero_action": [
     "Alaina Jarrett",
     "Mallory Matheny",
     "Morgan Williams",
     "Emma Frietch",
+    "Anni Tang",
     "Mackenzie Plante",
     "Jade Williams",
     "Camille Perry",
@@ -6190,14 +6215,13 @@
    ]
   },
   "Colgate": {
-   "gid": "6625457",
-   "d": "2026-09-05",
-   "appeared": 10,
+   "gid": "6625459",
+   "d": "2026-09-06",
+   "appeared": 11,
    "zero_action": [
     "Gabrielle Emch",
     "Nina Gannon",
     "Ivyann Feay",
-    "Sydney Raszewski",
     "Aubrey Anders",
     "Sophia Towle"
    ]
@@ -6703,11 +6727,11 @@
    ]
   },
   "LSU New Orleans ": {
-   "gid": "6625421",
-   "d": "2026-09-04",
+   "gid": "6625426",
+   "d": "2026-09-06",
    "appeared": 13,
    "zero_action": [
-    "Elani Ratchkovska"
+    "Karina Barzanova"
    ]
   },
   "Alcorn": {
@@ -7115,15 +7139,13 @@
    ]
   },
   "Villanova": {
-   "gid": "6626384",
-   "d": "2026-09-05",
-   "appeared": 11,
+   "gid": "6625459",
+   "d": "2026-09-06",
+   "appeared": 13,
    "zero_action": [
-    "Ava Harris",
-    "Abby Harrell",
+    "Loren Winn",
     "Michelle Eburuoh",
     "Marly Smith",
-    "Mina Diggs",
     "Sophia Stalcup",
     "Margot Randall"
    ]
@@ -7608,9 +7630,9 @@
    ]
   },
   "Northeastern": {
-   "gid": "6625223",
-   "d": "2026-09-05",
-   "appeared": 10,
+   "gid": "6626573",
+   "d": "2026-09-06",
+   "appeared": 11,
    "zero_action": [
     "Bryce Leatherwood",
     "Kate Ewing",
@@ -7618,10 +7640,8 @@
     "Erikah Buff",
     "Zehra Yilmaz",
     "Jane Nelson",
-    "Elle Lucas",
     "Quinnlin Hickman",
-    "Sophie Lasala",
-    "Iris Canko"
+    "Sophie Lasala"
    ]
   },
   "Wofford": {
@@ -7851,11 +7871,13 @@
    ]
   },
   "Harvard": {
-   "gid": "6626170",
-   "d": "2026-09-05",
-   "appeared": 12,
+   "gid": "6626573",
+   "d": "2026-09-06",
+   "appeared": 11,
    "zero_action": [
     "Alicia Guo",
+    "Bennett Trubey",
+    "Taylor Larkin",
     "Madeline Pankowski",
     "Nicole Cornell"
    ]

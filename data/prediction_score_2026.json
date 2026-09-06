@@ -2,15 +2,15 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 881,
+  "scored": 886,
   "logged_after_tipoff_excluded": 3,
   "team_mismatch_excluded": 21,
   "predictions_on_record": 4780,
-  "results_available": 925,
-  "brier": 0.175,
+  "results_available": 931,
+  "brier": 0.1749,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 645,
-  "favourite_correct_pct": 73.2
+  "favourite_correct": 649,
+  "favourite_correct_pct": 73.3
  },
  "calibration": [
   {
@@ -21,15 +21,15 @@
   },
   {
    "range": "60-70%",
-   "n": 165,
+   "n": 168,
    "said": 65.0,
-   "happened": 58.2
+   "happened": 58.3
   },
   {
    "range": "70-80%",
-   "n": 140,
+   "n": 142,
    "said": 74.9,
-   "happened": 65.7
+   "happened": 66.2
   },
   {
    "range": "80-90%",
