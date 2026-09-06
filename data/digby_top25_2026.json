@@ -29,8 +29,8 @@
   "between_team_variance": 5.941,
   "caveat_schedule": "the opponent IS adjusted for from match one: a result is scored as the strength it implies (opponent's rating + margin, home court removed). What is still thin early is the opponent's own rating, which is the preseason projection until a schedule graph exists",
   "teams_with_a_result": 348,
-  "matches_counted": 917,
-  "corpus_fingerprint": "f0efca75814c26c0",
+  "matches_counted": 918,
+  "corpus_fingerprint": "bca375707baee9d6",
   "certifies": {
    "blend_weight_derived_not_chosen": {
     "value": true,
@@ -42,7 +42,7 @@
     }
    }
   },
-  "score_mean": 0.00041,
+  "score_mean": 0.00043,
   "score_sd": 1.08059,
   "score_scale_note": "mean and SD across ALL 348 teams, not just the ones shown -- a scale computed from the top 25 would measure the spread among the best",
   "shown": 25,
@@ -50,10 +50,10 @@
   "hit_channel_weight": 0.25,
   "hit_channel_tau": 0.1,
   "hit_channel_evidence": "data/blend_hiteff_2025.json",
-  "generated_at_utc": "2026-09-06T22:13:32Z",
+  "generated_at_utc": "2026-09-06T22:56:38Z",
   "data_through_epoch": 1788724800,
   "rating_cutoff_epoch": 1788678000,
-  "verified_intraday_counted": 37
+  "verified_intraday_counted": 38
  },
  "top": [
   {
@@ -1342,37 +1342,37 @@
    "weight_on_season": 0.307
   },
   {
-   "team": "Clemson",
-   "rank": 124,
-   "score": 0.3482,
-   "matches": 5,
-   "weight_on_season": 0.27
-  },
-  {
    "team": "Rutgers",
-   "rank": 125,
+   "rank": 124,
    "score": 0.3471,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "San Diego St.",
-   "rank": 126,
+   "rank": 125,
    "score": 0.3439,
    "matches": 4,
    "weight_on_season": 0.228
   },
   {
    "team": "Butler",
-   "rank": 127,
+   "rank": 126,
    "score": 0.3411,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Col. of Charleston",
-   "rank": 128,
+   "rank": 127,
    "score": 0.3349,
+   "matches": 6,
+   "weight_on_season": 0.307
+  },
+  {
+   "team": "Clemson",
+   "rank": 128,
+   "score": 0.3239,
    "matches": 6,
    "weight_on_season": 0.307
   },
@@ -1531,30 +1531,30 @@
    "weight_on_season": 0.27
   },
   {
-   "team": "Furman",
+   "team": "App State",
    "rank": 151,
+   "score": 0.2281,
+   "matches": 6,
+   "weight_on_season": 0.307
+  },
+  {
+   "team": "Furman",
+   "rank": 152,
    "score": 0.212,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Morehead St.",
-   "rank": 152,
+   "rank": 153,
    "score": 0.2035,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "North Dakota St.",
-   "rank": 153,
-   "score": 0.2009,
-   "matches": 5,
-   "weight_on_season": 0.27
-  },
-  {
-   "team": "App State",
    "rank": 154,
-   "score": 0.1997,
+   "score": 0.2009,
    "matches": 5,
    "weight_on_season": 0.27
   },

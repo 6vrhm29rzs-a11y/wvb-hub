@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-06T22:13:37Z",
+  "generated_at_utc": "2026-09-06T22:56:43Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 7,
    "expired": 2,
-   "anomalies": 208
+   "anomalies": 207
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -3307,19 +3307,6 @@
    "points_per_set_missing": 1.059
   },
   {
-   "game_id": "6637170",
-   "team_id": "46571",
-   "team": "App State",
-   "absent": [
-    {
-     "name": "Nevaeh Hays",
-     "rate": 1.056,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.056
-  },
-  {
    "game_id": "6628592",
    "team_id": "46507",
    "team": "TCU",
@@ -5204,15 +5191,14 @@
    ]
   },
   "App State": {
-   "gid": "6627927",
-   "d": "2026-09-05",
-   "appeared": 12,
+   "gid": "6628394",
+   "d": "2026-09-06",
+   "appeared": 13,
    "zero_action": [
-    "Bella Dafforn",
     "Lexi Shondell",
     "Charlotte Thompson",
-    "Iris Williams",
-    "Amber Mcclain"
+    "Eva Goodson",
+    "Nevaeh Hays"
    ]
   },
   "N.C. A&T": {
@@ -5944,13 +5930,11 @@
    ]
   },
   "Clemson": {
-   "gid": "6626155",
-   "d": "2026-09-05",
-   "appeared": 11,
+   "gid": "6628394",
+   "d": "2026-09-06",
+   "appeared": 12,
    "zero_action": [
     "Ihuoma Ozoh",
-    "Lauren Schneider",
-    "Khaya Gordon",
     "Brianna Washington",
     "Audrey Armbruster"
    ]

@@ -5843,6 +5843,9 @@ h1 em{font:700 .62em/1 var(--disp);font-style:normal;letter-spacing:.04em;
    under the table head so the board reads as a board. */
 .extref{margin:10px 0 2px}
 .extreftbl{width:100%;border-collapse:collapse;margin:8px 0}
+@media (max-width:560px){
+  .extreftbl{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+}
 .extreftbl th{font:600 11px/1.4 var(--mono,monospace);text-transform:uppercase;
   letter-spacing:.05em;text-align:left;padding:6px 10px 6px 0;color:var(--ink);
   white-space:nowrap;vertical-align:top;background:none;position:static;
@@ -6484,7 +6487,7 @@ body[data-view=scores] .mast .meta{display:none}
 body[data-view=scores] .season{display:none}
 .vh{margin:0 0 14px;font:700 23px/1.05 var(--disp);letter-spacing:.015em;
   text-transform:uppercase;color:var(--ink)}
-.vh::after{content:"";display:block;width:38px;height:3px;margin-top:7px;
+.vh::after{content:"";display:block;width:52px;height:3px;margin-top:7px;
   border-radius:2px;background:linear-gradient(90deg,var(--amber),#FF7A55)}
 body[data-view=scores] #v-scores .vh{display:none}
 nav{position:sticky;top:0;z-index:6;
@@ -6647,7 +6650,7 @@ td{padding:10px;border-bottom:1px solid var(--line);text-align:right;font-size:1
 tbody tr:nth-child(even of .row){background:var(--alt)}
 td.n{font-family:var(--mono);font-size:13.5px}
 td.rk{font:700 13px/1 var(--mono);color:var(--ink2);width:48px}
-td.tm{text-align:left;font-weight:650;letter-spacing:-.005em}
+td.tm{text-align:left;font-weight:700;letter-spacing:-.005em;font-size:15.5px}
 td.cf{text-align:left;color:var(--ink2);font-size:12.5px}
 td.cd{text-align:left;font-family:var(--mono);font-size:12.5px;color:var(--ink2);white-space:nowrap}
 td.at{color:var(--ink3);font-size:12px;width:26px;text-align:center}
@@ -6942,7 +6945,7 @@ td.pick b{color:var(--navy)}
      lands ON the crest once the phone grid removes that padding -- Cody's
      screenshot showed a navy stripe through the Pitt logo reading as a
      stray "1". The row's left edge tick already carries the colour here. */
-  .t25 .tm::before{content:none}
+  .t25 td.tm::before{content:none} /* td: outranks the desktop bar rule, which TIES without it and wins on source order */
   .t25 td.mvc{grid-column:2;grid-row:1;justify-self:start;white-space:nowrap}
   .t25 td.pw{grid-column:2 / 4;grid-row:2;justify-self:start}
   .t25 td.poll{grid-column:4;grid-row:2;justify-self:end;white-space:nowrap}
@@ -8633,7 +8636,7 @@ body.mdlopen{overflow:hidden}
 .chgc .sc{font:700 15px/1 var(--disp);color:var(--ink);letter-spacing:.02em}
 /* opponent-context chips on team match lists */
 .oprk{font:700 9.5px/1 var(--mono);font-style:normal;color:var(--ink2);
-  background:var(--alt);border:1px solid var(--line);border-radius:2px;
+  background:var(--alt);border:1px solid var(--line2);border-radius:2px;
   padding:2px 4px;margin-left:6px;letter-spacing:.03em;vertical-align:1px;
   white-space:nowrap}
 .oprk.av{color:var(--navy)}
@@ -8895,6 +8898,10 @@ tr.tvearlier td{padding:6px 0 10px;border:0}
   font:700 11px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
   color:var(--ink3)}
 .chead .chlab{grid-column:3 / span 2;text-align:right;white-space:nowrap}
+@media (max-width:560px){
+  .chead .chlab{white-space:normal;line-height:1.25}
+  #standings table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+}
 
 .crow{display:grid;grid-template-columns:118px 1fr 34px 26px;gap:10px;
   align-items:center;padding:5px 0;border-bottom:1px solid var(--line)}
@@ -8982,7 +8989,7 @@ tr.tvearlier td{padding:6px 0 10px;border:0}
   background-origin:border-box;background-clip:padding-box,border-box;
   background:var(--card);border:1px solid var(--line);
   display:flex;flex-direction:column;gap:5px;min-width:0}
-.gll{font:700 11px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;
+.gll{font:700 11px/1 var(--disp);letter-spacing:.2em;text-transform:uppercase;
   color:var(--ink3)}
 .glbig{font:600 27px/1 var(--disp);color:var(--ink);letter-spacing:.01em}
 .glbig.glw{color:var(--good)}

@@ -1,10 +1,10 @@
 {
  "date": "2026-09-06",
- "generated_utc": "2026-09-06T22:12:41Z",
+ "generated_utc": "2026-09-06T22:55:50Z",
  "counts": {
   "VERIFIED_BOTH": 14,
   "UNVERIFIED": 1,
-  "CORROBORATED_ONE": 23,
+  "CORROBORATED_ONE": 24,
   "CONTRADICTED_ONE": 1,
   "CONTRADICTED_BOTH": 2
  },
@@ -1003,6 +1003,26 @@
      "url": "https://gomarquette.com/sports/womens-volleyball/schedule/text",
      "assertion": "Marquette L 1-3 vs Stanford",
      "opponent_source": "Stanford",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6628394",
+   "date": "2026-09-06",
+   "canonical": "Clemson def. App State 3-2",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Clemson": {
+     "state": "SITE_HTTP_MISS",
+     "url": "https://clemsontigers.com/sports/womens-volleyball/schedule/text",
+     "http": 404
+    },
+    "App State": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://appstatesports.com/services/schedule_txt.ashx?schedule=429",
+     "assertion": "App State L 2-3 vs Clemson",
+     "opponent_source": "Clemson",
      "site_says": "Away"
     }
    }
