@@ -6363,6 +6363,9 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
   color:var(--ink);border-radius:2px;padding:7px 8px;font:12px/1 var(--mono)}
 .sbfilters{flex-wrap:wrap}
 .sbfrow{display:contents}
+/* ⚠ .lx spans carry their own spaces; the flex button would otherwise eat
+   the whitespace between its text nodes ("AVCACOACHES POLL") */
+.segb .lx{white-space:pre}
 /* ⚠ SAME SPECIFICITY, LATER SOURCE WINS. `.tdmarq` sets three columns and is
    defined after this block, so `.sbtop` alone lost the tie and four cards
    wrapped 3+1. Qualified so it wins on class count rather than on position,
@@ -6397,8 +6400,13 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .tdblock{margin:0 0 26px}
 .tdblock h3{display:flex;align-items:baseline;gap:11px;margin:0 0 12px;
   font:700 11px/1 var(--disp);letter-spacing:.19em;text-transform:uppercase;
-  color:var(--ink);padding-bottom:9px;
+  color:var(--ink);padding-bottom:9px;position:relative;
   border-bottom:1px solid var(--line)}
+/* the same warm fade the .tsec headers wear -- one header language */
+.tdblock h3::after{content:"";position:absolute;left:0;bottom:-1px;
+  width:120px;height:2px;
+  background:linear-gradient(90deg,var(--amber),
+    color-mix(in oklab,var(--amber) 10%,transparent))}
 .tdblock h3 span{font:500 11px/1 var(--mono);letter-spacing:.05em;
   text-transform:none;color:var(--slate);margin-left:auto}
 /* ⚠ THREE AT MOST, and they are cards because each carries its own reasons --
@@ -6464,6 +6472,10 @@ body[data-view=scores] .mast{padding-top:10px;padding-bottom:2px}
 body[data-view=scores] .mast h1{font-size:30px}
 body[data-view=scores] .mast .meta{display:none}
 body[data-view=scores] .season{display:none}
+.vh{margin:0 0 14px;font:700 23px/1.05 var(--disp);letter-spacing:.015em;
+  text-transform:uppercase;color:var(--ink)}
+.vh::after{content:"";display:block;width:38px;height:3px;margin-top:7px;
+  border-radius:2px;background:linear-gradient(90deg,var(--amber),#FF7A55)}
 body[data-view=scores] #v-scores .vh{display:none}
 nav{position:sticky;top:0;z-index:6;
   background:rgba(255,255,255,.94);
@@ -6487,7 +6499,8 @@ nav button:hover{color:var(--ink)}
 nav button[aria-selected=true]{color:var(--ink)}
 nav .inner{position:relative}
 nav .inner::after{content:"";position:absolute;bottom:0;left:0;height:3px;
-  width:var(--barw,0px);transform:translateX(var(--barx,0px));background:var(--amber);
+  width:var(--barw,0px);transform:translateX(var(--barx,0px));
+  background:linear-gradient(90deg,var(--amber),#FF7A55);
   transition:transform .26s cubic-bezier(.4,0,.2,1),width .26s cubic-bezier(.4,0,.2,1);
   pointer-events:none}
 @media (prefers-reduced-motion:reduce){nav .inner::after{transition:none}}
@@ -7432,6 +7445,10 @@ b.kres{color:#F2B441}
 #teamcard .thead h2{font:700 42px/.94 var(--disp);letter-spacing:-.012em;
   color:var(--ink);text-transform:uppercase;display:flex;align-items:center;
   gap:12px;margin:0}
+@supports (-webkit-background-clip:text){
+  #teamcard .thead h2{background:linear-gradient(165deg,var(--ink) 30%,#4A3D8F 100%);
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent}}
 #teamcard .thead h2 .lg{width:44px;height:44px;flex:none}
 #teamcard .thead .sub{font:12.5px/1.6 var(--sans);color:var(--slate)}
 /* the three rulers sit on one quiet line; the tier labels name them */
@@ -9219,6 +9236,10 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 .t25 .tm .tlogo{margin-right:9px}
 .t25 tbody tr:hover{background:var(--alt);cursor:pointer}
 .t25 .rk{font:600 26px/1 var(--disp);color:var(--ink3);width:54px;font-variant-numeric:tabular-nums}
+@supports (-webkit-background-clip:text){
+  .t25 .rk{background:linear-gradient(165deg,#1D2B66 20%,#7A4FB0 95%);
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent}}
 .t25 tbody tr:hover .rk{color:var(--navy)}
 .t25 .tm{font:600 17px/1.1 var(--disp);letter-spacing:.01em}
 .t25 .cf{color:var(--ink2);font-size:12px}
@@ -10479,7 +10500,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <div class="seg" role="tablist" aria-label="Which ranking">
       <button class="segb on" data-r="ours"><i class="vx-key vx-k-power"></i>POWER</button>
       <button class="segb" data-r="avca"><i class="vx-key vx-k-avca"></i>AVCA<span class="lx"> coaches poll</span></button>
-      <button class="segb" data-r="digby"><i class="vx-key vx-k-digby"></i>Digby<span class="lx">&rsquo;s Top</span> 25</button>
+      <button class="segb" data-r="digby"><i class="vx-key vx-k-digby"></i>Digby<span class="lx">&rsquo;s Top </span>25</button>
       <button class="segb" data-r="gap"><span class="lx">POWER </span>vs AVCA</button>
       <button class="segb" data-r="cal"><span class="lx">Weekly </span>calendar</button>
     </div>
