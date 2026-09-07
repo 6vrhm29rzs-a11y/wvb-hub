@@ -1,8 +1,10 @@
 {
  "date": "2026-09-07",
- "generated_utc": "2026-09-07T21:19:34Z",
+ "generated_utc": "2026-09-07T23:24:21Z",
  "counts": {
-  "VERIFIED_BOTH": 1
+  "VERIFIED_BOTH": 1,
+  "CORROBORATED_ONE": 2,
+  "UNVERIFIED": 1
  },
  "matches": [
   {
@@ -24,6 +26,76 @@
      "assertion": "George Mason L 0-3 vs Maryland",
      "opponent_source": "Maryland",
      "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6624240",
+   "date": "2026-09-07",
+   "canonical": "Indiana def. Southern Ind. 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Indiana": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://iuhoosiers.com/sports/womens-volleyball/schedule/text",
+     "rows_on_date": [
+      "Southern Indiana"
+     ]
+    },
+    "Southern Ind.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gousieagles.com/services/schedule_txt.ashx?schedule=523",
+     "assertion": "Southern Ind. L 1-3 vs Indiana University",
+     "opponent_source": "Indiana University",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6628139",
+   "date": "2026-09-07",
+   "canonical": "Penn St. def. DePaul 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Penn St.": {
+     "state": "SITE_HTTP_MISS",
+     "url": "https://gopsusports.com/sports/womens-volleyball/schedule/text",
+     "http": 404
+    },
+    "DePaul": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://depaulbluedemons.com/sports/womens-volleyball/schedule/text",
+     "assertion": "DePaul L 0-3 vs Penn State",
+     "opponent_source": "Penn State",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6627728",
+   "date": "2026-09-07",
+   "canonical": "Alabama def. Grambling 3-0",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Alabama": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://rolltide.com/sports/womens-volleyball/schedule/text",
+     "rows_on_date": [
+      "Grambling State"
+     ]
+    },
+    "Grambling": {
+     "state": "NOT_POSTED",
+     "url": "https://gsutigers.com/services/schedule_txt.ashx?schedule=263",
+     "row": [
+      "Sep 7 (Mon)",
+      "5 p.m.",
+      "Away",
+      "University of Alabama",
+      "Tuscaloosa, AL",
+      "",
+      ""
+     ]
     }
    }
   }

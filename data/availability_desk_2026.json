@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-07T18:34:11Z",
+  "generated_at_utc": "2026-09-07T23:25:17Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 7,
    "expired": 2,
-   "anomalies": 210
+   "anomalies": 211
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -868,6 +868,24 @@
     }
    ],
    "points_per_set_missing": 5.375
+  },
+  {
+   "game_id": "6628139",
+   "team_id": "45902",
+   "team": "DePaul",
+   "absent": [
+    {
+     "name": "Isabela Tavares-salomon",
+     "rate": 3.529,
+     "played_share": 1.0
+    },
+    {
+     "name": "Catalina Alvizuri",
+     "rate": 1.714,
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 5.243
   },
   {
    "game_id": "6639842",
@@ -2228,6 +2246,19 @@
    "points_per_set_missing": 2.125
   },
   {
+   "game_id": "6640218",
+   "team_id": "46614",
+   "team": "Penn St.",
+   "absent": [
+    {
+     "name": "Finley Krystkowiak",
+     "rate": 2.062,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.062
+  },
+  {
    "game_id": "6626681",
    "team_id": "46628",
    "team": "Utah",
@@ -2304,19 +2335,6 @@
     }
    ],
    "points_per_set_missing": 2.023
-  },
-  {
-   "game_id": "6640218",
-   "team_id": "46614",
-   "team": "Penn St.",
-   "absent": [
-    {
-     "name": "Finley Krystkowiak",
-     "rate": 2.0,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 2.0
   },
   {
    "game_id": "6624506",
@@ -2521,7 +2539,7 @@
     {
      "name": "Catalina Alvizuri",
      "rate": 1.714,
-     "played_share": 1.0
+     "played_share": 0.8
     }
    ],
    "points_per_set_missing": 1.714
@@ -2863,19 +2881,6 @@
     }
    ],
    "points_per_set_missing": 1.382
-  },
-  {
-   "game_id": "6625970",
-   "team_id": "46500",
-   "team": "Southern Ind.",
-   "absent": [
-    {
-     "name": "Aubrey Fair",
-     "rate": 1.361,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.361
   },
   {
    "game_id": "6628471",
@@ -3227,6 +3232,19 @@
     }
    ],
    "points_per_set_missing": 1.115
+  },
+  {
+   "game_id": "6625970",
+   "team_id": "46500",
+   "team": "Southern Ind.",
+   "absent": [
+    {
+     "name": "Aubrey Fair",
+     "rate": 1.114,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.114
   },
   {
    "game_id": "6640218",
@@ -3682,16 +3700,10 @@
    ]
   },
   "Penn St.": {
-   "gid": "6626809",
-   "d": "2026-09-06",
+   "gid": "6628139",
+   "d": "2026-09-07",
    "appeared": 11,
-   "zero_action": [
-    "Kendall Northern",
-    "Alexis Ewing",
-    "Emmi Sellman",
-    "Ava Jurevicius",
-    "Lexi Gin"
-   ]
+   "zero_action": []
   },
   "Old Dominion": {
    "gid": "6628616",
@@ -3783,11 +3795,11 @@
    ]
   },
   "Grambling": {
-   "gid": "6627726",
-   "d": "2026-09-02",
+   "gid": "6627728",
+   "d": "2026-09-07",
    "appeared": 14,
    "zero_action": [
-    "Kenya Lucas",
+    "Lainy Evans",
     "Chiara Mearelli",
     "Piper Nelson",
     "Jocelyn Pargas"
@@ -4813,10 +4825,16 @@
    ]
   },
   "Southern Ind.": {
-   "gid": "6625970",
-   "d": "2026-09-05",
+   "gid": "6624240",
+   "d": "2026-09-07",
    "appeared": 9,
-   "zero_action": []
+   "zero_action": [
+    "Vita Sensenbrenner",
+    "Jillian Moonan",
+    "Aubrey Fair",
+    "Ava Carpenter",
+    "Maeve Moonan"
+   ]
   },
   "Murray St.": {
    "gid": "6627136",
@@ -5319,18 +5337,10 @@
    ]
   },
   "DePaul": {
-   "gid": "6628136",
-   "d": "2026-09-04",
+   "gid": "6628139",
+   "d": "2026-09-07",
    "appeared": 9,
-   "zero_action": [
-    "Caroline Wright",
-    "Amanda Saeger",
-    "Yagmur Yavuz",
-    "Luisa Juncu",
-    "Ryan Gorski",
-    "Sage Meidroth",
-    "Arden Billingsley"
-   ]
+   "zero_action": []
   },
   "Milwaukee": {
    "gid": "6624726",
@@ -6228,16 +6238,13 @@
    ]
   },
   "Indiana": {
-   "gid": "6624239",
-   "d": "2026-09-06",
-   "appeared": 9,
+   "gid": "6624240",
+   "d": "2026-09-07",
+   "appeared": 11,
    "zero_action": [
-    "Avery Daum",
     "Spyridoula Komini",
-    "Sade Ilawole",
-    "Emma Segal",
-    "Avry Tatum",
     "Ava Vickers",
+    "Keondreya Granberry",
     "Luca Fickell"
    ]
   },
@@ -6511,17 +6518,11 @@
    ]
   },
   "Alabama": {
-   "gid": "6625390",
-   "d": "2026-09-04",
-   "appeared": 11,
+   "gid": "6627728",
+   "d": "2026-09-07",
+   "appeared": 17,
    "zero_action": [
-    "Kyla Dunaway",
-    "Audrey Simpson",
-    "Josie Imes",
-    "Tea Simic",
-    "Ava Wallis",
-    "Maggie Kyriakides",
-    "Maddie Snider"
+    "Ava Wallis"
    ]
   },
   "Samford": {
@@ -8210,6 +8211,12 @@
     "gid": "6626809",
     "ep": 1788735600,
     "sets": 4,
+    "state": "appeared"
+   },
+   {
+    "gid": "6628139",
+    "ep": 1788811200,
+    "sets": 3,
     "state": "appeared"
    }
   ],

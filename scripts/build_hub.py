@@ -11326,8 +11326,12 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 </section>
 
 <section id="v-bracket" hidden>
-  <p class="lead">A projected 64-team field: {{N_AQ}} conference champions plus the
-  next best at large, ordered by our 2026 projection. <b>32 teams are seeded</b>
+  <p class="lead">A projected 2026 64-team field on <b>committee criteria</b>:
+  each league&rsquo;s automatic bid goes to its <b>most likely champion</b>
+  (title odds from 4,000 season simulations), and the at-large places and every
+  seed follow <b>projected final RPI</b> &mdash; the committee&rsquo;s primary
+  tool &mdash; not our strength rating, which measurably favours good-margin,
+  bad-record teams relative to RPI. <b>32 teams are seeded</b>
   and placed four to a line, so the bracket carries four&nbsp;#1s down to
   four&nbsp;#8s &mdash; the format since 2022. The number on a row is that
   <b>seed line</b>; its national seed (1&ndash;32) is on the tooltip.</p>
@@ -11350,10 +11354,14 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <p><b>Every part of this is soft.</b> Conference champions are projected as each
       league&rsquo;s highest-rated team, but most leagues award the bid by tournament, so
       it can go to anyone who wins it. {{AQ_MECH}}</p>
-      <p>Seeding here is our order, not a committee&rsquo;s. The committee seeds on resume
-      &mdash; RPI, record against the top 25 and 50, head to head &mdash; and our field
-      projector, which reproduced 62 of the actual 64 for 2025, needs played matches
-      before it can run. It takes over once there are results.</p>
+      <p>Seeding follows the committee&rsquo;s own ruler as far as it can be
+      projected in September: the committee seeds on resume &mdash; RPI, record
+      against the top 25 and 50, head to head &mdash; and with most of the season
+      unplayed the honest committee-predictive number is the <b>projected final
+      RPI</b>, the median rank across 4,000 simulated seasons. KPI is proprietary
+      and absent; that is a known gap, not an oversight. The end-of-season field
+      projector (62 of the actual 64 on 2025) takes over from the simulation as
+      real resumes fill in.</p>
     </div>
   </div>
 </section>

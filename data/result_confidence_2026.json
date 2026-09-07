@@ -2,15 +2,15 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "corpus_fingerprint": "d114bf91d1239330",
-  "generated_at_utc": "2026-09-07T18:34:11Z",
+  "corpus_fingerprint": "ccb90a0d25d5f56f",
+  "generated_at_utc": "2026-09-07T23:25:17Z",
   "counts": {
-   "finals": 980,
+   "finals": 983,
    "official_only": 32,
-   "reconciled": 899,
+   "reconciled": 902,
    "confirmed": 0,
    "disputed": 8,
-   "pending_second": 972,
+   "pending_second": 975,
    "corrected": 41,
    "duplicate_listings": 8,
    "duplicate_candidates_pending": 0
@@ -43363,10 +43363,21 @@
      }
     }
    },
-   "n_indep": 2,
+   "n_indep": 3,
    "n_attempted": 0,
-   "last_checked": "2026-09-07T02:37:37Z",
+   "last_checked": "2026-09-07T21:20:03Z",
    "sources": [
+    {
+     "url": "https://jaxstatesports.com/sports/womens-volleyball/schedule",
+     "kind": "school_site",
+     "school": "Jacksonville St.",
+     "text": "class=\"s-game-card s-game-card--standard bg-theme-background-light shadow-level-1 @container/s-game-card-standard w-full rounded-[10px]\" role=\"group\" compact=\"false\" data-v-03a7b599 data-v-df670654>|vs|UNC Asheville|Asheville, NC|Blue Ridge Volleyball Classic|L, |0-3|Sep 6|(Sun)| 10 AM|Box Score|Rec",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-07T21:20:03Z"
+    },
     {
      "url": "https://jaxstatesports.com/sports/womens-volleyball/schedule/text",
      "kind": "school_schedule",
@@ -46666,21 +46677,15 @@
     "venue": "unavailable"
    },
    "verify": {
-    "v": "CORROBORATED_ONE",
-    "checked": "2026-09-07T18:33:19Z",
+    "v": "VERIFIED_BOTH",
+    "checked": "2026-09-07T23:24:21Z",
     "schools": {
      "Maryland": {
-      "state": "NOT_POSTED",
+      "state": "AGREE_COMPLETE",
       "url": "https://umterps.com/sports/womens-volleyball/schedule/text",
-      "row": [
-       "Sep 7 (Mon)",
-       "1 PM",
-       "Home",
-       "George Mason",
-       "College Park, MD (Stephen M. Schanwald Pavilion at XFINITY Center)",
-       "",
-       "-"
-      ]
+      "assertion": "Maryland W 3-0 vs George Mason",
+      "opponent_source": "George Mason",
+      "site_says": "Home"
      },
      "George Mason": {
       "state": "AGREE_COMPLETE",
@@ -46691,9 +46696,9 @@
      }
     }
    },
-   "n_indep": 1,
+   "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-07T18:33:19Z",
+   "last_checked": "2026-09-07T23:24:21Z",
    "sources": [
     {
      "url": "https://gomason.com/services/schedule_txt.ashx?schedule=498",
@@ -46704,9 +46709,189 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-07T18:33:19Z"
+     "retrieved": "2026-09-07T23:24:21Z"
+    },
+    {
+     "url": "https://umterps.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Maryland",
+     "text": "Maryland W 3-0 vs George Mason",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-07T23:24:21Z"
     }
    ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6624240",
+   "a": "Indiana",
+   "h": "Southern Ind.",
+   "exh": false,
+   "d": "2026-09-07",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "verify": {
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-07T23:24:21Z",
+    "schools": {
+     "Indiana": {
+      "state": "EVENT_NOT_FOUND",
+      "url": "https://iuhoosiers.com/sports/womens-volleyball/schedule/text",
+      "rows_on_date": [
+       "Southern Indiana"
+      ]
+     },
+     "Southern Ind.": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://gousieagles.com/services/schedule_txt.ashx?schedule=523",
+      "assertion": "Southern Ind. L 1-3 vs Indiana University",
+      "opponent_source": "Indiana University",
+      "site_says": "Home"
+     }
+    }
+   },
+   "n_indep": 1,
+   "n_attempted": 0,
+   "last_checked": "2026-09-07T23:24:21Z",
+   "sources": [
+    {
+     "url": "https://gousieagles.com/services/schedule_txt.ashx?schedule=523",
+     "kind": "school_schedule",
+     "school": "Southern Ind.",
+     "text": "Southern Ind. L 1-3 vs Indiana University",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-07T23:24:21Z"
+    }
+   ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6628139",
+   "a": "Penn St.",
+   "h": "DePaul",
+   "exh": false,
+   "d": "2026-09-07",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "unavailable"
+   },
+   "verify": {
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-07T23:24:21Z",
+    "schools": {
+     "Penn St.": {
+      "state": "SITE_HTTP_MISS",
+      "url": "https://gopsusports.com/sports/womens-volleyball/schedule/text",
+      "http": 404
+     },
+     "DePaul": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://depaulbluedemons.com/sports/womens-volleyball/schedule/text",
+      "assertion": "DePaul L 0-3 vs Penn State",
+      "opponent_source": "Penn State",
+      "site_says": "Home"
+     }
+    }
+   },
+   "n_indep": 1,
+   "n_attempted": 0,
+   "last_checked": "2026-09-07T23:24:21Z",
+   "sources": [
+    {
+     "url": "https://depaulbluedemons.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "DePaul",
+     "text": "DePaul L 0-3 vs Penn State",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-07T23:24:21Z"
+    }
+   ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6627728",
+   "a": "Grambling",
+   "h": "Alabama",
+   "exh": false,
+   "d": "2026-09-07",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "unavailable"
+   },
+   "verify": {
+    "v": "UNVERIFIED",
+    "checked": "2026-09-07T23:24:21Z",
+    "schools": {
+     "Alabama": {
+      "state": "EVENT_NOT_FOUND",
+      "url": "https://rolltide.com/sports/womens-volleyball/schedule/text",
+      "rows_on_date": [
+       "Grambling State"
+      ]
+     },
+     "Grambling": {
+      "state": "NOT_POSTED",
+      "url": "https://gsutigers.com/services/schedule_txt.ashx?schedule=263",
+      "row": [
+       "Sep 7 (Mon)",
+       "5 p.m.",
+       "Away",
+       "University of Alabama",
+       "Tuscaloosa, AL",
+       "",
+       ""
+      ]
+     }
+    }
+   },
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
   }
  ]
 }

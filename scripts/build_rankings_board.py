@@ -647,10 +647,40 @@ def build():
                       if c and c[0].isdigit()], "Massey")
 
     # ---- projected 64-team field ----------------------------------------
-    # 32 automatic bids: the top team of each conference by our 2026 estimate.
-    # THIS IS A PROJECTION OF A CHAMPION, not a standing. Most conferences award
-    # the AQ by tournament, so the actual bid can go to anyone in the field.
-    order = sorted(teams, key=lambda t: t["rank26"])
+    # ⚠ SELECTED AND SEEDED ON COMMITTEE CRITERIA, NOT ON STRENGTH (R3;
+    # Cody, 2026-09-07: "use the same metrics the selection committee
+    # uses"). The committee picks and seeds on RESUME -- RPI first -- and
+    # measured on 2025 the strength composite favours good-margin/BAD-record
+    # teams relative to RPI (corr -0.205), so ordering the field by rank26
+    # was the exact leak project_field.py's docstring forbids. The ruler
+    # here is the simulator's PROJECTED FINAL RPI (median rank across 4,000
+    # season plays -- in September the committee-predictive resume is the
+    # projected one, not six matches of it), tie-broken by the live resume
+    # rank where one is earned, then rank26 last. Automatic bids go to each
+    # league's MOST LIKELY CHAMPION (conf_title_pct from the same simulator)
+    # -- which also retires the Saint Francis artifact: a team with no
+    # fixtures has no title odds and can never take a bid.
+    _sim = load_json("data/season_sim_2026.json") or {}
+    _sim_by = {t["team"]: t for t in _sim.get("teams", [])}
+
+    def _committee_key(t):
+        s = _sim_by.get(t["team"]) or {}
+        r = s.get("rpi_rank_p50")
+        return (0 if r is not None else 1,
+                r if r is not None else 999,
+                t.get("resume_rank") or 999,
+                t["rank26"])
+
+    _have_sim = any(s.get("rpi_rank_p50") is not None
+                    for s in _sim_by.values())
+    if _have_sim:
+        order = sorted(teams, key=_committee_key)
+        field_basis = "committee (projected final RPI)"
+    else:
+        # honest fallback for a checkout with no simulator artifact --
+        # stated, never silent
+        order = sorted(teams, key=lambda t: t["rank26"])
+        field_basis = "strength rank (no season simulation on disk)"
     # A league needs enough D-I members to be a league. UT Arlington is still
     # served under "wac", which no longer fields a D-I volleyball conference --
     # left unguarded it becomes a one-team league collecting an automatic bid.
@@ -661,18 +691,46 @@ def build():
             size[t["conf"]] = size.get(t["conf"], 0) + 1
     too_small = sorted(c for c, n in size.items() if n < MIN_CONF)
     aq, seen_conf = [], set()
-    for t in order:
-        if t["conf"] and size.get(t["conf"], 0) >= MIN_CONF and t["conf"] not in seen_conf:
-            seen_conf.add(t["conf"])
-            aq.append(t)
+    if _have_sim:
+        # most likely champion per league; zero-odds teams cannot hold a bid
+        _best = {}
+        for t in teams:
+            c = t["conf"]
+            if not c or size.get(c, 0) < MIN_CONF:
+                continue
+            pct = (_sim_by.get(t["team"]) or {}).get("conf_title_pct")
+            if pct is None or pct <= 0:
+                continue
+            if c not in _best or pct > _best[c][0]:
+                _best[c] = (pct, t)
+        aq = [v[1] for _, v in sorted(_best.items())]
+        seen_conf = set(_best)
+        # a league whose every member lacks title odds still gets its bid,
+        # from its best committee-ordered team with any 2026 fixtures
+        for t in order:
+            c = t["conf"]
+            if (c and size.get(c, 0) >= MIN_CONF and c not in seen_conf
+                    and (_sim_by.get(t["team"]) or {}).get("fixtures")):
+                seen_conf.add(c)
+                aq.append(t)
+    else:
+        for t in order:
+            if t["conf"] and size.get(t["conf"], 0) >= MIN_CONF                     and t["conf"] not in seen_conf:
+                seen_conf.add(t["conf"])
+                aq.append(t)
     aq_keys = set(id(t) for t in aq)
     at_large = [t for t in order if id(t) not in aq_keys][:64 - len(aq)]
-    field = sorted(aq + at_large, key=lambda t: t["rank26"])[:64]
+    field = sorted(aq + at_large, key=(_committee_key if _have_sim
+                                       else (lambda t: t["rank26"])))[:64]
     for i, t in enumerate(field, 1):
         t["seed"] = i
         t["bid"] = "AQ" if id(t) in aq_keys else "at-large"
+        _s = _sim_by.get(t["team"]) or {}
+        t["rpi_proj"] = _s.get("rpi_rank_p50")
+        t["conf_title_pct"] = _s.get("conf_title_pct")
 
     return teams, field, unmatched, len(aq), {
+        "field_basis": field_basis,
         "conf_changed": sum(1 for t in teams if t.get("conf25") and t["conf"] != t["conf25"]),
         "too_small": too_small,
         "avca": avca.get("meta", {}).get("updated_label"),
@@ -872,9 +930,10 @@ they do. Source matching: MISSNOTE.</div>
 <tbody>SEEDS</tbody></table></div>
 <div class="note">
 <p><span class="k">This is a projection, and every part of it is soft.</span> NAQ conferences get a
-projected automatic bid, assigned to the conference's highest-rated team &mdash; but most conferences
-award the AQ by <b>tournament</b>, so the real bid can go to anyone who wins it. The remaining places
-are the next-best teams by our 2026 estimate.</p>
+projected automatic bid, assigned to the league's <b>most likely champion</b> by simulated title odds
+&mdash; but most conferences award the AQ by <b>tournament</b>, so the real bid can go to anyone who
+wins it. The remaining places and every seed follow <b>projected final RPI</b>, the committee's
+primary tool, never our strength rating.</p>
 <p><span class="k">Conferences are 2026's, taken from ncaa.com's own schedule feed.</span>
 CONFCHANGED D-I teams changed league since last season &mdash; the Pac-12 rebuilt itself out of
 Mountain West and WCC schools, and the WAC dissolved into the UAC, Big Sky and Big West. That gives
@@ -883,9 +942,11 @@ conference from the feed and keep their 2025 one rather than being guessed into 
 league below six D-I members cannot award a bid, which is what stops UT Arlington's defunct WAC
 from collecting one on its own.</p>
 <p><span class="k">{{AQ_MECH}}</span></p>
-<p><span class="k">Seeding here is just our order.</span> The committee seeds on resume &mdash; RPI,
-record vs the top 25/50, head-to-head &mdash; and our field projector, which reproduced 62 of the
-actual 64 for 2025, needs played matches before it can run. It takes over once there are results.</p>
+<p><span class="k">Seeding follows the committee's ruler as far as September allows.</span> The
+committee seeds on resume &mdash; RPI, record vs the top 25/50, head-to-head &mdash; and with most of
+the season unplayed the committee-predictive number is the projected final RPI (median across 4,000
+simulated seasons). KPI is proprietary and absent; that is a known gap. The end-of-season field
+projector (62 of the actual 64 for 2025) takes over as real resumes fill in.</p>
 </div>
 </div>
 </section>

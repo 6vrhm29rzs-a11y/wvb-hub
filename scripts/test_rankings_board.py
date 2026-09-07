@@ -438,6 +438,54 @@ def main():
               "boundary check has no live subject)")
 
     # ------------------------------------------------------------------
+    # COMMITTEE-BASIS FIELD (Cody, 2026-09-07: "use the same metrics the
+    # selection committee uses"). The projected field must be selected and
+    # seeded on the committee proxy (projected final RPI + simulated title
+    # odds), never on the strength rank -- R3's leak, which this board
+    # shipped for two weeks (rank26-ordered field, Saint Francis holding
+    # the NEC bid on zero fixtures while LIU led the league's title odds).
+    import build_rankings_board as _BB2
+    _sim = _BB2.load_json("data/season_sim_2026.json") or {}
+    _sim_by = {t["team"]: t for t in _sim.get("teams", [])}
+    if any(t.get("rpi_rank_p50") is not None for t in _sim_by.values()):
+        _teams2, _field2, _un2, _naq2, _meta2 = _BB2.build()
+        check("the field states a committee basis when the simulator exists",
+              str(_meta2.get("field_basis", "")).startswith("committee"),
+              _meta2.get("field_basis"))
+        _nofix = [t["team"] for t in _field2
+                  if not (_sim_by.get(t["team"]) or {}).get("fixtures")]
+        check("no team without a 2026 fixture is in the projected field",
+              not _nofix, str(_nofix[:4]))
+        _badaq = [t["team"] for t in _field2 if t["bid"] == "AQ"
+                  and not (_sim_by.get(t["team"]) or {}).get("conf_title_pct")
+                  and (_sim_by.get(t["team"]) or {}).get("fixtures")
+                  is not None]
+        # an AQ without title odds is legal only through the stated fallback
+        # (whole league without odds); a zero-fixture AQ never is
+        _zaq = [t["team"] for t in _field2 if t["bid"] == "AQ"
+                and not (_sim_by.get(t["team"]) or {}).get("fixtures")]
+        check("no AQ is held by a zero-fixture team", not _zaq, str(_zaq[:4]))
+        # seeds must be monotone in the committee proxy where it exists
+        _ranks = [t.get("rpi_proj") for t in _field2
+                  if t.get("rpi_proj") is not None]
+        _viol = sum(1 for a, b in zip(_ranks, _ranks[1:]) if a > b)
+        check("seed order is monotone in projected final RPI",
+              _viol == 0, "%d inversions" % _viol)
+        # NEGATIVE CONTROL: the old strength ordering must NOT satisfy the
+        # monotonicity check -- otherwise this guard cannot tell the bases
+        # apart and is testing nothing.
+        _old = sorted(_teams2, key=lambda t: t["rank26"])[:64]
+        _oranks = [(_sim_by.get(t["team"]) or {}).get("rpi_rank_p50")
+                   for t in _old]
+        _oranks = [r for r in _oranks if r is not None]
+        _oviol = sum(1 for a, b in zip(_oranks, _oranks[1:]) if a > b)
+        check("[NEG] a strength-ordered field would trip the monotone check",
+              _oviol > 0, "%d inversions under rank26 order" % _oviol)
+    else:
+        print("    (no season simulation on disk -- committee-basis field "
+              "checks have no live subject; the stated fallback applies)")
+
+    # ------------------------------------------------------------------
     # AVCA JOIN COVERAGE. Every school named in the captured AVCA poll must
     # key to a hub team through build_rankings_board.key(). ⚠ Paid for on
     # 2026-09-07: the AVCA writes "Southern Cal", no alias existed, and USC

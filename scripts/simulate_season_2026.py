@@ -95,6 +95,8 @@ def build():
     # duplicate/exhibition/review exclusion, no result corrections, and
     # a winnerless final scored the non-winner as a LOSS. One chain:
     # gamelog's dedup + season_counts' classification + corrections.
+    from reconcile_2025 import norm as _snorm
+    _hub_of = {_snorm(k): k for k in strength}
     gpath = os.path.join(REPO, "data/raw/%d/games.jsonl" % SEASON)
     if os.path.exists(gpath):
         import gamelog
@@ -107,7 +109,10 @@ def build():
             if not win:
                 continue               # no asserted winner, no tally
             for t in ts:
-                nm = t.get("name_short")
+                # feed spelling -> hub spelling (the New Orleans alias);
+                # an unknown name stays skipped, never guessed
+                nm = _hub_of.get(_snorm((t.get("name_short") or "")),
+                                 (t.get("name_short") or "").strip())
                 if nm not in strength:
                     continue
                 if str(t.get("team_id")) == win:

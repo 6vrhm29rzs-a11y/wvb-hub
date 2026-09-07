@@ -101,7 +101,7 @@ def build():
                 continue
             seen.add(g.get("game_id"))
             for t in g.get("teams") or []:
-                nm = t.get("name_short")
+                nm = (t.get("name_short") or "").strip()
                 if nm:
                     played[nm] = played.get(nm, 0) + 1
 
@@ -114,6 +114,9 @@ def build():
         home_adv = M.get("_home_adv_points_per_set", 0.0) or 0.0
     except Exception:
         home_adv = 0.0
+
+    from reconcile_2025 import norm as _pnorm
+    _hub_of = {_pnorm(k): k for k in strength}
 
     today = datetime.date.today().isoformat()
     rows, skipped = [], 0
@@ -130,6 +133,14 @@ def build():
             h = (g.get("home") or {}).get("names", {}).get("short")
             if not a or not h:
                 continue
+            # ⚠ THE SCOREBOARD SPELLS TEAMS ITS OWN WAY ("LSU New Orleans "
+            # with a trailing space vs the hub's "New Orleans") -- joining
+            # raw names against `strength` silently dropped all 29 of New
+            # Orleans' fixtures, so it had no projections, no title odds and
+            # no projected final RPI. Fifth bite of this alias; the fix is
+            # the same normaliser every other join uses.
+            a = _hub_of.get(_pnorm(a), a.strip())
+            h = _hub_of.get(_pnorm(h), h.strip())
             date = et_date(g.get("startTimeEpoch")) or os.path.basename(path)[:-5]
             if date < today:
                 continue
