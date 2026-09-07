@@ -48,6 +48,10 @@ OUT = os.path.join(REPO, "Cody", "RANKINGS-AND-BRACKET.html")
 ALIAS = {
     "southerncalifornia": "usc",
     "sc": "usc",
+    # the AVCA poll writes "Southern Cal" -- without this, USC silently
+    # rendered AVCA NR on the board and the ballot table while ranked #15
+    # (Cody's screenshot, 2026-09-07)
+    "southerncal": "usc",
     "miamifl": "miami",
     "miamiflorida": "miami",
     "arizonast": "arizonastate",
@@ -174,10 +178,14 @@ def pick_comparison(snaps, this_week, rank_source):
     blank the whole movement column -- a silent failure that looks exactly like
     "there is no history yet". snapshot_rankings.basis() is the one definition.
     """
-    from snapshot_rankings import basis
+    from snapshot_rankings import basis, captured_week
     want = basis(rank_source)
+    # ⚠ EXCLUDE ON CAPTURE WEEK, NOT THE LABEL. Weekly-track rows are
+    # labelled by the week they complete, captured the Monday after -- a
+    # label test excluded nothing and freeze-Monday movement compared the
+    # board against a snapshot minutes old (all flat, 2026-09-07).
     earlier = [s for s in snaps
-               if s.get("week") != this_week
+               if captured_week(s) != this_week
                and basis(s.get("source")) == want]
     return earlier[-1] if earlier else None
 

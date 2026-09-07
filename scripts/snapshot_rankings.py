@@ -62,6 +62,31 @@ def basis(name):
     return BASIS_ALIASES.get(name or "", name or "")
 
 
+def captured_week(row):
+    # type: (dict) -> str
+    """The ISO week a snapshot was CAPTURED in, as "YYYY-Www".
+
+    ⚠ THE WEEK LABEL IS NOT THE CAPTURE WEEK ANY MORE. The weekly track
+    labels a row by the week it COMPLETES (a Monday freeze of W36 play is
+    labelled 2026-W36) while the capture happens on the Monday of W37 -- so
+    the movement exclusion "not this week", which compares the LABEL to
+    today's ISO week, stopped matching anything. On freeze Monday both
+    movement columns compared the ranking against a snapshot taken minutes
+    earlier and rendered every team flat. Exclusion must key on when the row
+    was TAKEN. Falls back to the label for rows with no capture stamp, which
+    keeps the synthetic-row tests and any legacy row meaning what they did.
+    """
+    import datetime as _dt
+    for k in ("captured_utc", "date"):
+        v = str(row.get(k) or "")[:10]
+        try:
+            iso = _dt.date(int(v[0:4]), int(v[5:7]), int(v[8:10])).isocalendar()
+            return "%d-W%02d" % (iso[0], iso[1])
+        except (ValueError, IndexError):
+            continue
+    return str(row.get("week") or "")
+
+
 def load(path):
     p = os.path.join(REPO, path)
     if not os.path.exists(p):

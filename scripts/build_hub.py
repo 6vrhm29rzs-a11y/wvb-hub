@@ -830,11 +830,14 @@ def my_ballots():
                 and not x.get("is_previous_season")]
         if _cur:
             import re as _re
+            from build_rankings_board import key as _bkey
+            _by_bkey = dict((_bkey(_t), _t) for _t in pow_of)
             for r in (_cur[-1].get("rows") or _cur[-1].get("data") or []):
                 nm = _re.sub(r"\s*\(\d+\)\s*$", "",
                              str(r.get("SCHOOL") or ""))
+                _hub = _by_bkey.get(_bkey(nm)) or _hub_name(nm)
                 try:
-                    avca_of[_hub_name(nm)] = int(r.get("RANK"))
+                    avca_of[_hub] = int(r.get("RANK"))
                 except (TypeError, ValueError):
                     continue
     except OSError:
@@ -1648,11 +1651,14 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
                 encoding="utf-8") if x.strip()):
             if str(_row.get("season")) != str(SEASON) or                     _row.get("is_previous_season") in (True, "True"):
                 continue
+            from build_rankings_board import key as _bkey2
+            _by_bkey2 = dict((_bkey2(t["team"]), t["team"]) for t in teams)
             _m = {}
             for r in (_row.get("rows") or _row.get("data") or []):
                 _nm = re.sub(r"\s*\(\d+\)\s*$", "", str(r.get("SCHOOL") or ""))
+                _hub2 = _by_bkey2.get(_bkey2(_nm)) or _hub_name(_nm)
                 try:
-                    _m[_hub_name(_nm)] = int(r.get("RANK"))
+                    _m[_hub2] = int(r.get("RANK"))
                 except (TypeError, ValueError):
                     continue
             if _m and _row.get("date"):
@@ -3469,8 +3475,10 @@ def top25_view(avca=None):
             # sitting in the archive. THIRD place this same alias drift has
             # appeared; it goes through snapshot_rankings.basis() now, which is
             # the one definition of what a ruler is called.
+            # ⚠ capture week, not the label -- see pick_comparison
+            from snapshot_rankings import captured_week as _cw
             if _basis(row.get("source")) != "blend" or \
-                    row.get("week") == this_week:
+                    _cw(row) == this_week:
                 continue
             # ⚠ PREFER A COMPLETED WEEKLY FREEZE. The legacy row stored only
             # the 35 displayed teams, so comparing against it would leave

@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-07T17:13:41Z",
+  "generated_at_utc": "2026-09-07T18:34:11Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 7,
    "expired": 2,
-   "anomalies": 209
+   "anomalies": 210
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -955,32 +955,6 @@
    "points_per_set_missing": 4.796
   },
   {
-   "game_id": "6624444",
-   "team_id": "45798",
-   "team": "George Mason",
-   "absent": [
-    {
-     "name": "Kiera Hamilton",
-     "rate": 4.692,
-     "played_share": 0.75
-    }
-   ],
-   "points_per_set_missing": 4.692
-  },
-  {
-   "game_id": "6624445",
-   "team_id": "45798",
-   "team": "George Mason",
-   "absent": [
-    {
-     "name": "Kiera Hamilton",
-     "rate": 4.692,
-     "played_share": 0.75
-    }
-   ],
-   "points_per_set_missing": 4.692
-  },
-  {
    "game_id": "6626919",
    "team_id": "46241",
    "team": "Radford",
@@ -1323,6 +1297,32 @@
     }
    ],
    "points_per_set_missing": 3.833
+  },
+  {
+   "game_id": "6624444",
+   "team_id": "45798",
+   "team": "George Mason",
+   "absent": [
+    {
+     "name": "Kiera Hamilton",
+     "rate": 3.812,
+     "played_share": 0.8
+    }
+   ],
+   "points_per_set_missing": 3.812
+  },
+  {
+   "game_id": "6624445",
+   "team_id": "45798",
+   "team": "George Mason",
+   "absent": [
+    {
+     "name": "Kiera Hamilton",
+     "rate": 3.812,
+     "played_share": 0.8
+    }
+   ],
+   "points_per_set_missing": 3.812
   },
   {
    "game_id": "6628473",
@@ -2915,6 +2915,19 @@
     }
    ],
    "points_per_set_missing": 1.3
+  },
+  {
+   "game_id": "6624442",
+   "team_id": "45798",
+   "team": "George Mason",
+   "absent": [
+    {
+     "name": "Rylee Kinnell",
+     "rate": 1.289,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.289
   },
   {
    "game_id": "6625610",
@@ -5721,10 +5734,18 @@
    ]
   },
   "George Mason": {
-   "gid": "6624445",
-   "d": "2026-09-06",
-   "appeared": 9,
-   "zero_action": []
+   "gid": "6624446",
+   "d": "2026-09-07",
+   "appeared": 11,
+   "zero_action": [
+    "Adalynn Bollinger",
+    "Gabriella Gelfound",
+    "Morgan Inemer",
+    "Mckenna Reynolds",
+    "Kiera Hamilton",
+    "Chelsea Colter",
+    "Avery Booker"
+   ]
   },
   "Northwestern": {
    "gid": "6628443",
@@ -5755,12 +5776,13 @@
    ]
   },
   "Maryland": {
-   "gid": "6624625",
-   "d": "2026-09-06",
-   "appeared": 10,
+   "gid": "6624446",
+   "d": "2026-09-07",
+   "appeared": 9,
    "zero_action": [
     "Nikki Tawil",
     "Addie Canady",
+    "Ioanna Dimitriou",
     "Alex Mcgillivray",
     "Marlee Sivak",
     "Annika Sokol",

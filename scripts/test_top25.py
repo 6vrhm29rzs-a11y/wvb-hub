@@ -276,12 +276,18 @@ def test_the_two_rankings_explain_their_relationship():
     # locally only because nothing had moved yet, and failed the first sandbox
     # in which movement existed -- blocking CI on the first real match day.
     # Same family as the `a.ep` sort key: a guard aimed at a phantom.
-    _marks = _re.findall(r'class="mv-(up|dn)"', h)
+    # ⚠ SCOPE TO THE TOP 25 REGION. A page-wide grep found the My Ballot
+    # table's mv-up/dn marks (same classnames, different view) and demanded
+    # the Top 25's movers line while the Top 25 itself was correctly flat --
+    # the classname-collision family again, this time inside a guard.
+    _i = h.find('id="v-top25"')
+    _t25 = h[_i:h.find('</section>', _i)] if _i >= 0 else h
+    _marks = _re.findall(r'class="mv-(up|dn)"', _t25)
     if _marks:
-        check("Biggest movers" in h,
+        check("Biggest movers" in _t25,
               "the Top 25 names its biggest movers when there are any")
     else:
-        check("Biggest movers" not in h,
+        check("Biggest movers" not in _t25,
               "[-] no movers line is drawn when nothing has moved")
         print("     (no team moved against %s -- correctly silent)"
               % (_mv[0] if _mv else "the prior week"))

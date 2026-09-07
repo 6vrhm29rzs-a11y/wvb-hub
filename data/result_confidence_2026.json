@@ -2,15 +2,15 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "corpus_fingerprint": "3e07280ba8fb7a0c",
-  "generated_at_utc": "2026-09-07T17:13:41Z",
+  "corpus_fingerprint": "d114bf91d1239330",
+  "generated_at_utc": "2026-09-07T18:34:11Z",
   "counts": {
-   "finals": 979,
+   "finals": 980,
    "official_only": 32,
-   "reconciled": 898,
+   "reconciled": 899,
    "confirmed": 0,
    "disputed": 8,
-   "pending_second": 971,
+   "pending_second": 972,
    "corrected": 41,
    "duplicate_listings": 8,
    "duplicate_candidates_pending": 0
@@ -46642,6 +46642,71 @@
    "n_attempted": 0,
    "last_checked": null,
    "sources": []
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6624446",
+   "a": "George Mason",
+   "h": "Maryland",
+   "exh": false,
+   "d": "2026-09-07",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "unavailable"
+   },
+   "verify": {
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-07T18:33:19Z",
+    "schools": {
+     "Maryland": {
+      "state": "NOT_POSTED",
+      "url": "https://umterps.com/sports/womens-volleyball/schedule/text",
+      "row": [
+       "Sep 7 (Mon)",
+       "1 PM",
+       "Home",
+       "George Mason",
+       "College Park, MD (Stephen M. Schanwald Pavilion at XFINITY Center)",
+       "",
+       "-"
+      ]
+     },
+     "George Mason": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://gomason.com/services/schedule_txt.ashx?schedule=498",
+      "assertion": "George Mason L 0-3 vs Maryland",
+      "opponent_source": "Maryland",
+      "site_says": "Away"
+     }
+    }
+   },
+   "n_indep": 1,
+   "n_attempted": 0,
+   "last_checked": "2026-09-07T18:33:19Z",
+   "sources": [
+    {
+     "url": "https://gomason.com/services/schedule_txt.ashx?schedule=498",
+     "kind": "school_schedule",
+     "school": "George Mason",
+     "text": "George Mason L 0-3 vs Maryland",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-07T18:33:19Z"
+    }
+   ]
   }
  ]
 }

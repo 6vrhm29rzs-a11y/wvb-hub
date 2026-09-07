@@ -437,6 +437,39 @@ def main():
         print("    (no cutoff in the shown ranking's meta -- stamp "
               "boundary check has no live subject)")
 
+    # ------------------------------------------------------------------
+    # AVCA JOIN COVERAGE. Every school named in the captured AVCA poll must
+    # key to a hub team through build_rankings_board.key(). ⚠ Paid for on
+    # 2026-09-07: the AVCA writes "Southern Cal", no alias existed, and USC
+    # rendered AVCA NR on the board and the ballot table for a week while
+    # ranked #15 -- an unjoinable spelling is invisible because NR is also a
+    # legitimate state. This makes it loud instead.
+    import io as _io
+    _bkey = BB.key
+    _pf = os.path.join(REPO, "data", "raw", "2026", "polls_avca.jsonl")
+    if os.path.exists(_pf):
+        _polls = [json.loads(l) for l in
+                  _io.open(_pf, encoding="utf-8") if l.strip()]
+        # hub team names from the official 348 -- the D-I membership source
+        _rpi = BB.load_json(os.path.join(REPO, "data", "raw", "2025",
+                                         "rpi_official.json")) or {}
+        _hubkeys = set(_bkey(str(_r.get("School") or ""))
+                       for _r in (_rpi.get("data") or []))
+        _hubkeys.discard(_bkey(""))
+        if _hubkeys:
+            _miss = []
+            for _poll in _polls:
+                for _r in _poll.get("rows", []):
+                    _nm = re.sub(r"\s*\(\d+\)\s*$", "",
+                                  str(_r.get("SCHOOL", ""))).strip()
+                    if _nm and _bkey(_nm) not in _hubkeys:
+                        _miss.append(_nm)
+            check("every AVCA poll school keys to a hub team",
+                  not _miss, "unmatched: %s" % sorted(set(_miss))[:8])
+            # NEGATIVE CONTROL: a spelling with no alias must be caught
+            check("[NEG] an unaliased AVCA spelling would be flagged",
+                  _bkey("Southern Cal International") not in _hubkeys)
+
     print()
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))
