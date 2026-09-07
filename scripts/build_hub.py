@@ -6361,14 +6361,14 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
   font:600 15px/1 var(--sans);border-radius:2px}
 .sbnav:hover{border-color:var(--navy);color:var(--cs-gold)}
 .sbnav:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
-.sbconf select{font:600 12px/1.2 var(--mono);padding:6px 22px 6px 8px;
+.sbconf select{font:600 13px/1.2 var(--sans);padding:6px 22px 6px 8px;
   border:1px solid var(--line2);border-radius:2px;
   appearance:none;-webkit-appearance:none;
   background:var(--card,#fff)
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='6'%3E%3Cpath d='M1 1l3.5 3.5L8 1' fill='none' stroke='%235c6b81' stroke-width='1.6'/%3E%3C/svg%3E")
     no-repeat right 7px center;
   color:var(--ink);max-width:170px}
-.sbconfonly{font:600 11px/1.2 var(--mono);color:var(--ink2);display:inline-flex;
+.sbconfonly{font:600 11.5px/1.2 var(--sans);color:var(--ink2);display:inline-flex;
   align-items:center;gap:4px;white-space:nowrap}
 .sbday{display:flex;flex-direction:column;gap:2px;min-width:150px}
 .sbday b{font:700 21px/1 var(--disp);letter-spacing:.01em;color:var(--ink);
@@ -7383,7 +7383,8 @@ b.kres{color:#F2B441}
    is stripped from the public build, and why nothing below may drift outside
    these sentinels. */
 .bwmyb{margin:14px 0;padding:12px 14px;background:var(--card,#fff);
-  border:1px solid var(--line);border-radius:4px}
+  border:1px solid var(--line);border-radius:var(--r-panel);
+  box-shadow:var(--float2)}
 .bwmyb h3{font:600 13px/1 var(--disp);letter-spacing:.06em;
   text-transform:uppercase;color:var(--ink2);margin:0 0 8px}
 .bwmybwk{margin:6px 0}
@@ -7530,8 +7531,9 @@ b.kres{color:#F2B441}
   text-transform:uppercase;color:var(--slate)}
 /* every later section is a SECTION on one working surface -- a rule and a
    label, not a box inside a box */
-#teamcard .tsec{background:transparent;border:0;border-top:1px solid var(--line);
-  border-radius:0;padding:15px 0 6px}
+#teamcard .tsec{background:rgba(255,255,255,.80);border:1px solid var(--line2);
+  border-radius:var(--r-panel);box-shadow:var(--float);
+  padding:15px 16px 10px;margin-bottom:18px}
 #teamcard .tsec h4,#teamcard .tsec .wh2{font:600 11px/1 var(--disp);
   letter-spacing:.15em;text-transform:uppercase;color:var(--slate)}
 
@@ -8454,7 +8456,8 @@ body.mdlopen{overflow:hidden}
 .moremenu .phoneonly{display:none}
 @media (max-width:560px){.moremenu .phoneonly{display:block}}
 .moremenu{position:absolute;top:100%;right:0;z-index:20;
-  background:var(--card);border:1px solid var(--line2);border-radius:4px;
+  background:var(--card);border:1px solid var(--line2);
+  border-radius:var(--r-panel);box-shadow:var(--float);
   padding:10px 12px;box-shadow:0 18px 40px -18px rgba(0,0,0,.35);
   column-count:2;column-gap:22px;width:380px}
 .moremenu[hidden]{display:none}
