@@ -6869,13 +6869,14 @@ td.pick b{color:var(--navy)}
   .seg.sbfilters{display:flex;width:100%;flex-wrap:wrap}
   .seg.sbfilters .segb{flex:1 1 auto;min-height:32px;padding:8px 2px;
     font-size:10px;letter-spacing:.03em;text-align:center}
-  .sbconf{flex:1 1 auto;display:flex;align-items:center;padding:3px 4px;
-    border-top:1px solid var(--line)}
-  .sbconf select{width:100%;max-width:none;min-height:26px;
-    font-size:11px;padding:3px 6px}
-  .sbfilters .count{flex:0 0 auto;align-self:center;margin-left:0;
-    padding:3px 8px 0 2px;border-top:1px solid var(--line);
-    align-self:stretch;display:inline-flex;align-items:center}
+  .sbconf{flex:0 0 auto;display:flex;align-items:stretch;padding:0;
+    margin:0 0 0 auto;border-top:0}
+  .sbconf select{width:auto;max-width:76px;min-height:30px;
+    font-size:10px;padding:0 16px 0 6px;border:0;border-radius:0;
+    border-left:1px solid var(--line2);background-color:transparent;
+    background-position:right 4px center;background-size:8px 5px}
+  .sbfilters .count{flex:1 0 100%;text-align:right;font-size:10px;
+    border-top:1px solid var(--line);padding:4px 8px 2px}
   .sbbar{gap:7px;margin-bottom:12px;padding-bottom:9px}
   #v-scores .lead{font-size:12.5px;line-height:1.5;margin-bottom:10px}
   .tdmarq.sbtop .tdcard{padding:10px 12px;gap:5px}
