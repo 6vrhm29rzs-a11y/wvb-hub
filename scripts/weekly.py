@@ -162,6 +162,11 @@ def completeness(games, cutoff, now_epoch, season_start=None,
             "game_id": g.get("game_id"), "date": d, "state": state,
             "teams": [t.get("name_short") for t in teams][:2],
         }
+        if disp.get(gid) == "suspended_cited":
+            # officials suspended it, statements on file -- it cannot resolve
+            # and must not hold the poll open; it also counts NOWHERE
+            withdrawn.append(dict(row, why="suspended_cited"))
+            continue
         if disp.get(gid) == "source_withdrawn":
             row["why"] = "withdrawn"
             withdrawn.append(row)

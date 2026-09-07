@@ -1,11 +1,11 @@
 {
- "as_of": "2026-09-06",
- "built_utc": "2026-09-06T13:07:06Z",
+ "as_of": "2026-09-07",
+ "built_utc": "2026-09-07T17:59:49Z",
  "counts": {
-  "final": 926,
-  "scheduled_or_live": 3912,
-  "source_withdrawn": 43,
-  "unknown": 3
+  "final": 979,
+  "scheduled_or_live": 3859,
+  "source_withdrawn": 47,
+  "suspended_cited": 1
  },
  "fixtures": [
   {
@@ -741,26 +741,14 @@
   },
   {
    "date": "2026-09-05",
-   "disposition": "scheduled_or_live",
-   "game_id": "6625424",
-   "reason": "the source reports this match in progress",
-   "start_epoch": 1788638400,
-   "state": "I",
-   "teams": [
-    "Pacific",
-    "LSU New Orleans "
-   ]
-  },
-  {
-   "date": "2026-09-05",
-   "disposition": "unknown",
+   "disposition": "source_withdrawn",
    "evidence": {
-    "all_listed_final": false,
-    "listed": 160,
-    "observed_utc": "2026-09-06 12:51:01"
+    "all_listed_final": true,
+    "listed": 159,
+    "observed_utc": "2026-09-07 17:58:36"
    },
    "game_id": "6627068",
-   "reason": "the source had not finished with this date: not every listed game was final",
+   "reason": "the source published finals for this date and does not list this fixture",
    "start_epoch": 1788616800,
    "state": "P",
    "teams": [
@@ -770,14 +758,14 @@
   },
   {
    "date": "2026-09-05",
-   "disposition": "unknown",
+   "disposition": "source_withdrawn",
    "evidence": {
-    "all_listed_final": false,
-    "listed": 160,
-    "observed_utc": "2026-09-06 12:51:01"
+    "all_listed_final": true,
+    "listed": 159,
+    "observed_utc": "2026-09-07 17:58:36"
    },
    "game_id": "6627492",
-   "reason": "the source had not finished with this date: not every listed game was final",
+   "reason": "the source published finals for this date and does not list this fixture",
    "start_epoch": 1788631200,
    "state": "P",
    "teams": [
@@ -787,643 +775,49 @@
   },
   {
    "date": "2026-09-05",
-   "disposition": "unknown",
+   "disposition": "source_withdrawn",
    "evidence": {
-    "all_listed_final": false,
-    "listed": 160,
-    "observed_utc": "2026-09-06 12:51:01"
+    "all_listed_final": true,
+    "listed": 159,
+    "observed_utc": "2026-09-07 17:58:36"
    },
-   "game_id": "6640683",
-   "reason": "the source had not finished with this date: not every listed game was final",
+   "game_id": "6640746",
+   "reason": "the source published finals for this date and does not list this fixture",
    "start_epoch": 1788580800,
-   "state": "P",
-   "teams": [
-    "FDU",
-    "Lafayette"
-   ]
+   "state": "D",
+   "teams": []
+  },
+  {
+   "date": "2026-09-05",
+   "disposition": "source_withdrawn",
+   "evidence": {
+    "all_listed_final": true,
+    "listed": 159,
+    "observed_utc": "2026-09-07 17:58:36"
+   },
+   "game_id": "6640747",
+   "reason": "the source published finals for this date and does not list this fixture",
+   "start_epoch": 1788580800,
+   "state": "D",
+   "teams": []
   },
   {
    "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6624239",
-   "reason": "its date has not passed",
-   "start_epoch": 1788721200,
-   "state": "P",
-   "teams": [
-    "Tennessee",
-    "Indiana"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6624271",
-   "reason": "its date has not passed",
-   "start_epoch": 1788714000,
-   "state": "P",
-   "teams": [
-    "Western Caro.",
-    "Seton Hall"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6624300",
-   "reason": "its date has not passed",
-   "start_epoch": 1788714000,
-   "state": "P",
-   "teams": [
-    "Wright St.",
-    "Dayton"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6624326",
-   "reason": "its date has not passed",
-   "start_epoch": 1788728400,
-   "state": "P",
-   "teams": [
-    "Valparaiso",
-    "Michigan"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6624381",
-   "reason": "its date has not passed",
-   "start_epoch": 1788721200,
-   "state": "P",
-   "teams": [
-    "Rice",
-    "Illinois"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6624445",
-   "reason": "its date has not passed",
-   "start_epoch": 1788714000,
-   "state": "P",
-   "teams": [
-    "George Mason",
-    "Hampton"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6624625",
-   "reason": "its date has not passed",
-   "start_epoch": 1788714000,
-   "state": "P",
-   "teams": [
-    "Maryland",
-    "UMES"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6624674",
-   "reason": "its date has not passed",
-   "start_epoch": 1788721200,
-   "state": "P",
-   "teams": [
-    "Rhode Island",
-    "Providence"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6624807",
-   "reason": "its date has not passed",
-   "start_epoch": 1788717600,
-   "state": "P",
-   "teams": [
-    "South Carolina",
-    "Troy"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6624939",
-   "reason": "its date has not passed",
-   "start_epoch": 1788714000,
-   "state": "P",
-   "teams": [
-    "Cincinnati",
-    "Oakland"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6625165",
-   "reason": "its date has not passed",
-   "start_epoch": 1788721200,
-   "state": "P",
-   "teams": [
-    "Belmont",
-    "Middle Tenn."
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6625170",
-   "reason": "its date has not passed",
-   "start_epoch": 1788717600,
-   "state": "P",
-   "teams": [
-    "Vanderbilt",
-    "Samford"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6625274",
-   "reason": "its date has not passed",
-   "start_epoch": 1788721200,
-   "state": "P",
-   "teams": [
-    "Oregon",
-    "Washington St."
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6625333",
-   "reason": "its date has not passed",
-   "start_epoch": 1788714000,
-   "state": "P",
-   "teams": [
-    "Ga. Southern",
-    "Eastern Ky."
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6625426",
-   "reason": "its date has not passed",
-   "start_epoch": 1788724800,
-   "state": "P",
-   "teams": [
-    "San Jose St.",
-    "LSU New Orleans "
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6625459",
-   "reason": "its date has not passed",
-   "start_epoch": 1788717600,
-   "state": "P",
-   "teams": [
-    "Colgate",
-    "Villanova"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6625579",
-   "reason": "its date has not passed",
-   "start_epoch": 1788717600,
-   "state": "P",
-   "teams": [
-    "Kansas St.",
-    "Drake"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6625790",
-   "reason": "its date has not passed",
-   "start_epoch": 1788724800,
-   "state": "P",
-   "teams": [
-    "LMU (CA)",
-    "Utah Tech"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6626053",
-   "reason": "its date has not passed",
-   "start_epoch": 1788724800,
-   "state": "P",
-   "teams": [
-    "Creighton",
-    "Tulsa"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6626154",
-   "reason": "its date has not passed",
-   "start_epoch": 1788710400,
-   "state": "P",
-   "teams": [
-    "UNC Greensboro",
-    "East Carolina"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6626193",
-   "reason": "its date has not passed",
-   "start_epoch": 1788706800,
-   "state": "P",
-   "teams": [
-    "UNC Asheville",
-    "Jacksonville St."
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
+   "disposition": "suspended_cited",
+   "evidence": {
+    "statements": [
+     "https://mutigers.com/news/2026/09/6/weather-conditions-force-suspension-of-volleyball-match-against-no-1-nebraska-at-wrigley-field",
+     "https://huskers.com/news/2026/09/7/nebraska-missouri-volleyball-match-suspended"
+    ],
+    "suspended_at": "11-7 Nebraska, first set"
+   },
    "game_id": "6626229",
-   "reason": "its date has not passed",
+   "reason": "officials suspended the match -- cited school statements on file; no final exists and none is scheduled (per the Big Ten, the Wrigley date will NOT be rescheduled; a decision on continuation comes later)",
    "start_epoch": 1788742800,
-   "state": "P",
+   "state": "O",
    "teams": [
     "Nebraska",
     "Missouri"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6626287",
-   "reason": "its date has not passed",
-   "start_epoch": 1788724800,
-   "state": "P",
-   "teams": [
-    "Stanford",
-    "Marquette"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6626353",
-   "reason": "its date has not passed",
-   "start_epoch": 1788717600,
-   "state": "P",
-   "teams": [
-    "Liberty",
-    "High Point"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6626404",
-   "reason": "its date has not passed",
-   "start_epoch": 1788710400,
-   "state": "P",
-   "teams": [
-    "George Washington",
-    "Wofford"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6626573",
-   "reason": "its date has not passed",
-   "start_epoch": 1788717600,
-   "state": "P",
-   "teams": [
-    "Northeastern",
-    "Harvard"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6626597",
-   "reason": "its date has not passed",
-   "start_epoch": 1788717600,
-   "state": "P",
-   "teams": [
-    "Lipscomb",
-    "South Alabama"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6626682",
-   "reason": "its date has not passed",
-   "start_epoch": 1788717600,
-   "state": "P",
-   "teams": [
-    "Wyoming",
-    "Long Beach St."
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6626804",
-   "reason": "its date has not passed",
-   "start_epoch": 1788710400,
-   "state": "P",
-   "teams": [
-    "Bryant",
-    "Brown"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6626809",
-   "reason": "its date has not passed",
-   "start_epoch": 1788735600,
-   "state": "P",
-   "teams": [
-    "Penn St.",
-    "Kentucky"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6626851",
-   "reason": "its date has not passed",
-   "start_epoch": 1788708600,
-   "state": "P",
-   "teams": [
-    "Davidson",
-    "UCF"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6626866",
-   "reason": "its date has not passed",
-   "start_epoch": 1788710400,
-   "state": "P",
-   "teams": [
-    "Texas",
-    "Louisville"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6627090",
-   "reason": "its date has not passed",
-   "start_epoch": 1788728400,
-   "state": "P",
-   "teams": [
-    "Colorado",
-    "Northern Colo."
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6627175",
-   "reason": "its date has not passed",
-   "start_epoch": 1788714000,
-   "state": "P",
-   "teams": [
-    "Purdue",
-    "TCU"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6627387",
-   "reason": "its date has not passed",
-   "start_epoch": 1788721200,
-   "state": "P",
-   "teams": [
-    "NC State",
-    "Charlotte"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6627574",
-   "reason": "its date has not passed",
-   "start_epoch": 1788728400,
-   "state": "P",
-   "teams": [
-    "Grand Canyon",
-    "Temple"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6627708",
-   "reason": "its date has not passed",
-   "start_epoch": 1788717600,
-   "state": "P",
-   "teams": [
-    "Canisius",
-    "Dartmouth"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6627813",
-   "reason": "its date has not passed",
-   "start_epoch": 1788721200,
-   "state": "P",
-   "teams": [
-    "Navy",
-    "Stony Brook"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6628031",
-   "reason": "its date has not passed",
-   "start_epoch": 1788717600,
-   "state": "P",
-   "teams": [
-    "Loyola Maryland",
-    "Saint Peter's"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6628156",
-   "reason": "its date has not passed",
-   "start_epoch": 1788719400,
-   "state": "P",
-   "teams": [
-    "Eastern Mich.",
-    "Illinois St."
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6628218",
-   "reason": "its date has not passed",
-   "start_epoch": 1788717600,
-   "state": "P",
-   "teams": [
-    "ULM",
-    "San Francisco"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6628262",
-   "reason": "its date has not passed",
-   "start_epoch": 1788714000,
-   "state": "P",
-   "teams": [
-    "Pepperdine",
-    "Arizona"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6628321",
-   "reason": "its date has not passed",
-   "start_epoch": 1788732000,
-   "state": "P",
-   "teams": [
-    "Utah",
-    "Pittsburgh"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6628349",
-   "reason": "its date has not passed",
-   "start_epoch": 1788717600,
-   "state": "P",
-   "teams": [
-    "Jacksonville",
-    "Florida A&M"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6628394",
-   "reason": "its date has not passed",
-   "start_epoch": 1788724800,
-   "state": "P",
-   "teams": [
-    "Clemson",
-    "App State"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6628636",
-   "reason": "its date has not passed",
-   "start_epoch": 1788714000,
-   "state": "P",
-   "teams": [
-    "Georgia Tech",
-    "Xavier"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6628697",
-   "reason": "its date has not passed",
-   "start_epoch": 1788750000,
-   "state": "P",
-   "teams": [
-    "Hawaii",
-    "UC San Diego"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6637641",
-   "reason": "its date has not passed",
-   "start_epoch": 1788717600,
-   "state": "P",
-   "teams": [
-    "Wake Forest",
-    "Georgetown"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6638234",
-   "reason": "its date has not passed",
-   "start_epoch": 1788714000,
-   "state": "P",
-   "teams": [
-    "Ole Miss",
-    "Central Ark."
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6638582",
-   "reason": "its date has not passed",
-   "start_epoch": 1788717600,
-   "state": "P",
-   "teams": [
-    "North Texas",
-    "Florida"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6639375",
-   "reason": "its date has not passed",
-   "start_epoch": 1788728400,
-   "state": "P",
-   "teams": [
-    "San Diego",
-    "Southern California"
-   ]
-  },
-  {
-   "date": "2026-09-06",
-   "disposition": "scheduled_or_live",
-   "game_id": "6639553",
-   "reason": "its date has not passed",
-   "start_epoch": 1788717600,
-   "state": "P",
-   "teams": [
-    "Morgan St.",
-    "Towson"
    ]
   },
   {
@@ -1442,9 +836,9 @@
    "date": "2026-09-07",
    "disposition": "scheduled_or_live",
    "game_id": "6624446",
-   "reason": "its date has not passed",
+   "reason": "the source reports this match in progress",
    "start_epoch": 1788800400,
-   "state": "P",
+   "state": "I",
    "teams": [
     "Maryland",
     "George Mason"

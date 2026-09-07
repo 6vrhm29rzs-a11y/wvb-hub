@@ -263,6 +263,43 @@ def main():
         check("  %s carries a review date no later than first serve" % gid,
               bool(c.get("review_by")))
 
+    # ── 5b. SUSPENDED FIXTURES: cited, displayed, never counted ─────────
+    print("\n5b. SUSPENDED FIXTURES")
+    _sfp = os.path.join(REPO, "data", "raw", "2026", "suspended_fixtures.json")
+    if os.path.exists(_sfp):
+        _sdoc = json.load(open(_sfp, encoding="utf-8"))
+        _sents = _sdoc.get("entries") or {}
+        for _g, _e in _sents.items():
+            check("suspended %s carries attributable evidence" % _g,
+                  bool(_e.get("evidence")) and
+                  all(x.get("url") for x in _e["evidence"]))
+        _hub2 = os.path.join(REPO, "Cody", "START-HERE.html")
+        if os.path.exists(_hub2):
+            _h2 = open(_hub2, encoding="utf-8").read()
+            _m2 = re.search(r"const SUSPENDED = (\{.*?\});", _h2)
+            _pg = json.loads(_m2.group(1)) if _m2 else {}
+            _want = {g for g, e in _sents.items() if e.get("evidence")}
+            check("the page's SUSPENDED map is exactly the evidenced entries",
+                  set(_pg) == _want, "page=%s ledger=%s"
+                  % (sorted(_pg), sorted(_want)))
+            check("the row renderer has the SUSPENDED branch",
+                  "SUSPENDED[m.gid]" in _h2)
+        # in-process negative control: an evidence-free entry is refused by
+        # the disposition loader
+        import fixture_disposition as _fd
+        _fd._SUSP_CACHE.clear()
+        import tempfile as _tf, os as _os2
+        _td = _tf.mkdtemp()
+        _os2.makedirs(_os2.path.join(_td, "data", "raw", "2026"))
+        json.dump({"entries": {"999": {"teams": ["A", "B"]}}},
+                  open(_os2.path.join(_td, "data", "raw", "2026",
+                                      "suspended_fixtures.json"), "w"))
+        check("negative control: an evidence-free entry is ignored",
+              "999" not in _fd._suspended(2026, _td))
+        _fd._SUSP_CACHE.clear()
+    else:
+        print("  (no suspended ledger on file -- checks idle)")
+
     # ── 6. THE PAGE AGREES WITH ITSELF ──────────────────────────────────
     print("\n6. NO VIEW DISAGREES WITH ANOTHER")
     hub = os.path.join(REPO, "Cody", "START-HERE.html")

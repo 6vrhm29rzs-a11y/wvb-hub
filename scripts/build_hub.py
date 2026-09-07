@@ -4742,6 +4742,21 @@ def build():
             "under_review": bool(r.get("under_review")) or None,
         })
 
+    # officials-suspended fixtures (cited ledger; display + weekly gate only)
+    _susp_disp = {}
+    try:
+        _sdoc = json.load(open(os.path.join(
+            REPO, "data", "raw", str(SEASON), "suspended_fixtures.json"),
+            encoding="utf-8"))
+        for _gid, _e in (_sdoc.get("entries") or {}).items():
+            if _e.get("evidence"):
+                _susp_disp[str(_gid)] = {
+                    "at": _e.get("suspended_at") or "",
+                    "why": _e.get("reason_public") or "suspended by officials",
+                    "next": _e.get("continuation") or ""}
+    except (OSError, ValueError):
+        pass
+
     # ---- bracket ---------------------------------------------------------
     seeds = []
     for t in field:
@@ -4959,6 +4974,64 @@ def build():
     # moved it. This is a documented sort -- ranked-vs-ranked, then any ranked
     # side, then how close the forecast is -- and the page says so in those
     # words, so a reader can see the reason rather than a rating.
+    # ⚠ A SUSPENDED MATCH MUST NOT VANISH FROM ITS DAY. The schedule feed is
+    # today-forward, so a past-dated non-final simply left the payload -- and
+    # the day's biggest story rendered as nothing at all. Ledgered suspended
+    # fixtures are resurrected here from the raw record, so the day's page
+    # shows the row wearing its SUSPENDED badge.
+    _have_gids = {x["gid"] for x in _desk}
+    for _sgid in _susp_disp:
+        if _sgid in _have_gids:
+            continue
+        _last = None
+        try:
+            for _ln in open(os.path.join(REPO, "data", "raw", str(SEASON),
+                                         "games.jsonl"), encoding="utf-8"):
+                if '"%s"' % _sgid not in _ln:
+                    continue
+                try:
+                    _g = json.loads(_ln)
+                except ValueError:
+                    continue
+                if str(_g.get("gid") or _g.get("game_id")) == _sgid:
+                    _last = _g
+        except OSError:
+            pass
+        if not _last:
+            continue
+        _ts = _last.get("teams") or []
+        _hm = next((t for t in _ts if t.get("is_home")), {})
+        _aw2 = next((t for t in _ts if not t.get("is_home")), {})
+        # raw gamelog records carry no date field -- derive the ET date
+        # from the start epoch, the same convention the schedule uses
+        _sd = _last.get("date") or ""
+        if not _sd and _last.get("start_time_epoch"):
+            import datetime as _dt2
+            try:
+                from zoneinfo import ZoneInfo as _ZI
+                _sd = _dt2.datetime.fromtimestamp(
+                    int(_last["start_time_epoch"]),
+                    _ZI("America/New_York")).date().isoformat()
+            except Exception:
+                _sd = ""
+        if not _sd:
+            continue
+        _desk.append({
+            "gid": _sgid, "d": _sd, "dl": day_label(_sd, _today),
+            "t": "", "a": _aw2.get("name_short") or "",
+            "h": _hm.get("name_short") or "",
+            "ar": "", "hr": "",
+            "ao": _av.get(_aw2.get("name_short")) or "",
+            "ho": _av.get(_hm.get("name_short")) or "",
+            "ap": _pr.get(_aw2.get("name_short")),
+            "hp": _pr.get(_hm.get("name_short")),
+            "venue": None, "city": None, "st": None, "site": None,
+            "event": None, "kind": None, "tv": None, "tvu": None, "tvk": None,
+            "conflict": [], "corrected": [], "exh": None,
+            "csrc": None, "cverified": None,
+            "hw": None, "fsrc": None, "at": None, "ht": None,
+        })
+
     def _desk_order(x):
         both = 1 if (x["ar"] and x["hr"]) else 0
         one = 1 if (x["ar"] or x["hr"]) else 0
@@ -5267,6 +5340,7 @@ def build():
                  '<div class="empty">No completed matches yet.</div>') \
         .replace("{{SEED_ROWS}}", "".join(seeds)) \
         .replace("{{DESK_JSON}}", _desk_json) \
+        .replace("{{SUSPENDED_JSON}}", json.dumps(_susp_disp, separators=(",", ":"))) \
         .replace("{{CHANGED_ROWS}}", _chg_html) \
         .replace("{{CHANGED_META}}", esc(_chg_meta)) \
         .replace("{{CHANGED_HIDDEN}}", "" if _chg else "hidden") \
@@ -8196,6 +8270,9 @@ td.at{white-space:nowrap}
 .mrow .rvmk{font:700 11px/1.4 var(--mono);color:#1FA766;
   letter-spacing:.06em}
 .rvmk.bad{color:#C24747}
+.susp{font:700 10px/1 var(--disp);letter-spacing:.09em;color:#B26A00;
+  border:1px solid rgba(178,106,0,.5);border-radius:3px;padding:2px 6px;
+  font-style:normal;white-space:nowrap}
 .mrow .rvmk.bad{color:var(--coral);font:700 10.5px/1.3 var(--disp);
   letter-spacing:.1em;text-transform:uppercase}
 .rcverify{margin:10px 0;padding:10px 12px;border:1px solid var(--line2)}
@@ -14430,6 +14507,9 @@ function bwWire() {
    there; POWER, RESUME, records, leaders and the rankings all wait for the
    official final and the next verified refresh. */
 const DESK = {{DESK_JSON}};
+/* officials-suspended fixtures, cited in data/raw/{season}/suspended_fixtures
+   .json -- display only; a suspended match counts NOWHERE as a result */
+const SUSPENDED = {{SUSPENDED_JSON}};
 const DESK_SOON_SHOWN = 12;
 /* |p - 0.5| at or under this is called "close". A stated cutoff for a WORD, not
    a threshold that changes any number. */
@@ -16993,10 +17073,16 @@ function matchRow(m, live, dest) {
     '" data-match="' + esc(m.gid) + '" data-dest="' + dest + '">' +
     /* a row about ANOTHER DAY names the day (round 5): the weekend list
        showed bare clocks, so "7:00 PM PT" could be any of five days */
-    '<span class="mwhen">' + esc(st === 'live'
+    (typeof SUSPENDED !== 'undefined' && SUSPENDED[m.gid] && st !== 'final'
+      ? '<span class="mwhen"><b class="susp" title="' +
+        esc(SUSPENDED[m.gid].why + (SUSPENDED[m.gid].next ? ' \u2014 ' +
+        SUSPENDED[m.gid].next : '')) + '">SUSPENDED' +
+        (SUSPENDED[m.gid].at ? ' \u00b7 ' + esc(SUSPENDED[m.gid].at) : '') +
+        '</b></span>'
+      : '<span class="mwhen">' + esc(st === 'live'
         ? ((live && live.period) || 'live')
         : ((m.d && m.d !== todayPT() && m.dl ? m.dl + ' \u00b7 ' : '') +
-           (m.t || m.dl || ''))) + '</span>' +
+           (m.t || m.dl || ''))) + '</span>') +
     '<span class="mteams">' + t(mAway(m), m.ar, aw) + t(mHome(m), m.hr, hw) +
       '</span>' +
     rowLinescore(m, live, st) +

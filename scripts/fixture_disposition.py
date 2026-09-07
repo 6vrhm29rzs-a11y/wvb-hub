@@ -119,6 +119,19 @@ def classify(game, today, season, root=None, obs_cache=None):
                      "reason": "the source reports this match in progress"})
         return base
 
+    _susp = _suspended(season, root)
+    if gid in _susp:
+        e = _susp[gid]
+        base.update({"disposition": "suspended_cited",
+                     "evidence": {"statements": [x.get("url") for x in
+                                                 (e.get("evidence") or [])],
+                                  "suspended_at": e.get("suspended_at")},
+                     "reason": ("officials suspended the match -- cited "
+                                "school statements on file; no final exists "
+                                "and none is scheduled (%s)"
+                                % (e.get("continuation") or "status TBD"))})
+        return base
+
     if not date or date >= today.isoformat():
         base.update({"disposition": "scheduled_or_live",
                      "reason": "its date has not passed"})
@@ -154,6 +167,33 @@ def classify(game, today, season, root=None, obs_cache=None):
                  "reason": ("the source published finals for this date and "
                             "does not list this fixture")})
     return base
+
+
+_SUSP_CACHE = {}
+
+
+def _suspended(season, root=None):
+    # type: (int, str) -> dict
+    """gid -> ledgered suspension (data/raw/{season}/suspended_fixtures.json).
+    Cited, append-only; see the file's _doc. Only entries carrying at least
+    one attributable statement count -- an evidence-free entry is ignored,
+    the same refusal exhibitions.py makes."""
+    key = (season, root or REPO)
+    if key in _SUSP_CACHE:
+        return _SUSP_CACHE[key]
+    out = {}
+    fp = os.path.join(root or REPO, "data", "raw", str(season),
+                      "suspended_fixtures.json")
+    if os.path.exists(fp):
+        try:
+            doc = json.load(open(fp, encoding="utf-8"))
+            for gid, e in (doc.get("entries") or {}).items():
+                if e.get("evidence"):
+                    out[str(gid)] = e
+        except (ValueError, OSError):
+            pass
+    _SUSP_CACHE[key] = out
+    return out
 
 
 def build(season=SEASON, today=None, root=None):
