@@ -6361,7 +6361,8 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
   font:600 15px/1 var(--sans);border-radius:2px}
 .sbnav:hover{border-color:var(--navy);color:var(--cs-gold)}
 .sbnav:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
-.sbconf select{font:600 13px/1.2 var(--sans);padding:6px 22px 6px 8px;
+.sbconf select{font:700 11.5px/1 var(--sans);letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink2);padding:9px 24px 9px 10px;
   border:1px solid var(--line2);border-radius:2px;
   appearance:none;-webkit-appearance:none;
   background:var(--card,#fff)
@@ -18276,7 +18277,7 @@ function wireScoreboard() {
     const confs = {};
     Object.keys(TEAMS).forEach(n => {
       const c = (TEAMS[n] || {}).conf; if (c) confs[c] = 1; });
-    cs.innerHTML = '<option value="all">All conferences</option>' +
+    cs.innerHTML = '<option value="all">All</option>' +
       Object.keys(confs).sort().map(c =>
         '<option value="' + esc(c) + '">' + esc(c) + '</option>').join('');
     cs.addEventListener('change', () => {
