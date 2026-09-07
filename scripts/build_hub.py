@@ -6976,7 +6976,10 @@ td.pick b{color:var(--navy)}
      ranks and some to the right"): movement sits BESIDE the rank digit,
      on its line, on the POWER board and this one alike. */
   .t25 td.rk{grid-column:1;grid-row:1 / 3;align-self:center;width:auto;
-    min-width:26px;font:700 24px/1 var(--disp);white-space:nowrap}
+    min-width:2ch;font:800 27px/1 var(--disp);white-space:nowrap;
+    text-align:left}
+  .t25 tbody tr.row td:first-child::before{content:none}
+  .t25 td.mvc{justify-self:center;min-width:26px;text-align:center}
   .t25 td.tm{grid-column:3;grid-row:1;font-size:17.5px;font-weight:700;
     min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
     padding-left:0}
@@ -10040,7 +10043,13 @@ details.avhist{margin:14px 0}
   .rk3 tr.row td{display:block;border:0;padding:0;font-size:12.5px;
     white-space:nowrap}
   .rk3 tr.row td.rk{grid-row:1/3;grid-column:1;align-self:center;
-    font:700 22px/1 var(--disp);text-align:right}
+    display:grid;grid-template-columns:minmax(2ch,auto) 26px;
+    column-gap:2px;align-items:center;justify-items:start;
+    font:800 27px/1 var(--disp);text-align:left}
+  .rk3 tr.row td.rk .mv{justify-self:center;font-size:11px}
+  /* ⚠ the tick rules carry an ID (#rbody) -- the disable must outrank them */
+  #rbody tr.row td.rk:first-child::before,
+  #rbody tr.row td.rk:first-child::after{content:none}
   .rk3 tr.row td.tm{grid-row:1;grid-column:2/5;font-size:16.5px;
     font-weight:700;min-width:0;white-space:normal;overflow-wrap:anywhere}
   .rk3 tr.row td.pw{grid-row:1;grid-column:5;font:700 17px/1 var(--disp);

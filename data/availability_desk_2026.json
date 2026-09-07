@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-07T02:38:31Z",
+  "generated_at_utc": "2026-09-07T16:25:11Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 7,
    "expired": 2,
-   "anomalies": 208
+   "anomalies": 209
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -739,42 +739,6 @@
    "points_per_set_missing": 8.577
   },
   {
-   "game_id": "6628654",
-   "team_id": "46291",
-   "team": "UC San Diego",
-   "absent": [
-    {
-     "name": "Molly Mccluskey",
-     "rate": 4.538,
-     "played_share": 0.75
-    },
-    {
-     "name": "Ireland Mcnees",
-     "rate": 3.846,
-     "played_share": 0.75
-    }
-   ],
-   "points_per_set_missing": 8.384
-  },
-  {
-   "game_id": "6625788",
-   "team_id": "46291",
-   "team": "UC San Diego",
-   "absent": [
-    {
-     "name": "Molly Mccluskey",
-     "rate": 4.538,
-     "played_share": 0.75
-    },
-    {
-     "name": "Ireland Mcnees",
-     "rate": 3.846,
-     "played_share": 0.75
-    }
-   ],
-   "points_per_set_missing": 8.384
-  },
-  {
    "game_id": "6626506",
    "team_id": "46482",
    "team": "Pacific",
@@ -796,6 +760,42 @@
     }
    ],
    "points_per_set_missing": 7.85
+  },
+  {
+   "game_id": "6628654",
+   "team_id": "46291",
+   "team": "UC San Diego",
+   "absent": [
+    {
+     "name": "Molly Mccluskey",
+     "rate": 4.222,
+     "played_share": 0.8
+    },
+    {
+     "name": "Ireland Mcnees",
+     "rate": 3.278,
+     "played_share": 0.8
+    }
+   ],
+   "points_per_set_missing": 7.5
+  },
+  {
+   "game_id": "6625788",
+   "team_id": "46291",
+   "team": "UC San Diego",
+   "absent": [
+    {
+     "name": "Molly Mccluskey",
+     "rate": 4.222,
+     "played_share": 0.8
+    },
+    {
+     "name": "Ireland Mcnees",
+     "rate": 3.278,
+     "played_share": 0.8
+    }
+   ],
+   "points_per_set_missing": 7.5
   },
   {
    "game_id": "6624595",
@@ -2144,7 +2144,20 @@
     {
      "name": "Cha'lei Reid",
      "rate": 2.235,
-     "played_share": 1.0
+     "played_share": 0.8
+    }
+   ],
+   "points_per_set_missing": 2.235
+  },
+  {
+   "game_id": "6628697",
+   "team_id": "46419",
+   "team": "Hawaii",
+   "absent": [
+    {
+     "name": "Cha'lei Reid",
+     "rate": 2.235,
+     "played_share": 0.75
     }
    ],
    "points_per_set_missing": 2.235
@@ -7332,15 +7345,16 @@
    ]
   },
   "UC San Diego": {
-   "gid": "6628108",
-   "d": "2026-09-04",
-   "appeared": 12,
+   "gid": "6628697",
+   "d": "2026-09-06",
+   "appeared": 11,
    "zero_action": [
-    "Jaedyn Houston",
     "Hayden Shanafelt",
     "Ahnika Smith",
     "Katelyn Hernandez",
+    "Maija Nepszy",
     "Kaliya Ndiaye",
+    "Kylie Parker",
     "Soraya Dennis"
    ]
   },
@@ -7399,15 +7413,13 @@
    ]
   },
   "Hawaii": {
-   "gid": "6625789",
-   "d": "2026-09-04",
-   "appeared": 10,
+   "gid": "6628697",
+   "d": "2026-09-06",
+   "appeared": 11,
    "zero_action": [
-    "Manon Baudrillard",
+    "Kahea Moriwaki",
     "Marnie Ursem",
-    "Jaci Miyasaki",
-    "Mano Antiga",
-    "Cha'lei Reid"
+    "Mano Antiga"
    ]
   },
   "Ga. Southern": {
