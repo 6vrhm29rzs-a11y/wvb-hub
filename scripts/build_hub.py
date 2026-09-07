@@ -5400,13 +5400,16 @@ TEMPLATE = r"""<!doctype html><html lang="en"><head><meta charset="utf-8">
   --court:#12294B; --chalk:#F5F7FA; --rally:#1D5FC2;   /* ARENA DAYLIGHT 2026-08-30 */
   --gold:#8A6508; --gold-fill:#E3B341; --coral:#C2553F; --slate:#5D6B80;
 
-  --page:#F4F6F9; --card:#FFFFFF; --alt:#EDF1F6;
+  --page:#EFECF7; --card:#FFFFFF; --alt:#ECE9F5;
   --ink:#16233B; --ink2:#3F5068; --ink3:#5D6B80;
-  --line:#DDE4EE; --line2:#C9D4E2;
+  --line:#DEDBEC; --line2:#CBC7E0;
   --navy:#12294B; --blue:#1D5FC2; --amber:#8A6508; --amber-bg:#FBF3DC;
-  --sand:#EDF1F6;
+  --sand:#ECE9F5;
   /* the chalk sheet: a reading surface, not another card */
-  --sheet:rgba(18,41,75,.04); --sheet2:rgba(18,41,75,.07);
+  --sheet:rgba(74,61,143,.05); --sheet2:rgba(74,61,143,.09);
+  --r-panel:12px; --r-card:10px; --r-ctl:8px;
+  --float:0 10px 30px -18px rgba(74,61,143,.30);
+  --float2:0 4px 14px -9px rgba(74,61,143,.24);
   /* ⚠ --navy CHANGED MEANING when the page went dark: it used to be a dark
      blue used BOTH as chrome and as ink. On a dark ground the ink has to be
      light, so --navy is now the bright blue INK and the chrome that used to be
@@ -5540,7 +5543,7 @@ header h1{color:var(--chalk)}
 body{margin:0;color:var(--ink);font:15px/1.55 var(--sans);
   font-feature-settings:"tnum" 1;
   background:
-    linear-gradient(168deg,#F7F4FC 0%,#F4F3FA 26%,#F2F3F9 52%,#F4F6F9 100%)
+    linear-gradient(168deg,#F4EFFC 0%,#F0EBF9 30%,#EDE9F7 60%,#EDEBF5 100%)
     fixed var(--page);
   background-repeat:no-repeat}
 /* THE FLOOR. Flat vertical stripes read as stripes; a court reads as a court
@@ -6349,7 +6352,9 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .sbfull>summary:hover{color:var(--ink)}
 .sbfull>summary:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .sbbar{display:flex;flex-direction:column;gap:12px;margin:0 0 22px;
-  padding-bottom:16px;border-bottom:2px solid var(--line2)}
+  padding:12px 14px;border:1px solid var(--line2);
+  border-radius:var(--r-panel);box-shadow:var(--float2);
+  background:linear-gradient(160deg,#F1EAFA,#ECE6F6)}
 .sbdate{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .sbnav{appearance:none;width:36px;height:36px;flex:0 0 auto;cursor:pointer;
   border:1px solid var(--line2);background:var(--alt);color:var(--ink);
@@ -6422,7 +6427,9 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
 .tdquiet{font:14.5px/1.6 var(--sans);color:var(--ink2);margin:0 0 20px;
   padding-bottom:16px;border-bottom:1px solid var(--line)}
 .tdquiet b{color:var(--ink)}
-.tdblock{margin:0 0 26px}
+.tdblock{margin:0 0 26px;background:rgba(255,255,255,.80);
+  border:1px solid var(--line2);border-radius:var(--r-panel);
+  box-shadow:var(--float);padding:12px 14px 14px}
 .tdblock h3{display:flex;align-items:baseline;gap:11px;margin:0 0 12px;
   font:700 11px/1 var(--disp);letter-spacing:.19em;text-transform:uppercase;
   color:var(--ink);padding-bottom:9px;position:relative;
@@ -6438,7 +6445,8 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
    a row cannot hold them legibly. Everything else on this page stays a row. */
 .tdmarq{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 .tdcard{display:flex;flex-direction:column;gap:8px;min-width:0;
-  padding:14px;text-decoration:none;
+  padding:14px;text-decoration:none;border-radius:var(--r-card);
+  box-shadow:var(--float2);
   border:1px solid var(--line);border-left:3px solid var(--gold-fill);
   /* ⚠ NOT amber-to-coral at full strength: at 3px against white the coral
      read as an ERROR red down every card. The fade quiets instead. */
@@ -7440,8 +7448,9 @@ b.kres{color:#F2B441}
    loudest thing above it. The three rulers are separated by a RULE, not by
    three different background colours, so no group looks more official than
    another. */
-#v-rankings .panel{background:var(--sheet);border:0;border-top:2px solid var(--line2);
-  border-radius:0}
+#v-rankings .panel{background:rgba(255,255,255,.82);
+  border:1px solid var(--line2);border-radius:var(--r-panel);
+  box-shadow:var(--float)}
 #v-rankings .rk3{border-collapse:collapse}
 .rk3 thead tr.grp th{font:600 11px/1 var(--disp);letter-spacing:.16em;
   text-transform:uppercase;padding:11px 10px 7px;color:var(--slate);
@@ -8143,7 +8152,7 @@ td.at{white-space:nowrap}
 .mrow .mteams{display:flex;flex-direction:column;gap:3px;min-width:0}
 .mrow .mrt{display:flex;align-items:center;gap:7px;min-width:0}
 .mrow .mrt img{width:19px;height:19px;flex:none;object-fit:contain}
-.mrow .mrt b{font:600 15px/1.15 var(--disp);color:var(--ink2);overflow-wrap:anywhere}
+.mrow .mrt b{font:700 15.5px/1.15 var(--disp);color:var(--ink);overflow-wrap:anywhere}
 .mrow .mrt.won b{color:var(--ink)}
 .mrk{font:600 11px/1 var(--disp);color:var(--gold);flex:none}
 /* our POWER chip reads quieter than the gold AVCA number -- two rulers,
@@ -8222,7 +8231,7 @@ h4.sbtime span{font:600 11px/1 var(--mono);color:var(--ink3)}
    are the ones moving); the side ahead in the set reads gold; no winner-bold,
    because nobody has won a set still being played. */
 .mlc.cur{font:700 15.5px/1.2 var(--mono);color:var(--ink);
-  border:1px solid color-mix(in oklab,var(--cs-gold) 55%,transparent);
+  border:1.5px solid color-mix(in oklab,var(--cs-gold) 80%,transparent);
   box-shadow:0 0 0 1px rgba(255,181,46,.18),0 2px 9px rgba(255,150,60,.22);
   padding:1px 5px}
 .mlc.cur.ca{border-bottom:0;border-radius:3px 3px 0 0}
@@ -8236,8 +8245,8 @@ h4.sbtime span{font:600 11px/1 var(--mono);color:var(--ink3)}
 .mls.hastally{grid-template-columns:auto repeat(var(--mlsn,0),minmax(25px,auto))}
 .mlc{font:600 13.5px/1.2 var(--mono);color:var(--slate);text-align:center;
   padding:0 4px;font-variant-numeric:tabular-nums;font-style:normal}
-.mlc.w{color:var(--ink);font-weight:700}
-.mlt{font:700 15px/1.1 var(--mono);color:var(--ink2);text-align:center;
+.mlc.w{color:var(--ink);font-weight:800}
+.mlt{font:800 16px/1.1 var(--mono);color:var(--ink);text-align:center;
   margin-right:9px;padding-right:11px;border-right:1px solid var(--line2);
   font-variant-numeric:tabular-nums}
 .mlt.w{color:var(--ink)}
@@ -8307,7 +8316,7 @@ h4.sbtime span{font:600 11px/1 var(--mono);color:var(--ink3)}
 #deskdetail:not([hidden]),#scoredetail:not([hidden]){position:fixed;
   top:5vh;left:50%;transform:translateX(-50%);width:min(960px,94vw);
   max-height:90vh;overflow:auto;z-index:300;background:var(--card,#fff);
-  border:1px solid var(--line);border-radius:4px;
+  border:1px solid var(--line);border-radius:14px;
   border-top:3px solid transparent;
   background:linear-gradient(var(--card,#fff),var(--card,#fff)) padding-box,
     linear-gradient(90deg,#1D2B66,#7A4FB0 55%,#FF7A55) border-box;
@@ -9006,7 +9015,7 @@ tr.tvearlier td{padding:6px 0 10px;border:0}
    the survivors take the space, so the strip is correct at three or at
    four without either count being written down. */
 .glance{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:14px 0 18px}
-.gl{padding:13px 15px;border-radius:4px;border:1px solid transparent;
+.gl{padding:13px 15px;border-radius:var(--r-card);border:1px solid transparent;box-shadow:var(--float2);
   background:linear-gradient(150deg,#F5F3FA 0%,#F2F3F9 100%);
   background-origin:border-box;background-clip:padding-box,border-box;
   background:var(--card);border:1px solid var(--line);
@@ -9317,7 +9326,7 @@ td.wh .wu{color:var(--ink3);font-style:italic}
    under a 2026 heading is the error that looks completely correct. */
 .seasonwarn{background:var(--amber-bg);border:1px solid #6B551C;border-left:4px solid var(--amber);
   border-radius:2px;padding:11px 13px;margin:0 0 12px;font-size:13px;color:#1A1200;max-width:760px}
-.seg{display:inline-flex;border:1px solid var(--line2);border-radius:3px;
+.seg{display:inline-flex;border:1px solid var(--line2);border-radius:var(--r-ctl);
   overflow:hidden;margin:0 0 14px;background:var(--card)}
 .segb{appearance:none;border:0;background:transparent;font:700 11.5px/1 var(--sans);
   letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);padding:9px 14px;

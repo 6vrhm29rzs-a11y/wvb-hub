@@ -173,7 +173,7 @@
     {
      "field": "teams",
      "non_blocking": "site is confirmed neutral, so no displayed fact depends on which side is nominally home",
-     "records": 7,
+     "records": 9,
      "values": [
       "(('45792', False), ('45886', True))",
       "(('45792', True), ('45886', False))"
@@ -181,15 +181,23 @@
     },
     {
      "field": "start_time_epoch",
-     "records": 7,
+     "records": 9,
      "values": [
       "1788739200",
       "1788724800"
      ]
+    },
+    {
+     "field": "game_state",
+     "records": 9,
+     "values": [
+      "P",
+      "I"
+     ]
     }
    ],
    "matchup": "LMU (CA) / Utah Tech",
-   "records": 7
+   "records": 9
   },
   "6625822": {
    "conflicts": [
@@ -223,7 +231,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 8,
+     "records": 10,
      "values": [
       "1788670800",
       "1788742800"
@@ -231,7 +239,7 @@
     }
    ],
    "matchup": "Missouri / Nebraska",
-   "records": 8
+   "records": 10
   },
   "6626288": {
    "conflicts": [
@@ -585,7 +593,7 @@
  },
  "counts": {
   "blocked": 29,
-  "conflicted": 65,
+  "conflicted": 64,
   "corrected": 5,
   "fixtures": 4886
  },
