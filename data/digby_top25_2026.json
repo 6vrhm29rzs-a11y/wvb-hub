@@ -29,7 +29,7 @@
   "between_team_variance": 5.941,
   "caveat_schedule": "the opponent IS adjusted for from match one: a result is scored as the strength it implies (opponent's rating + margin, home court removed). What is still thin early is the opponent's own rating, which is the preseason projection until a schedule graph exists",
   "teams_with_a_result": 348,
-  "matches_counted": 926,
+  "matches_counted": 927,
   "corpus_fingerprint": "34b1c4127b6f43b4",
   "certifies": {
    "blend_weight_derived_not_chosen": {
@@ -42,18 +42,18 @@
     }
    }
   },
-  "score_mean": 0.00035,
-  "score_sd": 1.08088,
+  "score_mean": 0.00029,
+  "score_sd": 1.08086,
   "score_scale_note": "mean and SD across ALL 348 teams, not just the ones shown -- a scale computed from the top 25 would measure the spread among the best",
   "shown": 25,
   "also_receiving": 10,
   "hit_channel_weight": 0.25,
   "hit_channel_tau": 0.1,
   "hit_channel_evidence": "data/blend_hiteff_2025.json",
-  "generated_at_utc": "2026-09-07T02:30:56Z",
-  "data_through_epoch": 1788732000,
+  "generated_at_utc": "2026-09-07T02:38:26Z",
+  "data_through_epoch": 1788735600,
   "rating_cutoff_epoch": 1788678000,
-  "verified_intraday_counted": 45
+  "verified_intraday_counted": 46
  },
  "top": [
   {
@@ -81,6 +81,18 @@
    "rank": 2
   },
   {
+   "team": "Kentucky",
+   "score": 2.7256,
+   "preseason_z": 2.538,
+   "season_z": 3.149,
+   "matches": 6,
+   "weight_on_season": 0.307,
+   "record": "5-1",
+   "net_pts_per_set": 4.51,
+   "conf": "SEC",
+   "rank": 3
+  },
+  {
    "team": "Louisville",
    "score": 2.7218,
    "preseason_z": 2.232,
@@ -90,18 +102,6 @@
    "record": "5-1",
    "net_pts_per_set": 5.14,
    "conf": "ACC",
-   "rank": 3
-  },
-  {
-   "team": "Kentucky",
-   "score": 2.7006,
-   "preseason_z": 2.538,
-   "season_z": 3.141,
-   "matches": 5,
-   "weight_on_season": 0.27,
-   "record": "5-1",
-   "net_pts_per_set": 4.72,
-   "conf": "SEC",
    "rank": 4
   },
   {
@@ -309,18 +309,6 @@
    "rank": 21
   },
   {
-   "team": "Penn St.",
-   "score": 1.6135,
-   "preseason_z": 1.434,
-   "season_z": 2.424,
-   "matches": 3,
-   "weight_on_season": 0.182,
-   "record": "3-1",
-   "net_pts_per_set": 6.07,
-   "conf": "Big Ten",
-   "rank": 22
-  },
-  {
    "team": "Creighton",
    "score": 1.6074,
    "preseason_z": 1.971,
@@ -330,7 +318,7 @@
    "record": "4-2",
    "net_pts_per_set": -0.87,
    "conf": "Big East",
-   "rank": 23
+   "rank": 22
   },
   {
    "team": "Michigan",
@@ -341,6 +329,18 @@
    "weight_on_season": 0.27,
    "record": "4-1",
    "net_pts_per_set": 5.82,
+   "conf": "Big Ten",
+   "rank": 23
+  },
+  {
+   "team": "Penn St.",
+   "score": 1.5662,
+   "preseason_z": 1.434,
+   "season_z": 2.014,
+   "matches": 4,
+   "weight_on_season": 0.228,
+   "record": "3-1",
+   "net_pts_per_set": 3.67,
    "conf": "Big Ten",
    "rank": 24
   },
@@ -495,18 +495,18 @@
    "weight_on_season": 0.307
   },
   {
-   "team": "Louisville",
+   "team": "Kentucky",
    "rank": 3,
-   "score": 2.7218,
+   "score": 2.7256,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
-   "team": "Kentucky",
+   "team": "Louisville",
    "rank": 4,
-   "score": 2.7006,
-   "matches": 5,
-   "weight_on_season": 0.27
+   "score": 2.7218,
+   "matches": 6,
+   "weight_on_season": 0.307
   },
   {
    "team": "Arizona St.",
@@ -628,25 +628,25 @@
    "weight_on_season": 0.228
   },
   {
-   "team": "Penn St.",
-   "rank": 22,
-   "score": 1.6135,
-   "matches": 3,
-   "weight_on_season": 0.182
-  },
-  {
    "team": "Creighton",
-   "rank": 23,
+   "rank": 22,
    "score": 1.6074,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Michigan",
-   "rank": 24,
+   "rank": 23,
    "score": 1.6001,
    "matches": 5,
    "weight_on_season": 0.27
+  },
+  {
+   "team": "Penn St.",
+   "rank": 24,
+   "score": 1.5662,
+   "matches": 4,
+   "weight_on_season": 0.228
   },
   {
    "team": "Georgia Tech",

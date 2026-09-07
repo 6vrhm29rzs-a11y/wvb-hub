@@ -1,10 +1,10 @@
 {
  "date": "2026-09-06",
- "generated_utc": "2026-09-07T02:30:07Z",
+ "generated_utc": "2026-09-07T02:37:37Z",
  "counts": {
   "VERIFIED_BOTH": 19,
-  "UNVERIFIED": 2,
-  "CORROBORATED_ONE": 26,
+  "UNVERIFIED": 1,
+  "CORROBORATED_ONE": 27,
   "CONTRADICTED_ONE": 1,
   "CONTRADICTED_BOTH": 2
  },
@@ -1161,45 +1161,20 @@
    "gid": "6626809",
    "date": "2026-09-06",
    "canonical": "Kentucky def. Penn St. 3-1",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Kentucky": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://ukathletics.com/sports/wvball/schedule/",
-     "row": [
-      "Sun.",
-      "Sep 6",
-      "#3",
-      "vs.",
-      "#13",
-      "Penn State",
-      "Wrigley Field (Chicago, Ill.)",
-      "7:00 pm",
-      "Big Ten / SEC Challenge",
-      "Tickets",
-      "FOX",
-      "Live Stats"
-     ]
+     "assertion": "Kentucky W 3-1 vs Penn State",
+     "opponent_source": "Penn State",
+     "site_says": null,
+     "surface": "modern_card"
     },
     "Penn St.": {
-     "state": "NOT_POSTED",
-     "url": "https://gopsusports.com/sports/womens-volleyball/schedule",
-     "row": [
-      "Sep 6",
-      "vs.",
-      "Kentucky",
-      "Chicago, Ill. / Wrigley Field",
-      "7:00 PM EDT",
-      "Watch",
-      "FOX",
-      "Opens in a new window",
-      "Watch",
-      "FOX",
-      "Opens in a new window",
-      "Stats",
-      "Opens in a new window",
-      "Tickets"
-     ]
+     "state": "SITE_HTTP_MISS",
+     "url": "https://gopsusports.com/sports/womens-volleyball/schedule/text",
+     "http": 404
     }
    }
   },
