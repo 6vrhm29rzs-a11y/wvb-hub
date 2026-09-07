@@ -8190,8 +8190,9 @@ td.at{white-space:nowrap}
   justify-content:center}
 /* the verification mark: subdued, provenance-toned; loud only on a
    conflict, which is the one state that changes what the row means */
-.mrow .rvmk{font:700 11px/1.4 var(--mono);color:var(--slate);
+.mrow .rvmk{font:700 11px/1.4 var(--mono);color:#1FA766;
   letter-spacing:.06em}
+.rvmk.bad{color:#C24747}
 .mrow .rvmk.bad{color:var(--coral);font:700 10.5px/1.3 var(--disp);
   letter-spacing:.1em;text-transform:uppercase}
 .rcverify{margin:10px 0;padding:10px 12px;border:1px solid var(--line2)}
