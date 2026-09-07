@@ -274,9 +274,24 @@ def main():
         FIX = json.loads(m.group(1)) if m else {}
         check("the page carries the canonical fixture payload", len(FIX) > 1000,
               str(len(FIX)))
-        # the match route can reach a fixture far beyond the desk window
-        check("[-] a fixture 11 days out is routable", "6626809" in FIX,
-              "the Schedule would list a match the match route denies")
+        # the match route can reach a fixture far beyond the desk window.
+        # ⚠ REWRITTEN 2026-09-07: this pinned gid 6626809 as "11 days out",
+        # and the calendar made it a PLAYED match that correctly left the
+        # today-forward payload -- the guard failed on the season moving,
+        # not on a regression (the calendar-pin class, again). The far
+        # fixture is now picked from the canonical payload's own dates.
+        import datetime as _dt
+        _far_day = (_dt.date.today() + _dt.timedelta(days=10)).isoformat()
+        _far = [g for g, f in fx.items()
+                if not f.get("completed") and (f.get("date") or "") >= _far_day]
+        if _far:
+            _fg = sorted(_far, key=lambda g: fx[g].get("date") or "")[0]
+            check("[-] a fixture 10+ days out is routable (%s, %s)"
+                  % (_fg, fx[_fg].get("date")), _fg in FIX,
+                  "the Schedule would list a match the match route denies")
+        else:
+            print("  (no fixture 10+ days out on file -- late-season state, "
+                  "check idle)")
         for gid in ("6626809", "6628315", "6625717"):
             a, b = FIX.get(gid) or {}, fx.get(gid) or {}
             # ⚠ THE SCHEDULE PAYLOAD IS TODAY-FORWARD BY DESIGN. A completed

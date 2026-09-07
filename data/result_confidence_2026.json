@@ -2,16 +2,16 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "corpus_fingerprint": "62ee6b111f4e25f8",
-  "generated_at_utc": "2026-09-07T16:25:11Z",
+  "corpus_fingerprint": "3e07280ba8fb7a0c",
+  "generated_at_utc": "2026-09-07T17:13:41Z",
   "counts": {
    "finals": 979,
    "official_only": 32,
-   "reconciled": 899,
+   "reconciled": 898,
    "confirmed": 0,
    "disputed": 8,
    "pending_second": 971,
-   "corrected": 40,
+   "corrected": 41,
    "duplicate_listings": 8,
    "duplicate_candidates_pending": 0
   }
@@ -21920,11 +21920,28 @@
    ]
   },
   {
-   "result_corrected": null,
-   "corr_reason": null,
-   "corr_kind": null,
-   "corr_feed_said": null,
-   "corr_evidence": [],
+   "result_corrected": true,
+   "corr_reason": "Radford won 3-1 -- the feed's entire team attribution is inverted (the SMU-UC Davis class). Flagged by the lineup-attribution guard on 2026-09-04 and HELD as pending while neither school had posted; the pending entry's recheck alarm fired on 2026-09-07 and both schools had published the same alternative: Prairie View 'L 1-3 vs Radford' and Radford 'W 3-1 vs Prairie View A&M', both marking it Neutral at the Georgia Southern Tournament, Statesboro. Linescores flipped column-for-column.",
+   "corr_kind": "contradicted",
+   "corr_feed_said": "Prairie View (home) won 3-1 -- 28-26, 19-25, 25-22, 25-18 from the home column -- with box and lineup rows attributed the same way. Internally coherent, and wrong.",
+   "corr_evidence": [
+    {
+     "school": "Prairie View",
+     "url": "https://pvpanthers.com/services/schedule_txt.ashx?schedule=334",
+     "text": "'Sep 4 (Fri) 11:00 AM Neutral Radford Statesboro, GA (Hanner Fieldhouse) L 1-3' -- Prairie View's own schedule export",
+     "status": null,
+     "note": null,
+     "retrieved": "2026-09-07"
+    },
+    {
+     "school": "Radford",
+     "url": "https://radfordathletics.com/sports/womens-volleyball/schedule/text",
+     "text": "'Sep 4 (Fri) 11:00 AM Neutral Prairie View A&M Statesboro, GA Georgia Southern Tournament W 3-1' -- Radford's own schedule",
+     "status": null,
+     "note": null,
+     "retrieved": "2026-09-07"
+    }
+   ],
    "duplicate_of": null,
    "dup_reason": null,
    "dup_asym": null,
@@ -21934,10 +21951,10 @@
    "h": "Prairie View",
    "exh": false,
    "d": "2026-09-04",
-   "overall": "reconciled",
+   "overall": "corrected",
    "states": {
-    "result": "reconciled",
-    "sets": "reconciled",
+    "result": "corrected",
+    "sets": "corrected",
     "box": "reconciled",
     "venue": "official"
    },
