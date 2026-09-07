@@ -6412,17 +6412,30 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
      label inline instead of stacked, and the date input compact. */
   .sbdate{gap:6px}
   .sbday{min-width:0;flex:0 1 auto;flex-direction:row;align-items:baseline;gap:7px}
-  .sbday b{font-size:15px}
-  .sbday span{font-size:10px}
-  .sbnav{width:30px;height:32px;min-height:32px}
-  .sbtoday{min-height:32px;padding:6px 8px}
+  .sbday b{font-size:14px}
+  .sbday span{font-size:9.5px}
+  .sbnav{width:30px;height:30px;min-height:30px;border-radius:var(--r-ctl)}
+  .sbtoday{min-height:30px;padding:5px 8px;border-radius:var(--r-ctl)}
   /* on today the day label already says TODAY -- a second, disabled TODAY
      button beside it said the same word twice (Cody's screenshot) */
   .sbtoday:disabled{display:none}
   .sbpick{margin-left:auto;gap:5px}
   .sbpick>span{display:none} /* the input shows the date; the caption doubled it */
-  .sbpick input{min-height:32px;padding:4px 6px;font-size:11px;max-width:142px;
-    appearance:none;-webkit-appearance:none} /* iOS ignores compact sizing otherwise */
+  /* the input's TEXT is the third statement of the same date on one row --
+     it collapses to a calendar icon; the native picker still opens on tap */
+  .sbpick input{min-height:30px;width:38px;padding:0;font-size:11px;
+    color:transparent;border-radius:var(--r-ctl);
+    appearance:none;-webkit-appearance:none;
+    background:var(--alt)
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='%233F5068' stroke-width='2.2'%3E%3Crect x='3' y='5' width='18' height='16' rx='2'/%3E%3Cpath d='M3 10h18M8 3v4M16 3v4'/%3E%3C/svg%3E")
+      no-repeat center}
+  .sbpick input::-webkit-date-and-time-value{color:transparent}
+  .sbpick input::-webkit-calendar-picker-indicator{opacity:0}
+  .sbbar{padding:9px 10px}
+  .sbfilters .segb{min-height:30px}
+  .sbconf select{min-height:30px}
+  .sbfilters .count{font-size:10px}
+  .sbmeth{font-size:11.5px;margin-bottom:6px}
 }
 .tdquiet{font:14.5px/1.6 var(--sans);color:var(--ink2);margin:0 0 20px;
   padding-bottom:16px;border-bottom:1px solid var(--line)}
