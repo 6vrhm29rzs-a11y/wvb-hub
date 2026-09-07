@@ -2,7 +2,7 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-07T00:03:38Z",
+  "generated_at_utc": "2026-09-07T01:47:45Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
@@ -888,6 +888,19 @@
    "points_per_set_missing": 5.375
   },
   {
+   "game_id": "6639842",
+   "team_id": "45920",
+   "team": "Kentucky",
+   "absent": [
+    {
+     "name": "Brooklyn Deleye",
+     "rate": 5.235,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 5.235
+  },
+  {
    "game_id": "6625970",
    "team_id": "46708",
    "team": "Xavier",
@@ -904,19 +917,6 @@
     }
    ],
    "points_per_set_missing": 5.168
-  },
-  {
-   "game_id": "6639842",
-   "team_id": "45920",
-   "team": "Kentucky",
-   "absent": [
-    {
-     "name": "Brooklyn Deleye",
-     "rate": 5.154,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 5.154
   },
   {
    "game_id": "6628284",
@@ -2293,6 +2293,19 @@
    "points_per_set_missing": 2.023
   },
   {
+   "game_id": "6640218",
+   "team_id": "46614",
+   "team": "Penn St.",
+   "absent": [
+    {
+     "name": "Finley Krystkowiak",
+     "rate": 2.0,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.0
+  },
+  {
    "game_id": "6624506",
    "team_id": "45895",
    "team": "UC Santa Barbara",
@@ -2538,19 +2551,6 @@
     }
    ],
    "points_per_set_missing": 1.692
-  },
-  {
-   "game_id": "6640218",
-   "team_id": "46614",
-   "team": "Penn St.",
-   "absent": [
-    {
-     "name": "Finley Krystkowiak",
-     "rate": 1.667,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.667
   },
   {
    "game_id": "6627811",
@@ -3526,15 +3526,14 @@
    ]
   },
   "Kentucky": {
-   "gid": "6625953",
-   "d": "2026-09-02",
-   "appeared": 9,
+   "gid": "6626809",
+   "d": "2026-09-06",
+   "appeared": 10,
    "zero_action": [
     "Bellamie Beus",
+    "Gracison Saylors",
     "Caroline Prihoda",
     "Sidney Burley",
-    "Georgia Watson",
-    "Kennedy Washington",
     "Molly Berezowitz",
     "Bryah Breaux",
     "Hannah Benjamin"
@@ -3657,15 +3656,15 @@
    ]
   },
   "Penn St.": {
-   "gid": "6626658",
-   "d": "2026-08-30",
+   "gid": "6626809",
+   "d": "2026-09-06",
    "appeared": 11,
    "zero_action": [
-    "Danielle Whitmire",
+    "Kendall Northern",
     "Alexis Ewing",
     "Emmi Sellman",
-    "Caroline Jurevicius",
-    "Ava Jurevicius"
+    "Ava Jurevicius",
+    "Lexi Gin"
    ]
   },
   "Old Dominion": {
@@ -8092,6 +8091,12 @@
     "ep": 1788390000,
     "sets": 3,
     "state": "zero_action"
+   },
+   {
+    "gid": "6626809",
+    "ep": 1788735600,
+    "sets": 4,
+    "state": "appeared"
    }
   ],
   "Texas|Abby Vander Wal": [
@@ -8163,6 +8168,12 @@
     "gid": "6626658",
     "ep": 1788127200,
     "sets": 3,
+    "state": "appeared"
+   },
+   {
+    "gid": "6626809",
+    "ep": 1788735600,
+    "sets": 4,
     "state": "appeared"
    }
   ],

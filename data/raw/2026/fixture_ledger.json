@@ -29,8 +29,8 @@
    "game_id": "6626809",
    "kind": "correction",
    "matchup": "Kentucky vs Penn St.",
-   "why": "The NCAA /game record carries Rec Hall, State College PA -- Penn State's own gym -- so the hub derived site=home and rendered 'Kentucky at Penn St.'. Both schools publish it as a neutral-site Big Ten/SEC Challenge fixture at Wrigley Field. The feed's location block is stale.",
-   "review_by": "2026-09-06",
+   "why": "The NCAA /game record carries Rec Hall, State College PA -- Penn State's own gym -- so the hub derived site=home and rendered 'Kentucky at Penn St.'. Both schools publish it as a neutral-site Big Ten/SEC Challenge fixture at Wrigley Field. The feed's location block is stale. ⚠ UPGRADED TO applies_to_final POSTGAME (2026-09-06 night): the match was PLAYED at Wrigley -- watched there live (Cody, courtside via broadcast, including dew slicking the outdoor court after sunset), Kentucky's own schedule's schema.org event data names 'Wrigley Field (Chicago, Ill.)', and the feed's own schedule/live surfaces said Wrigley throughout. Without the flag the FINAL regressed to the /game endpoint's Rec Hall template and the match page asserted 'home floor' on a neutral outdoor showcase.",
+   "review_by": "2026-09-09",
    "fields": {
     "site": "neutral",
     "venue": "Wrigley Field",
@@ -65,7 +65,8 @@
      "text": "Sun. Sep 6 vs. Penn State Wrigley Field (Chicago, Ill.) 7:00 pm Big Ten / SEC Challenge"
     }
    },
-   "note": "The feed's START TIME (7:00 PM ET) already agrees with both schools and is deliberately NOT overridden."
+   "note": "The feed's START TIME (7:00 PM ET) already agrees with both schools and is deliberately NOT overridden.",
+   "applies_to_final": true
   },
   {
    "game_id": "6628315",
