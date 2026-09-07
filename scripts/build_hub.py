@@ -5834,9 +5834,16 @@ h1 em{font:700 .62em/1 var(--disp);font-style:normal;letter-spacing:.04em;
   border-left:4px solid var(--tc,var(--cs-blue));
   border-bottom:2px solid var(--cs-edge2);
   background:linear-gradient(90deg,
-    color-mix(in oklab,var(--tc,var(--cs-blue)) 13%,transparent),
-    transparent 46%)}
+    color-mix(in oklab,var(--tc,var(--cs-blue)) 19%,transparent),
+    transparent 58%)}
 #teamcard>.thead.cs-prog::before{opacity:.5}
+/* the podium metals, same convention as the ranking boards */
+#lplayer tbody tr:nth-child(1) td:first-child,
+#lplayer tbody tr:nth-child(2) td:first-child,
+#lplayer tbody tr:nth-child(3) td:first-child{font-weight:800}
+#lplayer tbody tr:nth-child(1) td:first-child{color:#C9A227}
+#lplayer tbody tr:nth-child(2) td:first-child{color:#8E9BB0}
+#lplayer tbody tr:nth-child(3) td:first-child{color:#B0713A}
 
 /* ── RANKINGS / TOP 25: a strong editorial index ───────────────────────── */
 /* ⚠ NUMBERED MARKERS ARE USUALLY DECORATION AND HERE THEY ARE THE DATA. A
@@ -19158,8 +19165,8 @@ function momentHTML(m, live, opts) {
   const sets = matchSets(m, live);
   const aw = (sc[0] !== null && sc[1] !== null) && +sc[0] > +sc[1];
   const hw = (sc[0] !== null && sc[1] !== null) && +sc[1] > +sc[0];
-  const ca = (typeof COLORS !== 'undefined' && COLORS[mAway(m)]) || '';
-  const cb = (typeof COLORS !== 'undefined' && COLORS[mHome(m)]) || '';
+  const ca = ((typeof COLORS !== 'undefined' && COLORS[mAway(m)]) || {}).primary || '';
+  const cb = ((typeof COLORS !== 'undefined' && COLORS[mHome(m)]) || {}).primary || '';
 
   const side = (name, rk, won, cls) =>
     '<div class="mm-side ' + cls + (won ? ' won' : '') + '">' +
@@ -21956,7 +21963,7 @@ function showTeam(name) {
        with no readable colour gets NO edge, not an invented hue -- the same
        rule crawl_team_colors.py already enforces for the avatars. */
     '<div class="thead cs-court cs-prog"' +
-      (COLORS[name] ? ' style="--tc:' + esc(COLORS[name]) + '"' : '') +
+      ((COLORS[name] || {}).primary ? ' style="--tc:' + esc(COLORS[name].primary) + '"' : '') +
       '><h2>' + logo(name, 'lg') + name + '</h2>' +
     /* COURTSIGNAL-THEAD-END */
     '<div class="sub">' + (t.conf || '') +

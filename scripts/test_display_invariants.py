@@ -1360,7 +1360,25 @@ def check_no_feed_mojibake():
                       "public")):
         if not os.path.exists(path):
             continue
-        hits = moji.findall(open(path, encoding="utf-8").read())
+        html_ = open(path, encoding="utf-8").read()
+        # server-side object interpolation lands in the HTML itself...
+        if "[object Object]" in html_:
+            bad("a stringified JS object reached the %s page" % nm,
+                "an object was interpolated where a value belongs")
+        # ...but the JS-time version never does (the --tc:[object Object]
+        # header bug stringified at RENDER time), so the SOURCE is checked
+        # too: COLORS values are records, and passing one to esc() whole is
+        # exactly the bug. A property access must sit between.
+        # ⚠ the first version banned the SUBSTRING esc(COLORS[ -- which the
+        # FIX also contains (esc(COLORS[name].primary)), so it failed correct
+        # code. The bad form is the record passed whole: bracket, then the
+        # closing paren with no property access between.
+        import re as _re_o
+        if _re_o.search(r"esc\(COLORS\[[^\]]+\]\s*\)", html_):
+            bad("a COLORS record is interpolated whole on the %s page" % nm,
+                "esc(COLORS[x]) with no property access -- renders as "
+                "[object Object] at runtime")
+        hits = moji.findall(html_)
         if hits:
             bad("feed mojibake reached the %s page" % nm,
                 "%d escaped lead+continuation pairs, e.g. %s"

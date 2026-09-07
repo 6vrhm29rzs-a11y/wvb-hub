@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-06T23:41:35Z",
+  "generated_at_utc": "2026-09-07T00:03:38Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
    "signals": 7,
    "expired": 2,
-   "anomalies": 207
+   "anomalies": 208
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -2176,19 +2176,6 @@
    "points_per_set_missing": 2.192
   },
   {
-   "game_id": "6626681",
-   "team_id": "46628",
-   "team": "Utah",
-   "absent": [
-    {
-     "name": "Omonigho princess Atamah",
-     "rate": 2.167,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 2.167
-  },
-  {
    "game_id": "6625558",
    "team_id": "45955",
    "team": "Central Ark.",
@@ -2226,6 +2213,19 @@
     }
    ],
    "points_per_set_missing": 2.125
+  },
+  {
+   "game_id": "6626681",
+   "team_id": "46628",
+   "team": "Utah",
+   "absent": [
+    {
+     "name": "Omonigho princess Atamah",
+     "rate": 2.062,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.062
   },
   {
    "game_id": "6625329",
@@ -3424,6 +3424,19 @@
    "points_per_set_missing": 0.929
   },
   {
+   "game_id": "6639891",
+   "team_id": "45986",
+   "team": "Pittsburgh",
+   "absent": [
+    {
+     "name": "Jordyn Dailey",
+     "rate": 0.868,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 0.868
+  },
+  {
    "game_id": "6627347",
    "team_id": "46148",
    "team": "IU Indy",
@@ -3582,12 +3595,11 @@
    ]
   },
   "Pittsburgh": {
-   "gid": "6626878",
-   "d": "2026-09-04",
-   "appeared": 10,
+   "gid": "6628321",
+   "d": "2026-09-06",
+   "appeared": 11,
    "zero_action": [
-    "Haiti Tautua'a",
-    "Sophia Gregoire",
+    "Abbey Emch",
     "Lola Sageer",
     "Jessica Smallwood",
     "Marina Pezelj"
@@ -7050,10 +7062,18 @@
    ]
   },
   "Utah": {
-   "gid": "6626681",
-   "d": "2026-09-05",
-   "appeared": 12,
-   "zero_action": []
+   "gid": "6628321",
+   "d": "2026-09-06",
+   "appeared": 11,
+   "zero_action": [
+    "Allie Grossenbach",
+    "Suttyn Harris",
+    "Olga Musial",
+    "Langley Griffin",
+    "Grace Moss",
+    "Dyborrah Johnson",
+    "Lana Mijacic"
+   ]
   },
   "Seattle U": {
    "gid": "6627965",
