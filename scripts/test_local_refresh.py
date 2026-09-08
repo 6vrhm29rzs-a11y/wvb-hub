@@ -91,6 +91,53 @@ def check_lock_is_used():
         ok("non-blocking flock guards against overlapping cycles")
 
 
+def check_verifier_precedes_ratings():
+    """In EVERY workflow that runs both, verification precedes the ratings.
+
+    ⚠ Paid for 2026-09-07: daily.yml ran verify_results_daily AFTER
+    rating_2025 and digby_top25, so finals verified mid-run grew the
+    rating-eligible set (rating_input_ok) after digby's artifact was built,
+    and the audit-manifest gate refused the build (932 counted vs 934
+    eligible). refresh.yml and local_refresh had the right order; the daily
+    job was the unmirrored copy. This asserts the ORDER, not a literal, in
+    every workflow file plus local_refresh's own sequence.
+    """
+    import glob
+    for wf in sorted(glob.glob(os.path.join(REPO, ".github/workflows/*.yml"))):
+        text = open(wf, encoding="utf-8").read()
+        # only lines that RUN the scripts, not comments naming them
+        runs = [ln for ln in text.splitlines()
+                if ln.strip().startswith("python3 scripts/")]
+        def first(name):
+            for i, ln in enumerate(runs):
+                if name in ln:
+                    return i
+            return None
+        v = first("verify_results_daily.py")
+        for rated in ("rating_2025.py", "digby_top25.py"):
+            r = first(rated)
+            if v is not None and r is not None and v > r:
+                bad("verifier order", "%s runs verify_results_daily AFTER %s"
+                    % (os.path.basename(wf), rated))
+    # local_refresh's own sequence
+    seq = [" ".join(c) for _, c in __import__("local_refresh").SEQUENCE]         if hasattr(__import__("local_refresh"), "SEQUENCE") else None
+    if seq:
+        vi = next((i for i, c in enumerate(seq)
+                   if "verify_results_daily" in c), None)
+        ri = next((i for i, c in enumerate(seq)
+                   if "rating_2025" in c or "digby_top25" in c), None)
+        if vi is not None and ri is not None and vi > ri:
+            bad("verifier order", "local_refresh verifies after the rating")
+    # NEGATIVE CONTROL: a reversed order must be caught by the same logic
+    _runs = ["python3 scripts/rating_2025.py",
+             "python3 scripts/verify_results_daily.py"]
+    _v = next(i for i, ln in enumerate(_runs) if "verify_results" in ln)
+    _r = next(i for i, ln in enumerate(_runs) if "rating_2025" in ln)
+    if not (_v > _r):
+        bad("verifier order", "negative control cannot trip -- guard is dead")
+    ok("verification precedes the rating chain in every workflow")
+
+
 def check_stamp_reaches_the_page():
     """The ranking's own recompute stamp must render, from artifact meta.
 
@@ -124,6 +171,7 @@ def main():
     check_in_step()
     check_negative_control()
     check_lock_is_used()
+    check_verifier_precedes_ratings()
     check_stamp_reaches_the_page()
     if FAILS:
         print("\nFAILED:")
