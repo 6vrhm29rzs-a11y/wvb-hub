@@ -1,11 +1,12 @@
 {
- "as_of": "2026-09-07",
- "built_utc": "2026-09-07T20:59:53Z",
+ "as_of": "2026-09-08",
+ "built_utc": "2026-09-08T00:34:02Z",
  "counts": {
-  "final": 980,
-  "scheduled_or_live": 3862,
+  "final": 983,
+  "scheduled_or_live": 3858,
   "source_withdrawn": 47,
-  "suspended_cited": 1
+  "suspended_cited": 1,
+  "unknown": 1
  },
  "fixtures": [
   {
@@ -822,50 +823,19 @@
   },
   {
    "date": "2026-09-07",
-   "disposition": "scheduled_or_live",
-   "game_id": "6624240",
-   "reason": "the source reports this match in progress",
-   "start_epoch": 1788811200,
-   "state": "I",
-   "teams": [
-    "Southern Ind.",
-    "Indiana"
-   ]
-  },
-  {
-   "date": "2026-09-07",
-   "disposition": "scheduled_or_live",
+   "disposition": "unknown",
+   "evidence": {
+    "all_listed_final": false,
+    "listed": 5,
+    "observed_utc": "2026-09-08 00:17:51"
+   },
    "game_id": "6627131",
-   "reason": "its date has not passed",
+   "reason": "the source had not finished with this date: not every listed game was final",
    "start_epoch": 1788825600,
    "state": "P",
    "teams": [
     "New Mexico",
     "New Mexico St."
-   ]
-  },
-  {
-   "date": "2026-09-07",
-   "disposition": "scheduled_or_live",
-   "game_id": "6627728",
-   "reason": "its date has not passed",
-   "start_epoch": 1788818400,
-   "state": "P",
-   "teams": [
-    "Alabama",
-    "Grambling"
-   ]
-  },
-  {
-   "date": "2026-09-07",
-   "disposition": "scheduled_or_live",
-   "game_id": "6628139",
-   "reason": "the source reports this match in progress",
-   "start_epoch": 1788811200,
-   "state": "I",
-   "teams": [
-    "DePaul",
-    "Penn St."
    ]
   },
   {
@@ -974,18 +944,6 @@
    "teams": [
     "South Carolina",
     "California"
-   ]
-  },
-  {
-   "date": "2026-09-08",
-   "disposition": "scheduled_or_live",
-   "game_id": "6625668",
-   "reason": "its date has not passed",
-   "start_epoch": 1788908400,
-   "state": "P",
-   "teams": [
-    "Southern U.",
-    "Southeastern La."
    ]
   },
   {
@@ -16670,6 +16628,18 @@
    "teams": [
     "Western Mich.",
     "Central Mich."
+   ]
+  },
+  {
+   "date": "2026-09-29",
+   "disposition": "scheduled_or_live",
+   "game_id": "6625668",
+   "reason": "its date has not passed",
+   "start_epoch": 1790722800,
+   "state": "P",
+   "teams": [
+    "Southern U.",
+    "Southeastern La."
    ]
   },
   {
