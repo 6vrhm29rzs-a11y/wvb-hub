@@ -29,8 +29,8 @@
   "between_team_variance": 5.941,
   "caveat_schedule": "the opponent IS adjusted for from match one: a result is scored as the strength it implies (opponent's rating + margin, home court removed). What is still thin early is the opponent's own rating, which is the preseason projection until a schedule graph exists",
   "teams_with_a_result": 348,
-  "matches_counted": 943,
-  "corpus_fingerprint": "fb967eff4e71708b",
+  "matches_counted": 955,
+  "corpus_fingerprint": "88d1b5adb722d7cc",
   "certifies": {
    "blend_weight_derived_not_chosen": {
     "value": true,
@@ -42,18 +42,18 @@
     }
    }
   },
-  "score_mean": -0.00021,
-  "score_sd": 1.08426,
+  "score_mean": -0.00024,
+  "score_sd": 1.08734,
   "score_scale_note": "mean and SD across ALL 348 teams, not just the ones shown -- a scale computed from the top 25 would measure the spread among the best",
   "shown": 25,
   "also_receiving": 10,
   "hit_channel_weight": 0.25,
   "hit_channel_tau": 0.1,
   "hit_channel_evidence": "data/blend_hiteff_2025.json",
-  "generated_at_utc": "2026-09-09T00:10:13Z",
+  "generated_at_utc": "2026-09-09T00:59:55Z",
   "data_through_epoch": 1788912000,
   "rating_cutoff_epoch": 1788850800,
-  "verified_intraday_counted": 7
+  "verified_intraday_counted": 18
  },
  "top": [
   {
@@ -225,6 +225,18 @@
    "rank": 14
   },
   {
+   "team": "Kansas",
+   "score": 1.9037,
+   "preseason_z": 1.59,
+   "season_z": 2.753,
+   "matches": 5,
+   "weight_on_season": 0.27,
+   "record": "2-3",
+   "net_pts_per_set": 3.08,
+   "conf": "Big 12",
+   "rank": 15
+  },
+  {
    "team": "Wisconsin",
    "score": 1.8295,
    "preseason_z": 1.967,
@@ -234,7 +246,7 @@
    "record": "3-3",
    "net_pts_per_set": -0.44,
    "conf": "Big Ten",
-   "rank": 15
+   "rank": 16
   },
   {
    "team": "Michigan St.",
@@ -246,7 +258,7 @@
    "record": "6-0",
    "net_pts_per_set": 8.29,
    "conf": "Big Ten",
-   "rank": 16
+   "rank": 17
   },
   {
    "team": "TCU",
@@ -257,18 +269,6 @@
    "weight_on_season": 0.27,
    "record": "3-2",
    "net_pts_per_set": 0.76,
-   "conf": "Big 12",
-   "rank": 17
-  },
-  {
-   "team": "Kansas",
-   "score": 1.7444,
-   "preseason_z": 1.59,
-   "season_z": 2.267,
-   "matches": 4,
-   "weight_on_season": 0.228,
-   "record": "1-3",
-   "net_pts_per_set": 1.26,
    "conf": "Big 12",
    "rank": 18
   },
@@ -579,32 +579,32 @@
    "weight_on_season": 0.228
   },
   {
-   "team": "Wisconsin",
+   "team": "Kansas",
    "rank": 15,
+   "score": 1.9037,
+   "matches": 5,
+   "weight_on_season": 0.27
+  },
+  {
+   "team": "Wisconsin",
+   "rank": 16,
    "score": 1.8295,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Michigan St.",
-   "rank": 16,
+   "rank": 17,
    "score": 1.8288,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "TCU",
-   "rank": 17,
+   "rank": 18,
    "score": 1.7691,
    "matches": 5,
    "weight_on_season": 0.27
-  },
-  {
-   "team": "Kansas",
-   "rank": 18,
-   "score": 1.7444,
-   "matches": 4,
-   "weight_on_season": 0.228
   },
   {
    "team": "North Carolina",
@@ -817,74 +817,74 @@
    "weight_on_season": 0.27
   },
   {
-   "team": "James Madison",
+   "team": "Mississippi St.",
    "rank": 49,
+   "score": 1.1362,
+   "matches": 6,
+   "weight_on_season": 0.307
+  },
+  {
+   "team": "James Madison",
+   "rank": 50,
    "score": 1.1212,
    "matches": 4,
    "weight_on_season": 0.228
   },
   {
    "team": "Florida St.",
-   "rank": 50,
+   "rank": 51,
    "score": 1.1083,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "Rice",
-   "rank": 51,
+   "rank": 52,
    "score": 1.0819,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Arizona",
-   "rank": 52,
+   "rank": 53,
    "score": 1.0773,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Ball St.",
-   "rank": 53,
+   "rank": 54,
    "score": 1.0703,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "Arkansas St.",
-   "rank": 54,
+   "rank": 55,
    "score": 1.0699,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "UTEP",
-   "rank": 55,
+   "rank": 56,
    "score": 1.0695,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "UC Santa Barbara",
-   "rank": 56,
+   "rank": 57,
    "score": 1.0668,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "Missouri",
-   "rank": 57,
+   "rank": 58,
    "score": 1.0498,
    "matches": 4,
    "weight_on_season": 0.228
-  },
-  {
-   "team": "Mississippi St.",
-   "rank": 58,
-   "score": 1.0425,
-   "matches": 5,
-   "weight_on_season": 0.27
   },
   {
    "team": "Georgia",
@@ -931,9 +931,9 @@
   {
    "team": "American",
    "rank": 65,
-   "score": 0.9108,
-   "matches": 6,
-   "weight_on_season": 0.307
+   "score": 0.934,
+   "matches": 7,
+   "weight_on_season": 0.341
   },
   {
    "team": "UC Davis",
@@ -943,102 +943,102 @@
    "weight_on_season": 0.27
   },
   {
-   "team": "Wichita St.",
-   "rank": 67,
-   "score": 0.8814,
-   "matches": 5,
-   "weight_on_season": 0.27
-  },
-  {
    "team": "Hofstra",
-   "rank": 68,
+   "rank": 67,
    "score": 0.8643,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Dayton",
-   "rank": 69,
+   "rank": 68,
    "score": 0.8599,
    "matches": 7,
    "weight_on_season": 0.341
   },
   {
    "team": "Xavier",
-   "rank": 70,
+   "rank": 69,
    "score": 0.8528,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "West Virginia",
-   "rank": 71,
+   "rank": 70,
    "score": 0.8521,
    "matches": 4,
    "weight_on_season": 0.228
   },
   {
    "team": "Toledo",
-   "rank": 72,
+   "rank": 71,
    "score": 0.8429,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "Ole Miss",
-   "rank": 73,
+   "rank": 72,
    "score": 0.8396,
    "matches": 7,
    "weight_on_season": 0.341
   },
   {
    "team": "Eastern Ky.",
-   "rank": 74,
+   "rank": 73,
    "score": 0.8289,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "Fla. Atlantic",
-   "rank": 75,
+   "rank": 74,
    "score": 0.8198,
    "matches": 4,
    "weight_on_season": 0.228
   },
   {
    "team": "LSU",
-   "rank": 76,
+   "rank": 75,
    "score": 0.7878,
    "matches": 4,
    "weight_on_season": 0.228
   },
   {
    "team": "South Dakota St.",
-   "rank": 77,
+   "rank": 76,
    "score": 0.7848,
    "matches": 8,
    "weight_on_season": 0.372
   },
   {
    "team": "Long Beach St.",
-   "rank": 78,
+   "rank": 77,
    "score": 0.7736,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "Iowa",
-   "rank": 79,
+   "rank": 78,
    "score": 0.7545,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "Northwestern",
-   "rank": 80,
+   "rank": 79,
    "score": 0.7422,
    "matches": 5,
    "weight_on_season": 0.27
+  },
+  {
+   "team": "Wichita St.",
+   "rank": 80,
+   "score": 0.7307,
+   "matches": 6,
+   "weight_on_season": 0.307
   },
   {
    "team": "Oregon St.",
@@ -1055,67 +1055,67 @@
    "weight_on_season": 0.27
   },
   {
-   "team": "Yale",
+   "team": "North Ala.",
    "rank": 83,
+   "score": 0.6928,
+   "matches": 8,
+   "weight_on_season": 0.372
+  },
+  {
+   "team": "Yale",
+   "rank": 84,
    "score": 0.6855,
    "matches": 3,
    "weight_on_season": 0.182
   },
   {
    "team": "Virginia",
-   "rank": 84,
+   "rank": 85,
    "score": 0.6638,
    "matches": 4,
    "weight_on_season": 0.228
   },
   {
    "team": "Notre Dame",
-   "rank": 85,
+   "rank": 86,
    "score": 0.66,
    "matches": 3,
    "weight_on_season": 0.182
   },
   {
    "team": "High Point",
-   "rank": 86,
+   "rank": 87,
    "score": 0.6478,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "Utah St.",
-   "rank": 87,
+   "rank": 88,
    "score": 0.619,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "Wyoming",
-   "rank": 88,
+   "rank": 89,
    "score": 0.6179,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "North Texas",
-   "rank": 89,
+   "rank": 90,
    "score": 0.6168,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "South Fla.",
-   "rank": 90,
+   "rank": 91,
    "score": 0.6135,
    "matches": 5,
    "weight_on_season": 0.27
-  },
-  {
-   "team": "North Ala.",
-   "rank": 91,
-   "score": 0.6114,
-   "matches": 7,
-   "weight_on_season": 0.341
   },
   {
    "team": "Grand Canyon",
@@ -1279,67 +1279,67 @@
    "weight_on_season": 0.27
   },
   {
-   "team": "Col. of Charleston",
+   "team": "Rutgers",
    "rank": 115,
+   "score": 0.4382,
+   "matches": 6,
+   "weight_on_season": 0.307
+  },
+  {
+   "team": "Col. of Charleston",
+   "rank": 116,
    "score": 0.435,
    "matches": 7,
    "weight_on_season": 0.341
   },
   {
    "team": "Liberty",
-   "rank": 116,
+   "rank": 117,
    "score": 0.4337,
    "matches": 7,
    "weight_on_season": 0.341
   },
   {
    "team": "Northern Ky.",
-   "rank": 117,
+   "rank": 118,
    "score": 0.4173,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Illinois St.",
-   "rank": 118,
+   "rank": 119,
    "score": 0.4164,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Maryland",
-   "rank": 119,
+   "rank": 120,
    "score": 0.4108,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "Fairfield",
-   "rank": 120,
+   "rank": 121,
    "score": 0.4088,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Georgetown",
-   "rank": 121,
+   "rank": 122,
    "score": 0.4084,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Sacramento St.",
-   "rank": 122,
+   "rank": 123,
    "score": 0.4042,
    "matches": 6,
    "weight_on_season": 0.307
-  },
-  {
-   "team": "Wake Forest",
-   "rank": 123,
-   "score": 0.3755,
-   "matches": 5,
-   "weight_on_season": 0.27
   },
   {
    "team": "South Alabama",
@@ -1356,9 +1356,9 @@
    "weight_on_season": 0.27
   },
   {
-   "team": "Rutgers",
+   "team": "Coastal Carolina",
    "rank": 126,
-   "score": 0.3471,
+   "score": 0.3594,
    "matches": 5,
    "weight_on_season": 0.27
   },
@@ -1384,18 +1384,18 @@
    "weight_on_season": 0.27
   },
   {
-   "team": "Clemson",
+   "team": "UConn",
    "rank": 130,
+   "score": 0.332,
+   "matches": 7,
+   "weight_on_season": 0.341
+  },
+  {
+   "team": "Clemson",
+   "rank": 131,
    "score": 0.3239,
    "matches": 6,
    "weight_on_season": 0.307
-  },
-  {
-   "team": "Coastal Carolina",
-   "rank": 131,
-   "score": 0.3069,
-   "matches": 4,
-   "weight_on_season": 0.228
   },
   {
    "team": "Hawaii",
@@ -1433,18 +1433,18 @@
    "weight_on_season": 0.27
   },
   {
-   "team": "FIU",
+   "team": "Wake Forest",
    "rank": 137,
+   "score": 0.2826,
+   "matches": 6,
+   "weight_on_season": 0.307
+  },
+  {
+   "team": "FIU",
+   "rank": 138,
    "score": 0.2818,
    "matches": 5,
    "weight_on_season": 0.27
-  },
-  {
-   "team": "UConn",
-   "rank": 138,
-   "score": 0.2816,
-   "matches": 6,
-   "weight_on_season": 0.307
   },
   {
    "team": "UTSA",
@@ -1517,16 +1517,16 @@
    "weight_on_season": 0.27
   },
   {
-   "team": "Denver",
+   "team": "App State",
    "rank": 149,
-   "score": 0.235,
-   "matches": 6,
-   "weight_on_season": 0.307
+   "score": 0.2401,
+   "matches": 7,
+   "weight_on_season": 0.341
   },
   {
-   "team": "App State",
+   "team": "Denver",
    "rank": 150,
-   "score": 0.2281,
+   "score": 0.235,
    "matches": 6,
    "weight_on_season": 0.307
   },
@@ -1818,72 +1818,72 @@
    "weight_on_season": 0.27
   },
   {
-   "team": "Akron",
+   "team": "St. John's (NY)",
    "rank": 192,
+   "score": -0.0567,
+   "matches": 7,
+   "weight_on_season": 0.341
+  },
+  {
+   "team": "Akron",
+   "rank": 193,
    "score": -0.0612,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "UIC",
-   "rank": 193,
+   "rank": 194,
    "score": -0.073,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "VCU",
-   "rank": 194,
+   "rank": 195,
    "score": -0.0814,
    "matches": 4,
    "weight_on_season": 0.228
   },
   {
    "team": "UNC Greensboro",
-   "rank": 195,
+   "rank": 196,
    "score": -0.0839,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "Omaha",
-   "rank": 196,
+   "rank": 197,
    "score": -0.088,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "Southeastern La.",
-   "rank": 197,
+   "rank": 198,
    "score": -0.0888,
    "matches": 4,
    "weight_on_season": 0.228
   },
   {
    "team": "Saint Louis",
-   "rank": 198,
+   "rank": 199,
    "score": -0.0892,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "George Mason",
-   "rank": 199,
+   "rank": 200,
    "score": -0.1059,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "New Hampshire",
-   "rank": 200,
-   "score": -0.1294,
-   "matches": 6,
-   "weight_on_season": 0.307
-  },
-  {
-   "team": "St. John's (NY)",
    "rank": 201,
-   "score": -0.1384,
+   "score": -0.1294,
    "matches": 6,
    "weight_on_season": 0.307
   },
@@ -1958,151 +1958,151 @@
    "weight_on_season": 0.307
   },
   {
-   "team": "Seton Hall",
+   "team": "William & Mary",
    "rank": 212,
+   "score": -0.2001,
+   "matches": 6,
+   "weight_on_season": 0.307
+  },
+  {
+   "team": "Seton Hall",
+   "rank": 213,
    "score": -0.2005,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "Tarleton St.",
-   "rank": 213,
+   "rank": 214,
    "score": -0.2074,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Milwaukee",
-   "rank": 214,
+   "rank": 215,
    "score": -0.2108,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Middle Tenn.",
-   "rank": 215,
+   "rank": 216,
    "score": -0.2191,
    "matches": 4,
    "weight_on_season": 0.228
   },
   {
    "team": "Little Rock",
-   "rank": 216,
+   "rank": 217,
    "score": -0.2222,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "Charlotte",
-   "rank": 217,
+   "rank": 218,
    "score": -0.2361,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "A&M-Corpus Christi",
-   "rank": 218,
+   "rank": 219,
    "score": -0.2408,
    "matches": 4,
    "weight_on_season": 0.228
   },
   {
    "team": "UC San Diego",
-   "rank": 219,
+   "rank": 220,
    "score": -0.2548,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Saint Mary's (CA)",
-   "rank": 220,
+   "rank": 221,
    "score": -0.2618,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
-   "team": "Fordham",
-   "rank": 221,
-   "score": -0.277,
-   "matches": 6,
-   "weight_on_season": 0.307
-  },
-  {
-   "team": "William & Mary",
-   "rank": 222,
-   "score": -0.2936,
-   "matches": 5,
-   "weight_on_season": 0.27
-  },
-  {
    "team": "Coppin St.",
-   "rank": 223,
+   "rank": 222,
    "score": -0.2956,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Virginia Tech",
-   "rank": 224,
+   "rank": 223,
    "score": -0.3066,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "USC Upstate",
-   "rank": 225,
+   "rank": 224,
    "score": -0.3133,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
-   "team": "Bryant",
-   "rank": 226,
-   "score": -0.3187,
-   "matches": 5,
-   "weight_on_season": 0.27
-  },
-  {
    "team": "Buffalo",
-   "rank": 227,
+   "rank": 225,
    "score": -0.3275,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Abilene Christian",
-   "rank": 228,
+   "rank": 226,
    "score": -0.33,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Eastern Mich.",
-   "rank": 229,
+   "rank": 227,
    "score": -0.3458,
    "matches": 7,
    "weight_on_season": 0.341
   },
   {
    "team": "Youngstown St.",
-   "rank": 230,
+   "rank": 228,
    "score": -0.3594,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Gonzaga",
-   "rank": 231,
+   "rank": 229,
    "score": -0.3632,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
+   "team": "Bryant",
+   "rank": 230,
+   "score": -0.3696,
+   "matches": 6,
+   "weight_on_season": 0.307
+  },
+  {
    "team": "North Florida",
-   "rank": 232,
+   "rank": 231,
    "score": -0.3721,
    "matches": 6,
    "weight_on_season": 0.307
+  },
+  {
+   "team": "Fordham",
+   "rank": 232,
+   "score": -0.3888,
+   "matches": 7,
+   "weight_on_season": 0.341
   },
   {
    "team": "East Texas A&M",
@@ -2182,18 +2182,18 @@
    "weight_on_season": 0.182
   },
   {
-   "team": "Presbyterian",
+   "team": "Howard",
    "rank": 244,
+   "score": -0.5471,
+   "matches": 6,
+   "weight_on_season": 0.307
+  },
+  {
+   "team": "Presbyterian",
+   "rank": 245,
    "score": -0.5494,
    "matches": 8,
    "weight_on_season": 0.372
-  },
-  {
-   "team": "Howard",
-   "rank": 245,
-   "score": -0.5511,
-   "matches": 5,
-   "weight_on_season": 0.27
   },
   {
    "team": "Southern Ill.",
@@ -2203,30 +2203,30 @@
    "weight_on_season": 0.307
   },
   {
-   "team": "Gardner-Webb",
-   "rank": 247,
-   "score": -0.5707,
-   "matches": 5,
-   "weight_on_season": 0.27
-  },
-  {
    "team": "Delaware",
-   "rank": 248,
+   "rank": 247,
    "score": -0.5805,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "Fresno St.",
-   "rank": 249,
+   "rank": 248,
    "score": -0.5808,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Old Dominion",
-   "rank": 250,
+   "rank": 249,
    "score": -0.5811,
+   "matches": 6,
+   "weight_on_season": 0.307
+  },
+  {
+   "team": "Gardner-Webb",
+   "rank": 250,
+   "score": -0.5836,
    "matches": 6,
    "weight_on_season": 0.307
   },
@@ -2282,9 +2282,9 @@
   {
    "team": "Western Caro.",
    "rank": 258,
-   "score": -0.6348,
-   "matches": 6,
-   "weight_on_season": 0.307
+   "score": -0.6337,
+   "matches": 7,
+   "weight_on_season": 0.341
   },
   {
    "team": "UT Arlington",
@@ -2385,86 +2385,86 @@
    "weight_on_season": 0.27
   },
   {
-   "team": "LIU",
-   "rank": 273,
-   "score": -0.8374,
-   "matches": 4,
-   "weight_on_season": 0.228
-  },
-  {
    "team": "NIU",
-   "rank": 274,
+   "rank": 273,
    "score": -0.8379,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Purdue Fort Wayne",
-   "rank": 275,
+   "rank": 274,
    "score": -0.8431,
    "matches": 7,
    "weight_on_season": 0.341
   },
   {
    "team": "Eastern Wash.",
-   "rank": 276,
+   "rank": 275,
    "score": -0.8519,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Houston Christian",
-   "rank": 277,
+   "rank": 276,
    "score": -0.8735,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
-   "team": "Florida A&M",
-   "rank": 278,
-   "score": -0.8789,
-   "matches": 5,
-   "weight_on_season": 0.27
-  },
-  {
    "team": "Navy",
-   "rank": 279,
+   "rank": 277,
    "score": -0.8794,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
-   "team": "Prairie View",
+   "team": "Louisiana Tech",
+   "rank": 278,
+   "score": -0.8953,
+   "matches": 7,
+   "weight_on_season": 0.341
+  },
+  {
+   "team": "Florida A&M",
+   "rank": 279,
+   "score": -0.9177,
+   "matches": 6,
+   "weight_on_season": 0.307
+  },
+  {
+   "team": "LIU",
    "rank": 280,
+   "score": -0.9189,
+   "matches": 5,
+   "weight_on_season": 0.27
+  },
+  {
+   "team": "Prairie View",
+   "rank": 281,
    "score": -0.9302,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Mercer",
-   "rank": 281,
+   "rank": 282,
    "score": -0.9352,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "Nevada",
-   "rank": 282,
+   "rank": 283,
    "score": -0.9378,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
    "team": "Bucknell",
-   "rank": 283,
-   "score": -0.9545,
-   "matches": 6,
-   "weight_on_season": 0.307
-  },
-  {
-   "team": "Louisiana Tech",
    "rank": 284,
-   "score": -0.9834,
+   "score": -0.9545,
    "matches": 6,
    "weight_on_season": 0.307
   },
@@ -2583,9 +2583,9 @@
   {
    "team": "Elon",
    "rank": 301,
-   "score": -1.1498,
-   "matches": 7,
-   "weight_on_season": 0.341
+   "score": -1.1552,
+   "matches": 8,
+   "weight_on_season": 0.372
   },
   {
    "team": "Kansas City",
@@ -2672,39 +2672,39 @@
    "weight_on_season": 0.307
   },
   {
-   "team": "Norfolk St.",
-   "rank": 314,
-   "score": -1.3817,
-   "matches": 4,
-   "weight_on_season": 0.228
-  },
-  {
    "team": "Hampton",
-   "rank": 315,
+   "rank": 314,
    "score": -1.4023,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Western Ill.",
-   "rank": 316,
+   "rank": 315,
    "score": -1.4031,
    "matches": 7,
    "weight_on_season": 0.341
   },
   {
    "team": "Seattle U",
-   "rank": 317,
+   "rank": 316,
    "score": -1.4192,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Robert Morris",
-   "rank": 318,
+   "rank": 317,
    "score": -1.4242,
    "matches": 6,
    "weight_on_season": 0.307
+  },
+  {
+   "team": "Norfolk St.",
+   "rank": 318,
+   "score": -1.4787,
+   "matches": 5,
+   "weight_on_season": 0.27
   },
   {
    "team": "N.C. Central",
@@ -2875,32 +2875,32 @@
    "weight_on_season": 0.307
   },
   {
-   "team": "Tennessee St.",
-   "rank": 343,
-   "score": -2.7698,
-   "matches": 6,
-   "weight_on_season": 0.307
-  },
-  {
    "team": "Ark.-Pine Bluff",
-   "rank": 344,
+   "rank": 343,
    "score": -2.8503,
    "matches": 3,
    "weight_on_season": 0.182
   },
   {
    "team": "Le Moyne",
-   "rank": 345,
+   "rank": 344,
    "score": -2.8537,
    "matches": 5,
    "weight_on_season": 0.27
   },
   {
+   "team": "Tennessee St.",
+   "rank": 345,
+   "score": -2.87,
+   "matches": 7,
+   "weight_on_season": 0.341
+  },
+  {
    "team": "Alcorn",
    "rank": 346,
-   "score": -2.9316,
-   "matches": 4,
-   "weight_on_season": 0.228
+   "score": -3.031,
+   "matches": 5,
+   "weight_on_season": 0.27
   },
   {
    "team": "Chicago St.",

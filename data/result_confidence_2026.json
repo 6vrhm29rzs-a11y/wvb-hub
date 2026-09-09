@@ -2,16 +2,16 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "corpus_fingerprint": "fb967eff4e71708b",
-  "generated_at_utc": "2026-09-09T00:10:18Z",
+  "corpus_fingerprint": "88d1b5adb722d7cc",
+  "generated_at_utc": "2026-09-09T01:00:00Z",
   "counts": {
-   "finals": 997,
+   "finals": 1003,
    "official_only": 33,
-   "reconciled": 915,
+   "reconciled": 921,
    "confirmed": 0,
-   "disputed": 8,
-   "pending_second": 989,
-   "corrected": 41,
+   "disputed": 7,
+   "pending_second": 996,
+   "corrected": 42,
    "duplicate_listings": 8,
    "duplicate_candidates_pending": 0
   }
@@ -40720,11 +40720,28 @@
    ]
   },
   {
-   "result_corrected": null,
-   "corr_reason": null,
-   "corr_kind": null,
-   "corr_feed_said": null,
-   "corr_evidence": [],
+   "result_corrected": true,
+   "corr_reason": "Coastal Carolina won 3-1 -- the feed's entire team attribution is inverted (the SMU-UC Davis class). Flagged by the lineup-attribution guard on 2026-09-05 and HELD as pending while only Florida A&M had posted; the pending entry's recheck alarm fired on 2026-09-08 (CI, UTC boundary) and by then both schools had published the same alternative: FAMU 'L 1-3 vs Coastal Carolina' and Coastal 'W 3-1 vs Florida A&M', both marking it Neutral in Jacksonville at the Dolphin Volleyball Classic. Linescores flipped column-for-column.",
+   "corr_kind": "contradicted",
+   "corr_feed_said": "Florida A&M (home) won 3-1 -- 25-21, 28-30, 25-11, 25-16 from the home column -- with box and lineup rows attributed the same way. Internally coherent, and wrong; it also lists FAMU as home when both schools mark the match neutral (Dolphin Volleyball Classic, Jacksonville).",
+   "corr_evidence": [
+    {
+     "school": "Florida A&M",
+     "url": "https://famuathletics.com/services/schedule_txt.ashx?schedule=214",
+     "text": "'Sep 5 (Sat) 5 p.m. Neutral Coastal Carolina Jacksonville, Fla. L 1-3' -- Florida A&M's own schedule export",
+     "status": null,
+     "note": null,
+     "retrieved": "2026-09-09"
+    },
+    {
+     "school": "Coastal Carolina",
+     "url": "https://goccusports.com/sports/womens-volleyball/schedule/text",
+     "text": "'Sep 5 (Sat) 5:00 p.m. Neutral Florida A&M Jacksonville, FL Dolphin Volleyball Classic W 3-1' -- Coastal Carolina's schedule text",
+     "status": null,
+     "note": null,
+     "retrieved": "2026-09-09"
+    }
+   ],
    "duplicate_of": null,
    "dup_reason": null,
    "dup_asym": null,
@@ -40734,10 +40751,10 @@
    "h": "Florida A&M",
    "exh": false,
    "d": "2026-09-05",
-   "overall": "disputed",
+   "overall": "corrected",
    "states": {
-    "result": "disputed",
-    "sets": "reconciled",
+    "result": "corrected",
+    "sets": "corrected",
     "box": "reconciled",
     "venue": "official"
    },
@@ -46945,7 +46962,7 @@
    },
    "verify": {
     "v": "UNVERIFIED",
-    "checked": "2026-09-09T00:09:25Z",
+    "checked": "2026-09-09T00:59:02Z",
     "schools": {
      "Delaware St.": {
       "state": "EVENT_NOT_FOUND",
@@ -46988,21 +47005,15 @@
     "venue": "unavailable"
    },
    "verify": {
-    "v": "UNVERIFIED",
-    "checked": "2026-09-09T00:09:25Z",
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-09T00:59:02Z",
     "schools": {
      "Western Caro.": {
-      "state": "NOT_POSTED",
+      "state": "AGREE_COMPLETE",
       "url": "https://catamountsports.com/services/schedule_txt.ashx?schedule=593",
-      "row": [
-       "Sep 8 (Tue)",
-       "6:00 PM",
-       "Home",
-       "Gardner-Webb",
-       "Cullowhee, NC",
-       "",
-       ""
-      ]
+      "assertion": "Western Caro. W 3-1 vs Gardner-Webb",
+      "opponent_source": "Gardner-Webb",
+      "site_says": "Home"
      },
      "Gardner-Webb": {
       "state": "NOT_POSTED",
@@ -47019,10 +47030,22 @@
      }
     }
    },
-   "n_indep": 0,
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-09T00:59:02Z",
+   "sources": [
+    {
+     "url": "https://catamountsports.com/services/schedule_txt.ashx?schedule=593",
+     "kind": "school_schedule",
+     "school": "Western Caro.",
+     "text": "Western Caro. W 3-1 vs Gardner-Webb",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-09T00:59:02Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -47048,7 +47071,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-09T00:09:25Z",
+    "checked": "2026-09-09T00:59:02Z",
     "schools": {
      "Michigan St.": {
       "state": "AGREE_COMPLETE",
@@ -47068,7 +47091,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-09T00:09:25Z",
+   "last_checked": "2026-09-09T00:59:02Z",
    "sources": [
     {
      "url": "https://msuspartans.com/sports/womens-volleyball/schedule/text",
@@ -47079,7 +47102,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-09T00:09:25Z"
+     "retrieved": "2026-09-09T00:59:02Z"
     },
     {
      "url": "https://wmubroncos.com/services/schedule_txt.ashx?schedule=2344",
@@ -47090,7 +47113,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-09T00:09:25Z"
+     "retrieved": "2026-09-09T00:59:02Z"
     }
    ]
   },
@@ -47117,8 +47140,8 @@
     "venue": "unavailable"
    },
    "verify": {
-    "v": "UNVERIFIED",
-    "checked": "2026-09-09T00:09:25Z",
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-09T00:59:02Z",
     "schools": {
      "American": {
       "state": "NOT_POSTED",
@@ -47134,24 +47157,30 @@
       ]
      },
      "Howard": {
-      "state": "NOT_POSTED",
+      "state": "AGREE_COMPLETE",
       "url": "https://hubison.com/services/schedule_txt.ashx?schedule=357",
-      "row": [
-       "Sep 8 (Tue)",
-       "6 P.M.",
-       "Away",
-       "American",
-       "Washington, D.C.",
-       "",
-       ""
-      ]
+      "assertion": "Howard L 0-3 vs American",
+      "opponent_source": "American",
+      "site_says": "Away"
      }
     }
    },
-   "n_indep": 0,
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-09T00:59:02Z",
+   "sources": [
+    {
+     "url": "https://hubison.com/services/schedule_txt.ashx?schedule=357",
+     "kind": "school_schedule",
+     "school": "Howard",
+     "text": "Howard L 0-3 vs American",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-09T00:59:02Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -47177,7 +47206,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-09T00:09:25Z",
+    "checked": "2026-09-09T00:59:02Z",
     "schools": {
      "Col. of Charleston": {
       "state": "AGREE_COMPLETE",
@@ -47197,7 +47226,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-09T00:09:25Z",
+   "last_checked": "2026-09-09T00:59:02Z",
    "sources": [
     {
      "url": "https://cofcsports.com/sports/womens-volleyball/schedule/text",
@@ -47208,7 +47237,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-09T00:09:25Z"
+     "retrieved": "2026-09-09T00:59:02Z"
     }
    ]
   },
@@ -47236,7 +47265,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-09T00:09:25Z",
+    "checked": "2026-09-09T00:59:02Z",
     "schools": {
      "Duke": {
       "state": "AGREE_COMPLETE",
@@ -47256,7 +47285,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-09T00:09:25Z",
+   "last_checked": "2026-09-09T00:59:02Z",
    "sources": [
     {
      "url": "https://csusports.com/services/schedule_txt.ashx?schedule=465",
@@ -47267,7 +47296,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-09T00:09:25Z"
+     "retrieved": "2026-09-09T00:59:02Z"
     },
     {
      "url": "https://goduke.com/sports/womens-volleyball/schedule/text",
@@ -47278,7 +47307,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-09T00:09:25Z"
+     "retrieved": "2026-09-09T00:59:02Z"
     }
    ]
   },
@@ -47306,7 +47335,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-09T00:09:25Z",
+    "checked": "2026-09-09T00:59:02Z",
     "schools": {
      "Holy Cross": {
       "state": "NOT_POSTED",
@@ -47332,7 +47361,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-09T00:09:25Z",
+   "last_checked": "2026-09-09T00:59:02Z",
    "sources": [
     {
      "url": "https://goredfoxes.com/services/schedule_txt.ashx?schedule=656",
@@ -47343,7 +47372,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-09T00:09:25Z"
+     "retrieved": "2026-09-09T00:59:02Z"
     }
    ]
   },
@@ -47371,7 +47400,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-09T00:09:25Z",
+    "checked": "2026-09-09T00:59:02Z",
     "schools": {
      "Liberty": {
       "state": "AGREE_COMPLETE",
@@ -47391,7 +47420,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-09T00:09:25Z",
+   "last_checked": "2026-09-09T00:59:02Z",
    "sources": [
     {
      "url": "https://libertyflames.com/sports/womens-volleyball/schedule/text",
@@ -47402,7 +47431,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-09T00:09:25Z"
+     "retrieved": "2026-09-09T00:59:02Z"
     },
     {
      "url": "https://radfordathletics.com/sports/womens-volleyball/schedule/text",
@@ -47413,7 +47442,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-09T00:09:25Z"
+     "retrieved": "2026-09-09T00:59:02Z"
     }
    ]
   },
@@ -47440,21 +47469,15 @@
     "venue": "unavailable"
    },
    "verify": {
-    "v": "UNVERIFIED",
-    "checked": "2026-09-09T00:09:25Z",
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-09T00:59:02Z",
     "schools": {
      "UConn": {
-      "state": "NOT_POSTED",
+      "state": "AGREE_COMPLETE",
       "url": "https://uconnhuskies.com/sports/womens-volleyball/schedule/text",
-      "row": [
-       "Sep 8 (Tue)",
-       "6PM",
-       "Home",
-       "Bryant",
-       "Storrs, CT (UConn Volleyball Center)",
-       "",
-       "-"
-      ]
+      "assertion": "UConn W 3-0 vs Bryant",
+      "opponent_source": "Bryant",
+      "site_says": "Home"
      },
      "Bryant": {
       "state": "EVENT_NOT_FOUND",
@@ -47465,10 +47488,81 @@
      }
     }
    },
-   "n_indep": 0,
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-09T00:59:02Z",
+   "sources": [
+    {
+     "url": "https://uconnhuskies.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "UConn",
+     "text": "UConn W 3-0 vs Bryant",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-09T00:59:02Z"
+    }
+   ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6626958",
+   "a": "App State",
+   "h": "Elon",
+   "exh": false,
+   "d": "2026-09-08",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "verify": {
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-09T00:59:02Z",
+    "schools": {
+     "App State": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://appstatesports.com/services/schedule_txt.ashx?schedule=429",
+      "assertion": "App State W 3-1 vs Elon",
+      "opponent_source": "Elon",
+      "site_says": "Away"
+     },
+     "Elon": {
+      "state": "EVENT_NOT_FOUND",
+      "url": "https://elonphoenix.com/services/schedule_txt.ashx?schedule=627",
+      "rows_on_date": [
+       "Appalachian State"
+      ]
+     }
+    }
+   },
+   "n_indep": 1,
+   "n_attempted": 0,
+   "last_checked": "2026-09-09T00:59:02Z",
+   "sources": [
+    {
+     "url": "https://appstatesports.com/services/schedule_txt.ashx?schedule=429",
+     "kind": "school_schedule",
+     "school": "App State",
+     "text": "App State W 3-1 vs Elon",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-09T00:59:02Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -47494,7 +47588,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-09T00:09:25Z",
+    "checked": "2026-09-09T00:59:02Z",
     "schools": {
      "UNC Asheville": {
       "state": "NOT_POSTED",
@@ -47520,7 +47614,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-09T00:09:25Z",
+   "last_checked": "2026-09-09T00:59:02Z",
    "sources": [
     {
      "url": "https://nccueaglepride.com/services/schedule_txt.ashx?schedule=345",
@@ -47531,7 +47625,77 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-09T00:09:25Z"
+     "retrieved": "2026-09-09T00:59:02Z"
+    }
+   ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6640144",
+   "a": "LIU",
+   "h": "Rutgers",
+   "exh": false,
+   "d": "2026-09-08",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "verify": {
+    "v": "VERIFIED_BOTH",
+    "checked": "2026-09-09T00:59:02Z",
+    "schools": {
+     "Rutgers": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://scarletknights.com/sports/womens-volleyball/schedule/text",
+      "assertion": "Rutgers W 3-1 vs LIU",
+      "opponent_source": "LIU",
+      "site_says": "Home"
+     },
+     "LIU": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://liuathletics.com/services/schedule_txt.ashx?schedule=262",
+      "assertion": "LIU L 1-3 vs Rutgers",
+      "opponent_source": "Rutgers",
+      "site_says": "Away"
+     }
+    }
+   },
+   "n_indep": 2,
+   "n_attempted": 0,
+   "last_checked": "2026-09-09T00:59:02Z",
+   "sources": [
+    {
+     "url": "https://liuathletics.com/services/schedule_txt.ashx?schedule=262",
+     "kind": "school_schedule",
+     "school": "LIU",
+     "text": "LIU L 1-3 vs Rutgers",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-09T00:59:02Z"
+    },
+    {
+     "url": "https://scarletknights.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Rutgers",
+     "text": "Rutgers W 3-1 vs LIU",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-09T00:59:02Z"
     }
    ]
   },
@@ -47558,21 +47722,15 @@
     "venue": "unavailable"
    },
    "verify": {
-    "v": "UNVERIFIED",
-    "checked": "2026-09-09T00:09:25Z",
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-09T00:59:02Z",
     "schools": {
      "William & Mary": {
-      "state": "NOT_POSTED",
+      "state": "AGREE_COMPLETE",
       "url": "https://tribeathletics.com/services/schedule_txt.ashx?schedule=1178",
-      "row": [
-       "Sep 8 (Tue)",
-       "6:30 PM",
-       "Away",
-       "Norfolk State",
-       "Norfolk, Va.",
-       "",
-       ""
-      ]
+      "assertion": "William & Mary W 3-0 vs Norfolk State",
+      "opponent_source": "Norfolk State",
+      "site_says": "Away"
      },
      "Norfolk St.": {
       "state": "NOT_POSTED",
@@ -47589,10 +47747,216 @@
      }
     }
    },
-   "n_indep": 0,
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-09T00:59:02Z",
+   "sources": [
+    {
+     "url": "https://tribeathletics.com/services/schedule_txt.ashx?schedule=1178",
+     "kind": "school_schedule",
+     "school": "William & Mary",
+     "text": "William & Mary W 3-0 vs Norfolk State",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-09T00:59:02Z"
+    }
+   ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6625727",
+   "a": "Wichita St.",
+   "h": "Kansas",
+   "exh": false,
+   "d": "2026-09-08",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "verify": {
+    "v": "VERIFIED_BOTH",
+    "checked": "2026-09-09T00:59:02Z",
+    "schools": {
+     "Kansas": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://kuathletics.com/sports/womens-volleyball/schedule/text",
+      "assertion": "Kansas W 3-0 vs Wichita State",
+      "opponent_source": "Wichita State",
+      "site_says": "Home"
+     },
+     "Wichita St.": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://goshockers.com/services/schedule_txt.ashx?schedule=5357",
+      "assertion": "Wichita St. L 0-3 vs Kansas",
+      "opponent_source": "Kansas",
+      "site_says": "Away"
+     }
+    }
+   },
+   "n_indep": 2,
+   "n_attempted": 0,
+   "last_checked": "2026-09-09T00:59:02Z",
+   "sources": [
+    {
+     "url": "https://kuathletics.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Kansas",
+     "text": "Kansas W 3-0 vs Wichita State",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-09T00:59:02Z"
+    },
+    {
+     "url": "https://goshockers.com/services/schedule_txt.ashx?schedule=5357",
+     "kind": "school_schedule",
+     "school": "Wichita St.",
+     "text": "Wichita St. L 0-3 vs Kansas",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-09T00:59:02Z"
+    }
+   ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6627111",
+   "a": "St. John's (NY)",
+   "h": "Fordham",
+   "exh": false,
+   "d": "2026-09-08",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "verify": {
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-09T00:59:02Z",
+    "schools": {
+     "St. John's (NY)": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://redstormsports.com/sports/womens-volleyball/schedule/text",
+      "assertion": "St. John's (NY) W 3-0 vs Fordham",
+      "opponent_source": "Fordham",
+      "site_says": "Away"
+     },
+     "Fordham": {
+      "state": "EVENT_NOT_FOUND",
+      "url": "https://fordhamsports.com/services/schedule_txt.ashx?schedule=1735",
+      "rows_on_date": [
+       "St. John's"
+      ]
+     }
+    }
+   },
+   "n_indep": 1,
+   "n_attempted": 0,
+   "last_checked": "2026-09-09T00:59:02Z",
+   "sources": [
+    {
+     "url": "https://redstormsports.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "St. John's (NY)",
+     "text": "St. John's (NY) W 3-0 vs Fordham",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-09T00:59:02Z"
+    }
+   ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6628640",
+   "a": "North Ala.",
+   "h": "Tennessee St.",
+   "exh": false,
+   "d": "2026-09-08",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "unavailable"
+   },
+   "verify": {
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-09T00:59:02Z",
+    "schools": {
+     "North Ala.": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://roarlions.com/services/schedule_txt.ashx?schedule=171",
+      "assertion": "North Ala. W 3-0 vs Tennessee State",
+      "opponent_source": "Tennessee State",
+      "site_says": "Away"
+     },
+     "Tennessee St.": {
+      "state": "NOT_POSTED",
+      "url": "https://tsutigers.com/services/schedule_txt.ashx?schedule=265",
+      "row": [
+       "Sep 8 (Tue)",
+       "6:00 PM",
+       "Home",
+       "North Alabama",
+       "TBD (Kean Hall)",
+       "",
+       ""
+      ]
+     }
+    }
+   },
+   "n_indep": 1,
+   "n_attempted": 0,
+   "last_checked": "2026-09-09T00:59:02Z",
+   "sources": [
+    {
+     "url": "https://roarlions.com/services/schedule_txt.ashx?schedule=171",
+     "kind": "school_schedule",
+     "school": "North Ala.",
+     "text": "North Ala. W 3-0 vs Tennessee State",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-09T00:59:02Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -47617,8 +47981,8 @@
     "venue": "official"
    },
    "verify": {
-    "v": "UNVERIFIED",
-    "checked": "2026-09-09T00:09:25Z",
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-09T00:59:02Z",
     "schools": {
      "Louisiana Tech": {
       "state": "EVENT_NOT_FOUND",
@@ -47628,24 +47992,95 @@
       ]
      },
      "Alcorn": {
-      "state": "NOT_POSTED",
+      "state": "AGREE_COMPLETE",
       "url": "https://alcornsports.com/services/schedule_txt.ashx?schedule=320",
+      "assertion": "Alcorn L 0-3 vs Louisiana Tech",
+      "opponent_source": "Louisiana Tech",
+      "site_says": "Away"
+     }
+    }
+   },
+   "n_indep": 1,
+   "n_attempted": 0,
+   "last_checked": "2026-09-09T00:59:02Z",
+   "sources": [
+    {
+     "url": "https://alcornsports.com/services/schedule_txt.ashx?schedule=320",
+     "kind": "school_schedule",
+     "school": "Alcorn",
+     "text": "Alcorn L 0-3 vs Louisiana Tech",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-09T00:59:02Z"
+    }
+   ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6628444",
+   "a": "Mississippi St.",
+   "h": "Wake Forest",
+   "exh": false,
+   "d": "2026-09-08",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "unavailable"
+   },
+   "verify": {
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-09T00:59:02Z",
+    "schools": {
+     "Mississippi St.": {
+      "state": "NOT_POSTED",
+      "url": "https://hailstate.com/sports/womens-volleyball/schedule/text",
       "row": [
        "Sep 8 (Tue)",
        "5:30 p.m.",
        "Away",
-       "Louisiana Tech",
-       "Ruston, La.",
-       "",
-       ""
+       "Wake Forest",
+       "Winston-Salem, N.C.",
+       "Showdown At The Net",
+       "-"
       ]
+     },
+     "Wake Forest": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://godeacs.com/sports/womens-volleyball/schedule/text",
+      "assertion": "Wake Forest L 1-3 vs Mississippi State",
+      "opponent_source": "Mississippi State",
+      "site_says": "Home"
      }
     }
    },
-   "n_indep": 0,
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-09T00:59:02Z",
+   "sources": [
+    {
+     "url": "https://godeacs.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Wake Forest",
+     "text": "Wake Forest L 1-3 vs Mississippi State",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-09T00:59:02Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -47671,7 +48106,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-09T00:09:25Z",
+    "checked": "2026-09-09T00:59:02Z",
     "schools": {
      "Tulsa": {
       "state": "AGREE_COMPLETE",
@@ -47691,7 +48126,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-09T00:09:25Z",
+   "last_checked": "2026-09-09T00:59:02Z",
    "sources": [
     {
      "url": "https://oruathletics.com/services/schedule_txt.ashx?schedule=338",
@@ -47702,7 +48137,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-09T00:09:25Z"
+     "retrieved": "2026-09-09T00:59:02Z"
     },
     {
      "url": "https://tulsahurricane.com/sports/womens-volleyball/schedule/text",
@@ -47713,7 +48148,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-09T00:09:25Z"
+     "retrieved": "2026-09-09T00:59:02Z"
     }
    ]
   }

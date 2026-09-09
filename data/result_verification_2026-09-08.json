@@ -1,10 +1,10 @@
 {
  "date": "2026-09-08",
- "generated_utc": "2026-09-09T00:09:25Z",
+ "generated_utc": "2026-09-09T00:59:02Z",
  "counts": {
-  "UNVERIFIED": 6,
-  "VERIFIED_BOTH": 4,
-  "CORROBORATED_ONE": 3
+  "UNVERIFIED": 1,
+  "CORROBORATED_ONE": 12,
+  "VERIFIED_BOTH": 6
  },
  "matches": [
   {
@@ -30,20 +30,14 @@
    "gid": "6624314",
    "date": "2026-09-08",
    "canonical": "Western Caro. def. Gardner-Webb 3-1",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Western Caro.": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://catamountsports.com/services/schedule_txt.ashx?schedule=593",
-     "row": [
-      "Sep 8 (Tue)",
-      "6:00 PM",
-      "Home",
-      "Gardner-Webb",
-      "Cullowhee, NC",
-      "",
-      ""
-     ]
+     "assertion": "Western Caro. W 3-1 vs Gardner-Webb",
+     "opponent_source": "Gardner-Webb",
+     "site_says": "Home"
     },
     "Gardner-Webb": {
      "state": "NOT_POSTED",
@@ -86,7 +80,7 @@
    "gid": "6624700",
    "date": "2026-09-08",
    "canonical": "American def. Howard 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "American": {
      "state": "NOT_POSTED",
@@ -102,17 +96,11 @@
      ]
     },
     "Howard": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://hubison.com/services/schedule_txt.ashx?schedule=357",
-     "row": [
-      "Sep 8 (Tue)",
-      "6 P.M.",
-      "Away",
-      "American",
-      "Washington, D.C.",
-      "",
-      ""
-     ]
+     "assertion": "Howard L 0-3 vs American",
+     "opponent_source": "American",
+     "site_says": "Away"
     }
    }
   },
@@ -214,20 +202,14 @@
    "gid": "6626607",
    "date": "2026-09-08",
    "canonical": "UConn def. Bryant 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "UConn": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://uconnhuskies.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 8 (Tue)",
-      "6PM",
-      "Home",
-      "Bryant",
-      "Storrs, CT (UConn Volleyball Center)",
-      "",
-      "-"
-     ]
+     "assertion": "UConn W 3-0 vs Bryant",
+     "opponent_source": "Bryant",
+     "site_says": "Home"
     },
     "Bryant": {
      "state": "EVENT_NOT_FOUND",
@@ -270,20 +252,14 @@
    "gid": "6625054",
    "date": "2026-09-08",
    "canonical": "William & Mary def. Norfolk St. 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "William & Mary": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://tribeathletics.com/services/schedule_txt.ashx?schedule=1178",
-     "row": [
-      "Sep 8 (Tue)",
-      "6:30 PM",
-      "Away",
-      "Norfolk State",
-      "Norfolk, Va.",
-      "",
-      ""
-     ]
+     "assertion": "William & Mary W 3-0 vs Norfolk State",
+     "opponent_source": "Norfolk State",
+     "site_says": "Away"
     },
     "Norfolk St.": {
      "state": "NOT_POSTED",
@@ -304,7 +280,7 @@
    "gid": "6627548",
    "date": "2026-09-08",
    "canonical": "Louisiana Tech def. Alcorn 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Louisiana Tech": {
      "state": "EVENT_NOT_FOUND",
@@ -314,17 +290,11 @@
      ]
     },
     "Alcorn": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://alcornsports.com/services/schedule_txt.ashx?schedule=320",
-     "row": [
-      "Sep 8 (Tue)",
-      "5:30 p.m.",
-      "Away",
-      "Louisiana Tech",
-      "Ruston, La.",
-      "",
-      ""
-     ]
+     "assertion": "Alcorn L 0-3 vs Louisiana Tech",
+     "opponent_source": "Louisiana Tech",
+     "site_says": "Away"
     }
    }
   },
@@ -346,6 +316,150 @@
      "url": "https://oruathletics.com/services/schedule_txt.ashx?schedule=338",
      "assertion": "Oral Roberts L 0-3 vs Tulsa",
      "opponent_source": "Tulsa",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6626958",
+   "date": "2026-09-08",
+   "canonical": "App State def. Elon 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "App State": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://appstatesports.com/services/schedule_txt.ashx?schedule=429",
+     "assertion": "App State W 3-1 vs Elon",
+     "opponent_source": "Elon",
+     "site_says": "Away"
+    },
+    "Elon": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://elonphoenix.com/services/schedule_txt.ashx?schedule=627",
+     "rows_on_date": [
+      "Appalachian State"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6640144",
+   "date": "2026-09-08",
+   "canonical": "Rutgers def. LIU 3-1",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Rutgers": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://scarletknights.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Rutgers W 3-1 vs LIU",
+     "opponent_source": "LIU",
+     "site_says": "Home"
+    },
+    "LIU": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://liuathletics.com/services/schedule_txt.ashx?schedule=262",
+     "assertion": "LIU L 1-3 vs Rutgers",
+     "opponent_source": "Rutgers",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6625727",
+   "date": "2026-09-08",
+   "canonical": "Kansas def. Wichita St. 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Kansas": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://kuathletics.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Kansas W 3-0 vs Wichita State",
+     "opponent_source": "Wichita State",
+     "site_says": "Home"
+    },
+    "Wichita St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://goshockers.com/services/schedule_txt.ashx?schedule=5357",
+     "assertion": "Wichita St. L 0-3 vs Kansas",
+     "opponent_source": "Kansas",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6627111",
+   "date": "2026-09-08",
+   "canonical": "St. John's (NY) def. Fordham 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "St. John's (NY)": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://redstormsports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "St. John's (NY) W 3-0 vs Fordham",
+     "opponent_source": "Fordham",
+     "site_says": "Away"
+    },
+    "Fordham": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://fordhamsports.com/services/schedule_txt.ashx?schedule=1735",
+     "rows_on_date": [
+      "St. John's"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6628640",
+   "date": "2026-09-08",
+   "canonical": "North Ala. def. Tennessee St. 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "North Ala.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://roarlions.com/services/schedule_txt.ashx?schedule=171",
+     "assertion": "North Ala. W 3-0 vs Tennessee State",
+     "opponent_source": "Tennessee State",
+     "site_says": "Away"
+    },
+    "Tennessee St.": {
+     "state": "NOT_POSTED",
+     "url": "https://tsutigers.com/services/schedule_txt.ashx?schedule=265",
+     "row": [
+      "Sep 8 (Tue)",
+      "6:00 PM",
+      "Home",
+      "North Alabama",
+      "TBD (Kean Hall)",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6628444",
+   "date": "2026-09-08",
+   "canonical": "Mississippi St. def. Wake Forest 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Mississippi St.": {
+     "state": "NOT_POSTED",
+     "url": "https://hailstate.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 8 (Tue)",
+      "5:30 p.m.",
+      "Away",
+      "Wake Forest",
+      "Winston-Salem, N.C.",
+      "Showdown At The Net",
+      "-"
+     ]
+    },
+    "Wake Forest": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://godeacs.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Wake Forest L 1-3 vs Mississippi State",
+     "opponent_source": "Mississippi State",
      "site_says": "Home"
     }
    }

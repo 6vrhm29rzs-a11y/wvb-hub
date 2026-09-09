@@ -2038,6 +2038,62 @@
      "establishes": "Radford won 3-1 -- the second school source; both schools assert the same alternative against the feed"
     }
    ]
+  },
+  "6627992": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Florida A&M (home) won 3-1 -- 25-21, 28-30, 25-11, 25-16 from the home column -- with box and lineup rows attributed the same way. Internally coherent, and wrong; it also lists FAMU as home when both schools mark the match neutral (Dolphin Volleyball Classic, Jacksonville).",
+   "correct": {
+    "winner_team_id": "46170",
+    "away_sets": 3,
+    "home_sets": 1,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 25,
+      "home": 21
+     },
+     {
+      "period": 2,
+      "visit": 28,
+      "home": 30
+     },
+     {
+      "period": 3,
+      "visit": 25,
+      "home": 11
+     },
+     {
+      "period": 4,
+      "visit": 25,
+      "home": 16
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46412": "46170",
+     "46170": "46412"
+    }
+   },
+   "established": "Coastal Carolina won 3-1 -- the feed's entire team attribution is inverted (the SMU-UC Davis class). Flagged by the lineup-attribution guard on 2026-09-05 and HELD as pending while only Florida A&M had posted; the pending entry's recheck alarm fired on 2026-09-08 (CI, UTC boundary) and by then both schools had published the same alternative: FAMU 'L 1-3 vs Coastal Carolina' and Coastal 'W 3-1 vs Florida A&M', both marking it Neutral in Jacksonville at the Dolphin Volleyball Classic. Linescores flipped column-for-column.",
+   "evidence": [
+    {
+     "url": "https://famuathletics.com/services/schedule_txt.ashx?schedule=214",
+     "kind": "school_site",
+     "school": "Florida A&M",
+     "retrieved": "2026-09-09T00:56:47Z",
+     "text": "'Sep 5 (Sat) 5 p.m. Neutral Coastal Carolina Jacksonville, Fla. L 1-3' -- Florida A&M's own schedule export",
+     "establishes": "Florida A&M lost 1-3"
+    },
+    {
+     "url": "https://goccusports.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Coastal Carolina",
+     "retrieved": "2026-09-09T00:50:00Z",
+     "text": "'Sep 5 (Sat) 5:00 p.m. Neutral Florida A&M Jacksonville, FL Dolphin Volleyball Classic W 3-1' -- Coastal Carolina's schedule text",
+     "establishes": "Coastal Carolina won 3-1 -- the second school source; both schools assert the same alternative against the feed"
+    }
+   ]
   }
  }
 }
