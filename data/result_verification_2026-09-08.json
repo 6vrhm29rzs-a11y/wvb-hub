@@ -1,9 +1,9 @@
 {
  "date": "2026-09-08",
- "generated_utc": "2026-09-09T00:59:02Z",
+ "generated_utc": "2026-09-09T01:19:44Z",
  "counts": {
-  "UNVERIFIED": 1,
-  "CORROBORATED_ONE": 12,
+  "UNVERIFIED": 5,
+  "CORROBORATED_ONE": 15,
   "VERIFIED_BOTH": 6
  },
  "matches": [
@@ -461,6 +461,209 @@
      "assertion": "Wake Forest L 1-3 vs Mississippi State",
      "opponent_source": "Mississippi State",
      "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6625632",
+   "date": "2026-09-08",
+   "canonical": "California def. South Carolina 3-1",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "California": {
+     "state": "NOT_POSTED",
+     "url": "https://calbears.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 8 (Tue)",
+      "4:00 p.m.",
+      "Away",
+      "South Carolina",
+      "Columbia, SC",
+      "Showdown at the Net",
+      "-"
+     ]
+    },
+    "South Carolina": {
+     "state": "SITE_UNPARSED",
+     "url": "https://gamecocksonline.com/news/2021/09/03/textforhelp/"
+    }
+   }
+  },
+  {
+   "gid": "6625996",
+   "date": "2026-09-08",
+   "canonical": "SFA def. Sam Houston 3-1",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "SFA": {
+     "state": "NOT_POSTED",
+     "url": "https://sfajacks.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 8 (Tue)",
+      "6:00 PM",
+      "Away",
+      "Sam Houston",
+      "Huntsville, TX",
+      "",
+      "-"
+     ]
+    },
+    "Sam Houston": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://gobearkats.com/sports/womens-volleyball/schedule/text",
+     "rows_on_date": [
+      "Stephen F. Austin"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6626327",
+   "date": "2026-09-08",
+   "canonical": "Georgia def. Notre Dame 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Georgia": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://georgiadogs.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Georgia W 3-1 vs Notre Dame",
+     "opponent_source": "Notre Dame",
+     "site_says": "Home"
+    },
+    "Notre Dame": {
+     "state": "SITE_HTTP_MISS",
+     "url": "https://und.com/sports/womens-volleyball/schedule/text",
+     "http": 404
+    }
+   }
+  },
+  {
+   "gid": "6627856",
+   "date": "2026-09-08",
+   "canonical": "New Hampshire def. Merrimack 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "New Hampshire": {
+     "state": "NOT_POSTED",
+     "url": "https://unhwildcats.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 8 (Tue)",
+      "7 PM",
+      "Away",
+      "Merrimack",
+      "North Andover, Mass. (MPR at The Sakowich Center)",
+      "",
+      "-"
+     ]
+    },
+    "Merrimack": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://merrimackathletics.com/services/schedule_txt.ashx?schedule=554",
+     "assertion": "Merrimack L 1-3 vs University of New Hampshire",
+     "opponent_source": "University of New Hampshire",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6627969",
+   "date": "2026-09-08",
+   "canonical": "Auburn def. Florida St. 3-1",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Auburn": {
+     "state": "NOT_POSTED",
+     "url": "https://auburntigers.com/sports/volleyball/schedule",
+     "row": [
+      "Sep 8",
+      "at",
+      "Florida State",
+      "Tallahassee, FL",
+      "6:00 PM CDT",
+      "Match Notes",
+      "Live Stats",
+      "DePaul Invitational",
+      "Fri"
+     ]
+    },
+    "Florida St.": {
+     "state": "NOT_POSTED",
+     "url": "https://seminoles.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 8 (Tue)",
+      "7 p.m.",
+      "Home",
+      "Auburn",
+      "(Tully Gymnasium)",
+      "",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6624546",
+   "date": "2026-09-08",
+   "canonical": "Houston def. Lamar University 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Houston": {
+     "state": "NOT_POSTED",
+     "url": "https://uhcougars.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 8 (Tue)",
+      "6:30 p.m.",
+      "Home",
+      "Lamar",
+      "Houston, Texas (Fertitta Center)",
+      "",
+      "-"
+     ]
+    },
+    "Lamar University": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://lamarcardinals.com/services/schedule_txt.ashx?schedule=5633",
+     "assertion": "Lamar University L 0-3 vs Houston",
+     "opponent_source": "Houston",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6625389",
+   "date": "2026-09-08",
+   "canonical": "Iowa def. Iowa St. 3-0",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Iowa": {
+     "state": "NOT_POSTED",
+     "url": "https://hawkeyesports.com/sports/wvball/schedule",
+     "row": [
+      "Sep 8",
+      "at",
+      "Iowa State",
+      "Ames, Iowa",
+      "6:30 PM CDT",
+      "Opens in a new window",
+      "Opens in a new window",
+      "Opens in a new window",
+      "Preview",
+      "Hawkeye Invitational",
+      "Thu"
+     ]
+    },
+    "Iowa St.": {
+     "state": "NOT_POSTED",
+     "url": "https://cyclones.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 8 (Tue)",
+      "6:30 PM",
+      "Home",
+      "Iowa",
+      "",
+      "Iowa Corn Cy-Hawk Series",
+      "-"
+     ]
     }
    }
   }

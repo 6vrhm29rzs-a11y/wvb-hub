@@ -1,15 +1,15 @@
 {
  "meta": {
   "season": 2026,
-  "generated_at_utc": "2026-09-09T01:00:01Z",
-  "n_claims": 80,
+  "generated_at_utc": "2026-09-09T01:20:42Z",
+  "n_claims": 81,
   "feed_cap": 5,
   "recent_hours": 72,
   "states": {
    "confirmed_official": 49,
    "corroborated": 10,
    "official_unconfirmed": 0,
-   "community_signal": 6,
+   "community_signal": 7,
    "conflicting": 9,
    "expired": 5,
    "inaccessible": 1
@@ -2346,6 +2346,40 @@
    "review_by": null
   },
   {
+   "id": "1f6b55660128",
+   "type": "availability",
+   "subject": {
+    "kind": "player",
+    "team": "Iowa St.",
+    "player": "Lilly Wachholz"
+   },
+   "what": "Lilly Wachholz (Iowa St.): availability signal",
+   "state": "community_signal",
+   "state_label": "community signal — a lead, not a fact",
+   "why": "community signal — a lead, not a fact",
+   "scope": "one player's availability for the stated dates",
+   "sources": [
+    {
+     "url": "volleytalk.proboards.com thread '2026 Upset Alerts' p.38, relayed by Cody via screenshot during the live Iowa at Iowa St. match (gid 6625389)",
+     "excerpt": "'Wachholz went down for Iowa State., but ISU can't serve in and their middles are getting killed on the block.' ... 'Iowa up 2-0. Tough injury for Wachholz.'",
+     "retrieved": "2026-09-09T01:04:45Z",
+     "source_class": "community"
+    }
+   ],
+   "public": false,
+   "priority": 45,
+   "route": {
+    "team": "Iowa St."
+   },
+   "effective": {
+    "from": "2026-09-08",
+    "to": null
+   },
+   "review_by": "2026-09-15",
+   "source_kind": "community_forum",
+   "source_kind_label": "COMMUNITY"
+  },
+  {
    "id": "0f6bce5007d1",
    "type": "availability",
    "subject": {
@@ -2766,6 +2800,41 @@
    "first_seen": "2026-09-09T01:00:01Z"
   },
   {
+   "id": "1f6b55660128",
+   "type": "availability",
+   "subject": {
+    "kind": "player",
+    "team": "Iowa St.",
+    "player": "Lilly Wachholz"
+   },
+   "what": "Lilly Wachholz (Iowa St.): availability signal",
+   "state": "community_signal",
+   "state_label": "community signal — a lead, not a fact",
+   "why": "community signal — a lead, not a fact",
+   "scope": "one player's availability for the stated dates",
+   "sources": [
+    {
+     "url": "volleytalk.proboards.com thread '2026 Upset Alerts' p.38, relayed by Cody via screenshot during the live Iowa at Iowa St. match (gid 6625389)",
+     "excerpt": "'Wachholz went down for Iowa State., but ISU can't serve in and their middles are getting killed on the block.' ... 'Iowa up 2-0. Tough injury for Wachholz.'",
+     "retrieved": "2026-09-09T01:04:45Z",
+     "source_class": "community"
+    }
+   ],
+   "public": false,
+   "priority": 45,
+   "route": {
+    "team": "Iowa St."
+   },
+   "effective": {
+    "from": "2026-09-08",
+    "to": null
+   },
+   "review_by": "2026-09-15",
+   "source_kind": "community_forum",
+   "source_kind_label": "COMMUNITY",
+   "first_seen": "2026-09-09T01:20:42Z"
+  },
+  {
    "id": "675babf09890",
    "type": "result_correction",
    "subject": {
@@ -2871,28 +2940,6 @@
    "effective": null,
    "review_by": "2026-09-14",
    "first_seen": "2026-09-06T22:13:37Z"
-  },
-  {
-   "id": "175f8e97dbce",
-   "type": "fixture_evidence",
-   "subject": {
-    "kind": "match",
-    "gid": "6627523"
-   },
-   "what": "A schedule reading for Southern California vs Arizona St. passed its review date",
-   "state": "expired",
-   "state_label": "evidence past its review date",
-   "why": "a schedule claim is perishable; this one was not re-verified by its review date",
-   "scope": "a schedule reading, now past its review date",
-   "sources": [],
-   "public": true,
-   "priority": 20,
-   "route": {
-    "match": "6627523"
-   },
-   "effective": null,
-   "review_by": "2026-09-05",
-   "first_seen": "2026-09-06T16:43:00Z"
   }
  ]
 }

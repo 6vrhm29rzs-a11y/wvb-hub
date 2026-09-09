@@ -427,7 +427,14 @@ Repo initialized 2026-08-09 on `main`, commit `499a537` (20 files). Identity set
 
 ## Next steps
 
-**⚑ 2026-08-27 — READ `docs/session_close_2026-08-27.md` FIRST.** It supersedes the
+**⚑ 2026-09-08 — READ `docs/session_close_2026-09-08.md` FIRST.** It carries the
+committee-basis field selection (Cody's directive), the ultrareview round (five
+findings, all real, all fixed — and HOW to scope the tool past data churn),
+corrections at 42, the freeze-Monday movement repair, the daily-workflow
+verifier reorder, and the phone-access infrastructure (sleep disabled, Serve
+re-enabled, key expiry disabled — all three resolved by Cody on 2026-09-08).
+
+**⚑ 2026-08-27 — `docs/session_close_2026-08-27.md` is the prior close.** It supersedes the
 2026-08-25 close on the product and carries today's 13 commits: the poller crash that
 would have fired all day on the first match day, the string-sorted clock times in four
 places, the guard that was holding one of them in place, 14 of 46 guards never running
@@ -480,7 +487,7 @@ the build works from a fresh checkout with no `Cody/` · `Cody/` holds one page,
 uncommitted work after it. Git is classifier-blocked in auto mode — hand Cody the command.
 
 **OPEN (updated 2026-08-27):** ⚠ **THE "338 SUMMARIES TO WRITE" LINE WAS STALE AND I REPEATED IT TO CODY THREE TIMES AS A PENDING ~$4 SPEND.** Counted on 2026-08-27: `data/digby_summaries_2026.json` holds **348 of 348**, and exactly **3** are withheld because their durable facts moved — Central Conn. St., Purdue Fort Wayne and Tennessee Tech, two of which are the rosters that arrived late via the PRESTO parser. Regenerating three is pennies, not four dollars. **Count the file before quoting this number.** ·
-Cody has still not run `/code-review ultra` · rotations have no live 2026 source ·
+✅ Cody ran `/code-review ultra` 2026-09-08 (five findings, all fixed same day — see the close) · rotations have no live 2026 source ·
 ⚠ **"GitHub Pages no longer updates" WAS ALSO STALE ON THIS LINE.** The public build was
 re-enabled on 2026-08-24 and `daily.yml` has been running `--public` since; checked
 2026-08-27, the served copy is stamped that morning and `verify_shipped.py` reports it clean.

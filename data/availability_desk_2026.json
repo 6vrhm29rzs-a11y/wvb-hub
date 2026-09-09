@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-09T01:00:01Z",
+  "generated_at_utc": "2026-09-09T01:20:42Z",
   "counts": {
    "statuses": 3,
    "incidents": 1,
-   "signals": 7,
+   "signals": 8,
    "expired": 2,
-   "anomalies": 216
+   "anomalies": 218
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -90,6 +90,34 @@
   }
  ],
  "projection": [
+  {
+   "team": "Iowa St.",
+   "player": "Lilly Wachholz",
+   "state": "signal",
+   "supports": [
+    {
+     "team": "Iowa St.",
+     "player": "Lilly Wachholz",
+     "kind": "community_forum",
+     "kind_label": "COMMUNITY",
+     "quote": "'Wachholz went down for Iowa State., but ISU can't serve in and their middles are getting killed on the block.' ... 'Iowa up 2-0. Tough injury for Wachholz.'",
+     "summary": null,
+     "url": "volleytalk.proboards.com thread '2026 Upset Alerts' p.38, relayed by Cody via screenshot during the live Iowa at Iowa St. match (gid 6625389)",
+     "retrieved": "2026-09-09T01:04:45Z",
+     "effective": {
+      "from": "2026-09-08",
+      "to": null
+     },
+     "review_by": "2026-09-15",
+     "incident_date": null,
+     "claim": null,
+     "note": "SIGNAL only, sets no status: forum accounts of an in-match injury with no attributable school or beat source yet. TEAM-anchored per R8: box lines give exactly one Wachholz in D-I, Lilly Wachholz, OH #13, Iowa St. (team 46190). What is verifiable from data: her participation line in tonight's box, and any zero-set listings in later matches. If a school release or beat report appears, record it as its own entry -- never upgrade this one."
+    }
+   ],
+   "claim": null,
+   "headline": "Signal only -- sets no status",
+   "n_supports": 1
+  },
   {
    "team": "Kentucky",
    "player": "Kennedy Washington",
@@ -506,6 +534,24 @@
    "incident_date": null,
    "claim": null,
    "note": "CONTEXT, not an absence: reads as PLAYING but post-ACL -- the exact prior-season-health class the DeLeye rule exists for (a prior-year rate understates a player recovering; a current-year rate may too). box name, TEAM-anchored per R8 -- three Stuckys play D-I (Penn St., Kansas St., Wyoming); Penn St.'s is Alexis Stucky, S (team 46614). Sets no status."
+  },
+  {
+   "team": "Iowa St.",
+   "player": "Lilly Wachholz",
+   "kind": "community_forum",
+   "kind_label": "COMMUNITY",
+   "quote": "'Wachholz went down for Iowa State., but ISU can't serve in and their middles are getting killed on the block.' ... 'Iowa up 2-0. Tough injury for Wachholz.'",
+   "summary": null,
+   "url": "volleytalk.proboards.com thread '2026 Upset Alerts' p.38, relayed by Cody via screenshot during the live Iowa at Iowa St. match (gid 6625389)",
+   "retrieved": "2026-09-09T01:04:45Z",
+   "effective": {
+    "from": "2026-09-08",
+    "to": null
+   },
+   "review_by": "2026-09-15",
+   "incident_date": null,
+   "claim": null,
+   "note": "SIGNAL only, sets no status: forum accounts of an in-match injury with no attributable school or beat source yet. TEAM-anchored per R8: box lines give exactly one Wachholz in D-I, Lilly Wachholz, OH #13, Iowa St. (team 46190). What is verifiable from data: her participation line in tonight's box, and any zero-set listings in later matches. If a school release or beat report appears, record it as its own entry -- never upgrade this one."
   }
  ],
  "expired": [
@@ -794,16 +840,16 @@
    "absent": [
     {
      "name": "Mckenna Shotwell",
-     "rate": 3.094,
+     "rate": 3.0,
      "played_share": 1.0
     },
     {
      "name": "Jocelyn Hammerstrand",
-     "rate": 2.625,
+     "rate": 2.575,
      "played_share": 1.0
     }
    ],
-   "points_per_set_missing": 5.719
+   "points_per_set_missing": 5.575
   },
   {
    "game_id": "6626376",
@@ -2402,19 +2448,6 @@
    "points_per_set_missing": 2.0
   },
   {
-   "game_id": "6640393",
-   "team_id": "45808",
-   "team": "Auburn",
-   "absent": [
-    {
-     "name": "Greer Chambless",
-     "rate": 1.929,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.929
-  },
-  {
    "game_id": "6626241",
    "team_id": "45828",
    "team": "Gardner-Webb",
@@ -2478,6 +2511,45 @@
     }
    ],
    "points_per_set_missing": 1.812
+  },
+  {
+   "game_id": "6640393",
+   "team_id": "45808",
+   "team": "Auburn",
+   "absent": [
+    {
+     "name": "Greer Chambless",
+     "rate": 1.778,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.778
+  },
+  {
+   "game_id": "6627166",
+   "team_id": "45911",
+   "team": "Georgia",
+   "absent": [
+    {
+     "name": "Alyssa Worden",
+     "rate": 1.769,
+     "played_share": 0.6
+    }
+   ],
+   "points_per_set_missing": 1.769
+  },
+  {
+   "game_id": "6625987",
+   "team_id": "45911",
+   "team": "Georgia",
+   "absent": [
+    {
+     "name": "Alyssa Worden",
+     "rate": 1.769,
+     "played_share": 0.6
+    }
+   ],
+   "points_per_set_missing": 1.769
   },
   {
    "game_id": "6627126",
@@ -3234,19 +3306,6 @@
    "points_per_set_missing": 1.143
   },
   {
-   "game_id": "6626264",
-   "team_id": "45975",
-   "team": "New Hampshire",
-   "absent": [
-    {
-     "name": "Julianne Lee",
-     "rate": 1.139,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.139
-  },
-  {
    "game_id": "6624356",
    "team_id": "46164",
    "team": "Central Mich.",
@@ -3544,6 +3603,19 @@
     }
    ],
    "points_per_set_missing": 0.868
+  },
+  {
+   "game_id": "6626699",
+   "team_id": "46190",
+   "team": "Iowa St.",
+   "absent": [
+    {
+     "name": "Pam Mccune",
+     "rate": 0.806,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 0.806
   },
   {
    "game_id": "6627347",
@@ -3875,15 +3947,14 @@
    ]
   },
   "Merrimack": {
-   "gid": "6625928",
-   "d": "2026-09-05",
-   "appeared": 14,
+   "gid": "6627856",
+   "d": "2026-09-08",
+   "appeared": 15,
    "zero_action": [
-    "Gabrielle Moore",
-    "Maddy Fennessy",
+    "Avry Bryant",
     "Fabiola Betancourt",
-    "Ella Gizmunt",
-    "Sienna Franks"
+    "Natalia Zelubowski",
+    "Ella Gizmunt"
    ]
   },
   "NIU": {
@@ -3952,17 +4023,14 @@
    ]
   },
   "Georgia": {
-   "gid": "6627167",
-   "d": "2026-09-02",
-   "appeared": 10,
+   "gid": "6626327",
+   "d": "2026-09-08",
+   "appeared": 12,
    "zero_action": [
+    "Alex Richter",
     "Arianna Muoneke",
     "Keira Steininger",
-    "Taylor Bruce",
-    "Marin Collins",
-    "Emma Bryson",
-    "Kate Yoshimoto",
-    "Rylan Miller"
+    "Taylor Bruce"
    ]
   },
   "North Florida": {
@@ -4064,17 +4132,15 @@
    ]
   },
   "SFA": {
-   "gid": "6626518",
-   "d": "2026-09-05",
-   "appeared": 10,
+   "gid": "6625996",
+   "d": "2026-09-08",
+   "appeared": 12,
    "zero_action": [
     "Sydney Lafferty",
     "Haley Peterson",
     "Brinkley Reeves",
     "Asha King",
-    "Kennedy Jones",
-    "Izzy Orton",
-    "Lara Gilardi"
+    "Erin Goodson"
    ]
   },
   "Idaho St.": {
@@ -4897,15 +4963,13 @@
    ]
   },
   "Sam Houston": {
-   "gid": "6625995",
-   "d": "2026-09-05",
-   "appeared": 9,
+   "gid": "6625996",
+   "d": "2026-09-08",
+   "appeared": 11,
    "zero_action": [
-    "Sarah Odell",
     "A'miyrie Anderson",
     "Nevaeh Smith",
     "Audrey Terry",
-    "Kameron Rector",
     "Avery Pruitt"
    ]
   },
@@ -5004,18 +5068,16 @@
    ]
   },
   "Lamar University": {
-   "gid": "6624545",
-   "d": "2026-09-05",
-   "appeared": 10,
+   "gid": "6624546",
+   "d": "2026-09-08",
+   "appeared": 12,
    "zero_action": [
     "Addison Stanley",
-    "Madelynn Coy",
     "Kimaya Webb",
+    "Riley Johnson",
     "Emily Moon",
-    "Saida Maksoud",
     "Jo Moffitt",
-    "Leila Ceaser",
-    "Gabrielle St louis"
+    "Maja Malinowska"
    ]
   },
   "Oakland": {
@@ -5249,16 +5311,15 @@
    ]
   },
   "Florida St.": {
-   "gid": "6628193",
-   "d": "2026-09-05",
-   "appeared": 12,
+   "gid": "6627969",
+   "d": "2026-09-08",
+   "appeared": 13,
    "zero_action": [
     "Ryan Murphy",
     "Payton Whalen",
     "Ava Lambert",
-    "Nicole Mauser",
     "Kelsey Perry",
-    "Johanna Sova"
+    "Caylan Russ"
    ]
   },
   "BYU": {
@@ -5402,12 +5463,15 @@
    ]
   },
   "Houston": {
-   "gid": "6628277",
-   "d": "2026-09-04",
-   "appeared": 14,
+   "gid": "6624546",
+   "d": "2026-09-08",
+   "appeared": 11,
    "zero_action": [
-    "Noemi Despaigne",
+    "Olivia Stringer",
     "Leah Robinson",
+    "Shannon Dworaczyk",
+    "Kaitlyn Evans",
+    "Aidan Conner",
     "Harmoni Dobbins",
     "Ava Wilkerson"
    ]
@@ -5641,17 +5705,16 @@
    ]
   },
   "Iowa": {
-   "gid": "6625390",
-   "d": "2026-09-04",
-   "appeared": 10,
+   "gid": "6625389",
+   "d": "2026-09-08",
+   "appeared": 9,
    "zero_action": [
-    "Gabby Deery",
     "Nikolija Bulatovic",
     "Peyton Young",
     "Allison Berent",
     "Makena Rumple",
     "Emily Lavin",
-    "Greta Schlichter"
+    "Rosa Vesty"
    ]
   },
   "UConn": {
@@ -6018,14 +6081,15 @@
    ]
   },
   "Auburn": {
-   "gid": "6627966",
-   "d": "2026-09-03",
-   "appeared": 12,
+   "gid": "6627969",
+   "d": "2026-09-08",
+   "appeared": 11,
    "zero_action": [
     "Chierika Okororie",
     "Jasmine Okeoma",
-    "Reese Shugart",
+    "Lauren Dreves",
     "Eden Bower",
+    "Emma Moore",
     "Emma Gutke"
    ]
   },
@@ -6209,18 +6273,15 @@
    ]
   },
   "Notre Dame": {
-   "gid": "6626324",
-   "d": "2026-09-05",
+   "gid": "6626327",
+   "d": "2026-09-08",
    "appeared": 11,
    "zero_action": [
     "Portia Zeidler",
     "Kailyn Greene- gordon",
     "Carla Mercado",
-    "Stella Adeyemi",
     "Mia Radeff",
-    "Ava Lange",
-    "Hailie Vaughn",
-    "Sophia Thornburg"
+    "Hailie Vaughn"
    ]
   },
   "Ball St.": {
@@ -6348,16 +6409,13 @@
    ]
   },
   "South Carolina": {
-   "gid": "6624807",
-   "d": "2026-09-06",
-   "appeared": 11,
+   "gid": "6625632",
+   "d": "2026-09-08",
+   "appeared": 14,
    "zero_action": [
     "Maggie Penn",
-    "Sydney Floyd",
     "Norunn Westersjo",
-    "Anne Bing",
-    "Ella Grivna",
-    "Jillian Bohannon"
+    "Anne Bing"
    ]
   },
   "UNC Greensboro": {
@@ -6458,18 +6516,15 @@
    ]
   },
   "Iowa St.": {
-   "gid": "6628329",
-   "d": "2026-09-04",
-   "appeared": 10,
+   "gid": "6625389",
+   "d": "2026-09-08",
+   "appeared": 11,
    "zero_action": [
-    "Katie Byergo",
-    "Abbi Brenizer",
-    "Layna Waselewsky",
-    "Baileigh Carlsen",
     "Macie Lupkes",
-    "Taylor Johnson",
-    "Reagan Hanfelt",
-    "Ella Florez"
+    "Layna Waselewsky",
+    "Reese Naeve",
+    "Katie Byergo",
+    "Taylor Johnson"
    ]
   },
   "Loyola Chicago": {
@@ -6568,17 +6623,18 @@
    ]
   },
   "New Hampshire": {
-   "gid": "6627855",
-   "d": "2026-09-05",
-   "appeared": 12,
+   "gid": "6627856",
+   "d": "2026-09-08",
+   "appeared": 11,
    "zero_action": [
     "Evelyn Jurden",
-    "Reilly Garrity",
     "Katie Smith",
-    "Ella Treasure",
     "Avery Albritton",
+    "Julianne Lee",
     "Caitlin Leddy",
-    "Lucy Chertock"
+    "Miray Su keskin",
+    "Lucy Chertock",
+    "Cecilia Anderson"
    ]
   },
   "New Haven": {
@@ -7266,16 +7322,17 @@
    ]
   },
   "California": {
-   "gid": "6626518",
-   "d": "2026-09-05",
-   "appeared": 10,
+   "gid": "6625632",
+   "d": "2026-09-08",
+   "appeared": 9,
    "zero_action": [
     "Maria Stirbu",
+    "Portia Sherman",
     "Arissa Carbonara",
     "Francesca Popescu",
     "Ashleigh Woodruff",
+    "Annemarie O'gara",
     "Nicole Milosevic",
-    "Grace Agolli",
     "Dominique Phills",
     "Rania Chimonides"
    ]
@@ -8236,6 +8293,44 @@
    {
     "gid": "6628139",
     "ep": 1788811200,
+    "sets": 3,
+    "state": "appeared"
+   }
+  ],
+  "Iowa St.|Lilly Wachholz": [
+   {
+    "gid": "6626699",
+    "ep": 1787959800,
+    "sets": 3,
+    "state": "appeared"
+   },
+   {
+    "gid": "6628328",
+    "ep": 1788037200,
+    "sets": 3,
+    "state": "appeared"
+   },
+   {
+    "gid": "6624989",
+    "ep": 1788116400,
+    "sets": 4,
+    "state": "appeared"
+   },
+   {
+    "gid": "6624507",
+    "ep": 1788483600,
+    "sets": 4,
+    "state": "appeared"
+   },
+   {
+    "gid": "6628329",
+    "ep": 1788570000,
+    "sets": 4,
+    "state": "appeared"
+   },
+   {
+    "gid": "6625389",
+    "ep": 1788910200,
     "sets": 3,
     "state": "appeared"
    }
