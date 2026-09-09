@@ -182,6 +182,37 @@
    "matchup": "LSU / Tulsa",
    "records": 4
   },
+  "6625668": {
+   "conflicts": [
+    {
+     "field": "teams",
+     "records": 11,
+     "values": [
+      "(('46123', True), ('46622', False))",
+      "(('46123', False), ('46622', True))"
+     ]
+    },
+    {
+     "field": "start_time_epoch",
+     "records": 11,
+     "values": [
+      "1788908400",
+      "1790722800",
+      "1788910200"
+     ]
+    },
+    {
+     "field": "game_state",
+     "records": 11,
+     "values": [
+      "P",
+      "I"
+     ]
+    }
+   ],
+   "matchup": "Southeastern La. / Southern U.",
+   "records": 11
+  },
   "6625712": {
    "conflicts": [
     {
@@ -228,7 +259,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 81,
+     "records": 95,
      "values": [
       "1788670800",
       "1788742800"
@@ -236,7 +267,7 @@
     },
     {
      "field": "game_state",
-     "records": 81,
+     "records": 95,
      "values": [
       "P",
       "I",
@@ -245,7 +276,7 @@
     }
    ],
    "matchup": "Missouri / Nebraska",
-   "records": 81
+   "records": 95
   },
   "6626288": {
    "conflicts": [
@@ -415,11 +446,25 @@
    "matchup": "UNC Asheville / Morgan St.",
    "records": 3
   },
+  "6639033": {
+   "conflicts": [
+    {
+     "field": "start_time_epoch",
+     "records": 10,
+     "values": [
+      "1788912000",
+      "1788915600"
+     ]
+    }
+   ],
+   "matchup": "Oklahoma / Georgia Tech",
+   "records": 10
+  },
   "6639126": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 6,
+     "records": 7,
      "values": [
       "1789016400",
       "1789083000"
@@ -427,13 +472,13 @@
     }
    ],
    "matchup": "New Mexico / Nebraska",
-   "records": 6
+   "records": 7
   },
   "6639127": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 5,
+     "records": 6,
      "values": [
       "1789102800",
       "1789160400"
@@ -441,12 +486,13 @@
     }
    ],
    "matchup": "New Mexico / Georgia Tech",
-   "records": 5
+   "records": 6
   }
  },
  "by_field": {
-  "game_state": 31,
-  "start_time_epoch": 31,
+  "game_state": 49,
+  "start_time_epoch": 33,
+  "teams": 1,
   "teams (non-blocking)": 4
  },
  "corrections": {
@@ -612,8 +658,8 @@
   }
  },
  "counts": {
-  "blocked": 31,
-  "conflicted": 65,
+  "blocked": 33,
+  "conflicted": 84,
   "corrected": 5,
   "fixtures": 4890
  },

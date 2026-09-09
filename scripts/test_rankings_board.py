@@ -456,12 +456,18 @@ def main():
                   if not (_sim_by.get(t["team"]) or {}).get("fixtures")]
         check("no team without a 2026 fixture is in the projected field",
               not _nofix, str(_nofix[:4]))
+        # an AQ without title odds is legal only through the stated fallback
+        # -- its WHOLE league lacks odds; a zero-fixture AQ never is.
+        # ⚠ ultrareview 2026-09-08: the first version computed this list and
+        # never asserted on it -- dead code reading as coverage.
+        def _league_has_odds(conf):
+            return any((_sim_by.get(t["team"]) or {}).get("conf_title_pct")
+                       for t in _teams2 if t.get("conf") == conf)
         _badaq = [t["team"] for t in _field2 if t["bid"] == "AQ"
                   and not (_sim_by.get(t["team"]) or {}).get("conf_title_pct")
-                  and (_sim_by.get(t["team"]) or {}).get("fixtures")
-                  is not None]
-        # an AQ without title odds is legal only through the stated fallback
-        # (whole league without odds); a zero-fixture AQ never is
+                  and _league_has_odds(t.get("conf"))]
+        check("an AQ without title odds only stands when its whole league "
+              "lacks them", not _badaq, str(_badaq[:4]))
         _zaq = [t["team"] for t in _field2 if t["bid"] == "AQ"
                 and not (_sim_by.get(t["team"]) or {}).get("fixtures")]
         check("no AQ is held by a zero-fixture team", not _zaq, str(_zaq[:4]))

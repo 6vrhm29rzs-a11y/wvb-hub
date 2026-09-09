@@ -1646,13 +1646,14 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
     _prk_of = dict((t["team"], t["rank26"]) for t in teams if t.get("rank26"))
     _avca_polls = []          # [(capture_date, {hub_name: rank})]
     try:
+        # loop-invariant: one key map for every archived poll (ultrareview)
+        from build_rankings_board import key as _bkey2
+        _by_bkey2 = dict((_bkey2(t["team"]), t["team"]) for t in teams)
         for _row in (json.loads(x) for x in open(os.path.join(
                 REPO, "data", "raw", str(SEASON), "polls_avca.jsonl"),
                 encoding="utf-8") if x.strip()):
             if str(_row.get("season")) != str(SEASON) or                     _row.get("is_previous_season") in (True, "True"):
                 continue
-            from build_rankings_board import key as _bkey2
-            _by_bkey2 = dict((_bkey2(t["team"]), t["team"]) for t in teams)
             _m = {}
             for r in (_row.get("rows") or _row.get("data") or []):
                 _nm = re.sub(r"\s*\(\d+\)\s*$", "", str(r.get("SCHOOL") or ""))
@@ -5378,6 +5379,20 @@ def build():
         .replace("{{TV_ROWS}}", trows) \
         .replace("{{N_PLAYED}}", str(played)) \
         .replace("{{N_PLAYED_DEF}}", esc(_SCC.DEFINITIONS["results_on_display"])) \
+        .replace("{{FIELD_BASIS_PROSE}}",
+                 ("A projected 2026 64-team field on <b>committee criteria</b>: "
+                  "each league&rsquo;s automatic bid goes to its <b>most likely "
+                  "champion</b> (title odds from 4,000 season simulations), and "
+                  "the at-large places and every seed follow <b>projected final "
+                  "RPI</b> &mdash; the committee&rsquo;s primary tool &mdash; "
+                  "not our strength rating, which measurably favours "
+                  "good-margin, bad-record teams relative to RPI.")
+                 if str(meta.get("field_basis", "")).startswith("committee")
+                 else
+                 ("<b>&#9888; This build had no season simulation on disk, so "
+                  "this field is ordered by our STRENGTH rank &mdash; not the "
+                  "committee criteria this page normally uses.</b> Treat it as "
+                  "a stand-in until the simulator artifact exists.")) \
         .replace("{{N_AQ}}", str(n_aq)) \
         .replace("{{N_TEAMS}}", str(len(teams))) \
         .replace("{{HERO_EYEBROW}}", _hero["eyebrow"]) \
@@ -11326,12 +11341,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 </section>
 
 <section id="v-bracket" hidden>
-  <p class="lead">A projected 2026 64-team field on <b>committee criteria</b>:
-  each league&rsquo;s automatic bid goes to its <b>most likely champion</b>
-  (title odds from 4,000 season simulations), and the at-large places and every
-  seed follow <b>projected final RPI</b> &mdash; the committee&rsquo;s primary
-  tool &mdash; not our strength rating, which measurably favours good-margin,
-  bad-record teams relative to RPI. <b>32 teams are seeded</b>
+  <p class="lead">{{FIELD_BASIS_PROSE}} <b>32 teams are seeded</b>
   and placed four to a line, so the bracket carries four&nbsp;#1s down to
   four&nbsp;#8s &mdash; the format since 2022. The number on a row is that
   <b>seed line</b>; its national seed (1&ndash;32) is on the tooltip.</p>

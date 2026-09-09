@@ -86,6 +86,12 @@ def build():
             event_of[gid] = e.get("name")
 
     # how many 2026 matches has each team actually played? -- the honesty column
+    # ⚠ KEY BY THE HUB SPELLING, SAME AS THE LOOKUP (ultrareview 2026-09-08).
+    # The counter stored "LSU New Orleans" while the fixture loop looked up
+    # "New Orleans", so played_2026 read 0 for aliased teams -- and the
+    # prediction log is append-only, so a wrong 0 written there is permanent.
+    from reconcile_2025 import norm as _pnorm
+    _hub_of = {_pnorm(k): k for k in strength}
     played = {}
     gpath = os.path.join(REPO, "data/raw/%d/games.jsonl" % SEASON)
     if os.path.exists(gpath):
@@ -101,7 +107,8 @@ def build():
                 continue
             seen.add(g.get("game_id"))
             for t in g.get("teams") or []:
-                nm = (t.get("name_short") or "").strip()
+                nm_raw = (t.get("name_short") or "").strip()
+                nm = _hub_of.get(_pnorm(nm_raw), nm_raw)
                 if nm:
                     played[nm] = played.get(nm, 0) + 1
 
@@ -114,9 +121,6 @@ def build():
         home_adv = M.get("_home_adv_points_per_set", 0.0) or 0.0
     except Exception:
         home_adv = 0.0
-
-    from reconcile_2025 import norm as _pnorm
-    _hub_of = {_pnorm(k): k for k in strength}
 
     today = datetime.date.today().isoformat()
     rows, skipped = [], 0

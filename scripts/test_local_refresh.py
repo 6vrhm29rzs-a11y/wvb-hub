@@ -120,7 +120,13 @@ def check_verifier_precedes_ratings():
                 bad("verifier order", "%s runs verify_results_daily AFTER %s"
                     % (os.path.basename(wf), rated))
     # local_refresh's own sequence
-    seq = [" ".join(c) for _, c in __import__("local_refresh").SEQUENCE]         if hasattr(__import__("local_refresh"), "SEQUENCE") else None
+    # ⚠ the first version referenced a SEQUENCE attribute that does not
+    # exist; the hasattr guard made the whole arm silently skip
+    # (ultrareview 2026-09-08). The real constant is REBUILD -- (env, cmd)
+    # tuples -- and the verifier lives there. CRAWL entries are bare lists
+    # and never run the verifier, so they are not part of this order.
+    _lr = __import__("local_refresh")
+    seq = [" ".join(c) for _, c in _lr.REBUILD]
     if seq:
         vi = next((i for i, c in enumerate(seq)
                    if "verify_results_daily" in c), None)

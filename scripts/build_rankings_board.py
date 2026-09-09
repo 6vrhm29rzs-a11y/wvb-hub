@@ -929,11 +929,7 @@ they do. Source matching: MISSNOTE.</div>
 <th>AVCA</th><th>Massey</th></tr></thead>
 <tbody>SEEDS</tbody></table></div>
 <div class="note">
-<p><span class="k">This is a projection, and every part of it is soft.</span> NAQ conferences get a
-projected automatic bid, assigned to the league's <b>most likely champion</b> by simulated title odds
-&mdash; but most conferences award the AQ by <b>tournament</b>, so the real bid can go to anyone who
-wins it. The remaining places and every seed follow <b>projected final RPI</b>, the committee's
-primary tool, never our strength rating.</p>
+<p><span class="k">This is a projection, and every part of it is soft.</span> FIELDPROSE</p>
 <p><span class="k">Conferences are 2026's, taken from ncaa.com's own schedule feed.</span>
 CONFCHANGED D-I teams changed league since last season &mdash; the Pac-12 rebuilt itself out of
 Mountain West and WCC schools, and the WAC dissolved into the UAC, Big Sky and Big West. That gives
@@ -999,7 +995,20 @@ function render(){
 ['q','conf','top'].forEach(id=>document.getElementById(id).addEventListener('input',render));
 render();
 </script>
-</body></html>""".replace("ROWS", "".join(rows)) \
+</body></html>""".replace("FIELDPROSE",
+     ("NAQ conferences get a projected automatic bid, assigned to the league's "
+      "<b>most likely champion</b> by simulated title odds &mdash; but most "
+      "conferences award the AQ by <b>tournament</b>, so the real bid can go "
+      "to anyone who wins it. The remaining places and every seed follow "
+      "<b>projected final RPI</b>, the committee's primary tool, never our "
+      "strength rating.")
+     if str(meta.get("field_basis", "")).startswith("committee") else
+     ("<b>&#9888; This build had no season simulation on disk, so the field "
+      "below is ordered by our STRENGTH rank &mdash; not the committee "
+      "criteria this page normally uses.</b> The strength rating measurably "
+      "favours good-margin, bad-record teams relative to RPI; treat this "
+      "field as a stand-in until the simulator artifact exists.")) \
+   .replace("ROWS", "".join(rows)) \
    .replace("SEEDS", "".join(seeds)) \
    .replace("MISSNOTE", esc(miss_note) or "all sources matched") \
    .replace("{{AQ_MECH}}", aq_mech_note) \
