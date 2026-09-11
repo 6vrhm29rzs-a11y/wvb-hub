@@ -865,6 +865,18 @@ class Handler(SimpleHTTPRequestHandler):
         import gzip as _gzip
         import posixpath
         import mimetypes
+        # ⚠ THE BARE HOSTNAME MUST OPEN THE SITE, NOT A FILE LISTING. Tailscale
+        # Serve proxies "/" and a phone bookmark is usually the bare host, so
+        # falling through to SimpleHTTPRequestHandler's directory index showed
+        # a list of Cody/ filenames -- which reads as "the site is broken".
+        # The page's own name stays the canonical URL; this only redirects.
+        if self.path.split("?")[0] in ("/", "/index.html"):
+            if os.path.exists(os.path.join(WEBROOT, "START-HERE.html")):
+                self.send_response(302)
+                self.send_header("Location", "/START-HERE.html")
+                self.send_header("Content-Length", "0")
+                self.end_headers()
+                return
         path = self.translate_path(self.path)
         if os.path.isdir(path):
             return SimpleHTTPRequestHandler.do_GET(self)

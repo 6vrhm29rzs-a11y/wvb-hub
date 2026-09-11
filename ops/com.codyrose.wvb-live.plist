@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.codyrose.wvb-live</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/python3</string>
+        <string>/Users/codyrose/Womens_College_Volleyball_2026/scripts/live_server.py</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/codyrose/Womens_College_Volleyball_2026</string>
+
+    <!-- RunAtLoad starts it at login; KeepAlive restarts it if it ever exits.
+         Together these are the whole point: the server was started by hand in a
+         terminal, so the 2026-09-09 reboot silently took the phone site down
+         and nothing brought it back. -->
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+
+    <!-- Do not respawn faster than this if it ever crash-loops. -->
+    <key>ThrottleInterval</key>
+    <integer>20</integer>
+
+    <key>StandardOutPath</key>
+    <string>/Users/codyrose/Library/Logs/wvb-live.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/codyrose/Library/Logs/wvb-live.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>WVB_LIVE_PORT</key>
+        <string>8799</string>
+        <key>PYTHONUNBUFFERED</key>
+        <string>1</string>
+        <!-- ⚠ TERM_PROGRAM IS LOAD-BEARING AND IT IS NOT ABOUT TERMINALS.
+             Measured 2026-09-11: the Tailscale macOS CLI talks to the RUNNING
+             GUI only when TERM_PROGRAM is present in its environment; with the
+             variable absent it instead tries to LAUNCH the GUI and dies with
+             "Tailscale.CLIError error 3". launchd passes a bare environment,
+             so tailscale_self() returned None and live_server bound 127.0.0.1
+             only -- losing the direct tailnet URL. Any value works; the
+             variable's PRESENCE is the whole trigger (verified both ways).
+             Serve still proxies 127.0.0.1:8799, so if a Tailscale update ever
+             breaks this the site keeps working over HTTPS -- only the direct
+             http://<magicdns>:8799 fallback goes away. -->
+        <key>TERM_PROGRAM</key>
+        <string>Apple_Terminal</string>
+    </dict>
+</dict>
+</plist>
