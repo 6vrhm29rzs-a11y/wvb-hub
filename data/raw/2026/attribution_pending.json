@@ -1,4 +1,14 @@
 {
  "_doc": "Lineup-flagged games AWAITING school evidence. A machine signal (lineup rows fitting the opposite roster) may CORROBORATE but never quarantine or correct alone -- so a flagged final whose schools have not posted yet sits here, counted as the feed says, until the schools decide. Every entry carries recheck_by; test_lineup_attribution accepts a pending gid ONLY until that date, so an entry cannot rot into permanent silence. Resolution: file a result_corrections entry (confirmed inversion), or an attribution_adjudications label confirmed_correct (false alarm), then delete the entry here.",
- "pending": {}
+ "pending": {
+  "6626935": {
+   "teams": [
+    "Hampton",
+    "FIU"
+   ],
+   "noticed": "2026-09-11",
+   "recheck_by": "2026-09-14",
+   "why": "Lineup rows fit the opposite roster (the inversion signature: 6/6 starters filed under Hampton are FIU players, 5/6 under FIU are Hampton players), and FIU's OWN schedule already contradicts the feed -- 'FIU W 3-0 vs Hampton', retrieved 2026-09-11, against the feed's Hampton 3-0. Hampton's schedule CARRIES the row for this date (opponent 'Florida International', Florida A&M Tournament, Al Lawson Center) but its result cell is still empty. One official source plus machine corroboration is a HOLD, not a correction; upgrade when Hampton posts (expected: 'L 0-3 vs FIU')."
+  }
+ }
 }
