@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-11T16:19:50Z",
+  "generated_at_utc": "2026-09-11T17:34:06Z",
   "counts": {
    "statuses": 3,
    "incidents": 0,
    "signals": 8,
    "expired": 3,
-   "anomalies": 239
+   "anomalies": 237
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -605,6 +605,57 @@
    "points_per_set_missing": 11.775
   },
   {
+   "game_id": "6626935",
+   "team_id": "46546",
+   "team": "FIU",
+   "absent": [
+    {
+     "name": "Lana Sesar",
+     "rate": 3.955,
+     "played_share": 1.0
+    },
+    {
+     "name": "Jillian Huckabey",
+     "rate": 3.25,
+     "played_share": 1.0
+    },
+    {
+     "name": "Rayne Williams",
+     "rate": 2.033,
+     "played_share": 1.0
+    },
+    {
+     "name": "Chiara Fabbrini",
+     "rate": 2.023,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 11.261
+  },
+  {
+   "game_id": "6626935",
+   "team_id": "46679",
+   "team": "Hampton",
+   "absent": [
+    {
+     "name": "Racquel Frazier",
+     "rate": 3.818,
+     "played_share": 1.0
+    },
+    {
+     "name": "Katerina Pappa",
+     "rate": 3.568,
+     "played_share": 1.0
+    },
+    {
+     "name": "Nikola Jaroszewicz",
+     "rate": 3.31,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 10.696
+  },
+  {
    "game_id": "6627266",
    "team_id": "46659",
    "team": "Cal Poly",
@@ -657,26 +708,26 @@
    "absent": [
     {
      "name": "Andrea Diaz dominguez",
-     "rate": 2.8,
-     "played_share": 0.6
+     "rate": 2.769,
+     "played_share": 0.667
     },
     {
      "name": "Sofia Torcello",
-     "rate": 2.4,
-     "played_share": 0.8
+     "rate": 2.278,
+     "played_share": 0.833
     },
     {
      "name": "Karsu Bayraktar",
-     "rate": 2.1,
+     "rate": 2.111,
      "played_share": 1.0
     },
     {
      "name": "Lelia Fitz",
-     "rate": 2.028,
+     "rate": 1.929,
      "played_share": 1.0
     }
    ],
-   "points_per_set_missing": 9.328
+   "points_per_set_missing": 9.087
   },
   {
    "game_id": "6627266",
@@ -890,24 +941,6 @@
    "points_per_set_missing": 5.235
   },
   {
-   "game_id": "6626852",
-   "team_id": "46502",
-   "team": "Stetson",
-   "absent": [
-    {
-     "name": "Andrea Diaz dominguez",
-     "rate": 2.8,
-     "played_share": 0.75
-    },
-    {
-     "name": "Sofia Torcello",
-     "rate": 2.4,
-     "played_share": 0.75
-    }
-   ],
-   "points_per_set_missing": 5.2
-  },
-  {
    "game_id": "6625970",
    "team_id": "46708",
    "team": "Xavier",
@@ -924,6 +957,24 @@
     }
    ],
    "points_per_set_missing": 5.168
+  },
+  {
+   "game_id": "6626852",
+   "team_id": "46502",
+   "team": "Stetson",
+   "absent": [
+    {
+     "name": "Andrea Diaz dominguez",
+     "rate": 2.769,
+     "played_share": 0.8
+    },
+    {
+     "name": "Sofia Torcello",
+     "rate": 2.278,
+     "played_share": 0.8
+    }
+   ],
+   "points_per_set_missing": 5.047
   },
   {
    "game_id": "6624966",
@@ -1221,24 +1272,6 @@
     }
    ],
    "points_per_set_missing": 4.036
-  },
-  {
-   "game_id": "6625965",
-   "team_id": "46604",
-   "team": "Murray St.",
-   "absent": [
-    {
-     "name": "Maezi Snyder",
-     "rate": 2.25,
-     "played_share": 0.75
-    },
-    {
-     "name": "Mija Sagadin pristovnik",
-     "rate": 1.692,
-     "played_share": 0.75
-    }
-   ],
-   "points_per_set_missing": 3.942
   },
   {
    "game_id": "6624442",
@@ -1588,6 +1621,19 @@
    "points_per_set_missing": 3.25
   },
   {
+   "game_id": "6639364",
+   "team_id": "46498",
+   "team": "Southern Ill.",
+   "absent": [
+    {
+     "name": "Mckenzie Moeller",
+     "rate": 3.179,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 3.179
+  },
+  {
    "game_id": "6639613",
    "team_id": "46252",
    "team": "Texas Southern",
@@ -1606,19 +1652,6 @@
    "points_per_set_missing": 3.175
   },
   {
-   "game_id": "6639364",
-   "team_id": "46498",
-   "team": "Southern Ill.",
-   "absent": [
-    {
-     "name": "Mckenzie Moeller",
-     "rate": 3.16,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 3.16
-  },
-  {
    "game_id": "6637939",
    "team_id": "46369",
    "team": "UTSA",
@@ -1635,24 +1668,6 @@
     }
    ],
    "points_per_set_missing": 3.093
-  },
-  {
-   "game_id": "6625667",
-   "team_id": "46123",
-   "team": "Southern U.",
-   "absent": [
-    {
-     "name": "Paulina Agudelo marin",
-     "rate": 2.045,
-     "played_share": 1.0
-    },
-    {
-     "name": "Zaria Nelson",
-     "rate": 1.045,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 3.09
   },
   {
    "game_id": "6627748",
@@ -1679,6 +1694,24 @@
     }
    ],
    "points_per_set_missing": 3.062
+  },
+  {
+   "game_id": "6625667",
+   "team_id": "46123",
+   "team": "Southern U.",
+   "absent": [
+    {
+     "name": "Paulina Agudelo marin",
+     "rate": 2.143,
+     "played_share": 1.0
+    },
+    {
+     "name": "Norielle Battle",
+     "rate": 0.893,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 3.036
   },
   {
    "game_id": "6625090",
@@ -1873,19 +1906,6 @@
    "points_per_set_missing": 2.848
   },
   {
-   "game_id": "6626923",
-   "team_id": "46502",
-   "team": "Stetson",
-   "absent": [
-    {
-     "name": "Andrea Diaz dominguez",
-     "rate": 2.8,
-     "played_share": 0.75
-    }
-   ],
-   "points_per_set_missing": 2.8
-  },
-  {
    "game_id": "6625692",
    "team_id": "46656",
    "team": "Queens (NC)",
@@ -1897,6 +1917,19 @@
     }
    ],
    "points_per_set_missing": 2.783
+  },
+  {
+   "game_id": "6626923",
+   "team_id": "46502",
+   "team": "Stetson",
+   "absent": [
+    {
+     "name": "Andrea Diaz dominguez",
+     "rate": 2.769,
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 2.769
   },
   {
    "game_id": "6627720",
@@ -2397,19 +2430,6 @@
    "points_per_set_missing": 2.25
   },
   {
-   "game_id": "6624406",
-   "team_id": "46604",
-   "team": "Murray St.",
-   "absent": [
-    {
-     "name": "Maezi Snyder",
-     "rate": 2.25,
-     "played_share": 0.8
-    }
-   ],
-   "points_per_set_missing": 2.25
-  },
-  {
    "game_id": "6627179",
    "team_id": "46616",
    "team": "Purdue",
@@ -2590,6 +2610,32 @@
     }
    ],
    "points_per_set_missing": 2.033
+  },
+  {
+   "game_id": "6625965",
+   "team_id": "46604",
+   "team": "Murray St.",
+   "absent": [
+    {
+     "name": "Maezi Snyder",
+     "rate": 2.0,
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 2.0
+  },
+  {
+   "game_id": "6624406",
+   "team_id": "46604",
+   "team": "Murray St.",
+   "absent": [
+    {
+     "name": "Maezi Snyder",
+     "rate": 2.0,
+     "played_share": 0.833
+    }
+   ],
+   "points_per_set_missing": 2.0
   },
   {
    "game_id": "6639364",
@@ -2787,19 +2833,6 @@
    "points_per_set_missing": 1.694
   },
   {
-   "game_id": "6637012",
-   "team_id": "46604",
-   "team": "Murray St.",
-   "absent": [
-    {
-     "name": "Mija Sagadin pristovnik",
-     "rate": 1.692,
-     "played_share": 0.8
-    }
-   ],
-   "points_per_set_missing": 1.692
-  },
-  {
    "game_id": "6627659",
    "team_id": "46346",
    "team": "Oklahoma",
@@ -2956,19 +2989,6 @@
    "points_per_set_missing": 1.594
   },
   {
-   "game_id": "6625418",
-   "team_id": "46726",
-   "team": "LSU New Orleans ",
-   "absent": [
-    {
-     "name": "Olivia Bartrina",
-     "rate": 1.577,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.577
-  },
-  {
    "game_id": "6625817",
    "team_id": "46366",
    "team": "Stonehill",
@@ -3021,19 +3041,6 @@
    "points_per_set_missing": 1.526
   },
   {
-   "game_id": "6628152",
-   "team_id": "45981",
-   "team": "NIU",
-   "absent": [
-    {
-     "name": "Naomi Dowd",
-     "rate": 1.5,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.5
-  },
-  {
    "game_id": "6624506",
    "team_id": "45895",
    "team": "UC Santa Barbara",
@@ -3071,6 +3078,19 @@
     }
    ],
    "points_per_set_missing": 1.472
+  },
+  {
+   "game_id": "6625418",
+   "team_id": "46726",
+   "team": "LSU New Orleans ",
+   "absent": [
+    {
+     "name": "Olivia Bartrina",
+     "rate": 1.469,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.469
   },
   {
    "game_id": "6627347",
@@ -3149,6 +3169,19 @@
     }
    ],
    "points_per_set_missing": 1.375
+  },
+  {
+   "game_id": "6628152",
+   "team_id": "45981",
+   "team": "NIU",
+   "absent": [
+    {
+     "name": "Naomi Dowd",
+     "rate": 1.368,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.368
   },
   {
    "game_id": "6624757",
@@ -3255,19 +3288,6 @@
    "points_per_set_missing": 1.326
   },
   {
-   "game_id": "6627087",
-   "team_id": "46478",
-   "team": "Northern Colo.",
-   "absent": [
-    {
-     "name": "Nerea Alvarez-jorge",
-     "rate": 1.324,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.324
-  },
-  {
    "game_id": "6628246",
    "team_id": "45845",
    "team": "N.C. Central",
@@ -3292,6 +3312,19 @@
     }
    ],
    "points_per_set_missing": 1.316
+  },
+  {
+   "game_id": "6627087",
+   "team_id": "46478",
+   "team": "Northern Colo.",
+   "absent": [
+    {
+     "name": "Nerea Alvarez-jorge",
+     "rate": 1.295,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.295
   },
   {
    "game_id": "6624442",
@@ -3845,12 +3878,12 @@
    "team": "South Carolina St.",
    "absent": [
     {
-     "name": "Carra Pierre-louis",
-     "rate": 0.886,
+     "name": "De'oni Mcphearson",
+     "rate": 0.846,
      "played_share": 1.0
     }
    ],
-   "points_per_set_missing": 0.886
+   "points_per_set_missing": 0.846
   },
   {
    "game_id": "6626699",
@@ -3890,45 +3923,6 @@
     }
    ],
    "points_per_set_missing": 0.708
-  },
-  {
-   "game_id": "6639575",
-   "team_id": "46679",
-   "team": "Hampton",
-   "absent": [
-    {
-     "name": "Ana luiza Matos",
-     "rate": 0.692,
-     "played_share": 0.75
-    }
-   ],
-   "points_per_set_missing": 0.692
-  },
-  {
-   "game_id": "6626131",
-   "team_id": "46679",
-   "team": "Hampton",
-   "absent": [
-    {
-     "name": "Ana luiza Matos",
-     "rate": 0.692,
-     "played_share": 0.6
-    }
-   ],
-   "points_per_set_missing": 0.692
-  },
-  {
-   "game_id": "6624445",
-   "team_id": "46679",
-   "team": "Hampton",
-   "absent": [
-    {
-     "name": "Ana luiza Matos",
-     "rate": 0.692,
-     "played_share": 0.75
-    }
-   ],
-   "points_per_set_missing": 0.692
   },
   {
    "game_id": "6626080",
@@ -4212,13 +4206,12 @@
    ]
   },
   "NIU": {
-   "gid": "6624407",
-   "d": "2026-09-05",
-   "appeared": 12,
+   "gid": "6637014",
+   "d": "2026-09-11",
+   "appeared": 13,
    "zero_action": [
     "Nathalie Tulumaris",
-    "Ellie Smith",
-    "Aiden Lightburn"
+    "Ellie Smith"
    ]
   },
   "Eastern Mich.": {
@@ -4536,16 +4529,16 @@
    ]
   },
   "Duquesne": {
-   "gid": "6628535",
-   "d": "2026-09-05",
+   "gid": "6626542",
+   "d": "2026-09-11",
    "appeared": 9,
    "zero_action": [
-    "Alexa Flowers",
     "Ryan Hicks",
     "Kylie Griffin",
     "Karli Jordan",
+    "Charlotte Arrington",
     "Keely Mcmahon-regan",
-    "Mirabella Iriarte"
+    "Kaylie Baumgart"
    ]
   },
   "Canisius": {
@@ -4616,13 +4609,14 @@
    ]
   },
   "Southern U.": {
-   "gid": "6625668",
-   "d": "2026-09-08",
+   "gid": "6624547",
+   "d": "2026-09-11",
    "appeared": 11,
    "zero_action": [
     "Nyla Hoult",
-    "Penina Vito",
-    "Alayah Wilson",
+    "Zaria Nelson",
+    "Kaila Baker",
+    "Ayana Johnson",
     "Logan Hart",
     "Alyssa Williams"
    ]
@@ -4756,26 +4750,26 @@
    ]
   },
   "Stetson": {
-   "gid": "6626852",
-   "d": "2026-09-09",
-   "appeared": 10,
+   "gid": "6628571",
+   "d": "2026-09-11",
+   "appeared": 14,
    "zero_action": [
-    "Maria Ozaeta",
-    "Sophie Jones",
-    "Vitoria Stedile"
+    "Eden Bristow",
+    "Sophie Jones"
    ]
   },
   "FIU": {
-   "gid": "6624898",
-   "d": "2026-09-05",
-   "appeared": 11,
+   "gid": "6626935",
+   "d": "2026-09-11",
+   "appeared": 10,
    "zero_action": [
-    "Mia Gonzalez",
-    "Nichole Kelly",
-    "Teodora Skocajic",
-    "Marla Valentin",
-    "Ksenija Krunic",
-    "Alina Cebotari"
+    "Maria clara Andrade",
+    "Jaya Rimm",
+    "Olivia Bryant",
+    "Antonia Vasquez",
+    "Janiah Robinson",
+    "Leila Ricks",
+    "Kyndall Williams"
    ]
   },
   "Utah Valley": {
@@ -5163,12 +5157,15 @@
    ]
   },
   "Murray St.": {
-   "gid": "6627136",
-   "d": "2026-09-05",
-   "appeared": 12,
+   "gid": "6627091",
+   "d": "2026-09-11",
+   "appeared": 9,
    "zero_action": [
+    "Bailey Keusch",
+    "Paige Brock",
+    "Teodora Cickovic",
     "Melis Aydin",
-    "Teodora Cickovic"
+    "Burcu Gulomur"
    ]
   },
   "Sam Houston": {
@@ -5255,12 +5252,13 @@
    ]
   },
   "Hampton": {
-   "gid": "6624445",
-   "d": "2026-09-06",
-   "appeared": 12,
+   "gid": "6626935",
+   "d": "2026-09-11",
+   "appeared": 14,
    "zero_action": [
-    "Maria Clara Andrade",
-    "Jaya Rimm"
+    "Teodora Skocajic",
+    "Jillian Huckabey",
+    "Alina Cebotari"
    ]
   },
   "CSU Bakersfield": {
@@ -5277,16 +5275,17 @@
    ]
   },
   "Lamar University": {
-   "gid": "6624546",
-   "d": "2026-09-08",
-   "appeared": 12,
+   "gid": "6624547",
+   "d": "2026-09-11",
+   "appeared": 11,
    "zero_action": [
     "Addison Stanley",
-    "Kimaya Webb",
+    "Madelynn Coy",
     "Riley Johnson",
-    "Emily Moon",
+    "Saida Maksoud",
     "Jo Moffitt",
-    "Maja Malinowska"
+    "Leila Ceaser",
+    "Gabrielle St louis"
    ]
   },
   "Oakland": {
@@ -5470,28 +5469,25 @@
    ]
   },
   "Alabama St.": {
-   "gid": "6626980",
-   "d": "2026-09-05",
-   "appeared": 11,
+   "gid": "6639307",
+   "d": "2026-09-11",
+   "appeared": 12,
    "zero_action": [
+    "Amaya Robinson",
     "Sharide Sykes",
     "Aliyah Pooler",
     "Chidera Okocha",
-    "Alexis Williams",
     "Makeda Edwards",
-    "Nadiyyah Northern",
     "Jaci Moore"
    ]
   },
   "Southern Ill.": {
-   "gid": "6625385",
-   "d": "2026-09-10",
-   "appeared": 11,
+   "gid": "6626749",
+   "d": "2026-09-11",
+   "appeared": 13,
    "zero_action": [
     "Dafne Sosa",
     "Carlota Mora",
-    "Julia Laidig",
-    "Una Stepic",
     "Valentina Zevallos"
    ]
   },
@@ -5625,15 +5621,15 @@
    ]
   },
   "South Carolina St.": {
-   "gid": "6639579",
-   "d": "2026-09-10",
+   "gid": "6639307",
+   "d": "2026-09-11",
    "appeared": 12,
    "zero_action": [
     "Jessika Martinez",
-    "Carra Pierre-louis",
-    "Arianna James",
-    "Hedia Lewis",
-    "Lael Valdez"
+    "Autumn Culbreath",
+    "Jayden Mathis",
+    "Lael Valdez",
+    "Kiyla Mighty"
    ]
   },
   "Mississippi Val.": {
@@ -5680,14 +5676,14 @@
    ]
   },
   "UIW": {
-   "gid": "6626743",
-   "d": "2026-09-10",
+   "gid": "6626749",
+   "d": "2026-09-11",
    "appeared": 11,
    "zero_action": [
     "Liliana Brisco",
+    "Lilly Roach",
     "Ashley Go",
     "Mya Cheatum",
-    "Alana Kolb",
     "Victoria Sanchez",
     "Jadyn Molina"
    ]
@@ -5729,16 +5725,12 @@
    ]
   },
   "Northern Ky.": {
-   "gid": "6626540",
-   "d": "2026-09-05",
-   "appeared": 9,
+   "gid": "6626542",
+   "d": "2026-09-11",
+   "appeared": 13,
    "zero_action": [
-    "Lainey Green",
     "Emily Erwin",
-    "Kendall Hopewell",
-    "Emory Guderian",
-    "Zy'aire Barr",
-    "Ashley Sess"
+    "Kendall Hopewell"
    ]
   },
   "Fresno St.": {
@@ -6191,15 +6183,16 @@
    ]
   },
   "UTRGV": {
-   "gid": "6627141",
-   "d": "2026-09-10",
-   "appeared": 11,
+   "gid": "6640130",
+   "d": "2026-09-11",
+   "appeared": 10,
    "zero_action": [
     "Shylah Totten",
     "Nadine Zech",
     "Jasmine Allen",
     "Sujeili Mermella",
-    "Isa Bento"
+    "Isa Bento",
+    "Jasmyn Walker"
    ]
   },
   "Western Mich.": {
@@ -6480,15 +6473,11 @@
    ]
   },
   "Ball St.": {
-   "gid": "6628570",
-   "d": "2026-09-05",
-   "appeared": 11,
+   "gid": "6628571",
+   "d": "2026-09-11",
+   "appeared": 15,
    "zero_action": [
-    "Lucy Mccollum",
-    "Alana Bailey",
-    "Camryn Wise",
     "Elizabeth Tabeling",
-    "Kendall Eden",
     "Allie Wuestenfeld"
    ]
   },
@@ -6545,13 +6534,15 @@
    ]
   },
   "Mercer": {
-   "gid": "6638240",
-   "d": "2026-09-05",
-   "appeared": 12,
+   "gid": "6625427",
+   "d": "2026-09-11",
+   "appeared": 10,
    "zero_action": [
     "Emily Matias",
+    "Ipek Ulukutlu",
     "Lexie Stotenbur",
     "Bella Pons",
+    "Jasmine Calton",
     "Sydney Vancott",
     "Olivia Elliott",
     "Tracey Hemelings"
@@ -7053,11 +7044,16 @@
    ]
   },
   "LSU New Orleans ": {
-   "gid": "6625426",
-   "d": "2026-09-06",
-   "appeared": 13,
+   "gid": "6625427",
+   "d": "2026-09-11",
+   "appeared": 12,
    "zero_action": [
-    "Karina Barzanova"
+    "Elani Ratchkovska",
+    "Karina Barzanova",
+    "Ania Anderson",
+    "Ava Frerman",
+    "Rylie Hallman",
+    "Derin nur Aydin"
    ]
   },
   "Alcorn": {
@@ -7370,8 +7366,8 @@
    ]
   },
   "Chicago St.": {
-   "gid": "6628369",
-   "d": "2026-09-05",
+   "gid": "6637014",
+   "d": "2026-09-11",
    "appeared": 12,
    "zero_action": []
   },
@@ -7433,14 +7429,12 @@
    ]
   },
   "Prairie View": {
-   "gid": "6628028",
-   "d": "2026-09-10",
-   "appeared": 11,
+   "gid": "6640130",
+   "d": "2026-09-11",
+   "appeared": 13,
    "zero_action": [
     "Charli Harvin",
-    "Jade Smith",
-    "Shea Mcelroy",
-    "Lucy Dieterlen"
+    "Shea Mcelroy"
    ]
   },
   "Pepperdine": {
@@ -7989,18 +7983,12 @@
    ]
   },
   "Northern Colo.": {
-   "gid": "6627090",
-   "d": "2026-09-06",
-   "appeared": 10,
+   "gid": "6627091",
+   "d": "2026-09-11",
+   "appeared": 12,
    "zero_action": [
     "Emily Bruss",
-    "Jaylyn Lynch",
-    "Jenna Baller",
-    "Kylie Cackovic",
-    "Addison Roark",
-    "Cy rae Campbell",
-    "Kaitlyn Hutchins",
-    "Shelby Schoenbeck"
+    "Julia Angert"
    ]
   },
   "UNLV": {

@@ -2,15 +2,15 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "corpus_fingerprint": "54647b0695784f6a",
-  "generated_at_utc": "2026-09-11T16:19:49Z",
+  "corpus_fingerprint": "a5a833e88aba72f8",
+  "generated_at_utc": "2026-09-11T17:34:06Z",
   "counts": {
-   "finals": 1098,
+   "finals": 1108,
    "official_only": 36,
-   "reconciled": 1014,
+   "reconciled": 1024,
    "confirmed": 0,
    "disputed": 2,
-   "pending_second": 1096,
+   "pending_second": 1106,
    "corrected": 46,
    "duplicate_listings": 8,
    "duplicate_candidates_pending": 0
@@ -53854,7 +53854,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-11T16:18:54Z",
+    "checked": "2026-09-11T17:33:11Z",
     "schools": {
      "Hawaii": {
       "state": "NOT_POSTED",
@@ -53880,7 +53880,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-11T16:18:54Z",
+   "last_checked": "2026-09-11T17:33:11Z",
    "sources": [
     {
      "url": "https://ucasports.com/services/schedule_txt.ashx?schedule=1309",
@@ -53891,7 +53891,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-11T16:18:54Z"
+     "retrieved": "2026-09-11T17:33:11Z"
     }
    ]
   },
@@ -53919,7 +53919,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-11T16:18:54Z",
+    "checked": "2026-09-11T17:33:11Z",
     "schools": {
      "UAB": {
       "state": "AGREE_COMPLETE",
@@ -53945,7 +53945,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-11T16:18:54Z",
+   "last_checked": "2026-09-11T17:33:11Z",
    "sources": [
     {
      "url": "https://uabsports.com/sports/womens-volleyball/schedule/text",
@@ -53956,7 +53956,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-11T16:18:54Z"
+     "retrieved": "2026-09-11T17:33:11Z"
     }
    ]
   },
@@ -53984,7 +53984,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-11T16:18:54Z",
+    "checked": "2026-09-11T17:33:11Z",
     "schools": {
      "Queens (NC)": {
       "state": "AGREE_COMPLETE",
@@ -54005,7 +54005,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-11T16:18:54Z",
+   "last_checked": "2026-09-11T17:33:11Z",
    "sources": [
     {
      "url": "https://queensathletics.com/services/schedule_txt.ashx?schedule=541",
@@ -54016,7 +54016,77 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-11T16:18:54Z"
+     "retrieved": "2026-09-11T17:33:11Z"
+    }
+   ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6626542",
+   "a": "Northern Ky.",
+   "h": "Duquesne",
+   "exh": false,
+   "d": "2026-09-11",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "verify": {
+    "v": "VERIFIED_BOTH",
+    "checked": "2026-09-11T17:33:11Z",
+    "schools": {
+     "Northern Ky.": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://nkunorse.com/services/schedule_txt.ashx?schedule=321",
+      "assertion": "Northern Ky. W 3-2 vs Duquesne",
+      "opponent_source": "Duquesne",
+      "site_says": "Neutral"
+     },
+     "Duquesne": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://goduquesne.com/services/schedule_txt.ashx?schedule=2679",
+      "assertion": "Duquesne L 2-3 vs Northern Kentucky",
+      "opponent_source": "Northern Kentucky",
+      "site_says": "Neutral"
+     }
+    }
+   },
+   "n_indep": 2,
+   "n_attempted": 0,
+   "last_checked": "2026-09-11T17:33:11Z",
+   "sources": [
+    {
+     "url": "https://goduquesne.com/services/schedule_txt.ashx?schedule=2679",
+     "kind": "school_schedule",
+     "school": "Duquesne",
+     "text": "Duquesne L 2-3 vs Northern Kentucky",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-11T17:33:11Z"
+    },
+    {
+     "url": "https://nkunorse.com/services/schedule_txt.ashx?schedule=321",
+     "kind": "school_schedule",
+     "school": "Northern Ky.",
+     "text": "Northern Ky. W 3-2 vs Duquesne",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-11T17:33:11Z"
     }
    ]
   },
@@ -54044,7 +54114,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-11T16:18:54Z",
+    "checked": "2026-09-11T17:33:11Z",
     "schools": {
      "Harvard": {
       "state": "AGREE_COMPLETE",
@@ -54064,7 +54134,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-11T16:18:54Z",
+   "last_checked": "2026-09-11T17:33:11Z",
    "sources": [
     {
      "url": "https://gocrimson.com/services/schedule_txt.ashx?schedule=1800",
@@ -54075,7 +54145,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-11T16:18:54Z"
+     "retrieved": "2026-09-11T17:33:11Z"
     },
     {
      "url": "https://uncabulldogs.com/sports/womens-volleyball/schedule/text",
@@ -54086,7 +54156,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-11T16:18:54Z"
+     "retrieved": "2026-09-11T17:33:11Z"
     }
    ]
   },
@@ -54114,7 +54184,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-11T16:18:54Z",
+    "checked": "2026-09-11T17:33:11Z",
     "schools": {
      "Kent St.": {
       "state": "NOT_POSTED",
@@ -54140,7 +54210,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-11T16:18:54Z",
+   "last_checked": "2026-09-11T17:33:11Z",
    "sources": [
     {
      "url": "https://purpleeagles.com/services/schedule_txt.ashx?schedule=695",
@@ -54151,7 +54221,256 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-11T16:18:54Z"
+     "retrieved": "2026-09-11T17:33:11Z"
+    }
+   ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6625427",
+   "a": "LSU New Orleans ",
+   "h": "Mercer",
+   "exh": false,
+   "d": "2026-09-11",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "verify": {
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-11T17:33:11Z",
+    "schools": {
+     "Mercer": {
+      "state": "NOT_POSTED",
+      "url": "https://mercerbears.com/sports/womens-volleyball/schedule/text",
+      "row": [
+       "Sep 11 (Fri)",
+       "11 a.m.",
+       "Neutral",
+       "New Orleans",
+       "Carrollton, Ga. (The Coliseum)",
+       "UWG Volleyball Classic",
+       "-"
+      ]
+     },
+     "LSU New Orleans ": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://unoprivateers.com/services/schedule_txt.ashx?schedule=410",
+      "assertion": "LSU New Orleans  L 0-3 vs Mercer",
+      "opponent_source": "Mercer",
+      "site_says": "Neutral"
+     }
+    }
+   },
+   "n_indep": 1,
+   "n_attempted": 0,
+   "last_checked": "2026-09-11T17:33:11Z",
+   "sources": [
+    {
+     "url": "https://unoprivateers.com/services/schedule_txt.ashx?schedule=410",
+     "kind": "school_schedule",
+     "school": "LSU New Orleans ",
+     "text": "LSU New Orleans  L 0-3 vs Mercer",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-11T17:33:11Z"
+    }
+   ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6626935",
+   "a": "FIU",
+   "h": "Hampton",
+   "exh": false,
+   "d": "2026-09-11",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "unavailable"
+   },
+   "verify": {
+    "v": "CONTRADICTED_ONE",
+    "checked": "2026-09-11T17:33:11Z",
+    "schools": {
+     "Hampton": {
+      "state": "EVENT_NOT_FOUND",
+      "url": "https://hamptonpirates.com/sports/womens-volleyball/schedule/text",
+      "rows_on_date": [
+       "Florida International",
+       "Louisiana"
+      ]
+     },
+     "FIU": {
+      "state": "CONTRADICTS",
+      "url": "https://fiusports.com/services/schedule_txt.ashx?schedule=378",
+      "assertion": "FIU W 3-0 vs Hampton",
+      "opponent_source": "Hampton",
+      "site_says": "Neutral"
+     }
+    }
+   },
+   "n_indep": 1,
+   "n_attempted": 0,
+   "last_checked": "2026-09-11T17:33:11Z",
+   "sources": [
+    {
+     "url": "https://fiusports.com/services/schedule_txt.ashx?schedule=378",
+     "kind": "school_schedule",
+     "school": "FIU",
+     "text": "FIU W 3-0 vs Hampton",
+     "fields": [
+      "result"
+     ],
+     "status": "conflict_observed",
+     "retrieved": "2026-09-11T17:33:11Z"
+    }
+   ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6627091",
+   "a": "Northern Colo.",
+   "h": "Murray St.",
+   "exh": false,
+   "d": "2026-09-11",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "unavailable"
+   },
+   "verify": {
+    "v": "UNVERIFIED",
+    "checked": "2026-09-11T17:33:11Z",
+    "schools": {
+     "Northern Colo.": {
+      "state": "NOT_POSTED",
+      "url": "https://uncbears.com/sports/womens-volleyball/schedule/text",
+      "row": [
+       "Sep 11 (Fri)",
+       "9 a.m. MT | 10 a.m. CT",
+       "Neutral",
+       "Murray State",
+       "Murfreesboro, Tenn. (Alumni Memorial Gymnasium)",
+       "Blue Raider Bash",
+       "-"
+      ]
+     },
+     "Murray St.": {
+      "state": "NOT_POSTED",
+      "url": "https://goracers.com/sports/womens-volleyball/schedule/text",
+      "row": [
+       "Sep 11 (Fri)",
+       "10 a.m.",
+       "Neutral",
+       "Northern Colorado",
+       "Murfreesboro, Tenn.",
+       "Blue Raider Bash",
+       "-"
+      ]
+     }
+    }
+   },
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6628571",
+   "a": "Ball St.",
+   "h": "Stetson",
+   "exh": false,
+   "d": "2026-09-11",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "verify": {
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-11T17:33:11Z",
+    "schools": {
+     "Ball St.": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://ballstatesports.com/sports/womens-volleyball/schedule/text",
+      "assertion": "Ball St. W 3-0 vs Stetson",
+      "opponent_source": "Stetson",
+      "site_says": "Neutral"
+     },
+     "Stetson": {
+      "state": "NOT_POSTED",
+      "url": "https://gohatters.com/services/schedule_txt.ashx?schedule=555",
+      "row": [
+       "Sep 11 (Fri)",
+       "11:00 AM",
+       "Neutral",
+       "Ball State",
+       "Buies Creek, NC (Gore Arena)",
+       "",
+       ""
+      ]
+     }
+    }
+   },
+   "n_indep": 1,
+   "n_attempted": 0,
+   "last_checked": "2026-09-11T17:33:11Z",
+   "sources": [
+    {
+     "url": "https://ballstatesports.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Ball St.",
+     "text": "Ball St. W 3-0 vs Stetson",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-11T17:33:11Z"
     }
    ]
   },
@@ -54179,7 +54498,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-11T16:18:54Z",
+    "checked": "2026-09-11T17:33:11Z",
     "schools": {
      "Arkansas": {
       "state": "SITE_HTTP_MISS",
@@ -54197,7 +54516,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-11T16:18:54Z",
+   "last_checked": "2026-09-11T17:33:11Z",
    "sources": [
     {
      "url": "https://rmucolonials.com/services/schedule_txt.ashx?schedule=503",
@@ -54208,9 +54527,299 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-11T16:18:54Z"
+     "retrieved": "2026-09-11T17:33:11Z"
     }
    ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6637014",
+   "a": "NIU",
+   "h": "Chicago St.",
+   "exh": false,
+   "d": "2026-09-11",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "verify": {
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-11T17:33:11Z",
+    "schools": {
+     "NIU": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://niuhuskies.com/services/schedule_txt.ashx?schedule=2734",
+      "assertion": "NIU W 3-0 vs Chicago State University",
+      "opponent_source": "Chicago State University",
+      "site_says": "Neutral"
+     },
+     "Chicago St.": {
+      "state": "NOT_POSTED",
+      "url": "https://gocsucougars.com/services/schedule_txt.ashx?schedule=266",
+      "row": [
+       "Sep 11 (Fri)",
+       "10:00 AM",
+       "Away",
+       "NIU",
+       "Edwardsville, IL",
+       "",
+       ""
+      ]
+     }
+    }
+   },
+   "n_indep": 1,
+   "n_attempted": 0,
+   "last_checked": "2026-09-11T17:33:11Z",
+   "sources": [
+    {
+     "url": "https://niuhuskies.com/services/schedule_txt.ashx?schedule=2734",
+     "kind": "school_schedule",
+     "school": "NIU",
+     "text": "NIU W 3-0 vs Chicago State University",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-11T17:33:11Z"
+    }
+   ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6639307",
+   "a": "South Carolina St.",
+   "h": "Alabama St.",
+   "exh": false,
+   "d": "2026-09-11",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "unavailable"
+   },
+   "verify": {
+    "v": "UNVERIFIED",
+    "checked": "2026-09-11T17:33:11Z",
+    "schools": {
+     "Alabama St.": {
+      "state": "NOT_POSTED",
+      "url": "https://bamastatesports.com/services/schedule_txt.ashx?schedule=434",
+      "row": [
+       "Sep 11 (Fri)",
+       "10:00 AM",
+       "Home",
+       "South Carolina State",
+       "Montgomery, AL (Dunn-Oliver Acadome)",
+       "",
+       ""
+      ]
+     },
+     "South Carolina St.": {
+      "state": "NOT_POSTED",
+      "url": "https://scsuathletics.com/services/schedule_txt.ashx?schedule=320",
+      "row": [
+       "Sep 11 (Fri)",
+       "10:00 AM",
+       "Away",
+       "Alabama State University",
+       "Montgomery, AL",
+       "",
+       ""
+      ]
+     }
+    }
+   },
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6624547",
+   "a": "Lamar University",
+   "h": "Southern U.",
+   "exh": false,
+   "d": "2026-09-11",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "unavailable"
+   },
+   "verify": {
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-11T17:33:11Z",
+    "schools": {
+     "Lamar University": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://lamarcardinals.com/services/schedule_txt.ashx?schedule=5633",
+      "assertion": "Lamar University W 3-0 vs Southern",
+      "opponent_source": "Southern",
+      "site_says": "Neutral"
+     },
+     "Southern U.": {
+      "state": "NOT_POSTED",
+      "url": "https://gojagsports.com/services/schedule_txt.ashx?schedule=311",
+      "row": [
+       "Sep 11 (Fri)",
+       "10:30 a.m.",
+       "Neutral",
+       "Lamar",
+       "Hattiesburg, Miss. (Southern Miss Wellness Center)",
+       "",
+       ""
+      ]
+     }
+    }
+   },
+   "n_indep": 1,
+   "n_attempted": 0,
+   "last_checked": "2026-09-11T17:33:11Z",
+   "sources": [
+    {
+     "url": "https://lamarcardinals.com/services/schedule_txt.ashx?schedule=5633",
+     "kind": "school_schedule",
+     "school": "Lamar University",
+     "text": "Lamar University W 3-0 vs Southern",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-11T17:33:11Z"
+    }
+   ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6640130",
+   "a": "UTRGV",
+   "h": "Prairie View",
+   "exh": false,
+   "d": "2026-09-11",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "verify": {
+    "v": "UNVERIFIED",
+    "checked": "2026-09-11T17:33:11Z",
+    "schools": {
+     "UTRGV": {
+      "state": "EVENT_NOT_FOUND",
+      "url": "https://goutrgv.com/services/schedule_txt.ashx?schedule=1068",
+      "rows_on_date": [
+       "Prairie View A&M"
+      ]
+     },
+     "Prairie View": {
+      "state": "EVENT_NOT_FOUND",
+      "url": "https://pvpanthers.com/services/schedule_txt.ashx?schedule=334",
+      "rows_on_date": [
+       "Rio Grande Valley"
+      ]
+     }
+    }
+   },
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6626749",
+   "a": "UIW",
+   "h": "Southern Ill.",
+   "exh": false,
+   "d": "2026-09-11",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "unavailable"
+   },
+   "verify": {
+    "v": "UNVERIFIED",
+    "checked": "2026-09-11T17:33:11Z",
+    "schools": {
+     "UIW": {
+      "state": "NOT_POSTED",
+      "url": "https://uiwcardinals.com/services/schedule_txt.ashx?schedule=424",
+      "row": [
+       "Sep 11 (Fri)",
+       "11 a.m.",
+       "Neutral",
+       "Southern Illinois University",
+       "Iowa City, IA",
+       "",
+       ""
+      ]
+     },
+     "Southern Ill.": {
+      "state": "EVENT_NOT_FOUND",
+      "url": "https://siusalukis.com/sports/womens-volleyball/schedule/text",
+      "rows_on_date": [
+       "Incarnate Word",
+       "Missouri State"
+      ]
+     }
+    }
+   },
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
   }
  ]
 }

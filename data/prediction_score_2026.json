@@ -2,22 +2,22 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 1014,
+  "scored": 1023,
   "logged_after_tipoff_excluded": 3,
-  "team_mismatch_excluded": 25,
+  "team_mismatch_excluded": 26,
   "predictions_on_record": 4807,
-  "results_available": 1066,
-  "brier": 0.1723,
+  "results_available": 1076,
+  "brier": 0.1721,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 751,
-  "favourite_correct_pct": 74.1
+  "favourite_correct": 759,
+  "favourite_correct_pct": 74.2
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 172,
+   "n": 173,
    "said": 55.3,
-   "happened": 57.0
+   "happened": 57.2
   },
   {
    "range": "60-70%",
@@ -27,24 +27,33 @@
   },
   {
    "range": "70-80%",
-   "n": 163,
+   "n": 164,
    "said": 75.0,
-   "happened": 67.5
+   "happened": 67.7
   },
   {
    "range": "80-90%",
-   "n": 183,
-   "said": 85.2,
-   "happened": 78.7
+   "n": 184,
+   "said": 85.3,
+   "happened": 78.8
   },
   {
    "range": "90-101%",
-   "n": 307,
+   "n": 313,
    "said": 95.5,
-   "happened": 93.2
+   "happened": 93.0
   }
  ],
  "matches": [
+  {
+   "game_id": "6626935",
+   "date": "2026-09-11",
+   "away": "FIU",
+   "home": "Hampton",
+   "p_home": 0.0001,
+   "home_won": true,
+   "brier": 0.9998000100000001
+  },
   {
    "game_id": "6627232",
    "date": "2026-08-28",
@@ -485,15 +494,6 @@
    "p_home": 0.8272,
    "home_won": false,
    "brier": 0.6842598400000001
-  },
-  {
-   "game_id": "6624238",
-   "date": "2026-09-02",
-   "away": "Indiana",
-   "home": "Texas A&M",
-   "p_home": 0.8261,
-   "home_won": false,
-   "brier": 0.6824412099999999
   }
  ]
 }

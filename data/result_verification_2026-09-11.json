@@ -1,9 +1,11 @@
 {
  "date": "2026-09-11",
- "generated_utc": "2026-09-11T16:18:54Z",
+ "generated_utc": "2026-09-11T17:33:11Z",
  "counts": {
-  "CORROBORATED_ONE": 5,
-  "VERIFIED_BOTH": 1
+  "CORROBORATED_ONE": 9,
+  "VERIFIED_BOTH": 2,
+  "CONTRADICTED_ONE": 1,
+  "UNVERIFIED": 4
  },
  "matches": [
   {
@@ -151,6 +153,282 @@
      "rows_on_date": [
       "Queens (N.C.)",
       "Presbyterian"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6626542",
+   "date": "2026-09-11",
+   "canonical": "Northern Ky. def. Duquesne 3-2",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Northern Ky.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://nkunorse.com/services/schedule_txt.ashx?schedule=321",
+     "assertion": "Northern Ky. W 3-2 vs Duquesne",
+     "opponent_source": "Duquesne",
+     "site_says": "Neutral"
+    },
+    "Duquesne": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://goduquesne.com/services/schedule_txt.ashx?schedule=2679",
+     "assertion": "Duquesne L 2-3 vs Northern Kentucky",
+     "opponent_source": "Northern Kentucky",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6625427",
+   "date": "2026-09-11",
+   "canonical": "Mercer def. LSU New Orleans  3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Mercer": {
+     "state": "NOT_POSTED",
+     "url": "https://mercerbears.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 11 (Fri)",
+      "11 a.m.",
+      "Neutral",
+      "New Orleans",
+      "Carrollton, Ga. (The Coliseum)",
+      "UWG Volleyball Classic",
+      "-"
+     ]
+    },
+    "LSU New Orleans ": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://unoprivateers.com/services/schedule_txt.ashx?schedule=410",
+     "assertion": "LSU New Orleans  L 0-3 vs Mercer",
+     "opponent_source": "Mercer",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6628571",
+   "date": "2026-09-11",
+   "canonical": "Ball St. def. Stetson 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Ball St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://ballstatesports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Ball St. W 3-0 vs Stetson",
+     "opponent_source": "Stetson",
+     "site_says": "Neutral"
+    },
+    "Stetson": {
+     "state": "NOT_POSTED",
+     "url": "https://gohatters.com/services/schedule_txt.ashx?schedule=555",
+     "row": [
+      "Sep 11 (Fri)",
+      "11:00 AM",
+      "Neutral",
+      "Ball State",
+      "Buies Creek, NC (Gore Arena)",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6637014",
+   "date": "2026-09-11",
+   "canonical": "NIU def. Chicago St. 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "NIU": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://niuhuskies.com/services/schedule_txt.ashx?schedule=2734",
+     "assertion": "NIU W 3-0 vs Chicago State University",
+     "opponent_source": "Chicago State University",
+     "site_says": "Neutral"
+    },
+    "Chicago St.": {
+     "state": "NOT_POSTED",
+     "url": "https://gocsucougars.com/services/schedule_txt.ashx?schedule=266",
+     "row": [
+      "Sep 11 (Fri)",
+      "10:00 AM",
+      "Away",
+      "NIU",
+      "Edwardsville, IL",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6626935",
+   "date": "2026-09-11",
+   "canonical": "Hampton def. FIU 3-0",
+   "verdict": "CONTRADICTED_ONE",
+   "schools": {
+    "Hampton": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://hamptonpirates.com/sports/womens-volleyball/schedule/text",
+     "rows_on_date": [
+      "Florida International",
+      "Louisiana"
+     ]
+    },
+    "FIU": {
+     "state": "CONTRADICTS",
+     "url": "https://fiusports.com/services/schedule_txt.ashx?schedule=378",
+     "assertion": "FIU W 3-0 vs Hampton",
+     "opponent_source": "Hampton",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6624547",
+   "date": "2026-09-11",
+   "canonical": "Lamar University def. Southern U. 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Lamar University": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://lamarcardinals.com/services/schedule_txt.ashx?schedule=5633",
+     "assertion": "Lamar University W 3-0 vs Southern",
+     "opponent_source": "Southern",
+     "site_says": "Neutral"
+    },
+    "Southern U.": {
+     "state": "NOT_POSTED",
+     "url": "https://gojagsports.com/services/schedule_txt.ashx?schedule=311",
+     "row": [
+      "Sep 11 (Fri)",
+      "10:30 a.m.",
+      "Neutral",
+      "Lamar",
+      "Hattiesburg, Miss. (Southern Miss Wellness Center)",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6640130",
+   "date": "2026-09-11",
+   "canonical": "UTRGV def. Prairie View 3-0",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "UTRGV": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://goutrgv.com/services/schedule_txt.ashx?schedule=1068",
+     "rows_on_date": [
+      "Prairie View A&M"
+     ]
+    },
+    "Prairie View": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://pvpanthers.com/services/schedule_txt.ashx?schedule=334",
+     "rows_on_date": [
+      "Rio Grande Valley"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6627091",
+   "date": "2026-09-11",
+   "canonical": "Northern Colo. def. Murray St. 3-2",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Northern Colo.": {
+     "state": "NOT_POSTED",
+     "url": "https://uncbears.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 11 (Fri)",
+      "9 a.m. MT | 10 a.m. CT",
+      "Neutral",
+      "Murray State",
+      "Murfreesboro, Tenn. (Alumni Memorial Gymnasium)",
+      "Blue Raider Bash",
+      "-"
+     ]
+    },
+    "Murray St.": {
+     "state": "NOT_POSTED",
+     "url": "https://goracers.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 11 (Fri)",
+      "10 a.m.",
+      "Neutral",
+      "Northern Colorado",
+      "Murfreesboro, Tenn.",
+      "Blue Raider Bash",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6639307",
+   "date": "2026-09-11",
+   "canonical": "Alabama St. def. South Carolina St. 3-1",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Alabama St.": {
+     "state": "NOT_POSTED",
+     "url": "https://bamastatesports.com/services/schedule_txt.ashx?schedule=434",
+     "row": [
+      "Sep 11 (Fri)",
+      "10:00 AM",
+      "Home",
+      "South Carolina State",
+      "Montgomery, AL (Dunn-Oliver Acadome)",
+      "",
+      ""
+     ]
+    },
+    "South Carolina St.": {
+     "state": "NOT_POSTED",
+     "url": "https://scsuathletics.com/services/schedule_txt.ashx?schedule=320",
+     "row": [
+      "Sep 11 (Fri)",
+      "10:00 AM",
+      "Away",
+      "Alabama State University",
+      "Montgomery, AL",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6626749",
+   "date": "2026-09-11",
+   "canonical": "UIW def. Southern Ill. 3-0",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "UIW": {
+     "state": "NOT_POSTED",
+     "url": "https://uiwcardinals.com/services/schedule_txt.ashx?schedule=424",
+     "row": [
+      "Sep 11 (Fri)",
+      "11 a.m.",
+      "Neutral",
+      "Southern Illinois University",
+      "Iowa City, IA",
+      "",
+      ""
+     ]
+    },
+    "Southern Ill.": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://siusalukis.com/sports/womens-volleyball/schedule/text",
+     "rows_on_date": [
+      "Incarnate Word",
+      "Missouri State"
      ]
     }
    }
