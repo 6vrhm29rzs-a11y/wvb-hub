@@ -1,14 +1,4 @@
 {
  "_doc": "Lineup-flagged games AWAITING school evidence. A machine signal (lineup rows fitting the opposite roster) may CORROBORATE but never quarantine or correct alone -- so a flagged final whose schools have not posted yet sits here, counted as the feed says, until the schools decide. Every entry carries recheck_by; test_lineup_attribution accepts a pending gid ONLY until that date, so an entry cannot rot into permanent silence. Resolution: file a result_corrections entry (confirmed inversion), or an attribution_adjudications label confirmed_correct (false alarm), then delete the entry here.",
- "pending": {
-  "6626804": {
-   "teams": [
-    "Bryant",
-    "Brown"
-   ],
-   "noticed": "2026-09-06",
-   "recheck_by": "2026-09-09",
-   "why": "Lineup rows fit the opposite roster (the inversion signature), and Brown's OWN schedule already contradicts the feed ('Brown L 1-3 vs Bryant', retrieved 2026-09-06T18:40:00Z). Bryant's schedule export had NOT_POSTED at the same check. One official source + machine corroboration is a HOLD, not a correction; upgrade when Bryant posts (expected: 'W 3-1 vs Brown University')."
-  }
- }
+ "pending": {}
 }

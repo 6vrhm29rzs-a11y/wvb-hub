@@ -1,0 +1,120 @@
+{
+ "date": "2026-09-11",
+ "generated_utc": "2026-09-11T15:41:39Z",
+ "counts": {
+  "CORROBORATED_ONE": 3,
+  "UNVERIFIED": 1
+ },
+ "matches": [
+  {
+   "gid": "6628698",
+   "date": "2026-09-11",
+   "canonical": "Hawaii def. Central Ark. 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Hawaii": {
+     "state": "NOT_POSTED",
+     "url": "https://hawaiiathletics.com/services/schedule_txt.ashx?schedule=4497",
+     "row": [
+      "Sep 11 (Fri)",
+      "7:00 P.M. HT",
+      "Home",
+      "Central Arkansas",
+      "Honolulu, O'ahu (Bankoh Arena at Stan Sheriff Center)",
+      "",
+      ""
+     ]
+    },
+    "Central Ark.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://ucasports.com/services/schedule_txt.ashx?schedule=1309",
+     "assertion": "Central Ark. L 0-3 vs Hawaii",
+     "opponent_source": "Hawaii",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6627684",
+   "date": "2026-09-11",
+   "canonical": "Harvard def. UNC Asheville 3-0",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Harvard": {
+     "state": "NOT_POSTED",
+     "url": "https://gocrimson.com/services/schedule_txt.ashx?schedule=1800",
+     "row": [
+      "Sep 11 (Fri)",
+      "10:00 AM",
+      "Neutral",
+      "UNC Asheville",
+      "Wilmington, NC",
+      "",
+      ""
+     ]
+    },
+    "UNC Asheville": {
+     "state": "NOT_POSTED",
+     "url": "https://uncabulldogs.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 11 (Fri)",
+      "10 AM",
+      "Neutral",
+      "Harvard",
+      "Wilmington, NC (at UNC Wilmington)",
+      "UNCW Invitational",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6639549",
+   "date": "2026-09-11",
+   "canonical": "Kent St. def. Niagara 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Kent St.": {
+     "state": "NOT_POSTED",
+     "url": "https://kentstatesports.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 11 (Fri)",
+      "10:00 a.m.",
+      "Neutral",
+      "Niagara",
+      "Erie, Pa.",
+      "Laker Invitational",
+      "-"
+     ]
+    },
+    "Niagara": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://purpleeagles.com/services/schedule_txt.ashx?schedule=695",
+     "assertion": "Niagara L 0-3 vs Kent State",
+     "opponent_source": "Kent State",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6628679",
+   "date": "2026-09-11",
+   "canonical": "Arkansas def. Robert Morris 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Arkansas": {
+     "state": "SITE_HTTP_MISS",
+     "url": "https://arkansasrazorbacks.com/sports/womens-volleyball/schedule/text",
+     "http": 404
+    },
+    "Robert Morris": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://rmucolonials.com/services/schedule_txt.ashx?schedule=503",
+     "assertion": "Robert Morris L 0-3 vs Arkansas",
+     "opponent_source": "Arkansas",
+     "site_says": "Neutral"
+    }
+   }
+  }
+ ]
+}

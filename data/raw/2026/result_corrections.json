@@ -2094,6 +2094,204 @@
      "establishes": "Coastal Carolina won 3-1 -- the second school source; both schools assert the same alternative against the feed"
     }
    ]
+  },
+  "6626804": {
+   "field": "result",
+   "feed_said": "Brown (away) won 3-1 with the set line 18-25, 25-15, 26-24, 25-21 -- the TRUE sequence with the TEAMS SWAPPED. Internally coherent, and wrong.",
+   "correct": {
+    "winner_team_id": "45813",
+    "away_sets": 1,
+    "home_sets": 3,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 25,
+      "home": 18
+     },
+     {
+      "period": 2,
+      "visit": 15,
+      "home": 25
+     },
+     {
+      "period": 3,
+      "visit": 24,
+      "home": 26
+     },
+     {
+      "period": 4,
+      "visit": 21,
+      "home": 25
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "45813": "46218",
+     "46218": "45813"
+    }
+   },
+   "established": "Bryant (home) beat Brown 3-1. Both schools publish the result against the feed, independently: Brown's own schedule records a LOSS and Bryant's records the WIN, and the two agree on the 3-1 margin. Swapping the feed's visit/home columns reproduces that result exactly (25-18 Brown, then 25-15, 26-24, 25-21 Bryant). AUDITED: the lineup rows are swapped the same way -- all 6 starters filed under Bryant are Brown roster players and all 6 under Brown are Bryant players (6/6 both ways, 0 own-roster matches). box_team_swap re-attributes the rows at the derived layer; each player's own numbers are untouched and the raw log is never rewritten.",
+   "evidence": [
+    {
+     "url": "https://brownbears.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Brown",
+     "retrieved": "2026-09-11T15:14:48Z",
+     "text": "Schedule row for September 6, 2026: 'Brown L 1-3 vs Bryant' (site column: Neutral)",
+     "establishes": "Brown lost 1-3"
+    },
+    {
+     "url": "https://bryantbulldogs.com/services/schedule_txt.ashx?schedule=493",
+     "kind": "school_site",
+     "school": "Bryant",
+     "retrieved": "2026-09-11T15:14:48Z",
+     "text": "Schedule export row for September 6, 2026: 'Bryant W 3-1 vs Brown University' (site column: Neutral)",
+     "establishes": "Bryant won 3-1 -- the second school source; posted after the 2026-09-09 recheck the pending entry was waiting on"
+    }
+   ]
+  },
+  "6627138": {
+   "field": "result",
+   "feed_said": "Prairie View (home) won 3-1 with the set line 23-25, 17-25, 26-24, 21-25 -- the TRUE sequence with the TEAMS SWAPPED. Internally coherent, and wrong.",
+   "correct": {
+    "winner_team_id": "45987",
+    "away_sets": 3,
+    "home_sets": 1,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 25,
+      "home": 23
+     },
+     {
+      "period": 2,
+      "visit": 25,
+      "home": 17
+     },
+     {
+      "period": 3,
+      "visit": 24,
+      "home": 26
+     },
+     {
+      "period": 4,
+      "visit": 25,
+      "home": 21
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46734": "45987",
+     "45987": "46734"
+    }
+   },
+   "established": "Portland St. (away) beat Prairie View 3-1. Both schools publish the result against the feed, independently: Prairie View's schedule records a LOSS and Portland St.'s records the WIN, agreeing on the 3-1 margin. Swapping the feed's visit/home columns reproduces it exactly (25-23, 25-17 Portland St., 24-26 Prairie View, 25-21 Portland St.). AUDITED: the lineup rows are swapped the same way -- 6/6 starters under each team id belong to the other team's roster, 0 own-roster matches. box_team_swap re-attributes the rows at the derived layer; the raw log is never rewritten.",
+   "evidence": [
+    {
+     "url": "https://pvpanthers.com/services/schedule_txt.ashx?schedule=334",
+     "kind": "school_site",
+     "school": "Prairie View",
+     "retrieved": "2026-09-11T15:14:48Z",
+     "text": "Schedule export row for September 10, 2026: 'Prairie View L 1-3 vs Portland State' (site column: Neutral)",
+     "establishes": "Prairie View lost 1-3"
+    },
+    {
+     "url": "https://goviks.com/services/schedule_txt.ashx?schedule=224",
+     "kind": "school_site",
+     "school": "Portland St.",
+     "retrieved": "2026-09-11T15:14:48Z",
+     "text": "Schedule export row for September 10, 2026: 'Sep 10 (Thu) | 11 a.m. PT / 1 p.m. CT | Neutral | Prairie View A&M | Lubbock, Texas | W 3-1'",
+     "establishes": "Portland St. won 3-1 -- the second school source"
+    }
+   ]
+  },
+  "6625400": {
+   "field": "result",
+   "feed_said": "James Madison (away) won 3-2 with the set line 18-25, 25-23, 27-25, 15-25, 15-11 -- the TRUE sequence with the TEAMS SWAPPED. Internally coherent, and wrong.",
+   "correct": {
+    "winner_team_id": "45770",
+    "away_sets": 2,
+    "home_sets": 3,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 25,
+      "home": 18
+     },
+     {
+      "period": 2,
+      "visit": 23,
+      "home": 25
+     },
+     {
+      "period": 3,
+      "visit": 25,
+      "home": 27
+     },
+     {
+      "period": 4,
+      "visit": 25,
+      "home": 15
+     },
+     {
+      "period": 5,
+      "visit": 11,
+      "home": 15
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "45770": "45785",
+     "45785": "45770"
+    }
+   },
+   "established": "Eastern Ky. (home) beat James Madison 3-2. Both schools publish the result against the feed, independently: James Madison's schedule records a LOSS and Eastern Ky.'s records the WIN, agreeing on the 3-2 margin. Swapping the feed's visit/home columns reproduces it exactly (25-18 JMU, then 25-23, 27-25 EKU, 25-15 JMU, 15-11 EKU). AUDITED: the lineup rows are swapped the same way -- 6/6 starters under each team id belong to the other team's roster, 0 own-roster matches. box_team_swap re-attributes the rows at the derived layer; the raw log is never rewritten.",
+   "evidence": [
+    {
+     "url": "https://ekusports.com/services/schedule_txt.ashx?schedule=350",
+     "kind": "school_site",
+     "school": "Eastern Ky.",
+     "retrieved": "2026-09-11T15:14:48Z",
+     "text": "Schedule export row for September 10, 2026: 'Eastern Ky. W 3-2 vs James Madison' (site column: Neutral)",
+     "establishes": "Eastern Ky. won 3-2"
+    },
+    {
+     "url": "https://jmusports.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "James Madison",
+     "retrieved": "2026-09-11T15:14:48Z",
+     "text": "Schedule row for September 10, 2026: 'Sep 10 (Thu) | 4 p.m. ET (3 p.m. CT) | Neutral | EKU | Bowling Green, Ky. | Alyssa Cavanaugh Classic | L 2-3'",
+     "establishes": "James Madison lost 2-3 -- the second school source"
+    }
+   ]
+  },
+  "6624524": {
+   "field": "result",
+   "feed_said": "FINAL with sets_won frozen at 2-2 and is_winner FALSE on BOTH teams (winner_team_id null) -- the tally stopped updating after the fourth set while the fifth was still played and recorded.",
+   "correct": {
+    "winner_team_id": "46082",
+    "away_sets": 2,
+    "home_sets": 3
+   },
+   "established": "Wyoming (home) beat UC Santa Barbara 3-2. The feed's OWN complete five-set line says so -- 21-25, 26-24, 25-27, 25-15, 6-15 read visitor-first gives Wyoming sets 1, 3 and 5 -- and BOTH schools publish that result independently. Only the DERIVED columns are wrong: sets_won froze at 2-2 after the fourth set and no winner flag was ever set, so winner_index() correctly returned None and the match counted nowhere. The linescores are NOT replaced -- they were right all along; this corrects the feed's derivation of them, which is exactly what this ledger is for. No box_team_swap: the per-team rows are attributed correctly here, this is a frozen tally and not an attribution swap.",
+   "evidence": [
+    {
+     "url": "https://gowyo.com/services/schedule_txt.ashx?schedule=1205",
+     "kind": "school_site",
+     "school": "Wyoming",
+     "retrieved": "2026-09-11T15:37:12Z",
+     "text": "Schedule export row for September 10, 2026: 'Wyoming W 3-2 vs UC Santa Barbara' (site column: Home)",
+     "establishes": "Wyoming won 3-2"
+    },
+    {
+     "url": "https://ucsbgauchos.com/services/schedule_txt.ashx?schedule=409",
+     "kind": "school_site",
+     "school": "UC Santa Barbara",
+     "retrieved": "2026-09-11T15:37:12Z",
+     "text": "Schedule export row for September 10, 2026: 'UC Santa Barbara L 2-3 vs University of Wyoming' (site column: Away)",
+     "establishes": "UC Santa Barbara lost 2-3 -- the second school source, agreeing on the margin"
+    }
+   ]
   }
  }
 }
