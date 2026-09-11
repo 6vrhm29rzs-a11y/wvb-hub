@@ -6,9 +6,9 @@
   "min_home_games": 3,
   "note": "'unknown' means we do not yet have 3 home matches for that team, so no claim is made either way -- it is not a synonym for 'home'",
   "counts": {
-   "no-venue": 1684,
-   "neutral": 512,
-   "home": 2685,
+   "no-venue": 1682,
+   "neutral": 518,
+   "home": 2682,
    "unknown": 7
   },
   "teams_with_known_home": 262,
@@ -44,7 +44,7 @@
   "46563": "Hytche Center, Princess Anne, MD",
   "46232": "Halton Arena, Charlotte, NC",
   "46175": "Memorial Hall, Dover, DE",
-  "46443": "Events Center, Vestal, NY",
+  "46443": "John F. Savage Arena, Toledo, OH",
   "45966": "Curry Arena, Charlotte, NC",
   "45773": "Abessinio Court at Eleanor R. Baldwin Arena, Boca Raton, FL",
   "45981": "Liberty Arena, Evansville, IN",
@@ -403,6 +403,21 @@
     "6625932",
     "6625933",
     "6626491"
+   ],
+   "name": null
+  },
+  {
+   "venue": "Orleans Arena, Las Vegas, NV",
+   "matches": 6,
+   "first_date": "2026-09-18",
+   "last_date": "2026-09-20",
+   "game_ids": [
+    "6628335",
+    "6628149",
+    "6628150",
+    "6628338",
+    "6628151",
+    "6628704"
    ],
    "name": null
   },
@@ -1416,6 +1431,18 @@
    "name": null
   },
   {
+   "venue": "Premier America Credit Union Arena, Northridge, CA",
+   "matches": 3,
+   "first_date": "2026-09-11",
+   "last_date": "2026-09-13",
+   "game_ids": [
+    "6626206",
+    "6626207",
+    "6628322"
+   ],
+   "name": null
+  },
+  {
    "venue": "Welsh-Ryan Arena, Evanston, IL",
    "matches": 3,
    "first_date": "2026-09-11",
@@ -1887,17 +1914,6 @@
    "name": null
   },
   {
-   "venue": "Premier America Credit Union Arena, Northridge, CA",
-   "matches": 2,
-   "first_date": "2026-09-11",
-   "last_date": "2026-09-12",
-   "game_ids": [
-    "6626206",
-    "6626207"
-   ],
-   "name": null
-  },
-  {
    "venue": "Chace Athletic Center, Smithfield, RI",
    "matches": 2,
    "first_date": "2026-09-11",
@@ -1905,17 +1921,6 @@
    "game_ids": [
     "6627160",
     "6627161"
-   ],
-   "name": null
-  },
-  {
-   "venue": "Events Center, Vestal, NY",
-   "matches": 2,
-   "first_date": "2026-09-12",
-   "last_date": "2026-09-12",
-   "game_ids": [
-    "6627806",
-    "6625308"
    ],
    "name": null
   },
@@ -2588,7 +2593,7 @@
    "game_id": "6627092",
    "venue": "John F. Savage Arena, Toledo, OH",
    "home_team_id": "46443",
-   "home_venue_on_record": "Events Center, Vestal, NY",
+   "home_venue_on_record": "John F. Savage Arena, Toledo, OH",
    "venue_owner": "46007",
    "event": null,
    "site": "neutral"
@@ -3011,7 +3016,7 @@
    "game_id": "6624934",
    "venue": "John F. Savage Arena, Toledo, OH",
    "home_team_id": "46443",
-   "home_venue_on_record": "Events Center, Vestal, NY",
+   "home_venue_on_record": "John F. Savage Arena, Toledo, OH",
    "venue_owner": "46007",
    "event": null,
    "site": "neutral"
@@ -10193,7 +10198,7 @@
    "game_id": "6627936",
    "venue": "William H. Pitt Center, Fairfield, CT",
    "home_team_id": "46443",
-   "home_venue_on_record": "Events Center, Vestal, NY",
+   "home_venue_on_record": "John F. Savage Arena, Toledo, OH",
    "venue_owner": "46737",
    "event": null,
    "site": "neutral"
@@ -11966,7 +11971,7 @@
    "game_id": "6628066",
    "venue": null,
    "home_team_id": "46443",
-   "home_venue_on_record": "Events Center, Vestal, NY",
+   "home_venue_on_record": "John F. Savage Arena, Toledo, OH",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -13091,7 +13096,7 @@
    "game_id": "6627805",
    "venue": null,
    "home_team_id": "46443",
-   "home_venue_on_record": "Events Center, Vestal, NY",
+   "home_venue_on_record": "John F. Savage Arena, Toledo, OH",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -13801,8 +13806,8 @@
   {
    "game_id": "6626334",
    "venue": "TD Arena, Charleston, SC",
-   "home_team_id": "46297",
-   "home_venue_on_record": "UPMC Cooper Fieldhouse, Pittsburgh, PA",
+   "home_team_id": "46610",
+   "home_venue_on_record": "Purcell Pavilion at the Joyce Center, Notre Dame, IN",
    "venue_owner": "46585",
    "event": null,
    "site": "neutral"
@@ -13827,12 +13832,12 @@
   },
   {
    "game_id": "6627806",
-   "venue": "Events Center, Vestal, NY",
-   "home_team_id": "45871",
-   "home_venue_on_record": null,
-   "venue_owner": "46443",
+   "venue": null,
+   "home_team_id": "46173",
+   "home_venue_on_record": "Newman Arena, Ithaca, NY",
+   "venue_owner": null,
    "event": null,
-   "site": "neutral"
+   "site": "no-venue"
   },
   {
    "game_id": "6628457",
@@ -14178,12 +14183,12 @@
   },
   {
    "game_id": "6625309",
-   "venue": "Events Center, Vestal, NY",
+   "venue": null,
    "home_team_id": "46443",
-   "home_venue_on_record": "Events Center, Vestal, NY",
-   "venue_owner": "46443",
+   "home_venue_on_record": "John F. Savage Arena, Toledo, OH",
+   "venue_owner": null,
    "event": null,
-   "site": "home"
+   "site": "no-venue"
   },
   {
    "game_id": "6625502",
@@ -14655,12 +14660,12 @@
   },
   {
    "game_id": "6625308",
-   "venue": "Events Center, Vestal, NY",
-   "home_team_id": "46173",
-   "home_venue_on_record": "Newman Arena, Ithaca, NY",
-   "venue_owner": "46443",
+   "venue": null,
+   "home_team_id": "46234",
+   "home_venue_on_record": "The Hazell Center, West Haven, CT",
+   "venue_owner": null,
    "event": null,
-   "site": "neutral"
+   "site": "no-venue"
   },
   {
    "game_id": "6625535",
@@ -15465,12 +15470,12 @@
   },
   {
    "game_id": "6628322",
-   "venue": null,
+   "venue": "Premier America Credit Union Arena, Northridge, CA",
    "home_team_id": "46247",
    "home_venue_on_record": "War Memorial at the Sobrato Center, San Francisco, CA",
-   "venue_owner": null,
+   "venue_owner": "46289",
    "event": null,
-   "site": "no-venue"
+   "site": "neutral"
   },
   {
    "game_id": "6628617",
@@ -17356,8 +17361,8 @@
   {
    "game_id": "6625563",
    "venue": null,
-   "home_team_id": "45805",
-   "home_venue_on_record": "Jack Stephens Center, Little Rock, AR",
+   "home_team_id": "45868",
+   "home_venue_on_record": null,
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -18003,10 +18008,10 @@
   },
   {
    "game_id": "6628335",
-   "venue": "Bankoh Arena at Stan Sheriff Center, Honolulu, HI",
+   "venue": "Orleans Arena, Las Vegas, NV",
    "home_team_id": "45896",
    "home_venue_on_record": "Pauley Pavilion, Los Angeles, CA",
-   "venue_owner": "46419",
+   "venue_owner": null,
    "event": null,
    "site": "neutral"
   },
@@ -18309,12 +18314,12 @@
   },
   {
    "game_id": "6628149",
-   "venue": null,
+   "venue": "Orleans Arena, Las Vegas, NV",
    "home_team_id": "46419",
    "home_venue_on_record": "Bankoh Arena at Stan Sheriff Center, Honolulu, HI",
    "venue_owner": null,
    "event": null,
-   "site": "no-venue"
+   "site": "neutral"
   },
   {
    "game_id": "6626686",
@@ -18399,12 +18404,12 @@
   },
   {
    "game_id": "6628150",
-   "venue": null,
+   "venue": "Orleans Arena, Las Vegas, NV",
    "home_team_id": "45896",
    "home_venue_on_record": "Pauley Pavilion, Los Angeles, CA",
    "venue_owner": null,
    "event": null,
-   "site": "no-venue"
+   "site": "neutral"
   },
   {
    "game_id": "6627097",
@@ -19524,12 +19529,12 @@
   },
   {
    "game_id": "6628338",
-   "venue": null,
+   "venue": "Orleans Arena, Las Vegas, NV",
    "home_team_id": "46419",
    "home_venue_on_record": "Bankoh Arena at Stan Sheriff Center, Honolulu, HI",
    "venue_owner": null,
    "event": null,
-   "site": "no-venue"
+   "site": "neutral"
   },
   {
    "game_id": "6624970",
@@ -19722,12 +19727,12 @@
   },
   {
    "game_id": "6628151",
-   "venue": null,
+   "venue": "Orleans Arena, Las Vegas, NV",
    "home_team_id": "46190",
    "home_venue_on_record": "James H. Hilton Coliseum, Ames, IA",
    "venue_owner": null,
    "event": null,
-   "site": "no-venue"
+   "site": "neutral"
   },
   {
    "game_id": "6624452",
@@ -19857,12 +19862,12 @@
   },
   {
    "game_id": "6628704",
-   "venue": null,
+   "venue": "Orleans Arena, Las Vegas, NV",
    "home_team_id": "45896",
    "home_venue_on_record": "Pauley Pavilion, Los Angeles, CA",
    "venue_owner": null,
    "event": null,
-   "site": "no-venue"
+   "site": "neutral"
   },
   {
    "game_id": "6627272",
@@ -24980,7 +24985,7 @@
    "game_id": "6628076",
    "venue": null,
    "home_team_id": "46443",
-   "home_venue_on_record": "Events Center, Vestal, NY",
+   "home_venue_on_record": "John F. Savage Arena, Toledo, OH",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -27275,10 +27280,10 @@
    "game_id": "6625043",
    "venue": "Events Center, Vestal, NY",
    "home_team_id": "46443",
-   "home_venue_on_record": "Events Center, Vestal, NY",
+   "home_venue_on_record": "John F. Savage Arena, Toledo, OH",
    "venue_owner": "46443",
    "event": null,
-   "site": "home"
+   "site": "neutral"
   },
   {
    "game_id": "6625103",
@@ -28931,7 +28936,7 @@
    "game_id": "6628077",
    "venue": null,
    "home_team_id": "46443",
-   "home_venue_on_record": "Events Center, Vestal, NY",
+   "home_venue_on_record": "John F. Savage Arena, Toledo, OH",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -34970,10 +34975,10 @@
    "game_id": "6627864",
    "venue": "Events Center, Vestal, NY",
    "home_team_id": "46443",
-   "home_venue_on_record": "Events Center, Vestal, NY",
+   "home_venue_on_record": "John F. Savage Arena, Toledo, OH",
    "venue_owner": "46443",
    "event": null,
-   "site": "home"
+   "site": "neutral"
   },
   {
    "game_id": "6628095",
@@ -41117,7 +41122,7 @@
    "game_id": "6628082",
    "venue": null,
    "home_team_id": "46443",
-   "home_venue_on_record": "Events Center, Vestal, NY",
+   "home_venue_on_record": "John F. Savage Arena, Toledo, OH",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -46041,6 +46046,15 @@
    "venue": null,
    "home_team_id": "46474",
    "home_venue_on_record": "T-Mobile Arena, Las Vegas, NV",
+   "venue_owner": null,
+   "event": null,
+   "site": "no-venue"
+  },
+  {
+   "game_id": "6640803",
+   "venue": null,
+   "home_team_id": "46207",
+   "home_venue_on_record": null,
    "venue_owner": null,
    "event": null,
    "site": "no-venue"

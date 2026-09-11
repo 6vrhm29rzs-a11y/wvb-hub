@@ -1,9 +1,9 @@
 {
  "date": "2026-09-11",
- "generated_utc": "2026-09-11T15:41:39Z",
+ "generated_utc": "2026-09-11T16:18:54Z",
  "counts": {
-  "CORROBORATED_ONE": 3,
-  "UNVERIFIED": 1
+  "CORROBORATED_ONE": 5,
+  "VERIFIED_BOTH": 1
  },
  "matches": [
   {
@@ -38,33 +38,21 @@
    "gid": "6627684",
    "date": "2026-09-11",
    "canonical": "Harvard def. UNC Asheville 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "Harvard": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://gocrimson.com/services/schedule_txt.ashx?schedule=1800",
-     "row": [
-      "Sep 11 (Fri)",
-      "10:00 AM",
-      "Neutral",
-      "UNC Asheville",
-      "Wilmington, NC",
-      "",
-      ""
-     ]
+     "assertion": "Harvard W 3-0 vs UNC Asheville",
+     "opponent_source": "UNC Asheville",
+     "site_says": "Neutral"
     },
     "UNC Asheville": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://uncabulldogs.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 11 (Fri)",
-      "10 AM",
-      "Neutral",
-      "Harvard",
-      "Wilmington, NC (at UNC Wilmington)",
-      "UNCW Invitational",
-      "-"
-     ]
+     "assertion": "UNC Asheville L 0-3 vs Harvard",
+     "opponent_source": "Harvard",
+     "site_says": "Neutral"
     }
    }
   },
@@ -113,6 +101,57 @@
      "assertion": "Robert Morris L 0-3 vs Arkansas",
      "opponent_source": "Arkansas",
      "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6624940",
+   "date": "2026-09-11",
+   "canonical": "UAB def. Oakland 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "UAB": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://uabsports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "UAB W 3-1 vs Oakland",
+     "opponent_source": "Oakland",
+     "site_says": "Away"
+    },
+    "Oakland": {
+     "state": "NOT_POSTED",
+     "url": "https://goldengrizzlies.com/services/schedule_txt.ashx?schedule=1366",
+     "row": [
+      "Sep 11 (Fri)",
+      "10 AM ET",
+      "Home",
+      "UAB",
+      "Rochester, Mich.  (OU Credit Union O'rena)",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6625362",
+   "date": "2026-09-11",
+   "canonical": "Queens (NC) def. Chattanooga 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Queens (NC)": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://queensathletics.com/services/schedule_txt.ashx?schedule=541",
+     "assertion": "Queens (NC) W 3-1 vs Chattanooga",
+     "opponent_source": "Chattanooga",
+     "site_says": "Home"
+    },
+    "Chattanooga": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://gomocs.com/sports/womens-volleyball/schedule/text",
+     "rows_on_date": [
+      "Queens (N.C.)",
+      "Presbyterian"
+     ]
     }
    }
   }

@@ -2,15 +2,15 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "corpus_fingerprint": "4540473d7d276d4a",
-  "generated_at_utc": "2026-09-11T15:42:45Z",
+  "corpus_fingerprint": "54647b0695784f6a",
+  "generated_at_utc": "2026-09-11T16:19:49Z",
   "counts": {
-   "finals": 1096,
+   "finals": 1098,
    "official_only": 36,
-   "reconciled": 1012,
+   "reconciled": 1014,
    "confirmed": 0,
    "disputed": 2,
-   "pending_second": 1094,
+   "pending_second": 1096,
    "corrected": 46,
    "duplicate_listings": 8,
    "duplicate_candidates_pending": 0
@@ -53854,7 +53854,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-11T15:41:39Z",
+    "checked": "2026-09-11T16:18:54Z",
     "schools": {
      "Hawaii": {
       "state": "NOT_POSTED",
@@ -53880,7 +53880,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-11T15:41:39Z",
+   "last_checked": "2026-09-11T16:18:54Z",
    "sources": [
     {
      "url": "https://ucasports.com/services/schedule_txt.ashx?schedule=1309",
@@ -53891,7 +53891,132 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-11T15:41:39Z"
+     "retrieved": "2026-09-11T16:18:54Z"
+    }
+   ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6624940",
+   "a": "UAB",
+   "h": "Oakland",
+   "exh": false,
+   "d": "2026-09-11",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "verify": {
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-11T16:18:54Z",
+    "schools": {
+     "UAB": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://uabsports.com/sports/womens-volleyball/schedule/text",
+      "assertion": "UAB W 3-1 vs Oakland",
+      "opponent_source": "Oakland",
+      "site_says": "Away"
+     },
+     "Oakland": {
+      "state": "NOT_POSTED",
+      "url": "https://goldengrizzlies.com/services/schedule_txt.ashx?schedule=1366",
+      "row": [
+       "Sep 11 (Fri)",
+       "10 AM ET",
+       "Home",
+       "UAB",
+       "Rochester, Mich.  (OU Credit Union O'rena)",
+       "",
+       ""
+      ]
+     }
+    }
+   },
+   "n_indep": 1,
+   "n_attempted": 0,
+   "last_checked": "2026-09-11T16:18:54Z",
+   "sources": [
+    {
+     "url": "https://uabsports.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "UAB",
+     "text": "UAB W 3-1 vs Oakland",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-11T16:18:54Z"
+    }
+   ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6625362",
+   "a": "Chattanooga",
+   "h": "Queens (NC)",
+   "exh": false,
+   "d": "2026-09-11",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "verify": {
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-11T16:18:54Z",
+    "schools": {
+     "Queens (NC)": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://queensathletics.com/services/schedule_txt.ashx?schedule=541",
+      "assertion": "Queens (NC) W 3-1 vs Chattanooga",
+      "opponent_source": "Chattanooga",
+      "site_says": "Home"
+     },
+     "Chattanooga": {
+      "state": "EVENT_NOT_FOUND",
+      "url": "https://gomocs.com/sports/womens-volleyball/schedule/text",
+      "rows_on_date": [
+       "Queens (N.C.)",
+       "Presbyterian"
+      ]
+     }
+    }
+   },
+   "n_indep": 1,
+   "n_attempted": 0,
+   "last_checked": "2026-09-11T16:18:54Z",
+   "sources": [
+    {
+     "url": "https://queensathletics.com/services/schedule_txt.ashx?schedule=541",
+     "kind": "school_schedule",
+     "school": "Queens (NC)",
+     "text": "Queens (NC) W 3-1 vs Chattanooga",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-11T16:18:54Z"
     }
    ]
   },
@@ -53918,41 +54043,52 @@
     "venue": "unavailable"
    },
    "verify": {
-    "v": "UNVERIFIED",
-    "checked": "2026-09-11T15:41:39Z",
+    "v": "VERIFIED_BOTH",
+    "checked": "2026-09-11T16:18:54Z",
     "schools": {
      "Harvard": {
-      "state": "NOT_POSTED",
+      "state": "AGREE_COMPLETE",
       "url": "https://gocrimson.com/services/schedule_txt.ashx?schedule=1800",
-      "row": [
-       "Sep 11 (Fri)",
-       "10:00 AM",
-       "Neutral",
-       "UNC Asheville",
-       "Wilmington, NC",
-       "",
-       ""
-      ]
+      "assertion": "Harvard W 3-0 vs UNC Asheville",
+      "opponent_source": "UNC Asheville",
+      "site_says": "Neutral"
      },
      "UNC Asheville": {
-      "state": "NOT_POSTED",
+      "state": "AGREE_COMPLETE",
       "url": "https://uncabulldogs.com/sports/womens-volleyball/schedule/text",
-      "row": [
-       "Sep 11 (Fri)",
-       "10 AM",
-       "Neutral",
-       "Harvard",
-       "Wilmington, NC (at UNC Wilmington)",
-       "UNCW Invitational",
-       "-"
-      ]
+      "assertion": "UNC Asheville L 0-3 vs Harvard",
+      "opponent_source": "Harvard",
+      "site_says": "Neutral"
      }
     }
    },
-   "n_indep": 0,
+   "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-11T16:18:54Z",
+   "sources": [
+    {
+     "url": "https://gocrimson.com/services/schedule_txt.ashx?schedule=1800",
+     "kind": "school_schedule",
+     "school": "Harvard",
+     "text": "Harvard W 3-0 vs UNC Asheville",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-11T16:18:54Z"
+    },
+    {
+     "url": "https://uncabulldogs.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "UNC Asheville",
+     "text": "UNC Asheville L 0-3 vs Harvard",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-11T16:18:54Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -53978,7 +54114,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-11T15:41:39Z",
+    "checked": "2026-09-11T16:18:54Z",
     "schools": {
      "Kent St.": {
       "state": "NOT_POSTED",
@@ -54004,7 +54140,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-11T15:41:39Z",
+   "last_checked": "2026-09-11T16:18:54Z",
    "sources": [
     {
      "url": "https://purpleeagles.com/services/schedule_txt.ashx?schedule=695",
@@ -54015,7 +54151,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-11T15:41:39Z"
+     "retrieved": "2026-09-11T16:18:54Z"
     }
    ]
   },
@@ -54043,7 +54179,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-11T15:41:39Z",
+    "checked": "2026-09-11T16:18:54Z",
     "schools": {
      "Arkansas": {
       "state": "SITE_HTTP_MISS",
@@ -54061,7 +54197,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-11T15:41:39Z",
+   "last_checked": "2026-09-11T16:18:54Z",
    "sources": [
     {
      "url": "https://rmucolonials.com/services/schedule_txt.ashx?schedule=503",
@@ -54072,7 +54208,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-11T15:41:39Z"
+     "retrieved": "2026-09-11T16:18:54Z"
     }
    ]
   }
