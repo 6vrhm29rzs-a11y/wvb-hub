@@ -51,6 +51,28 @@ seen in any state. Next step is to take a handful of the −1 teams and diff
 our match list against the school's own published schedule, which is what
 settled every case above.
 
+### Passing stats: real data, not ours to take (2026-09-12)
+VolleyTalk's `2026 Passing Stats Thread` carries genuine serve-receive
+quality — per player per match on the sport's 0–3 scale, with reception
+counts: `Stafford 2.10 (34)`, `Wisconsin 2.36 team`. This is the measure the
+sport actually uses and the NCAA feed does not carry at all.
+
+⚠ **Do not build on it.** It is hand-posted for a handful of matches by one
+poster, and it comes from VolleyMetrics — a paid scouting platform (a post
+in the thread says "VM has her in as Tonga-Davis"). It is someone else's
+proprietary data shared informally in a forum. Read it, do not ingest it.
+
+**What it taught us instead, and this is measurable.** Our own reception
+number is BINARY — a reception is an error or it is not — so it counts aces
+conceded and says nothing about the quality of the other 90%. Measured over
+342 teams with 5+ matches: reception success correlates **+0.466** with win
+rate, where hitting % manages **+0.789** and % of points won **+0.890**. Its
+entire range is 0.871–0.977. That narrowness *is* the limitation. The page
+now says so in the tooltip rather than letting a weak number sit beside
+hitting % implying equal weight.
+**If a passing scale ever becomes available legitimately, it is the single
+biggest metric gap we have.**
+
 ### Ideas and sources from VolleyTalk (2026-09-12)
 Scoured the board. What is worth having:
 

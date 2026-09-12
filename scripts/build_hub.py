@@ -22805,8 +22805,16 @@ function showTeam(name) {
             : '') +
           (O.recv_ok_rate !== null && O.recv_ok_rate !== undefined
             ? '. <b>Receiving:</b> ' + O.recv_att + ' receptions, ' +
-              (O.recv_ok_rate * 100).toFixed(1) + '% handled &mdash; a ' +
-              'separate fact from serving, on the other side of the rally.'
+              (O.recv_ok_rate * 100).toFixed(1) + '% handled ' +
+              '<span class="munk" title="Binary: a reception either was an ' +
+              'error or it was not. It cannot tell a perfect pass from a ' +
+              'scramble, which is most of what passing quality means -- the ' +
+              'sport grades receptions 0-3 and that scale is not in the feed. ' +
+              'Measured on 342 teams with 5+ matches, this correlates +0.47 ' +
+              'with win rate where hitting % manages +0.79, and its whole ' +
+              'range is 87% to 98%.">(counts aces conceded only)</span>' +
+              ' &mdash; a separate fact from serving, on the other side of ' +
+              'the rally.'
             : '.')
         : '') +
       /* ⚠ THE DIVISION OF THE OPPONENT, said where the rate is read. Stated
