@@ -4,15 +4,23 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 6,
+     "records": 13,
      "values": [
       "1789174800",
       "1789171200"
      ]
+    },
+    {
+     "field": "game_state",
+     "records": 13,
+     "values": [
+      "P",
+      "I"
+     ]
     }
    ],
    "matchup": "Utah Valley / Kansas City",
-   "records": 6
+   "records": 13
   },
   "6624385": {
    "conflicts": [
@@ -240,20 +248,6 @@
    "matchup": "Drake / Kansas City",
    "records": 5
   },
-  "6625581": {
-   "conflicts": [
-    {
-     "field": "start_time_epoch",
-     "records": 7,
-     "values": [
-      "1789228800",
-      "1789162200"
-     ]
-    }
-   ],
-   "matchup": "Drake / Radford",
-   "records": 7
-  },
   "6625615": {
    "conflicts": [
     {
@@ -286,21 +280,29 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 9,
+     "records": 16,
      "values": [
       "1789102800",
       "1789171200"
      ]
+    },
+    {
+     "field": "game_state",
+     "records": 16,
+     "values": [
+      "P",
+      "I"
+     ]
     }
    ],
    "matchup": "Baylor / Nebraska",
-   "records": 9
+   "records": 16
   },
   "6626229": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 11,
+     "records": 18,
      "values": [
       "1788670800",
       "1788742800"
@@ -308,7 +310,7 @@
     },
     {
      "field": "game_state",
-     "records": 11,
+     "records": 18,
      "values": [
       "P",
       "I",
@@ -317,7 +319,7 @@
     }
    ],
    "matchup": "Missouri / Nebraska",
-   "records": 11
+   "records": 18
   },
   "6626288": {
    "conflicts": [
@@ -403,28 +405,6 @@
    "matchup": "Virginia / UCF",
    "records": 5
   },
-  "6626921": {
-   "conflicts": [
-    {
-     "field": "start_time_epoch",
-     "records": 8,
-     "values": [
-      "1789173000",
-      "1789140600"
-     ]
-    },
-    {
-     "field": "game_state",
-     "records": 8,
-     "values": [
-      "P",
-      "I"
-     ]
-    }
-   ],
-   "matchup": "Radford / Kansas City",
-   "records": 8
-  },
   "6626993": {
    "conflicts": [
     {
@@ -466,20 +446,6 @@
    ],
    "matchup": "Utah / Northern Colo.",
    "records": 4
-  },
-  "6627311": {
-   "conflicts": [
-    {
-     "field": "start_time_epoch",
-     "records": 6,
-     "values": [
-      "1789164000",
-      "1789160400"
-     ]
-    }
-   ],
-   "matchup": "San Jose St. / Utah Tech",
-   "records": 6
   },
   "6627551": {
    "conflicts": [
@@ -639,20 +605,6 @@
    "matchup": "Iowa St. / UCLA",
    "records": 4
   },
-  "6628376": {
-   "conflicts": [
-    {
-     "field": "start_time_epoch",
-     "records": 6,
-     "values": [
-      "1789110000",
-      "1789164000"
-     ]
-    }
-   ],
-   "matchup": "Omaha / UC Riverside",
-   "records": 6
-  },
   "6637764": {
    "conflicts": [
     {
@@ -666,30 +618,16 @@
    ],
    "matchup": "UNC Asheville / Morgan St.",
    "records": 4
-  },
-  "6639127": {
-   "conflicts": [
-    {
-     "field": "start_time_epoch",
-     "records": 9,
-     "values": [
-      "1789102800",
-      "1789160400"
-     ]
-    }
-   ],
-   "matchup": "New Mexico / Georgia Tech",
-   "records": 9
   }
  },
  "by_field": {
   "city": 1,
-  "game_state": 49,
+  "game_state": 86,
   "site": 3,
-  "start_time_epoch": 41,
+  "start_time_epoch": 36,
   "state_usps": 1,
   "teams": 3,
-  "teams (non-blocking)": 9,
+  "teams (non-blocking)": 4,
   "venue": 1
  },
  "corrections": {
@@ -855,8 +793,8 @@
   }
  },
  "counts": {
-  "blocked": 44,
-  "conflicted": 100,
+  "blocked": 39,
+  "conflicted": 126,
   "corrected": 5,
   "fixtures": 4891
  },

@@ -2,46 +2,46 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 1023,
+  "scored": 1118,
   "logged_after_tipoff_excluded": 3,
-  "team_mismatch_excluded": 26,
+  "team_mismatch_excluded": 31,
   "predictions_on_record": 4807,
-  "results_available": 1076,
-  "brier": 0.1721,
+  "results_available": 1176,
+  "brier": 0.1735,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 759,
-  "favourite_correct_pct": 74.2
+  "favourite_correct": 832,
+  "favourite_correct_pct": 74.4
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 173,
+   "n": 196,
    "said": 55.3,
-   "happened": 57.2
+   "happened": 59.7
   },
   {
    "range": "60-70%",
-   "n": 189,
+   "n": 203,
    "said": 65.2,
-   "happened": 59.8
+   "happened": 60.1
   },
   {
    "range": "70-80%",
-   "n": 164,
-   "said": 75.0,
-   "happened": 67.7
+   "n": 179,
+   "said": 75.1,
+   "happened": 67.6
   },
   {
    "range": "80-90%",
-   "n": 184,
-   "said": 85.3,
-   "happened": 78.8
+   "n": 197,
+   "said": 85.2,
+   "happened": 79.2
   },
   {
    "range": "90-101%",
-   "n": 313,
-   "said": 95.5,
-   "happened": 93.0
+   "n": 343,
+   "said": 95.6,
+   "happened": 92.1
   }
  ],
  "matches": [
@@ -71,6 +71,15 @@
    "p_home": 0.0212,
    "home_won": true,
    "brier": 0.95804944
+  },
+  {
+   "game_id": "6627599",
+   "date": "2026-09-11",
+   "away": "Sacramento St.",
+   "home": "Eastern Wash.",
+   "p_home": 0.0223,
+   "home_won": true,
+   "brier": 0.95589729
   },
   {
    "game_id": "6639575",
@@ -190,6 +199,15 @@
    "brier": 0.8585875599999999
   },
   {
+   "game_id": "6628456",
+   "date": "2026-09-11",
+   "away": "Marist",
+   "home": "Bryant",
+   "p_home": 0.9258,
+   "home_won": false,
+   "brier": 0.8571056399999999
+  },
+  {
    "game_id": "6624723",
    "date": "2026-09-03",
    "away": "Milwaukee",
@@ -217,6 +235,24 @@
    "brier": 0.83832336
   },
   {
+   "game_id": "6626552",
+   "date": "2026-09-11",
+   "away": "Lehigh",
+   "home": "West Virginia",
+   "p_home": 0.9141,
+   "home_won": false,
+   "brier": 0.83557881
+  },
+  {
+   "game_id": "6628417",
+   "date": "2026-09-11",
+   "away": "Dartmouth",
+   "home": "UAlbany",
+   "p_home": 0.9136,
+   "home_won": false,
+   "brier": 0.8346649599999999
+  },
+  {
    "game_id": "6627368",
    "date": "2026-09-04",
    "away": "East Texas A&M",
@@ -224,6 +260,15 @@
    "p_home": 0.9127,
    "home_won": false,
    "brier": 0.8330212899999999
+  },
+  {
+   "game_id": "6628166",
+   "date": "2026-09-11",
+   "away": "Northwestern St.",
+   "home": "ULM",
+   "p_home": 0.9126,
+   "home_won": false,
+   "brier": 0.8328387599999999
   },
   {
    "game_id": "6628176",
@@ -397,6 +442,15 @@
    "brier": 0.73410624
   },
   {
+   "game_id": "6628239",
+   "date": "2026-09-11",
+   "away": "Stanford",
+   "home": "Penn St.",
+   "p_home": 0.1433,
+   "home_won": true,
+   "brier": 0.73393489
+  },
+  {
    "game_id": "6627101",
    "date": "2026-08-29",
    "away": "Fordham",
@@ -440,60 +494,6 @@
    "p_home": 0.151,
    "home_won": true,
    "brier": 0.7208009999999999
-  },
-  {
-   "game_id": "6625033",
-   "date": "2026-08-29",
-   "away": "UMBC",
-   "home": "UTRGV",
-   "p_home": 0.8487,
-   "home_won": false,
-   "brier": 0.72029169
-  },
-  {
-   "game_id": "6627779",
-   "date": "2026-09-05",
-   "away": "Montana St.",
-   "home": "UIC",
-   "p_home": 0.8459,
-   "home_won": false,
-   "brier": 0.71554681
-  },
-  {
-   "game_id": "6627141",
-   "date": "2026-09-10",
-   "away": "Portland St.",
-   "home": "UTRGV",
-   "p_home": 0.8402,
-   "home_won": false,
-   "brier": 0.7059360399999999
-  },
-  {
-   "game_id": "6625759",
-   "date": "2026-08-30",
-   "away": "Iona",
-   "home": "Houston Christian",
-   "p_home": 0.8401,
-   "home_won": false,
-   "brier": 0.7057680099999999
-  },
-  {
-   "game_id": "6624352",
-   "date": "2026-08-28",
-   "away": "Miami (FL)",
-   "home": "Michigan St.",
-   "p_home": 0.162,
-   "home_won": true,
-   "brier": 0.702244
-  },
-  {
-   "game_id": "6624937",
-   "date": "2026-09-02",
-   "away": "Oakland",
-   "home": "Central Mich.",
-   "p_home": 0.8272,
-   "home_won": false,
-   "brier": 0.6842598400000001
   }
  ]
 }

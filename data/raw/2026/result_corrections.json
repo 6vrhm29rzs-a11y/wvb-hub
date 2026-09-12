@@ -2292,6 +2292,56 @@
      "establishes": "UC Santa Barbara lost 2-3 -- the second school source, agreeing on the margin"
     }
    ]
+  },
+  "6628376": {
+   "field": "result",
+   "feed_said": "UC Riverside (nominal home) won 3-0 with the set line 25-13, 25-20, 25-18 -- the TRUE set sequence with the TEAMS SWAPPED. Internally coherent, and wrong.",
+   "correct": {
+    "winner_team_id": "46342",
+    "away_sets": 3,
+    "home_sets": 0,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 25,
+      "home": 13
+     },
+     {
+      "period": 2,
+      "visit": 25,
+      "home": 20
+     },
+     {
+      "period": 3,
+      "visit": 25,
+      "home": 18
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46536": "46342",
+     "46342": "46536"
+    }
+   },
+   "established": "Omaha beat UC Riverside 3-0 at a NEUTRAL site (Rolle Activity Center, Flagstaff, Ariz.). Both schools publish the result against the feed, independently and in agreement: UC Riverside's own schedule records a LOSS 0-3 and Omaha's records the WIN 3-0, both marking the site Neutral. The feed's set sequence is kept and re-attributed -- the sweeping side scored 25-13, 25-20, 25-18 and that side is Omaha, the away column. AUDITED: the lineup rows are swapped the same way -- 0 of 6 starters filed under each team id appear on that team's own roster, while 6 of 6 filed under Omaha belong to UC Riverside and 4 of 6 filed under UC Riverside belong to Omaha. box_team_swap re-attributes the rows at the derived layer; the raw log is never rewritten. NOTE the two schools name the event differently (Lumberjack Classic / Northern Arizona Tournament) and list different local start times; they agree on the result, which is what is being established here.",
+   "evidence": [
+    {
+     "url": "https://gohighlanders.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "UC Riverside",
+     "retrieved": "2026-09-12T00:27:28Z",
+     "text": "Schedule row for September 11, 2026: 'Sep 11 (Fri) | 3:00 pm | Neutral | Omaha | Flagstaff, Ariz. | Lumberjack Classic | L 0-3'",
+     "establishes": "UC Riverside lost 0-3"
+    },
+    {
+     "url": "https://omahamavs.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Omaha",
+     "retrieved": "2026-09-12T00:27:29Z",
+     "text": "Schedule row for September 11, 2026: 'Sep 11 (Fri) | 5 p.m. | Neutral | UC Riverside | Flagstaff, AZ | Northern Arizona Tournament | W 3-0' (requested via omavs.com, which redirects to omahamavs.com)",
+     "establishes": "Omaha won 3-0 -- the second, independent school source"
+    }
+   ]
   }
  }
 }
