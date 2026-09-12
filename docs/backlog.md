@@ -134,10 +134,16 @@ itself; the only automated source we have is the one that is stale.
   only current through Week 2 (2026-09-07) and Week 3 is out; and no routine
   captures the threads regularly — each one is a manual browser save,
   because the forum serves a bot challenge to every non-browser client.
-- **Evollve metrics we can replicate and have not:** Srv Avg, ace rate,
-  service-error rate, reception success rate, % of points won, Pythagorean
-  win % and Luck, rally-denominated kill/block/dig rates, and a matchup
-  score. All computable from data already on disk.
+- **Evollve metrics — SERVING IS DONE (2026-09-12).** Srv Avg (Evollve's own
+  formula and constant, credited on the page), ace rate, service-error rate
+  and reception success rate now compute per team and render on the team
+  stats panel. Coverage measured first: 1,344 of 1,363 games carry serve
+  attempts (98.6%), all-or-nothing per game; a team without them renders
+  nothing rather than a zero. Guarded in `test_serving_rates.py`.
+  **Still to build:** % of points won, Pythagorean win % and Luck (both
+  computable from linescores — `own`/`opp` scoreboard points already
+  accumulate in team_season_stats), rally-denominated kill/block/dig rates,
+  and a matchup score.
 - **Cannot replicate without play-by-play** (2026 has none): Point-Scoring %,
   Sideout %, RAPM, and the two real Four Factors (serve-receive vs transition
   hitting). The serve/points algebra is genuinely underdetermined — one

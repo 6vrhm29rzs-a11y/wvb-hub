@@ -1,12 +1,12 @@
 {
  "date": "2026-09-12",
- "generated_utc": "2026-09-12T21:03:33Z",
+ "generated_utc": "2026-09-12T21:45:43Z",
  "counts": {
-  "CORROBORATED_ONE": 46,
-  "VERIFIED_BOTH": 25,
+  "CORROBORATED_ONE": 57,
+  "VERIFIED_BOTH": 27,
   "CONTRADICTED_BOTH": 2,
-  "UNVERIFIED": 7,
-  "CONTRADICTED_ONE": 1
+  "UNVERIFIED": 5,
+  "CONTRADICTED_ONE": 2
  },
  "matches": [
   {
@@ -750,7 +750,7 @@
    "gid": "6627550",
    "date": "2026-09-12",
    "canonical": "Boston College def. Alcorn 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Boston College": {
      "state": "EVENT_NOT_FOUND",
@@ -760,17 +760,11 @@
      ]
     },
     "Alcorn": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://alcornsports.com/services/schedule_txt.ashx?schedule=320",
-     "row": [
-      "Sep 12 (Sat)",
-      "Noon",
-      "Neutral",
-      "Boston College",
-      "Memphis, Tenn.",
-      "",
-      ""
-     ]
+     "assertion": "Alcorn L 0-3 vs Boston College",
+     "opponent_source": "Boston College",
+     "site_says": "Neutral"
     }
    }
   },
@@ -1832,7 +1826,7 @@
    "gid": "6627495",
    "date": "2026-09-12",
    "canonical": "Idaho def. California Baptist 3-2",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Idaho": {
      "state": "EVENT_NOT_FOUND",
@@ -1842,17 +1836,11 @@
      ]
     },
     "California Baptist": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://cbulancers.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 12 (Sat)",
-      "11:00 AM",
-      "Home",
-      "University of Idaho",
-      "Riverside, Calif. (Van Dyne Gym)",
-      "The Joust",
-      "-"
-     ]
+     "assertion": "California Baptist L 2-3 vs University of Idaho",
+     "opponent_source": "University of Idaho",
+     "site_says": "Home"
     }
    }
   },
@@ -1954,20 +1942,14 @@
    "gid": "6625205",
    "date": "2026-09-12",
    "canonical": "Tennessee def. Coastal Carolina 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Tennessee": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://utsports.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 12 (Sat)",
-      "3 p.m. ET",
-      "Home",
-      "Coastal Carolina",
-      "Knoxville, Tenn. (Food City Center)",
-      "",
-      "-"
-     ]
+     "assertion": "Tennessee W 3-0 vs Coastal Carolina",
+     "opponent_source": "Coastal Carolina",
+     "site_says": "Home"
     },
     "Coastal Carolina": {
      "state": "NOT_POSTED",
@@ -1988,7 +1970,7 @@
    "gid": "6639308",
    "date": "2026-09-12",
    "canonical": "Alabama St. def. Nicholls 3-1",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Alabama St.": {
      "state": "EVENT_NOT_FOUND",
@@ -1998,17 +1980,327 @@
      ]
     },
     "Nicholls": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://geauxcolonels.com/services/schedule_txt.ashx?schedule=458",
+     "assertion": "Nicholls L 1-3 vs Alabama State",
+     "opponent_source": "Alabama State",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6625580",
+   "date": "2026-09-12",
+   "canonical": "Drake def. Kansas City 3-2",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Drake": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://godrakebulldogs.com/services/schedule_txt.ashx?schedule=550",
+     "assertion": "Drake W 3-2 vs Kansas City",
+     "opponent_source": "Kansas City",
+     "site_says": "Away"
+    },
+    "Kansas City": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://kcroos.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Kansas City L 2-3 vs Drake",
+     "opponent_source": "Drake",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6626521",
+   "date": "2026-09-12",
+   "canonical": "SFA def. UT Arlington 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "SFA": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://sfajacks.com/sports/womens-volleyball/schedule/text",
+     "assertion": "SFA W 3-0 vs UT Arlington",
+     "opponent_source": "UT Arlington",
+     "site_says": "Home"
+    },
+    "UT Arlington": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://utamavs.com/services/schedule_txt.ashx?schedule=2427",
+     "rows_on_date": [
+      "Stephen F. Austin"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6627045",
+   "date": "2026-09-12",
+   "canonical": "A&M-Corpus Christi def. Tarleton St. 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "A&M-Corpus Christi": {
+     "state": "NOT_POSTED",
+     "url": "https://goislanders.com/services/schedule_txt.ashx?schedule=286",
      "row": [
       "Sep 12 (Sat)",
-      "2:00 p.m.",
+      "2:30 p.m.",
       "Away",
-      "Alabama State",
-      "Montgomery, Ala. (Dunn-Oliver Acadome)",
+      "Tarleton State",
+      "Stephenville, TX",
       "",
       ""
      ]
+    },
+    "Tarleton St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://tarletonsports.com/services/schedule_txt.ashx?schedule=308",
+     "assertion": "Tarleton St. L 0-3 vs Texas A&M-Corpus Christi",
+     "opponent_source": "Texas A&M-Corpus Christi",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6624549",
+   "date": "2026-09-12",
+   "canonical": "Lamar University def. Jackson St. 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Lamar University": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://lamarcardinals.com/services/schedule_txt.ashx?schedule=5633",
+     "assertion": "Lamar University W 3-0 vs Jackson State",
+     "opponent_source": "Jackson State",
+     "site_says": "Neutral"
+    },
+    "Jackson St.": {
+     "state": "NOT_POSTED",
+     "url": "https://gojsutigers.com/services/schedule_txt.ashx?schedule=172",
+     "row": [
+      "Sep 12 (Sat)",
+      "2:30 p.m.",
+      "Neutral",
+      "Lamar",
+      "Hattiesburg, Miss.",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6625876",
+   "date": "2026-09-12",
+   "canonical": "Idaho St. def. Air Force 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Idaho St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://www.isubengals.com/services/schedule_txt.ashx?schedule=352",
+     "assertion": "Idaho St. W 3-0 vs Air Force",
+     "opponent_source": "Air Force",
+     "site_says": "Away"
+    },
+    "Air Force": {
+     "state": "NOT_POSTED",
+     "url": "https://goairforcefalcons.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 12 (Sat)",
+      "1:30 pm MT",
+      "Home",
+      "Idaho State",
+      "USAFA",
+      "Amy Svoboda Memorial Classic",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6627429",
+   "date": "2026-09-12",
+   "canonical": "Tampa def. West Florida 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Tampa": {
+     "state": "SITE_HTTP_MISS",
+     "url": "https://tampaspartans.com/sports/womens-volleyball/schedule/text",
+     "http": 404
+    },
+    "West Florida": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://goargos.com/services/schedule_txt.ashx?schedule=323",
+     "assertion": "West Florida L 1-3 vs Tampa",
+     "opponent_source": "Tampa",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6628362",
+   "date": "2026-09-12",
+   "canonical": "Boise St. def. Eastern Wash. 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Boise St.": {
+     "state": "NOT_POSTED",
+     "url": "https://broncosports.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 12 (Sat)",
+      "1 p.m.",
+      "Home",
+      "Eastern Washington",
+      "Boise, Idaho (ExtraMile Arena)",
+      "Boise State Invitational",
+      "-"
+     ]
+    },
+    "Eastern Wash.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://goeags.com/services/schedule_txt.ashx?schedule=266",
+     "assertion": "Eastern Wash. L 0-3 vs Boise State",
+     "opponent_source": "Boise State",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6625276",
+   "date": "2026-09-12",
+   "canonical": "UC Davis def. Oregon 3-0",
+   "verdict": "CONTRADICTED_ONE",
+   "schools": {
+    "UC Davis": {
+     "state": "CONTRADICTS",
+     "url": "https://ucdavisaggies.com/services/schedule_txt.ashx?schedule=3547",
+     "assertion": "UC Davis L 0-3 vs Oregon",
+     "opponent_source": "Oregon",
+     "site_says": "Neutral"
+    },
+    "Oregon": {
+     "state": "NOT_POSTED",
+     "url": "https://goducks.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 12 (Sat)",
+      "1:00 PM",
+      "Neutral",
+      "UC Davis",
+      "Tempe, AZ",
+      "Snyder-Park Classic",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6625308",
+   "date": "2026-09-12",
+   "canonical": "Cornell def. New Haven 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Cornell": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://cornellbigred.com/services/schedule_txt.ashx?schedule=12300",
+     "assertion": "Cornell W 3-0 vs University of New Haven",
+     "opponent_source": "University of New Haven",
+     "site_says": "Neutral"
+    },
+    "New Haven": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://newhavenchargers.com/services/schedule_txt.ashx?schedule=1553",
+     "assertion": "New Haven L 0-3 vs Cornell University",
+     "opponent_source": "Cornell University",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6625535",
+   "date": "2026-09-12",
+   "canonical": "Mississippi St. def. Memphis 3-0",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Mississippi St.": {
+     "state": "NOT_POSTED",
+     "url": "https://hailstate.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 12 (Sat)",
+      "3 p.m.",
+      "Away",
+      "Memphis",
+      "Memphis, Tenn.",
+      "Carrie Yerty Classic",
+      "-"
+     ]
+    },
+    "Memphis": {
+     "state": "NOT_POSTED",
+     "url": "https://gotigersgo.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 12 (Sat)",
+      "3 p.m.",
+      "Home",
+      "Mississippi State",
+      "Memphis, Tenn. (Elma Roane Fieldhouse)",
+      "Carrie Yerty Classic",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6627162",
+   "date": "2026-09-12",
+   "canonical": "Fordham def. Bryant 3-0",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Fordham": {
+     "state": "NOT_POSTED",
+     "url": "https://fordhamsports.com/services/schedule_txt.ashx?schedule=1735",
+     "row": [
+      "Sep 12 (Sat)",
+      "4:00 PM",
+      "Away",
+      "Bryant",
+      "Smithfield, R.I.",
+      "",
+      ""
+     ]
+    },
+    "Bryant": {
+     "state": "NOT_POSTED",
+     "url": "https://bryantbulldogs.com/services/schedule_txt.ashx?schedule=493",
+     "row": [
+      "Sep 12 (Sat)",
+      "4:00 PM",
+      "Home",
+      "Fordham University",
+      "Smithfield, RI (Chace Athletic Center)",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6628032",
+   "date": "2026-09-12",
+   "canonical": "Georgetown def. Loyola Maryland 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Georgetown": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://guhoyas.com/services/schedule_txt.ashx?schedule=1666",
+     "rows_on_date": [
+      "Loyola (Md.)"
+     ]
+    },
+    "Loyola Maryland": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://loyolagreyhounds.com/services/schedule_txt.ashx?schedule=3570",
+     "assertion": "Loyola Maryland L 0-3 vs Georgetown",
+     "opponent_source": "Georgetown",
+     "site_says": "Away"
     }
    }
   }

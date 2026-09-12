@@ -2706,6 +2706,9 @@ def box_and_players(res, photos=None, honours=None, xfer=None,
                 # other side of the rally from serving, and pairing them in
                 # one line is exactly the conflation Cody corrected.
                 "se": num(r.get("serve_errors")),
+                "sa": num(r.get("serve_atts")),
+                "ra": num(r.get("recv_atts")),
+                "re": num(r.get("recv_errors")),
             }
             rows.append(row)
             # ⚠ THE DEFECT THIS REPLACES. The key was the team plus the name AS
@@ -2877,6 +2880,7 @@ def team_season_stats(boxes, res):
     def blank():
         return {"k": 0.0, "e": 0.0, "ta": 0.0, "ast": 0.0, "digs": 0.0,
                 "bs": 0.0, "ba": 0.0, "aces": 0.0, "se": 0.0,
+                "sa": 0.0, "ra": 0.0, "re": 0.0,
                 "sets": 0.0, "matches": 0,
                 # ⚠ HOW MANY OF THOSE MATCHES WERE AGAINST A NON-D-I SIDE.
                 # Norfolk St.'s 2026 page read "Hitting % .390" against
@@ -2946,7 +2950,7 @@ def team_season_stats(boxes, res):
                 sets = 0.0
                 for r in src:
                     for f in ("k", "e", "ta", "ast", "digs", "bs", "ba",
-                              "aces", "se"):
+                              "aces", "se", "sa", "ra", "re"):
                         dst[f] += float(r.get(f) or 0)
                     sets = max(sets, float(r.get("sets") or 0))
                 dst["sets"] += sets
@@ -2986,6 +2990,16 @@ def team_season_stats(boxes, res):
                 # fact from hitting %, never blended with it. None without
                 # attempts: a rate with no denominator is not a measurement.
                 "killpct": (round(d["k"] / d["ta"], 3) if d["ta"] else None),
+                "serves": (d.get("sa") or 0) or None,
+                "srv_avg": (round((d["aces"] + 0.435 * max(
+                    0.0, d["sa"] - d["aces"] - d.get("se", 0))) / d["sa"], 3)
+                    if d.get("sa") else None),
+                "ace_rate": (round(d["aces"] / d["sa"], 4) if d.get("sa") else None),
+                "svc_err_rate": (round(d.get("se", 0) / d["sa"], 4)
+                                 if d.get("sa") else None),
+                "recv_att": (d.get("ra") or 0) or None,
+                "recv_ok_rate": (round((d["ra"] - d.get("re", 0)) / d["ra"], 4)
+                                 if d.get("ra") else None),
                 "kps": (round(d["k"] / n, 2) if n else None),
                 "asps": (round(d["ast"] / n, 2) if n else None),
                 "dps": (round(d["digs"] / n, 2) if n else None),
@@ -22740,6 +22754,23 @@ function showTeam(name) {
         : '') +
       '. <b>Opponents</b> is what this team allowed &mdash; ' +
       'the same counts from the other side of the same box scores.' +
+      ((O.serves)
+        ? ' <b>Serving:</b> ' + O.serves + ' serves, ' +
+          '<b>' + (O.ace_rate * 100).toFixed(1) + '% aces</b> against ' +
+          '<b>' + (O.svc_err_rate * 100).toFixed(1) + '% errors</b>' +
+          (O.srv_avg !== null && O.srv_avg !== undefined
+            ? ' &mdash; <b>Srv Avg ' + O.srv_avg.toFixed(3).replace(/^0/, '') +
+              '</b> <span class="munk" title="(aces + 0.435 x serves that were ' +
+              'neither an ace nor an error) / serves. Evollve&rsquo;s published ' +
+              'formula and their constant, computed here from our own counted ' +
+              'box scores so the two are comparable.">(Evollve&rsquo;s formula)</span>'
+            : '') +
+          (O.recv_ok_rate !== null && O.recv_ok_rate !== undefined
+            ? '. <b>Receiving:</b> ' + O.recv_att + ' receptions, ' +
+              (O.recv_ok_rate * 100).toFixed(1) + '% handled &mdash; a ' +
+              'separate fact from serving, on the other side of the rally.'
+            : '.')
+        : '') +
       /* ⚠ THE DIVISION OF THE OPPONENT, said where the rate is read. Stated
          only when it applies, and it names how much of the sample it is --
          "the only match" and "1 of 4" are different facts. */
