@@ -142,6 +142,17 @@
     "box_team_swap": {
      "46036": "46250",
      "46250": "46036"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 1.0,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 22
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "SMU (away) beat UC Davis 3-2: 27-25, 25-20, 20-25, 23-25, 15-12 from SMU's side. Two separately attributable official sources agree digit for digit: SMU's SidearmStats box data and UC Davis's own schedule row. The feed's linescores are REPLACED, not filled -- the only correction to do so, justified exactly because two official sources attribute every set to the opposite team from the feed. AUDITED: the per-player box rows are swapped the same way -- all 16 rows under UC Davis's team id are SMU roster players (16/16 roster-matched, 0 cross-matches) and all 17 under SMU's id are UC Davis players. box_team_swap re-attributes the rows at the derived layer; each player's own numbers are untouched and the raw log is never rewritten.",
@@ -228,6 +239,17 @@
     "box_team_swap": {
      "45955": "46048",
      "46048": "45955"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 1.0,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 24
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Denver won 3-1 -- the feed's ENTIRE team attribution is inverted for this match (the SMU-UC Davis class, found by the attribution-suspicion detector). Both schools' published schedules confirm the swapped result, and the box rows fit the OPPOSITE rosters at ~1.00 while fitting their own at ~0.00 (both sides). The set counts are the feed's own, reattributed.",
@@ -284,6 +306,17 @@
     "box_team_swap": {
      "46635": "45914",
      "45914": "46635"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 0.957,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 23
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Hofstra won 3-1 -- the feed's ENTIRE team attribution is inverted for this match (the SMU-UC Davis class, found by the attribution-suspicion detector). Both schools' published schedules confirm the swapped result, and the box rows fit the OPPOSITE rosters at ~1.00 while fitting their own at ~0.00 (both sides). The set counts are the feed's own, reattributed.",
@@ -335,6 +368,17 @@
     "box_team_swap": {
      "45872": "46757",
      "46757": "45872"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 1.0,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 23
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Valparaiso won 3-0 -- the feed's ENTIRE team attribution is inverted for this match (the SMU-UC Davis class, found by the attribution-suspicion detector). Both schools' published schedules confirm the swapped result, and the box rows fit the OPPOSITE rosters at ~1.00 while fitting their own at ~0.00 (both sides). The set counts are the feed's own, reattributed.",
@@ -396,6 +440,17 @@
     "box_team_swap": {
      "46506": "46391",
      "46391": "46506"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 1.0,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 23
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Kansas City won 3-2 -- the feed's ENTIRE team attribution is inverted for this match (the SMU-UC Davis class, found by the attribution-suspicion detector). Both schools' published schedules confirm the swapped result, and the box rows fit the OPPOSITE rosters at ~1.00 while fitting their own at ~0.00 (both sides). The set counts are the feed's own, reattributed.",
@@ -457,6 +512,17 @@
     "box_team_swap": {
      "46219": "46074",
      "46074": "46219"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 1.0,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 27
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Charleston So. won 3-2 -- the feed's ENTIRE team attribution is inverted for this match (the SMU-UC Davis class, found by the attribution-suspicion detector). Both schools' published schedules confirm the swapped result, and the box rows fit the OPPOSITE rosters at ~1.00 while fitting their own at ~0.00 (both sides). The set counts are the feed's own, reattributed.",
@@ -513,6 +579,17 @@
     "box_team_swap": {
      "46476": "45948",
      "45948": "46476"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 0.913,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 23
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Bucknell won 3-1 -- the feed's ENTIRE team attribution is inverted for this match (the SMU-UC Davis class, found by the attribution-suspicion detector). Both schools' published schedules confirm the swapped result, and the box rows fit the OPPOSITE rosters at ~1.00 while fitting their own at ~0.00 (both sides). The set counts are the feed's own, reattributed.",
@@ -574,6 +651,17 @@
     "box_team_swap": {
      "46137": "46162",
      "46162": "46137"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 0.964,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 28
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Campbell won 3-2 -- the feed's ENTIRE team attribution is inverted for this match (the SMU-UC Davis class, found by the attribution-suspicion detector). Both schools' published schedules confirm the swapped result, and the box rows fit the OPPOSITE rosters at ~1.00 while fitting their own at ~0.00 (both sides). The set counts are the feed's own, reattributed.",
@@ -630,6 +718,17 @@
     "box_team_swap": {
      "46375": "46674",
      "46674": "46375"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 1.0,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 23
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Florida St. won 3-1 -- the feed's ENTIRE team attribution is inverted for this match (the SMU-UC Davis class, found by the attribution-suspicion detector). Both schools' published schedules confirm the swapped result, and the box rows fit the OPPOSITE rosters at ~1.00 while fitting their own at ~0.00 (both sides). The set counts are the feed's own, reattributed.",
@@ -681,6 +780,17 @@
     "box_team_swap": {
      "46656": "46409",
      "46409": "46656"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 0.955,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 22
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Duke won 3-0 -- the feed's entire team attribution is inverted (the SMU-UC Davis class, found by the attribution-suspicion detector). Queens (NC)'s own schedule says 'L 0-3 vs Duke' and Duke's says 'W 3-0 vs Queens University of Charlotte' (Neutral, Conway S.C.); the box rows fit the OPPOSITE rosters ~1.00/0.00 both sides.",
@@ -742,6 +852,17 @@
     "box_team_swap": {
      "46097": "45895",
      "45895": "46097"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 0.96,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 25
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "UC Santa Barbara won 3-2 -- the feed's entire team attribution is inverted (the SMU-UC Davis class, attribution-suspicion detector). Tarleton St.'s schedule says 'L 2-3 vs UC Santa Barbara'; UCSB's legacy schedule export says 'W 3-2 vs Tarleton State University' (second source, found once the export id and the University spelling folds were fixed). Box rows fit the OPPOSITE rosters ~1.00/0.00 both sides.",
@@ -793,6 +914,17 @@
     "box_team_swap": {
      "46236": "46180",
      "46180": "46236"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 1.0,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 9
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Eastern Wash. won 3-0 -- the feed's entire team attribution is inverted (the attribution-suspicion detector's record_continuity component flagged it at delta >= 2 with no box held; both schools' published schedules contradict the feed's version and confirm the swap.",
@@ -844,6 +976,17 @@
     "box_team_swap": {
      "46563": "46412",
      "46412": "46563"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 1.0,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 11
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Florida A&M won 3-0 -- the feed's entire team attribution is inverted (the SMU-UC Davis class; flagged by the attribution-suspicion detector, then UMES's own site reported the loss). Both schools' legacy schedule exports agree, same date and neutral site (Aug 29, Huntsville AL): UMES 'L 0-3 vs Florida A&M University', FAMU 'W 3-0 vs Maryland Eastern Shore'. Twelfth confirmed inversion; nominal-home-not-host again.",
@@ -934,6 +1077,17 @@
     "box_team_swap": {
      "45938": "46759",
      "46759": "45938"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 0.909,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 22
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Washington won 3-2 -- the feed's entire team attribution is inverted (the SMU-UC Davis class; caught the same evening by the LINEUP-attribution guard, then confirmed both ways: both schools contradict the feed's version and both confirm the swap). Box and lineup rows fit the OPPOSITE rosters ~0.9-1.0 / own 0.00, both sides.",
@@ -990,6 +1144,17 @@
     "box_team_swap": {
      "45973": "46680",
      "46680": "45973"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 0.962,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 26
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Idaho St. won 3-1 -- the feed's entire team attribution is inverted (the SMU-UC Davis class; caught the same evening by the LINEUP-attribution guard, then confirmed both ways: both schools contradict the feed's version and both confirm the swap). Box and lineup rows fit the OPPOSITE rosters ~0.9-1.0 / own 0.00, both sides.",
@@ -1041,6 +1206,17 @@
     "box_team_swap": {
      "46126": "45779",
      "45779": "46126"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 1.0,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 16
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Syracuse won 3-0 -- the feed's F record inverted the visit/home attribution wholesale: its own LATER in-progress records show the home column (Syracuse) taking sets 25-13 and 25-18, the same point totals the F record hands to Howard's column flipped. Both schools contradict the feed's version and both assert the same alternative, each marking the match Neutral (Newman Arena, Ithaca -- Cornell's floor, so the home flag is nominal).",
@@ -1133,6 +1309,17 @@
     "box_team_swap": {
      "46408": "46170",
      "46170": "46408"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 0.913,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 23
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "UConn won 3-2 -- the feed's entire team attribution is inverted (the SMU-UC Davis class; caught by the lineup-attribution guard: lineup rows fit the OPPOSITE roster, then confirmed both ways -- both schools contradict the feed's version and both assert the same 3-2 UConn result). Linescores flipped column-for-column to match.",
@@ -1223,6 +1410,17 @@
     "box_team_swap": {
      "46708": "46162",
      "46162": "46708"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 0.963,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 27
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Xavier won 3-2 at home -- the feed's entire team attribution is inverted (lineup rows fit the OPPOSITE roster; both schools contradict the feed and assert the same 3-2 Xavier result). Linescores flipped column-for-column.",
@@ -1284,6 +1482,17 @@
     "box_team_swap": {
      "46674": "46422",
      "46422": "46674"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 1.0,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 23
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Florida St. won 3-2 (neutral floor, Allen Arena, Nashville) -- the feed's entire team attribution is inverted. Cody watched the match live and flagged the hub's Kansas 3-2 within the hour; both schools contradict the feed and assert the same alternative, including Kansas' own site recording the LOSS. Linescores flipped column-for-column.",
@@ -1340,6 +1549,17 @@
     "box_team_swap": {
      "45876": "46240",
      "46240": "45876"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 1.0,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 23
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Tulsa won 3-1 -- the feed's entire team attribution is inverted (the SMU-UC Davis class). Caught by the FIRST INTRADAY verification sweep (the trust cutoff, 2026-09-04): both schools contradict the feed and assert the same alternative. Linescores flipped column-for-column.",
@@ -1391,6 +1611,17 @@
     "box_team_swap": {
      "45984": "46124",
      "46124": "45984"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 0.957,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 23
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "UTRGV won 3-0 -- the feed's entire team attribution is inverted (the SMU-UC Davis class). Caught by the FIRST INTRADAY verification sweep (the trust cutoff, 2026-09-04): both schools contradict the feed and assert the same alternative. Linescores flipped column-for-column.",
@@ -1442,6 +1673,17 @@
     "box_team_swap": {
      "45783": "46506",
      "46506": "45783"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 1.0,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 12
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Jackson St. won 3-0 -- the feed's entire team attribution is inverted (the SMU-UC Davis class). Caught by the FIRST INTRADAY verification sweep (the trust cutoff, 2026-09-04): both schools contradict the feed and assert the same alternative. Linescores flipped column-for-column.",
@@ -1498,6 +1740,17 @@
     "box_team_swap": {
      "46235": "46478",
      "46478": "46235"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 1.0,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 24
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "New Mexico won 3-1 -- the feed's entire team attribution is inverted (the SMU-UC Davis class). Caught by the FIRST INTRADAY verification sweep (the trust cutoff, 2026-09-04): both schools contradict the feed and assert the same alternative. Linescores flipped column-for-column.",
@@ -1554,6 +1807,17 @@
     "box_team_swap": {
      "46190": "46756",
      "46756": "46190"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 0.955,
+      "roster_fit_if_swapped": 0.045,
+      "rows_checked": 22
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Iowa St. won 3-1 -- the feed's entire team attribution is inverted (lineup rows fit the OPPOSITE roster; both schools contradict the feed and assert the same alternative). Linescores flipped column-for-column.",
@@ -1610,6 +1874,17 @@
     "box_team_swap": {
      "46391": "45781",
      "45781": "46391"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 1.0,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 22
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Kansas City won 3-1 at home -- the feed's entire team attribution is inverted (lineup rows fit the OPPOSITE roster; held UNDER REVIEW from the first intraday sweep when only PFW's own site contradicted the feed, upgraded to a correction once Kansas City posted and both schools asserted the same alternative). Linescores flipped column-for-column.",
@@ -1666,6 +1941,17 @@
     "box_team_swap": {
      "45940": "51287",
      "51287": "45940"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 0.963,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 27
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Abilene Christian won 3-1 -- the feed's entire team attribution is inverted (lineup rows fit the OPPOSITE roster, surfaced by the fresh-checkout sandbox's rebuild; both schools contradict the feed and assert the same alternative). Linescores flipped column-for-column.",
@@ -1808,6 +2094,17 @@
     "box_team_swap": {
      "46604": "45987",
      "45987": "46604"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 0.885,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 26
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Portland St. won 3-0 -- the feed's entire team attribution is inverted (the SMU-UC Davis class). Caught by the intraday verification sweep on the Sept 5 slate: both schools contradict the feed and assert the same alternative, and the attribution-suspicion detector's box_roster_fit scores the rows on the OPPOSITE rosters at 1.00/0.786 while fitting their own at 0.00. Linescores flipped column-for-column.",
@@ -1900,6 +2197,17 @@
     "box_team_swap": {
      "46472": "46668",
      "46668": "46472"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 0.957,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 23
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "UNC Greensboro won 3-2 -- the feed's entire team attribution is inverted (the SMU-UC Davis class; caught by the LINEUP-attribution guard the same afternoon, then confirmed both ways: both schools contradict the feed's version and assert the same alternative). Linescores flipped column-for-column.",
@@ -1961,6 +2269,17 @@
     "box_team_swap": {
      "46240": "46211",
      "46211": "46240"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 1.0,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 23
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Pepperdine won 3-2 -- the feed's entire team attribution is inverted (the SMU-UC Davis class). Caught by the intraday verification sweep on the Sunday slate: both schools contradict the feed's version and assert the same alternative. Linescores flipped column-for-column.",
@@ -2017,6 +2336,17 @@
     "box_team_swap": {
      "46734": "46241",
      "46241": "46734"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 1.0,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 23
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Radford won 3-1 -- the feed's entire team attribution is inverted (the SMU-UC Davis class). Flagged by the lineup-attribution guard on 2026-09-04 and HELD as pending while neither school had posted; the pending entry's recheck alarm fired on 2026-09-07 and both schools had published the same alternative: Prairie View 'L 1-3 vs Radford' and Radford 'W 3-1 vs Prairie View A&M', both marking it Neutral at the Georgia Southern Tournament, Statesboro. Linescores flipped column-for-column.",
@@ -2128,6 +2458,17 @@
     "box_team_swap": {
      "45813": "46218",
      "46218": "45813"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 1.0,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 22
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Bryant (home) beat Brown 3-1. Both schools publish the result against the feed, independently: Brown's own schedule records a LOSS and Bryant's records the WIN, and the two agree on the 3-1 margin. Swapping the feed's visit/home columns reproduces that result exactly (25-18 Brown, then 25-15, 26-24, 25-21 Bryant). AUDITED: the lineup rows are swapped the same way -- all 6 starters filed under Bryant are Brown roster players and all 6 under Brown are Bryant players (6/6 both ways, 0 own-roster matches). box_team_swap re-attributes the rows at the derived layer; each player's own numbers are untouched and the raw log is never rewritten.",
@@ -2183,6 +2524,17 @@
     "box_team_swap": {
      "46734": "45987",
      "45987": "46734"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 1.0,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 27
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Portland St. (away) beat Prairie View 3-1. Both schools publish the result against the feed, independently: Prairie View's schedule records a LOSS and Portland St.'s records the WIN, agreeing on the 3-1 margin. Swapping the feed's visit/home columns reproduces it exactly (25-23, 25-17 Portland St., 24-26 Prairie View, 25-21 Portland St.). AUDITED: the lineup rows are swapped the same way -- 6/6 starters under each team id belong to the other team's roster, 0 own-roster matches. box_team_swap re-attributes the rows at the derived layer; the raw log is never rewritten.",
@@ -2243,6 +2595,17 @@
     "box_team_swap": {
      "45770": "45785",
      "45785": "45770"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 1.0,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 21
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Eastern Ky. (home) beat James Madison 3-2. Both schools publish the result against the feed, independently: James Madison's schedule records a LOSS and Eastern Ky.'s records the WIN, agreeing on the 3-2 margin. Swapping the feed's visit/home columns reproduces it exactly (25-18 JMU, then 25-23, 27-25 EKU, 25-15 JMU, 15-11 EKU). AUDITED: the lineup rows are swapped the same way -- 6/6 starters under each team id belong to the other team's roster, 0 own-roster matches. box_team_swap re-attributes the rows at the derived layer; the raw log is never rewritten.",
@@ -2321,6 +2684,17 @@
     "box_team_swap": {
      "46536": "46342",
      "46342": "46536"
+    },
+    "box_team_swap_superseded": {
+     "on": "2026-09-11",
+     "why": "THE FEED CORRECTED ITS OWN TEAM ATTRIBUTION for this match. The swap was right against the box rows as originally served and would now RE-INVERT rows that are already correct. The correction is not withdrawn and its evidence still stands -- what changed is the source, so the swap is superseded rather than wrong. Discovered 2026-09-11 when the season's player boxes were re-crawled to capture service errors: 758 players appeared under two teams at once, because the log then held the feed's old attribution and its new one.",
+     "measured": {
+      "method": "share of box rows whose player is on that team's 2026 roster",
+      "roster_fit_as_filed": 0.909,
+      "roster_fit_if_swapped": 0.0,
+      "rows_checked": 22
+     },
+     "note": "box_team_swaps() skips a superseded entry. test_box_swaps.py re-derives the fit from the CURRENT log, so if the feed ever reverts, the guard fails rather than the page going quietly wrong."
     }
    },
    "established": "Omaha beat UC Riverside 3-0 at a NEUTRAL site (Rolle Activity Center, Flagstaff, Ariz.). Both schools publish the result against the feed, independently and in agreement: UC Riverside's own schedule records a LOSS 0-3 and Omaha's records the WIN 3-0, both marking the site Neutral. The feed's set sequence is kept and re-attributed -- the sweeping side scored 25-13, 25-20, 25-18 and that side is Omaha, the away column. AUDITED: the lineup rows are swapped the same way -- 0 of 6 starters filed under each team id appear on that team's own roster, while 6 of 6 filed under Omaha belong to UC Riverside and 4 of 6 filed under UC Riverside belong to Omaha. box_team_swap re-attributes the rows at the derived layer; the raw log is never rewritten. NOTE the two schools name the event differently (Lumberjack Classic / Northern Arizona Tournament) and list different local start times; they agree on the result, which is what is being established here.",

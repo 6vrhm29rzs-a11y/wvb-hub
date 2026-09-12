@@ -2,46 +2,46 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 1159,
+  "scored": 1184,
   "logged_after_tipoff_excluded": 3,
   "team_mismatch_excluded": 32,
   "predictions_on_record": 4807,
-  "results_available": 1219,
-  "brier": 0.1727,
+  "results_available": 1244,
+  "brier": 0.1737,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 864,
-  "favourite_correct_pct": 74.5
+  "favourite_correct": 879,
+  "favourite_correct_pct": 74.2
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 200,
-   "said": 55.3,
-   "happened": 59.5
+   "n": 209,
+   "said": 55.2,
+   "happened": 58.4
   },
   {
    "range": "60-70%",
-   "n": 208,
-   "said": 65.3,
-   "happened": 60.1
+   "n": 212,
+   "said": 65.2,
+   "happened": 60.4
   },
   {
    "range": "70-80%",
-   "n": 187,
+   "n": 191,
    "said": 75.1,
-   "happened": 67.9
+   "happened": 68.1
   },
   {
    "range": "80-90%",
-   "n": 211,
-   "said": 85.2,
-   "happened": 79.1
+   "n": 214,
+   "said": 85.3,
+   "happened": 79.0
   },
   {
    "range": "90-101%",
-   "n": 353,
+   "n": 358,
    "said": 95.6,
-   "happened": 92.4
+   "happened": 92.2
   }
  ],
  "matches": [
@@ -271,6 +271,15 @@
    "brier": 0.8328387599999999
   },
   {
+   "game_id": "6627513",
+   "date": "2026-09-11",
+   "away": "Kansas St.",
+   "home": "Weber St.",
+   "p_home": 0.0975,
+   "home_won": true,
+   "brier": 0.81450625
+  },
+  {
    "game_id": "6628176",
    "date": "2026-08-28",
    "away": "Idaho",
@@ -379,6 +388,15 @@
    "brier": 0.7742240100000001
   },
   {
+   "game_id": "6625599",
+   "date": "2026-09-11",
+   "away": "Northern Colo.",
+   "home": "Middle Tenn.",
+   "p_home": 0.1211,
+   "home_won": true,
+   "brier": 0.77246521
+  },
+  {
    "game_id": "6626942",
    "date": "2026-08-29",
    "away": "Butler",
@@ -476,24 +494,6 @@
    "p_home": 0.1455,
    "home_won": true,
    "brier": 0.73017025
-  },
-  {
-   "game_id": "6626484",
-   "date": "2026-08-29",
-   "away": "UIC",
-   "home": "Saint Louis",
-   "p_home": 0.1503,
-   "home_won": true,
-   "brier": 0.72199009
-  },
-  {
-   "game_id": "6639570",
-   "date": "2026-08-29",
-   "away": "Eastern Ky.",
-   "home": "Utah St.",
-   "p_home": 0.8492,
-   "home_won": false,
-   "brier": 0.7211406399999999
   }
  ]
 }
