@@ -1,0 +1,11 @@
+{
+ "season_fitted_on": 2025,
+ "exponent": 8.559,
+ "rmse_win_pct": 0.0489,
+ "rmse_if_everyone_500": 0.1982,
+ "rmse_if_everyone_league_mean": 0.1982,
+ "n_teams": 349,
+ "what_it_is": "pts_for^x / (pts_for^x + pts_against^x), on SCOREBOARD points from the set scores -- not the kills+aces+blocks earned-points formula, which is a different quantity",
+ "how_to_read": "RMSE is in win-percentage points. Compare it to the two baselines: a model that says every team is .500, and one that says every team is the league mean. A Pythagorean worth showing beats both clearly.",
+ "caveat": "Fitted on a COMPLETE season and applied to a partial one. Early-season teams have small point totals, so their expectation is noisier than this RMSE suggests."
+}

@@ -3024,6 +3024,19 @@ def team_season_stats(boxes, res):
     # _di_ms above is the COUNTING set (di_counting: 348 + unanimously-div1
     # reclassifiers). West Florida's games count for its opponents, but it
     # holds no leaderboard row until an official 2026 table lists it.
+    _pyfit = load("data/pythagorean_fit.json") or {}
+    _px = _pyfit.get("exponent")
+    for _nm, _d in out.items():
+        _o = _d.get("own") or {}
+        _p = _d.get("opp") or {}
+        _f, _a = float(_o.get("board") or 0), float(_p.get("board") or 0)
+        if _f + _a <= 0:
+            continue
+        _o["pts_won_pct"] = round(_f / (_f + _a), 4)
+        if _px and _f > 0 and _a > 0:
+            _o["pyth"] = round((_f ** _px) / (_f ** _px + _a ** _px), 4)
+            _o["pyth_exp"] = _px
+
     _di = di_teams()
     if _di:
         out = dict((k, v) for k, v in out.items() if k in _di)
@@ -22733,6 +22746,14 @@ function showTeam(name) {
             w(b) + '%"></i></span><b>' + f(b, r[3]) + '</b></div>' +
         '</div></div>';
     };
+    let luckTxt = '';
+    {
+      const _m = /^(\d+)-(\d+)$/.exec(String(t.record26 || ''));
+      if (_m && O.pyth) {
+        const _gp = (+_m[1]) + (+_m[2]);
+        if (_gp) luckTxt = '<b>' + Math.round(100 * (+_m[1]) / _gp) + '%</b>';
+      }
+    }
     statHtml =
       '<div class="tsec" style="margin-top:14px"><h3>Team stats, 2026</h3>' +
       '<div class="ckey"><span><i class="sw own"></i>' + name + '</span>' +
@@ -22754,6 +22775,23 @@ function showTeam(name) {
         : '') +
       '. <b>Opponents</b> is what this team allowed &mdash; ' +
       'the same counts from the other side of the same box scores.' +
+      ((O.pts_won_pct)
+        ? ' <b>Rally points:</b> this team won <b>' +
+          (O.pts_won_pct * 100).toFixed(1) + '%</b> of every point the ' +
+          'scoreboard moved &mdash; a different count from the kills, blocks ' +
+          'and aces above, because it includes the points opponents gave away' +
+          ((O.pyth !== null && O.pyth !== undefined)
+            ? '. At that share a team is expected to win <b>' +
+              (O.pyth * 100).toFixed(0) + '%</b> of its matches' +
+              (luckTxt ? ', and it has actually won ' + luckTxt : '') +
+              ' <span class="munk" title="Pythagorean expectation, exponent ' +
+              (O.pyth_exp || '') + ', FITTED on the complete 2025 season (349 ' +
+              'teams; RMSE 0.049 in win percentage against 0.198 for a model ' +
+              'that calls every team .500). Applied to a part-season here, so ' +
+              'a team with few matches is noisier than that suggests.">' +
+              '(fitted on 2025)</span>'
+            : '') + '.'
+        : '') +
       ((O.serves)
         ? ' <b>Serving:</b> ' + O.serves + ' serves, ' +
           '<b>' + (O.ace_rate * 100).toFixed(1) + '% aces</b> against ' +

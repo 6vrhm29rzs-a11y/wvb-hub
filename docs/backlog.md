@@ -140,10 +140,16 @@ itself; the only automated source we have is the one that is stale.
   stats panel. Coverage measured first: 1,344 of 1,363 games carry serve
   attempts (98.6%), all-or-nothing per game; a team without them renders
   nothing rather than a zero. Guarded in `test_serving_rates.py`.
-  **Still to build:** % of points won, Pythagorean win % and Luck (both
-  computable from linescores — `own`/`opp` scoreboard points already
-  accumulate in team_season_stats), rally-denominated kill/block/dig rates,
-  and a matchup score.
+  **% of points won, Pythagorean and the actual win rate are DONE too**
+  (2026-09-12). The exponent is FITTED — 8.559 on the complete 2025 season,
+  349 teams, RMSE 0.049 win% against 0.198 for a model that calls every team
+  .500 (`scripts/fit_pythagorean.py`, receipt in `data/pythagorean_fit.json`).
+  ⚠ Our % of points won matches Evollve's published figure to a **median 0.22
+  percentage points across 346 teams**, computed independently from our own
+  linescores — which is a stronger check on our scoreboard data than anything
+  self-referential, and it is now a standing guard.
+  **Still to build:** rally-denominated kill/block/dig rates, and a matchup
+  score like their EMS.
 - **Cannot replicate without play-by-play** (2026 has none): Point-Scoring %,
   Sideout %, RAPM, and the two real Four Factors (serve-receive vs transition
   hitting). The serve/points algebra is genuinely underdetermined — one

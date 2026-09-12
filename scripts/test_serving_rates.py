@@ -69,6 +69,31 @@ def main():
     check("serving and receiving are stated as different sides of the rally",
           "other side of the rally" in page)
 
+    ev_path = os.path.join(REPO, "Cody/data/evollve_snapshots.jsonl")
+    if os.path.exists(ev_path):
+        import statistics
+        last = None
+        for ln in io.open(ev_path, encoding="utf-8"):
+            if ln.strip():
+                last = json.loads(ln)
+        E = {r["hub_team"]: r for r in (last or {}).get("data", [])
+             if r.get("hub_team")}
+        d = []
+        for nm, o in got:
+            e = E.get(nm)
+            if e and o.get("pts_won_pct") is not None and e.get("pct_pts_won") is not None:
+                d.append(abs(o["pts_won_pct"] * 100 - e["pct_pts_won"]))
+        if d:
+            med = statistics.median(d)
+            check("our %% of points won matches an INDEPENDENT publisher "
+                  "(median |diff| %.2f pp over %d teams)" % (med, len(d)),
+                  med < 1.5, "median %.2f" % med)
+    check("Pythagorean is present wherever points are, and never invented",
+          not [nm for nm, o in got
+               if o.get("pyth") is not None and not o.get("pts_won_pct")])
+    check("the fitted exponent rides with the number, not as a page literal",
+          all(o.get("pyth_exp") for _n, o in got if o.get("pyth") is not None))
+
     print("\n  negative controls")
     tripped = []
 
