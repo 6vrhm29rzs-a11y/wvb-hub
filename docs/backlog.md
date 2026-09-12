@@ -62,10 +62,11 @@ itself; the only automated source we have is the one that is stale.
 
 ### Still not pulled / built
 - **Massey** and **FIGstats** captures are 13 days old (last 2026-08-30).
-- **VolleyTalk**: only the weekly Top-25 poll is saved, through Week 2
-  (2026-09-07). Week 3 exists. The forum *posts* — the actual ask — have
-  never been persisted; extraction worked weeks ago, the save pipeline and
-  its privacy fencing were never built.
+- **VolleyTalk**: the save pipeline now EXISTS (`ingest_volleytalk.py`,
+  first thread stored 2026-09-12). Still to do: the weekly Top-25 poll is
+  only current through Week 2 (2026-09-07) and Week 3 is out; and no routine
+  captures the threads regularly — each one is a manual browser save,
+  because the forum serves a bot challenge to every non-browser client.
 - **Evollve metrics we can replicate and have not:** Srv Avg, ace rate,
   service-error rate, reception success rate, % of points won, Pythagorean
   win % and Luck, rally-denominated kill/block/dig rates, and a matchup
