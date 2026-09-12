@@ -1,11 +1,12 @@
 {
  "date": "2026-09-12",
- "generated_utc": "2026-09-12T19:16:40Z",
+ "generated_utc": "2026-09-12T19:31:23Z",
  "counts": {
-  "CORROBORATED_ONE": 31,
-  "VERIFIED_BOTH": 8,
+  "CORROBORATED_ONE": 35,
+  "VERIFIED_BOTH": 9,
   "CONTRADICTED_BOTH": 2,
-  "UNVERIFIED": 5
+  "UNVERIFIED": 5,
+  "CONTRADICTED_ONE": 1
  },
  "matches": [
   {
@@ -999,20 +1000,14 @@
    "gid": "6627094",
    "date": "2026-09-12",
    "canonical": "Georgia St. def. Northern Colo. 3-1",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Georgia St.": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://georgiastatesports.com/services/schedule_txt.ashx?schedule=360",
-     "row": [
-      "Sep 12 (Sat)",
-      "1:00 PM",
-      "Neutral",
-      "Northern Colorado",
-      "Murfreesboro, Tenn.",
-      "",
-      ""
-     ]
+     "assertion": "Georgia St. W 3-1 vs Northern Colorado",
+     "opponent_source": "Northern Colorado",
+     "site_says": "Neutral"
     },
     "Northern Colo.": {
      "state": "NOT_POSTED",
@@ -1145,7 +1140,7 @@
    "gid": "6625846",
    "date": "2026-09-12",
    "canonical": "Providence def. Stonehill 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Providence": {
      "state": "NOT_POSTED",
@@ -1161,16 +1156,178 @@
      ]
     },
     "Stonehill": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://stonehillskyhawks.com/services/schedule_txt.ashx?schedule=489",
+     "assertion": "Stonehill L 0-3 vs Providence College",
+     "opponent_source": "Providence College",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6625252",
+   "date": "2026-09-12",
+   "canonical": "Sacramento St. def. Saint Mary's (CA) 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Sacramento St.": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://hornetsports.com/services/schedule_txt.ashx?schedule=637",
+     "rows_on_date": [
+      "Saint Mary's"
+     ]
+    },
+    "Saint Mary's (CA)": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://smcgaels.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Saint Mary's (CA) L 1-3 vs Sacramento State",
+     "opponent_source": "Sacramento State",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6624573",
+   "date": "2026-09-12",
+   "canonical": "Portland def. Montana St. 3-1",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Portland": {
+     "state": "NOT_POSTED",
+     "url": "https://portlandpilots.com/services/schedule_txt.ashx?schedule=1469",
      "row": [
       "Sep 12 (Sat)",
-      "1:30 p.m.",
+      "10:00 AM",
       "Away",
-      "Providence College",
-      "Providence. R.I. (Alumni Hall)",
+      "Montana State",
+      "Bozeman, Mont. (Shroyer Gymnasium)",
       "",
       ""
+     ]
+    },
+    "Montana St.": {
+     "state": "NOT_POSTED",
+     "url": "https://msubobcats.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 12 (Sat)",
+      "11:00 am MT",
+      "Home",
+      "Portland",
+      "Bozeman, MT (Shroyer Gymnasium)",
+      "Bobcat Invitational",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6625225",
+   "date": "2026-09-12",
+   "canonical": "Liberty def. Fairfield 3-1",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Liberty": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://libertyflames.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Liberty W 3-1 vs Fairfield",
+     "opponent_source": "Fairfield",
+     "site_says": "Neutral"
+    },
+    "Fairfield": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://fairfieldstags.com/services/schedule_txt.ashx?schedule=1530",
+     "assertion": "Fairfield L 1-3 vs Liberty",
+     "opponent_source": "Liberty",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6624771",
+   "date": "2026-09-12",
+   "canonical": "Winthrop def. Youngstown St. 3-1",
+   "verdict": "CONTRADICTED_ONE",
+   "schools": {
+    "Winthrop": {
+     "state": "NOT_POSTED",
+     "url": "https://winthropeagles.com/services/schedule_txt.ashx?schedule=1016",
+     "row": [
+      "Sep 12 (Sat)",
+      "1:00 p.m.",
+      "Neutral",
+      "Youngstown State",
+      "Columbus, Ohio",
+      "",
+      ""
+     ]
+    },
+    "Youngstown St.": {
+     "state": "CONTRADICTS",
+     "url": "https://ysusports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Youngstown St. W 3-1 vs Winthrop",
+     "opponent_source": "Winthrop",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6626788",
+   "date": "2026-09-12",
+   "canonical": "Mercyhurst def. Niagara 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Mercyhurst": {
+     "state": "NOT_POSTED",
+     "url": "https://hurstathletics.com/services/schedule_txt.ashx?schedule=617",
+     "row": [
+      "Sep 12 (Sat)",
+      "2:00 PM",
+      "Home",
+      "Niagara",
+      "Erie, PA (Owen McCormick Court at the Mercyhurst Athletic Center)",
+      "",
+      ""
+     ]
+    },
+    "Niagara": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://purpleeagles.com/services/schedule_txt.ashx?schedule=695",
+     "assertion": "Niagara L 0-3 vs Mercyhurst",
+     "opponent_source": "Mercyhurst",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6627222",
+   "date": "2026-09-12",
+   "canonical": "Yale def. New Hampshire 3-0",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Yale": {
+     "state": "NOT_POSTED",
+     "url": "https://yalebulldogs.com/services/schedule_txt.ashx?schedule=717",
+     "row": [
+      "Sep 12 (Sat)",
+      "2 p.m.",
+      "Neutral",
+      "New Hampshire",
+      "Storrs, Conn.",
+      "",
+      ""
+     ]
+    },
+    "New Hampshire": {
+     "state": "NOT_POSTED",
+     "url": "https://unhwildcats.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 12 (Sat)",
+      "2 PM",
+      "Neutral",
+      "Yale",
+      "Storrs, Conn. (UConn Volleyball Center)",
+      "East Coast Challenge",
+      "-"
      ]
     }
    }

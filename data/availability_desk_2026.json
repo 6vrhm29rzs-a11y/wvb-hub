@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-12T19:17:49Z",
+  "generated_at_utc": "2026-09-12T19:32:33Z",
   "counts": {
    "statuses": 3,
    "incidents": 0,
    "signals": 4,
    "expired": 7,
-   "anomalies": 399
+   "anomalies": 403
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -1037,24 +1037,6 @@
    "points_per_set_missing": 5.125
   },
   {
-   "game_id": "6624572",
-   "team_id": "46351",
-   "team": "Portland",
-   "absent": [
-    {
-     "name": "Eliot Diehl palmer",
-     "rate": 2.588,
-     "played_share": 1.0
-    },
-    {
-     "name": "Lillian Lansing",
-     "rate": 2.529,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 5.117
-  },
-  {
    "game_id": "6627406",
    "team_id": "46175",
    "team": "Delaware St.",
@@ -1107,6 +1089,24 @@
     }
    ],
    "points_per_set_missing": 4.883
+  },
+  {
+   "game_id": "6624572",
+   "team_id": "46351",
+   "team": "Portland",
+   "absent": [
+    {
+     "name": "Eliot Diehl palmer",
+     "rate": 2.605,
+     "played_share": 1.0
+    },
+    {
+     "name": "Lillian Lansing",
+     "rate": 2.263,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 4.868
   },
   {
    "game_id": "6625817",
@@ -1353,6 +1353,32 @@
     }
    ],
    "points_per_set_missing": 4.263
+  },
+  {
+   "game_id": "6624571",
+   "team_id": "46351",
+   "team": "Portland",
+   "absent": [
+    {
+     "name": "Maui Robins",
+     "rate": 4.222,
+     "played_share": 0.6
+    }
+   ],
+   "points_per_set_missing": 4.222
+  },
+  {
+   "game_id": "6627309",
+   "team_id": "46351",
+   "team": "Portland",
+   "absent": [
+    {
+     "name": "Maui Robins",
+     "rate": 4.222,
+     "played_share": 0.6
+    }
+   ],
+   "points_per_set_missing": 4.222
   },
   {
    "game_id": "6640390",
@@ -2453,32 +2479,6 @@
    "points_per_set_missing": 3.043
   },
   {
-   "game_id": "6640393",
-   "team_id": "45925",
-   "team": "Liberty",
-   "absent": [
-    {
-     "name": "Carly O'brien",
-     "rate": 3.036,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 3.036
-  },
-  {
-   "game_id": "6625494",
-   "team_id": "45925",
-   "team": "Liberty",
-   "absent": [
-    {
-     "name": "Carly O'brien",
-     "rate": 3.036,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 3.036
-  },
-  {
    "game_id": "6626376",
    "team_id": "46501",
    "team": "Stanford",
@@ -2783,6 +2783,32 @@
    "points_per_set_missing": 2.907
   },
   {
+   "game_id": "6640393",
+   "team_id": "45925",
+   "team": "Liberty",
+   "absent": [
+    {
+     "name": "Carly O'brien",
+     "rate": 2.9,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.9
+  },
+  {
+   "game_id": "6625494",
+   "team_id": "45925",
+   "team": "Liberty",
+   "absent": [
+    {
+     "name": "Carly O'brien",
+     "rate": 2.9,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.9
+  },
+  {
    "game_id": "6624572",
    "team_id": "45847",
    "team": "North Dakota St.",
@@ -2846,6 +2872,19 @@
     }
    ],
    "points_per_set_missing": 2.875
+  },
+  {
+   "game_id": "6625225",
+   "team_id": "45925",
+   "team": "Liberty",
+   "absent": [
+    {
+     "name": "Carly O'Brien",
+     "rate": 2.868,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.868
   },
   {
    "game_id": "6627704",
@@ -3074,19 +3113,6 @@
    "points_per_set_missing": 2.739
   },
   {
-   "game_id": "6628543",
-   "team_id": "46476",
-   "team": "Niagara",
-   "absent": [
-    {
-     "name": "Karlotta Kattai",
-     "rate": 2.714,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 2.714
-  },
-  {
    "game_id": "6637546",
    "team_id": "46768",
    "team": "Lipscomb",
@@ -3202,6 +3228,19 @@
     }
    ],
    "points_per_set_missing": 2.639
+  },
+  {
+   "game_id": "6628543",
+   "team_id": "46476",
+   "team": "Niagara",
+   "absent": [
+    {
+     "name": "Karlotta Kattai",
+     "rate": 2.625,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.625
   },
   {
    "game_id": "6625901",
@@ -3598,7 +3637,20 @@
     {
      "name": "Eliot Diehl Palmer",
      "rate": 2.4,
-     "played_share": 1.0
+     "played_share": 0.8
+    }
+   ],
+   "points_per_set_missing": 2.4
+  },
+  {
+   "game_id": "6624573",
+   "team_id": "46351",
+   "team": "Portland",
+   "absent": [
+    {
+     "name": "Eliot Diehl Palmer",
+     "rate": 2.4,
+     "played_share": 0.75
     }
    ],
    "points_per_set_missing": 2.4
@@ -3682,6 +3734,19 @@
    "points_per_set_missing": 2.339
   },
   {
+   "game_id": "6627766",
+   "team_id": "46340",
+   "team": "Montana St.",
+   "absent": [
+    {
+     "name": "Karli Heidemann",
+     "rate": 2.308,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.308
+  },
+  {
    "game_id": "6625160",
    "team_id": "46494",
    "team": "San Jose St.",
@@ -3745,19 +3810,6 @@
     }
    ],
    "points_per_set_missing": 2.28
-  },
-  {
-   "game_id": "6627766",
-   "team_id": "46340",
-   "team": "Montana St.",
-   "absent": [
-    {
-     "name": "Karli Heidemann",
-     "rate": 2.271,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 2.271
   },
   {
    "game_id": "6625924",
@@ -4662,19 +4714,6 @@
    "points_per_set_missing": 1.7
   },
   {
-   "game_id": "6624754",
-   "team_id": "46583",
-   "team": "Youngstown St.",
-   "absent": [
-    {
-     "name": "Abbie Householder",
-     "rate": 1.676,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.676
-  },
-  {
    "game_id": "6625998",
    "team_id": "45863",
    "team": "Sam Houston",
@@ -4948,19 +4987,6 @@
    "points_per_set_missing": 1.586
   },
   {
-   "game_id": "6626264",
-   "team_id": "45975",
-   "team": "New Hampshire",
-   "absent": [
-    {
-     "name": "Julianne Lee",
-     "rate": 1.58,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.58
-  },
-  {
    "game_id": "6639891",
    "team_id": "45986",
    "team": "Pittsburgh",
@@ -5011,6 +5037,19 @@
     }
    ],
    "points_per_set_missing": 1.556
+  },
+  {
+   "game_id": "6626264",
+   "team_id": "45975",
+   "team": "New Hampshire",
+   "absent": [
+    {
+     "name": "Julianne Lee",
+     "rate": 1.554,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.554
   },
   {
    "game_id": "6625817",
@@ -5099,6 +5138,19 @@
      "name": "Tosia Serafinowska",
      "rate": 1.5,
      "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 1.5
+  },
+  {
+   "game_id": "6624754",
+   "team_id": "46583",
+   "team": "Youngstown St.",
+   "absent": [
+    {
+     "name": "Abbie Householder",
+     "rate": 1.5,
+     "played_share": 1.0
     }
    ],
    "points_per_set_missing": 1.5
@@ -5832,6 +5884,32 @@
    "points_per_set_missing": 1.091
   },
   {
+   "game_id": "6624754",
+   "team_id": "45799",
+   "team": "Mercyhurst",
+   "absent": [
+    {
+     "name": "Payton Melin",
+     "rate": 1.062,
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 1.062
+  },
+  {
+   "game_id": "6626781",
+   "team_id": "45799",
+   "team": "Mercyhurst",
+   "absent": [
+    {
+     "name": "Payton Melin",
+     "rate": 1.062,
+     "played_share": 0.8
+    }
+   ],
+   "points_per_set_missing": 1.062
+  },
+  {
    "game_id": "6628592",
    "team_id": "46507",
    "team": "TCU",
@@ -5843,32 +5921,6 @@
     }
    ],
    "points_per_set_missing": 1.059
-  },
-  {
-   "game_id": "6624754",
-   "team_id": "45799",
-   "team": "Mercyhurst",
-   "absent": [
-    {
-     "name": "Payton Melin",
-     "rate": 1.045,
-     "played_share": 0.75
-    }
-   ],
-   "points_per_set_missing": 1.045
-  },
-  {
-   "game_id": "6626781",
-   "team_id": "45799",
-   "team": "Mercyhurst",
-   "absent": [
-    {
-     "name": "Payton Melin",
-     "rate": 1.045,
-     "played_share": 0.8
-    }
-   ],
-   "points_per_set_missing": 1.045
   },
   {
    "game_id": "6624447",
@@ -7084,31 +7136,33 @@
    ]
   },
   "Youngstown St.": {
-   "gid": "6624766",
-   "d": "2026-09-11",
-   "appeared": 22,
+   "gid": "6624771",
+   "d": "2026-09-12",
+   "appeared": 10,
    "zero_action": [
-    "Abbie Householder",
-    "Abbie Householder"
+    "Makayla Keibler",
+    "Hayden Rodriguez",
+    "Ashlee Gnau",
+    "Juliana Rivera",
+    "Teagan Ng",
+    "Natalie Carr",
+    "Brie Habeeb"
    ]
   },
   "Mercyhurst": {
-   "gid": "6626787",
-   "d": "2026-09-11",
-   "appeared": 28,
+   "gid": "6626788",
+   "d": "2026-09-12",
+   "appeared": 11,
    "zero_action": [
     "Sarina Notaro",
     "Katherine Picozzi",
+    "Sydney Forcht",
     "Camryn Ketron",
     "Erin Robbins",
     "Ellie Kleven",
     "Sarah Barnum",
-    "Sarina Notaro",
-    "Katherine Picozzi",
-    "Camryn Ketron",
-    "Erin Robbins",
-    "Ellie Kleven",
-    "Sarah Barnum"
+    "Trinity Tatupu",
+    "Mya Comer"
    ]
   },
   "William & Mary": {
@@ -7240,10 +7294,17 @@
    ]
   },
   "Niagara": {
-   "gid": "6640794",
-   "d": "2026-09-11",
-   "appeared": 26,
-   "zero_action": []
+   "gid": "6626788",
+   "d": "2026-09-12",
+   "appeared": 11,
+   "zero_action": [
+    "Leah Allen",
+    "Maille Malone",
+    "Taylor Jenkins",
+    "Elyannah Sonza",
+    "Chloe Moreland",
+    "Kaitlyn Doyle"
+   ]
   },
   "West Florida": {
    "gid": "6627428",
@@ -8085,22 +8146,15 @@
    ]
   },
   "Fairfield": {
-   "gid": "6625224",
-   "d": "2026-09-11",
-   "appeared": 22,
+   "gid": "6625225",
+   "d": "2026-09-12",
+   "appeared": 10,
    "zero_action": [
     "Keyaira Limuel-washington",
     "Daniella Suarez",
     "Ella Paniagua",
     "Nicole Macalintal",
-    "Mary kate Bradley",
-    "Lilly Guinane",
-    "Lindsey Healey",
-    "Julie Dufourt",
-    "Keyaira Limuel-washington",
-    "Daniella Suarez",
-    "Ella Paniagua",
-    "Nicole Macalintal",
+    "Courtney Vines",
     "Mary kate Bradley",
     "Lilly Guinane",
     "Lindsey Healey",
@@ -8604,12 +8658,15 @@
    ]
   },
   "Sacramento St.": {
-   "gid": "6627599",
-   "d": "2026-09-11",
-   "appeared": 24,
+   "gid": "6625252",
+   "d": "2026-09-12",
+   "appeared": 9,
    "zero_action": [
     "Allison Mimbs",
     "Cyniya Stewart",
+    "Kaylee Piepho",
+    "Eleanor Weeks",
+    "Kelsey Heffner",
     "Addy Scheitlin"
    ]
   },
@@ -9203,18 +9260,17 @@
    ]
   },
   "New Hampshire": {
-   "gid": "6626610",
-   "d": "2026-09-11",
-   "appeared": 24,
+   "gid": "6627222",
+   "d": "2026-09-12",
+   "appeared": 12,
    "zero_action": [
     "Evelyn Jurden",
-    "Reilly Garrity",
     "Katie Smith",
     "Ella Treasure",
+    "Miray Su keskin",
     "Lucy Chertock",
     "Cecilia Anderson",
-    "Vivien Affeldt",
-    "Katie Smith"
+    "Vivien Affeldt"
    ]
   },
   "New Haven": {
@@ -9436,18 +9492,10 @@
    ]
   },
   "Winthrop": {
-   "gid": "6637633",
-   "d": "2026-09-11",
-   "appeared": 18,
+   "gid": "6624771",
+   "d": "2026-09-12",
+   "appeared": 9,
    "zero_action": [
-    "Makenzie Malloy",
-    "Trabrece Marbley",
-    "Keara Bowen",
-    "Kimanni Rugley",
-    "Reese Kincaid",
-    "Cami Roberts",
-    "Morgan Heater",
-    "Maggie Czajka",
     "Makenzie Malloy",
     "Trabrece Marbley",
     "Keara Bowen",
@@ -10108,17 +10156,15 @@
    ]
   },
   "Saint Mary's (CA)": {
-   "gid": "6625251",
-   "d": "2026-09-11",
-   "appeared": 39,
+   "gid": "6625252",
+   "d": "2026-09-12",
+   "appeared": 10,
    "zero_action": [
+    "Sadie White",
     "Amanda Prior",
+    "Hadlee Gray",
     "Kiana Johnson",
-    "Lainey Day",
-    "Milani Billings",
-    "Tallulah Carney",
-    "Amanda Prior",
-    "Kiana Johnson",
+    "Caroline Formankova",
     "Lainey Day",
     "Milani Billings",
     "Tallulah Carney"
@@ -10172,12 +10218,22 @@
    ]
   },
   "Portland": {
-   "gid": "6624572",
-   "d": "2026-09-11",
-   "appeared": 20,
+   "gid": "6624573",
+   "d": "2026-09-12",
+   "appeared": 8,
    "zero_action": [
+    "Josephine Portela",
+    "Meki Maile",
+    "Sydney Cazimero",
+    "Lillian Lansing",
+    "Lila Krall",
+    "Ava Lilo",
+    "Alana Villela",
+    "Nevaeh Bray",
+    "Callie Pieper",
+    "Vanessa Haddock",
     "Amiyah Eason",
-    "Amiyah Eason"
+    "Sophia Schneck"
    ]
   },
   "Portland St.": {
@@ -10210,19 +10266,16 @@
    "zero_action": []
   },
   "Liberty": {
-   "gid": "6626420",
-   "d": "2026-09-11",
-   "appeared": 20,
+   "gid": "6625225",
+   "d": "2026-09-12",
+   "appeared": 10,
    "zero_action": [
     "Kayla O'brien",
     "Keira Rosenmarkle",
     "Jana Thymes",
     "Addison Hart",
     "Addie Fielder",
-    "Vb Trost",
-    "Kayla O'Brien",
-    "Addie Fielder",
-    "VB Trost"
+    "Vb Trost"
    ]
   },
   "Delaware": {
@@ -10242,12 +10295,13 @@
    ]
   },
   "Montana St.": {
-   "gid": "6627781",
-   "d": "2026-09-10",
-   "appeared": 18,
+   "gid": "6624573",
+   "d": "2026-09-12",
+   "appeared": 8,
    "zero_action": [
     "Keely Culler",
     "Lauren Schloe",
+    "Elli Esko",
     "Maggie Rhew",
     "Afton Thomsen",
     "Jolene Green ewen",
@@ -10664,17 +10718,14 @@
    "zero_action": []
   },
   "Yale": {
-   "gid": "6627221",
-   "d": "2026-09-10",
-   "appeared": 22,
+   "gid": "6627222",
+   "d": "2026-09-12",
+   "appeared": 11,
    "zero_action": [
     "Jaidynn Perkins-martin",
-    "Callie Funk",
+    "Isabel Patterson",
     "Bethanie Wu",
-    "Cara Lehmitz",
-    "Mila Mijailovic",
-    "Caroline Huseman",
-    "Jaidynn Perkins-Martin",
+    "Gaby Stasys",
     "Mila Mijailovic",
     "Caroline Huseman"
    ]

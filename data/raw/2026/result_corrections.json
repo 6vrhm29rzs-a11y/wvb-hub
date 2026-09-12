@@ -2825,6 +2825,260 @@
     }
    ],
    "note": "⚠ FOUND BY RECONCILING OUR RECORDS AGAINST EVOLLVE'S PUBLISHED BOARD, not by any internal check: the feed's final is internally COHERENT, so is_self_contradictory cannot see it and the lineup guard did not fire. Two teams' records disagreed with Evollve on the same match count but a different W-L split, which is the signature of an inverted winner rather than an inclusion difference; the schools then settled it. ⚠ COST: this match was reported in the 2026-09-11 Night Desk email as the night's third-biggest upset -- 'Weber St. #163 def Kansas St. #46, 117 places'. It did not happen. An inverted winner does not just misstate one row, it manufactures the loudest line in the report. ⚠ NO box_team_swap: not checked against the rosters here, and the result correction stands on the schools alone. ⚠ SEPARATE: the feed labels Weber St. home; both schools say NEUTRAL (Reno, NV, Nevada Tournament). That is a fixture-ledger matter, not a result one, and is not corrected here."
+  },
+  "6627266": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "San Diego St. (labelled home) won 3-1, set line 25-22, 25-22, 20-25, 26-24 attributed to San Diego St. -- the TRUE sequence with the TEAMS SWAPPED. Internally coherent, and wrong.",
+   "correct": {
+    "winner_team_id": "46659",
+    "away_sets": 3,
+    "home_sets": 1,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 25,
+      "home": 22
+     },
+     {
+      "period": 2,
+      "visit": 25,
+      "home": 22
+     },
+     {
+      "period": 3,
+      "visit": 20,
+      "home": 25
+     },
+     {
+      "period": 4,
+      "visit": 26,
+      "home": 24
+     }
+    ],
+    "linescores_replace": true
+   },
+   "established": "Cal Poly won 3-1. This was already an open CONFLICT -- Cal Poly's own schedule said 'Cal Poly W 3-1 vs San Diego State' on 2026-09-05, but goaztecs.com 404'd at review time so it stood on one source and counted NOWHERE, with a review_by of 2026-09-06 that had since expired. San Diego State's site now publishes it: 'Sep 4 1:00 PM PDT vs. (rv) Cal Poly L 1-3 (22-25, 22-25, 25-20, 24-26)'. Two independent official sources, so the conflict is upgraded to a correction and the match counts again. SDSU's published per-set line reproduces exactly when the feed's columns are swapped -- SDSU 22, 22, 25, 24 against Cal Poly 25, 25, 20, 26.",
+   "evidence": [
+    {
+     "url": "https://gopoly.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Cal Poly",
+     "retrieved": "2026-09-05T01:49:04Z",
+     "text": "published schedule row for 2026-09-04: 'Cal Poly W 3-1 vs San Diego State'",
+     "establishes": "Cal Poly won 3-1"
+    },
+    {
+     "url": "https://goaztecs.com/sports/womens-volleyball/schedule",
+     "kind": "school_schedule",
+     "school": "San Diego St.",
+     "retrieved": "2026-09-12T19:40:00Z",
+     "text": "'Sep 4 1:00 PM PDT vs. (rv) Cal Poly L 1-3 (22-25, 22-25, 25-20, 24-26)'",
+     "establishes": "San Diego St. lost 1-3, with the per-set line"
+    }
+   ],
+   "note": "⚠ THE SECOND SOURCE WAS SIMPLY LATE, AND NOTHING WENT BACK FOR IT. The review_by lapsed on 2026-09-06 and the match sat uncounted for six days while goaztecs.com had published it. Found only because Cal Poly's record disagreed with Evollve's board -- an expired review_by needs to resurface on its own, not wait for a cross-source reconciliation to trip over it. ⚠ NO box_team_swap: not checked against the rosters; the result correction stands on the two schools alone. ⚠ I first wrote winner_team_id 46143 from memory; Cal Poly is 46659. Read the id off the record, never recall it."
+  },
+  "6627095": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "the TRUE set sequence with the TEAMS SWAPPED -- internally coherent, and wrong",
+   "correct": {
+    "winner_team_id": "46729",
+    "away_sets": 2,
+    "home_sets": 3,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 18,
+      "home": 25
+     },
+     {
+      "period": 2,
+      "visit": 25,
+      "home": 20
+     },
+     {
+      "period": 3,
+      "visit": 24,
+      "home": 26
+     },
+     {
+      "period": 4,
+      "visit": 25,
+      "home": 17
+     },
+     {
+      "period": 5,
+      "visit": 4,
+      "home": 15
+     }
+    ],
+    "linescores_replace": true
+   },
+   "established": "Northern Ariz. won 3-2. BOTH schools publish it independently, and the feed's per-set VALUES reproduce exactly once its columns are swapped -- the team labels are inverted, not the scores.",
+   "evidence": [
+    {
+     "url": "https://nauathletics.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Northern Ariz.",
+     "retrieved": "2026-09-12T19:50:00Z",
+     "text": "'2026-09-04 | Bradley | W 3 2'",
+     "establishes": "Northern Ariz. won 3-2"
+    },
+    {
+     "url": "https://bradleybraves.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Bradley",
+     "retrieved": "2026-09-12T19:50:00Z",
+     "text": "'2026-09-04 | Northern Arizona University | L 2 3'",
+     "establishes": "Northern Ariz. won 3-2"
+    }
+   ],
+   "note": "⚠ THIS WAS ALREADY AN OPEN CONFLICT WHOSE review_by HAD LAPSED. It counted NOWHERE while both schools had published it. Found by sweeping every conflicts entry for an expired review date, which nothing does automatically -- see the backlog. ⚠ NO box_team_swap: the result correction stands on the two schools alone; the box was not checked against the rosters."
+  },
+  "6626506": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "the TRUE set sequence with the TEAMS SWAPPED -- internally coherent, and wrong",
+   "correct": {
+    "winner_team_id": "46482",
+    "away_sets": 3,
+    "home_sets": 2,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 22,
+      "home": 25
+     },
+     {
+      "period": 2,
+      "visit": 21,
+      "home": 25
+     },
+     {
+      "period": 3,
+      "visit": 25,
+      "home": 16
+     },
+     {
+      "period": 4,
+      "visit": 25,
+      "home": 13
+     },
+     {
+      "period": 5,
+      "visit": 15,
+      "home": 12
+     }
+    ],
+    "linescores_replace": true
+   },
+   "established": "Pacific won 3-2. BOTH schools publish it independently, and the feed's per-set VALUES reproduce exactly once its columns are swapped -- the team labels are inverted, not the scores.",
+   "evidence": [
+    {
+     "url": "https://suuthunderbirds.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Southern Utah",
+     "retrieved": "2026-09-12T19:50:00Z",
+     "text": "'2026-08-30 | University of the Pacific | L 2 3'",
+     "establishes": "Pacific won 3-2"
+    },
+    {
+     "url": "https://pacifictigers.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Pacific",
+     "retrieved": "2026-09-12T19:50:00Z",
+     "text": "'2026-08-30 | Southern Utah | W 3 2'",
+     "establishes": "Pacific won 3-2"
+    }
+   ],
+   "note": "⚠ THIS WAS ALREADY AN OPEN CONFLICT WHOSE review_by HAD LAPSED. It counted NOWHERE while both schools had published it. Found by sweeping every conflicts entry for an expired review date, which nothing does automatically -- see the backlog. ⚠ NO box_team_swap: the result correction stands on the two schools alone; the box was not checked against the rosters."
+  },
+  "6628624": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "the TRUE set sequence with the TEAMS SWAPPED -- internally coherent, and wrong",
+   "correct": {
+    "winner_team_id": "46502",
+    "away_sets": 3,
+    "home_sets": 1,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 25,
+      "home": 18
+     },
+     {
+      "period": 2,
+      "visit": 24,
+      "home": 26
+     },
+     {
+      "period": 3,
+      "visit": 25,
+      "home": 16
+     },
+     {
+      "period": 4,
+      "visit": 25,
+      "home": 22
+     }
+    ],
+    "linescores_replace": true
+   },
+   "established": "Stetson won 3-1. BOTH schools publish it independently, and the feed's per-set VALUES reproduce exactly once its columns are swapped -- the team labels are inverted, not the scores.",
+   "evidence": [
+    {
+     "url": "https://merrimackathletics.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Merrimack",
+     "retrieved": "2026-09-12T19:50:00Z",
+     "text": "'2026-08-29 | Stetson University | L 1 3'",
+     "establishes": "Stetson won 3-1"
+    },
+    {
+     "url": "https://gohatters.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Stetson",
+     "retrieved": "2026-09-12T19:50:00Z",
+     "text": "'2026-08-29 | Merrimack | W 3 1'",
+     "establishes": "Stetson won 3-1"
+    }
+   ],
+   "note": "⚠ THIS WAS ALREADY AN OPEN CONFLICT WHOSE review_by HAD LAPSED. It counted NOWHERE while both schools had published it. Found by sweeping every conflicts entry for an expired review date, which nothing does automatically -- see the backlog. ⚠ NO box_team_swap: the result correction stands on the two schools alone; the box was not checked against the rosters."
+  },
+  "6626268": {
+   "field": "result",
+   "corr_kind": "incomplete",
+   "feed_said": "0-0 with no winner flag on either side and a single partial linescore (7-10) -- the feed asserts no result at all",
+   "correct": {
+    "winner_team_id": "45855",
+    "away_sets": 3,
+    "home_sets": 1,
+    "linescores": [],
+    "linescores_replace": true
+   },
+   "established": "Providence won 3-1. Both schools publish it: Bryant records 'Providence College L 1 3' and Providence 'Bryant University W 3 1'. ⚠ THE PER-SET LINE IS WITHHELD DELIBERATELY -- the feed only ever served a 7-10 fragment of set one, neither school publishes a set line, and no source we hold knows the rest. The result is established; the tape is not.",
+   "evidence": [
+    {
+     "url": "https://bryantbulldogs.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Bryant",
+     "retrieved": "2026-09-12T19:50:00Z",
+     "text": "'2026-09-05 | Providence College | L 1 3'",
+     "establishes": "Bryant lost 1-3"
+    },
+    {
+     "url": "https://friars.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Providence",
+     "retrieved": "2026-09-12T19:50:00Z",
+     "text": "'2026-09-05 | Bryant University | W 3 1'",
+     "establishes": "Providence won 3-1"
+    }
+   ],
+   "note": "⚠ A FROZEN PARTIAL, NOT AN INVERSION: the feed stopped updating mid-first-set and never recorded an outcome. Its review_by lapsed 2026-09-08 and it counted nowhere for four days."
   }
  }
 }

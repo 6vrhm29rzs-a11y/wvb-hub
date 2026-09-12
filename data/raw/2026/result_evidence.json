@@ -547,8 +547,10 @@
      "result": "Little Rock won 3-0. The feed says Northwestern St. won 3-0; the feed's line tape (25-8, 25-18, 15-10) is not three completed sets, so it corroborates nothing."
     },
     "status": "conflicts",
-    "review_by": "2026-09-08",
-    "note": "ONE official source against the feed's counted winner. Northwestern St.'s schedule export had not posted the result (checked 2026-09-05T23:16:41Z). Recheck NSU for the second source."
+    "review_by": "2026-09-19",
+    "note": "ONE official source against the feed's counted winner. Northwestern St.'s schedule export had not posted the result (checked 2026-09-05T23:16:41Z). Recheck NSU for the second source.",
+    "rechecked": "2026-09-12",
+    "recheck_note": "Rechecked 2026-09-12. Northwestern St. publishes '2026-09-05 | Little Rock | L 0 3', so Little Rock won 3-0 -- but Little Rock's own site still does not parse, so this remains ONE attributable source and stays a conflict, counting nowhere. The one-source rule is not waived because the second site is inconvenient."
    }
   ],
   "6640584": [
@@ -565,8 +567,10 @@
      "result": "Nicholls won 3-0. The feed says Wiley (non-D-I) won 3-0; its tape holds a single frozen partial (13-4), corroborating nothing."
     },
     "status": "conflicts",
-    "review_by": "2026-09-08",
-    "note": "ONE official source against the feed. Wiley is non-D-I with no athletics site on file, so a second school source may never exist; the feed's own later revisions or a Nicholls box score are the plausible second sources. Non-D-I result -- excluded from D-I tallies either way, but displayed."
+    "review_by": "2026-09-26",
+    "note": "ONE official source against the feed. Wiley is non-D-I with no athletics site on file, so a second school source may never exist; the feed's own later revisions or a Nicholls box score are the plausible second sources. Non-D-I result -- excluded from D-I tallies either way, but displayed.",
+    "rechecked": "2026-09-12",
+    "recheck_note": "Rechecked 2026-09-12. Nicholls publishes '2026-09-05 | Wiley | W 3 0', contradicting the feed's Wiley 3-0. ⚠ A SECOND SOURCE MAY NEVER COME: Wiley is not a Division-I programme and is not in athletics_sites, so there is no second school to consult. Left as a one-source conflict rather than corrected, and flagged in the backlog as a case the two-source rule cannot resolve by waiting."
    }
   ],
   "6627437": [
@@ -582,9 +586,11 @@
     "value": {
      "result": "Siena won 3-1 per Morehead St.'s site -- while Siena's OWN site says 'Siena L 1-3 vs Morehead State'. The two schools contradict EACH OTHER; the feed sides with Siena's version (Morehead won 3-1)."
     },
-    "status": "conflicts",
+    "status": "resolved_confirmed",
     "review_by": "2026-09-08",
-    "note": "SCHOOL-vs-SCHOOL conflict: the sources disagree with each other, so neither corroborates a correction and the feed's version keeps exactly one school behind it. Held for review until one school revises. Do NOT correct on the current evidence."
+    "note": "SCHOOL-vs-SCHOOL conflict: the sources disagree with each other, so neither corroborates a correction and the feed's version keeps exactly one school behind it. Held for review until one school revises. Do NOT correct on the current evidence.",
+    "rechecked": "2026-09-12",
+    "recheck_note": "Rechecked 2026-09-12 and the conflict does NOT survive: Siena publishes '2026-09-05 | Morehead State | L 1 3' and Morehead St. '2026-09-05 | Siena | W 3 1' -- both agree with the feed's own Morehead St. 3-1. Closed as CONFIRMED, not corrected: nothing is overridden, the feed was right, and the match counts again. Status moved off 'conflicts' so review_gids no longer withholds it."
    }
   ],
   "6627992": [

@@ -26,13 +26,33 @@ all go one way:
 - **Mississippi Val.** (ours 1-5, theirs 0-6) — EVOLLVE IS WRONG;
   mvsusports.com carries the Wiley win we count.
 
-**Still open: the 106 with a different match count.** 80 of them are ours
+**106 with a different match count — PARTLY WORKED.** Six of them turned out
+to be results sitting in an expired conflict or an inverted feed record, all
+now corrected (see below). Sampling six teams against their own schedules
+found the rest split three ways: some are our diff's name-matching failing
+("Binghamton University" vs "Binghamton"), some are genuine feed gaps (App
+State–UNCG on 09-05 is in no scoreboard file we hold), and some are Evollve
+counting something we do not. **Still open:** 80 of them are ours
 minus theirs = −1 (they hold one more match than we do), 16 are +1. This is
 an INCLUSION question, not a winner question, and it is the remaining lead.
 The BYU case is the type specimen: they carry a seventh match we have never
 seen in any state. Next step is to take a handful of the −1 teams and diff
 our match list against the school's own published schedule, which is what
 settled every case above.
+
+### Two conflicts the two-source rule cannot settle by waiting (2026-09-12)
+Both stay uncounted, both now carry a recorded recheck:
+- **6628157 Little Rock – Northwestern St.** Northwestern St. publishes
+  "Little Rock L 0 3", so Little Rock won 3-0 — but Little Rock's own site
+  still does not parse, so it is one attributable source. The rule is not
+  waived because a site is awkward; the fix is a working parser for that host.
+- **6640584 Nicholls – Wiley.** Nicholls publishes "Wiley W 3 0" against the
+  feed's Wiley 3-0. ⚠ **A second source may never exist**: Wiley is not a
+  Division-I programme and has no entry in athletics_sites. This is the case
+  the two-source rule cannot resolve by waiting, and it needs a decision —
+  either a stated exception for a non-D-I opponent (where the D-I school's
+  own record is the only record anyone keeps), or it stays uncounted forever.
+  **Cody's call.**
 
 ### Twelve teams both external boards disagree with us about (2026-09-12)
 Three-way rank comparison, all current through 2026-09-11 (346 teams on all
