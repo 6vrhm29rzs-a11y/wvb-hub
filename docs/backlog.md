@@ -24,6 +24,25 @@ rather than inclusion differences (Norfolk St. is one win / one loss apart
 from us on the same number of matches). **Next: a systematic per-match diff
 against their board, not team-by-team.** That is the error-finding pass.
 
+### Twelve teams both external boards disagree with us about (2026-09-12)
+Three-way rank comparison, all current through 2026-09-11 (346 teams on all
+three boards). Agreement, as median rank gap:
+  POWER vs Evollve 10 · POWER vs Massey 16 · **Massey vs Evollve 14**
+The two external boards disagree with each other MORE than we disagree with
+Evollve, so POWER is not the odd one out. But twelve teams are placed 40+
+places apart by BOTH of them in the SAME direction, which is the shape a real
+defect makes:
+  we rate HIGHER: Miami (OH) 100 (M179/E142) · Fairfield 106 (178/161) ·
+    Duquesne 115 (186/170) · N.C. A&T 148 (209/202) · UMBC 113 (173/166) ·
+    FIU 127 (183/173) · Col. of Charleston 94 (142/140) ·
+    Kennesaw St. 120 (160/162)
+  we rate LOWER: New Mexico 219 (155/163) · Wright St. 140 (88/93) ·
+    UC San Diego 210 (165/159) · Wake Forest 170 (130/117)
+Both of theirs are point-level efficiency ratings and POWER is margin-based
+with an RPI component, so some of this is method rather than error. **Worth
+checking whether these twelve share anything — schedule shape, a common
+opponent, a bad result — before concluding either way.**
+
 ### Norfolk St. – Elizabeth City St. (gid 6639821): counted, contested
 The only gid all season whose feed state went **F → D**. Left counted, on the
 strength of Norfolk St.'s own schedule showing `W 3-0` with no exhibition
