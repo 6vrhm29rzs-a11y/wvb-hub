@@ -65,24 +65,28 @@ Both stay uncounted, both now carry a recorded recheck:
   own record is the only record anyone keeps), or it stays uncounted forever.
   **Cody's call.**
 
-### Twelve teams both external boards disagree with us about (2026-09-12)
-Three-way rank comparison, all current through 2026-09-11 (346 teams on all
-three boards). Agreement, as median rank gap:
-  POWER vs Evollve 10 · POWER vs Massey 16 · **Massey vs Evollve 14**
-The two external boards disagree with each other MORE than we disagree with
-Evollve, so POWER is not the odd one out. But twelve teams are placed 40+
-places apart by BOTH of them in the SAME direction, which is the shape a real
-defect makes:
-  we rate HIGHER: Miami (OH) 100 (M179/E142) · Fairfield 106 (178/161) ·
-    Duquesne 115 (186/170) · N.C. A&T 148 (209/202) · UMBC 113 (173/166) ·
-    FIU 127 (183/173) · Col. of Charleston 94 (142/140) ·
-    Kennesaw St. 120 (160/162)
-  we rate LOWER: New Mexico 219 (155/163) · Wright St. 140 (88/93) ·
-    UC San Diego 210 (165/159) · Wake Forest 170 (130/117)
-Both of theirs are point-level efficiency ratings and POWER is margin-based
-with an RPI component, so some of this is method rather than error. **Worth
-checking whether these twelve share anything — schedule shape, a common
-opponent, a bad result — before concluding either way.**
+### Twelve teams both external boards disagree with us about — WORKED (2026-09-12)
+**Not a data defect.** Ran the date-level differ over all thirteen (the list
+moved slightly after the day's corrections): **eleven of twelve agree with
+their own school on every date.** The two exceptions are August 12/15/21/22 —
+preseason exhibition dates the schools list and we correctly exclude. No
+missing matches, no phantom ones, no wrong records.
+
+So the disagreement is METHOD: our board is on the blend, which at a median
+of 7 matches is still roughly two-thirds preseason projection, while Massey
+and Evollve are entirely this-season. Measured: corr(our gap vs the external
+consensus, the PRESEASON gap vs that consensus) = **0.598**. But it is not
+simply the projection dragging us — of the 33 teams differing by 40+, **17
+are closer to the externals than the preseason was**, so the season component
+is already pulling us toward them.
+
+**Whose ordering is better is now measured, not argued.**
+`scripts/board_bakeoff.py` scores all three on finals that landed AFTER every
+board's stated data horizon, and appends so the sample grows. First run, 55
+held-out matches: POWER 76.4%, Evollve 70.9%, Massey 61.8%; paired, POWER
+beat Massey 9-1 (p=0.021) and Evollve 6-3 (p=0.51, i.e. nothing).
+⚠ **One day is not evidence** and the script says so. Run it daily; revisit
+when n is in the hundreds.
 
 ### Norfolk St. – Elizabeth City St. (gid 6639821): counted, contested
 The only gid all season whose feed state went **F → D**. Left counted, on the
