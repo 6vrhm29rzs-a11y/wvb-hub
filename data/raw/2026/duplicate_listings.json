@@ -216,6 +216,105 @@
      "establishes": "one meeting, 2026-09-04"
     }
    ]
+  },
+  "6640631": {
+   "canonical_gid": "6626436",
+   "teams": [
+    "South Dakota St.",
+    "Western Ill."
+   ],
+   "date": "2026-09-04",
+   "established": "one meeting only, 2026-09-04, South Dakota St. 3-0",
+   "quality_asymmetry": "6640631 carries a 1:00 AM ET placeholder start; 6626436 carries the 1:30 PM start",
+   "evidence": [
+    {
+     "url": "https://gojacks.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "South Dakota St.",
+     "retrieved": "2026-09-12T21:10:00Z",
+     "text": "'2026-09-04 | Western Illinois | W 3 0' -- the ONLY Western Illinois row that date",
+     "establishes": "exactly one South Dakota St.-Western Ill. meeting in the window"
+    },
+    {
+     "url": "https://goleathernecks.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Western Ill.",
+     "retrieved": "2026-09-12T21:10:00Z",
+     "text": "'2026-09-04 | South Dakota State | L 0 3' -- the ONLY South Dakota State row that date",
+     "establishes": "exactly one South Dakota St.-Western Ill. meeting in the window"
+    }
+   ],
+   "note": "⚠ FOUND BY THE PER-DATE SCHOOL RECONCILIATION, not by the duplicate detector -- the schools list one meeting and our log held two FINALS, both classed ok, so the match was counted TWICE for both teams."
+  },
+  "6640627": {
+   "canonical_gid": "6627646",
+   "teams": [
+    "Indiana St.",
+    "Northwestern St."
+   ],
+   "date": "2026-09-04",
+   "established": "one meeting only, 2026-09-04, Indiana St. 3-2",
+   "quality_asymmetry": "6640627 carries a midnight ET placeholder start; 6627646 carries the 11:00 AM start",
+   "evidence": [
+    {
+     "url": "https://gosycamores.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Indiana St.",
+     "retrieved": "2026-09-12T21:10:00Z",
+     "text": "'2026-09-04 | Northwestern State | W 3 2' -- the ONLY Northwestern State row that date",
+     "establishes": "exactly one Indiana St.-Northwestern St. meeting in the window"
+    },
+    {
+     "url": "https://nsudemons.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Northwestern St.",
+     "retrieved": "2026-09-12T21:10:00Z",
+     "text": "'2026-09-04 | Indiana State | L 2 3' -- the ONLY Indiana State row that date",
+     "establishes": "exactly one Indiana St.-Northwestern St. meeting in the window"
+    }
+   ],
+   "note": "⚠ FOUND BY THE PER-DATE SCHOOL RECONCILIATION, not by the duplicate detector -- the schools list one meeting and our log held two FINALS, both classed ok, so the match was counted TWICE for both teams."
+  },
+  "6640683": {
+   "canonical_gid": "6637099",
+   "teams": [
+    "Lafayette",
+    "FDU"
+   ],
+   "date": "2026-09-05",
+   "established": "one meeting only, 2026-09-05, Lafayette 3-0",
+   "quality_asymmetry": "6640683 carries a midnight ET placeholder start, NO box score and no result at all; 6637099 carries the 11:00 AM start, the held box and the 3-0 line",
+   "evidence": [
+    {
+     "url": "https://goleopards.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "Lafayette",
+     "retrieved": "2026-09-12T21:10:00Z",
+     "text": "'2026-09-05 | FDU | W 3 0' -- the ONLY FDU row that date",
+     "establishes": "exactly one Lafayette-FDU meeting in the window"
+    },
+    {
+     "url": "https://fduknights.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_site",
+     "school": "FDU",
+     "retrieved": "2026-09-12T21:10:00Z",
+     "text": "'2026-09-05 | Lafayette | L 0 3' -- the ONLY Lafayette row that date",
+     "establishes": "exactly one Lafayette-FDU meeting in the window"
+    }
+   ],
+   "note": "⚠ FOUND BY THE PER-DATE SCHOOL RECONCILIATION, not by the duplicate detector -- the schools list one meeting and our log held two FINALS, both classed ok, so the match was counted TWICE for both teams. ⚠⚠ AND I MADE IT WORSE BEFORE I FOUND IT. Earlier on 2026-09-12 I 'corrected' 6640683 -- a final the feed served with no result -- to Lafayette 3-0 on both schools' evidence. The evidence was right and the gid was wrong: the canonical record 6637099 already carried that result, so the correction turned a harmless empty record into a SECOND counted copy of the same match. The correction is withdrawn and the gid is ledgered as the duplicate it always was. The lesson is specific: before correcting an empty final, check whether the match is already counted under another gid -- an empty record and a duplicate listing look identical until you look for the twin."
+  }
+ },
+ "_unledgered": {
+  "6640635": {
+   "teams": [
+    "Little Rock",
+    "Indiana St."
+   ],
+   "date": "2026-09-04",
+   "looks_like": "a duplicate listing of 6627647 (Little Rock 3-2 Indiana St.)",
+   "why_not_ledgered": "only ONE school could be cited -- Indiana St. publishes '2026-09-04 | Little Rock | L 3 2' as its only Little Rock row -- because littlerocktrojans.com does not parse. The ledger requires both schools. It is moot today: 6640635 is an EMPTY final and counts nowhere on that basis. Ledger it properly if Little Rock's site ever becomes readable.",
+   "noticed": "2026-09-12"
   }
  }
 }

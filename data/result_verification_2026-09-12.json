@@ -1,11 +1,11 @@
 {
  "date": "2026-09-12",
- "generated_utc": "2026-09-12T20:36:19Z",
+ "generated_utc": "2026-09-12T21:03:33Z",
  "counts": {
-  "CORROBORATED_ONE": 45,
-  "VERIFIED_BOTH": 21,
+  "CORROBORATED_ONE": 46,
+  "VERIFIED_BOTH": 25,
   "CONTRADICTED_BOTH": 2,
-  "UNVERIFIED": 4,
+  "UNVERIFIED": 7,
   "CONTRADICTED_ONE": 1
  },
  "matches": [
@@ -1692,20 +1692,14 @@
    "gid": "6627999",
    "date": "2026-09-12",
    "canonical": "Navy def. UMES 3-1",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Navy": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://navysports.com/services/schedule_txt.ashx?schedule=2027",
-     "row": [
-      "Sep 12 (Sat)",
-      "2:00 p.m.",
-      "Neutral",
-      "UMES",
-      "Norfolk, Va.",
-      "",
-      ""
-     ]
+     "assertion": "Navy W 3-1 vs UMES",
+     "opponent_source": "UMES",
+     "site_says": "Neutral"
     },
     "UMES": {
      "state": "NOT_POSTED",
@@ -1808,6 +1802,213 @@
      "opponent_source": "#20 Baylor",
      "site_says": "Neutral",
      "surface": "modern_card"
+    }
+   }
+  },
+  {
+   "gid": "6626263",
+   "date": "2026-09-12",
+   "canonical": "SMU def. Kentucky 3-1",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "SMU": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://smumustangs.com/sports/womens-volleyball/schedule/text",
+     "assertion": "SMU W 3-1 vs Kentucky",
+     "opponent_source": "Kentucky",
+     "site_says": "Neutral"
+    },
+    "Kentucky": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://ukathletics.com/sports/wvball/schedule/",
+     "assertion": "Kentucky L 1-3 vs SMU",
+     "opponent_source": "SMU",
+     "site_says": null,
+     "surface": "modern_card"
+    }
+   }
+  },
+  {
+   "gid": "6627495",
+   "date": "2026-09-12",
+   "canonical": "Idaho def. California Baptist 3-2",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Idaho": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://govandals.com/services/schedule_txt.ashx?schedule=2489",
+     "rows_on_date": [
+      "Cal Baptist"
+     ]
+    },
+    "California Baptist": {
+     "state": "NOT_POSTED",
+     "url": "https://cbulancers.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 12 (Sat)",
+      "11:00 AM",
+      "Home",
+      "University of Idaho",
+      "Riverside, Calif. (Van Dyne Gym)",
+      "The Joust",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6638117",
+   "date": "2026-09-12",
+   "canonical": "North Florida def. App State 3-2",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "North Florida": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://unfospreys.com/sports/womens-volleyball/schedule/text",
+     "rows_on_date": [
+      "Appalachian State"
+     ]
+    },
+    "App State": {
+     "state": "NOT_POSTED",
+     "url": "https://appstatesports.com/services/schedule_txt.ashx?schedule=429",
+     "row": [
+      "Sep 12 (Sat)",
+      "2:00 PM",
+      "Home",
+      "North Florida",
+      "Boone, N.C. (Holmes Convocation Center)",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6624942",
+   "date": "2026-09-12",
+   "canonical": "Oakland def. Eastern Mich. 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Oakland": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://goldengrizzlies.com/services/schedule_txt.ashx?schedule=1366",
+     "assertion": "Oakland W 3-0 vs Eastern Michigan",
+     "opponent_source": "Eastern Michigan",
+     "site_says": "Home"
+    },
+    "Eastern Mich.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://emueagles.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Eastern Mich. L 0-3 vs Oakland",
+     "opponent_source": "Oakland",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6627819",
+   "date": "2026-09-12",
+   "canonical": "Stony Brook def. Delaware 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Stony Brook": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://stonybrookathletics.com/services/schedule_txt.ashx?schedule=486",
+     "assertion": "Stony Brook W 3-0 vs Delaware",
+     "opponent_source": "Delaware",
+     "site_says": "Neutral"
+    },
+    "Delaware": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://bluehens.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Delaware L 0-3 vs Stony Brook",
+     "opponent_source": "Stony Brook",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6627579",
+   "date": "2026-09-12",
+   "canonical": "Omaha def. Grand Canyon 3-2",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Omaha": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://omavs.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Omaha W 3-2 vs Grand Canyon",
+     "opponent_source": "Grand Canyon",
+     "site_says": "Neutral"
+    },
+    "Grand Canyon": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gculopes.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Grand Canyon L 2-3 vs Omaha",
+     "opponent_source": "Omaha",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6625205",
+   "date": "2026-09-12",
+   "canonical": "Tennessee def. Coastal Carolina 3-0",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Tennessee": {
+     "state": "NOT_POSTED",
+     "url": "https://utsports.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 12 (Sat)",
+      "3 p.m. ET",
+      "Home",
+      "Coastal Carolina",
+      "Knoxville, Tenn. (Food City Center)",
+      "",
+      "-"
+     ]
+    },
+    "Coastal Carolina": {
+     "state": "NOT_POSTED",
+     "url": "https://goccusports.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 12 (Sat)",
+      "3:00 p.m.",
+      "Away",
+      "Tennessee",
+      "Knoxville, TN",
+      "",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6639308",
+   "date": "2026-09-12",
+   "canonical": "Alabama St. def. Nicholls 3-1",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Alabama St.": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://bamastatesports.com/services/schedule_txt.ashx?schedule=434",
+     "rows_on_date": [
+      "Nicholls State"
+     ]
+    },
+    "Nicholls": {
+     "state": "NOT_POSTED",
+     "url": "https://geauxcolonels.com/services/schedule_txt.ashx?schedule=458",
+     "row": [
+      "Sep 12 (Sat)",
+      "2:00 p.m.",
+      "Away",
+      "Alabama State",
+      "Montgomery, Ala. (Dunn-Oliver Acadome)",
+      "",
+      ""
+     ]
     }
    }
   }

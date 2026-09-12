@@ -26,8 +26,8 @@ all go one way:
 - **Mississippi Val.** (ours 1-5, theirs 0-6) — EVOLLVE IS WRONG;
   mvsusports.com carries the Wiley win we count.
 
-**106 with a different match count — WORKED DOWN TO 92.** Agreement with
-Evollve now reads **256 exact · 0 winner mismatches · 92 count mismatches**
+**106 with a different match count — WORKED DOWN TO 87.** Agreement with
+Evollve now reads **261 exact · 0 winner mismatches · 87 count mismatches**
 (from 238 · 4 · 106 this morning). 13 matches were restored by going to the
 schools for finals the feed had served with no usable result; 6 more by
 resolving lapsed conflicts. What remains is below.
@@ -50,6 +50,28 @@ The BYU case is the type specimen: they carry a seventh match we have never
 seen in any state. Next step is to take a handful of the −1 teams and diff
 our match list against the school's own published schedule, which is what
 settled every case above.
+
+### The reconciliation is a permanent script now (2026-09-12)
+`scripts/school_reconcile.py` diffs our counted matches against every school's
+own schedule BY DATE. Full run through 09-11: **265 of 351 teams agree on
+every date**, 48 differ, 38 sites unreadable.
+
+Of the 48, most are **August exhibition dates** the schools list and we
+correctly exclude (8/12–8/23), plus two non-D-I schools in the site list
+(Fla. Southern, Southwest Minn. St.) whose schedules we never crawl.
+
+**The real yield was three DOUBLE-COUNTED matches** — two feed records for
+one meeting, both classed ok:
+  South Dakota St.–Western Ill. · Indiana St.–Northwestern St. · Lafayette–FDU
+All three now ledgered as duplicate listings, each on both schools' evidence.
+⚠ The duplicate detector never flagged them; the per-date school
+reconciliation did.
+
+**38 unreadable school sites is the next lever.** Every one is a team whose
+results can never be second-sourced, which is why Little Rock and Wiley sit
+uncounted. Auburn, BYU, Kentucky, Kansas St., Arizona St., Clemson, LSU and
+Cincinnati are among them — these are not obscure programmes, and a parser
+that handles their templates would unblock verification across the board.
 
 ### Two conflicts the two-source rule cannot settle by waiting (2026-09-12)
 Both stay uncounted, both now carry a recorded recheck:

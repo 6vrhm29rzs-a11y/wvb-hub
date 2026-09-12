@@ -2,17 +2,17 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "corpus_fingerprint": "bb60718e724d77a9",
-  "generated_at_utc": "2026-09-12T20:37:32Z",
+  "corpus_fingerprint": "bca1601e96c6ffa0",
+  "generated_at_utc": "2026-09-12T21:04:44Z",
   "counts": {
-   "finals": 1356,
-   "official_only": 35,
-   "reconciled": 1251,
+   "finals": 1364,
+   "official_only": 37,
+   "reconciled": 1258,
    "confirmed": 0,
    "disputed": 2,
-   "pending_second": 1354,
-   "corrected": 68,
-   "duplicate_listings": 8,
+   "pending_second": 1362,
+   "corrected": 67,
+   "duplicate_listings": 11,
    "duplicate_candidates_pending": 0
   }
  },
@@ -21296,10 +21296,23 @@
    "corr_kind": null,
    "corr_feed_said": null,
    "corr_evidence": [],
-   "duplicate_of": null,
-   "dup_reason": null,
-   "dup_asym": null,
-   "dup_evidence": [],
+   "duplicate_of": "6627646",
+   "dup_reason": "one meeting only, 2026-09-04, Indiana St. 3-2",
+   "dup_asym": "6640627 carries a midnight ET placeholder start; 6627646 carries the 11:00 AM start",
+   "dup_evidence": [
+    {
+     "school": "Indiana St.",
+     "url": "https://gosycamores.com/sports/womens-volleyball/schedule/text",
+     "text": "'2026-09-04 | Northwestern State | W 3 2' -- the ONLY Northwestern State row that date",
+     "retrieved": "2026-09-12"
+    },
+    {
+     "school": "Northwestern St.",
+     "url": "https://nsudemons.com/sports/womens-volleyball/schedule/text",
+     "text": "'2026-09-04 | Indiana State | L 2 3' -- the ONLY Indiana State row that date",
+     "retrieved": "2026-09-12"
+    }
+   ],
    "gid": "6640627",
    "a": "Northwestern St.",
    "h": "Indiana St.",
@@ -21482,10 +21495,23 @@
    "corr_kind": null,
    "corr_feed_said": null,
    "corr_evidence": [],
-   "duplicate_of": null,
-   "dup_reason": null,
-   "dup_asym": null,
-   "dup_evidence": [],
+   "duplicate_of": "6626436",
+   "dup_reason": "one meeting only, 2026-09-04, South Dakota St. 3-0",
+   "dup_asym": "6640631 carries a 1:00 AM ET placeholder start; 6626436 carries the 1:30 PM start",
+   "dup_evidence": [
+    {
+     "school": "South Dakota St.",
+     "url": "https://gojacks.com/sports/womens-volleyball/schedule/text",
+     "text": "'2026-09-04 | Western Illinois | W 3 0' -- the ONLY Western Illinois row that date",
+     "retrieved": "2026-09-12"
+    },
+    {
+     "school": "Western Ill.",
+     "url": "https://goleathernecks.com/sports/womens-volleyball/schedule/text",
+     "text": "'2026-09-04 | South Dakota State | L 0 3' -- the ONLY South Dakota State row that date",
+     "retrieved": "2026-09-12"
+    }
+   ],
    "gid": "6640631",
    "a": "Western Ill.",
    "h": "South Dakota St.",
@@ -33282,41 +33308,37 @@
    "sources": []
   },
   {
-   "result_corrected": true,
-   "corr_reason": "Lafayette won 3-0. Both schools publish it independently. \u26a0 THE TAPE IS WITHHELD because none exists: the feed served this final with sets_won null on both sides and ZERO linescores -- it asserted no result at all. Neither school publishes a set line. The result is established; the per-set score is genuinely unknown.",
-   "corr_kind": "incomplete",
-   "corr_feed_said": "a FINAL with sets_won null on both sides and no linescores",
-   "corr_evidence": [
-    {
-     "school": "FDU",
-     "url": "https://fduknights.com/sports/womens-volleyball/schedule/text",
-     "text": "'2026-09-05 | Lafayette | L 0 3'",
-     "status": null,
-     "note": null,
-     "retrieved": "2026-09-12"
-    },
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": "6637099",
+   "dup_reason": "one meeting only, 2026-09-05, Lafayette 3-0",
+   "dup_asym": "6640683 carries a midnight ET placeholder start, NO box score and no result at all; 6637099 carries the 11:00 AM start, the held box and the 3-0 line",
+   "dup_evidence": [
     {
      "school": "Lafayette",
      "url": "https://goleopards.com/sports/womens-volleyball/schedule/text",
-     "text": "'2026-09-05 | FDU | W 3 0'",
-     "status": null,
-     "note": null,
+     "text": "'2026-09-05 | FDU | W 3 0' -- the ONLY FDU row that date",
+     "retrieved": "2026-09-12"
+    },
+    {
+     "school": "FDU",
+     "url": "https://fduknights.com/sports/womens-volleyball/schedule/text",
+     "text": "'2026-09-05 | Lafayette | L 0 3' -- the ONLY Lafayette row that date",
      "retrieved": "2026-09-12"
     }
    ],
-   "duplicate_of": null,
-   "dup_reason": null,
-   "dup_asym": null,
-   "dup_evidence": [],
    "gid": "6640683",
    "a": "Lafayette",
    "h": "FDU",
    "exh": false,
    "d": "2026-09-04",
-   "overall": "corrected",
+   "overall": "official",
    "states": {
-    "result": "corrected",
-    "sets": "corrected",
+    "result": "official",
+    "sets": "official",
     "box": "official",
     "venue": "unavailable"
    },
@@ -66192,7 +66214,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Hawaii": {
       "state": "EVENT_NOT_FOUND",
@@ -66210,7 +66232,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://ucasports.com/services/schedule_txt.ashx?schedule=1309",
@@ -66221,7 +66243,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -66249,7 +66271,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Duquesne": {
       "state": "AGREE_COMPLETE",
@@ -66267,7 +66289,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://goduquesne.com/services/schedule_txt.ashx?schedule=2679",
@@ -66278,7 +66300,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -66306,7 +66328,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Bowling Green": {
       "state": "AGREE_COMPLETE",
@@ -66332,7 +66354,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://bgsufalcons.com/sports/womens-volleyball/schedule/text",
@@ -66343,7 +66365,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -66371,7 +66393,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Gardner-Webb": {
       "state": "NOT_POSTED",
@@ -66397,7 +66419,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://mercerbears.com/sports/womens-volleyball/schedule/text",
@@ -66408,7 +66430,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -66436,7 +66458,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Cornell": {
       "state": "AGREE_COMPLETE",
@@ -66456,7 +66478,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://cornellbigred.com/services/schedule_txt.ashx?schedule=12300",
@@ -66467,7 +66489,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     },
     {
      "url": "https://owlsports.com/sports/womens-volleyball/schedule/text",
@@ -66478,7 +66500,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -66506,7 +66528,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Marist": {
       "state": "AGREE_COMPLETE",
@@ -66532,7 +66554,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://goredfoxes.com/services/schedule_txt.ashx?schedule=656",
@@ -66543,7 +66565,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -66571,7 +66593,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Central Conn. St.": {
       "state": "SITE_HTTP_MISS",
@@ -66589,7 +66611,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://njithighlanders.com/services/schedule_txt.ashx?schedule=467",
@@ -66600,7 +66622,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -66628,7 +66650,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Florida A&M": {
       "state": "AGREE_COMPLETE",
@@ -66654,7 +66676,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://famuathletics.com/services/schedule_txt.ashx?schedule=214",
@@ -66665,7 +66687,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -66693,7 +66715,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "UAB": {
       "state": "AGREE_COMPLETE",
@@ -66713,7 +66735,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://gogriz.com/sports/womens-volleyball/schedule/text",
@@ -66724,7 +66746,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     },
     {
      "url": "https://uabsports.com/sports/womens-volleyball/schedule/text",
@@ -66735,7 +66757,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -66763,7 +66785,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Campbell": {
       "state": "NOT_POSTED",
@@ -66789,7 +66811,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://gohatters.com/services/schedule_txt.ashx?schedule=555",
@@ -66800,7 +66822,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -66828,7 +66850,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "UNC Asheville": {
       "state": "AGREE_COMPLETE",
@@ -66854,7 +66876,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://uncabulldogs.com/sports/womens-volleyball/schedule/text",
@@ -66865,7 +66887,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -66893,7 +66915,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Denver": {
       "state": "AGREE_COMPLETE",
@@ -66913,7 +66935,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://denverpioneers.com/sports/womens-volleyball/schedule/text",
@@ -66924,7 +66946,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     },
     {
      "url": "https://gobearkats.com/sports/womens-volleyball/schedule/text",
@@ -66935,7 +66957,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -66963,7 +66985,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "The Citadel": {
       "state": "NOT_POSTED",
@@ -66989,7 +67011,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://fullertontitans.com/services/schedule_txt.ashx?schedule=265",
@@ -67000,7 +67022,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -67053,7 +67075,7 @@
    },
    "verify": {
     "v": "CONTRADICTED_BOTH",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Manhattan": {
       "state": "CONTRADICTS",
@@ -67073,7 +67095,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://goholycross.com/services/schedule_txt.ashx?schedule=562",
@@ -67084,7 +67106,7 @@
       "result"
      ],
      "status": "conflict_observed",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     },
     {
      "url": "https://gojaspers.com/services/schedule_txt.ashx?schedule=443",
@@ -67095,7 +67117,7 @@
       "result"
      ],
      "status": "conflict_observed",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -67123,7 +67145,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Akron": {
       "state": "NOT_POSTED",
@@ -67149,7 +67171,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://valpoathletics.com/services/schedule_txt.ashx?schedule=455",
@@ -67160,7 +67182,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -67188,7 +67210,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Arkansas St.": {
       "state": "NOT_POSTED",
@@ -67214,7 +67236,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://goshockers.com/services/schedule_txt.ashx?schedule=5357",
@@ -67225,7 +67247,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -67253,7 +67275,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Purdue": {
       "state": "SITE_HTTP_MISS",
@@ -67271,7 +67293,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://uhcougars.com/sports/womens-volleyball/schedule/text",
@@ -67282,7 +67304,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -67310,7 +67332,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Bucknell": {
       "state": "AGREE_COMPLETE",
@@ -67336,7 +67358,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://bucknellbison.com/sports/womens-volleyball/schedule/text",
@@ -67347,7 +67369,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -67375,7 +67397,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Kent St.": {
       "state": "AGREE_COMPLETE",
@@ -67395,7 +67417,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://gocolumbialions.com/sports/womens-volleyball/schedule/text",
@@ -67406,7 +67428,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     },
     {
      "url": "https://kentstatesports.com/sports/womens-volleyball/schedule/text",
@@ -67417,7 +67439,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -67473,7 +67495,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Buffalo": {
       "state": "EVENT_NOT_FOUND",
@@ -67493,7 +67515,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://gomocs.com/sports/womens-volleyball/schedule/text",
@@ -67504,7 +67526,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -67560,7 +67582,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "George Mason": {
       "state": "AGREE_COMPLETE",
@@ -67580,7 +67602,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://gomason.com/services/schedule_txt.ashx?schedule=498",
@@ -67591,7 +67613,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     },
     {
      "url": "https://morganstatebears.com/services/schedule_txt.ashx?schedule=326",
@@ -67602,7 +67624,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -67630,7 +67652,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Arkansas": {
       "state": "SITE_HTTP_MISS",
@@ -67648,7 +67670,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://hubison.com/services/schedule_txt.ashx?schedule=357",
@@ -67659,7 +67681,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -67687,7 +67709,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Belmont": {
       "state": "AGREE_COMPLETE",
@@ -67707,7 +67729,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://belmontbruins.com/services/schedule_txt.ashx?schedule=251",
@@ -67718,7 +67740,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     },
     {
      "url": "https://herdzone.com/sports/womens-volleyball/schedule/text",
@@ -67729,7 +67751,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -67757,7 +67779,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "North Texas": {
       "state": "NOT_POSTED",
@@ -67783,7 +67805,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://txstatebobcats.com/services/schedule_txt.ashx?schedule=360",
@@ -67794,7 +67816,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -67822,7 +67844,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Davidson": {
       "state": "NOT_POSTED",
@@ -67848,7 +67870,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://uncgspartans.com/services/schedule_txt.ashx?schedule=322",
@@ -67859,7 +67881,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -67887,7 +67909,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Miami (OH)": {
       "state": "AGREE_COMPLETE",
@@ -67907,7 +67929,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://miamiredhawks.com/sports/womens-volleyball/schedule/text",
@@ -67918,7 +67940,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -67946,7 +67968,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Little Rock": {
       "state": "AGREE_COMPLETE",
@@ -67965,7 +67987,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://LRTrojans.com/sports/womens-volleyball/schedule",
@@ -67976,7 +67998,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -68004,7 +68026,7 @@
    },
    "verify": {
     "v": "CONTRADICTED_BOTH",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Fordham": {
       "state": "CONTRADICTS_SETS",
@@ -68024,7 +68046,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://fordhamsports.com/services/schedule_txt.ashx?schedule=1735",
@@ -68035,7 +68057,7 @@
       "result"
      ],
      "status": "conflict_observed",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     },
     {
      "url": "https://merrimackathletics.com/services/schedule_txt.ashx?schedule=554",
@@ -68046,7 +68068,7 @@
       "result"
      ],
      "status": "conflict_observed",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -68074,7 +68096,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Xavier": {
       "state": "AGREE_COMPLETE",
@@ -68094,7 +68116,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://letsgopeay.com/services/schedule_txt.ashx?schedule=1382",
@@ -68105,7 +68127,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     },
     {
      "url": "https://goxavier.com/sports/womens-volleyball/schedule/text",
@@ -68116,7 +68138,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -68144,7 +68166,7 @@
    },
    "verify": {
     "v": "UNVERIFIED",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Ark.-Pine Bluff": {
       "state": "EVENT_NOT_FOUND",
@@ -68191,7 +68213,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Princeton": {
       "state": "AGREE_COMPLETE",
@@ -68217,7 +68239,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://goprincetontigers.com/sports/womens-volleyball/schedule/text",
@@ -68228,7 +68250,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -68256,7 +68278,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "St. John's (NY)": {
       "state": "AGREE_COMPLETE",
@@ -68277,7 +68299,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://redstormsports.com/sports/womens-volleyball/schedule/text",
@@ -68288,7 +68310,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -68316,7 +68338,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Portland": {
       "state": "AGREE_COMPLETE",
@@ -68336,7 +68358,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://msubobcats.com/sports/womens-volleyball/schedule/text",
@@ -68347,7 +68369,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     },
     {
      "url": "https://portlandpilots.com/services/schedule_txt.ashx?schedule=1469",
@@ -68358,7 +68380,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -68386,7 +68408,7 @@
    },
    "verify": {
     "v": "CONTRADICTED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Winthrop": {
       "state": "NOT_POSTED",
@@ -68412,7 +68434,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://ysusports.com/sports/womens-volleyball/schedule/text",
@@ -68423,7 +68445,7 @@
       "result"
      ],
      "status": "conflict_observed",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -68451,7 +68473,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Coppin St.": {
       "state": "NOT_POSTED",
@@ -68477,7 +68499,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://csuvikings.com/services/schedule_txt.ashx?schedule=799",
@@ -68488,7 +68510,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -68516,7 +68538,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Col. of Charleston": {
       "state": "AGREE_COMPLETE",
@@ -68536,7 +68558,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://cofcsports.com/sports/womens-volleyball/schedule/text",
@@ -68547,7 +68569,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -68603,7 +68625,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Loyola Chicago": {
       "state": "AGREE_COMPLETE",
@@ -68629,7 +68651,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://loyolaramblers.com/services/schedule_txt.ashx?schedule=252",
@@ -68640,7 +68662,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -68668,7 +68690,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Liberty": {
       "state": "AGREE_COMPLETE",
@@ -68688,7 +68710,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://fairfieldstags.com/services/schedule_txt.ashx?schedule=1530",
@@ -68699,7 +68721,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     },
     {
      "url": "https://libertyflames.com/sports/womens-volleyball/schedule/text",
@@ -68710,7 +68732,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -68738,7 +68760,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Sacramento St.": {
       "state": "EVENT_NOT_FOUND",
@@ -68758,7 +68780,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://smcgaels.com/sports/womens-volleyball/schedule/text",
@@ -68769,7 +68791,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -68797,7 +68819,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Binghamton": {
       "state": "AGREE_COMPLETE",
@@ -68817,7 +68839,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://bubearcats.com/services/schedule_txt.ashx?schedule=1638",
@@ -68828,7 +68850,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     },
     {
      "url": "https://newhavenchargers.com/services/schedule_txt.ashx?schedule=1553",
@@ -68839,7 +68861,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -68867,7 +68889,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Pepperdine": {
       "state": "AGREE_COMPLETE",
@@ -68893,7 +68915,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://pepperdinewaves.com/sports/womens-volleyball/schedule/text",
@@ -68904,7 +68926,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -68932,7 +68954,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Auburn": {
       "state": "NOT_POSTED",
@@ -68960,7 +68982,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://cmuchippewas.com/sports/womens-volleyball/schedule/text",
@@ -68971,7 +68993,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -68999,7 +69021,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Southern Miss.": {
       "state": "AGREE_COMPLETE",
@@ -69025,7 +69047,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://southernmiss.com/sports/womens-volleyball/schedule/text",
@@ -69036,7 +69058,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -69064,7 +69086,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "St. Thomas (MN)": {
       "state": "AGREE_COMPLETE",
@@ -69085,7 +69107,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://tommiesports.com/sports/wvball/schedule/text",
@@ -69096,7 +69118,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -69124,7 +69146,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Ball St.": {
       "state": "NOT_POSTED",
@@ -69150,7 +69172,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://furmanpaladins.com/services/schedule_txt.ashx?schedule=303",
@@ -69161,7 +69183,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -69189,7 +69211,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Georgia St.": {
       "state": "AGREE_COMPLETE",
@@ -69215,7 +69237,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://georgiastatesports.com/services/schedule_txt.ashx?schedule=360",
@@ -69226,7 +69248,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -69254,7 +69276,7 @@
    },
    "verify": {
     "v": "UNVERIFIED",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Boston College": {
       "state": "EVENT_NOT_FOUND",
@@ -69307,7 +69329,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "American": {
       "state": "NOT_POSTED",
@@ -69333,7 +69355,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://cyclones.com/sports/womens-volleyball/schedule/text",
@@ -69344,7 +69366,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -69372,7 +69394,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Texas Southern": {
       "state": "NOT_POSTED",
@@ -69398,7 +69420,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://charlotte49ers.com/sports/womens-volleyball/schedule/text",
@@ -69409,7 +69431,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -69437,7 +69459,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Gardner-Webb": {
       "state": "NOT_POSTED",
@@ -69463,7 +69485,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://unoprivateers.com/services/schedule_txt.ashx?schedule=410",
@@ -69474,7 +69496,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -69502,7 +69524,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Providence": {
       "state": "NOT_POSTED",
@@ -69528,7 +69550,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://stonehillskyhawks.com/services/schedule_txt.ashx?schedule=489",
@@ -69539,7 +69561,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -69567,7 +69589,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Michigan St.": {
       "state": "AGREE_COMPLETE",
@@ -69587,7 +69609,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://msuspartans.com/sports/womens-volleyball/schedule/text",
@@ -69598,7 +69620,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     },
     {
      "url": "https://msueagles.com/services/schedule_txt.ashx?schedule=291",
@@ -69609,7 +69631,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -69637,7 +69659,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "South Dakota": {
       "state": "AGREE_COMPLETE",
@@ -69657,7 +69679,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://goyotes.com/services/schedule_txt.ashx?schedule=331",
@@ -69668,7 +69690,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     },
     {
      "url": "https://ucsbgauchos.com/services/schedule_txt.ashx?schedule=409",
@@ -69679,7 +69701,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -69707,7 +69729,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "FIU": {
       "state": "AGREE_COMPLETE",
@@ -69727,7 +69749,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://fiusports.com/services/schedule_txt.ashx?schedule=378",
@@ -69738,7 +69760,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     },
     {
      "url": "https://ragincajuns.com/sports/womens-volleyball/schedule/text",
@@ -69749,7 +69771,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -69805,7 +69827,7 @@
    },
    "verify": {
     "v": "UNVERIFIED",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "ULM": {
       "state": "EVENT_NOT_FOUND",
@@ -69852,7 +69874,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Missouri St.": {
       "state": "AGREE_COMPLETE",
@@ -69873,7 +69895,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://hawkeyesports.com/sports/wvball/schedule",
@@ -69884,7 +69906,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     },
     {
      "url": "https://missouristatebears.com/sports/womens-volleyball/schedule/text",
@@ -69895,7 +69917,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -69923,7 +69945,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "ETSU": {
       "state": "AGREE_COMPLETE",
@@ -69943,7 +69965,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://etsubucs.com/services/schedule_txt.ashx?schedule=414",
@@ -69954,7 +69976,78 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
+    }
+   ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6626263",
+   "a": "Kentucky",
+   "h": "SMU",
+   "exh": false,
+   "d": "2026-09-12",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "unavailable"
+   },
+   "verify": {
+    "v": "VERIFIED_BOTH",
+    "checked": "2026-09-12T21:03:33Z",
+    "schools": {
+     "SMU": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://smumustangs.com/sports/womens-volleyball/schedule/text",
+      "assertion": "SMU W 3-1 vs Kentucky",
+      "opponent_source": "Kentucky",
+      "site_says": "Neutral"
+     },
+     "Kentucky": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://ukathletics.com/sports/wvball/schedule/",
+      "assertion": "Kentucky L 1-3 vs SMU",
+      "opponent_source": "SMU",
+      "site_says": null,
+      "surface": "modern_card"
+     }
+    }
+   },
+   "n_indep": 2,
+   "n_attempted": 0,
+   "last_checked": "2026-09-12T21:03:33Z",
+   "sources": [
+    {
+     "url": "https://ukathletics.com/sports/wvball/schedule/",
+     "kind": "school_schedule",
+     "school": "Kentucky",
+     "text": "Kentucky L 1-3 vs SMU",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-12T21:03:33Z"
+    },
+    {
+     "url": "https://smumustangs.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "SMU",
+     "text": "SMU W 3-1 vs Kentucky",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -69982,7 +70075,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Purdue Fort Wayne": {
       "state": "AGREE_COMPLETE",
@@ -70008,7 +70101,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://gomastodons.com/sports/womens-volleyball/schedule/text",
@@ -70019,7 +70112,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -70047,7 +70140,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Mercyhurst": {
       "state": "NOT_POSTED",
@@ -70073,7 +70166,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://purpleeagles.com/services/schedule_txt.ashx?schedule=695",
@@ -70084,7 +70177,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -70112,7 +70205,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "UCF": {
       "state": "SITE_HTTP_MISS",
@@ -70131,7 +70224,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://virginiasports.com/sports/wvball/schedule",
@@ -70142,7 +70235,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -70170,7 +70263,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Bellarmine": {
       "state": "NOT_POSTED",
@@ -70196,7 +70289,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://butlersports.com/services/schedule_txt.ashx?schedule=2372",
@@ -70207,7 +70300,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -70235,7 +70328,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Louisville": {
       "state": "AGREE_COMPLETE",
@@ -70255,7 +70348,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://gocreighton.com/sports/womens-volleyball/schedule/text",
@@ -70266,7 +70359,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     },
     {
      "url": "https://gocards.com/sports/womens-volleyball/schedule/text",
@@ -70277,7 +70370,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -70305,7 +70398,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Yale": {
       "state": "NOT_POSTED",
@@ -70331,7 +70424,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://unhwildcats.com/sports/womens-volleyball/schedule/text",
@@ -70342,7 +70435,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -70370,7 +70463,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "McNeese": {
       "state": "AGREE_COMPLETE",
@@ -70390,7 +70483,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://latechsports.com/sports/womens-volleyball/schedule/text",
@@ -70401,7 +70494,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     },
     {
      "url": "https://mcneesesports.com/services/schedule_txt.ashx?schedule=1467",
@@ -70412,9 +70505,62 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6627495",
+   "a": "Idaho",
+   "h": "California Baptist",
+   "exh": false,
+   "d": "2026-09-12",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "verify": {
+    "v": "UNVERIFIED",
+    "checked": "2026-09-12T21:03:33Z",
+    "schools": {
+     "Idaho": {
+      "state": "EVENT_NOT_FOUND",
+      "url": "https://govandals.com/services/schedule_txt.ashx?schedule=2489",
+      "rows_on_date": [
+       "Cal Baptist"
+      ]
+     },
+     "California Baptist": {
+      "state": "NOT_POSTED",
+      "url": "https://cbulancers.com/sports/womens-volleyball/schedule/text",
+      "row": [
+       "Sep 12 (Sat)",
+       "11:00 AM",
+       "Home",
+       "University of Idaho",
+       "Riverside, Calif. (Van Dyne Gym)",
+       "The Joust",
+       "-"
+      ]
+     }
+    }
+   },
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
   },
   {
    "result_corrected": null,
@@ -70440,7 +70586,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "UTSA": {
       "state": "SITE_HTTP_MISS",
@@ -70458,7 +70604,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://iuindyjags.com/services/schedule_txt.ashx?schedule=550",
@@ -70469,7 +70615,77 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
+    }
+   ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6627579",
+   "a": "Grand Canyon",
+   "h": "Omaha",
+   "exh": false,
+   "d": "2026-09-12",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "verify": {
+    "v": "VERIFIED_BOTH",
+    "checked": "2026-09-12T21:03:33Z",
+    "schools": {
+     "Omaha": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://omavs.com/sports/womens-volleyball/schedule/text",
+      "assertion": "Omaha W 3-2 vs Grand Canyon",
+      "opponent_source": "Grand Canyon",
+      "site_says": "Neutral"
+     },
+     "Grand Canyon": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://gculopes.com/sports/womens-volleyball/schedule/text",
+      "assertion": "Grand Canyon L 2-3 vs Omaha",
+      "opponent_source": "Omaha",
+      "site_says": "Neutral"
+     }
+    }
+   },
+   "n_indep": 2,
+   "n_attempted": 0,
+   "last_checked": "2026-09-12T21:03:33Z",
+   "sources": [
+    {
+     "url": "https://gculopes.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Grand Canyon",
+     "text": "Grand Canyon L 2-3 vs Omaha",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-12T21:03:33Z"
+    },
+    {
+     "url": "https://omavs.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Omaha",
+     "text": "Omaha W 3-2 vs Grand Canyon",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -70497,7 +70713,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Charleston So.": {
       "state": "NOT_POSTED",
@@ -70523,7 +70739,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://bcuathletics.com/services/schedule_txt.ashx?schedule=2442",
@@ -70534,7 +70750,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -70562,7 +70778,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Northwestern St.": {
       "state": "AGREE_COMPLETE",
@@ -70582,7 +70798,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://gsutigers.com/services/schedule_txt.ashx?schedule=263",
@@ -70593,7 +70809,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     },
     {
      "url": "https://nsudemons.com/services/schedule_txt.ashx?schedule=477",
@@ -70604,7 +70820,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -70632,7 +70848,7 @@
    },
    "verify": {
     "v": "CORROBORATED_ONE",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Queens (NC)": {
       "state": "NOT_POSTED",
@@ -70658,7 +70874,7 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://gobluehose.com/services/schedule_txt.ashx?schedule=714",
@@ -70669,7 +70885,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -70696,21 +70912,15 @@
     "venue": "unavailable"
    },
    "verify": {
-    "v": "UNVERIFIED",
-    "checked": "2026-09-12T20:36:19Z",
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Navy": {
-      "state": "NOT_POSTED",
+      "state": "AGREE_COMPLETE",
       "url": "https://navysports.com/services/schedule_txt.ashx?schedule=2027",
-      "row": [
-       "Sep 12 (Sat)",
-       "2:00 p.m.",
-       "Neutral",
-       "UMES",
-       "Norfolk, Va.",
-       "",
-       ""
-      ]
+      "assertion": "Navy W 3-1 vs UMES",
+      "opponent_source": "UMES",
+      "site_says": "Neutral"
      },
      "UMES": {
       "state": "NOT_POSTED",
@@ -70727,10 +70937,22 @@
      }
     }
    },
-   "n_indep": 0,
+   "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": null,
-   "sources": []
+   "last_checked": "2026-09-12T21:03:33Z",
+   "sources": [
+    {
+     "url": "https://navysports.com/services/schedule_txt.ashx?schedule=2027",
+     "kind": "school_schedule",
+     "school": "Navy",
+     "text": "Navy W 3-1 vs UMES",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-12T21:03:33Z"
+    }
+   ]
   },
   {
    "result_corrected": null,
@@ -70756,7 +70978,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Siena": {
       "state": "AGREE_COMPLETE",
@@ -70776,7 +70998,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://bucknellbison.com/sports/womens-volleyball/schedule/text",
@@ -70787,7 +71009,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     },
     {
      "url": "https://sienasaints.com/services/schedule_txt.ashx?schedule=3497",
@@ -70798,7 +71020,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -70826,7 +71048,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Jacksonville": {
       "state": "AGREE_COMPLETE",
@@ -70846,7 +71068,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://judolphins.com/services/schedule_txt.ashx?schedule=337",
@@ -70857,7 +71079,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     },
     {
      "url": "https://wsuraiders.com/sports/womens-volleyball/schedule/text",
@@ -70868,9 +71090,191 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6638117",
+   "a": "North Florida",
+   "h": "App State",
+   "exh": false,
+   "d": "2026-09-12",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "unavailable"
+   },
+   "verify": {
+    "v": "UNVERIFIED",
+    "checked": "2026-09-12T21:03:33Z",
+    "schools": {
+     "North Florida": {
+      "state": "EVENT_NOT_FOUND",
+      "url": "https://unfospreys.com/sports/womens-volleyball/schedule/text",
+      "rows_on_date": [
+       "Appalachian State"
+      ]
+     },
+     "App State": {
+      "state": "NOT_POSTED",
+      "url": "https://appstatesports.com/services/schedule_txt.ashx?schedule=429",
+      "row": [
+       "Sep 12 (Sat)",
+       "2:00 PM",
+       "Home",
+       "North Florida",
+       "Boone, N.C. (Holmes Convocation Center)",
+       "",
+       ""
+      ]
+     }
+    }
+   },
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6624942",
+   "a": "Eastern Mich.",
+   "h": "Oakland",
+   "exh": false,
+   "d": "2026-09-12",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "verify": {
+    "v": "VERIFIED_BOTH",
+    "checked": "2026-09-12T21:03:33Z",
+    "schools": {
+     "Oakland": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://goldengrizzlies.com/services/schedule_txt.ashx?schedule=1366",
+      "assertion": "Oakland W 3-0 vs Eastern Michigan",
+      "opponent_source": "Eastern Michigan",
+      "site_says": "Home"
+     },
+     "Eastern Mich.": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://emueagles.com/sports/womens-volleyball/schedule/text",
+      "assertion": "Eastern Mich. L 0-3 vs Oakland",
+      "opponent_source": "Oakland",
+      "site_says": "Away"
+     }
+    }
+   },
+   "n_indep": 2,
+   "n_attempted": 0,
+   "last_checked": "2026-09-12T21:03:33Z",
+   "sources": [
+    {
+     "url": "https://emueagles.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Eastern Mich.",
+     "text": "Eastern Mich. L 0-3 vs Oakland",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-12T21:03:33Z"
+    },
+    {
+     "url": "https://goldengrizzlies.com/services/schedule_txt.ashx?schedule=1366",
+     "kind": "school_schedule",
+     "school": "Oakland",
+     "text": "Oakland W 3-0 vs Eastern Michigan",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-12T21:03:33Z"
+    }
+   ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6625205",
+   "a": "Coastal Carolina",
+   "h": "Tennessee",
+   "exh": false,
+   "d": "2026-09-12",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "verify": {
+    "v": "UNVERIFIED",
+    "checked": "2026-09-12T21:03:33Z",
+    "schools": {
+     "Tennessee": {
+      "state": "NOT_POSTED",
+      "url": "https://utsports.com/sports/womens-volleyball/schedule/text",
+      "row": [
+       "Sep 12 (Sat)",
+       "3 p.m. ET",
+       "Home",
+       "Coastal Carolina",
+       "Knoxville, Tenn. (Food City Center)",
+       "",
+       "-"
+      ]
+     },
+     "Coastal Carolina": {
+      "state": "NOT_POSTED",
+      "url": "https://goccusports.com/sports/womens-volleyball/schedule/text",
+      "row": [
+       "Sep 12 (Sat)",
+       "3:00 p.m.",
+       "Away",
+       "Tennessee",
+       "Knoxville, TN",
+       "",
+       "-"
+      ]
+     }
+    }
+   },
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
   },
   {
    "result_corrected": null,
@@ -70896,7 +71300,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Baylor": {
       "state": "AGREE_COMPLETE",
@@ -70917,7 +71321,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://baylorbears.com/sports/womens-volleyball/schedule/text",
@@ -70928,7 +71332,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     },
     {
      "url": "https://golobos.com/sports/wvball/schedule",
@@ -70939,7 +71343,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
   },
@@ -70981,6 +71385,76 @@
    "dup_reason": null,
    "dup_asym": null,
    "dup_evidence": [],
+   "gid": "6627819",
+   "a": "Stony Brook",
+   "h": "Delaware",
+   "exh": false,
+   "d": "2026-09-12",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "verify": {
+    "v": "VERIFIED_BOTH",
+    "checked": "2026-09-12T21:03:33Z",
+    "schools": {
+     "Stony Brook": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://stonybrookathletics.com/services/schedule_txt.ashx?schedule=486",
+      "assertion": "Stony Brook W 3-0 vs Delaware",
+      "opponent_source": "Delaware",
+      "site_says": "Neutral"
+     },
+     "Delaware": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://bluehens.com/sports/womens-volleyball/schedule/text",
+      "assertion": "Delaware L 0-3 vs Stony Brook",
+      "opponent_source": "Stony Brook",
+      "site_says": "Neutral"
+     }
+    }
+   },
+   "n_indep": 2,
+   "n_attempted": 0,
+   "last_checked": "2026-09-12T21:03:33Z",
+   "sources": [
+    {
+     "url": "https://bluehens.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Delaware",
+     "text": "Delaware L 0-3 vs Stony Brook",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-12T21:03:33Z"
+    },
+    {
+     "url": "https://stonybrookathletics.com/services/schedule_txt.ashx?schedule=486",
+     "kind": "school_schedule",
+     "school": "Stony Brook",
+     "text": "Stony Brook W 3-0 vs Delaware",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-12T21:03:33Z"
+    }
+   ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6638861",
    "a": "Tulane",
    "h": "Kennesaw St.",
@@ -70995,7 +71469,7 @@
    },
    "verify": {
     "v": "VERIFIED_BOTH",
-    "checked": "2026-09-12T20:36:19Z",
+    "checked": "2026-09-12T21:03:33Z",
     "schools": {
      "Tulane": {
       "state": "AGREE_COMPLETE",
@@ -71015,7 +71489,7 @@
    },
    "n_indep": 2,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T20:36:19Z",
+   "last_checked": "2026-09-12T21:03:33Z",
    "sources": [
     {
      "url": "https://ksuowls.com/services/schedule_txt.ashx?schedule=432",
@@ -71026,7 +71500,7 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     },
     {
      "url": "https://tulanegreenwave.com/sports/womens-volleyball/schedule/text",
@@ -71037,9 +71511,62 @@
       "result"
      ],
      "status": "confirms",
-     "retrieved": "2026-09-12T20:36:19Z"
+     "retrieved": "2026-09-12T21:03:33Z"
     }
    ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6639308",
+   "a": "Nicholls",
+   "h": "Alabama St.",
+   "exh": false,
+   "d": "2026-09-12",
+   "overall": "official",
+   "states": {
+    "result": "official",
+    "sets": "official",
+    "box": "reconciled",
+    "venue": "unavailable"
+   },
+   "verify": {
+    "v": "UNVERIFIED",
+    "checked": "2026-09-12T21:03:33Z",
+    "schools": {
+     "Alabama St.": {
+      "state": "EVENT_NOT_FOUND",
+      "url": "https://bamastatesports.com/services/schedule_txt.ashx?schedule=434",
+      "rows_on_date": [
+       "Nicholls State"
+      ]
+     },
+     "Nicholls": {
+      "state": "NOT_POSTED",
+      "url": "https://geauxcolonels.com/services/schedule_txt.ashx?schedule=458",
+      "row": [
+       "Sep 12 (Sat)",
+       "2:00 p.m.",
+       "Away",
+       "Alabama State",
+       "Montgomery, Ala. (Dunn-Oliver Acadome)",
+       "",
+       ""
+      ]
+     }
+    }
+   },
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
   }
  ]
 }

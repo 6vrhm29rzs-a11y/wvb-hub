@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-12T20:37:32Z",
+  "generated_at_utc": "2026-09-12T21:04:44Z",
   "counts": {
    "statuses": 3,
    "incidents": 0,
    "signals": 4,
    "expired": 7,
-   "anomalies": 412
+   "anomalies": 421
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -602,12 +602,12 @@
     {
      "name": "Nalanie Neal",
      "rate": 4.605,
-     "played_share": 0.75
+     "played_share": 0.6
     },
     {
      "name": "Emery DeJong",
      "rate": 2.143,
-     "played_share": 0.75
+     "played_share": 0.6
     }
    ],
    "points_per_set_missing": 6.748
@@ -888,32 +888,6 @@
    "points_per_set_missing": 5.427
   },
   {
-   "game_id": "6639842",
-   "team_id": "45920",
-   "team": "Kentucky",
-   "absent": [
-    {
-     "name": "Brooklyn Deleye",
-     "rate": 5.235,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 5.235
-  },
-  {
-   "game_id": "6626811",
-   "team_id": "45920",
-   "team": "Kentucky",
-   "absent": [
-    {
-     "name": "Brooklyn Deleye",
-     "rate": 5.235,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 5.235
-  },
-  {
    "game_id": "6624849",
    "team_id": "46406",
    "team": "Cleveland St.",
@@ -930,6 +904,19 @@
     }
    ],
    "points_per_set_missing": 5.21
+  },
+  {
+   "game_id": "6626263",
+   "team_id": "45920",
+   "team": "Kentucky",
+   "absent": [
+    {
+     "name": "Brooklyn DeLeye",
+     "rate": 5.174,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 5.174
   },
   {
    "game_id": "6628298",
@@ -1004,6 +991,32 @@
    "points_per_set_missing": 5.079
   },
   {
+   "game_id": "6639842",
+   "team_id": "45920",
+   "team": "Kentucky",
+   "absent": [
+    {
+     "name": "Brooklyn Deleye",
+     "rate": 5.048,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 5.048
+  },
+  {
+   "game_id": "6626811",
+   "team_id": "45920",
+   "team": "Kentucky",
+   "absent": [
+    {
+     "name": "Brooklyn Deleye",
+     "rate": 5.048,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 5.048
+  },
+  {
    "game_id": "6628347",
    "team_id": "46193",
    "team": "Lafayette",
@@ -1038,24 +1051,6 @@
     }
    ],
    "points_per_set_missing": 4.868
-  },
-  {
-   "game_id": "6625817",
-   "team_id": "46103",
-   "team": "Nicholls",
-   "absent": [
-    {
-     "name": "Mckenzie Mitchell",
-     "rate": 2.8,
-     "played_share": 1.0
-    },
-    {
-     "name": "Zahahrah Edwards-wyllie",
-     "rate": 2.06,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 4.86
   },
   {
    "game_id": "6626689",
@@ -1128,6 +1123,24 @@
    "points_per_set_missing": 4.618
   },
   {
+   "game_id": "6625817",
+   "team_id": "46103",
+   "team": "Nicholls",
+   "absent": [
+    {
+     "name": "Mckenzie Mitchell",
+     "rate": 2.824,
+     "played_share": 1.0
+    },
+    {
+     "name": "Zahahrah Edwards-wyllie",
+     "rate": 1.793,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 4.617
+  },
+  {
    "game_id": "6627493",
    "team_id": "51173",
    "team": "California Baptist",
@@ -1135,7 +1148,7 @@
     {
      "name": "Nalanie Neal",
      "rate": 4.605,
-     "played_share": 0.8
+     "played_share": 0.667
     }
    ],
    "points_per_set_missing": 4.605
@@ -1325,24 +1338,6 @@
    "points_per_set_missing": 4.024
   },
   {
-   "game_id": "6627126",
-   "team_id": "51173",
-   "team": "California Baptist",
-   "absent": [
-    {
-     "name": "Emery DeJong",
-     "rate": 2.143,
-     "played_share": 0.6
-    },
-    {
-     "name": "Daria Chekhovskikh",
-     "rate": 1.87,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 4.013
-  },
-  {
    "game_id": "6628383",
    "team_id": "46162",
    "team": "Campbell",
@@ -1442,6 +1437,19 @@
     }
    ],
    "points_per_set_missing": 3.897
+  },
+  {
+   "game_id": "6627819",
+   "team_id": "46667",
+   "team": "Delaware",
+   "absent": [
+    {
+     "name": "Anna Logan Gillens",
+     "rate": 3.893,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 3.893
   },
   {
    "game_id": "6639651",
@@ -2553,19 +2561,6 @@
    "points_per_set_missing": 2.997
   },
   {
-   "game_id": "6627933",
-   "team_id": "46179",
-   "team": "Eastern Mich.",
-   "absent": [
-    {
-     "name": "Haley Trosky",
-     "rate": 2.983,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 2.983
-  },
-  {
    "game_id": "6627829",
    "team_id": "46708",
    "team": "Xavier",
@@ -2891,24 +2886,6 @@
    "points_per_set_missing": 2.864
   },
   {
-   "game_id": "6627816",
-   "team_id": "46753",
-   "team": "Stony Brook",
-   "absent": [
-    {
-     "name": "Ayanna pierre Louis",
-     "rate": 1.614,
-     "played_share": 1.0
-    },
-    {
-     "name": "Avari Amstutz",
-     "rate": 1.25,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 2.864
-  },
-  {
    "game_id": "6628699",
    "team_id": "45955",
    "team": "Central Ark.",
@@ -2920,6 +2897,19 @@
     }
    ],
    "points_per_set_missing": 2.861
+  },
+  {
+   "game_id": "6627933",
+   "team_id": "46179",
+   "team": "Eastern Mich.",
+   "absent": [
+    {
+     "name": "Haley Trosky",
+     "rate": 2.859,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.859
   },
   {
    "game_id": "6628274",
@@ -3011,6 +3001,24 @@
     }
    ],
    "points_per_set_missing": 2.793
+  },
+  {
+   "game_id": "6627816",
+   "team_id": "46753",
+   "team": "Stony Brook",
+   "absent": [
+    {
+     "name": "Ayanna pierre Louis",
+     "rate": 1.68,
+     "played_share": 1.0
+    },
+    {
+     "name": "Avari Amstutz",
+     "rate": 1.111,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.791
   },
   {
    "game_id": "6628381",
@@ -3128,6 +3136,42 @@
     }
    ],
    "points_per_set_missing": 2.696
+  },
+  {
+   "game_id": "6627165",
+   "team_id": "46392",
+   "team": "North Florida",
+   "absent": [
+    {
+     "name": "Yarimar Francis garay",
+     "rate": 1.435,
+     "played_share": 0.75
+    },
+    {
+     "name": "Leah Mcdonald",
+     "rate": 1.217,
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 2.652
+  },
+  {
+   "game_id": "6625946",
+   "team_id": "46392",
+   "team": "North Florida",
+   "absent": [
+    {
+     "name": "Yarimar Francis garay",
+     "rate": 1.435,
+     "played_share": 0.8
+    },
+    {
+     "name": "Leah Mcdonald",
+     "rate": 1.217,
+     "played_share": 0.8
+    }
+   ],
+   "points_per_set_missing": 2.652
   },
   {
    "game_id": "6628214",
@@ -3459,7 +3503,20 @@
     {
      "name": "Zahahrah Edwards-Wyllie",
      "rate": 2.5,
-     "played_share": 1.0
+     "played_share": 0.8
+    }
+   ],
+   "points_per_set_missing": 2.5
+  },
+  {
+   "game_id": "6639308",
+   "team_id": "46103",
+   "team": "Nicholls",
+   "absent": [
+    {
+     "name": "Zahahrah Edwards-Wyllie",
+     "rate": 2.5,
+     "played_share": 0.75
     }
    ],
    "points_per_set_missing": 2.5
@@ -3816,6 +3873,45 @@
    "points_per_set_missing": 2.308
   },
   {
+   "game_id": "6626259",
+   "team_id": "46250",
+   "team": "SMU",
+   "absent": [
+    {
+     "name": "Christa Wilburn",
+     "rate": 2.3,
+     "played_share": 0.714
+    }
+   ],
+   "points_per_set_missing": 2.3
+  },
+  {
+   "game_id": "6626260",
+   "team_id": "46250",
+   "team": "SMU",
+   "absent": [
+    {
+     "name": "Christa Wilburn",
+     "rate": 2.3,
+     "played_share": 0.714
+    }
+   ],
+   "points_per_set_missing": 2.3
+  },
+  {
+   "game_id": "6626261",
+   "team_id": "46250",
+   "team": "SMU",
+   "absent": [
+    {
+     "name": "Christa Wilburn",
+     "rate": 2.3,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 2.3
+  },
+  {
    "game_id": "6625160",
    "team_id": "46494",
    "team": "San Jose St.",
@@ -4151,6 +4247,32 @@
    "points_per_set_missing": 2.15
   },
   {
+   "game_id": "6627126",
+   "team_id": "51173",
+   "team": "California Baptist",
+   "absent": [
+    {
+     "name": "Emery DeJong",
+     "rate": 2.143,
+     "played_share": 0.6
+    }
+   ],
+   "points_per_set_missing": 2.143
+  },
+  {
+   "game_id": "6627495",
+   "team_id": "51173",
+   "team": "California Baptist",
+   "absent": [
+    {
+     "name": "Emery DeJong",
+     "rate": 2.143,
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 2.143
+  },
+  {
    "game_id": "6624526",
    "team_id": "45895",
    "team": "UC Santa Barbara",
@@ -4266,19 +4388,6 @@
     }
    ],
    "points_per_set_missing": 2.077
-  },
-  {
-   "game_id": "6639077",
-   "team_id": "46103",
-   "team": "Nicholls",
-   "absent": [
-    {
-     "name": "Zahahrah Edwards-wyllie",
-     "rate": 2.06,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 2.06
   },
   {
    "game_id": "6637949",
@@ -4548,7 +4657,20 @@
     {
      "name": "Ayanna Pierre Louis",
      "rate": 1.929,
-     "played_share": 1.0
+     "played_share": 0.875
+    }
+   ],
+   "points_per_set_missing": 1.929
+  },
+  {
+   "game_id": "6627819",
+   "team_id": "46753",
+   "team": "Stony Brook",
+   "absent": [
+    {
+     "name": "Ayanna Pierre Louis",
+     "rate": 1.929,
+     "played_share": 0.75
     }
    ],
    "points_per_set_missing": 1.929
@@ -4749,17 +4871,17 @@
    "points_per_set_missing": 1.812
   },
   {
-   "game_id": "6628408",
-   "team_id": "46571",
-   "team": "App State",
+   "game_id": "6639077",
+   "team_id": "46103",
+   "team": "Nicholls",
    "absent": [
     {
-     "name": "Lou Johnson",
-     "rate": 1.812,
+     "name": "Zahahrah Edwards-wyllie",
+     "rate": 1.793,
      "played_share": 1.0
     }
    ],
-   "points_per_set_missing": 1.812
+   "points_per_set_missing": 1.793
   },
   {
    "game_id": "6625926",
@@ -4775,17 +4897,17 @@
    "points_per_set_missing": 1.727
   },
   {
-   "game_id": "6639307",
-   "team_id": "46436",
-   "team": "Alabama St.",
+   "game_id": "6637170",
+   "team_id": "46571",
+   "team": "App State",
    "absent": [
     {
-     "name": "Amaya Robinson",
-     "rate": 1.717,
+     "name": "Nevaeh Hays",
+     "rate": 1.722,
      "played_share": 1.0
     }
    ],
-   "points_per_set_missing": 1.717
+   "points_per_set_missing": 1.722
   },
   {
    "game_id": "6626451",
@@ -4825,6 +4947,45 @@
     }
    ],
    "points_per_set_missing": 1.7
+  },
+  {
+   "game_id": "6639307",
+   "team_id": "46436",
+   "team": "Alabama St.",
+   "absent": [
+    {
+     "name": "Amaya Robinson",
+     "rate": 1.685,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.685
+  },
+  {
+   "game_id": "6627811",
+   "team_id": "46753",
+   "team": "Stony Brook",
+   "absent": [
+    {
+     "name": "Ayanna pierre Louis",
+     "rate": 1.68,
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 1.68
+  },
+  {
+   "game_id": "6627812",
+   "team_id": "46753",
+   "team": "Stony Brook",
+   "absent": [
+    {
+     "name": "Ayanna pierre Louis",
+     "rate": 1.68,
+     "played_share": 0.857
+    }
+   ],
+   "points_per_set_missing": 1.68
   },
   {
    "game_id": "6625998",
@@ -4994,32 +5155,6 @@
     }
    ],
    "points_per_set_missing": 1.625
-  },
-  {
-   "game_id": "6627811",
-   "team_id": "46753",
-   "team": "Stony Brook",
-   "absent": [
-    {
-     "name": "Ayanna pierre Louis",
-     "rate": 1.614,
-     "played_share": 0.75
-    }
-   ],
-   "points_per_set_missing": 1.614
-  },
-  {
-   "game_id": "6627812",
-   "team_id": "46753",
-   "team": "Stony Brook",
-   "absent": [
-    {
-     "name": "Ayanna pierre Louis",
-     "rate": 1.614,
-     "played_share": 0.857
-    }
-   ],
-   "points_per_set_missing": 1.614
   },
   {
    "game_id": "6627827",
@@ -5295,6 +5430,19 @@
    "points_per_set_missing": 1.5
   },
   {
+   "game_id": "6628408",
+   "team_id": "46571",
+   "team": "App State",
+   "absent": [
+    {
+     "name": "Lou Johnson",
+     "rate": 1.5,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.5
+  },
+  {
    "game_id": "6627192",
    "team_id": "46327",
    "team": "Green Bay",
@@ -5306,19 +5454,6 @@
     }
    ],
    "points_per_set_missing": 1.5
-  },
-  {
-   "game_id": "6637170",
-   "team_id": "46571",
-   "team": "App State",
-   "absent": [
-    {
-     "name": "Nevaeh Hays",
-     "rate": 1.477,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.477
   },
   {
    "game_id": "6627748",
@@ -5568,30 +5703,17 @@
    "points_per_set_missing": 1.345
   },
   {
-   "game_id": "6627165",
+   "game_id": "6638117",
    "team_id": "46392",
    "team": "North Florida",
    "absent": [
     {
-     "name": "Yarimar Francis garay",
-     "rate": 1.333,
-     "played_share": 0.75
+     "name": "Yarimar Francis Garay",
+     "rate": 1.34,
+     "played_share": 1.0
     }
    ],
-   "points_per_set_missing": 1.333
-  },
-  {
-   "game_id": "6625946",
-   "team_id": "46392",
-   "team": "North Florida",
-   "absent": [
-    {
-     "name": "Yarimar Francis garay",
-     "rate": 1.333,
-     "played_share": 0.8
-    }
-   ],
-   "points_per_set_missing": 1.333
+   "points_per_set_missing": 1.34
   },
   {
    "game_id": "6625823",
@@ -5678,11 +5800,11 @@
    "absent": [
     {
      "name": "Macey Hughes",
-     "rate": 1.261,
+     "rate": 1.286,
      "played_share": 0.8
     }
    ],
-   "points_per_set_missing": 1.261
+   "points_per_set_missing": 1.286
   },
   {
    "game_id": "6626470",
@@ -5691,11 +5813,11 @@
    "absent": [
     {
      "name": "Macey Hughes",
-     "rate": 1.261,
+     "rate": 1.286,
      "played_share": 0.833
     }
    ],
-   "points_per_set_missing": 1.261
+   "points_per_set_missing": 1.286
   },
   {
    "game_id": "6627305",
@@ -5795,32 +5917,6 @@
    "absent": [
     {
      "name": "Tre'niya Miller",
-     "rate": 1.167,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.167
-  },
-  {
-   "game_id": "6624934",
-   "team_id": "46108",
-   "team": "Oakland",
-   "absent": [
-    {
-     "name": "Grace Cooney",
-     "rate": 1.167,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.167
-  },
-  {
-   "game_id": "6624939",
-   "team_id": "46108",
-   "team": "Oakland",
-   "absent": [
-    {
-     "name": "Grace Cooney",
      "rate": 1.167,
      "played_share": 1.0
     }
@@ -6088,6 +6184,32 @@
    "points_per_set_missing": 1.036
   },
   {
+   "game_id": "6624934",
+   "team_id": "46108",
+   "team": "Oakland",
+   "absent": [
+    {
+     "name": "Grace Cooney",
+     "rate": 1.021,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.021
+  },
+  {
+   "game_id": "6624939",
+   "team_id": "46108",
+   "team": "Oakland",
+   "absent": [
+    {
+     "name": "Grace Cooney",
+     "rate": 1.021,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.021
+  },
+  {
    "game_id": "6625090",
    "team_id": "45803",
    "team": "Mississippi Val.",
@@ -6196,10 +6318,19 @@
    ]
   },
   "Kentucky": {
-   "gid": "6626811",
-   "d": "2026-09-09",
-   "appeared": 18,
-   "zero_action": []
+   "gid": "6626263",
+   "d": "2026-09-12",
+   "appeared": 9,
+   "zero_action": [
+    "Bellamie Beus",
+    "Gracison Saylors",
+    "Caroline Prihoda",
+    "Sidney Burley",
+    "Georgia Watson",
+    "Molly Berezowitz",
+    "Bryah Breaux",
+    "Hannah Benjamin"
+   ]
   },
   "Norfolk St.": {
    "gid": "6625057",
@@ -6253,12 +6384,13 @@
    ]
   },
   "SMU": {
-   "gid": "6626262",
-   "d": "2026-09-09",
-   "appeared": 18,
+   "gid": "6626263",
+   "d": "2026-09-12",
+   "appeared": 9,
    "zero_action": [
     "Brooke Gilmour",
     "Levariya Pinder",
+    "Jadyn Livings",
     "Bojana Ambulija",
     "Mia Silva",
     "Ellie Moore",
@@ -6513,21 +6645,17 @@
    ]
   },
   "Eastern Mich.": {
-   "gid": "6628158",
-   "d": "2026-09-11",
-   "appeared": 22,
+   "gid": "6624942",
+   "d": "2026-09-12",
+   "appeared": 13,
    "zero_action": [
-    "Kayla Ostrander",
     "Bianca Salvador",
-    "Kaylin Schroeder",
     "Olivia Stewart",
     "Mya Eberlein",
     "Arynn Randle el",
-    "Lily Spark",
+    "Julia Johnson",
     "Ashleekay Christensen",
-    "Zaria Ragler",
-    "Kayla Ostrander",
-    "Kaylin Schroeder"
+    "Zaria Ragler"
    ]
   },
   "Florida A&M": {
@@ -6581,15 +6709,15 @@
    "zero_action": []
   },
   "North Florida": {
-   "gid": "6624315",
-   "d": "2026-09-11",
-   "appeared": 24,
+   "gid": "6638117",
+   "d": "2026-09-12",
+   "appeared": 12,
    "zero_action": [
-    "Haydin Froehlich",
     "Fallon Humphries",
+    "Lily Rodgers",
+    "Brooklyn Stringfellow",
     "Kacey Kazmierski",
-    "Kendall Newbold",
-    "Evelina Gerogianni"
+    "Kendall Newbold"
    ]
   },
   "Virginia Tech": {
@@ -6658,19 +6786,17 @@
    ]
   },
   "Nicholls": {
-   "gid": "6639580",
-   "d": "2026-09-11",
-   "appeared": 18,
+   "gid": "6639308",
+   "d": "2026-09-12",
+   "appeared": 10,
    "zero_action": [
-    "Ava-claire Calais",
     "Karina Smith",
-    "Zahahrah Edwards-wyllie",
     "Molly Muller",
     "Sydney Valentine",
     "Amelie Shalfoon",
+    "Beryn Hyland",
     "Jenna Cicherski",
-    "Tierney Terrell",
-    "Ava-Claire Calais"
+    "Tierney Terrell"
    ]
   },
   "Stonehill": {
@@ -6902,10 +7028,17 @@
    ]
   },
   "Stony Brook": {
-   "gid": "6627816",
-   "d": "2026-09-11",
-   "appeared": 22,
-   "zero_action": []
+   "gid": "6627819",
+   "d": "2026-09-12",
+   "appeared": 10,
+   "zero_action": [
+    "Madison Cigna",
+    "Ellery Singleton",
+    "Mopelola Ojo",
+    "Aajaylah Zeno",
+    "Avari Amstutz",
+    "Hanna Berkefelt"
+   ]
   },
   "Ohio": {
    "gid": "6626939",
@@ -7042,8 +7175,8 @@
    ]
   },
   "Grand Canyon": {
-   "gid": "6627577",
-   "d": "2026-09-11",
+   "gid": "6627579",
+   "d": "2026-09-12",
    "appeared": 10,
    "zero_action": [
     "Nika Zupanic",
@@ -7051,10 +7184,10 @@
     "Logan Strong",
     "Mia Vukic",
     "Ali Wiest",
-    "Alayna Austin",
     "Hunter West",
     "Audrey Cook",
     "Milica Zigic",
+    "Gentry Oblad",
     "Kaela Jenkins"
    ]
   },
@@ -7606,12 +7739,11 @@
    ]
   },
   "Idaho": {
-   "gid": "6627749",
-   "d": "2026-09-11",
-   "appeared": 22,
+   "gid": "6627495",
+   "d": "2026-09-12",
+   "appeared": 13,
    "zero_action": [
-    "Keira Kleidon",
-    "Keira Kleidon"
+    "Alaina Armstrong"
    ]
   },
   "Bethune-Cookman": {
@@ -7681,19 +7813,10 @@
    ]
   },
   "Oakland": {
-   "gid": "6624941",
-   "d": "2026-09-11",
-   "appeared": 16,
+   "gid": "6624942",
+   "d": "2026-09-12",
+   "appeared": 9,
    "zero_action": [
-    "Ella Martin",
-    "Mya Kattula",
-    "Maddie Jipping",
-    "Kamsi Iweajunwa",
-    "Olivia Rust",
-    "Morgin Parsley",
-    "Kate Vrabel",
-    "Grace Cooney",
-    "Ella Martin",
     "Mya Kattula",
     "Maddie Jipping",
     "Kamsi Iweajunwa",
@@ -7883,17 +8006,15 @@
    ]
   },
   "Alabama St.": {
-   "gid": "6639078",
-   "d": "2026-09-11",
-   "appeared": 28,
+   "gid": "6639308",
+   "d": "2026-09-12",
+   "appeared": 12,
    "zero_action": [
     "Ava O'hare",
     "Sharide Sykes",
     "Chidera Okocha",
-    "Jaci Moore",
-    "Ava O'hare",
-    "Sharide Sykes",
-    "Chidera Okocha",
+    "Makeda Edwards",
+    "Nadiyyah Northern",
     "Jaci Moore"
    ]
   },
@@ -7978,12 +8099,16 @@
    ]
   },
   "App State": {
-   "gid": "6628408",
-   "d": "2026-09-11",
-   "appeared": 22,
+   "gid": "6638117",
+   "d": "2026-09-12",
+   "appeared": 11,
    "zero_action": [
-    "Charlotte Thompson",
-    "Charlotte Thompson"
+    "Lou Johnson",
+    "Molly Teague",
+    "Lexi Shondell",
+    "Iris Williams",
+    "Eva Goodson",
+    "Amber Mcclain"
    ]
   },
   "N.C. A&T": {
@@ -8544,13 +8669,12 @@
    ]
   },
   "Coastal Carolina": {
-   "gid": "6626405",
-   "d": "2026-09-10",
-   "appeared": 24,
+   "gid": "6625205",
+   "d": "2026-09-12",
+   "appeared": 12,
    "zero_action": [
     "Elin Andersson",
-    "Amarah Johnson",
-    "Kayla Channell"
+    "Amarah Johnson"
    ]
   },
   "Duke": {
@@ -9038,12 +9162,15 @@
    ]
   },
   "Tennessee": {
-   "gid": "6625204",
-   "d": "2026-09-09",
-   "appeared": 20,
+   "gid": "6625205",
+   "d": "2026-09-12",
+   "appeared": 12,
    "zero_action": [
-    "Sydney Jaynes",
-    "Sydney Jaynes"
+    "Alaina Jarrett",
+    "Mallory Matheny",
+    "Morgan Williams",
+    "Emma Frietch",
+    "Jade Williams"
    ]
   },
   "Colgate": {
@@ -9971,13 +10098,14 @@
    ]
   },
   "Omaha": {
-   "gid": "6628376",
-   "d": "2026-09-11",
-   "appeared": 22,
+   "gid": "6627579",
+   "d": "2026-09-12",
+   "appeared": 10,
    "zero_action": [
-    "Mckenna Giles",
-    "Casi Doll",
-    "Izzy Jeffery"
+    "Cora Metcalf",
+    "Hayden Hart",
+    "Torrey Tkach",
+    "Ella Tiarks"
    ]
   },
   "New Mexico": {
@@ -9987,13 +10115,14 @@
    "zero_action": []
   },
   "California Baptist": {
-   "gid": "6627494",
-   "d": "2026-09-11",
-   "appeared": 13,
+   "gid": "6627495",
+   "d": "2026-09-12",
+   "appeared": 12,
    "zero_action": [
     "Nika Safavi",
-    "Filippa Botcher",
+    "Samantha Bailey",
     "Maria Contreras",
+    "Jana Cetkovic",
     "Ifeoma Okeke"
    ]
   },
@@ -10328,19 +10457,17 @@
    ]
   },
   "Delaware": {
-   "gid": "6639662",
-   "d": "2026-09-11",
-   "appeared": 20,
+   "gid": "6627819",
+   "d": "2026-09-12",
+   "appeared": 11,
    "zero_action": [
     "Sydney Mayfield",
     "Sofia Guerrero-wilson",
-    "Carolina Sayeg blak",
-    "Auna Wiegand",
     "Fiona Rigby",
     "Avery Brown",
+    "Kristyn Membreno",
     "India Gantt",
-    "Aubrey Lyssy",
-    "Carolina Sayeg Blak"
+    "Aubrey Lyssy"
    ]
   },
   "Montana St.": {
@@ -11098,6 +11225,12 @@
     "ep": 1788991200,
     "sets": 3,
     "state": "appeared"
+   },
+   {
+    "gid": "6626263",
+    "ep": 1789236000,
+    "sets": 4,
+    "state": "appeared"
    }
   ],
   "Texas|Abby Vander Wal": [
@@ -11526,6 +11659,12 @@
    {
     "gid": "6626261",
     "ep": 1788573600,
+    "sets": 4,
+    "state": "zero_action"
+   },
+   {
+    "gid": "6626263",
+    "ep": 1789236000,
     "sets": 4,
     "state": "zero_action"
    }
