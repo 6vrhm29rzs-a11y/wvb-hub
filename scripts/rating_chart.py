@@ -38,8 +38,9 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SEASON = int(os.environ.get("WVB_SEASON", "2026"))
 SRC = os.path.join(REPO, "data", "rating_history_%d.json" % SEASON)
 OUT = os.path.join(REPO, "Cody", "rating_history_%d.png" % SEASON)
+OUT_SVG = os.path.join(REPO, "Cody", "rating_history_%d.svg" % SEASON)
 TOPN = int(os.environ.get("WVB_CHART_TOP", "50"))
-HILITE = int(os.environ.get("WVB_CHART_HILITE", "8"))
+HILITE = int(os.environ.get("WVB_CHART_HILITE", "20"))
 
 
 def power(scores):
@@ -89,7 +90,7 @@ def main():
             if isinstance(c, str) and c.startswith("#"):
                 colours[k] = c
 
-    fig, ax = plt.subplots(figsize=(15, 9), dpi=160)
+    fig, ax = plt.subplots(figsize=(16, 11), dpi=170)
     fig.patch.set_facecolor("#FFFFFF")
     ax.set_facecolor("#FFFFFF")
 
@@ -202,7 +203,12 @@ def main():
     tmp = OUT + ".partial.png"
     fig.savefig(tmp, facecolor=fig.get_facecolor())
     os.replace(tmp, OUT)
+    tmps = OUT_SVG + ".partial.svg"
+    fig.savefig(tmps, facecolor=fig.get_facecolor(), format="svg")
+    os.replace(tmps, OUT_SVG)
     print("wrote %s" % os.path.relpath(OUT, REPO))
+    print("wrote %s  (vector -- zooms without blurring)"
+          % os.path.relpath(OUT_SVG, REPO))
     print("  %d days, top %d drawn, %d highlighted: %s"
           % (len(pts), TOPN, HILITE, ", ".join(top)))
     return 0

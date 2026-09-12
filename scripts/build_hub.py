@@ -558,6 +558,61 @@ def public_rulers():
     return {k: list(v) for k, v in RULERS.items()
             if not (PUBLIC and k in PRIVATE_RULERS)}
 
+def season_chart_payload():
+    """The rating history, trimmed to what an in-page chart needs.
+
+    Cody, 2026-09-11: "make it more 3d looking and dynamic to fit more info in
+    creatively."
+
+    ⚠ NOT LITERAL 3D, AND THE REASON IS THE DATA. On a line chart the y value
+    IS the information; a perspective projection distorts exactly that, and
+    rotated lines occlude each other so the ones behind cannot be read at all.
+    A 3D line chart shows less than a flat one while looking like it shows
+    more -- which is the opposite of what was asked for.
+    What "fit more info in creatively" actually wants is reach: every team
+    available instead of twenty labels fighting for the right margin. So the
+    chart moves INTO the page, where hovering lifts a line out of the field
+    and names it, and depth comes from layering rather than from geometry.
+
+    Returns None when there is too little history to draw honestly.
+    """
+    import statistics as _st
+    path = os.path.join(REPO, "data", "rating_history_%d.json" % SEASON)
+    if not os.path.exists(path):
+        return None
+    doc = json.load(io.open(path, encoding="utf-8"))
+    pts = doc.get("points") or []
+    if len(pts) < 3:
+        return None
+    days, per_day = [], []
+    for p_ in pts:
+        sc = {t: v.get("score") for t, v in (p_.get("teams") or {}).items()
+              if v.get("score") is not None}
+        if len(sc) < 50:
+            continue
+        m = _st.mean(sc.values())
+        sd = _st.pstdev(list(sc.values()))
+        if not sd:
+            continue
+        # the board's own transform, so the chart and the table agree
+        per_day.append({t: round(max(0.0, min(100.0, 50.0 + 12.5 * (v - m) / sd)), 1)
+                        for t, v in sc.items()})
+        days.append(p_["day"])
+    if len(days) < 3:
+        return None
+    latest = per_day[-1]
+    order = sorted(latest, key=lambda t: -latest[t])
+    keep = order[:60]
+    series = {}
+    for t in keep:
+        # None marks a day with no snapshot -- the line breaks there rather
+        # than drawing straight through dates we never ranked
+        series[t] = [d.get(t) for d in per_day]
+    return {"days": days, "teams": keep, "series": series,
+            "missing": (doc.get("meta") or {}).get("missing_days") or [],
+            "ranks": dict((t, i + 1) for i, t in enumerate(order[:60]))}
+
+
 def ruler_key_html(bases):
     """The colour decoder: swatch, the ruler's NAME IN WORDS, what it is.
 
@@ -1482,6 +1537,7 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
     """
     played = {}
     _di_pl = di_counting()
+    _vidx_res = venue_index()
     for r in res:
         for side, opp, mine, theirs, home in (
                 ("away", r["home"], r["away_sets"], r["home_sets"], False),
@@ -1508,6 +1564,18 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
                          [list(x) for x in r["sets"]]),
                 "venue": ", ".join(x for x in ((r.get("loc") or {}).get("venue"),
                                                (r.get("loc") or {}).get("city")) if x),
+                # ⚠ THREE-VALUED, NOT TWO. `home` is a boolean and cannot say
+                # "neutral", and 719 fixtures this season genuinely are --
+                # while 3,326 are UNCONFIRMED, which is a third state and not
+                # a synonym for away. A home/away split that silently folded
+                # the unknowns in would be inventing 3,326 road games.
+                # ⚠ THE RESULT RECORD DOES NOT CARRY `site` -- it comes from
+                # the venue index, keyed by gid, which is where the fixture
+                # list gets it too. Reading r.get("site") returned None for
+                # every match and filed all 348 teams as "unconfirmed", a
+                # split that looked plausible and said nothing.
+                "site": (_vidx_res.get(str(r.get("gid"))) or {}).get("site")
+                        or "unconfirmed",
             })
 
     # THIS season's W-L, from the very same `played` list the fixtures, the form
@@ -1831,6 +1899,71 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
             o["oav"] = _a
         return o
 
+    def _resume_splits(games):
+        """The resume columns a selection committee actually reads.
+
+        Built from our OWN game log. Reviewed FIGstats (2026-09-11) and it carries
+        home/away/neutral splits, records against RPI tiers, good wins and bad
+        losses, and an opponents' combined record -- while data/resume_2026.json
+        held rank, RPI, W-L and WAB and nothing else. None of it needed a new
+        source; we simply had never computed it.
+
+        ⚠ SITE IS THREE-VALUED. 719 fixtures this season are genuinely neutral and
+        3,326 are UNCONFIRMED, which is not a synonym for away. The unconfirmed
+        bucket is reported as its own number rather than folded into a road record
+        that would then be wrong for 3,326 matches.
+
+        ⚠ TIERS ARE BY **OUR OWN** POWER RANK, and the label says so. Using RPI
+        tiers would import somebody else's ruler; using the AVCA poll would cover
+        only 25 teams. A match whose opponent has no rank (non-D-I) counts in the
+        overall record and in NO tier -- it is excluded, not silently binned.
+
+        ⚠ "GOOD WIN" AND "BAD LOSS" ARE DEFINITIONS, NOT VERDICTS. They are stated
+        on the page in the same words used here: a win over a top-50 opponent, a
+        loss to one outside the top 150. Those cutoffs are conventions borrowed
+        from how the sport talks, not thresholds fitted to anything -- so they are
+        labelled as conventions and never fed to a rating (R1).
+        """
+        TIERS = (("t25", 1, 25), ("t50", 1, 50), ("t100", 1, 100),
+                 ("t101_200", 101, 200), ("t201", 201, 10 ** 6))
+        out = {"site": {"home": [0, 0], "neutral": [0, 0], "unconfirmed": [0, 0]},
+               "tiers": dict((k, [0, 0]) for k, _a, _b in TIERS),
+               "good_wins": 0, "bad_losses": 0,
+               "untiered": 0, "sets": [0, 0],
+               "defs": {"good_win": "a win over a team ranked in our POWER top 50",
+                        "bad_loss": "a loss to a team outside our POWER top 150",
+                        "tiers": "by OUR POWER rank, not RPI or the AVCA poll",
+                        "site": "neutral and unconfirmed are separate; an "
+                                "unconfirmed site is not counted as a road game"}}
+        for g in games:
+            mine, theirs = g.get("mine"), g.get("theirs")
+            if mine is None or theirs is None:
+                continue
+            won = 1 if mine > theirs else 0
+            site = g.get("site") or "unconfirmed"
+            if site not in out["site"]:
+                site = "unconfirmed"
+            out["site"][site][0 if won else 1] += 1
+            for sv in (g.get("sets") or []):
+                try:
+                    out["sets"][0] += 1 if sv[0] > sv[1] else 0
+                    out["sets"][1] += 1 if sv[1] > sv[0] else 0
+                except (TypeError, IndexError):
+                    pass
+            rk = g.get("opr")
+            if not rk:
+                out["untiered"] += 1
+                continue
+            for key, lo, hi in TIERS:
+                if lo <= rk <= hi:
+                    out["tiers"][key][0 if won else 1] += 1
+            if won and rk <= 50:
+                out["good_wins"] += 1
+            if (not won) and rk > 150:
+                out["bad_losses"] += 1
+        return out
+
+
     def _wl_quality(rows):
         """Mean opponent POWER rating across wins and across losses. An
         opponent with no rating (non-D-I, or outside the rated 348)
@@ -1935,6 +2068,8 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
                                 key=lambda x: -(x.get("pts") or 0))[:3]],
             "played": [_opp_ctx(g) for g in played.get(nm, [])],
             "wlq": _wl_quality(played.get(nm, [])),
+            "splits": _resume_splits(
+                [_opp_ctx(g) for g in played.get(nm, [])]),
             "fixtures": [_opp_ctx(dict(f, pick=_fixture_pick(pred_by_pair, f, nm)))
                          for f in fixtures.get(team_norm(nm), [])
                          if f["d"] >= today][:40],
@@ -5558,6 +5693,25 @@ def build():
         .replace("{{CHANGED_HIDDEN}}", "" if _chg else "hidden") \
         .replace("{{RULER_TOKENS}}", ruler_color_css()) \
         .replace("{{RULER_KEYS}}", "") \
+        .replace("{{SEASON_CHART}}", "" if PUBLIC else (
+            '<details class="seasonchart" id="seasonchart">'
+            '<summary>Season movement &middot; POWER, every day</summary>'
+            '<div class="scctl">'
+            '<input id="scq" type="search" placeholder="Highlight a team\u2026" '
+            'autocomplete="off" spellcheck="false">'
+            '<span class="scnote" id="scnote"></span></div>'
+            '<div class="scwrap"><svg id="scsvg" viewBox="0 0 1000 520" '
+            'preserveAspectRatio="xMidYMid meet" role="img" '
+            'aria-label="POWER rating by day for the top teams"></svg>'
+            '<div class="sctip" id="sctip" hidden></div></div>'
+            '<p class="tnote">Hover or tap a line to lift it out. '
+            'POWER = 50 + 12.5z across all 348 &mdash; the same number the '
+            'board shows. Days with no snapshot are gaps, not straight '
+            'lines. <a href="rating_history_%d.svg" target="_blank" '
+            'rel="noopener">Open the printable version</a>.</p>'
+            '</details>' % SEASON)) \
+        .replace("{{SEASON_CHART_JSON}}", json.dumps(
+            season_chart_payload() or {}, separators=(",", ":"))) \
         .replace("{{RULER_KEY}}", ruler_key_html(
             ["power", "resume", "digby", "avca", "rpi", "committee",
              "massey", "vt"])) \
@@ -9948,10 +10102,60 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 .vx-label .vx-key{width:8px;height:8px;border-radius:1px;flex:0 0 8px}
 
 /* the key swatch, wherever a ruler is named */
+.cs-feederr{font:700 10px/1.5 var(--disp);letter-spacing:.1em;
+  text-transform:uppercase;color:#FFB3A7;border:1px dashed rgba(255,179,167,.55);
+  border-radius:3px;padding:2px 7px;align-self:center;white-space:nowrap}
 .feederr{font:700 10px/1.4 var(--disp);letter-spacing:.09em;
   text-transform:uppercase;color:var(--bad);white-space:nowrap;
   border:1px dashed color-mix(in oklab,var(--bad) 55%,transparent);
   border-radius:3px;padding:1px 5px;margin-right:7px}
+.scctl{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:4px 0 8px}
+#scq{flex:1 1 200px;min-width:0;padding:8px 11px;border:1px solid var(--line2);
+  border-radius:var(--r-ctl);font:14px/1.2 var(--sans);background:var(--card);
+  color:var(--ink)}
+.scnote{font:12px/1.3 var(--sans);color:var(--ink3)}
+.scwrap{position:relative;background:
+  linear-gradient(180deg,rgba(74,61,143,.05),rgba(74,61,143,0) 55%),var(--card);
+  border:1px solid var(--line);border-radius:var(--r-card);
+  box-shadow:var(--float);padding:6px 4px 2px}
+#scsvg{width:100%;height:auto;display:block;touch-action:pan-y}
+/* DEPTH IS LAYERING, NOT PERSPECTIVE: the field recedes, the hovered line
+   lifts with a soft shadow and a halo that separates it from the pack. */
+#scsvg .scl{fill:none;stroke-width:1.2;stroke:#CBC7E0;opacity:.85;
+  stroke-linecap:round;stroke-linejoin:round;transition:opacity .12s,
+  stroke-width .12s}
+#scsvg .scl.top{stroke-width:2.1;opacity:1}
+#scsvg.dim .scl{opacity:.18}
+#scsvg .scl.on{opacity:1;stroke-width:3.4;filter:drop-shadow(0 2px 3px
+  rgba(18,41,75,.35))}
+#scsvg .schalo{fill:none;stroke:#fff;stroke-width:5.5;opacity:0;
+  stroke-linecap:round}
+#scsvg .schalo.on{opacity:.9}
+#scsvg .scdot{opacity:0}
+#scsvg .scdot.on{opacity:1}
+#scsvg .scax{font:600 10px/1 var(--mono);fill:var(--ink3)}
+#scsvg .scgrid{stroke:var(--line);stroke-width:.7}
+.sctip{position:absolute;pointer-events:none;z-index:5;background:var(--court);
+  color:var(--chalk);border-radius:5px;padding:6px 9px;font:600 12px/1.45
+  var(--sans);box-shadow:0 6px 18px -8px rgba(18,41,75,.6);white-space:nowrap}
+.sctip b{color:#fff}
+@media (max-width:560px){.scnote{flex:1 1 100%}}
+.rsprow{display:flex;flex-wrap:wrap;gap:8px 10px;margin:8px 0}
+.rsp{border:1px solid var(--line2);border-radius:var(--r-ctl);padding:7px 11px;
+  background:var(--card);min-width:86px}
+.rsp i{display:block;font:700 9px/1.4 var(--disp);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink3);font-style:normal}
+.rsp b{font:800 16px/1.15 var(--mono);color:var(--ink)}
+@media (max-width:560px){.rsp{min-width:0;flex:1 1 30%;padding:6px 8px}
+  .rsp b{font-size:15px}}
+.seasonchart{margin:10px 0 4px;border:1px solid var(--line);
+  border-radius:var(--r-ctl);background:var(--card);padding:0 12px}
+.seasonchart>summary{cursor:pointer;padding:10px 0;font:700 12px/1.3 var(--disp);
+  letter-spacing:.08em;text-transform:uppercase;color:var(--ink)}
+.seasonchart .lead{margin:2px 0 10px}
+.seasonimg{width:100%;height:auto;display:block;border:1px solid var(--line);
+  border-radius:4px;background:#fff}
+@media (max-width:560px){.seasonchart{padding:0 10px}}
 .rkeys{display:flex;flex-wrap:wrap;gap:6px 18px;margin:8px 0 2px;
   padding:9px 11px;border:1px solid var(--line);border-radius:var(--r-ctl);
   background:var(--sheet)}
@@ -10979,6 +11183,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
        repeated, and a height>0 DOM read said "visible" while the screenshot
        showed a collapsed triangle; the pixels were right. -->
   {{RULER_KEY}}
+  {{SEASON_CHART}}
   <details class="rkhow" open id="rkhow">
     <summary>How this ranking works &middot; basis &amp; freshness</summary>
   <!-- ⚠ ONE SENTENCE PER RULER, FROM ONE MAP. A rank means nothing without
@@ -17260,6 +17465,139 @@ function ribbonHTML(m, live, why) {
    ⚠ NO SET IS VALIDATED AGAINST 25 -- the exhibition's real 24-22 set is why.
    ⚠ THE SET IN PROGRESS IS MARKED, NOT CROWNED: its column is tinted and its
    numbers carry no winner-bold, because nobody has won it. */
+/* ══ SEASON MOVEMENT ══════════════════════════════════════════════════════
+   Cody: "make it more 3d looking and dynamic to fit more info in creatively."
+   ⚠ NOT LITERAL 3D. On a line chart the y value IS the information, and a
+   perspective projection distorts exactly that while lines occlude each
+   other -- it would show LESS while looking like more. Depth here is
+   LAYERING: the field recedes, the hovered line lifts on a white halo and a
+   shadow. "More info" is reach -- 60 teams all hoverable instead of 20
+   labels fighting over the right margin. */
+const SCH = {{SEASON_CHART_JSON}};
+(function(){
+  const svg = document.getElementById('scsvg');
+  if (!svg || !SCH || !SCH.days || SCH.days.length < 3) return;
+  const W = 1000, H = 520, L = 44, R = 150, T = 16, B = 46;
+  const days = SCH.days, teams = SCH.teams, ser = SCH.series;
+  let lo = Infinity, hi = -Infinity;
+  teams.forEach(t => (ser[t]||[]).forEach(v => {
+    if (v === null || v === undefined) return;
+    if (v < lo) lo = v; if (v > hi) hi = v;
+  }));
+  const pad = (hi - lo) * 0.06 || 1;
+  lo -= pad; hi += pad;
+  const X = i => L + (W - L - R) * (days.length === 1 ? 0 : i / (days.length - 1));
+  const Y = v => T + (H - T - B) * (1 - (v - lo) / (hi - lo));
+  const esc2 = s2 => String(s2).replace(/[&<>"]/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  /* a team's path, BROKEN at any day we did not publish */
+  function d_(t) {
+    const v = ser[t] || [];
+    let out = '', pen = false;
+    for (let i = 0; i < v.length; i++) {
+      if (v[i] === null || v[i] === undefined) { pen = false; continue; }
+      out += (pen ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(v[i]).toFixed(1) + ' ';
+      pen = true;
+    }
+    return out.trim();
+  }
+  /* an isolated day has no segment and would draw NOTHING -- the same defect
+     the printable chart had, where the most recent day vanished. */
+  function dots(t) {
+    const v = ser[t] || [], out = [];
+    for (let i = 0; i < v.length; i++) {
+      const a = v[i]; if (a === null || a === undefined) continue;
+      const before = i > 0 && v[i-1] !== null && v[i-1] !== undefined;
+      const after = i < v.length-1 && v[i+1] !== null && v[i+1] !== undefined;
+      if (!before && !after) out.push([X(i), Y(a)]);
+    }
+    return out;
+  }
+
+  let g = '';
+  /* recessive grid + axis */
+  const ticks = 5;
+  for (let k = 0; k <= ticks; k++) {
+    const v = lo + (hi - lo) * k / ticks, y = Y(v);
+    g += '<line class="scgrid" x1="' + L + '" y1="' + y.toFixed(1) +
+         '" x2="' + (W - R) + '" y2="' + y.toFixed(1) + '"/>' +
+         '<text class="scax" x="' + (L - 8) + '" y="' + (y + 3.5).toFixed(1) +
+         '" text-anchor="end">' + v.toFixed(0) + '</text>';
+  }
+  days.forEach((dd, i) => {
+    if (days.length > 10 && i % 2) return;
+    g += '<text class="scax" x="' + X(i).toFixed(1) + '" y="' + (H - B + 18) +
+         '" text-anchor="middle">' + esc2(dd.slice(5)) + '</text>';
+  });
+  teams.forEach((t, i) => {
+    /* ⚠ COLORS is the page's own map, not a helper I invented. The first
+       version called TEAMCOLOR(), which does not exist -- the same
+       assumed-helper mistake that has cost time repeatedly today. */
+    const col = ((typeof COLORS !== 'undefined' && COLORS[t]) || {}).primary
+                || '#12294B';
+    const dd = d_(t);
+    const isTop = i < 8;
+    g += '<g class="scg" data-t="' + esc2(t) + '">' +
+         '<path class="schalo" d="' + dd + '"/>' +
+         '<path class="scl' + (isTop ? ' top' : '') + '" d="' + dd +
+         '" style="stroke:' + (isTop ? col : '') + '"/>' +
+         dots(t).map(pt => '<circle class="scdot" cx="' + pt[0].toFixed(1) +
+           '" cy="' + pt[1].toFixed(1) + '" r="2.6" fill="' + col + '"/>').join('') +
+         '</g>';
+  });
+  svg.innerHTML = g;
+
+  const tip = document.getElementById('sctip'), note = document.getElementById('scnote');
+  note.textContent = teams.length + ' teams \u00b7 ' + days.length + ' days';
+  let pinned = null;
+  function show(t, ev) {
+    svg.classList.add('dim');
+    svg.querySelectorAll('.scg').forEach(n => {
+      const on = n.dataset.t === t;
+      n.querySelector('.scl').classList.toggle('on', on);
+      n.querySelector('.schalo').classList.toggle('on', on);
+      n.querySelectorAll('.scdot').forEach(c => c.classList.toggle('on', on));
+      if (on) n.parentNode.appendChild(n);          /* lift to the front */
+    });
+    const v = (ser[t] || []).filter(x => x !== null && x !== undefined);
+    const first = v[0], last = v[v.length - 1];
+    const delta = (last - first);
+    tip.innerHTML = '<b>' + esc2(t) + '</b> \u00b7 POWER ' + last.toFixed(1) +
+      ' \u00b7 rank ' + (SCH.ranks[t] || '\u2014') + '<br>' +
+      (delta >= 0 ? '\u25b2 +' : '\u25bc ') + delta.toFixed(1) +
+      ' since ' + esc2(days[0].slice(5));
+    tip.hidden = false;
+    if (ev) {
+      const r = svg.getBoundingClientRect();
+      tip.style.left = Math.min(r.width - 160, Math.max(4, ev.clientX - r.left + 12)) + 'px';
+      tip.style.top = Math.max(2, ev.clientY - r.top - 40) + 'px';
+    }
+  }
+  function clear() {
+    if (pinned) return;
+    svg.classList.remove('dim');
+    svg.querySelectorAll('.on').forEach(n => n.classList.remove('on'));
+    tip.hidden = true;
+  }
+  svg.addEventListener('mousemove', e => {
+    const g2 = e.target.closest('.scg');
+    if (g2) show(g2.dataset.t, e); else clear();
+  });
+  svg.addEventListener('mouseleave', clear);
+  svg.addEventListener('click', e => {
+    const g2 = e.target.closest('.scg');
+    pinned = (g2 && pinned !== g2.dataset.t) ? g2.dataset.t : null;
+    if (pinned) show(pinned, e); else { pinned = null; clear(); }
+  });
+  const q = document.getElementById('scq');
+  q.addEventListener('input', () => {
+    const s2 = q.value.trim().toLowerCase();
+    if (!s2) { pinned = null; clear(); return; }
+    const hit = teams.find(t => t.toLowerCase().includes(s2));
+    if (hit) { pinned = hit; show(hit, null); }
+  });
+})();
 /* ⚠ THE ONE PLACE A SET SCORE MAY BE COMPARED TO A NUMBER, and it is not a
    format check. test_scoreboard_density forbids `> 25` inside rowLinescore
    for a good reason: set one of SMU-Penn St. finished 24-22, a REAL set in a
@@ -19424,6 +19762,15 @@ function csSide(name, rk, sets, won, serving, quiet) {
 }
 
 function csCells(sets, playing) {
+  /* ⚠ THE LIVE CARD IS A SECOND RENDERER AND IT MISSED THE FEED-ERROR RULE.
+     Cody's phone, 2026-09-11: the Today card still showed Le Moyne-Siena as
+     20/56 and 32/62 -- the very scores that prompted the flag -- because the
+     flag went into rowLinescore and this draws the same match from the same
+     feed by a different path. Two renderers, one rule: a tape the scoring
+     rules forbid is withheld HERE too, and the caller shows the mark.
+     Same lesson as the position-headline fix: a fix applied to one copy of a
+     duplicated line is a fix that has not happened. */
+  if (typeof impossibleTape === 'function' && impossibleTape(sets)) return [];
   /* One cell per PLAYED set (plus the one in progress). Unplayed sets
      render NOTHING -- the dotted placeholder cells for sets four and five
      sat as dead boxes on every three-set night (QA pass, 2026-09-03:
@@ -19653,6 +20000,13 @@ function csTape() {
          a best-of-THREE exhibition, so five cells were wrong twice over.) */
       (quiet || (st === 'final' && !sets.length)
         ? '' : csCells(sets, st === 'live')) +
+      /* the card says WHY its tape is missing, rather than just showing a
+         gap -- the same mark the scoreboard row carries */
+      ((typeof impossibleTape === 'function' && impossibleTape(sets))
+        ? '<div class="cs-feederr" title="The feed sent a set score the ' +
+          'rules of the sport forbid. The set scores are not trustworthy ' +
+          'for this match and are withheld; the result is as reported.">' +
+          'FEED ERROR</div>' : '') +
       '<div class="cs-pad"></div>' +
       csCtx(m, kind, n) +
     '</div>';
@@ -22425,7 +22779,52 @@ function showTeam(name) {
           ' against unrated or non-D-I opponents contribute nothing rather ' +
           'than a stand-in' : '') + '.</div></div>';
       }
-      mbmHtml = qualHtml +
+      /* ⚠ THE RESUME COLUMNS A COMMITTEE ACTUALLY READS: home/away/neutral,
+         records against rank tiers, good wins and bad losses, where ours
+         held rank, RPI, W-L and WAB. None of it needed a new source -- it
+         is all in our own game log and had simply never been computed.
+         Pittsburgh is 5-0 against the top 25 and Texas 2-4; both look fine
+         on the W-L column alone, which is the point. */
+      let splitHtml = '';
+      const sp = t.splits;
+      if (sp && (sp.site.home[0] + sp.site.home[1] + sp.site.neutral[0] +
+                 sp.site.neutral[1] + sp.site.unconfirmed[0] +
+                 sp.site.unconfirmed[1]) > 0) {
+        const wl = a => a[0] + '\u2013' + a[1];
+        const cell = (lab, a, ttl) =>
+          '<div class="rsp"' + (ttl ? ' title="' + esc(ttl) + '"' : '') +
+          '><i>' + lab + '</i><b>' + wl(a) + '</b></div>';
+        const S = sp.site, T = sp.tiers;
+        splitHtml =
+          '<div class="tsec" style="margin-top:14px"><h3>R\u00e9sum\u00e9, 2026</h3>' +
+          '<div class="rsprow">' +
+          cell('HOME', S.home) + cell('NEUTRAL', S.neutral) +
+          /* ⚠ NOT "AWAY". 836 played matches have no confirmed site, and
+             calling those road games would invent 836 of them. */
+          cell('SITE NOT CONFIRMED', S.unconfirmed,
+               'The feed did not report a site for these matches. They are ' +
+               'not counted as road games.') +
+          '</div><div class="rsprow">' +
+          cell('VS TOP 25', T.t25) + cell('VS TOP 50', T.t50) +
+          cell('VS TOP 100', T.t100) + cell('VS 101\u2013200', T.t101_200) +
+          cell('VS 201+', T.t201) +
+          '</div><div class="rsprow">' +
+          '<div class="rsp"><i>GOOD WINS</i><b>' + sp.good_wins + '</b></div>' +
+          '<div class="rsp"><i>BAD LOSSES</i><b>' + sp.bad_losses + '</b></div>' +
+          '<div class="rsp"><i>SETS</i><b>' + wl(sp.sets) + '</b></div>' +
+          '</div>' +
+          '<div class="tnote">Tiers are by <b>our own POWER rank</b>, not RPI ' +
+          'or the AVCA poll \u2014 a different ruler would rank the same ' +
+          'r\u00e9sum\u00e9 differently. ' + esc(sp.defs.good_win) +
+          '; ' + esc(sp.defs.bad_loss) + ' \u2014 those cutoffs are ' +
+          'conventions borrowed from how the sport talks, not thresholds ' +
+          'fitted to anything, and they feed no rating.' +
+          (sp.untiered ? ' ' + sp.untiered + (sp.untiered === 1 ?
+            ' match is' : ' matches are') + ' against an unranked or non-D-I ' +
+            'opponent: counted in the record, in no tier.' : '') +
+          '</div></div>';
+      }
+      mbmHtml = qualHtml + splitHtml +
         '<div class="tsec" style="margin-top:14px"><h3>Match by match, 2026</h3>' +
         '<div class="scroll"><table class="box mbm"><thead><tr>' +
         '<th class="l">Date</th><th class="l">Opponent</th><th>Res</th>' +

@@ -2,22 +2,22 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 1184,
+  "scored": 1185,
   "logged_after_tipoff_excluded": 3,
   "team_mismatch_excluded": 32,
   "predictions_on_record": 4807,
-  "results_available": 1244,
-  "brier": 0.1737,
+  "results_available": 1245,
+  "brier": 0.173,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 879,
-  "favourite_correct_pct": 74.2
+  "favourite_correct": 880,
+  "favourite_correct_pct": 74.3
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 209,
+   "n": 210,
    "said": 55.2,
-   "happened": 58.4
+   "happened": 58.1
   },
   {
    "range": "60-70%",
@@ -40,20 +40,11 @@
   {
    "range": "90-101%",
    "n": 358,
-   "said": 95.6,
-   "happened": 92.2
+   "said": 95.5,
+   "happened": 92.5
   }
  ],
  "matches": [
-  {
-   "game_id": "6626935",
-   "date": "2026-09-11",
-   "away": "FIU",
-   "home": "Hampton",
-   "p_home": 0.0001,
-   "home_won": true,
-   "brier": 0.9998000100000001
-  },
   {
    "game_id": "6627232",
    "date": "2026-08-28",
@@ -494,6 +485,15 @@
    "p_home": 0.1455,
    "home_won": true,
    "brier": 0.73017025
+  },
+  {
+   "game_id": "6626484",
+   "date": "2026-08-29",
+   "away": "UIC",
+   "home": "Saint Louis",
+   "p_home": 0.1503,
+   "home_won": true,
+   "brier": 0.72199009
   }
  ]
 }

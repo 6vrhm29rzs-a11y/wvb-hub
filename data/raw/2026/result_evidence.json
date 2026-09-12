@@ -784,6 +784,24 @@
     "review_by": null,
     "collector": true
    }
+  ],
+  "6626935": [
+   {
+    "url": "https://fiusports.com/services/schedule_txt.ashx?schedule=378",
+    "kind": "school_schedule",
+    "school": "FIU",
+    "retrieved": "2026-09-11T00:00:00Z",
+    "text": "FIU's own published schedule for 2026-09-11: 'W 3-0' vs Hampton, site Neutral (Florida A&M Tournament).",
+    "fields": [
+     "result"
+    ],
+    "value": {
+     "result": "FIU won 3-0 over Hampton. The NCAA feed carries the same 3-0 set line with the WINNER INVERTED (Hampton 3-0), and the feed's own lineup rows fit the opposite rosters -- 6/6 starters filed under Hampton are FIU players, 5/6 under FIU are Hampton players."
+    },
+    "status": "conflicts",
+    "review_by": "2026-09-14",
+    "note": "ONE official source against the feed, plus machine corroboration. Hampton's schedule carries the row for this date (opponent 'Florida International', Florida A&M Tournament, Al Lawson Center) with its RESULT CELL STILL EMPTY, so the second source has not posted. Per the Purdue Fort Wayne-Kansas City precedent this is a conflict that counts NOWHERE, never a correction on one source. ⚠ IT WAS FIRST FILED ONLY IN attribution_pending, whose own doc says a pending gid is 'counted as the feed says' -- so the intended HOLD did not hold: the match counted, and the night mail led its UPSETS list with 'Hampton def FIU, 191 places', the single loudest line in the report, for a result one official source says did not happen. The lineup signal belongs there; the COUNTING hold belongs here."
+   }
   ]
  }
 }

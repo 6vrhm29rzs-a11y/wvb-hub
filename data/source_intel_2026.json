@@ -1,17 +1,17 @@
 {
  "meta": {
   "season": 2026,
-  "generated_at_utc": "2026-09-12T05:44:46Z",
-  "n_claims": 86,
+  "generated_at_utc": "2026-09-12T07:03:57Z",
+  "n_claims": 87,
   "feed_cap": 5,
   "recent_hours": 72,
   "states": {
    "confirmed_official": 52,
    "corroborated": 10,
    "official_unconfirmed": 0,
-   "community_signal": 8,
-   "conflicting": 8,
-   "expired": 7,
+   "community_signal": 4,
+   "conflicting": 9,
+   "expired": 11,
    "inaccessible": 1
   }
  },
@@ -2473,6 +2473,35 @@
    "review_by": null
   },
   {
+   "id": "94a63a100d41",
+   "type": "result_conflict",
+   "subject": {
+    "kind": "match",
+    "gid": "6626935"
+   },
+   "what": "An attributable source disputes this result — Hampton v FIU",
+   "state": "conflicting",
+   "state_label": "sources conflict — shown, not chosen",
+   "why": "shown, never chosen; the Result Ledger holds both claims",
+   "scope": "that sources disagree about this result",
+   "sources": [
+    {
+     "url": "https://fiusports.com/services/schedule_txt.ashx?schedule=378",
+     "excerpt": "FIU's own published schedule for 2026-09-11: 'W 3-0' vs Hampton, site Neutral (Florida A&M Tournament).",
+     "retrieved": "2026-09-11T00:00:00Z",
+     "source_class": "school_schedule"
+    }
+   ],
+   "public": true,
+   "priority": 95,
+   "route": {
+    "match": "6626935",
+    "ledger": true
+   },
+   "effective": null,
+   "review_by": null
+  },
+  {
    "id": "1f6b55660128",
    "type": "availability",
    "subject": {
@@ -2505,74 +2534,6 @@
    "review_by": "2026-09-15",
    "source_kind": "community_forum",
    "source_kind_label": "COMMUNITY"
-  },
-  {
-   "id": "0f6bce5007d1",
-   "type": "availability",
-   "subject": {
-    "kind": "player",
-    "team": "Kentucky",
-    "player": "Kennedy Washington"
-   },
-   "what": "Kennedy Washington (Kentucky): availability signal",
-   "state": "community_signal",
-   "state_label": "community signal — a lead, not a fact",
-   "why": "community signal — a lead, not a fact",
-   "scope": "one player's availability for the stated dates",
-   "sources": [
-    {
-     "url": null,
-     "excerpt": "are you keeping track of big players being unavailable or available like if/when jaidyn livings comes back for smu. if andi jackson's ankle sprain will keep her out for a bit, kenna wollard situation and updates, champion (6'6 puerto rican national team outside) getting to campus at wisconsin and assumably will play soon, grace egan and jaela auguste being out for wisconsin in the last few matches",
-     "retrieved": "2026-09-05T04:01:29Z",
-     "source_class": "community"
-    }
-   ],
-   "public": false,
-   "priority": 45,
-   "route": {
-    "team": "Kentucky"
-   },
-   "effective": {
-    "from": "2026-09-02",
-    "to": null
-   },
-   "review_by": "2026-09-11",
-   "source_kind": "cody_observation",
-   "source_kind_label": "EYE TEST"
-  },
-  {
-   "id": "d7f7dcad99cf",
-   "type": "availability",
-   "subject": {
-    "kind": "player",
-    "team": "Nebraska",
-    "player": "Andi Jackson"
-   },
-   "what": "Andi Jackson (Nebraska): availability signal",
-   "state": "community_signal",
-   "state_label": "community signal — a lead, not a fact",
-   "why": "community signal — a lead, not a fact",
-   "scope": "one player's availability for the stated dates",
-   "sources": [
-    {
-     "url": null,
-     "excerpt": "are you keeping track of big players being unavailable or available like if/when jaidyn livings comes back for smu. if andi jackson's ankle sprain will keep her out for a bit, kenna wollard situation and updates, champion (6'6 puerto rican national team outside) getting to campus at wisconsin and assumably will play soon, grace egan and jaela auguste being out for wisconsin in the last few matches",
-     "retrieved": "2026-09-05T04:01:29Z",
-     "source_class": "community"
-    }
-   ],
-   "public": false,
-   "priority": 45,
-   "route": {
-    "team": "Nebraska"
-   },
-   "effective": {
-    "from": "2026-09-04",
-    "to": null
-   },
-   "review_by": "2026-09-11",
-   "source_kind": "cody_observation",
-   "source_kind_label": "EYE TEST"
   },
   {
    "id": "fa884968b9a3",
@@ -2641,40 +2602,6 @@
    "review_by": "2026-09-13",
    "source_kind": "player_statement",
    "source_kind_label": "PLAYER STATEMENT"
-  },
-  {
-   "id": "6b3ed7c3dc5a",
-   "type": "availability",
-   "subject": {
-    "kind": "player",
-    "team": "SMU",
-    "player": "Jadyn Livings"
-   },
-   "what": "Jadyn Livings (SMU): availability signal",
-   "state": "community_signal",
-   "state_label": "community signal — a lead, not a fact",
-   "why": "community signal — a lead, not a fact",
-   "scope": "one player's availability for the stated dates",
-   "sources": [
-    {
-     "url": null,
-     "excerpt": "are you keeping track of big players being unavailable or available like if/when jaidyn livings comes back for smu. if andi jackson's ankle sprain will keep her out for a bit, kenna wollard situation and updates, champion (6'6 puerto rican national team outside) getting to campus at wisconsin and assumably will play soon, grace egan and jaela auguste being out for wisconsin in the last few matches",
-     "retrieved": "2026-09-05T04:01:29Z",
-     "source_class": "community"
-    }
-   ],
-   "public": false,
-   "priority": 45,
-   "route": {
-    "team": "SMU"
-   },
-   "effective": {
-    "from": "2026-08-23",
-    "to": null
-   },
-   "review_by": "2026-09-11",
-   "source_kind": "cody_observation",
-   "source_kind_label": "EYE TEST"
   },
   {
    "id": "eb06a881496b",
@@ -2785,40 +2712,6 @@
    "source_kind_label": "EYE TEST"
   },
   {
-   "id": "1c34d578f7c8",
-   "type": "availability",
-   "subject": {
-    "kind": "player",
-    "team": "Wisconsin",
-    "player": "Grace Egan"
-   },
-   "what": "Grace Egan (Wisconsin): availability signal",
-   "state": "community_signal",
-   "state_label": "community signal — a lead, not a fact",
-   "why": "community signal — a lead, not a fact",
-   "scope": "one player's availability for the stated dates",
-   "sources": [
-    {
-     "url": null,
-     "excerpt": "are you keeping track of big players being unavailable or available like if/when jaidyn livings comes back for smu. if andi jackson's ankle sprain will keep her out for a bit, kenna wollard situation and updates, champion (6'6 puerto rican national team outside) getting to campus at wisconsin and assumably will play soon, grace egan and jaela auguste being out for wisconsin in the last few matches",
-     "retrieved": "2026-09-05T04:01:29Z",
-     "source_class": "community"
-    }
-   ],
-   "public": false,
-   "priority": 45,
-   "route": {
-    "team": "Wisconsin"
-   },
-   "effective": {
-    "from": "2026-08-30",
-    "to": null
-   },
-   "review_by": "2026-09-11",
-   "source_kind": "cody_observation",
-   "source_kind_label": "EYE TEST"
-  },
-  {
    "id": "7e5d6a47bcb2",
    "type": "availability",
    "subject": {
@@ -2913,9 +2806,167 @@
     "to": null
    },
    "review_by": "2026-09-09"
+  },
+  {
+   "id": "d7f7dcad99cf",
+   "type": "availability",
+   "subject": {
+    "kind": "player",
+    "team": "Nebraska",
+    "player": "Andi Jackson"
+   },
+   "what": "Andi Jackson (Nebraska): availability signal",
+   "state": "expired",
+   "state_label": "evidence past its review date",
+   "why": "evidence past its review date",
+   "scope": "one player's availability for the stated dates",
+   "sources": [
+    {
+     "url": null,
+     "excerpt": "are you keeping track of big players being unavailable or available like if/when jaidyn livings comes back for smu. if andi jackson's ankle sprain will keep her out for a bit, kenna wollard situation and updates, champion (6'6 puerto rican national team outside) getting to campus at wisconsin and assumably will play soon, grace egan and jaela auguste being out for wisconsin in the last few matches",
+     "retrieved": "2026-09-05T04:01:29Z",
+     "source_class": "community"
+    }
+   ],
+   "public": false,
+   "priority": 20,
+   "route": {
+    "team": "Nebraska"
+   },
+   "effective": {
+    "from": "2026-09-04",
+    "to": null
+   },
+   "review_by": "2026-09-11"
+  },
+  {
+   "id": "0f6bce5007d1",
+   "type": "availability",
+   "subject": {
+    "kind": "player",
+    "team": "Kentucky",
+    "player": "Kennedy Washington"
+   },
+   "what": "Kennedy Washington (Kentucky): availability signal",
+   "state": "expired",
+   "state_label": "evidence past its review date",
+   "why": "evidence past its review date",
+   "scope": "one player's availability for the stated dates",
+   "sources": [
+    {
+     "url": null,
+     "excerpt": "are you keeping track of big players being unavailable or available like if/when jaidyn livings comes back for smu. if andi jackson's ankle sprain will keep her out for a bit, kenna wollard situation and updates, champion (6'6 puerto rican national team outside) getting to campus at wisconsin and assumably will play soon, grace egan and jaela auguste being out for wisconsin in the last few matches",
+     "retrieved": "2026-09-05T04:01:29Z",
+     "source_class": "community"
+    }
+   ],
+   "public": false,
+   "priority": 20,
+   "route": {
+    "team": "Kentucky"
+   },
+   "effective": {
+    "from": "2026-09-02",
+    "to": null
+   },
+   "review_by": "2026-09-11"
+  },
+  {
+   "id": "1c34d578f7c8",
+   "type": "availability",
+   "subject": {
+    "kind": "player",
+    "team": "Wisconsin",
+    "player": "Grace Egan"
+   },
+   "what": "Grace Egan (Wisconsin): availability signal",
+   "state": "expired",
+   "state_label": "evidence past its review date",
+   "why": "evidence past its review date",
+   "scope": "one player's availability for the stated dates",
+   "sources": [
+    {
+     "url": null,
+     "excerpt": "are you keeping track of big players being unavailable or available like if/when jaidyn livings comes back for smu. if andi jackson's ankle sprain will keep her out for a bit, kenna wollard situation and updates, champion (6'6 puerto rican national team outside) getting to campus at wisconsin and assumably will play soon, grace egan and jaela auguste being out for wisconsin in the last few matches",
+     "retrieved": "2026-09-05T04:01:29Z",
+     "source_class": "community"
+    }
+   ],
+   "public": false,
+   "priority": 20,
+   "route": {
+    "team": "Wisconsin"
+   },
+   "effective": {
+    "from": "2026-08-30",
+    "to": null
+   },
+   "review_by": "2026-09-11"
+  },
+  {
+   "id": "6b3ed7c3dc5a",
+   "type": "availability",
+   "subject": {
+    "kind": "player",
+    "team": "SMU",
+    "player": "Jadyn Livings"
+   },
+   "what": "Jadyn Livings (SMU): availability signal",
+   "state": "expired",
+   "state_label": "evidence past its review date",
+   "why": "evidence past its review date",
+   "scope": "one player's availability for the stated dates",
+   "sources": [
+    {
+     "url": null,
+     "excerpt": "are you keeping track of big players being unavailable or available like if/when jaidyn livings comes back for smu. if andi jackson's ankle sprain will keep her out for a bit, kenna wollard situation and updates, champion (6'6 puerto rican national team outside) getting to campus at wisconsin and assumably will play soon, grace egan and jaela auguste being out for wisconsin in the last few matches",
+     "retrieved": "2026-09-05T04:01:29Z",
+     "source_class": "community"
+    }
+   ],
+   "public": false,
+   "priority": 20,
+   "route": {
+    "team": "SMU"
+   },
+   "effective": {
+    "from": "2026-08-23",
+    "to": null
+   },
+   "review_by": "2026-09-11"
   }
  ],
  "feed": [
+  {
+   "id": "94a63a100d41",
+   "type": "result_conflict",
+   "subject": {
+    "kind": "match",
+    "gid": "6626935"
+   },
+   "what": "An attributable source disputes this result — Hampton v FIU",
+   "state": "conflicting",
+   "state_label": "sources conflict — shown, not chosen",
+   "why": "shown, never chosen; the Result Ledger holds both claims",
+   "scope": "that sources disagree about this result",
+   "sources": [
+    {
+     "url": "https://fiusports.com/services/schedule_txt.ashx?schedule=378",
+     "excerpt": "FIU's own published schedule for 2026-09-11: 'W 3-0' vs Hampton, site Neutral (Florida A&M Tournament).",
+     "retrieved": "2026-09-11T00:00:00Z",
+     "source_class": "school_schedule"
+    }
+   ],
+   "public": true,
+   "priority": 95,
+   "route": {
+    "match": "6626935",
+    "ledger": true
+   },
+   "effective": null,
+   "review_by": null,
+   "first_seen": "2026-09-12T06:43:50Z"
+  },
   {
    "id": "13ff7bba0214",
    "type": "result_correction",
@@ -2989,41 +3040,6 @@
    "first_seen": "2026-09-11T15:42:45Z"
   },
   {
-   "id": "d7f7dcad99cf",
-   "type": "availability",
-   "subject": {
-    "kind": "player",
-    "team": "Nebraska",
-    "player": "Andi Jackson"
-   },
-   "what": "Andi Jackson (Nebraska): availability signal",
-   "state": "community_signal",
-   "state_label": "community signal — a lead, not a fact",
-   "why": "community signal — a lead, not a fact",
-   "scope": "one player's availability for the stated dates",
-   "sources": [
-    {
-     "url": null,
-     "excerpt": "are you keeping track of big players being unavailable or available like if/when jaidyn livings comes back for smu. if andi jackson's ankle sprain will keep her out for a bit, kenna wollard situation and updates, champion (6'6 puerto rican national team outside) getting to campus at wisconsin and assumably will play soon, grace egan and jaela auguste being out for wisconsin in the last few matches",
-     "retrieved": "2026-09-05T04:01:29Z",
-     "source_class": "community"
-    }
-   ],
-   "public": false,
-   "priority": 45,
-   "route": {
-    "team": "Nebraska"
-   },
-   "effective": {
-    "from": "2026-09-04",
-    "to": null
-   },
-   "review_by": "2026-09-11",
-   "source_kind": "cody_observation",
-   "source_kind_label": "EYE TEST",
-   "first_seen": "2026-09-10T16:34:08Z"
-  },
-  {
    "id": "4678803557c1",
    "type": "fixture_evidence",
    "subject": {
@@ -3043,6 +3059,39 @@
    },
    "effective": null,
    "review_by": "2026-09-09",
+   "first_seen": "2026-09-10T16:34:08Z"
+  },
+  {
+   "id": "d7f7dcad99cf",
+   "type": "availability",
+   "subject": {
+    "kind": "player",
+    "team": "Nebraska",
+    "player": "Andi Jackson"
+   },
+   "what": "Andi Jackson (Nebraska): availability signal",
+   "state": "expired",
+   "state_label": "evidence past its review date",
+   "why": "evidence past its review date",
+   "scope": "one player's availability for the stated dates",
+   "sources": [
+    {
+     "url": null,
+     "excerpt": "are you keeping track of big players being unavailable or available like if/when jaidyn livings comes back for smu. if andi jackson's ankle sprain will keep her out for a bit, kenna wollard situation and updates, champion (6'6 puerto rican national team outside) getting to campus at wisconsin and assumably will play soon, grace egan and jaela auguste being out for wisconsin in the last few matches",
+     "retrieved": "2026-09-05T04:01:29Z",
+     "source_class": "community"
+    }
+   ],
+   "public": false,
+   "priority": 20,
+   "route": {
+    "team": "Nebraska"
+   },
+   "effective": {
+    "from": "2026-09-04",
+    "to": null
+   },
+   "review_by": "2026-09-11",
    "first_seen": "2026-09-10T16:34:08Z"
   }
  ]

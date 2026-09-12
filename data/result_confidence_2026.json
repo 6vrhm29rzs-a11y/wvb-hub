@@ -2,15 +2,15 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "corpus_fingerprint": "31e577aca8ba3f1a",
-  "generated_at_utc": "2026-09-12T05:44:46Z",
+  "corpus_fingerprint": "d70302d042575730",
+  "generated_at_utc": "2026-09-12T07:03:57Z",
   "counts": {
-   "finals": 1277,
+   "finals": 1279,
    "official_only": 37,
-   "reconciled": 1191,
+   "reconciled": 1192,
    "confirmed": 0,
-   "disputed": 2,
-   "pending_second": 1275,
+   "disputed": 3,
+   "pending_second": 1276,
    "corrected": 47,
    "duplicate_listings": 8,
    "duplicate_candidates_pending": 0
@@ -54403,9 +54403,9 @@
    "h": "Hampton",
    "exh": false,
    "d": "2026-09-11",
-   "overall": "reconciled",
+   "overall": "disputed",
    "states": {
-    "result": "reconciled",
+    "result": "disputed",
     "sets": "reconciled",
     "box": "reconciled",
     "venue": "unavailable"
@@ -54433,18 +54433,18 @@
    },
    "n_indep": 1,
    "n_attempted": 0,
-   "last_checked": "2026-09-12T03:51:22Z",
+   "last_checked": "2026-09-11T00:00:00Z",
    "sources": [
     {
      "url": "https://fiusports.com/services/schedule_txt.ashx?schedule=378",
      "kind": "school_schedule",
      "school": "FIU",
-     "text": "FIU W 3-0 vs Hampton",
+     "text": "FIU's own published schedule for 2026-09-11: 'W 3-0' vs Hampton, site Neutral (Florida A&M Tournament).",
      "fields": [
       "result"
      ],
-     "status": "conflict_observed",
-     "retrieved": "2026-09-12T03:51:22Z"
+     "status": "conflicts",
+     "retrieved": "2026-09-11T00:00:00Z"
     }
    ]
   },
@@ -65673,6 +65673,34 @@
    "dup_reason": null,
    "dup_asym": null,
    "dup_evidence": [],
+   "gid": "6626683",
+   "a": "Brown",
+   "h": "Long Beach St.",
+   "exh": false,
+   "d": "2026-09-11",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "verify": null,
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
    "gid": "6628243",
    "a": "Arizona",
    "h": "Southern California",
@@ -65745,6 +65773,63 @@
      ],
      "status": "confirms",
      "retrieved": "2026-09-12T03:51:22Z"
+    }
+   ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6628699",
+   "a": "Central Ark.",
+   "h": "Hawaii",
+   "exh": false,
+   "d": "2026-09-11",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "official"
+   },
+   "verify": {
+    "v": "CORROBORATED_ONE",
+    "checked": "2026-09-12T07:02:58Z",
+    "schools": {
+     "Hawaii": {
+      "state": "EVENT_NOT_FOUND",
+      "url": "https://hawaiiathletics.com/services/schedule_txt.ashx?schedule=4497",
+      "rows_on_date": []
+     },
+     "Central Ark.": {
+      "state": "AGREE_COMPLETE",
+      "url": "https://ucasports.com/services/schedule_txt.ashx?schedule=1309",
+      "assertion": "Central Ark. L 0-3 vs Hawaii",
+      "opponent_source": "Hawaii",
+      "site_says": "Away"
+     }
+    }
+   },
+   "n_indep": 1,
+   "n_attempted": 0,
+   "last_checked": "2026-09-12T07:02:58Z",
+   "sources": [
+    {
+     "url": "https://ucasports.com/services/schedule_txt.ashx?schedule=1309",
+     "kind": "school_schedule",
+     "school": "Central Ark.",
+     "text": "Central Ark. L 0-3 vs Hawaii",
+     "fields": [
+      "result"
+     ],
+     "status": "confirms",
+     "retrieved": "2026-09-12T07:02:58Z"
     }
    ]
   }
