@@ -1,10 +1,9 @@
 {
  "date": "2026-09-12",
- "generated_utc": "2026-09-12T17:43:36Z",
+ "generated_utc": "2026-09-12T17:52:28Z",
  "counts": {
-  "CORROBORATED_ONE": 15,
+  "CORROBORATED_ONE": 16,
   "VERIFIED_BOTH": 3,
-  "UNVERIFIED": 1,
   "CONTRADICTED_BOTH": 1
  },
  "matches": [
@@ -130,20 +129,14 @@
    "gid": "6626334",
    "date": "2026-09-12",
    "canonical": "Duquesne def. Notre Dame 3-2",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Duquesne": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://goduquesne.com/services/schedule_txt.ashx?schedule=2679",
-     "row": [
-      "Sep 12 (Sat)",
-      "10:00 a.m.",
-      "Neutral",
-      "Notre Dame",
-      "Charleston, S.C.",
-      "",
-      ""
-     ]
+     "assertion": "Duquesne W 3-2 vs Notre Dame",
+     "opponent_source": "Notre Dame",
+     "site_says": "Neutral"
     },
     "Notre Dame": {
      "state": "SITE_HTTP_MISS",
