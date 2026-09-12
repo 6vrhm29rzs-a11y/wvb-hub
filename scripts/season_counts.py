@@ -397,6 +397,17 @@ def is_self_contradictory(g):
     again)."""
     if (g.get("game_state") or g.get("state")) != "F":
         return False
+
+    _w = winner_index(g)
+    if _w is not None:
+        _ts = g.get("teams") or []
+        _sw = _ts[_w].get("sets_won") if len(_ts) == 2 else None
+        try:
+            if _sw is not None and int(_sw) < 3:
+                return True
+        except (TypeError, ValueError):
+            pass
+
     ls = [(l.get("visit"), l.get("home"))
           for l in (g.get("linescores") or [])
           if l.get("home") is not None and l.get("visit") is not None]

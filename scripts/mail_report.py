@@ -128,7 +128,25 @@ def night(day=None):
         for r in rk[:25]:
             W(line(r))
         W("")
-    rest = len(rows) - len(ups) - min(len(rk), 25)
+    def close_call(r):
+        if r in ups:
+            return False
+        lo_, wn = r.get("lose_rank"), r.get("mine_rank")
+        if not (lo_ and wn) or wn >= lo_:
+            return False                      # the favourite must have WON
+        if (lo_ - wn) < 40:
+            return False                      # ...and by a wide margin of rank
+        return r["ls"] >= 2                   # taken to four or five sets
+
+    cc = [r for r in rows if close_call(r)]
+    cc.sort(key=lambda r: -((r.get("lose_rank") or 0) - (r.get("mine_rank") or 0)))
+    if cc:
+        W("  CLOSE CALLS  (a heavy favourite taken to 4 or 5 sets)")
+        for r in cc[:10]:
+            W(line(r, "   %d places" % ((r.get("lose_rank") or 0) - (r.get("mine_rank") or 0))))
+        W("")
+
+    rest = len(rows) - len(ups) - min(len(rk), 25) - len(cc)
     if rest > 0:
         W("  %d further counted results are on the site." % rest)
         W("")
@@ -153,7 +171,9 @@ def night(day=None):
     W("-" * 62)
     W("  Counted matches only: exhibitions, duplicate feed listings and")
     W("  results under review are excluded, the same rule the site uses.")
-    W("  Upset size is measured in POWER places, our own ruler.")
+    W("  Upset size is measured in POWER places, our own ruler. A CLOSE CALL")
+    W("  is a favourite ranked 40+ places higher that still dropped two sets.")
+    W("  Both thresholds are conventions, not fitted numbers, and feed nothing.")
     W("")
     W("  Full site: https://codys-macbook-pro.tail069aa6.ts.net/START-HERE.html")
     return "\n".join(out)

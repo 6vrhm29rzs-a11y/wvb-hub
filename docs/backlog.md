@@ -51,6 +51,40 @@ seen in any state. Next step is to take a handful of the −1 teams and diff
 our match list against the school's own published schedule, which is what
 settled every case above.
 
+### Ideas and sources from VolleyTalk (2026-09-12)
+Scoured the board. What is worth having:
+
+**A third results source: themonsterblock.com.** Built by a VT member
+(kingofcrank), publishes every match with its FULL SET LINE by conference,
+plus rankings, standings, team and player stats, and a daily 7 AM email.
+⚠ **It is independently sourced, not a feed mirror** — proven on the match I
+corrected today: it shows "Holy Cross 3 @ Manhattan 1 (18-25, 26-24, 27-25,
+25-18)", Holy Cross's column matching my corrected line DIGIT FOR DIGIT while
+the NCAA feed says Manhattan won. That makes it a genuine third check on
+inversions, which is exactly what the two-source rule is short of. No
+robots.txt; it is a hobbyist site, so read lightly and never crawl it hard.
+**Next:** capture it the way Massey/Evollve are captured, and use it as the
+second source for the matches whose schools do not parse (Little Rock, Wiley).
+
+**"Almosts" — BUILT.** Their season-long upset thread tracks near-misses as
+well as upsets, on the reasoning that those are what you want to look back
+on. The night email now has a **CLOSE CALLS** section: a favourite ranked
+40+ places higher that still dropped two sets. First night it fired on three.
+
+**Upsets by poll rank vs by rating.** The room argues about whether a result
+is *"an upset only in name recognition sense"* — they judge by AVCA rank, we
+judge by POWER places. Both are defensible and they answer different
+questions. **Idea:** show both in the email — the AVCA framing is the one
+people actually argue about.
+
+**Threads worth watching** (availability signals ONLY, never a status — a
+post saying a player is out is a prompt to go and look):
+`2026 Upset Alerts` · per-team threads (Nebraska, Wisconsin, Washington,
+Minnesota, Tennessee, Hawaii, Iowa) · `Fall 2026 Match Threads & stream
+links` · `2026 Passing Stats Thread` — passing/serve-receive quality, which
+the NCAA feed does not carry at all and which we cannot compute.
+Example caught today: *"a&m without stowers"*.
+
 ### The reconciliation is a permanent script now (2026-09-12)
 `scripts/school_reconcile.py` diffs our counted matches against every school's
 own schedule BY DATE. Full run through 09-11: **265 of 351 teams agree on
