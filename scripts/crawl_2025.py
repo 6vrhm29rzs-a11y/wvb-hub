@@ -646,7 +646,23 @@ def crawl_players():
     # buys a pile of failures that hide a real one.
     finals = final_game_ids(GAMES_JSONL)
     have = set(load_records_jsonl(PLAYERBOX_JSONL, key="game_id"))
-    todo = [g for g in ids if g in finals and g not in have]
+    # ⚠ REFETCH IS OPT-IN AND OFF BY DEFAULT. Added 2026-09-11 when the
+    # extractor started keeping eight raw counts it had been discarding all
+    # season (service errors, serve/reception attempts and errors, ball-
+    # handling, set and blocking errors, starter). The rows already on disk
+    # are THIN, not wrong, and the boxscore endpoint still serves complete
+    # data for games weeks old -- verified on the season's first match -- so
+    # the gap is recoverable rather than lost. This log is per-gid
+    # last-wins, so a refetched record supersedes its thin predecessor and
+    # nothing has to be deleted.
+    # It stays opt-in because the daily job must NEVER re-fetch 1,200 games
+    # on a 30-minute cadence.
+    if os.environ.get("WVB_PLAYERS_REFETCH") == "1":
+        todo = [g for g in ids if g in finals]
+        print("players: REFETCH requested -- re-fetching all %d finals"
+              % len(todo))
+    else:
+        todo = [g for g in ids if g in finals and g not in have]
     print("players: %d games enumerated, %d final, %d on disk, %d to fetch"
           % (len(ids), len(finals), len(have), len(todo)))
 
@@ -677,6 +693,37 @@ def crawl_players():
                                 "digs": ps.get("digs"),
                                 "bs": ps.get("blockSolos"), "ba": ps.get("blockAssists"),
                                 "assists": ps.get("assists"), "points": ps.get("points"),
+                                # ⚠ EIGHT RAW COUNTS WE HAD BEEN DISCARDING
+                                # ALL SEASON (Cody, 2026-09-11: "are we not
+                                # tracking service errors in box scores? ...
+                                # ALL points of stats and data is necessary").
+                                # He was right. The feed carries 27 fields per
+                                # player and this extractor kept 9. MEASURED
+                                # over 10 games / 335 rows before adding them:
+                                # every one below is 100% populated. The only
+                                # genuinely empty field is setAttempts (0%),
+                                # which is therefore NOT stored -- an always-
+                                # empty column is a promise the data cannot
+                                # keep.
+                                # Names are spelled out rather than shortened.
+                                # This codebase has already shipped two files
+                                # disagreeing about whether `aps` meant aces,
+                                # assists or attacks (R4); eight new terse
+                                # codes is how that happens a third time.
+                                # ⚠ ADDITIVE ONLY. Every existing key keeps
+                                # its name and meaning, so no consumer of
+                                # playerbox.jsonl changes behaviour.
+                                "serve_errors": ps.get("serviceErrors"),
+                                "serve_atts": ps.get("serveAttempts"),
+                                "recv_atts": ps.get("receptionAttempts"),
+                                "recv_errors": ps.get("receptionErrors"),
+                                "bh_errors": ps.get("ballHandlingErrors"),
+                                "set_errors": ps.get("setErrors"),
+                                "block_errors": ps.get("blockingErrors"),
+                                # `participated` is the filter above, so every
+                                # stored row participated; `starter` is new
+                                # information and is kept.
+                                "starter": ps.get("starter"),
                             })
                     out.write(json.dumps({"game_id": gid, "rows": rows}) + "\n")
                     out.flush()
@@ -841,12 +888,36 @@ def crawl_players():
                 "matches": 0, "sets": 0, "kills": 0, "errors": 0, "atts": 0,
                 "aces": 0, "digs": 0, "block_solos": 0, "block_assists": 0,
                 "assists": 0, "points": 0,
+                # ⚠ THE ERROR SIDE, CARRIED THROUGH TO THE AGGREGATE
+                # (Cody, 2026-09-11: "I look at the Stanford matches and want
+                # to know how many serves they miss because they miss a lot.
+                # Same with Texas" ... "I just want the good, bad, and ugly
+                # stats accurately represented and included.")
+                # Capturing these in playerbox was necessary and not
+                # sufficient -- nothing downstream reads the raw log, so an
+                # aggregate that stops at the flattering columns is where the
+                # gap would have survived the fix.
+                "serve_errors": 0, "serve_atts": 0,
+                "recv_atts": 0, "recv_errors": 0,
+                "bh_errors": 0, "set_errors": 0, "block_errors": 0,
+                "starts": 0,
             })
             e["matches"] += 1
+            # boolean per match, so it COUNTS rather than sums -- `starts`
+            # is "how many times she started", not a running total of True
+            if r.get("starter"):
+                e["starts"] += 1
             for src, dst in (("gp", "sets"), ("kills", "kills"), ("errors", "errors"),
                              ("atts", "atts"), ("aces", "aces"), ("digs", "digs"),
                              ("bs", "block_solos"), ("ba", "block_assists"),
-                             ("assists", "assists"), ("points", "points")):
+                             ("assists", "assists"), ("points", "points"),
+                             ("serve_errors", "serve_errors"),
+                             ("serve_atts", "serve_atts"),
+                             ("recv_atts", "recv_atts"),
+                             ("recv_errors", "recv_errors"),
+                             ("bh_errors", "bh_errors"),
+                             ("set_errors", "set_errors"),
+                             ("block_errors", "block_errors")):
                 try:
                     e[dst] += int(str(r.get(src) or 0).strip() or 0)
                 except (TypeError, ValueError):
