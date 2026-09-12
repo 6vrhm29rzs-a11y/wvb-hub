@@ -287,6 +287,41 @@ def main():
     check("the poller's isOver carries the same rule",
           "+g.away_sets >= 3" in src and "+g.home_sets >= 3" in src)
 
+    # ⚠ AND THE PYTHON CLASSIFIER, WHICH THIS SECTION DID NOT COVER.
+    # Caught live 2026-09-11 (Cody: "Did this game get stuck?"):
+    # Baylor-Nebraska sat at gameState "I" / "3RD SET" with Nebraska's tally
+    # on 3 and linescores 25-20, 25-22, 26-24. The checks above passed the
+    # whole time -- they assert the rule on mOver and the poller, both JS,
+    # while /api/live's `state` comes from match_state.is_over in PYTHON,
+    # which only ever read the text fields. Two rulers for one question, the
+    # thing the "one live snapshot" work was meant to end.
+    check("match_state.is_over treats a tally of three as over",
+          MS.is_over({"state": "live", "period": "3RD SET",
+                      "away_sets": "0", "home_sets": "3"}),
+          "the server payload called a decided match live")
+    check("...either side",
+          MS.is_over({"state": "live", "away_sets": "3", "home_sets": "2"}))
+    check("[-] a genuine 2-1 is NOT over",
+          not MS.is_over({"state": "live", "away_sets": "2",
+                          "home_sets": "1", "period": "4TH SET"}))
+    check("[-] and 2-0 in a best-of-five is NOT over",
+          not MS.is_over({"state": "live", "away_sets": "2",
+                          "home_sets": "0"}),
+          "generalising from the best-of-3 exhibition would suppress a "
+          "true live state")
+    check("[-] an unplayed match is not 0-0 over ('' is not zero)",
+          not MS.is_over({"state": "pre", "away_sets": "",
+                          "home_sets": ""}))
+    check("[+] the text-field path still works",
+          MS.is_over({"state": "I", "period": "FINAL"}))
+    # NEGATIVE CONTROL: strip the by-rule branch and the first check must fail
+    _src_ms = open(os.path.join(REPO, "scripts", "match_state.py"),
+                   encoding="utf-8").read()
+    check("[NEG] the by-rule branch is what makes it pass",
+          'for k in ("away_sets", "home_sets"):' in _src_ms,
+          "removing it returns is_over to the text fields only, and the "
+          "Baylor-Nebraska shape reads live again")
+
     print()
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))

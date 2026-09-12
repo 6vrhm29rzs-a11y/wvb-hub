@@ -115,6 +115,26 @@ def is_over(feed):
         v = str(feed.get(k) or "").lower()
         if "final" in v or "complete" in v:
             return True
+    # ⚠ AND BY RULE, WHICH IS THE CASE THE TEXT FIELDS MISS ENTIRELY.
+    # Caught live 2026-09-11 (Cody: "Did this game get stuck? It ended a
+    # while ago"): Baylor-Nebraska read gameState "I" / period "3RD SET"
+    # with linescores 25-20, 25-22, 26-24 and Nebraska's tally on 3. A side
+    # that has won THREE sets has won the match; the feed sometimes never
+    # flips. Three of the 23 matches the feed called live at that moment
+    # were already decided this way.
+    # This rule ALREADY existed in the page's own mOver()/isOver from the
+    # FIU-Merrimack case (2026-08-28) -- it was never brought back to this
+    # classifier, so the server payload and the page disagreed about what
+    # "live" means. One rule, one place (R4).
+    # ⚠ THREE, not "more than the other side". A 2-0 lead in a best-of-five
+    # is not a win, and the best-of-3 exhibition format is deliberately NOT
+    # generalised from -- inventing a second threshold is how a plausibility
+    # rule suppresses a true state.
+    # _score keeps '' from coercing to 0 (an unplayed match is not 0-0 over).
+    for k in ("away_sets", "home_sets"):
+        n = _score(feed.get(k))
+        if n is not None and n >= 3:
+            return True
     return False
 
 

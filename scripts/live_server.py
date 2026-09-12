@@ -284,6 +284,19 @@ class Cache(object):
             row["state_label"] = r["label"]
             row["state_note"] = r["note"]
             row["caps"] = r["caps"]
+            # ⚠ AND THE LEGACY `state` FOLLOWS THE RESOLUTION (2026-09-11).
+            # It carried the feed's raw word, so a match the resolver had
+            # already called Final still read state:"live" in the same
+            # payload -- Baylor-Nebraska sat on a 0-3 tally with state6
+            # final_box_pending and state "live" at the same time. Any
+            # renderer or filter still keyed on `state` therefore disagreed
+            # with the one that reads `state6`, which is precisely the
+            # two-rulers split this block's own comment says it ended.
+            # The feed's claim is KEPT, under its own name, because the
+            # Result Ledger's job is to be able to say what the feed said.
+            row["state_feed"] = row.get("state")
+            if r["state"] in (MS.FINAL_PENDING, MS.FINAL_BOX):
+                row["state"] = "final"
 
         # Only in-progress matches get a detail call -- a finished match is
         # already in the committed game log, and an unplayed one has nothing.
