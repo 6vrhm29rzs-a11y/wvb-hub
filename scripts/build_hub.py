@@ -343,6 +343,20 @@ def results() -> List[Dict]:
         # match tally, the payload ships NO tape: the scoreboard row, the
         # detail's reference table and the recap all inherit the
         # withhold from this one place instead of each learning it.
+        # ⚠ AND A SET THE RULES SAY CANNOT EXIST WITHHOLDS THE TAPE TOO
+        # (Cody, 2026-09-11, reading the Scores tab: "these errors in scores
+        # need to be flagged ... so I know when I should and should not
+        # trust what I'm reading"). The feed served Le Moyne-Siena as 20-56
+        # and 32-62, and a COUNTED final -- Kennesaw St.-Alabama A&M -- as
+        # 26-21, which the rules end at 25-21. A tape carrying an impossible
+        # set is not partially trustworthy; the whole line is suspect.
+        # The match still renders, with its tally and a FEED ERROR mark: the
+        # reader is told the feed is wrong, not shown nothing. Flagged, never
+        # silently corrected -- we do not know the true score.
+        import season_counts as _SCI
+        _feed_error = bool(_SCI.impossible_sets(g))
+        if _feed_error:
+            sets = []
         if sets:
             _va = sum(1 for a, b in sets if a > b)
             _ha = sum(1 for a, b in sets if b > a)
@@ -389,6 +403,9 @@ def results() -> List[Dict]:
             "loc": g.get("location") or None,
             "gid": str(g.get("game_id")),
             "sets": sets,
+            # the tape was withheld because the feed sent a set the rules
+            # forbid -- the row must SAY so, not merely show nothing
+            "feed_error": _feed_error,
         })
     out.sort(key=lambda r: -r["epoch"])
     return out
@@ -2123,6 +2140,13 @@ def leaders(photos=None, honours=None):
         blocks = (r.get("block_solos") or 0) + 0.5 * (r.get("block_assists") or 0)
         pts = kills + (r.get("aces") or 0) + (r.get("block_solos") or 0) \
             + 0.5 * (r.get("block_assists") or 0)
+        # serving and serve-receive. `or 0` is right here and NOT the "'' is
+        # not zero" case: these come from the AGGREGATE, which sums ints, so
+        # a missing key means the player genuinely recorded none -- unlike a
+        # raw feed row, where '' means "not reported".
+        sverr = r.get("serve_errors") or 0
+        svatt = r.get("serve_atts") or 0
+        rcerr = r.get("recv_errors") or 0
         out.append({
             "name": ("%s %s" % (r.get("first") or "", r.get("last") or "")).strip(),
             "team": names.get(str(r.get("team_id"))) or str(r.get("team_id")),
@@ -2145,6 +2169,26 @@ def leaders(photos=None, honours=None):
             "asps": round((r.get("assists") or 0) / float(sets), 2),
             # hitting % is only meaningful with a real number of swings
             "hit": (round((kills - errs) / float(atts), 3) if atts >= 20 else None),
+            # ── SERVING AND SERVE-RECEIVE (2026-09-11) ──────────────────
+            # Cody: "I look at the Stanford matches and want to know how many
+            # serves they miss because they miss a lot." The site showed aces
+            # and hid their cost all season.
+            # ⚠ KEY NAMES ARE SPELLED OUT. `aps` is aces/set HERE and ATTACKS
+            # in player_rating.py -- the collision this file already documents
+            # (R4). Four new two-letter codes is how that happens again.
+            # ⚠ SERVING AND RECEIVING ARE SEPARATE SKILLS AND STAY SEPARATE
+            # KEYS. A reception error is being aced BY someone -- the opposite
+            # side of the rally from serving. Putting them in one line implied
+            # a passer's failures were part of her serving, which is wrong.
+            # ⚠ THE PERCENTAGES NEED A DENOMINATOR FLOOR, same reason hitting
+            # does: one serve at 100% is not a rate. A player under the floor
+            # renders -- , never a flattering or damning number.
+            "sv_err_set": round(sverr / float(sets), 2),
+            "sv_err_pct": (round(sverr / float(svatt), 3)
+                           if svatt >= 20 else None),
+            "sv_ace_pct": (round((r.get("aces") or 0) / float(svatt), 3)
+                           if svatt >= 20 else None),
+            "rc_err_set": round(rcerr / float(sets), 2),
         })
     out.sort(key=lambda r: -r["pps"])
     return out, floor, len(rows)
@@ -5085,6 +5129,11 @@ def build():
             # reproduce the tally ships EMPTY (Cody's Florida-Baylor shot
             # came from THIS emitter -- the desk payload read the raw
             # linescores and bypassed the res builder's rule)
+            # same rule as res: an impossible set voids the whole tape
+            import season_counts as _SCI2
+            _desk_feed_error = bool(_SCI2.impossible_sets(fin))
+            if _desk_feed_error:
+                _fsets = []
             try:
                 _va = sum(1 for a2, b2 in _fsets if a2 > b2)
                 _ha = sum(1 for a2, b2 in _fsets if b2 > a2)
@@ -5098,6 +5147,7 @@ def build():
                 "hs": (home or {}).get("sets_won"),
                 "as": (away or {}).get("sets_won"),
                 "sets": _fsets,
+                "feed_error": _desk_feed_error,
             }
         _desk.append(row)
 
@@ -9874,6 +9924,10 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 .vx-label .vx-key{width:8px;height:8px;border-radius:1px;flex:0 0 8px}
 
 /* the key swatch, wherever a ruler is named */
+.feederr{font:700 10px/1.4 var(--disp);letter-spacing:.09em;
+  text-transform:uppercase;color:var(--bad);white-space:nowrap;
+  border:1px dashed color-mix(in oklab,var(--bad) 55%,transparent);
+  border-radius:3px;padding:1px 5px;margin-right:7px}
 .rkeys{display:flex;flex-wrap:wrap;gap:6px 18px;margin:8px 0 2px;
   padding:9px 11px;border:1px solid var(--line);border-radius:var(--r-ctl);
   background:var(--sheet)}
@@ -11353,6 +11407,10 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <option value="bps">Blocks / set</option>
       <option value="aps">Aces / set</option>
       <option value="asps">Assists / set</option>
+      <option value="sv_err_set">Service errors / set</option>
+      <option value="sv_err_pct">Service error %</option>
+      <option value="sv_ace_pct">Ace %</option>
+      <option value="rc_err_set">Reception errors / set</option>
     </select>
     <select id="lside" hidden>
       <option value="own">This team</option>
@@ -17157,12 +17215,46 @@ function ribbonHTML(m, live, why) {
    ⚠ NO SET IS VALIDATED AGAINST 25 -- the exhibition's real 24-22 set is why.
    ⚠ THE SET IN PROGRESS IS MARKED, NOT CROWNED: its column is tinted and its
    numbers carry no winner-bold, because nobody has won it. */
+/* ⚠ THE ONE PLACE A SET SCORE MAY BE COMPARED TO A NUMBER, and it is not a
+   format check. test_scoreboard_density forbids `> 25` inside rowLinescore
+   for a good reason: set one of SMU-Penn St. finished 24-22, a REAL set in a
+   first-two-to-21 exhibition, and a plausibility rule invented from the
+   standard format would have suppressed it.
+   This is a different claim. A set above the format minimum ends the moment
+   a side leads by two, so a winner OVER 25 with any other margin could not
+   have been played -- under the 25-point set, the 15-point decider or the
+   21-point exhibition alike. It never asks which format was used, and it
+   judges nothing at or below 25, so the 24-22 case stays untouched.
+   Mirrors season_counts.impossible_sets; test_feed_error asserts the two
+   agree rather than trusting the comment. */
+function impossibleSetPair(a, b) {
+  const x = +a, y = +b;
+  if (!isFinite(x) || !isFinite(y)) return false;
+  const hi = Math.max(x, y), lo = Math.min(x, y);
+  return hi > 25 && (hi - lo) !== 2;
+}
+function impossibleTape(sets) {
+  return !!(sets && sets.length && sets.some(pr => impossibleSetPair(pr[0], pr[1])));
+}
 function rowLinescore(m, live, st) {
   const full = (live && live.sets && live.sets.length) ? live.sets
     : (m.sets && m.sets.length ? m.sets : null);
   const sc = matchScore(m, live);
   const tally = (sc && sc[0] !== null && sc[0] !== undefined) ? sc : null;
   if (!full && !tally) return '<span class="mls"></span>';
+  const _liveBadEarly = impossibleTape(live && live.sets);
+  if (_liveBadEarly ||
+      (m.feed_error && !(live && live.sets && live.sets.length))) {
+    const sc0 = matchScore(m, live);
+    const t0 = (sc0 && sc0[0] !== null && sc0[0] !== undefined) ? sc0 : null;
+    return '<span class="mls"><span class="feederr" title="The feed sent a ' +
+      'set score the rules of the sport forbid -- a set above the minimum ' +
+      'ends on a two-point lead. The set scores are not trustworthy for ' +
+      'this match and are withheld; the result is shown as reported.">' +
+      'FEED ERROR</span>' +
+      (t0 ? '<b class="msc">' + esc(String(t0[0])) + '\u2013' +
+            esc(String(t0[1])) + '</b>' : '') + '</span>';
+  }
   const playing = st === 'live';
   /* ⚠ A FINAL'S TAPE RENDERS ONLY WHEN IT ADDS UP (2026-09-05, UNCG-App
      State: the feed froze the tape mid-third and stamped 3-0 -- the two
@@ -17183,7 +17275,29 @@ function rowLinescore(m, live, st) {
      the fact in dispute -- the numbers render, the emphasis does not. */
   const disputed = playing && typeof ATTR_WATCH !== 'undefined' &&
                    ATTR_WATCH[m.gid] && !ATTR_WATCH[m.gid].corrected;
-  const raw = withheld ? null : full;   /* withheld tape: tally only */
+  /* ⚠ THE FEED SENT A SET THE RULES FORBID, AND THE ROW SAYS SO (Cody,
+     2026-09-11: "these errors in scores need to be flagged ... so I know
+     when I should and should not trust what I'm reading"). Le Moyne-Siena
+     came through as 20-56 and 32-62; a COUNTED final, Kennesaw St.-Alabama
+     A&M, as 26-21, which the rules end at 25-21.
+     A set above the format minimum ends on a two-point lead, so a winner
+     over 25 with any other margin cannot have been played -- true of the
+     25-point set, the 15-point decider and the first-to-21 exhibition
+     alike, which is why it never has to ask the format. Deliberately NOT
+     extended below 25: a real 24-22 exhibition set was nearly deleted once
+     by a plausibility rule invented from the standard format.
+     The tape is withheld and REPLACED BY A MARK. Showing nothing would read
+     as missing data; the reader is told the source is wrong. Never
+     corrected -- we do not know the true score. */
+  /* ⚠ AND THE LIVE PATH NEEDS THE SAME RULE, which is where Cody saw it:
+     Le Moyne-Siena's 20-56 / 32-62 came from the 60-second poller, not from
+     the build payload, so a server-side flag alone would have missed the
+     only case anyone had actually noticed. Same rule as
+     season_counts.impossible_sets, deliberately mirrored rather than
+     inferred: a winner over 25 with a margin other than two cannot have
+     been played under any format. */
+  const feedErr = !!m.feed_error || impossibleTape(live && live.sets);
+  const raw = (withheld || feedErr) ? null : full;   /* tally only */
   const n = raw ? raw.length : 0;
   /* THE SHAPE, all of it Cody's (2026-08-28): sets-won FIRST, rule on its
      right; then the sets strictly in order, set one leftmost; and the set in
@@ -20826,7 +20940,18 @@ document.addEventListener('click', e => {
 const LEADERS = {{LEADERS_JSON}};
 const TSTATS = {{TSTATS_JSON}};
 const LSTAT = {pps:'Pts/set',kps:'Kills/set',hit:'Hit %',dps:'Digs/set',
-               bps:'Blocks/set',aps:'Aces/set',asps:'Asst/set'};
+               bps:'Blocks/set',aps:'Aces/set',asps:'Asst/set',
+               sv_err_set:'Serve err/set', sv_err_pct:'Serve err %',
+               sv_ace_pct:'Ace %', rc_err_set:'Recv err/set'};
+/* Rates render at three decimals like Hit %; counts at two. */
+const LRATE = {hit:1, sv_err_pct:1, sv_ace_pct:1};
+/* ⚠ HIGH IS BAD FOR AN ERROR COLUMN. The heat scale is told which end is
+   GOOD; leaving it at 'high' would have painted the worst servers in the
+   same green as the best scorers -- the "worst defence ranks first and
+   looks like a bug" lesson, in colour rather than in sort order. The SORT
+   stays descending on purpose: "how many serves do they miss" is a question
+   whose answer belongs at the top. */
+const LBAD = {sv_err_set:1, sv_err_pct:1, rc_err_set:1};
 function renderLeaders() {
   const q = document.getElementById('lq').value.toLowerCase().trim();
   const k = document.getElementById('lstat').value;
@@ -20835,7 +20960,7 @@ function renderLeaders() {
     .filter(r => r[k] !== null && r[k] !== undefined)
     .filter(r => !q || (r.name + ' ' + r.team).toLowerCase().includes(q))
     .sort((a, b) => b[k] - a[k]).slice(0, 200);
-  const vs = rows.map(r => k === 'hit' ? r.hit : r[k]);
+  const vs = rows.map(r => r[k]);
   const lo = Math.min.apply(null, vs), hi = Math.max.apply(null, vs);
   document.getElementById('lbody').innerHTML = rows.map((r, i) =>
     '<tr class="prow" data-p="' + i + '" data-k="' +
@@ -20843,9 +20968,8 @@ function renderLeaders() {
     '<td class="tm">' + playerCell(r, 34) + '</td>' +
     '<td class="cf">' + logo(r.team) + r.team + '</td>' +
     '<td class="n">' + r.sets + '</td>' +
-    hcell(k === 'hit' ? r.hit : r[k],
-          k === 'hit' ? r.hit.toFixed(3) : r[k].toFixed(2),
-          lo, hi, 'high', 'seq') + '</tr>').join('');
+    hcell(r[k], r[k].toFixed(LRATE[k] ? 3 : 2),
+          lo, hi, LBAD[k] ? 'low' : 'high', 'seq') + '</tr>').join('');
   document.getElementById('lcnt').textContent =
     rows.length + (rows.length === 1 ? ' player' : ' players');
 }

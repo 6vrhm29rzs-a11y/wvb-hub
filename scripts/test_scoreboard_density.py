@@ -17,6 +17,7 @@ Python 3.9 target. Run: python3 scripts/test_scoreboard_density.py
 """
 import io
 import os
+import json
 import re
 import sys
 
@@ -121,9 +122,51 @@ def main():
     # first-two-to-21. A plausibility rule invented from the standard format
     # would suppress true scores -- inventing a threshold and calling the
     # result a verdict is exactly what R1 forbids.
+    # ⚠ THE BAN STAYS ON rowLinescore, AND THE ONE EXCEPTION MUST NAME
+    # ITSELF (2026-09-11). The feed began serving sets the rules forbid --
+    # Le Moyne-Siena at 20-56 and 32-62, a counted final at 26-21 -- so the
+    # page needs ONE comparison to a number. It lives in impossibleSetPair,
+    # a named helper that documents why, and rowLinescore merely calls it.
+    # Keeping the ban here means the rendering path still cannot grow a
+    # format assumption, and the exception cannot spread without being
+    # written down. The helper's SEMANTICS are asserted below rather than
+    # its text, including that the real 24-22 set survives.
     nums = re.findall(r"[<>=]=?\s*(?:25|21|15)\b", strip)
     check("[-] no set score is validated against an assumed target",
           not nums, str(nums))
+
+    # the one sanctioned comparison, asserted by BEHAVIOUR
+    _hi = src.find("function impossibleSetPair")
+    helper = block(src, _hi) if _hi >= 0 else ""
+    check("[+] impossibleSetPair exists and is where the rule lives",
+          bool(helper) and ">" in helper, "the exception must be named")
+    check("rowLinescore delegates rather than re-implementing",
+          "impossibleTape(" in strip,
+          "a second copy of the rule is how the two drift apart")
+    import subprocess as _sp
+    _ti = src.find("function impossibleTape")
+    _tape = block(src, _ti) if _ti >= 0 else ""
+    _js = (helper + "\n" + _tape +
+           "\nconsole.log(JSON.stringify(["
+           "impossibleSetPair(56,20), impossibleSetPair(26,21),"
+           "impossibleSetPair(24,22), impossibleSetPair(25,20),"
+           "impossibleSetPair(31,29), impossibleSetPair(15,10)]));")
+    # ⚠ DO NOT SWALLOW THE REASON. A bare `except: got = None` turns "node
+    # is missing" and "the rule is wrong" into the same failure message,
+    # which is how a guard wastes an hour of somebody's evening.
+    _why = ""
+    try:
+        _r = _sp.run(["node", "-e", _js], capture_output=True, text=True)
+        if _r.returncode != 0:
+            got, _why = None, (_r.stderr or "").strip()[:160]
+        else:
+            import json as _json      # `json` is shadowed by a local
+            got = _json.loads(_r.stdout.strip())   # import later in main()
+    except Exception as _e:                                  # noqa: BLE001
+        got, _why = None, repr(_e)[:160]
+    check("[+] the rule flags the impossible and spares the real",
+          got == [True, True, False, False, False, False],
+          _why or got)
 
     # a live set is provisional and is marked as such, never as a result
     # ⚠ THE RULE EVOLVED TWICE IN ONE EVENING, both times at Cody's word.
@@ -383,9 +426,21 @@ def main():
         #     (tally-only) -- asserted against the source below;
         #   everything else must truly reproduce.
         src2 = io.open(SRC, encoding="utf-8").read()
+        # ⚠ ASSERT THE RULE, NOT THE LITERAL. This pinned the exact text
+        # `withheld ? null : full`, so ADDING a second, correct reason to
+        # withhold a tape (2026-09-11: the feed began serving sets the rules
+        # forbid) failed a build that satisfies the rule more completely.
+        # Same pin this file has already been burned by twice. What must be
+        # true: the tally mismatch still sets `withheld`, and `withheld`
+        # still gates the tape.
+        _rl = src2.find("function rowLinescore")
+        _body = (block(src2, _rl) if _rl >= 0 else "")
+        _null = re.search(r"const raw = ([^;]+);", _body)
         check("[-] a final whose tape does not add up renders tally-only",
               "withheld = (va !== +tally[0] || ha !== +tally[1])" in src2
-              and "withheld ? null : full" in src2)
+              and bool(_null) and "withheld" in _null.group(1)
+              and "null" in _null.group(1),
+              _null.group(1) if _null else "no `const raw =` found")
         wrong = []
         for g in withsets:
             if g.get("under_review"):
