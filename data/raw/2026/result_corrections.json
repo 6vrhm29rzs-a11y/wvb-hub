@@ -2772,6 +2772,59 @@
     }
    ],
    "note": "⚠ NO box_team_swap, DELIBERATELY. The pending entry recorded a lineup inversion signature (6/6 starters filed under Hampton fitting FIU's roster), which invited a swap -- but that signature is in lineups.jsonl, and the PLAYERBOX was checked directly before filing and is correctly attributed. Swapping it would have re-inverted good rows, which is exactly what happened on 6626259 when the feed fixed its own attribution underneath a standing swap. Only the result is corrected here."
+  },
+  "6627513": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Weber St. (labelled home) won 3-1, set line 25-16, 25-19, 25-27, 25-18 attributed to Weber St. -- the TRUE set sequence with the TEAMS SWAPPED. Internally coherent, and wrong.",
+   "correct": {
+    "winner_team_id": "46557",
+    "away_sets": 3,
+    "home_sets": 1,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 25,
+      "home": 16
+     },
+     {
+      "period": 2,
+      "visit": 25,
+      "home": 19
+     },
+     {
+      "period": 3,
+      "visit": 25,
+      "home": 27
+     },
+     {
+      "period": 4,
+      "visit": 25,
+      "home": 18
+     }
+    ],
+    "linescores_replace": true
+   },
+   "established": "Kansas St. won 3-1. BOTH schools say so independently: Kansas State's own site carries 'Completed Event: Volleyball versus Weber State on September 11, 2026, Win, 3, to, 1', and Weber State's own schedule carries 'Sep 11 | Neutral | Kansas State | Reno, NV | Nevada Tournament | L 1-3'. The feed's per-set VALUES are right and its TEAM LABELS are inverted: its 'home' column takes sets 1, 2 and 4 at 25 and loses set 3 at 25-27, which is the winner's line, and the winner is Kansas St. Swapping the columns reproduces both schools exactly -- Kansas St. 25-16, 25-19, 25-27 lost, 25-18; Weber St. 1-3 with set 3 won 27-25.",
+   "evidence": [
+    {
+     "url": "https://www.kstatesports.com/sports/womens-volleyball/schedule",
+     "kind": "school_schedule",
+     "school": "Kansas St.",
+     "retrieved": "2026-09-12T19:15:00Z",
+     "text": "'Completed Event: Volleyball versus Weber State on September 11, 2026 , Win , 3, to, 1'",
+     "establishes": "Kansas St. won 3-1"
+    },
+    {
+     "url": "https://weberstatesports.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Weber St.",
+     "retrieved": "2026-09-12T19:15:00Z",
+     "text": "'Sep 11 (Fri) 7:00 p.m. MT | Neutral | Kansas State | Reno, NV | Nevada Tournament | L 1-3'",
+     "establishes": "Weber St. lost 1-3, at a neutral site"
+    }
+   ],
+   "note": "⚠ FOUND BY RECONCILING OUR RECORDS AGAINST EVOLLVE'S PUBLISHED BOARD, not by any internal check: the feed's final is internally COHERENT, so is_self_contradictory cannot see it and the lineup guard did not fire. Two teams' records disagreed with Evollve on the same match count but a different W-L split, which is the signature of an inverted winner rather than an inclusion difference; the schools then settled it. ⚠ COST: this match was reported in the 2026-09-11 Night Desk email as the night's third-biggest upset -- 'Weber St. #163 def Kansas St. #46, 117 places'. It did not happen. An inverted winner does not just misstate one row, it manufactures the loudest line in the report. ⚠ NO box_team_swap: not checked against the rosters here, and the result correction stands on the schools alone. ⚠ SEPARATE: the feed labels Weber St. home; both schools say NEUTRAL (Reno, NV, Nevada Tournament). That is a fixture-ledger matter, not a result one, and is not corrected here."
   }
  }
 }

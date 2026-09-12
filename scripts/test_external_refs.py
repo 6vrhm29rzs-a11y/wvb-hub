@@ -356,10 +356,13 @@ def main():
               "Massey &mdash; current browser-reviewed snapshot" in page
               and "Massey &mdash; preseason snapshot" in page)
         if ER.massey_latest():
+            _ms = ER.massey_latest() or {}
+            _through = (_ms.get("publisher_through") or "").strip()
             check("the current Massey row carries the publisher's own "
                   "through-games date AND our review time",
-                  "Using games thru Sat, Aug 29, 2026" in page
-                  and "reviewed 2026-" in page)
+                  bool(_through) and _through in page
+                  and "reviewed 2026-" in page,
+                  "snapshot says %r" % _through)
             check("...and states the MSY column is NOT this",
                   "the MSY column below is NOT this" in page)
         else:

@@ -190,15 +190,26 @@ def main():
             hit += 1
 
     payload = json.dumps(rows, sort_keys=True, ensure_ascii=False)
-    snap = {"source": "masseyratings.com/cvol/ncaa-d1/ratings",
-            "kind": "team_ratings", "season": SEASON,
-            "publisher_through": through,
-            "retrieved": os.environ.get("MASSEY_RETRIEVED", ""),
-            "capture": "manual browser review (no-scrape host)",
-            "rows": len(rows), "resolved_to_hub": hit,
-            "unresolved": sorted(r["team_raw"] for r in rows if not r["hub_team"]),
-            "sha256": hashlib.sha256(payload.encode("utf-8")).hexdigest(),
-            "data": rows}
+    snap = {
+        "source_label": "Massey current browser-reviewed snapshot",
+        "role": "external strength reference -- never a POWER input or result source",
+        "url": "https://masseyratings.com/cvol/ncaa-d1/ratings",
+        "retrieved_utc": os.environ.get("MASSEY_RETRIEVED", ""),
+        "publisher_through": through,
+        "publisher_through_note": ("the page's own header line, verbatim -- the "
+                                   "source's data horizon, DISTINCT from "
+                                   "retrieved_utc, never collapsed into one date"),
+        "access": ("manual browser review in Cody's own Chrome; masseyratings.com "
+                   "is on the no-scrape hook and is never fetched"),
+        "parser": "browser transcription -> scripts/ingest_massey.py",
+        "status": "ok",
+        "content_sha256": hashlib.sha256(payload.encode("utf-8")).hexdigest(),
+        "content_sha256_of": "the parsed rows, sorted (%d teams)" % len(rows),
+        "coverage": "%d listed, %d resolved to hub teams, %d unresolved"
+                    % (len(rows), hit, len(rows) - hit),
+        "n_rows": len(rows), "n_listed": len(rows),
+        "rows": [dict(r, rank=r.get("rating_rank"), team=r["team_raw"]) for r in rows],
+    }
     with io.open(OUT, "a", encoding="utf-8") as fh:
         fh.write(json.dumps(snap, ensure_ascii=False) + "\n")
     print("massey snapshot: %d rows, %d resolved, %d unresolved"

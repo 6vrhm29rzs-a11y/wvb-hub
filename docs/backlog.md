@@ -10,19 +10,29 @@ better, and each one records what was observed and what is actually known.
 
 ## OPEN
 
-### Records disagree with Evollve on ~115 teams (2026-09-12)
-Reconciling our counting corpus against Evollve's published 348-team board:
-**233 of 348 match exactly** at a 2026-09-11 cutoff. The residual is NOT one
-cause — three are already ruled in or out by measurement:
-- **Ruled IN:** they lag us by about a day (24 teams explained by today's
-  results alone).
-- **Ruled OUT:** exhibition handling. Including the `D`-state games makes
-  agreement *worse* (226 vs 233), so they exclude them exactly as we do.
-- **Ruled OUT:** non-D-I opponents explains only 7.
-What remains is per-match, and at least some are winner-level disagreements
-rather than inclusion differences (Norfolk St. is one win / one loss apart
-from us on the same number of matches). **Next: a systematic per-match diff
-against their board, not team-by-team.** That is the error-finding pass.
+### Record disagreements vs Evollve — WORKED (2026-09-12)
+Reconciled team by team through a 2026-09-11 cutoff, with the counting chain
+applied. **238 exact · 4 winner disagreements · 106 different match count.**
+
+The four winner disagreements were settled at the SCHOOLS, and they did not
+all go one way:
+- **Kansas St. / Weber St.** (one match, gid 6627513) — WE WERE WRONG. The
+  feed inverted the teams; both schools say Kansas St. won 3-1. **Correction
+  49 filed.** Kansas St. 4-1→5-0 (rank 55→45), Weber St. 6-1→5-2 (145→175).
+  ⚠ It was reported in the 2026-09-11 Night Desk email as the night's third
+  upset, "Weber St. #163 def Kansas St. #46". That upset did not happen.
+- **Cleveland St.** (ours 2-5, theirs 3-4) — EVOLLVE IS WRONG; csuvikings.com
+  matches us exactly.
+- **Mississippi Val.** (ours 1-5, theirs 0-6) — EVOLLVE IS WRONG;
+  mvsusports.com carries the Wiley win we count.
+
+**Still open: the 106 with a different match count.** 80 of them are ours
+minus theirs = −1 (they hold one more match than we do), 16 are +1. This is
+an INCLUSION question, not a winner question, and it is the remaining lead.
+The BYU case is the type specimen: they carry a seventh match we have never
+seen in any state. Next step is to take a handful of the −1 teams and diff
+our match list against the school's own published schedule, which is what
+settled every case above.
 
 ### Twelve teams both external boards disagree with us about (2026-09-12)
 Three-way rank comparison, all current through 2026-09-11 (346 teams on all
