@@ -912,8 +912,17 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_header("Vary", "Accept-Encoding")
         self.end_headers()
         if self.command != "HEAD":
-            self.wfile.write(body)
+            try:
+                self.wfile.write(body)
+            except (BrokenPipeError, ConnectionResetError):
+                return None
         return None
+
+    def handle_one_request(self):
+        try:
+            SimpleHTTPRequestHandler.handle_one_request(self)
+        except (BrokenPipeError, ConnectionResetError):
+            self.close_connection = True
 
     def log_message(self, fmt, *args):
         pass                                          # keep the console quiet
@@ -1050,7 +1059,7 @@ def main():
               " the pipeline is run by hand")
     # Say plainly whether the chat will work, at the moment it can still be
     # fixed. Finding out by clicking the button and reading an error is worse.
-    if (os.environ.get("ANTHROPIC_API_KEY") or "").startswith("sk-ant-"):
+    if _digby_key():
         print("  Ask Digby: ready")
     else:
         print("  Ask Digby: OFF -- no ANTHROPIC_API_KEY in this shell. "
