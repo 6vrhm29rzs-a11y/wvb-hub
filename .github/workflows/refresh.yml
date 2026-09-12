@@ -31,6 +31,25 @@ name: in-season refresh
 # of polling gap plus a run of about 3 minutes. MEASURED COST: the bounded
 # `recent` crawl is 2 requests and under a second, against 132 requests and
 # ~1.6 minutes for the full schedule pass it replaces.
+#
+# ⚠ THAT "ABOUT 3 MINUTES" WENT STALE AND THE JOB STARTED KILLING ITSELF
+# (2026-09-11). Measured on run 34636399949: 23m38s, against a 25-minute
+# bound and a 30-minute cadence -- and the 21:40Z run WAS killed at 25m20s.
+# The time was not spread around: `verify_results_daily --incremental` alone
+# was 651.6s of the 860s rebuild (76%), because it walked both schools of
+# every new final strictly one after another, up to 16 fetches per school
+# each spaced 0.5s and allowed a 20s timeout.
+#
+# That sweep now runs schools CONCURRENTLY, serialised per host, so an
+# individual athletics site sees exactly the traffic it saw before. MEASURED
+# A/B on six real finals (12 school ladders, live sites, same machine and
+# minute): 123.7s serial -> 20.4s parallel, 6.1x, with the SAME 79 logged
+# fetches and IDENTICAL verdicts in both passes -- the work is unchanged,
+# only the waiting overlaps. A stubbed harness independently measured 6.0x.
+#
+# ⚠ What that implies for THIS job (651.6s -> ~107s, run ~23m -> ~14m) is
+# arithmetic, not a measurement. Read the real number off the next clean run
+# rather than trusting this line.
 
 on:
   schedule:

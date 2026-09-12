@@ -35,9 +35,12 @@ import json
 import os
 import re
 import sys
+import threading
 import time
-import urllib.request
 import urllib.error
+import urllib.parse
+import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(REPO, "scripts"))
@@ -82,18 +85,31 @@ def _strip_inst(n):
 
 
 _STRIPPED_HUB = {}
+_STRIPPED_HUB_LOCK = threading.Lock()
 
 
 def _stripped_hub_count(key):
+    """⚠ BUILT ONCE, UNDER A LOCK -- it is a lazily-built COUNTER, and the
+    sweep is threaded (2026-09-11). Two threads both finding it empty would
+    each increment the SAME shared dict and leave every count at twice the
+    truth. Its one consumer refuses a name match when a stripped key is
+    ambiguous (> 1), so doubled counts would silently refuse legitimate
+    matches -- intermittently, and only ever under concurrency, which is the
+    hardest possible thing to diagnose after the fact. Build into a local
+    dict, publish once."""
     if not _STRIPPED_HUB:
-        try:
-            d = json.load(open(os.path.join(
-                REPO, "data", "data_%d.json" % SEASON)))
-            for t in d.get("teams") or []:
-                k = _strip_inst(team_norm(t.get("name_short") or ""))
-                _STRIPPED_HUB[k] = _STRIPPED_HUB.get(k, 0) + 1
-        except (OSError, ValueError):
-            return 2          # cannot check -> refuse pass 2
+        with _STRIPPED_HUB_LOCK:
+            if not _STRIPPED_HUB:     # another thread may have finished while
+                built = {}            # we waited on the lock
+                try:
+                    d = json.load(open(os.path.join(
+                        REPO, "data", "data_%d.json" % SEASON)))
+                    for t in d.get("teams") or []:
+                        k = _strip_inst(team_norm(t.get("name_short") or ""))
+                        built[k] = built.get(k, 0) + 1
+                except (OSError, ValueError):
+                    return 2          # cannot check -> refuse pass 2
+                _STRIPPED_HUB.update(built)
     return _STRIPPED_HUB.get(key, 0)
 
 
@@ -162,6 +178,27 @@ def _fetch(url, timeout=20):
         return e.code, "", url
     except Exception as e:                                    # noqa: BLE001
         return None, str(e)[:120], url
+
+
+# How many DIFFERENT schools may be in flight at once. Per-host serialisation
+# (_host_lock) is what keeps this polite, so this bounds our own outbound
+# connections, not the load any one athletics site sees.
+VERIFY_WORKERS = max(1, int(os.environ.get("WVB_VERIFY_WORKERS", "8")))
+
+_HOST_LOCKS = {}
+_HOST_LOCKS_GUARD = threading.Lock()
+
+
+def _host_lock(url):
+    """One lock per hostname, held for a whole school ladder. A given
+    athletics site therefore never sees two of our requests at once -- the
+    politeness the sequential version got for free, now kept explicitly."""
+    host = urllib.parse.urlsplit(url).netloc.lower()
+    with _HOST_LOCKS_GUARD:
+        lk = _HOST_LOCKS.get(host)
+        if lk is None:
+            lk = _HOST_LOCKS[host] = threading.Lock()
+    return lk
 
 
 def _cells(row_html):
@@ -680,6 +717,51 @@ def write_auto_evidence():
           % (len(latest), len(ev), os.path.relpath(AUTO_EVIDENCE, REPO)))
 
 
+def gather_evidence(finals, sites, date, workers=None):
+    """Both schools' ladders for every final, keyed (index, side) so the
+    caller reassembles in the original order. `workers` defaults to
+    VERIFY_WORKERS; workers=1 is a genuinely serial sweep, which is what the
+    guard compares the parallel result against."""
+    # ⚠ PARALLEL ACROSS SCHOOLS, STRICTLY SEQUENTIAL PER HOST (2026-09-11).
+    # MEASURED in CI: this step was 651.6s of an 860s rebuild -- 76% of it,
+    # and the reason the half-hourly refresh began hitting its own 25-minute
+    # bound (the header's "run of about 3 minutes" had become 23). It is pure
+    # I/O wait: up to 16 fetches per school, each spaced 0.5s and allowed a
+    # 20s timeout, run one school strictly after another.
+    #
+    # WHAT CHANGES IS THE WALL CLOCK AND NOTHING ELSE. Each school's ladder
+    # still runs in the same order with the same spacing, and _host_lock
+    # holds one lock per hostname for the whole ladder -- so an individual
+    # athletics site sees exactly the traffic it saw before. Only DIFFERENT
+    # schools overlap. Results are reassembled in the original order, so the
+    # report rows, the printed lines and the append-only fetch log come out
+    # in the same sequence a serial run produced.
+    tasks = []
+    for _i, _f in enumerate(finals):
+        tasks.append((_i, 0, _f, _f["winner"], _f["loser"]))
+        tasks.append((_i, 1, _f, _f["loser"], _f["winner"]))
+
+    def _one(task):
+        _idx, _side, _fin, team, opp = task
+        mylog = []
+        base = sites.get(team)
+        if base is None:          # SITE_NOT_CONFIGURED -- no fetch, no host
+            return task, school_evidence(team, opp, date, _fin, sites,
+                                         mylog), mylog
+        with _host_lock(base):
+            return task, school_evidence(team, opp, date, _fin, sites,
+                                         mylog), mylog
+
+    done, logs = {}, {}
+    if tasks:
+        _w = VERIFY_WORKERS if workers is None else max(1, int(workers))
+        with ThreadPoolExecutor(max_workers=min(_w, len(tasks))) as _ex:
+            for task, res, mylog in _ex.map(_one, tasks):
+                done[(task[0], task[1])] = res
+                logs[(task[0], task[1])] = mylog
+    return done, logs
+
+
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     incremental = "--incremental" in sys.argv
@@ -712,10 +794,14 @@ def main():
               len(finals), date,
               " (incremental; %d already settled)" % len(prior)
               if incremental else ""))
+    done, logs = gather_evidence(finals, sites, date)
+
     log, report, queue_adds = [], [], []
-    for f in finals:
-        sa, da = school_evidence(f["winner"], f["loser"], date, f, sites, log)
-        sb, db = school_evidence(f["loser"], f["winner"], date, f, sites, log)
+    for _i, f in enumerate(finals):
+        sa, da = done[(_i, 0)]
+        sb, db = done[(_i, 1)]
+        log.extend(logs[(_i, 0)])
+        log.extend(logs[(_i, 1)])
         v = verdict(sa, sb)
         row = {"gid": f["gid"], "date": date,
                "canonical": "%s def. %s %d-%d" % (
