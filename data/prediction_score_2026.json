@@ -2,15 +2,15 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 1238,
-  "logged_after_tipoff_excluded": 3,
-  "team_mismatch_excluded": 37,
+  "scored": 1251,
+  "logged_after_tipoff_excluded": 5,
+  "team_mismatch_excluded": 39,
   "predictions_on_record": 4807,
-  "results_available": 1303,
-  "brier": 0.1735,
+  "results_available": 1320,
+  "brier": 0.1747,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 917,
-  "favourite_correct_pct": 74.1
+  "favourite_correct": 925,
+  "favourite_correct_pct": 73.9
  },
  "calibration": [
   {
@@ -21,27 +21,27 @@
   },
   {
    "range": "60-70%",
-   "n": 220,
+   "n": 222,
    "said": 65.2,
-   "happened": 59.1
+   "happened": 59.0
   },
   {
    "range": "70-80%",
-   "n": 201,
-   "said": 75.2,
-   "happened": 68.7
+   "n": 204,
+   "said": 75.1,
+   "happened": 68.6
   },
   {
    "range": "80-90%",
-   "n": 224,
-   "said": 85.3,
-   "happened": 79.0
+   "n": 228,
+   "said": 85.2,
+   "happened": 78.9
   },
   {
    "range": "90-101%",
-   "n": 375,
+   "n": 379,
    "said": 95.6,
-   "happened": 92.3
+   "happened": 91.8
   }
  ],
  "matches": [
@@ -102,6 +102,15 @@
   {
    "game_id": "6624350",
    "date": "2026-08-28",
+   "away": "Middle Tenn.",
+   "home": "Boise St.",
+   "p_home": 0.9668,
+   "home_won": false,
+   "brier": 0.93470224
+  },
+  {
+   "game_id": "6625596",
+   "date": "2026-08-29",
    "away": "Middle Tenn.",
    "home": "Boise St.",
    "p_home": 0.9668,
@@ -233,6 +242,15 @@
    "p_home": 0.919,
    "home_won": false,
    "brier": 0.8445610000000001
+  },
+  {
+   "game_id": "6625597",
+   "date": "2026-09-05",
+   "away": "Middle Tenn.",
+   "home": "South Alabama",
+   "p_home": 0.9164,
+   "home_won": false,
+   "brier": 0.83978896
   },
   {
    "game_id": "6625787",
@@ -476,24 +494,6 @@
    "p_home": 0.8631,
    "home_won": false,
    "brier": 0.7449416099999999
-  },
-  {
-   "game_id": "6624896",
-   "date": "2026-09-03",
-   "away": "FIU",
-   "home": "North Florida",
-   "p_home": 0.1432,
-   "home_won": true,
-   "brier": 0.73410624
-  },
-  {
-   "game_id": "6627746",
-   "date": "2026-09-05",
-   "away": "Presbyterian",
-   "home": "Queens (NC)",
-   "p_home": 0.8568,
-   "home_won": false,
-   "brier": 0.73410624
   }
  ]
 }

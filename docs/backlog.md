@@ -26,7 +26,18 @@ all go one way:
 - **Mississippi Val.** (ours 1-5, theirs 0-6) — EVOLLVE IS WRONG;
   mvsusports.com carries the Wiley win we count.
 
-**106 with a different match count — PARTLY WORKED.** Six of them turned out
+**106 with a different match count — WORKED DOWN TO 92.** Agreement with
+Evollve now reads **256 exact · 0 winner mismatches · 92 count mismatches**
+(from 238 · 4 · 106 this morning). 13 matches were restored by going to the
+schools for finals the feed had served with no usable result; 6 more by
+resolving lapsed conflicts. What remains is below.
+
+**The 92 still open.** Sampling says they split three ways: our diff's name
+matching (fixed — compare match COUNTS PER DATE, never names), genuine feed
+gaps (App State–UNCG on 09-05 appears in no scoreboard file we hold), and
+Evollve counting something we do not. The date-level differ (/tmp/datediff.py
+pattern) is the tool; it should be made permanent and pointed at all 92.
+Earlier notes: Six of them turned out
 to be results sitting in an expired conflict or an inverted feed record, all
 now corrected (see below). Sampling six teams against their own schedules
 found the rest split three ways: some are our diff's name-matching failing

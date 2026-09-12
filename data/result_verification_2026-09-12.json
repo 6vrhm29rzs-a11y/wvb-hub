@@ -1,11 +1,11 @@
 {
  "date": "2026-09-12",
- "generated_utc": "2026-09-12T19:31:23Z",
+ "generated_utc": "2026-09-12T19:41:18Z",
  "counts": {
-  "CORROBORATED_ONE": 35,
-  "VERIFIED_BOTH": 9,
+  "CORROBORATED_ONE": 37,
+  "VERIFIED_BOTH": 10,
   "CONTRADICTED_BOTH": 2,
-  "UNVERIFIED": 5,
+  "UNVERIFIED": 6,
   "CONTRADICTED_ONE": 1
  },
  "matches": [
@@ -1190,33 +1190,21 @@
    "gid": "6624573",
    "date": "2026-09-12",
    "canonical": "Portland def. Montana St. 3-1",
-   "verdict": "UNVERIFIED",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "Portland": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://portlandpilots.com/services/schedule_txt.ashx?schedule=1469",
-     "row": [
-      "Sep 12 (Sat)",
-      "10:00 AM",
-      "Away",
-      "Montana State",
-      "Bozeman, Mont. (Shroyer Gymnasium)",
-      "",
-      ""
-     ]
+     "assertion": "Portland W 3-1 vs Montana State",
+     "opponent_source": "Montana State",
+     "site_says": "Away"
     },
     "Montana St.": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://msubobcats.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 12 (Sat)",
-      "11:00 am MT",
-      "Home",
-      "Portland",
-      "Bozeman, MT (Shroyer Gymnasium)",
-      "Bobcat Invitational",
-      "-"
-     ]
+     "assertion": "Montana St. L 1-3 vs Portland",
+     "opponent_source": "Portland",
+     "site_says": "Home"
     }
    }
   },
@@ -1328,6 +1316,130 @@
       "Storrs, Conn. (UConn Volleyball Center)",
       "East Coast Challenge",
       "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6624359",
+   "date": "2026-09-12",
+   "canonical": "Michigan St. def. Morehead St. 3-0",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Michigan St.": {
+     "state": "NOT_POSTED",
+     "url": "https://msuspartans.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 12 (Sat)",
+      "2 PM",
+      "Away",
+      "Morehead State",
+      "Morehead, Ky.",
+      "Morehead State Invitational",
+      "-"
+     ]
+    },
+    "Morehead St.": {
+     "state": "NOT_POSTED",
+     "url": "https://msueagles.com/services/schedule_txt.ashx?schedule=291",
+     "row": [
+      "Sep 12 (Sat)",
+      "2:00 PM",
+      "Home",
+      "Michigan State",
+      "Morehead, KY",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6626941",
+   "date": "2026-09-12",
+   "canonical": "Bellarmine def. Butler 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Bellarmine": {
+     "state": "NOT_POSTED",
+     "url": "https://athletics.bellarmine.edu/services/schedule_txt.ashx?schedule=381",
+     "row": [
+      "Sep 12 (Sat)",
+      "2 PM",
+      "Home",
+      "Butler University",
+      "Louisville, KY (Knights Hall)",
+      "",
+      ""
+     ]
+    },
+    "Butler": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://butlersports.com/services/schedule_txt.ashx?schedule=2372",
+     "assertion": "Butler L 0-3 vs Bellarmine",
+     "opponent_source": "Bellarmine",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6627676",
+   "date": "2026-09-12",
+   "canonical": "Charleston So. def. Bethune-Cookman 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Charleston So.": {
+     "state": "NOT_POSTED",
+     "url": "https://csusports.com/services/schedule_txt.ashx?schedule=465",
+     "row": [
+      "Sep 12 (Sat)",
+      "2:00 PM",
+      "Home",
+      "Bethune-Cookman",
+      "Charleston, S.C. (Buccaneer Fieldhouse)",
+      "",
+      ""
+     ]
+    },
+    "Bethune-Cookman": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://bcuathletics.com/services/schedule_txt.ashx?schedule=2442",
+     "assertion": "Bethune-Cookman L 0-3 vs Charleston Southern",
+     "opponent_source": "Charleston Southern",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6627751",
+   "date": "2026-09-12",
+   "canonical": "Queens (NC) def. Presbyterian 3-0",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Queens (NC)": {
+     "state": "NOT_POSTED",
+     "url": "https://queensathletics.com/services/schedule_txt.ashx?schedule=541",
+     "row": [
+      "Sep 12 (Sat)",
+      "2:00 PM",
+      "Home",
+      "Presbyterian",
+      "Charlotte, N.C. (Curry Arena)",
+      "",
+      ""
+     ]
+    },
+    "Presbyterian": {
+     "state": "NOT_POSTED",
+     "url": "https://gobluehose.com/services/schedule_txt.ashx?schedule=714",
+     "row": [
+      "Sep 12 (Sat)",
+      "2:00 PM",
+      "Away",
+      "Queens",
+      "Charlotte, NC",
+      "",
+      ""
      ]
     }
    }
