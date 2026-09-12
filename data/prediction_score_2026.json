@@ -2,46 +2,46 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 1118,
+  "scored": 1159,
   "logged_after_tipoff_excluded": 3,
-  "team_mismatch_excluded": 31,
+  "team_mismatch_excluded": 32,
   "predictions_on_record": 4807,
-  "results_available": 1176,
-  "brier": 0.1735,
+  "results_available": 1219,
+  "brier": 0.1727,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 832,
-  "favourite_correct_pct": 74.4
+  "favourite_correct": 864,
+  "favourite_correct_pct": 74.5
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 196,
+   "n": 200,
    "said": 55.3,
-   "happened": 59.7
+   "happened": 59.5
   },
   {
    "range": "60-70%",
-   "n": 203,
-   "said": 65.2,
+   "n": 208,
+   "said": 65.3,
    "happened": 60.1
   },
   {
    "range": "70-80%",
-   "n": 179,
+   "n": 187,
    "said": 75.1,
-   "happened": 67.6
+   "happened": 67.9
   },
   {
    "range": "80-90%",
-   "n": 197,
+   "n": 211,
    "said": 85.2,
-   "happened": 79.2
+   "happened": 79.1
   },
   {
    "range": "90-101%",
-   "n": 343,
+   "n": 353,
    "said": 95.6,
-   "happened": 92.1
+   "happened": 92.4
   }
  ],
  "matches": [
@@ -298,6 +298,15 @@
    "brier": 0.8092801599999999
   },
   {
+   "game_id": "6624941",
+   "date": "2026-09-11",
+   "away": "Montana",
+   "home": "Oakland",
+   "p_home": 0.1016,
+   "home_won": true,
+   "brier": 0.8071225599999999
+  },
+  {
    "game_id": "6628300",
    "date": "2026-09-10",
    "away": "UT Arlington",
@@ -485,15 +494,6 @@
    "p_home": 0.8492,
    "home_won": false,
    "brier": 0.7211406399999999
-  },
-  {
-   "game_id": "6638777",
-   "date": "2026-09-05",
-   "away": "Weber St.",
-   "home": "CSU Bakersfield",
-   "p_home": 0.151,
-   "home_won": true,
-   "brier": 0.7208009999999999
   }
  ]
 }
