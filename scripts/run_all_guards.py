@@ -45,7 +45,18 @@ _ENV_EXCLUDE = [x.strip() for x in
 MIN_SUITES = 30
 
 
+def _corpus():
+    """The counted-corpus fingerprint, or None if it cannot be read."""
+    try:
+        sys.path.insert(0, SCRIPTS)
+        import season_counts as SC
+        return SC.corpus_fingerprint()
+    except Exception:                                     # noqa: BLE001
+        return None
+
+
 def main():
+    fp_before = _corpus()
     suites = sorted(f for f in os.listdir(SCRIPTS)
                     if f.startswith("test_") and f.endswith(".py"))
     if len(suites) < MIN_SUITES:
@@ -78,6 +89,16 @@ def main():
           % (len(suites), len(failed), len(skipped), time.time() - t0))
     for s in failed:
         print("   FAILED: %s" % s)
+    fp_after = _corpus()
+    if failed and fp_before and fp_after and fp_before != fp_after:
+        print("\n   ⚠ THE COUNTED CORPUS CHANGED DURING THIS RUN "
+              "(%s -> %s)." % (fp_before[:12], fp_after[:12]))
+        print("     A rebuild landed mid-sweep, so certificate and "
+              "season-count failures above may be CONTENTION, not")
+        print("     regressions. Re-run the named suites on a settled tree "
+              "before believing them -- and to get a clean")
+        print("     sweep, stop the refresh loop first "
+              "(WVB_LOCAL_REFRESH_SECONDS=0) or run when nothing is polling.")
     return 1 if failed else 0
 
 

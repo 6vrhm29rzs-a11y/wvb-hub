@@ -73,6 +73,17 @@ uncounted. Auburn, BYU, Kentucky, Kansas St., Arizona St., Clemson, LSU and
 Cincinnati are among them — these are not obscure programmes, and a parser
 that handles their templates would unblock verification across the board.
 
+### A local full sweep races the refresh loop (2026-09-12)
+The sweep takes ~17.5 minutes; `live_server` rebuilds the whole chain every
+20. So a local run very often has the counted corpus change underneath it,
+and when it does the certificate suites and the season-count contract fail on
+a **healthy** tree. That misdiagnosis cost three separate investigations
+today. `run_all_guards.py` now fingerprints the corpus at both ends and says
+plainly when it moved, so contention is distinguishable from regression
+instead of being guessed at. For a genuinely clean sweep, stop the refresh
+first (`WVB_LOCAL_REFRESH_SECONDS=0`) — CI does not have this problem because
+it runs against a static checkout.
+
 ### Two conflicts the two-source rule cannot settle by waiting (2026-09-12)
 Both stay uncounted, both now carry a recorded recheck:
 - **6628157 Little Rock – Northwestern St.** Northwestern St. publishes

@@ -140,36 +140,6 @@
    "matchup": "Oregon / Wisconsin",
    "records": 2
   },
-  "6625308": {
-   "conflicts": [
-    {
-     "field": "teams",
-     "records": 61,
-     "values": [
-      "(('46173', True), ('46234', False))",
-      "(('46173', False), ('46234', True))"
-     ]
-    },
-    {
-     "field": "game_state",
-     "records": 61,
-     "values": [
-      "P",
-      "I"
-     ]
-    },
-    {
-     "field": "site",
-     "records": 61,
-     "values": [
-      "home/away flip across snapshots",
-      "no venue owner on record"
-     ]
-    }
-   ],
-   "matchup": "New Haven / Cornell",
-   "records": 61
-  },
   "6625563": {
    "conflicts": [
     {
@@ -238,7 +208,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 91,
+     "records": 92,
      "values": [
       "1788670800",
       "1788742800"
@@ -246,7 +216,7 @@
     },
     {
      "field": "game_state",
-     "records": 91,
+     "records": 92,
      "values": [
       "P",
       "I",
@@ -255,7 +225,7 @@
     }
    ],
    "matchup": "Missouri / Nebraska",
-   "records": 91
+   "records": 92
   },
   "6626288": {
    "conflicts": [
@@ -475,44 +445,6 @@
    "matchup": "Auburn / Arkansas",
    "records": 2
   },
-  "6628032": {
-   "conflicts": [
-    {
-     "field": "teams",
-     "records": 60,
-     "values": [
-      "(('46062', True), ('46417', False))",
-      "(('46062', False), ('46417', True))"
-     ]
-    },
-    {
-     "field": "venue",
-     "records": 60,
-     "values": [
-      "Reitz Arena",
-      "McDonough Arena"
-     ]
-    },
-    {
-     "field": "city",
-     "records": 60,
-     "values": [
-      "Baltimore",
-      "Washington"
-     ]
-    },
-    {
-     "field": "state_usps",
-     "records": 60,
-     "values": [
-      "MD",
-      "DC"
-     ]
-    }
-   ],
-   "matchup": "Georgetown / Loyola Maryland",
-   "records": 60
-  },
   "6628149": {
    "conflicts": [
     {
@@ -623,14 +555,14 @@
   }
  },
  "by_field": {
-  "city": 2,
-  "game_state": 69,
-  "site": 3,
+  "city": 1,
+  "game_state": 62,
+  "site": 2,
   "start_time_epoch": 34,
-  "state_usps": 2,
-  "teams": 4,
+  "state_usps": 1,
+  "teams": 2,
   "teams (non-blocking)": 5,
-  "venue": 2
+  "venue": 1
  },
  "corrections": {
   "6625717": {
@@ -795,8 +727,8 @@
   }
  },
  "counts": {
-  "blocked": 38,
-  "conflicted": 110,
+  "blocked": 36,
+  "conflicted": 102,
   "corrected": 5,
   "fixtures": 4891
  },

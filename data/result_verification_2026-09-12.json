@@ -1,11 +1,11 @@
 {
  "date": "2026-09-12",
- "generated_utc": "2026-09-12T21:45:43Z",
+ "generated_utc": "2026-09-12T22:09:38Z",
  "counts": {
-  "CORROBORATED_ONE": 57,
-  "VERIFIED_BOTH": 27,
+  "CORROBORATED_ONE": 58,
+  "VERIFIED_BOTH": 30,
   "CONTRADICTED_BOTH": 2,
-  "UNVERIFIED": 5,
+  "UNVERIFIED": 7,
   "CONTRADICTED_ONE": 2
  },
  "matches": [
@@ -2218,33 +2218,21 @@
    "gid": "6625535",
    "date": "2026-09-12",
    "canonical": "Mississippi St. def. Memphis 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "Mississippi St.": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://hailstate.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 12 (Sat)",
-      "3 p.m.",
-      "Away",
-      "Memphis",
-      "Memphis, Tenn.",
-      "Carrie Yerty Classic",
-      "-"
-     ]
+     "assertion": "Mississippi St. W 3-0 vs Memphis",
+     "opponent_source": "Memphis",
+     "site_says": "Away"
     },
     "Memphis": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://gotigersgo.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 12 (Sat)",
-      "3 p.m.",
-      "Home",
-      "Mississippi State",
-      "Memphis, Tenn. (Elma Roane Fieldhouse)",
-      "Carrie Yerty Classic",
-      "-"
-     ]
+     "assertion": "Memphis L 0-3 vs Mississippi State",
+     "opponent_source": "Mississippi State",
+     "site_says": "Home"
     }
    }
   },
@@ -2300,6 +2288,175 @@
      "url": "https://loyolagreyhounds.com/services/schedule_txt.ashx?schedule=3570",
      "assertion": "Loyola Maryland L 0-3 vs Georgetown",
      "opponent_source": "Georgetown",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6625848",
+   "date": "2026-09-12",
+   "canonical": "Stonehill def. Manhattan 3-1",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Stonehill": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://stonehillskyhawks.com/services/schedule_txt.ashx?schedule=489",
+     "assertion": "Stonehill W 3-1 vs Manhattan",
+     "opponent_source": "Manhattan",
+     "site_says": "Neutral"
+    },
+    "Manhattan": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gojaspers.com/services/schedule_txt.ashx?schedule=443",
+     "assertion": "Manhattan L 1-3 vs Stonehill",
+     "opponent_source": "Stonehill",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6625036",
+   "date": "2026-09-12",
+   "canonical": "George Washington def. UMBC 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "George Washington": {
+     "state": "NOT_POSTED",
+     "url": "https://gwsports.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 12 (Sat)",
+      "4 p.m.",
+      "Away",
+      "UMBC",
+      "Baltimore, MD",
+      "Battle of the Beltway",
+      "-"
+     ]
+    },
+    "UMBC": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://umbcretrievers.com/services/schedule_txt.ashx?schedule=384",
+     "assertion": "UMBC L 1-3 vs George Washington",
+     "opponent_source": "George Washington",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6625600",
+   "date": "2026-09-12",
+   "canonical": "Middle Tenn. def. Murray St. 3-1",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Middle Tenn.": {
+     "state": "NOT_POSTED",
+     "url": "https://goblueraiders.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 12 (Sat)",
+      "3:00 PM",
+      "Home",
+      "Murray State",
+      "Murfreesboro, Tenn. (Alumni Memorial Gymnasium)",
+      "Blue Raider Bash",
+      "-"
+     ]
+    },
+    "Murray St.": {
+     "state": "NOT_POSTED",
+     "url": "https://goracers.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 12 (Sat)",
+      "3 p.m.",
+      "Away",
+      "Middle Tennessee",
+      "Murfreesboro, Tenn.",
+      "Blue Raider Bash",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6625971",
+   "date": "2026-09-12",
+   "canonical": "Ohio St. def. Southern Ind. 3-1",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Ohio St.": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://ohiostatebuckeyes.com/sports/womens-volleyball/schedule/text",
+     "rows_on_date": [
+      "Winthrop vs. Youngstown State",
+      "Southern Indiana"
+     ]
+    },
+    "Southern Ind.": {
+     "state": "NOT_POSTED",
+     "url": "https://gousieagles.com/services/schedule_txt.ashx?schedule=523",
+     "row": [
+      "Sep 12 (Sat)",
+      "3 p.m. (CDT)",
+      "Away",
+      "Ohio State University",
+      "Columbus, OH",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6627468",
+   "date": "2026-09-12",
+   "canonical": "Eastern Ky. def. Western Ky. 3-1",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Eastern Ky.": {
+     "state": "NOT_POSTED",
+     "url": "https://ekusports.com/services/schedule_txt.ashx?schedule=350",
+     "row": [
+      "Sep 12 (Sat)",
+      "4:00 p.m.",
+      "Away",
+      "Western Kentucky",
+      "Bowling Green, Ky.",
+      "",
+      ""
+     ]
+    },
+    "Western Ky.": {
+     "state": "NOT_POSTED",
+     "url": "https://wkusports.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 12 (Sat)",
+      "3 p.m. CT",
+      "Home",
+      "Eastern Kentucky",
+      "Bowling Green, Ky. (E.A. Diddle Arena)",
+      "Alyssa Cavanaugh Classic",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6639551",
+   "date": "2026-09-12",
+   "canonical": "Towson def. Robert Morris 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Towson": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://towsontigers.com/services/schedule_txt.ashx?schedule=6584",
+     "assertion": "Towson W 3-0 vs Robert Morris",
+     "opponent_source": "Robert Morris",
+     "site_says": "Home"
+    },
+    "Robert Morris": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://rmucolonials.com/services/schedule_txt.ashx?schedule=503",
+     "assertion": "Robert Morris L 0-3 vs Towson",
+     "opponent_source": "Towson",
      "site_says": "Away"
     }
    }
