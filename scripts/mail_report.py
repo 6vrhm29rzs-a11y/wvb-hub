@@ -181,6 +181,7 @@ def morning(day=None):
                        "home": f.get("home"), "tv": f.get("tv"),
                        "ar": (teams.get(nm) or {}).get("rank"),
                        "hr": (teams.get(f.get("opp")) or {}).get("rank"),
+                       "site": f.get("site"), "city": f.get("city"),
                        "venue": f.get("venue")})
     def best(f):
         a, b = f.get("ar") or 999, f.get("hr") or 999
@@ -196,9 +197,12 @@ def morning(day=None):
         arx = ("#%-4d" % ar) if ar else "     "
         hrx = ("#%-4d" % hr) if hr else "     "
         tv = ("  [%s]" % f["tv"]) if f.get("tv") else ""
-        W("  %-11s %s%-22s %s %s%-22s%s"
-          % (f.get("t") or "TBA", arx, a[:22], "vs" if home else "at",
-             hrx, opp[:22], tv))
+        neutral = f.get("site") == "neutral"
+        word = "vs" if (neutral or home) else "at"
+        where = ("  (%s)" % f["city"]) if (neutral and f.get("city")) else ""
+        W("  %-11s %s%-22s %s %s%-22s%s%s"
+          % (f.get("t") or "TBA", arx, a[:22], word,
+             hrx, opp[:22], where, tv))
     if len(fx) > 30:
         W("  ... and %d more on the site." % (len(fx) - 30))
     W("")
