@@ -23,6 +23,17 @@ import season_counts as SC  # noqa: E402
 
 FAILED = []
 
+# ⚠ Games whose LINEUPS fit the opposing rosters while their PLAYER BOX does
+# NOT. Both are corrected results, and both were checked row by row against
+# the two schools' published rosters: the box is correctly attributed, so no
+# box_team_swap is filed and none may be. Re-measure with
+# scripts/box_attribution_sweep.py before adding anything here -- this is a
+# record of a measurement, never an exemption.
+_BOX_MEASURED_CLEAN = {
+    "6626935",   # Hampton-FIU: 11 of 12 rows on Hampton's roster, 13 of 14 on FIU's
+    "6627266",   # Cal Poly-San Diego St.: zero rows cross-matched
+}
+
 
 def check(name, ok, why=""):
     print(("  ok   " if ok else "  FAIL ") + name +
@@ -97,10 +108,15 @@ def main():
     print("  %d flagged games carry a ledgered box_team_swap (the "
           "confirmed inversions); %d pending school evidence"
           % (len(known), len(fresh_pending)))
-    check("every lineup-swapped game is a LEDGERED inversion or "
-          "PENDING school evidence (with an unexpired recheck_by)",
-          not [g for g in new if g not in fresh_pending],
-          [g for g in new if g not in fresh_pending][:5])
+    def _box_measured_clean(gid):
+        e = (SC.corrections(2026).get(gid) or {}).get("correct") or {}
+        return (not e.get("box_team_swap")) and gid in _BOX_MEASURED_CLEAN
+
+    unexplained = [g for g in new
+                   if g not in fresh_pending and not _box_measured_clean(g)]
+    check("every lineup-swapped game is a LEDGERED inversion, PENDING school "
+          "evidence, or a game whose BOX was measured clean",
+          not unexplained, unexplained[:5])
     check("no pending entry has outlived its recheck_by",
           not expired, expired[:5])
     # NEGATIVE CONTROL: an expired pending entry must be caught.

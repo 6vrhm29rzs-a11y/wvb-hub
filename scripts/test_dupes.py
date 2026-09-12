@@ -158,15 +158,34 @@ def main():
                   "duplicate_listings.json")))["duplicates"].values()))
 
     print("\n4. EMPTY FINALS: VISIBLE FOR AUDIT, COUNTED NOWHERE")
-    empty = [r for r in rc["finals"] if r["gid"] == "6625090"]
-    check("6625090 is visible in the Result Ledger", len(empty) == 1)
-    if os.path.exists(hub):
-        gids_all = set()
-        for team in ("Mississippi Val.", "Delaware St."):
-            for p in (T.get(team) or {}).get("played") or []:
-                gids_all.add(p.get("gid"))
-        check("...and appears in no team's played list",
-              "6625090" not in gids_all)
+    import season_counts as _SCd
+    _best = {}
+    for _l in io.open(os.path.join(REPO, "data/raw/2026/games.jsonl"),
+                      encoding="utf-8"):
+        try:
+            _g = json.loads(_l)
+        except ValueError:
+            continue
+        _k = str(_g.get("game_id")); _p = _best.get(_k)
+        if _p is None or _g.get("game_state") == "F" or _p.get("game_state") != "F":
+            _best[_k] = _g
+    _cls = _SCd.classify(list(_best.values()), 2026)
+    _empty = sorted(g for g, c in _cls.items() if c == "empty")
+    if not _empty:
+        check("no final currently asserts an unusable result "
+              "(nothing to withhold today)", True)
+    else:
+        gid0 = _empty[0]
+        check("an empty final is visible in the Result Ledger (%s)" % gid0,
+              any(r["gid"] == gid0 for r in rc["finals"]))
+        if os.path.exists(hub):
+            counted = set()
+            for _t in (T or {}).values():
+                for _p in (_t.get("played") or []):
+                    counted.add(str(_p.get("gid")))
+            leaked = [g for g in _empty if g in counted]
+            check("...and NO empty final appears in any team's played list",
+                  not leaked, leaked[:4])
 
     print("\n5. THE LEDGER UI RENDERS THE DUPLICATE STATE (behavioural)")
     # node executes the page's own renderConfidence + rcDrill against

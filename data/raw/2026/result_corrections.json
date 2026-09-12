@@ -2803,7 +2803,11 @@
       "home": 18
      }
     ],
-    "linescores_replace": true
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46011": "46557",
+     "46557": "46011"
+    }
    },
    "established": "Kansas St. won 3-1. BOTH schools say so independently: Kansas State's own site carries 'Completed Event: Volleyball versus Weber State on September 11, 2026, Win, 3, to, 1', and Weber State's own schedule carries 'Sep 11 | Neutral | Kansas State | Reno, NV | Nevada Tournament | L 1-3'. The feed's per-set VALUES are right and its TEAM LABELS are inverted: its 'home' column takes sets 1, 2 and 4 at 25 and loses set 3 at 25-27, which is the winner's line, and the winner is Kansas St. Swapping the columns reproduces both schools exactly -- Kansas St. 25-16, 25-19, 25-27 lost, 25-18; Weber St. 1-3 with set 3 won 27-25.",
    "evidence": [
@@ -2824,7 +2828,7 @@
      "establishes": "Weber St. lost 1-3, at a neutral site"
     }
    ],
-   "note": "⚠ FOUND BY RECONCILING OUR RECORDS AGAINST EVOLLVE'S PUBLISHED BOARD, not by any internal check: the feed's final is internally COHERENT, so is_self_contradictory cannot see it and the lineup guard did not fire. Two teams' records disagreed with Evollve on the same match count but a different W-L split, which is the signature of an inverted winner rather than an inclusion difference; the schools then settled it. ⚠ COST: this match was reported in the 2026-09-11 Night Desk email as the night's third-biggest upset -- 'Weber St. #163 def Kansas St. #46, 117 places'. It did not happen. An inverted winner does not just misstate one row, it manufactures the loudest line in the report. ⚠ NO box_team_swap: not checked against the rosters here, and the result correction stands on the schools alone. ⚠ SEPARATE: the feed labels Weber St. home; both schools say NEUTRAL (Reno, NV, Nevada Tournament). That is a fixture-ledger matter, not a result one, and is not corrected here."
+   "note": "⚠ FOUND BY RECONCILING OUR RECORDS AGAINST EVOLLVE'S PUBLISHED BOARD, not by any internal check: the feed's final is internally COHERENT, so is_self_contradictory cannot see it and the lineup guard did not fire. Two teams' records disagreed with Evollve on the same match count but a different W-L split, which is the signature of an inverted winner rather than an inclusion difference; the schools then settled it. ⚠ COST: this match was reported in the 2026-09-11 Night Desk email as the night's third-biggest upset -- 'Weber St. #163 def Kansas St. #46, 117 places'. It did not happen. An inverted winner does not just misstate one row, it manufactures the loudest line in the report. ⚠ NO box_team_swap: not checked against the rosters here, and the result correction stands on the schools alone. ⚠ SEPARATE: the feed labels Weber St. home; both schools say NEUTRAL (Reno, NV, Nevada Tournament). That is a fixture-ledger matter, not a result one, and is not corrected here. ⚠ BOX SWAP ADDED ON MEASURED EVIDENCE. The result correction deliberately claimed nothing about the player rows; the box-attribution sweep then reconciled every row against both schools' published rosters -- 32 of 33 resolvable rows match the OPPOSITE team, ZERO match the team they are filed under. The inversion is the whole match. If the feed later re-serves these rows correctly the swap must be SUPERSEDED, not left standing (the 6626259 lesson)."
   },
   "6627266": {
    "field": "result",
@@ -3569,6 +3573,71 @@
     }
    ],
    "note": "⚠ THIS MATCH COUNTED NOWHERE UNTIL NOW, and it cost BOTH teams a game. Found by reconciling our per-date match counts against the schools' own schedules after Evollve's board showed 80 teams holding one more match than we did. The withholding was correct -- a final that asserts no usable result must not be guessed at -- but nothing went back for the schools, which had published it all along."
+  },
+  "6626176": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Manhattan (labelled home) won 3-1 -- the TRUE set sequence with the TEAMS SWAPPED. Internally coherent, and wrong.",
+   "correct": {
+    "winner_team_id": "45915",
+    "away_sets": 3,
+    "home_sets": 1,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 18,
+      "home": 25
+     },
+     {
+      "period": 2,
+      "visit": 26,
+      "home": 24
+     },
+     {
+      "period": 3,
+      "visit": 27,
+      "home": 25
+     },
+     {
+      "period": 4,
+      "visit": 25,
+      "home": 18
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46198": "45915",
+     "45915": "46198"
+    }
+   },
+   "established": "Holy Cross won 3-1. Both schools publish it -- Manhattan records 'Holy Cross L 1 3' and Holy Cross 'Manhattan W 3 1', both at a neutral site -- and the feed's per-set values reproduce exactly once its columns are swapped.",
+   "evidence": [
+    {
+     "url": "https://gojaspers.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Manhattan",
+     "retrieved": "2026-09-12T20:40:00Z",
+     "text": "'2026-09-12 | Holy Cross | L 1 3 | Neutral'",
+     "establishes": "Manhattan lost 1-3"
+    },
+    {
+     "url": "https://goholycross.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Holy Cross",
+     "retrieved": "2026-09-12T20:40:00Z",
+     "text": "'2026-09-12 | Manhattan | W 3 1 | Neutral'",
+     "establishes": "Holy Cross won 3-1"
+    },
+    {
+     "url": "internal:playerbox/6626176",
+     "kind": "internal_box",
+     "school": null,
+     "retrieved": "2026-09-12T20:40:00Z",
+     "text": "all 38 resolvable box rows match the OPPOSITE school's published roster; 0 match the team they are filed under",
+     "establishes": "the player rows are inverted too, not only the scoreline"
+    }
+   ],
+   "note": "⚠ FOUND BY THE BOX-ATTRIBUTION SWEEP, NOT BY ANY RESULT CHECK. The feed's final is internally coherent -- a complete line that adds up to the winner it names -- so nothing in the result chain could see it. It surfaced because every player row sat under the wrong school. A whole-match inversion leaves its clearest fingerprint in the BOX, not in the score."
   }
  }
 }

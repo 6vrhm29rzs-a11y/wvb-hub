@@ -308,9 +308,7 @@ def results() -> List[Dict]:
         # from it. It stays out of `res` entirely (so no record, no rate,
         # no form pill), and the Result Ledger's official-only state is
         # where its existence remains visible.
-        if g.get("winner_team_id") is None \
-                and home.get("sets_won") is None \
-                and away.get("sets_won") is None:
+        if _SCR.winner_index(g) is None:
             continue
         sets = []
         for s in g.get("linescores") or []:

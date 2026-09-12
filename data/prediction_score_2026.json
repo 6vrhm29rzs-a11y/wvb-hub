@@ -2,46 +2,46 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 1251,
+  "scored": 1268,
   "logged_after_tipoff_excluded": 5,
   "team_mismatch_excluded": 39,
   "predictions_on_record": 4807,
-  "results_available": 1320,
-  "brier": 0.1747,
+  "results_available": 1337,
+  "brier": 0.1758,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 925,
+  "favourite_correct": 937,
   "favourite_correct_pct": 73.9
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 218,
+   "n": 221,
    "said": 55.2,
-   "happened": 57.8
+   "happened": 58.8
   },
   {
    "range": "60-70%",
-   "n": 222,
+   "n": 226,
    "said": 65.2,
-   "happened": 59.0
+   "happened": 58.8
   },
   {
    "range": "70-80%",
-   "n": 204,
+   "n": 208,
    "said": 75.1,
-   "happened": 68.6
+   "happened": 68.3
   },
   {
    "range": "80-90%",
-   "n": 228,
-   "said": 85.2,
-   "happened": 78.9
+   "n": 231,
+   "said": 85.3,
+   "happened": 78.4
   },
   {
    "range": "90-101%",
-   "n": 379,
+   "n": 382,
    "said": 95.6,
-   "happened": 91.8
+   "happened": 91.9
   }
  ],
  "matches": [
@@ -415,6 +415,15 @@
    "brier": 0.7873012899999999
   },
   {
+   "game_id": "6625384",
+   "date": "2026-09-12",
+   "away": "Missouri St.",
+   "home": "Iowa",
+   "p_home": 0.8868,
+   "home_won": false,
+   "brier": 0.78641424
+  },
+  {
    "game_id": "6626053",
    "date": "2026-09-06",
    "away": "Tulsa",
@@ -485,15 +494,6 @@
    "p_home": 0.8636,
    "home_won": false,
    "brier": 0.7458049600000001
-  },
-  {
-   "game_id": "6637641",
-   "date": "2026-09-06",
-   "away": "Georgetown",
-   "home": "Wake Forest",
-   "p_home": 0.8631,
-   "home_won": false,
-   "brier": 0.7449416099999999
   }
  ]
 }

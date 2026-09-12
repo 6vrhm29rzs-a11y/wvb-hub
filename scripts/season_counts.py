@@ -445,7 +445,8 @@ def classify(games, season):
             out[gid] = "exhibition"
         elif gid in review:
             out[gid] = "under_review"
-        elif is_empty_final(apply_correction(g, corr)):
+        elif is_empty_final(apply_correction(g, corr)) or \
+                winner_index(apply_correction(g, corr)) is None:
             out[gid] = "empty"
         elif is_self_contradictory(apply_correction(g, corr)):
             out[gid] = "self_contradictory"
