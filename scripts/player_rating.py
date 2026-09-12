@@ -303,7 +303,16 @@ def _counted_playerbox(year):
     ok = set(str(g.get("game_id")) for g in _SC.countable(
         gamelog.load_games_jsonl(gpath), year))
     swaps = _SC.box_team_swaps(year)
-    out = []
+    # ⚠ ONE RECORD PER GAME, LAST WINS. playerbox.jsonl is append-only, so a
+    # REFETCHED match appears more than once -- and on 2026-09-11 the whole
+    # season was re-crawled to capture service errors and seven other fields
+    # the extractor had been dropping, which made duplicates universal rather
+    # than rare. This loop appended every line, so every consumer that sums
+    # over the result (defence profiles, faced-defence, schedule strength)
+    # would have counted each refetched match TWICE.
+    # The log's documented reader semantics have always been per-gid
+    # last-wins; this loop simply predated the day that started mattering.
+    _byg = {}
     pb = os.path.join(REPO, "data/raw/%d/playerbox.jsonl" % year)
     if os.path.exists(pb):
         for ln in io.open(pb, encoding="utf-8"):
@@ -314,13 +323,16 @@ def _counted_playerbox(year):
             gid = str(rec.get("game_id"))
             if gid not in ok:
                 continue
-            sw = swaps.get(gid) or {}
-            rows = rec.get("rows") or []
-            if sw:
-                rows = [dict(r, team_id=sw.get(str(r.get("team_id")),
-                                               r.get("team_id")))
-                        for r in rows]
-            out.append((gid, rows))
+            _byg[gid] = rec
+    out = []
+    for gid, rec in _byg.items():
+        sw = swaps.get(gid) or {}
+        rows = rec.get("rows") or []
+        if sw:
+            rows = [dict(r, team_id=sw.get(str(r.get("team_id")),
+                                           r.get("team_id")))
+                    for r in rows]
+        out.append((gid, rows))
     _COUNTED_PB_CACHE[year] = out
     return out
 

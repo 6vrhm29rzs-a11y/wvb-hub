@@ -64,14 +64,25 @@ def main():
     print("\n4. THE REAL KNOWN POSITIVE (SMU-UC Davis, from committed raw)")
     raw, corrected = A.load_corpora()
     results_real = A.team_results(corrected)
-    boxes_real = {}
+    # ⚠ THIS KNOWN POSITIVE WAS CORRECTED AT SOURCE (2026-09-11). The feed
+    # went back and fixed its own team attribution on SMU-UC Davis, so the
+    # box it serves TODAY is right and there is no inversion left to detect.
+    # Reading last-wins here made this check fail against a feed that had
+    # improved -- the expectation was stale, not the detector.
+    # The log is append-only, so the record the correction was FILED AGAINST
+    # is still present; it is simply no longer last. Keeping FIRST-wins for
+    # this fixture keeps the detector's capability provable, and the
+    # last-wins copy is kept beside it so the two can be compared.
+    boxes_real, boxes_latest = {}, {}
     with open(os.path.join(A.RAW, "playerbox.jsonl")) as f:
         for line in f:
             try:
                 rr = json.loads(line)
-                boxes_real[str(rr.get("game_id"))] = rr
             except ValueError:
                 continue
+            gid = str(rr.get("game_id"))
+            boxes_latest[gid] = rr
+            boxes_real.setdefault(gid, rr)        # first wins
     d = json.load(open(os.path.join(REPO, "data", "data_2026.json")))
     id2n = {str(t["team_id"]): t["name_short"] for t in d["teams"]}
     R = json.load(open(os.path.join(A.RAW, "rosters_2026.json")))
@@ -84,7 +95,8 @@ def main():
             rkeys[team] = ks
     smu = A.box_roster_fit("6626259", raw["6626259"], boxes_real, rkeys,
                            id2n)
-    check("SMU-UC Davis box rows vote SUPPORTS_H1 on the RAW attribution",
+    check("SMU-UC Davis box rows vote SUPPORTS_H1 on the AS-FILED "
+          "attribution (the feed has since corrected itself)",
           smu["vote"] == "SUPPORTS_H1" and smu["fit_gain"] > 0.5, smu)
 
     print("\n5. THE DETECTOR MUTATES NOTHING")

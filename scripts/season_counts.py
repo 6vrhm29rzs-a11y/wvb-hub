@@ -144,10 +144,23 @@ def box_team_swaps(season):
     Davis's id are SMU roster players, 17/17 the reverse). The raw log is
     never rewritten; every derived consumer of player rows applies this
     map at read."""
+    # ⚠ A SWAP CAN BE SUPERSEDED BY ITS OWN SOURCE (2026-09-11). The feed
+    # went back and fixed its team attribution on 34 of these 35 matches, so
+    # applying the swap to the rows it serves TODAY re-inverts data that is
+    # already right. The correction is not withdrawn -- its evidence stands
+    # and its `feed_said` remains the record of what was served at the time
+    # -- it is labelled superseded, the same way this project supersedes any
+    # document rather than deleting it.
+    # The coupling is dangerous precisely because it is invisible: whether a
+    # swap should apply depends on WHICH version of the box the log holds.
+    # test_box_swaps.py re-derives that from the current log on every run, so
+    # a re-crawl that flips it back fails a guard instead of silently
+    # mis-attributing a match's players.
     out = {}
     for gid, c in corrections(season).items():
-        m = (c.get("correct") or {}).get("box_team_swap")
-        if m:
+        fix = (c.get("correct") or {})
+        m = fix.get("box_team_swap")
+        if m and not fix.get("box_team_swap_superseded"):
             out[str(gid)] = {str(k): str(v) for k, v in m.items()}
     return out
 
@@ -323,6 +336,51 @@ def resolve(games):
                 (prev.get("game_state") or prev.get("state")) != "F":
             best[gid] = g
     return [best[g] for g in order]
+
+
+def impossible_sets(g):
+    # type: (Dict) -> List
+    """Set rows the SCORING RULES say cannot exist. [(period, visit, home)].
+
+    ⚠ THE RULE IS THE SPORT'S, NOT A THRESHOLD I PICKED. A set ends the
+    moment a side is at or past the format minimum with a two-point lead.
+    So a winner ABOVE that minimum can only have got there through deuce,
+    and its margin is EXACTLY two. A winner over 25 with any other margin
+    could not have been played.
+
+    That formulation is deliberately format-agnostic: it is true of the
+    25-point set, the 15-point decider and the first-to-21 exhibition
+    alike, so it never has to ask which format a match used.
+
+    ⚠ AND IT IS DELIBERATELY CONSERVATIVE, because this project has already
+    nearly deleted a true score by inventing a plausibility rule. A set
+    read 24-22 and was taken for corruption; it was a real completed set in
+    a first-to-21 exhibition. Anything at or under 25 is therefore NOT
+    judged here, even where a particular format would have ended it sooner
+    -- a 16-10 might be a set to 21 in progress. Only the universally
+    impossible is named.
+
+    Found by Cody reading the Scores tab (2026-09-11): the feed served
+    Le Moyne-Siena as 20-56 and 32-62, and the page rendered it as fact.
+    A counted FINAL was carrying one too -- Kennesaw St.-Alabama A&M at
+    26-21, which the rules say ended at 25-21.
+    """
+    bad = []
+    for r in (g.get("linescores") or []):
+        try:
+            h = int(str(r.get("home")).strip())
+            v = int(str(r.get("visit")).strip())
+        except (TypeError, ValueError):
+            continue
+        hi, lo = max(h, v), min(h, v)
+        if hi > 25 and (hi - lo) != 2:
+            bad.append((r.get("period"), v, h))
+    return bad
+
+
+def has_impossible_sets(g):
+    # type: (Dict) -> bool
+    return bool(impossible_sets(g))
 
 
 def is_self_contradictory(g):

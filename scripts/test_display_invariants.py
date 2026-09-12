@@ -1433,7 +1433,23 @@ def check_phantom_sets_are_harmless():
     # correct aggregate. crawl_2025._canon merges case, accents and
     # feed-corruption (nameclean); the auditor must speak the same key or it
     # is auditing a different question.
-    recs = [json.loads(l) for l in open(pb) if l.strip()]
+    # ⚠ LAST-WINS PER GAME, like every other reader of this log.
+    # playerbox.jsonl is append-only, so a game REFETCHED later appears twice
+    # -- which happened in bulk on 2026-09-11 when the whole season was
+    # re-crawled to capture service errors and seven other fields the
+    # extractor had been discarding. This check read every line, counted each
+    # refetched match twice, and reported 2,282 players whose "justified" set
+    # counts were exactly double. The aggregate was right; the guard was not.
+    # gamelog.load_records_jsonl is the canonical reader and already does
+    # this; the raw comprehension here was a second, divergent one (R4).
+    _byg = {}
+    for _l in open(pb):
+        _l = _l.strip()
+        if not _l:
+            continue
+        _r = json.loads(_l)
+        _byg[str(_r.get("game_id") or _r.get("gid") or "")] = _r
+    recs = list(_byg.values())
     # ⚠ SKIP EXHIBITIONS, EXACTLY AS THE AGGREGATOR DOES (CI, 2026-08-30):
     # Lexi Gin's gp=2 line is from the SMU-Penn St. exhibition, which the
     # aggregate rightly excludes -- a recount that counts it reports
