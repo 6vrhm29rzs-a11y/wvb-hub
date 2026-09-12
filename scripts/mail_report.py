@@ -220,12 +220,27 @@ def morning(day=None):
             if k in seen:
                 continue
             seen.add(k)
-            fx.append({"a": nm, "opp": f.get("opp"), "t": f.get("t"),
+            fx.append({"apw": (teams.get(nm) or {}).get("power"),
+                       "hpw": (teams.get(f.get("opp")) or {}).get("power"),
+                       "a": nm, "opp": f.get("opp"), "t": f.get("t"),
                        "home": f.get("home"), "tv": f.get("tv"),
                        "ar": (teams.get(nm) or {}).get("rank"),
                        "hr": (teams.get(f.get("opp")) or {}).get("rank"),
                        "site": f.get("site"), "city": f.get("city"),
                        "venue": f.get("venue")})
+    def watch(f):
+        """0-100: how worth watching this projects to be. Convention, not a
+        forecast -- quality of the two sides x how evenly matched they are."""
+        pa, pb = f.get("apw"), f.get("hpw")
+        if pa is None or pb is None:
+            return None
+        quality = (pa + pb) / 2.0
+        closeness = max(0.0, 1.0 - abs(pa - pb) / 12.0)
+        return round(quality * (0.70 + 0.30 * closeness), 1)
+
+    for f in fx:
+        f["ems"] = watch(f)
+
     def best(f):
         a, b = f.get("ar") or 999, f.get("hr") or 999
         return min(a, b) * 1000 + max(a, b)
@@ -249,6 +264,27 @@ def morning(day=None):
     if len(fx) > 30:
         W("  ... and %d more on the site." % (len(fx) - 30))
     W("")
+    top = sorted([f for f in fx if f.get("ems") is not None],
+                 key=lambda f: -f["ems"])[:6]
+    if top:
+        W("WORTH WATCHING  (strength of both sides x how close they project)")
+        W("-" * 62)
+        for f in top:
+            a, opp, ar, hr, home = f["a"], f["opp"], f.get("ar"), f.get("hr"), f.get("home")
+            if (hr or 999) < (ar or 999):
+                a, opp, ar, hr, home = opp, a, hr, ar, (not home)
+            W("  %-5.1f  %-11s %s%-20s %s %s%-20s"
+              % (f["ems"], f.get("t") or "TBA",
+                 ("#%-4d" % ar) if ar else "     ", a[:20],
+                 "vs" if (home or f.get("site") == "neutral") else "at",
+                 ("#%-4d" % hr) if hr else "     ", opp[:20]))
+        W("")
+        W("  That score orders this list and nothing else: the two POWER")
+        W("  ratings averaged, then discounted by how far apart they are,")
+        W("  weighted 70/30 toward quality so two strong teams outrank two")
+        W("  average ones. The weighting is a judgement, not a fitted number,")
+        W("  and it is not a forecast.")
+        W("")
     W("  Times are Pacific. Ranks are our POWER rank.")
     W("  Full site: https://codys-macbook-pro.tail069aa6.ts.net/START-HERE.html")
     return "\n".join(out)
