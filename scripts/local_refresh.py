@@ -80,6 +80,9 @@ REBUILD = [
     ({}, ["scripts/collector.py", "--recheck-reviews"]),
     ({}, ["scripts/provenance.py", "--check"]),
     ({}, ["scripts/build_hub.py"]),
+    # --- reference checks: read-only, local-only, never gate the build ---
+    ({}, ["scripts/ingest_monsterblock.py"]),
+    ({}, ["scripts/board_bakeoff.py"]),
 ]
 
 # Steps that MUST succeed for the cycle to continue. Everything else is

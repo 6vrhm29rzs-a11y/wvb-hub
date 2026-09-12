@@ -80,7 +80,9 @@ def night(day=None):
             rows.append({"w": w, "l": l, "ws": ws, "ls": ls,
                          "site": g.get("site"), "opr": g.get("opr"),
                          "mine_rank": (teams.get(w) or {}).get("rank"),
-                         "lose_rank": (teams.get(l) or {}).get("rank")})
+                         "lose_rank": (teams.get(l) or {}).get("rank"),
+                         "mine_avca": (teams.get(w) or {}).get("avca"),
+                         "lose_avca": (teams.get(l) or {}).get("avca")})
     W("RESULTS  (%d counted matches)" % len(rows))
     W("-" * 62)
     if not rows:
@@ -92,8 +94,15 @@ def night(day=None):
     def line(r, tag=""):
         wr = ("#%-3d " % r["mine_rank"]) if r["mine_rank"] else "     "
         lr = ("#%-3d " % r["lose_rank"]) if r["lose_rank"] else "     "
-        return ("  %s%-22s def %s%-22s %d-%d%s"
-                % (wr, r["w"][:22], lr, r["l"][:22], r["ws"], r["ls"], tag))
+        # the AVCA poll rank rides alongside when either side carries one --
+        # only 25 teams do, so it is absent far more often than present
+        av = ""
+        if r.get("lose_avca") or r.get("mine_avca"):
+            av = "   [AVCA %s over %s]" % (
+                ("#%d" % r["mine_avca"]) if r.get("mine_avca") else "unranked",
+                ("#%d" % r["lose_avca"]) if r.get("lose_avca") else "unranked")
+        return ("  %s%-22s def %s%-22s %d-%d%s%s"
+                % (wr, r["w"][:22], lr, r["l"][:22], r["ws"], r["ls"], tag, av))
 
     # ⚠ A FLAT 40-PLACE GAP WAS THE WRONG RULE AND HID THE NIGHT'S STORY.
     # Penn St. (#22) beating Stanford (#8) is 14 places and was the result
@@ -103,8 +112,16 @@ def night(day=None):
     # OR a 40-place gap anywhere. Both numbers are CONVENTIONS chosen to
     # match how the sport talks, not thresholds fitted to anything -- stated
     # here and in the mail, and they feed no rating.
+    def poll_upset(r):
+        lo_, wn = r.get("lose_avca"), r.get("mine_avca")
+        if not lo_:
+            return False                 # the beaten side must be poll-ranked
+        return (wn is None) or (wn > lo_)
+
     def notable(r):
         lo_, wn = r.get("lose_rank"), r.get("mine_rank")
+        if poll_upset(r):
+            return True
         if lo_ and lo_ <= 25 and (wn or 999) >= lo_ + 10:
             return True
         return gap(r) >= 40
@@ -113,10 +130,12 @@ def night(day=None):
                             if (r.get("lose_rank") or 999) <= 25
                             else 1000 - min(gap(r), 999)))
     if ups:
-        W("  UPSETS  (beat a POWER top-25 side from 10+ places below,")
-        W("           or won across a 40-place gap)")
-        for r in ups[:12]:
-            W(line(r, "   %d places" % gap(r)))
+        W("  UPSETS  (an AVCA-ranked side beaten by someone it outranks;")
+        W("           a POWER top-25 side beaten from 10+ places below;")
+        W("           or a win across a 40-place POWER gap)")
+        for r in ups[:14]:
+            g = gap(r)
+            W(line(r, ("   %d places" % g) if g > 0 else "   poll upset"))
         W("")
     rk = [r for r in rows
           if r not in ups and ((r.get("mine_rank") or 999) <= 50
@@ -171,6 +190,10 @@ def night(day=None):
     W("-" * 62)
     W("  Counted matches only: exhibitions, duplicate feed listings and")
     W("  results under review are excluded, the same rule the site uses.")
+    W("  Two rulers, never merged: POWER is who has PLAYED well, the AVCA")
+    W("  poll is who people thought was good. A result can be an upset on one")
+    W("  and unremarkable on the other -- the poll ranks only 25 teams, so")
+    W("  most nights most matches carry no AVCA note at all.")
     W("  Upset size is measured in POWER places, our own ruler. A CLOSE CALL")
     W("  is a favourite ranked 40+ places higher that still dropped two sets.")
     W("  Both thresholds are conventions, not fitted numbers, and feed nothing.")
