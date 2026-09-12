@@ -1,0 +1,145 @@
+{
+ "_doc": "Feed game_states OTHER than P/I/F, and any gid whose state was re-served as one of them after a Final. D = exhibition/scrimmage, O = suspended (measured 2026-09-12). Neither is counted by any consumer -- but they fall out of the counting chain because every counter tests state != 'F', so nothing in code knows what they mean. This file is where the EVIDENCE for each judgement lives, so a D-state game that is NOT an exhibition cannot vanish silently. test_feed_states.py fails on any entry that is not recorded here.",
+ "gids": {
+  "6639821": {
+   "teams": [
+    "Norfolk St.",
+    "Elizabeth City St."
+   ],
+   "date": "2026-08-22",
+   "flip": "F -> D",
+   "counted_now": true,
+   "why": "⚠ OPEN -- THE EVIDENCE CONFLICTS AND IT IS LEFT COUNTED DELIBERATELY. The feed served this as F (Norfolk St. 3-0, three linescores) and then re-served the IDENTICAL result as D. It is the only gid all season to flip that way. final-beats-non-final therefore keeps counting it, which is correct for a scorer's revision and wrong for a re-classification, and the record itself does not say which this is. AGAINST counting: every other D-state game this season is a confirmed exhibition; it sits on 2026-08-22 with all of them; the opponent is Division II; and Evollve, which excludes D, shows Norfolk St. one win lighter than we do. FOR counting: Norfolk St.'s own schedule lists 'Elizabeth City, W 3-0' with NO exhibition marker, among its counting fixtures -- and the schools that DO post results for exhibitions mark them plainly (Southern Miss. 'Nicholls (Exhibition) W 3 0', Utah Tech 'BYU (Exhibition) L 0 3'), so an unmarked row carrying a result is the school saying this one was real. The school's own word is the strongest single source here, so it stays counted and VISIBLE rather than being quietly dropped. Cody's call. Worth exactly one win on one team's record (Norfolk St. 2-6 vs 1-6).",
+   "evidence": [
+    {
+     "url": "https://nsuspartans.com/services/schedule_txt.ashx?schedule=274",
+     "school": "Norfolk St.",
+     "retrieved": "2026-09-12",
+     "text": "'2026-08-21 | Elizabeth City | W 3 0' -- no exhibition marker",
+     "establishes": "the school presents it as a real result"
+    },
+    {
+     "url": "internal:games.jsonl/6639821",
+     "school": null,
+     "retrieved": "2026-09-12",
+     "text": "record sequence: state F (sets 3-0, 3 linescores) then state D (identical)",
+     "establishes": "the feed re-classified an already-final game"
+    }
+   ]
+  },
+  "6639846": {
+   "teams": [
+    "BYU",
+    "Utah Tech"
+   ],
+   "date": "2026-08-22",
+   "flip": null,
+   "counted_now": false,
+   "why": "Exhibition, confirmed from the opponent's side.",
+   "evidence": [
+    {
+     "url": "https://utahtechtrailblazers.com/services/schedule_txt.ashx?schedule=1390",
+     "school": "Utah Tech",
+     "retrieved": "2026-09-12",
+     "text": "'2026-08-22 | BYU (Exhibition) | L 0 3'",
+     "establishes": "explicitly an exhibition"
+    }
+   ]
+  },
+  "6639850": {
+   "teams": [
+    "Georgia",
+    "Mercer"
+   ],
+   "date": "2026-08-22",
+   "flip": null,
+   "counted_now": false,
+   "why": "Exhibition, confirmed on the host's own schedule.",
+   "evidence": [
+    {
+     "url": "https://georgiadogs.com/sports/womens-volleyball/schedule/text",
+     "school": "Georgia",
+     "retrieved": "2026-09-12",
+     "text": "'2026-08-22 | Mercer (exh.)'",
+     "establishes": "explicitly an exhibition"
+    }
+   ]
+  },
+  "6639820": {
+   "teams": [
+    "Oakland",
+    "Wayne State"
+   ],
+   "date": "2026-08-22",
+   "flip": null,
+   "counted_now": false,
+   "why": "Exhibition. Wayne State is Division II, Oakland posts the fixture with NO result, and the row immediately above it on Oakland's own schedule is a 'Black and Gold Scrimmage' -- a preseason block.",
+   "evidence": [
+    {
+     "url": "https://goldengrizzlies.com/services/schedule_txt.ashx?schedule=1366",
+     "school": "Oakland",
+     "retrieved": "2026-09-12",
+     "text": "'2026-08-21 | Black and Gold Scrimmage' then '2026-08-22 | Wayne State' (no result)",
+     "establishes": "preseason exhibition block against a D-II side"
+    }
+   ]
+  },
+  "6639823": {
+   "teams": [
+    "Milwaukee",
+    "Parkside"
+   ],
+   "date": "2026-08-22",
+   "flip": null,
+   "counted_now": false,
+   "why": "Exhibition. UW-Parkside is Division II and Milwaukee posts no result.",
+   "evidence": [
+    {
+     "url": "https://mkepanthers.com/services/schedule_txt.ashx?schedule=5404",
+     "school": "Milwaukee",
+     "retrieved": "2026-09-12",
+     "text": "'2026-08-22 | Parkside' with no result",
+     "establishes": "preseason exhibition against a D-II side"
+    }
+   ]
+  },
+  "6639871": {
+   "teams": [
+    "Miami (OH)",
+    "Wright St."
+   ],
+   "date": "2026-08-22",
+   "flip": null,
+   "counted_now": false,
+   "why": "Exhibition, confirmed on the host's own schedule.",
+   "evidence": [
+    {
+     "url": "https://wsuraiders.com/sports/womens-volleyball/schedule/text",
+     "school": "Wright St.",
+     "retrieved": "2026-09-12",
+     "text": "'2026-08-22 | Miami (OH) (EX)'",
+     "establishes": "explicitly an exhibition"
+    }
+   ]
+  },
+  "6639875": {
+   "teams": [
+    "Eastern Ky.",
+    "Morehead St."
+   ],
+   "date": "2026-08-22",
+   "flip": null,
+   "counted_now": false,
+   "why": "Exhibition. Eastern Ky. carries the fixture with NO result while posting results for every counting match around it.",
+   "evidence": [
+    {
+     "url": "https://ekusports.com/services/schedule_txt.ashx?schedule=350",
+     "school": "Eastern Ky.",
+     "retrieved": "2026-09-12",
+     "text": "'2026-08-22 | Morehead State' with no result, against 'W 3 2' and 'W 3 1' on 08-28/08-29",
+     "establishes": "preseason exhibition the school does not score"
+    }
+   ]
+  }
+ }
+}

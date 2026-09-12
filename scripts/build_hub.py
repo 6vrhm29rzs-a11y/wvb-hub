@@ -8791,6 +8791,7 @@ h4.sbtime span{font:600 11px/1 var(--mono);color:var(--ink3)}
   margin-top:3px}
 .mrow .mtg{font:600 11px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
   color:var(--slate);border:1px solid var(--line);border-radius:2px;padding:3px 5px}
+.mtg.stale{color:var(--warn,#8a6100);border-color:currentColor;opacity:.95}
 .mrow .mtg.rv{color:var(--gold);border-color:color-mix(in oklab,var(--gold) 40%,transparent)}
 .mrow .mtg.lv{color:var(--coral);border-color:color-mix(in oklab,var(--coral) 45%,transparent)}
 /* ⚠ A LIVE ROW ALREADY SAYS SO TWICE -- its eyebrow shows the set period and
@@ -17766,6 +17767,7 @@ function matchRow(m, live, dest) {
   if (urv) tags.push(['rvw', 'UNDER REVIEW']);
   if (m.ar && m.hr) tags.push(['rv', 'ranked v ranked']);
   if (st === 'live') tags.push(['lv', 'live']);
+  const _od = feedOverdue(m, st);
   if (m.site === 'neutral') tags.push(['', 'neutral']);
   /* ⚠ A LIVE ROW SAYS THE POINTS, RIGHT HERE (Cody, mid-slate, with the
      NCAA.com card as the reference: "I shouldn't have to click on a match to
@@ -17833,6 +17835,15 @@ function matchRow(m, live, dest) {
           '</span></span>'
         : '') +
       (m.exh ? '<span class="mtags">' + exhTag(m) + '</span>' : '') +
+      /* The feed still calls this scheduled long after its own listed start.
+         Says only what is known -- the time passed, the feed has not moved --
+         and never claims the match is live. */
+      (_od ? '<span class="mtags"><span class="mtg stale" title="' +
+        'Listed start was ' + esc(m.t || '') + ' and the feed still lists ' +
+        'this as scheduled ' + _od + ' minutes later. It may be under way; ' +
+        'the source has not updated. Shown after a ' + FEED_OVERDUE_MIN +
+        '-minute grace, a display convention, not a judgement about the match.'
+        + '">feed not updated \u00b7 start time passed</span></span>' : '') +
     '</span></button>';
 }
 
@@ -18052,6 +18063,38 @@ function tMinutes(t) {
   if (!m) return null;
   const h = (+m[1] % 12) + (/pm/i.test(m[3]) ? 12 : 0);
   return h * 60 + (+m[2]);
+}
+
+/* ══ THE FEED CAN JUST NOT UPDATE, AND SCHEDULED IS THEN A LIE ══════════
+   Cody, 2026-09-12 11:21 PT, watching a match on another service while this
+   page still showed it as SCHEDULED: "the live scores aren't pulling in rn".
+   They were. MEASURED at 11:32: our poller held 347 fixtures, 25 of them
+   live, stamped one minute earlier with no error -- and TWENTY-SIX 11:00 AM
+   fixtures, the entire wave, still sat at state `pre` thirty-two minutes
+   after their listed start. ncaa.com had not moved them. Kentucky-SMU and
+   Creighton-Louisville, both top-ten matches, read as not yet started.
+
+   Nothing here can make the feed report. What it must not do is present the
+   feed's silence as fact. A fixture whose listed start has passed while the
+   feed still calls it scheduled is marked, and the mark says exactly what is
+   and is not known: the start time has passed, and the feed has not updated.
+   It is NEVER upgraded to `live` -- we do not know that it started, only that
+   the listing is stale (R5: no synthesised state).
+
+   ⚠ THE GRACE PERIOD IS A DISPLAY CONVENTION, NOT A VERDICT, and is stated
+   as one. Matches start late for ordinary reasons; 20 minutes is chosen to
+   sit clear of that and is not fitted to anything. It decides only whether a
+   sentence appears, and feeds no rating, no count and no state. */
+const FEED_OVERDUE_MIN = 20;
+function feedOverdue(m, st) {
+  if (st !== 'upcoming') return 0;
+  if (!m || m.d !== todayPT()) return 0;       /* only today's own slate */
+  const start = tMinutes(m.t);
+  if (start === null) return 0;                /* TBA asserts no start time */
+  const now = nowMinutesPT();
+  if (now === null) return 0;
+  const late = now - start;
+  return late >= FEED_OVERDUE_MIN ? late : 0;
 }
 
 function sbDate() { return SB_DATE || todayPT(); }
@@ -19806,6 +19849,16 @@ function csWhere(m) {
 function todayPT() {
   return new Intl.DateTimeFormat('en-CA',
     { timeZone: 'America/Los_Angeles' }).format(new Date());
+}
+
+function nowMinutesPT() {
+  const p = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Los_Angeles', hour12: false,
+    hour: '2-digit', minute: '2-digit' }).formatToParts(new Date());
+  const g = k => { const f = p.find(x => x.type === k); return f ? +f.value : null; };
+  const h = g('hour'), mi = g('minute');
+  if (h === null || mi === null) return null;
+  return (h % 24) * 60 + mi;
 }
 
 function csCtx(m, kind, n) {
