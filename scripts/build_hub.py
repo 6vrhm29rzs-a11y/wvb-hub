@@ -2562,6 +2562,17 @@ def box_and_players(res, photos=None, honours=None, xfer=None,
                 "aces": num(r.get("aces")), "digs": num(r.get("digs")),
                 "bs": bs, "ba": ba, "ast": num(r.get("assists")),
                 "pts": k + num(r.get("aces")) + bs + 0.5 * ba,
+                # ⚠ SERVING'S COST, NOT JUST ITS REWARD (Cody, 2026-09-11).
+                # The box showed aces and hid service errors all season, so a
+                # server with 8 aces and 14 errors read identically to one
+                # with 8 and 2. `se` rides in the BOXES payload beside aces
+                # because every consumer of a box row -- the match box score,
+                # the team match-by-match table, teamTotals -- reads from
+                # here, so adding it once reaches all three.
+                # Reception errors are NOT put in this row: being aced is the
+                # other side of the rally from serving, and pairing them in
+                # one line is exactly the conflation Cody corrected.
+                "se": num(r.get("serve_errors")),
             }
             rows.append(row)
             # ⚠ THE DEFECT THIS REPLACES. The key was the team plus the name AS
@@ -2628,6 +2639,10 @@ def box_and_players(res, photos=None, honours=None, xfer=None,
                 # that was actually her match.
                 "ast": row["ast"],
                 "aces": row["aces"], "sets": sets, "pts": row["pts"],
+                # serving's cost travels with the player's match line too, so
+                # a game log can show 3 aces against 7 errors rather than
+                # only the flattering half
+                "se": row["se"],
             }
             # Same canonical player, same game: keep the RICHER valid row --
             # more sets, then more counted volume as a deterministic tiebreak,
@@ -2728,7 +2743,8 @@ def team_season_stats(boxes, res):
 
     def blank():
         return {"k": 0.0, "e": 0.0, "ta": 0.0, "ast": 0.0, "digs": 0.0,
-                "bs": 0.0, "ba": 0.0, "aces": 0.0, "sets": 0.0, "matches": 0,
+                "bs": 0.0, "ba": 0.0, "aces": 0.0, "se": 0.0,
+                "sets": 0.0, "matches": 0,
                 # ⚠ HOW MANY OF THOSE MATCHES WERE AGAINST A NON-D-I SIDE.
                 # Norfolk St.'s 2026 page read "Hitting % .390" against
                 # opponents' ".037" -- both true, both from ONE Division-II
@@ -2796,7 +2812,8 @@ def team_season_stats(boxes, res):
             for src, dst in _pairs:
                 sets = 0.0
                 for r in src:
-                    for f in ("k", "e", "ta", "ast", "digs", "bs", "ba", "aces"):
+                    for f in ("k", "e", "ta", "ast", "digs", "bs", "ba",
+                              "aces", "se"):
                         dst[f] += float(r.get(f) or 0)
                     sets = max(sets, float(r.get("sets") or 0))
                 dst["sets"] += sets
@@ -2822,6 +2839,13 @@ def team_season_stats(boxes, res):
                 "sets": round(n, 1),
                 "kills": d["k"], "errors": d["e"], "attacks": d["ta"],
                 "assists": d["ast"], "digs": d["digs"], "aces": d["aces"],
+                # ⚠ SERVING BOTH WAYS. This function already totals what a
+                # team DOES and what it ALLOWS from the same pass, so service
+                # errors come free on both sides -- and "errors the opponent
+                # gave us" is as real a defensive fact as opponent hitting %.
+                # Aces without their cost was half the picture all season.
+                "serve_errors": d.get("se", 0),
+                "seps": (round(d.get("se", 0) / n, 2) if n else None),
                 "blocks": d["bs"] + d["ba"] * 0.5,
                 "hit": (round((d["k"] - d["e"]) / d["ta"], 3) if d["ta"] else None),
                 # Kill % = kills / total attacks -- the share of swings that
@@ -11400,6 +11424,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <div class="ctl">
     <input type="search" id="lq" placeholder="Search player or team&hellip;">
     <select id="lstat">
+      <optgroup label="Attack, defence &amp; setting">
       <option value="pps">Points / set</option>
       <option value="kps">Kills / set</option>
       <option value="hit">Hitting %</option>
@@ -11407,10 +11432,21 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <option value="bps">Blocks / set</option>
       <option value="aps">Aces / set</option>
       <option value="asps">Assists / set</option>
-      <option value="sv_err_set">Service errors / set</option>
-      <option value="sv_err_pct">Service error %</option>
+      </optgroup>
+      <!-- ⚠ GROUPED, BECAUSE FOUR NEW METRICS AT THE BOTTOM OF A FLAT LIST
+           IS THE SAME AS NOT SHIPPING THEM (Cody, 2026-09-11: "have we not
+           added the service aces, errors, attempts ... I'm looking on mobile
+           and I don't see it" -- they were live and live at the bottom of a
+           closed dropdown). Serving and serve-receive are separate groups
+           because they are opposite sides of the rally. -->
+      <optgroup label="Serving">
       <option value="sv_ace_pct">Ace %</option>
+      <option value="sv_err_pct">Service error %</option>
+      <option value="sv_err_set">Service errors / set</option>
+      </optgroup>
+      <optgroup label="Serve receive">
       <option value="rc_err_set">Reception errors / set</option>
+      </optgroup>
     </select>
     <select id="lside" hidden>
       <option value="own">This team</option>
@@ -12803,19 +12839,27 @@ function boxHTML(gid) {
     out += '<div class="boxteam">' + logo(team) + team + '</div>' +
       '<table class="box"><thead><tr><th class="l">Player</th><th>Pos</th>' +
       '<th>S</th><th>K</th><th>E</th><th>TA</th><th>Hit%</th><th>Ast</th>' +
-      '<th>Digs</th><th>Blk</th><th>Aces</th><th>Pts</th></tr></thead><tbody>' +
+      '<th>Digs</th><th>Blk</th><th>Aces</th>' +
+      /* ⚠ SERVING'S COST SITS BESIDE ITS REWARD. The box showed aces and hid
+         service errors all season, so 8 aces / 14 errors read the same as
+         8 / 2. SE goes next to Aces because that is the comparison a reader
+         is actually making. Reception errors deliberately do NOT join this
+         row: being aced is the other side of the rally from serving. */
+      '<th title="service errors">SE</th><th>Pts</th></tr></thead><tbody>' +
       rs.map(r => '<tr><td class="pn">' + r.name + '</td><td>' + (r.pos || '') + '</td>' +
         '<td>' + r.sets + '</td><td>' + r.k + '</td><td>' + r.e + '</td>' +
         '<td>' + r.ta + '</td><td>' + pct(r.hit) + '</td><td>' + r.ast + '</td>' +
         '<td>' + r.digs + '</td><td>' + (r.bs + r.ba * 0.5) + '</td>' +
-        '<td>' + r.aces + '</td><td>' + r.pts + '</td></tr>').join('') +
+        '<td>' + r.aces + '</td><td>' + (r.se || 0) + '</td>' +
+        '<td>' + r.pts + '</td></tr>').join('') +
       (function () {
         const t = teamTotals(rs);
         return '<tr class="btot"><td class="pn">Team</td><td></td>' +
           '<td>' + t.sets + '</td><td>' + t.k + '</td><td>' + t.e + '</td>' +
           '<td>' + t.ta + '</td><td>' + pct(t.hit) + '</td><td>' + t.ast + '</td>' +
           '<td>' + t.digs + '</td><td>' + t.blk + '</td>' +
-          '<td>' + t.aces + '</td><td>' + t.pts + '</td></tr>';
+          '<td>' + t.aces + '</td><td>' + t.se + '</td>' +
+          '<td>' + t.pts + '</td></tr>';
       })() +
       '</tbody></table>';
   }
@@ -12828,11 +12872,12 @@ function boxHTML(gid) {
    one, an assist is a half. Sets are the MATCH's sets, not the sum of the
    players' (six players on court means that sum is ~6x the truth). */
 function teamTotals(rs) {
-  const t = {k:0, e:0, ta:0, ast:0, digs:0, bs:0, ba:0, aces:0, pts:0, sets:0};
+  const t = {k:0, e:0, ta:0, ast:0, digs:0, bs:0, ba:0, aces:0, se:0,
+             pts:0, sets:0};
   rs.forEach(r => {
     t.k += r.k || 0; t.e += r.e || 0; t.ta += r.ta || 0; t.ast += r.ast || 0;
     t.digs += r.digs || 0; t.bs += r.bs || 0; t.ba += r.ba || 0;
-    t.aces += r.aces || 0; t.pts += r.pts || 0;
+    t.aces += r.aces || 0; t.se += r.se || 0; t.pts += r.pts || 0;
     t.sets = Math.max(t.sets, r.sets || 0);
   });
   t.hit = t.ta ? (t.k - t.e) / t.ta : null;
@@ -22326,6 +22371,7 @@ function showTeam(name) {
         const x = teamTotals(mine);
         agg.k += x.k; agg.e += x.e; agg.ta += x.ta; agg.ast += x.ast;
         agg.digs += x.digs; agg.bs += x.bs; agg.ba += x.ba; agg.aces += x.aces;
+        agg.se = (agg.se || 0) + (x.se || 0);
         agg.sets += x.sets; agg.n += 1;
         const earned = x.k + x.aces + x.bs + x.ba * 0.5;
         return '<tr data-match="' + g.gid + '" class="mbmr">' +
@@ -22334,6 +22380,7 @@ function showTeam(name) {
           '<td>' + x.sets + '</td><td>' + x.k + '</td><td>' + x.e + '</td>' +
           '<td>' + x.ta + '</td><td>' + pct(x.hit) + '</td><td>' + x.ast + '</td>' +
           '<td>' + x.digs + '</td><td>' + x.blk + '</td><td>' + x.aces + '</td>' +
+          '<td>' + (x.se || 0) + '</td>' +
           '<td>' + earned + '</td><td><b>' + (x.sets ? (earned / x.sets).toFixed(2) : '\u2014') + '</b></td></tr>';
       }).join('');
       const aBlk = agg.bs + agg.ba * 0.5;
@@ -22344,7 +22391,8 @@ function showTeam(name) {
           '<td>' + agg.sets + '</td><td>' + agg.k + '</td><td>' + agg.e + '</td>' +
           '<td>' + agg.ta + '</td><td>' + pct(agg.ta ? (agg.k - agg.e) / agg.ta : null) + '</td>' +
           '<td>' + agg.ast + '</td><td>' + agg.digs + '</td><td>' + aBlk + '</td>' +
-          '<td>' + agg.aces + '</td><td>' + aPts + '</td>' +
+          '<td>' + agg.aces + '</td><td>' + (agg.se || 0) + '</td>' +
+          '<td>' + aPts + '</td>' +
           '<td><b>' + (agg.sets ? (aPts / agg.sets).toFixed(2) : '\u2014') + '</b></td></tr>'
         : '';
       let qualHtml = '';
@@ -22382,7 +22430,8 @@ function showTeam(name) {
         '<div class="scroll"><table class="box mbm"><thead><tr>' +
         '<th class="l">Date</th><th class="l">Opponent</th><th>Res</th>' +
         '<th>S</th><th>K</th><th>E</th><th>TA</th><th>Hit%</th><th>Ast</th>' +
-        '<th>Digs</th><th>Blk</th><th>Aces</th><th>Pts</th><th>Pts/Set</th>' +
+        '<th>Digs</th><th>Blk</th><th>Aces</th><th title="service errors">SE</th>' +
+        '<th>Pts</th><th>Pts/Set</th>' +
         '</tr></thead><tbody>' + trs + tot + '</tbody></table></div>' +
         '<div class="tnote"><b>Pts</b> are kills + blocks + aces, and the ' +
         'totals row recomputes hitting % and points per set from the summed ' +
