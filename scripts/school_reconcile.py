@@ -96,6 +96,14 @@ def main():
                     r = V.parse_schedule_text(body)
                     if r:
                         return team, r
+            # modern templates that render results statically (a label or a
+            # visible score row) -- the legacy text export does not exist
+            for sport in ("womens-volleyball", "volleyball", "wvball", "wvb"):
+                st, body, _ = V._fetch(base + "/sports/%s/schedule" % sport)
+                if st == 200 and body:
+                    r = V.parse_completed_events(body)
+                    if r:
+                        return team, r
         except Exception:                                  # noqa: BLE001
             return team, None
         return team, None

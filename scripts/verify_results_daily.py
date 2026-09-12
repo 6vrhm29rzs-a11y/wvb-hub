@@ -170,10 +170,16 @@ def _fetch(url, timeout=20):
     the final URL is part of the evidence -- /schedule/text 302ing to the JS
     /schedule page is exactly how SITE_UNPARSED happens (review consult,
     2026-09-01)."""
+    class _P308(urllib.request.HTTPRedirectHandler):
+        def http_error_308(self, req, fp, code, msg, headers):
+            return self.http_error_301(req, fp, 301, msg, headers)
+
     req = urllib.request.Request(url, headers={"User-Agent": UA})
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as r:
-            return r.status, r.read().decode("utf-8", "replace"), r.geturl()
+        opener = urllib.request.build_opener(_P308)
+        with opener.open(req, timeout=timeout) as r:
+            return (getattr(r, "status", r.getcode()),
+                    r.read().decode("utf-8", "replace"), r.geturl())
     except urllib.error.HTTPError as e:
         return e.code, "", url
     except Exception as e:                                    # noqa: BLE001
@@ -313,6 +319,65 @@ _CARD_MARKS = re.compile(
     r'class="[^"]*(?:schedule-event-item__date-box|'
     r'schedule-event-date__day|schedule-event-date__month-day|'
     r's-game-card|schedule-item__date)')
+
+
+def parse_completed_events(page, season=SEASON):
+    """Modern SIDEARM/Vue templates that DO render results into the HTML.
+
+    ⚠ MOST OF THEM DO NOT. Auburn, Kentucky and BYU ship the schedule
+    scaffold and fetch the results client-side -- their Nuxt payload carries
+    config and no events -- so no static parser can read them and they stay
+    honestly unreadable (the JS ceiling this project already hit on rosters).
+    The ones that DO write an accessibility label are readable, and that is
+    what this reads:
+
+      "Completed Event: Volleyball versus Weber State on September 11, 2026 ,
+       Win , 3, to, 1"          -- kstatesports.com, measured 2026-09-12
+
+    plus the visible-row form some sites use instead:
+
+      "Sep 4 1:00 PM PDT vs. (rv) Cal Poly L 1-3 (22-25, 22-25, 25-20, 24-26)"
+                                -- goaztecs.com, measured 2026-09-12
+    """
+    import html as _html
+    flat = re.sub(r"\s+", " ", _html.unescape(re.sub(r"<[^>]+>", " ", page)))
+    rows = []
+    for chunk in flat.split("Completed Event:")[1:]:
+        txt = chunk[:180]
+        mm = re.search(r"(?:versus|vs\.?|at)\s+(.+?)\s+on\s+"
+                       r"([A-Z][a-z]+ \d{1,2}, \d{4})\s*,?\s*"
+                       r"(Win|Loss)\s*,\s*(\d+)\s*,\s*to\s*,\s*(\d+)", txt)
+        if not mm:
+            continue
+        try:
+            when = datetime.datetime.strptime(mm.group(2), "%B %d, %Y")
+        except ValueError:
+            continue
+        if when.year != season:
+            continue
+        w, a, b = mm.group(3), int(mm.group(4)), int(mm.group(5))
+        rows.append({"date": when.strftime("%Y-%m-%d"),
+                     "opponent": mm.group(1).strip(),
+                     "result": "%s %d %d" % ("W" if w == "Win" else "L", a, b),
+                     "site": "", "location": "", "tournament": "",
+                     "parser": "completed_event_label"})
+    if rows:
+        return rows
+    for m in re.finditer(
+            r"([A-Z][a-z]{2})\s+(\d{1,2})\b.{0,60}?"
+            r"(?:vs\.?|at)\s+(?:\(\w+\)\s*)?([A-Za-z&'.\- ]{3,40}?)\s+"
+            r"([WL])\s*(\d)-(\d)\b", flat):
+        try:
+            when = datetime.datetime.strptime(
+                "%s %s %d" % (m.group(1), m.group(2), season), "%b %d %Y")
+        except ValueError:
+            continue
+        rows.append({"date": when.strftime("%Y-%m-%d"),
+                     "opponent": m.group(3).strip(),
+                     "result": "%s %s %s" % (m.group(4), m.group(5), m.group(6)),
+                     "site": "", "location": "", "tournament": "",
+                     "parser": "visible_row"})
+    return rows
 
 
 def parse_modern_cards(page, season=SEASON):
@@ -540,7 +605,7 @@ def school_evidence(team, opponent, date, canonical, sites, log):
         if not rows:
             # the modern JS page (often what /schedule/text silently
             # redirected to) -- reuse THIS body rather than refetching
-            mrows = parse_modern_cards(body)
+            mrows = parse_completed_events(body) or parse_modern_cards(body)
             entry["state"] = "unparsed"
             entry["modern_blocks"] = len(mrows)
             log.append(entry)
@@ -569,7 +634,7 @@ def school_evidence(team, opponent, date, canonical, sites, log):
         time.sleep(0.5)
         if mstatus != 200 or not mbody:
             continue
-        mrows = parse_modern_cards(mbody)
+        mrows = parse_completed_events(mbody) or parse_modern_cards(mbody)
         log.append({"team": team, "url": murl, "http": mstatus,
                     "retrieved_utc": datetime.datetime.utcnow()
                     .strftime("%Y-%m-%dT%H:%M:%SZ"),
