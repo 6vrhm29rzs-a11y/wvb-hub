@@ -206,6 +206,36 @@ def main():
           "preflight.py" in close and "verify_shipped.py" in close,
           "a safeguard nobody knows about is not a safeguard")
 
+    # ── THE PAGE WRITE MUST BE ATOMIC ───────────────────────────────────
+    # ⚠ PAID FOR 2026-09-11: "the site on my iphone went down while you were
+    # working". build_hub wrote the page with open(OUT,"w"), which TRUNCATES
+    # TO ZERO and then streams ~34 MB. live_server serves that same file over
+    # the tailnet, so every rebuild opened a window in which a phone got an
+    # empty or half-written page. Nothing was wrong with the data; the reader
+    # just caught the file mid-write. Verified after the fix by hammering the
+    # tailnet with 90 requests DURING a rebuild: 90/90 complete.
+    print("\n6. A REBUILD CANNOT SERVE A HALF-WRITTEN PAGE")
+    bh = read("scripts/build_hub.py") or ""
+    check("build_hub.py is readable", bool(bh))
+    if bh:
+        i = bh.find('print("wrote %s (%.0f KB)"')
+        check("[+] the page write really is in this file", i > 0)
+        region = bh[max(0, i - 900):i] if i > 0 else ""
+        check("the page is renamed into place, not written in place",
+              "os.replace(" in region,
+              "no os.replace before the write confirmation -- a reader can "
+              "catch the file truncated")
+        check("[-] ...and nothing truncates the destination directly",
+              'open(OUT, "w"' not in region and "open(OUT,'w'" not in region,
+              "open(OUT,\"w\") truncates to zero before writing 34 MB")
+        # NEGATIVE CONTROL: the pre-fix line must be caught by the check above
+        broken = region.replace(
+            "os.replace(_tmp, OUT)", 'open(OUT, "w", encoding="utf-8")'
+                                     '.write(html)')
+        check("[NEG] the pre-fix in-place write WOULD be caught",
+              not ("os.replace(" in broken)
+              and ('open(OUT, "w"' in broken))
+
     print()
     if FAILS:
         print("FAILED: %d check(s)" % len(FAILS))

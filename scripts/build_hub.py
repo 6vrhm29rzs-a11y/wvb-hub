@@ -20,6 +20,7 @@ Python 3.9 target.
 """
 
 import collections
+import io
 import json
 import os
 import re
@@ -480,26 +481,50 @@ RANK_TITLE = "AVCA coaches poll rank"
 #   key: (visible label, compact label, what it actually is)
 # The compact label is SHORTER, never ABSENT -- "space is tight" is not a
 # reason to publish an ambiguous number.
+# ⚠ THE FOURTH FIELD IS THE RULER'S COLOUR, AND IT LIVES HERE ON PURPOSE
+# (Cody, 2026-09-11: "ranks ... are all the same color across all pages").
+# It was NOT consistent: `i.rnk` painted every badge amber whatever the
+# basis, `.mrk` painted AVCA gold and POWER slate, the masthead tape painted
+# both cs-gold, and the Ballot Workshop painted POWER green and AVCA blue --
+# four answers to one question, and a key in the workshop whose own comment
+# already claimed "THE SAME COLOURS AS EVERY OTHER TAB".
+#
+# Colour is a PROPERTY OF THE RULER, exactly like its label, so it is stored
+# beside the label and the CSS custom properties are GENERATED from this
+# table (ruler_color_css). Nothing hand-writes a --vx-* value, so the colour
+# and the name cannot drift apart the way they just had. public_rulers()
+# already drops the private rulers, so their colours never reach the public
+# page either.
+#
+# Values are MEASURED, not picked by eye: every one clears 4.5:1 against both
+# the page ground (#EFECF7) and card white, and the chromatic ones sit at
+# least 25 degrees apart in hue. test_rulers.py re-derives both.
 RULERS = {
-    "avca":      ("AVCA", "AVCA", "AVCA coaches poll"),
+    "avca":      ("AVCA", "AVCA", "AVCA coaches poll", "#1D5FC2"),
     "power":     ("POWER", "PWR", "our POWER rating -- how strong a team "
                                   "is. Sourced availability is not an "
-                                  "input."),
+                                  "input.", "#16693F"),
     "digby":     ("DIGBY", "DGB", "Digby's Top 25 -- this site's own "
-                                  "in-season ranking"),
+                                  "in-season ranking", "#8A6508"),
     "resume":    ("R\u00c9SUM\u00c9", "RES", "our r\u00e9sum\u00e9 rank -- "
-                                           "what a team has earned"),
-    "rpi":       ("RPI", "RPI", "official NCAA RPI"),
-    "ballot":    ("MY BALLOT", "MINE", "your own saved ballot"),
-    "vt":        ("VT", "VT", "VolleyTalk community poll"),
+                                           "what a team has earned",
+                  "#0B6B66"),
+    "rpi":       ("RPI", "RPI", "official NCAA RPI", "#3F3D9E"),
+    "ballot":    ("MY BALLOT", "MINE", "your own saved ballot", "#8340B8"),
+    "vt":        ("VT", "VT", "VolleyTalk community poll", "#5D6B80"),
     "massey":    ("MASSEY (PRE)", "MSY",
                   "Massey preseason snapshot -- a manual browser capture, "
-                  "not current, never a Power input"),
-    "power25":   ("2025", "2025", "final 2025 POWER rank"),
+                  "not current, never a Power input", "#5D6B80"),
+    "power25":   ("2025", "2025", "final 2025 POWER rank", "#5D6B80"),
     "committee": ("TOP 16", "T16", "the DI Committee's in-season Top 16 "
-                                   "reveal"),
-    "seed":      ("SEED", "SEED", "projected tournament seed"),
+                                   "reveal", "#8A3A7E"),
+    "seed":      ("SEED", "SEED", "projected tournament seed", "#5D6B80"),
 }
+
+# The four rulers that are somebody's OWN JUDGEMENT or a reference we do not
+# compute get a neutral slate; the rest carry a hue. Stated so the palette
+# reads as a decision rather than as eleven arbitrary swatches.
+RULER_NEUTRAL = ("vt", "massey", "power25", "seed")
 
 # ⚠ TWO OF THESE RULERS NAME SOMEBODY ELSE'S PRODUCT, and this table is
 # SERIALISED INTO THE PAGE. Adding them shipped the strings "VolleyTalk" and
@@ -515,6 +540,102 @@ def public_rulers():
     """The ruler table as the built page should carry it."""
     return {k: list(v) for k, v in RULERS.items()
             if not (PUBLIC and k in PRIVATE_RULERS)}
+
+def ruler_key_html(bases):
+    """The colour decoder: swatch, the ruler's NAME IN WORDS, what it is.
+
+    Cody, 2026-09-11: the colour code has to be "known and clearly
+    recognizable". A palette nobody can decode is decoration, so the key is
+    generated from the same RULERS table that supplies the colours -- a
+    ruler cannot be coloured on the board and missing from its own legend.
+
+    ⚠ IT SAYS WHAT THE RULER IS, NOT WHEN IT WAS TAKEN. Freshness already
+    has one owner (extref_strip for the disclosure, RANK_BASIS for POWER,
+    each poll view for its own capture stamp). A second place printing
+    as-of dates is how two surfaces end up disagreeing about one date (R4).
+    """
+    avail = public_rulers()
+    items = []
+    for b in bases:
+        if b not in avail:
+            continue                      # private ruler, public build
+        r = RULERS[b]
+        # the description is also the title, so hiding it on a phone (where
+        # eight of them is half a screen) loses nothing a long-press cannot
+        # get back, and the explainer below still spells every ruler out.
+        items.append(
+            '<span class="rkey" title="%s"><i class="vx-key vx-k-%s"></i>'
+            '<b>%s</b><span class="rkeyw">%s</span></span>'
+            % (esc(r[2]), b, esc(r[0]), esc(r[2])))
+    if not items:
+        return ""
+    return ('<div class="rkeys" aria-label="What each ranking colour means">'
+            '%s</div>' % "".join(items))
+
+
+def ruler_lift(hexv):
+    """The SAME hue, lifted for a dark ground -- derived, never hand-picked.
+
+    ⚠ THE NAVY HEADER BAND IS WHY THIS EXISTS. `th{background:var(--navy)}`
+    puts every table header on #12294B, and the AVCA column header was
+    var(--ink2) there: 1.77:1, the "faint mystery numerals" defect in a cell
+    nobody had re-measured after the band arrived. Inheriting or guessing a
+    light colour would throw the ruler's identity away, so the lift keeps
+    hue and saturation and raises lightness only.
+    """
+    import colorsys
+    r, g, b = (int(hexv[1:3], 16) / 255.0, int(hexv[3:5], 16) / 255.0,
+               int(hexv[5:7], 16) / 255.0)
+    h, l, sat = colorsys.rgb_to_hls(r, g, b)
+    # 72% lightness clears 4.5:1 on the navy band for every hue in the table;
+    # test_rulers.py re-derives the contrast rather than trusting the number.
+    r2, g2, b2 = colorsys.hls_to_rgb(h, 0.72, max(sat, 0.45))
+    return "#%02X%02X%02X" % (round(r2 * 255), round(g2 * 255),
+                              round(b2 * 255))
+
+
+def ruler_color_css():
+    """Every --vx-* colour, and the per-basis rank rule, GENERATED from
+    RULERS so a ruler's colour cannot drift from its name.
+
+    Three things come out of one table:
+      --vx-<basis>       the ruler's colour
+      --vx-<basis>-dim   the same hue at 12%, for chip backgrounds
+      i.rnk.rnk-<basis>  the rank badge itself
+
+    ⚠ THE BADGE RULE NEEDS THE ELEMENT SELECTOR. `i.rnk` is (0,1,1) and a
+    bare `.rnk-avca` is (0,1,0), so the blanket amber would have WON every
+    tie and the whole change would have rendered as nothing. This codebase
+    has shipped that exact specificity bug at least twice (the crest bar
+    drawing through every logo, the decade-band boxes on phone Rankings), so
+    the selector is written to outrank it rather than to rely on order.
+    """
+    out = [":root{"]
+    for k, r in sorted(public_rulers().items()):
+        hexv = r[3]
+        rr, gg, bb = (int(hexv[1:3], 16), int(hexv[3:5], 16),
+                      int(hexv[5:7], 16))
+        out.append("  --vx-%s:%s; --vx-%s-dim:rgba(%d,%d,%d,.12);"
+                   % (k, hexv, k, rr, gg, bb))
+        out.append("  --vx-%s-lift:%s;" % (k, ruler_lift(hexv)))
+    out.append("}")
+    for k in sorted(public_rulers()):
+        out.append("i.rnk.rnk-%s{color:var(--vx-%s)}" % (k, k))
+    # the legend swatch, same table again -- it was four hand-written rules
+    # covering four of eleven rulers, so a key could silently omit a ruler
+    # it was supposed to explain.
+    for k in sorted(public_rulers()):
+        out.append(".vx-key.vx-k-%s{background:var(--vx-%s)}" % (k, k))
+    # ⚠ THE DARK SURFACES KEEP THE HUE AND LIFT THE LIGHTNESS. The masthead
+    # tape and the live card sit on navy, where a 4.5:1-on-white green is
+    # unreadable. Inheriting the parent colour (what they did before) threw
+    # the ruler's identity away entirely; mixing toward white keeps the same
+    # hue the rest of the site uses and stays legible on the dark ground.
+    for k in sorted(public_rulers()):
+        out.append(".cs-trk i.rnk.rnk-%s,.cs-side i.rnk.rnk-%s{"
+                   "color:var(--vx-%s-lift)}" % (k, k, k))
+    return "\n".join(out)
+
 
 def rank_badge(basis, v, compact=False, text=False):
     """The one way a rank is rendered. BASIS IS REQUIRED.
@@ -547,11 +668,13 @@ def rank_badge(basis, v, compact=False, text=False):
         # Granted for AVCA beside team names (Cody, 2026-09-01: "you don't
         # need to spell out AVCA"); the basis parameter stays required, and
         # the JS twin rankHTML carries the identical mode.
-        return '<i class="rnk" title="%s \u2014 #%s">#%s</i> ' % (r[2], v, v)
+        return ('<i class="rnk rnk-%s" title="%s \u2014 #%s">#%s</i> '
+                % (basis, r[2], v, v))
     # ⚠ AND THE TITLE SAID "ranking rank". The descriptions are already noun
     # phrases naming the ruler, so appending the word doubled it.
-    return ('<i class="rnk" title="%s"><span class="rank-label">%s</span>'
-            '#%s</i> ' % (r[2], label, v))
+    return ('<i class="rnk rnk-%s" title="%s">'
+            '<span class="rank-label">%s</span>'
+            '#%s</i> ' % (basis, r[2], label, v))
 
 
 def team_rank_chips(name, feed_avca, pr, av):
@@ -5077,8 +5200,14 @@ def build():
 
     def _chgcard(c):
         def side(nm, rk, cls):
-            badge = ('<i class="pwr" title="our POWER rank as of now, not as of '
-                     'the match">%d</i> ' % rk) if rk else ""
+            # ⚠ WAS A SECOND RANK RENDERER, AND IT WAS WRONG TWICE.
+            # `<i class="pwr">` emitted a BARE numeral -- no ruler named, so
+            # a reader could not tell a POWER rank from an AVCA one -- in a
+            # hand-picked #31D07E that measures 2.01:1 on the white card it
+            # sits on, against the 4.5 floor. Routed through the component,
+            # it now names its ruler and takes --vx-power like every other
+            # POWER rank on the site (R4: one renderer, not two).
+            badge = rank_badge("power", rk, compact=True) if rk else ""
             return ('<span class="%s">%s%s%s</span>'
                     % (cls, badge, logo_img(nm, logos), esc(nm)))
         return ('<div class="chgc%s">%s<b class="sc">%s&ndash;%s</b>%s</div>'
@@ -5353,6 +5482,11 @@ def build():
         .replace("{{CHANGED_ROWS}}", _chg_html) \
         .replace("{{CHANGED_META}}", esc(_chg_meta)) \
         .replace("{{CHANGED_HIDDEN}}", "" if _chg else "hidden") \
+        .replace("{{RULER_TOKENS}}", ruler_color_css()) \
+        .replace("{{RULER_KEYS}}", "") \
+        .replace("{{RULER_KEY}}", ruler_key_html(
+            ["power", "resume", "digby", "avca", "rpi", "committee",
+             "massey", "vt"])) \
         .replace("{{SEASON_YEAR}}", str(SEASON)) \
         .replace("{{RESUME_ACTIVE_JS}}", "true" if _resume_active else "false") \
         .replace("{{BW_RESUME_LEGEND}}",
@@ -6203,7 +6337,7 @@ a.mmlink:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:2px}
   border-radius:4px;padding:6px 10px;font:700 17px/1 var(--disp)}
 .rchip b{font:700 11px/1 var(--disp);letter-spacing:.08em;color:var(--ink3)}
 .rchip i{font-style:normal;font:400 11px/1.2 var(--sans);color:var(--ink3)}
-.rchip.pw{border-color:var(--gold,#c9a227)}
+.rchip.pw{border-color:var(--vx-power)}
 .rchip.off{opacity:.6}
 .rtags{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline;margin-top:8px}
 .rtag{font-size:11px;padding:2px 7px;border-radius:4px;
@@ -7033,7 +7167,7 @@ td.pick b{color:var(--navy)}
      against -- it just prints a green block behind the number and the whole
      figure reads as a smudge. Drop the bar, keep the colour on the digits. */
   .rk3 tbody td.hx::before,.t25 tbody td.hx::before{content:none}
-  .rk3 tbody td.pw b{color:#31D07E}
+  .rk3 tbody td.pw b{color:var(--vx-power)}
 
   /* The header row is gone on mobile, so each number carries its own label.
      ⚠ position:static IS LOAD-BEARING. These labels re-use ::before, the SAME
@@ -7048,9 +7182,9 @@ td.pick b{color:var(--navy)}
     top:auto;right:auto;bottom:auto;left:auto;background:none;border:0;
     animation:none;font:700 11px/1 var(--sans);letter-spacing:.1em;
     margin-right:4px;vertical-align:baseline}
-  .rk3 tbody td.pw::before{content:"POWER ";color:#31D07E;opacity:.9}
-  .rk3 tbody td.rs::before{content:"R\00c9SUM\00c9 ";color:#F2B441;opacity:.9}
-  .rk3 tbody td.c-avca::before{content:"AVCA ";color:var(--ink3,var(--ink2));opacity:.8}
+  .rk3 tbody td.pw::before{content:"POWER ";color:var(--vx-power)}
+  .rk3 tbody td.rs::before{content:"R\00c9SUM\00c9 ";color:var(--vx-resume)}
+  .rk3 tbody td.c-avca::before{content:"AVCA ";color:var(--vx-avca)}
   /* the numbers sit left in their own cells, not right-aligned as in a table */
   .rk3 tbody td.pw,.rk3 tbody td.rs,.rk3 tbody td.c-avca,
   .t25 tbody td.pw,.t25 tbody td.poll{text-align:left;width:auto}
@@ -7092,8 +7226,8 @@ td.pick b{color:var(--navy)}
     font:700 15px/1 var(--mono);color:var(--ink)}
   .t25 td.form{grid-column:1 / -1;grid-row:3;justify-self:start}
   .t25 td.cf,.t25 td.wt,.t25 td.dv{display:none}
-  .t25 tbody td.pw::before{content:"POWER ";color:#31D07E;opacity:.9}
-  .t25 tbody td.poll::before{content:"AVCA ";color:var(--ink3,var(--ink2));opacity:.8}
+  .t25 tbody td.pw::before{content:"POWER ";color:var(--vx-power)}
+  .t25 tbody td.poll::before{content:"AVCA ";color:var(--vx-avca)}
 
   /* Long prose becomes readable rather than a wall */
   .tabhint,.note{font-size:13px;line-height:1.5}
@@ -7108,14 +7242,16 @@ td.pick b{color:var(--navy)}
 .rk3 tr.grp th{font:700 11px/1 var(--sans);letter-spacing:.14em;
   text-transform:uppercase;color:var(--ink3,var(--ink2));padding:9px 10px 3px;
   border-bottom:0;background:transparent;text-align:center}
-.rk3 tr.grp th.g-ours{color:#31D07E;
-  box-shadow:inset 0 -2px 0 color-mix(in oklab,#31D07E 55%,transparent)}
+/* ⚠ THIS PAIR WAS DEAD AND DISAGREED WITH THE LIVE RULE. `.rk3 thead
+   tr.grp th.g-ours` (0,3,3) further down outranks `.rk3 tr.grp th.g-ours`
+   (0,2,2), so this #31D07E never rendered while reading as the answer.
+   Folded into the live rule rather than left as a second opinion. */
 .rk3 tr.grp th.g-ref{color:var(--ink2);opacity:.72;
   box-shadow:inset 0 -2px 0 color-mix(in oklab,var(--line2) 90%,transparent)}
 .rk3 tr.grp th.g-proj{color:var(--navy);
   box-shadow:inset 0 -2px 0 color-mix(in oklab,var(--navy) 45%,transparent)}
-.rk3 th.c-pow{color:#31D07E}
-.rk3 th.c-res{color:#F2B441}
+.rk3 th.c-pow{color:var(--vx-power-lift)}
+.rk3 th.c-res{color:var(--vx-resume-lift)}
 /* the reference block recedes -- present, checkable, and visibly not ours */
 /* ⚠ HEADER CELLS SIT ON THE NAVY BAND: an ink-toned, .7-opacity label
    there was the "faint mystery numerals" defect -- ~2:1 contrast.
@@ -7123,10 +7259,32 @@ td.pick b{color:var(--navy)}
    staying readable (>= 7:1 on #12294B). */
 .rk3 th.c-ref{color:var(--chalk);opacity:.85;font-weight:600}
 .rk3 td.c-ref,.rk3 tbody tr td.c-ref{color:var(--ink2);opacity:.78}
-.rk3 th.c-avca{color:var(--ink2)}
+/* ⚠ THE LABEL WENT BLUE AND THE NUMBER STAYED BLACK (Cody's phone, 2026-09-11:
+   "These AVCA colors are just black"). POWER colours BOTH its label and its
+   value; AVCA only got the label, because the number is a reference cell and
+   the reference block deliberately recedes to --ink2. A ruler that is half
+   coloured reads as a bug, not as restraint -- and AVCA is already treated as
+   a first-class column everywhere else (it is the one c-ref the phone layout
+   keeps, via :not(.c-avca)). The value now carries the ruler's colour, like
+   POWER and RESUME do.
+   ⚠ SPECIFICITY, NOT SOURCE ORDER: (0,3,3) via .n.c-avca beats both the
+   desktop .rk3 tbody tr td.c-ref (0,2,3) and the phone .rk3 tbody td.c-avca
+   (0,2,2), at every width and wherever these land in the file. */
+.rk3 tbody tr td.n.c-avca{color:var(--vx-avca);opacity:1}
+.t25 tbody tr td.n.poll{color:var(--vx-avca);opacity:1}
+/* ⚠ AND THE TOP 25 PUTS ITS POLL NUMBER IN A <b> with its own --ink colour
+   (.t25 td.poll b), so colouring the cell alone would have left that board's
+   number black while the Rankings board went blue -- the exact split this
+   pass exists to remove. The movement chips (.pgup/.pgdn) keep their own
+   up/down colours: those encode DIRECTION, not which ruler it is. */
+.t25 tbody tr td.n.poll b{color:var(--vx-avca)}
+/* "not ranked" is an absence, not an AVCA rank -- it stays muted. */
+.rk3 tbody tr td.n.c-avca .nr,.t25 tbody tr td.n.poll .nr{
+  color:var(--ink3);opacity:.75}
+.rk3 th.c-avca{color:var(--vx-avca-lift)}
 /* R\00c9SUM\00c9 gets its own ramp -- amber, so it can never be mistaken for the
    green POWER column at a glance, which is the whole point of having two. */
-.rs b{font:700 14px/1 var(--disp);color:#F2B441}
+.rs b{font:700 14px/1 var(--disp);color:var(--vx-resume)}
 .rs .rsoff{color:var(--ink3,var(--ink2));opacity:.55}
 /* ── TEAM HEADER: THREE TIERS, NOT TWELVE EQUAL CHIPS ────────────────────
    Our two rankings lead at full weight, the projection sits under them, and
@@ -7268,8 +7426,8 @@ b.kres{color:#F2B441}
   font:12px/1.4 var(--mono);color:var(--ink2)}
 .bwe i{font-style:normal;font:700 11px/1 var(--sans);letter-spacing:.11em;
   margin-right:4px;opacity:.85}
-.bwe.pw i{color:#31D07E}
-.bwe.rs i{color:#F2B441}
+.bwe.pw i{color:var(--vx-power)}
+.bwe.rs i{color:var(--vx-resume)}
 .bwe.rs.off{opacity:.62}
 .bwe.ref i{color:var(--ink3,var(--ink2))}
 .bwe.form i{display:inline-block;width:14px;height:14px;line-height:14px;
@@ -7297,7 +7455,7 @@ b.kres{color:#F2B441}
 /* ── THE REVIEW QUEUE: one trigger per item, named ───────────────────────── */
 .bwtrig{font:600 11px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase;
   border:1px solid var(--line2);border-radius:2px;padding:3px 6px;color:var(--slate)}
-.bwtrig.pw{color:var(--good);border-color:color-mix(in oklab,var(--good) 40%,transparent)}
+.bwtrig.pw{color:var(--vx-power);border-color:color-mix(in oklab,var(--vx-power) 40%,transparent)}
 .bwtrig.av{color:#7aa7ff;border-color:color-mix(in oklab,#7aa7ff 40%,transparent)}
 .bwtrig.res{color:var(--ink);border-color:var(--line2)}
 .bwtrig.mine{color:#e8b13a;border-color:color-mix(in oklab,#e8b13a 45%,transparent)}
@@ -7571,10 +7729,10 @@ b.kres{color:#F2B441}
 .rk3 thead tr.grp th{font:600 11px/1 var(--disp);letter-spacing:.16em;
   text-transform:uppercase;padding:11px 10px 7px;color:var(--slate);
   border-bottom:1px solid var(--line)}
-.rk3 thead tr.grp th.g-ours{color:var(--good);
-  box-shadow:inset 2px 0 0 color-mix(in oklab,var(--good) 55%,transparent)}
-.rk3 thead tr.grp th.g-ref{color:var(--gold);
-  box-shadow:inset 2px 0 0 color-mix(in oklab,var(--gold) 55%,transparent)}
+.rk3 thead tr.grp th.g-ours{color:var(--vx-power);
+  box-shadow:inset 2px 0 0 color-mix(in oklab,var(--vx-power) 55%,transparent)}
+.rk3 thead tr.grp th.g-ref{color:var(--slate);
+  box-shadow:inset 2px 0 0 color-mix(in oklab,var(--slate) 55%,transparent)}
 .rk3 thead tr.grp th.g-proj{color:var(--navy);
   box-shadow:inset 2px 0 0 color-mix(in oklab,var(--navy) 55%,transparent)}
 /* the rank numeral is the anchor of the row */
@@ -8171,7 +8329,7 @@ label.fr-btn{cursor:pointer;display:inline-block}
 .rbside{display:grid;grid-template-columns:26px 34px 1fr auto;align-items:center;
   gap:12px;padding:7px 0}
 .rbside+.rbside{border-top:1px solid var(--line)}
-.rbside .rbrk{font:600 11px/1 var(--disp);color:var(--gold);text-align:right}
+.rbside .rbrk{font:600 11px/1 var(--disp);color:var(--ink3);text-align:right}
 /* holds the crest column open when a team has no crest -- see the note in
    ribbonHTML: without it every cell in the row shifts one column left */
 .rbside .rbnologo{display:block;width:34px;height:1px}
@@ -8271,10 +8429,10 @@ td.at{white-space:nowrap}
 .mrow .mrt img{width:19px;height:19px;flex:none;object-fit:contain}
 .mrow .mrt b{font:700 15.5px/1.15 var(--disp);color:var(--ink);overflow-wrap:anywhere}
 .mrow .mrt.won b{color:var(--ink)}
-.mrk{font:600 11px/1 var(--disp);color:var(--gold);flex:none}
+.mrk{font:600 11px/1 var(--disp);color:var(--ink3);flex:none}
 /* our POWER chip reads quieter than the gold AVCA number -- two rulers,
    two voices, never mistakable for one poll */
-.mrk.pw{color:var(--slate)}
+/* .mrk.pw no longer recolours: POWER carries --vx-power like everywhere else */
 
 .mrow .msc{font:700 17px/1.2 var(--mono);color:var(--ink3);text-align:right;
   font-variant-numeric:tabular-nums}
@@ -8709,7 +8867,12 @@ body.mdlopen{overflow:hidden}
 /* the tape and the ribbon carry the label at their own scale */
 .cs-trk .rank-label,.rbrk .rank-label,.mrk .rank-label{font-size:max(9px,.62em);
   opacity:.8;margin-right:1px;display:inline}
-.cs-trk .rnk,.rbrk .rnk,.mrk .rnk{color:inherit}
+/* ⚠ THESE USED TO SAY color:inherit, WHICH THREW THE RULER'S IDENTITY AWAY.
+   A rank beside a team name took the wrapper's gold and a POWER rank took
+   slate, so the same ruler was a different colour here than on the board.
+   The basis class now carries the colour on every surface; the dark tape
+   gets a lifted mix of the SAME hue (ruler_color_css) rather than giving up
+   and inheriting. */
 .dlive{margin-top:11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
 .dopen{margin-left:auto;font:600 11px/1 var(--disp);letter-spacing:.09em;
   text-transform:uppercase;color:var(--ink2);background:transparent;
@@ -8811,7 +8974,7 @@ body.mdlopen{overflow:hidden}
 .qual .qleg .qw{color:#1FA766}
 .qual .qleg .ql{color:#D45454}
 .qual .qleg .qn{color:var(--ink3);font-weight:500}
-.chgc .pwr{font:700 11px/1 var(--mono);font-style:normal;color:#31D07E;
+.chgc .pwr{font:700 11px/1 var(--mono);font-style:normal;
   padding:2px 4px;border-radius:3px;
   background:color-mix(in oklab,#31D07E 14%,transparent)}
 @media (max-width:560px){
@@ -9693,13 +9856,14 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
      have been a fresh inconsistency introduced by the very system meant to
      remove them. Digby's Top 25 takes the amber instead: it is ours and it is
      the editorial one. */
-  --vx-power:#1D7D4F;   --vx-power-dim:rgba(29,125,79,.12);
-  --vx-avca:#1D5FC2;    --vx-avca-dim:rgba(29,95,194,.12);
-  --vx-digby:#8A6508;   --vx-digby-dim:rgba(138,101,8,.12);
-  --vx-ballot:#6D4FC2;  --vx-ballot-dim:rgba(109,79,194,.12);
+  /* ⚠ THE RULER COLOURS ARE NOT WRITTEN HERE ANY MORE. They are generated
+     from build_hub.RULERS by ruler_color_css(), so the colour and the name
+     travel together and the public build drops private rulers' colours for
+     free. Only the two non-ruler rules stay hand-written. */
   --vx-rule:rgba(18,41,75,.12);
   --vx-rule-strong:rgba(18,41,75,.24);
 }
+{{RULER_TOKENS}}
 
 /* ── section label: a rule line with a name on it ──────────────────────── */
 .vx-label{display:flex;align-items:center;gap:10px;margin:0 0 10px;
@@ -9710,6 +9874,23 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 .vx-label .vx-key{width:8px;height:8px;border-radius:1px;flex:0 0 8px}
 
 /* the key swatch, wherever a ruler is named */
+.rkeys{display:flex;flex-wrap:wrap;gap:6px 18px;margin:8px 0 2px;
+  padding:9px 11px;border:1px solid var(--line);border-radius:var(--r-ctl);
+  background:var(--sheet)}
+.rkey{display:flex;align-items:baseline;gap:6px;font-size:12.5px;
+  color:var(--ink2);min-width:0}
+.rkey b{font:700 11px/1.3 var(--disp);letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink);white-space:nowrap}
+.rkeyw{color:var(--ink3);overflow-wrap:anywhere}
+@media (max-width:560px){
+  /* ⚠ NAME AND SWATCH ONLY ON A PHONE. With all eight descriptions this key
+     ran ~430px -- half the viewport -- and pushed the first ranked card off
+     the first screen, undoing the 2026-09-06 pass that fought to get it
+     there. The colour code still reads; the wording lives one tap down in
+     the explainer and in each chip's title. */
+  .rkeys{gap:6px 14px;font-size:12px;padding:8px 10px}
+  .rkey .rkeyw{display:none}
+}
 .vx-key{display:inline-block;width:8px;height:8px;border-radius:1px;
   vertical-align:middle;padding:0;border:0;flex:0 0 8px}
 /* ⚠ THE MODIFIERS ARE NAMESPACED TOO, AND THAT WAS NOT PARANOIA. The first
@@ -9719,10 +9900,7 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
    `vx-` prefix and not the modifier. All four of `power`, `avca`, `digby` and
    `ballot` were already taken. Collision number nine, caught by the tool
    written for this phase (scripts/css_names.py). */
-.vx-key.vx-k-power{background:var(--vx-power)}
-.vx-key.vx-k-avca{background:var(--vx-avca)}
-.vx-key.vx-k-digby{background:var(--vx-digby)}
-.vx-key.vx-k-ballot{background:var(--vx-ballot)}
+{{RULER_KEYS}}
 
 /* ── fact strip: label over value, in a row, no chips ──────────────────── */
 .vx-facts{display:flex;flex-wrap:wrap;gap:2px 26px;margin:0}
@@ -10171,9 +10349,24 @@ details.avhist{margin:14px 0}
      ties the real phone loses. */
   .rk3 tbody tr:nth-child(n) td{background:none}
   /* the label rides in front of the value, so no number is anonymous */
+  /* ⚠ THIS RULE QUIETLY OWNED THE AVCA LABEL'S COLOUR, and it was the only
+     one of the three it reached. There are two phone-label systems in this
+     block: the older per-column `td.pw::before` / `td.rs::before` pair, and
+     this generic attr(data-l) one. Only td.c-avca carries data-l, so only
+     AVCA fell through to the generic slate -- POWER stayed green, RESUME
+     stayed teal, and AVCA looked like a label rather than a ruler.
+     ⚠ FIXED WITH A CUSTOM PROPERTY, NOT MORE SPECIFICITY. This selector is
+     (0,3,3) and the per-column one is (0,2,3), so escalating would start a
+     war the next rule has to win again. --lblc INHERITS from the td, so
+     whichever system draws the label takes the ruler's colour and neither
+     has to outrank the other. */
   .rk3 tr.row td[data-l]::before{content:attr(data-l) " ";
-    font:700 11px/1 var(--disp);letter-spacing:.08em;color:var(--slate);
+    font:700 11px/1 var(--disp);letter-spacing:.08em;
+    color:var(--lblc,var(--slate));
     text-transform:uppercase;margin-right:3px}
+  .rk3 tr.row td.pw{--lblc:var(--vx-power)}
+  .rk3 tr.row td.rs{--lblc:var(--vx-resume)}
+  .rk3 tr.row td.c-avca{--lblc:var(--vx-avca)}
   /* the ruler seg, phone shape (Cody's screenshot, 2026-09-06): five long
      labels wrapped as two rows of big boxes -- same cure as the Scores
      chips: one full-width line of short labels. The .lx spans carry the
@@ -10701,6 +10894,13 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       </select>
     </label>
   </div>
+  <!-- ⚠ THE KEY SITS OUTSIDE THE FOLD ON PURPOSE. It was inside #rkhow,
+       which the phone closes at boot -- so the one element whose whole job
+       is to make the colour code recognisable was invisible on the device
+       it matters most on. That is the #pollview-inside-the-explainer bug
+       repeated, and a height>0 DOM read said "visible" while the screenshot
+       showed a collapsed triangle; the pixels were right. -->
+  {{RULER_KEY}}
   <details class="rkhow" open id="rkhow">
     <summary>How this ranking works &middot; basis &amp; freshness</summary>
   <!-- ⚠ ONE SENTENCE PER RULER, FROM ONE MAP. A rank means nothing without
@@ -11925,8 +12125,11 @@ function rankHTML(basis, v, compact) {
      stays required, and every other basis keeps its visible label (R4). */
   const lbl = compact === 'bare' ? '' :
     '<span class="rank-label">' + esc(compact ? r[1] : r[0]) + '</span>';
-  return '<i class="rnk" title="' + esc(r[2]) + ' \u2014 #' + esc(String(v)) +
-    '">' + lbl + '#' + esc(String(v)) + '</i> ';
+  /* the basis class carries the ruler's colour -- same table, same rule as
+     the Python twin, so a rank is the same colour whichever side drew it. */
+  return '<i class="rnk rnk-' + esc(basis) + '" title="' + esc(r[2]) +
+    ' \u2014 #' + esc(String(v)) + '">' + lbl + '#' + esc(String(v)) +
+    '</i> ';
 }
 /* Kept as the AVCA shorthand the scoreboard-feed views already read well with.
    It is a NAMED call through the component, not a second implementation. */
@@ -23338,7 +23541,19 @@ if __name__ == "__main__":
                 % ", ".join(leaked))
     if not os.path.isdir(os.path.dirname(OUT)):
         os.makedirs(os.path.dirname(OUT))
-    open(OUT, "w", encoding="utf-8").write(html)
+    # ⚠ ATOMIC, BECAUSE A REBUILD MUST NOT TAKE THE PHONE SITE DOWN
+    # (Cody, 2026-09-11: "the site on my iphone went down while you were
+    # working"). `open(OUT,"w")` TRUNCATES TO ZERO and then streams ~34 MB,
+    # so every rebuild opened a window in which live_server served a partial
+    # or empty page -- and the page is read over the tailnet by a phone that
+    # has no idea a build is running. Write beside it and rename: os.replace
+    # is atomic within a filesystem, so a reader gets the whole old file or
+    # the whole new one, never half of either. Same discipline the crawl
+    # checkpoints already use.
+    _tmp = OUT + ".tmp-%d" % os.getpid()
+    with io.open(_tmp, "w", encoding="utf-8") as _f:
+        _f.write(html)
+    os.replace(_tmp, OUT)
     print("wrote %s (%.0f KB)" % (OUT, os.path.getsize(OUT) / 1024.0))
 
     if PUBLIC:

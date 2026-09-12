@@ -74,26 +74,30 @@ def main():
         check("[-] the bare modifier %-7r is NOT used as a vx selector" % mod,
               (".vx-key.%s{" % mod) not in src,
               "it would inherit the existing .%s block style" % mod)
-    for mod in ("vx-k-power", "vx-k-avca", "vx-k-digby"):
-        check("   %s is namespaced and defined" % mod,
-              (".vx-key.%s{" % mod) in src)
+    # ⚠ THESE MOVED FROM THE SOURCE TO THE BUILT PAGE (2026-09-11). The
+    # swatch rules and the --vx-* tokens are GENERATED from build_hub.RULERS
+    # now, so grepping build_hub.py for them fails a correct build. Assert
+    # what must be TRUE OF THE PAGE instead, and take the expected colour
+    # from the registry rather than pinning a hex -- the old version pinned
+    # #1D7D4F and would have failed the contrast fix that replaced it.
+    import build_hub as _B
+    for k in ("power", "avca", "digby"):
+        check("   vx-k-%s is namespaced and defined on the page" % k,
+              (".vx-key.vx-k-%s{" % k) in h)
 
     print("\n3. THE RULER KEY IS ONE SYSTEM, USED EVERYWHERE")
-    for tok in ("--vx-power", "--vx-avca", "--vx-digby", "--vx-ballot"):
-        check("the token %s is defined" % tok, "%s:" % tok in src)
-    # ⚠ THE KEY MUST MATCH THE COLOURS ALREADY ON THE PAGE, or it introduces
-    # the inconsistency it exists to remove. POWER has been green since the
-    # rating shipped -- including the heat scale on the POWER column itself.
-    # ⚠ ARENA DAYLIGHT (2026-08-30): the values are light-surface grades
-    # now; the INVARIANT is that each key is a token consumed by its
-    # labels, not a pinned hex from the dark theme.
-    check("POWER's key is a defined green token",
-          "--vx-power:#1D7D4F" in src)
+    for k in ("power", "avca", "digby", "ballot"):
+        check("the token --vx-%s is defined on the page" % k,
+              ("--vx-%s:" % k) in h)
+    wrong = [(k, _B.RULERS[k][3]) for k in _B.public_rulers()
+             if ("--vx-%s:%s" % (k, _B.RULERS[k][3])) not in h]
+    check("every token carries exactly the registry's colour", not wrong,
+          wrong[:3])
     check("...and the existing POWER labels use the token, not a literal",
           "b.kpow{color:var(--vx-power)}" in src
           and ".bwv.pw{color:var(--vx-power)}" in src)
-    check("AVCA's key is a defined blue token",
-          "--vx-avca:#1D5FC2" in src)
+    check("[+] POWER and AVCA are still different colours",
+          _B.RULERS["power"][3] != _B.RULERS["avca"][3])
     check("the three rulers each carry a swatch on the selector",
           h.count('class="vx-key vx-k-') >= 3,
           "%d" % h.count('class="vx-key vx-k-'))
