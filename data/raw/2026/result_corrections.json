@@ -2716,6 +2716,62 @@
      "establishes": "Omaha won 3-0 -- the second, independent school source"
     }
    ]
+  },
+  "6626935": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Hampton (home, 46679) won 3-0, with the set line 25-21, 25-16, 25-15 attributed to Hampton -- the TRUE sequence with the SCORE COLUMNS transposed. Internally coherent, and wrong.",
+   "correct": {
+    "winner_team_id": "46546",
+    "away_sets": 3,
+    "home_sets": 0,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 25,
+      "home": 21
+     },
+     {
+      "period": 2,
+      "visit": 25,
+      "home": 16
+     },
+     {
+      "period": 3,
+      "visit": 25,
+      "home": 15
+     }
+    ],
+    "linescores_replace": true
+   },
+   "established": "FIU won 3-0. BOTH schools now say so independently -- FIU's schedule carried 'W 3-0 vs Hampton' from the evening of the match, and Hampton posted 'L 0-3' against Florida International the next morning, with its season record moving to 2-6 and its streak to L3 (a Sep 11 win is impossible against an L3 streak ending Sep 11). The per-set attribution follows by force rather than by inference: the three pairs the feed served are (21,25), (16,25), (15,25), and a side that wins 3-0 has won EVERY set, so the 25s are FIU's. The correctly-attributed box score corroborates the direction independently -- FIU 45 kills to 23, .298 hitting to .103, 11 aces to 4, 61 earned points to 34.",
+   "evidence": [
+    {
+     "url": "https://fiusports.com/services/schedule_txt.ashx?schedule=378",
+     "kind": "school_schedule",
+     "school": "FIU",
+     "retrieved": "2026-09-11T00:00:00Z",
+     "text": "FIU's published schedule for 2026-09-11: 'W 3-0' vs Hampton, site Neutral (Florida A&M Tournament).",
+     "establishes": "FIU won 3-0"
+    },
+    {
+     "url": "https://hamptonpirates.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Hampton",
+     "retrieved": "2026-09-12T17:40:00Z",
+     "text": "'Sep 11 (Fri) | 11:00 AM | Neutral | Florida International | Tallahassee, Fla. (Al Lawson Center) | Florida A&M Tournament | L 0-3'; the same page reports Overall 2-6 and Streak L3.",
+     "establishes": "Hampton lost 0-3 to FIU"
+    },
+    {
+     "url": "internal:playerbox/6626935",
+     "kind": "internal_box",
+     "school": null,
+     "retrieved": "2026-09-12T17:45:00Z",
+     "text": "Box rows reconcile to the schools' own rosters with no cross-attribution (11 of 12 rows filed under Hampton are on Hampton's roster, 13 of 14 under FIU are on FIU's; zero cross-matches). Aggregated: FIU 45 kills / 17 errors / 94 attacks / 11 aces; Hampton 23 / 15 / 78 / 4.",
+     "establishes": "the BOX attribution is correct and independently indicates FIU dominated"
+    }
+   ],
+   "note": "⚠ NO box_team_swap, DELIBERATELY. The pending entry recorded a lineup inversion signature (6/6 starters filed under Hampton fitting FIU's roster), which invited a swap -- but that signature is in lineups.jsonl, and the PLAYERBOX was checked directly before filing and is correctly attributed. Swapping it would have re-inverted good rows, which is exactly what happened on 6626259 when the feed fixed its own attribution underneath a standing swap. Only the result is corrected here."
   }
  }
 }
