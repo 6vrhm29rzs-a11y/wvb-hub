@@ -48,6 +48,12 @@ BLOCKED = {
     "figstats.net": ("robots.txt disallows every non-named agent "
                      "('User-agent: * / Disallow: /', measured 2026-08-31); "
                      "snapshots are manual browser reviews only"),
+    "evollve.net": ("robots.txt disallows every non-named agent -- "
+                    "'User-agent: * / Disallow: /', then an allow-list of "
+                    "Googlebot, Bingbot, Yandex, Baidu, Facebot, Twitterbot, "
+                    "Slurp, DuckDuckBot, ia_archiver (measured 2026-09-12). "
+                    "We are none of those. Reading it in Cody's own Chrome is "
+                    "ordinary browsing and stays fine; a crawler does not"),
 }
 
 # The command has to actually be a fetch. Matching a bare hostname is not
