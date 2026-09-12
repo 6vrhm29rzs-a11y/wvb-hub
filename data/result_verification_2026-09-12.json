@@ -1,12 +1,12 @@
 {
  "date": "2026-09-12",
- "generated_utc": "2026-09-12T22:09:38Z",
+ "generated_utc": "2026-09-12T22:33:37Z",
  "counts": {
-  "CORROBORATED_ONE": 58,
-  "VERIFIED_BOTH": 30,
+  "CORROBORATED_ONE": 61,
+  "VERIFIED_BOTH": 33,
   "CONTRADICTED_BOTH": 2,
-  "UNVERIFIED": 7,
-  "CONTRADICTED_ONE": 2
+  "UNVERIFIED": 5,
+  "CONTRADICTED_ONE": 3
  },
  "matches": [
   {
@@ -2240,20 +2240,14 @@
    "gid": "6627162",
    "date": "2026-09-12",
    "canonical": "Fordham def. Bryant 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Fordham": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://fordhamsports.com/services/schedule_txt.ashx?schedule=1735",
-     "row": [
-      "Sep 12 (Sat)",
-      "4:00 PM",
-      "Away",
-      "Bryant",
-      "Smithfield, R.I.",
-      "",
-      ""
-     ]
+     "assertion": "Fordham W 3-0 vs Bryant",
+     "opponent_source": "Bryant",
+     "site_says": "Away"
     },
     "Bryant": {
      "state": "NOT_POSTED",
@@ -2346,33 +2340,21 @@
    "gid": "6625600",
    "date": "2026-09-12",
    "canonical": "Middle Tenn. def. Murray St. 3-1",
-   "verdict": "UNVERIFIED",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "Middle Tenn.": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://goblueraiders.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 12 (Sat)",
-      "3:00 PM",
-      "Home",
-      "Murray State",
-      "Murfreesboro, Tenn. (Alumni Memorial Gymnasium)",
-      "Blue Raider Bash",
-      "-"
-     ]
+     "assertion": "Middle Tenn. W 3-1 vs Murray State",
+     "opponent_source": "Murray State",
+     "site_says": "Home"
     },
     "Murray St.": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://goracers.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 12 (Sat)",
-      "3 p.m.",
-      "Away",
-      "Middle Tennessee",
-      "Murfreesboro, Tenn.",
-      "Blue Raider Bash",
-      "-"
-     ]
+     "assertion": "Murray St. L 1-3 vs Middle Tennessee",
+     "opponent_source": "Middle Tennessee",
+     "site_says": "Away"
     }
    }
   },
@@ -2409,33 +2391,21 @@
    "gid": "6627468",
    "date": "2026-09-12",
    "canonical": "Eastern Ky. def. Western Ky. 3-1",
-   "verdict": "UNVERIFIED",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "Eastern Ky.": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://ekusports.com/services/schedule_txt.ashx?schedule=350",
-     "row": [
-      "Sep 12 (Sat)",
-      "4:00 p.m.",
-      "Away",
-      "Western Kentucky",
-      "Bowling Green, Ky.",
-      "",
-      ""
-     ]
+     "assertion": "Eastern Ky. W 3-1 vs Western Kentucky",
+     "opponent_source": "Western Kentucky",
+     "site_says": "Away"
     },
     "Western Ky.": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://wkusports.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 12 (Sat)",
-      "3 p.m. CT",
-      "Home",
-      "Eastern Kentucky",
-      "Bowling Green, Ky. (E.A. Diddle Arena)",
-      "Alyssa Cavanaugh Classic",
-      "-"
-     ]
+     "assertion": "Western Ky. L 1-3 vs Eastern Kentucky",
+     "opponent_source": "Eastern Kentucky",
+     "site_says": "Home"
     }
    }
   },
@@ -2457,6 +2427,131 @@
      "url": "https://rmucolonials.com/services/schedule_txt.ashx?schedule=503",
      "assertion": "Robert Morris L 0-3 vs Towson",
      "opponent_source": "Towson",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6624603",
+   "date": "2026-09-12",
+   "canonical": "Mercer def. West Ga. 3-2",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Mercer": {
+     "state": "NOT_POSTED",
+     "url": "https://mercerbears.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 12 (Sat)",
+      "4 p.m.",
+      "Away",
+      "West Georgia",
+      "Carrollton, Ga. (The Coliseum)",
+      "UWG Volleyball Classic",
+      "-"
+     ]
+    },
+    "West Ga.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://uwgathletics.com/services/schedule_txt.ashx?schedule=306",
+     "assertion": "West Ga. L 2-3 vs Mercer",
+     "opponent_source": "Mercer",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6625634",
+   "date": "2026-09-12",
+   "canonical": "South Carolina def. Wofford 2-1",
+   "verdict": "CONTRADICTED_ONE",
+   "schools": {
+    "South Carolina": {
+     "state": "SITE_UNPARSED",
+     "url": "https://gamecocksonline.com/news/2021/09/03/textforhelp/"
+    },
+    "Wofford": {
+     "state": "CONTRADICTS_SETS",
+     "url": "https://athletics.wofford.edu/services/schedule_txt.ashx?schedule=538",
+     "assertion": "Wofford L 1-3 vs University of South Carolina",
+     "opponent_source": "University of South Carolina",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6627350",
+   "date": "2026-09-12",
+   "canonical": "Utah Tech def. UC Irvine 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Utah Tech": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://utahtechtrailblazers.com/services/schedule_txt.ashx?schedule=1390",
+     "assertion": "Utah Tech W 3-0 vs UC Irvine",
+     "opponent_source": "UC Irvine",
+     "site_says": "Away"
+    },
+    "UC Irvine": {
+     "state": "NOT_POSTED",
+     "url": "https://ucirvinesports.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 12 (Sat)",
+      "1:00 PM",
+      "Home",
+      "Utah Tech",
+      "Irvine, Calif. (Bren Events Center)",
+      "UCI Invitational",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6626357",
+   "date": "2026-09-12",
+   "canonical": "Pittsburgh def. High Point 3-0",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Pittsburgh": {
+     "state": "NOT_POSTED",
+     "url": "https://pittsburghpanthers.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 12 (Sat)",
+      "5 PM",
+      "Home",
+      "High Point",
+      "Pittsburgh, Pa. (Victory Heights Arena and Sports Performance Center)",
+      "Panther Challenge",
+      "-"
+     ]
+    },
+    "High Point": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://highpointpanthers.com/services/schedule_txt.ashx?schedule=628",
+     "rows_on_date": [
+      "Pitt"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6626621",
+   "date": "2026-09-12",
+   "canonical": "DePaul def. Western Mich. 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "DePaul": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://depaulbluedemons.com/sports/womens-volleyball/schedule/text",
+     "assertion": "DePaul W 3-0 vs Western Michigan",
+     "opponent_source": "Western Michigan",
+     "site_says": "Home"
+    },
+    "Western Mich.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://wmubroncos.com/services/schedule_txt.ashx?schedule=2344",
+     "assertion": "Western Mich. L 0-3 vs DePaul",
+     "opponent_source": "DePaul",
      "site_says": "Away"
     }
    }
