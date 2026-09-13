@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-13T21:01:31Z",
+  "generated_at_utc": "2026-09-13T21:40:04Z",
   "counts": {
    "statuses": 3,
    "incidents": 0,
    "signals": 3,
    "expired": 8,
-   "anomalies": 751
+   "anomalies": 750
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -524,6 +524,52 @@
     }
    ],
    "points_per_set_missing": 10.847
+  },
+  {
+   "game_id": "6628322",
+   "team_id": "46247",
+   "team": "San Francisco",
+   "absent": [
+    {
+     "name": "Petra Fritz",
+     "rate": 4.015,
+     "played_share": 1.0
+    },
+    {
+     "name": "Katariina Korhonen",
+     "rate": 3.0,
+     "played_share": 1.0
+    },
+    {
+     "name": "Emma Neukirchen",
+     "rate": 2.409,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 9.424
+  },
+  {
+   "game_id": "6628322",
+   "team_id": "45973",
+   "team": "UNLV",
+   "absent": [
+    {
+     "name": "Basia Latos",
+     "rate": 3.839,
+     "played_share": 1.0
+    },
+    {
+     "name": "Jaida Harris",
+     "rate": 2.5,
+     "played_share": 1.0
+    },
+    {
+     "name": "Jada Ingram",
+     "rate": 1.982,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 8.321
   },
   {
    "game_id": "6625876",
@@ -1346,19 +1392,6 @@
    "points_per_set_missing": 4.281
   },
   {
-   "game_id": "6627969",
-   "team_id": "45808",
-   "team": "Auburn",
-   "absent": [
-    {
-     "name": "Lauren Dreves",
-     "rate": 4.25,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 4.25
-  },
-  {
    "game_id": "6624263",
    "team_id": "46074",
    "team": "Charleston So.",
@@ -1901,7 +1934,20 @@
     {
      "name": "Isabela Tavares-Salomon",
      "rate": 3.652,
-     "played_share": 1.0
+     "played_share": 0.8
+    }
+   ],
+   "points_per_set_missing": 3.652
+  },
+  {
+   "game_id": "6627973",
+   "team_id": "45902",
+   "team": "DePaul",
+   "absent": [
+    {
+     "name": "Isabela Tavares-Salomon",
+     "rate": 3.652,
+     "played_share": 0.75
     }
    ],
    "points_per_set_missing": 3.652
@@ -2014,6 +2060,19 @@
    "absent": [
     {
      "name": "Laura Perugini Bieleski",
+     "rate": 3.596,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 3.596
+  },
+  {
+   "game_id": "6627969",
+   "team_id": "45808",
+   "team": "Auburn",
+   "absent": [
+    {
+     "name": "Lauren Dreves",
      "rate": 3.596,
      "played_share": 1.0
     }
@@ -2815,32 +2874,6 @@
     }
    ],
    "points_per_set_missing": 3.173
-  },
-  {
-   "game_id": "6628318",
-   "team_id": "46580",
-   "team": "Wisconsin",
-   "absent": [
-    {
-     "name": "Grace Egan",
-     "rate": 3.167,
-     "played_share": 0.667
-    }
-   ],
-   "points_per_set_missing": 3.167
-  },
-  {
-   "game_id": "6627966",
-   "team_id": "46580",
-   "team": "Wisconsin",
-   "absent": [
-    {
-     "name": "Grace Egan",
-     "rate": 3.167,
-     "played_share": 0.6
-    }
-   ],
-   "points_per_set_missing": 3.167
   },
   {
    "game_id": "6637451",
@@ -4332,6 +4365,45 @@
    "points_per_set_missing": 2.524
   },
   {
+   "game_id": "6628318",
+   "team_id": "46580",
+   "team": "Wisconsin",
+   "absent": [
+    {
+     "name": "Grace Egan",
+     "rate": 2.5,
+     "played_share": 0.714
+    }
+   ],
+   "points_per_set_missing": 2.5
+  },
+  {
+   "game_id": "6627966",
+   "team_id": "46580",
+   "team": "Wisconsin",
+   "absent": [
+    {
+     "name": "Grace Egan",
+     "rate": 2.5,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 2.5
+  },
+  {
+   "game_id": "6628691",
+   "team_id": "46580",
+   "team": "Wisconsin",
+   "absent": [
+    {
+     "name": "Grace Egan",
+     "rate": 2.5,
+     "played_share": 0.6
+    }
+   ],
+   "points_per_set_missing": 2.5
+  },
+  {
    "game_id": "6639580",
    "team_id": "46103",
    "team": "Nicholls",
@@ -4693,6 +4765,19 @@
    "points_per_set_missing": 2.438
   },
   {
+   "game_id": "6627964",
+   "team_id": "45808",
+   "team": "Auburn",
+   "absent": [
+    {
+     "name": "Anastasija Ivkovic",
+     "rate": 2.432,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.432
+  },
+  {
    "game_id": "6624265",
    "team_id": "46495",
    "team": "Seton Hall",
@@ -4995,6 +5080,19 @@
     }
    ],
    "points_per_set_missing": 2.355
+  },
+  {
+   "game_id": "6640393",
+   "team_id": "45808",
+   "team": "Auburn",
+   "absent": [
+    {
+     "name": "Greer Chambless",
+     "rate": 2.34,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.34
   },
   {
    "game_id": "6624262",
@@ -5450,19 +5548,6 @@
    "absent": [
     {
      "name": "Jordyn Byrd",
-     "rate": 2.222,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 2.222
-  },
-  {
-   "game_id": "6627964",
-   "team_id": "45808",
-   "team": "Auburn",
-   "absent": [
-    {
-     "name": "Anastasija Ivkovic",
      "rate": 2.222,
      "played_share": 1.0
     }
@@ -6120,19 +6205,6 @@
    "points_per_set_missing": 2.079
   },
   {
-   "game_id": "6627779",
-   "team_id": "45916",
-   "team": "UIC",
-   "absent": [
-    {
-     "name": "Ana Petrides",
-     "rate": 2.065,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 2.065
-  },
-  {
    "game_id": "6627619",
    "team_id": "46172",
    "team": "Colorado St.",
@@ -6783,32 +6855,6 @@
    "points_per_set_missing": 1.963
   },
   {
-   "game_id": "6626942",
-   "team_id": "46294",
-   "team": "Clemson",
-   "absent": [
-    {
-     "name": "Kennedy Wagner",
-     "rate": 1.958,
-     "played_share": 0.6
-    }
-   ],
-   "points_per_set_missing": 1.958
-  },
-  {
-   "game_id": "6628395",
-   "team_id": "46294",
-   "team": "Clemson",
-   "absent": [
-    {
-     "name": "Kennedy Wagner",
-     "rate": 1.958,
-     "played_share": 0.8
-    }
-   ],
-   "points_per_set_missing": 1.958
-  },
-  {
    "game_id": "6625577",
    "team_id": "46177",
    "team": "Drake",
@@ -6999,19 +7045,6 @@
      "name": "Ayanna Pierre Louis",
      "rate": 1.929,
      "played_share": 0.75
-    }
-   ],
-   "points_per_set_missing": 1.929
-  },
-  {
-   "game_id": "6640393",
-   "team_id": "45808",
-   "team": "Auburn",
-   "absent": [
-    {
-     "name": "Greer Chambless",
-     "rate": 1.929,
-     "played_share": 1.0
     }
    ],
    "points_per_set_missing": 1.929
@@ -7602,19 +7635,6 @@
    "points_per_set_missing": 1.853
   },
   {
-   "game_id": "6639889",
-   "team_id": "46580",
-   "team": "Wisconsin",
-   "absent": [
-    {
-     "name": "Natalie Wardlow",
-     "rate": 1.833,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.833
-  },
-  {
    "game_id": "6627667",
    "team_id": "46124",
    "team": "Texas St.",
@@ -7626,6 +7646,19 @@
     }
    ],
    "points_per_set_missing": 1.833
+  },
+  {
+   "game_id": "6627779",
+   "team_id": "45916",
+   "team": "UIC",
+   "absent": [
+    {
+     "name": "Ana Petrides",
+     "rate": 1.827,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.827
   },
   {
    "game_id": "6627192",
@@ -7888,6 +7921,32 @@
    "points_per_set_missing": 1.783
   },
   {
+   "game_id": "6626942",
+   "team_id": "46294",
+   "team": "Clemson",
+   "absent": [
+    {
+     "name": "Kennedy Wagner",
+     "rate": 1.781,
+     "played_share": 0.6
+    }
+   ],
+   "points_per_set_missing": 1.781
+  },
+  {
+   "game_id": "6628395",
+   "team_id": "46294",
+   "team": "Clemson",
+   "absent": [
+    {
+     "name": "Kennedy Wagner",
+     "rate": 1.781,
+     "played_share": 0.833
+    }
+   ],
+   "points_per_set_missing": 1.781
+  },
+  {
    "game_id": "6627456",
    "team_id": "46567",
    "team": "Mercer",
@@ -7951,6 +8010,19 @@
     }
    ],
    "points_per_set_missing": 1.767
+  },
+  {
+   "game_id": "6639889",
+   "team_id": "46580",
+   "team": "Wisconsin",
+   "absent": [
+    {
+     "name": "Natalie Wardlow",
+     "rate": 1.75,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.75
   },
   {
    "game_id": "6626305",
@@ -8252,19 +8324,6 @@
    "points_per_set_missing": 1.667
   },
   {
-   "game_id": "6628319",
-   "team_id": "45973",
-   "team": "UNLV",
-   "absent": [
-    {
-     "name": "Logan Lindsay",
-     "rate": 1.667,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.667
-  },
-  {
    "game_id": "6625998",
    "team_id": "45863",
    "team": "Sam Houston",
@@ -8393,32 +8452,6 @@
     }
    ],
    "points_per_set_missing": 1.65
-  },
-  {
-   "game_id": "6628320",
-   "team_id": "45973",
-   "team": "UNLV",
-   "absent": [
-    {
-     "name": "Rheanna Deen-Jackson",
-     "rate": 1.647,
-     "played_share": 0.8
-    }
-   ],
-   "points_per_set_missing": 1.647
-  },
-  {
-   "game_id": "6626207",
-   "team_id": "45973",
-   "team": "UNLV",
-   "absent": [
-    {
-     "name": "Rheanna Deen-Jackson",
-     "rate": 1.647,
-     "played_share": 0.75
-    }
-   ],
-   "points_per_set_missing": 1.647
   },
   {
    "game_id": "6628425",
@@ -10514,32 +10547,6 @@
    "points_per_set_missing": 0.875
   },
   {
-   "game_id": "6625161",
-   "team_id": "46247",
-   "team": "San Francisco",
-   "absent": [
-    {
-     "name": "Talula Lenoir",
-     "rate": 0.867,
-     "played_share": 0.6
-    }
-   ],
-   "points_per_set_missing": 0.867
-  },
-  {
-   "game_id": "6627308",
-   "team_id": "46247",
-   "team": "San Francisco",
-   "absent": [
-    {
-     "name": "Talula Lenoir",
-     "rate": 0.867,
-     "played_share": 0.667
-    }
-   ],
-   "points_per_set_missing": 0.867
-  },
-  {
    "game_id": "6624622",
    "team_id": "46686",
    "team": "Maryland",
@@ -10636,15 +10643,15 @@
    ]
   },
   "Wisconsin": {
-   "gid": "6628691",
-   "d": "2026-09-11",
-   "appeared": 11,
+   "gid": "6628580",
+   "d": "2026-09-13",
+   "appeared": 12,
    "zero_action": [
     "Kymora Scott",
-    "Halle Thompson",
+    "Madison Quest",
+    "Grace Egan",
     "Morgan Van wie",
     "Jane Manecke",
-    "Jaela Auguste",
     "Alyssa Konrad"
    ]
   },
@@ -10685,13 +10692,16 @@
    ]
   },
   "Texas": {
-   "gid": "6626262",
-   "d": "2026-09-09",
+   "gid": "6628580",
+   "d": "2026-09-13",
    "appeared": 9,
    "zero_action": [
+    "Camille Presley",
+    "Addy Gaido",
     "Callie Krueger",
     "Genevieve Harris",
-    "Emma Cugino"
+    "Emma Cugino",
+    "Mackenzie Collins"
    ]
   },
   "Arizona St.": {
@@ -11025,14 +11035,17 @@
    ]
   },
   "UIC": {
-   "gid": "6625503",
-   "d": "2026-09-12",
-   "appeared": 13,
+   "gid": "6626622",
+   "d": "2026-09-13",
+   "appeared": 10,
    "zero_action": [
     "Ana Petrides",
+    "Maryam Hussein",
     "Nath\u00e0lia Souza da silva",
     "Francesca Lorenzo",
+    "Elizabeth King",
     "Mihaela Harizanova",
+    "Lianna Ortiz",
     "Nour Elsafy"
    ]
   },
@@ -12386,17 +12399,17 @@
    ]
   },
   "DePaul": {
-   "gid": "6626621",
-   "d": "2026-09-12",
+   "gid": "6627973",
+   "d": "2026-09-13",
    "appeared": 9,
    "zero_action": [
     "Amanda Saeger",
     "Yagmur Yavuz",
     "Luisa Juncu",
     "Ryan Gorski",
+    "Eva Hurrle",
     "Sage Meidroth",
-    "Arden Billingsley",
-    "Jocelyn Paige"
+    "Arden Billingsley"
    ]
   },
   "Milwaukee": {
@@ -12922,14 +12935,12 @@
    "zero_action": []
   },
   "Western Mich.": {
-   "gid": "6626621",
-   "d": "2026-09-12",
-   "appeared": 9,
+   "gid": "6626622",
+   "d": "2026-09-13",
+   "appeared": 11,
    "zero_action": [
-    "Bri Zimmerman",
     "Riley Messenger",
-    "Camille Morrison",
-    "Ella Guilfoy"
+    "Camille Morrison"
    ]
   },
   "Green Bay": {
@@ -13012,27 +13023,26 @@
    ]
   },
   "Auburn": {
-   "gid": "6625502",
-   "d": "2026-09-12",
-   "appeared": 10,
+   "gid": "6627973",
+   "d": "2026-09-13",
+   "appeared": 11,
    "zero_action": [
     "Chierika Okororie",
     "Jasmine Okeoma",
     "Lauren Dreves",
-    "Reese Shugart",
     "Eden Bower",
     "Emma Moore",
     "Emma Gutke"
    ]
   },
   "Clemson": {
-   "gid": "6625633",
-   "d": "2026-09-11",
+   "gid": "6626406",
+   "d": "2026-09-13",
    "appeared": 12,
    "zero_action": [
     "Ihuoma Ozoh",
-    "Lauren Schneider",
     "Khaya Gordon",
+    "Lina Merz",
     "Audrey Armbruster"
    ]
   },
@@ -13979,12 +13989,15 @@
    ]
   },
   "San Francisco": {
-   "gid": "6638574",
-   "d": "2026-09-12",
-   "appeared": 12,
+   "gid": "6628322",
+   "d": "2026-09-13",
+   "appeared": 14,
    "zero_action": [
-    "Andjela Sojic",
-    "Simona Ivanova"
+    "Brooklynn Williams",
+    "Sanja Popovic",
+    "Kadence Wilson",
+    "Kamiera Watkins",
+    "Julie Beckham"
    ]
   },
   "Colorado": {
@@ -14714,15 +14727,12 @@
    ]
   },
   "Wofford": {
-   "gid": "6625634",
-   "d": "2026-09-12",
-   "appeared": 9,
+   "gid": "6626406",
+   "d": "2026-09-13",
+   "appeared": 12,
    "zero_action": [
     "Madison Barrera",
-    "Ella Coleman",
-    "Megan Brown",
     "Ramsey Chastain",
-    "Makaylee Ruiz",
     "Emily Normand",
     "Caroline Cannon",
     "Anna Adcock"
@@ -14771,15 +14781,12 @@
    ]
   },
   "UNLV": {
-   "gid": "6626207",
-   "d": "2026-09-12",
-   "appeared": 14,
+   "gid": "6628322",
+   "d": "2026-09-13",
+   "appeared": 12,
    "zero_action": [
-    "Natalie Monroe",
-    "Sloan Cleveland",
-    "Sanja Popovic",
-    "Kadence Wilson",
-    "Brooklynn Williams"
+    "Simona Ivanova",
+    "Andjela Sojic"
    ]
   },
   "TCU": {
@@ -15007,6 +15014,12 @@
     "ep": 1788393600,
     "sets": 5,
     "state": "appeared"
+   },
+   {
+    "gid": "6628580",
+    "ep": 1789326000,
+    "sets": 4,
+    "state": "zero_action"
    }
   ],
   "Wisconsin|Jaela Auguste": [
@@ -15027,6 +15040,12 @@
     "ep": 1789171200,
     "sets": 5,
     "state": "zero_action"
+   },
+   {
+    "gid": "6628580",
+    "ep": 1789326000,
+    "sets": 4,
+    "state": "appeared"
    }
   ],
   "Kentucky|Kennedy Washington": [
@@ -15306,6 +15325,12 @@
     "gid": "6628691",
     "ep": 1789171200,
     "sets": 5,
+    "state": "appeared"
+   },
+   {
+    "gid": "6628580",
+    "ep": 1789326000,
+    "sets": 4,
     "state": "appeared"
    }
   ],

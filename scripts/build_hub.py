@@ -2903,6 +2903,17 @@ PROFILE_METRICS = [
 PROFILE_MIN_MATCHES = 3
 
 
+def metric_value():
+    """The measured answer to "what makes a team good", or None.
+
+    Produced by scripts/what_makes_good.py over the completed 2025 season:
+    for every metric, how often the team with the better season rate won the
+    match, with that match removed from both teams' rates first. Read here,
+    never recomputed -- one producer, one consumer.
+    """
+    return load("data/metric_value_2025.json")
+
+
 def team_profiles(tstats):
     """Per-team percentile profile, both sides of the ball.
 
@@ -4428,6 +4439,47 @@ def _pyslug(name):
                                        (name or "").lower()))
 
 
+def what_makes_good_html():
+    """WHAT SEPARATES A GOOD TEAM FROM A BAD ONE, as measured.
+
+    ⚠ EVERY NUMBER HERE WAS COMPUTED BEFORE A WORD OF THE COPY EXISTED (R1).
+    The section states what the measurement is, what it is not, and prints
+    the coin-flip line, because "72.8%" means nothing to a reader who cannot
+    see where zero information sits.
+    """
+    doc = metric_value()
+    if not doc or not doc.get("results"):
+        return ""
+    rows = doc["results"]
+    SIDE = {"own": "what they do", "opp": "what they allow",
+            "diff": "them minus opponents"}
+    js = [{"label": r["label"] + "  \u00b7 " + SIDE.get(r["side"], r["side"]),
+           "auc": r["auc"], "lo": r["lo"], "hi": r["hi"],
+           "def": r["definition"], "side": r["side"], "metric": r["metric"]}
+          for r in rows]
+    return (
+        '<details class="method wmg" id="wmgwrap">'
+        '<summary>What actually separates a good team from a bad one</summary>'
+        '<div id="wmgbody"></div>'
+        '<div class="tnote"><b>How this was measured.</b> Over the '
+        '<b>%d</b> Division-I matches of the completed %d season: for each '
+        'metric, both teams\u2019 season rates are rebuilt with that match '
+        'removed, the metric picks whichever team has the better rate, and '
+        'the score is how often it picked the winner. Ties count as half. '
+        'That share is threshold-free \u2014 no cutoff is chosen anywhere in '
+        'it \u2014 and the bar behind each dot is a 1,000-resample bootstrap '
+        'interval, so two metrics whose bars overlap are not really ranked '
+        'against each other. <b>50%% is a coin flip</b> and is drawn.'
+        '<br><b>What it is not.</b> Separation, not causation. A season rate '
+        'is partly the RESULT of being good \u2014 a strong team faces '
+        'scrambling defences and hits better because of it \u2014 and '
+        'schedule strength is not controlled here. It says which qualities '
+        'distinguish teams that win, not what to go and do.</div></details>'
+        '<script>const WMG = %s;</script>'
+        % (doc.get("matches") or 0, doc.get("season") or 0,
+           json.dumps(js, separators=(",", ":"))))
+
+
 def extref_strip(meta, teams):
     """The External references disclosure (PRIVATE ONLY) -- what every
     outside source IS, when it was taken, and where it disagrees.
@@ -5906,6 +5958,7 @@ def build():
         .replace("{{RULER_KEY}}", ruler_key_html(
             ["power", "resume", "digby", "avca", "rpi", "committee",
              "massey", "vt"])) \
+        .replace("{{WHAT_MAKES_GOOD}}", what_makes_good_html()) \
         .replace("{{PROFILE_ORDER}}", json.dumps(
             [m[0] for m in PROFILE_METRICS], separators=(",", ":"))) \
         .replace("{{PROFILE_MIN_N}}", str(PROFILE_MIN_MATCHES)) \
@@ -9494,6 +9547,10 @@ body.mdlopen{overflow:hidden}
 .cx.cxp .cxdot{position:absolute;top:-4px;width:11px;height:11px;
   border-radius:50%;background:var(--cx-fill);
   transform:translateX(-50%);box-shadow:0 0 0 2px var(--card)}
+.cx.cxp .cxband{position:absolute;top:1px;height:3px;border-radius:2px;
+  background:var(--cx-fill);opacity:.28}
+.cx.cxp .cxref{position:absolute;top:-5px;bottom:-5px;width:1px;
+  background:var(--ink3);opacity:.55}
 .cx.cxp .cxdot.lead{background:var(--gold-fill);
   box-shadow:0 0 0 2px var(--card),0 0 0 3.5px var(--gold)}
 .cx .cxax{display:grid;grid-template-columns:var(--cxlab,116px) 1fr auto;
@@ -12017,6 +12074,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       {{LDR_FLOOR}} sets</span>
     <span class="count" id="lcnt"></span>
   </div>
+  {{WHAT_MAKES_GOOD}}
   <div id="ldrchart"></div>
   <div class="panel" id="lplayer"><div class="scroll"><table>
     <thead><tr><th>#</th><th class="l">Player</th><th class="l">Team</th>
@@ -12589,18 +12647,37 @@ function cxDots(rows, o) {
   if (items.length < 2) return '';
   const vals = items.map(r => r.value);
   let lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+  if (o.lo != null) lo = Math.min(lo, o.lo);
+  if (o.hi != null) hi = Math.max(hi, o.hi);
+  (items || []).forEach(r => {
+    if (r.lo != null) lo = Math.min(lo, r.lo);
+    if (r.hi != null) hi = Math.max(hi, r.hi);
+  });
   if (hi === lo) { hi = lo + 1; lo = lo - 1; }
   const pad = (hi - lo) * 0.08;
   lo -= pad; hi += pad;
   const best = o.lowGood ? Math.min.apply(null, vals)
                          : Math.max.apply(null, vals);
+  const at = v => ((v - lo) / (hi - lo)) * 100;
+  /* an optional reference line -- for a "share of matches called correctly"
+     chart the 50% coin flip is the only honest origin, and a reader cannot
+     judge 62% against 72% without seeing where nothing begins */
+  const ref = (o.ref != null && o.ref > lo && o.ref < hi)
+    ? '<i class="cxref" style="left:' + at(o.ref).toFixed(2) + '%"></i>' : '';
   const body = items.map(r => {
-    const f = (r.value - lo) / (hi - lo);
+    const f = at(r.value);
+    /* ⚠ AN INTERVAL IS DRAWN WHERE ONE WAS MEASURED. A bootstrap gives a
+       range, and printing only its midpoint hides how much of the ordering
+       is noise -- two metrics whose intervals overlap are not ranked. */
+    const band = (r.lo != null && r.hi != null)
+      ? '<i class="cxband" style="left:' + at(r.lo).toFixed(2) +
+        '%;width:' + Math.max(0, at(r.hi) - at(r.lo)).toFixed(2) + '%"></i>'
+      : '';
     return '<div class="cxrow" title="' + esc(r.note || r.label) + '">' +
       '<span class="cxlab">' + esc(r.label) + '</span>' +
-      '<span class="cxtrack"><i class="cxdot' +
+      '<span class="cxtrack">' + ref + band + '<i class="cxdot' +
       (r.value === best ? ' lead' : '') + '" style="left:' +
-      (f * 100).toFixed(2) + '%"></i></span>' +
+      f.toFixed(2) + '%"></i></span>' +
       '<span class="cxval">' + esc(r.text != null ? r.text : r.value) +
       '</span></div>';
   }).join('');
@@ -22094,6 +22171,33 @@ const LBAD = {sv_err_set:1, sv_err_pct:1, rc_err_set:1};
    ⚠ Magnitude, so one sequential hue and a common scale. The bar is drawn
    from zero for a rate that starts at zero, which is the only honest
    baseline for a length comparison. */
+/* WHAT SEPARATES A GOOD TEAM FROM A BAD ONE -- measured, then drawn.
+   ⚠ THE COIN-FLIP LINE IS THE POINT. "72.8%" is meaningless to a reader who
+   cannot see where zero information sits, so 50% is drawn as a rule and the
+   axis is pinned to include it. The bar behind each dot is the bootstrap
+   interval: two metrics whose bars overlap are not ranked against each
+   other, and a chart that hid that would be inventing an ordering. */
+function renderWMG() {
+  const host = document.getElementById('wmgbody');
+  if (!host || typeof WMG === 'undefined' || !WMG.length) return;
+  host.innerHTML = cxDots(WMG.map(r => ({
+    label: r.label,
+    value: r.auc * 100, lo: r.lo * 100, hi: r.hi * 100,
+    text: (r.auc * 100).toFixed(1) + '%',
+    note: r.label + ' (' + r.def + ') called the winner in ' +
+      (r.auc * 100).toFixed(1) + '% of matches \u2014 interval ' +
+      (r.lo * 100).toFixed(1) + '\u2013' + (r.hi * 100).toFixed(1) + '%'
+  })), {
+    lab: '210px', labm: '128px', lo: 50,
+    ref: 50, fmt: v => v.toFixed(0) + '%',
+    title: 'How often each quality picked the winner',
+    scale: '50% = a coin flip'
+  });
+}
+document.addEventListener('toggle', e => {
+  if (e.target && e.target.id === 'wmgwrap' && e.target.open) renderWMG();
+}, true);
+
 function renderLeaderChart(rows, key, label, fmt, lowGood) {
   const host = document.getElementById('ldrchart');
   if (!host) return;

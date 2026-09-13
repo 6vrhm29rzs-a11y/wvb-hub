@@ -29,8 +29,8 @@
   "between_team_variance": 5.941,
   "caveat_schedule": "the opponent IS adjusted for from match one: a result is scored as the strength it implies (opponent's rating + margin, home court removed). What is still thin early is the opponent's own rating, which is the preseason projection until a schedule graph exists",
   "teams_with_a_result": 348,
-  "matches_counted": 1420,
-  "corpus_fingerprint": "54efa9dc08114f5e",
+  "matches_counted": 1422,
+  "corpus_fingerprint": "670e9197a9162684",
   "certifies": {
    "blend_weight_derived_not_chosen": {
     "value": true,
@@ -42,18 +42,18 @@
     }
    }
   },
-  "score_mean": -0.00058,
-  "score_sd": 1.1093,
+  "score_mean": -0.00069,
+  "score_sd": 1.10943,
   "score_scale_note": "mean and SD across ALL 348 teams, not just the ones shown -- a scale computed from the top 25 would measure the spread among the best",
   "shown": 25,
   "also_receiving": 10,
   "hit_channel_weight": 0.25,
   "hit_channel_tau": 0.1,
   "hit_channel_evidence": "data/blend_hiteff_2025.json",
-  "generated_at_utc": "2026-09-13T21:01:21Z",
+  "generated_at_utc": "2026-09-13T21:39:54Z",
   "data_through_epoch": 1789326000,
   "rating_cutoff_epoch": 1789282800,
-  "verified_intraday_counted": 36
+  "verified_intraday_counted": 38
  },
  "top": [
   {
@@ -135,7 +135,7 @@
    "season_z": 1.376,
    "matches": 7,
    "weight_on_season": 0.341,
-   "record": "3-4",
+   "record": "4-4",
    "net_pts_per_set": -1.29,
    "conf": "SEC",
    "rank": 7
@@ -255,7 +255,7 @@
    "season_z": 1.661,
    "matches": 7,
    "weight_on_season": 0.341,
-   "record": "4-3",
+   "record": "4-4",
    "net_pts_per_set": -0.38,
    "conf": "Big Ten",
    "rank": 17
@@ -372,13 +372,13 @@
   },
   {
    "team": "Auburn",
-   "score": 1.5302,
+   "score": 1.5979,
    "preseason_z": 1.215,
-   "season_z": 2.062,
-   "matches": 8,
-   "weight_on_season": 0.372,
-   "record": "6-2",
-   "net_pts_per_set": 2.91,
+   "season_z": 2.173,
+   "matches": 9,
+   "weight_on_season": 0.4,
+   "record": "7-2",
+   "net_pts_per_set": 3.31,
    "conf": "SEC",
    "rank": 27
   },
@@ -665,9 +665,9 @@
   {
    "team": "Auburn",
    "rank": 27,
-   "score": 1.5302,
-   "matches": 8,
-   "weight_on_season": 0.372
+   "score": 1.5979,
+   "matches": 9,
+   "weight_on_season": 0.4
   },
   {
    "team": "UCLA",
@@ -978,18 +978,18 @@
    "weight_on_season": 0.341
   },
   {
-   "team": "Ga. Southern",
+   "team": "Wofford",
    "rank": 72,
-   "score": 0.8609,
+   "score": 0.872,
    "matches": 9,
    "weight_on_season": 0.4
   },
   {
-   "team": "Wofford",
+   "team": "Ga. Southern",
    "rank": 73,
-   "score": 0.8534,
-   "matches": 8,
-   "weight_on_season": 0.372
+   "score": 0.8609,
+   "matches": 9,
+   "weight_on_season": 0.4
   },
   {
    "team": "South Dakota St.",
@@ -1076,74 +1076,74 @@
    "weight_on_season": 0.372
   },
   {
-   "team": "DePaul",
-   "rank": 86,
-   "score": 0.7103,
-   "matches": 8,
-   "weight_on_season": 0.372
-  },
-  {
    "team": "Utah Tech",
-   "rank": 87,
+   "rank": 86,
    "score": 0.7056,
    "matches": 8,
    "weight_on_season": 0.372
   },
   {
    "team": "Oregon St.",
-   "rank": 88,
+   "rank": 87,
    "score": 0.7043,
    "matches": 8,
    "weight_on_season": 0.372
   },
   {
    "team": "High Point",
-   "rank": 89,
+   "rank": 88,
    "score": 0.6854,
    "matches": 8,
    "weight_on_season": 0.372
   },
   {
    "team": "Texas St.",
-   "rank": 90,
+   "rank": 89,
    "score": 0.6565,
    "matches": 8,
    "weight_on_season": 0.372
   },
   {
    "team": "Boise St.",
-   "rank": 91,
+   "rank": 90,
    "score": 0.6359,
    "matches": 9,
    "weight_on_season": 0.4
   },
   {
    "team": "Houston",
-   "rank": 92,
+   "rank": 91,
    "score": 0.6264,
    "matches": 8,
    "weight_on_season": 0.372
   },
   {
    "team": "Wichita St.",
-   "rank": 93,
+   "rank": 92,
    "score": 0.6202,
    "matches": 9,
    "weight_on_season": 0.4
   },
   {
    "team": "Virginia",
-   "rank": 94,
+   "rank": 93,
    "score": 0.6194,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Washington St.",
-   "rank": 95,
+   "rank": 94,
    "score": 0.6107,
    "matches": 7,
    "weight_on_season": 0.341
+  },
+  {
+   "team": "DePaul",
+   "rank": 95,
+   "score": 0.6094,
+   "matches": 9,
+   "weight_on_season": 0.4
   },
   {
    "team": "Fairfield",
@@ -1384,44 +1384,44 @@
    "weight_on_season": 0.341
   },
   {
-   "team": "Clemson",
-   "rank": 130,
-   "score": 0.323,
-   "matches": 8,
-   "weight_on_season": 0.372
-  },
-  {
    "team": "Ohio",
-   "rank": 131,
+   "rank": 130,
    "score": 0.31,
    "matches": 8,
    "weight_on_season": 0.372
   },
   {
    "team": "Tulane",
-   "rank": 132,
+   "rank": 131,
    "score": 0.3031,
    "matches": 7,
    "weight_on_season": 0.341
   },
   {
    "team": "Ohio St.",
-   "rank": 133,
+   "rank": 132,
    "score": 0.3012,
    "matches": 8,
    "weight_on_season": 0.372
   },
   {
    "team": "Lipscomb",
-   "rank": 134,
+   "rank": 133,
    "score": 0.301,
    "matches": 6,
    "weight_on_season": 0.307
   },
   {
    "team": "Santa Clara",
-   "rank": 135,
+   "rank": 134,
    "score": 0.2995,
+   "matches": 9,
+   "weight_on_season": 0.4
+  },
+  {
+   "team": "Clemson",
+   "rank": 135,
+   "score": 0.2963,
    "matches": 9,
    "weight_on_season": 0.4
   },

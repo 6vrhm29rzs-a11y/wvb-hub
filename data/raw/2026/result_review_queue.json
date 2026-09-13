@@ -2606,5 +2606,56 @@
    }
   },
   "held_as": "self_contradictory"
+ },
+ "6628322": {
+  "gid": "6628322",
+  "date": "2026-09-13",
+  "canonical": "UNLV def. San Francisco 3-2",
+  "verdict": "CONTRADICTED_ONE",
+  "schools": {
+   "UNLV": {
+    "state": "NOT_POSTED",
+    "url": "https://unlvrebels.com/services/schedule_txt.ashx?schedule=1503",
+    "row": [
+     "Sep 13 (Sun)",
+     "11 AM PT",
+     "Neutral",
+     "San Francisco",
+     "Northridge, Calif.",
+     "",
+     ""
+    ]
+   },
+   "San Francisco": {
+    "state": "CONTRADICTS",
+    "url": "https://usfdons.com/sports/womens-volleyball/schedule/text",
+    "assertion": "San Francisco W 3-2 vs UNLV",
+    "opponent_source": "UNLV",
+    "site_says": "Neutral"
+   }
+  }
+ },
+ "6627613": {
+  "gid": "6627613",
+  "date": "2026-09-13",
+  "canonical": "HELD as empty -- Wake Forest vs ETSU, no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "Wake Forest": {
+    "state": "REPORTS",
+    "url": "https://godeacs.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Wake Forest W 3-2 vs ETSU",
+    "opponent_source": "ETSU",
+    "site_says": "Home"
+   },
+   "ETSU": {
+    "state": "REPORTS",
+    "url": "https://etsubucs.com/services/schedule_txt.ashx?schedule=414",
+    "assertion": "ETSU L 2-3 vs Wake Forest",
+    "opponent_source": "Wake Forest",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "empty"
  }
 }

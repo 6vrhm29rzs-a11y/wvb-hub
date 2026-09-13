@@ -10,6 +10,30 @@ better, and each one records what was observed and what is actually known.
 
 ## OPEN
 
+### Cody watched Purdue-SMU live while the feed called it "pre" (2026-09-13)
+He said it was live at **2:29 PM PT**. Checked at that moment, three ways:
+the day's scoreboard, the `/game/6626265` contest record and our own crawled
+file all read `gameState: P / pre`, with **no** linescores and the start
+listed as **18:00 ET = 3:00 PM PT** -- half an hour in the future. Fourteen
+other matches were correctly live in the same feed response.
+
+So this is not the documented period-vs-state lag (where `period` flips to
+FINAL before `gameState` leaves `I`). Either the match started early or the
+feed's `startTimeEpoch` is wrong for it -- and a wrong start time on a
+showcase fixture is already a measured class here (USC-Arizona St., listed
+two hours late at the wrong venue).
+
+⚠ **Consequence while it is happening: the site cannot show it.** Every live
+surface reads the same feed, so a match the source says has not started
+renders as an upcoming card with a 3:00 PM clock. There is no second live
+source (StatBroadcast stays off-limits to automation).
+
+**To do when it goes final:** verify the result at BOTH schools before it
+counts, per the precedent for any match where Cody's own eyes contradicted
+the feed (Indiana-Georgia, SMU-UC Davis). If the start time proves wrong,
+file a fixture-ledger correction for the time only -- classification stays
+separate from where-and-when.
+
 ### THE EMAIL ACCOUNT IS DISABLED, NOT MIS-CREDENTIALLED (Cody, 2026-09-13)
 He forwarded Google's "Appeal received" notice: he has asked Google to
 restore access to the account, and they say most reviews take about two
