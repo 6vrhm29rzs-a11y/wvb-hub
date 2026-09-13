@@ -2,34 +2,34 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 1312,
+  "scored": 1322,
   "logged_after_tipoff_excluded": 2,
-  "team_mismatch_excluded": 42,
+  "team_mismatch_excluded": 43,
   "predictions_on_record": 4809,
-  "results_available": 1382,
-  "brier": 0.1762,
+  "results_available": 1393,
+  "brier": 0.1763,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 966,
-  "favourite_correct_pct": 73.6
+  "favourite_correct": 974,
+  "favourite_correct_pct": 73.7
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 229,
+   "n": 230,
    "said": 55.2,
-   "happened": 58.5
+   "happened": 58.7
   },
   {
    "range": "60-70%",
-   "n": 236,
+   "n": 237,
    "said": 65.2,
-   "happened": 58.1
+   "happened": 58.2
   },
   {
    "range": "70-80%",
-   "n": 216,
+   "n": 219,
    "said": 75.2,
-   "happened": 68.1
+   "happened": 68.0
   },
   {
    "range": "80-90%",
@@ -39,9 +39,9 @@
   },
   {
    "range": "90-101%",
-   "n": 395,
+   "n": 400,
    "said": 95.6,
-   "happened": 92.2
+   "happened": 92.0
   }
  ],
  "matches": [
@@ -152,6 +152,15 @@
    "p_home": 0.9482,
    "home_won": false,
    "brier": 0.8990832400000001
+  },
+  {
+   "game_id": "6624409",
+   "date": "2026-09-12",
+   "away": "Lindenwood",
+   "home": "Illinois St.",
+   "p_home": 0.9448,
+   "home_won": false,
+   "brier": 0.89264704
   },
   {
    "game_id": "6625870",
@@ -485,15 +494,6 @@
    "p_home": 0.8711,
    "home_won": false,
    "brier": 0.75881521
-  },
-  {
-   "game_id": "6625868",
-   "date": "2026-08-28",
-   "away": "Idaho St.",
-   "home": "SFA",
-   "p_home": 0.8636,
-   "home_won": false,
-   "brier": 0.7458049600000001
   }
  ]
 }
