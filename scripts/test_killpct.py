@@ -176,7 +176,15 @@ def main():
             "function nonDiPhrase(){return ''}\nconst NONDI_WHY='';\n"
             "const _els={};function el(id){return _els[id]=_els[id]||"
             "{value:'',textContent:'',innerHTML:''}}\n"
-            "const document={getElementById:el};\n")
+            "const document={getElementById:el};\n"
+            # ⚠ THE RENDERER GAINED A REAL DEPENDENCY (2026-09-13): every
+            # Stats mode now also draws the leaders chart, so a harness that
+            # executes the renderer has to model it. Stubbed rather than
+            # guarded away with `typeof` in the page: on the real page a
+            # missing renderLeaderChart SHOULD be a loud failure, because a
+            # table with no matching picture is the seam this whole change
+            # exists to close.
+            "function renderLeaderChart(){}\n")
     ts_stub = [
         {"team": "Alpha", "conf": "X", "own": {
             "matches": 3, "sets": 11.0, "kills": 80, "errors": 15,

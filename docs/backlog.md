@@ -10,6 +10,73 @@ better, and each one records what was observed and what is actually known.
 
 ## OPEN
 
+### THE EMAIL ACCOUNT IS DISABLED, NOT MIS-CREDENTIALLED (Cody, 2026-09-13)
+He forwarded Google's "Appeal received" notice: he has asked Google to
+restore access to the account, and they say most reviews take about two
+business days.
+
+⚠ **THAT CORRECTS THE DIAGNOSIS I GAVE HIM TWICE.** I read the SMTP 535
+BadCredentials as a revoked app password and told him to generate a new one.
+He cannot: the ACCOUNT is locked, and an app password cannot be created for
+an account you cannot sign into. There was nothing wrong with the stored
+password. Nothing to do here until the appeal lands.
+
+Meanwhile nothing is lost: `send_daily_mail.sh` writes each unsent report to
+`Cody/data/unsent/<kind>-<date>.txt` rather than dropping it.
+
+**Worth deciding when it resolves:** if Google restores the account and it
+gets disabled again, SMTP from a fresh Gmail account is the wrong transport
+for a daily job. The reports are plain text built from the page's own
+payload, so the cheap alternative is a route on the site he already reads on
+his phone — no third party, no credential to revoke.
+
+### THE TAB AUDIT — Cody's call, not the Builder's (2026-09-13)
+He asked: "There are tabs and pages I don't look at. Either improve and make
+them useable, or remove excess/fluff pages." Removing a page is a product
+decision, so here is the evidence and the recommendation; the deletion needs
+his word.
+
+Measured with `phone_probe.py` (which now DISCOVERS routes from the page's
+own router — the hand-written list had drifted to 15 of 18). Rendered height
+at a true 390px, all 18 routes clean, no overflow anywhere:
+
+| route | height | read |
+|---|---|---|
+| /result-ledger | **136,427px** | ~160 screens. Unusable by construction. |
+| /schedule | 50,029 | a season of fixtures; filters exist |
+| /players | 37,009 | overlaps /player-ratings |
+| /standings | 28,888 | 32 conference tables |
+| /player-ratings | 18,316 | overlaps /players |
+| /tv | 18,119 | broadcast listings |
+| /stats | 16,143 | now has a leaders chart |
+| /ballot | 9,545 | his own ballot |
+| /scores | 7,918 | |
+| /bracket | 5,912 | |
+| /today | 4,638 | |
+| /rankings | 4,207 | |
+| /conference-lab | 3,517 | |
+| /teams | 3,137 | now has profile + margin + squad |
+| /availability | 2,719 | real content, 3 sourced statuses |
+| /film-room | 1,744 | an empty note-taking form |
+| /front-page | 1,584 | new, 10 stories |
+| /intel | **676** | says "0 stories" |
+
+**Recommendation, for Cody to accept or reject:**
+1. **Merge /players into /player-ratings** — two tabs asking one question.
+   One view, a toggle, one place to look. (Improve, not remove.)
+2. **/result-ledger needs a filter before it needs anything else.** It is the
+   provenance record and it is worth keeping; 160 screens of it is not a page,
+   it is a data dump. Default to "corrected, held or disputed only" with the
+   full ledger behind a control.
+3. **/intel: decide.** It renders 0 stories and depends on the local server.
+   Either it earns its place on a match day or it goes.
+4. **/film-room: decide.** An empty form for notes he has never written is
+   the definition of fluff — unless he wants it, in which case it needs a
+   reason to open it (a prompt on a match he just watched).
+
+Nothing was deleted. Everything above still works.
+
+
 ### CLOSED 2026-09-13 — the top-50 verification gap
 The 13 top-50 programmes with no readable schedule are readable now. All of
 them run the same platform, whose own page fetches a plain JSON API on the
