@@ -1,8 +1,8 @@
 {
  "date": "2026-09-13",
- "generated_utc": "2026-09-13T17:58:19Z",
+ "generated_utc": "2026-09-13T18:10:57Z",
  "counts": {
-  "CORROBORATED_ONE": 3,
+  "CORROBORATED_ONE": 4,
   "VERIFIED_BOTH": 3
  },
  "matches": [
@@ -148,6 +148,26 @@
      "assertion": "Florida St. L 0-3 vs FIU",
      "opponent_source": "FIU",
      "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6628432",
+   "date": "2026-09-13",
+   "canonical": "LIU def. Virginia Tech 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "LIU": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://liuathletics.com/services/schedule_txt.ashx?schedule=262",
+     "assertion": "LIU W 3-1 vs Virginia Tech",
+     "opponent_source": "Virginia Tech",
+     "site_says": "Neutral"
+    },
+    "Virginia Tech": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://hokiesports.com/website-api/schedule-events?filter%5Bschedule.sport_id%5D=13&filter%5Bpast%5D=true&per_page=25&sort=-datetime&include=opponent,scheduleEventResult",
+     "rows_on_date": []
     }
    }
   }

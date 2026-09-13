@@ -496,6 +496,47 @@ def main():
         V._fetch = _real
         V._WMT_SPORT.clear()
 
+    print("\n9. THE 13th SCHOOL -- THE WORDPRESS schedule-item TEMPLATE")
+    # ⚠ Kentucky is the one of the thirteen the platform API cannot reach
+    # (its host redirects /website-api/* to a 2018 news page). Its schedule
+    # IS in the HTML, in a shape no parser here read. With this, 13 of 13.
+    UK = ('<div class="schedule__item schedule-item neutral ">'
+          '<div class="schedule-item__date"><time><span>Sat.</span>'
+          '<span>Sep 12</span></time></div>'
+          '<div class="schedule-item__team"><h3> SMU </h3>'
+          '<p>Nassau, Bahamas</p></div>'
+          '<span class="schedule-item__result"> L 3-1 </span></div>'
+          '<div class="schedule__item schedule-item home ">'
+          '<div class="schedule-item__date"><time><span>Fri.</span>'
+          '<span>Aug 14</span></time></div>'
+          '<div class="schedule-item__team"><h3> Dayton (EXH) </h3></div>'
+          '<span class="schedule-item__result"> W 4-0 </span></div>')
+    ui = V.parse_schedule_items(UK)
+    check("both items parse", len(ui) == 2, len(ui))
+    check("date, opponent and venue come off the row",
+          ui[0]["date"] == "2026-09-12" and ui[0]["opponent"] == "SMU"
+          and ui[0]["site"] == "Neutral", ui[0])
+    check("the exhibition is flagged and its (EXH) tag left out of the name",
+          ui[1]["exhibition"] is True and ui[1]["opponent"] == "Dayton",
+          ui[1])
+    # ⚠ Kentucky writes a LOSS OPPONENT-FIRST: "L 3-1" is a 1-3 defeat.
+    st, det = V._judge_rows(ui[:1], "u", "Kentucky", "SMU", "2026-09-12",
+                            {"winner": "SMU", "loser": "Kentucky",
+                             "w_sets": 3, "l_sets": 1})
+    check("an opponent-first loss reads as 1-3 and agrees",
+          st == "AGREE_COMPLETE"
+          and det["assertion"] == "Kentucky L 1-3 vs SMU", (st, det))
+    st2, _ = V._judge_rows(ui[1:], "u", "Kentucky", "Dayton", "2026-08-14",
+                           {"winner": "Kentucky", "loser": "Dayton",
+                            "w_sets": 4, "l_sets": 0})
+    check("[NEG] and its exhibition can never verify a counted final",
+          st2 == "EVENT_NOT_FOUND", st2)
+    _src = open(os.path.join(REPO, "scripts",
+                             "verify_results_daily.py")).read()
+    check("every surface chain offers the same three parsers",
+          _src.count("parse_schedule_items(") == 3, "one definition, two "
+          "call sites")
+
     if FAILED:
         print("\nFAILED: %d" % len(FAILED))
         for f in FAILED:

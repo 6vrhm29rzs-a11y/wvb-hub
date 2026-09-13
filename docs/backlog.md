@@ -10,6 +10,34 @@ better, and each one records what was observed and what is actually known.
 
 ## OPEN
 
+### CLOSED 2026-09-13 — the top-50 verification gap
+The 13 top-50 programmes with no readable schedule are readable now. All of
+them run the same platform, whose own page fetches a plain JSON API on the
+school's domain (`/website-api/schedule-events`, sport id read per site from
+`/website-api/sports`). **12 of the 13 answer it** — Kentucky is the
+exception: `ukathletics.com` redirects `/website-api/*` to a 2018 news page.
+Measured across every school whose site had never answered usefully this
+season: **16 of 31 now readable**. Still dark and worth a browser look one
+day: **Arkansas, South Carolina, Southern California, Kansas St.** (that one
+already reads through the completed-event label parser), Tennessee Tech,
+Central Conn. St. The rest of the list is non-D-I and Cody has ruled it out.
+
+### CLOSED 2026-09-13 — held matches are verified now
+`finals_for()` skipped everything `classify()` did not call `ok`, so the
+matches that count NOWHERE — the ones a school's own word could settle — were
+never taken to the schools at all. Eleven held finals from 09-12 had no
+verification record; nine now do, and every one of them is corrected and
+counting. Held matches are OBSERVED (`HELD_BOTH_REPORT` / `HELD_ONE_REPORTS`
+/ `HELD_NO_REPORT`), never verified: no canonical exists, so nothing can
+agree with one and none of it can move a ranking.
+
+### Kentucky's site is the one remaining unreadable top-50 programme (2026-09-13)
+`/website-api/*` 301s to `https://ukathletics.com/news/2018/08/08/sports-video/`.
+Its schedule page does render results, so the data is fetched from somewhere —
+the next step is one browser look at the network panel on
+`ukathletics.com/sports/wvball/schedule` to see which endpoint it calls.
+
+
 ### Record disagreements vs Evollve — WORKED (2026-09-12)
 Reconciled team by team through a 2026-09-11 cutoff, with the counting chain
 applied. **238 exact · 4 winner disagreements · 106 different match count.**
@@ -123,11 +151,12 @@ All three now ledgered as duplicate listings, each on both schools' evidence.
 ⚠ The duplicate detector never flagged them; the per-date school
 reconciliation did.
 
-**38 unreadable school sites is the next lever.** Every one is a team whose
-results can never be second-sourced, which is why Little Rock and Wiley sit
-uncounted. Auburn, BYU, Kentucky, Kansas St., Arizona St., Clemson, LSU and
-Cincinnati are among them — these are not obscure programmes, and a parser
-that handles their templates would unblock verification across the board.
+**38 unreadable school sites was the next lever — LARGELY PULLED
+2026-09-13.** The platform JSON API reads 16 of the 31 that had never
+answered, Nebraska, Stanford, Penn St., Purdue, UCLA, BYU, Georgia Tech,
+Texas A&M, UCF, Vanderbilt, Clemson, Notre Dame, Virginia Tech, UTSA, San
+Diego St. and San Jose St. among them. See the CLOSED note at the top for
+what is still dark.
 
 ### One match the feed never finished (2026-09-12)
 **6627939, Siena 3-0 Le Moyne, 2026-09-11.** Our record is still `state=I`

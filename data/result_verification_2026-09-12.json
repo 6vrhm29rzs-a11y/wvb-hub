@@ -1,12 +1,10 @@
 {
  "date": "2026-09-12",
- "generated_utc": "2026-09-13T17:53:26Z",
+ "generated_utc": "2026-09-13T18:07:31Z",
  "counts": {
-  "VERIFIED_BOTH": 117,
+  "VERIFIED_BOTH": 127,
   "CORROBORATED_ONE": 32,
-  "HELD_BOTH_REPORT": 9,
-  "UNVERIFIED": 1,
-  "CONTRADICTED_BOTH": 1
+  "UNVERIFIED": 1
  },
  "matches": [
   {
@@ -514,25 +512,24 @@
   {
    "gid": "6624309",
    "date": "2026-09-12",
-   "canonical": "HELD as empty -- Radford vs Utah Valley, no counted result",
-   "verdict": "HELD_BOTH_REPORT",
+   "canonical": "Utah Valley def. Radford 3-2",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
-    "Radford": {
-     "state": "REPORTS",
-     "url": "https://radfordathletics.com/sports/womens-volleyball/schedule/text",
-     "assertion": "Radford L 2-3 vs Utah Valley",
-     "opponent_source": "Utah Valley",
-     "site_says": "Neutral"
-    },
     "Utah Valley": {
-     "state": "REPORTS",
+     "state": "AGREE_COMPLETE",
      "url": "https://gouvu.com/services/schedule_txt.ashx?schedule=2303",
      "assertion": "Utah Valley W 3-2 vs Radford",
      "opponent_source": "Radford",
      "site_says": "Neutral"
+    },
+    "Radford": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://radfordathletics.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Radford L 2-3 vs Utah Valley",
+     "opponent_source": "Utah Valley",
+     "site_says": "Neutral"
     }
-   },
-   "held_as": "empty"
+   }
   },
   {
    "gid": "6624915",
@@ -559,25 +556,24 @@
   {
    "gid": "6627372",
    "date": "2026-09-12",
-   "canonical": "HELD as self_contradictory -- Gonzaga vs East Texas A&M, no counted result",
-   "verdict": "HELD_BOTH_REPORT",
+   "canonical": "East Texas A&M def. Gonzaga 3-2",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
-    "Gonzaga": {
-     "state": "REPORTS",
-     "url": "https://gozags.com/sports/womens-volleyball/schedule/text",
-     "assertion": "Gonzaga L 2-3 vs East Texas A&M",
-     "opponent_source": "East Texas A&M",
-     "site_says": "Neutral"
-    },
     "East Texas A&M": {
-     "state": "REPORTS",
+     "state": "AGREE_COMPLETE",
      "url": "https://lionathletics.com/services/schedule_txt.ashx?schedule=490",
      "assertion": "East Texas A&M W 3-2 vs Gonzaga",
      "opponent_source": "Gonzaga",
      "site_says": "Neutral"
+    },
+    "Gonzaga": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gozags.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Gonzaga L 2-3 vs East Texas A&M",
+     "opponent_source": "East Texas A&M",
+     "site_says": "Neutral"
     }
-   },
-   "held_as": "self_contradictory"
+   }
   },
   {
    "gid": "6624702",
@@ -756,25 +752,24 @@
   {
    "gid": "6627161",
    "date": "2026-09-12",
-   "canonical": "HELD as self_contradictory -- Merrimack vs Fordham, no counted result",
-   "verdict": "HELD_BOTH_REPORT",
+   "canonical": "Fordham def. Merrimack 3-1",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
-    "Merrimack": {
-     "state": "REPORTS",
-     "url": "https://merrimackathletics.com/services/schedule_txt.ashx?schedule=554",
-     "assertion": "Merrimack L 1-3 vs Fordham University",
-     "opponent_source": "Fordham University",
-     "site_says": "Neutral"
-    },
     "Fordham": {
-     "state": "REPORTS",
+     "state": "AGREE_COMPLETE",
      "url": "https://fordhamsports.com/services/schedule_txt.ashx?schedule=1735",
      "assertion": "Fordham W 3-1 vs Merrimack",
      "opponent_source": "Merrimack",
      "site_says": "Neutral"
+    },
+    "Merrimack": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://merrimackathletics.com/services/schedule_txt.ashx?schedule=554",
+     "assertion": "Merrimack L 1-3 vs Fordham University",
+     "opponent_source": "Fordham University",
+     "site_says": "Neutral"
     }
-   },
-   "held_as": "self_contradictory"
+   }
   },
   {
    "gid": "6627829",
@@ -890,21 +885,21 @@
   {
    "gid": "6624771",
    "date": "2026-09-12",
-   "canonical": "Winthrop def. Youngstown St. 3-1",
-   "verdict": "CONTRADICTED_BOTH",
+   "canonical": "Youngstown St. def. Winthrop 3-1",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
-    "Winthrop": {
-     "state": "CONTRADICTS",
-     "url": "https://winthropeagles.com/services/schedule_txt.ashx?schedule=1016",
-     "assertion": "Winthrop L 1-3 vs Youngstown State",
-     "opponent_source": "Youngstown State",
-     "site_says": "Neutral"
-    },
     "Youngstown St.": {
-     "state": "CONTRADICTS",
+     "state": "AGREE_COMPLETE",
      "url": "https://ysusports.com/sports/womens-volleyball/schedule/text",
      "assertion": "Youngstown St. W 3-1 vs Winthrop",
      "opponent_source": "Winthrop",
+     "site_says": "Neutral"
+    },
+    "Winthrop": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://winthropeagles.com/services/schedule_txt.ashx?schedule=1016",
+     "assertion": "Winthrop L 1-3 vs Youngstown State",
+     "opponent_source": "Youngstown State",
      "site_says": "Neutral"
     }
    }
@@ -956,25 +951,24 @@
   {
    "gid": "6625014",
    "date": "2026-09-12",
-   "canonical": "HELD as self_contradictory -- TCU vs Dayton, no counted result",
-   "verdict": "HELD_BOTH_REPORT",
+   "canonical": "TCU def. Dayton 3-1",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "TCU": {
-     "state": "REPORTS",
+     "state": "AGREE_COMPLETE",
      "url": "https://gofrogs.com/sports/womens-volleyball/schedule/text",
      "assertion": "TCU W 3-1 vs Dayton",
      "opponent_source": "Dayton",
      "site_says": "Neutral"
     },
     "Dayton": {
-     "state": "REPORTS",
+     "state": "AGREE_COMPLETE",
      "url": "https://daytonflyers.com/services/schedule_txt.ashx?schedule=3377",
      "assertion": "Dayton L 1-3 vs TCU",
      "opponent_source": "TCU",
      "site_says": "Neutral"
     }
-   },
-   "held_as": "self_contradictory"
+   }
   },
   {
    "gid": "6625118",
@@ -1289,25 +1283,24 @@
   {
    "gid": "6624808",
    "date": "2026-09-12",
-   "canonical": "HELD as self_contradictory -- Fla. Atlantic vs Troy, no counted result",
-   "verdict": "HELD_BOTH_REPORT",
+   "canonical": "Fla. Atlantic def. Troy 3-1",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "Fla. Atlantic": {
-     "state": "REPORTS",
+     "state": "AGREE_COMPLETE",
      "url": "https://fausports.com/sports/womens-volleyball/schedule/text",
      "assertion": "Fla. Atlantic W 3-1 vs Troy",
      "opponent_source": "Troy",
      "site_says": "Neutral"
     },
     "Troy": {
-     "state": "REPORTS",
+     "state": "AGREE_COMPLETE",
      "url": "https://troytrojans.com/sports/womens-volleyball/schedule/text",
      "assertion": "Troy L 1-3 vs Florida Atlantic",
      "opponent_source": "Florida Atlantic",
      "site_says": "Neutral"
     }
-   },
-   "held_as": "self_contradictory"
+   }
   },
   {
    "gid": "6625096",
@@ -1467,25 +1460,24 @@
   {
    "gid": "6627056",
    "date": "2026-09-12",
-   "canonical": "HELD as empty -- UNCW vs Harvard, no counted result",
-   "verdict": "HELD_BOTH_REPORT",
+   "canonical": "Harvard def. UNCW 3-0",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
-    "UNCW": {
-     "state": "REPORTS",
-     "url": "https://uncwsports.com/services/schedule_txt.ashx?schedule=390",
-     "assertion": "UNCW L 0-3 vs Harvard",
-     "opponent_source": "Harvard",
-     "site_says": "Home"
-    },
     "Harvard": {
-     "state": "REPORTS",
+     "state": "AGREE_COMPLETE",
      "url": "https://gocrimson.com/services/schedule_txt.ashx?schedule=1800",
      "assertion": "Harvard W 3-0 vs University of North Carolina Wilmington",
      "opponent_source": "University of North Carolina Wilmington",
      "site_says": "Away"
+    },
+    "UNCW": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://uncwsports.com/services/schedule_txt.ashx?schedule=390",
+     "assertion": "UNCW L 0-3 vs Harvard",
+     "opponent_source": "Harvard",
+     "site_says": "Home"
     }
-   },
-   "held_as": "empty"
+   }
   },
   {
    "gid": "6627222",
@@ -2475,25 +2467,24 @@
   {
    "gid": "6624318",
    "date": "2026-09-12",
-   "canonical": "HELD as self_contradictory -- William & Mary vs Western Caro., no counted result",
-   "verdict": "HELD_BOTH_REPORT",
+   "canonical": "Western Caro. def. William & Mary 3-1",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
-    "William & Mary": {
-     "state": "REPORTS",
-     "url": "https://tribeathletics.com/services/schedule_txt.ashx?schedule=1178",
-     "assertion": "William & Mary L 1-3 vs Western Carolina",
-     "opponent_source": "Western Carolina",
-     "site_says": "Neutral"
-    },
     "Western Caro.": {
-     "state": "REPORTS",
+     "state": "AGREE_COMPLETE",
      "url": "https://catamountsports.com/services/schedule_txt.ashx?schedule=593",
      "assertion": "Western Caro. W 3-1 vs William & Mary",
      "opponent_source": "William & Mary",
      "site_says": "Neutral"
+    },
+    "William & Mary": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://tribeathletics.com/services/schedule_txt.ashx?schedule=1178",
+     "assertion": "William & Mary L 1-3 vs Western Carolina",
+     "opponent_source": "Western Carolina",
+     "site_says": "Neutral"
     }
-   },
-   "held_as": "self_contradictory"
+   }
   },
   {
    "gid": "6624650",
@@ -3320,25 +3311,24 @@
   {
    "gid": "6628642",
    "date": "2026-09-12",
-   "canonical": "HELD as empty -- Evansville vs Tennessee St., no counted result",
-   "verdict": "HELD_BOTH_REPORT",
+   "canonical": "Evansville def. Tennessee St. 3-1",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "Evansville": {
-     "state": "REPORTS",
+     "state": "AGREE_COMPLETE",
      "url": "https://gopurpleaces.com/services/schedule_txt.ashx?schedule=1403",
      "assertion": "Evansville W 3-1 vs Tennessee State",
      "opponent_source": "Tennessee State",
      "site_says": "Home"
     },
     "Tennessee St.": {
-     "state": "REPORTS",
+     "state": "AGREE_COMPLETE",
      "url": "https://tsutigers.com/services/schedule_txt.ashx?schedule=265",
      "assertion": "Tennessee St. L 1-3 vs Evansville",
      "opponent_source": "Evansville",
      "site_says": "Away"
     }
-   },
-   "held_as": "empty"
+   }
   },
   {
    "gid": "6628637",
@@ -3455,25 +3445,24 @@
   {
    "gid": "6638574",
    "date": "2026-09-12",
-   "canonical": "HELD as self_contradictory -- CSUN vs San Francisco, no counted result",
-   "verdict": "HELD_BOTH_REPORT",
+   "canonical": "CSUN def. San Francisco 3-1",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "CSUN": {
-     "state": "REPORTS",
+     "state": "AGREE_COMPLETE",
      "url": "https://gomatadors.com/sports/womens-volleyball/schedule/text",
      "assertion": "CSUN W 3-1 vs San Francisco",
      "opponent_source": "San Francisco",
      "site_says": "Home"
     },
     "San Francisco": {
-     "state": "REPORTS",
+     "state": "AGREE_COMPLETE",
      "url": "https://usfdons.com/sports/womens-volleyball/schedule/text",
      "assertion": "San Francisco L 1-3 vs CSUN",
      "opponent_source": "CSUN",
      "site_says": "Away"
     }
-   },
-   "held_as": "self_contradictory"
+   }
   },
   {
    "gid": "6627475",

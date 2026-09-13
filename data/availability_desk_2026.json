@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-13T17:59:33Z",
+  "generated_at_utc": "2026-09-13T18:12:13Z",
   "counts": {
    "statuses": 3,
    "incidents": 0,
    "signals": 3,
    "expired": 8,
-   "anomalies": 741
+   "anomalies": 740
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -526,34 +526,6 @@
    "points_per_set_missing": 10.847
   },
   {
-   "game_id": "6627197",
-   "team_id": "45791",
-   "team": "LIU",
-   "absent": [
-    {
-     "name": "Sara van Gisteren",
-     "rate": 3.577,
-     "played_share": 0.6
-    },
-    {
-     "name": "Mia Rojas-Avila",
-     "rate": 2.0,
-     "played_share": 0.6
-    },
-    {
-     "name": "Bella Correia",
-     "rate": 1.974,
-     "played_share": 1.0
-    },
-    {
-     "name": "Yasmeen Muhammad",
-     "rate": 1.5,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 9.051
-  },
-  {
    "game_id": "6625876",
    "team_id": "46129",
    "team": "Air Force",
@@ -786,24 +758,6 @@
     }
    ],
    "points_per_set_missing": 5.606
-  },
-  {
-   "game_id": "6637545",
-   "team_id": "45791",
-   "team": "LIU",
-   "absent": [
-    {
-     "name": "Sara van Gisteren",
-     "rate": 3.577,
-     "played_share": 0.667
-    },
-    {
-     "name": "Mia Rojas-Avila",
-     "rate": 2.0,
-     "played_share": 0.667
-    }
-   ],
-   "points_per_set_missing": 5.577
   },
   {
    "game_id": "6625609",
@@ -1586,6 +1540,24 @@
     }
    ],
    "points_per_set_missing": 4.037
+  },
+  {
+   "game_id": "6627197",
+   "team_id": "45791",
+   "team": "LIU",
+   "absent": [
+    {
+     "name": "Bella Correia",
+     "rate": 2.152,
+     "played_share": 1.0
+    },
+    {
+     "name": "Yasmeen Muhammad",
+     "rate": 1.826,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 3.978
   },
   {
    "game_id": "6639556",
@@ -10884,10 +10856,11 @@
    ]
   },
   "Virginia Tech": {
-   "gid": "6627198",
-   "d": "2026-09-12",
-   "appeared": 10,
+   "gid": "6628432",
+   "d": "2026-09-13",
+   "appeared": 9,
    "zero_action": [
+    "Isabela Lopez",
     "Santina Martcheva",
     "Courtney Burgess",
     "Ece Yildiz",
@@ -12671,13 +12644,13 @@
    ]
   },
   "LIU": {
-   "gid": "6626635",
-   "d": "2026-09-12",
+   "gid": "6628432",
+   "d": "2026-09-13",
    "appeared": 8,
    "zero_action": [
     "Neela Feliberty",
-    "Anna Ligart",
     "Sibana Gonz\u00e1lez acevedo",
+    "Anna Ligart",
     "Rodaina Mohamed",
     "Daniela De los santos castillo"
    ]

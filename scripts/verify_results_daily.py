@@ -494,6 +494,69 @@ def parse_completed_events(page, season=SEASON):
     return rows
 
 
+def parse_schedule_items(page, season=SEASON):
+    """The WordPress "schedule-item" template -- Kentucky's, and the LAST of
+    the 13 unreadable top-50 programmes (2026-09-13).
+
+    ukathletics.com is the one of the thirteen whose host redirects
+    /website-api/* to a 2018 news page, so the platform API cannot reach it.
+    Its schedule is in the HTML after all, in a shape no parser here read:
+
+      <div class="schedule__item schedule-item neutral">
+        <div class="schedule-item__date"><time><span>Sat.</span>
+          <span>Sep 12</span></time></div>
+        ... <div class="schedule-item__team"><h3> SMU </h3>
+        <span class="schedule-item__result"> L 3-1 </span>
+
+    ⚠ Kentucky writes a LOSS OPPONENT-FIRST -- that "L 3-1" is a 1-3 defeat.
+    Already the measured convention (Alabama A&M, 2026-09-02): the letter is
+    the school's claim and the numbers are the two set counts, so
+    _judge_rows' orientation fix handles it and nothing is special-cased.
+    ⚠ Its exhibitions are marked in the opponent cell -- "Ohio (EXH)", with a
+    4-0 "result" -- and are flagged here, never judged.
+    """
+    import html as _html
+    rows = []
+    for m in re.finditer(r'<div class="[^"]*\bschedule-item\b([^"]*)"', page):
+        cls = m.group(1)
+        start = m.start()
+        nxt = page.find('class="schedule__item', start + 10)
+        block = page[start:nxt if nxt > 0 else start + 6000]
+        dm = re.search(r'schedule-item__date.*?<time>(.*?)</time>', block,
+                       re.S)
+        if not dm:
+            continue
+        dtxt = re.sub(r"<[^>]+>", " ", dm.group(1))
+        dm2 = re.search(r"([A-Z][a-z]{2})[a-z]*\.?\s+(\d{1,2})\b",
+                        re.sub(r"\s+", " ", dtxt).replace("Sept", "Sep"))
+        if not dm2 or dm2.group(1) not in MONTHS:
+            continue
+        tm = re.search(r'schedule-item__team[^>]*>\s*<h3>(.*?)</h3>', block,
+                       re.S)
+        if not tm:
+            continue
+        opp_raw = _html.unescape(re.sub(r"<[^>]+>", " ", tm.group(1))).strip()
+        exh = "(EXH" in opp_raw.upper() or "EXHIBITION" in block.upper()
+        opp = re.sub(r"\s*\(EXH\.?\)\s*", " ", opp_raw,
+                     flags=re.IGNORECASE)
+        opp = re.sub(r"^(?:#\d+|No\.\s*\d+|RV)\s+", "", opp).strip()
+        rm = re.search(r'schedule-item__result[^>]*>\s*([WL])[,\s]+'
+                       r'(\d)\s*-\s*(\d)', block)
+        res = (rm.group(1), int(rm.group(2)), int(rm.group(3))) if rm else None
+        site = None
+        for word in ("neutral", "home", "away"):
+            if re.search(r"\b%s\b" % word, cls):
+                site = word.capitalize()
+                break
+        rows.append({"date": "%04d-%02d-%02d"
+                     % (season, MONTHS[dm2.group(1)], int(dm2.group(2))),
+                     "site": site, "opponent": opp, "exhibition": exh,
+                     "result": res, "raw": [dtxt.strip(), opp_raw,
+                                            rm.group(0) if rm else ""],
+                     "surface": "schedule_item"})
+    return rows
+
+
 def parse_modern_cards(page, season=SEASON):
     """JS-rendered schedule pages -> normalized rows, by TOKEN SCHEMA.
 
@@ -878,7 +941,8 @@ def school_evidence(team, opponent, date, canonical, sites, log):
         if not rows:
             # the modern JS page (often what /schedule/text silently
             # redirected to) -- reuse THIS body rather than refetching
-            mrows = parse_completed_events(body) or parse_modern_cards(body)
+            mrows = (parse_completed_events(body) or parse_schedule_items(body)
+                     or parse_modern_cards(body))
             entry["state"] = "unparsed"
             entry["modern_blocks"] = len(mrows)
             log.append(entry)
@@ -913,7 +977,8 @@ def school_evidence(team, opponent, date, canonical, sites, log):
         time.sleep(0.5)
         if mstatus != 200 or not mbody:
             continue
-        mrows = parse_completed_events(mbody) or parse_modern_cards(mbody)
+        mrows = (parse_completed_events(mbody) or parse_schedule_items(mbody)
+                 or parse_modern_cards(mbody))
         log.append({"team": team, "url": murl, "http": mstatus,
                     "retrieved_utc": datetime.datetime.utcnow()
                     .strftime("%Y-%m-%dT%H:%M:%SZ"),
