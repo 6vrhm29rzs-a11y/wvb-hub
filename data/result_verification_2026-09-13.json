@@ -1,8 +1,8 @@
 {
  "date": "2026-09-13",
- "generated_utc": "2026-09-13T18:10:57Z",
+ "generated_utc": "2026-09-13T18:57:44Z",
  "counts": {
-  "CORROBORATED_ONE": 4,
+  "CORROBORATED_ONE": 10,
   "VERIFIED_BOTH": 3
  },
  "matches": [
@@ -168,6 +168,175 @@
      "state": "EVENT_NOT_FOUND",
      "url": "https://hokiesports.com/website-api/schedule-events?filter%5Bschedule.sport_id%5D=13&filter%5Bpast%5D=true&per_page=25&sort=-datetime&include=opponent,scheduleEventResult",
      "rows_on_date": []
+    }
+   }
+  },
+  {
+   "gid": "6624627",
+   "date": "2026-09-13",
+   "canonical": "Maryland def. Saint Peter's 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Maryland": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://umterps.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Maryland W 3-0 vs Saint Peter's",
+     "opponent_source": "Saint Peter's",
+     "site_says": "Home"
+    },
+    "Saint Peter's": {
+     "state": "NOT_POSTED",
+     "url": "https://saintpeterspeacocks.com/services/schedule_txt.ashx?schedule=1302",
+     "row": [
+      "Sep 13 (Sun)",
+      "1:00 p.m.",
+      "Away",
+      "Maryland",
+      "College Park, MD (Stephen M. Schanwald Pavilion at XFINITY Center)",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6624994",
+   "date": "2026-09-13",
+   "canonical": "Louisville def. UNI 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Louisville": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gocards.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Louisville W 3-0 vs Northern Iowa",
+     "opponent_source": "Northern Iowa",
+     "site_says": "Neutral"
+    },
+    "UNI": {
+     "state": "NOT_POSTED",
+     "url": "https://unipanthers.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 13 (Sun)",
+      "12 p.m.",
+      "Neutral",
+      "#5 Louisville",
+      "Houston, Tex. (Tudor Fieldhouse)",
+      "Rice Tournament II",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6624969",
+   "date": "2026-09-13",
+   "canonical": "Col. of Charleston def. Notre Dame 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Col. of Charleston": {
+     "state": "NOT_POSTED",
+     "url": "https://cofcsports.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 13 (Sun)",
+      "1:00 PM",
+      "Home",
+      "Notre Dame",
+      "Charleston, S.C. (TD Arena)",
+      "Steve Baumrind Invitational presented by Hampton Inn & Suites by Hilton West Ashley",
+      "-"
+     ]
+    },
+    "Notre Dame": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://und.com/website-api/schedule-events?filter%5Bschedule.sport_id%5D=22&filter%5Bpast%5D=true&per_page=25&sort=-datetime&include=opponent,scheduleEventResult",
+     "assertion": "Notre Dame L 0-3 vs College of Charleston",
+     "opponent_source": "College of Charleston",
+     "site_says": "Away",
+     "surface": "wmt_api"
+    }
+   }
+  },
+  {
+   "gid": "6625463",
+   "date": "2026-09-13",
+   "canonical": "Colgate def. Dartmouth 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Colgate": {
+     "state": "NOT_POSTED",
+     "url": "https://colgateathletics.com/services/schedule_txt.ashx?schedule=890",
+     "row": [
+      "Sep 13 (Sun)",
+      "1 p.m.",
+      "Home",
+      "Dartmouth",
+      "Hamilton, N.Y. (Cotterell Court)",
+      "",
+      ""
+     ]
+    },
+    "Dartmouth": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://dartmouthsports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Dartmouth L 0-3 vs Colgate",
+     "opponent_source": "Colgate",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6626511",
+   "date": "2026-09-13",
+   "canonical": "UC San Diego def. Pacific 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "UC San Diego": {
+     "state": "NOT_POSTED",
+     "url": "https://ucsdtritons.com/services/schedule_txt.ashx?schedule=460",
+     "row": [
+      "Sep 13 (Sun)",
+      "10 AM",
+      "Neutral",
+      "Pacific",
+      "El Paso, Texas",
+      "",
+      ""
+     ]
+    },
+    "Pacific": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://pacifictigers.com/services/schedule_txt.ashx?schedule=405",
+     "assertion": "Pacific L 0-3 vs UC San Diego",
+     "opponent_source": "UC San Diego",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6627170",
+   "date": "2026-09-13",
+   "canonical": "Georgia def. Kennesaw St. 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Georgia": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://georgiadogs.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Georgia W 3-1 vs Kennesaw State",
+     "opponent_source": "Kennesaw State",
+     "site_says": "Neutral"
+    },
+    "Kennesaw St.": {
+     "state": "NOT_POSTED",
+     "url": "https://ksuowls.com/services/schedule_txt.ashx?schedule=432",
+     "row": [
+      "Sep 13 (Sun)",
+      "1 PM",
+      "Neutral",
+      "Georgia",
+      "Mobile, Ala.",
+      "",
+      ""
+     ]
     }
    }
   }

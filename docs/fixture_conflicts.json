@@ -88,15 +88,23 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 36,
+     "records": 43,
      "values": [
       "1789232400",
       "1789318800"
      ]
+    },
+    {
+     "field": "game_state",
+     "records": 43,
+     "values": [
+      "P",
+      "I"
+     ]
     }
    ],
    "matchup": "Belmont / NC State",
-   "records": 36
+   "records": 43
   },
   "6625253": {
    "conflicts": [
@@ -208,7 +216,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 152,
+     "records": 159,
      "values": [
       "1788670800",
       "1788742800"
@@ -216,7 +224,7 @@
     },
     {
      "field": "game_state",
-     "records": 152,
+     "records": 159,
      "values": [
       "P",
       "I",
@@ -225,13 +233,13 @@
     }
    ],
    "matchup": "Missouri / Nebraska",
-   "records": 152
+   "records": 159
   },
   "6626265": {
    "conflicts": [
     {
      "field": "teams",
-     "records": 34,
+     "records": 41,
      "values": [
       "(('46250', False), ('52339', True))",
       "(('46250', False), ('46616', True))",
@@ -240,7 +248,7 @@
     },
     {
      "field": "site",
-     "records": 34,
+     "records": 41,
      "values": [
       "home/away flip across snapshots",
       "no venue owner on record"
@@ -248,7 +256,7 @@
     }
    ],
    "matchup": "SMU / TBA",
-   "records": 34
+   "records": 41
   },
   "6626288": {
    "conflicts": [
@@ -394,7 +402,7 @@
    "conflicts": [
     {
      "field": "teams",
-     "records": 34,
+     "records": 41,
      "values": [
       "(('46616', False), ('52339', True))",
       "(('45920', False), ('46054', True))",
@@ -402,8 +410,16 @@
      ]
     },
     {
+     "field": "game_state",
+     "records": 41,
+     "values": [
+      "P",
+      "I"
+     ]
+    },
+    {
      "field": "site",
-     "records": 34,
+     "records": 41,
      "values": [
       "home/away flip across snapshots",
       "no venue owner on record"
@@ -411,7 +427,7 @@
     }
    ],
    "matchup": "Purdue / TBA",
-   "records": 34
+   "records": 41
   },
   "6627351": {
    "conflicts": [
@@ -602,12 +618,12 @@
  },
  "by_field": {
   "city": 1,
-  "game_state": 38,
+  "game_state": 56,
   "site": 4,
   "start_time_epoch": 34,
   "state_usps": 1,
   "teams": 4,
-  "teams (non-blocking)": 4,
+  "teams (non-blocking)": 3,
   "venue": 1
  },
  "corrections": {
@@ -774,7 +790,7 @@
  },
  "counts": {
   "blocked": 38,
-  "conflicted": 78,
+  "conflicted": 93,
   "corrected": 5,
   "fixtures": 4891
  },

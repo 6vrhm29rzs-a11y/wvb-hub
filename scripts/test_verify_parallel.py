@@ -95,6 +95,13 @@ def run(fs, workers, patch_lock=None):
     if patch_lock is not None:
         V._host_lock = patch_lock
     V._HOST_LOCKS.clear()
+    # ⚠ AND THE PLATFORM-API SPORT CACHE. wmt_sport_id remembers a
+    # host's volleyball id for the life of the PROCESS -- which is the
+    # point in a real sweep (one probe per host, not one per school),
+    # but it means the second run here would skip a fetch the first
+    # one logged and the serial-vs-parallel log comparison would fail
+    # on a warm cache rather than on anything about concurrency.
+    V._WMT_SPORT.clear()
     try:
         t0 = time.time()
         done, logs = V.gather_evidence(fs, sites_for(fs), "2026-09-11",

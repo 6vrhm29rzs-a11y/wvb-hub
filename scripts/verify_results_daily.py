@@ -1218,7 +1218,10 @@ def gather_evidence(finals, sites, date, workers=None):
         # ⚠ PAIRED BY SIDES, NOT BY WINNER/LOSER -- a held match has no
         # winner, and reusing those keys for "the two teams" would be the
         # field-meaning trap this codebase keeps paying for (R4).
-        _a, _b = _f["sides"]
+        # a counted final may be handed in either shape: "sides" is what
+        # finals_for emits, winner/loser is what older callers (and the
+        # parallel-equivalence guard's fixtures) build.
+        _a, _b = _f.get("sides") or [_f["winner"], _f["loser"]]
         tasks.append((_i, 0, _f, _a, _b))
         tasks.append((_i, 1, _f, _b, _a))
 
@@ -1307,7 +1310,7 @@ def main():
         sb, db = done[(_i, 1)]
         log.extend(logs[(_i, 0)])
         log.extend(logs[(_i, 1)])
-        _a, _b = f["sides"]
+        _a, _b = f.get("sides") or [f["winner"], f["loser"]]
         if f.get("held"):
             v = held_verdict(sa, sb)
             canon = ("HELD as %s -- %s vs %s, no counted result"
