@@ -3758,6 +3758,254 @@
     }
    ],
    "note": "⚠ FOUND BY THE SAME NEW RULE, in the same minute as Brown-LMU. Three inversions in one afternoon on the same shape, one of which a human spotted first."
+  },
+  "6624309": {
+   "field": "result",
+   "corr_kind": "incomplete",
+   "feed_said": "no side is flagged as the winner; the record went final with Radford 2, Utah Valley 2",
+   "correct": {
+    "winner_team_id": "46016",
+    "away_sets": 3,
+    "home_sets": 2,
+    "linescores": [],
+    "linescores_replace": true
+   },
+   "established": "Utah Valley def. Radford 3-2. Utah Valley publishes \"Utah Valley W 3-2 vs Radford\" and Radford publishes \"Radford L 2-3 vs Utah Valley\". The feed's fifth-set line froze at 9-10 -- a deciding set plays to 15, so the tape is incomplete and is withheld rather than half-shown.",
+   "evidence": [
+    {
+     "url": "https://radfordathletics.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Radford",
+     "retrieved": "2026-09-12",
+     "text": "Radford L 2-3 vs Utah Valley",
+     "establishes": "Radford L 2-3 vs Utah Valley"
+    },
+    {
+     "url": "https://gouvu.com/services/schedule_txt.ashx?schedule=2303",
+     "kind": "school_schedule",
+     "school": "Utah Valley",
+     "retrieved": "2026-09-12",
+     "text": "Utah Valley W 3-2 vs Radford",
+     "establishes": "Utah Valley W 3-2 vs Radford"
+    }
+   ],
+   "note": "Found 2026-09-13 by taking HELD matches to the schools for the first time: the nightly verifier had only ever asked about results it already counted, so a match that counted nowhere was never checked by anybody. The Monster Block, an independent third source, names the same winner."
+  },
+  "6627372": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "East Texas A&M (away) credited with 3 sets against Gonzaga's 2",
+   "correct": {
+    "winner_team_id": "45903",
+    "away_sets": 3,
+    "home_sets": 2,
+    "linescores": [],
+    "linescores_replace": true
+   },
+   "established": "East Texas A&M def. Gonzaga 3-2. East Texas A&M publishes \"East Texas A&M W 3-2 vs Gonzaga\" and Gonzaga publishes \"Gonzaga L 2-3 vs East Texas A&M\". The feed's fifth-set line froze at 14-13 and credits it to Gonzaga, which is what made the record self-contradictory; the tape is withheld.",
+   "evidence": [
+    {
+     "url": "https://gozags.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Gonzaga",
+     "retrieved": "2026-09-12",
+     "text": "Gonzaga L 2-3 vs East Texas A&M",
+     "establishes": "Gonzaga L 2-3 vs East Texas A&M"
+    },
+    {
+     "url": "https://lionathletics.com/services/schedule_txt.ashx?schedule=490",
+     "kind": "school_schedule",
+     "school": "East Texas A&M",
+     "retrieved": "2026-09-12",
+     "text": "East Texas A&M W 3-2 vs Gonzaga",
+     "establishes": "East Texas A&M W 3-2 vs Gonzaga"
+    }
+   ],
+   "note": "Found 2026-09-13 by taking HELD matches to the schools for the first time: the nightly verifier had only ever asked about results it already counted, so a match that counted nowhere was never checked by anybody. The Monster Block, an independent third source, names the same winner."
+  },
+  "6627161": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Fordham (away) credited with 2 sets against Merrimack's 1",
+   "correct": {
+    "winner_team_id": "46302",
+    "away_sets": 3,
+    "home_sets": 1,
+    "linescores": [],
+    "linescores_replace": true
+   },
+   "established": "Fordham def. Merrimack 3-1. Fordham publishes \"Fordham W 3-1 vs Merrimack\" and Merrimack publishes \"Merrimack L 1-3 vs Fordham University\". The feed stopped at 2-0 with the third set frozen at 4-2 and never served sets three or four; the tape is withheld.",
+   "evidence": [
+    {
+     "url": "https://merrimackathletics.com/services/schedule_txt.ashx?schedule=554",
+     "kind": "school_schedule",
+     "school": "Merrimack",
+     "retrieved": "2026-09-12",
+     "text": "Merrimack L 1-3 vs Fordham University",
+     "establishes": "Merrimack L 1-3 vs Fordham University"
+    },
+    {
+     "url": "https://fordhamsports.com/services/schedule_txt.ashx?schedule=1735",
+     "kind": "school_schedule",
+     "school": "Fordham",
+     "retrieved": "2026-09-12",
+     "text": "Fordham W 3-1 vs Merrimack",
+     "establishes": "Fordham W 3-1 vs Merrimack"
+    }
+   ],
+   "note": "Found 2026-09-13 by taking HELD matches to the schools for the first time: the nightly verifier had only ever asked about results it already counted, so a match that counted nowhere was never checked by anybody. The Monster Block, an independent third source, names the same winner."
+  },
+  "6625014": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Dayton (away) credited with 3 sets against TCU's 1",
+   "correct": {
+    "winner_team_id": "46507",
+    "away_sets": 1,
+    "home_sets": 3,
+    "linescores": [],
+    "linescores_replace": true
+   },
+   "established": "TCU def. Dayton 3-1. TCU publishes \"TCU W 3-1 vs Dayton\" and Dayton publishes \"Dayton L 1-3 vs TCU\". The feed's fourth-set line reads 25-24, which no set can end on, so the tape is withheld; the result itself is not in doubt.",
+   "evidence": [
+    {
+     "url": "https://gofrogs.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "TCU",
+     "retrieved": "2026-09-12",
+     "text": "TCU W 3-1 vs Dayton",
+     "establishes": "TCU W 3-1 vs Dayton"
+    },
+    {
+     "url": "https://daytonflyers.com/services/schedule_txt.ashx?schedule=3377",
+     "kind": "school_schedule",
+     "school": "Dayton",
+     "retrieved": "2026-09-12",
+     "text": "Dayton L 1-3 vs TCU",
+     "establishes": "Dayton L 1-3 vs TCU"
+    }
+   ],
+   "note": "Found 2026-09-13 by taking HELD matches to the schools for the first time: the nightly verifier had only ever asked about results it already counted, so a match that counted nowhere was never checked by anybody. The Monster Block, an independent third source, names the same winner."
+  },
+  "6624808": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Troy (away) credited with 3 sets against Fla. Atlantic's 1",
+   "correct": {
+    "winner_team_id": "45773",
+    "away_sets": 1,
+    "home_sets": 3
+   },
+   "established": "Fla. Atlantic def. Troy 3-1. Fla. Atlantic publishes \"Fla. Atlantic W 3-1 vs Troy\" and Troy publishes \"Troy L 1-3 vs Florida Atlantic\". The feed's own per-set lines are complete and correct -- only the winner flag and the sets-won fields are wrong, so the tape is kept as served.",
+   "evidence": [
+    {
+     "url": "https://fausports.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Fla. Atlantic",
+     "retrieved": "2026-09-12",
+     "text": "Fla. Atlantic W 3-1 vs Troy",
+     "establishes": "Fla. Atlantic W 3-1 vs Troy"
+    },
+    {
+     "url": "https://troytrojans.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Troy",
+     "retrieved": "2026-09-12",
+     "text": "Troy L 1-3 vs Florida Atlantic",
+     "establishes": "Troy L 1-3 vs Florida Atlantic"
+    }
+   ],
+   "note": "Found 2026-09-13 by taking HELD matches to the schools for the first time: the nightly verifier had only ever asked about results it already counted, so a match that counted nowhere was never checked by anybody. The Monster Block, an independent third source, names the same winner."
+  },
+  "6624318": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Western Caro. (away) credited with 2 sets against William & Mary's 1",
+   "correct": {
+    "winner_team_id": "46382",
+    "away_sets": 3,
+    "home_sets": 1
+   },
+   "established": "Western Caro. def. William & Mary 3-1. Western Caro. publishes \"Western Caro. W 3-1 vs William & Mary\" and William & Mary publishes \"William & Mary L 1-3 vs Western Carolina\". The feed's lines are complete and correct and already show 3-1; only the sets-won fields were wrong, so the tape is kept as served.",
+   "evidence": [
+    {
+     "url": "https://tribeathletics.com/services/schedule_txt.ashx?schedule=1178",
+     "kind": "school_schedule",
+     "school": "William & Mary",
+     "retrieved": "2026-09-12",
+     "text": "William & Mary L 1-3 vs Western Carolina",
+     "establishes": "William & Mary L 1-3 vs Western Carolina"
+    },
+    {
+     "url": "https://catamountsports.com/services/schedule_txt.ashx?schedule=593",
+     "kind": "school_schedule",
+     "school": "Western Caro.",
+     "retrieved": "2026-09-12",
+     "text": "Western Caro. W 3-1 vs William & Mary",
+     "establishes": "Western Caro. W 3-1 vs William & Mary"
+    }
+   ],
+   "note": "Found 2026-09-13 by taking HELD matches to the schools for the first time: the nightly verifier had only ever asked about results it already counted, so a match that counted nowhere was never checked by anybody. The Monster Block, an independent third source, names the same winner."
+  },
+  "6628642": {
+   "field": "result",
+   "corr_kind": "incomplete",
+   "feed_said": "no winner, no sets-won and no per-set lines -- the record went final asserting nothing",
+   "correct": {
+    "winner_team_id": "46672",
+    "away_sets": 1,
+    "home_sets": 3
+   },
+   "established": "Evansville def. Tennessee St. 3-1. Evansville publishes \"Evansville W 3-1 vs Tennessee State\" and Tennessee St. publishes \"Tennessee St. L 1-3 vs Evansville\". The feed served no result at all: no winner, no sets, no lines.",
+   "evidence": [
+    {
+     "url": "https://gopurpleaces.com/services/schedule_txt.ashx?schedule=1403",
+     "kind": "school_schedule",
+     "school": "Evansville",
+     "retrieved": "2026-09-12",
+     "text": "Evansville W 3-1 vs Tennessee State",
+     "establishes": "Evansville W 3-1 vs Tennessee State"
+    },
+    {
+     "url": "https://tsutigers.com/services/schedule_txt.ashx?schedule=265",
+     "kind": "school_schedule",
+     "school": "Tennessee St.",
+     "retrieved": "2026-09-12",
+     "text": "Tennessee St. L 1-3 vs Evansville",
+     "establishes": "Tennessee St. L 1-3 vs Evansville"
+    }
+   ],
+   "note": "Found 2026-09-13 by taking HELD matches to the schools for the first time: the nightly verifier had only ever asked about results it already counted, so a match that counted nowhere was never checked by anybody. The Monster Block, an independent third source, names the same winner."
+  },
+  "6638574": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "CSUN (home) credited with 2 sets against San Francisco's 1",
+   "correct": {
+    "winner_team_id": "46289",
+    "away_sets": 1,
+    "home_sets": 3
+   },
+   "established": "CSUN def. San Francisco 3-1. CSUN publishes \"CSUN W 3-1 vs San Francisco\" and San Francisco publishes \"San Francisco L 1-3 vs CSUN\". The feed's lines are complete and correct and already show 3-1; only the sets-won fields were wrong, so the tape is kept as served.",
+   "evidence": [
+    {
+     "url": "https://gomatadors.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "CSUN",
+     "retrieved": "2026-09-12",
+     "text": "CSUN W 3-1 vs San Francisco",
+     "establishes": "CSUN W 3-1 vs San Francisco"
+    },
+    {
+     "url": "https://usfdons.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "San Francisco",
+     "retrieved": "2026-09-12",
+     "text": "San Francisco L 1-3 vs CSUN",
+     "establishes": "San Francisco L 1-3 vs CSUN"
+    }
+   ],
+   "note": "Found 2026-09-13 by taking HELD matches to the schools for the first time: the nightly verifier had only ever asked about results it already counted, so a match that counted nowhere was never checked by anybody. The Monster Block, an independent third source, names the same winner."
   }
  }
 }

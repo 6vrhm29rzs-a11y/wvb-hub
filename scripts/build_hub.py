@@ -18719,6 +18719,14 @@ function rvWording(v) {
     CONTRADICTED_BOTH: '\u26a0 Both schools contradict the recorded result',
     CONTRADICTED_ONE: '\u26a0 A school source contradicts the recorded result',
     UNVERIFIED: 'Not verifiable when checked',
+    /* HELD: the match counts nowhere, so no school can agree or disagree
+       with a result we are not claiming. These say what was OBSERVED, and
+       none of them is a verification -- see held_verdict() in
+       verify_results_daily.py, which keeps a separate vocabulary for
+       exactly this reason. */
+    HELD_BOTH_REPORT: 'Held \u2014 both schools have published a result',
+    HELD_ONE_REPORTS: 'Held \u2014 one school has published a result',
+    HELD_NO_REPORT: 'Held \u2014 neither school has published yet',
   })[v] || esc(v);
 }
 function rvSchoolNote(st) {
@@ -18750,6 +18758,15 @@ function rvMark(gid) {
   }
   const v = RVQ[gid];
   if (!v || v === 'UNVERIFIED') return '';
+  /* ⚠ A HELD MATCH IS NOT A DISPUTE. Before the verifier began observing
+     held matches (2026-09-13) every non-verified verdict here was a
+     contradiction, so the fall-through below was safe; it no longer is, and
+     letting a HELD_* row reach it would print "sources disagree" about a
+     match where nobody disagrees with anything. */
+  if (v.indexOf('HELD_') === 0) {
+    return '<span class="rvmk" title="' + rvWording(v) +
+      ' \u2014 details in the Result Ledger">held</span>';
+  }
   if (v === 'VERIFIED_BOTH' || v === 'CORROBORATED_ONE') {
     return '<span class="rvmk" title="' + rvWording(v).replace(/^[^ ]+ /, '') +
       ' \u2014 details in the Result Ledger">' +

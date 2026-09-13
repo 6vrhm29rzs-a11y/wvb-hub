@@ -18,7 +18,9 @@ so nothing disallows reading it -- but ONE page per run, no crawling, and it
 is a REFERENCE only: it may raise a question about a result, and it may never
 by itself correct one. The two-source rule still wants a school.
 """
+import datetime
 import hashlib
+import html
 import io
 import json
 import os
@@ -39,6 +41,26 @@ ROW = re.compile(
     r'(?:\s*<span class="sets">\(([^)]*)\)</span>)?'
     r'.*?<td class="status">([^<]*)</td>', re.S)
 NAME_SETS = re.compile(r"^(.*?)\s+(\d+)$")
+RANK_PREFIX = re.compile(r"^#(\d+)\s+")
+
+
+def clean_name(raw):
+    """The source's team string -> (joinable name, the rank it published).
+
+    Two things sit in front of a team name here and BOTH broke the join on
+    exactly the matches that matter most (measured 2026-09-13: 22 of 160
+    rows had a side that would not resolve, and they were the RANKED ones):
+      * the site prefixes a ranked team with its AVCA rank -- "#15 Creighton";
+      * team names arrive HTML-escaped -- "Alabama A&amp;M", "St. John&#x27;s (NY)".
+    So the third witness was blind precisely where the verification gap is
+    (the top 50), which is the inverse of what it was captured for.
+    The raw string is kept on the row; this returns what may be joined.
+    The published rank is returned rather than discarded -- it is the AVCA
+    poll as a third party read it, a fact of its own.
+    """
+    txt = html.unescape(raw or "").strip()
+    m = RANK_PREFIX.match(txt)
+    return (txt[m.end():].strip() if m else txt), (int(m.group(1)) if m else None)
 
 
 def parse(page):
@@ -57,14 +79,65 @@ def parse(page):
             mm = re.match(r"\s*(\d+)\s*-\s*(\d+)\s*$", chunk)
             if mm:
                 pairs.append([int(mm.group(1)), int(mm.group(2))])
+        aname, arank = clean_name(a.group(1))
+        hname, hrank = clean_name(h.group(1))
         out.append({"away_slug": aslug, "away": a.group(1).strip(),
+                    "away_name": aname, "away_rank_listed": arank,
                     "away_sets": int(a.group(2)),
                     "home_slug": hslug, "home": h.group(1).strip(),
+                    "home_name": hname, "home_rank_listed": hrank,
                     "home_sets": int(h.group(2)),
                     "winner": "away" if aw == "winner" else
                               ("home" if hw == "winner" else None),
                     "sets": pairs, "status": (status or "").strip()})
     return out
+
+
+def hub_keys(hub):
+    """Normalised team name -> the hub's own spelling."""
+    from external_refs import _ref_norm
+    keys = {}
+    for t in hub["teams"]:
+        n = t.get("name_short")
+        if n:
+            keys.setdefault(_ref_norm(n), n)
+    return keys
+
+
+def attach_hub(rows, keys):
+    """Resolve both sides of each row to hub teams; return how many joined.
+
+    Joins on the CLEANED name -- "away"/"home" stay exactly what the page said,
+    so the snapshot remains a faithful record of the source.
+    """
+    from external_refs import _ref_norm
+    hit = 0
+    for r in rows:
+        for side in ("away", "home"):
+            r[side + "_hub"] = keys.get(_ref_norm(r[side + "_name"]))
+        if r["away_hub"] and r["home_hub"]:
+            hit += 1
+    return hit
+
+
+def unchanged(path, sha):
+    """True when the newest stored snapshot already carries exactly this content.
+
+    APPEND ONLY WHEN THE CONTENT MOVES -- the crawl_polls rule. local_refresh
+    runs this ingester every cycle, so on a quiet evening the same day's results
+    were written again every 20 minutes: 16 of the first 17 snapshots held
+    byte-identical payloads. Append-only means a stored row is never rewritten,
+    not that an unchanged one must be stored again.
+    """
+    prev = None
+    if os.path.exists(path):
+        for line in io.open(path, encoding="utf-8"):
+            if line.strip():
+                try:
+                    prev = json.loads(line).get("content_sha256")
+                except ValueError:
+                    pass
+    return prev is not None and prev == sha
 
 
 def main():
@@ -73,12 +146,21 @@ def main():
         page = io.open(sys.argv[sys.argv.index("--file") + 1],
                        encoding="utf-8", errors="replace").read()
         fetched = "local file"
+        # A file read is not a retrieval; only an env-supplied time can say
+        # when the bytes were actually taken from the site.
+        retrieved = os.environ.get("MB_RETRIEVED", "")
     else:
         req = urllib.request.Request(URL, headers={"User-Agent":
                                      "wvb-hub reference check (one page per run)"})
         with urllib.request.urlopen(req, timeout=25) as r:
             page = r.read().decode("utf-8", "replace")
         fetched = URL
+        # We did the fetching, so the retrieval time is a fact this script
+        # holds -- it must not depend on an env var being remembered (14 of
+        # the first 17 snapshots carried an empty one). The publisher's own
+        # date heading stays a separate field: two facts, never collapsed.
+        retrieved = os.environ.get("MB_RETRIEVED") or (
+            datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"))
     rows = parse(page)
     if not rows:
         raise SystemExit("no match rows parsed -- the page layout may have "
@@ -88,20 +170,9 @@ def main():
     if dm:
         date = dm.group(1).strip()
 
-    from external_refs import _ref_norm
     hub = json.load(io.open(os.path.join(REPO, "data/data_%d.json" % SEASON),
                             encoding="utf-8"))
-    keys = {}
-    for t in hub["teams"]:
-        n = t.get("name_short")
-        if n:
-            keys.setdefault(_ref_norm(n), n)
-    hit = 0
-    for r in rows:
-        for side in ("away", "home"):
-            r[side + "_hub"] = keys.get(_ref_norm(r[side]))
-        if r["away_hub"] and r["home_hub"]:
-            hit += 1
+    hit = attach_hub(rows, hub_keys(hub))
 
     payload = json.dumps(rows, sort_keys=True, ensure_ascii=False)
     snap = {"source": "themonsterblock.com", "url": URL,
@@ -111,16 +182,23 @@ def main():
             "access": ("one page per run, no crawling; no robots.txt exists on "
                        "the host. Hobbyist site run by a VolleyTalk member."),
             "publisher_date_heading": date,
-            "retrieved_utc": os.environ.get("MB_RETRIEVED", ""),
+            "retrieved_utc": retrieved,
             "fetched": fetched, "n_rows": len(rows),
             "both_sides_resolved": hit,
             "content_sha256": hashlib.sha256(payload.encode("utf-8")).hexdigest(),
             "rows": rows}
-    with io.open(OUT, "a", encoding="utf-8") as fh:
-        fh.write(json.dumps(snap, ensure_ascii=False) + "\n")
-    print("monsterblock: %d matches for %s; both sides joined on %d"
-          % (len(rows), date or "?", hit))
-    print("  ->", OUT)
+    if unchanged(OUT, snap["content_sha256"]):
+        print("monsterblock: %d matches for %s; both sides joined on %d "
+              "(unchanged since the last snapshot -- nothing appended)"
+              % (len(rows), date or "?", hit))
+    else:
+        with io.open(OUT, "a", encoding="utf-8") as fh:
+            fh.write(json.dumps(snap, ensure_ascii=False) + "\n")
+        print("monsterblock: %d matches for %s; both sides joined on %d"
+              % (len(rows), date or "?", hit))
+        print("  ->", OUT)
+    # The cross-check below runs on EVERY invocation either way -- it is the
+    # point of the run, and it costs nothing.
 
     import season_counts as SC
     best = {}

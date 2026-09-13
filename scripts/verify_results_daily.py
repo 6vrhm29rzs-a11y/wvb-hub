@@ -68,15 +68,100 @@ def team_norm(name):
     t = re.sub(r"\b([NS])\.C\.", lambda m: (
         "North" if m.group(1) == "N" else "South") + " Carolina", t)
     n = _ref_norm(t)
+    # ⚠ THE RESIDUAL-PAIR TABLE ALREADY EXISTED, IN THE OTHER DIRECTION.
+    # external_refs.FIG_ALIASES maps an OUTSIDE source's spelling to the
+    # hub's, keyed on exactly this _ref_norm form -- "northern arizona" ->
+    # "northern ariz", "army" -> "army west point", "college of charleston"
+    # -> "col of charleston", "unc wilmington" -> "uncw". A school's own
+    # schedule page spells its opponents the same long way FIGstats does, so
+    # the verifier was hand-maintaining a five-entry table beside a
+    # forty-entry one solving the identical problem (measured 2026-09-13: 91
+    # of 170 EVENT_NOT_FOUND observations this season were name-match
+    # failures on pages that HAD published the result).
+    # It is consulted on the _ref_norm form AND on the folded form, because
+    # some of its keys are pre-fold ("southern indiana") and some post-fold.
+    n = _EXT_ALIASES.get(n, n)
+    n = _fold_key(n)
+    n = _EXT_ALIASES.get(n, n)
+    n = _fold_key(n)
+    return _VERIFIER_ALIASES.get(n, n)
+
+
+def _fold_key(n):
+    """Word-level folds on an already-normalised key, applied to BOTH sides."""
     n = re.sub(r"\bcollege\b", " ", n)
     # "Charleston Southern" (page) vs "Charleston So." (hub) -- the same
     # word folded the same way on both sides
     n = re.sub(r"\bsouthern\b", "so", n)
-    n = re.sub(r"\s+", " ", n).strip()
-    # the residual pairs no general fold covers -- the FIG_ALIASES pattern,
-    # keyed on the FOLDED form, both directions where needed. A global
-    # parenthetical strip is banned: Miami (FL) and Miami (OH) would merge.
-    return _VERIFIER_ALIASES.get(n, n)
+    return re.sub(r"\s+", " ", n).strip()
+
+
+# ⚠ A GLOBAL PARENTHETICAL STRIP IS BANNED HERE: Miami (FL) and Miami (OH)
+# would merge. The loose pass below may drop one, and only ever when the
+# result is UNIQUE across the hub -- which refuses exactly that pair.
+_LOOSE_CONTRACT = {
+    "valley": "val", "indiana": "ind", "california": "cal",
+    "carolina": "caro", "arizona": "ariz", "illinois": "ill",
+    "tennessee": "tenn", "mississippi": "miss", "florida": "fla",
+    "kentucky": "ky", "louisiana": "la", "michigan": "mich",
+    "washington": "wash", "wisconsin": "wis", "nebraska": "neb",
+    "minnesota": "minn", "connecticut": "conn", "massachusetts": "mass",
+    "pennsylvania": "pa", "colorado": "colo", "oklahoma": "okla",
+    "virginia": "va", "georgia": "ga", "alabama": "ala", "arkansas": "ark",
+    "missouri": "mo", "montana": "mont", "nevada": "nev", "oregon": "ore",
+}
+_LOOSE_DROP = ("college", "col", "of", "the", "university", "u")
+_STATE_TAG = ("ny", "ca", "mn", "nc", "fl", "oh", "la", "md", "pa", "tx",
+              "mo", "in", "ky", "sc", "va", "wi", "ga", "il")
+
+
+def loose_key(name):
+    """A deliberately over-folded key for the LAST matching pass only.
+
+    Every fold here is one a school page and the hub genuinely disagree on:
+    a spelled-out state ("Mississippi Valley State" vs "Mississippi Val."),
+    a campus tag the page omits ("St. John's (NY)" vs "St. John's"), a
+    trailing "State"/"A&M" the hub drops ("Alcorn State" vs "Alcorn"), and
+    "College of X" against "Col. of X".
+
+    ⚠ IT IS ONLY SAFE BECAUSE ITS CALLER REFUSES AN AMBIGUOUS RESULT. Folded
+    this hard, 30 hub keys collide -- every "X" against "X St." (Ohio/Ohio
+    St., Texas/Texas A&M/Texas St.). The pass checks the folded key against
+    the whole hub and declines rather than guess, the same gate _strip_inst's
+    pass already uses (R8: a name match must not be resolved by hope).
+    """
+    k = team_norm(name)
+    k = re.sub(r"\([^)]*\)", " ", k)
+    ws = [_LOOSE_CONTRACT.get(w, w) for w in k.split()
+          if w not in _LOOSE_DROP]
+    while ws and (ws[-1] in ("st", "a", "and", "m")
+                  or (len(ws) > 1 and ws[-1] in _STATE_TAG)):
+        ws.pop()
+    return " ".join(ws).strip()
+
+
+_LOOSE_HUB = {}
+_LOOSE_HUB_LOCK = threading.Lock()
+
+
+def _loose_hub_count(key):
+    """How many hub teams share this loose key. Built once, under a lock --
+    the sweep is threaded and a doubled counter would silently refuse real
+    matches (the _stripped_hub_count lesson, same shape)."""
+    if not _LOOSE_HUB:
+        with _LOOSE_HUB_LOCK:
+            if not _LOOSE_HUB:
+                built = {}
+                try:
+                    d = json.load(open(os.path.join(
+                        REPO, "data", "data_%d.json" % SEASON)))
+                    for t in d.get("teams") or []:
+                        k = loose_key(t.get("name_short") or "")
+                        built[k] = built.get(k, 0) + 1
+                except (OSError, ValueError):
+                    return 2          # cannot check -> refuse the pass
+                _LOOSE_HUB.update(built)
+    return _LOOSE_HUB.get(key, 0)
 
 
 def _strip_inst(n):
@@ -113,7 +198,17 @@ def _stripped_hub_count(key):
     return _STRIPPED_HUB.get(key, 0)
 
 
+from external_refs import FIG_ALIASES as _EXT_ALIASES  # noqa: E402
+
 _VERIFIER_ALIASES = {
+    # the long form a school writes out in full: "University of North
+    # Carolina Wilmington" (Harvard's page, 2026-09-12) against the hub's
+    # "UNCW". Entered per measured miss, never speculatively -- and NOT as a
+    # general "north caro X" -> "unc X" fold, because the hub spells N.C.
+    # Central "N.C. Central" and that fold would break it.
+    "north caro wilmington": "uncw",
+    "north caro greensboro": "unc greensboro",
+    "north caro asheville": "unc asheville",
     "ucsb": "uc santa barbara",
     "queens": "queens nc",
     "queens university of charlotte": "queens nc",   # Duke's spelling
@@ -338,6 +433,20 @@ def parse_completed_events(page, season=SEASON):
 
       "Sep 4 1:00 PM PDT vs. (rv) Cal Poly L 1-3 (22-25, 22-25, 25-20, 24-26)"
                                 -- goaztecs.com, measured 2026-09-12
+
+    ⚠⚠ A ROW HERE MUST CARRY THE SAME SHAPE AS EVERY OTHER PARSER'S, AND
+    THIS ONE DID NOT (found 2026-09-13). It emitted `result` as the STRING
+    "W 3 1" where the contract is the tuple ("W", 3, 1), and it omitted
+    `exhibition` entirely -- so `_judge_rows` raised KeyError('exhibition')
+    on the first row it produced, inside a thread-pool map, which aborts the
+    WHOLE run -- and an aborted run writes no report at all, so the failure
+    is silent and looks like a quiet night. What is measured: this parser
+    landed 2026-09-12 21:15Z; the 2026-09-12 report's last write is 22:33Z
+    and holds 104 matches against 149 counted finals, while EVERY other date
+    this season was written by the next-morning sweep (03:00-04:00Z). That
+    date never got its nightly sweep.
+    The contract is: date, opponent (or tokens), exhibition (bool), result as
+    (W/L, sets_for, sets_against) or None, raw.
     """
     import html as _html
     flat = re.sub(r"\s+", " ", _html.unescape(re.sub(r"<[^>]+>", " ", page)))
@@ -357,9 +466,12 @@ def parse_completed_events(page, season=SEASON):
             continue
         w, a, b = mm.group(3), int(mm.group(4)), int(mm.group(5))
         rows.append({"date": when.strftime("%Y-%m-%d"),
-                     "opponent": mm.group(1).strip(),
-                     "result": "%s %d %d" % ("W" if w == "Win" else "L", a, b),
+                     "opponent": re.sub(r"^(?:#\d+|No\.\s*\d+|RV)\s+", "",
+                                        mm.group(1).strip()),
+                     "result": ("W" if w == "Win" else "L", a, b),
+                     "exhibition": "xhibition" in txt,
                      "site": "", "location": "", "tournament": "",
+                     "raw": txt[:120],
                      "parser": "completed_event_label"})
     if rows:
         return rows
@@ -374,8 +486,10 @@ def parse_completed_events(page, season=SEASON):
             continue
         rows.append({"date": when.strftime("%Y-%m-%d"),
                      "opponent": m.group(3).strip(),
-                     "result": "%s %s %s" % (m.group(4), m.group(5), m.group(6)),
+                     "result": (m.group(4), int(m.group(5)), int(m.group(6))),
+                     "exhibition": False,
                      "site": "", "location": "", "tournament": "",
+                     "raw": m.group(0),
                      "parser": "visible_row"})
     return rows
 
@@ -520,6 +634,28 @@ def _judge_rows(rows, url, team, opponent, date, canonical):
                     and not r["exhibition"]]
             cand = [(r, tok) for r, tok in cand if tok]
     if not cand:
+        # PASS 3 -- the LOOSE key ("Mississippi Valley State" vs the hub's
+        # "Mississippi Val.", "St. John's" vs "St. John's (NY)"), gated on
+        # the same uniqueness rule: a fold this hard collides "Ohio" with
+        # "Ohio St.", so an ambiguous key refuses rather than guesses.
+        # ⚠ MEASURED BEFORE IT WAS BUILT (2026-09-13): 91 of this season's
+        # 170 EVENT_NOT_FOUND observations were pages that HAD published the
+        # result under a spelling this could not read.
+        wantl = loose_key(opponent)
+        if wantl and _loose_hub_count(wantl) == 1:
+            def _match3(r):
+                toks = ([r["opponent"]] if r.get("opponent") is not None
+                        else (r.get("tokens") or []))
+                for tk in toks:
+                    bare = re.sub(r"^\(?(?:#\d+|No\.\s*\d+|RV)\)?\s+",
+                                  "", tk)
+                    if loose_key(bare) == wantl:
+                        return tk
+                return None
+            cand = [(r, _match3(r)) for r in rows if r["date"] == date
+                    and not r["exhibition"]]
+            cand = [(r, tok) for r, tok in cand if tok]
+    if not cand:
         return "EVENT_NOT_FOUND", {"url": url, "rows_on_date": [
             (r["opponent"] if r.get("opponent") is not None
              else " ".join((r.get("tokens") or [])[:6]))
@@ -536,15 +672,23 @@ def _judge_rows(rows, url, team, opponent, date, canonical):
     if (wl == "L" and a > b) or (wl == "W" and a < b):
         a, b = b, a
     won = wl == "W"
-    c_won = canonical["winner"] == team
-    c_sets = (canonical["w_sets"], canonical["l_sets"]) if c_won \
-        else (canonical["l_sets"], canonical["w_sets"])
     det = {"url": url, "assertion": "%s %s %d-%d vs %s"
            % (team, wl, a, b, opp_src),
            "opponent_source": opp_src,
            "site_says": r["site"]}
     if r.get("surface"):
         det["surface"] = r["surface"]
+    if canonical.get("held"):
+        # ⚠ A HELD MATCH HAS NO CANONICAL TO AGREE WITH -- that is what being
+        # held MEANS. So the school's own row is recorded as an observation
+        # and judged by nobody here: AGREE/CONTRADICT are claims about our
+        # counted result, and we are not counting one. A human reads these
+        # and files a correction on two of them (2026-09-13).
+        return "REPORTS", det
+    # a held canonical carries no winner, so these are read only below it
+    c_won = canonical["winner"] == team
+    c_sets = (canonical["w_sets"], canonical["l_sets"]) if c_won \
+        else (canonical["l_sets"], canonical["w_sets"])
     if won == c_won and (a, b) == c_sets:
         return "AGREE_COMPLETE", det
     if won == c_won:
@@ -612,7 +756,7 @@ def school_evidence(team, opponent, date, canonical, sites, log):
             if mrows:
                 st, det = _judge_rows(mrows, final_url, team, opponent,
                                       date, canonical)
-                if st in ("AGREE_COMPLETE", "CONTRADICTS",
+                if st in ("AGREE_COMPLETE", "CONTRADICTS", "REPORTS",
                           "CONTRADICTS_SETS", "NOT_POSTED"):
                     return st, det
                 best = better(st, det)
@@ -623,6 +767,12 @@ def school_evidence(team, opponent, date, canonical, sites, log):
         log.append(entry)
         st, det = _judge_rows(rows, url, team, opponent, date, canonical)
         if st in ("AGREE_COMPLETE", "CONTRADICTS", "CONTRADICTS_SETS",
+                  # ⚠ REPORTS IS A JUDGED ROW TOO -- a held match's only
+                  # possible outcome. Left out of these ladders it fell to
+                  # better(), whose rank table scores an unknown state 0, so
+                  # every school's published word on a held match was silently
+                  # discarded and all 11 read HELD_NO_REPORT.
+                  "REPORTS",
                   "NOT_POSTED"):
             return st, det
         best = better(st, det)
@@ -644,6 +794,12 @@ def school_evidence(team, opponent, date, canonical, sites, log):
         st, det = _judge_rows(mrows, mfinal, team, opponent, date,
                               canonical)
         if st in ("AGREE_COMPLETE", "CONTRADICTS", "CONTRADICTS_SETS",
+                  # ⚠ REPORTS IS A JUDGED ROW TOO -- a held match's only
+                  # possible outcome. Left out of these ladders it fell to
+                  # better(), whose rank table scores an unknown state 0, so
+                  # every school's published word on a held match was silently
+                  # discarded and all 11 read HELD_NO_REPORT.
+                  "REPORTS",
                   "NOT_POSTED"):
             return st, det
         best = better(st, det)
@@ -654,6 +810,12 @@ def school_evidence(team, opponent, date, canonical, sites, log):
     if rows2:
         st, det = _judge_rows(rows2, turl, team, opponent, date, canonical)
         if st in ("AGREE_COMPLETE", "CONTRADICTS", "CONTRADICTS_SETS",
+                  # ⚠ REPORTS IS A JUDGED ROW TOO -- a held match's only
+                  # possible outcome. Left out of these ladders it fell to
+                  # better(), whose rank table scores an unknown state 0, so
+                  # every school's published word on a held match was silently
+                  # discarded and all 11 read HELD_NO_REPORT.
+                  "REPORTS",
                   "NOT_POSTED"):
             return st, det
         best = better(st, det)
@@ -679,6 +841,25 @@ def verdict(sa, sb):
     return "UNVERIFIED"
 
 
+HELD_FOR_VERIFICATION = ("self_contradictory", "empty", "under_review")
+
+
+def held_verdict(sa, sb):
+    """What the schools said about a match that counts nowhere.
+
+    Deliberately a SEPARATE vocabulary from verdict(): none of these words
+    may ever be mistaken for verification. A held match has no counted
+    result, so nothing here can confirm one, and none of these states is in
+    the set that lets a same-day final feed a rating.
+    """
+    n = sum(1 for st in (sa, sb) if st == "REPORTS")
+    if n == 2:
+        return "HELD_BOTH_REPORT"
+    if n == 1:
+        return "HELD_ONE_REPORTS"
+    return "HELD_NO_REPORT"
+
+
 def finals_for(date):
     games = []
     with open(os.path.join(RAW, "games.jsonl")) as f:
@@ -691,7 +872,20 @@ def finals_for(date):
     cls_of = SC.classify(games, SEASON)
     _corr = SC.corrections(SEASON)
     for g in SC.resolve(games):
-        if cls_of.get(str(g.get("game_id"))) != "ok":
+        _cls = cls_of.get(str(g.get("game_id")))
+        # ⚠⚠ THE MATCHES THAT NEED THE SCHOOLS MOST WERE THE ONES NEVER ASKED
+        # (found 2026-09-13, by the third witness). This filter kept exactly
+        # the counted results and dropped every HELD one -- and a held match
+        # counts NOWHERE until somebody establishes what happened, which is
+        # precisely what a school's own schedule does. The comment below,
+        # written the day the flagless final was found, says a final with no
+        # derivable winner "NEEDS verification most of all"; this line above
+        # it had already thrown it away. 11 held matches from 2026-09-12 had
+        # no verification record at all.
+        # A held match is fetched for OBSERVATION, never for verification:
+        # it has no canonical, so no school can agree with one, it can never
+        # enter verified_result_gids, and no ranking moves on it.
+        if _cls != "ok" and _cls not in HELD_FOR_VERIFICATION:
             continue
         # ⚠ VERIFY THE COUNTED RESULT, NOT THE FEED'S REFUTED CLAIM
         # (2026-09-04): before this line, an already-corrected inversion
@@ -711,10 +905,21 @@ def finals_for(date):
         if len(ts) != 2:
             continue
         _wi = SC.winner_index(g)   # sets decide when is_winner is absent/
-        if _wi is None:            # incoherent (6628428) -- the flagless
-            continue               # final NEEDS verification most of all
+        if _cls != "ok" or _wi is None:
+            # HELD: no canonical, so the two sides are carried in the order
+            # the feed lists them and nothing is asserted about either.
+            names = [t.get("name_short") for t in ts]
+            if not all(names):
+                continue
+            out.append({"gid": str(g.get("game_id")),
+                        "held": _cls or "empty",
+                        "sides": names,
+                        "winner": None, "loser": None,
+                        "w_sets": None, "l_sets": None})
+            continue
         w, l = ts[_wi], ts[1 - _wi]
         out.append({"gid": str(g.get("game_id")),
+                    "sides": [w.get("name_short"), l.get("name_short")],
                     "winner": w.get("name_short"),
                     "loser": l.get("name_short"),
                     "w_sets": w.get("sets_won"),
@@ -803,8 +1008,12 @@ def gather_evidence(finals, sites, date, workers=None):
     # in the same sequence a serial run produced.
     tasks = []
     for _i, _f in enumerate(finals):
-        tasks.append((_i, 0, _f, _f["winner"], _f["loser"]))
-        tasks.append((_i, 1, _f, _f["loser"], _f["winner"]))
+        # ⚠ PAIRED BY SIDES, NOT BY WINNER/LOSER -- a held match has no
+        # winner, and reusing those keys for "the two teams" would be the
+        # field-meaning trap this codebase keeps paying for (R4).
+        _a, _b = _f["sides"]
+        tasks.append((_i, 0, _f, _a, _b))
+        tasks.append((_i, 1, _f, _b, _a))
 
     def _one(task):
         _idx, _side, _fin, team, opp = task
@@ -852,11 +1061,17 @@ def main():
                                            "CORROBORATED_ONE",
                                            "CONTRADICTED_BOTH",
                                            "CONTRADICTED_ONE",
-                                           "SCHOOL_CONFLICT")}
+                                           "SCHOOL_CONFLICT",
+                                           # both schools have published on a
+                                           # held match: the evidence is in,
+                                           # and a human files from here.
+                                           "HELD_BOTH_REPORT")}
         finals = [f for f in finals if f["gid"] not in settled]
-    print("verifying %d counted finals for %s against both schools' "
-          "published schedules%s" % (
-              len(finals), date,
+    _n_held = sum(1 for f in finals if f.get("held"))
+    print("verifying %d matches for %s against both schools' published "
+          "schedules -- %d counted finals, %d HELD (observed only, never "
+          "verified)%s" % (
+              len(finals), date, len(finals) - _n_held, _n_held,
               " (incremental; %d already settled)" % len(prior)
               if incremental else ""))
     done, logs = gather_evidence(finals, sites, date)
@@ -867,15 +1082,28 @@ def main():
         sb, db = done[(_i, 1)]
         log.extend(logs[(_i, 0)])
         log.extend(logs[(_i, 1)])
-        v = verdict(sa, sb)
+        _a, _b = f["sides"]
+        if f.get("held"):
+            v = held_verdict(sa, sb)
+            canon = ("HELD as %s -- %s vs %s, no counted result"
+                     % (f["held"], _a, _b))
+        else:
+            v = verdict(sa, sb)
+            canon = "%s def. %s %d-%d" % (
+                f["winner"], f["loser"], f["w_sets"], f["l_sets"])
         row = {"gid": f["gid"], "date": date,
-               "canonical": "%s def. %s %d-%d" % (
-                   f["winner"], f["loser"], f["w_sets"], f["l_sets"]),
+               "canonical": canon,
                "verdict": v,
-               "schools": {f["winner"]: {"state": sa, **da},
-                           f["loser"]: {"state": sb, **db}}}
+               "schools": {_a: {"state": sa, **da},
+                           _b: {"state": sb, **db}}}
+        if f.get("held"):
+            row["held_as"] = f["held"]
         report.append(row)
-        if v in ("CONTRADICTED_BOTH", "CONTRADICTED_ONE", "SCHOOL_CONFLICT"):
+        if v in ("CONTRADICTED_BOTH", "CONTRADICTED_ONE", "SCHOOL_CONFLICT",
+                 # a held match a school HAS published on is the most
+                 # actionable row in the report: it counts nowhere today and
+                 # a school's own word is what ends that.
+                 "HELD_BOTH_REPORT", "HELD_ONE_REPORTS"):
             queue_adds.append(row)
         print("  %-22s %s" % (v, row["canonical"]))
 

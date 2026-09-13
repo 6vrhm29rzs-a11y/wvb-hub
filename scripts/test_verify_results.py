@@ -110,12 +110,23 @@ def main():
           st3 == "EVENT_NOT_FOUND", st3)
     # ⚠ the real R8 control: the token match is EXACT-whole-token, so a
     # partial name can never absorb a longer one ("Norfolk" must not match
-    # the "Norfolk State" token -- the Lauren Pyle/Lauren Malone class)
-    check("[NEG] a partial name never matches a longer token",
-          V._judge_rows(mrows, "t://m", "Old Dominion", "Norfolk",
-                        "2026-09-01", {"winner": "x", "loser": "y",
-                                       "w_sets": 3, "l_sets": 0}
-                        )[0] == "EVENT_NOT_FOUND")
+    # the "Norfolk State" token -- the Lauren Pyle/Lauren Malone class).
+    # ⚠⚠ REWRITTEN 2026-09-13, and the reason matters. A third, LOOSE pass
+    # was added (it recovers 112 of this season's 170 EVENT_NOT_FOUND
+    # observations, which were pages that HAD published the result under a
+    # spelling the matcher could not read), and it deliberately drops a
+    # trailing "State" -- so it does match a "Norfolk State" row from a
+    # "Norfolk" query. That is not the hazard: the query side is always a
+    # HUB team name, and the hub has no team called "Norfolk", so the query
+    # cannot occur. The hazard is two hub teams whose loose forms collide,
+    # and the pass REFUSES those outright rather than picking one. Both
+    # halves are asserted.
+    check("[NEG] at the exact pass a partial name is a different team",
+          V.team_norm("Norfolk") != V.team_norm("Norfolk State"))
+    check("[NEG] and where both forms are real hub teams the loose pass "
+          "refuses (Ohio / Ohio St.)",
+          V._loose_hub_count(V.loose_key("Ohio")) > 1
+          and V._loose_hub_count(V.loose_key("Norfolk St.")) == 1)
 
     print("\n1c. THE JOIN FOLDS -- both sides, and no two teams collide")
     n = V.team_norm
@@ -309,6 +320,103 @@ def main():
     check("[NEG] an event title is not a result",
           by.get(("2026-09-01", "Georgia"), {}).get("result") is None and
           by.get(("2026-09-01", "Purdue"), {}).get("result") == ("W", 3, 2))
+
+    print("\n5. THE NAME MATCHER REACHES THE SPELLINGS SCHOOLS ACTUALLY USE")
+    # ⚠ MEASURED FIRST (2026-09-13): 91 of this season's 170
+    # EVENT_NOT_FOUND observations were pages that HAD published the result,
+    # under a spelling the matcher could not read. Each pair below is one
+    # that really appeared in a stored report.
+    PAIRS = [("Southern Indiana", "Southern Ind."),
+             ("Mississippi Valley State", "Mississippi Val."),
+             ("Alcorn State", "Alcorn"),
+             ("College of Charleston", "Col. of Charleston"),
+             ("Army", "Army West Point"),
+             ("Northern Arizona", "Northern Ariz."),
+             ("University of North Carolina Wilmington", "UNCW")]
+    for page, hub in PAIRS:
+        check("page %r joins hub %r" % (page, hub),
+              V.team_norm(page) == V.team_norm(hub)
+              or (V.loose_key(page) == V.loose_key(hub)
+                  and V._loose_hub_count(V.loose_key(hub)) == 1),
+              "%r vs %r" % (V.team_norm(page), V.team_norm(hub)))
+
+    # the shared alias table must not COLLAPSE two hub teams into one key
+    _d = json.load(open(os.path.join(REPO, "data", "data_2026.json")))
+    _names = [t["name_short"] for t in _d["teams"] if t.get("name_short")]
+    _idx = {}
+    for _n in _names:
+        _idx.setdefault(V.team_norm(_n), []).append(_n)
+    _coll = {k: v for k, v in _idx.items() if len(v) > 1}
+    check("no two hub teams share a normalised key", not _coll, _coll)
+
+    # the loose pass REFUSES what it cannot tell apart
+    check("[NEG] Miami (FL) and Miami (OH) collide, so the loose pass "
+          "refuses both", V._loose_hub_count(V.loose_key("Miami (FL)")) > 1)
+    check("[NEG] ...and so do Ohio and Ohio St.",
+          V._loose_hub_count(V.loose_key("Ohio")) > 1)
+
+    def _rows(*opps):
+        return [{"date": "d", "exhibition": False, "opponent": o,
+                 "site": "Home", "result": ("W", 3, 0), "raw": o}
+                for o in opps]
+    st, det = V._judge_rows(_rows("Mississippi Valley State"), "u", "Us",
+                            "Mississippi Val.", "d", {"held": True})
+    check("the loose pass matches a row the earlier passes miss",
+          st == "REPORTS", (st, det))
+    check("...and the evidence quotes the PAGE's own words, not ours",
+          det.get("opponent_source") == "Mississippi Valley State", det)
+    st2, _ = V._judge_rows(_rows("Ohio State"), "u", "Us", "Ohio", "d",
+                           {"held": True})
+    check("[NEG] an AMBIGUOUS loose key matches nothing (Ohio St. row, "
+          "Ohio query)", st2 == "EVENT_NOT_FOUND", st2)
+
+    print("\n6. A HELD MATCH IS OBSERVED, NEVER VERIFIED")
+    # ⚠ The verifier only ever asked about results it ALREADY counted, so a
+    # match that counts nowhere -- the one a school's own word could settle
+    # -- was never checked by anybody. 11 held matches from 2026-09-12 had
+    # no verification record at all.
+    check("held classes are named", set(V.HELD_FOR_VERIFICATION) ==
+          {"self_contradictory", "empty", "under_review"})
+    check("both schools reporting -> HELD_BOTH_REPORT",
+          V.held_verdict("REPORTS", "REPORTS") == "HELD_BOTH_REPORT")
+    check("one -> HELD_ONE_REPORTS",
+          V.held_verdict("REPORTS", "NOT_POSTED") == "HELD_ONE_REPORTS")
+    check("neither -> HELD_NO_REPORT",
+          V.held_verdict("SITE_UNPARSED", "NOT_POSTED") == "HELD_NO_REPORT")
+    import season_counts as SC
+    _src = open(os.path.join(REPO, "scripts", "season_counts.py")).read()
+    check("[NEG] no held verdict can make a final rating-eligible",
+          "HELD_" not in _src,
+          "verified_result_gids must take only VERIFIED_BOTH/"
+          "CORROBORATED_ONE")
+    _rep = os.path.join(REPO, "data", "result_verification_2026-09-12.json")
+    if os.path.exists(_rep):
+        _doc = json.load(open(_rep))
+        _held = [m for m in _doc["matches"]
+                 if str(m.get("verdict", "")).startswith("HELD_")]
+        _ver = SC.verified_result_gids(2026)
+        check("[NEG] ...and none of the day's held gids is in fact eligible",
+              not ({str(m["gid"]) for m in _held} & _ver))
+
+    print("\n7. EVERY PARSER EMITS THE SAME ROW SHAPE")
+    # ⚠ parse_completed_events did not, and `r["exhibition"]` raised
+    # KeyError inside a thread-pool map -- which aborts the whole run and
+    # writes no report, so the failure looked like a quiet night.
+    _cev = V.parse_completed_events(
+        "Completed Event: Volleyball versus Weber State on September 11, "
+        "2026 , Win , 3, to, 1")
+    check("parse_completed_events returns a row", len(_cev) == 1, _cev)
+    for _r in _cev:
+        check("...carrying date, opponent, exhibition, result, raw",
+              set(("date", "opponent", "exhibition", "result", "raw"))
+              <= set(_r), sorted(_r))
+        check("...with result as a (W/L, sets, sets) TUPLE, not a string",
+              _r["result"] == ("W", 3, 1), _r["result"])
+    _judged, _ = V._judge_rows(_cev, "u", "Kansas St.", "Weber St.",
+                               "2026-09-11", {"winner": "Kansas St.",
+                                              "w_sets": 3, "l_sets": 1})
+    check("...and _judge_rows can actually read it",
+          _judged == "AGREE_COMPLETE", _judged)
 
     if FAILED:
         print("\nFAILED: %d" % len(FAILED))
