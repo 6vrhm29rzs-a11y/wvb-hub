@@ -1,11 +1,9 @@
 {
  "date": "2026-09-10",
- "generated_utc": "2026-09-11T03:58:09Z",
+ "generated_utc": "2026-09-13T17:55:11Z",
  "counts": {
-  "CORROBORATED_ONE": 28,
-  "VERIFIED_BOTH": 21,
-  "CONTRADICTED_ONE": 3,
-  "UNVERIFIED": 4
+  "CORROBORATED_ONE": 31,
+  "VERIFIED_BOTH": 27
  },
  "matches": [
   {
@@ -105,23 +103,22 @@
   {
    "gid": "6627138",
    "date": "2026-09-10",
-   "canonical": "Prairie View def. Portland St. 3-1",
-   "verdict": "CONTRADICTED_ONE",
+   "canonical": "Portland St. def. Prairie View 3-1",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
+    "Portland St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://goviks.com/services/schedule_txt.ashx?schedule=224",
+     "assertion": "Portland St. W 3-1 vs Prairie View A&M",
+     "opponent_source": "Prairie View A&M",
+     "site_says": "Neutral"
+    },
     "Prairie View": {
-     "state": "CONTRADICTS",
+     "state": "AGREE_COMPLETE",
      "url": "https://pvpanthers.com/services/schedule_txt.ashx?schedule=334",
      "assertion": "Prairie View L 1-3 vs Portland State",
      "opponent_source": "Portland State",
      "site_says": "Neutral"
-    },
-    "Portland St.": {
-     "state": "EVENT_NOT_FOUND",
-     "url": "https://goviks.com/services/schedule_txt.ashx?schedule=224",
-     "rows_on_date": [
-      "Prairie View A&M",
-      "UTRGV"
-     ]
     }
    }
   },
@@ -150,22 +147,22 @@
   {
    "gid": "6625400",
    "date": "2026-09-10",
-   "canonical": "James Madison def. Eastern Ky. 3-2",
-   "verdict": "CONTRADICTED_ONE",
+   "canonical": "Eastern Ky. def. James Madison 3-2",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
+    "Eastern Ky.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://ekusports.com/services/schedule_txt.ashx?schedule=350",
+     "assertion": "Eastern Ky. W 3-2 vs James Madison",
+     "opponent_source": "James Madison",
+     "site_says": "Neutral"
+    },
     "James Madison": {
      "state": "EVENT_NOT_FOUND",
      "url": "https://jmusports.com/sports/womens-volleyball/schedule/text",
      "rows_on_date": [
       "EKU"
      ]
-    },
-    "Eastern Ky.": {
-     "state": "CONTRADICTS",
-     "url": "https://ekusports.com/services/schedule_txt.ashx?schedule=350",
-     "assertion": "Eastern Ky. W 3-2 vs James Madison",
-     "opponent_source": "James Madison",
-     "site_says": "Neutral"
     }
    }
   },
@@ -293,14 +290,14 @@
    "gid": "6625763",
    "date": "2026-09-10",
    "canonical": "Iona def. Central Conn. St. 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Iona": {
-     "state": "EVENT_NOT_FOUND",
+     "state": "AGREE_COMPLETE",
      "url": "https://icgaels.com/services/schedule_txt.ashx?schedule=513",
-     "rows_on_date": [
-      "Central Connecticut"
-     ]
+     "assertion": "Iona W 3-0 vs Central Connecticut",
+     "opponent_source": "Central Connecticut",
+     "site_says": "Home"
     },
     "Central Conn. St.": {
      "state": "SITE_HTTP_MISS",
@@ -588,20 +585,14 @@
    "gid": "6639579",
    "date": "2026-09-10",
    "canonical": "South Carolina St. def. Tuskegee 3-1",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "South Carolina St.": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://scsuathletics.com/services/schedule_txt.ashx?schedule=320",
-     "row": [
-      "Sep 10 (Thu)",
-      "5:00 PM (CST)",
-      "Away",
-      "Tuskegee University",
-      "Tuskegee, AL",
-      "",
-      ""
-     ]
+     "assertion": "South Carolina St. W 3-1 vs Tuskegee University",
+     "opponent_source": "Tuskegee University",
+     "site_says": "Away"
     },
     "Tuskegee": {
      "state": "SITE_NOT_CONFIGURED",
@@ -1159,28 +1150,21 @@
    "gid": "6628028",
    "date": "2026-09-10",
    "canonical": "Texas Tech def. Prairie View 3-2",
-   "verdict": "UNVERIFIED",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "Texas Tech": {
-     "state": "EVENT_NOT_FOUND",
+     "state": "AGREE_COMPLETE",
      "url": "https://texastech.com/sports/womens-volleyball/schedule/text",
-     "rows_on_date": [
-      "UTRGV",
-      "Prairie View A&M"
-     ]
+     "assertion": "Texas Tech W 3-2 vs Prairie View A&M",
+     "opponent_source": "Prairie View A&M",
+     "site_says": "Home"
     },
     "Prairie View": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://pvpanthers.com/services/schedule_txt.ashx?schedule=334",
-     "row": [
-      "Sep 10 (Thu)",
-      "7:30 PM",
-      "Away",
-      "Texas Tech",
-      "Lubbock, TX (United Supermarkets Arena)",
-      "",
-      ""
-     ]
+     "assertion": "Prairie View L 2-3 vs Texas Tech",
+     "opponent_source": "Texas Tech",
+     "site_says": "Away"
     }
    }
   },
@@ -1210,51 +1194,39 @@
    "gid": "6628375",
    "date": "2026-09-10",
    "canonical": "Northern Ariz. def. Omaha 3-1",
-   "verdict": "UNVERIFIED",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "Northern Ariz.": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://nauathletics.com/services/schedule_txt.ashx?schedule=200",
-     "row": [
-      "Sep 10 (Thu)",
-      "6 p.m.",
-      "Home",
-      "Omaha",
-      "Flagstaff, Ariz. (Rolle Activity Center)",
-      "",
-      ""
-     ]
+     "assertion": "Northern Ariz. W 3-1 vs Omaha",
+     "opponent_source": "Omaha",
+     "site_says": "Home"
     },
     "Omaha": {
-     "state": "EVENT_NOT_FOUND",
+     "state": "AGREE_COMPLETE",
      "url": "https://omavs.com/sports/womens-volleyball/schedule/text",
-     "rows_on_date": [
-      "Northern Arizona"
-     ]
+     "assertion": "Omaha L 1-3 vs Northern Arizona",
+     "opponent_source": "Northern Arizona",
+     "site_says": "Away"
     }
    }
   },
   {
    "gid": "6638981",
    "date": "2026-09-10",
-   "canonical": "Washington def. Lipscomb 2-0",
-   "verdict": "CONTRADICTED_ONE",
+   "canonical": "Washington def. Lipscomb 3-0",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "Washington": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://gohuskies.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 10 (Thu)",
-      "7:00 PM",
-      "Home",
-      "Lipscomb",
-      "Seattle, Wash.",
-      "",
-      "-"
-     ]
+     "assertion": "Washington W 3-0 vs Lipscomb",
+     "opponent_source": "Lipscomb",
+     "site_says": "Home"
     },
     "Lipscomb": {
-     "state": "CONTRADICTS_SETS",
+     "state": "AGREE_COMPLETE",
      "url": "https://lipscombsports.com/sports/womens-volleyball/schedule/text",
      "assertion": "Lipscomb L 0-3 vs Washington",
      "opponent_source": "Washington",
@@ -1332,6 +1304,50 @@
      "assertion": "California Baptist L 2-3 vs University of North Dakota",
      "opponent_source": "University of North Dakota",
      "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6628181",
+   "date": "2026-09-10",
+   "canonical": "Sacred Heart def. Idaho 3-2",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Sacred Heart": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://sacredheartpioneers.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Sacred Heart W 3-2 vs Idaho",
+     "opponent_source": "Idaho",
+     "site_says": "Neutral"
+    },
+    "Idaho": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://govandals.com/services/schedule_txt.ashx?schedule=2489",
+     "assertion": "Idaho L 2-3 vs Sacred Heart",
+     "opponent_source": "Sacred Heart",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6624524",
+   "date": "2026-09-10",
+   "canonical": "Wyoming def. UC Santa Barbara 3-2",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Wyoming": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gowyo.com/services/schedule_txt.ashx?schedule=1205",
+     "assertion": "Wyoming W 3-2 vs UC Santa Barbara",
+     "opponent_source": "UC Santa Barbara",
+     "site_says": "Home"
+    },
+    "UC Santa Barbara": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://ucsbgauchos.com/services/schedule_txt.ashx?schedule=409",
+     "assertion": "UC Santa Barbara L 2-3 vs University of Wyoming",
+     "opponent_source": "University of Wyoming",
+     "site_says": "Away"
     }
    }
   }

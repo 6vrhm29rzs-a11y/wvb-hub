@@ -4006,6 +4006,183 @@
     }
    ],
    "note": "Found 2026-09-13 by taking HELD matches to the schools for the first time: the nightly verifier had only ever asked about results it already counted, so a match that counted nowhere was never checked by anybody. The Monster Block, an independent third source, names the same winner."
+  },
+  "6624771": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Winthrop (home) won 3-1 -- on a tape that stops halfway through the second set (25-18, then 11-13). Winthrop is credited with three sets on two served lines, so this one COUNTED: the impossible-tally rule only fires when the served rows equal the claimed sets.",
+   "correct": {
+    "winner_team_id": "46583",
+    "away_sets": 3,
+    "home_sets": 1,
+    "linescores": [],
+    "linescores_replace": true
+   },
+   "established": "Youngstown St. def. Winthrop 3-1. Youngstown St. publishes \"Youngstown St. W 3-1 vs Winthrop\" and Winthrop publishes \"Winthrop L 1-3 vs Youngstown State\" -- Winthrop had not posted when the match was first checked and posted the next day. The Monster Block independently lists Youngstown St. 3-1 with a full set line. The feed served only one and a half sets, so its tape is withheld rather than half-shown.",
+   "evidence": [
+    {
+     "url": "https://ysusports.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Youngstown St.",
+     "retrieved": "2026-09-12",
+     "text": "Youngstown St. W 3-1 vs Winthrop",
+     "establishes": "Youngstown St. W 3-1 vs Winthrop"
+    },
+    {
+     "url": "https://winthropeagles.com/services/schedule_txt.ashx?schedule=1016",
+     "kind": "school_schedule",
+     "school": "Winthrop",
+     "retrieved": "2026-09-12",
+     "text": "Winthrop L 1-3 vs Youngstown State",
+     "establishes": "Winthrop L 1-3 vs Youngstown State"
+    }
+   ],
+   "note": "⚠ THIS ONE WAS COUNTING, AND THE WRONG WAY ROUND. Found by the Monster Block cross-check on 2026-09-13 -- the only surface that disagreed with us, because the feed's own record is internally consistent enough to pass every structural rule we have."
+  },
+  "6627056": {
+   "field": "result",
+   "corr_kind": "incomplete",
+   "feed_said": "no winner, no sets-won and no per-set lines -- the record went final asserting nothing",
+   "correct": {
+    "winner_team_id": "46307",
+    "away_sets": 3,
+    "home_sets": 0
+   },
+   "established": "Harvard def. UNCW 3-0. Harvard publishes \"Harvard W 3-0 vs University of North Carolina Wilmington\" and UNCW publishes \"UNCW L 0-3 vs Harvard\". No per-set line is asserted -- the feed never served one and neither school's schedule carries set scores.",
+   "evidence": [
+    {
+     "url": "https://gocrimson.com/services/schedule_txt.ashx?schedule=1800",
+     "kind": "school_schedule",
+     "school": "Harvard",
+     "retrieved": "2026-09-12",
+     "text": "Harvard W 3-0 vs University of North Carolina Wilmington",
+     "establishes": "Harvard W 3-0 vs University of North Carolina Wilmington"
+    },
+    {
+     "url": "https://uncwsports.com/services/schedule_txt.ashx?schedule=390",
+     "kind": "school_schedule",
+     "school": "UNCW",
+     "retrieved": "2026-09-12",
+     "text": "UNCW L 0-3 vs Harvard",
+     "establishes": "UNCW L 0-3 vs Harvard"
+    }
+   ],
+   "note": "Harvard's row was unreadable until 2026-09-13 for a spelling reason alone: its page writes \"University of North Carolina Wilmington\" where the hub says UNCW."
+  },
+  "6625634": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "South Carolina credited with 2 sets against Wofford's 1, on its own COMPLETE four-set tape where South Carolina takes 30-28, 25-23 and 25-17. The winner is right and the sets-won fields are wrong.",
+   "correct": {
+    "winner_team_id": "46363",
+    "away_sets": 3,
+    "home_sets": 1
+   },
+   "established": "South Carolina def. Wofford 3-1. Wofford publishes \"Wofford L 1-3 vs University of South Carolina\", and the feed's own complete per-set lines independently give the same 3-1 -- the W&M-Kent St. precedent, where the feed's own internal evidence is the second witness. South Carolina's own site cannot be read (gamecocksonline's text surface redirects to a 2021 help page). The Monster Block also lists South Carolina 3-1. The tape is correct and is kept as served.",
+   "evidence": [
+    {
+     "url": "https://athletics.wofford.edu/services/schedule_txt.ashx?schedule=538",
+     "kind": "school_schedule",
+     "school": "Wofford",
+     "retrieved": "2026-09-12",
+     "text": "Wofford L 1-3 vs University of South Carolina",
+     "establishes": "Wofford L 1-3 vs University of South Carolina"
+    }
+   ],
+   "note": "One of the 13 top-50 programmes whose schedule no static parser can read; here the feed's own tape supplied what the school could not."
+  },
+  "6640791": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Nebraska (home) credited with 2 sets against Georgia Tech's 1, on a tape that stops after three sets. A side with two sets has won nothing, so the record contradicts itself and counted nowhere.",
+   "correct": {
+    "winner_team_id": "46474",
+    "away_sets": 1,
+    "home_sets": 3,
+    "linescores": [
+     {
+      "period": 1,
+      "home": 24,
+      "visit": 26
+     },
+     {
+      "period": 2,
+      "home": 25,
+      "visit": 17
+     },
+     {
+      "period": 3,
+      "home": 25,
+      "visit": 18
+     },
+     {
+      "period": 4,
+      "home": 25,
+      "visit": 12
+     }
+    ],
+    "linescores_replace": true
+   },
+   "established": "Nebraska def. Georgia Tech 3-1 (24-26, 25-17, 25-18, 25-12). Nebraska's own site publishes the win and the full set line; Georgia Tech's own site publishes the loss. The feed's first three lines match theirs digit for digit and it simply never served the fourth, so the tape is replaced with the complete one both schools publish rather than withheld.",
+   "evidence": [
+    {
+     "url": "https://huskers.com/website-api/schedule-events?filter[schedule.sport_id]=16&filter[past]=true&sort=-datetime",
+     "kind": "school_schedule",
+     "school": "Nebraska",
+     "retrieved": "2026-09-13T17:51:10Z",
+     "text": "2026-09-12 vs Georgia Tech -- result win, 3-1, \"(24-26, 25-17, 25-18, 25-12)\"",
+     "establishes": "Nebraska won 3-1 and published the full set line"
+    },
+    {
+     "url": "https://ramblinwreck.com/website-api/schedule-events?filter[schedule.sport_id]=17&filter[past]=true&sort=-datetime",
+     "kind": "school_schedule",
+     "school": "Georgia Tech",
+     "retrieved": "2026-09-13T17:51:10Z",
+     "text": "2026-09-12 vs Nebraska -- result loss, 3-1",
+     "establishes": "Georgia Tech lost 1-3"
+    },
+    {
+     "url": "https://themonsterblock.com/",
+     "kind": "external_results_reference",
+     "school": null,
+     "retrieved": "2026-09-13T17:51:10Z",
+     "text": "Georgia Tech 1 @ Nebraska 3 (26-24, 17-25, 18-25, 12-25)",
+     "establishes": "an independent third source giving the same winner and the same set line; a reference, never the authority"
+    }
+   ],
+   "note": "⚠ THE TOP-50 GAP, AND THE DAY IT CLOSED. Nebraska is the #1 team in the country and neither school's schedule could be read by any parser we had -- so this match sat held with no way to settle it. Found by the Monster Block cross-check, then established at both schools through the WMT JSON API their own pages call (wmt_sport_id): 12 of the 13 unreadable top-50 programmes are readable through it."
+  },
+  "6627160": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Marist (home) won 4-0 -- a score no volleyball match can produce. The tape carries four rows, the first frozen at 24-23, and Marist is credited with every one of them.",
+   "correct": {
+    "winner_team_id": "46561",
+    "away_sets": 1,
+    "home_sets": 3,
+    "linescores": [],
+    "linescores_replace": true
+   },
+   "established": "Marist def. Fordham 3-1. Marist publishes \"Marist W 3-1 vs Fordham University\" and Fordham publishes \"Fordham L 1-3 vs Marist\". The feed's first set is frozen at 24-23 and its fourth row is a set that cannot have been played, so the tape is withheld rather than half-shown.",
+   "evidence": [
+    {
+     "url": "https://goredfoxes.com/services/schedule_txt.ashx?schedule=656",
+     "kind": "school_schedule",
+     "school": "Marist",
+     "retrieved": "2026-09-11",
+     "text": "Marist W 3-1 vs Fordham University",
+     "establishes": "Marist W 3-1 vs Fordham University"
+    },
+    {
+     "url": "https://fordhamsports.com/services/schedule_txt.ashx?schedule=1735",
+     "kind": "school_schedule",
+     "school": "Fordham",
+     "retrieved": "2026-09-11",
+     "text": "Fordham L 1-3 vs Marist",
+     "establishes": "Fordham L 1-3 vs Marist"
+    }
+   ],
+   "note": "⚠ THIS COUNTED, AS A 4-0. Every structural rule here asked whether the winner had too FEW sets; none asked whether it had too many. The playing rules bound the field at both ends -- a side that wins three sets has won the match -- and is_self_contradictory now says so. It is the only record in the 2026 corpus crediting four."
   }
  }
 }

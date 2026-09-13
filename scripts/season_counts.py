@@ -398,9 +398,26 @@ def is_self_contradictory(g):
     if (g.get("game_state") or g.get("state")) != "F":
         return False
 
+    # ⚠ THE PLAYING RULES BOUND THIS FIELD AT BOTH ENDS, and only the lower
+    # bound was checked. A match is best-of-five: a side that has won three
+    # sets has won the match and no further set is played, so FOUR is not a
+    # near miss, it is impossible. Found 2026-09-13 -- game 6627160 went
+    # final reading "Marist 4, Fordham 0" with a first-set line frozen at
+    # 24-23, and COUNTED, because every rule here asked whether the winner
+    # had too FEW sets. Both schools publish Marist 3-1.
+    # This is a rule of the sport, not a threshold anyone chose (R1):
+    # exhibitions play other formats and are classified before this point.
+    _ts = g.get("teams") or []
+    for _t in _ts:
+        try:
+            _n = _t.get("sets_won")
+            if _n is not None and int(_n) > 3:
+                return True
+        except (TypeError, ValueError):
+            pass
+
     _w = winner_index(g)
     if _w is not None:
-        _ts = g.get("teams") or []
         _sw = _ts[_w].get("sets_won") if len(_ts) == 2 else None
         try:
             if _sw is not None and int(_sw) < 3:

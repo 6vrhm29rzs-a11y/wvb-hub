@@ -552,6 +552,135 @@ def parse_modern_cards(page, season=SEASON):
     return rows
 
 
+_WMT_SPORT = {}
+_WMT_SPORT_LOCK = threading.Lock()
+
+
+def wmt_sport_id(base, log):
+    """The site's OWN id for women's volleyball, read from its sports table.
+
+    ⚠⚠ THIS IS THE SURFACE THAT CLOSES THE TOP-50 VERIFICATION GAP
+    (found 2026-09-13). Thirteen of the top fifty -- Nebraska, Stanford, Penn
+    St., Purdue, UCLA, Kentucky, Arizona St., Auburn, BYU, Georgia Tech,
+    Texas A&M, UCF and Vanderbilt -- render their schedules client-side, so
+    no static parser could read them and no second official source existed
+    for any of their results. If the feed inverted a Nebraska result, nothing
+    caught it. All thirteen run the same WMT platform, and its page fetches
+    its own data from a plain JSON API on the school's own domain. Measured:
+    /website-api/sports answers 200 on 12 of the 13 (Kentucky redirects), and
+    the events it returns carry the result, the full set line, the venue, an
+    is_exhibition flag and a status.
+    ⚠ The sport id is per-SITE, never global: Volleyball is 16 at Nebraska
+    and 17 at Georgia Tech. It is read, never assumed, and the name must
+    match EXACTLY -- "Beach Volleyball" and "Men's Volleyball" are different
+    sports and a substring test would take them (R8's lesson, applied to a
+    sport rather than a surname).
+    """
+    with _WMT_SPORT_LOCK:
+        if base in _WMT_SPORT:
+            return _WMT_SPORT[base]
+    url = base + "/website-api/sports?per_page=100"
+    status, body, _fu = _fetch(url)
+    sid = None
+    if status == 200 and body:
+        try:
+            doc = json.loads(body)
+        except ValueError:
+            doc = {}
+        cands = [x for x in (doc.get("data") or [])
+                 if (x.get("name") or "").strip().lower()
+                 in ("volleyball", "women's volleyball", "womens volleyball")]
+        # exactly one, or nothing -- an ambiguous sports table is not guessed
+        if len(cands) == 1:
+            sid = cands[0].get("id")
+        elif cands:
+            womens = [x for x in cands
+                      if (x.get("name") or "").lower().startswith("w")]
+            sid = womens[0].get("id") if len(womens) == 1 else None
+    log.append({"team": None, "url": url, "http": status,
+                "retrieved_utc": datetime.datetime.utcnow()
+                .strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "state": "wmt_sports_probe", "sport_id": sid})
+    with _WMT_SPORT_LOCK:
+        _WMT_SPORT[base] = sid
+    return sid
+
+
+def parse_wmt_events(doc, season=SEASON):
+    """WMT's own schedule JSON -> rows in the SAME shape every parser emits.
+
+    ⚠ THE RESULT NUMBERS ARE NOT OWN-FIRST, AND NOT CONSISTENTLY ANYTHING.
+    Georgia Tech's loss to Nebraska reads winning_score 3 / losing_score 1
+    while its loss to Baylor reads 0 / 3. The LETTER is the school's
+    authoritative claim and the numbers are the two set counts -- exactly the
+    convention already measured on the text schedules, so the orientation fix
+    in _judge_rows handles both and nothing new is needed here.
+    """
+    rows = []
+    for r in (doc.get("data") or []):
+        dt = r.get("datetime")
+        if not dt:
+            continue
+        try:
+            when = datetime.datetime.strptime(dt[:19], "%Y-%m-%dT%H:%M:%S")
+        except ValueError:
+            continue
+        # the feed stamps UTC; the verifier dates everything Eastern
+        when = when - datetime.timedelta(hours=4)
+        if when.year != season:
+            continue
+        opp = (r.get("opponent_name")
+               or (r.get("opponent") or {}).get("name") or "").strip()
+        if not opp:
+            continue
+        res = r.get("schedule_event_result") or {}
+        letter = (res.get("result") or "").strip().lower()
+        out = None
+        if letter in ("win", "loss"):
+            try:
+                a = int(float(res.get("winning_score")))
+                b = int(float(res.get("losing_score")))
+            except (TypeError, ValueError):
+                a = b = None
+            if a is not None:
+                out = ("W" if letter == "win" else "L", a, b)
+        site = {"home": "Home", "away": "Away",
+                "neutral": "Neutral"}.get(r.get("venue_type"))
+        rows.append({"date": when.strftime("%Y-%m-%d"),
+                     "site": site,
+                     "opponent": re.sub(r"^(?:#\d+|No\.\s*\d+|RV)\s+", "",
+                                        opp),
+                     # the platform states this itself -- no name-sniffing
+                     "exhibition": bool(r.get("is_exhibition")),
+                     "result": out,
+                     "raw": [dt, opp, res.get("text") or "",
+                             r.get("status_text") or ""],
+                     "surface": "wmt_api"})
+    return rows
+
+
+def wmt_api_rows(base, log, team):
+    """Both requests, or nothing. Returns (rows, url)."""
+    sid = wmt_sport_id(base, log)
+    if sid is None:
+        return [], None
+    url = (base + "/website-api/schedule-events?filter%5Bschedule.sport_id%5D="
+           + str(sid) + "&filter%5Bpast%5D=true&per_page=25&sort=-datetime"
+           "&include=opponent,scheduleEventResult")
+    status, body, _fu = _fetch(url)
+    rows = []
+    if status == 200 and body:
+        try:
+            rows = parse_wmt_events(json.loads(body))
+        except ValueError:
+            rows = []
+    log.append({"team": team, "url": url, "http": status,
+                "retrieved_utc": datetime.datetime.utcnow()
+                .strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "state": "wmt_api", "rows": len(rows)})
+    return rows, url
+
+
 def legacy_txt_rows(base, log, team):
     """Find the schedule_txt.ashx link on the vendor schedule page and parse
     its plain-text export. Returns (rows, url) or (None, None)."""
@@ -819,6 +948,19 @@ def school_evidence(team, opponent, date, canonical, sites, log):
                   "NOT_POSTED"):
             return st, det
         best = better(st, det)
+    # ⚠ THE PLATFORM'S OWN JSON, LAST AND ONLY WHEN NOTHING ELSE ANSWERED.
+    # Two extra requests, so it is reached only by the schools whose HTML
+    # surfaces cannot be read -- which is exactly the set that matters: 13 of
+    # the top 50 had NO readable second source at all before this (see
+    # wmt_sport_id). The ~300 schools whose text export already parses see
+    # the same traffic they saw before.
+    rows3, aurl = wmt_api_rows(base, log, team)
+    if rows3:
+        st, det = _judge_rows(rows3, aurl, team, opponent, date, canonical)
+        if st in ("AGREE_COMPLETE", "CONTRADICTS", "CONTRADICTS_SETS",
+                  "REPORTS", "NOT_POSTED"):
+            return st, det
+        best = better(st, det)
     return best
 
 
@@ -1066,6 +1208,24 @@ def main():
                                            # held match: the evidence is in,
                                            # and a human files from here.
                                            "HELD_BOTH_REPORT")}
+        # ⚠ A SETTLED VERDICT IS ABOUT A PARTICULAR CANONICAL, AND THE
+        # CANONICAL CAN MOVE UNDER IT. File a correction on a match whose
+        # verdict already settled and the stored row keeps describing the
+        # refuted claim forever -- the 2026-09-11 report still read "Weber
+        # St. def. Kansas St. 3-1" a day after the ledger overturned it, and
+        # the nightly re-confirmation (both schools agreeing with the
+        # CORRECTION) never runs for it. A row whose canonical no longer
+        # matches is re-verified however settled it was.
+        _canon_now = {}
+        for _f in finals:
+            _canon_now[_f["gid"]] = (
+                "HELD as %s -- %s vs %s, no counted result"
+                % (_f["held"], _f["sides"][0], _f["sides"][1])
+                if _f.get("held") else
+                "%s def. %s %d-%d" % (_f["winner"], _f["loser"],
+                                      _f["w_sets"], _f["l_sets"]))
+        settled = {g for g in settled
+                   if prior[g].get("canonical") == _canon_now.get(g, object())}
         finals = [f for f in finals if f["gid"] not in settled]
     _n_held = sum(1 for f in finals if f.get("held"))
     print("verifying %d matches for %s against both schools' published "

@@ -2,44 +2,44 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 1340,
+  "scored": 1356,
   "logged_after_tipoff_excluded": 2,
-  "team_mismatch_excluded": 43,
+  "team_mismatch_excluded": 44,
   "predictions_on_record": 4809,
-  "results_available": 1411,
-  "brier": 0.1762,
+  "results_available": 1428,
+  "brier": 0.1769,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 988,
-  "favourite_correct_pct": 73.7
+  "favourite_correct": 998,
+  "favourite_correct_pct": 73.6
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 233,
+   "n": 234,
    "said": 55.2,
-   "happened": 58.8
-  },
-  {
-   "range": "60-70%",
-   "n": 241,
-   "said": 65.2,
    "happened": 58.5
   },
   {
+   "range": "60-70%",
+   "n": 242,
+   "said": 65.3,
+   "happened": 58.7
+  },
+  {
    "range": "70-80%",
-   "n": 221,
-   "said": 75.2,
-   "happened": 67.9
+   "n": 226,
+   "said": 75.1,
+   "happened": 67.3
   },
   {
    "range": "80-90%",
-   "n": 242,
+   "n": 247,
    "said": 85.2,
-   "happened": 78.1
+   "happened": 77.7
   },
   {
    "range": "90-101%",
-   "n": 403,
+   "n": 407,
    "said": 95.6,
    "happened": 92.1
   }
@@ -352,6 +352,15 @@
    "brier": 0.8071225599999999
   },
   {
+   "game_id": "6627372",
+   "date": "2026-09-12",
+   "away": "East Texas A&M",
+   "home": "Gonzaga",
+   "p_home": 0.8976,
+   "home_won": false,
+   "brier": 0.8056857599999999
+  },
+  {
    "game_id": "6628300",
    "date": "2026-09-10",
    "away": "UT Arlington",
@@ -485,15 +494,6 @@
    "p_home": 0.8773,
    "home_won": false,
    "brier": 0.76965529
-  },
-  {
-   "game_id": "6624596",
-   "date": "2026-08-28",
-   "away": "Grambling",
-   "home": "West Ga.",
-   "p_home": 0.8711,
-   "home_won": false,
-   "brier": 0.75881521
   }
  ]
 }

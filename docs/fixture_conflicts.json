@@ -88,7 +88,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 5,
+     "records": 36,
      "values": [
       "1789232400",
       "1789318800"
@@ -96,7 +96,7 @@
     }
    ],
    "matchup": "Belmont / NC State",
-   "records": 5
+   "records": 36
   },
   "6625253": {
    "conflicts": [
@@ -208,7 +208,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 99,
+     "records": 152,
      "values": [
       "1788670800",
       "1788742800"
@@ -216,7 +216,7 @@
     },
     {
      "field": "game_state",
-     "records": 99,
+     "records": 152,
      "values": [
       "P",
       "I",
@@ -225,7 +225,30 @@
     }
    ],
    "matchup": "Missouri / Nebraska",
-   "records": 99
+   "records": 152
+  },
+  "6626265": {
+   "conflicts": [
+    {
+     "field": "teams",
+     "records": 34,
+     "values": [
+      "(('46250', False), ('52339', True))",
+      "(('46250', False), ('46616', True))",
+      "(('46250', True), ('46616', False))"
+     ]
+    },
+    {
+     "field": "site",
+     "records": 34,
+     "values": [
+      "home/away flip across snapshots",
+      "no venue owner on record"
+     ]
+    }
+   ],
+   "matchup": "SMU / TBA",
+   "records": 34
   },
   "6626288": {
    "conflicts": [
@@ -366,6 +389,29 @@
    ],
    "matchup": "Montana St. / Northern Colo.",
    "records": 2
+  },
+  "6627186": {
+   "conflicts": [
+    {
+     "field": "teams",
+     "records": 34,
+     "values": [
+      "(('46616', False), ('52339', True))",
+      "(('45920', False), ('46054', True))",
+      "(('45920', True), ('46054', False))"
+     ]
+    },
+    {
+     "field": "site",
+     "records": 34,
+     "values": [
+      "home/away flip across snapshots",
+      "no venue owner on record"
+     ]
+    }
+   ],
+   "matchup": "Purdue / TBA",
+   "records": 34
   },
   "6627351": {
    "conflicts": [
@@ -556,12 +602,12 @@
  },
  "by_field": {
   "city": 1,
-  "game_state": 49,
-  "site": 2,
+  "game_state": 38,
+  "site": 4,
   "start_time_epoch": 34,
   "state_usps": 1,
-  "teams": 2,
-  "teams (non-blocking)": 5,
+  "teams": 4,
+  "teams (non-blocking)": 4,
   "venue": 1
  },
  "corrections": {
@@ -727,8 +773,8 @@
   }
  },
  "counts": {
-  "blocked": 36,
-  "conflicted": 88,
+  "blocked": 38,
+  "conflicted": 78,
   "corrected": 5,
   "fixtures": 4891
  },

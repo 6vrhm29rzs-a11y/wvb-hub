@@ -1,12 +1,10 @@
 {
  "date": "2026-09-11",
- "generated_utc": "2026-09-12T03:51:22Z",
+ "generated_utc": "2026-09-13T17:54:37Z",
  "counts": {
-  "CORROBORATED_ONE": 89,
-  "VERIFIED_BOTH": 78,
-  "CONTRADICTED_ONE": 2,
-  "UNVERIFIED": 9,
-  "CONTRADICTED_BOTH": 2
+  "CORROBORATED_ONE": 94,
+  "VERIFIED_BOTH": 91,
+  "CONTRADICTED_BOTH": 1
  },
  "matches": [
   {
@@ -267,22 +265,21 @@
   {
    "gid": "6626935",
    "date": "2026-09-11",
-   "canonical": "Hampton def. FIU 3-0",
-   "verdict": "CONTRADICTED_ONE",
+   "canonical": "FIU def. Hampton 3-0",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
-    "Hampton": {
-     "state": "EVENT_NOT_FOUND",
-     "url": "https://hamptonpirates.com/sports/womens-volleyball/schedule/text",
-     "rows_on_date": [
-      "Florida International",
-      "Louisiana"
-     ]
-    },
     "FIU": {
-     "state": "CONTRADICTS",
+     "state": "AGREE_COMPLETE",
      "url": "https://fiusports.com/services/schedule_txt.ashx?schedule=378",
      "assertion": "FIU W 3-0 vs Hampton",
      "opponent_source": "Hampton",
+     "site_says": "Neutral"
+    },
+    "Hampton": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://hamptonpirates.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Hampton L 0-3 vs Florida International",
+     "opponent_source": "Florida International",
      "site_says": "Neutral"
     }
    }
@@ -319,14 +316,14 @@
    "gid": "6640130",
    "date": "2026-09-11",
    "canonical": "UTRGV def. Prairie View 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "UTRGV": {
-     "state": "EVENT_NOT_FOUND",
+     "state": "AGREE_COMPLETE",
      "url": "https://goutrgv.com/services/schedule_txt.ashx?schedule=1068",
-     "rows_on_date": [
-      "Prairie View A&M"
-     ]
+     "assertion": "UTRGV W 3-0 vs Prairie View A&M",
+     "opponent_source": "Prairie View A&M",
+     "site_says": "Neutral"
     },
     "Prairie View": {
      "state": "EVENT_NOT_FOUND",
@@ -477,21 +474,21 @@
   {
    "gid": "6628376",
    "date": "2026-09-11",
-   "canonical": "UC Riverside def. Omaha 3-0",
-   "verdict": "CONTRADICTED_BOTH",
+   "canonical": "Omaha def. UC Riverside 3-0",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
-    "UC Riverside": {
-     "state": "CONTRADICTS",
-     "url": "https://gohighlanders.com/sports/womens-volleyball/schedule/text",
-     "assertion": "UC Riverside L 0-3 vs Omaha",
-     "opponent_source": "Omaha",
-     "site_says": "Neutral"
-    },
     "Omaha": {
-     "state": "CONTRADICTS",
+     "state": "AGREE_COMPLETE",
      "url": "https://omavs.com/sports/womens-volleyball/schedule/text",
      "assertion": "Omaha W 3-0 vs UC Riverside",
      "opponent_source": "UC Riverside",
+     "site_says": "Neutral"
+    },
+    "UC Riverside": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gohighlanders.com/sports/womens-volleyball/schedule/text",
+     "assertion": "UC Riverside L 0-3 vs Omaha",
+     "opponent_source": "Omaha",
      "site_says": "Neutral"
     }
    }
@@ -3076,22 +3073,20 @@
    "gid": "6627055",
    "date": "2026-09-11",
    "canonical": "UNC Asheville def. UNCW 3-2",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "UNC Asheville": {
-     "state": "EVENT_NOT_FOUND",
+     "state": "AGREE_COMPLETE",
      "url": "https://uncabulldogs.com/sports/womens-volleyball/schedule/text",
-     "rows_on_date": [
-      "Harvard",
-      "UNC Wilmington"
-     ]
+     "assertion": "UNC Asheville W 3-2 vs UNC Wilmington",
+     "opponent_source": "UNC Wilmington",
+     "site_says": "Away"
     },
     "UNCW": {
      "state": "EVENT_NOT_FOUND",
      "url": "https://uncwsports.com/services/schedule_txt.ashx?schedule=390",
      "rows_on_date": [
       "Norfolk St.",
-      "Norfolk St. vs Harvard",
       "UNCA"
      ]
     }
@@ -3374,16 +3369,19 @@
    "gid": "6625633",
    "date": "2026-09-11",
    "canonical": "South Carolina def. Clemson 3-1",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "South Carolina": {
      "state": "SITE_UNPARSED",
      "url": "https://gamecocksonline.com/news/2021/09/03/textforhelp/"
     },
     "Clemson": {
-     "state": "SITE_HTTP_MISS",
-     "url": "https://clemsontigers.com/sports/womens-volleyball/schedule/text",
-     "http": 404
+     "state": "AGREE_COMPLETE",
+     "url": "https://clemsontigers.com/website-api/schedule-events?filter%5Bschedule.sport_id%5D=6&filter%5Bpast%5D=true&per_page=25&sort=-datetime&include=opponent,scheduleEventResult",
+     "assertion": "Clemson L 1-3 vs South Carolina",
+     "opponent_source": "South Carolina",
+     "site_says": "Home",
+     "surface": "wmt_api"
     }
    }
   },
@@ -3419,20 +3417,19 @@
    "gid": "6626520",
    "date": "2026-09-11",
    "canonical": "North Texas def. SFA 3-1",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "North Texas": {
-     "state": "EVENT_NOT_FOUND",
+     "state": "AGREE_COMPLETE",
      "url": "https://meangreensports.com/sports/womens-volleyball/schedule/text",
-     "rows_on_date": [
-      "Stephen F. Austin"
-     ]
+     "assertion": "North Texas W 3-1 vs Stephen F. Austin",
+     "opponent_source": "Stephen F. Austin",
+     "site_says": "Away"
     },
     "SFA": {
      "state": "EVENT_NOT_FOUND",
      "url": "https://sfajacks.com/sports/womens-volleyball/schedule/text",
      "rows_on_date": [
-      "Texas State vs UT-Arlington",
       "UNT"
      ]
     }
@@ -3542,25 +3539,22 @@
    "gid": "6627371",
    "date": "2026-09-11",
    "canonical": "UTSA def. East Texas A&M 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "UTSA": {
-     "state": "SITE_HTTP_MISS",
-     "url": "https://goutsa.com/sports/womens-volleyball/schedule/text",
-     "http": 404
+     "state": "AGREE_COMPLETE",
+     "url": "https://goutsa.com/website-api/schedule-events?filter%5Bschedule.sport_id%5D=15&filter%5Bpast%5D=true&per_page=25&sort=-datetime&include=opponent,scheduleEventResult",
+     "assertion": "UTSA W 3-0 vs East Texas A&M",
+     "opponent_source": "East Texas A&M",
+     "site_says": "Home",
+     "surface": "wmt_api"
     },
     "East Texas A&M": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://lionathletics.com/services/schedule_txt.ashx?schedule=490",
-     "row": [
-      "Sep 11 (Fri)",
-      "6:30 p.m.",
-      "Away",
-      "UTSA",
-      "San Antonio (UTSA Convocation Center)",
-      "",
-      ""
-     ]
+     "assertion": "East Texas A&M L 0-3 vs UTSA",
+     "opponent_source": "UTSA",
+     "site_says": "Away"
     }
    }
   },
@@ -4155,28 +4149,21 @@
    "gid": "6625791",
    "date": "2026-09-11",
    "canonical": "LMU (CA) def. UC Irvine 3-2",
-   "verdict": "UNVERIFIED",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "LMU (CA)": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://lmulions.com/services/schedule_txt.ashx?schedule=483",
-     "row": [
-      "Sep 11 (Fri)",
-      "6:00 PM",
-      "Away",
-      "UC Irvine",
-      "Irvine, CA",
-      "",
-      ""
-     ]
+     "assertion": "LMU (CA) W 3-2 vs UC Irvine",
+     "opponent_source": "UC Irvine",
+     "site_says": "Away"
     },
     "UC Irvine": {
-     "state": "EVENT_NOT_FOUND",
+     "state": "AGREE_COMPLETE",
      "url": "https://ucirvinesports.com/sports/womens-volleyball/schedule/text",
-     "rows_on_date": [
-      "San Jos\u00e9 State vs. Utah Tech",
-      "LMU"
-     ]
+     "assertion": "UC Irvine L 2-3 vs LMU",
+     "opponent_source": "LMU",
+     "site_says": "Home"
     }
    }
   },
@@ -4184,25 +4171,19 @@
    "gid": "6626689",
    "date": "2026-09-11",
    "canonical": "Air Force def. Tennessee Tech 3-1",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Air Force": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://goairforcefalcons.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 11 (Fri)",
-      "7:00 pm MT",
-      "Home",
-      "Tennessee Tech",
-      "USAFA",
-      "Amy Svoboda Memorial Classic",
-      "-"
-     ]
+     "assertion": "Air Force W 3-1 vs Tennessee Tech",
+     "opponent_source": "Tennessee Tech",
+     "site_says": "Home"
     },
     "Tennessee Tech": {
      "state": "SITE_HTTP_MISS",
      "url": "https://ttusports.com/sports/womens-volleyball/schedule/text",
-     "http": 404
+     "http": 202
     }
    }
   },
@@ -4232,20 +4213,22 @@
   {
    "gid": "6627513",
    "date": "2026-09-11",
-   "canonical": "Weber St. def. Kansas St. 3-1",
-   "verdict": "CONTRADICTED_ONE",
+   "canonical": "Kansas St. def. Weber St. 3-1",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
+    "Kansas St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://kstatesports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Kansas St. W 3-1 vs Weber State",
+     "opponent_source": "Weber State",
+     "site_says": "Neutral"
+    },
     "Weber St.": {
-     "state": "CONTRADICTS",
+     "state": "AGREE_COMPLETE",
      "url": "https://weberstatesports.com/sports/womens-volleyball/schedule/text",
      "assertion": "Weber St. L 1-3 vs Kansas State",
      "opponent_source": "Kansas State",
      "site_says": "Neutral"
-    },
-    "Kansas St.": {
-     "state": "SITE_HTTP_MISS",
-     "url": "https://kstatesports.com/sports/womens-volleyball/schedule/text",
-     "http": 308
     }
    }
   },
@@ -4253,27 +4236,21 @@
    "gid": "6627577",
    "date": "2026-09-11",
    "canonical": "Grand Canyon def. Northern Ariz. 3-2",
-   "verdict": "UNVERIFIED",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "Grand Canyon": {
-     "state": "EVENT_NOT_FOUND",
+     "state": "AGREE_COMPLETE",
      "url": "https://gculopes.com/sports/womens-volleyball/schedule/text",
-     "rows_on_date": [
-      "Northern Arizona"
-     ]
+     "assertion": "Grand Canyon W 3-2 vs Northern Arizona",
+     "opponent_source": "Northern Arizona",
+     "site_says": "Away"
     },
     "Northern Ariz.": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://nauathletics.com/services/schedule_txt.ashx?schedule=200",
-     "row": [
-      "Sep 11 (Fri)",
-      "6 p.m.",
-      "Home",
-      "Grand Canyon",
-      "Flagstaff, Ariz. (Rolle Activity Center)",
-      "",
-      ""
-     ]
+     "assertion": "Northern Ariz. L 2-3 vs Grand Canyon",
+     "opponent_source": "Grand Canyon",
+     "site_says": "Home"
     }
    }
   },
@@ -4281,40 +4258,22 @@
    "gid": "6628127",
    "date": "2026-09-11",
    "canonical": "Seattle U def. Southern Utah 3-1",
-   "verdict": "UNVERIFIED",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "Seattle U": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://goseattleu.com/sports/volleyball/schedule",
-     "row": [
-      "Sep 11",
-      "Seattle U",
-      "vs.",
-      "Southern Utah",
-      "Redhawk Center",
-      "Seattle, Wash.",
-      "6:00 PM PDT",
-      "Watch on ESPN+",
-      "Opens in a new window",
-      "Live Stats",
-      "Opens in a new window",
-      "Buy Tickets",
-      "Opens in a new window",
-      "Related Articles"
-     ]
+     "assertion": "Seattle U W 3-1 vs Southern Utah",
+     "opponent_source": "Southern Utah",
+     "site_says": null,
+     "surface": "modern_card"
     },
     "Southern Utah": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://suutbirds.com/services/schedule_txt.ashx?schedule=2429",
-     "row": [
-      "Sep 11 (Fri)",
-      "7:00 PM MT",
-      "Away",
-      "Seattle University",
-      "Seattle, WA",
-      "",
-      ""
-     ]
+     "assertion": "Southern Utah L 1-3 vs Seattle University",
+     "opponent_source": "Seattle University",
+     "site_says": "Away"
     }
    }
   },
@@ -4335,6 +4294,138 @@
      "assertion": "Santa Clara L 0-3 vs San Diego State",
      "opponent_source": "San Diego State",
      "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6628158",
+   "date": "2026-09-11",
+   "canonical": "UAB def. Eastern Mich. 3-1",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "UAB": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://uabsports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "UAB W 3-1 vs Eastern Michigan",
+     "opponent_source": "Eastern Michigan",
+     "site_says": "Neutral"
+    },
+    "Eastern Mich.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://emueagles.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Eastern Mich. L 1-3 vs UAB",
+     "opponent_source": "UAB",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6627939",
+   "date": "2026-09-11",
+   "canonical": "Siena def. Le Moyne 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Siena": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://sienasaints.com/services/schedule_txt.ashx?schedule=3497",
+     "assertion": "Siena W 3-0 vs Le Moyne",
+     "opponent_source": "Le Moyne",
+     "site_says": "Home"
+    },
+    "Le Moyne": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://lemoynedolphins.com/services/schedule_txt.ashx?schedule=1537",
+     "assertion": "Le Moyne L 0-3 vs Siena University",
+     "opponent_source": "Siena University",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6625599",
+   "date": "2026-09-11",
+   "canonical": "Middle Tenn. def. Northern Colo. 3-1",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Middle Tenn.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://goblueraiders.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Middle Tenn. W 3-1 vs Northern Colorado",
+     "opponent_source": "Northern Colorado",
+     "site_says": "Home"
+    },
+    "Northern Colo.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://uncbears.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Northern Colo. L 1-3 vs Middle Tennessee",
+     "opponent_source": "Middle Tennessee",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6628320",
+   "date": "2026-09-11",
+   "canonical": "CSUN def. UNLV 3-2",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "CSUN": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gomatadors.com/sports/womens-volleyball/schedule/text",
+     "assertion": "CSUN W 3-2 vs UNLV",
+     "opponent_source": "UNLV",
+     "site_says": "Home"
+    },
+    "UNLV": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://unlvrebels.com/services/schedule_txt.ashx?schedule=1503",
+     "assertion": "UNLV L 2-3 vs CSUN",
+     "opponent_source": "CSUN",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6626683",
+   "date": "2026-09-11",
+   "canonical": "Long Beach St. def. Brown 3-1",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Long Beach St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://longbeachstate.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Long Beach St. W 3-1 vs Brown",
+     "opponent_source": "Brown",
+     "site_says": "Home"
+    },
+    "Brown": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://brownbears.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Brown L 1-3 vs Long Beach State",
+     "opponent_source": "Long Beach State",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6628243",
+   "date": "2026-09-11",
+   "canonical": "Southern California def. Arizona 3-1",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Southern California": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://www.usctrojans.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Southern California W 3-1 vs Arizona",
+     "opponent_source": "Arizona",
+     "site_says": "Home"
+    },
+    "Arizona": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://arizonawildcats.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Arizona L 1-3 vs USC",
+     "opponent_source": "USC",
+     "site_says": "Away"
     }
    }
   }

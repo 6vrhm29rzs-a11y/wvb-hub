@@ -418,6 +418,84 @@ def main():
     check("...and _judge_rows can actually read it",
           _judged == "AGREE_COMPLETE", _judged)
 
+    print("\n8. THE PLATFORM API -- THE SURFACE THAT CLOSES THE TOP-50 GAP")
+    # ⚠ 13 of the top 50 render their schedules client-side, so no static
+    # parser could read them and NO second official source existed for any of
+    # their results. All 13 run the same platform, whose own page fetches a
+    # plain JSON API on the school's domain. Measured 2026-09-13: 12 of the
+    # 13 answer it (Kentucky's host redirects /website-api to a 2018 news
+    # page). Nothing below touches the network.
+    DOC = {"data": [
+        {"datetime": "2026-09-12T19:00:00.000000Z", "opponent_name":
+         "Georgia Tech", "venue_type": "home", "is_exhibition": False,
+         "schedule_event_result": {"result": "win", "winning_score":
+                                   "3.0000", "losing_score": "1.0000",
+                                   "text": "(24-26, 25-17, 25-18, 25-12)"}},
+        {"datetime": "2026-09-12T19:00:00.000000Z", "opponent_name":
+         "Nebraska", "venue_type": "away", "is_exhibition": False,
+         "schedule_event_result": {"result": "loss", "winning_score":
+                                   "3.0000", "losing_score": "1.0000"}},
+        {"datetime": "2026-09-11T01:00:00.000000Z", "opponent_name":
+         "Somebody", "venue_type": "home", "is_exhibition": True,
+         "schedule_event_result": {"result": "win", "winning_score":
+                                   "3.0000", "losing_score": "0.0000"}},
+        {"datetime": "2026-09-16T23:00:00.000000Z", "opponent_name":
+         "Creighton", "venue_type": "home", "is_exhibition": False,
+         "schedule_event_result": None},
+    ]}
+    wr = V.parse_wmt_events(DOC)
+    check("every event parses to a row", len(wr) == 4, len(wr))
+    check("rows carry the SAME shape every other parser emits",
+          all(set(("date", "opponent", "exhibition", "result", "site", "raw"))
+              <= set(r) for r in wr))
+    check("a UTC stamp dates to the EASTERN day",
+          wr[0]["date"] == "2026-09-12" and wr[2]["date"] == "2026-09-10",
+          [r["date"] for r in wr])
+    check("the platform's own is_exhibition flag is used, not a name sniff",
+          [r["exhibition"] for r in wr] == [False, False, True, False])
+    check("an unplayed event has no result rather than a zero",
+          wr[3]["result"] is None)
+    # ⚠ the numbers are NOT own-first and not consistently anything: Georgia
+    # Tech's loss to Nebraska reads 3/1 while its loss to Baylor reads 0/3.
+    # The letter is authoritative; _judge_rows' orientation fix handles it.
+    st, det = V._judge_rows([wr[1]], "u", "Georgia Tech", "Nebraska",
+                            "2026-09-12",
+                            {"winner": "Nebraska", "loser": "Georgia Tech",
+                             "w_sets": 3, "l_sets": 1})
+    check("a LOSS written winner-first still reads as 1-3",
+          st == "AGREE_COMPLETE" and det["assertion"].endswith("1-3 vs "
+                                                               "Nebraska"),
+          (st, det.get("assertion")))
+    st2, _ = V._judge_rows([wr[2]], "u", "Us", "Somebody", "2026-09-10",
+                           {"winner": "Us", "loser": "Somebody",
+                            "w_sets": 3, "l_sets": 0})
+    check("[NEG] an exhibition row never verifies a counted final",
+          st2 == "EVENT_NOT_FOUND", st2)
+
+    # the SPORT id is per-site (16 at Nebraska, 17 at Georgia Tech) and the
+    # name must match EXACTLY -- a substring test takes Beach Volleyball.
+    SPORTS = {"data": [{"id": 2, "name": "Beach Volleyball"},
+                       {"id": 9, "name": "Men's Volleyball"},
+                       {"id": 16, "name": "Volleyball"}]}
+    _real = V._fetch
+    try:
+        V._fetch = lambda url, timeout=20: (200, json.dumps(SPORTS), url)
+        V._WMT_SPORT.clear()
+        check("the site's own volleyball id is read, never assumed",
+              V.wmt_sport_id("https://x.test", []) == 16)
+        V._WMT_SPORT.clear()
+        V._fetch = lambda url, timeout=20: (200, json.dumps(
+            {"data": [{"id": 2, "name": "Beach Volleyball"}]}), url)
+        check("[NEG] a site with no plain volleyball sport yields nothing",
+              V.wmt_sport_id("https://y.test", []) is None)
+        V._WMT_SPORT.clear()
+        V._fetch = lambda url, timeout=20: (404, "", url)
+        check("[NEG] and a site without the API yields nothing",
+              V.wmt_sport_id("https://z.test", []) is None)
+    finally:
+        V._fetch = _real
+        V._WMT_SPORT.clear()
+
     if FAILED:
         print("\nFAILED: %d" % len(FAILED))
         for f in FAILED:

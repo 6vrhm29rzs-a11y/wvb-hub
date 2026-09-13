@@ -1,6 +1,155 @@
 {
  "date": "2026-09-13",
- "generated_utc": "2026-09-13T06:01:33Z",
- "counts": {},
- "matches": []
+ "generated_utc": "2026-09-13T17:58:19Z",
+ "counts": {
+  "CORROBORATED_ONE": 3,
+  "VERIFIED_BOTH": 3
+ },
+ "matches": [
+  {
+   "gid": "6624676",
+   "date": "2026-09-13",
+   "canonical": "Penn def. Rhode Island 3-2",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Penn": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://pennathletics.com/services/schedule_txt.ashx?schedule=3124",
+     "rows_on_date": [
+      "URI",
+      "Lafayette"
+     ]
+    },
+    "Rhode Island": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gorhody.com/services/schedule_txt.ashx?schedule=455",
+     "assertion": "Rhode Island L 2-3 vs Penn",
+     "opponent_source": "Penn",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6625336",
+   "date": "2026-09-13",
+   "canonical": "Ga. Southern def. East Carolina 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Ga. Southern": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gseagles.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Ga. Southern W 3-0 vs East Carolina University",
+     "opponent_source": "East Carolina University",
+     "site_says": "Neutral"
+    },
+    "East Carolina": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://ecupirates.com/sports/womens-volleyball/schedule/text",
+     "assertion": "East Carolina L 0-3 vs Georgia Southern",
+     "opponent_source": "Georgia Southern",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6626360",
+   "date": "2026-09-13",
+   "canonical": "High Point def. Jacksonville 3-1",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "High Point": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://highpointpanthers.com/services/schedule_txt.ashx?schedule=628",
+     "assertion": "High Point W 3-1 vs Jacksonville",
+     "opponent_source": "Jacksonville",
+     "site_says": "Neutral"
+    },
+    "Jacksonville": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://judolphins.com/services/schedule_txt.ashx?schedule=337",
+     "assertion": "Jacksonville L 1-3 vs High Point University",
+     "opponent_source": "High Point University",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6628410",
+   "date": "2026-09-13",
+   "canonical": "William & Mary def. North Florida 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "William & Mary": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://tribeathletics.com/services/schedule_txt.ashx?schedule=1178",
+     "assertion": "William & Mary W 3-1 vs North Florida",
+     "opponent_source": "North Florida",
+     "site_says": "Neutral"
+    },
+    "North Florida": {
+     "state": "NOT_POSTED",
+     "url": "https://unfospreys.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 13 (Sun)",
+      "11 a.m.",
+      "Neutral",
+      "William & Mary",
+      "Boone, N.C. / Holmes Convocation Center",
+      "Mountaineer Classic",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6625972",
+   "date": "2026-09-13",
+   "canonical": "Southern Ind. def. Winthrop 3-2",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Southern Ind.": {
+     "state": "NOT_POSTED",
+     "url": "https://gousieagles.com/services/schedule_txt.ashx?schedule=523",
+     "row": [
+      "Sep 13 (Sun)",
+      "10 a.m. (CDT)",
+      "Neutral",
+      "Winthrop University",
+      "Columbus, OH",
+      "",
+      ""
+     ]
+    },
+    "Winthrop": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://winthropeagles.com/services/schedule_txt.ashx?schedule=1016",
+     "assertion": "Winthrop L 2-3 vs Southern Indiana",
+     "opponent_source": "Southern Indiana",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6624899",
+   "date": "2026-09-13",
+   "canonical": "FIU def. Florida St. 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "FIU": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://fiusports.com/services/schedule_txt.ashx?schedule=378",
+     "assertion": "FIU W 3-0 vs Florida State",
+     "opponent_source": "Florida State",
+     "site_says": "Away"
+    },
+    "Florida St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://seminoles.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Florida St. L 0-3 vs FIU",
+     "opponent_source": "FIU",
+     "site_says": "Home"
+    }
+   }
+  }
+ ]
 }

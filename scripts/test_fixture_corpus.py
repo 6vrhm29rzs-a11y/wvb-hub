@@ -145,6 +145,19 @@ def main():
                                            (25, 16)]),
                       "start_time_epoch": 3000}
 
+    # 13. the IMPOSSIBLE TALLY (2026-09-13, game 6627160: the feed served
+    #     "Marist 4, Fordham 0" with a first-set line frozen at 24-23, and it
+    #     COUNTED -- every rule asked whether the winner had too FEW sets and
+    #     none asked whether it had too many). A match is best-of-five, so a
+    #     side that wins three has won it and no fourth set is played.
+    G["F_TOOMANY"] = {"game_id": "900013", "game_state": "F",
+                      "winner_team_id": "21",
+                      "teams": [team(20, sets=0), team(21, home=True,
+                                                       sets=4, winner=True)],
+                      "linescores": lines([(23, 24), (14, 25), (22, 25),
+                                           (21, 25)]),
+                      "start_time_epoch": 3100}
+
     games = list(G.values())
 
     # ── injected ledgers, at the module seams the real code uses ──────
@@ -170,6 +183,7 @@ def main():
         want = {"900001": "ok", "900002": "ok", "900003": "duplicate",
                 "900004": "exhibition", "900005": "empty", "900011": "ok",
                 "900012": "self_contradictory",
+                "900013": "self_contradictory",
                 "900006": "under_review", "900007": "ok",
                 "900008": "ok", "900009": "ok", "900010": "ok"}
         for gid, w in sorted(want.items()):
@@ -180,11 +194,11 @@ def main():
         print("\n2. THE NAMED TOTALS ADD UP")
         t = SC.totals(games, SEASON)
         check("feed_records counts every completed record",
-              t["feed_records"] == 12, t)  # +F_NOFLAG +F_SELFCON
+              t["feed_records"] == 13, t)  # +F_NOFLAG +F_SELFCON +F_TOOMANY
         check("results_on_display = ok + exhibition + under_review",
               t["results_on_display"] == t["ok"] + t["exhibition"]
               + t["under_review"] + t["self_contradictory"]
-              == 7 + 1 + 1 + 1)  # +F_NOFLAG; +F_SELFCON displays, held
+              == 7 + 1 + 1 + 2)  # +F_NOFLAG; the two held finals display
         check("rating_eligible: ok, both D-I, with a line",
               t["rating_eligible"] == 7, t)  # +F_NOFLAG
 
