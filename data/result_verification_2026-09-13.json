@@ -1,11 +1,10 @@
 {
  "date": "2026-09-13",
- "generated_utc": "2026-09-13T21:38:47Z",
+ "generated_utc": "2026-09-13T21:55:31Z",
  "counts": {
-  "CORROBORATED_ONE": 24,
-  "VERIFIED_BOTH": 14,
+  "CORROBORATED_ONE": 25,
+  "VERIFIED_BOTH": 15,
   "CONTRADICTED_ONE": 1,
-  "UNVERIFIED": 2,
   "HELD_BOTH_REPORT": 1
  },
  "matches": [
@@ -1016,7 +1015,7 @@
    "gid": "6628580",
    "date": "2026-09-13",
    "canonical": "Texas def. Wisconsin 3-1",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Texas": {
      "state": "NOT_POSTED",
@@ -1032,17 +1031,11 @@
      ]
     },
     "Wisconsin": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://uwbadgers.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 13 (Sun)",
-      "2 PM",
-      "Away",
-      "#9 Texas",
-      "Austin, TX",
-      "",
-      "-"
-     ]
+     "assertion": "Wisconsin L 1-3 vs Texas",
+     "opponent_source": "Texas",
+     "site_says": "Away"
     }
    }
   },
@@ -1073,33 +1066,21 @@
    "gid": "6626622",
    "date": "2026-09-13",
    "canonical": "UIC def. Western Mich. 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "VERIFIED_BOTH",
    "schools": {
     "UIC": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://uicflames.com/services/schedule_txt.ashx?schedule=3505",
-     "row": [
-      "Sep 13 (Sun)",
-      "2:00 PM",
-      "Home",
-      "Western Michigan",
-      "Chicago, Ill. (Credit Union 1 Arena)",
-      "",
-      ""
-     ]
+     "assertion": "UIC W 3-0 vs Western Michigan",
+     "opponent_source": "Western Michigan",
+     "site_says": "Home"
     },
     "Western Mich.": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://wmubroncos.com/services/schedule_txt.ashx?schedule=2344",
-     "row": [
-      "Sep 13 (Sun)",
-      "3:00 PM",
-      "Away",
-      "UIC",
-      "Chicago, Ill.",
-      "",
-      ""
-     ]
+     "assertion": "Western Mich. L 0-3 vs UIC",
+     "opponent_source": "UIC",
+     "site_says": "Away"
     }
    }
   }

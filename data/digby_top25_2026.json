@@ -29,7 +29,7 @@
   "between_team_variance": 5.941,
   "caveat_schedule": "the opponent IS adjusted for from match one: a result is scored as the strength it implies (opponent's rating + margin, home court removed). What is still thin early is the opponent's own rating, which is the preseason projection until a schedule graph exists",
   "teams_with_a_result": 348,
-  "matches_counted": 1422,
+  "matches_counted": 1424,
   "corpus_fingerprint": "670e9197a9162684",
   "certifies": {
    "blend_weight_derived_not_chosen": {
@@ -42,18 +42,18 @@
     }
    }
   },
-  "score_mean": -0.00069,
-  "score_sd": 1.10943,
+  "score_mean": -0.00061,
+  "score_sd": 1.10947,
   "score_scale_note": "mean and SD across ALL 348 teams, not just the ones shown -- a scale computed from the top 25 would measure the spread among the best",
   "shown": 25,
   "also_receiving": 10,
   "hit_channel_weight": 0.25,
   "hit_channel_tau": 0.1,
   "hit_channel_evidence": "data/blend_hiteff_2025.json",
-  "generated_at_utc": "2026-09-13T21:39:54Z",
+  "generated_at_utc": "2026-09-13T21:56:42Z",
   "data_through_epoch": 1789326000,
   "rating_cutoff_epoch": 1789282800,
-  "verified_intraday_counted": 38
+  "verified_intraday_counted": 40
  },
  "top": [
   {
@@ -117,6 +117,18 @@
    "rank": 5
   },
   {
+   "team": "Texas",
+   "score": 2.2656,
+   "preseason_z": 2.689,
+   "season_z": 1.55,
+   "matches": 8,
+   "weight_on_season": 0.372,
+   "record": "4-4",
+   "net_pts_per_set": -0.69,
+   "conf": "SEC",
+   "rank": 6
+  },
+  {
    "team": "SMU",
    "score": 2.2559,
    "preseason_z": 2.135,
@@ -126,18 +138,6 @@
    "record": "6-1",
    "net_pts_per_set": 1.33,
    "conf": "ACC",
-   "rank": 6
-  },
-  {
-   "team": "Texas",
-   "score": 2.2412,
-   "preseason_z": 2.689,
-   "season_z": 1.376,
-   "matches": 7,
-   "weight_on_season": 0.341,
-   "record": "4-4",
-   "net_pts_per_set": -1.29,
-   "conf": "SEC",
    "rank": 7
   },
   {
@@ -250,13 +250,13 @@
   },
   {
    "team": "Wisconsin",
-   "score": 1.8627,
+   "score": 1.8639,
    "preseason_z": 1.967,
-   "season_z": 1.661,
-   "matches": 7,
-   "weight_on_season": 0.341,
+   "season_z": 1.69,
+   "matches": 8,
+   "weight_on_season": 0.372,
    "record": "4-4",
-   "net_pts_per_set": -0.38,
+   "net_pts_per_set": -0.77,
    "conf": "Big Ten",
    "rank": 17
   },
@@ -516,16 +516,16 @@
    "weight_on_season": 0.4
   },
   {
-   "team": "SMU",
+   "team": "Texas",
    "rank": 6,
-   "score": 2.2559,
-   "matches": 7,
-   "weight_on_season": 0.341
+   "score": 2.2656,
+   "matches": 8,
+   "weight_on_season": 0.372
   },
   {
-   "team": "Texas",
+   "team": "SMU",
    "rank": 7,
-   "score": 2.2412,
+   "score": 2.2559,
    "matches": 7,
    "weight_on_season": 0.341
   },
@@ -595,9 +595,9 @@
   {
    "team": "Wisconsin",
    "rank": 17,
-   "score": 1.8627,
-   "matches": 7,
-   "weight_on_season": 0.341
+   "score": 1.8639,
+   "matches": 8,
+   "weight_on_season": 0.372
   },
   {
    "team": "Colorado",
@@ -1286,102 +1286,102 @@
    "weight_on_season": 0.341
   },
   {
-   "team": "Western Mich.",
-   "rank": 116,
-   "score": 0.4235,
-   "matches": 8,
-   "weight_on_season": 0.372
-  },
-  {
    "team": "Wyoming",
-   "rank": 117,
+   "rank": 116,
    "score": 0.4107,
    "matches": 8,
    "weight_on_season": 0.372
   },
   {
    "team": "Northern Ky.",
-   "rank": 118,
+   "rank": 117,
    "score": 0.3915,
    "matches": 9,
    "weight_on_season": 0.4
   },
   {
    "team": "UMBC",
-   "rank": 119,
+   "rank": 118,
    "score": 0.3911,
    "matches": 7,
    "weight_on_season": 0.341
   },
   {
    "team": "SFA",
-   "rank": 120,
+   "rank": 119,
    "score": 0.3877,
    "matches": 9,
    "weight_on_season": 0.4
   },
   {
    "team": "Notre Dame",
-   "rank": 121,
+   "rank": 120,
    "score": 0.3843,
    "matches": 7,
    "weight_on_season": 0.341
   },
   {
    "team": "Jacksonville",
-   "rank": 122,
+   "rank": 121,
    "score": 0.3743,
    "matches": 9,
    "weight_on_season": 0.4
   },
   {
    "team": "App State",
-   "rank": 123,
+   "rank": 122,
    "score": 0.3649,
    "matches": 10,
    "weight_on_season": 0.425
   },
   {
    "team": "Drake",
-   "rank": 124,
+   "rank": 123,
    "score": 0.3615,
    "matches": 8,
    "weight_on_season": 0.372
   },
   {
    "team": "UConn",
-   "rank": 125,
+   "rank": 124,
    "score": 0.3612,
    "matches": 10,
    "weight_on_season": 0.425
   },
   {
    "team": "Duke",
-   "rank": 126,
+   "rank": 125,
    "score": 0.3432,
    "matches": 8,
    "weight_on_season": 0.372
   },
   {
    "team": "LMU (CA)",
-   "rank": 127,
+   "rank": 126,
    "score": 0.3404,
    "matches": 8,
    "weight_on_season": 0.372
   },
   {
    "team": "Boston College",
-   "rank": 128,
+   "rank": 127,
    "score": 0.3353,
    "matches": 8,
    "weight_on_season": 0.372
   },
   {
    "team": "Coastal Carolina",
-   "rank": 129,
+   "rank": 128,
    "score": 0.3305,
    "matches": 7,
    "weight_on_season": 0.341
+  },
+  {
+   "team": "Western Mich.",
+   "rank": 129,
+   "score": 0.3266,
+   "matches": 9,
+   "weight_on_season": 0.4
   },
   {
    "team": "Ohio",
@@ -1797,51 +1797,51 @@
    "weight_on_season": 0.307
   },
   {
-   "team": "San Jose St.",
+   "team": "UIC",
    "rank": 189,
+   "score": 0.0064,
+   "matches": 8,
+   "weight_on_season": 0.372
+  },
+  {
+   "team": "San Jose St.",
+   "rank": 190,
    "score": -0.009,
    "matches": 8,
    "weight_on_season": 0.372
   },
   {
    "team": "Air Force",
-   "rank": 190,
+   "rank": 191,
    "score": -0.0128,
    "matches": 7,
    "weight_on_season": 0.341
   },
   {
    "team": "Stony Brook",
-   "rank": 191,
+   "rank": 192,
    "score": -0.0161,
    "matches": 10,
    "weight_on_season": 0.425
   },
   {
    "team": "Omaha",
-   "rank": 192,
+   "rank": 193,
    "score": -0.0437,
    "matches": 8,
    "weight_on_season": 0.372
   },
   {
    "team": "Akron",
-   "rank": 193,
+   "rank": 194,
    "score": -0.0498,
    "matches": 9,
    "weight_on_season": 0.4
   },
   {
    "team": "Montana",
-   "rank": 194,
-   "score": -0.0761,
-   "matches": 7,
-   "weight_on_season": 0.341
-  },
-  {
-   "team": "UIC",
    "rank": 195,
-   "score": -0.0934,
+   "score": -0.0761,
    "matches": 7,
    "weight_on_season": 0.341
   },

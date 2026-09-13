@@ -63,6 +63,9 @@ REBUILD = [
     ({"WVB_SEASON": "2025"}, ["scripts/rating_2025.py"]),
     ({}, ["scripts/venues.py"]),
     ({}, ["scripts/availability.py"]),
+    # ranks what availability.py merely flags: 750 undifferentiated
+    # team-match flags are not a thing anyone can read.
+    ({}, ["scripts/participation_radar.py"]),
     ({}, ["scripts/build_dataset.py"]),
     ({}, ["scripts/rpi_2025.py"]),
     ({}, ["scripts/rating_2025.py"]),

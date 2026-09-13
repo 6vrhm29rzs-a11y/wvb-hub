@@ -167,6 +167,7 @@ jobs:
           # Who did not take the floor. Cheap, and it needs the player lines
           # collected earlier in this same run.
           python3 scripts/availability.py
+          python3 scripts/participation_radar.py
           # Win probability for everything still to be played. Depends on
           # venues.py above -- a neutral floor gets no home advantage.
           python3 scripts/predict_2026.py || echo "prediction needs a prior rating; skipping"

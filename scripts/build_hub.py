@@ -1545,6 +1545,9 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
     # than passed in beside it: one caller, one source, nothing to keep in
     # sync if the profile ever gains a metric (R4).
     _profiles = team_profiles(tstats or {})
+    # PARTICIPATION, NOT AVAILABILITY. See participation_radar.py: this says
+    # a player has not appeared in a box, and never why.
+    _radar = radar_by_team()
     _di_pl = di_counting()
     _vidx_res = venue_index()
     for r in res:
@@ -2062,6 +2065,7 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
             "rotso": _rotso.get(nm),
             "tstats": (tstats or {}).get(nm),
             "pctl": (_profiles or {}).get(nm),
+            "outbox": (_radar or {}).get(nm) or [],
             "aq": (aq_of or {}).get(t["conf"]),
             "sched_n": (sched_n or {}).get(team_norm(nm), 0),
             # position within its own conference on our 2026 order -- a sort of
@@ -2901,6 +2905,34 @@ PROFILE_METRICS = [
     ("svc_err_rate", "Serve errors", False, "pct1"),
 ]
 PROFILE_MIN_MATCHES = 3
+
+
+def _nkey_letters(s):
+    """Letters-only identity fold, the same one the page applies in JS.
+    ⚠ ONE FOLD, BOTH SIDES. The radar keys on this because the feed
+    re-spells players mid-season -- it printed "DeLeye" for seven matches
+    and "Deleye" for the next two, which split one player into two and
+    reported Kentucky's 22%-of-points hitter as missing while she was
+    playing."""
+    import unicodedata as _u
+    s = _u.normalize("NFKD", s or "")
+    return "".join(c for c in s if c.isalpha() and ord(c) < 128).lower()
+
+
+def participation_radar():
+    """Established players who have not appeared in their team's latest
+    counted box scores, ranked. Read, never recomputed here."""
+    return load("data/participation_radar_%d.json" % SEASON) or {}
+
+
+def radar_by_team():
+    """team -> {player identity key: row}, for the page to mark a squad."""
+    doc = participation_radar()
+    out = {}
+    for r in (doc.get("players") or []):
+        if r.get("team"):
+            out.setdefault(r["team"], []).append(r)
+    return out
 
 
 def metric_value():
@@ -5959,6 +5991,10 @@ def build():
             ["power", "resume", "digby", "avca", "rpi", "committee",
              "massey", "vt"])) \
         .replace("{{WHAT_MAKES_GOOD}}", what_makes_good_html()) \
+        .replace("{{OUTBOX_JSON}}", json.dumps(
+            dict((tm, dict((_nkey_letters(r["player"]), r) for r in rows))
+                 for tm, rows in radar_by_team().items()),
+            separators=(",", ":"))) \
         .replace("{{PROFILE_ORDER}}", json.dumps(
             [m[0] for m in PROFILE_METRICS], separators=(",", ":"))) \
         .replace("{{PROFILE_MIN_N}}", str(PROFILE_MIN_MATCHES)) \
@@ -9463,6 +9499,24 @@ body.mdlopen{overflow:hidden}
   background:rgba(18,41,75,.82);color:#fff;font:800 10.5px/1.5 var(--mono)}
 .sqaa{position:absolute;top:5px;right:5px;padding:1px 4px;border-radius:3px;
   background:var(--gold-fill);color:#2A1E00;font:800 9px/1.5 var(--mono)}
+/* NOT APPEARING. A quiet, factual mark -- never a red "OUT" badge, because
+   the page does not know why and a loud absence claim about a named athlete
+   is exactly what the availability rules exist to prevent. */
+.sqc.sqout .sqf,.sqc.sqout .sqi{filter:grayscale(.85) opacity(.62)}
+/* ⚠ IN THE FLOW, NOT OVER THE NAME. Positioned absolutely at a fixed offset
+   it landed across the player's own name and her set count -- a mark about a
+   person rendered on top of who she is. It is a strip of the card now, so it
+   cannot collide with anything at any width. */
+.sqout-tag{display:block;margin:0 0 3px;padding:2px 5px;border-radius:3px;
+  background:var(--chrome);color:#fff;
+  font:700 9px/1.35 var(--mono);letter-spacing:.02em;text-align:center}
+.tdout{margin:10px 0 2px;padding:9px 11px;border-radius:var(--r-card);
+  background:var(--sheet);border:1px solid var(--line)}
+.tdout b{font:800 10px/1 var(--disp);letter-spacing:.07em;
+  text-transform:uppercase;color:var(--ink2)}
+.tdout ul{margin:6px 0 0;padding-left:16px}
+.tdout li{font:13px/1.5 var(--sans);color:var(--ink)}
+.tdout .ow{font:700 12px/1.4 var(--mono);color:var(--ink2)}
 .sqh{font:800 10px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase;
   color:var(--ink3);margin:12px 0 2px}
 @media (max-width:560px){
@@ -13563,6 +13617,7 @@ const POSFULL = { OH: 'Outside', OPP: 'Opposite', MB: 'Middle',
    blank view in this file: a top-level const read before its declaration
    line has run THROWS, and the throw lands inside showTeam's assembly, so
    the team card renders with its sections orphaned and no error on screen. */
+const OUTBOX = {{OUTBOX_JSON}};
 const PROFILE_ORDER = {{PROFILE_ORDER}};
 const PROFILE_MIN_N = {{PROFILE_MIN_N}};
 const TD_GROUPS = [['overview', 'Overview'], ['matches', 'Matches'],
@@ -24301,7 +24356,7 @@ function tdDashboard(t, name) {
       '</div>' +
     '<div class="tddcol">' + tdForm(t, name) + tdLeaders(t, name) +
       tdIntel(t, name) +
-    '</div></div>' + tdProfile(t, name);
+    '</div></div>' + tdOutbox(t, name) + tdProfile(t, name);
 }
 
 /* THE SQUAD, SEEN. Photographs the roster already holds, at a size a face is
@@ -24343,11 +24398,24 @@ function tdSquad(t, name) {
           : (r.r != null ? (+r.r).toFixed(2) + ' pts/set ’25' : '');
         const aa = (r.aa && r.aa.length) ? '<span class="sqaa" title="AVCA ' +
           esc(r.aa[0].honour) + ', ' + r.aa[0].season + '">AA</span>' : '';
-        return '<div class="sqc" data-player="' + esc(r.n) + '" title="' +
+        /* ⚠ PARTICIPATION, STATED AS PARTICIPATION. "Not in a box since" is
+           an observed fact; "out" is a claim about a person that this page
+           has no source for. The tooltip carries the full wording. */
+        const out = (OUTBOX[name] || {})[nkeyJS(r.n)];
+        const outTag = out
+          ? '<span class="sqout-tag" title="' + esc(out.claim) +
+            ' Last appeared ' + esc(dshort(out.last_seen_epoch)) + ' vs ' +
+            esc(out.last_opponent || '') + '; ' + out.missed +
+            (out.missed === 1 ? ' match' : ' matches') + ' since.">' +
+            'NOT IN A BOX \u00b7 ' + out.missed + '</span>'
+          : '';
+        return '<div class="sqc' + (out ? ' sqout' : '') +
+          '" data-player="' + esc(r.n) + '" title="' +
           esc(r.n + (r.p ? ' · ' + r.p : '') + (r.cl ? ' · ' + r.cl : '')) +
           '">' + face +
           (r.num ? '<span class="sqnum">' + esc(r.num) + '</span>' : '') + aa +
-          '<span class="sqb"><span class="sqn">' + esc(r.n) + '</span>' +
+          '<span class="sqb">' + outTag + '<span class="sqn">' + esc(r.n) +
+          '</span>' +
           '<span class="sqm">' + esc([r.p, r.cl].filter(Boolean).join(' · ')) +
           '</span>' + (rate ? '<span class="sqv">' + esc(rate) + '</span>' : '') +
           '</span></div>';
@@ -24360,6 +24428,44 @@ function tdSquad(t, name) {
     'referenced never copied; <b>' + withPh + ' of ' + rost.length +
     '</b> players here have one, and a player without renders her initials ' +
     'rather than an empty frame. Click a face to open her page.</div></div>';
+}
+
+/* the chain's own identity key, in JS: nameclean's repair is Python-side,
+   but the letters-only fold is what the join needs and it must match. */
+function nkeyJS(s) {
+  return String(s || '').normalize('NFKD').replace(/[^A-Za-z]/g, '')
+    .toLowerCase();
+}
+function dshort(ep) {
+  if (!ep) return 'an earlier match';
+  return new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles',
+    month: 'short', day: 'numeric' }).format(new Date(ep * 1000));
+}
+
+/* WHO IS NOT APPEARING -- the team's own list, ranked by what is missing.
+   ⚠ THIS IS NOT AN INJURY REPORT AND MAY NEVER BECOME ONE. A player absent
+   from a box may be rested, suspended, ineligible, or simply omitted by a
+   scorer. The page says what it observed and stops. */
+function tdOutbox(t, name) {
+  const rows = (t.outbox || []).slice(0, 6);
+  if (!rows.length) return '';
+  return '<div class="tdout"><b>Not appearing</b>' +
+    '<ul>' + rows.map(r =>
+      '<li>' + esc(r.player) + ' — <span class="ow">' +
+      (r.share_of_team_points * 100).toFixed(0) + '% of this team’s ' +
+      'points</span>, last in a box ' + esc(dshort(r.last_seen_epoch)) +
+      ' vs ' + esc(r.last_opponent || '') + ' · ' + r.missed +
+      (r.missed === 1 ? ' match since' : ' matches since') + '</li>').join('') +
+    /* ⚠ ONE UNBROKEN LITERAL. A guard searching for this sentence cannot
+       see it across a `+`, and this codebase has already shipped a notice
+       split between two string literals that its own check could not find. */
+    '</ul><div class="cxcap">Observed participation only: she has not ' +
+    'recorded an action in a counted box score since that date. ' +
+    'The reason is not in the data' +
+    ' — rest, suspension, eligibility and a scorer’s ' +
+    'omission all look identical here, and this is never an injury report. ' +
+    'A listing with a set count but no actions is the feed’s DNP ' +
+    'convention and counts as not appearing.</div></div>';
 }
 
 /* THE PROFILE: what this team does well, drawn against the other 347.

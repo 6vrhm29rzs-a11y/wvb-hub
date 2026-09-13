@@ -199,7 +199,14 @@ console.log(JSON.stringify(cxLine([{x:'W1',y:3},{x:'W2',y:1},{x:'W3',y:2}],
     print("\n6. A FACE IS A PHOTOGRAPH OR INITIALS")
     squad = js_block(page, "tdSquad")
     init = js_block(page, "tdInitials")
+    # ⚠ tdSquad gained real dependencies when the participation radar
+    # landed (the OUTBOX map and the page's identity fold). Stubbed here
+    # rather than guarded away in the page: on the real page a missing
+    # OUTBOX should fail loudly, not silently stop marking absences.
     js = esc + init + squad + """
+const OUTBOX={};
+function nkeyJS(s){return String(s||'').replace(/[^A-Za-z]/g,'').toLowerCase();}
+function dshort(){return 'a date';}
 const t={roster:[{n:'Ada One',p:'S',num:2,ph:'https://x.test/a.jpg',l26:{sets:9}},
                  {n:'Bea Two',p:'OH',num:7,l26:{sets:3}},
                  {n:'Cal Three',p:'MB',num:9},
