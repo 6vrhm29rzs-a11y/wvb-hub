@@ -2,7 +2,7 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-13T03:58:26Z",
+  "generated_at_utc": "2026-09-13T06:02:43Z",
   "counts": {
    "statuses": 3,
    "incidents": 0,
@@ -1460,6 +1460,24 @@
    "points_per_set_missing": 4.222
   },
   {
+   "game_id": "6639651",
+   "team_id": "46672",
+   "team": "Evansville",
+   "absent": [
+    {
+     "name": "McKenzie Laubach",
+     "rate": 2.147,
+     "played_share": 0.8
+    },
+    {
+     "name": "Carlotta Pascual Centelles",
+     "rate": 2.0,
+     "played_share": 0.8
+    }
+   ],
+   "points_per_set_missing": 4.147
+  },
+  {
    "game_id": "6624444",
    "team_id": "45798",
    "team": "George Mason",
@@ -1786,24 +1804,6 @@
     }
    ],
    "points_per_set_missing": 3.857
-  },
-  {
-   "game_id": "6639651",
-   "team_id": "46672",
-   "team": "Evansville",
-   "absent": [
-    {
-     "name": "McKenzie Laubach",
-     "rate": 2.115,
-     "played_share": 0.8
-    },
-    {
-     "name": "Carlotta Pascual Centelles",
-     "rate": 1.727,
-     "played_share": 0.8
-    }
-   ],
-   "points_per_set_missing": 3.842
   },
   {
    "game_id": "6628544",
@@ -5174,6 +5174,19 @@
    "points_per_set_missing": 2.31
   },
   {
+   "game_id": "6626423",
+   "team_id": "45872",
+   "team": "Tennessee St.",
+   "absent": [
+    {
+     "name": "Gabrielle Washington",
+     "rate": 2.304,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.304
+  },
+  {
    "game_id": "6626259",
    "team_id": "46250",
    "team": "SMU",
@@ -5829,6 +5842,19 @@
    "points_per_set_missing": 2.15
   },
   {
+   "game_id": "6627233",
+   "team_id": "46672",
+   "team": "Evansville",
+   "absent": [
+    {
+     "name": "McKenzie Laubach",
+     "rate": 2.147,
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 2.147
+  },
+  {
    "game_id": "6627126",
    "team_id": "51173",
    "team": "California Baptist",
@@ -5868,19 +5894,6 @@
    "points_per_set_missing": 2.136
   },
   {
-   "game_id": "6626423",
-   "team_id": "45872",
-   "team": "Tennessee St.",
-   "absent": [
-    {
-     "name": "Gabrielle Washington",
-     "rate": 2.132,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 2.132
-  },
-  {
    "game_id": "6625401",
    "team_id": "45785",
    "team": "James Madison",
@@ -5918,19 +5931,6 @@
     }
    ],
    "points_per_set_missing": 2.132
-  },
-  {
-   "game_id": "6627233",
-   "team_id": "46672",
-   "team": "Evansville",
-   "absent": [
-    {
-     "name": "McKenzie Laubach",
-     "rate": 2.115,
-     "played_share": 0.75
-    }
-   ],
-   "points_per_set_missing": 2.115
   },
   {
    "game_id": "6637170",
@@ -6461,6 +6461,19 @@
      "name": "Paloma Routaboul",
      "rate": 2.0,
      "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 2.0
+  },
+  {
+   "game_id": "6625926",
+   "team_id": "46672",
+   "team": "Evansville",
+   "absent": [
+    {
+     "name": "Carlotta Pascual Centelles",
+     "rate": 2.0,
+     "played_share": 0.857
     }
    ],
    "points_per_set_missing": 2.0
@@ -7998,19 +8011,6 @@
     }
    ],
    "points_per_set_missing": 1.735
-  },
-  {
-   "game_id": "6625926",
-   "team_id": "46672",
-   "team": "Evansville",
-   "absent": [
-    {
-     "name": "Carlotta Pascual Centelles",
-     "rate": 1.727,
-     "played_share": 0.857
-    }
-   ],
-   "points_per_set_missing": 1.727
   },
   {
    "game_id": "6639033",
@@ -11966,9 +11966,9 @@
    ]
   },
   "Tennessee St.": {
-   "gid": "6628641",
-   "d": "2026-09-10",
-   "appeared": 12,
+   "gid": "6628642",
+   "d": "2026-09-12",
+   "appeared": 13,
    "zero_action": []
   },
   "Montana": {
@@ -12412,10 +12412,12 @@
    ]
   },
   "Evansville": {
-   "gid": "6628641",
-   "d": "2026-09-10",
-   "appeared": 12,
-   "zero_action": []
+   "gid": "6628642",
+   "d": "2026-09-12",
+   "appeared": 10,
+   "zero_action": [
+    "Aubry Dowling"
+   ]
   },
   "Eastern Wash.": {
    "gid": "6628362",

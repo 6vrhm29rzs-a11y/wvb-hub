@@ -47,15 +47,24 @@ esac
 if python3 scripts/mailer.py "$SUBJ" < "$BODY" >> "$LOG" 2>&1; then
     echo "  sent ($LINES lines)" >> "$LOG"
 else
-    echo "  SEND FAILED -- see the error above." >> "$LOG"
-    echo "  534 WebLoginRequired means Google is holding the ACCOUNT until" >> "$LOG"
-    echo "  it is signed into from a browser. This happened once, on" >> "$LOG"
-    echo "  2026-09-11: signing in as wvbhub.desk@gmail.com cleared it and" >> "$LOG"
-    echo "  the next send worked with the SAME stored password." >> "$LOG"
-    echo "  If signing in does not clear it, check the app password is" >> "$LOG"
-    echo "  current -- Cody/data/gmail_app_password.txt, one line, 600." >> "$LOG"
-    echo "  A security alert saying an app password was REMOVED may refer to" >> "$LOG"
-    echo "  an earlier one; compare the alert time against the file mtime" >> "$LOG"
-    echo "  before concluding the stored credential is dead." >> "$LOG"
+    KEEP="$REPO/Cody/data/unsent"
+    mkdir -p "$KEEP"
+    cp "$BODY" "$KEEP/$KIND-$(date '+%Y-%m-%d').txt"
+    if grep -q "535" "$LOG" 2>/dev/null && tail -40 "$LOG" | grep -q "535"; then
+        echo "  SEND FAILED -- 535 BadCredentials: Google is refusing the APP" >> "$LOG"
+        echo "  PASSWORD itself, not the account. Signing in will NOT fix this." >> "$LOG"
+        echo "  Generate a NEW app password as wvbhub.desk@gmail.com and replace" >> "$LOG"
+        echo "  the one line in Cody/data/gmail_app_password.txt (600)." >> "$LOG"
+        echo "  ⚠ If a fresh password is revoked again within a day or two," >> "$LOG"
+        echo "  SMTP from this account is the wrong transport -- switch" >> "$LOG"
+        echo "  approach rather than keep re-issuing passwords." >> "$LOG"
+    else
+        echo "  SEND FAILED -- see the error above." >> "$LOG"
+        echo "  534 WebLoginRequired means Google is holding the ACCOUNT until" >> "$LOG"
+        echo "  it is signed into from a browser; that happened on 2026-09-11" >> "$LOG"
+        echo "  and signing in cleared it with the same stored password." >> "$LOG"
+    fi
+    echo "  the report was KEPT at $KEEP/$KIND-$(date '+%Y-%m-%d').txt" >> "$LOG"
+    rm -f "$BODY"; exit 1
 fi
 rm -f "$BODY"
