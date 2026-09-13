@@ -105,5 +105,5 @@ if __name__ == "__main__":
     routes = sys.argv[1:] or [
         "/today", "/scores", "/rankings", "/rankings/avca", "/rankings/digby",
         "/rankings/gap", "/rankings/cal", "/stats", "/teams/Kentucky",
-        "/ballot", "/desk", "/standings", "/schedule"]
+        "/ballot", "/desk", "/standings", "/schedule", "/front-page", "/conference-lab"]
     sys.exit(1 if asyncio.run(probe(routes)) else 0)

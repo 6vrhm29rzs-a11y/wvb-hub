@@ -4646,6 +4646,51 @@ def build():
     tindex = team_index(teams, res_cnt, pred_by_pair, sim_of, ldr_floor,
                         tstats=tstats, aq_of=aq_of, sched_n=sched_n)
     _conflab = conference_lab(teams, tindex)
+
+    # ── THE NEWSROOM ────────────────────────────────────────────────────
+    # ⚠ ONE CONTENT LAYER, TWO RENDERERS. This page and the daily emails must
+    # not each decide what the day's lead was, or they disagree inside a week
+    # and one of them has already been posted. newsroom.day_stories takes the
+    # same counted rows both use.
+    # ⚠ AND A HEADLINE IS NEVER AUTHORED AS A STRING. It is a shape whose
+    # every number is a named slot filled from a fact -- "sweeps" is licensed
+    # by the loser holding zero sets, not by anyone's judgement. That is why
+    # this is computed HERE in Python, where the shape system lives, rather
+    # than assembled in the page.
+    _news = {"day": None, "stories": [], "n_results": 0}
+    try:
+        import newsroom as _NR
+        _nday = max((g.get("d") for t in tindex.values()
+                     for g in (t.get("played") or []) if g.get("d")), default=None)
+        if _nday:
+            _seen, _rows = set(), []
+            for _nm, _t in tindex.items():
+                for _g in (_t.get("played") or []):
+                    if _g.get("d") != _nday:
+                        continue
+                    _gid = str(_g.get("gid"))
+                    if _gid in _seen:
+                        continue
+                    _seen.add(_gid)
+                    _mine, _th = _g.get("mine"), _g.get("theirs")
+                    if _mine is None or _th is None:
+                        continue
+                    _won = _mine > _th
+                    _w, _l = ((_nm, _g.get("opp")) if _won
+                              else (_g.get("opp"), _nm))
+                    _ws, _ls = (_mine, _th) if _won else (_th, _mine)
+                    _rows.append({"w": _w, "l": _l, "ws": _ws, "ls": _ls,
+                                  "gid": _gid})
+            _rk = dict((n, t.get("rank")) for n, t in tindex.items() if t.get("rank"))
+            _av = dict((n, t.get("avca")) for n, t in tindex.items() if t.get("avca"))
+            _news = {"day": _nday, "n_results": len(_rows),
+                     "stories": _NR.day_stories(_rows, _rk, _av, limit=10)}
+    except Exception as _e:                                # noqa: BLE001
+        # ⚠ THE FRONT PAGE MUST NEVER TAKE THE BUILD DOWN. It is a reading
+        # surface; every number it shows exists elsewhere. An empty newsroom
+        # renders as "no stories yet", which is true, rather than aborting a
+        # page whose other twelve views are fine.
+        print("  newsroom skipped: %s" % _e)
     # a side artifact so the Sunday-cutoff snapshot script can freeze the
     # SAME payload the page renders, without re-deriving it (R4)
     json.dump(_conflab, open(os.path.join(REPO, "data",
@@ -5818,6 +5863,7 @@ def build():
         .replace("{{N_PLAYERS}}", str(len(plist))) \
         .replace("{{LEADERS_JSON}}", json.dumps(ldrs, separators=(",", ":"))) \
         .replace("{{CONFLAB_JSON}}", json.dumps(_conflab, separators=(",", ":"))) \
+        .replace("{{NEWS_JSON}}", json.dumps(_news, separators=(",", ":"))) \
         .replace("{{AVAIL_JSON}}", json.dumps(
             load("data/availability_desk_%d.json" % SEASON) or {},
             separators=(",", ":"))) \
@@ -10462,6 +10508,24 @@ details.avhist{margin:14px 0}
   text-transform:uppercase}
 .cfcard span{font-size:12px;color:var(--ink2)}
 .cftab{width:100%;border-collapse:collapse}
+/* ── FRONT PAGE ─────────────────────────────────────────────────────── */
+#v-news .nwitem{background:var(--card,#fff);border:1px solid var(--line);
+  border-radius:var(--r-card,10px);padding:14px 16px;margin:10px 0;
+  box-shadow:var(--float,none)}
+#v-news .nwitem.nwlead{padding:20px 18px}
+#v-news .nwh{font:700 19px/1.25 var(--disp);margin:0 0 6px;letter-spacing:.01em}
+#v-news .nwitem.nwlead .nwh{font-size:27px;line-height:1.18}
+#v-news .nwmeta{font-size:12px;color:var(--slate);letter-spacing:.02em}
+#v-news .nwgo{margin-top:10px;font:600 11px/1 var(--disp);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--slate);background:none;
+  border:1px solid var(--line);border-radius:var(--r-ctl,8px);
+  padding:6px 10px;cursor:pointer}
+#v-news .nwgo:hover{border-color:var(--line2);color:var(--ink)}
+#v-news .nwnote p{margin:8px 0}
+@media (max-width:560px){
+  #v-news .nwitem.nwlead .nwh{font-size:22px}
+  #v-news .nwh{font-size:17px}
+}
 .cftab th{font:600 11px/1.2 var(--disp);letter-spacing:.09em;
   text-transform:uppercase;color:var(--ink3);padding:7px 8px;cursor:pointer;
   white-space:nowrap}
@@ -10964,6 +11028,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
           <button role="menuitem" data-v="players">Players</button>
           <button role="menuitem" data-v="prank">Player ratings</button>
           <button role="menuitem" data-v="standings">Standings</button>
+          <button role="menuitem" data-v="news">Front page</button>
           <button role="menuitem" data-v="conflab">Conference Lab</button>
           <button role="menuitem" data-v="schedule">Schedule</button>
         </div>
@@ -11725,6 +11790,28 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   </div>
 </section>
 
+<section id="v-news" hidden>
+  <h2>Front page</h2>
+  <p class="lead" id="nwlead">The {{SEASON_YEAR}} season&rsquo;s most recent day of results, read as stories&hellip;</p>
+  <div id="nwbody"></div>
+  <details id="nwhow"><summary>How a headline here is written</summary>
+    <div class="munk nwnote">
+      <p>Every headline is a <b>shape</b>, not a sentence someone wrote: a
+      template whose every number is a named slot filled from the match&rsquo;s
+      own facts, with a precondition that makes the wording true. &ldquo;Sweeps&rdquo;
+      appears only when the losing side holds zero sets; &ldquo;in five&rdquo; only
+      when five were played. No quantity can appear that is not in the data.</p>
+      <p>The order is a <b>convention</b> and nothing more. It weighs how
+      highly the beaten side was ranked, how far the winner sat below it, the
+      quality of the better team and whether it went five. Those weights were
+      chosen, not fitted, and they order this list and feed nothing &mdash; no
+      rating, no record, no forecast.</p>
+      <p>Stories are drawn from the same counted results the daily email uses,
+      so the two cannot disagree about what happened.</p>
+    </div>
+  </details>
+</section>
+
 <section id="v-conflab" hidden>
   <h2>Conference Lab</h2>
   <p class="lead" id="cflead">The <b>2026</b> interconference evidence, loading&hellip;</p>
@@ -12079,6 +12166,7 @@ const ROUTE_OF_VIEW = { desk:'today', scores:'scores', rankings:'rankings',
   teams:'teams', ballot:'ballot', leaders:'stats', players:'players',
   prank:'player-ratings',
   standings:'standings', conflab:'conference-lab', confidence:'result-ledger',
+  news:'front-page',
   /* AVAIL-ROUTE-BEGIN */ avail:'availability', /* AVAIL-ROUTE-END */
   bracket:'bracket', schedule:'schedule', tv:'tv',
   /* FILMROOM-ROUTE-BEGIN */ film:'film-room', /* FILMROOM-ROUTE-END */
@@ -18291,6 +18379,56 @@ function renderScoreboard() {
    separately-labelled things -- never one blended score; and every count can
    be OPENED -- each matrix cell carries the exact match list behind it, so a
    number on this page is a drillable fact, not a claim. */
+const NEWS = {{NEWS_JSON}};
+
+/* ── FRONT PAGE ──────────────────────────────────────────────────────────
+   Renders stories the SERVER composed. Deliberately dumb: the shape system
+   that guarantees a headline's numbers are real lives in Python, and nothing
+   here may compose a sentence about a match. This file lays out text it is
+   given and nothing more -- if a headline is wrong, it is wrong in newsroom.py
+   where the facts and the preconditions are, not in a template here. */
+function renderNews() {
+  const lead = document.getElementById('nwlead');
+  const body = document.getElementById('nwbody');
+  if (!lead || !body) return;
+  const st = (NEWS && NEWS.stories) || [];
+  if (!st.length) {
+    lead.innerHTML = 'No results counted yet for the most recent day of the ' + SEASON_YEAR + ' season.';
+    body.innerHTML = '';
+    return;
+  }
+  lead.innerHTML = '<b>' + esc(NEWS.day) + '</b> &mdash; ' +
+    NEWS.n_results + (NEWS.n_results === 1 ? ' counted result' : ' counted results') +
+    ', the ' + st.length + ' most notable below. Ordering is a convention; ' +
+    'see <i>How a headline here is written</i>.';
+
+  const one = (s, i) => {
+    const f = s.facts || {};
+    const bits = [];
+    if (f.winner_power) bits.push('POWER #' + f.winner_power + ' ' + esc(f.winner));
+    if (f.loser_power) bits.push('POWER #' + f.loser_power + ' ' + esc(f.loser));
+    return '<article class="nwitem' + (i === 0 ? ' nwlead' : '') + '">' +
+      '<h3 class="nwh">' + esc(s.headline) + '</h3>' +
+      '<div class="nwmeta munk">' +
+        (f.loser_rank ? '<b>AVCA No. ' + f.loser_rank + '</b> beaten &middot; ' : '') +
+        bits.join(' &middot; ') +
+        (f.total_sets ? ' &middot; ' + f.total_sets + ' sets' : '') +
+      '</div>' +
+      (s.gid ? '<button class="nwgo" data-match="' + esc(s.gid) +
+               '">box score</button>' : '') +
+      '</article>';
+  };
+  body.innerHTML = st.map(one).join('');
+}
+
+(function () {
+  /* No click handler here ON PURPOSE. A document-level listener already
+     routes ANY element carrying data-match through matchRoute() -- it was
+     made general precisely so new surfaces would not each add their own.
+     This button carries the attribute and is therefore already wired. */
+  if (document.getElementById('v-news')) renderNews();
+})();
+
 const CONFLAB = {{CONFLAB_JSON}};
 let CF_SORT = ['w', -1];
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Guards for the attribution-suspicion detector (2026-09-01)."""
+import copy
 import json
 import os
 import sys
@@ -61,28 +62,29 @@ def main():
     check("below the reliability floor -> UNAVAILABLE",
           r["vote"] == "UNAVAILABLE" and "reliability" in r.get("why", ""))
 
-    print("\n4. THE REAL KNOWN POSITIVE (SMU-UC Davis, from committed raw)")
+    print("\n4. THE KNOWN POSITIVE, PROVED IN PROCESS (SMU-UC Davis)")
     raw, corrected = A.load_corpora()
     results_real = A.team_results(corrected)
-    # ⚠ THIS KNOWN POSITIVE WAS CORRECTED AT SOURCE (2026-09-11). The feed
-    # went back and fixed its own team attribution on SMU-UC Davis, so the
-    # box it serves TODAY is right and there is no inversion left to detect.
-    # Reading last-wins here made this check fail against a feed that had
-    # improved -- the expectation was stale, not the detector.
-    # The log is append-only, so the record the correction was FILED AGAINST
-    # is still present; it is simply no longer last. Keeping FIRST-wins for
-    # this fixture keeps the detector's capability provable, and the
-    # last-wins copy is kept beside it so the two can be compared.
-    boxes_real, boxes_latest = {}, {}
+    # ⚠ THIS FIXTURE HAS NOW ROTTED TWICE, AND THE SECOND TIME SETTLES THE
+    # SHAPE. (1) The feed went back and fixed its own team attribution on
+    # SMU-UC Davis (2026-09-11), so the box it serves TODAY is correct and a
+    # last-wins read had no inversion left to find. Reading FIRST-wins kept
+    # the capability provable -- until (2) the per-gid last-wins MERGE rule
+    # for playerbox.jsonl collapsed the game to a single record, which is
+    # exactly what that rule is for. The inverted copy is gone and is not
+    # coming back.
+    # So the detector's capability is no longer proved from a stored artifact
+    # at all: the CURRENT box is read, the attribution is swapped IN PROCESS,
+    # and the detector must see it. That control cannot rot, because it builds
+    # the condition it tests instead of hoping the world still holds one.
+    boxes_latest = {}
     with open(os.path.join(A.RAW, "playerbox.jsonl")) as f:
         for line in f:
             try:
                 rr = json.loads(line)
             except ValueError:
                 continue
-            gid = str(rr.get("game_id"))
-            boxes_latest[gid] = rr
-            boxes_real.setdefault(gid, rr)        # first wins
+            boxes_latest[str(rr.get("game_id"))] = rr        # last wins
     d = json.load(open(os.path.join(REPO, "data", "data_2026.json")))
     id2n = {str(t["team_id"]): t["name_short"] for t in d["teams"]}
     R = json.load(open(os.path.join(A.RAW, "rosters_2026.json")))
@@ -93,11 +95,36 @@ def main():
         ks.discard("")
         if ks:
             rkeys[team] = ks
-    smu = A.box_roster_fit("6626259", raw["6626259"], boxes_real, rkeys,
-                           id2n)
-    check("SMU-UC Davis box rows vote SUPPORTS_H1 on the AS-FILED "
-          "attribution (the feed has since corrected itself)",
-          smu["vote"] == "SUPPORTS_H1" and smu["fit_gain"] > 0.5, smu)
+    GID = "6626259"
+    have = GID in boxes_latest and GID in raw
+    if not have:
+        check("the SMU-UC Davis box is still held to test against", False,
+              "gid %s absent from the raw corpus" % GID)
+    else:
+        clean = A.box_roster_fit(GID, raw[GID], boxes_latest, rkeys, id2n)
+        check("as served TODAY the box matches the filed attribution "
+              "(the feed corrected itself)",
+              clean["vote"] == "SUPPORTS_H0", clean)
+        # POSITIVE CONTROL: swap the two teams' rows and the detector must
+        # call it -- this is the inversion the source once served.
+        tids = [str(t.get("team_id")) for t in (raw[GID].get("teams") or [])]
+        flip = {tids[0]: tids[1], tids[1]: tids[0]} if len(tids) == 2 else {}
+        swapped = copy.deepcopy(boxes_latest[GID])
+        for row in (swapped.get("rows") or []):
+            row["team_id"] = flip.get(str(row.get("team_id")),
+                                      row.get("team_id"))
+        inverted = A.box_roster_fit(GID, raw[GID], dict(boxes_latest,
+                                                        **{GID: swapped}),
+                                    rkeys, id2n)
+        check("[+] ...and an inverted attribution votes SUPPORTS_H1",
+              inverted["vote"] == "SUPPORTS_H1"
+              and inverted["fit_gain"] > 0.5, inverted)
+        check("[+] ...on the same rows, so the detector is what changed "
+              "the verdict",
+              clean.get("eligible_rows") == inverted.get("eligible_rows")
+              and clean.get("eligible_rows", 0) > 0,
+              "%s vs %s" % (clean.get("eligible_rows"),
+                            inverted.get("eligible_rows")))
 
     print("\n5. THE DETECTOR MUTATES NOTHING")
     src = open(os.path.join(REPO, "scripts",
