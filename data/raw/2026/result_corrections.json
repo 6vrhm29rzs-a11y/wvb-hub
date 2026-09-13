@@ -3646,6 +3646,118 @@
     }
    ],
    "note": "⚠ FOUND BY THE PER-DATE SCHOOL RECONCILIATION, and it was already being HELD correctly -- the impossible-tally rule added earlier today caught it as self-contradictory, so it counted nowhere while both schools had published it. The hold was right; what was missing was going back for the schools."
+  },
+  "6625276": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "UC Davis (home) won 3-0 -- refuted by the feed's OWN lines, where the visit column (Oregon) takes 25-19 and 25-18 and the third row is a frozen 25-25. UC Davis won ZERO decided sets and is credited with three.",
+   "correct": {
+    "winner_team_id": "46613",
+    "away_sets": 3,
+    "home_sets": 0,
+    "linescores": [],
+    "linescores_replace": true
+   },
+   "established": "Oregon swept UC Davis 3-0. Both schools publish it -- Oregon records 'UC Davis W 3 0' and UC Davis 'Oregon L 0 3'. ⚠ THE TAPE IS WITHHELD. The feed's first two rows (25-19, 25-18 to Oregon) are consistent with the schools, but its third is 25-25, which is not a finished set, and no source we hold publishes how it ended. The RESULT is established; the third set's score is not.",
+   "evidence": [
+    {
+     "url": "https://goducks.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Oregon",
+     "retrieved": "2026-09-13T02:10:00Z",
+     "text": "'2026-09-12 | UC Davis | W 3 0'",
+     "establishes": "Oregon won 3-0"
+    },
+    {
+     "url": "https://ucdavisaggies.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "UC Davis",
+     "retrieved": "2026-09-13T02:10:00Z",
+     "text": "'2026-09-12 | Oregon | L 0 3'",
+     "establishes": "UC Davis lost 0-3"
+    }
+   ],
+   "note": "⚠⚠ CODY CAUGHT THIS BY EYE -- 'Oregon swept Davis' -- after it had already reached the night email as an upset AND led the newsroom's front page as 'UC Davis sweeps No. 24 Oregon'. Both guards that should have seen it were blind to this exact shape: is_self_contradictory bails out the moment ANY linescore pair is tied (25-25 here), and the impossible-tally rule added hours earlier only fires when the winner claims FEWER than three sets, not when it claims three it did not win. A frozen set in the tape is precisely the cover an inversion needs."
+  },
+  "6625792": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Brown (home) won 3-0 -- refuted by the feed's OWN complete lines, where the visit column (LMU) takes 25-20, 25-13, 25-18. Brown is credited with three sets and won none of them.",
+   "correct": {
+    "winner_team_id": "45792",
+    "away_sets": 3,
+    "home_sets": 0,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 25,
+      "home": 20
+     },
+     {
+      "period": 2,
+      "visit": 25,
+      "home": 13
+     },
+     {
+      "period": 3,
+      "visit": 25,
+      "home": 18
+     }
+    ],
+    "linescores_replace": true
+   },
+   "established": "LMU (CA) swept Brown 3-0. Both schools publish it -- LMU records 'Brown W 3 0' and Brown 'LMU L 0 3'. The feed's per-set LINES are correct and complete; only its winner and sets-won fields are wrong, so the tape is kept as served.",
+   "evidence": [
+    {
+     "url": "https://lmulions.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "LMU (CA)",
+     "retrieved": "2026-09-13T02:20:00Z",
+     "text": "'2026-09-12 | Brown | W 3 0'",
+     "establishes": "LMU won 3-0"
+    },
+    {
+     "url": "https://brownbears.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Brown",
+     "retrieved": "2026-09-13T02:20:00Z",
+     "text": "'2026-09-12 | LMU | L 0 3'",
+     "establishes": "Brown lost 0-3"
+    }
+   ],
+   "note": "⚠ FOUND BY THE RULE ADDED MINUTES EARLIER, after Cody caught the Oregon-UC Davis inversion by eye. Same shape: the winner credited with sets it did not win on the feed's own tape."
+  },
+  "6626576": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Dartmouth (home) won 3-1 -- refuted by its own lines, where the visit column (Northeastern) takes 25-21 and 25-16 and leads the fourth 12-9. Dartmouth won ONE decided set and is credited with three.",
+   "correct": {
+    "winner_team_id": "46728",
+    "away_sets": 3,
+    "home_sets": 1,
+    "linescores": [],
+    "linescores_replace": true
+   },
+   "established": "Northeastern beat Dartmouth 3-1. Both schools publish it -- Northeastern records 'Dartmouth W 3 1' and Dartmouth 'Northeastern L 1 3'. ⚠ THE TAPE IS WITHHELD: the feed's fourth row is 12-9, which is not a finished set, and no source we hold says how it ended.",
+   "evidence": [
+    {
+     "url": "https://gonu.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Northeastern",
+     "retrieved": "2026-09-13T02:20:00Z",
+     "text": "'2026-09-12 | Dartmouth | W 3 1'",
+     "establishes": "Northeastern won 3-1"
+    },
+    {
+     "url": "https://dartmouthsports.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Dartmouth",
+     "retrieved": "2026-09-13T02:20:00Z",
+     "text": "'2026-09-12 | Northeastern | L 1 3'",
+     "establishes": "Dartmouth lost 1-3"
+    }
+   ],
+   "note": "⚠ FOUND BY THE SAME NEW RULE, in the same minute as Brown-LMU. Three inversions in one afternoon on the same shape, one of which a human spotted first."
   }
  }
 }

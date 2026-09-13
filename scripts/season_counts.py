@@ -417,6 +417,23 @@ def is_self_contradictory(g):
         ls = [(int(v), int(h)) for v, h in ls]
     except (TypeError, ValueError):
         return False
+    _decided = [(v, h) for v, h in ls if v != h]
+    _rows, _ts0 = len(ls), (g.get("teams") or [])
+    if len(_ts0) == 2 and _decided:
+        try:
+            _claimed = int(_ts0[0].get("sets_won") or 0) + int(_ts0[1].get("sets_won") or 0)
+        except (TypeError, ValueError):
+            _claimed = None
+        _wi = winner_index(g)
+        if _claimed and _rows == _claimed and _wi is not None:
+            _home_i = 0 if _ts0[0].get("is_home") else 1
+            _vwins = sum(1 for v, h in _decided if v > h)
+            _hwins = len(_decided) - _vwins
+            _won_by_winner = _hwins if _wi == _home_i else _vwins
+            _won_by_loser = _vwins if _wi == _home_i else _hwins
+            if _won_by_winner < _won_by_loser:
+                return True        # credited the win, lost more decided sets
+
     if any(v == h for v, h in ls):
         return False                      # a frozen partial set: not this class
     va = sum(1 for v, h in ls if v > h)
