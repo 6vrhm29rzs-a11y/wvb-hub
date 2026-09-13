@@ -66,6 +66,11 @@ REBUILD = [
     # ranks what availability.py merely flags: 750 undifferentiated
     # team-match flags are not a thing anyone can read.
     ({}, ["scripts/participation_radar.py"]),
+    # the two outside-source legs: does the school agree about when a
+    # match starts, and do its own words say anything about the
+    # players the box scores flagged.
+    ({}, ["scripts/fixture_time_check.py", "--days", "4"]),
+    ({}, ["scripts/availability_scan.py"]),
     ({}, ["scripts/build_dataset.py"]),
     ({}, ["scripts/rpi_2025.py"]),
     ({}, ["scripts/rating_2025.py"]),

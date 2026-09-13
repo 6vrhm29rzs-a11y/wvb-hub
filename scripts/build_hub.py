@@ -1548,6 +1548,7 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
     # PARTICIPATION, NOT AVAILABILITY. See participation_radar.py: this says
     # a player has not appeared in a box, and never why.
     _radar = radar_by_team()
+    _tdis = time_disputes()
     _di_pl = di_counting()
     _vidx_res = venue_index()
     for r in res:
@@ -2093,7 +2094,12 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
             "wlq": _wl_quality(played.get(nm, [])),
             "splits": _resume_splits(
                 [_opp_ctx(g) for g in played.get(nm, [])]),
-            "fixtures": [_opp_ctx(dict(f, pick=_fixture_pick(pred_by_pair, f, nm)))
+            # ⚠ THE DISAGREEMENT TRAVELS WITH THE FIXTURE, like `conflict`
+            # does: a view that has it and ignores it is choosing to; a view
+            # that never received it could not have known.
+            "fixtures": [_opp_ctx(dict(
+                f, pick=_fixture_pick(pred_by_pair, f, nm),
+                tdis=_tdis.get(str(f.get("gid")))))
                          for f in fixtures.get(team_norm(nm), [])
                          if f["d"] >= today][:40],
         }
@@ -2917,6 +2923,20 @@ def _nkey_letters(s):
     import unicodedata as _u
     s = _u.normalize("NFKD", s or "")
     return "".join(c for c in s if c.isalpha() and ord(c) < 128).lower()
+
+
+def time_disputes():
+    """gid -> the school's own start time, where it differs from the feed.
+
+    Produced by scripts/fixture_time_check.py. A FLAG, never a correction:
+    only the hand-curated fixture ledger may change a displayed time, and it
+    needs a citation.
+    """
+    doc = load("data/fixture_time_check_%d.json" % SEASON) or {}
+    out = {}
+    for r in (doc.get("disagreements") or []):
+        out[str(r.get("gid"))] = r
+    return out
 
 
 def participation_radar():
@@ -9510,6 +9530,9 @@ body.mdlopen{overflow:hidden}
 .sqout-tag{display:block;margin:0 0 3px;padding:2px 5px;border-radius:3px;
   background:var(--chrome);color:#fff;
   font:700 9px/1.35 var(--mono);letter-spacing:.02em;text-align:center}
+.tdisq{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:3px;
+  border:1px dashed var(--gold);background:var(--amber-bg);
+  font:700 10px/1.5 var(--mono);color:var(--amber);cursor:help}
 .tdout{margin:10px 0 2px;padding:9px 11px;border-radius:var(--r-card);
   background:var(--sheet);border:1px solid var(--line)}
 .tdout b{font:800 10px/1 var(--disp);letter-spacing:.07em;
@@ -24184,7 +24207,8 @@ function tdNextMatch(t, name) {
             return 'FINAL' + (_sc && _sc[0] !== null && _sc[0] !== undefined
                               ? ' ' + _sc[0] + '\u2013' + _sc[1] : '');
           })()
-        : esc(dayLabel(f.d)) + (f.t ? ' &middot; ' + esc(f.t) : '')) +
+        : esc(dayLabel(f.d)) + (f.t ? ' &middot; ' + esc(f.t) : '') +
+          tdisNote(f)) +
         /* ⚠ THE MODEL'S PRE-MATCH PICK MOVED HERE FROM THE GLANCE STRIP,
            IT WAS NOT DROPPED. The strip's "Next" tile and this card said the
            same thing twice in one viewport; this card is the richer of the two
@@ -24428,6 +24452,27 @@ function tdSquad(t, name) {
     'referenced never copied; <b>' + withPh + ' of ' + rost.length +
     '</b> players here have one, and a player without renders her initials ' +
     'rather than an empty frame. Click a face to open her page.</div></div>';
+}
+
+/* ⚠ THE FEED AND THE SCHOOL DISAGREE ABOUT WHEN THIS STARTS, so the page
+   says so instead of picking one. Cody watched Purdue-SMU while every
+   surface here called it upcoming: the feed said 3:00 PM PT, Purdue's own
+   site said 2:00, and the match was underway. Only the hand-curated fixture
+   ledger may CHANGE a displayed time -- this is a flag with both times and
+   the school that published the other one. */
+function tdisNote(f) {
+  const d = f && f.tdis;
+  if (!d || !d.school_epoch) return '';
+  const t = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Los_Angeles', hour: 'numeric', minute: '2-digit'
+  }).format(new Date(d.school_epoch * 1000));
+  return '<span class="tdisq" title="The NCAA feed lists this start time; ' +
+    esc(d.school_asked) + '’s own published schedule lists ' + esc(t) +
+    ' PT, ' + Math.abs(d.minutes_apart) + ' minutes ' +
+    (d.minutes_apart > 0 ? 'later' : 'earlier') +
+    '. Neither is corrected here — the feed has been wrong about start ' +
+    'times before, and so has a school.">' +
+    esc(d.school_asked) + ' lists ' + esc(t) + ' PT</span>';
 }
 
 /* the chain's own identity key, in JS: nameclean's repair is Python-side,

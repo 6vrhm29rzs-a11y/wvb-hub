@@ -168,6 +168,8 @@ jobs:
           # collected earlier in this same run.
           python3 scripts/availability.py
           python3 scripts/participation_radar.py
+          python3 scripts/fixture_time_check.py --days 4
+          python3 scripts/availability_scan.py
           # Win probability for everything still to be played. Depends on
           # venues.py above -- a neutral floor gets no home advantage.
           python3 scripts/predict_2026.py || echo "prediction needs a prior rating; skipping"

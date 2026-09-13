@@ -1,0 +1,33 @@
+{
+ "season": 2026,
+ "generated_utc": "2026-09-13T22:27:10Z",
+ "teams_with_a_flagged_player": 179,
+ "teams_reached": 15,
+ "teams_unreadable": 164,
+ "phrases": [
+  "did not play",
+  "did not dress",
+  "was unavailable",
+  "is unavailable",
+  "will not play",
+  "will miss",
+  "has missed",
+  "out of the lineup",
+  "out of the rotation",
+  "did not travel",
+  "has not played",
+  "returned to the lineup",
+  "returned to action",
+  "back in the lineup",
+  "made her return",
+  "in street clothes",
+  "held out"
+ ],
+ "binding_rule": "the surname and the phrase must appear in the SAME sentence, and the surname must match as a whole token (R8; the USC-Arizona St. incident)",
+ "what_this_is_not": "Not an availability status and not a diagnosis. No medical vocabulary is searched for at all.",
+ "articles_read": 55,
+ "chars_scanned": 179795,
+ "reading_note": "school recaps describe what happened and rarely state that a player was unavailable; a run that reads thousands of words and returns no signal is the expected result from this source, which is why the counters above are recorded.",
+ "n": 0,
+ "signals": []
+}

@@ -1,10 +1,10 @@
 {
  "date": "2026-09-13",
- "generated_utc": "2026-09-13T21:55:31Z",
+ "generated_utc": "2026-09-13T22:21:57Z",
  "counts": {
-  "CORROBORATED_ONE": 25,
-  "VERIFIED_BOTH": 15,
-  "CONTRADICTED_ONE": 1,
+  "CORROBORATED_ONE": 27,
+  "VERIFIED_BOTH": 16,
+  "CONTRADICTED_ONE": 2,
   "HELD_BOTH_REPORT": 1
  },
  "matches": [
@@ -1081,6 +1081,99 @@
      "assertion": "Western Mich. L 0-3 vs UIC",
      "opponent_source": "UIC",
      "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6627313",
+   "date": "2026-09-13",
+   "canonical": "San Jose St. def. UC Irvine 3-2",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "San Jose St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://sjsuspartans.com/website-api/schedule-events?filter%5Bschedule.sport_id%5D=22&filter%5Bpast%5D=true&per_page=25&sort=-datetime&include=opponent,scheduleEventResult",
+     "assertion": "San Jose St. W 3-2 vs UC Irvine",
+     "opponent_source": "UC Irvine",
+     "site_says": "Away",
+     "surface": "wmt_api"
+    },
+    "UC Irvine": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://ucirvinesports.com/sports/womens-volleyball/schedule/text",
+     "rows_on_date": [
+      "San Jos\u00e9\tState"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6626986",
+   "date": "2026-09-13",
+   "canonical": "Rice def. Creighton 3-1",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Rice": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://riceowls.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Rice W 3-1 vs Creighton",
+     "opponent_source": "Creighton",
+     "site_says": "Home"
+    },
+    "Creighton": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gocreighton.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Creighton L 1-3 vs Rice",
+     "opponent_source": "Rice",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6627514",
+   "date": "2026-09-13",
+   "canonical": "Kansas St. def. Nevada 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Kansas St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://kstatesports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Kansas St. W 3-1 vs Nevada",
+     "opponent_source": "Nevada",
+     "site_says": "Away"
+    },
+    "Nevada": {
+     "state": "NOT_POSTED",
+     "url": "https://nevadawolfpack.com/services/schedule_txt.ashx?schedule=525",
+     "row": [
+      "Sep 13 (Sun)",
+      "1 PM (PT)",
+      "Home",
+      "Kansas State",
+      "Reno, Nev.  (Virginia Street Gym)",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6628128",
+   "date": "2026-09-13",
+   "canonical": "San Diego St. def. CSU Bakersfield 3-1",
+   "verdict": "CONTRADICTED_ONE",
+   "schools": {
+    "San Diego St.": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://goaztecs.com/sports/volleyball/schedule",
+     "rows_on_date": []
+    },
+    "CSU Bakersfield": {
+     "state": "CONTRADICTS",
+     "url": "https://gorunners.com/services/schedule_txt.ashx?schedule=349",
+     "assertion": "CSU Bakersfield W 3-1 vs San Diego State",
+     "opponent_source": "San Diego State",
+     "site_says": "Neutral"
     }
    }
   }
