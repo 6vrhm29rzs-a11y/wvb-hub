@@ -1534,6 +1534,10 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
     as markup would quadruple the file for content nobody looks at at once.
     """
     played = {}
+    # Computed HERE from the tstats this function already receives, rather
+    # than passed in beside it: one caller, one source, nothing to keep in
+    # sync if the profile ever gains a metric (R4).
+    _profiles = team_profiles(tstats or {})
     _di_pl = di_counting()
     _vidx_res = venue_index()
     for r in res:
@@ -2041,6 +2045,7 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
             "retpos": _retpos.get(nm),
             "rotso": _rotso.get(nm),
             "tstats": (tstats or {}).get(nm),
+            "pctl": (_profiles or {}).get(nm),
             "aq": (aq_of or {}).get(t["conf"]),
             "sched_n": (sched_n or {}).get(team_norm(nm), 0),
             # position within its own conference on our 2026 order -- a sort of
@@ -2855,6 +2860,83 @@ def player_photos():
             out.setdefault(tname, {}).setdefault(
                 re.sub(r"[^a-z]", "", (nm or "").lower()), url)
     return out
+
+# ⚠ A RATE ALONE DOES NOT SAY WHETHER IT IS GOOD. ".326 hitting" is a fact
+# nobody can place without knowing what the other 347 teams did, so every
+# profiled metric carries its PERCENTILE among the teams with a real sample,
+# and the chart draws the percentile while the label prints the rate.
+#
+# ⚠ DIRECTION IS DECLARED, NEVER INFERRED FROM THE NAME. Serve-error rate and
+# everything in the ALLOWED column are better when LOW, and a renderer that
+# guesses from a key name is the R4 trap with a new face (this file has
+# already shipped two modules that disagreed about which key meant aces).
+# Each entry states `hi_good`, and the percentile is always oriented so that
+# 100 means "best in Division I at this", whichever way the raw number runs.
+PROFILE_METRICS = [
+    ("hit", "Hitting %", True, "pct3"),
+    ("killpct", "Kill %", True, "pct1"),
+    ("kps", "Kills / set", True, "num2"),
+    ("pps", "Points / set", True, "num2"),
+    ("bps", "Blocks / set", True, "num2"),
+    ("aps", "Aces / set", True, "num2"),
+    ("dps", "Digs / set", True, "num2"),
+    ("asps", "Assists / set", True, "num2"),
+    ("recv_ok_rate", "Reception, clean", True, "pct1"),
+    ("svc_err_rate", "Serve errors", False, "pct1"),
+]
+PROFILE_MIN_MATCHES = 3
+
+
+def team_profiles(tstats):
+    """Per-team percentile profile, both sides of the ball.
+
+    Returns {team: {metric: {v, p, av, ap, hi_good, fmt, label, n}}} where
+    `v`/`p` are what the team DOES and `av`/`ap` what it ALLOWS, so one row
+    can draw both. A team under the sample floor gets no profile at all --
+    a percentile from two matches is a number pretending to be a measurement.
+    """
+    if not tstats:
+        return {}
+    pools = {}
+    for key, _lab, _hi, _fmt in PROFILE_METRICS:
+        for side in ("own_di", "opp_di"):
+            vals = []
+            for _nm, blk in tstats.items():
+                d = (blk or {}).get(side) or {}
+                if (d.get("matches") or 0) >= PROFILE_MIN_MATCHES and \
+                        d.get(key) is not None:
+                    vals.append(float(d[key]))
+            pools[(key, side)] = sorted(vals)
+
+    def pctl(pool, v, hi_good):
+        if not pool or v is None:
+            return None
+        lo = sum(1 for x in pool if x < v)
+        eq = sum(1 for x in pool if x == v)
+        r = (lo + eq / 2.0) / len(pool) * 100.0
+        return round(r if hi_good else 100.0 - r, 1)
+
+    out = {}
+    for nm, blk in tstats.items():
+        own = (blk or {}).get("own_di") or {}
+        opp = (blk or {}).get("opp_di") or {}
+        if (own.get("matches") or 0) < PROFILE_MIN_MATCHES:
+            continue
+        prof = {}
+        for key, lab, hi_good, fmt in PROFILE_METRICS:
+            v = own.get(key)
+            av = opp.get(key)
+            prof[key] = {
+                "label": lab, "fmt": fmt, "hi_good": hi_good,
+                "v": v, "p": pctl(pools[(key, "own_di")], v, hi_good),
+                # ⚠ what a team ALLOWS is good when it is LOW, so its
+                # percentile inverts against the same pool's direction.
+                "av": av, "ap": pctl(pools[(key, "opp_di")], av, not hi_good),
+            }
+        prof["_n"] = own.get("matches")
+        out[nm] = prof
+    return out
+
 
 def team_season_stats(boxes, res):
     # type: (Dict, Any) -> Dict[str, Any]
@@ -5785,6 +5867,9 @@ def build():
         .replace("{{RULER_KEY}}", ruler_key_html(
             ["power", "resume", "digby", "avca", "rpi", "committee",
              "massey", "vt"])) \
+        .replace("{{PROFILE_ORDER}}", json.dumps(
+            [m[0] for m in PROFILE_METRICS], separators=(",", ":"))) \
+        .replace("{{PROFILE_MIN_N}}", str(PROFILE_MIN_MATCHES)) \
         .replace("{{SEASON_YEAR}}", str(SEASON)) \
         .replace("{{RESUME_ACTIVE_JS}}", "true" if _resume_active else "false") \
         .replace("{{BW_RESUME_LEGEND}}",
@@ -9259,6 +9344,121 @@ body.mdlopen{overflow:hidden}
 /* the quality-of-results scale: one 0-100 track, two dots. The track wears
    the site's lavender-to-navy fade -- the identity doing WORK (left = weak
    opposition, right = strong), not decoration. */
+/* THE SQUAD WALL. The roster already held 94% of its photographs -- 5,585 of
+   5,937 players -- and showed them as 40px circles inside a text list, which
+   is a list with decoration rather than a picture of a team. Same data, seen.
+   ⚠ A player with no photograph gets her INITIALS, never a drawn likeness and
+   never an empty frame: an empty circle reads as a failed image, and a drawn
+   face beside real photographs of real athletes is a different claim. */
+.sqgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));
+  gap:10px;margin:8px 0 2px}
+.sqc{position:relative;border-radius:var(--r-card);overflow:hidden;
+  background:var(--alt);border:1px solid var(--line);box-shadow:var(--float2);
+  cursor:pointer}
+.sqc:hover{border-color:var(--navy)}
+.sqf{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;
+  object-position:50% 18%;background:var(--sheet2)}
+.sqi{display:flex;align-items:center;justify-content:center;width:100%;
+  aspect-ratio:1/1;background:var(--sheet2);
+  font:800 26px/1 var(--disp);color:var(--ink3);letter-spacing:.04em}
+.sqb{padding:5px 6px 6px;background:var(--card)}
+.sqn{display:block;font:700 12px/1.2 var(--sans);color:var(--ink);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sqm{display:block;font:600 9.5px/1.4 var(--mono);color:var(--ink3);
+  letter-spacing:.02em}
+.sqv{display:block;font:800 11px/1.3 var(--mono);color:var(--navy)}
+.sqnum{position:absolute;top:5px;left:5px;padding:1px 5px;border-radius:3px;
+  background:rgba(18,41,75,.82);color:#fff;font:800 10.5px/1.5 var(--mono)}
+.sqaa{position:absolute;top:5px;right:5px;padding:1px 4px;border-radius:3px;
+  background:var(--gold-fill);color:#2A1E00;font:800 9px/1.5 var(--mono)}
+.sqh{font:800 10px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink3);margin:12px 0 2px}
+@media (max-width:560px){
+  .sqgrid{grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
+  .sqi{font-size:22px}
+}
+/* ═══ CHART TOOLKIT ═══════════════════════════════════════════════════
+   Cody, 2026-09-13: "I want to SEE more, not read more." The audit that
+   prompted this: 19 views, 16 tables, and ZERO data graphics -- the 362
+   <svg> on the page were all crests, icons and avatars.
+
+   THREE FORMS, CHOSEN BY THE DATA'S JOB rather than for variety:
+     .cxb  magnitude  -- one sequential hue, light to dark
+     .cxd  polarity   -- cool/warm around a zero rule
+     .cxl  change     -- one series over time, one colour, no legend
+
+   ⚠ THE DIVERGING PAIR IS MEASURED, NOT PICKED BY EYE. Green/red is the
+   classic colour-vision trap and our own good/bad tokens prove it:
+   #1D7D4F against #B42332 scores dE 3.8 under protanopia -- effectively
+   one colour. The cool/warm pair below scores 22.5 protan / 29.7 normal,
+   passing every check in the validator (lightness band, chroma floor, CVD
+   separation, contrast vs surface). W/L pills elsewhere keep green/red
+   because they also carry the LETTER, which is the secondary encoding
+   that makes a weak pair legal; a bar has no letter, so it may not. */
+:root{
+  --cx-cool:#2563C9; --cx-warm:#C2553F; --cx-zero:#5D6B80;
+  --cx-fill:#2563C9; --cx-track:rgba(74,61,143,.10);
+}
+.cx{margin:10px 0 2px}
+.cx .cxrow{display:grid;grid-template-columns:var(--cxlab,116px) 1fr auto;
+  align-items:center;gap:8px;padding:2.5px 0}
+/* ⚠ ONE LINE PER ROW. Wrapping "#73 South Dakota St." to two lines makes the
+   rows uneven heights, which turns a chart into a list -- the eye reads bar
+   LENGTH across a regular grid, and an irregular one breaks that. The full
+   label is on the row's own title, the same call the score rows make. */
+.cx .cxlab{font:600 11.5px/1.25 var(--sans);color:var(--ink2);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.cx .cxval{font:800 12.5px/1 var(--mono);color:var(--ink);
+  justify-self:end;white-space:nowrap}
+.cx .cxsub{font:600 10px/1 var(--mono);color:var(--ink3)}
+/* the track is the SURFACE the bar sits on, so a 2px gap always separates
+   two adjacent fills (the spacer rule) */
+.cx .cxtrack{position:relative;height:11px;border-radius:3px;
+  background:var(--cx-track);overflow:hidden}
+.cx .cxfill{position:absolute;top:0;bottom:0;left:0;border-radius:3px;
+  background:var(--cx-fill)}
+/* the track keeps its own rounded corners without clipping the mark that
+   deliberately stands proud of it */
+.cx .cxtrack{background-clip:padding-box}
+/* a reference marker on the same track: what the team ALLOWS, drawn against
+   what it does, so one row answers both halves */
+/* ⚠ THE ALLOWED MARK MUST NOT READ AS THE BAR'S END. At 2px and 55% it sat
+   flush against the fill and looked like a rounded cap -- two different
+   claims rendering as one shape. It is now taller than the track with a
+   light halo either side, which is the same treatment the quality-bar dots
+   use to sit ON a filled ground without joining it. */
+.cx .cxtrack{overflow:visible}
+.cx .cxmark{position:absolute;top:-4px;bottom:-4px;width:3px;
+  background:var(--ink);border-radius:2px;
+  box-shadow:0 0 0 2px var(--card)}
+.cx .cxmed{position:absolute;top:0;bottom:0;width:1px;background:var(--ink3);
+  opacity:.45}
+/* polarity: a centre rule with bars either side */
+.cx.cxd .cxtrack{background:none;overflow:visible;height:13px}
+.cx.cxd .cxzero{position:absolute;top:-1px;bottom:-1px;left:50%;width:1px;
+  background:var(--cx-zero);opacity:.6}
+.cx.cxd .cxbar{position:absolute;top:1px;bottom:1px;border-radius:2px}
+.cx.cxd .cxbar.pos{left:50%;background:var(--cx-cool)}
+.cx.cxd .cxbar.neg{right:50%;background:var(--cx-warm)}
+.cx .cxcap{font:600 10.5px/1.5 var(--sans);color:var(--ink3);margin-top:7px}
+.cx .cxhead{display:flex;justify-content:space-between;align-items:baseline;
+  gap:10px;margin-bottom:4px}
+.cx .cxtitle{font:800 11px/1 var(--disp);letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink2)}
+.cx .cxscale{font:600 9.5px/1 var(--mono);color:var(--ink3)}
+/* change over time */
+.cxl{width:100%;display:block;overflow:visible}
+.cxl .cxpath{fill:none;stroke:var(--cx-fill);stroke-width:2;
+  stroke-linejoin:round;stroke-linecap:round}
+.cxl .cxarea{fill:var(--cx-fill);opacity:.10}
+.cxl .cxpt{fill:var(--card);stroke:var(--cx-fill);stroke-width:2}
+.cxl .cxgrid{stroke:var(--line2);stroke-width:1;opacity:.7}
+.cxl .cxaxt{font:600 9.5px/1 var(--mono);fill:var(--ink3)}
+@media (max-width:560px){
+  .cx .cxrow{grid-template-columns:var(--cxlabm,92px) 1fr auto;gap:6px}
+  .cx .cxlab{font-size:11px}
+  .cx .cxval{font-size:12px}
+}
 .qual .qualbar{position:relative;height:22px;margin:10px 2px 4px;
   border-radius:3px;
   background:linear-gradient(90deg,#EDEBF5 0%,#C9CBE8 45%,#5C6BB0 80%,#1D2B66 100%)}
@@ -12161,6 +12361,128 @@ function openMore() {
    the old path, and breaking those to rename a tab would trade the reader's
    history for a label. VIEW_OF_ROUTE resolves both; ROUTE_OF_VIEW emits only
    the new one, so nothing new is minted under the old name. */
+/* ═══ CHART TOOLKIT ═══════════════════════════════════════════════════
+   Inline SVG and HTML, no library: this page is one self-contained file
+   served off a laptop over a tailnet, so an external chart library is a
+   network dependency, a CSP problem and bytes nobody here can audit.
+
+   ⚠ EVERY CHART DRAWS ONLY WHAT WAS MEASURED. A missing value is an absent
+   bar with an em dash beside it, never a zero -- a zero-length bar and "we
+   do not have this" look identical, and R5 is exactly about that. Each
+   chart states its own sample where the sample is what makes it weak. */
+
+/* magnitude: value against a common maximum, one sequential hue.
+   rows: [{label, value, text, pct, mark, markText, note}]
+   pct is the FILL fraction 0..1 -- the caller decides the scale, because
+   only the caller knows whether the axis is 0..max or a percentile. */
+function cxBars(rows, o) {
+  o = o || {};
+  const items = (rows || []).filter(r => r);
+  if (!items.length) return '';
+  const body = items.map(r => {
+    const known = r.value != null && isFinite(r.value);
+    const frac = known ? Math.max(0, Math.min(1, r.pct != null ? r.pct : 0)) : 0;
+    const mk = (r.mark != null && isFinite(r.mark))
+      ? '<i class="cxmark" style="left:' +
+        (Math.max(0, Math.min(1, r.mark)) * 100).toFixed(2) + '%" title="' +
+        esc(r.markText || '') + '"></i>' : '';
+    return '<div class="cxrow" title="' + esc(r.note || r.label) + '">' +
+      '<span class="cxlab">' + esc(r.label) + '</span>' +
+      '<span class="cxtrack">' +
+      (known ? '<i class="cxfill" style="width:' + (frac * 100).toFixed(2) +
+        '%"></i>' : '') + mk + '</span>' +
+      '<span class="cxval">' + (known ? esc(r.text != null ? r.text : r.value)
+        : '—') + '</span></div>';
+  }).join('');
+  return '<div class="cx cxb"' + cxLabVars(o) +
+    '>' + cxHead(o) + body + (o.cap ? '<div class="cxcap">' + o.cap + '</div>' : '') +
+    '</div>';
+}
+
+/* polarity: signed values around a zero rule, cool above / warm below.
+   rows: [{label, value, text, note}]; the scale is the largest magnitude
+   present unless the caller pins one. */
+function cxDiff(rows, o) {
+  o = o || {};
+  const items = (rows || []).filter(r => r && r.value != null && isFinite(r.value));
+  if (!items.length) return '';
+  const span = o.span || Math.max.apply(null, items.map(r => Math.abs(r.value))) || 1;
+  const body = items.map(r => {
+    const w = Math.min(50, Math.abs(r.value) / span * 50);
+    const pos = r.value >= 0;
+    return '<div class="cxrow" title="' + esc(r.note || r.label) + '">' +
+      '<span class="cxlab">' + esc(r.label) + '</span>' +
+      '<span class="cxtrack">' +
+      '<i class="cxzero"></i>' +
+      '<i class="cxbar ' + (pos ? 'pos' : 'neg') + '" style="width:' +
+      w.toFixed(2) + '%"></i></span>' +
+      '<span class="cxval">' + esc(r.text != null ? r.text : r.value) +
+      '</span></div>';
+  }).join('');
+  return '<div class="cx cxd"' + cxLabVars(o) +
+    '>' + cxHead(o) + body + (o.cap ? '<div class="cxcap">' + o.cap + '</div>' : '') +
+    '</div>';
+}
+
+/* ⚠ AN INLINE CUSTOM PROPERTY BEATS THE MEDIA QUERY THAT NARROWS IT. Setting
+   only --cxlab kept a 132px label column at 390px, so "South Dakota St."
+   wrapped to two lines and the value column was pushed off the right edge.
+   A caller that widens the label must say what the PHONE width is too. */
+function cxLabVars(o) {
+  const v = [];
+  if (o.lab) v.push('--cxlab:' + o.lab);
+  if (o.lab) v.push('--cxlabm:' + (o.labm || '96px'));
+  return v.length ? ' style="' + v.join(';') + '"' : '';
+}
+
+function cxHead(o) {
+  if (!o.title && !o.scale) return '';
+  return '<div class="cxhead">' +
+    (o.title ? '<span class="cxtitle">' + esc(o.title) + '</span>' : '') +
+    (o.scale ? '<span class="cxscale">' + esc(o.scale) + '</span>' : '') + '</div>';
+}
+
+/* change over time: ONE series, so no legend -- the title names it.
+   pts: [{x label, y value, note}]. Y is inverted when o.invert (ranks:
+   1 is the top of the chart, which is the only way a rank line reads). */
+function cxLine(pts, o) {
+  o = o || {};
+  const p = (pts || []).filter(d => d && d.y != null && isFinite(d.y));
+  if (p.length < 2) return '';
+  const W = 300, H = o.h || 76, L = 4, R = 4, T = 8, B = 16;
+  const ys = p.map(d => d.y);
+  let lo = o.min != null ? o.min : Math.min.apply(null, ys);
+  let hi = o.max != null ? o.max : Math.max.apply(null, ys);
+  if (hi === lo) { hi = lo + 1; lo = lo - 1; }
+  const pad = (hi - lo) * 0.12; lo -= pad; hi += pad;
+  const px = i => L + (W - L - R) * (p.length === 1 ? 0.5 : i / (p.length - 1));
+  const py = v => {
+    const f = (v - lo) / (hi - lo);
+    return o.invert ? T + (H - T - B) * f : H - B - (H - T - B) * f;
+  };
+  const d = p.map((q, i) => (i ? 'L' : 'M') + px(i).toFixed(1) + ' ' +
+    py(q.y).toFixed(1)).join(' ');
+  const area = d + ' L' + px(p.length - 1).toFixed(1) + ' ' + (H - B) +
+    ' L' + px(0).toFixed(1) + ' ' + (H - B) + ' Z';
+  const dots = p.map((q, i) => '<circle class="cxpt" cx="' + px(i).toFixed(1) +
+    '" cy="' + py(q.y).toFixed(1) + '" r="3.4"><title>' +
+    esc(q.note || (q.x + ': ' + q.y)) + '</title></circle>').join('');
+  const labs = p.map((q, i) => (p.length > 6 && i % 2) ? '' :
+    '<text class="cxaxt" x="' + px(i).toFixed(1) + '" y="' + (H - 3) +
+    '" text-anchor="' + (i === 0 ? 'start' : i === p.length - 1 ? 'end' : 'middle') +
+    '">' + esc(q.x) + '</text>').join('');
+  /* ⚠ UNIFORM SCALING ONLY. preserveAspectRatio="none" is the obvious way
+     to make a sparkline fill its box and it stretches the geometry with it:
+     the dots render as ellipses and the axis text as condensed type nobody
+     chose. The viewBox keeps its own aspect and the SVG scales inside it. */
+  return '<div class="cx">' + cxHead(o) +
+    '<svg class="cxl" viewBox="0 0 ' + W + ' ' + H + '" ' +
+    'role="img" aria-label="' + esc(o.title || 'trend') + '">' +
+    '<path class="cxarea" d="' + area + '"/>' +
+    '<path class="cxpath" d="' + d + '"/>' + dots + labs + '</svg>' +
+    (o.cap ? '<div class="cxcap">' + o.cap + '</div>' : '') + '</div>';
+}
+
 const ROUTE_ALIASES = { 'match-desk': 'desk' };
 const ROUTE_OF_VIEW = { desk:'today', scores:'scores', rankings:'rankings',
   teams:'teams', ballot:'ballot', leaders:'stats', players:'players',
@@ -12987,6 +13309,8 @@ const POSFULL = { OH: 'Outside', OPP: 'Opposite', MB: 'Middle',
    blank view in this file: a top-level const read before its declaration
    line has run THROWS, and the throw lands inside showTeam's assembly, so
    the team card renders with its sections orphaned and no error on screen. */
+const PROFILE_ORDER = {{PROFILE_ORDER}};
+const PROFILE_MIN_N = {{PROFILE_MIN_N}};
 const TD_GROUPS = [['overview', 'Overview'], ['matches', 'Matches'],
                    ['roster', 'Roster'], ['numbers', 'Numbers'],
                    ['scouting', 'Scouting'], ['outlook', 'Outlook']];
@@ -12996,6 +13320,7 @@ const TD_MAP = [
   [/^results/i, 'matches'], [/^upcoming/i, 'matches'], [/^next up/i, 'matches'],
   [/^postseason/i, 'outlook'], [/^outlook/i, 'outlook'],
   [/^projected six/i, 'roster'], [/^full roster/i, 'roster'],
+  [/^squad/i, 'roster'],
   [/^returning avca/i, 'roster'], [/^biggest losses/i, 'roster'],
   [/^roster turnover/i, 'roster'], [/^who arrived/i, 'roster'],
   [/^team stats/i, 'numbers'], [/^match by match/i, 'numbers'],
@@ -21747,7 +22072,11 @@ function openPlayer(name, team, from) {
   return true;
 }
 document.addEventListener('click', e => {
-  const row = e.target.closest('#teamcard .rrow[data-player]');
+  /* ⚠ ANY player-bearing element inside the team card, not just the roster
+     ROW. The squad wall carries the same data-player contract, and a second
+     handler for it would be the duplicated-renderer mistake this file keeps
+     paying for -- one dispatcher, one contract. */
+  const row = e.target.closest('#teamcard [data-player]');
   if (!row) return;
   const team = (document.querySelector('#teamcard .thead h2') || {}).textContent || '';
   openPlayer(row.dataset.player, team.trim(), 'teams');
@@ -23107,7 +23436,7 @@ function showTeam(name) {
             'opponent: counted in the record, in no tier.' : '') +
           '</div></div>';
       }
-      mbmHtml = qualHtml + splitHtml +
+      mbmHtml = qualHtml + splitHtml + tdMargin(t, name) +
         '<div class="tsec" style="margin-top:14px"><h3>Match by match, 2026</h3>' +
         '<div class="scroll"><table class="box mbm"><thead><tr>' +
         '<th class="l">Date</th><th class="l">Opponent</th><th>Res</th>' +
@@ -23337,6 +23666,7 @@ function showTeam(name) {
         '</div></div>' +
       '</div>' +
     '</div>' +
+    tdSquad(t, name) +
     (rosterHtml
       ? '<div class="tsec tsec--wide"><h3>Full roster' +
         /* same unlabelled-count fix as the Upcoming pill: "Full roster17"
@@ -23619,7 +23949,150 @@ function tdDashboard(t, name) {
       '</div>' +
     '<div class="tddcol">' + tdForm(t, name) + tdLeaders(t, name) +
       tdIntel(t, name) +
-    '</div></div>';
+    '</div></div>' + tdProfile(t, name);
+}
+
+/* THE SQUAD, SEEN. Photographs the roster already holds, at a size a face is
+   actually recognisable at, grouped the way a coach lists a team.
+   ⚠ URLS ONLY, exactly as everywhere else: the image is never downloaded and
+   never committed -- it belongs to the school, and referencing it is a
+   different act from republishing it. */
+function tdSquad(t, name) {
+  const rost = (t.roster || []).filter(r => r && r.n);
+  if (rost.length < 4) return '';
+  const groups = [['S', 'Setters'], ['OPP', 'Opposites'], ['OH', 'Outside hitters'],
+                  ['MB', 'Middle blockers'], ['L/DS', 'Libero / defensive specialists'],
+                  [null, 'Position not listed']];
+  const bucket = r => {
+    const p = (r.p || '').toUpperCase();
+    if (p === 'S') return 'S';
+    if (p === 'OPP' || p === 'RS') return 'OPP';
+    if (p === 'OH') return 'OH';
+    if (p === 'MB') return 'MB';
+    if (p === 'L' || p === 'DS' || p === 'L/DS') return 'L/DS';
+    return null;
+  };
+  const seen = {};
+  rost.forEach(r => { (seen[bucket(r)] = seen[bucket(r)] || []).push(r); });
+  let html = '';
+  groups.forEach(g => {
+    const list = seen[g[0]];
+    if (!list || !list.length) return;
+    html += '<div class="sqh">' + esc(g[1]) + '</div><div class="sqgrid">' +
+      list.map(r => {
+        const face = r.ph
+          ? '<img class="sqf" src="' + esc(r.ph) + '" alt="" loading="lazy" ' +
+            'onerror="this.replaceWith(Object.assign(document.createElement(' +
+            '\'span\'),{className:\'sqi\',textContent:this.dataset.i}))" ' +
+            'data-i="' + esc(tdInitials(r.n)) + '">'
+          : '<span class="sqi">' + esc(tdInitials(r.n)) + '</span>';
+        const rate = (r.l26 && r.l26.sets)
+          ? r.l26.sets + (r.l26.sets === 1 ? ' set' : ' sets') + ' in 2026'
+          : (r.r != null ? (+r.r).toFixed(2) + ' pts/set ’25' : '');
+        const aa = (r.aa && r.aa.length) ? '<span class="sqaa" title="AVCA ' +
+          esc(r.aa[0].honour) + ', ' + r.aa[0].season + '">AA</span>' : '';
+        return '<div class="sqc" data-player="' + esc(r.n) + '" title="' +
+          esc(r.n + (r.p ? ' · ' + r.p : '') + (r.cl ? ' · ' + r.cl : '')) +
+          '">' + face +
+          (r.num ? '<span class="sqnum">' + esc(r.num) + '</span>' : '') + aa +
+          '<span class="sqb"><span class="sqn">' + esc(r.n) + '</span>' +
+          '<span class="sqm">' + esc([r.p, r.cl].filter(Boolean).join(' · ')) +
+          '</span>' + (rate ? '<span class="sqv">' + esc(rate) + '</span>' : '') +
+          '</span></div>';
+      }).join('') + '</div>';
+  });
+  if (!html) return '';
+  const withPh = rost.filter(r => r.ph).length;
+  return '<div class="tsec tsec--wide"><h3>Squad</h3>' + html +
+    '<div class="tnote">Photographs from each school’s own roster page, ' +
+    'referenced never copied; <b>' + withPh + ' of ' + rost.length +
+    '</b> players here have one, and a player without renders her initials ' +
+    'rather than an empty frame. Click a face to open her page.</div></div>';
+}
+
+/* THE PROFILE: what this team does well, drawn against the other 347.
+   ⚠ THE BAR IS THE PERCENTILE, THE LABEL IS THE RATE. ".326 hitting" is a
+   fact nobody can place; "98th percentile" places it and says nothing about
+   what it is. Both, or the chart is either unreadable or unanchored.
+   ⚠ The thin dark tick on the same track is what the team ALLOWS at that
+   same metric, already oriented so that further right is better defence --
+   so one row answers both halves of the team and a page that shows only
+   the offence is not showing a team. */
+function tdProfile(t, name) {
+  const pr = t.pctl;
+  if (!pr) return '';
+  const fmt = (v, f) => v == null ? null :
+    f === 'pct3' ? (v < 0 ? '-' : '') + Math.abs(v).toFixed(3).replace(/^0/, '')
+    : f === 'pct1' ? (v * 100).toFixed(1) + '%'
+    : (+v).toFixed(2);
+  const rows = [];
+  PROFILE_ORDER.forEach(k => {
+    const m = pr[k];
+    if (!m || m.p == null) return;
+    rows.push({
+      label: m.label,
+      value: m.p,
+      pct: m.p / 100,
+      text: fmt(m.v, m.fmt),
+      mark: m.ap == null ? null : m.ap / 100,
+      markText: m.av == null ? '' : 'allowed ' + fmt(m.av, m.fmt) +
+        ' — ' + Math.round(m.ap) + 'th percentile as defence',
+      note: m.label + ': ' + fmt(m.v, m.fmt) + ' — ' +
+        Math.round(m.p) + 'th percentile in Division I' +
+        (m.av == null ? '' : ' · allows ' + fmt(m.av, m.fmt) +
+          ' (' + Math.round(m.ap) + 'th)')
+    });
+  });
+  if (!rows.length) return '';
+  return '<div class="tdcard tdprof"><span class="tdlab">Profile vs Division I</span>' +
+    cxBars(rows, {
+      scale: 'percentile 0→100',
+      cap: '<b>Bar</b> = percentile among the ' +
+        'teams with at least ' + PROFILE_MIN_N + ' matches; <b>tick</b> = the ' +
+        'same metric ALLOWED, oriented so further right is better defence. ' +
+        'Rates are per set over ' + (pr._n || 0) +
+        (pr._n === 1 ? ' match' : ' matches') + '. Digs are opportunity-led: ' +
+        'a team that faces fewer attacks has fewer balls to dig.'
+    }) + '</div>';
+}
+
+/* THE SEASON'S SHAPE: every counted match by its net points per set.
+   Not "who won" -- the record says that -- but by how much, against whom,
+   in the order it happened. */
+function tdMargin(t, name) {
+  const g = (t.played || []).filter(x => x && x.sets && x.sets.length);
+  if (g.length < 2) return '';
+  const rows = g.slice().sort((a, b) => (a.d || '').localeCompare(b.d || ''))
+    .map(x => {
+      let mine = 0, theirs = 0, n = 0;
+      x.sets.forEach(pr => {
+        if (!pr || pr.length < 2) return;
+        mine += +pr[0]; theirs += +pr[1]; n++;
+      });
+      if (!n) return null;
+      const net = (mine - theirs) / n;
+      const won = (x.mine || 0) > (x.theirs || 0);
+      return {
+        label: (x.opr ? '#' + x.opr + ' ' : '') + x.opp,
+        value: net,
+        text: (net >= 0 ? '+' : '−') + Math.abs(net).toFixed(1),
+        note: (won ? 'beat ' : 'lost to ') + x.opp + ' ' + x.mine + '–' +
+          x.theirs + ' on ' + x.d + ' · ' + mine + '–' + theirs +
+          ' points across ' + n + (n === 1 ? ' set' : ' sets') +
+          (x.nondi ? ' · non-Division-I opponent' : '')
+      };
+    }).filter(Boolean);
+  if (rows.length < 2) return '';
+  return '<div class="tsec"><h3>Margin, match by match</h3>' +
+    cxDiff(rows, {
+      lab: '132px',
+      scale: 'net points per set',
+      cap: 'Points won minus points conceded, per set, in the order the ' +
+        'matches happened — a sweep of a good side and a sweep of a ' +
+        'weak one are different results and the record cannot tell them ' +
+        'apart. Opponent rank is our POWER rank as of now. Set scores the ' +
+        'feed never published are absent, not zero.'
+    }) + '</div>';
 }
 
 function tdPlayers(t, name) {
