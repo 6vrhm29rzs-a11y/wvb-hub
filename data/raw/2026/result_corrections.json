@@ -3614,6 +3614,38 @@
     }
    ],
    "note": "⚠ FOUND BY THE BOX-ATTRIBUTION SWEEP, NOT BY ANY RESULT CHECK. The feed's final is internally coherent -- a complete line that adds up to the winner it names -- so nothing in the result chain could see it. It surfaced because every player row sat under the wrong school. A whole-match inversion leaves its clearest fingerprint in the BOX, not in the score."
+  },
+  "6638981": {
+   "field": "result",
+   "corr_kind": "incomplete",
+   "feed_said": "a FINAL at sets 2-0 with the third set still running at 21-24 -- a tally that cannot end a match, and a tape that stops mid-set",
+   "correct": {
+    "winner_team_id": "46759",
+    "away_sets": 0,
+    "home_sets": 3,
+    "linescores": [],
+    "linescores_replace": true
+   },
+   "established": "Washington won 3-0. Both schools publish it independently -- Washington records 'Lipscomb W 3 0' and Lipscomb 'Washington L 0 3'. ⚠ THE TAPE IS WITHHELD. The feed's first two sets (25-14, 25-16 to Washington) are almost certainly right, but its third stops at 24-21 with the set unfinished and NO source we hold publishes how it ended. The RESULT is established; the third set's final score is not, and printing 24-21 beside a 3-0 would be inventing the end of a set.",
+   "evidence": [
+    {
+     "url": "https://gohuskies.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Washington",
+     "retrieved": "2026-09-13T01:30:00Z",
+     "text": "'2026-09-10 | Lipscomb | W 3 0'",
+     "establishes": "Washington won 3-0"
+    },
+    {
+     "url": "https://lipscombsports.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Lipscomb",
+     "retrieved": "2026-09-13T01:30:00Z",
+     "text": "'2026-09-10 | Washington | L 0 3'",
+     "establishes": "Lipscomb lost 0-3"
+    }
+   ],
+   "note": "⚠ FOUND BY THE PER-DATE SCHOOL RECONCILIATION, and it was already being HELD correctly -- the impossible-tally rule added earlier today caught it as self-contradictory, so it counted nowhere while both schools had published it. The hold was right; what was missing was going back for the schools."
   }
  }
 }

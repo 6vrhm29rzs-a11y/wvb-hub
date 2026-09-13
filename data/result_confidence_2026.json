@@ -2,16 +2,16 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "corpus_fingerprint": "e0e56609ed258f4b",
-  "generated_at_utc": "2026-09-13T00:56:03Z",
+  "corpus_fingerprint": "b0cf51b6849ca889",
+  "generated_at_utc": "2026-09-13T01:10:38Z",
   "counts": {
-   "finals": 1425,
+   "finals": 1426,
    "official_only": 40,
    "reconciled": 1316,
    "confirmed": 0,
    "disputed": 2,
-   "pending_second": 1423,
-   "corrected": 67,
+   "pending_second": 1424,
+   "corrected": 68,
    "duplicate_listings": 11,
    "duplicate_candidates_pending": 0
   }
@@ -53588,11 +53588,28 @@
    "sources": []
   },
   {
-   "result_corrected": null,
-   "corr_reason": null,
-   "corr_kind": null,
-   "corr_feed_said": null,
-   "corr_evidence": [],
+   "result_corrected": true,
+   "corr_reason": "Washington won 3-0. Both schools publish it independently -- Washington records 'Lipscomb W 3 0' and Lipscomb 'Washington L 0 3'. \u26a0 THE TAPE IS WITHHELD. The feed's first two sets (25-14, 25-16 to Washington) are almost certainly right, but its third stops at 24-21 with the set unfinished and NO source we hold publishes how it ended. The RESULT is established; the third set's final score is not, and printing 24-21 beside a 3-0 would be inventing the end of a set.",
+   "corr_kind": "contradicted",
+   "corr_feed_said": "a FINAL at sets 2-0 with the third set still running at 21-24 -- a tally that cannot end a match, and a tape that stops mid-set",
+   "corr_evidence": [
+    {
+     "school": "Washington",
+     "url": "https://gohuskies.com/sports/womens-volleyball/schedule/text",
+     "text": "'2026-09-10 | Lipscomb | W 3 0'",
+     "status": null,
+     "note": null,
+     "retrieved": "2026-09-13"
+    },
+    {
+     "school": "Lipscomb",
+     "url": "https://lipscombsports.com/sports/womens-volleyball/schedule/text",
+     "text": "'2026-09-10 | Washington | L 0 3'",
+     "status": null,
+     "note": null,
+     "retrieved": "2026-09-13"
+    }
+   ],
    "duplicate_of": null,
    "dup_reason": null,
    "dup_asym": null,
@@ -53602,11 +53619,11 @@
    "h": "Washington",
    "exh": false,
    "d": "2026-09-10",
-   "overall": "reconciled",
+   "overall": "corrected",
    "states": {
-    "result": "reconciled",
-    "sets": "reconciled",
-    "box": "reconciled",
+    "result": "corrected",
+    "sets": "corrected",
+    "box": "official",
     "venue": "official"
    },
    "verify": {
@@ -61630,6 +61647,34 @@
      "retrieved": "2026-09-12T03:51:22Z"
     }
    ]
+  },
+  {
+   "result_corrected": null,
+   "corr_reason": null,
+   "corr_kind": null,
+   "corr_feed_said": null,
+   "corr_evidence": [],
+   "duplicate_of": null,
+   "dup_reason": null,
+   "dup_asym": null,
+   "dup_evidence": [],
+   "gid": "6627939",
+   "a": "Le Moyne",
+   "h": "Siena",
+   "exh": false,
+   "d": "2026-09-11",
+   "overall": "reconciled",
+   "states": {
+    "result": "reconciled",
+    "sets": "reconciled",
+    "box": "reconciled",
+    "venue": "unavailable"
+   },
+   "verify": null,
+   "n_indep": 0,
+   "n_attempted": 0,
+   "last_checked": null,
+   "sources": []
   },
   {
    "result_corrected": null,

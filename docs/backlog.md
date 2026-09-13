@@ -129,6 +129,22 @@ uncounted. Auburn, BYU, Kentucky, Kansas St., Arizona St., Clemson, LSU and
 Cincinnati are among them — these are not obscure programmes, and a parser
 that handles their templates would unblock verification across the board.
 
+### One match the feed never finished (2026-09-12)
+**6627939, Siena 3-0 Le Moyne, 2026-09-11.** Our record is still `state=I`
+with the tally at 2-0: the feed stopped updating mid-match and never declared
+a final. Both schools published it — Siena "Le Moyne W 3 0", Le Moyne "Siena
+University L 0 3" — so it is a real result we are missing, and it costs both
+teams a match.
+
+⚠ **A result correction cannot rescue it**, because `classify()` only
+considers records in state F; a correction on a non-final never reaches the
+counting chain. Building a "the feed never finalised it" mechanism would be
+the right move for a class — but measured across the whole season this is
+**the only one**, so it is recorded here rather than engineered around.
+**Revisit:** if the feed finalises it, it counts automatically and this note
+can go. If it is still `I` in a week, that is the moment to build the
+mechanism, not now.
+
 ### A local full sweep races the refresh loop (2026-09-12)
 The sweep takes ~17.5 minutes; `live_server` rebuilds the whole chain every
 20. So a local run very often has the counted corpus change underneath it,

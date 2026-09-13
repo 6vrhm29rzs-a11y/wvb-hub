@@ -56,8 +56,9 @@ def main():
     cls = SC.classify(list(best.values()), SEASON)
 
     def etd(g):
+        # ⚠ PACIFIC, like the page -- NOT Eastern. See the note above.
         ep = g.get("start_time_epoch")
-        return (datetime.datetime.utcfromtimestamp(ep - 4 * 3600).strftime("%Y-%m-%d")
+        return (datetime.datetime.utcfromtimestamp(ep - 7 * 3600).strftime("%Y-%m-%d")
                 if ep else None)
 
     ours = collections.defaultdict(lambda: collections.defaultdict(list))

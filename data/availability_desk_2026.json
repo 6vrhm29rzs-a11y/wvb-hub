@@ -2,13 +2,13 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-09-13T00:56:03Z",
+  "generated_at_utc": "2026-09-13T01:10:38Z",
   "counts": {
    "statuses": 3,
    "incidents": 0,
    "signals": 4,
    "expired": 7,
-   "anomalies": 453
+   "anomalies": 454
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -2128,6 +2128,19 @@
    "points_per_set_missing": 3.397
   },
   {
+   "game_id": "6628053",
+   "team_id": "46248",
+   "team": "Siena",
+   "absent": [
+    {
+     "name": "Mary Claire Deacy",
+     "rate": 3.387,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 3.387
+  },
+  {
    "game_id": "6626680",
    "team_id": "46129",
    "team": "Air Force",
@@ -2332,7 +2345,20 @@
     {
      "name": "Mary claire Deacy",
      "rate": 3.268,
-     "played_share": 1.0
+     "played_share": 0.833
+    }
+   ],
+   "points_per_set_missing": 3.268
+  },
+  {
+   "game_id": "6627939",
+   "team_id": "46248",
+   "team": "Siena",
+   "absent": [
+    {
+     "name": "Mary claire Deacy",
+     "rate": 3.268,
+     "played_share": 0.8
     }
    ],
    "points_per_set_missing": 3.268
@@ -2388,19 +2414,6 @@
     }
    ],
    "points_per_set_missing": 3.22
-  },
-  {
-   "game_id": "6628053",
-   "team_id": "46248",
-   "team": "Siena",
-   "absent": [
-    {
-     "name": "Mary Claire Deacy",
-     "rate": 3.196,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 3.196
   },
   {
    "game_id": "6624939",
@@ -6581,19 +6594,6 @@
    "points_per_set_missing": 1.036
   },
   {
-   "game_id": "6627049",
-   "team_id": "46684",
-   "team": "Le Moyne",
-   "absent": [
-    {
-     "name": "Payton Horan",
-     "rate": 1.031,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.031
-  },
-  {
    "game_id": "6624934",
    "team_id": "46108",
    "team": "Oakland",
@@ -6618,6 +6618,19 @@
     }
    ],
    "points_per_set_missing": 1.021
+  },
+  {
+   "game_id": "6627049",
+   "team_id": "46684",
+   "team": "Le Moyne",
+   "absent": [
+    {
+     "name": "Payton Horan",
+     "rate": 1.0,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.0
   },
   {
    "game_id": "6628471",
