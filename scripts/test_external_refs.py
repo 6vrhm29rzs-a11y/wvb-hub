@@ -35,6 +35,44 @@ def check(label, ok, detail=""):
         FAILS.append(label)
 
 
+def _strip_py_comments(src):
+    """Python source with comments and docstrings removed.
+
+    Deliberately crude but never LESS strict than a raw substring search:
+    it drops only # comments and triple-quoted blocks, so every executable
+    line survives to be checked.
+    """
+    TQ = ('"' * 3, "'" * 3)
+    out, i, n = [], 0, len(src)
+    while i < n:
+        c = src[i]
+        if c == "#":
+            j = src.find(chr(10), i)
+            i = n if j < 0 else j
+            continue
+        q3 = next((q for q in TQ if src.startswith(q, i)), None)
+        if q3:
+            j = src.find(q3, i + 3)
+            i = n if j < 0 else j + 3
+            continue
+        if c == '"' or c == "'":
+            j, esc = i + 1, False
+            while j < n:
+                if esc:
+                    esc = False
+                elif src[j] == chr(92):
+                    esc = True
+                elif src[j] == c:
+                    break
+                j += 1
+            out.append(src[i:j + 1])
+            i = j + 1
+            continue
+        out.append(c)
+        i += 1
+    return "".join(out)
+
+
 def main():
     import external_refs as ER
 
@@ -86,6 +124,50 @@ def main():
     else:
         print("  (no Massey snapshot in this checkout -- identity proven "
               "on the empty case)")
+
+    # ---- EVOLLVE: the same boundary, stated in the loudest terms -------
+    # It publishes a WHOLE rating system (rating, adjusted points scored,
+    # adjusted side-out, SOS, Pythagorean, luck), which makes it the most
+    # tempting source on the page to fold into ours -- and the most
+    # important not to, because our rating is fitted and validated on 2025
+    # outcomes and a blend with a method we cannot inspect is unmeasurable
+    # by construction.
+    evo = ER.evollve_latest()
+    if evo:
+        check("the Evollve snapshot resolves every row it claims to",
+              evo.get("resolved_to_hub") == evo.get("rows"),
+              (evo.get("resolved_to_hub"), evo.get("rows")))
+        check("...and carries its own hash and retrieval stamp",
+              bool(evo.get("sha256")) and bool(evo.get("retrieved")))
+        real_open = B.os.path.exists
+        try:
+            # the snapshot made unreadable -> the reference column empties
+            # and NOTHING hub-owned may move
+            B.os.path.exists = lambda q: (False if "evollve" in str(q)
+                                          else real_open(q))
+            t4, f4, _u4, _n4, _m4 = B.build()
+        finally:
+            B.os.path.exists = real_open
+        moved = []
+        for a, b in zip(t1, t4):
+            for k in ("rank26", "power", "resume_rank", "rank_source",
+                      "seed", "rpi", "avca", "massey"):
+                if a.get(k) != b.get(k):
+                    moved.append((a.get("team"), k))
+        check("[NEG] removing the Evollve snapshot moves NO hub number",
+              not moved, moved[:4])
+        check("...and it really was feeding the reference column",
+              any(t.get("evollve") for t in t1)
+              and not any(t.get("evollve") for t in t4))
+        check("the projected field is unchanged without it",
+              [t.get("team") for t in (f1 or [])] ==
+              [t.get("team") for t in (f4 or [])])
+    else:
+        print("  (no Evollve snapshot in this checkout)")
+    hook_src = io.open(os.path.join(REPO, ".claude/hooks/no_scrape.py"),
+                       encoding="utf-8").read()
+    check("evollve.net is on the no-scrape hook (robots.txt disallows "
+          "crawlers)", "evollve.net" in hook_src)
 
     print("\n2. THE REAL SMU FIXTURE -- A MISMATCH IS A FACT, NOT A LEVER")
     fig = ER.fig_latest()
@@ -378,8 +460,17 @@ def main():
         if not os.path.exists(p):
             continue
         msrc = io.open(p, encoding="utf-8").read()
+        # ⚠ COMMENT-BLIND, AND THAT IS THE POINT. A bare substring search
+        # cannot tell an import from a comment EXPLAINING the ban, so writing
+        # down WHY a module must not import external_refs failed the guard
+        # that enforces it -- the ninth time a check in this codebase has
+        # matched the prose describing it. Comments and docstrings are
+        # stripped first; every executable line, including every import
+        # spelling, still gets checked.
+        code = _strip_py_comments(msrc).lower()
+        bad = [w for w in ("external_refs", "figstats") if w in code]
         check("%s never reads external_refs or the FIG snapshot" % mod,
-              "external_refs" not in msrc and "figstats" not in msrc.lower())
+              not bad, bad)
     hook = io.open(os.path.join(REPO, ".claude/hooks/no_scrape.py"),
                    encoding="utf-8").read()
     check("figstats.net is on the no-scrape hook", "figstats.net" in hook)
@@ -388,6 +479,23 @@ def main():
     pub_p = os.path.join(REPO, "output", "vb_dashboard.html")
     if os.path.exists(pub_p):
         pub = io.open(pub_p, encoding="utf-8").read()
+        # ⚠ THE KEY IS THE PRODUCT'S NAME. Dropping the VALUE was not
+        # enough: `"evollve":null` shipped the word 347 times on a public
+        # page. The key is omitted entirely there now, and this asserts the
+        # DATA rather than the markup, which is the 2026-08-23 lesson.
+        import json as _json
+        import re as _re
+        _tm = _re.search(r"const TEAMS\s*=\s*(\{.*?\});\n", pub, _re.S)
+        if _tm:
+            _pt = _json.loads(_tm.group(1))
+            check("no Evollve VALUE in the public TEAMS payload",
+                  not any(t.get("evollve") for t in _pt.values()))
+            check("...and not even the KEY, which is the product's name",
+                  not any("evollve" in t for t in _pt.values()))
+        check("the public page names Evollve only where it credits a "
+              "FORMULA we compute ourselves",
+              pub.lower().count("evollve") <= 2,
+              pub.lower().count("evollve"))
         for frag in ("FIGstats", "figstats", "Massey preseason",
                      "REFERENCE MISMATCH", "EXTREF", "ncaastats",
                      "Generated: 2026"):

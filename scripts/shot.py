@@ -62,7 +62,11 @@ async def shoot(route, sel, width, out, click=None):
             # a panel behind a tab has no box until the tab is open, and an
             # element with no box is not a missing element (the zero-width
             # bracket lesson): click first, then measure.
-            if click:
+            if click and click.startswith("JS:"):
+                await call("Runtime.evaluate", {"expression": click[3:],
+                                                "returnByValue": True})
+                await asyncio.sleep(0.8)
+            elif click:
                 await call("Runtime.evaluate", {"expression":
                     "(()=>{const c=document.querySelector(" + json.dumps(click) +
                     ");if(c)c.click();return !!c;})()", "returnByValue": True})
@@ -82,10 +86,18 @@ async def shoot(route, sel, width, out, click=None):
             if b["h"] < 1 or b["w"] < 1:
                 print("element has no box: %s" % sel)
                 return 1
+            # ⚠ PAD THE CLIP. Clipping exactly to the element's box shaves
+            # the last pixel column at deviceScaleFactor 2, so a value sitting
+            # 2px inside its container photographs as "sam" instead of "same"
+            # -- and I chased that as a layout bug twice before measuring
+            # scrollWidth and finding nothing wrong with the page. An
+            # instrument that crops is an instrument that invents defects.
+            pad = 8
             shot = await call("Page.captureScreenshot", {
                 "format": "png", "captureBeyondViewport": True,
-                "clip": {"x": b["x"], "y": b["y"], "width": b["w"],
-                         "height": b["h"], "scale": 2}})
+                "clip": {"x": max(0, b["x"] - pad), "y": max(0, b["y"] - pad),
+                         "width": b["w"] + pad * 2, "height": b["h"] + pad * 2,
+                         "scale": 2}})
             open(out, "wb").write(base64.b64decode(shot["data"]))
             print("%s  %dx%d  -> %s" % (sel, round(b["w"]), round(b["h"]), out))
             return 0

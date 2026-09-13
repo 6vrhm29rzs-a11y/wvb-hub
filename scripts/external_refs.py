@@ -45,6 +45,7 @@ SEASON = int(os.environ.get("WVB_SEASON", "2026"))
 MASSEY_PATH = "Cody/data/massey_2026_preseason.txt"
 FIG_PATH = "Cody/data/figstats_snapshots.jsonl"
 MASSEY_SNAP_PATH = "Cody/data/massey_snapshots.jsonl"
+EVOLLVE_PATH = "Cody/data/evollve_snapshots.jsonl"
 
 ROLES = (
     ("Hub POWER / RÉSUMÉ", "the hub's own evidence-qualified "
@@ -122,6 +123,55 @@ def fig_latest():
             except ValueError:
                 continue
     return last
+
+
+def evollve_latest():
+    """The most recent Evollve team-ratings snapshot, or None.
+
+    ⚠ REFERENCE ONLY, AND MORE STRICTLY THAN THE OTHERS. Evollve publishes a
+    full rating system -- an overall rating, adjusted points scored, adjusted
+    side-out, strength of schedule, a Pythagorean expectation and a "luck"
+    residual. That makes it the most tempting external source on the page to
+    quietly fold into our own number, and the most important one not to: our
+    rating is fitted and validated on 2025 outcomes, and a blend with a
+    system whose method we cannot inspect would be unmeasurable by
+    construction. It is a COMPARISON, never an input, and that boundary is
+    asserted in both directions (test_external_refs).
+
+    Captured by manual browser review -- evollve.net's robots.txt disallows
+    crawlers, so it is on the no-scrape hook and is read the way Massey and
+    FIGstats are: a human opens the page, the text is transcribed, and the
+    snapshot carries its own sha256.
+    """
+    p = os.path.join(REPO, EVOLLVE_PATH)
+    if not os.path.exists(p):
+        return None
+    last = None
+    for ln in io.open(p, encoding="utf-8"):
+        ln = ln.strip()
+        if ln:
+            try:
+                last = json.loads(ln)
+            except ValueError:
+                continue
+    return last
+
+
+def evollve_by_team():
+    """hub team -> its Evollve row, for the teams that resolved.
+
+    A row whose school did not resolve to a hub team is DROPPED and counted
+    in the snapshot's own `unresolved`, never guessed onto a near name (R8).
+    """
+    snap = evollve_latest()
+    if not snap:
+        return {}
+    out = {}
+    for r in (snap.get("data") or []):
+        hub = r.get("hub_team")
+        if hub:
+            out[hub] = r
+    return out
 
 
 # FIG spells names its own way; norm() plus the State/Saint folds cover

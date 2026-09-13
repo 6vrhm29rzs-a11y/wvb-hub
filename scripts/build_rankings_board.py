@@ -646,6 +646,36 @@ def build():
     attach("massey", [(int(c[0]), c[1]) for c in load_pipe("Cody/data/massey_2026_preseason.txt")
                       if c and c[0].isdigit()], "Massey")
 
+    # ⚠ A REFERENCE, AND THE ONE IT IS MOST TEMPTING TO CHEAT WITH. Evollve
+    # publishes a whole rating system -- overall rating, adjusted points
+    # scored, adjusted side-out, strength of schedule, Pythagorean
+    # expectation and a luck residual. Our own rating is fitted and validated
+    # on 2025 outcomes; blending in a system whose method we cannot inspect
+    # would make the result unmeasurable by construction. It is attached for
+    # COMPARISON only, on the same footing as Massey, and the boundary is
+    # asserted in both directions (test_external_refs).
+    # ⚠ READ HERE, NOT THROUGH external_refs. test_external_refs asserts that
+    # this module never imports that one -- a structural ban that exists so no
+    # outside rating can reach the ranking through a helper, and importing it
+    # for a reference COLUMN would satisfy the letter of the boundary while
+    # dissolving the guard that protects it. The snapshot is read the same way
+    # Massey's is: straight from the file, last record wins.
+    _evo = []
+    _evop = os.path.join(REPO, "Cody", "data", "evollve_snapshots.jsonl")
+    if os.path.exists(_evop):
+        _last = None
+        for _ln in open(_evop, encoding="utf-8"):
+            _ln = _ln.strip()
+            if _ln:
+                try:
+                    _last = json.loads(_ln)
+                except ValueError:
+                    continue
+        for _r in ((_last or {}).get("data") or []):
+            if _r.get("hub_team") and _r.get("evollve_rtg_rank"):
+                _evo.append((int(_r["evollve_rtg_rank"]), _r["hub_team"]))
+    attach("evollve", _evo, "Evollve")
+
     # ---- projected 64-team field ----------------------------------------
     # ⚠ SELECTED AND SEEDED ON COMMITTEE CRITERIA, NOT ON STRENGTH (R3;
     # Cody, 2026-09-07: "use the same metrics the selection committee

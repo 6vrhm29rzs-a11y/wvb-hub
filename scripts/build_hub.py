@@ -530,6 +530,10 @@ RULERS = {
     "massey":    ("MASSEY (PRE)", "MSY",
                   "Massey preseason snapshot -- a manual browser capture, "
                   "not current, never a Power input", "#5D6B80"),
+    "evollve":   ("EVOLLVE", "EVO",
+                  "Evollve team ratings -- a manual browser capture of "
+                  "somebody else's rating system, never a Power input",
+                  "#5D6B80"),
     "power25":   ("2025", "2025", "final 2025 POWER rank", "#5D6B80"),
     "committee": ("TOP 16", "T16", "the DI Committee's in-season Top 16 "
                                    "reveal", "#8A3A7E"),
@@ -539,7 +543,7 @@ RULERS = {
 # The four rulers that are somebody's OWN JUDGEMENT or a reference we do not
 # compute get a neutral slate; the rest carry a hue. Stated so the palette
 # reads as a decision rather than as eleven arbitrary swatches.
-RULER_NEUTRAL = ("vt", "massey", "power25", "seed")
+RULER_NEUTRAL = ("vt", "massey", "evollve", "power25", "seed")
 
 # ⚠ TWO OF THESE RULERS NAME SOMEBODY ELSE'S PRODUCT, and this table is
 # SERIALISED INTO THE PAGE. Adding them shipped the strings "VolleyTalk" and
@@ -549,7 +553,10 @@ RULER_NEUTRAL = ("vt", "massey", "power25", "seed")
 # structure nobody would think of as markup.
 # The general lesson this project keeps relearning: when the question is "did
 # we publish X", grep the DATA. A table is data.
-PRIVATE_RULERS = ("vt", "massey")
+# ⚠ THREE NOW. Evollve joins them for the same reason: it is somebody
+# else's published product, captured by hand from a site whose robots.txt
+# disallows crawlers. Naming it on a public page republishes it.
+PRIVATE_RULERS = ("vt", "massey", "evollve")
 
 def public_rulers():
     """The ruler table as the built page should carry it."""
@@ -2013,6 +2020,15 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
             "rank25": t["rank25"],
             "avca": t.get("avca"), "vt": t.get("vt"),
             "massey": t.get("massey"), "rpi": t.get("rpi"),
+            # ⚠ THE KEY IS THE PRODUCT'S NAME, so on the public build it is
+            # not emitted at all rather than emitted null. Dropping the VALUE
+            # was not enough: `"evollve":null` still shipped the word 347
+            # times, which is the 2026-08-23 lesson ("hiding third-party data
+            # is not the same as not publishing it") one level down -- that
+            # time it was the LABELS in the ruler table, this time the KEY in
+            # the payload. When the question is "did we publish X", grep the
+            # DATA, and a key is data.
+            **({} if PUBLIC else {"evollve": t.get("evollve")}),
             "record25": ("%s-%s" % (t.get("wins"), t.get("losses"))
                          if t.get("wins") is not None else None),
             # THIS season's record, from the same results list the standings
@@ -4499,6 +4515,24 @@ def extref_strip(meta, teams):
                      (ms["retrieved_utc"] or "").replace("T", " ")
                      .replace("Z", ""), ms.get("coverage") or ""))
                  if ms else "no current browser-reviewed snapshot held"))
+    # ⚠ THE MOST TEMPTING SOURCE ON THE PAGE TO CHEAT WITH, so it states
+    # its boundary in the loudest terms here. Evollve publishes a whole
+    # rating system -- rating, adjusted points scored, adjusted side-out,
+    # SOS, a Pythagorean expectation and a luck residual. Ours is fitted and
+    # validated on 2025 outcomes; blending in a system whose method we
+    # cannot inspect would make the result unmeasurable by construction.
+    ev = ER.evollve_latest()
+    rows.append(("Evollve team ratings",
+                 "external strength reference only &mdash; never a POWER "
+                 "input, a result authority or a correction source; "
+                 "comparison on the Rankings tab, nothing else",
+                 ("captured %s UTC &middot; %d teams, %d resolved to ours "
+                  "&middot; manual browser review (robots.txt disallows "
+                  "crawlers) &middot; sha256 %s"
+                  % ((ev.get("retrieved") or "").replace("T", " ")[:19],
+                     ev.get("rows") or 0, ev.get("resolved_to_hub") or 0,
+                     (ev.get("sha256") or "")[:12]))
+                 if ev else "no snapshot held"))
     rows.append(("Massey &mdash; preseason snapshot (feeds the MSY "
                  "reference column)",
                  "external strength-reference snapshot only &mdash; never "
@@ -4596,6 +4630,7 @@ def build():
         for _t in teams:
             _t["vt"] = None
             _t["massey"] = None
+            _t["evollve"] = None
     venues = load("data/venues_%d.json" % SEASON) or {}
     site_of = {r["game_id"]: r["site"] for r in venues.get("games", [])}
     event_of = {}
@@ -5789,6 +5824,10 @@ def build():
     return TEMPLATE \
         .replace("{{POLLS_JSON}}", json.dumps(polls, separators=(",", ":"))) \
         .replace("{{FORECAST_NOTE_JSON}}", json.dumps(FORECAST_AVAIL_NOTE)) \
+        .replace("{{RANK_COMPARE}}", "" if PUBLIC else (
+            '<details class="method extref" id="rkcmpwrap">'
+            '<summary>Where the outside sources disagree with us'
+            '</summary><div id="rkcmp"></div></details>')) \
         .replace("{{EXTREF_STRIP}}", "" if PUBLIC else extref_strip(meta, teams)) \
         .replace("{{REF_CHIPS_JS}}", "" if PUBLIC else
                  "          add('VT', t.vt ? '#' + t.vt : '');\n"
@@ -9399,7 +9438,11 @@ body.mdlopen{overflow:hidden}
   --cx-cool:#2563C9; --cx-warm:#C2553F; --cx-zero:#5D6B80;
   --cx-fill:#2563C9; --cx-track:rgba(74,61,143,.10);
 }
-.cx{margin:10px 0 2px}
+/* ⚠ 2px OF AIR AT THE RIGHT EDGE. Measured, not guessed: the value column's
+   right edge sat at exactly the container's right edge (734 vs 734), inside
+   the box and touching it -- nothing was clipped and it read as clipped,
+   which for a reader is the same defect. */
+.cx{margin:10px 0 2px;padding-right:2px}
 .cx .cxrow{display:grid;grid-template-columns:var(--cxlab,116px) 1fr auto;
   align-items:center;gap:8px;padding:2.5px 0}
 /* ⚠ ONE LINE PER ROW. Wrapping "#73 South Dakota St." to two lines makes the
@@ -11558,6 +11601,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <th class="c-ref" title="projected FINAL RPI rank: the median across simulated seasons, from the same calibrated simulator (win bands backtested at 87.3% coverage). A Division-I approximation over rated fixtures; conference tournaments do not exist yet. Forecast does not incorporate availability.">RPI&nbsp;proj</th>
     </tr></thead>
     <tbody id="rbody">{{RANK_ROWS}}</tbody></table></div>
+    {{RANK_COMPARE}}
     {{EXTREF_STRIP}}
     <!-- ⚠ PROGRESSIVE DISCLOSURE, NOT DELETION. This methodology is the most
          valuable thing on the tab and it was also 1,250 characters of essay
@@ -12361,6 +12405,83 @@ function openMore() {
    the old path, and breaking those to rename a tab would trade the reader's
    history for a label. VIEW_OF_ROUTE resolves both; ROUTE_OF_VIEW emits only
    the new one, so nothing new is minted under the old name. */
+/* WHERE THE OUTSIDE SOURCES DISAGREE WITH US.
+   The job is POLARITY -- do we rate a team higher or lower than they do --
+   so it is a diverging chart around a zero rule, not four parallel series
+   in four colours. One source at a time, because the question is always
+   "against WHICH ruler", and a four-hue categorical palette for it would
+   have to pass a CVD check it does not need to take.
+   ⚠ THE GAP IS RANK POSITIONS AND SAYS NOTHING ABOUT WHO IS RIGHT. Two
+   rankings built on different evidence SHOULD disagree; the chart shows
+   where to look, and the note says so rather than implying a verdict. */
+let RKCMP = 'avca';
+const RKCMP_SRC = [
+  ['avca', 'AVCA poll', 'the coaches’ poll, captured from its own publication'],
+  ['rpi', 'RPI', 'the official NCAA RPI'],
+  ['evollve', 'Evollve', 'an outside rating system, captured by hand'],
+  ['massey', 'Massey', 'an outside rating snapshot, not current'],
+  ['vt', 'VolleyTalk', 'the community poll']
+];
+
+function rkCompare() {
+  const host = document.getElementById('rkcmp');
+  if (!host) return;
+  const meta = RKCMP_SRC.filter(x => x[0] === RKCMP)[0] || RKCMP_SRC[0];
+  const rows = [];
+  Object.keys(TEAMS).forEach(nm => {
+    const t = TEAMS[nm];
+    const ours = t.rank, theirs = t[RKCMP];
+    if (!ours || !theirs || ours > 25) return;
+    /* positive = THEY have the team further down the list than we do, i.e.
+       we are higher on it. Phrased in the note, never left to a sign. */
+    rows.push({
+      label: '#' + ours + ' ' + nm,
+      value: theirs - ours,
+      text: theirs - ours === 0 ? 'same' :
+        (theirs - ours > 0 ? '+' : '−') + Math.abs(theirs - ours),
+      note: nm + ': we have them #' + ours + ', ' + meta[1] + ' has them #' +
+        theirs + (theirs === ours ? ' — agreed' :
+          ' — ' + Math.abs(theirs - ours) + ' place' +
+          (Math.abs(theirs - ours) === 1 ? '' : 's') +
+          (theirs > ours ? ' higher on ours' : ' higher on theirs')),
+      _o: ours
+    });
+  });
+  rows.sort((a, b) => a._o - b._o);
+  const tabs = RKCMP_SRC.map(x =>
+    '<button class="segb' + (x[0] === RKCMP ? ' on' : '') +
+    '" data-rkcmp="' + x[0] + '" title="' + esc(x[2]) + '">' +
+    esc(x[1]) + '</button>').join('');
+  const missing = 25 - rows.length;
+  host.innerHTML = '<div class="seg rkcmpseg" role="group" ' +
+      'aria-label="reference source">' + tabs + '</div>' +
+    (rows.length ? cxDiff(rows, {
+      lab: '150px',
+      scale: 'rank places',
+      cap: '<b>Blue</b> = we rate them higher than ' + esc(meta[1]) +
+        ' does; <b>red</b> = ' + esc(meta[1]) + ' rates them higher. ' +
+        'Our top 25 only. Two rankings built on different evidence are ' +
+        'SUPPOSED to disagree — this says where to look, not who is ' +
+        'right, and none of it feeds our rating.' +
+        (missing > 0 ? ' ' + missing + ' of our top 25 are not listed by ' +
+          esc(meta[1]) + '.' : '')
+    }) : '<p class="tnote">' + esc(meta[1]) +
+      ' lists none of our top 25.</p>');
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('[data-rkcmp]');
+  if (!b) return;
+  RKCMP = b.dataset.rkcmp;
+  rkCompare();
+});
+/* ⚠ RENDERED ON OPEN, NOT AT LOAD. It lives inside a <details> that ships
+   closed, and a closed details hides every child but its summary -- the
+   pollview-inside-a-fold bug is the same shape, from the other side: here
+   the cost of rendering eagerly is work nobody can see, so it waits. */
+document.addEventListener('toggle', e => {
+  if (e.target && e.target.id === 'rkcmpwrap' && e.target.open) rkCompare();
+}, true);
+
 /* ═══ CHART TOOLKIT ═══════════════════════════════════════════════════
    Inline SVG and HTML, no library: this page is one self-contained file
    served off a laptop over a tailnet, so an external chart library is a
