@@ -50,6 +50,29 @@ def check(label, ok, detail=""):
         FAILS.append(label)
 
 
+def _strip_js_comments(src):
+    """JS source minus /* */ and // comments.
+
+    ⚠ Needed because this guard kept matching the COMMENT that documents
+    the bug it checks for -- the tenth time in this codebase that a check has
+    matched the prose describing it. Stripping comments is strictly stronger
+    than rewording the comment: the rule stays written down AND enforced.
+    """
+    out, i, n = [], 0, len(src)
+    while i < n:
+        if src.startswith("/*", i):
+            j = src.find("*/", i + 2)
+            i = n if j < 0 else j + 2
+            continue
+        if src.startswith("//", i):
+            j = src.find(chr(10), i)
+            i = n if j < 0 else j
+            continue
+        out.append(src[i])
+        i += 1
+    return "".join(out)
+
+
 def node(js):
     r = subprocess.run(["node", "-e", js], capture_output=True, text=True)
     if r.returncode != 0:
@@ -200,7 +223,51 @@ console.log(JSON.stringify(tdSquad(t,'Test')));"""
         check("coverage is stated rather than implied",
               '1 of 4' in html, html[-260:])
 
-    print("\n7. THE PAGE ACTUALLY DRAWS THEM")
+    print("\n7. DOTS, WHERE A BAR WOULD LIE EITHER WAY")
+    # ⚠ THE LEADERBOARD IS THE CASE. The top twelve at points per set sit
+    # between 4.98 and 6.50: a zero-based bar draws twelve near-identical
+    # bars and says nothing, and a truncated bar exaggerates a small spread
+    # into a large one. A dot encodes POSITION, which a truncated axis does
+    # not distort -- so the axis is truncated deliberately and printed.
+    dots = js_block(page, "cxDots")
+    js2 = esc + dots + head + labv + """
+const rows=[{label:'A',value:5.48,text:'5.48'},{label:'B',value:5.02,text:'5.02'},
+            {label:'C',value:4.98,text:'4.98'}];
+console.log(JSON.stringify(cxDots(rows,{fmt:v=>v.toFixed(2)})));"""
+    out, err = node(js2)
+    check("cxDots runs", bool(out), err[:130])
+    if out:
+        h2 = json.loads(out)
+        check("each value is a positioned dot, not a length",
+              h2.count('cxdot') == 3 and 'cxfill' not in h2)
+        check("the BEST value is marked as the leader",
+              h2.count('cxdot lead') == 1)
+        check("both ends of the truncated axis are PRINTED",
+              'cxax' in h2 and '4.9' in h2 and '5.5' in h2, h2[-300:])
+        lefts = [float(x) for x in re.findall(r'cxdot[^"]*" style="left:([0-9.]+)%', h2)]
+        check("a higher value sits further right",
+              len(lefts) == 3 and lefts[0] > lefts[1] > lefts[2], lefts)
+        one, _ = node(esc + dots + head + labv +
+                      "console.log(JSON.stringify(cxDots([{label:'x',value:1}],{})))")
+        check("[NEG] a single point draws no axis at all",
+              json.loads(one) == "", "one dot on an invented axis is theatre")
+
+    print("\n8. THE CHART FOLLOWS THE TABLE IN EVERY STATS MODE")
+    # Stats has three modes and ONE chart host. A mode that does not feed it
+    # leaves a picture of a different query standing above the rows -- which
+    # really happened: renderTeamOffense referenced a `side` variable it does
+    # not define, threw inside a click listener (silent), and the chart kept
+    # the previous mode's content.
+    for fname in ("renderLeaders", "renderTeamStats", "renderTeamOffense"):
+        body = js_block(page, fname)
+        check("%s feeds the chart" % fname, "renderLeaderChart(" in body,
+              "mode renders a table with no matching picture")
+    off = _strip_js_comments(js_block(page, "renderTeamOffense"))
+    check("[NEG] ...and renderTeamOffense uses its own rows, not a `side` "
+          "it never defines", "r[side]" not in off,
+          "an undefined variable throws silently inside a listener")
+
+    print("\n9. THE PAGE ACTUALLY DRAWS THEM")
     check("the built team payload carries percentile profiles",
           '"pctl":' in page)
     n_cx = page.count('class="cx ')

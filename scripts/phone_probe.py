@@ -13,7 +13,7 @@ Usage: python3 scripts/phone_probe.py [route ...]
 Reports per route: horizontal overflow, elements wider than the viewport,
 and clipped text; writes /tmp/phone_<route>.png screenshots.
 """
-import asyncio, base64, json, os, subprocess, sys, time, urllib.request
+import asyncio, base64, io, json, os, re, subprocess, sys, time, urllib.request
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
@@ -101,9 +101,32 @@ async def probe(routes):
         proc.terminate()
 
 
+def discovered_routes():
+    """Every route the BUILT PAGE declares, read from its own router.
+
+    ⚠ A HAND-WRITTEN LIST DRIFTS. This one carried 15 routes while the page
+    declared 18, so bracket, TV, players, player-ratings, the result ledger,
+    availability, intel and film-room were never probed at all -- the same
+    failure as the CI suite list that ran 32 of 46 guards, and as the media
+    query sweep that missed 700px. The router is the source of truth; a
+    scanner that finds none is a loud failure, not a clean run.
+    """
+    src = io.open(PAGE.replace("file://", ""), encoding="utf-8").read()
+    m = re.search(r"const ROUTE_OF_VIEW = \{(.*?)\};", src, re.S)
+    if not m:
+        raise SystemExit("phone_probe: could not read ROUTE_OF_VIEW from the "
+                         "built page -- refusing to probe a guessed list")
+    routes = ["/" + r for r in re.findall(r":\s*'([a-z0-9-]+)'", m.group(1))]
+    if len(routes) < 10:
+        raise SystemExit("phone_probe: found only %d routes; the page "
+                         "declares more than that" % len(routes))
+    # a team and a player page are routes too, and the deepest layouts here
+    return routes + ["/teams/Nebraska", "/rankings/avca", "/rankings/gap"]
+
+
 if __name__ == "__main__":
-    routes = sys.argv[1:] or [
-        "/today", "/scores", "/rankings", "/rankings/avca", "/rankings/digby",
-        "/rankings/gap", "/rankings/cal", "/stats", "/teams/Kentucky",
-        "/ballot", "/desk", "/standings", "/schedule", "/front-page", "/conference-lab"]
+    # ⚠ NO HAND-WRITTEN FALLBACK. A fallback list is how the old one drifted
+    # to 15 of 18 routes: discovery would fail quietly and the stale list
+    # would read as a clean sweep. Discovery raises instead.
+    routes = sys.argv[1:] or discovered_routes()
     sys.exit(1 if asyncio.run(probe(routes)) else 0)

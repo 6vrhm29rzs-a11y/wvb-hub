@@ -72,7 +72,12 @@ async def shoot(route, sel, width, out, click=None):
                     ");if(c)c.click();return !!c;})()", "returnByValue": True})
                 await asyncio.sleep(1.0)
             expr = ("(()=>{const e=document.querySelector(" + json.dumps(sel) +
-                    ");if(!e)return 'null';e.scrollIntoView();"
+                    ");if(!e)return 'null';"
+                    # ⚠ CENTRED, NOT TOP-ALIGNED. scrollIntoView() parks the
+                    # element under the page's own sticky nav, which then
+                    # paints across the top of every capture -- an artifact
+                    # that looks exactly like the component being clipped.
+                    "e.scrollIntoView({block:'center'});"
                     "const b=e.getBoundingClientRect();"
                     "return JSON.stringify({x:b.x+scrollX,y:b.y+scrollY,"
                     "w:b.width,h:b.height});})()")

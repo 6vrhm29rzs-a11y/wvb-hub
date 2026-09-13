@@ -9483,6 +9483,25 @@ body.mdlopen{overflow:hidden}
 .cx.cxd .cxbar{position:absolute;top:1px;bottom:1px;border-radius:2px}
 .cx.cxd .cxbar.pos{left:50%;background:var(--cx-cool)}
 .cx.cxd .cxbar.neg{right:50%;background:var(--cx-warm)}
+/* DOTS, FOR WHEN A BAR WOULD LIE EITHER WAY. A bar encodes LENGTH, so it
+   needs a zero baseline; the leaderboard's top twelve sit between 4.98 and
+   5.48 points per set, where a zero-based bar renders twelve identical bars
+   and says nothing, and a truncated bar exaggerates a 10% spread into a 10x
+   one. A dot encodes POSITION, which a truncated axis does not distort -- so
+   the axis is truncated on purpose and its ends are printed. */
+.cx.cxp .cxtrack{background:none;height:13px;
+  border-top:1px solid var(--line2);border-radius:0;margin-top:5px}
+.cx.cxp .cxdot{position:absolute;top:-4px;width:11px;height:11px;
+  border-radius:50%;background:var(--cx-fill);
+  transform:translateX(-50%);box-shadow:0 0 0 2px var(--card)}
+.cx.cxp .cxdot.lead{background:var(--gold-fill);
+  box-shadow:0 0 0 2px var(--card),0 0 0 3.5px var(--gold)}
+.cx .cxax{display:grid;grid-template-columns:var(--cxlab,116px) 1fr auto;
+  gap:8px;font:600 9.5px/1 var(--mono);color:var(--ink3);margin-top:3px}
+.cx .cxax .cxaxe{display:flex;justify-content:space-between}
+@media (max-width:560px){
+  .cx .cxax{grid-template-columns:var(--cxlabm,96px) 1fr auto;gap:6px}
+}
 .cx .cxcap{font:600 10.5px/1.5 var(--sans);color:var(--ink3);margin-top:7px}
 .cx .cxhead{display:flex;justify-content:space-between;align-items:baseline;
   gap:10px;margin-bottom:4px}
@@ -11998,6 +12017,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       {{LDR_FLOOR}} sets</span>
     <span class="count" id="lcnt"></span>
   </div>
+  <div id="ldrchart"></div>
   <div class="panel" id="lplayer"><div class="scroll"><table>
     <thead><tr><th>#</th><th class="l">Player</th><th class="l">Team</th>
       <th>Sets</th><th id="lhead">Pts/set</th></tr></thead>
@@ -12405,6 +12425,7 @@ function openMore() {
    the old path, and breaking those to rename a tab would trade the reader's
    history for a label. VIEW_OF_ROUTE resolves both; ROUTE_OF_VIEW emits only
    the new one, so nothing new is minted under the old name. */
+/* RKCMP-JS-BEGIN */
 /* WHERE THE OUTSIDE SOURCES DISAGREE WITH US.
    The job is POLARITY -- do we rate a team higher or lower than they do --
    so it is a diverging chart around a zero rule, not four parallel series
@@ -12481,6 +12502,7 @@ document.addEventListener('click', e => {
 document.addEventListener('toggle', e => {
   if (e.target && e.target.id === 'rkcmpwrap' && e.target.open) rkCompare();
 }, true);
+/* RKCMP-JS-END */
 
 /* ═══ CHART TOOLKIT ═══════════════════════════════════════════════════
    Inline SVG and HTML, no library: this page is one self-contained file
@@ -12554,6 +12576,40 @@ function cxLabVars(o) {
   if (o.lab) v.push('--cxlab:' + o.lab);
   if (o.lab) v.push('--cxlabm:' + (o.labm || '96px'));
   return v.length ? ' style="' + v.join(';') + '"' : '';
+}
+
+/* position on a common, DELIBERATELY TRUNCATED axis.
+   rows: [{label, value, text, note}]; the axis is the data's own range
+   padded a little, and both ends are printed under the chart so the
+   truncation is a stated choice rather than a hidden one. */
+function cxDots(rows, o) {
+  o = o || {};
+  const items = (rows || []).filter(r => r && r.value != null &&
+                                     isFinite(r.value));
+  if (items.length < 2) return '';
+  const vals = items.map(r => r.value);
+  let lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+  if (hi === lo) { hi = lo + 1; lo = lo - 1; }
+  const pad = (hi - lo) * 0.08;
+  lo -= pad; hi += pad;
+  const best = o.lowGood ? Math.min.apply(null, vals)
+                         : Math.max.apply(null, vals);
+  const body = items.map(r => {
+    const f = (r.value - lo) / (hi - lo);
+    return '<div class="cxrow" title="' + esc(r.note || r.label) + '">' +
+      '<span class="cxlab">' + esc(r.label) + '</span>' +
+      '<span class="cxtrack"><i class="cxdot' +
+      (r.value === best ? ' lead' : '') + '" style="left:' +
+      (f * 100).toFixed(2) + '%"></i></span>' +
+      '<span class="cxval">' + esc(r.text != null ? r.text : r.value) +
+      '</span></div>';
+  }).join('');
+  const fmt = o.fmt || (v => v.toFixed(2));
+  return '<div class="cx cxp"' + cxLabVars(o) + '>' + cxHead(o) + body +
+    '<div class="cxax"><span></span><span class="cxaxe"><span>' +
+    esc(fmt(lo)) + '</span><span>' + esc(fmt(hi)) +
+    '</span></span><span></span></div>' +
+    (o.cap ? '<div class="cxcap">' + o.cap + '</div>' : '') + '</div>';
 }
 
 function cxHead(o) {
@@ -22030,6 +22086,36 @@ const LRATE = {hit:1, sv_err_pct:1, sv_ace_pct:1};
    stays descending on purpose: "how many serves do they miss" is a question
    whose answer belongs at the top. */
 const LBAD = {sv_err_set:1, sv_err_pct:1, rc_err_set:1};
+/* THE LEADERS, SEEN. The Stats tab was 15,700px of table: 200 sorted rows
+   answer "who is 47th" and never answer "who leads, and by how much" -- the
+   question a leaderboard exists for. This draws the same rows the table is
+   already showing, so the two cannot disagree; it is a VIEW of the table,
+   never a second query.
+   ⚠ Magnitude, so one sequential hue and a common scale. The bar is drawn
+   from zero for a rate that starts at zero, which is the only honest
+   baseline for a length comparison. */
+function renderLeaderChart(rows, key, label, fmt, lowGood) {
+  const host = document.getElementById('ldrchart');
+  if (!host) return;
+  const top = rows.slice(0, 12);
+  if (top.length < 3) { host.innerHTML = ''; return; }
+  const vals = top.map(r => r.v).filter(v => v != null && isFinite(v));
+  if (!vals.length) { host.innerHTML = ''; return; }
+  host.innerHTML = '<div class="panel ldrpanel">' + cxDots(top.map(r => ({
+    label: r.label, value: r.v, text: fmt(r.v), note: r.note
+  })), {
+    lab: '176px', labm: '104px', lowGood: lowGood, fmt: fmt,
+    title: 'Top 12 · ' + label,
+    scale: 'position on a truncated axis',
+    cap: 'The same rows the table below is showing, with the same minimum. ' +
+      '<b>The axis does not start at zero</b> and its ends are printed: ' +
+      'these twelve sit inside a narrow band, where a zero-based bar chart ' +
+      'draws twelve identical bars and a truncated one exaggerates the gap. ' +
+      'A dot encodes position, which a truncated axis does not distort. ' +
+      'Gold is the leader.'
+  }) + '</div>';
+}
+
 function renderLeaders() {
   const q = document.getElementById('lq').value.toLowerCase().trim();
   const k = document.getElementById('lstat').value;
@@ -22050,6 +22136,12 @@ function renderLeaders() {
           lo, hi, LBAD[k] ? 'low' : 'high', 'seq') + '</tr>').join('');
   document.getElementById('lcnt').textContent =
     rows.length + (rows.length === 1 ? ' player' : ' players');
+  renderLeaderChart(rows.map(r => ({
+    label: r.name, v: r[k],
+    note: r.name + ', ' + r.team + ' — ' +
+      r[k].toFixed(LRATE[k] ? 3 : 2) + ' ' + LSTAT[k] + ' over ' + r.sets +
+      (r.sets === 1 ? ' set' : ' sets')
+  })), k, LSTAT[k], v => v.toFixed(LRATE[k] ? 3 : 2), !!LBAD[k]);
 }
 /* TEAM STATS, the other half of the Stats tab. Same box scores as the player
    numbers, so the two agree by construction. "Allowed" is the identical count
@@ -22097,6 +22189,22 @@ function renderTeamStats() {
             tlo, thi, better, 'seq') + '</tr>';
   }).join('');
   document.getElementById('lcnt').textContent = rows.length + ' teams';
+  /* ⚠ THE CHART FOLLOWS THE TABLE, ALWAYS. Stats has THREE modes
+     (players, team rates, team offense) and one chart host. Wiring only the
+     player mode would leave a picture of a different query standing above
+     the rows -- worse than no picture, and the same "two views, one seam"
+     shape as every vanishing-match bug in this file. Each renderer feeds it
+     with what IT is showing. */
+  const tlab = (LSTAT[k] || k) + (side === 'opp' ? ' allowed' : '');
+  renderLeaderChart(rows.map(r => ({
+    label: r.team,
+    v: (k === 'hit' ? r[side].hit : r[side][k]),
+    note: r.team + ' \u2014 ' + tlab + ' ' +
+      (k === 'hit' ? r[side].hit.toFixed(3) : r[side][k].toFixed(2)) +
+      ' over ' + r[side].matches +
+      (r[side].matches === 1 ? ' match' : ' matches')
+  })), k, tlab, v => (k === 'hit' ? v.toFixed(3) : v.toFixed(2)),
+    better === 'low');
 }
 
 let LSIDE = 'player';
@@ -22169,6 +22277,25 @@ function renderTeamOffense() {
       hcell(d.hit, p3(d.hit), hlo, hhi, 'high', 'seq') + '</tr>';
   }).join('');
   document.getElementById('lcnt').textContent = rows.length + ' teams';
+  /* ⚠ THE CHART FOLLOWS THE TABLE, ALWAYS. Stats has THREE modes
+     (players, team rates, team offense) and one chart host. Wiring only the
+     player mode would leave a picture of a different query standing above
+     the rows -- worse than no picture, and the same "two views, one seam"
+     shape as every vanishing-match bug in this file. Each renderer feeds it
+     with what IT is showing. */
+  /* ⚠ THIS RENDERER HAS NO `side` -- it is always the team's OWN offense
+     (r.own). Writing r[side] here threw a TypeError inside a click listener,
+     which never reaches the caller, so the chart simply kept whatever the
+     PREVIOUS mode had drawn and looked like it was working. That is the
+     failure this function's own comment already documents about renderStats
+     calling itself; a variable assumed rather than read, again. */
+  renderLeaderChart(rows.map(r => ({
+    label: r.team,
+    v: r.own.killpct,
+    note: r.team + ' \u2014 kill % ' + p3(r.own.killpct) +
+      ' (hitting ' + p3(r.own.hit) + ') over ' + r.own.matches +
+      (r.own.matches === 1 ? ' match' : ' matches')
+  })), 'killpct', 'Kill %', v => p3(v), false);
 }
 document.querySelectorAll('#v-leaders .segb').forEach(b =>
   b.addEventListener('click', () => {
@@ -24912,7 +25039,15 @@ def strip_private(html):
                    ("/* GAMEDAY-JS-BEGIN */", "/* GAMEDAY-JS-END */"),
                    ("/* GAMEDAY-CSS-BEGIN */", "/* GAMEDAY-CSS-END */"),
                    ("/* GAMEDAY-CALL-BEGIN */", "/* GAMEDAY-CALL-END */"),
-                   ("/* GAMEDAY-CALL2-BEGIN */", "/* GAMEDAY-CALL2-END */")):
+                   ("/* GAMEDAY-CALL2-BEGIN */", "/* GAMEDAY-CALL2-END */"),
+                   # ⚠ THE COMPARISON NAMES OTHER PEOPLE'S PRODUCTS IN A
+                   # CONST. Its markup was private-only from the start and its
+                   # SOURCE TABLE still sat in the shared script, naming
+                   # VolleyTalk and Evollve -- which the public gate caught and
+                   # refused to build, exactly as it is meant to. Fourth time
+                   # private-feature code has been written into shared script;
+                   # private code goes inside the feature's own fence, always.
+                   ("/* RKCMP-JS-BEGIN */", "/* RKCMP-JS-END */")):
         html = re.sub(re.escape(_a) + r".*?" + re.escape(_b), "", html,
                       flags=re.S)
 
