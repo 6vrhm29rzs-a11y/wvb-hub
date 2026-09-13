@@ -167,3 +167,56 @@ RESULT_SHAPES = [
 ]
 
 ALL_SHAPES = RESULT_SHAPES
+
+
+# ── THE DAY'S STORIES ────────────────────────────────────────────────────
+# ⚠ ONE CONTENT LAYER, TWO RENDERERS -- the reason this module exists. The
+# front page and the emails must not each decide what the lead is, or they
+# disagree inside a week and one of them has already been posted.
+#
+# ⚠ NEWSWORTHINESS IS A CONVENTION AND IS STATED AS ONE. It orders stories; it
+# is not a claim about the sport and it feeds nothing. The weights below were
+# chosen, not fitted, and the page says so.
+
+def _fact_row(r, ranks, avca):
+    """One result -> the facts a shape may draw on. Every number here comes
+    from the counted corpus; a shape may use no quantity that is not in it."""
+    w, l = r["w"], r["l"]
+    f = {"winner": w, "loser": l,
+         "w_sets": r["ws"], "l_sets": r["ls"],
+         "total_sets": r["ws"] + r["ls"],
+         "winner_rank": ranks.get(w), "loser_rank": avca.get(l),
+         "winner_power": ranks.get(w), "loser_power": ranks.get(l)}
+    return f
+
+
+def newsworthiness(f, avca):
+    """0-100, purely for ordering. CONVENTION, not a measurement."""
+    lp, wp = f.get("loser_power"), f.get("winner_power")
+    score = 0.0
+    if f.get("loser_rank"):                       # the beaten side is poll-ranked
+        score += 55 - min(f["loser_rank"], 25)
+        if not avca.get(f["winner"]) or avca[f["winner"]] > f["loser_rank"]:
+            score += 25                           # ...and lost to someone below it
+    if lp and wp:
+        if wp > lp:
+            score += min(25.0, (wp - lp) / 6.0)   # rating upset, by margin
+        score += max(0.0, 20.0 - min(lp, wp) / 5.0)   # quality of the best side
+    if f["total_sets"] == 5:
+        score += 6                                # five sets is a story
+    return round(score, 1)
+
+
+def day_stories(rows, ranks, avca, limit=8):
+    """rows: the same dicts mail_report builds. Returns ordered stories."""
+    out = []
+    for r in rows:
+        f = _fact_row(r, ranks, avca)
+        text, shape = headline(RESULT_SHAPES, f)
+        if not text:
+            continue
+        out.append({"headline": text, "shape": shape, "facts": f,
+                    "score": newsworthiness(f, avca),
+                    "gid": r.get("gid")})
+    out.sort(key=lambda s: -s["score"])
+    return out[:limit]
