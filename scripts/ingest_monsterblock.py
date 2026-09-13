@@ -149,6 +149,18 @@ def main():
         ours[tuple(pair)] = (gid, cls.get(gid),
                              nm_of.get(ts[w]["team_id"]) if w is not None else None)
 
+    # POWER ranks, so a disagreement can be weighted by who it involves
+    ranks = {}
+    try:
+        import re as _re
+        _page = io.open(os.path.join(REPO, "Cody", "START-HERE.html"),
+                        encoding="utf-8").read()
+        _T = json.loads(_re.search(r"const TEAMS\s*=\s*(\{.*?\});\n",
+                                   _page, _re.S).group(1))
+        ranks = {nm: t.get("rank") for nm, t in _T.items() if t.get("rank")}
+    except Exception:                                     # noqa: BLE001
+        pass
+
     agree = dis = miss = 0
     notes = []
     for r in rows:
@@ -169,14 +181,19 @@ def main():
             continue
         if ourw != mbw:
             dis += 1
-            notes.append("  ⚠ DISAGREE  %s vs %s -- ours %s, theirs %s (gid %s). "
-                         "Go to BOTH schools before believing either."
-                         % (a, h, ourw, mbw, gid))
+            best_rank = min([r for r in (ranks.get(a), ranks.get(h)) if r] or [999])
+            notes.append("  %s DISAGREE  %s (#%s) vs %s (#%s) -- ours %s, "
+                         "theirs %s (gid %s). Go to BOTH schools before "
+                         "believing either."
+                         % ("⚠⚠ TOP-50" if best_rank <= 50 else "⚠",
+                            a, ranks.get(a) or "-", h, ranks.get(h) or "-",
+                            ourw, mbw, gid))
         else:
             agree += 1
     print("\ncross-check against our counted results: "
           "agree %d · disagree %d · not in our log %d" % (agree, dis, miss))
-    for n in notes:
+    # loudest first: a top-50 disagreement is the one that matters
+    for n in sorted(notes, key=lambda x: (0 if "TOP-50" in x else 1, x)):
         print(n)
     if dis:
         print("\n⚠ A DISAGREEMENT IS A PLACE TO LOOK, NOT A CORRECTION. This "

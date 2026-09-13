@@ -156,6 +156,34 @@ instead of being guessed at. For a genuinely clean sweep, stop the refresh
 first (`WVB_LOCAL_REFRESH_SECONDS=0`) — CI does not have this problem because
 it runs against a static checkout.
 
+### CLOSED — Cody's priority call (2026-09-12)
+> "I don't give a shit about d2. If a 300+ rank d1 team plays a d2 team and
+> we don't have info from that match, I do not care. It doesn't affect the
+> top 50 that I care about."
+
+That settles three things that were sitting open as decisions, and they stop
+being decisions:
+- **Nicholls–Wiley** stays uncounted. Wiley is not D-I and no second source
+  will ever exist. Not worth another minute.
+- **Norfolk St.–Elizabeth City St.** stays as it is. One win, one team, rank
+  329.
+- **D-II fixtures on the board** (Tampa at West Florida): leave them. They
+  cost a slate count of one and nothing that matters.
+- The unreadable sites of **Little Rock, Central Conn. St., Wheeling, Fla.
+  Southern, Southwest Minn. St.** stop being a priority.
+
+⚠ **AND IT REDIRECTS THE REAL PROBLEM.** Measured the same day: **13 of the
+top 50 cannot be second-sourced at all** — Nebraska, Stanford, Penn St.,
+Purdue, UCLA, Kentucky, Arizona St., Auburn, BYU, Georgia Tech, Texas A&M,
+UCF, Vanderbilt. Every one renders its schedule client-side, so no static
+parser can read it and no second OFFICIAL source exists. **If the feed
+inverts a Nebraska result, nothing currently catches it** — and that is
+squarely inside what Cody cares about, unlike anything above.
+**This is now the top verification priority.** The Monster Block is their
+only independent witness today, so its cross-check flags a top-50
+disagreement loudly and sorts it first. Confirming one still needs a human
+in a browser, which does work — that is the escalation path.
+
 ### Two conflicts the two-source rule cannot settle by waiting (2026-09-12)
 Both stay uncounted, both now carry a recorded recheck:
 - **6628157 Little Rock – Northwestern St.** Northwestern St. publishes
