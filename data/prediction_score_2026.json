@@ -2,46 +2,46 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 1393,
+  "scored": 1409,
   "logged_after_tipoff_excluded": 2,
-  "team_mismatch_excluded": 46,
+  "team_mismatch_excluded": 47,
   "predictions_on_record": 4809,
-  "results_available": 1467,
-  "brier": 0.1759,
+  "results_available": 1484,
+  "brier": 0.1771,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 1027,
-  "favourite_correct_pct": 73.7
+  "favourite_correct": 1035,
+  "favourite_correct_pct": 73.5
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 237,
+   "n": 241,
    "said": 55.1,
-   "happened": 58.2
+   "happened": 57.7
   },
   {
    "range": "60-70%",
-   "n": 248,
+   "n": 250,
    "said": 65.3,
-   "happened": 58.9
+   "happened": 58.8
   },
   {
    "range": "70-80%",
-   "n": 230,
+   "n": 233,
    "said": 75.1,
-   "happened": 67.0
+   "happened": 66.5
   },
   {
    "range": "80-90%",
-   "n": 255,
-   "said": 85.1,
+   "n": 259,
+   "said": 85.2,
    "happened": 77.6
   },
   {
    "range": "90-101%",
-   "n": 423,
+   "n": 426,
    "said": 95.6,
-   "happened": 92.4
+   "happened": 92.3
   }
  ],
  "matches": [
@@ -125,6 +125,15 @@
    "p_home": 0.9613,
    "home_won": false,
    "brier": 0.9240976900000001
+  },
+  {
+   "game_id": "6626639",
+   "date": "2026-09-13",
+   "away": "Green Bay",
+   "home": "Northwestern",
+   "p_home": 0.9547,
+   "home_won": false,
+   "brier": 0.9114520899999999
   },
   {
    "game_id": "6624726",
@@ -485,15 +494,6 @@
    "p_home": 0.1221,
    "home_won": true,
    "brier": 0.77070841
-  },
-  {
-   "game_id": "6627790",
-   "date": "2026-08-28",
-   "away": "Georgetown",
-   "home": "American",
-   "p_home": 0.8773,
-   "home_won": false,
-   "brier": 0.76965529
   }
  ]
 }

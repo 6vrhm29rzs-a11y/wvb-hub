@@ -45,6 +45,17 @@
    "n": 5077
   },
   {
+   "metric": "kpr",
+   "label": "Kills / rally",
+   "definition": "kills per rally played",
+   "side": "own",
+   "higher_is_better": true,
+   "auc": 0.7138,
+   "lo": 0.7004,
+   "hi": 0.7266,
+   "n": 5077
+  },
+  {
    "metric": "hit",
    "label": "Hitting %",
    "definition": "(kills - errors) / attacks",
@@ -122,6 +133,17 @@
    "n": 5077
   },
   {
+   "metric": "kpr",
+   "label": "Kills / rally",
+   "definition": "kills per rally played",
+   "side": "diff",
+   "higher_is_better": true,
+   "auc": 0.6906,
+   "lo": 0.6764,
+   "hi": 0.7036,
+   "n": 5077
+  },
+  {
    "metric": "asps",
    "label": "Assists / set",
    "definition": "assists per set",
@@ -163,6 +185,17 @@
    "auc": 0.6603,
    "lo": 0.6485,
    "hi": 0.6737,
+   "n": 5077
+  },
+  {
+   "metric": "dpr",
+   "label": "Digs / rally",
+   "definition": "digs per rally played",
+   "side": "diff",
+   "higher_is_better": true,
+   "auc": 0.6547,
+   "lo": 0.6415,
+   "hi": 0.6673,
    "n": 5077
   },
   {
@@ -210,6 +243,17 @@
    "n": 5077
   },
   {
+   "metric": "bpr",
+   "label": "Blocks / rally",
+   "definition": "solo + half assists, per rally",
+   "side": "own",
+   "higher_is_better": true,
+   "auc": 0.6297,
+   "lo": 0.6169,
+   "hi": 0.6433,
+   "n": 5077
+  },
+  {
    "metric": "err_ps",
    "label": "Attack errors / set",
    "definition": "attack errors per set",
@@ -232,6 +276,17 @@
    "n": 5077
   },
   {
+   "metric": "kpr",
+   "label": "Kills / rally",
+   "definition": "kills per rally played",
+   "side": "opp",
+   "higher_is_better": false,
+   "auc": 0.6216,
+   "lo": 0.6084,
+   "hi": 0.6344,
+   "n": 5077
+  },
+  {
    "metric": "recv_ok_rate",
    "label": "Reception, clean",
    "definition": "1 - reception errors / attempts",
@@ -240,6 +295,17 @@
    "auc": 0.6191,
    "lo": 0.6057,
    "hi": 0.6325,
+   "n": 5077
+  },
+  {
+   "metric": "bpr",
+   "label": "Blocks / rally",
+   "definition": "solo + half assists, per rally",
+   "side": "diff",
+   "higher_is_better": true,
+   "auc": 0.6137,
+   "lo": 0.5998,
+   "hi": 0.6271,
    "n": 5077
   },
   {
@@ -287,6 +353,17 @@
    "n": 5077
   },
   {
+   "metric": "dpr",
+   "label": "Digs / rally",
+   "definition": "digs per rally played",
+   "side": "opp",
+   "higher_is_better": false,
+   "auc": 0.5671,
+   "lo": 0.5531,
+   "hi": 0.5805,
+   "n": 5077
+  },
+  {
    "metric": "dps",
    "label": "Digs / set",
    "definition": "digs per set",
@@ -295,6 +372,17 @@
    "auc": 0.561,
    "lo": 0.5487,
    "hi": 0.5749,
+   "n": 5077
+  },
+  {
+   "metric": "dpr",
+   "label": "Digs / rally",
+   "definition": "digs per rally played",
+   "side": "own",
+   "higher_is_better": true,
+   "auc": 0.5466,
+   "lo": 0.5332,
+   "hi": 0.56,
    "n": 5077
   },
   {
@@ -328,6 +416,17 @@
    "auc": 0.5351,
    "lo": 0.5208,
    "hi": 0.5485,
+   "n": 5077
+  },
+  {
+   "metric": "bpr",
+   "label": "Blocks / rally",
+   "definition": "solo + half assists, per rally",
+   "side": "opp",
+   "higher_is_better": false,
+   "auc": 0.5348,
+   "lo": 0.5208,
+   "hi": 0.5478,
    "n": 5077
   },
   {

@@ -107,6 +107,57 @@ def main():
         check("[NEG] it never replaces the displayed time",
               "f.t =" not in note and "f.t=" not in note)
 
+    print("\n2b. EVERY SURFACE THAT SHOWS A START TIME SHOWS THE DISPUTE")
+    # ⚠ THE FLAG SHIPPED ON ONE SURFACE AND NOT THE OTHER TWO, AND THAT IS
+    # THE FAILURE THIS SECTION EXISTS FOR. The team-page card carried it for
+    # a day while Today's card and the Schedule table -- the view whose whole
+    # job is listing start times -- said nothing, because each is a SEPARATE
+    # emitter reading the same schedule() row. Showing it on one surface and
+    # not the others is how two views end up telling one reader different
+    # things about one match.
+    bsrc = io.open(os.path.join(REPO, "scripts", "build_hub.py"),
+                   encoding="utf-8").read()
+    bcode = _code_only(bsrc)
+    check("the schedule row carries the flag",
+          '"tdis": _tdis_now.get(gid)' in bcode)
+    check("the DESK payload carries it too",
+          bcode.count('"tdis": r.get("tdis")') >= 2,
+          bcode.count('"tdis": r.get("tdis")'))
+    check("the Python-rendered schedule table renders it",
+          "tdis_html(r)" in bcode)
+    check("...from one definition, not a second copy of the wording",
+          bcode.count("Neither is corrected here") == 1,
+          bcode.count("Neither is corrected here"))
+    desk = None
+    import re as _re
+    _m = _re.search(r"const DESK = (\[.*?\]);\n", page, _re.S)
+    if _m:
+        desk = json.loads(_m.group(1))
+        check("[NEG] every desk row declares the field, present or null",
+              all("tdis" in r for r in desk), len(desk))
+    dis = {}
+    if os.path.exists(p_tc := os.path.join(
+            REPO, "data", "fixture_time_check_%d.json" % SEASON)):
+        dis = dict((str(r["gid"]), r) for r in
+                   (json.load(io.open(p_tc, encoding="utf-8"))
+                    .get("disagreements") or []))
+    # ⚠ CALENDAR-CONDITIONAL, DELIBERATELY. A disputed fixture is only on the
+    # page while it is in the displayed range, so asserting a rendered badge
+    # unconditionally is a guard that cries wolf the morning after the match
+    # (the exhibition-badge lesson). The MECHANISM is checked above always;
+    # the rendered flag is checked only when one is genuinely in range.
+    if desk is not None:
+        live_rows = [r for r in desk if r["gid"] in dis]
+        if live_rows:
+            check("a disputed fixture in range carries its flag on the desk",
+                  all(r.get("tdis") for r in live_rows),
+                  [r["gid"] for r in live_rows if not r.get("tdis")])
+            check("...and the schedule table renders the badge",
+                  'class="tdisq"' in page)
+        else:
+            check("no disputed fixture is in the displayed range "
+                  "(mechanism checked above)", True)
+
     print("\n3. THE TEXT SCAN CANNOT CREATE A STATUS")
     ssrc = io.open(os.path.join(REPO, "scripts", "availability_scan.py"),
                    encoding="utf-8").read()

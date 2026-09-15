@@ -243,17 +243,34 @@ def main():
         "availability_evidence.json")))["players"]["Purdue|Grace Heaney"]
     _hclosed = any((e.get("effective") or {}).get("to")
                    for e in _hev0 if e.get("claim") == "match_incident")
+    # ⚠ WOLLARD IS NO LONGER A STANDING CONTROL (2026-09-14). Her status
+    # carried review_by 2026-09-13 and expired on its own date rule, so every
+    # assertion of the form "Wollard is a current status" fails the morning
+    # after -- for no reason connected to the code. That is the calendar-pin
+    # class this file already avoids for Heaney. The INVARIANT is the rule:
+    # a player is current exactly while her evidence is, and an expired item
+    # appears in neither current list.
+    # ⚠ COMPARE THE ARTIFACT TO ITS OWN CLOCK, NOT THE FIXTURE'S. `today`
+    # in this file is a FIXED fixture date (2026-08-31) used for the
+    # clock-injectable entry_state tests; the artifact on disk was built
+    # against the real day. Grading one by the other reports a defect
+    # whenever the two differ. The invariant that holds under any clock is
+    # the artifact's INTERNAL consistency: a player in `expired` is in
+    # neither current list.
+    _exp_players = {x["player"] for x in art.get("expired") or []}
+    _both = sorted(_exp_players & (set(sts) | set(incs)))
+    check("[NEG] no expired player also appears in a current list",
+          not _both, _both)
+    _wollard_live = "Kenna Wollard" not in _exp_players
     if _hclosed:
         # Heaney gone from current incidents; OTHER players' incidents
         # (Andi Jackson's Sep 2 ankle, OWH-sourced) are legitimate
-        check("artifact: Wollard a status; Heaney resolved -> not in any "
-              "current list",
-              "Kenna Wollard" in sts and "Grace Heaney" not in incs
-              and "Grace Heaney" not in sts, (sts, incs))
-    else:
-        check("artifact: Wollard a status, Heaney the ONLY incident",
-              "Kenna Wollard" in sts and incs == ["Grace Heaney"],
+        check("artifact: Heaney resolved -> in no current list",
+              "Grace Heaney" not in incs and "Grace Heaney" not in sts,
               (sts, incs))
+    else:
+        check("artifact: Heaney the ONLY current incident",
+              incs == ["Grace Heaney"], (sts, incs))
     check("Vander Wal: two separately-attributed season-ending sources, "
           "both statuses",
           sts.count("Abby Vander Wal") == 2
@@ -310,8 +327,14 @@ def main():
               art["meta"]["counts"]["statuses"] == len(sts)
               and art["meta"]["counts"]["incidents"] == 1)
 
-    wrow = [x for x in art["statuses"]
-            if x["player"] == "Kenna Wollard"][0]
+    # ⚠ SAME RESURRECTION THE INCIDENT ROW ALREADY USES. These renderer
+    # fixtures need a status-SHAPED row for Wollard to exercise avCard's
+    # branching; once her evidence expired she left `statuses`, so take the
+    # row from expired history, where its wording is intact by design. The
+    # fixture tests the RENDERER, not who is currently out.
+    wrow = ([x for x in art["statuses"] if x["player"] == "Kenna Wollard"]
+            or [dict(x, state="status") for x in art["expired"]
+                if x["player"] == "Kenna Wollard"])[0]
     # a resolved incident empties the current list -- the render fixtures
     # below still need an incident-shaped row, so take it from expired
     # history (its wording is intact there by design)
@@ -329,7 +352,18 @@ def main():
              "\n" + fns["avMeta"] + "\n" +
              fns["avSupportRow"] + "\n" + fns["avCard"] + "\n")
     proj = {(c["team"], c["player"]): c for c in art["projection"]}
-    wcard = proj[("Purdue", "Kenna Wollard")]
+    # mirrors the hcard fixture above: an expired row carries its wording
+    # but not the projection's own fields, so the card SHAPE is rebuilt
+    # mirrors the hcard fixture above: an expired row carries its wording
+    # but NOT the projection's own fields -- `headline` in particular, which
+    # avCard renders. Rebuild it from the same map the projection uses, so
+    # the fixture exercises the real wording rather than a blank.
+    wcard = proj.get(("Purdue", "Kenna Wollard")) or {
+        "team": "Purdue", "player": "Kenna Wollard", "state": "status",
+        "claim": wrow.get("claim"), "n_supports": 1,
+        "headline": AD._CLAIM_HEADLINE.get(wrow.get("claim"),
+                                           wrow.get("claim")),
+        "supports": [dict(wrow)]}
     # a resolved incident has no current projection card -- resurrect a
     # synthetic one FROM THE EXPIRED ROW for the renderer fixtures (same
     # shape as a live incident card: state + headline support), so the
@@ -355,8 +389,12 @@ def main():
         check("Wollard: her own words render verbatim",
               "unexpected health issue that will keep me away fro a "
               "little while" in w)
+        # ⚠ THE CARD IS RENDERED FROM A RESURRECTED ROW, so the wording
+        # invariant holds regardless of whether her evidence is still live;
+        # what may NOT hold once it expires is the "(sourced)" currency mark.
         check("Wollard: away from team / unavailable, nothing stronger",
-              "Away from team / unavailable" in w and "(sourced)" in w
+              "Away from team / unavailable" in w
+              and ("(sourced)" in w if _wollard_live else True)
               and "Out for the" not in w)
         for banned in ("season-ending", "season ending", "hospital",
                        "surgery", "diagnos", "out for the season",
@@ -489,18 +527,32 @@ def main():
     check("pdAvailability runs under node", rc == 0, err)
     if rc == 0:
         d = json.loads(out.strip().splitlines()[-1])
-        check("Wollard's dossier shows the sourced status + desk link",
-              "Away from team / unavailable" in d["w"]
-              and "(sourced)" in d["w"]
-              and "Availability Desk" in d["w"], d["w"])
+        # ⚠ STATE-CONDITIONAL. While her evidence is live the dossier must
+        # carry the sourced status; once it expires the dossier must NOT
+        # assert a current one -- and that second case is the more important
+        # invariant, because a stale "unavailable" on a player who may be
+        # back is exactly what review_by exists to prevent.
+        if _wollard_live:
+            check("Wollard's dossier shows the sourced status + desk link",
+                  "Away from team / unavailable" in d["w"]
+                  and "(sourced)" in d["w"]
+                  and "Availability Desk" in d["w"], d["w"])
+        else:
+            check("[NEG] Wollard's dossier asserts NO current status once "
+                  "her evidence has expired",
+                  "Away from team / unavailable" not in d["w"]
+                  and "Out for the" not in d["w"], d["w"])
         if _closed:
             # resolved: she is back (box-verified); her dossier honestly
             # carries no CURRENT availability claim
             check("Heaney's dossier carries no current claim after the "
                   "box-verified return",
                   "Sourced match incident" not in d["h"], d["h"])
-            check("...never the no-information default for Wollard",
-                  "No availability information" not in d["w"])
+            check("...and the no-information default appears for Wollard "
+                  "only once her evidence has expired",
+                  ("No availability information" in d["w"])
+                  if not _wollard_live else
+                  ("No availability information" not in d["w"]), d["w"])
         else:
             check("Heaney's dossier shows the incident, availability "
                   "unknown",
@@ -561,9 +613,19 @@ def main():
               tx.get("digby") is None
               and tx.get("digby_avail_withheld") == ["Abby Vander Wal"],
               tx.get("digby_avail_withheld"))
-        check("...and Purdue's while Wollard is unavailable",
-              pu.get("digby") is None
-              and "Kenna Wollard" in (pu.get("digby_avail_withheld") or []))
+        # ⚠ The withhold follows the CURRENT status list: a scout note is
+        # only stale while somebody it describes is actually out. Once
+        # Wollard's evidence expires the note is no longer contradicted by
+        # her, so pinning the withhold to her name is a calendar pin.
+        if _wollard_live:
+            check("...and Purdue's while Wollard is unavailable",
+                  pu.get("digby") is None
+                  and "Kenna Wollard" in (pu.get("digby_avail_withheld") or []))
+        else:
+            check("...and Purdue's note is no longer withheld on Wollard's "
+                  "account once her evidence expired",
+                  "Kenna Wollard" not in (pu.get("digby_avail_withheld") or []),
+                  pu.get("digby_avail_withheld"))
         check("...and the stored notes really did carry the stale claims "
               "(the withhold caught real text)",
               True)  # asserted below against the summaries file

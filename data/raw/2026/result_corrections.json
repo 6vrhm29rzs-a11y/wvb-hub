@@ -4191,6 +4191,68 @@
     }
    ],
    "note": "⚠ THIS COUNTED, AS A 4-0. Every structural rule here asked whether the winner had too FEW sets; none asked whether it had too many. The playing rules bound the field at both ends -- a side that wins three sets has won the match -- and is_self_contradictory now says so. It is the only record in the 2026 corpus crediting four."
+  },
+  "6628322": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "UNLV (away) won 3-2, with the set line 29-27, 25-21, 19-25, 21-25, 12-15 attributed to San Francisco as the home column -- the TRUE sequence with the TEAMS SWAPPED. Internally coherent, and wrong: read as served, San Francisco takes sets 1-2 and UNLV takes 3-5. The box rows are inverted the same way (0 of 32 player rows fit the team they are filed under; all 32 fit the opposite roster).",
+   "correct": {
+    "winner_team_id": "46247",
+    "away_sets": 2,
+    "home_sets": 3,
+    "linescores": [
+     {
+      "period": 1,
+      "visit": 29,
+      "home": 27
+     },
+     {
+      "period": 2,
+      "visit": 25,
+      "home": 21
+     },
+     {
+      "period": 3,
+      "visit": 19,
+      "home": 25
+     },
+     {
+      "period": 4,
+      "visit": 21,
+      "home": 25
+     },
+     {
+      "period": 5,
+      "visit": 12,
+      "home": 15
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46247": "45973",
+     "45973": "46247"
+    }
+   },
+   "established": "San Francisco def. UNLV 3-2. UNLV publishes \"UNLV L 2-3 vs San Francisco\" and San Francisco publishes \"San Francisco W 3-2 vs UNLV\" -- two independent witnesses, both real schools, agreeing against the feed. Swapping the columns reproduces a fully coherent match from San Francisco's side (27-29, 21-25, 25-19, 25-21, 15-12), deciding set to 15; the feed's own arrangement is equally coherent, which is exactly why the schools decide it and internal coherence cannot. Both sites report the venue as Neutral.",
+   "evidence": [
+    {
+     "url": "https://unlvrebels.com/services/schedule_txt.ashx?schedule=1503",
+     "kind": "school_schedule",
+     "school": "UNLV",
+     "retrieved": "2026-09-13",
+     "text": "UNLV L 2-3 vs San Francisco",
+     "establishes": "UNLV L 2-3 vs San Francisco"
+    },
+    {
+     "url": "https://usfdons.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "San Francisco",
+     "retrieved": "2026-09-13",
+     "text": "San Francisco W 3-2 vs UNLV",
+     "establishes": "San Francisco W 3-2 vs UNLV"
+    }
+   ],
+   "note": "Found by three guards at once -- box attribution, lineup attribution and the display invariants -- all pointing at the same gid, which is the cross-check working. The nightly verifier had already settled it as CONTRADICTED_BOTH hours earlier; the correction is what turns a settled verdict into a counted result."
   }
  }
 }

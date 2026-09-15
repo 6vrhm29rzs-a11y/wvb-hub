@@ -29,6 +29,7 @@ import datetime
 import io
 import json
 import os
+import re
 import sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -41,6 +42,53 @@ IDS = os.path.join(REPO, "data", "raw", str(SEASON), "wmt_sport_ids.json")
 # A disagreement under this is scheduling noise (a school rounding a 7:00 to
 # 7:05, a feed storing the doors time). Stated, not fitted, and it feeds
 # nothing but the display.
+# ---- TIMESTAMP PARSING -------------------------------------------------
+# WARN: `dt[:19]` + `replace(tzinfo=utc)` DISCARDED THE OFFSET AND THEN
+# ASSUMED UTC (found by Codex review, 2026-09-13). It happens to be right for
+# every host measured -- 36 of 36 samples across 18 schools return
+# `2026-11-21T01:00:00.000000Z` -- but a host emitting `...T20:00:00-05:00`
+# would have been read as 20:00 UTC and produced a FIVE-HOUR false
+# disagreement. This module's whole job is to flag disagreements; one it
+# manufactures itself is the worst output it can produce.
+#
+# THE SOURCE CONTRACT, measured rather than assumed: this platform emits an
+# explicit zone, and every observed value is `Z`. So:
+#   * `Z` and any explicit `+HH:MM` / `+HHMM` offset are honoured exactly;
+#   * a TIMEZONE-NAIVE value is OFF-CONTRACT and returns None -- it is
+#     counted as unresolved and the fixture is skipped, never guessed into a
+#     zone. Guessing is how a false flag gets made.
+_TZ_TAIL = re.compile(r"(?:Z|[+-]\d{2}:?\d{2})$")
+
+
+def parse_dt(text):
+    """An ISO-8601 instant -> aware datetime, or None if it carries no zone.
+
+    Handles `Z`, `+HH:MM`, `+HHMM` and fractional seconds. Returns None for a
+    naive value rather than assuming one, and None for anything unparseable.
+    """
+    t = (text or "").strip()
+    if not t:
+        return None
+    m = _TZ_TAIL.search(t)
+    if not m:
+        return None                      # naive: off-contract, unresolved
+    tail = m.group(0)
+    body = t[:m.start()]
+    if tail == "Z":
+        tail = "+00:00"
+    elif ":" not in tail:
+        tail = tail[:3] + ":" + tail[3:]
+    # 3.9's fromisoformat takes 3- or 6-digit fractions only
+    if "." in body:
+        head, frac = body.split(".", 1)
+        frac = (frac + "000000")[:6]
+        body = head + "." + frac
+    try:
+        return datetime.datetime.fromisoformat(body + tail)
+    except ValueError:
+        return None
+
+
 TOLERANCE_MIN = 15
 
 
@@ -118,6 +166,11 @@ def main():
 
     events = {}
     asked = 0
+    # rows whose timestamp carried no zone, or would not parse.
+    # Counted and reported so coverage is stated rather than
+    # silently reduced -- a run that read nothing must not look
+    # like a run that found nothing.
+    unresolved = []
     for s in schools:
         base = sites.get(s)
         log = []
@@ -146,13 +199,13 @@ def main():
                    or (r.get("opponent") or {}).get("name") or "").strip()
             if not dt or not opp:
                 continue
-            try:
-                when = datetime.datetime.strptime(dt[:19], "%Y-%m-%dT%H:%M:%S")
-            except ValueError:
+            when = parse_dt(dt)
+            if when is None:
+                # off-contract or unparseable: counted, never guessed
+                unresolved.append({"school": s, "datetime": dt, "opp": opp})
                 continue
-            rows.append({"epoch": when.replace(
-                tzinfo=datetime.timezone.utc).timestamp(),
-                "opp": opp, "url": base + "/schedule"})
+            rows.append({"epoch": when.timestamp(),
+                         "opp": opp, "url": base + "/schedule"})
         events[s] = rows
     save_ids(ids)
     print("asked %d schools, %d answered with events" % (asked, len(events)))
@@ -207,6 +260,8 @@ def main():
         "window_days": days,
         "fixtures_checked": len(fixtures),
         "schools_answered": len(events),
+        "timestamps_unresolved": len(unresolved),
+        "timestamps_unresolved_sample": unresolved[:5],
         "tolerance_minutes": TOLERANCE_MIN,
         "what_this_is": "Fixtures where the feed's start time and the "
                         "school's own published start time differ by more "

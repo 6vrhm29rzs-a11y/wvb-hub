@@ -91,6 +91,13 @@ REBUILD = [
     # --- reference checks: read-only, local-only, never gate the build ---
     ({}, ["scripts/ingest_monsterblock.py"]),
     ({}, ["scripts/board_bakeoff.py"]),
+    # ⚠ LOCAL-ONLY AND IT HAS TO BE. This snapshots the files git is
+    # DELIBERATELY not carrying -- Cody's notes log, his ballots, the manual
+    # browser captures -- and CI checks out a tree with none of them. It is
+    # last because the notes log may have been written to earlier in the same
+    # cycle, and --if-stale means it lands about daily rather than every 20
+    # minutes churning through its own retention window.
+    ({}, ["scripts/backup_local.py", "--if-stale"]),
 ]
 
 # Steps that MUST succeed for the cycle to continue. Everything else is

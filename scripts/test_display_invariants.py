@@ -2991,12 +2991,30 @@ def check_every_view_names_its_season():
         if not os.path.exists(path):
             continue
         h = open(path, encoding="utf-8").read()
-        leads = re.findall(r'<p class="lead"[^>]*>(.*?)</p>', h, re.S)
+        # ⚠ AN EXEMPTION EXISTS AND IT IS DECLARED IN THE MARKUP, NOT IN A
+        # LIST HERE. A view that shows no season-scoped data at all -- the
+        # Notes & ideas log, which is Cody's own writing -- has no season to
+        # name, and naming one would be worse than silent: "the 2026 season"
+        # over a page of his notes is a false label. But an exemption list
+        # kept in this file is exactly the thing that drifts (the CI suite
+        # list, the media-query sweep, the phone_probe routes -- three
+        # separate times). So the VIEW declares it, with a reason, and the
+        # count of exemptions is printed so a wrongly-exempted data view is
+        # visible in the output rather than absent from it.
+        leads = re.findall(r'<p class="lead"([^>]*)>(.*?)</p>', h, re.S)
         unlabelled = []
-        for raw in leads:
+        exempt = []
+        for attrs, raw in leads:
             txt = re.sub(r"<[^>]+>", "", raw)
+            m_ex = re.search(r'data-noseason="([^"]+)"', attrs)
+            if m_ex:
+                exempt.append((re.sub(r"\s+", " ", txt).strip()[:44],
+                               m_ex.group(1)))
+                continue
             if not re.search(r"20\d{2}", txt):
                 unlabelled.append(re.sub(r"\s+", " ", txt).strip()[:60])
+        for t, why in exempt:
+            print("     (no season by design: %s... -- %s)" % (t, why))
         if unlabelled:
             bad("%s: a view does not name its season" % label, str(unlabelled[:3]))
         else:

@@ -32,7 +32,24 @@ def main():
         entries = [json.loads(l) for l in open(p, encoding="utf-8")
                    if l.strip()]
         check("at least the W1 ballot is stored", len(entries) >= 1)
+        # ⚠ THE FILE IS APPEND-ONLY, SO A WEEK CAN CARRY MORE THAN ONE ROW:
+        # the ballot as submitted, a later corrected copy, and an `op` row
+        # amending them. This guard used to check EVERY row and failed the
+        # moment a real correction was filed -- it was grading a ledger as if
+        # it were a table. Same rule the renderer uses: skip rows that are not
+        # ballots, then LAST WINS per week.
+        ballots = {}
         for e in entries:
+            if not e.get("ranks"):
+                # a non-ballot row must still say what it is and why
+                check("%s: an amendment row states its op and reason"
+                      % e.get("week"),
+                      bool(e.get("op")) and bool(e.get("note")))
+                continue
+            ballots[e.get("week")] = e
+        check("every stored week resolves to exactly one ballot",
+              len(ballots) >= 1, sorted(ballots))
+        for e in ballots.values():
             check("%s: 25 ranked teams" % e.get("week"),
                   len(e.get("ranks") or []) == 25)
             unresolved = [r["as_written"] for r in e["ranks"]

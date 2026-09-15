@@ -190,6 +190,9 @@ def pick_comparison(snaps, this_week, rank_source):
     return earlier[-1] if earlier else None
 
 
+_POWER_SCALE = {}
+
+
 def build():
     rating = load_json("data/rating_2025.json")
     if not rating:
@@ -506,7 +509,20 @@ def build():
         z = (c - _mu) / _sd
         t["power"] = round(max(0.0, min(100.0, 50.0 + 12.5 * z)), 1)
         t["power_z"] = round(z, 3)
+        t["power_c"] = round(c, 4)
         t["power_basis"] = t.get("rank_source") or "preseason"
+    # ⚠ THE STANDARDISATION CONSTANTS ARE PART OF THE ANSWER. Without the
+    # mean and SD the page can print "POWER 81.2" and nobody -- including us
+    # -- can reproduce it from the artifacts. Cody asked to be able to.
+    _POWER_SCALE.clear()
+    _POWER_SCALE.update({"mean": (round(_mu, 4) if _mu is not None else None),
+                         "sd": (round(_sd, 4) if _sd is not None else None),
+                         "n": len(_cvals),
+                         "formula": "power = 50 + 12.5 * (c - mean) / sd, "
+                                    "clipped to 0-100",
+                         "c_is": "the composite the rank itself is built "
+                                 "from -- the live fit when one has "
+                                 "validated, the blend until then"})
     for t in teams:
         t.pop("_pv", None)
 
@@ -770,6 +786,7 @@ def build():
         "rank_stamp": rank_stamp,
         "resume_active": resume_active,
         "resume": resume_meta,
+        "power_scale": dict(_POWER_SCALE),
     }
 
 

@@ -195,3 +195,21 @@ AVCA-*.xlsx
 .intel_cache/
 data/.local_refresh.lock
 data/raw/2026/collector_cache/
+
+# ⚠ CODY'S CHATGPT DROP FOLDER. Briefs he pastes out of his ChatGPT desktop
+# app land here as .rtf/.txt/.md files. Same call as the research briefs the
+# other seats return, one section above: this repository is PUBLIC, the text
+# is somebody else's writing, and what we DERIVE from it (a feasibility
+# verdict, a backlog item, a note in the log) is what gets committed. It is
+# not lost -- scripts/backup_local.py snapshots the folder, because git is
+# deliberately not carrying it.
+Cody dropbox of Chat GPT prompts/
+
+# ⚠ THE CLAUDE <-> CODEX HANDOFF RECORD IS LOCAL AND PRIVATE (2026-09-13).
+# It carries another agent's research verbatim, Cody's own direction, and the
+# working state of an exchange between two seats -- none of it ours to
+# republish and this repository is PUBLIC. It is AUTHORITATIVE for that
+# exchange and it is NOT disposable: scripts/backup_local.py snapshots it, the
+# same treatment the notes log and the ballots get, precisely because git is
+# deliberately not carrying it.
+handoff/

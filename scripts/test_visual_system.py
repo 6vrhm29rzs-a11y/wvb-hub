@@ -183,6 +183,8 @@ def main():
         FAILS.append("every CSS variable read is also defined")
     if not check_type_floor(h):
         FAILS.append("no type is set below the 9px floor")
+    if not check_dead_phone_rules(src):
+        FAILS.append("no phone rule is dead by source order")
     if not check_flex_buttons_center(src):
         FAILS.append("flex-display button rules declare justify-content")
 
@@ -291,6 +293,95 @@ def check_flex_buttons_center(src):
     ok = not bad
     print("  %-64s %s" % ("flex-display button rules declare justify-content",
                           "ok" if ok else "FAIL %s" % bad[:3]))
+    return ok
+
+
+def _specificity(sel):
+    """(ids, classes, elements) for one selector -- the standard count."""
+    import re as _re
+    sel = _re.sub(r"::[a-z-]+", " ", sel)          # pseudo-elements: element
+    ids = len(_re.findall(r"#[\w-]+", sel))
+    cls = len(_re.findall(r"\.[\w-]+", sel)) + \
+        len(_re.findall(r"\[[^\]]+\]", sel)) + \
+        len(_re.findall(r":(?!:)[a-z-]+", sel))
+    els = len(_re.findall(r"(?:^|[\s>+~,(])([a-z][\w-]*)", sel))
+    return (ids, cls, els)
+
+
+def check_dead_phone_rules(src):
+    """No phone rule is silently beaten by a later desktop rule.
+
+    ⚠⚠ THIS SHIPPED AND NOBODY SAW IT FOR MONTHS. The player match log had a
+    phone rule -- `.gline .ss{flex:1 1 100%}` -- written specifically to stop
+    a long stat line running off a 390px screen. The base rule
+    `.gline .ss{flex:none}` sits LATER in the file at the SAME specificity
+    (0,2,0), so source order handed the win to the base and the phone fix did
+    nothing: measured 393px inside a 368px row on the device Cody actually
+    uses. It is the third time this exact cascade has bitten here (the
+    decade-band zebra over the phone reset; the crest bar over the disable
+    rule), so it is a guard now rather than a lesson.
+
+    A media rule is DEAD when a rule outside any media block, later in the
+    file, sets the same property on the same selector at equal or greater
+    specificity. Same-selector comparison only -- it will not catch every
+    possible override, but it catches the one that keeps happening, and a
+    narrow check that fires is worth more than a broad one that cannot.
+    """
+    import re as _re
+    css = src
+    rules = []          # (pos, selector, prop, in_media)
+    for m in _re.finditer(r"(@media[^{]*\{)|([^{}@]+)\{([^{}]*)\}", css):
+        if m.group(1):
+            continue
+        sel = (m.group(2) or "").strip()
+        body = m.group(3) or ""
+        if not sel or sel.startswith("@"):
+            continue
+        # is this inside a max-width media block?
+        before = css[:m.start()]
+        opens = before.count("@media")
+        # crude but adequate: a media block that has not been closed yet
+        in_media = False
+        mm = None
+        for mo in _re.finditer(r"@media([^{]*)\{", before):
+            depth = 0
+            j = mo.end()
+            while j < m.start():
+                if css[j] == "{":
+                    depth += 1
+                elif css[j] == "}":
+                    if depth == 0:
+                        break
+                    depth -= 1
+                j += 1
+            else:
+                in_media = True
+                mm = mo.group(1)
+        for pm in _re.finditer(r"([a-z-]+)\s*:\s*([^;}]+)", body):
+            rules.append((m.start(), sel, pm.group(1),
+                          " ".join(pm.group(2).split()),
+                          in_media and "max-width" in (mm or "")))
+    dead = []
+    for pos, sel, prop, val, is_phone in rules:
+        if not is_phone:
+            continue
+        spec = _specificity(sel)
+        for pos2, sel2, prop2, val2, is_phone2 in rules:
+            if is_phone2 or pos2 <= pos or prop2 != prop or sel2 != sel:
+                continue
+            # ⚠ ONLY WHEN THE VALUES DIFFER. A later rule repeating the
+            # SAME value makes the phone rule redundant, not broken, and a
+            # guard that reports both kinds together is one nobody reads.
+            if val2 == val:
+                continue
+            if _specificity(sel2) >= spec:
+                dead.append("%s {%s: %s} beaten by a later %r"
+                            % (sel, prop, val, val2))
+                break
+    dead = sorted(set(dead))
+    ok = not dead
+    print("  %-64s %s" % ("no phone rule is dead by source order",
+                          "ok" if ok else "FAIL %s" % dead[:3]))
     return ok
 
 

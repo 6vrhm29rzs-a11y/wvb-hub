@@ -148,6 +148,31 @@ def test_desk_hierarchy():
           "Ranking week" in fn and "Last saved" in fn)
 
 
+def _strip_py_prose(src):
+    """Python source minus comments and docstrings.
+
+    Used by the model-isolation scan below: an invariant about which scripts
+    READ the ballot file is an invariant about code, and a comment that
+    mentions the path is prose about the rule, not a breach of it.
+    """
+    out, i, n = [], 0, len(src)
+    TQ = ('"' * 3, "'" * 3)
+    while i < n:
+        c = src[i]
+        if c == "#":
+            j = src.find(chr(10), i)
+            i = n if j < 0 else j
+            continue
+        q3 = next((q for q in TQ if src.startswith(q, i)), None)
+        if q3:
+            j = src.find(q3, i + 3)
+            i = n if j < 0 else j + 3
+            continue
+        out.append(c)
+        i += 1
+    return "".join(out)
+
+
 def main():
     print("BALLOT WORKSHOP GUARDS\n")
 
@@ -424,10 +449,29 @@ def main():
                                             "live_server.py", "build_hub.py"):
             continue
         src = open(os.path.join(REPO, "scripts", fn), encoding="utf-8").read()
-        if "ballots_" in src or re.search(r"^\s*import ballot\b", src, re.M):
+        # ⚠ SCAN THE CODE, NOT THE PROSE. This flagged backup_local.py for a
+        # COMMENT explaining why the ballot path is deliberately NOT in its
+        # source list -- a comment arguing for the invariant, failed by the
+        # guard that enforces it. Thirteenth time in this codebase. A comment
+        # cannot read a file, so it cannot violate an invariant about reading
+        # files; strip first, then search. The invariant is unchanged and the
+        # negative control below proves a real reference still trips.
+        code = _strip_py_prose(src)
+        if "ballots_" in code or re.search(r"^\s*import ballot\b", code, re.M):
             hits.append(fn)
     check("no rating, projection or simulator script reads the ballot file",
           not hits, str(hits))
+    # ⚠ NEGATIVE CONTROL, IN PROCESS. Inject a real CODE reference into a
+    # rating script's source text and require the scan to catch it -- a
+    # comment-blind scan that could no longer catch anything would be worse
+    # than the false positive it replaced.
+    _probe = _strip_py_prose(
+        'import os\n# this comment names ballots_2026.jsonl harmlessly\n')
+    _probe_real = _strip_py_prose(
+        'p = "data/ballots_2026.jsonl"\nopen(p)\n')
+    check("[NEG] the comment-blind scan still catches a real reference",
+          "ballots_" not in _probe and "ballots_" in _probe_real,
+          (repr(_probe)[:60], repr(_probe_real)[:60]))
     # ⚠ AND THE BACKUP MUST STAY INERT. It may read the ballot -- that is what a
     # backup does -- but it must never compute from it or hand it to anything.
     bbp = os.path.join(REPO, "scripts", "ballot_backup.py")

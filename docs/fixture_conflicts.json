@@ -194,7 +194,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 168,
+     "records": 266,
      "values": [
       "1788670800",
       "1788742800"
@@ -202,7 +202,7 @@
     },
     {
      "field": "game_state",
-     "records": 168,
+     "records": 266,
      "values": [
       "P",
       "I",
@@ -211,30 +211,7 @@
     }
    ],
    "matchup": "Missouri / Nebraska",
-   "records": 168
-  },
-  "6626265": {
-   "conflicts": [
-    {
-     "field": "teams",
-     "records": 50,
-     "values": [
-      "(('46250', False), ('52339', True))",
-      "(('46250', False), ('46616', True))",
-      "(('46250', True), ('46616', False))"
-     ]
-    },
-    {
-     "field": "site",
-     "records": 50,
-     "values": [
-      "home/away flip across snapshots",
-      "no venue owner on record"
-     ]
-    }
-   ],
-   "matchup": "SMU / TBA",
-   "records": 50
+   "records": 266
   },
   "6626288": {
    "conflicts": [
@@ -565,11 +542,11 @@
  },
  "by_field": {
   "city": 1,
-  "game_state": 47,
-  "site": 3,
+  "game_state": 31,
+  "site": 2,
   "start_time_epoch": 33,
   "state_usps": 1,
-  "teams": 3,
+  "teams": 2,
   "teams (non-blocking)": 2,
   "venue": 1
  },
@@ -736,8 +713,8 @@
   }
  },
  "counts": {
-  "blocked": 36,
-  "conflicted": 84,
+  "blocked": 35,
+  "conflicted": 67,
   "corrected": 5,
   "fixtures": 4891
  },

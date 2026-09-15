@@ -27,6 +27,7 @@ Python 3.9 target. Run: python3 scripts/test_player_rating.py
 import io
 import json
 import os
+import re
 import sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -548,10 +549,31 @@ def main():
                     break
         if pos and anchor > 0:
             lo, hi = min(pos.values()), max(pos.values())
-            check("render-helper tables sit together, below the payload",
-                  lo > anchor and (hi - lo) < 4000,
-                  "spread over %d chars; payload at %d, first table at %d"
-                  % (hi - lo, anchor, lo))
+            # ⚠ THIS CHECK USED TO BE "WITHIN 4,000 CHARACTERS OF EACH OTHER",
+            # AND IT FAILED A CORRECT PAGE. Three new payload consts (R26,
+            # MOVERS, OUTBOX -- 227 KB of JSON between two of the tables)
+            # pushed the spread past the window, and nothing was wrong: every
+            # table was still declared exactly where it must be. Adjacency was
+            # a PROXY for the real rule, and proxies fail when the world grows
+            # (the ninth guard in this file to pin the shape of a fix rather
+            # than the fix).
+            # THE REAL RULE, and why it is the right one: a top-level `const`
+            # read before its declaration line has run THROWS -- the temporal
+            # dead zone -- and the throw lands inside a render function, so a
+            # view blanks with nothing on screen. What makes that impossible
+            # is the table being declared before the first top-level CALL,
+            # because only a call can execute code that reads it. Function
+            # DECLARATIONS are hoisted and prove nothing either way, so the
+            # boundary is the first top-level invocation.
+            firstcall = re.search(r"\n([A-Za-z_$][\w$.]*)\(", page[anchor:])
+            bound = anchor + firstcall.start() + 1 if firstcall else len(page)
+            late = sorted(t for t, d in pos.items() if d > bound)
+            check("every render-helper table is declared before the first "
+                  "top-level call", not late,
+                  "%s declared after %s() runs"
+                  % (", ".join(late), firstcall.group(1) if firstcall else "?"))
+            check("...and all of them sit below the payload they belong to",
+                  lo > anchor, "first table at %d, payload at %d" % (lo, anchor))
 
     print("\n%s" % ("ALL PASS" if not FAILS else "FAILED: %s" % FAILS))
     return 1 if FAILS else 0

@@ -120,8 +120,13 @@ def discovered_routes():
     if len(routes) < 10:
         raise SystemExit("phone_probe: found only %d routes; the page "
                          "declares more than that" % len(routes))
-    # a team and a player page are routes too, and the deepest layouts here
-    return routes + ["/teams/Nebraska", "/rankings/avca", "/rankings/gap"]
+    # ⚠ THE DEEP ROUTES, WITH REAL SLUGS. Team slugs are LOWERCASE, and
+    # "/teams/Nebraska" silently falls back to the default team -- which IS
+    # Nebraska, so it looked like it worked and tested nothing. Auburn is
+    # used because it is not the default and currently carries a
+    # participation flag, so the newest markup is on the probed page.
+    return routes + ["/teams/auburn", "/players/auburn/lauren-dreves",
+                     "/rankings/avca", "/rankings/gap"]
 
 
 if __name__ == "__main__":

@@ -543,6 +543,13 @@ def main():
         # this one (R4). Kept compact: the Top 25 rows above carry the detail.
         "all": [{"team": r["team"], "rank": r["rank"], "score": r["score"],
                  "matches": r["matches"],
+                 # ⚠ THE TWO INPUTS TRAVEL WITH THE RESULT. Cody, 2026-09-13:
+                 # "I want to be able to see a score of 81.2 power rating and
+                 # know exactly how it was calculated." The blend already
+                 # computes both halves; emitting only their combination made
+                 # the arithmetic unreproducible from the artifact.
+                 "preseason_z": r["preseason_z"],
+                 "season_z": r["season_z"],
                  "weight_on_season": r["weight_on_season"]} for r in rows],
     }
     doc["meta"]["home_advantage_pts_per_set"] = round(home_adv, 4)

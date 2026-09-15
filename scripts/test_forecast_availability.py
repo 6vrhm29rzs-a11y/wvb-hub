@@ -150,12 +150,35 @@ def main():
         "availability_evidence.json")))["players"]["Purdue|Grace Heaney"]
     _hopen = not any((e.get("effective") or {}).get("to")
                      for e in _hev if e.get("claim") == "match_incident")
-    check("controls stay distinct: Wollard status%s" %
-          (", Heaney incident" if _hopen else "; Heaney resolved, no card"),
-          proj.get(("Purdue", "Kenna Wollard")) == "status"
-          and (proj.get(("Purdue", "Grace Heaney")) == "incident"
-               if _hopen else
-               ("Purdue", "Grace Heaney") not in proj))
+    # ⚠ AND STATE-CONDITIONAL FOR WOLLARD TOO (2026-09-14). Her status
+    # carried review_by 2026-09-13 and EXPIRED on its own date rule, so
+    # pinning her as a live status is the same calendar-pin class the Heaney
+    # note above already names -- it failed the morning after the review date
+    # passed, for no reason connected to the code. What is invariant is that
+    # `status` and `incident` remain DISTINCT states and that an expired item
+    # leaves the current projection while keeping its words; the identity of
+    # whoever happens to be out today is not.
+    _states = set(proj.values())
+    check("status and incident remain distinct states in the projection",
+          _states <= {"status", "incident", "signal"}, sorted(_states))
+    _ev_all = json.load(open(os.path.join(
+        REPO, "data", "raw", "2026", "availability_evidence.json")))["players"]
+    import datetime as _dt
+    _st, _inc, _sig, _exp = AD.classify(_ev_all, _dt.date(2026, 9, 13))
+    _st2, _, _, _exp2 = AD.classify(_ev_all, _dt.date(2026, 9, 14))
+    _w = ("Purdue", "Kenna Wollard")
+    _in = lambda L: any((e.get("team"), e.get("player")) == _w for e in L)
+    check("a status is current up to its review_by (Wollard, 09-13)",
+          _in(_st) and not _in(_exp))
+    check("...and leaves the current list the day after (09-14)",
+          not _in(_st2) and _in(_exp2))
+    check("[NEG] an expired status keeps its words, it is not deleted",
+          any((e.get("team"), e.get("player")) == _w and e.get("quote")
+              and "review date" in (e.get("expired_on") or "")
+              for e in _exp2))
+    check("Heaney's resolved incident holds no current card",
+          (proj.get(("Purdue", "Grace Heaney")) == "incident") if _hopen
+          else (("Purdue", "Grace Heaney") not in proj))
 
     print("\n5. PUBLIC FENCES")
     pub_p = os.path.join(REPO, "output", "vb_dashboard.html")

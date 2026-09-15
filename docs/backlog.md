@@ -6,9 +6,105 @@ turned into the largest measured gains on this project, so nothing is dropped:
 an item leaves this file only when it is done or is written up somewhere
 better, and each one records what was observed and what is actually known.
 
+**TWO FILES, TWO JOBS, AND THEY ARE NOT THE SAME RECORD (2026-09-13).** Cody
+asked for a tab where his own notes are logged verbatim "so i know you didn't
+forget it". That is `Cody/data/notes_log.jsonl`, rendered on the private
+**Notes & ideas** tab: *his words*, exactly as written, with a status and a
+line saying what happened. This file is the *derived work record* — the
+engineering item an observation turned into, in our words, safe to commit to a
+public repository. A note and its backlog entry may both exist; what must never
+happen is his wording being paraphrased into this file and the original thrown
+away. `scripts/notes_log.py` stores them; `scripts/backup_local.py` keeps the
+private file durable, because `Cody/` is gitignored on purpose.
+
 ---
 
 ## OPEN
+
+### ⚠ MY OWN FOLD METRIC WAS WRONG ABOUT STATS (2026-09-14)
+A phone sweep reported "Stats: first content at y=1075, BELOW THE FOLD" and I
+went looking for bloat. The metric keyed on `#lbody tr` — the TABLE — while
+the element above it at y=622 is **`#ldrchart`, the Top-12 dot plot**, which
+*is* the leaderboard, rendered visually before the table exactly as Cody asked
+("I want to SEE more, not read more"). **The page was fine; the measurement
+was not.** Same family as the media-lift and the window-clamp: a scanner that
+looks at the wrong element manufactures a defect.
+Kept from the pass, honestly described as small: the Stats view had TWO leads
+back to back, and the second (per-set choice, set minimum, per-job ranking)
+moved behind a **How these leaders are ranked** disclosure, matching Rankings
+and Schedule. That saved **48px**, not the 450 I expected. Nothing dropped.
+
+### THE NAV UNDERLINE POINTED AT THE WRONG TAB ON TEN ROUTES (2026-09-14)
+`moveNavBar()` did `if (!inner || !on) return;`. Ten routes live in the More
+menu — Front page, Standings, Players, Conference Lab, Schedule, TV, Bracket,
+Result Ledger, Notes, Availability — and on every one of them NO primary tab
+carries `aria-selected`. The guard bailed and the sliding gold bar simply
+STAYED where it last was, so opening Front page from a fresh load left the
+underline under **STATS**: the nav asserting a location the reader was not at.
+Fixed by falling back to the More button, which is where those routes honestly
+live. ⚠ **Found by reading a phone screenshot, not by a test** — the DOM was
+correct (`aria-selected` was absent, as it should be); only the painted bar
+lied. Guarded in `test_wayfinding.py` §2b, negative control trips.
+⚠ The guard's first version then failed a CORRECT page: `ballot` is a primary
+tab on desktop AND a More item on phones, which is deliberate and marked
+`class="phoneonly"`. A flat "no route in both places" rule called that a
+defect; the rule is that a duplicate must declare itself phone-only.
+
+### EMAIL IS NOT FULLY BLOCKED — the Gmail CONNECTOR works (2026-09-14)
+The standing note says email is unavailable pending Google's appeal. That is
+true of the **`wvbhub.desk` SMTP account**, which is disabled — and it is NOT
+true of the **Gmail MCP connector**, which is a different path and sent
+successfully today (the Graystone write-up, message `1a0a2f76c3346709`).
+⚠ Two things that look like one: "our sending account is disabled" and "we
+cannot send email" are different claims, and I had been repeating the second.
+The connector sends as Cody's own authenticated account, so it is for things
+addressed TO him, not for anything that would impersonate a project mailbox.
+
+### MEASURED — rally-denominated rates make no difference (2026-09-14)
+The open ask was "rally-denominated kill/block/dig rates". Built and measured
+against their per-set twins on the same leave-one-out harness (n=5,077).
+Rallies are read from the line score — every rally ends in exactly one point,
+so rallies played = points both sides scored; a match with a missing or
+frozen tape contributes no rally count rather than a guessed one.
+
+```
+                per-set   per-rally   verdict
+Kills  own       .7163      .7138     intervals overlap
+Kills  diff      .6906      .6906     intervals overlap
+Blocks own       .6340      .6297     intervals overlap
+Digs   diff      .6533      .6547     intervals overlap
+                       ... all nine pairs overlap ...
+```
+
+**The premise is right and the effect is nil.** A per-set rate really is
+distorted by how long the sets ran, but correcting it changes nothing about
+which teams the metric picks. The three rally metrics are KEPT in the
+measurement — showing kills/rally beside kills/set is itself the answer to a
+reader who wonders whether the denominator matters — but nothing was
+restructured around them. **Item closed, not deferred.**
+
+### MEASURED AND REFUSED — the serve-receive channel (2026-09-14)
+We hold per-team reception on **10,262 of 10,262** 2025 team blocks and on
+**99% of 2026 player rows**, and it is displayed but feeds no rating. Asked
+the same question the hitting channel was asked and passed, on the same
+harness (checkpoint walk, paired bootstrap, ships only with the CI clear of
+zero). Receipt: `data/blend_recv_2025.json`.
+
+```
+pooled AUC   margin-only 0.82051
+             + reception at 0.25   0.82056   delta +0.00006  CI [-0.00062,+0.00071]  inconclusive
+             + reception at 0.50   0.81721   delta -0.00330  CI [-0.00480,-0.00186]  HURTS
+             reception only        0.79334   delta -0.02712                          HURTS
+```
+
+**REFUSED — do not retry.** For comparison the hitting channel SHIPPED at
++0.00030 to +0.00089 with the CI clear of zero; reception's best variant
+straddles zero and every heavier weighting is worse. Clean passing correlates
+with winning, but it carries **no information the margin channel does not
+already have** — which is the same shape as the two blend upgrades refused on
+2026-09-04.
+⚠ This says nothing against reception as a DISPLAYED stat: `recv_ok_rate`
+already renders per team and stays. It is a statement about the rating only.
 
 ### Cody watched Purdue-SMU live while the feed called it "pre" (2026-09-13)
 He said it was live at **2:29 PM PT**. Checked at that moment, three ways:

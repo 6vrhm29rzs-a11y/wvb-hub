@@ -890,6 +890,12 @@ def venue_index():
 
 def schedule(limit_days: int = 21) -> List[Dict]:
     """Upcoming fixtures from today forward, with WHERE and WHAT KIND."""
+    # ⚠ POPULATED HERE, NOT BY HOPING ABOUT CALL ORDER. A module cache read
+    # by one function and filled by another is an ordering dependency, and
+    # this file has already paid for one of those (the const TEAMS temporal
+    # dead zone). ⚠ And it goes BELOW the docstring: a statement above it
+    # turns the docstring into a discarded string expression.
+    _tdis_now = time_disputes()
     today = today_pt().isoformat()
     vidx = venue_index()
     tvx = tv_index()
@@ -936,6 +942,12 @@ def schedule(limit_days: int = 21) -> List[Dict]:
                 "st": v.get("state_usps"),
                 "site": v.get("site"), "event": v.get("event"),
                 "kind": kind, "conf": ac if kind == "conf" else "",
+                # ⚠ THE DISPUTED START TIME TRAVELS WITH EVERY FIXTURE ROW,
+                # not just the team page's. Cody would have seen the wrong
+                # Purdue-SMU time on TODAY, which is where a start time is
+                # actually read, so the flag has to reach the same rows the
+                # clock does.
+                "tdis": _tdis_now.get(gid),
                 # ⚠ CONFLICT TRAVELS WITH THE FIXTURE. A view that has this and
                 # ignores it is choosing to; a view that never received it
                 # could not have known.
@@ -1002,6 +1014,17 @@ def my_ballots():
             entries.append(json.loads(line))
         except ValueError:
             continue
+    # ⚠ ONE BALLOT PER WEEK, LAST WINS -- and rows that are not ballots are
+    # skipped. The file is append-only, so a week can carry a correction and
+    # an amendment note alongside the original; without this the renderer
+    # drew an EMPTY table for every non-ballot row and showed one week three
+    # times. Same per-key last-wins rule the crawl outputs use.
+    by_week = {}
+    for e in entries:
+        if not e.get("ranks"):
+            continue
+        by_week[e.get("week") or e.get("label") or id(e)] = e
+    entries = list(by_week.values())
     if not entries:
         return ""
     entries.sort(key=lambda e: e.get("submitted_at") or "")
@@ -1088,6 +1111,8 @@ def my_ballots():
                esc(e.get("label") or e.get("week") or "ballot"),
                esc((e.get("submitted_at") or "")[:10]),
                "".join(rows),
+               (('<p class="bwsub">%s</p>' % esc(e["source"]))
+                if e.get("source") else "") +
                ('<details class="bwmybcmt"><summary>Your write-up, verbatim'
                 '</summary><p>%s</p></details>' % esc(cmt)) if cmt else ""))
     out.append('</div>')
@@ -2925,6 +2950,72 @@ def _nkey_letters(s):
     return "".join(c for c in s if c.isalpha() and ord(c) < 128).lower()
 
 
+def rating_2026_only():
+    """The ranking built on 2026 RESULTS ALONE -- no preseason projection.
+
+    Cody, 2026-09-13: "a POWER 2026 ranking tab that is power ranking solely
+    based on 2026 results and not including preseason projections."
+
+    ⚠ THIS IS THE RATING THE BOARD DELIBERATELY DOES NOT USE YET, and the
+    view says so. The main board blends the preseason projection with 2026
+    results because the blend's own measurement says the season is still the
+    minority voice at this point (k = 13.5 matches, median team has 9). This
+    order is what the results say on their own -- interesting precisely
+    because it disagrees, and unstable for exactly the same reason.
+    """
+    doc = load("data/rating_%d.json" % SEASON) or {}
+    rows = []
+    for t in (doc.get("teams") or []):
+        if t.get("composite_rank") and t.get("team"):
+            rows.append({
+                "r": t["composite_rank"], "t": t["team"],
+                "w": t.get("wins"), "l": t.get("losses"),
+                "adj": t.get("adj_net_points_set"),
+                "raw": t.get("raw_net_points_set"),
+                "sos": t.get("sos_rank"), "gp": t.get("games_played"),
+                "lc": bool(t.get("low_confidence")),
+            })
+    rows.sort(key=lambda r: r["r"])
+    return {"meta": doc.get("meta") or {}, "rows": rows}
+
+
+def rank_movers():
+    """Who moved, since yesterday and since the weekly freeze.
+
+    Two clocks, never merged: the daily copy is a convenience and the Monday
+    freeze is the append-only archive. A mover is reported against ONE of
+    them at a time and the page says which.
+    """
+    import glob as _glob
+    cur = {}
+    board = load("data/rank_daily_%d.jsonl" % SEASON)   # not JSON -- read raw
+    daily = []
+    p = os.path.join(REPO, "data", "rank_daily_%d.jsonl" % SEASON)
+    if os.path.exists(p):
+        for line in io.open(p, encoding="utf-8"):
+            line = line.strip()
+            if line:
+                try:
+                    daily.append(json.loads(line))
+                except ValueError:
+                    pass
+    daily.sort(key=lambda r: r.get("date") or "")
+    weekly = []
+    for wp in sorted(_glob.glob(os.path.join(
+            REPO, "data", "rankings_history_%d.jsonl" % SEASON))):
+        for line in io.open(wp, encoding="utf-8"):
+            line = line.strip()
+            if line:
+                try:
+                    weekly.append(json.loads(line))
+                except ValueError:
+                    pass
+    return {"daily": daily[-3:], "weekly": weekly[-4:]}
+
+
+_TDIS_CACHE = {}
+
+
 def time_disputes():
     """gid -> the school's own start time, where it differs from the feed.
 
@@ -2932,11 +3023,43 @@ def time_disputes():
     only the hand-curated fixture ledger may change a displayed time, and it
     needs a citation.
     """
+    if _TDIS_CACHE:
+        return _TDIS_CACHE
     doc = load("data/fixture_time_check_%d.json" % SEASON) or {}
-    out = {}
     for r in (doc.get("disagreements") or []):
-        out[str(r.get("gid"))] = r
-    return out
+        _TDIS_CACHE[str(r.get("gid"))] = r
+    return _TDIS_CACHE
+
+
+def tdis_html(row):
+    """The disputed-start flag for a PYTHON-rendered fixture row, or "".
+
+    ⚠ THE THIRD SURFACE. deskCard and the team-page match card each carry
+    this flag in JS; the Schedule table is built in Python and could not
+    reach that helper, so the one view whose whole job is listing start
+    times was the one view that did not say when a start time is disputed.
+    Same text, same rule: a flag naming both times and the school that
+    published the other one, never a correction -- only the hand-curated
+    fixture ledger may CHANGE a displayed time, and it needs a citation.
+    """
+    d = (row or {}).get("tdis") or {}
+    ep = d.get("school_epoch")
+    if not ep:
+        return ""
+    try:
+        from zoneinfo import ZoneInfo
+        t = datetime.datetime.fromtimestamp(
+            int(ep), ZoneInfo("America/Los_Angeles")).strftime("%-I:%M %p")
+    except Exception:
+        return ""
+    mins = abs(int(d.get("minutes_apart") or 0))
+    return ('<span class="tdisq" title="The NCAA feed lists this start time; '
+            '%s\u2019s own published schedule lists %s PT, %d minutes %s. '
+            'Neither is corrected here \u2014 the feed has been wrong about '
+            'start times before, and so has a school.">%s lists %s PT</span>'
+            % (esc(d.get("school_asked") or ""), esc(t), mins,
+               "later" if (d.get("minutes_apart") or 0) > 0 else "earlier",
+               esc(d.get("school_asked") or ""), esc(t)))
 
 
 def participation_radar():
@@ -4532,6 +4655,309 @@ def what_makes_good_html():
            json.dumps(js, separators=(",", ":"))))
 
 
+def notes_log_html():
+    """Cody's notes and ideas, with what happened to each one. PRIVATE.
+
+    He asked for this in his own words: "maybe the site needs a separate
+    tab/page for my ideas and thoughts and things like that that you log and
+    mark to review later so i know you didn't forget it".
+
+    ⚠ TWO VOICES, VISIBLY SEPARATE, AND HIS IS NEVER REWRITTEN. His note
+    renders verbatim inside a blockquote; my answer sits underneath, labelled
+    as mine. Merging them -- paraphrasing his note into a tidier sentence, or
+    letting my response read as part of what he said -- is the same failure as
+    rewriting a quoted source in the evidence ledgers, and it would destroy
+    the only thing this page is for: proving what he actually asked.
+
+    ⚠ THE OPEN ITEMS LEAD. A log that opens with everything already done reads
+    as a victory lap; the value is the four things still outstanding.
+    """
+    if PUBLIC:
+        return ""
+    # ⚠ AN OPTIONAL PRIVATE FEATURE MAY NEVER BREAK THE BUILD. The
+    # fresh-checkout sandbox materialises TRACKED FILES ONLY -- which is
+    # exactly what CI checks out -- so a module that exists on this disk and
+    # is not yet committed is simply absent there, and a bare `import` took
+    # the whole page down with it. The page is the product; a notes tab is
+    # not. Missing module, missing tab, build continues.
+    try:
+        import notes_log as NL
+    except ImportError:
+        return ""
+    notes = NL.load()
+    if not notes:
+        return ('<p class="tnote">No notes logged yet. Start a message with '
+                '&ldquo;thoughts:&rdquo; or &ldquo;from chat gpt:&rdquo; and '
+                'it lands here with a status.</p>')
+    c = NL.counts(notes)
+
+    def card(n):
+        st = n.get("status", "logged")
+        when = (n.get("received") or "")[:10]
+        try:
+            d = datetime.date(*[int(x) for x in when.split("-")])
+            when = d.strftime("%a %b %-d")
+        except Exception:
+            pass
+        head = ('<div class="nlmeta"><span class="nlst nl-%s">%s</span>'
+                '<span class="nlkind">%s</span>'
+                '<span class="nlwhen">%s%s</span>'
+                '<span class="nlid">%s</span></div>'
+                % (st, esc(NL.STATUS_LABEL.get(st, st)),
+                   esc(NL.KIND_LABEL.get(n.get("kind"), n.get("kind") or "")),
+                   esc(when),
+                   # ⚠ SAYS SO WHEN THE DATE IS THE DAY IT WAS WRITTEN DOWN
+                   # rather than the day he said it. The first eleven rows were
+                   # read back out of the conversation, and stamping them with
+                   # an arrival time nobody recorded would be inventing a
+                   # measurement.
+                   (' <span class="nlbf" title="read back out of the '
+                    'conversation when this log was built -- this is the day '
+                    'it was written down, not necessarily the day you said '
+                    'it">logged later</span>') if n.get("backfilled") else "",
+                   esc(n["id"])))
+        topic = ('<h4 class="nltopic">%s</h4>' % esc(n["topic"])) if n.get("topic") else ""
+        # ⚠ A NOTE CLAUDE WROTE SAYS SO. The log's promise is that CODY's
+        # words are verbatim; an unattributed Claude-authored note would
+        # quietly turn that into "somebody's words". His notes carry no
+        # badge -- they are the default and the page is his.
+        if (n.get("by") or "cody") != "cody":
+            topic += ('<p class="nlprov">Logged by %s \u2014 not Cody\u2019s '
+                      'words. Surfaced automatically and kept here so it is '
+                      'not lost.</p>' % esc(n["by"]))
+        # ⚠ A LONG NOTE IS FOLDED, NOT TRUNCATED. The ChatGPT briefs run to
+        # thousands of characters and one of them pushed every other open
+        # item off the page. The preview is a lead-in; the FULL verbatim text
+        # sits in the disclosure below it, unaltered -- never a cut-off
+        # version standing in for what he wrote.
+        txt = n.get("text") or ""
+        if len(txt) > 700:
+            cut = txt[:420]
+            sp = cut.rfind(" ")
+            body = ('<blockquote class="nlsaid">%s\u2026</blockquote>'
+                    '<details class="method"><summary>Read the whole note '
+                    '(%d characters, exactly as written)</summary>'
+                    '<blockquote class="nlsaid">%s</blockquote></details>'
+                    % (esc(cut[:sp] if sp > 200 else cut), len(txt), esc(txt)))
+        else:
+            body = '<blockquote class="nlsaid">%s</blockquote>' % esc(txt)
+        resp = ('<div class="nlresp"><span class="nlrl">What happened</span>'
+                '<p>%s</p></div>' % esc(n["response"])) if n.get("response") else (
+                '<div class="nlresp nlnone"><span class="nlrl">What happened'
+                '</span><p>Nothing yet \u2014 logged, not looked at.</p></div>')
+        return ('<article class="nlcard nlc-%s">%s%s%s%s</article>'
+                % (st, head, topic, body, resp))
+
+    open_n = [n for n in notes if n.get("status") in NL.OPEN_STATUS]
+    done_n = [n for n in notes if n.get("status") == "done"]
+    decl_n = [n for n in notes if n.get("status") == "declined"]
+    out = ['<div class="nlsum"><b>%d</b> notes logged &middot; <b>%d</b> still '
+           'open &middot; <b>%d</b> done &middot; <b>%d</b> not doing'
+           '</div>' % (c["total"], c["open"], c["done"], c["declined"])]
+    out.append('<h3 class="cfh">Still open &mdash; %d</h3>' % len(open_n))
+    out.append(("".join(card(n) for n in open_n)) if open_n else
+               '<p class="tnote">Nothing open.</p>')
+    if done_n:
+        out.append('<details class="method"><summary>Done &mdash; %d</summary>%s'
+                   '</details>' % (len(done_n), "".join(card(n) for n in done_n)))
+    if decl_n:
+        out.append('<details class="method"><summary>Not doing &mdash; %d '
+                   '(each says why)</summary>%s</details>'
+                   % (len(decl_n), "".join(card(n) for n in decl_n)))
+    return "".join(out)
+
+
+def handoff_html():
+    """The Claude <-> Codex handoff record, rendered on the Notes tab. PRIVATE.
+
+    Cody, 2026-09-13: "If useful, display the same records in the private
+    site's notes tab. Keep them out of public HTML, GitHub Pages, and public
+    commits. Browser-only localStorage is not an adequate shared record."
+
+    ⚠ IT RENDERS THE LEDGER; IT IS NOT A SECOND COPY OF IT. The authoritative
+    record is handoff/messages.jsonl plus the body files beside it, and this
+    reads them at build time. Storing the exchange in the page -- or in
+    localStorage, which he ruled out by name -- would make the page a second
+    answer to one question, which is the R4 trap, and would put a shared
+    record somewhere only one browser can see.
+
+    ⚠ PROVENANCE RENDERS BESIDE EVERY MESSAGE. "Filed on its behalf" and
+    "written by that seat" are different claims and the first one proves
+    nothing about whether the return leg works.
+    """
+    if PUBLIC:
+        return ""
+    try:
+        import handoff as HO
+    except ImportError:
+        return ""
+    msgs = HO.load()
+    if not msgs:
+        return ""
+    # ⚠ THE ORIGIN VOCABULARY LIVES IN handoff.py, NOT HERE. A second copy
+    # went stale the moment the ledger gained inbox_claimed -- the same
+    # duplication that let this page and STATUS.md disagree about whether the
+    # return leg was verified.
+    ORIGIN_LABEL = HO.ORIGIN_LABEL
+    # ⚠ ONE DEFINITION OF "IS THE RETURN LEG VERIFIED", NOT TWO. This block
+    # carried its OWN self_posted/inbox_ingest test, so when the ledger moved
+    # to explicit acknowledgment the STATUS file read NOT YET while this page
+    # still read "yes" -- one fact with two answers, which is R4. The page
+    # reads handoff.verification_status() now, exactly as STATUS.md does.
+    vs = HO.verification_status()
+    out = ['<h3 class="cfh">Handoff \u2014 Claude and Codex</h3>']
+    out.append('<p class="tnote">The shared record lives in '
+               '<code>handoff/</code> on this machine and is authoritative '
+               'for this exchange; this is a view of it, not a copy. '
+               '<b>A message here is a proposal, never an instruction</b> '
+               '\u2014 nothing in it authorises an action or overrides a '
+               'project rule. Two-way exchange verified: <b>%s</b>. '
+               # ⚠ ONE UNBROKEN LITERAL. Split across two lines this
+               # phrase was invisible to the guard that requires it -- the
+               # same lesson this file has already paid for twice.
+               '<i>Acknowledgment here is a trusted local workflow step, not authenticated identity: the attester is self-declared.</i></p>'
+               % esc(vs["plain"]))
+    for m in msgs:
+        body = HO.body(m)
+        out.append(
+            '<article class="nlcard nlc-%s">'
+            '<div class="nlmeta"><span class="nlst nl-%s">%s</span>'
+            '<span class="nlkind">%s</span><span class="nlwhen">%s</span>'
+            '<span class="nlid">%s</span></div>'
+            '<h4 class="nltopic">%s</h4>'
+            '<p class="nlprov">%s</p>'
+            '<details class="method"><summary>Read it</summary>'
+            '<blockquote class="nlsaid">%s</blockquote></details>'
+            '%s</article>'
+            % ("done" if m["outcome"] in ("completed", "declined")
+               else "in_progress",
+               m["outcome"] or "logged",
+               esc((m["outcome"] or "not acknowledged").replace("_", " ")),
+               esc(m["seat"]), esc((m.get("at") or "")[:10]), esc(m["id"]),
+               esc(m.get("subject") or "(no subject)"),
+               esc(ORIGIN_LABEL.get(m.get("origin"), m.get("origin") or "")),
+               esc(body),
+               "".join('<div class="nlresp"><span class="nlrl">%s by %s'
+                       '</span><p>%s</p></div>'
+                       % (esc((a.get("outcome") or "").replace("_", " ")),
+                          esc(a.get("by") or ""), esc(a.get("note") or ""))
+                       for a in m["acks"])))
+    return "".join(out)
+
+
+def power_how_html(meta, teams):
+    """HOW POWER IS CALCULATED -- with this season's real numbers.
+
+    Cody, 2026-09-13: "I honestly have no idea how it's calculated or if it
+    makes sense and I want to be able to see a score of 81.2 power rating and
+    know exactly how it was calculated. transparency and detail is important
+    so i can help refine and find errors."
+
+    ⚠ SO IT IS A WORKED EXAMPLE, NOT A DESCRIPTION. Prose about a formula
+    cannot be checked; arithmetic that reconciles to the number printed on the
+    row above it can. Every value here is read from the artifacts the rating
+    actually produced -- nothing is recomputed for display, because a second
+    implementation that agreed would prove nothing and one that disagreed
+    would be a third bug.
+    """
+    scale = (meta or {}).get("power_scale") or {}
+    if not scale.get("sd"):
+        return ""
+    blend = load("data/digby_top25_%d.json" % SEASON) or {}
+    bmeta = blend.get("meta") or {}
+    by = dict((r["team"], r) for r in (blend.get("all") or []))
+    # the worked example is the top-ranked team: it is the row a reader is
+    # most likely to be looking at, and it is on screen directly above this.
+    top = None
+    for t in sorted(teams, key=lambda x: x.get("rank26") or 9999):
+        if t.get("power") is not None and by.get(t["team"]):
+            top = t
+            break
+    if not top:
+        return ""
+    b = by[top["team"]]
+    k = bmeta.get("k_matches")
+    w = b.get("weight_on_season")
+    rows = [
+        ("1", "Preseason projection, as a z-score",
+         "%.3f" % b["preseason_z"],
+         "2026 rosters \u00d7 2025 production, fitted and scored out of sample "
+         "(rho 0.838). Reads no 2026 result at all."),
+        ("2", "This season, as a z-score", 
+         ("%.3f" % b["season_z"]) if b.get("season_z") is not None else "--",
+         "Opponent-adjusted net points per set (a quarter of each match's "
+         "evidence is the hitting-efficiency differential), divided by the "
+         "between-team SD of 2.44 \u2014 NOT z-scored against whoever has "
+         "played, "
+         "which in week one would score the best of six teams as the best of "
+         "348."),
+        ("3", "How much of it is this season",
+         ("%.3f" % w) if w is not None else "--",
+         "w = n / (n + k) with n = %s matches played and k = %s, the point "
+         "where this season and the projection weigh the same. k is measured "
+         "from 2025, not chosen." % (b.get("matches"), k)),
+        ("4", "Blend the two",
+         "%.4f" % b["score"],
+         "(1 \u2212 w) \u00d7 preseason + w \u00d7 this season = "
+         "(1 \u2212 %.3f) \u00d7 %.3f + %.3f \u00d7 %s"
+         % (w, b["preseason_z"], w,
+            ("%.3f" % b["season_z"]) if b.get("season_z") is not None
+            else "--")),
+        ("5", "Standardise across all %d rated teams" % (scale.get("n") or 0),
+         "%.3f" % (top.get("power_z") or 0),
+         "z = (blend \u2212 mean) / SD = (%.4f \u2212 %s) / %.4f"
+         % (top.get("power_c") or 0,
+            _signed(scale.get("mean") or 0), scale.get("sd") or 1)),
+        ("6", "Put it on the 0-100 scale",
+         "%.1f" % top["power"],
+         "power = 50 + 12.5 \u00d7 z. 50 is an average Division-I team and "
+         "every "
+         "12.5 points is one standard deviation. The scale is FIXED, not "
+         "stretched to put the leader at 100, so this week and next week "
+         "mean the same thing."),
+    ]
+    tr = "".join(
+        '<tr><td class="pwn">%s</td><td class="pwl">%s'
+        '<span class="pww">%s</span></td><td class="pwv">%s</td></tr>'
+        % (n, lab, why, val) for n, lab, val, why in rows)
+    return (
+        '<details class="method powhow" id="powhow">'
+        '<summary>How a POWER rating is calculated &mdash; worked through '
+        '%s&rsquo;s %s</summary>'
+        '<div class="tnote">Every number below is read from the files the '
+        'rating produced, in order, and the last line is the number on '
+        '%s&rsquo;s row. Nothing here is recomputed for display: a second '
+        'implementation that agreed would prove nothing, and one that '
+        'disagreed would be a third bug.</div>'
+        '<table class="powtbl"><tbody>%s</tbody></table>'
+        '<div class="tnote"><b>What POWER is not.</b> It is a STRENGTH '
+        'rating &mdash; who would win tomorrow &mdash; and not a r&eacute;sum&eacute;. '
+        'Measured on 2025, relative to RPI it favours teams with WORSE '
+        'records (corr -0.205), which is why selection uses the '
+        'R&eacute;sum&eacute; ranking instead. It is a monotone rescaling of the '
+        'composite the project validated out of sample, so the ORDER is the '
+        'rating\u2019s and the number only makes the gaps legible. '
+        'Availability is not an input. '
+        '<b>Where to check it:</b> the weights are fitted, never typed '
+        '(w_rpi %s, w_margin %s), and the receipts are in '
+        '<code>data/blend_hiteff_2025.json</code> and '
+        '<code>data/blend_upgrades_2025.json</code>, which also records two '
+        'upgrades that were measured and REFUSED.</div></details>'
+        % (esc(top["team"]), ("%.1f" % top["power"]), esc(top["team"]), tr,
+           _fmt_w(bmeta, "w_rpi"), _fmt_w(bmeta, "w_margin")))
+
+
+def _signed(v):
+    """A negative operand in brackets, so "a - -b" never reaches the page."""
+    return ("(\u2212%.4f)" % abs(v)) if v < 0 else ("%.4f" % v)
+
+
+def _fmt_w(bmeta, key):
+    r = load("data/rating_%d.json" % SEASON) or {}
+    w = ((r.get("meta") or {}).get("weights") or {}).get(key)
+    return ("%.3f" % w) if isinstance(w, (int, float)) else "fitted"
+
+
 def extref_strip(meta, teams):
     """The External references disclosure (PRIVATE ONLY) -- what every
     outside source IS, when it was taken, and where it disagrees.
@@ -5557,6 +5983,12 @@ def build():
             # "exhibition" alone invites the question this answers.
             "exh": (_exh_ledger.get(gid) or {}).get("event") if gid in _exh_ledger else None,
             "csrc": r.get("csrc"), "cverified": r.get("cverified"),
+            # ⚠ THE DESK IS A SEPARATE EMITTER FROM {{FIXTURES_JSON}}, AND A
+            # FIELD ADDED TO ONE DOES NOT REACH THE OTHER. The disputed-start
+            # flag was wired into the fixtures payload first and the Today
+            # card stayed silent, which is the two-views-one-fact failure this
+            # file keeps paying for. Both read schedule()'s row; both carry it.
+            "tdis": r.get("tdis"),
             "hw": hw, "fsrc": src,
             "at": _tourn.get(r["a"]), "ht": _tourn.get(r["h"]),
         }
@@ -5662,6 +6094,7 @@ def build():
             "conflict": [], "corrected": [], "exh": None,
             "csrc": None, "cverified": None,
             "hw": None, "fsrc": None, "at": None, "ht": None,
+            "tdis": None,
         })
 
     def _desk_order(x):
@@ -5822,7 +6255,8 @@ def build():
                # so any future sort or filter still has a sortable key -- the
                # reason the table kept ISO in the first place -- while the cell
                # a person reads says "Fri Aug 28" like every other date here.
-               r["d"], day_label(r["d"]), r["t"] or "&mdash;",
+               r["d"], day_label(r["d"]),
+               (r["t"] or "&mdash;") + tdis_html(r),
                team_rank_chips(r["a"], r["ar"], _pr, _av),
                logo_img(r["a"], logos), esc(r["a"]),
                connector,
@@ -5928,6 +6362,11 @@ def build():
     return TEMPLATE \
         .replace("{{POLLS_JSON}}", json.dumps(polls, separators=(",", ":"))) \
         .replace("{{FORECAST_NOTE_JSON}}", json.dumps(FORECAST_AVAIL_NOTE)) \
+        .replace("{{R26_JSON}}", json.dumps(
+            rating_2026_only(), separators=(",", ":"))) \
+        .replace("{{MOVERS_JSON}}", json.dumps(
+            rank_movers(), separators=(",", ":"))) \
+        .replace("{{POWER_HOW}}", power_how_html(meta, teams)) \
         .replace("{{RANK_COMPARE}}", "" if PUBLIC else (
             '<details class="method extref" id="rkcmpwrap">'
             '<summary>Where the outside sources disagree with us'
@@ -6029,6 +6468,12 @@ def build():
             {str(r["gid"]): {
                 "gid": str(r["gid"]), "d": r["d"],
                 "dl": day_label(r["d"], _today), "t": r["t"],
+                # ⚠ THE DESK IS ITS OWN PROJECTION OF A FIXTURE ROW, so a
+                # field added to the schedule row does NOT reach it. That is
+                # how the disputed start time rendered on the team page and
+                # not on Today, which is the surface where a start time is
+                # actually read.
+                "tdis": r.get("tdis"),
                 "a": r["a"], "h": r["h"],
                 "ar": r.get("ar") or "", "hr": r.get("hr") or "",
                 "venue": r.get("venue"), "city": r.get("city"),
@@ -6041,6 +6486,8 @@ def build():
              } for r in sched if r.get("gid")},
             separators=(",", ":"))) \
         .replace("{{SCHED_ROWS}}", srows) \
+        .replace("{{NOTES_HTML}}", notes_log_html()) \
+        .replace("{{HANDOFF_HTML}}", handoff_html()) \
         .replace("{{TV_ROWS}}", trows) \
         .replace("{{N_PLAYED}}", str(played)) \
         .replace("{{N_PLAYED_DEF}}", esc(_SCC.DEFINITIONS["results_on_display"])) \
@@ -8392,9 +8839,18 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
    opponent, a long stat string and the result; with nothing allowed to wrap it
    measured 431-570px inside a 370px column and clipped, with no scrollbar to
    say so. The stat string wraps now and the row reflows. */
+/* ⚠⚠ AND THAT FIX WAS DEAD FOR MONTHS. `.gline .ss{flex:1 1 100%}` here TIES
+   the base `.gline .ss{flex:none}` at (0,2,0), and the base rule sits LATER
+   in this file, so source order handed it the win: the stat line kept
+   `flex:none`, measured 393px inside a 368px row and ran off a 390px phone
+   exactly as before. Measured 2026-09-13 on the player match log.
+   The class is doubled to take the specificity to (0,3,0) so the rule wins
+   wherever it sits -- the same cure the crest bar needed (one more token),
+   and the third time this cascade has bitten. A phone fix that depends on
+   source order is not a fix. */
 @media (max-width:560px){
   .gline{flex-wrap:wrap;row-gap:3px}
-  .gline .ss{flex:1 1 100%;min-width:0;white-space:normal}
+  .gline.gline .ss{flex:1 1 100%;min-width:0;white-space:normal}
   .gline .dt{min-width:0}
 }
 
@@ -9530,6 +9986,33 @@ body.mdlopen{overflow:hidden}
 .sqout-tag{display:block;margin:0 0 3px;padding:2px 5px;border-radius:3px;
   background:var(--chrome);color:#fff;
   font:700 9px/1.35 var(--mono);letter-spacing:.02em;text-align:center}
+.basisseg{margin:2px 0 8px}
+.powtbl{width:100%;border-collapse:collapse;margin:8px 0 4px}
+.powtbl td{padding:7px 8px;border-bottom:1px solid var(--line);
+  vertical-align:top}
+.powtbl .pwn{width:22px;font:800 12px/1.4 var(--mono);color:var(--ink3)}
+/* ⚠ LEFT, EXPLICITLY. The page's table rules right-align cells, which is
+   right for numbers and wrong for two sentences of explanation -- ragged-left
+   prose reads as broken layout. */
+.powtbl .pwl{font:600 13px/1.45 var(--sans);color:var(--ink);text-align:left}
+.powtbl .pww{display:block;font:12px/1.5 var(--sans);color:var(--ink3);
+  margin-top:2px;text-align:left}
+.powtbl .pwv{width:86px;text-align:right;font:800 14px/1.4 var(--mono);
+  color:var(--navy);white-space:nowrap}
+.mvgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
+.mvcol{background:var(--card);border:1px solid var(--line);
+  border-radius:var(--r-card);padding:9px 11px;box-shadow:var(--float2)}
+.mvcol h4{margin:0 0 5px;font:800 10px/1 var(--disp);letter-spacing:.07em;
+  text-transform:uppercase;color:var(--ink2)}
+.mvrow{display:flex;justify-content:space-between;gap:8px;
+  font:13px/1.7 var(--sans)}
+.mvrow b{font:700 13px/1.7 var(--mono)}
+.mvup b{color:var(--win)}.mvdn b{color:var(--bad)}
+@media (max-width:560px){
+  .mvgrid{grid-template-columns:1fr}
+  .powtbl .pwv{width:70px;font-size:13px}
+  .powtbl .pwl{font-size:12.5px}
+}
 .tdisq{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:3px;
   border:1px dashed var(--gold);background:var(--amber-bg);
   font:700 10px/1.5 var(--mono);color:var(--amber);cursor:help}
@@ -10750,6 +11233,57 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 #livetick .tkm b{color:var(--ink);font-weight:700}
 #livetick .tkm .tkset{color:var(--gold);font-weight:700}
 /* (.tkrk retired 2026-09-01 -- ticker chips come from teamRankChips now) */
+/* NOTES-CSS-BEGIN */
+/* ⚠ HIS WORDS AND MINE MUST NOT LOOK ALIKE. The blockquote keeps a left rule
+   and the page's reading face; my answer sits in a tinted block with its own
+   label. If the two ever share a treatment, the page stops being able to
+   prove what he actually asked, which is the only reason it exists. */
+.nlsum{font:600 12.5px/1.5 var(--sans);color:var(--ink2);margin:0 0 14px}
+.nlsum b{color:var(--ink);font-family:var(--mono)}
+.nlcard{border:1px solid var(--line);border-radius:var(--r-card);
+  background:var(--card);box-shadow:var(--float2);padding:13px 15px;
+  margin:0 0 10px}
+.nlcard.nlc-done{opacity:.92}
+.nlmeta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+  margin-bottom:7px}
+.nlst{font:700 9.5px/1 var(--disp);letter-spacing:.08em;
+  text-transform:uppercase;padding:4px 7px;border-radius:3px;
+  border:1px solid var(--line2);color:var(--ink2)}
+.nlst.nl-logged{color:var(--gold);
+  border-color:color-mix(in oklab,var(--gold) 45%,transparent)}
+.nlst.nl-in_progress{color:var(--cx-cool);
+  border-color:color-mix(in oklab,var(--cx-cool) 45%,transparent)}
+.nlst.nl-done{color:var(--ink3)}
+.nlst.nl-deferred{border-style:dashed;color:var(--ink3)}
+.nlst.nl-declined{color:var(--cx-warm);
+  border-color:color-mix(in oklab,var(--cx-warm) 45%,transparent)}
+.nlkind,.nlwhen,.nlid{font:600 10.5px/1 var(--disp);letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink3)}
+.nlid{margin-left:auto;font-family:var(--mono);letter-spacing:0}
+.nlbf{border-bottom:1px dotted var(--line2);cursor:help}
+.nltopic{margin:0 0 7px;font:700 15.5px/1.25 var(--disp);color:var(--ink)}
+/* ⚠ `pre-wrap` KEEPS HIS LINE BREAKS AND DOES NOT BREAK A LONG TOKEN. The
+   ChatGPT briefs arrive as one long line per bullet with bare URLs in them,
+   and at 390px the true-phone probe caught two blockquotes clipping their
+   own text. `overflow-wrap:anywhere` breaks the URL without touching the
+   line breaks -- the same cure the roster names got. */
+.nlsaid{margin:0;padding:0 0 0 12px;border-left:3px solid var(--line2);
+  font:400 13.5px/1.6 var(--sans);color:var(--ink);white-space:pre-wrap;
+  overflow-wrap:anywhere;min-width:0}
+.nlresp{margin-top:11px;padding:9px 11px;border-radius:var(--r-ctl);
+  background:var(--sheet)}
+.nlresp p{margin:4px 0 0;font:400 12.5px/1.6 var(--sans);color:var(--ink2)}
+.nlrl{font:700 9.5px/1 var(--disp);letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink3)}
+.nlresp.nlnone p{font-style:italic;color:var(--ink3)}
+.nlprov{margin:0 0 8px;font:400 11.5px/1.4 var(--sans);color:var(--ink3);
+  font-style:italic}
+@media (max-width:560px){
+  .nlcard{padding:11px 12px}
+  .nlid{margin-left:0}
+  .nltopic{font-size:14.5px}
+}
+/* NOTES-CSS-END */
 /* AVAIL-CSS-BEGIN */
 .avrow{border:1px solid var(--line);border-radius:3px;padding:9px 12px;
   margin:0 0 7px;font-size:12.5px;color:var(--ink2)}
@@ -11444,6 +11978,9 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
           <!-- AVAIL-MENU-BEGIN -->
           <button role="menuitem" data-v="avail">Availability</button>
           <!-- AVAIL-MENU-END -->
+          <!-- NOTES-MENU-BEGIN -->
+          <button role="menuitem" data-v="notes">Notes &amp; ideas</button>
+          <!-- NOTES-MENU-END -->
           <!-- INTEL-MENU-BEGIN -->
           <button role="menuitem" data-v="intel">Intel</button>
           <!-- INTEL-MENU-END -->
@@ -11720,6 +12257,19 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
        element and switching back to POWER toggled the comparison surface
        instead. Same shape as the duplicate-id bug that made the just-finished
        band query the schedule tbody. -->
+  <!-- ⚠ A TOGGLE, NOT A SIXTH TAB. The ruler bar already carries five
+       choices and this phone is the device Cody actually uses; a second row
+       of buttons there would cost more than it explains. These belong to
+       POWER, so they live inside POWER. -->
+  <div class="seg basisseg" role="group" aria-label="Which POWER order">
+    <button class="segb on" data-basis="blend">Blend<span class="lx">
+      &nbsp;(preseason + 2026)</span></button>
+    <button class="segb" data-basis="r26">2026 <span class="lx">results
+      </span>only</button>
+    <button class="segb" data-basis="movers">Movers</button>
+  </div>
+  <div id="r26panel" hidden></div>
+  <div id="moverspanel" hidden></div>
   <div class="panel" id="rankpanel"><div class="scroll rkscroll"><table class="rk3">
     <!-- ⚠ A GROUPED HEADER, BECAUSE THIRTEEN EQUAL COLUMNS SAY NOTHING ABOUT
          WHAT IS OURS AND WHAT IS SOMEBODY ELSE'S. POWER and R&eacute;sum&eacute;
@@ -11754,6 +12304,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <th class="c-ref" title="projected FINAL RPI rank: the median across simulated seasons, from the same calibrated simulator (win bands backtested at 87.3% coverage). A Division-I approximation over rated fixtures; conference tournaments do not exist yet. Forecast does not incorporate availability.">RPI&nbsp;proj</th>
     </tr></thead>
     <tbody id="rbody">{{RANK_ROWS}}</tbody></table></div>
+    {{POWER_HOW}}
     {{RANK_COMPARE}}
     {{EXTREF_STRIP}}
     <!-- ⚠ PROGRESSIVE DISCLOSURE, NOT DELETION. This methodology is the most
@@ -12096,11 +12647,22 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <button class="segb" data-ls="team">Teams</button>
     <button class="segb" data-ls="off">Team offense</button>
   </div>
-  <p class="lead" id="lplead"><b>2026 season</b> leaders, <b>per set</b> rather than totals &mdash; totals just rank
-  whoever has played most. A player needs {{LDR_FLOOR}} sets to qualify; that minimum rises
-  with the season. Each category ranks a <b>job</b> &mdash; kills rank the
-  hitters, digs the defenders, assists the setters &mdash; so positions are
-  compared only where the number is their work.</p>
+  <!-- ⚠ TWO LEADS BACK TO BACK PUT ~440px OF PROSE BEFORE ANY CONTROL. The
+       view already opens with a season/box-universe paragraph; this one then
+       explained the per-set choice, the set minimum and the per-job ranking
+       before the reader reached a single name. Same essay-before-content
+       shape already fixed on Rankings and on Schedule, and fixed the same
+       way: one line up top, the method one tap away. Nothing is dropped. -->
+  <p class="lead" id="lplead"><b>2026 season</b> leaders, <b>per set</b>
+  rather than totals, with a {{LDR_FLOOR}}-set minimum.</p>
+  <details class="method" id="lphow"><summary>How these leaders are
+    ranked</summary>
+    <p class="tnote">Per set rather than totals, because totals just rank
+    whoever has played most. A player needs {{LDR_FLOOR}} sets to qualify and
+    that minimum rises with the season. Each category ranks a <b>job</b>
+    &mdash; kills rank the hitters, digs the defenders, assists the setters
+    &mdash; so positions are compared only where the number is their
+    work.</p></details>
   <p class="lead" id="lolead" hidden><b>2026 team offense</b> &mdash; two
   team rates from the same counted box scores, side by side with the raw
   counts they come from. <b>Kill&nbsp;%</b> is kills &divide; total attacks:
@@ -12264,6 +12826,41 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   <div id="avteam"></div>
 </section>
 <!-- AVAIL-HTML-END -->
+
+<!-- NOTES-HTML-BEGIN -->
+<section id="v-notes" hidden>
+  <h2>Notes &amp; ideas</h2>
+  <!-- ⚠ THREE LINES, THEN THE NOTES. This lead was written at ten lines and
+       pushed the first open item off the screen -- the same essay-before-the-
+       content failure already fixed on Rankings and on Schedule. The rules
+       still matter and they are one tap away, which is where a reader looking
+       for them goes. -->
+  <!-- ⚠ data-noseason: this view shows no season-scoped data, so it has no
+       season to name and stamping one on it would be a false label. The
+       exemption is declared here rather than in a list inside the guard,
+       because a list in the guard is what drifts. -->
+  <p class="lead" data-noseason="Cody's own notes and the handoff record -- not season data">Your notes and ideas, logged as they arrive and carried until
+    something is said about them. Start a message with
+    <b>&ldquo;thoughts:&rdquo;</b> or <b>&ldquo;from chat gpt:&rdquo;</b> and
+    it lands here without interrupting whatever is being built. <b>Your words
+    are stored exactly as you wrote them</b>; what happened about each one is
+    written underneath and is mine.</p>
+  <details class="method"><summary>How this log works</summary>
+    <p class="tnote">Five states: <b>logged</b> (not looked at yet),
+      <b>being worked on</b>, <b>done</b>, <b>not now</b> (your call), and
+      <b>not doing</b> &mdash; and a &ldquo;not doing&rdquo; always carries its
+      reason, because an item that quietly stops being mentioned is the exact
+      failure this page exists to prevent. The file is <b>append-only</b>: a
+      status change appends a new row and never edits the note you wrote, so
+      the original is always recoverable. It lives at
+      <code>Cody/data/notes_log.jsonl</code>, which git does not carry
+      (this repository is public and these are yours);
+      <code>scripts/backup_local.py</code> is what keeps it durable.</p>
+  </details>
+  {{NOTES_HTML}}
+  {{HANDOFF_HTML}}
+</section>
+<!-- NOTES-HTML-END -->
 
 <section id="v-confidence" hidden>
   <h2>Result Confidence Ledger</h2>
@@ -12487,8 +13084,19 @@ function $$(id) { return document.getElementById(id) || NOWHERE; }
    so it stays right when the tabs wrap to a second row on a narrow screen. */
 function moveNavBar() {
   const inner = document.querySelector('nav .inner');
-  const on = document.querySelector('nav button[aria-selected=true]');
-  if (!inner || !on) return;
+  if (!inner) return;
+  /* ⚠ "NO PRIMARY TAB SELECTED" IS A REAL STATE, AND RETURNING EARLY LEFT
+     THE BAR LYING. Ten routes live in the More menu -- Front page,
+     Standings, Players, Conference Lab, Schedule, TV, Bracket, the Result
+     Ledger and the private ones -- and on every one of them no primary tab
+     carries aria-selected. The old guard bailed and the underline simply
+     STAYED where it last was, so opening Front page from a fresh load left
+     a gold bar under STATS: the nav asserting you are somewhere you are
+     not. Those routes really are More routes, so the bar belongs under
+     More. Found by reading a phone screenshot, not by a test. */
+  const on = document.querySelector('nav button[aria-selected=true]')
+    || document.getElementById('morebtn');
+  if (!on) return;
   const p = inner.getBoundingClientRect();
   const r = on.getBoundingClientRect();
   inner.style.setProperty('--barw', r.width + 'px');
@@ -12561,6 +13169,101 @@ function openMore() {
    history for a label. VIEW_OF_ROUTE resolves both; ROUTE_OF_VIEW emits only
    the new one, so nothing new is minted under the old name. */
 /* RKCMP-JS-BEGIN */
+/* THE 2026-ONLY ORDER, AND WHO MOVED. Both live inside POWER rather than as
+   new tabs: the ruler bar already carries five choices and a sixth row of
+   buttons costs more on a 390px phone than it explains. */
+function renderR26() {
+  const host = document.getElementById('r26panel');
+  if (!host || typeof R26 === 'undefined') return;
+  const rows = (R26.rows || []).slice(0, 60);
+  if (!rows.length) { host.innerHTML = ''; return; }
+  const m = R26.meta || {};
+  host.innerHTML = '<div class="panel"><div class="tnote">' +
+    '<b>2026 results only.</b> No preseason projection anywhere in this ' +
+    'order: it is the fitted composite (RPI + opponent-adjusted net points ' +
+    'per set) run on this season’s ' + (m.matches || 0) + ' matches and ' +
+    'nothing else. <b>The board does not use it yet, on purpose</b> — ' +
+    'the blend’s own measurement says this season is still the minority ' +
+    'voice until a team has about 13.5 matches, and the median has 9. That ' +
+    'is exactly why it is worth looking at: it disagrees, and it is ' +
+    'unstable for the same reason.</div>' +
+    '<div class="scroll"><table class="rk3"><thead><tr>' +
+    '<th>#</th><th class="l">Team</th><th>W-L</th><th>M</th>' +
+    '<th title="opponent-adjusted net points per set">Adj</th>' +
+    '<th title="strength of schedule rank on this same rating">SOS</th>' +
+    '</tr></thead><tbody>' + rows.map(r =>
+      '<tr><td class="rk">' + r.r + '</td>' +
+      '<td class="tm"><button type="button" class="lnk" data-team="' +
+      esc(r.t) + '">' + logo(r.t) + esc(r.t) + '</button></td>' +
+      '<td class="n">' + (r.w == null ? '—' : r.w + '-' + r.l) + '</td>' +
+      '<td class="n">' + (r.gp == null ? '—' : r.gp) + '</td>' +
+      '<td class="n">' + (r.adj == null ? '—' : r.adj.toFixed(2)) + '</td>' +
+      '<td class="n">' + (r.sos == null ? '—' : '#' + r.sos) + '</td>' +
+      '</tr>').join('') + '</tbody></table></div></div>';
+}
+
+/* ⚠ TWO CLOCKS, NAMED SEPARATELY. The daily file is a convenience copy; the
+   Monday freeze is the append-only archive. A move is reported against ONE
+   of them and the column says which, because "up six" means nothing without
+   "since when". */
+function renderMovers() {
+  const host = document.getElementById('moverspanel');
+  if (!host || typeof MOVERS === 'undefined') return;
+  const now = {};
+  Object.keys(TEAMS).forEach(t => { if (TEAMS[t].rank) now[t] = TEAMS[t].rank; });
+  const col = (title, prev, when) => {
+    if (!prev) return '<div class="mvcol"><h4>' + esc(title) + '</h4>' +
+      '<div class="tnote">No earlier snapshot to compare with yet.</div></div>';
+    const moves = [];
+    Object.keys(now).forEach(t => {
+      const p = prev[t];
+      if (!p) return;
+      const d = p - now[t];                 // positive = moved UP the list
+      if (d) moves.push({ t: t, d: d, from: p, to: now[t] });
+    });
+    moves.sort((a, b) => Math.abs(b.d) - Math.abs(a.d));
+    const top = moves.slice(0, 8);
+    if (!top.length) return '<div class="mvcol"><h4>' + esc(title) + '</h4>' +
+      '<div class="tnote">Nobody moved ' + esc(when) + '.</div></div>';
+    return '<div class="mvcol"><h4>' + esc(title) + '</h4>' + top.map(m =>
+      '<div class="mvrow ' + (m.d > 0 ? 'mvup' : 'mvdn') + '">' +
+      '<span>' + esc(m.t) + '</span><b>' + (m.d > 0 ? '▲' : '▼') +
+      Math.abs(m.d) + ' <span class="cxsub">' + m.from + '→' + m.to +
+      '</span></b></div>').join('') +
+      '<div class="cxcap">Movement ' + esc(when) + '.</div></div>';
+  };
+  const daily = (MOVERS.daily || []);
+  const weekly = (MOVERS.weekly || []);
+  const prevDay = daily.length > 1 ? daily[daily.length - 2] : null;
+  /* the weekly archive stores rows as a LIST of {team, rank}, not a map */
+  const wk = weekly.length ? weekly[weekly.length - 1] : null;
+  const wkMap = wk ? (wk.teams || []).reduce(
+    (a, r) => { a[r.team] = r.rank; return a; }, {}) : null;
+  host.innerHTML = '<div class="mvgrid">' +
+    col('Since yesterday', prevDay ? prevDay.ranks : null,
+        prevDay ? 'since ' + prevDay.date : '') +
+    col('Since the weekly freeze', wkMap,
+        wk ? 'since ' + (wk.week || wk.date) : '') +
+    '</div>';
+}
+
+let RK_BASIS = 'blend';
+function setBasis(b) {
+  RK_BASIS = b;
+  document.querySelectorAll('.basisseg [data-basis]').forEach(x =>
+    x.classList.toggle('on', x.dataset.basis === b));
+  const board = document.getElementById('rankpanel');
+  const r26 = document.getElementById('r26panel');
+  const mv = document.getElementById('moverspanel');
+  if (board) board.hidden = (b !== 'blend');
+  if (r26) { r26.hidden = (b !== 'r26'); if (b === 'r26') renderR26(); }
+  if (mv) { mv.hidden = (b !== 'movers'); if (b === 'movers') renderMovers(); }
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('.basisseg [data-basis]');
+  if (b) setBasis(b.dataset.basis);
+});
+
 /* WHERE THE OUTSIDE SOURCES DISAGREE WITH US.
    The job is POLARITY -- do we rate a team higher or lower than they do --
    so it is a diverging chart around a zero rule, not four parallel series
@@ -12821,6 +13524,7 @@ const ROUTE_OF_VIEW = { desk:'today', scores:'scores', rankings:'rankings',
   standings:'standings', conflab:'conference-lab', confidence:'result-ledger',
   news:'front-page',
   /* AVAIL-ROUTE-BEGIN */ avail:'availability', /* AVAIL-ROUTE-END */
+  /* NOTES-ROUTE-BEGIN */ notes:'notes', /* NOTES-ROUTE-END */
   bracket:'bracket', schedule:'schedule', tv:'tv',
   /* FILMROOM-ROUTE-BEGIN */ film:'film-room', /* FILMROOM-ROUTE-END */
   /* INTEL-ROUTE-BEGIN */ intel:'intel' /* INTEL-ROUTE-END */ };
@@ -13640,6 +14344,8 @@ const POSFULL = { OH: 'Outside', OPP: 'Opposite', MB: 'Middle',
    blank view in this file: a top-level const read before its declaration
    line has run THROWS, and the throw lands inside showTeam's assembly, so
    the team card renders with its sections orphaned and no error on screen. */
+const R26 = {{R26_JSON}};
+const MOVERS = {{MOVERS_JSON}};
 const OUTBOX = {{OUTBOX_JSON}};
 const PROFILE_ORDER = {{PROFILE_ORDER}};
 const PROFILE_MIN_N = {{PROFILE_MIN_N}};
@@ -16004,7 +16710,13 @@ function deskCard(m, live, full) {
   const isFinal = !!m.final || (live && /final/i.test(live.state || ''));
   const cls = 'dcard' + (live && !isFinal ? ' islive' : '') + (isFinal ? ' isfinal' : '');
   let head = '<div class="dhead"><span class="dwhen">' +
-    esc(m.dl || m.d) + (m.t ? ' · ' + esc(m.t) : '') + '</span>' +
+    esc(m.dl || m.d) + (m.t ? ' · ' + esc(m.t) : '') +
+    /* ⚠ THE SAME FLAG THE TEAM PAGE SHOWS. This is where a start time is
+       actually read before deciding what to watch, so a fixture whose
+       school disagrees about the clock must say so HERE too -- showing it
+       on one surface and not the other is how two views end up telling one
+       reader different things. */
+    tdisNote(m) + '</span>' +
     deskTags(m, live && !isFinal) + '</div>';
   let body = '<div class="dteams">' +
     deskSide(m.a, m.ao, m.ap, isFinal && m.final && +m.final.as > +m.final.hs ? 'won' : '') +
@@ -25285,6 +25997,14 @@ def strip_private(html):
                    ("<!-- AVAIL-MENU-BEGIN -->", "<!-- AVAIL-MENU-END -->"),
                    ("/* AVAIL-MD-BEGIN */", "/* AVAIL-MD-END */"),
                    ("/* AVAIL-CSS-BEGIN */", "/* AVAIL-CSS-END */"),
+                   # ⚠ THE NOTES LOG IS CODY'S OWN WRITING. It is private in
+                   # every layer -- markup, route, menu item and stylesheet --
+                   # for the same reason the ballot file is gitignored: this
+                   # repository is PUBLIC and his notes are his.
+                   ("<!-- NOTES-HTML-BEGIN -->", "<!-- NOTES-HTML-END -->"),
+                   ("/* NOTES-ROUTE-BEGIN */", "/* NOTES-ROUTE-END */"),
+                   ("<!-- NOTES-MENU-BEGIN -->", "<!-- NOTES-MENU-END -->"),
+                   ("/* NOTES-CSS-BEGIN */", "/* NOTES-CSS-END */"),
                    ("<!-- INTEL-HTML-BEGIN -->", "<!-- INTEL-HTML-END -->"),
                    ("/* INTEL-JS-BEGIN */", "/* INTEL-JS-END */"),
                    ("/* INTEL-CSS-BEGIN */", "/* INTEL-CSS-END */"),

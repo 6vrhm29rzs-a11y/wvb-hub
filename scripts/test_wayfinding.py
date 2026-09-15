@@ -167,6 +167,48 @@ def main():
           C.count("rankHTML(") >= 8, "%d uses" % C.count("rankHTML("))
 
     # ── 3. SCORES OPENS ON THE DAY ──────────────────────────────────────
+    # ── 2b. THE SLIDING UNDERLINE MAY NOT LIE ───────────────────────────
+    print("\n2b. THE NAV UNDERLINE NEVER POINTS AT THE WRONG TAB")
+    # ⚠ THE DEFECT: moveNavBar() did `if (!inner || !on) return;`, and TEN
+    # routes live in the More menu -- Front page, Standings, Players,
+    # Conference Lab, Schedule, TV, Bracket, the Result Ledger, Notes and
+    # Availability -- where NO primary tab carries aria-selected. The guard
+    # bailed and the bar simply stayed where it last was, so opening Front
+    # page from a fresh load left the gold bar under STATS. The nav asserted
+    # a location the reader was not at. Found in a phone screenshot.
+    # ⚠ THIS MODULE HAS NO jsfn(). Assuming a helper instead of reading the
+    # file is now the fourteenth instance in this codebase, and every one
+    # crashed its suite rather than failing a check. The project's single
+    # function extractor lives in test_scoreboard_density.
+    sys.path.insert(0, os.path.join(REPO, "scripts"))
+    from test_scoreboard_density import fn as _jsfn
+    fn = _jsfn(C, "moveNavBar") or ""
+    check("the underline function exists", bool(fn))
+    if fn:
+        check("it falls back to the More button when no primary tab is "
+              "selected", "morebtn" in fn, fn[:90])
+        # the bug shape, written plainly: a single guard that returns when
+        # EITHER the container or the selected tab is missing
+        check("[NEG] it does not bail out on 'no tab selected', leaving the "
+              "bar where it was",
+              "!inner||!on)return" not in fn.replace(" ", ""),
+              "an early return there is exactly the defect")
+    # every More-menu route must be reachable and must not claim a primary tab
+    more = re.findall(r'<button role="menuitem" data-v="([a-z]+)"', h)
+    check("the More menu carries its routes", len(more) >= 5, more)
+    prim = set(re.findall(r'<button role="tab"[^>]*data-v="([a-z]+)"', h))
+    # ⚠ ONE ROUTE IS DELIBERATELY IN BOTH. My Ballot is a primary tab on a
+    # desktop and rides in the More menu on a phone, where only four
+    # primaries fit -- the menu copy carries class="phoneonly" and that is
+    # what makes it legal. A flat "no route in both" check called that a
+    # defect; the rule is that a duplicate must declare itself phone-only.
+    phoneonly = set(re.findall(
+        r'<button role="menuitem" data-v="([a-z]+)"[^>]*class="phoneonly"', h))
+    overlap = sorted((set(more) & prim) - phoneonly)
+    check("[NEG] no route is in both places unless the More copy is "
+          "explicitly phone-only", not overlap, overlap)
+    check("...and the phone-only duplicates are declared", sorted(phoneonly))
+
     print("\n3. SCORES OPENS ON THE DAY")
     check("the default ledger state is today", "let LEDGER_STATE = 'today';" in h)
     check("[-] ...not the full ledger",

@@ -53,6 +53,15 @@ METRICS = [
     ("svc_err_rate", "Serve errors", "service errors / serve attempts",
      False),
     ("err_ps", "Attack errors / set", "attack errors per set", False),
+    # ⚠ RALLY-DENOMINATED, the backlog's open ask. A per-SET rate is
+    # distorted by how long the sets ran: a 30-28 set gives a team far more
+    # chances than a 25-15 one, so "kills per set" partly measures how close
+    # the match was. Rallies are the real denominator -- every rally ends in
+    # exactly one point, so the count is the points both teams scored.
+    # Whether it actually SEPARATES better is the question, not the premise.
+    ("kpr", "Kills / rally", "kills per rally played", True),
+    ("bpr", "Blocks / rally", "solo + half assists, per rally", True),
+    ("dpr", "Digs / rally", "digs per rally played", True),
 ]
 # the same metric measured on what a team ALLOWS, and the differential
 SIDES = ("own", "opp", "diff")
@@ -146,9 +155,28 @@ def load():
                 "re": _num(st.get("receptionErrors")),
                 "bs": _num(st.get("blockSolos")),
                 "ba": _num(st.get("blockAssists")),
+                "rally": 0.0,
             }
         if not ok or len(side) != 2:
             continue
+        # ⚠ RALLIES ARE READ FROM THE LINE SCORE, NOT ESTIMATED. Every rally
+        # ends in exactly one point, so the rallies played in a match are the
+        # points both sides scored. A match whose tape is missing or whose
+        # pairs are tied (the frozen-partial shape) contributes NO rally
+        # count rather than a guessed one, and its rally metrics stay None.
+        rall = 0.0
+        for ls in (g.get("linescores") or []):
+            try:
+                v, h = int(ls["visit"]), int(ls["home"])
+            except (TypeError, ValueError, KeyError):
+                rall = 0.0
+                break
+            if v == h:
+                rall = 0.0
+                break
+            rall += v + h
+        for tid in side:
+            side[tid]["rally"] = rall
         ids = list(side)
         rows.append({"gid": gid, "a": ids[0], "b": ids[1], "win": win,
                      "stats": side, "names": names})
@@ -156,7 +184,7 @@ def load():
 
 
 FIELDS = ("sets", "k", "e", "ta", "ast", "aces", "serr", "satt", "digs",
-          "ra", "re", "bs", "ba")
+          "ra", "re", "bs", "ba", "rally")
 
 
 def rates(tot):
@@ -175,6 +203,10 @@ def rates(tot):
     out["recv_ok_rate"] = (1.0 - tot["re"] / ra) if ra else None
     out["svc_err_rate"] = (tot["serr"] / satt) if satt else None
     out["err_ps"] = tot["e"] / s if s else None
+    rl = tot.get("rally") or 0.0
+    out["kpr"] = tot["k"] / rl if rl else None
+    out["bpr"] = blocks / rl if rl else None
+    out["dpr"] = tot["digs"] / rl if rl else None
     return out
 
 
