@@ -30,6 +30,13 @@ sys.path.insert(0, os.path.join(REPO, "scripts"))
 FAILS = []
 
 
+def load_json_safe(path):
+    try:
+        return json.load(io.open(path, encoding="utf-8"))
+    except Exception:
+        return None
+
+
 def check(label, ok, detail=""):
     print("  %-64s %s" % (label, "ok" if ok else "FAIL %s" % detail))
     if not ok:
@@ -96,6 +103,52 @@ def main():
           stats == box_n, "%s vs %s" % (stats, box_n))
     check("Stats NAMES the box universe beside the number",
           "the box universe" in page)
+
+    # ⚠ AND THE ARTIFACT THAT NUMBER COMES FROM MUST MEAN THE SAME THING.
+    # The page renders players_2026.json's meta.games_aggregated under the
+    # label "every match with a held box score". The aggregator counted a
+    # record even when it carried ZERO player rows -- an empty shell the
+    # feed returns for a match that has just gone final, before playerStats
+    # are filled. CI caught it on a live Friday evening as 1626 vs 1625 and
+    # it cleared by the next run, which is exactly how a real skew looks.
+    from gamelog import load_records_jsonl
+    recs = load_records_jsonl(
+        os.path.join(REPO, "data", "raw", "2026", "playerbox.jsonl"),
+        key="game_id")
+    skip = dup | exh | rev
+
+    def _agg_count(records, require_rows):
+        n = 0
+        for gid, rec in records.items():
+            if str(gid) in skip:
+                continue
+            if require_rows and not (rec.get("rows") or []):
+                continue
+            n += 1
+        return n
+
+    meta = (load_json_safe(os.path.join(
+        REPO, "data", "raw", "2026", "players_2026.json")) or {}).get("meta") or {}
+    agg = meta.get("games_aggregated")
+    check("games_aggregated counts only matches WITH player rows",
+          agg == _agg_count(recs, True),
+          "%s vs %s" % (agg, _agg_count(recs, True)))
+    check("no counted playerbox record is an empty shell",
+          _agg_count(recs, True) == _agg_count(recs, False),
+          "%d with rows vs %d counted loosely"
+          % (_agg_count(recs, True), _agg_count(recs, False)))
+    check("the aggregator reports how many empty boxes it skipped",
+          meta.get("boxes_empty_skipped") is not None,
+          "meta.boxes_empty_skipped missing")
+
+    # [NEG] IN-PROCESS CONTROL, so this cannot pass vacuously on a day when
+    # no empty box happens to exist: inject one and the two counts must part.
+    _probe = dict(recs)
+    _probe["__synthetic_empty__"] = {"game_id": "__synthetic_empty__",
+                                     "rows": []}
+    check("[NEG] an empty shell WOULD be caught if one appeared",
+          _agg_count(_probe, True) != _agg_count(_probe, False),
+          "control did not part the counts")
     if t25 is not None and t.get("rating_eligible_now") is not None:
         check("Top 25 'rating-eligible finals' == rating_eligible_now",
               t25 == t["rating_eligible_now"],

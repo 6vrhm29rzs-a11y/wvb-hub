@@ -6,9 +6,9 @@
   "min_home_games": 3,
   "note": "'unknown' means we do not yet have 3 home matches for that team, so no claim is made either way -- it is not a synonym for 'home'",
   "counts": {
-   "no-venue": 1683,
+   "no-venue": 1689,
    "neutral": 518,
-   "home": 2681,
+   "home": 2678,
    "unknown": 7
   },
   "teams_with_known_home": 262,
@@ -65,7 +65,6 @@
   "46318": "Cam Henderson Center, Huntington, WV",
   "46157": "UWF Field House, Pensacola, FL",
   "46381": "The Coliseum, Carrollton, GA",
-  "46621": "Historic Memorial Coliseum, Lexington, KY",
   "46500": "Liberty Arena, Evansville, IN",
   "45863": "Johnson Coliseum, Huntsville, TX",
   "46128": "SECU Arena, Towson, MD",
@@ -171,6 +170,7 @@
   "46737": "William H. Pitt Center, Fairfield, CT",
   "51287": "Thomas Assembly Center, Ruston, LA",
   "45907": "Bogota Savings Bank Center, Hackensack, NJ",
+  "46311": "Hearnes Center, Columbia, MO",
   "46561": "Kirby Sports Center, Easton, PA",
   "46301": "Exactech Arena at Stephen C. O'Connell Center, Gainesville, FL",
   "45943": "Ferrell Center, Waco, TX",
@@ -273,10 +273,10 @@
   "45876": "Donald W. Reynolds Center, Tulsa, OK",
   "46045": "Physical Education Complex, Baltimore, MD",
   "51330": "Robert F. Hyland Arena, Saint Charles, MO",
-  "46211": "McKale Center, Tucson, AZ",
   "46686": "XFINITY Center, College Park, MD",
   "46482": "Alex G. Spanos Center, Stockton, CA",
-  "46444": "Alumni Arena, Buffalo, NY"
+  "46444": "Alumni Arena, Buffalo, NY",
+  "46211": "McKale Center, Tucson, AZ"
  },
  "events": [
   {
@@ -1961,7 +1961,7 @@
    "venue": "Rec Hall, State College, PA",
    "matches": 2,
    "first_date": "2026-09-13",
-   "last_date": "2026-09-18",
+   "last_date": "2026-09-19",
    "game_ids": [
     "6628240",
     "6625208"
@@ -2944,7 +2944,7 @@
    "game_id": "6625446",
    "venue": "Historic Memorial Coliseum, Lexington, KY",
    "home_team_id": "46621",
-   "home_venue_on_record": "Historic Memorial Coliseum, Lexington, KY",
+   "home_venue_on_record": null,
    "venue_owner": "45920",
    "event": null,
    "site": "neutral"
@@ -6067,7 +6067,7 @@
    "game_id": "6626430",
    "venue": "Hearnes Center, Columbia, MO",
    "home_team_id": "46311",
-   "home_venue_on_record": null,
+   "home_venue_on_record": "Hearnes Center, Columbia, MO",
    "venue_owner": "45939",
    "event": null,
    "site": "neutral"
@@ -10153,7 +10153,7 @@
    "game_id": "6626286",
    "venue": "Maples Pavilion, Stanford, CA",
    "home_team_id": "46621",
-   "home_venue_on_record": "Historic Memorial Coliseum, Lexington, KY",
+   "home_venue_on_record": null,
    "venue_owner": "46501",
    "event": null,
    "site": "neutral"
@@ -11593,7 +11593,7 @@
    "game_id": "6626378",
    "venue": null,
    "home_team_id": "46621",
-   "home_venue_on_record": "Historic Memorial Coliseum, Lexington, KY",
+   "home_venue_on_record": null,
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -12358,7 +12358,7 @@
    "game_id": "6627749",
    "venue": "Van Dyne Gym, Riverside, CA",
    "home_team_id": "46311",
-   "home_venue_on_record": null,
+   "home_venue_on_record": "Hearnes Center, Columbia, MO",
    "venue_owner": "51173",
    "event": null,
    "site": "neutral"
@@ -13006,7 +13006,7 @@
    "game_id": "6625013",
    "venue": null,
    "home_team_id": "46621",
-   "home_venue_on_record": "Historic Memorial Coliseum, Lexington, KY",
+   "home_venue_on_record": null,
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -14968,7 +14968,7 @@
    "game_id": "6624328",
    "venue": null,
    "home_team_id": "46621",
-   "home_venue_on_record": "Historic Memorial Coliseum, Lexington, KY",
+   "home_venue_on_record": null,
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -16740,8 +16740,8 @@
   {
    "game_id": "6625208",
    "venue": "Rec Hall, State College, PA",
-   "home_team_id": "46621",
-   "home_venue_on_record": "Historic Memorial Coliseum, Lexington, KY",
+   "home_team_id": "46005",
+   "home_venue_on_record": "Food City Center, Knoxville, TN",
    "venue_owner": "46614",
    "event": null,
    "site": "neutral"
@@ -16866,7 +16866,7 @@
   {
    "game_id": "6627277",
    "venue": null,
-   "home_team_id": "46074",
+   "home_team_id": "46676",
    "home_venue_on_record": null,
    "venue_owner": null,
    "event": null,
@@ -17208,8 +17208,8 @@
   {
    "game_id": "6626834",
    "venue": null,
-   "home_team_id": "45937",
-   "home_venue_on_record": null,
+   "home_team_id": "45783",
+   "home_venue_on_record": "Lee E. Williams Athletics and Assembly Center, Jackson, MS",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -17253,8 +17253,8 @@
   {
    "game_id": "6625615",
    "venue": null,
-   "home_team_id": "45876",
-   "home_venue_on_record": "Donald W. Reynolds Center, Tulsa, OK",
+   "home_team_id": "46059",
+   "home_venue_on_record": "Maravich Assembly Center, Baton Rouge, LA",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -17325,8 +17325,8 @@
   {
    "game_id": "6626790",
    "venue": "Convocation Center, Athens, OH",
-   "home_team_id": "45841",
-   "home_venue_on_record": "Hill Field House, Baltimore, MD",
+   "home_team_id": "45799",
+   "home_venue_on_record": "Mercyhurst Athletic Center, Erie, PA",
    "venue_owner": "46731",
    "event": null,
    "site": "neutral"
@@ -18072,8 +18072,8 @@
   {
    "game_id": "6628182",
    "venue": "Kiefer Lakefront Arena, New Orleans, LA",
-   "home_team_id": "46412",
-   "home_venue_on_record": "Elmore Gymnasium, Huntsville, AL",
+   "home_team_id": "46311",
+   "home_venue_on_record": "Hearnes Center, Columbia, MO",
    "venue_owner": null,
    "event": null,
    "site": "neutral"
@@ -18405,8 +18405,8 @@
   {
    "game_id": "6628150",
    "venue": "Orleans Arena, Las Vegas, NV",
-   "home_team_id": "45896",
-   "home_venue_on_record": "Pauley Pavilion, Los Angeles, CA",
+   "home_team_id": "46137",
+   "home_venue_on_record": "Dugan Wellness Center, Corpus Christi, TX",
    "venue_owner": null,
    "event": null,
    "site": "neutral"
@@ -18468,7 +18468,7 @@
   {
    "game_id": "6627281",
    "venue": null,
-   "home_team_id": "46340",
+   "home_team_id": "46676",
    "home_venue_on_record": null,
    "venue_owner": null,
    "event": null,
@@ -18504,8 +18504,8 @@
   {
    "game_id": "6639465",
    "venue": "Moody Coliseum, Abilene, TX",
-   "home_team_id": "46734",
-   "home_venue_on_record": "Hanner Fieldhouse, Statesboro, GA",
+   "home_team_id": "46060",
+   "home_venue_on_record": "Thomas Assembly Center, Ruston, LA",
    "venue_owner": "45940",
    "event": null,
    "site": "neutral"
@@ -18594,8 +18594,8 @@
   {
    "game_id": "6626987",
    "venue": null,
-   "home_team_id": "46499",
-   "home_venue_on_record": "First Community Arena, Edwardsville, IL",
+   "home_team_id": "45828",
+   "home_venue_on_record": "Paul Porter Arena, Boiling Springs, NC",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -19863,8 +19863,8 @@
   {
    "game_id": "6628704",
    "venue": "Orleans Arena, Las Vegas, NV",
-   "home_team_id": "45896",
-   "home_venue_on_record": "Pauley Pavilion, Los Angeles, CA",
+   "home_team_id": "46419",
+   "home_venue_on_record": "Bankoh Arena at Stan Sheriff Center, Honolulu, HI",
    "venue_owner": null,
    "event": null,
    "site": "neutral"
@@ -20179,7 +20179,7 @@
    "game_id": "6625880",
    "venue": null,
    "home_team_id": "46311",
-   "home_venue_on_record": null,
+   "home_venue_on_record": "Hearnes Center, Columbia, MO",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -22420,7 +22420,7 @@
    "game_id": "6628184",
    "venue": null,
    "home_team_id": "46311",
-   "home_venue_on_record": null,
+   "home_venue_on_record": "Hearnes Center, Columbia, MO",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -23489,12 +23489,12 @@
   },
   {
    "game_id": "6626110",
-   "venue": "Fant-Ewing Coliseum, Monroe, LA",
+   "venue": null,
    "home_team_id": "46106",
    "home_venue_on_record": "Fant-Ewing Coliseum, Monroe, LA",
-   "venue_owner": "46106",
+   "venue_owner": null,
    "event": null,
-   "site": "home"
+   "site": "no-venue"
   },
   {
    "game_id": "6626820",
@@ -23851,7 +23851,7 @@
    "game_id": "6627103",
    "venue": null,
    "home_team_id": "46621",
-   "home_venue_on_record": "Historic Memorial Coliseum, Lexington, KY",
+   "home_venue_on_record": null,
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -24533,12 +24533,12 @@
   },
   {
    "game_id": "6628247",
-   "venue": "McKale Center, Tucson, AZ",
+   "venue": null,
    "home_team_id": "46211",
    "home_venue_on_record": "McKale Center, Tucson, AZ",
-   "venue_owner": "46211",
+   "venue_owner": null,
    "event": null,
-   "site": "home"
+   "site": "no-venue"
   },
   {
    "game_id": "6628422",
@@ -24614,12 +24614,12 @@
   },
   {
    "game_id": "6626111",
-   "venue": "Fant-Ewing Coliseum, Monroe, LA",
+   "venue": null,
    "home_team_id": "46106",
    "home_venue_on_record": "Fant-Ewing Coliseum, Monroe, LA",
-   "venue_owner": "46106",
+   "venue_owner": null,
    "event": null,
-   "site": "home"
+   "site": "no-venue"
   },
   {
    "game_id": "6637167",
@@ -25795,7 +25795,7 @@
    "game_id": "6627393",
    "venue": null,
    "home_team_id": "46621",
-   "home_venue_on_record": "Historic Memorial Coliseum, Lexington, KY",
+   "home_venue_on_record": null,
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -25982,12 +25982,12 @@
   },
   {
    "game_id": "6628041",
-   "venue": "McKale Center, Tucson, AZ",
+   "venue": null,
    "home_team_id": "46211",
    "home_venue_on_record": "McKale Center, Tucson, AZ",
-   "venue_owner": "46211",
+   "venue_owner": null,
    "event": null,
-   "site": "home"
+   "site": "no-venue"
   },
   {
    "game_id": "6627872",
@@ -29800,7 +29800,7 @@
    "game_id": "6627151",
    "venue": null,
    "home_team_id": "46311",
-   "home_venue_on_record": null,
+   "home_venue_on_record": "Hearnes Center, Columbia, MO",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -30259,7 +30259,7 @@
    "game_id": "6627400",
    "venue": null,
    "home_team_id": "46621",
-   "home_venue_on_record": "Historic Memorial Coliseum, Lexington, KY",
+   "home_venue_on_record": null,
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -30871,7 +30871,7 @@
    "game_id": "6628186",
    "venue": null,
    "home_team_id": "46311",
-   "home_venue_on_record": null,
+   "home_venue_on_record": "Hearnes Center, Columbia, MO",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -31978,7 +31978,7 @@
    "game_id": "6627403",
    "venue": null,
    "home_team_id": "46621",
-   "home_venue_on_record": "Historic Memorial Coliseum, Lexington, KY",
+   "home_venue_on_record": null,
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -32311,7 +32311,7 @@
    "game_id": "6627404",
    "venue": null,
    "home_team_id": "46621",
-   "home_venue_on_record": "Historic Memorial Coliseum, Lexington, KY",
+   "home_venue_on_record": null,
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -34795,7 +34795,7 @@
    "game_id": "6628187",
    "venue": null,
    "home_team_id": "46311",
-   "home_venue_on_record": null,
+   "home_venue_on_record": "Hearnes Center, Columbia, MO",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -34903,7 +34903,7 @@
    "game_id": "6625548",
    "venue": null,
    "home_team_id": "46621",
-   "home_venue_on_record": "Historic Memorial Coliseum, Lexington, KY",
+   "home_venue_on_record": null,
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -39061,7 +39061,7 @@
    "game_id": "6628191",
    "venue": null,
    "home_team_id": "46311",
-   "home_venue_on_record": null,
+   "home_venue_on_record": "Hearnes Center, Columbia, MO",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -41041,7 +41041,7 @@
    "game_id": "6628192",
    "venue": null,
    "home_team_id": "46311",
-   "home_venue_on_record": null,
+   "home_venue_on_record": "Hearnes Center, Columbia, MO",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -41302,7 +41302,7 @@
    "game_id": "6627409",
    "venue": null,
    "home_team_id": "46621",
-   "home_venue_on_record": "Historic Memorial Coliseum, Lexington, KY",
+   "home_venue_on_record": null,
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -42022,7 +42022,7 @@
    "game_id": "6627959",
    "venue": null,
    "home_team_id": "46311",
-   "home_venue_on_record": null,
+   "home_venue_on_record": "Hearnes Center, Columbia, MO",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -43273,7 +43273,7 @@
    "game_id": "6627800",
    "venue": null,
    "home_team_id": "46311",
-   "home_venue_on_record": null,
+   "home_venue_on_record": "Hearnes Center, Columbia, MO",
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -44092,7 +44092,7 @@
    "game_id": "6626175",
    "venue": null,
    "home_team_id": "46621",
-   "home_venue_on_record": "Historic Memorial Coliseum, Lexington, KY",
+   "home_venue_on_record": null,
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
@@ -46058,6 +46058,33 @@
    "venue_owner": null,
    "event": null,
    "site": "no-venue"
+  },
+  {
+   "game_id": "6640985",
+   "venue": null,
+   "home_team_id": "46474",
+   "home_venue_on_record": "T-Mobile Arena, Las Vegas, NV",
+   "venue_owner": null,
+   "event": null,
+   "site": "no-venue"
+  },
+  {
+   "game_id": "6641817",
+   "venue": null,
+   "home_team_id": "46549",
+   "home_venue_on_record": null,
+   "venue_owner": null,
+   "event": null,
+   "site": "no-venue"
+  },
+  {
+   "game_id": "6641818",
+   "venue": "Ed and Rae Schollmaier Arena, Fort Worth, TX",
+   "home_team_id": "46507",
+   "home_venue_on_record": "Ed and Rae Schollmaier Arena, Fort Worth, TX",
+   "venue_owner": "46507",
+   "event": null,
+   "site": "home"
   }
  ]
 }

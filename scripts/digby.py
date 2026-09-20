@@ -602,8 +602,8 @@ def teams_from_page():
     if not os.path.exists(page):
         return {}
     html = open(page, encoding="utf-8").read()
-    m = re.search(r"const TEAMS = (\{.*?\});\n", html, re.S)
-    return json.loads(m.group(1)) if m else {}
+    import pageconst as _PC          # one definition of how a payload is spelled
+    return _PC.teams(html)
 
 
 def main():

@@ -153,9 +153,19 @@ def main():
         # the normal order of events, not a regression. A guard that depends
         # on build order cries wolf exactly like one that depends on the
         # calendar. Say which case it is.
-        _stale = (os.path.getmtime(os.path.join(REPO, "Cody", "data",
-                                                "notes_log.jsonl"))
-                  > os.path.getmtime(priv))
+        # ⚠ AND THE LOG ITSELF MAY BE ABSENT. Cody/data/ is gitignored, so in
+        # CI (and any fresh checkout) build_hub writes the private page while
+        # the notes log never exists -- this getmtime raised FileNotFoundError
+        # and killed the whole suite, which is an ENVIRONMENT pin of exactly
+        # the kind test_external_refs already learned to state rather than
+        # crash on. No log means no notes to render; say so and carry on.
+        _logp = os.path.join(REPO, "Cody", "data", "notes_log.jsonl")
+        if not os.path.exists(_logp):
+            check("no notes log in this checkout -- asserting the "
+                  "honest-absence mode instead (not a failure)", True)
+            notes = []
+        _stale = (os.path.exists(_logp)
+                  and os.path.getmtime(_logp) > os.path.getmtime(priv))
         if _stale:
             check("page predates the newest note -- rebuild to verify "
                   "verbatim rendering (not a failure)", True)

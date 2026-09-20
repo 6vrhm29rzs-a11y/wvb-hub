@@ -298,9 +298,10 @@ def main():
             # nothing, so every assertion below it was skipped in silence and
             # the section still printed all-ok. A guard that cannot run is not
             # a guard -- so a missing payload is now a FAILURE, not a skip.
-            m4 = re.search(r"const TEAMS = (\{.*?\});\n", hp, re.S)
+            import pageconst as _PC
+            m4 = _PC.find(hp, "TEAMS")
             check("[+] the TEAMS payload was found and parsed", bool(m4),
-                  "regex did not match -- the checks below would be skipped")
+                  "payload unreadable -- the checks below would be skipped")
             if m4:
                 _T = json.loads(m4.group(1))
                 # ⚠ TEAMS IS KEYED BY NAME AND ITS VALUES CARRY NO `team`

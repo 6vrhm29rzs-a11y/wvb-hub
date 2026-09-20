@@ -603,9 +603,10 @@ def main():
           "Out for the 2026 season" in (vw_c.get("what") or "")
           and len(vw_c.get("sources") or []) == 2)
     # cross-surface wording agreement, from the built page payload
-    m2 = re.search(r"const TEAMS = (\{.*?\});\n", page, re.S)
+    import pageconst as _PC
+    m2 = _PC.find(page, "TEAMS")
     if m2:
-        tp = json.loads(m2.group(1).replace("<\\/", "</"))
+        tp = m2
         tx = tp.get("Texas") or {}
         pu = tp.get("Purdue") or {}
         check("STALE PRESENT TENSE: Texas's scout note is withheld while "
@@ -717,9 +718,7 @@ def main():
     check("scoutRead renders NOTHING when withheld (no empty module)",
           "if (!t.digby) return '';" in page)
     check("a team with no availability evidence keeps its scout note",
-          (json.loads(re.search(r"const TEAMS = (\{.*?\});\n", page,
-                                re.S).group(1).replace("<\\/", "</"))
-           .get("Nebraska") or {}).get("digby"))
+          ((_PC.teams(page).get("Nebraska") or {}).get("digby")))
 
     print("\n  the public page carries none of it")
     pub_p = os.path.join(REPO, "output", "vb_dashboard.html")

@@ -25,6 +25,7 @@ import datetime
 import json
 import os
 import re
+import pageconst as _PC
 import sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -591,10 +592,9 @@ def check_roster():
                 % (code, pos_bucket(code), want))
 
     h = open(hub, encoding="utf-8").read()
-    m = re.search(r"const TEAMS = (\{.*?\});\n", h, re.S)
-    if not m:
+    teams = _PC.teams(h)
+    if not teams:
         return
-    teams = json.loads(m.group(1))
     fabricated, dupes, overstarted, n = [], [], [], 0
     for tname, rec in teams.items():
         roster = rec.get("roster") or []
@@ -2105,10 +2105,9 @@ def check_transfer_reconciliation():
         print("  no built hub -- skipping transfer reconciliation")
         return
     h = open(hub, encoding="utf-8").read()
-    m = re.search(r"const TEAMS = (\{.*?\});\n", h, re.S)
-    if not m:
+    teams = _PC.teams(h)
+    if not teams:
         return
-    teams = json.loads(m.group(1))
     pairs = {}
     for _t, v in teams.items():
         for d in (v.get("top_dep") or []):
@@ -2185,12 +2184,8 @@ def check_public_gate_catches_leaks():
         ok("the gate catches every class of private content", len(cases))
 
     # ⚠ THE ONE THAT ACTUALLY HAPPENED: values in the payload, columns removed.
-    m = re.search(r"const TEAMS = (\{.*?\});\n", clean, re.S)
-    if m:
-        try:
-            teams = json.loads(m.group(1).replace("<\\/", "</"))
-        except ValueError:
-            teams = None
+    if True:
+        teams = _PC.teams(clean) or None
         if teams:
             for t in list(teams)[:5]:
                 teams[t]["massey"] = 1
@@ -2243,9 +2238,9 @@ def check_public_build_is_clean():
     # VolleyTalk ranks and 151 Massey ranks inside const TEAMS -- invisible on
     # the page, one devtools open away from anyone. Hiding third-party data is
     # not the same as not publishing it.
-    tm = re.search(r"const TEAMS = (\{.*?\});\n", h, re.S)
+    tm = _PC.teams(h)
     if tm:
-        teams = json.loads(tm.group(1))
+        teams = tm
         vt = sum(1 for v in teams.values() if v.get("vt") is not None)
         ms = sum(1 for v in teams.values() if v.get("massey") is not None)
         if vt or ms:
@@ -2471,12 +2466,7 @@ def check_public_build_is_clean():
     _zh = open(_zp, encoding="utf-8").read() if os.path.exists(_zp) else ""
     _zt = {}
     if _zh:
-        _m = re.search(r"const TEAMS = (\{.*?\});\n", _zh, re.S)
-        if _m:
-            try:
-                _zt = json.loads(_m.group(1))
-            except ValueError:
-                _zt = {}
+        _zt = _PC.teams(_zh)
     if _zt:
         zero = [k for k, v in _zt.items() if not v.get("sched_n")]
         if len(zero) > 1:
@@ -2728,10 +2718,9 @@ def check_photos_are_urls_only():
         if not os.path.exists(path):
             continue
         h = open(path, encoding="utf-8").read()
-        m = re.search(r"const TEAMS = (\{.*?\});\n", h, re.S)
-        if not m:
+        teams = _PC.teams(h)
+        if not teams:
             continue
-        teams = json.loads(m.group(1))
         vals = [c.get("photo") for v in teams.values()
                 for c in (v.get("rotation") or []) if c.get("photo")]
         embedded = [u for u in vals if str(u).startswith("data:")]

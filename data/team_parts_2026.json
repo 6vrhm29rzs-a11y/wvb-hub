@@ -2,11 +2,11 @@
  "meta": {
   "parts_fit": {
    "basis": "mean of the team's top 7 rated players, fitted against its measured 2025 strength",
-   "intercept": -2.1701,
-   "r2": 0.6936,
-   "residual_sd": 2.6772,
-   "slope": 2.3276,
-   "teams": 164
+   "intercept": -2.3346,
+   "r2": 0.6674,
+   "residual_sd": 2.5427,
+   "slope": 2.1199,
+   "teams": 258
   },
   "parts_note": "a 2025 measurement on purpose: the 2026 team projection is built from 2025 production, so comparing the two would be circular and the gap would measure nothing",
   "parts_season": 2025,
@@ -18,1315 +18,2067 @@
  "parts": {
   "A&M-Corpus Christi": {
    "actual": -0.2369,
-   "parts_mean": 0.6492,
-   "predicted": -0.659,
-   "rated_players": 9,
-   "residual": 0.4221,
-   "residual_sd": 0.158
+   "parts_mean": 1.0844,
+   "predicted": -0.0358,
+   "rated_players": 10,
+   "residual": -0.2011,
+   "residual_sd": -0.079
   },
   "Abilene Christian": {
    "actual": -1.6348,
    "parts_mean": 1.3461,
-   "predicted": 0.9631,
+   "predicted": 0.5189,
    "rated_players": 10,
-   "residual": -2.5979,
-   "residual_sd": -0.97
+   "residual": -2.1537,
+   "residual_sd": -0.847
+  },
+  "Air Force": {
+   "actual": 0.8047,
+   "parts_mean": 0.9345,
+   "predicted": -0.3536,
+   "rated_players": 7,
+   "residual": 1.1583,
+   "residual_sd": 0.456
+  },
+  "Akron": {
+   "actual": -0.4541,
+   "parts_mean": 1.6738,
+   "predicted": 1.2137,
+   "rated_players": 9,
+   "residual": -1.6678,
+   "residual_sd": -0.656
+  },
+  "Alabama": {
+   "actual": 4.0143,
+   "parts_mean": 2.598,
+   "predicted": 3.1729,
+   "rated_players": 9,
+   "residual": 0.8414,
+   "residual_sd": 0.331
+  },
+  "Alabama A&M": {
+   "actual": -4.4464,
+   "parts_mean": 0.7573,
+   "predicted": -0.7293,
+   "rated_players": 8,
+   "residual": -3.7171,
+   "residual_sd": -1.462
   },
   "Alcorn": {
    "actual": -14.1196,
-   "parts_mean": -3.7877,
-   "predicted": -10.9865,
-   "rated_players": 8,
-   "residual": -3.1331,
-   "residual_sd": -1.17
+   "parts_mean": -3.74,
+   "predicted": -10.2631,
+   "rated_players": 9,
+   "residual": -3.8565,
+   "residual_sd": -1.517
   },
   "American": {
    "actual": 3.1729,
-   "parts_mean": 3.2108,
-   "predicted": 5.3036,
-   "rated_players": 7,
-   "residual": -2.1307,
-   "residual_sd": -0.796
+   "parts_mean": 3.9751,
+   "predicted": 6.0923,
+   "rated_players": 9,
+   "residual": -2.9194,
+   "residual_sd": -1.148
+  },
+  "App State": {
+   "actual": 1.0945,
+   "parts_mean": 1.4258,
+   "predicted": 0.6878,
+   "rated_players": 8,
+   "residual": 0.4067,
+   "residual_sd": 0.16
+  },
+  "Arizona": {
+   "actual": 5.3901,
+   "parts_mean": 3.1299,
+   "predicted": 4.3004,
+   "rated_players": 10,
+   "residual": 1.0897,
+   "residual_sd": 0.429
   },
   "Arizona St.": {
    "actual": 8.6833,
-   "parts_mean": 3.3853,
-   "predicted": 5.7098,
-   "rated_players": 8,
-   "residual": 2.9735,
-   "residual_sd": 1.111
+   "parts_mean": 4.6462,
+   "predicted": 7.5148,
+   "rated_players": 9,
+   "residual": 1.1685,
+   "residual_sd": 0.46
   },
   "Ark.-Pine Bluff": {
    "actual": -14.3084,
-   "parts_mean": -2.8754,
-   "predicted": -8.863,
+   "parts_mean": -2.8752,
+   "predicted": -8.4298,
    "rated_players": 7,
-   "residual": -5.4454,
-   "residual_sd": -2.034
+   "residual": -5.8786,
+   "residual_sd": -2.312
+  },
+  "Arkansas": {
+   "actual": 2.1108,
+   "parts_mean": 4.1363,
+   "predicted": 6.4338,
+   "rated_players": 9,
+   "residual": -4.323,
+   "residual_sd": -1.7
   },
   "Arkansas St.": {
    "actual": 5.4265,
    "parts_mean": 2.0875,
-   "predicted": 2.6889,
+   "predicted": 2.0906,
    "rated_players": 7,
-   "residual": 2.7376,
-   "residual_sd": 1.023
+   "residual": 3.3359,
+   "residual_sd": 1.312
   },
   "Army West Point": {
    "actual": -1.3599,
-   "parts_mean": 0.0236,
-   "predicted": -2.1152,
+   "parts_mean": 0.0235,
+   "predicted": -2.2849,
    "rated_players": 7,
-   "residual": 0.7553,
-   "residual_sd": 0.282
+   "residual": 0.925,
+   "residual_sd": 0.364
+  },
+  "Auburn": {
+   "actual": 6.1177,
+   "parts_mean": 1.9046,
+   "predicted": 1.703,
+   "rated_players": 7,
+   "residual": 4.4147,
+   "residual_sd": 1.736
   },
   "Austin Peay": {
    "actual": -4.5865,
-   "parts_mean": 0.0274,
-   "predicted": -2.1064,
+   "parts_mean": 0.0275,
+   "predicted": -2.2764,
    "rated_players": 9,
-   "residual": -2.4801,
-   "residual_sd": -0.926
+   "residual": -2.3101,
+   "residual_sd": -0.909
   },
   "BYU": {
    "actual": 7.2128,
-   "parts_mean": 2.5472,
-   "predicted": 3.7589,
-   "rated_players": 7,
-   "residual": 3.4539,
-   "residual_sd": 1.29
+   "parts_mean": 5.1476,
+   "predicted": 8.5778,
+   "rated_players": 9,
+   "residual": -1.365,
+   "residual_sd": -0.537
   },
   "Ball St.": {
    "actual": 2.6518,
-   "parts_mean": 1.3008,
-   "predicted": 0.8577,
-   "rated_players": 7,
-   "residual": 1.7941,
-   "residual_sd": 0.67
+   "parts_mean": 1.363,
+   "predicted": 0.5548,
+   "rated_players": 8,
+   "residual": 2.097,
+   "residual_sd": 0.825
   },
   "Baylor": {
    "actual": 6.9191,
-   "parts_mean": 3.2362,
-   "predicted": 5.3626,
-   "rated_players": 8,
-   "residual": 1.5565,
-   "residual_sd": 0.581
+   "parts_mean": 3.8639,
+   "predicted": 5.8564,
+   "rated_players": 9,
+   "residual": 1.0627,
+   "residual_sd": 0.418
   },
   "Belmont": {
    "actual": -0.1268,
-   "parts_mean": -0.6389,
-   "predicted": -3.6573,
-   "rated_players": 9,
-   "residual": 3.5305,
-   "residual_sd": 1.319
+   "parts_mean": 0.2645,
+   "predicted": -1.7739,
+   "rated_players": 11,
+   "residual": 1.6471,
+   "residual_sd": 0.648
   },
   "Binghamton": {
    "actual": -2.9207,
-   "parts_mean": -0.3363,
-   "predicted": -2.9528,
-   "rated_players": 9,
-   "residual": 0.0321,
-   "residual_sd": 0.012
+   "parts_mean": 0.2773,
+   "predicted": -1.7468,
+   "rated_players": 12,
+   "residual": -1.1739,
+   "residual_sd": -0.462
   },
   "Boston College": {
    "actual": 1.4561,
-   "parts_mean": 0.7044,
-   "predicted": -0.5304,
+   "parts_mean": 0.7043,
+   "predicted": -0.8417,
    "rated_players": 9,
-   "residual": 1.9865,
-   "residual_sd": 0.742
+   "residual": 2.2978,
+   "residual_sd": 0.904
   },
   "Bowling Green": {
    "actual": 0.9401,
-   "parts_mean": 1.7667,
-   "predicted": 1.9422,
-   "rated_players": 9,
-   "residual": -1.0021,
-   "residual_sd": -0.374
+   "parts_mean": 2.0553,
+   "predicted": 2.0225,
+   "rated_players": 11,
+   "residual": -1.0824,
+   "residual_sd": -0.426
   },
   "Bryant": {
    "actual": -1.8178,
-   "parts_mean": 0.9194,
-   "predicted": -0.0302,
+   "parts_mean": 0.9195,
+   "predicted": -0.3855,
    "rated_players": 8,
-   "residual": -1.7876,
-   "residual_sd": -0.668
+   "residual": -1.4323,
+   "residual_sd": -0.563
+  },
+  "Bucknell": {
+   "actual": -1.9705,
+   "parts_mean": -0.7223,
+   "predicted": -3.8659,
+   "rated_players": 7,
+   "residual": 1.8954,
+   "residual_sd": 0.745
+  },
+  "Buffalo": {
+   "actual": -2.6219,
+   "parts_mean": 0.1717,
+   "predicted": -1.9706,
+   "rated_players": 8,
+   "residual": -0.6513,
+   "residual_sd": -0.256
   },
   "Butler": {
    "actual": -0.7263,
-   "parts_mean": 0.1494,
-   "predicted": -1.8223,
-   "rated_players": 10,
-   "residual": 1.096,
-   "residual_sd": 0.409
+   "parts_mean": 1.1391,
+   "predicted": 0.0802,
+   "rated_players": 12,
+   "residual": -0.8065,
+   "residual_sd": -0.317
   },
   "CSUN": {
    "actual": 0.8312,
-   "parts_mean": 1.5,
-   "predicted": 1.3213,
-   "rated_players": 8,
-   "residual": -0.4901,
-   "residual_sd": -0.183
+   "parts_mean": 1.5001,
+   "predicted": 0.8454,
+   "rated_players": 9,
+   "residual": -0.0142,
+   "residual_sd": -0.006
   },
   "California": {
    "actual": 1.3249,
-   "parts_mean": 0.8884,
-   "predicted": -0.1021,
+   "parts_mean": 1.2378,
+   "predicted": 0.2893,
+   "rated_players": 9,
+   "residual": 1.0356,
+   "residual_sd": 0.407
+  },
+  "California Baptist": {
+   "actual": -2.7798,
+   "parts_mean": -0.487,
+   "predicted": -3.3671,
    "rated_players": 8,
-   "residual": 1.427,
-   "residual_sd": 0.533
+   "residual": 0.5873,
+   "residual_sd": 0.231
   },
   "Campbell": {
    "actual": 0.4989,
-   "parts_mean": -0.62,
-   "predicted": -3.6133,
+   "parts_mean": 0.4085,
+   "predicted": -1.4686,
+   "rated_players": 8,
+   "residual": 1.9675,
+   "residual_sd": 0.774
+  },
+  "Central Ark.": {
+   "actual": 1.3461,
+   "parts_mean": 0.8338,
+   "predicted": -0.567,
+   "rated_players": 8,
+   "residual": 1.9131,
+   "residual_sd": 0.752
+  },
+  "Central Conn. St.": {
+   "actual": -7.8139,
+   "parts_mean": 0.3688,
+   "predicted": -1.5529,
+   "rated_players": 8,
+   "residual": -6.261,
+   "residual_sd": -2.462
+  },
+  "Charleston So.": {
+   "actual": -2.4,
+   "parts_mean": -0.3536,
+   "predicted": -3.0842,
    "rated_players": 7,
-   "residual": 4.1122,
-   "residual_sd": 1.536
+   "residual": 0.6842,
+   "residual_sd": 0.269
   },
   "Chattanooga": {
    "actual": -2.0683,
-   "parts_mean": 0.1088,
-   "predicted": -1.9168,
-   "rated_players": 8,
-   "residual": -0.1515,
-   "residual_sd": -0.057
+   "parts_mean": 0.2282,
+   "predicted": -1.8509,
+   "rated_players": 9,
+   "residual": -0.2174,
+   "residual_sd": -0.085
+  },
+  "Cincinnati": {
+   "actual": 5.0683,
+   "parts_mean": 3.112,
+   "predicted": 4.2626,
+   "rated_players": 7,
+   "residual": 0.8057,
+   "residual_sd": 0.317
+  },
+  "Clemson": {
+   "actual": 2.8754,
+   "parts_mean": 2.1504,
+   "predicted": 2.2241,
+   "rated_players": 9,
+   "residual": 0.6513,
+   "residual_sd": 0.256
   },
   "Cleveland St.": {
    "actual": -5.3311,
-   "parts_mean": -0.0816,
-   "predicted": -2.36,
-   "rated_players": 7,
-   "residual": -2.9711,
-   "residual_sd": -1.11
+   "parts_mean": 0.0656,
+   "predicted": -2.1956,
+   "rated_players": 8,
+   "residual": -3.1355,
+   "residual_sd": -1.233
   },
   "Col. of Charleston": {
    "actual": -0.4533,
-   "parts_mean": 1.5789,
-   "predicted": 1.5051,
-   "rated_players": 9,
-   "residual": -1.9584,
-   "residual_sd": -0.731
+   "parts_mean": 2.2582,
+   "predicted": 2.4524,
+   "rated_players": 10,
+   "residual": -2.9057,
+   "residual_sd": -1.143
   },
   "Colorado": {
    "actual": 5.8584,
-   "parts_mean": 0.1882,
-   "predicted": -1.7321,
-   "rated_players": 7,
-   "residual": 7.5905,
-   "residual_sd": 2.835
+   "parts_mean": 3.4745,
+   "predicted": 5.031,
+   "rated_players": 11,
+   "residual": 0.8274,
+   "residual_sd": 0.325
   },
   "Colorado St.": {
    "actual": 4.2821,
-   "parts_mean": 4.2229,
-   "predicted": 7.6594,
-   "rated_players": 7,
-   "residual": -3.3773,
-   "residual_sd": -1.261
+   "parts_mean": 4.7474,
+   "predicted": 7.7293,
+   "rated_players": 8,
+   "residual": -3.4472,
+   "residual_sd": -1.356
   },
   "Columbia": {
    "actual": -6.0899,
-   "parts_mean": 0.2606,
-   "predicted": -1.5634,
+   "parts_mean": 0.2738,
+   "predicted": -1.7542,
    "rated_players": 8,
-   "residual": -4.5265,
-   "residual_sd": -1.691
+   "residual": -4.3357,
+   "residual_sd": -1.705
   },
   "Coppin St.": {
    "actual": -2.2189,
    "parts_mean": -0.3039,
-   "predicted": -2.8775,
+   "predicted": -2.979,
    "rated_players": 8,
-   "residual": 0.6586,
-   "residual_sd": 0.246
+   "residual": 0.7601,
+   "residual_sd": 0.299
+  },
+  "Cornell": {
+   "actual": 0.4975,
+   "parts_mean": -0.5113,
+   "predicted": -3.4185,
+   "rated_players": 7,
+   "residual": 3.916,
+   "residual_sd": 1.54
+  },
+  "Creighton": {
+   "actual": 8.382,
+   "parts_mean": 2.8016,
+   "predicted": 3.6045,
+   "rated_players": 8,
+   "residual": 4.7775,
+   "residual_sd": 1.879
   },
   "Davidson": {
    "actual": -0.8143,
-   "parts_mean": 0.6092,
-   "predicted": -0.7521,
+   "parts_mean": 0.9241,
+   "predicted": -0.3755,
+   "rated_players": 9,
+   "residual": -0.4388,
+   "residual_sd": -0.173
+  },
+  "Dayton": {
+   "actual": 4.0083,
+   "parts_mean": 2.4011,
+   "predicted": 2.7555,
+   "rated_players": 9,
+   "residual": 1.2528,
+   "residual_sd": 0.493
+  },
+  "DePaul": {
+   "actual": 0.3264,
+   "parts_mean": 2.8416,
+   "predicted": 3.6892,
    "rated_players": 8,
-   "residual": -0.0622,
-   "residual_sd": -0.023
+   "residual": -3.3628,
+   "residual_sd": -1.323
   },
   "Delaware": {
    "actual": -3.1448,
-   "parts_mean": -0.6349,
-   "predicted": -3.6479,
+   "parts_mean": -0.6358,
+   "predicted": -3.6825,
    "rated_players": 8,
-   "residual": 0.5031,
-   "residual_sd": 0.188
+   "residual": 0.5377,
+   "residual_sd": 0.211
   },
   "Delaware St.": {
    "actual": -4.3384,
-   "parts_mean": -1.9466,
-   "predicted": -6.701,
-   "rated_players": 7,
-   "residual": 2.3626,
-   "residual_sd": 0.882
+   "parts_mean": -1.9462,
+   "predicted": -6.4605,
+   "rated_players": 8,
+   "residual": 2.1221,
+   "residual_sd": 0.835
   },
   "Denver": {
    "actual": 1.7412,
-   "parts_mean": 0.125,
-   "predicted": -1.879,
+   "parts_mean": 0.126,
+   "predicted": -2.0676,
    "rated_players": 7,
-   "residual": 3.6202,
-   "residual_sd": 1.352
+   "residual": 3.8088,
+   "residual_sd": 1.498
+  },
+  "Drake": {
+   "actual": 2.5138,
+   "parts_mean": -0.2404,
+   "predicted": -2.8442,
+   "rated_players": 8,
+   "residual": 5.358,
+   "residual_sd": 2.107
   },
   "Duke": {
    "actual": -0.3141,
-   "parts_mean": 1.456,
-   "predicted": 1.2191,
+   "parts_mean": 1.5831,
+   "predicted": 1.0215,
+   "rated_players": 9,
+   "residual": -1.3356,
+   "residual_sd": -0.525
+  },
+  "Duquesne": {
+   "actual": -0.109,
+   "parts_mean": 0.7802,
+   "predicted": -0.6806,
+   "rated_players": 7,
+   "residual": 0.5716,
+   "residual_sd": 0.225
+  },
+  "ETSU": {
+   "actual": 1.0689,
+   "parts_mean": 0.6425,
+   "predicted": -0.9725,
+   "rated_players": 7,
+   "residual": 2.0414,
+   "residual_sd": 0.803
+  },
+  "East Carolina": {
+   "actual": 0.0648,
+   "parts_mean": 2.6113,
+   "predicted": 3.2011,
    "rated_players": 8,
-   "residual": -1.5332,
-   "residual_sd": -0.573
+   "residual": -3.1363,
+   "residual_sd": -1.233
+  },
+  "East Texas A&M": {
+   "actual": -4.0002,
+   "parts_mean": 1.4766,
+   "predicted": 0.7955,
+   "rated_players": 7,
+   "residual": -4.7957,
+   "residual_sd": -1.886
+  },
+  "Eastern Ky.": {
+   "actual": 2.239,
+   "parts_mean": 1.5277,
+   "predicted": 0.904,
+   "rated_players": 8,
+   "residual": 1.335,
+   "residual_sd": 0.525
   },
   "Eastern Wash.": {
    "actual": -5.2278,
-   "parts_mean": -0.9221,
-   "predicted": -4.3164,
+   "parts_mean": -0.9219,
+   "predicted": -4.2889,
    "rated_players": 7,
-   "residual": -0.9114,
-   "residual_sd": -0.34
+   "residual": -0.9389,
+   "residual_sd": -0.369
   },
   "Elon": {
    "actual": -4.8139,
-   "parts_mean": -0.931,
-   "predicted": -4.3371,
-   "rated_players": 7,
-   "residual": -0.4768,
-   "residual_sd": -0.178
+   "parts_mean": -0.3608,
+   "predicted": -3.0996,
+   "rated_players": 9,
+   "residual": -1.7143,
+   "residual_sd": -0.674
   },
   "Evansville": {
    "actual": -4.0853,
    "parts_mean": -0.6118,
-   "predicted": -3.5942,
-   "rated_players": 7,
-   "residual": -0.4911,
-   "residual_sd": -0.183
+   "predicted": -3.6315,
+   "rated_players": 8,
+   "residual": -0.4538,
+   "residual_sd": -0.178
   },
   "Fairfield": {
    "actual": 0.1258,
-   "parts_mean": -0.1691,
-   "predicted": -2.5636,
+   "parts_mean": -0.1692,
+   "predicted": -2.6934,
    "rated_players": 7,
-   "residual": 2.6894,
-   "residual_sd": 1.005
+   "residual": 2.8192,
+   "residual_sd": 1.109
   },
   "Fla. Atlantic": {
    "actual": 2.4734,
-   "parts_mean": 2.279,
-   "predicted": 3.1347,
-   "rated_players": 8,
-   "residual": -0.6613,
-   "residual_sd": -0.247
+   "parts_mean": 2.5766,
+   "predicted": 3.1275,
+   "rated_players": 10,
+   "residual": -0.6541,
+   "residual_sd": -0.257
   },
   "Florida": {
    "actual": 6.6349,
-   "parts_mean": 2.0667,
-   "predicted": 2.6404,
-   "rated_players": 8,
-   "residual": 3.9945,
-   "residual_sd": 1.492
+   "parts_mean": 4.7488,
+   "predicted": 7.7325,
+   "rated_players": 14,
+   "residual": -1.0976,
+   "residual_sd": -0.432
   },
   "Florida A&M": {
    "actual": -4.8814,
-   "parts_mean": 0.4073,
-   "predicted": -1.2221,
+   "parts_mean": 0.4075,
+   "predicted": -1.4708,
    "rated_players": 10,
-   "residual": -3.6593,
-   "residual_sd": -1.367
+   "residual": -3.4106,
+   "residual_sd": -1.341
   },
   "Florida St.": {
    "actual": 5.235,
-   "parts_mean": 0.6054,
-   "predicted": -0.761,
-   "rated_players": 7,
-   "residual": 5.996,
-   "residual_sd": 2.24
+   "parts_mean": 1.223,
+   "predicted": 0.2579,
+   "rated_players": 10,
+   "residual": 4.9771,
+   "residual_sd": 1.957
   },
   "Fordham": {
    "actual": -3.0825,
-   "parts_mean": -0.3176,
-   "predicted": -2.9094,
-   "rated_players": 7,
-   "residual": -0.1731,
-   "residual_sd": -0.065
+   "parts_mean": 0.3684,
+   "predicted": -1.5536,
+   "rated_players": 8,
+   "residual": -1.5289,
+   "residual_sd": -0.601
   },
   "Fresno St.": {
    "actual": -2.0469,
-   "parts_mean": 0.3634,
-   "predicted": -1.3243,
-   "rated_players": 7,
-   "residual": -0.7226,
-   "residual_sd": -0.27
+   "parts_mean": 0.7888,
+   "predicted": -0.6625,
+   "rated_players": 8,
+   "residual": -1.3844,
+   "residual_sd": -0.544
   },
   "Furman": {
    "actual": -0.0262,
    "parts_mean": 1.4577,
-   "predicted": 1.2228,
+   "predicted": 0.7555,
    "rated_players": 8,
-   "residual": -1.249,
-   "residual_sd": -0.467
+   "residual": -0.7817,
+   "residual_sd": -0.307
+  },
+  "Ga. Southern": {
+   "actual": 2.8113,
+   "parts_mean": 1.5442,
+   "predicted": 0.9389,
+   "rated_players": 7,
+   "residual": 1.8724,
+   "residual_sd": 0.736
   },
   "Gardner-Webb": {
    "actual": -4.0513,
-   "parts_mean": -0.878,
-   "predicted": -4.2138,
-   "rated_players": 9,
-   "residual": 0.1625,
-   "residual_sd": 0.061
+   "parts_mean": -0.8178,
+   "predicted": -4.0683,
+   "rated_players": 10,
+   "residual": 0.017,
+   "residual_sd": 0.007
+  },
+  "George Mason": {
+   "actual": 0.0484,
+   "parts_mean": 2.1379,
+   "predicted": 2.1974,
+   "rated_players": 8,
+   "residual": -2.149,
+   "residual_sd": -0.845
+  },
+  "George Washington": {
+   "actual": 0.4942,
+   "parts_mean": 0.4457,
+   "predicted": -1.3898,
+   "rated_players": 8,
+   "residual": 1.884,
+   "residual_sd": 0.741
   },
   "Georgetown": {
    "actual": -0.4155,
    "parts_mean": 1.9773,
-   "predicted": 2.4324,
-   "rated_players": 10,
-   "residual": -2.8479,
-   "residual_sd": -1.064
+   "predicted": 1.8571,
+   "rated_players": 11,
+   "residual": -2.2726,
+   "residual_sd": -0.894
+  },
+  "Georgia": {
+   "actual": 3.9104,
+   "parts_mean": 1.6002,
+   "predicted": 1.0577,
+   "rated_players": 7,
+   "residual": 2.8527,
+   "residual_sd": 1.122
+  },
+  "Gonzaga": {
+   "actual": -0.0534,
+   "parts_mean": -0.1409,
+   "predicted": -2.6334,
+   "rated_players": 7,
+   "residual": 2.58,
+   "residual_sd": 1.015
   },
   "Grambling": {
    "actual": -9.8815,
-   "parts_mean": -3.1405,
-   "predicted": -9.4801,
-   "rated_players": 8,
-   "residual": -0.4014,
-   "residual_sd": -0.15
+   "parts_mean": -2.0414,
+   "predicted": -6.6622,
+   "rated_players": 9,
+   "residual": -3.2193,
+   "residual_sd": -1.266
   },
   "Grand Canyon": {
    "actual": 2.5987,
-   "parts_mean": 1.7084,
-   "predicted": 1.8065,
-   "rated_players": 9,
-   "residual": 0.7922,
-   "residual_sd": 0.296
+   "parts_mean": 3.1585,
+   "predicted": 4.361,
+   "rated_players": 11,
+   "residual": -1.7623,
+   "residual_sd": -0.693
   },
   "Green Bay": {
    "actual": -1.437,
    "parts_mean": 0.5921,
-   "predicted": -0.7918,
+   "predicted": -1.0794,
    "rated_players": 7,
-   "residual": -0.6452,
-   "residual_sd": -0.241
+   "residual": -0.3576,
+   "residual_sd": -0.141
   },
   "Harvard": {
    "actual": -3.1892,
-   "parts_mean": -0.5398,
-   "predicted": -3.4266,
-   "rated_players": 8,
-   "residual": 0.2374,
-   "residual_sd": 0.089
+   "parts_mean": -0.1928,
+   "predicted": -2.7434,
+   "rated_players": 9,
+   "residual": -0.4458,
+   "residual_sd": -0.175
   },
   "Hawaii": {
    "actual": 0.9494,
-   "parts_mean": 1.1958,
-   "predicted": 0.6132,
-   "rated_players": 7,
-   "residual": 0.3362,
-   "residual_sd": 0.126
+   "parts_mean": 2.7444,
+   "predicted": 3.4832,
+   "rated_players": 10,
+   "residual": -2.5338,
+   "residual_sd": -0.997
   },
   "High Point": {
    "actual": 1.448,
-   "parts_mean": 2.1312,
-   "predicted": 2.7906,
-   "rated_players": 8,
-   "residual": -1.3426,
-   "residual_sd": -0.502
+   "parts_mean": 3.0142,
+   "predicted": 4.0551,
+   "rated_players": 11,
+   "residual": -2.6071,
+   "residual_sd": -1.025
   },
   "Holy Cross": {
    "actual": -6.8301,
-   "parts_mean": -0.0862,
-   "predicted": -2.3707,
-   "rated_players": 14,
-   "residual": -4.4594,
-   "residual_sd": -1.666
+   "parts_mean": -0.3659,
+   "predicted": -3.1103,
+   "rated_players": 15,
+   "residual": -3.7198,
+   "residual_sd": -1.463
+  },
+  "Houston": {
+   "actual": 2.555,
+   "parts_mean": 0.836,
+   "predicted": -0.5623,
+   "rated_players": 7,
+   "residual": 3.1173,
+   "residual_sd": 1.226
+  },
+  "Houston Christian": {
+   "actual": -3.6794,
+   "parts_mean": -0.0338,
+   "predicted": -2.4063,
+   "rated_players": 7,
+   "residual": -1.2731,
+   "residual_sd": -0.501
+  },
+  "Howard": {
+   "actual": -0.77,
+   "parts_mean": -0.6075,
+   "predicted": -3.6225,
+   "rated_players": 7,
+   "residual": 2.8525,
+   "residual_sd": 1.122
   },
   "IU Indy": {
    "actual": -0.2064,
-   "parts_mean": 1.7089,
-   "predicted": 1.8077,
+   "parts_mean": 1.7092,
+   "predicted": 1.2887,
+   "rated_players": 10,
+   "residual": -1.4951,
+   "residual_sd": -0.588
+  },
+  "Idaho": {
+   "actual": -3.9181,
+   "parts_mean": 0.4248,
+   "predicted": -1.4342,
    "rated_players": 9,
-   "residual": -2.0141,
-   "residual_sd": -0.752
+   "residual": -2.4839,
+   "residual_sd": -0.977
   },
   "Idaho St.": {
    "actual": -0.6105,
-   "parts_mean": 1.3774,
-   "predicted": 1.036,
-   "rated_players": 8,
-   "residual": -1.6465,
-   "residual_sd": -0.615
+   "parts_mean": 1.3776,
+   "predicted": 0.5857,
+   "rated_players": 9,
+   "residual": -1.1962,
+   "residual_sd": -0.47
   },
   "Illinois": {
    "actual": 4.5089,
-   "parts_mean": 1.8545,
-   "predicted": 2.1464,
+   "parts_mean": 4.1093,
+   "predicted": 6.3768,
+   "rated_players": 10,
+   "residual": -1.8679,
+   "residual_sd": -0.735
+  },
+  "Illinois St.": {
+   "actual": 1.3376,
+   "parts_mean": -0.4966,
+   "predicted": -3.3874,
+   "rated_players": 10,
+   "residual": 4.725,
+   "residual_sd": 1.858
+  },
+  "Indiana": {
+   "actual": 7.1113,
+   "parts_mean": 1.9252,
+   "predicted": 1.7467,
    "rated_players": 7,
-   "residual": 2.3625,
-   "residual_sd": 0.882
+   "residual": 5.3646,
+   "residual_sd": 2.11
   },
   "Indiana St.": {
    "actual": -3.4237,
-   "parts_mean": 1.3603,
-   "predicted": 0.9961,
-   "rated_players": 9,
-   "residual": -4.4198,
-   "residual_sd": -1.651
+   "parts_mean": 1.2506,
+   "predicted": 0.3165,
+   "rated_players": 8,
+   "residual": -3.7402,
+   "residual_sd": -1.471
   },
   "Iona": {
    "actual": -6.7039,
-   "parts_mean": -0.1146,
-   "predicted": -2.4369,
+   "parts_mean": -0.1142,
+   "predicted": -2.5768,
    "rated_players": 10,
-   "residual": -4.267,
-   "residual_sd": -1.594
+   "residual": -4.1271,
+   "residual_sd": -1.623
+  },
+  "Iowa": {
+   "actual": 3.4243,
+   "parts_mean": 0.4301,
+   "predicted": -1.4228,
+   "rated_players": 7,
+   "residual": 4.8471,
+   "residual_sd": 1.906
   },
   "Iowa St.": {
    "actual": 5.6716,
-   "parts_mean": 3.083,
-   "predicted": 5.006,
+   "parts_mean": 3.3814,
+   "predicted": 4.8337,
    "rated_players": 8,
-   "residual": 0.6656,
-   "residual_sd": 0.249
+   "residual": 0.8379,
+   "residual_sd": 0.33
+  },
+  "Jackson St.": {
+   "actual": -4.2678,
+   "parts_mean": -1.7135,
+   "predicted": -5.967,
+   "rated_players": 8,
+   "residual": 1.6992,
+   "residual_sd": 0.668
+  },
+  "Jacksonville": {
+   "actual": 1.7462,
+   "parts_mean": 0.4938,
+   "predicted": -1.2878,
+   "rated_players": 8,
+   "residual": 3.034,
+   "residual_sd": 1.193
   },
   "James Madison": {
    "actual": 2.2622,
-   "parts_mean": 2.8079,
-   "predicted": 4.3657,
-   "rated_players": 10,
-   "residual": -2.1035,
-   "residual_sd": -0.786
+   "parts_mean": 2.9221,
+   "predicted": 3.86,
+   "rated_players": 11,
+   "residual": -1.5978,
+   "residual_sd": -0.628
+  },
+  "Kansas": {
+   "actual": 7.7877,
+   "parts_mean": 3.0256,
+   "predicted": 4.0794,
+   "rated_players": 7,
+   "residual": 3.7083,
+   "residual_sd": 1.458
   },
   "Kennesaw St.": {
    "actual": 1.4471,
-   "parts_mean": -0.2576,
-   "predicted": -2.7697,
+   "parts_mean": -0.2578,
+   "predicted": -2.8811,
    "rated_players": 8,
-   "residual": 4.2168,
-   "residual_sd": 1.575
+   "residual": 4.3282,
+   "residual_sd": 1.702
   },
   "Kent St.": {
    "actual": -3.6541,
-   "parts_mean": 0.8616,
-   "predicted": -0.1645,
-   "rated_players": 8,
-   "residual": -3.4896,
-   "residual_sd": -1.303
+   "parts_mean": 0.9602,
+   "predicted": -0.2992,
+   "rated_players": 10,
+   "residual": -3.3549,
+   "residual_sd": -1.319
   },
   "Kentucky": {
    "actual": 10.4002,
-   "parts_mean": 6.0007,
-   "predicted": 11.7973,
+   "parts_mean": 6.0003,
+   "predicted": 10.3855,
    "rated_players": 10,
-   "residual": -1.3971,
-   "residual_sd": -0.522
+   "residual": 0.0147,
+   "residual_sd": 0.006
+  },
+  "LIU": {
+   "actual": -2.2975,
+   "parts_mean": 1.802,
+   "predicted": 1.4855,
+   "rated_players": 9,
+   "residual": -3.783,
+   "residual_sd": -1.488
   },
   "LMU (CA)": {
    "actual": 0.1041,
-   "parts_mean": -1.1631,
-   "predicted": -4.8773,
-   "rated_players": 7,
-   "residual": 4.9814,
-   "residual_sd": 1.861
+   "parts_mean": 0.1813,
+   "predicted": -1.9503,
+   "rated_players": 9,
+   "residual": 2.0544,
+   "residual_sd": 0.808
+  },
+  "LSU": {
+   "actual": 4.1343,
+   "parts_mean": 2.3651,
+   "predicted": 2.6791,
+   "rated_players": 10,
+   "residual": 1.4552,
+   "residual_sd": 0.572
   },
   "Lamar University": {
    "actual": -3.2709,
-   "parts_mean": 0.3843,
-   "predicted": -1.2755,
-   "rated_players": 7,
-   "residual": -1.9954,
-   "residual_sd": -0.745
+   "parts_mean": 1.3764,
+   "predicted": 0.5832,
+   "rated_players": 8,
+   "residual": -3.8541,
+   "residual_sd": -1.516
   },
   "Le Moyne": {
    "actual": -10.5367,
-   "parts_mean": -2.845,
-   "predicted": -8.7923,
+   "parts_mean": -2.8448,
+   "predicted": -8.3653,
    "rated_players": 8,
-   "residual": -1.7444,
-   "residual_sd": -0.652
+   "residual": -2.1714,
+   "residual_sd": -0.854
   },
   "Lehigh": {
    "actual": -1.5448,
-   "parts_mean": 1.2786,
-   "predicted": 0.8061,
+   "parts_mean": 1.2688,
+   "predicted": 0.3551,
    "rated_players": 12,
-   "residual": -2.3509,
-   "residual_sd": -0.878
+   "residual": -1.8999,
+   "residual_sd": -0.747
   },
   "Liberty": {
    "actual": 0.9012,
    "parts_mean": 1.8086,
-   "predicted": 2.0397,
+   "predicted": 1.4995,
    "rated_players": 9,
-   "residual": -1.1385,
-   "residual_sd": -0.425
+   "residual": -0.5983,
+   "residual_sd": -0.235
   },
   "Lindenwood": {
    "actual": -3.7191,
-   "parts_mean": 0.647,
-   "predicted": -0.664,
-   "rated_players": 7,
-   "residual": -3.0551,
-   "residual_sd": -1.141
+   "parts_mean": 1.2322,
+   "predicted": 0.2775,
+   "rated_players": 8,
+   "residual": -3.9966,
+   "residual_sd": -1.572
   },
   "Lipscomb": {
    "actual": 0.9715,
-   "parts_mean": 0.0732,
-   "predicted": -1.9996,
-   "rated_players": 9,
-   "residual": 2.9711,
-   "residual_sd": 1.11
+   "parts_mean": 0.3708,
+   "predicted": -1.5486,
+   "rated_players": 10,
+   "residual": 2.5201,
+   "residual_sd": 0.991
   },
   "Long Beach St.": {
    "actual": 4.2468,
-   "parts_mean": -0.0599,
-   "predicted": -2.3096,
-   "rated_players": 7,
-   "residual": 6.5564,
-   "residual_sd": 2.449
+   "parts_mean": -0.0964,
+   "predicted": -2.5389,
+   "rated_players": 8,
+   "residual": 6.7857,
+   "residual_sd": 2.669
   },
   "Louisiana Tech": {
    "actual": -4.7022,
-   "parts_mean": -1.6004,
-   "predicted": -5.8951,
+   "parts_mean": -1.6002,
+   "predicted": -5.7269,
    "rated_players": 8,
-   "residual": 1.1929,
-   "residual_sd": 0.446
+   "residual": 1.0247,
+   "residual_sd": 0.403
   },
   "Louisville": {
    "actual": 9.4478,
-   "parts_mean": 5.1726,
-   "predicted": 9.8698,
+   "parts_mean": 5.1723,
+   "predicted": 8.6302,
    "rated_players": 8,
-   "residual": -0.422,
-   "residual_sd": -0.158
+   "residual": 0.8176,
+   "residual_sd": 0.322
   },
   "Loyola Chicago": {
    "actual": 0.7733,
-   "parts_mean": 1.4825,
-   "predicted": 1.2807,
+   "parts_mean": 1.4824,
+   "predicted": 0.8079,
    "rated_players": 9,
-   "residual": -0.5074,
-   "residual_sd": -0.19
+   "residual": -0.0346,
+   "residual_sd": -0.014
   },
   "Loyola Maryland": {
    "actual": -5.1706,
-   "parts_mean": -0.8831,
-   "predicted": -4.2257,
+   "parts_mean": -0.8828,
+   "predicted": -4.206,
    "rated_players": 9,
-   "residual": -0.9449,
-   "residual_sd": -0.353
+   "residual": -0.9646,
+   "residual_sd": -0.379
   },
   "Manhattan": {
    "actual": -7.2537,
-   "parts_mean": -1.2864,
-   "predicted": -5.1644,
+   "parts_mean": -1.2863,
+   "predicted": -5.0615,
    "rated_players": 7,
-   "residual": -2.0893,
-   "residual_sd": -0.78
+   "residual": -2.1922,
+   "residual_sd": -0.862
   },
   "Marist": {
    "actual": -6.3646,
-   "parts_mean": -0.8404,
-   "predicted": -4.1262,
-   "rated_players": 9,
-   "residual": -2.2384,
-   "residual_sd": -0.836
+   "parts_mean": 0.1413,
+   "predicted": -2.035,
+   "rated_players": 10,
+   "residual": -4.3296,
+   "residual_sd": -1.703
   },
   "Marshall": {
    "actual": -0.6933,
-   "parts_mean": 1.2233,
-   "predicted": 0.6774,
+   "parts_mean": 2.1654,
+   "predicted": 2.2559,
+   "rated_players": 9,
+   "residual": -2.9492,
+   "residual_sd": -1.16
+  },
+  "McNeese": {
+   "actual": -6.4503,
+   "parts_mean": -1.5719,
+   "predicted": -5.6669,
+   "rated_players": 8,
+   "residual": -0.7834,
+   "residual_sd": -0.308
+  },
+  "Memphis": {
+   "actual": -2.2568,
+   "parts_mean": 1.969,
+   "predicted": 1.8395,
+   "rated_players": 10,
+   "residual": -4.0963,
+   "residual_sd": -1.611
+  },
+  "Mercer": {
+   "actual": -3.2075,
+   "parts_mean": -0.8251,
+   "predicted": -4.0838,
    "rated_players": 7,
-   "residual": -1.3707,
-   "residual_sd": -0.512
+   "residual": 0.8763,
+   "residual_sd": 0.345
   },
   "Mercyhurst": {
    "actual": -7.3528,
-   "parts_mean": -1.2441,
-   "predicted": -5.066,
-   "rated_players": 9,
-   "residual": -2.2868,
-   "residual_sd": -0.854
+   "parts_mean": -0.5791,
+   "predicted": -3.5622,
+   "rated_players": 10,
+   "residual": -3.7906,
+   "residual_sd": -1.491
+  },
+  "Miami (OH)": {
+   "actual": -0.2285,
+   "parts_mean": 0.8936,
+   "predicted": -0.4404,
+   "rated_players": 10,
+   "residual": 0.2119,
+   "residual_sd": 0.083
   },
   "Michigan": {
    "actual": 6.2831,
-   "parts_mean": 1.7295,
-   "predicted": 1.8555,
+   "parts_mean": 1.7293,
+   "predicted": 1.3313,
    "rated_players": 8,
-   "residual": 4.4276,
-   "residual_sd": 1.654
+   "residual": 4.9518,
+   "residual_sd": 1.947
   },
   "Michigan St.": {
    "actual": 3.9176,
-   "parts_mean": 3.5303,
-   "predicted": 6.0471,
-   "rated_players": 10,
-   "residual": -2.1295,
-   "residual_sd": -0.795
+   "parts_mean": 3.7666,
+   "predicted": 5.6502,
+   "rated_players": 12,
+   "residual": -1.7326,
+   "residual_sd": -0.681
+  },
+  "Milwaukee": {
+   "actual": -2.275,
+   "parts_mean": 0.5898,
+   "predicted": -1.0843,
+   "rated_players": 7,
+   "residual": -1.1907,
+   "residual_sd": -0.468
   },
   "Minnesota": {
    "actual": 7.6839,
-   "parts_mean": 3.4052,
-   "predicted": 5.756,
-   "rated_players": 8,
-   "residual": 1.9279,
-   "residual_sd": 0.72
+   "parts_mean": 4.5976,
+   "predicted": 7.4118,
+   "rated_players": 9,
+   "residual": 0.2721,
+   "residual_sd": 0.107
   },
   "Mississippi St.": {
    "actual": 3.8743,
-   "parts_mean": 2.9596,
-   "predicted": 4.7188,
-   "rated_players": 8,
-   "residual": -0.8445,
-   "residual_sd": -0.315
+   "parts_mean": 3.4197,
+   "predicted": 4.9148,
+   "rated_players": 9,
+   "residual": -1.0405,
+   "residual_sd": -0.409
+  },
+  "Missouri": {
+   "actual": 6.4058,
+   "parts_mean": 1.1945,
+   "predicted": 0.1976,
+   "rated_players": 7,
+   "residual": 6.2082,
+   "residual_sd": 2.442
   },
   "Missouri St.": {
    "actual": -0.3254,
-   "parts_mean": 1.3645,
-   "predicted": 1.0059,
-   "rated_players": 8,
-   "residual": -1.3313,
-   "residual_sd": -0.497
+   "parts_mean": 1.5596,
+   "predicted": 0.9716,
+   "rated_players": 10,
+   "residual": -1.297,
+   "residual_sd": -0.51
   },
   "Montana St.": {
    "actual": -0.9205,
-   "parts_mean": -0.0276,
-   "predicted": -2.2344,
+   "parts_mean": 1.0231,
+   "predicted": -0.1657,
+   "rated_players": 8,
+   "residual": -0.7548,
+   "residual_sd": -0.297
+  },
+  "Morgan St.": {
+   "actual": -5.3389,
+   "parts_mean": -1.3172,
+   "predicted": -5.127,
    "rated_players": 7,
-   "residual": 1.3139,
-   "residual_sd": 0.491
+   "residual": -0.2119,
+   "residual_sd": -0.083
   },
   "N.C. A&T": {
    "actual": -1.4483,
-   "parts_mean": 1.0357,
-   "predicted": 0.2407,
+   "parts_mean": 1.0359,
+   "predicted": -0.1387,
    "rated_players": 7,
-   "residual": -1.689,
-   "residual_sd": -0.631
+   "residual": -1.3096,
+   "residual_sd": -0.515
   },
   "NC State": {
    "actual": 2.506,
-   "parts_mean": 0.5642,
-   "predicted": -0.8568,
-   "rated_players": 8,
-   "residual": 3.3628,
-   "residual_sd": 1.256
+   "parts_mean": 1.6105,
+   "predicted": 1.0795,
+   "rated_players": 10,
+   "residual": 1.4265,
+   "residual_sd": 0.561
   },
   "NJIT": {
    "actual": -6.817,
-   "parts_mean": -0.5943,
-   "predicted": -3.5534,
+   "parts_mean": -0.594,
+   "predicted": -3.5939,
    "rated_players": 9,
-   "residual": -3.2636,
-   "residual_sd": -1.219
+   "residual": -3.2231,
+   "residual_sd": -1.268
   },
   "Navy": {
    "actual": -2.5727,
-   "parts_mean": 0.3273,
-   "predicted": -1.4083,
+   "parts_mean": 0.3274,
+   "predicted": -1.6406,
    "rated_players": 9,
-   "residual": -1.1644,
-   "residual_sd": -0.435
+   "residual": -0.9321,
+   "residual_sd": -0.367
   },
   "Nebraska": {
    "actual": 12.9387,
-   "parts_mean": 4.3087,
-   "predicted": 7.859,
+   "parts_mean": 4.3084,
+   "predicted": 6.7987,
    "rated_players": 7,
-   "residual": 5.0797,
-   "residual_sd": 1.897
+   "residual": 6.14,
+   "residual_sd": 2.415
   },
   "Nevada": {
    "actual": -1.7633,
-   "parts_mean": -1.187,
-   "predicted": -4.9329,
+   "parts_mean": -1.1872,
+   "predicted": -4.8513,
    "rated_players": 8,
-   "residual": 3.1696,
-   "residual_sd": 1.184
+   "residual": 3.088,
+   "residual_sd": 1.214
   },
   "New Hampshire": {
    "actual": -2.7748,
-   "parts_mean": -0.6655,
-   "predicted": -3.7192,
-   "rated_players": 7,
-   "residual": 0.9444,
-   "residual_sd": 0.353
+   "parts_mean": -0.1578,
+   "predicted": -2.6692,
+   "rated_players": 9,
+   "residual": -0.1056,
+   "residual_sd": -0.042
   },
   "New Haven": {
    "actual": -8.2557,
-   "parts_mean": -1.8424,
-   "predicted": -6.4584,
+   "parts_mean": -1.8423,
+   "predicted": -6.2401,
    "rated_players": 8,
-   "residual": -1.7973,
-   "residual_sd": -0.671
+   "residual": -2.0156,
+   "residual_sd": -0.793
   },
   "New Mexico": {
    "actual": -0.38,
-   "parts_mean": 1.0786,
-   "predicted": 0.3405,
-   "rated_players": 8,
-   "residual": -0.7205,
-   "residual_sd": -0.269
+   "parts_mean": 1.9409,
+   "predicted": 1.7799,
+   "rated_players": 9,
+   "residual": -2.1599,
+   "residual_sd": -0.849
   },
   "New Mexico St.": {
    "actual": -1.4004,
-   "parts_mean": 1.1695,
-   "predicted": 0.5522,
+   "parts_mean": 1.1696,
+   "predicted": 0.1449,
    "rated_players": 9,
-   "residual": -1.9526,
-   "residual_sd": -0.729
+   "residual": -1.5453,
+   "residual_sd": -0.608
   },
   "Norfolk St.": {
    "actual": -7.1161,
-   "parts_mean": -1.72,
-   "predicted": -6.1736,
+   "parts_mean": -1.7196,
+   "predicted": -5.9801,
    "rated_players": 10,
-   "residual": -0.9425,
-   "residual_sd": -0.352
+   "residual": -1.136,
+   "residual_sd": -0.447
   },
   "North Ala.": {
    "actual": -0.1909,
-   "parts_mean": 1.7942,
-   "predicted": 2.0062,
+   "parts_mean": 1.7943,
+   "predicted": 1.4691,
    "rated_players": 9,
-   "residual": -2.1971,
-   "residual_sd": -0.821
+   "residual": -1.66,
+   "residual_sd": -0.653
   },
   "North Carolina": {
    "actual": 6.2424,
-   "parts_mean": 2.9293,
-   "predicted": 4.6483,
+   "parts_mean": 2.8928,
+   "predicted": 3.7977,
    "rated_players": 10,
-   "residual": 1.5941,
-   "residual_sd": 0.595
+   "residual": 2.4447,
+   "residual_sd": 0.961
   },
   "North Dakota St.": {
    "actual": 0.0666,
-   "parts_mean": 1.1808,
-   "predicted": 0.5784,
-   "rated_players": 8,
-   "residual": -0.5118,
-   "residual_sd": -0.191
+   "parts_mean": 1.2625,
+   "predicted": 0.3417,
+   "rated_players": 9,
+   "residual": -0.2751,
+   "residual_sd": -0.108
   },
   "North Florida": {
    "actual": -1.4805,
-   "parts_mean": 0.2758,
-   "predicted": -1.5281,
+   "parts_mean": 0.2757,
+   "predicted": -1.7503,
    "rated_players": 8,
-   "residual": 0.0476,
-   "residual_sd": 0.018
+   "residual": 0.2698,
+   "residual_sd": 0.106
   },
   "North Texas": {
    "actual": 1.4045,
-   "parts_mean": 1.6531,
-   "predicted": 1.6776,
-   "rated_players": 9,
-   "residual": -0.2731,
-   "residual_sd": -0.102
+   "parts_mean": 2.5981,
+   "predicted": 3.1731,
+   "rated_players": 12,
+   "residual": -1.7686,
+   "residual_sd": -0.696
   },
   "Northeastern": {
    "actual": -2.3414,
    "parts_mean": -0.0297,
-   "predicted": -2.2392,
+   "predicted": -2.3977,
    "rated_players": 9,
-   "residual": -0.1022,
-   "residual_sd": -0.038
+   "residual": 0.0563,
+   "residual_sd": 0.022
+  },
+  "Northern Colo.": {
+   "actual": 1.434,
+   "parts_mean": 1.0252,
+   "predicted": -0.1614,
+   "rated_players": 8,
+   "residual": 1.5954,
+   "residual_sd": 0.627
+  },
+  "Northern Ky.": {
+   "actual": 0.8495,
+   "parts_mean": 2.2353,
+   "predicted": 2.4039,
+   "rated_players": 7,
+   "residual": -1.5544,
+   "residual_sd": -0.611
+  },
+  "Northwestern": {
+   "actual": 3.9455,
+   "parts_mean": 1.3384,
+   "predicted": 0.5026,
+   "rated_players": 9,
+   "residual": 3.4429,
+   "residual_sd": 1.354
   },
   "Notre Dame": {
    "actual": 3.7291,
-   "parts_mean": 0.4786,
-   "predicted": -1.0561,
+   "parts_mean": 0.4783,
+   "predicted": -1.3207,
    "rated_players": 7,
-   "residual": 4.7852,
-   "residual_sd": 1.787
+   "residual": 5.0498,
+   "residual_sd": 1.986
   },
   "Oakland": {
    "actual": -3.8533,
-   "parts_mean": -0.0444,
-   "predicted": -2.2735,
-   "rated_players": 10,
-   "residual": -1.5798,
-   "residual_sd": -0.59
+   "parts_mean": 0.0413,
+   "predicted": -2.2472,
+   "rated_players": 11,
+   "residual": -1.6061,
+   "residual_sd": -0.632
   },
   "Ohio": {
    "actual": -0.4326,
-   "parts_mean": 0.7819,
-   "predicted": -0.3502,
+   "parts_mean": 0.7844,
+   "predicted": -0.6718,
+   "rated_players": 11,
+   "residual": 0.2392,
+   "residual_sd": 0.094
+  },
+  "Oklahoma": {
+   "actual": 5.2371,
+   "parts_mean": 2.6467,
+   "predicted": 3.2762,
    "rated_players": 10,
-   "residual": -0.0824,
-   "residual_sd": -0.031
+   "residual": 1.9609,
+   "residual_sd": 0.771
   },
   "Old Dominion": {
    "actual": -2.686,
-   "parts_mean": 1.7693,
-   "predicted": 1.9482,
+   "parts_mean": 1.7696,
+   "predicted": 1.4167,
    "rated_players": 7,
-   "residual": -4.6342,
-   "residual_sd": -1.731
+   "residual": -4.1027,
+   "residual_sd": -1.614
   },
   "Ole Miss": {
    "actual": 4.4174,
-   "parts_mean": 1.3242,
-   "predicted": 0.9121,
-   "rated_players": 7,
-   "residual": 3.5053,
-   "residual_sd": 1.309
+   "parts_mean": 2.9703,
+   "predicted": 3.962,
+   "rated_players": 10,
+   "residual": 0.4554,
+   "residual_sd": 0.179
+  },
+  "Omaha": {
+   "actual": 1.083,
+   "parts_mean": 1.3902,
+   "predicted": 0.6124,
+   "rated_players": 10,
+   "residual": 0.4706,
+   "residual_sd": 0.185
+  },
+  "Oregon": {
+   "actual": 5.1425,
+   "parts_mean": 4.2879,
+   "predicted": 6.7552,
+   "rated_players": 10,
+   "residual": -1.6127,
+   "residual_sd": -0.634
   },
   "Penn": {
    "actual": -0.4625,
-   "parts_mean": 2.5816,
-   "predicted": 3.8389,
+   "parts_mean": 2.5819,
+   "predicted": 3.1387,
    "rated_players": 10,
-   "residual": -4.3014,
-   "residual_sd": -1.607
+   "residual": -3.6012,
+   "residual_sd": -1.416
   },
   "Penn St.": {
    "actual": 5.5613,
-   "parts_mean": 1.7432,
-   "predicted": 1.8875,
-   "rated_players": 8,
-   "residual": 3.6738,
-   "residual_sd": 1.372
+   "parts_mean": 3.5069,
+   "predicted": 5.0997,
+   "rated_players": 10,
+   "residual": 0.4616,
+   "residual_sd": 0.182
   },
   "Pepperdine": {
    "actual": 4.6433,
-   "parts_mean": 3.1807,
-   "predicted": 5.2335,
-   "rated_players": 8,
-   "residual": -0.5902,
-   "residual_sd": -0.22
+   "parts_mean": 3.3692,
+   "predicted": 4.8078,
+   "rated_players": 9,
+   "residual": -0.1645,
+   "residual_sd": -0.065
   },
   "Pittsburgh": {
    "actual": 10.4338,
-   "parts_mean": 3.171,
-   "predicted": 5.2108,
+   "parts_mean": 3.1704,
+   "predicted": 4.3862,
    "rated_players": 9,
-   "residual": 5.223,
-   "residual_sd": 1.951
+   "residual": 6.0476,
+   "residual_sd": 2.378
   },
   "Portland": {
    "actual": -0.0415,
-   "parts_mean": 1.1699,
-   "predicted": 0.5529,
+   "parts_mean": 1.1698,
+   "predicted": 0.1453,
    "rated_players": 7,
-   "residual": -0.5944,
-   "residual_sd": -0.222
+   "residual": -0.1868,
+   "residual_sd": -0.073
+  },
+  "Portland St.": {
+   "actual": -1.1281,
+   "parts_mean": 0.9948,
+   "predicted": -0.2258,
+   "rated_players": 8,
+   "residual": -0.9023,
+   "residual_sd": -0.355
   },
   "Prairie View": {
    "actual": -3.6002,
-   "parts_mean": -1.4137,
-   "predicted": -5.4607,
-   "rated_players": 7,
-   "residual": 1.8605,
-   "residual_sd": 0.695
+   "parts_mean": -0.7383,
+   "predicted": -3.8997,
+   "rated_players": 8,
+   "residual": 0.2995,
+   "residual_sd": 0.118
   },
   "Presbyterian": {
    "actual": -4.1607,
-   "parts_mean": 0.0828,
-   "predicted": -1.9774,
+   "parts_mean": 0.0829,
+   "predicted": -2.1588,
    "rated_players": 7,
-   "residual": -2.1833,
-   "residual_sd": -0.816
+   "residual": -2.0019,
+   "residual_sd": -0.787
   },
   "Providence": {
    "actual": -0.9275,
-   "parts_mean": 0.5421,
-   "predicted": -0.9083,
+   "parts_mean": 0.542,
+   "predicted": -1.1856,
    "rated_players": 7,
-   "residual": -0.0192,
-   "residual_sd": -0.007
+   "residual": 0.2581,
+   "residual_sd": 0.101
   },
   "Purdue": {
    "actual": 7.7032,
-   "parts_mean": 3.3771,
-   "predicted": 5.6905,
-   "rated_players": 7,
-   "residual": 2.0127,
-   "residual_sd": 0.752
+   "parts_mean": 5.1518,
+   "predicted": 8.5868,
+   "rated_players": 10,
+   "residual": -0.8836,
+   "residual_sd": -0.347
   },
   "Purdue Fort Wayne": {
    "actual": -6.2048,
-   "parts_mean": 0.5945,
-   "predicted": -0.7864,
+   "parts_mean": 0.5948,
+   "predicted": -1.0737,
    "rated_players": 8,
-   "residual": -5.4184,
-   "residual_sd": -2.024
+   "residual": -5.1311,
+   "residual_sd": -2.018
   },
   "Queens (NC)": {
    "actual": -0.8954,
-   "parts_mean": 0.7458,
-   "predicted": -0.434,
+   "parts_mean": 0.7459,
+   "predicted": -0.7534,
    "rated_players": 7,
-   "residual": -0.4614,
-   "residual_sd": -0.172
+   "residual": -0.142,
+   "residual_sd": -0.056
+  },
+  "Quinnipiac": {
+   "actual": -2.3966,
+   "parts_mean": 0.1708,
+   "predicted": -1.9726,
+   "rated_players": 10,
+   "residual": -0.424,
+   "residual_sd": -0.167
   },
   "Rhode Island": {
    "actual": -4.8115,
-   "parts_mean": -0.5106,
-   "predicted": -3.3587,
-   "rated_players": 9,
-   "residual": -1.4528,
-   "residual_sd": -0.543
+   "parts_mean": -0.2534,
+   "predicted": -2.8719,
+   "rated_players": 10,
+   "residual": -1.9396,
+   "residual_sd": -0.763
   },
   "Rice": {
    "actual": 5.131,
-   "parts_mean": 1.7511,
-   "predicted": 1.9058,
-   "rated_players": 7,
-   "residual": 3.2252,
-   "residual_sd": 1.205
+   "parts_mean": 2.682,
+   "predicted": 3.3509,
+   "rated_players": 9,
+   "residual": 1.7801,
+   "residual_sd": 0.7
   },
   "Rider": {
    "actual": -4.3942,
-   "parts_mean": -0.8161,
-   "predicted": -4.0696,
-   "rated_players": 7,
-   "residual": -0.3246,
-   "residual_sd": -0.121
+   "parts_mean": -0.7788,
+   "predicted": -3.9856,
+   "rated_players": 8,
+   "residual": -0.4086,
+   "residual_sd": -0.161
+  },
+  "Rutgers": {
+   "actual": 1.7745,
+   "parts_mean": 2.4948,
+   "predicted": 2.9542,
+   "rated_players": 8,
+   "residual": -1.1797,
+   "residual_sd": -0.464
   },
   "SIUE": {
    "actual": -4.006,
-   "parts_mean": -0.1241,
-   "predicted": -2.4588,
+   "parts_mean": -0.1238,
+   "predicted": -2.5971,
    "rated_players": 8,
-   "residual": -1.5472,
-   "residual_sd": -0.578
+   "residual": -1.4089,
+   "residual_sd": -0.554
   },
   "SMU": {
    "actual": 9.8127,
-   "parts_mean": 6.1749,
-   "predicted": 12.2028,
+   "parts_mean": 6.1746,
+   "predicted": 10.7549,
    "rated_players": 9,
-   "residual": -2.3901,
-   "residual_sd": -0.893
+   "residual": -0.9422,
+   "residual_sd": -0.371
   },
   "Saint Louis": {
    "actual": -1.6418,
-   "parts_mean": 0.845,
-   "predicted": -0.2032,
+   "parts_mean": 0.8453,
+   "predicted": -0.5427,
    "rated_players": 8,
-   "residual": -1.4386,
-   "residual_sd": -0.537
+   "residual": -1.0991,
+   "residual_sd": -0.432
+  },
+  "Saint Mary's (CA)": {
+   "actual": 0.8682,
+   "parts_mean": 0.3825,
+   "predicted": -1.5238,
+   "rated_players": 7,
+   "residual": 2.392,
+   "residual_sd": 0.941
   },
   "Sam Houston": {
    "actual": -1.6624,
-   "parts_mean": -0.4126,
-   "predicted": -3.1305,
-   "rated_players": 7,
-   "residual": 1.4681,
-   "residual_sd": 0.548
+   "parts_mean": 0.5876,
+   "predicted": -1.0889,
+   "rated_players": 8,
+   "residual": -0.5735,
+   "residual_sd": -0.226
   },
   "San Diego": {
    "actual": 5.8504,
-   "parts_mean": 1.5487,
-   "predicted": 1.4347,
+   "parts_mean": 3.0075,
+   "predicted": 4.041,
+   "rated_players": 9,
+   "residual": 1.8094,
+   "residual_sd": 0.712
+  },
+  "San Diego St.": {
+   "actual": 2.181,
+   "parts_mean": 1.7884,
+   "predicted": 1.4567,
+   "rated_players": 9,
+   "residual": 0.7243,
+   "residual_sd": 0.285
+  },
+  "San Jose St.": {
+   "actual": 0.8508,
+   "parts_mean": 1.4882,
+   "predicted": 0.8202,
    "rated_players": 7,
-   "residual": 4.4157,
-   "residual_sd": 1.649
+   "residual": 0.0306,
+   "residual_sd": 0.012
   },
   "Santa Clara": {
    "actual": 1.2815,
-   "parts_mean": 1.8328,
+   "parts_mean": 2.09,
    "predicted": 2.096,
-   "rated_players": 9,
+   "rated_players": 10,
    "residual": -0.8145,
-   "residual_sd": -0.304
+   "residual_sd": -0.32
+  },
+  "Seattle U": {
+   "actual": -3.1989,
+   "parts_mean": -1.7597,
+   "predicted": -6.0651,
+   "rated_players": 7,
+   "residual": 2.8662,
+   "residual_sd": 1.127
   },
   "Seton Hall": {
    "actual": -3.2382,
-   "parts_mean": 0.6828,
-   "predicted": -0.5809,
+   "parts_mean": 0.8614,
+   "predicted": -0.5086,
+   "rated_players": 9,
+   "residual": -2.7296,
+   "residual_sd": -1.074
+  },
+  "Siena": {
+   "actual": -5.8739,
+   "parts_mean": 0.046,
+   "predicted": -2.237,
    "rated_players": 7,
-   "residual": -2.6573,
-   "residual_sd": -0.993
+   "residual": -3.6369,
+   "residual_sd": -1.43
+  },
+  "South Alabama": {
+   "actual": 1.4834,
+   "parts_mean": 1.0476,
+   "predicted": -0.1138,
+   "rated_players": 7,
+   "residual": 1.5972,
+   "residual_sd": 0.628
   },
   "South Dakota": {
    "actual": 3.0431,
    "parts_mean": 3.1587,
-   "predicted": 5.1822,
+   "predicted": 4.3614,
    "rated_players": 9,
-   "residual": -2.1391,
-   "residual_sd": -0.799
+   "residual": -1.3183,
+   "residual_sd": -0.518
+  },
+  "South Fla.": {
+   "actual": 3.6519,
+   "parts_mean": 1.2086,
+   "predicted": 0.2275,
+   "rated_players": 7,
+   "residual": 3.4244,
+   "residual_sd": 1.347
+  },
+  "Southeast Mo. St.": {
+   "actual": 0.1277,
+   "parts_mean": 1.7192,
+   "predicted": 1.31,
+   "rated_players": 9,
+   "residual": -1.1823,
+   "residual_sd": -0.465
   },
   "Southern California": {
    "actual": 7.6255,
-   "parts_mean": 4.2132,
-   "predicted": 7.6367,
-   "rated_players": 7,
-   "residual": -0.0112,
-   "residual_sd": -0.004
+   "parts_mean": 4.2129,
+   "predicted": 6.5962,
+   "rated_players": 8,
+   "residual": 1.0293,
+   "residual_sd": 0.405
   },
   "Southern Ind.": {
    "actual": -1.0468,
-   "parts_mean": 1.8847,
-   "predicted": 2.2169,
+   "parts_mean": 1.885,
+   "predicted": 1.6613,
    "rated_players": 7,
-   "residual": -3.2637,
-   "residual_sd": -1.219
+   "residual": -2.7081,
+   "residual_sd": -1.065
   },
   "Southern Miss.": {
    "actual": 0.562,
-   "parts_mean": 1.5538,
-   "predicted": 1.4466,
+   "parts_mean": 1.5504,
+   "predicted": 0.9521,
    "rated_players": 8,
-   "residual": -0.8846,
-   "residual_sd": -0.33
+   "residual": -0.3901,
+   "residual_sd": -0.153
+  },
+  "St. John's (NY)": {
+   "actual": -1.2672,
+   "parts_mean": -1.3596,
+   "predicted": -5.2169,
+   "rated_players": 7,
+   "residual": 3.9497,
+   "residual_sd": 1.553
   },
   "Stanford": {
    "actual": 9.4917,
-   "parts_mean": 5.5519,
-   "predicted": 10.7527,
+   "parts_mean": 5.6255,
+   "predicted": 9.5909,
+   "rated_players": 10,
+   "residual": -0.0992,
+   "residual_sd": -0.039
+  },
+  "Stetson": {
+   "actual": -2.9129,
+   "parts_mean": 0.5957,
+   "predicted": -1.0718,
+   "rated_players": 7,
+   "residual": -1.8411,
+   "residual_sd": -0.724
+  },
+  "Stonehill": {
+   "actual": -9.0264,
+   "parts_mean": -2.0437,
+   "predicted": -6.6671,
    "rated_players": 9,
-   "residual": -1.261,
-   "residual_sd": -0.471
+   "residual": -2.3593,
+   "residual_sd": -0.928
+  },
+  "Stony Brook": {
+   "actual": -1.3566,
+   "parts_mean": 1.182,
+   "predicted": 0.1711,
+   "rated_players": 11,
+   "residual": -1.5277,
+   "residual_sd": -0.601
+  },
+  "Syracuse": {
+   "actual": 0.9987,
+   "parts_mean": -0.4922,
+   "predicted": -3.378,
+   "rated_players": 8,
+   "residual": 4.3767,
+   "residual_sd": 1.721
+  },
+  "TCU": {
+   "actual": 6.5968,
+   "parts_mean": 2.6574,
+   "predicted": 3.2987,
+   "rated_players": 7,
+   "residual": 3.2981,
+   "residual_sd": 1.297
+  },
+  "Temple": {
+   "actual": 0.1761,
+   "parts_mean": 0.8803,
+   "predicted": -0.4684,
+   "rated_players": 7,
+   "residual": 0.6445,
+   "residual_sd": 0.253
+  },
+  "Tennessee": {
+   "actual": 8.0682,
+   "parts_mean": 4.1824,
+   "predicted": 6.5316,
+   "rated_players": 8,
+   "residual": 1.5366,
+   "residual_sd": 0.604
   },
   "Tennessee Tech": {
    "actual": -3.3726,
-   "parts_mean": -0.387,
-   "predicted": -3.0709,
-   "rated_players": 8,
-   "residual": -0.3017,
-   "residual_sd": -0.113
+   "parts_mean": -0.287,
+   "predicted": -2.943,
+   "rated_players": 9,
+   "residual": -0.4296,
+   "residual_sd": -0.169
   },
   "Texas": {
    "actual": 10.8941,
-   "parts_mean": 4.9855,
-   "predicted": 9.4344,
-   "rated_players": 8,
-   "residual": 1.4597,
-   "residual_sd": 0.545
+   "parts_mean": 4.9851,
+   "predicted": 8.2333,
+   "rated_players": 9,
+   "residual": 2.6608,
+   "residual_sd": 1.046
   },
   "Texas A&M": {
    "actual": 9.9475,
-   "parts_mean": 3.9078,
-   "predicted": 6.9259,
+   "parts_mean": 3.9075,
+   "predicted": 5.949,
    "rated_players": 8,
-   "residual": 3.0216,
-   "residual_sd": 1.129
+   "residual": 3.9985,
+   "residual_sd": 1.573
+  },
+  "Texas St.": {
+   "actual": 3.2914,
+   "parts_mean": 2.3286,
+   "predicted": 2.6018,
+   "rated_players": 7,
+   "residual": 0.6896,
+   "residual_sd": 0.271
   },
   "Texas Tech": {
    "actual": 1.1513,
-   "parts_mean": -0.6865,
-   "predicted": -3.7679,
-   "rated_players": 7,
-   "residual": 4.9192,
-   "residual_sd": 1.837
+   "parts_mean": 0.2261,
+   "predicted": -1.8554,
+   "rated_players": 9,
+   "residual": 3.0067,
+   "residual_sd": 1.182
   },
   "The Citadel": {
    "actual": -8.236,
-   "parts_mean": 0.0031,
-   "predicted": -2.1629,
-   "rated_players": 8,
-   "residual": -6.0731,
-   "residual_sd": -2.268
+   "parts_mean": 0.0439,
+   "predicted": -2.2415,
+   "rated_players": 9,
+   "residual": -5.9945,
+   "residual_sd": -2.358
   },
   "Toledo": {
    "actual": 1.4752,
-   "parts_mean": 2.2135,
-   "predicted": 2.9821,
-   "rated_players": 7,
-   "residual": -1.5069,
-   "residual_sd": -0.563
+   "parts_mean": 3.0525,
+   "predicted": 4.1364,
+   "rated_players": 11,
+   "residual": -2.6612,
+   "residual_sd": -1.047
   },
   "Towson": {
    "actual": 0.0846,
-   "parts_mean": -0.0605,
-   "predicted": -2.3108,
-   "rated_players": 7,
-   "residual": 2.3954,
-   "residual_sd": 0.895
+   "parts_mean": 0.3126,
+   "predicted": -1.672,
+   "rated_players": 8,
+   "residual": 1.7566,
+   "residual_sd": 0.691
   },
   "Troy": {
    "actual": 0.7857,
-   "parts_mean": -0.0875,
-   "predicted": -2.3737,
+   "parts_mean": -0.0873,
+   "predicted": -2.5197,
+   "rated_players": 8,
+   "residual": 3.3054,
+   "residual_sd": 1.3
+  },
+  "Tulane": {
+   "actual": -0.8123,
+   "parts_mean": 2.312,
+   "predicted": 2.5667,
    "rated_players": 7,
-   "residual": 3.1594,
-   "residual_sd": 1.18
+   "residual": -3.379,
+   "residual_sd": -1.329
   },
   "Tulsa": {
    "actual": 4.6326,
-   "parts_mean": 2.2558,
-   "predicted": 3.0806,
-   "rated_players": 9,
-   "residual": 1.552,
-   "residual_sd": 0.58
+   "parts_mean": 2.5198,
+   "predicted": 3.007,
+   "rated_players": 12,
+   "residual": 1.6256,
+   "residual_sd": 0.639
+  },
+  "UAB": {
+   "actual": 0.2507,
+   "parts_mean": 1.6157,
+   "predicted": 1.0905,
+   "rated_players": 8,
+   "residual": -0.8398,
+   "residual_sd": -0.33
   },
   "UC Davis": {
    "actual": 4.681,
-   "parts_mean": 2.015,
-   "predicted": 2.52,
+   "parts_mean": 2.0149,
+   "predicted": 1.9368,
    "rated_players": 7,
-   "residual": 2.161,
-   "residual_sd": 0.807
+   "residual": 2.7442,
+   "residual_sd": 1.079
+  },
+  "UC San Diego": {
+   "actual": -0.6146,
+   "parts_mean": 1.1026,
+   "predicted": 0.0027,
+   "rated_players": 7,
+   "residual": -0.6173,
+   "residual_sd": -0.243
   },
   "UC Santa Barbara": {
    "actual": 4.7324,
-   "parts_mean": -0.6571,
-   "predicted": -3.6997,
-   "rated_players": 7,
-   "residual": 8.4321,
-   "residual_sd": 3.15
+   "parts_mean": 1.3035,
+   "predicted": 0.4286,
+   "rated_players": 11,
+   "residual": 4.3038,
+   "residual_sd": 1.693
   },
   "UCF": {
    "actual": 5.0049,
-   "parts_mean": 2.7438,
-   "predicted": 4.2165,
+   "parts_mean": 2.7437,
+   "predicted": 3.4817,
    "rated_players": 9,
-   "residual": 0.7884,
-   "residual_sd": 0.294
+   "residual": 1.5232,
+   "residual_sd": 0.599
   },
   "UCLA": {
    "actual": 5.969,
-   "parts_mean": 2.766,
-   "predicted": 4.2683,
+   "parts_mean": 3.5368,
+   "predicted": 5.163,
+   "rated_players": 10,
+   "residual": 0.806,
+   "residual_sd": 0.317
+  },
+  "UIW": {
+   "actual": 1.4836,
+   "parts_mean": 0.7392,
+   "predicted": -0.7676,
+   "rated_players": 8,
+   "residual": 2.2512,
+   "residual_sd": 0.885
+  },
+  "ULM": {
+   "actual": -5.2503,
+   "parts_mean": -0.9664,
+   "predicted": -4.3833,
    "rated_players": 7,
-   "residual": 1.7007,
-   "residual_sd": 0.635
+   "residual": -0.867,
+   "residual_sd": -0.341
   },
   "UMBC": {
    "actual": -1.2483,
-   "parts_mean": 1.4155,
-   "predicted": 1.1247,
+   "parts_mean": -0.2676,
+   "predicted": -2.902,
+   "rated_players": 7,
+   "residual": 1.6537,
+   "residual_sd": 0.65
+  },
+  "UMES": {
+   "actual": -5.436,
+   "parts_mean": -1.6949,
+   "predicted": -5.9276,
    "rated_players": 8,
-   "residual": -2.373,
-   "residual_sd": -0.886
+   "residual": 0.4916,
+   "residual_sd": 0.193
   },
   "UNC Greensboro": {
    "actual": -0.4524,
    "parts_mean": 1.2525,
-   "predicted": 0.7453,
+   "predicted": 0.3205,
    "rated_players": 8,
-   "residual": -1.1977,
-   "residual_sd": -0.447
+   "residual": -0.7729,
+   "residual_sd": -0.304
   },
   "UNI": {
    "actual": 5.4575,
    "parts_mean": 3.4165,
-   "predicted": 5.7823,
+   "predicted": 4.908,
    "rated_players": 9,
-   "residual": -0.3248,
-   "residual_sd": -0.121
+   "residual": 0.5495,
+   "residual_sd": 0.216
   },
   "UNLV": {
    "actual": 1.4143,
    "parts_mean": 1.5584,
-   "predicted": 1.4572,
-   "rated_players": 8,
-   "residual": -0.0429,
-   "residual_sd": -0.016
+   "predicted": 0.9689,
+   "rated_players": 9,
+   "residual": 0.4454,
+   "residual_sd": 0.175
   },
   "USC Upstate": {
    "actual": -2.2948,
    "parts_mean": 1.6312,
-   "predicted": 1.6267,
+   "predicted": 1.1234,
    "rated_players": 10,
-   "residual": -3.9215,
-   "residual_sd": -1.465
+   "residual": -3.4182,
+   "residual_sd": -1.344
+  },
+  "UT Arlington": {
+   "actual": -2.5085,
+   "parts_mean": -1.3021,
+   "predicted": -5.0951,
+   "rated_players": 7,
+   "residual": 2.5866,
+   "residual_sd": 1.017
+  },
+  "UTRGV": {
+   "actual": 1.8985,
+   "parts_mean": 1.9058,
+   "predicted": 1.7055,
+   "rated_players": 7,
+   "residual": 0.193,
+   "residual_sd": 0.076
   },
   "UTSA": {
    "actual": 0.2537,
-   "parts_mean": 1.1645,
-   "predicted": 0.5404,
-   "rated_players": 8,
-   "residual": -0.2867,
-   "residual_sd": -0.107
+   "parts_mean": 1.9535,
+   "predicted": 1.8066,
+   "rated_players": 12,
+   "residual": -1.5529,
+   "residual_sd": -0.611
   },
   "Utah": {
    "actual": 4.9197,
-   "parts_mean": 1.2287,
-   "predicted": 0.6898,
-   "rated_players": 7,
-   "residual": 4.2299,
-   "residual_sd": 1.58
+   "parts_mean": 3.2897,
+   "predicted": 4.6392,
+   "rated_players": 10,
+   "residual": 0.2805,
+   "residual_sd": 0.11
   },
   "Utah Tech": {
    "actual": 2.6534,
    "parts_mean": 2.2363,
-   "predicted": 3.0353,
-   "rated_players": 9,
-   "residual": -0.3819,
-   "residual_sd": -0.143
+   "predicted": 2.4061,
+   "rated_players": 10,
+   "residual": 0.2473,
+   "residual_sd": 0.097
+  },
+  "Vanderbilt": {
+   "actual": 4.1778,
+   "parts_mean": 2.3253,
+   "predicted": 2.5947,
+   "rated_players": 10,
+   "residual": 1.5831,
+   "residual_sd": 0.623
   },
   "Villanova": {
    "actual": 3.1203,
-   "parts_mean": 2.8496,
-   "predicted": 4.4627,
-   "rated_players": 9,
-   "residual": -1.3424,
-   "residual_sd": -0.501
+   "parts_mean": 2.9483,
+   "predicted": 3.9154,
+   "rated_players": 10,
+   "residual": -0.7951,
+   "residual_sd": -0.313
   },
   "Virginia": {
    "actual": 1.9885,
-   "parts_mean": 1.2473,
-   "predicted": 0.7332,
-   "rated_players": 9,
-   "residual": 1.2553,
-   "residual_sd": 0.469
+   "parts_mean": 2.7101,
+   "predicted": 3.4105,
+   "rated_players": 11,
+   "residual": -1.422,
+   "residual_sd": -0.559
+  },
+  "Wake Forest": {
+   "actual": 2.9455,
+   "parts_mean": 2.3398,
+   "predicted": 2.6254,
+   "rated_players": 10,
+   "residual": 0.3201,
+   "residual_sd": 0.126
+  },
+  "Washington St.": {
+   "actual": 1.7337,
+   "parts_mean": 1.8139,
+   "predicted": 1.5107,
+   "rated_players": 10,
+   "residual": 0.223,
+   "residual_sd": 0.088
+  },
+  "Weber St.": {
+   "actual": 1.3138,
+   "parts_mean": -0.4982,
+   "predicted": -3.3908,
+   "rated_players": 7,
+   "residual": 4.7046,
+   "residual_sd": 1.85
   },
   "West Virginia": {
    "actual": 2.7365,
-   "parts_mean": 0.9352,
-   "predicted": 0.0067,
+   "parts_mean": 0.9372,
+   "predicted": -0.3478,
    "rated_players": 7,
-   "residual": 2.7298,
-   "residual_sd": 1.02
+   "residual": 3.0843,
+   "residual_sd": 1.213
+  },
+  "Western Caro.": {
+   "actual": -3.7117,
+   "parts_mean": 1.9387,
+   "predicted": 1.7752,
+   "rated_players": 7,
+   "residual": -5.4869,
+   "residual_sd": -2.158
   },
   "Western Ill.": {
    "actual": -4.9384,
-   "parts_mean": -1.4455,
-   "predicted": -5.5347,
+   "parts_mean": -1.4452,
+   "predicted": -5.3983,
    "rated_players": 8,
-   "residual": 0.5963,
-   "residual_sd": 0.223
+   "residual": 0.4599,
+   "residual_sd": 0.181
   },
   "Western Ky.": {
    "actual": 4.97,
-   "parts_mean": 3.4713,
-   "predicted": 5.9098,
+   "parts_mean": 3.4744,
+   "predicted": 5.0308,
    "rated_players": 10,
-   "residual": -0.9398,
-   "residual_sd": -0.351
+   "residual": -0.0608,
+   "residual_sd": -0.024
+  },
+  "Western Mich.": {
+   "actual": 0.9999,
+   "parts_mean": 0.9192,
+   "predicted": -0.3861,
+   "rated_players": 8,
+   "residual": 1.386,
+   "residual_sd": 0.545
+  },
+  "William & Mary": {
+   "actual": -1.9012,
+   "parts_mean": 0.6526,
+   "predicted": -0.9513,
+   "rated_players": 7,
+   "residual": -0.9499,
+   "residual_sd": -0.374
+  },
+  "Winthrop": {
+   "actual": 0.5561,
+   "parts_mean": 0.4071,
+   "predicted": -1.4716,
+   "rated_players": 7,
+   "residual": 2.0277,
+   "residual_sd": 0.797
   },
   "Wisconsin": {
    "actual": 10.1029,
-   "parts_mean": 3.4947,
-   "predicted": 5.9642,
+   "parts_mean": 3.4945,
+   "predicted": 5.0734,
    "rated_players": 7,
-   "residual": 4.1387,
-   "residual_sd": 1.546
+   "residual": 5.0295,
+   "residual_sd": 1.978
   },
   "Wofford": {
    "actual": 1.3601,
-   "parts_mean": 1.5361,
-   "predicted": 1.4054,
-   "rated_players": 8,
-   "residual": -0.0453,
-   "residual_sd": -0.017
+   "parts_mean": -0.0922,
+   "predicted": -2.5301,
+   "rated_players": 7,
+   "residual": 3.8902,
+   "residual_sd": 1.53
   },
   "Wright St.": {
    "actual": 1.5675,
-   "parts_mean": 3.0361,
-   "predicted": 4.8969,
+   "parts_mean": 3.0362,
+   "predicted": 4.1017,
    "rated_players": 7,
-   "residual": -3.3294,
-   "residual_sd": -1.244
+   "residual": -2.5342,
+   "residual_sd": -0.997
+  },
+  "Wyoming": {
+   "actual": 2.5011,
+   "parts_mean": 0.6224,
+   "predicted": -1.0153,
+   "rated_players": 7,
+   "residual": 3.5164,
+   "residual_sd": 1.383
   },
   "Xavier": {
    "actual": 3.6382,
-   "parts_mean": 2.0842,
-   "predicted": 2.6811,
+   "parts_mean": 2.084,
+   "predicted": 2.0832,
    "rated_players": 9,
-   "residual": 0.9571,
-   "residual_sd": 0.357
+   "residual": 1.555,
+   "residual_sd": 0.612
   },
   "Yale": {
    "actual": 2.7509,
-   "parts_mean": 3.444,
-   "predicted": 5.8463,
+   "parts_mean": 3.4438,
+   "predicted": 4.966,
    "rated_players": 9,
-   "residual": -3.0954,
-   "residual_sd": -1.156
+   "residual": -2.2151,
+   "residual_sd": -0.871
+  },
+  "Youngstown St.": {
+   "actual": -1.6187,
+   "parts_mean": 1.613,
+   "predicted": 1.0849,
+   "rated_players": 8,
+   "residual": -2.7036,
+   "residual_sd": -1.063
   }
  },
  "returning_by_position": {
@@ -3136,18 +3888,18 @@
     "share": 0.7234
    },
    "MB": {
-    "departed_points": 43.5,
-    "n_departed": 2,
+    "departed_points": 17.5,
+    "n_departed": 1,
     "n_returning": 2,
-    "returning_points": 503.0,
-    "share": 0.9204
+    "returning_points": 529.0,
+    "share": 0.968
    },
    "OH": {
-    "departed_points": 90.5,
-    "n_departed": 2,
+    "departed_points": 0.0,
+    "n_departed": 0,
     "n_returning": 5,
-    "returning_points": 1243.0,
-    "share": 0.9321
+    "returning_points": 1333.5,
+    "share": 1.0
    },
    "S": {
     "departed_points": 88.0,
@@ -3709,11 +4461,11 @@
     "share": 0.8542
    },
    "S": {
-    "departed_points": 13.0,
-    "n_departed": 1,
+    "departed_points": 0.0,
+    "n_departed": 0,
     "n_returning": 2,
-    "returning_points": 131.5,
-    "share": 0.91
+    "returning_points": 144.5,
+    "share": 1.0
    }
   },
   "Eastern Ill.": {
@@ -4675,7 +5427,7 @@
    },
    "OH": {
     "departed_points": 624.5,
-    "n_departed": 5,
+    "n_departed": 4,
     "n_returning": 3,
     "returning_points": 285.0,
     "share": 0.3134
@@ -5053,11 +5805,11 @@
     "share": 0.0
    },
    "S": {
-    "departed_points": 19.5,
-    "n_departed": 1,
+    "departed_points": 0.0,
+    "n_departed": 0,
     "n_returning": 3,
-    "returning_points": 98.0,
-    "share": 0.834
+    "returning_points": 117.5,
+    "share": 1.0
    }
   },
   "Indiana St.": {
@@ -6223,11 +6975,11 @@
     "share": 0.6515
    },
    "OH": {
-    "departed_points": 216.0,
-    "n_departed": 3,
+    "departed_points": 214.0,
+    "n_departed": 2,
     "n_returning": 4,
-    "returning_points": 760.5,
-    "share": 0.7788
+    "returning_points": 762.5,
+    "share": 0.7808
    },
    "S": {
     "departed_points": 49.0,
@@ -7393,7 +8145,7 @@
    },
    "S": {
     "departed_points": 60.0,
-    "n_departed": 3,
+    "n_departed": 2,
     "n_returning": 0,
     "returning_points": 0.0,
     "share": 0.0
@@ -8363,7 +9115,7 @@
    },
    "MB": {
     "departed_points": 444.5,
-    "n_departed": 4,
+    "n_departed": 3,
     "n_returning": 1,
     "returning_points": 116.5,
     "share": 0.2077
@@ -9183,7 +9935,7 @@
    },
    "S": {
     "departed_points": 76.5,
-    "n_departed": 4,
+    "n_departed": 3,
     "n_returning": 2,
     "returning_points": 27.5,
     "share": 0.2644
@@ -12182,11 +12934,11 @@
   },
   "Western Caro.": {
    "LDS": {
-    "departed_points": 2.0,
-    "n_departed": 1,
+    "departed_points": 0.0,
+    "n_departed": 0,
     "n_returning": 4,
-    "returning_points": 53.0,
-    "share": 0.9636
+    "returning_points": 55.0,
+    "share": 1.0
    },
    "MB": {
     "departed_points": 517.5,

@@ -18,7 +18,7 @@ import sys
 import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from build_hub import mover  # noqa: E402
+from build_hub import mover, _movehead  # noqa: E402
 from build_rankings_board import pick_comparison  # noqa: E402
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -336,8 +336,58 @@ def check_basis_aliases():
           or basis(BB.pick_comparison(snaps, future, "live").get("source")) == "live", "a preseason week is never offered to a blended ranking")
 
 
+def test_movehead_names_its_interval():
+    """"vs last week" must not be said when last week was never frozen.
+
+    The comparison rule (latest same-basis freeze that is not this week's) is
+    right through a missed Monday; the HEADER is what goes wrong. 2026-W38 was
+    never frozen -- every CI run that week failed before snapshot_rankings --
+    so the next freeze measures against 2026-09-07 and a flat "vs last week"
+    would claim an interval that never happened. The archive is append-only, so
+    the gap is permanent and must render honestly rather than be waited out.
+    """
+    import datetime as _dt
+
+    def row(d):
+        return {"date": d, "captured_utc": d + "T12:00:00Z", "week": "x"}
+
+    today = _dt.date.today()
+    last = today - _dt.timedelta(days=7)
+    older = today - _dt.timedelta(days=21)
+
+    check(_movehead("preseason", None) == "vs preseason",
+          "a preseason basis still reads 'vs preseason'",
+          _movehead("preseason", None))
+    check(_movehead("week", row(last.isoformat())) == "vs last week",
+          "a genuine previous-week freeze reads 'vs last week'",
+          _movehead("week", row(last.isoformat())))
+
+    gap = _movehead("week", row(older.isoformat()))
+    check(gap != "vs last week",
+          "a three-week-old freeze does NOT claim last week", gap)
+    check(older.strftime("%b") in gap and str(older.day) in gap,
+          "...it names the freeze's own date instead", gap)
+
+    # An unreadable stamp must not invent an interval either.
+    check(_movehead("week", {"date": "nonsense"}) == "vs last freeze",
+          "an unreadable stamp says 'vs last freeze', inventing no interval",
+          _movehead("week", {"date": "nonsense"}))
+    check(_movehead("week", None) == "vs last freeze",
+          "and so does a missing comparison row",
+          _movehead("week", None))
+
+    # [NEG] the pre-fix behaviour -- a flat label regardless of the gap --
+    # must be caught by the checks above.
+    def _flat(basis, cmp_row):
+        return "vs last week" if basis == "week" else "vs preseason"
+    check(_flat("week", row(older.isoformat())) == "vs last week"
+          and gap != "vs last week",
+          "[NEG] the flat header would claim last week and IS caught")
+
+
 def main():
-    for fn in (test_mover_direction, test_movement_never_crosses_the_basis,
+    for fn in (test_mover_direction, test_movehead_names_its_interval,
+               test_movement_never_crosses_the_basis,
                check_snapshot_and_board_agree_on_the_basis,
                check_basis_aliases,
                test_snapshot_is_weekly_and_append_only,

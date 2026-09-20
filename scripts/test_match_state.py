@@ -188,8 +188,8 @@ def main():
     # The archive's per-player rows must sum to the team totals the page shows.
     hub = page()
     if hub:
-        mb = re.search(r"const BOXES = (\{.*?\});\n", hub, re.S)
-        B = json.loads(mb.group(1)) if mb else {}
+        import pageconst as _PC
+        B = _PC.find(hub, "BOXES") or {}
         checked = 0
         bad = []
         for gid, rows in B.items():

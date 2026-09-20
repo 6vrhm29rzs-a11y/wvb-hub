@@ -399,32 +399,9 @@ console.log('PD-OK');
     # still in the data, so the guard above is doing work rather than passing
     # because the case disappeared.
     import json
-    mm = re.search(r"const TEAMS = (\{)", page) if os.path.exists(PAGE) else None
-    if mm:
-        i = mm.start(1)
-        d = 0
-        j = i
-        instr = False
-        esc = False
-        while j < len(page):
-            c = page[j]
-            if instr:
-                if esc:
-                    esc = False
-                elif c == "\\":
-                    esc = True
-                elif c == '"':
-                    instr = False
-            elif c == '"':
-                instr = True
-            elif c == "{":
-                d += 1
-            elif c == "}":
-                d -= 1
-                if d == 0:
-                    break
-            j += 1
-        teams = json.loads(page[i:j + 1])
+    import pageconst as _PC
+    teams = _PC.teams(page) if os.path.exists(PAGE) else {}
+    if teams:
         near = 0
         for v in teams.values():
             for st in (v.get("stars") or []):

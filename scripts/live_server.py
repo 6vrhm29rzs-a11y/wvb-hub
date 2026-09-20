@@ -190,6 +190,13 @@ def _fmt_time(epoch, start_time=None, home_team=None):
         return st
 
 
+
+# Compressed-response cache: path -> (mtime_ns, size, etag, body).
+# Small on purpose -- this server hands out a handful of files, and an
+# unbounded cache of multi-megabyte bodies is a leak, not a speed-up.
+_GZ_CACHE = {}
+_GZ_CACHE_MAX = 8
+
 class Cache(object):
     """Holds the last good scoreboard. Never serves a half-built one."""
 
@@ -897,19 +904,58 @@ class Handler(SimpleHTTPRequestHandler):
         ctype = mimetypes.guess_type(path)[0] or ""
         if not accepts or not ctype.startswith(self._GZIP_TYPES):
             return SimpleHTTPRequestHandler.do_GET(self)
+        # ⚠ COMPRESSING 43.9 MB ON EVERY REQUEST WAS 0.42 s OF CPU A HIT.
+        # The comment above says "gzips this page to 1.5 MB"; that was true
+        # when the page was a third of its current size. Today START-HERE.html
+        # is 43.9 MB and gzip level 6 costs 0.42 s -- paid on every open, every
+        # reload, and every poll that happens to re-request it, alongside a
+        # 43.9 MB read from disk. The bytes only change when the page is
+        # rebuilt, so they are cached against the file's own mtime and size.
+        # A rebuild lands a new mtime and the entry is recomputed; nothing has
+        # to invalidate it by hand.
         try:
-            with open(path, "rb") as fh:
-                raw = fh.read()
+            st = os.stat(path)
         except OSError:
             # ⚠ FALL BACK, NEVER 500. A missing file is the base handler's job
             # to report, and it words it better than this would.
             return SimpleHTTPRequestHandler.do_GET(self)
-        body = _gzip.compress(raw, 6)
+        ent = _GZ_CACHE.get(path)
+        if not ent or ent[0] != st.st_mtime_ns or ent[1] != st.st_size:
+            try:
+                with open(path, "rb") as fh:
+                    raw = fh.read()
+            except OSError:
+                return SimpleHTTPRequestHandler.do_GET(self)
+            body = _gzip.compress(raw, 6)
+            # Identity, not content: mtime+size+compressed length. A hash of
+            # 43.9 MB would reintroduce the cost this cache exists to remove.
+            etag = '"%x-%x-%x"' % (st.st_mtime_ns, st.st_size, len(body))
+            if len(_GZ_CACHE) >= _GZ_CACHE_MAX:
+                _GZ_CACHE.clear()
+            _GZ_CACHE[path] = (st.st_mtime_ns, st.st_size, etag, body)
+            ent = _GZ_CACHE[path]
+        etag, body = ent[2], ent[3]
+
+        # ⚠ AND THE PHONE RE-DOWNLOADED 6.4 MB EVERY VISIT. This path never
+        # sent a validator, so a browser had nothing to revalidate against and
+        # re-fetched the whole body even when the page had not been rebuilt.
+        # no-cache means "revalidate", not "do not store": the browser keeps
+        # the bytes and asks; an unchanged page answers 304 and sends none.
+        if etag in (self.headers.get("If-None-Match") or ""):
+            self.send_response(304)
+            self.send_header("ETag", etag)
+            self.send_header("Cache-Control", "no-cache")
+            self.send_header("Vary", "Accept-Encoding")
+            self.end_headers()
+            return None
         self.send_response(200)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Encoding", "gzip")
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Vary", "Accept-Encoding")
+        self.send_header("ETag", etag)
+        self.send_header("Cache-Control", "no-cache")
+        self.send_header("Last-Modified", self.date_time_string(int(st.st_mtime)))
         self.end_headers()
         if self.command != "HEAD":
             try:

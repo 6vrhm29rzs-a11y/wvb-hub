@@ -4253,6 +4253,222 @@
     }
    ],
    "note": "Found by three guards at once -- box attribution, lineup attribution and the display invariants -- all pointing at the same gid, which is the cross-check working. The nightly verifier had already settled it as CONTRADICTED_BOTH hours earlier; the correction is what turns a settled verdict into a counted result."
+  },
+  "6626620": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "UConn (home) credited with 2 sets to Merrimack's 1, while the feed's OWN tape carries four complete rows -- 25-12, 25-15, 22-25, 25-22 -- which read UConn 3, Merrimack 1. The derived sets_won contradicts the primary record beside it, so the match was held and counted nowhere.",
+   "correct": {
+    "winner_team_id": "46408",
+    "home_sets": 3,
+    "away_sets": 1
+   },
+   "established": "UConn def. Merrimack 3-1. The feed's own set-by-set record already reads 3-1, and both schools publish the same: UConn publishes \"UConn W 3-1 vs Merrimack\" and Merrimack publishes \"Merrimack L 1-3 vs University of Connecticut\". Only the derived sets_won column was wrong; the tape is complete and is left exactly as served.",
+   "evidence": [
+    {
+     "url": "https://uconnhuskies.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "UConn",
+     "retrieved": "2026-09-20",
+     "text": "UConn W 3-1 vs Merrimack",
+     "establishes": "UConn W 3-1 vs Merrimack"
+    },
+    {
+     "url": "https://merrimackathletics.com/services/schedule_txt.ashx?schedule=554",
+     "kind": "school_schedule",
+     "school": "Merrimack",
+     "retrieved": "2026-09-20",
+     "text": "Merrimack L 1-3 vs University of Connecticut",
+     "establishes": "Merrimack L 1-3 vs University of Connecticut"
+    },
+    {
+     "url": "internal:linescores",
+     "kind": "internal_linescores",
+     "school": null,
+     "retrieved": "2026-09-20",
+     "text": "25-12, 25-15, 22-25, 25-22 (home=UConn)",
+     "establishes": "the feed's own primary record reads UConn 3, Merrimack 1"
+    }
+   ],
+   "note": "Found by running verify_results_daily for 2026-09-19, a date never verified because CI had been failing for a week. The tape needed no change -- only the derived flags."
+  },
+  "6628533": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Ohio St. (away) credited with 2 sets to Virginia's 0, while the feed's OWN tape carries three complete rows -- 19-25, 17-25, 11-25 -- which read Ohio St. 3, Virginia 0. A sweep cannot be a 2-0 final, and the derived sets_won contradicts the primary record beside it, so the match was held and counted nowhere.",
+   "correct": {
+    "winner_team_id": "45982",
+    "home_sets": 0,
+    "away_sets": 3
+   },
+   "established": "Ohio St. def. Virginia 3-0. The feed's own set-by-set record already reads 3-0, and both schools publish the same: Ohio St. publishes \"Ohio St. W 3-0 vs Virginia\" and Virginia publishes \"Virginia L 0-3 vs Ohio State\". Only the derived sets_won column was wrong; the tape is complete and is left exactly as served.",
+   "evidence": [
+    {
+     "url": "https://ohiostatebuckeyes.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Ohio St.",
+     "retrieved": "2026-09-20",
+     "text": "Ohio St. W 3-0 vs Virginia",
+     "establishes": "Ohio St. W 3-0 vs Virginia"
+    },
+    {
+     "url": "https://virginiasports.com/sports/wvball/schedule",
+     "kind": "school_schedule",
+     "school": "Virginia",
+     "retrieved": "2026-09-20",
+     "text": "Virginia L 0-3 vs Ohio State",
+     "establishes": "Virginia L 0-3 vs Ohio State"
+    },
+    {
+     "url": "internal:linescores",
+     "kind": "internal_linescores",
+     "school": null,
+     "retrieved": "2026-09-20",
+     "text": "19-25, 17-25, 11-25 (home=Virginia)",
+     "establishes": "the feed's own primary record reads Ohio St. 3, Virginia 0"
+    }
+   ],
+   "note": "Found by running verify_results_daily for 2026-09-19, a date never verified because CI had been failing for a week. The tape needed no change -- only the derived flags."
+  },
+  "6627672": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Texas St. (away) won 3-2, with the set line 25-15, 23-25, 25-21, 12-25, 8-15 filed with UTSA as the home column -- the TRUE sequence with the TEAMS SWAPPED. Internally coherent, and wrong: read as served the tape agrees with the feed's own winner, which is why no self-contradiction was detectable and the match counted for a week. The player box is inverted the same way: 0 of 36 eligible rows fit the team they are filed under, and all 36 fit the opposite roster.",
+   "correct": {
+    "winner_team_id": "46369",
+    "home_sets": 3,
+    "away_sets": 2,
+    "linescores": [
+     {
+      "period": 1,
+      "home": 15,
+      "visit": 25
+     },
+     {
+      "period": 2,
+      "home": 25,
+      "visit": 23
+     },
+     {
+      "period": 3,
+      "home": 21,
+      "visit": 25
+     },
+     {
+      "period": 4,
+      "home": 25,
+      "visit": 12
+     },
+     {
+      "period": 5,
+      "home": 15,
+      "visit": 8
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46369": "46124",
+     "46124": "46369"
+    }
+   },
+   "established": "UTSA def. Texas St. 3-2. Two independent witnesses agree against the feed and with each other: Texas St. publishes \"Texas St. L 2-3 vs UTSA\" and UTSA publishes \"UTSA W 3-2 vs Texas State\". A third, independent line of evidence establishes that the exchange is of the TEAMS and not merely of the winner flag: the box-roster fit separates perfectly (h0 0.00 as filed, h1 1.00 swapped, over 36 eligible rows) and record continuity prefers the swap (error 2 against 10 over 6 observations). Swapping the two columns reproduces UTSA 3-2 with every set score still valid -- 25-15, 25-23, 25-21, 25-12, 15-8 -- so the tape is re-attributed rather than withheld. Both schools list the match as a NEUTRAL-site game.",
+   "evidence": [
+    {
+     "url": "https://txstatebobcats.com/services/schedule_txt.ashx?schedule=360",
+     "kind": "school_schedule",
+     "school": "Texas St.",
+     "retrieved": "2026-09-20",
+     "text": "Texas St. L 2-3 vs UTSA",
+     "establishes": "Texas St. L 2-3 vs UTSA"
+    },
+    {
+     "url": "https://goutsa.com/website-api/schedule-events?filter%5Bschedule.sport_id%5D=15&filter%5Bpast%5D=true&per_page=25&sort=-datetime&include=opponent,scheduleEventResult",
+     "kind": "school_schedule",
+     "school": "UTSA",
+     "retrieved": "2026-09-20",
+     "text": "UTSA W 3-2 vs Texas State",
+     "establishes": "UTSA W 3-2 vs Texas State"
+    },
+    {
+     "url": "internal:box_roster_fit",
+     "kind": "internal_box_attribution",
+     "school": null,
+     "retrieved": "2026-09-20",
+     "text": "eligible_rows 36; h0 [0.0, 0.0] as filed; h1 [1.0, 1.0] swapped; fit_gain 1.0; record_continuity h0_error 10 vs h1_error 2",
+     "establishes": "the box rows belong to the opposite team, so the record is a TEAM swap rather than a wrong winner flag"
+    }
+   ],
+   "note": "Surfaced by running verify_results_daily for 2026-09-19 -- a date never verified because CI had been failing for a week -- and filed on Cody's explicit go-ahead (2026-09-20). Unlike the other two corrections filed the same day, the feed's own tape does NOT contradict its derived winner here; it agrees, because the tape is itself mis-attributed. That is the 2026-08-31 UNLV/San Francisco class."
+  },
+  "6628075": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Quinnipiac (home) won 3-2, with the set line 25-16, 25-27, 15-25, 25-23, 15-11 filed with Quinnipiac as the home column -- the TRUE sequence with the TEAMS SWAPPED. Internally coherent, so read as served the tape agrees with the feed's own winner and no self-contradiction is detectable. The player box is inverted the same way: 0 rows fit the team they are filed under and 17 fit the opposite roster.",
+   "correct": {
+    "winner_team_id": "46443",
+    "home_sets": 2,
+    "away_sets": 3,
+    "linescores": [
+     {
+      "period": 1,
+      "home": 16,
+      "visit": 25
+     },
+     {
+      "period": 2,
+      "home": 27,
+      "visit": 25
+     },
+     {
+      "period": 3,
+      "home": 25,
+      "visit": 15
+     },
+     {
+      "period": 4,
+      "home": 23,
+      "visit": 25
+     },
+     {
+      "period": 5,
+      "home": 11,
+      "visit": 15
+     }
+    ],
+    "linescores_replace": true,
+    "box_team_swap": {
+     "46112": "46443",
+     "46443": "46112"
+    }
+   },
+   "established": "Binghamton def. Quinnipiac 3-2. Two independent witnesses agree against the feed and with each other: Quinnipiac publishes \"Quinnipiac L 2-3 vs Binghamton\" and Binghamton publishes \"Binghamton W 3-2 vs Quinnipiac University\". The box-roster fit independently establishes that the exchange is of the TEAMS rather than the winner flag (0 rows fit as filed, 17 fit swapped). Swapping the two columns reproduces Binghamton 3-2 with every set score still legal -- 25-16, 27-25, 25-15, 25-23, 15-11 -- so the tape is re-attributed rather than withheld. Both schools list the match as NEUTRAL-site.",
+   "evidence": [
+    {
+     "url": "https://gobobcats.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Quinnipiac",
+     "retrieved": "2026-09-20",
+     "text": "Quinnipiac L 2-3 vs Binghamton",
+     "establishes": "Quinnipiac L 2-3 vs Binghamton"
+    },
+    {
+     "url": "https://bubearcats.com/services/schedule_txt.ashx?schedule=1638",
+     "kind": "school_schedule",
+     "school": "Binghamton",
+     "retrieved": "2026-09-20",
+     "text": "Binghamton W 3-2 vs Quinnipiac University",
+     "establishes": "Binghamton W 3-2 vs Quinnipiac University"
+    },
+    {
+     "url": "internal:box_roster_fit",
+     "kind": "internal_box_attribution",
+     "school": null,
+     "retrieved": "2026-09-20",
+     "text": "own=0, opposite=17, unresolved=13 (test_box_attribution candidate swap)",
+     "establishes": "the box rows belong to the opposite team, so the record is a TEAM swap rather than a wrong winner flag"
+    }
+   ],
+   "note": "Found the same afternoon the match was played: test_box_attribution flagged the box, and verify_results_daily then found BOTH schools contradicting the feed. Identical in class and evidence to 6627672. Filed on Cody's explicit go-ahead (2026-09-20), asked for separately from 6627672's -- one approval was not treated as standing permission for the class."
   }
  }
 }

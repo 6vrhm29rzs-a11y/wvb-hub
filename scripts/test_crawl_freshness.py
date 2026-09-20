@@ -24,6 +24,7 @@ import sys
 import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import crawl_2025 as C  # noqa: E402
 from crawl_2025 import date_is_authoritative, date_needs_refetch  # noqa: E402
 from gamelog import load_games_jsonl, final_game_ids, is_final  # noqa: E402
 
@@ -144,7 +145,7 @@ def main():
         print()
         print("FUTURE FIXTURES -- published-but-unplayed games must be skipped")
         import crawl_2025 as C
-        sbdir = os.path.join(tmp, "sb")
+        sbdir = os.path.join(tmp, "stale_sb")
         os.makedirs(sbdir)
         real_today = datetime.date.today()
         past_day = real_today - datetime.timedelta(days=2)
@@ -203,6 +204,60 @@ def main():
         unfiltered = list(recs)
         check("negative control -- without the filter, phantoms are counted",
               len(unfiltered) > len(counted), True)
+
+        # -------- THE STALE PAST DATE THE FIXED WINDOW COULD NOT REACH ------
+        print()
+        print("STALE PAST DATES -- the recent pass must heal them itself")
+        # 2026-09-17 sat on disk with all 61 games in state 'pre'. It was
+        # outside crawl_recent's 2-day window, and the only pass that would
+        # have healed it (the daily `schedule` sweep) had been failing for a
+        # week -- so 61 played matches were missing from the site with nothing
+        # reporting a problem. The recent pass now applies R2's own rule to
+        # the past dates already on disk.
+        sbdir = os.path.join(tmp, "sb")
+        os.makedirs(sbdir)
+        now = datetime.date(2026, 9, 20)
+
+        def put(day, games):
+            with open(os.path.join(sbdir, day + ".json"), "w") as fh:
+                json.dump(sb(games), fh)
+
+        put("2026-09-11", [game("a", "final", "FINAL")])        # settled
+        put("2026-09-17", [game("b", "pre"), game("c", "pre")])  # THE BUG
+        put("2026-09-19", [game("d", "final", "FINAL"),
+                           game("e", "live")])                  # partial
+        put("2026-09-25", [game("f", "pre")])                    # future
+
+        _real = C.SCOREBOARD_DIR
+        try:
+            C.SCOREBOARD_DIR = sbdir
+            got = [d.isoformat() for d in C.past_dates_needing_refetch(now)]
+        finally:
+            C.SCOREBOARD_DIR = _real
+
+        check("an all-'pre' past date is offered for refetch",
+              "2026-09-17" in got, True)
+        check("a partially-final past date is offered too",
+              "2026-09-19" in got, True)
+        check("a settled past date is NOT refetched",
+              "2026-09-11" in got, False)
+        check("a FUTURE date is not swept here (that is the daily pass's job)",
+              "2026-09-25" in got, False)
+        check("oldest first, so a backlog heals in order",
+              got, sorted(got))
+
+        # NEGATIVE CONTROL: the old fixed window -- Eastern today, two days
+        # back, and tomorrow -- cannot reach 2026-09-17, which is exactly why
+        # the date rotted. If this ever stops being true the guard above is
+        # no longer testing anything.
+        window = set()
+        window.add((now + datetime.timedelta(days=1)).isoformat())
+        for i in range(0, 3):
+            window.add((now - datetime.timedelta(days=i)).isoformat())
+        check("negative control -- the old 2-day window MISSES it",
+              "2026-09-17" in window, False)
+        check("...while the healing sweep catches it",
+              "2026-09-17" in got, True)
 
         print()
         if FAILED:

@@ -129,12 +129,13 @@ def main():
 
     print("\n3. THE REAL PAGE RECONCILES BY VALUE (swap included)")
     m = re.search(r"const TSTATS = (\[.*?\]);\n", page, re.S)
-    m2 = re.search(r"const BOXES = (\{.*?\});\n", page, re.S)
-    m3 = re.search(r"const TEAMS = (\{.*?\});\n", page, re.S)
+    import pageconst as _PC
+    m2 = _PC.find(page, "BOXES")
+    m3 = _PC.find(page, "TEAMS")
     if m and m2 and m3:
         tstats = {r["team"]: r for r in json.loads(m.group(1))}
-        boxes_p = json.loads(m2.group(1).replace("<\\/", "</"))
-        teams_p = json.loads(m3.group(1).replace("<\\/", "</"))
+        boxes_p = m2
+        teams_p = m3
         did = 0
         for nm in ("SMU", "Nebraska", "Kentucky"):
             t = teams_p.get(nm) or {}

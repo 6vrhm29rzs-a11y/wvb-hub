@@ -184,6 +184,32 @@ def eastern_today():
         return datetime.datetime.utcnow().date()
 
 
+def past_dates_needing_refetch(today):
+    # type: (datetime.date) -> List[datetime.date]
+    """Past scoreboard dates on disk that R2 still considers refetchable.
+
+    Read-only over the scoreboard directory: a date qualifies when it already
+    has a file, is strictly in the past, and is not authoritative -- i.e. it
+    holds at least one game that is not final. Returns them oldest first.
+    """
+    out = []  # type: List[datetime.date]
+    if not os.path.isdir(SCOREBOARD_DIR):
+        return out
+    for name in sorted(os.listdir(SCOREBOARD_DIR)):
+        if not name.endswith(".json"):
+            continue
+        try:
+            day = datetime.date(*[int(x) for x in name[:-5].split("-")])
+        except Exception:
+            continue
+        if day >= today:
+            continue
+        path = os.path.join(SCOREBOARD_DIR, name)
+        if date_needs_refetch(path, day, today):
+            out.append(day)
+    return out
+
+
 def crawl_recent(back_days=2):
     # type: (int) -> None
     """Refetch only the dates that could contain a NEW final.
@@ -212,6 +238,25 @@ def crawl_recent(back_days=2):
     # UTC terms, and one extra request is cheaper than a missed final.
     days = [east + datetime.timedelta(days=1)]
     days += [east - datetime.timedelta(days=i) for i in range(0, back_days + 1)]
+    # ⚠ AND ANY PAST DATE THAT IS STILL NOT AUTHORITATIVE, however old.
+    # The fixed window assumed the daily `schedule` pass would heal anything
+    # older -- and for a week in September 2026 it did not, because every
+    # daily run failed before it published. 2026-09-17 sat on disk with all
+    # 61 of its games in state 'pre', outside the 2-day window, invisible to
+    # the only crawl the local page ever runs. This applies R2's own rule
+    # (a date stays refetchable until it is past AND all-final) to the dates
+    # it already covers, rather than trusting a second job to do it.
+    #
+    # Cheap by construction: a date drops out the moment it goes all-final,
+    # so this normally adds nothing. A genuinely stuck date (2026-09-06 holds
+    # the suspended Wrigley match and can never go all-final) costs one
+    # request per cycle, which is the correct price for staying refetchable.
+    # Future dates are NOT swept here -- they are never authoritative and
+    # would cost ~130 requests a cycle to no purpose; that stays the daily
+    # `schedule` pass's job.
+    for d in past_dates_needing_refetch(today):
+        if d not in days:
+            days.append(d)
     days = [d for d in sorted(set(days)) if SEASON_START <= d <= SEASON_END]
     fetched = skipped = 0
     for day in days:
@@ -835,6 +880,7 @@ def crawl_players():
         pass
     _skipped_exh = 0
     _skipped_dup = 0
+    _skipped_empty = 0
     try:
         from season_counts import box_team_swaps as _bts
         _swaps = _bts(SEASON)
@@ -849,8 +895,21 @@ def crawl_players():
             else:
                 _skipped_exh += 1
             continue
-        ngames += 1
         _rows = rec.get("rows") or []
+        # ⚠ A RECORD WITH NO PLAYER ROWS IS NOT A HELD BOX SCORE, AND THE
+        # PAGE SAYS SO. games_aggregated is rendered as "the box universe:
+        # every match with a held box score", so counting an empty shell
+        # overstates it -- CI caught exactly that on a live Friday evening
+        # (page 1626 vs a recomputation of 1625): a match flips final and
+        # its box endpoint answers before the feed has filled playerStats,
+        # so the stored record is a shell. Aggregating it contributes
+        # nothing either way; only the COUNT was wrong.
+        # Counted separately so an empty box is visible rather than merely
+        # absent -- see the refetch note in crawl_players().
+        if not _rows:
+            _skipped_empty += 1
+            continue
+        ngames += 1
         _broken = _uniform_gp_game(_rows)
         _swap = _swaps.get(str(gid_key)) or {}
         for r in _rows:
@@ -949,6 +1008,7 @@ def crawl_players():
             "season": SEASON, "source_tier": "OFFICIAL",
             "source": "ncaa-api /game/{id}/boxscore playerStats, aggregated",
             "games_aggregated": ngames,
+            "boxes_empty_skipped": _skipped_empty,
             "exhibitions_excluded": len(_skip_gids) - len(_dup_gids & _skip_gids),
             "duplicate_listings_excluded": len(_dup_gids & _skip_gids),
             "exhibitions_note": ("matches that do not count are excluded here, "

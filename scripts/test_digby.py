@@ -467,7 +467,7 @@ def test_a_result_moves_no_durable_fact():
         print("  --   no built page; skipping")
         return
     h = open(hub, encoding="utf-8").read()
-    T = _j.loads(_re.search(r"const TEAMS = (\{.*?\});\n", h, _re.S).group(1))
+    T = __import__("pageconst").teams(h)
     moved, checked = [], 0
     for nm in list(T)[:120]:
         rec = T[nm]
@@ -541,7 +541,7 @@ def test_every_durable_field_was_classified_deliberately():
         print("  --   no built page; skipping")
         return
     h = open(hub, encoding="utf-8").read()
-    T = _j.loads(_re.search(r"const TEAMS = (\{.*?\});\n", h, _re.S).group(1))
+    T = __import__("pageconst").teams(h)
     shapes = set()
     for team in list(T)[:60]:
         for k in durable(fact_sheet(team, T[team])):

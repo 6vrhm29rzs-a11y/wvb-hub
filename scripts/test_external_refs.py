@@ -500,9 +500,10 @@ def main():
                      "REFERENCE MISMATCH", "EXTREF", "ncaastats",
                      "Generated: 2026"):
             check("public page lacks %r" % frag, frag not in pub)
-        m = re.search(r"const TEAMS = (\{.*?\});\n", pub, re.S)
+        import pageconst as _PC
+        m = _PC.find(pub, "TEAMS")
         if m:
-            teams = json.loads(m.group(1).replace("<\\/", "</"))
+            teams = m
             check("no massey/vt VALUE inside the public TEAMS payload",
                   not any(isinstance(t, dict) and (t.get("massey") or
                                                    t.get("vt"))

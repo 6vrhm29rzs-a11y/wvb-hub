@@ -109,6 +109,48 @@ def blob(o) -> str:
     """
     return json.dumps(o, separators=(",", ":")).replace("</", "<\\/")
 
+def jblob(o) -> str:
+    """Same payload as blob(), emitted for JSON.parse instead of the JS parser.
+
+    ⚠ MEASURED, NOT ASSUMED. A large object literal is parsed by the full
+    JavaScript parser; the same bytes as a JSON string go through the much
+    simpler JSON parser. On this page's own payloads (node, same V8):
+        TEAMS    7.8 MB   123 ms -> 21 ms
+        PLAYERS 12.9 MB   196 ms -> 39 ms
+        BOXES   10.4 MB   165 ms -> 30 ms
+    ~395 ms of main-thread work per load, on a fast desktop; a phone pays
+    several times that. Nothing about the data changes -- only how it is spelled.
+
+    The JSON is ASCII (json.dumps escapes non-ASCII by default), so the only
+    characters needing care for a single-quoted JS string are the backslash
+    and the apostrophe. `</` is then broken up exactly as blob() does it, so
+    a value containing `</script>` still cannot end the block; `\/` is a
+    legal JSON escape for `/` and round-trips losslessly.
+
+    Read back with pageconst.find(), which understands both spellings.
+
+    ⚠ MEASURED, TRIED, AND DELIBERATELY NOT WIRED UP (2026-09-20). Emitting
+    the three big payloads this way really is ~395 ms/load faster and every
+    JSON-parsing reader was migrated to pageconst for it -- but a whole class
+    of guard does not parse the payload at all: it SCRAPES THE RAW PAGE TEXT
+    with regexes like `"([^"]+)":\{"conf":"..."`. Single-quoting the payload
+    turns `Saint Mary's (CA)` into `Saint Mary\'s (CA)` in the source, so
+    those scrapers silently stop matching -- and only for names containing an
+    apostrophe, which is as data-dependent and quiet a failure as this
+    codebase has rules against. test_cross_surface caught it; the population
+    of such scrapers cannot be reliably enumerated by grep (three of my own
+    greps were too narrow in one afternoon).
+    Doing this properly means either migrating the text-scrapers too, or an
+    encoding that leaves the page text byte-identical (a template literal
+    keeps quotes and apostrophes but eats the JSON's own backslash escapes,
+    so it needs its own care). That is its own piece of work with its own
+    sweep, not a rider on a data catch-up.
+    """
+    txt = json.dumps(o, separators=(",", ":"))
+    txt = txt.replace("\\", "\\\\").replace("'", "\\'")
+    txt = txt.replace("</", "<\\/")
+    return "JSON.parse('" + txt + "')"
+
 def esc(s) -> str:
     return (str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
 
@@ -4034,6 +4076,44 @@ def rank_stamp_pt(utc_iso, now_epoch=None):
         return "%s PT yesterday" % clock
     return dt.strftime("%b %d, ") + clock + " PT"
 
+def _movehead(basis, cmp_row):
+    """The movement column's header, naming the interval it actually measures.
+
+    ⚠ "vs last week" IS A CLAIM ABOUT AN INTERVAL, AND IT CAN BE FALSE. The
+    comparison is "the most recent same-basis freeze that is not this week's",
+    which is correct whether or not last Monday's freeze exists -- but when a
+    Monday is MISSED the header still said seven days. 2026-W38 (Monday
+    2026-09-14) was never frozen, because every CI run that week failed before
+    reaching snapshot_rankings; the next freeze would have measured against
+    2026-09-07 while the column head read "vs last week".
+
+    So: say "vs last week" only when the comparison really is the immediately
+    preceding ISO week, and otherwise name the freeze's own date. The archive
+    is append-only and a missed week can never be filled in afterwards, so this
+    is a permanent condition to render honestly, not a transient one to wait
+    out. Blank basis keeps rendering "vs preseason" exactly as before.
+    """
+    if basis != "week":
+        return "vs preseason"
+    import datetime as _dt
+    try:
+        from snapshot_rankings import captured_week as _cw
+        cw = _cw(cmp_row) if cmp_row else None
+        prev = _dt.date.today() - _dt.timedelta(days=7)
+        iso = prev.isocalendar()
+        if cw == "%d-W%02d" % (iso[0], iso[1]):
+            return "vs last week"
+        # Name the freeze rather than counting weeks: "vs 2 weeks ago" would
+        # itself be arithmetic on a gap nobody checked.
+        d = (cmp_row or {}).get("date") or ""
+        day = _dt.date(*[int(x) for x in d.split("-")])
+        return "vs " + day.strftime("%b %-d")
+    except Exception:
+        # An unreadable stamp must not invent an interval. Say what the
+        # column measures without claiming how long it has been.
+        return "vs last freeze"
+
+
 def top25_view(avca=None):
     # type: (Optional[Dict[str, int]]) -> Dict[str, str]
     """Rows and copy for Digby's Top 25.
@@ -4094,6 +4174,7 @@ def top25_view(avca=None):
     pre, basis = {}, "preseason"
     from snapshot_rankings import basis as _basis
     hist_p = os.path.join(REPO, "data", "rankings_history_%d.jsonl" % SEASON)
+    _cmp_row = None
     if os.path.exists(hist_p):
         import datetime as _dt
         this_week = _dt.date.today().isocalendar()
@@ -4130,6 +4211,14 @@ def top25_view(avca=None):
                 if r.get("rank"):
                     pre[r["team"]] = r["rank"]
             basis = "week"
+            # ⚠ REMEMBER WHICH WEEK, because the header asserts an INTERVAL.
+            # pick-the-latest-earlier-freeze is right even when a Monday was
+            # missed, but "vs last week" then names a week that was never
+            # frozen. W38 (2026-09-14) was missed while CI was failing, so the
+            # next freeze would have compared against 2026-09-07 under a
+            # header claiming seven days. Same family as R4: the number was
+            # right and the label made it wrong.
+            _cmp_row = best
     if not pre:
         for r in ((load("data/projection_2026.json") or {}).get("teams") or []):
             if r.get("blend_rank"):
@@ -4324,7 +4413,7 @@ def top25_view(avca=None):
            m.get("home_advantage_pts_per_set") or 0.0))
     return {"rows": "".join(rows), "also": also, "lead": lead, "foot": foot,
             "season": str(SEASON),
-            "movehead": ("vs last week" if basis == "week" else "vs preseason")}
+            "movehead": _movehead(basis, _cmp_row)}
 
 def parse_logged_utc(text):
     """Epoch seconds for a prediction-log stamp, or None if it cannot be read."""
@@ -26072,12 +26161,19 @@ def public_leaks(html):
     found = [m for m in PRIVATE_MARKERS if m in html]
 
     # the payload itself
-    m = re.search(r"const TEAMS = (\{.*?\});\n", html, re.S)
-    if m:
-        try:
-            teams = json.loads(m.group(1).replace("<\\/", "</"))
-        except ValueError:
-            teams = {}
+    # ⚠ AND IT MUST FAIL CLOSED. This used to be `if m:` over a regex written
+    # for one spelling of the payload, so the day the payload was emitted any
+    # other way the gate would have inspected NOTHING and reported clean --
+    # publishing the very values it exists to catch. A gate that cannot read
+    # what it is guarding has not passed; it has failed to run. The shape is
+    # read through pageconst, which is the one definition of how a payload is
+    # spelled, and an unreadable payload is itself a finding.
+    import pageconst as _PC
+    teams = _PC.find(html, "TEAMS")
+    if not isinstance(teams, dict) or not teams:
+        found.append("const TEAMS could not be read -- the payload gate did "
+                     "NOT run (refusing to publish unchecked)")
+    else:
         for field, label in (("vt", "VolleyTalk"), ("massey", "Massey")):
             n = sum(1 for t in teams.values()
                     if isinstance(t, dict) and t.get(field) is not None)

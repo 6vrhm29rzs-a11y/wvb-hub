@@ -110,8 +110,8 @@ def main():
           or "changes no Power" in page)
 
     print("\n4. THE TEXAS TRACE + CONTROLS (numeric agreement)")
-    m = re.search(r"const TEAMS = (\{.*?\});\n", page, re.S)
-    teams = json.loads(m.group(1).replace("<\\/", "</")) if m else {}
+    import pageconst as _PC      # both payload spellings, one definition
+    teams = _PC.teams(page)
     tx = teams.get("Texas") or {}
     fx = [f for f in (tx.get("fixtures") or [])
           if f.get("pick") is not None]
