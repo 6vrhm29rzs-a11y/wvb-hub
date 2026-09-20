@@ -303,7 +303,7 @@ def main():
             check("[+] the TEAMS payload was found and parsed", bool(m4),
                   "payload unreadable -- the checks below would be skipped")
             if m4:
-                _T = json.loads(m4.group(1))
+                _T = m4
                 # ⚠ TEAMS IS KEYED BY NAME AND ITS VALUES CARRY NO `team`
                 # FIELD. Taking .values() dropped the only copy of the name, so
                 # a cross-check keyed on t["team"] compared ZERO teams and

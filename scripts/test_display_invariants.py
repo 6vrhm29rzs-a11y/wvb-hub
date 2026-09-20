@@ -2184,13 +2184,21 @@ def check_public_gate_catches_leaks():
         ok("the gate catches every class of private content", len(cases))
 
     # ⚠ THE ONE THAT ACTUALLY HAPPENED: values in the payload, columns removed.
-    if True:
-        teams = _PC.teams(clean) or None
+    # ⚠ THIS ONE NEEDS THE PAYLOAD'S SPAN, not just its value: it rewrites the
+    # payload in place to prove the gate catches a leak. pageconst returns the
+    # decoded value, so the span is found here and the value taken from it.
+    _mspan = re.search(r"const TEAMS = (\{.*?\});\n", clean, re.S)
+    if _mspan:
+        try:
+            teams = json.loads(_mspan.group(1).replace("<\\/", "</"))
+        except ValueError:
+            teams = None
         if teams:
             for t in list(teams)[:5]:
                 teams[t]["massey"] = 1
                 teams[t]["vt"] = 1
-            tampered = clean[:m.start(1)] + json.dumps(teams) + clean[m.end(1):]
+            tampered = (clean[:_mspan.start(1)] + json.dumps(teams)
+                        + clean[_mspan.end(1):])
             if not BH.public_leaks(tampered):
                 bad("ranks hidden inside const TEAMS are not caught",
                     "this exact leak shipped once: 151 Massey and 25 VolleyTalk "
