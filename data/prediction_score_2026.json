@@ -2,14 +2,14 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 1830,
+  "scored": 1832,
   "logged_after_tipoff_excluded": 2,
   "team_mismatch_excluded": 65,
   "predictions_on_record": 4812,
-  "results_available": 1931,
-  "brier": 0.1769,
+  "results_available": 1933,
+  "brier": 0.1773,
   "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 1345,
+  "favourite_correct": 1346,
   "favourite_correct_pct": 73.5
  },
  "calibration": [
@@ -21,9 +21,9 @@
   },
   {
    "range": "60-70%",
-   "n": 314,
+   "n": 315,
    "said": 65.2,
-   "happened": 60.8
+   "happened": 61.0
   },
   {
    "range": "70-80%",
@@ -39,9 +39,9 @@
   },
   {
    "range": "90-101%",
-   "n": 550,
+   "n": 551,
    "said": 95.7,
-   "happened": 92.4
+   "happened": 92.2
   }
  ],
  "matches": [
@@ -80,6 +80,15 @@
    "p_home": 0.0223,
    "home_won": true,
    "brier": 0.95589729
+  },
+  {
+   "game_id": "6628087",
+   "date": "2026-09-20",
+   "away": "Boston College",
+   "home": "Dartmouth",
+   "p_home": 0.0276,
+   "home_won": true,
+   "brier": 0.94556176
   },
   {
    "game_id": "6625536",
@@ -485,15 +494,6 @@
    "p_home": 0.8939,
    "home_won": false,
    "brier": 0.7990572100000001
-  },
-  {
-   "game_id": "6626018",
-   "date": "2026-09-12",
-   "away": "The Citadel",
-   "home": "Cal St. Fullerton",
-   "p_home": 0.8919,
-   "home_won": false,
-   "brier": 0.7954856100000001
   }
  ]
 }

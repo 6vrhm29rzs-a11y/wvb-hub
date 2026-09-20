@@ -1,13 +1,13 @@
 {
  "date": "2026-09-20",
- "generated_utc": "2026-09-20T21:40:07Z",
+ "generated_utc": "2026-09-20T22:24:46Z",
  "counts": {
-  "CORROBORATED_ONE": 5,
+  "CORROBORATED_ONE": 6,
   "VERIFIED_BOTH": 17,
   "HELD_BOTH_REPORT": 1,
   "SCHOOL_CONFLICT": 1,
   "CONTRADICTED_ONE": 1,
-  "UNVERIFIED": 1
+  "UNVERIFIED": 2
  },
  "matches": [
   {
@@ -614,6 +614,68 @@
      "assertion": "Sacred Heart L 0-3 vs Harvard",
      "opponent_source": "Harvard",
      "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6625279",
+   "date": "2026-09-20",
+   "canonical": "Oregon def. Oregon St. 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Oregon": {
+     "state": "NOT_POSTED",
+     "url": "https://goducks.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 20 (Sun)",
+      "1:00 PM",
+      "Home",
+      "Oregon State",
+      "Eugene, OR (Matthew Knight Arena)",
+      "",
+      "-"
+     ]
+    },
+    "Oregon St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://osubeavers.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Oregon St. L 0-3 vs Oregon",
+     "opponent_source": "Oregon",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6628087",
+   "date": "2026-09-20",
+   "canonical": "Dartmouth def. Boston College 3-1",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Dartmouth": {
+     "state": "NOT_POSTED",
+     "url": "https://dartmouthsports.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 20 (Sun)",
+      "3:00 PM",
+      "Home",
+      "Boston College",
+      "Hanover, N.H. (Leede Arena)",
+      "Dartmouth Invitational",
+      "-"
+     ]
+    },
+    "Boston College": {
+     "state": "NOT_POSTED",
+     "url": "https://bceagles.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 20 (Sun)",
+      "3:00 PM",
+      "Away",
+      "Dartmouth",
+      "Hanover, NH",
+      "Dartmouth Invitational",
+      "-"
+     ]
     }
    }
   }

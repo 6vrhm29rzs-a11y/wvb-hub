@@ -51,6 +51,27 @@ def _code_only(src):
     return "".join(out)
 
 
+def _repo_bodies_contaminated():
+    """True if this suite's fixture text landed in the REAL handoff/msg.
+
+    ⚠ AND THE REAL FOLDER MAY NOT EXIST. handoff/ is gitignored, so in CI --
+    and in any fresh checkout -- there is nothing to contaminate and
+    os.listdir raised FileNotFoundError, killing the suite. That is the
+    SECOND gitignored path in this file to do it: the first (the notes log)
+    was fixed this morning, and fixing it simply let the suite run far enough
+    to hit this one. Patching the line the error names is not the same as
+    auditing the file, which is what should have happened the first time.
+    No folder means no contamination is possible, which is the honest answer
+    rather than a skipped check.
+    """
+    d = os.path.join(REPO, "handoff", "msg")
+    if not os.path.isdir(d):
+        return False
+    return any(f.startswith("CL-0001")
+               and os.path.getsize(os.path.join(d, f)) < 100
+               for f in os.listdir(d))
+
+
 def main():
     import notes_log as NL
 
@@ -340,11 +361,7 @@ def main():
               all(os.path.dirname(os.path.abspath(
                   os.path.join(H.BODIES, os.path.basename(x["body_file"]))))
                   == os.path.abspath(H.BODIES) for x in H.load())
-              and not any(f.startswith("CL-0001")
-                          for f in os.listdir(os.path.join(REPO, "handoff",
-                                                           "msg"))
-                          if os.path.getsize(os.path.join(
-                              REPO, "handoff", "msg", f)) < 100))
+              and not _repo_bodies_contaminated())
         # ⚠ PRE-CREATE THE EXACT FILE THE NEXT POST WILL TARGET. A control
         # that cannot actually collide proves nothing -- the first version of
         # this one copied a body to an id `next_id` would never return, so it

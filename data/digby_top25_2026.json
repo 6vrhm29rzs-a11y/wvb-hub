@@ -29,8 +29,8 @@
   "between_team_variance": 5.941,
   "caveat_schedule": "the opponent IS adjusted for from match one: a result is scored as the strength it implies (opponent's rating + margin, home court removed). What is still thin early is the opponent's own rating, which is the preseason projection until a schedule graph exists",
   "teams_with_a_result": 348,
-  "matches_counted": 1885,
-  "corpus_fingerprint": "7ed2b883a3de461f",
+  "matches_counted": 1886,
+  "corpus_fingerprint": "63aa84f91c988ce2",
   "certifies": {
    "blend_weight_derived_not_chosen": {
     "value": true,
@@ -42,18 +42,18 @@
     }
    }
   },
-  "score_mean": 0.00095,
-  "score_sd": 1.12943,
+  "score_mean": 0.00092,
+  "score_sd": 1.12965,
   "score_scale_note": "mean and SD across ALL 348 teams, not just the ones shown -- a scale computed from the top 25 would measure the spread among the best",
   "shown": 25,
   "also_receiving": 10,
   "hit_channel_weight": 0.25,
   "hit_channel_tau": 0.1,
   "hit_channel_evidence": "data/blend_hiteff_2025.json",
-  "generated_at_utc": "2026-09-20T21:42:09Z",
+  "generated_at_utc": "2026-09-20T22:26:47Z",
   "data_through_epoch": 1789934400,
   "rating_cutoff_epoch": 1789887600,
-  "verified_intraday_counted": 22
+  "verified_intraday_counted": 23
  },
  "top": [
   {
@@ -455,6 +455,18 @@
    "rank": 33
   },
   {
+   "team": "Oregon",
+   "score": 1.4819,
+   "preseason_z": 1.076,
+   "season_z": 2.092,
+   "matches": 9,
+   "weight_on_season": 0.4,
+   "record": "9-1",
+   "net_pts_per_set": 3.76,
+   "conf": "Big Ten",
+   "rank": 34
+  },
+  {
    "team": "North Carolina",
    "score": 1.4617,
    "preseason_z": 1.599,
@@ -463,18 +475,6 @@
    "weight_on_season": 0.372,
    "record": "5-3",
    "net_pts_per_set": 0.65,
-   "conf": "ACC",
-   "rank": 34
-  },
-  {
-   "team": "Georgia Tech",
-   "score": 1.4467,
-   "preseason_z": 1.002,
-   "season_z": 1.994,
-   "matches": 11,
-   "weight_on_season": 0.449,
-   "record": "8-3",
-   "net_pts_per_set": 3.3,
    "conf": "ACC",
    "rank": 35
   }
@@ -778,8 +778,17 @@
    "weight_on_season": 0.449
   },
   {
-   "team": "North Carolina",
+   "team": "Oregon",
    "rank": 34,
+   "score": 1.4819,
+   "matches": 9,
+   "preseason_z": 1.076,
+   "season_z": 2.092,
+   "weight_on_season": 0.4
+  },
+  {
+   "team": "North Carolina",
+   "rank": 35,
    "score": 1.4617,
    "matches": 8,
    "preseason_z": 1.599,
@@ -788,7 +797,7 @@
   },
   {
    "team": "Georgia Tech",
-   "rank": 35,
+   "rank": 36,
    "score": 1.4467,
    "matches": 11,
    "preseason_z": 1.002,
@@ -797,7 +806,7 @@
   },
   {
    "team": "Mississippi St.",
-   "rank": 36,
+   "rank": 37,
    "score": 1.4354,
    "matches": 11,
    "preseason_z": 0.92,
@@ -806,7 +815,7 @@
   },
   {
    "team": "Vanderbilt",
-   "rank": 37,
+   "rank": 38,
    "score": 1.419,
    "matches": 9,
    "preseason_z": 0.741,
@@ -815,7 +824,7 @@
   },
   {
    "team": "UCF",
-   "rank": 38,
+   "rank": 39,
    "score": 1.3989,
    "matches": 10,
    "preseason_z": 1.055,
@@ -824,7 +833,7 @@
   },
   {
    "team": "Georgia",
-   "rank": 39,
+   "rank": 40,
    "score": 1.367,
    "matches": 10,
    "preseason_z": 0.777,
@@ -833,7 +842,7 @@
   },
   {
    "team": "James Madison",
-   "rank": 40,
+   "rank": 41,
    "score": 1.3599,
    "matches": 10,
    "preseason_z": 1.152,
@@ -842,21 +851,12 @@
   },
   {
    "team": "San Diego",
-   "rank": 41,
+   "rank": 42,
    "score": 1.3579,
    "matches": 10,
    "preseason_z": 1.379,
    "season_z": 1.329,
    "weight_on_season": 0.425
-  },
-  {
-   "team": "Oregon",
-   "rank": 42,
-   "score": 1.3541,
-   "matches": 8,
-   "preseason_z": 1.076,
-   "season_z": 1.824,
-   "weight_on_season": 0.372
   },
   {
    "team": "Tulsa",
@@ -1219,17 +1219,8 @@
    "weight_on_season": 0.449
   },
   {
-   "team": "Oregon St.",
-   "rank": 83,
-   "score": 0.763,
-   "matches": 10,
-   "preseason_z": 0.56,
-   "season_z": 1.038,
-   "weight_on_season": 0.425
-  },
-  {
    "team": "Hofstra",
-   "rank": 84,
+   "rank": 83,
    "score": 0.7332,
    "matches": 10,
    "preseason_z": 0.599,
@@ -1238,7 +1229,7 @@
   },
   {
    "team": "Hawaii",
-   "rank": 85,
+   "rank": 84,
    "score": 0.7087,
    "matches": 10,
    "preseason_z": 0.119,
@@ -1247,7 +1238,7 @@
   },
   {
    "team": "High Point",
-   "rank": 86,
+   "rank": 85,
    "score": 0.7043,
    "matches": 10,
    "preseason_z": 0.56,
@@ -1256,7 +1247,7 @@
   },
   {
    "team": "Texas St.",
-   "rank": 87,
+   "rank": 86,
    "score": 0.6965,
    "matches": 11,
    "preseason_z": 0.658,
@@ -1265,7 +1256,7 @@
   },
   {
    "team": "Georgetown",
-   "rank": 88,
+   "rank": 87,
    "score": 0.6858,
    "matches": 11,
    "preseason_z": 0.457,
@@ -1274,7 +1265,7 @@
   },
   {
    "team": "California",
-   "rank": 89,
+   "rank": 88,
    "score": 0.6722,
    "matches": 10,
    "preseason_z": 0.108,
@@ -1283,7 +1274,7 @@
   },
   {
    "team": "Lehigh",
-   "rank": 90,
+   "rank": 89,
    "score": 0.634,
    "matches": 10,
    "preseason_z": -0.028,
@@ -1292,7 +1283,7 @@
   },
   {
    "team": "Ole Miss",
-   "rank": 91,
+   "rank": 90,
    "score": 0.6305,
    "matches": 11,
    "preseason_z": 1.005,
@@ -1301,7 +1292,7 @@
   },
   {
    "team": "Boise St.",
-   "rank": 92,
+   "rank": 91,
    "score": 0.6301,
    "matches": 12,
    "preseason_z": 0.459,
@@ -1310,11 +1301,20 @@
   },
   {
    "team": "South Dakota St.",
-   "rank": 93,
+   "rank": 92,
    "score": 0.627,
    "matches": 11,
    "preseason_z": 1.28,
    "season_z": -0.176,
+   "weight_on_season": 0.449
+  },
+  {
+   "team": "Oregon St.",
+   "rank": 93,
+   "score": 0.626,
+   "matches": 11,
+   "preseason_z": 0.56,
+   "season_z": 0.707,
    "weight_on_season": 0.449
   },
   {
