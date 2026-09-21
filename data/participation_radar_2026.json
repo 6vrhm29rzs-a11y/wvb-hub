@@ -1,6 +1,6 @@
 {
  "season": 2026,
- "generated_utc": "2026-09-20T22:25:15Z",
+ "generated_utc": "2026-09-21T00:26:01Z",
  "what_this_is": "Players established in a team's box scores who have not appeared since a given date. Observed participation only.",
  "what_this_is_not": "Not an availability status, not an injury, not a diagnosis. A player may be rested, suspended, ineligible, or simply omitted by a scorer.",
  "rules": {
@@ -9,7 +9,7 @@
   "zero_action_listing": "counted as NOT appearing -- the feed's DNP convention",
   "ranking": "share of the team's points x matches missed (capped at 5), a display ordering that feeds nothing"
  },
- "n": 268,
+ "n": 271,
  "players": [
   {
    "team": "Air Force",
@@ -595,6 +595,27 @@
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
+   "team": "UC San Diego",
+   "team_id": "46291",
+   "player": "Lucia Barroso",
+   "missed": 5,
+   "missed_gids": [
+    "6627132",
+    "6626745",
+    "6626511",
+    "6637576",
+    "6628324"
+   ],
+   "last_seen_gid": "6628697",
+   "last_seen_epoch": 1788750000,
+   "last_opponent": "Hawaii",
+   "played_before": 6,
+   "points": 59.5,
+   "share_of_team_points": 0.0791,
+   "weight": 39.56,
+   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
+  },
+  {
    "team": "Portland",
    "team_id": "46351",
    "player": "Lillian Lansing",
@@ -613,24 +634,6 @@
    "points": 43.0,
    "share_of_team_points": 0.0779,
    "weight": 38.95,
-   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
-  },
-  {
-   "team": "Southern California",
-   "team_id": "46121",
-   "player": "Abigail Mullen",
-   "missed": 2,
-   "missed_gids": [
-    "6627903",
-    "6639376"
-   ],
-   "last_seen_gid": "6627970",
-   "last_seen_epoch": 1789333200,
-   "last_opponent": "Oregon St.",
-   "played_before": 7,
-   "points": 98.5,
-   "share_of_team_points": 0.1913,
-   "weight": 38.25,
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
@@ -772,26 +775,6 @@
    "points": 58.0,
    "share_of_team_points": 0.0706,
    "weight": 35.32,
-   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
-  },
-  {
-   "team": "UC San Diego",
-   "team_id": "46291",
-   "player": "Lucia Barroso",
-   "missed": 4,
-   "missed_gids": [
-    "6627132",
-    "6626745",
-    "6626511",
-    "6637576"
-   ],
-   "last_seen_gid": "6628697",
-   "last_seen_epoch": 1788750000,
-   "last_opponent": "Hawaii",
-   "played_before": 6,
-   "points": 59.5,
-   "share_of_team_points": 0.0879,
-   "weight": 35.16,
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
@@ -1174,27 +1157,6 @@
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
-   "team": "California",
-   "team_id": "45760",
-   "player": "Portia Sherman",
-   "missed": 5,
-   "missed_gids": [
-    "6625632",
-    "6628125",
-    "6628607",
-    "6627902",
-    "6627600"
-   ],
-   "last_seen_gid": "6626518",
-   "last_seen_epoch": 1788627600,
-   "last_opponent": "SFA",
-   "played_before": 5,
-   "points": 41.5,
-   "share_of_team_points": 0.0585,
-   "weight": 29.27,
-   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
-  },
-  {
    "team": "Little Rock",
    "team_id": "45805",
    "player": "Morgan Creer",
@@ -1284,6 +1246,27 @@
    "points": 50.5,
    "share_of_team_points": 0.0918,
    "weight": 27.55,
+   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
+  },
+  {
+   "team": "UC San Diego",
+   "team_id": "46291",
+   "player": "Yasemin Elmas",
+   "missed": 5,
+   "missed_gids": [
+    "6627132",
+    "6626745",
+    "6626511",
+    "6637576",
+    "6628324"
+   ],
+   "last_seen_gid": "6628697",
+   "last_seen_epoch": 1788750000,
+   "last_opponent": "Hawaii",
+   "played_before": 6,
+   "points": 41.0,
+   "share_of_team_points": 0.0545,
+   "weight": 27.26,
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
@@ -1404,6 +1387,28 @@
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
+   "team": "California",
+   "team_id": "45760",
+   "player": "Portia Sherman",
+   "missed": 6,
+   "missed_gids": [
+    "6625632",
+    "6628125",
+    "6628607",
+    "6627902",
+    "6627600",
+    "6627316"
+   ],
+   "last_seen_gid": "6626518",
+   "last_seen_epoch": 1788627600,
+   "last_opponent": "SFA",
+   "played_before": 5,
+   "points": 41.5,
+   "share_of_team_points": 0.0525,
+   "weight": 26.27,
+   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
+  },
+  {
    "team": "Winthrop",
    "team_id": "45817",
    "player": "Maggie Czajka",
@@ -1422,6 +1427,24 @@
    "points": 28.5,
    "share_of_team_points": 0.0516,
    "weight": 25.79,
+   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
+  },
+  {
+   "team": "Southern California",
+   "team_id": "46121",
+   "player": "Leah Ford",
+   "missed": 2,
+   "missed_gids": [
+    "6639376",
+    "6624528"
+   ],
+   "last_seen_gid": "6627903",
+   "last_seen_epoch": 1789783200,
+   "last_opponent": "UC Davis",
+   "played_before": 8,
+   "points": 74.5,
+   "share_of_team_points": 0.1288,
+   "weight": 25.76,
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
@@ -1600,28 +1623,6 @@
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
-   "team": "UC Santa Barbara",
-   "team_id": "45895",
-   "player": "Sandrea Thomas",
-   "missed": 6,
-   "missed_gids": [
-    "6624506",
-    "6624524",
-    "6624525",
-    "6624526",
-    "6624527",
-    "6624529"
-   ],
-   "last_seen_gid": "6624507",
-   "last_seen_epoch": 1788483600,
-   "last_opponent": "Iowa St.",
-   "played_before": 4,
-   "points": 30.0,
-   "share_of_team_points": 0.0487,
-   "weight": 24.35,
-   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
-  },
-  {
    "team": "Fordham",
    "team_id": "46302",
    "player": "Andrea Stanojevic",
@@ -1638,26 +1639,6 @@
    "points": 57.0,
    "share_of_team_points": 0.081,
    "weight": 24.29,
-   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
-  },
-  {
-   "team": "UC San Diego",
-   "team_id": "46291",
-   "player": "Yasemin Elmas",
-   "missed": 4,
-   "missed_gids": [
-    "6627132",
-    "6626745",
-    "6626511",
-    "6637576"
-   ],
-   "last_seen_gid": "6628697",
-   "last_seen_epoch": 1788750000,
-   "last_opponent": "Hawaii",
-   "played_before": 6,
-   "points": 41.0,
-   "share_of_team_points": 0.0606,
-   "weight": 24.22,
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
@@ -1835,6 +1816,29 @@
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
+   "team": "UC Santa Barbara",
+   "team_id": "45895",
+   "player": "Sandrea Thomas",
+   "missed": 7,
+   "missed_gids": [
+    "6624506",
+    "6624524",
+    "6624525",
+    "6624526",
+    "6624527",
+    "6624529",
+    "6624528"
+   ],
+   "last_seen_gid": "6624507",
+   "last_seen_epoch": 1788483600,
+   "last_opponent": "Iowa St.",
+   "played_before": 4,
+   "points": 30.0,
+   "share_of_team_points": 0.0455,
+   "weight": 22.76,
+   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
+  },
+  {
    "team": "Western Mich.",
    "team_id": "45950",
    "player": "Cassidy Pratley",
@@ -1931,6 +1935,24 @@
    "points": 53.0,
    "share_of_team_points": 0.0736,
    "weight": 22.08,
+   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
+  },
+  {
+   "team": "UC San Diego",
+   "team_id": "46291",
+   "player": "Gia Rivera",
+   "missed": 2,
+   "missed_gids": [
+    "6637576",
+    "6628324"
+   ],
+   "last_seen_gid": "6626511",
+   "last_seen_epoch": 1789318800,
+   "last_opponent": "Pacific",
+   "played_before": 8,
+   "points": 82.5,
+   "share_of_team_points": 0.1097,
+   "weight": 21.94,
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
@@ -2854,20 +2876,21 @@
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
-   "team": "Southern California",
-   "team_id": "46121",
-   "player": "Leah Ford",
-   "missed": 1,
+   "team": "San Jose St.",
+   "team_id": "46494",
+   "player": "Devon DeNecochea",
+   "missed": 2,
    "missed_gids": [
-    "6639376"
+    "6627315",
+    "6627316"
    ],
-   "last_seen_gid": "6627903",
-   "last_seen_epoch": 1789783200,
-   "last_opponent": "UC Davis",
-   "played_before": 8,
-   "points": 74.5,
-   "share_of_team_points": 0.1447,
-   "weight": 14.47,
+   "last_seen_gid": "6627313",
+   "last_seen_epoch": 1789326000,
+   "last_opponent": "UC Irvine",
+   "played_before": 7,
+   "points": 47.0,
+   "share_of_team_points": 0.0696,
+   "weight": 13.93,
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
@@ -3035,6 +3058,23 @@
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
+   "team": "Southern California",
+   "team_id": "46121",
+   "player": "Adonia Faumuina",
+   "missed": 1,
+   "missed_gids": [
+    "6624528"
+   ],
+   "last_seen_gid": "6639376",
+   "last_seen_epoch": 1789869600,
+   "last_opponent": "Pepperdine",
+   "played_before": 9,
+   "points": 76.0,
+   "share_of_team_points": 0.1314,
+   "weight": 13.14,
+   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
+  },
+  {
    "team": "Nicholls",
    "team_id": "46103",
    "player": "Mckenzie Mitchell",
@@ -3178,23 +3218,6 @@
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
-   "team": "UC San Diego",
-   "team_id": "46291",
-   "player": "Gia Rivera",
-   "missed": 1,
-   "missed_gids": [
-    "6637576"
-   ],
-   "last_seen_gid": "6626511",
-   "last_seen_epoch": 1789318800,
-   "last_opponent": "Pacific",
-   "played_before": 8,
-   "points": 82.5,
-   "share_of_team_points": 0.1219,
-   "weight": 12.19,
-   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
-  },
-  {
    "team": "Gonzaga",
    "team_id": "46304",
    "player": "Megan Deveaux",
@@ -3249,23 +3272,6 @@
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
-   "team": "Stanford",
-   "team_id": "46501",
-   "player": "Ipar Kurt",
-   "missed": 1,
-   "missed_gids": [
-    "6628241"
-   ],
-   "last_seen_gid": "6627526",
-   "last_seen_epoch": 1789680600,
-   "last_opponent": "Arizona St.",
-   "played_before": 7,
-   "points": 67.5,
-   "share_of_team_points": 0.1202,
-   "weight": 12.02,
-   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
-  },
-  {
    "team": "Louisiana",
    "team_id": "46003",
    "player": "Rhyan Miciotto",
@@ -3282,6 +3288,24 @@
    "points": 17.0,
    "share_of_team_points": 0.04,
    "weight": 12.0,
+   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
+  },
+  {
+   "team": "Samford",
+   "team_id": "45864",
+   "player": "Amyra Burchik",
+   "missed": 2,
+   "missed_gids": [
+    "6625177",
+    "6625178"
+   ],
+   "last_seen_gid": "6625175",
+   "last_seen_epoch": 1789675200,
+   "last_opponent": "South Alabama",
+   "played_before": 6,
+   "points": 36.5,
+   "share_of_team_points": 0.0596,
+   "weight": 11.93,
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
@@ -3455,6 +3479,23 @@
    "played_before": 11,
    "points": 42.0,
    "share_of_team_points": 0.0545,
+   "weight": 10.91,
+   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
+  },
+  {
+   "team": "Cal Poly",
+   "team_id": "46659",
+   "player": "Breklyn Pulling",
+   "missed": 1,
+   "missed_gids": [
+    "6627272"
+   ],
+   "last_seen_gid": "6627271",
+   "last_seen_epoch": 1789783200,
+   "last_opponent": "Arizona St.",
+   "played_before": 9,
+   "points": 68.5,
+   "share_of_team_points": 0.1091,
    "weight": 10.91,
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
@@ -3877,23 +3918,6 @@
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
-   "team": "San Jose St.",
-   "team_id": "46494",
-   "player": "Devon DeNecochea",
-   "missed": 1,
-   "missed_gids": [
-    "6627315"
-   ],
-   "last_seen_gid": "6627313",
-   "last_seen_epoch": 1789326000,
-   "last_opponent": "UC Irvine",
-   "played_before": 7,
-   "points": 47.0,
-   "share_of_team_points": 0.0759,
-   "weight": 7.59,
-   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
-  },
-  {
    "team": "FIU",
    "team_id": "46546",
    "player": "Kamryn Itzen",
@@ -4098,20 +4122,20 @@
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
-   "team": "Samford",
-   "team_id": "45864",
-   "player": "Amyra Burchik",
+   "team": "Creighton",
+   "team_id": "46664",
+   "player": "Ashlyn Paymal",
    "missed": 1,
    "missed_gids": [
-    "6625177"
+    "6626996"
    ],
-   "last_seen_gid": "6625175",
-   "last_seen_epoch": 1789675200,
-   "last_opponent": "South Alabama",
-   "played_before": 6,
-   "points": 36.5,
-   "share_of_team_points": 0.0666,
-   "weight": 6.66,
+   "last_seen_gid": "6626993",
+   "last_seen_epoch": 1789776000,
+   "last_opponent": "Kansas St.",
+   "played_before": 10,
+   "points": 51.0,
+   "share_of_team_points": 0.0674,
+   "weight": 6.74,
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
@@ -4401,6 +4425,23 @@
    "points": 35.5,
    "share_of_team_points": 0.0591,
    "weight": 5.91,
+   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
+  },
+  {
+   "team": "Stanford",
+   "team_id": "46501",
+   "player": "Kaci Demaria",
+   "missed": 1,
+   "missed_gids": [
+    "6627272"
+   ],
+   "last_seen_gid": "6628241",
+   "last_seen_epoch": 1789770600,
+   "last_opponent": "Santa Clara",
+   "played_before": 5,
+   "points": 37.5,
+   "share_of_team_points": 0.0589,
+   "weight": 5.89,
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
@@ -4826,6 +4867,23 @@
    "points": 30.5,
    "share_of_team_points": 0.0464,
    "weight": 4.64,
+   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
+  },
+  {
+   "team": "Southern California",
+   "team_id": "46121",
+   "player": "Quinn Loper",
+   "missed": 1,
+   "missed_gids": [
+    "6624528"
+   ],
+   "last_seen_gid": "6639376",
+   "last_seen_epoch": 1789869600,
+   "last_opponent": "Pepperdine",
+   "played_before": 6,
+   "points": 26.5,
+   "share_of_team_points": 0.0458,
+   "weight": 4.58,
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {

@@ -214,7 +214,10 @@ def main():
         # ⚠ A STALE PUBLIC FILE WOULD PASS THIS VACUOUSLY. The tab is new,
         # so an untouched older build carries no trace for reasons that have
         # nothing to do with the strip working. Say which case this is.
-        if os.path.getmtime(pub) < os.path.getmtime(priv):
+        # ⚠ pub IS TRACKED AND priv IS NOT, so "public present, private
+        # absent" is a real state -- any fresh clone before a build. Comparing
+        # their mtimes then raises instead of reporting.
+        if os.path.exists(priv) and os.path.getmtime(pub) < os.path.getmtime(priv):
             print("      (note: the public build on disk predates the "
                   "private one -- the fence checks above are what prove "
                   "the strip, not this file)")
@@ -243,14 +246,27 @@ def main():
     # asserting the SHAPE of the answer rather than the rule. The rule is:
     # every backed-up path must be one git is deliberately not carrying.
     import subprocess as _sp2
-    not_ignored = []
-    for pat in BL.SOURCES:
-        probe = pat.replace("*", "probe")
-        r = _sp2.run(["git", "check-ignore", "-q", probe], cwd=REPO)
-        if r.returncode != 0:
-            not_ignored.append(pat)
-    check("it backs up only paths git is deliberately NOT carrying",
-          not not_ignored, not_ignored)
+    # ⚠ AND THE RULE CAN ONLY BE ASKED WHERE GIT CAN ANSWER. The fresh-checkout
+    # sandbox is a tar of `git ls-files` with NO .git directory, so
+    # check-ignore exits 128 there and every path reads as "not ignored" --
+    # failing a correct tree. That is the THIRD environment pin in this suite
+    # (the notes log, handoff/msg, and now git itself); the pattern is that a
+    # guard which consults something outside the source tree must say what it
+    # does when that thing is absent.
+    _isrepo = _sp2.run(["git", "rev-parse", "--is-inside-work-tree"], cwd=REPO,
+                       stdout=_sp2.DEVNULL, stderr=_sp2.DEVNULL).returncode == 0
+    if not _isrepo:
+        check("no git repo in this checkout -- cannot ask whether the backup "
+              "paths are ignored (not a failure)", True)
+    else:
+        not_ignored = []
+        for pat in BL.SOURCES:
+            probe = pat.replace("*", "probe")
+            r = _sp2.run(["git", "check-ignore", "-q", probe], cwd=REPO)
+            if r.returncode != 0:
+                not_ignored.append(pat)
+        check("it backs up only paths git is deliberately NOT carrying",
+              not not_ignored, not_ignored)
     check("...and never the derived data/ artifacts",
           not any(pat.startswith("data/") and "ballots" not in pat
                   for pat in BL.SOURCES), BL.SOURCES)
@@ -620,8 +636,20 @@ def main():
 
         H.log_work("scoped work", "queued_for_review", files=[rel])
         w = H.work_items()[-1]
-        check("a work entry records its base commit AND its file hashes",
-              bool(w.get("base_commit")) and w["files"].get(rel) == fp[rel])
+        # ⚠ base_commit() IS `git rev-parse HEAD` AND RETURNS "" WITHOUT A
+        # REPO -- which is exactly the fresh-checkout sandbox (a tar of
+        # `git ls-files`, no .git). Asserting it is non-empty there fails a
+        # correct tree. The FILE HASHES are the part that does not depend on
+        # git and they are asserted unconditionally; the commit is asserted
+        # only where git can supply one.
+        _hasgit = bool(H.base_commit())
+        check("a work entry records its file hashes",
+              w["files"].get(rel) == fp[rel])
+        if _hasgit:
+            check("...and its base commit", bool(w.get("base_commit")))
+        else:
+            check("no git repo in this checkout -- base_commit is empty by "
+                  "design, so it is not asserted (not a failure)", True)
         io.open(probe, "a", encoding="utf-8").write("moved again")
         st = io.open(H.write_status(), encoding="utf-8").read()
         check("the status file REPORTS the drift rather than carrying the "
@@ -697,11 +725,25 @@ def main():
           not tracked, tracked[:80])
     check("backup_local snapshots the handoff record",
           any("handoff" in pat for pat in BL.SOURCES), BL.SOURCES)
+    # ⚠ THE MECHANISM ALWAYS; THE RENDERED OUTPUT ONLY WHEN THERE IS DATA.
+    # handoff/ is gitignored, so on a CI checkout there is no handoff record
+    # to render and asserting the heading fails a page that is behaving
+    # correctly. Same shape as the exhibition-badge guard that broke at
+    # midnight: check the branch exists always, check what it produced only
+    # when the subject is actually present. (Fifth environment pin in this
+    # file -- the rule is that a guard consulting anything outside the source
+    # tree must say what it does when that thing is absent.)
+    check("build_hub has the branch that renders the handoff record",
+          "notes_log_html" in bsrc and "Claude and Codex" in bsrc)
     if os.path.exists(priv):
         page = io.open(priv, encoding="utf-8").read()
-        check("the notes tab renders the handoff record",
-              "Handoff &mdash; Claude and Codex" in page
-              or "Handoff \u2014 Claude and Codex" in page)
+        if os.path.isdir(os.path.join(REPO, "handoff")):
+            check("the notes tab renders the handoff record",
+                  "Handoff &mdash; Claude and Codex" in page
+                  or "Handoff \u2014 Claude and Codex" in page)
+        else:
+            check("no handoff record in this checkout -- nothing to render "
+                  "(not a failure)", True)
     if os.path.exists(pub):
         pubtxt = io.open(pub, encoding="utf-8").read()
         # ⚠ GREP THE DATA. Bodies, ids and the seat names must all be absent.

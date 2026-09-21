@@ -1,13 +1,13 @@
 {
  "date": "2026-09-20",
- "generated_utc": "2026-09-20T22:24:46Z",
+ "generated_utc": "2026-09-21T00:25:33Z",
  "counts": {
-  "CORROBORATED_ONE": 6,
-  "VERIFIED_BOTH": 17,
+  "CORROBORATED_ONE": 12,
+  "VERIFIED_BOTH": 18,
   "HELD_BOTH_REPORT": 1,
   "SCHOOL_CONFLICT": 1,
   "CONTRADICTED_ONE": 1,
-  "UNVERIFIED": 2
+  "UNVERIFIED": 1
  },
  "matches": [
   {
@@ -563,16 +563,15 @@
    "gid": "6626814",
    "date": "2026-09-20",
    "canonical": "Kentucky def. Louisville 3-1",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Kentucky": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://ukathletics.com/sports/wvball/schedule/",
-     "row": [
-      "Sun. \n         Sep 20",
-      "Louisville",
-      ""
-     ]
+     "assertion": "Kentucky W 3-1 vs Louisville",
+     "opponent_source": "Louisville",
+     "site_says": "Home",
+     "surface": "schedule_item"
     },
     "Louisville": {
      "state": "NOT_POSTED",
@@ -649,20 +648,14 @@
    "gid": "6628087",
    "date": "2026-09-20",
    "canonical": "Dartmouth def. Boston College 3-1",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Dartmouth": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://dartmouthsports.com/sports/womens-volleyball/schedule/text",
-     "row": [
-      "Sep 20 (Sun)",
-      "3:00 PM",
-      "Home",
-      "Boston College",
-      "Hanover, N.H. (Leede Arena)",
-      "Dartmouth Invitational",
-      "-"
-     ]
+     "assertion": "Dartmouth W 3-1 vs Boston College",
+     "opponent_source": "Boston College",
+     "site_says": "Home"
     },
     "Boston College": {
      "state": "NOT_POSTED",
@@ -674,6 +667,162 @@
       "Dartmouth",
       "Hanover, NH",
       "Dartmouth Invitational",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6624528",
+   "date": "2026-09-20",
+   "canonical": "Southern California def. UC Santa Barbara 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Southern California": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://www.usctrojans.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Southern California W 3-0 vs UC Santa Barbara",
+     "opponent_source": "UC Santa Barbara",
+     "site_says": "Home"
+    },
+    "UC Santa Barbara": {
+     "state": "NOT_POSTED",
+     "url": "https://ucsbgauchos.com/services/schedule_txt.ashx?schedule=409",
+     "row": [
+      "Sep 20 (Sun)",
+      "2 p.m.",
+      "Away",
+      "USC",
+      "Los Angeles, Calif. (Galen Center)",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6628324",
+   "date": "2026-09-20",
+   "canonical": "UNLV def. UC San Diego 3-2",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "UNLV": {
+     "state": "NOT_POSTED",
+     "url": "https://unlvrebels.com/services/schedule_txt.ashx?schedule=1503",
+     "row": [
+      "Sep 20 (Sun)",
+      "1 PM PT",
+      "Home",
+      "UC San Diego",
+      "Las Vegas, Nev. / The Pavilion",
+      "",
+      ""
+     ]
+    },
+    "UC San Diego": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://ucsdtritons.com/services/schedule_txt.ashx?schedule=460",
+     "assertion": "UC San Diego L 2-3 vs UNLV",
+     "opponent_source": "UNLV",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6625178",
+   "date": "2026-09-20",
+   "canonical": "Samford def. UAB 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Samford": {
+     "state": "NOT_POSTED",
+     "url": "https://samfordsports.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 20 (Sun)",
+      "4 PM",
+      "Home",
+      "UAB",
+      "Birmingham, AL (Pete Hanna Center)",
+      "",
+      "-"
+     ]
+    },
+    "UAB": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://uabsports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "UAB L 1-3 vs Samford",
+     "opponent_source": "Samford",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6626996",
+   "date": "2026-09-20",
+   "canonical": "Texas A&M def. Creighton 3-1",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Texas A&M": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://12thman.com/website-api/schedule-events?filter%5Bschedule.sport_id%5D=13&filter%5Bpast%5D=true&per_page=25&sort=-datetime&include=opponent,scheduleEventResult",
+     "assertion": "Texas A&M W 3-1 vs Creighton",
+     "opponent_source": "Creighton",
+     "site_says": "Away",
+     "surface": "wmt_api"
+    },
+    "Creighton": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gocreighton.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Creighton L 1-3 vs Texas A&M",
+     "opponent_source": "Texas A&M",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6627316",
+   "date": "2026-09-20",
+   "canonical": "California def. San Jose St. 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "California": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://calbears.com/sports/womens-volleyball/schedule/text",
+     "rows_on_date": [
+      "San Jos\u00e9 State"
+     ]
+    },
+    "San Jose St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://sjsuspartans.com/website-api/schedule-events?filter%5Bschedule.sport_id%5D=22&filter%5Bpast%5D=true&per_page=25&sort=-datetime&include=opponent,scheduleEventResult",
+     "assertion": "San Jose St. L 1-3 vs California",
+     "opponent_source": "California",
+     "site_says": "Home",
+     "surface": "wmt_api"
+    }
+   }
+  },
+  {
+   "gid": "6627272",
+   "date": "2026-09-20",
+   "canonical": "Stanford def. Cal Poly 3-1",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Stanford": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://gostanford.com/website-api/schedule-events?filter%5Bschedule.sport_id%5D=31&filter%5Bpast%5D=true&per_page=25&sort=-datetime&include=opponent,scheduleEventResult",
+     "rows_on_date": []
+    },
+    "Cal Poly": {
+     "state": "NOT_POSTED",
+     "url": "https://gopoly.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 20 (Sun)",
+      "3:00 PM",
+      "Home",
+      "#8 Stanford",
+      "(Mott Athletics Center)",
+      "SLO Classic",
       "-"
      ]
     }
