@@ -1,0 +1,48 @@
+{
+ "k": 10.0,
+ "hit_mix": 0.25,
+ "scale_pts_per_unit": 3.05,
+ "home_adv_pts": 0.2675,
+ "fit_on": "even checkpoints",
+ "scored_on": "odd checkpoints",
+ "heldout_n": 11284,
+ "heldout_brier": 0.17184,
+ "reliability": [
+  {
+   "bucket": "50-60%",
+   "n": 2469,
+   "predicted": 0.5501,
+   "actual": 0.5646,
+   "gap_pts": 1.5
+  },
+  {
+   "bucket": "60-70%",
+   "n": 2464,
+   "predicted": 0.65,
+   "actual": 0.6534,
+   "gap_pts": 0.3
+  },
+  {
+   "bucket": "70-80%",
+   "n": 2311,
+   "predicted": 0.7503,
+   "actual": 0.7404,
+   "gap_pts": -1.0
+  },
+  {
+   "bucket": "80-90%",
+   "n": 2120,
+   "predicted": 0.8494,
+   "actual": 0.8533,
+   "gap_pts": 0.4
+  },
+  {
+   "bucket": "90-100%",
+   "n": 1920,
+   "predicted": 0.9495,
+   "actual": 0.9609,
+   "gap_pts": 1.1
+  }
+ ],
+ "prior_only_heldout_brier": 0.18713
+}

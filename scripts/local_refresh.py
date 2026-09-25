@@ -88,6 +88,10 @@ REBUILD = [
     ({}, ["scripts/collector.py", "--recheck-reviews"]),
     ({}, ["scripts/provenance.py", "--check"]),
     ({}, ["scripts/build_hub.py"]),
+    # ⚠ LOCAL-ONLY: Cody's Center Court dashboard (2026-09-24). Writes into
+    # the gitignored Cody/ tree and reads only artifacts rebuilt above, so it
+    # runs right after the hub and never in CI.
+    ({}, ["scripts/build_dashboard.py"]),
     # --- reference checks: read-only, local-only, never gate the build ---
     ({}, ["scripts/ingest_monsterblock.py"]),
     ({}, ["scripts/board_bakeoff.py"]),

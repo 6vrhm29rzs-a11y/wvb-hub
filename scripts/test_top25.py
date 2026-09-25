@@ -202,7 +202,18 @@ def test_the_move_column_states_which_comparison_it_makes():
     m = re.search(r'<th title="how the rank changed">([^<]+)</th>', h)
     check(m is not None, "the Move column has a header")
     if m:
-        check(m.group(1).strip() in ("vs last week", "vs preseason"),
+        # ⚠ ASSERT THE RULE, NOT A FIXED LIST OF TWO. The header gained two
+        # more legitimate forms when a MISSED freeze became possible to
+        # render honestly: "vs <Mon D>" names the freeze actually compared
+        # against when it is not last week's (2026-W38 was never frozen), and
+        # "vs last freeze" is the fallback when the stamp cannot be read. A
+        # list of two failed the first build that rendered one of them --
+        # and it failed in CI before it failed here only because CI's clock
+        # is UTC, where it was already the next ISO week. The rule is that
+        # the column must NAME what it measured against.
+        check(re.match(r"^vs (preseason|last week|last freeze"
+                       r"|[A-Z][a-z]{2} \d{1,2})$", m.group(1).strip())
+              is not None,
               "and it names the comparison", m.group(1))
 
 
@@ -538,7 +549,8 @@ def main():
                test_form_marks_ranked_opponents,
                test_form_shows_the_most_recent_last,
                test_the_two_rankings_explain_their_relationship,
-               test_hit_channel_is_measured):
+               test_hit_channel_is_measured,
+               test_blend_k_is_measured_and_forecasts_use_it):
         print(fn.__name__)
         fn()
     print()
@@ -573,6 +585,40 @@ def test_hit_channel_is_measured():
     assert v.get("V4_hitonly", {}).get("verdict") != "SHIPS", \
         "[NEG] hit-only shows SHIPS -- the receipt file is not the real one"
     print("  hit channel: weight %.2f measured, CI low %+.5f  ok" % (w, lo))
+
+
+
+def test_blend_k_is_measured_and_forecasts_use_it():
+    """k=10 (2026-09-23) ships only on its receipt; the switch stays derived.
+
+    Cody: lean the blend toward 2026, but keep the blend showing. So the
+    blend's weight may move off the derived k ONLY with a SHIPS verdict in
+    forecast_blend_k_2025.json, the board's crossover must read k_crossover
+    (the derived value), and forecasts must stand on the blend.
+    """
+    import json as _json
+    doc = _json.load(open(os.path.join(REPO, "data", "digby_top25_2026.json")))
+    m = doc.get("meta") or {}
+    k, kd, kc = m.get("k_matches"), m.get("k_derived"), m.get("k_crossover")
+    if k != kd:
+        rp = os.path.join(REPO, "data", "forecast_blend_k_2025.json")
+        v = (_json.load(open(rp)).get("verdicts") or {}) if os.path.exists(rp) else {}
+        assert v.get("k%g" % k, {}).get("verdict") == "SHIPS", \
+            "blend k %s differs from derived %s with no SHIPS receipt" % (k, kd)
+    assert kc == kd, "crossover k %s must stay the derived %s" % (kc, kd)
+    import build_rankings_board as BB
+    fake = {"teams": [{"games_played": int(kd) - 1}] * 3}
+    ok, _ = BB.live_rating_mature(fake)
+    # NEGATIVE CONTROL: a median just under the DERIVED k but over the blend
+    # k must NOT cross -- it would if the gate read k_matches.
+    assert not ok or int(kd) - 1 < k, \
+        "[NEG] gate crossed at %d matches -- it is reading the blend k" % (int(kd) - 1)
+    pp = os.path.join(REPO, "data", "predictions_2026.json")
+    if os.path.exists(pp):
+        basis = (_json.load(open(pp)).get("meta") or {}).get("strength_basis")
+        assert basis == "blend", "forecasts stand on %s, not the blend" % basis
+    print("  blend k %s (derived %s, crossover %s), forecasts on blend  ok"
+          % (k, kd, kc))
 
 
 if __name__ == "__main__":

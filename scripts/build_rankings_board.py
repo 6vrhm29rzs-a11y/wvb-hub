@@ -125,8 +125,11 @@ def live_rating_mature(live):
     teams = live.get("teams") or []
     gp = sorted(int(t.get("games_played") or 0) for t in teams)
     med = gp[len(gp) // 2] if gp else 0
-    k = ((load_json("data/digby_top25_%d.json" % SEASON) or {})
-         .get("meta") or {}).get("k_matches")
+    _m = ((load_json("data/digby_top25_%d.json" % SEASON) or {})
+          .get("meta") or {})
+    # k_crossover when present: the blend's weight (k_matches) and the
+    # switch point were decoupled 2026-09-23 on Cody's call -- see digby meta.
+    k = _m.get("k_crossover", _m.get("k_matches"))
     if k is None:
         return False, ("blend k unavailable -- holding the blend "
                        "(median gp %d)" % med)

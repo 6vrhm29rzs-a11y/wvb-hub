@@ -50,7 +50,8 @@ def build():
     validated = bool((rating.get("meta") or {}).get("validated"))
     mature, why = (BB.live_rating_mature(rating) if validated
                    else (False, "rating not validated"))
-    k = ((digby.get("meta") or {}).get("k_matches"))
+    _dm = (digby.get("meta") or {})
+    k = _dm.get("k_crossover", _dm.get("k_matches"))
     gp = sorted(int(t.get("games_played") or 0)
                 for t in (rating.get("teams") or []))
     med = gp[len(gp) // 2] if gp else 0

@@ -9,13 +9,12 @@ instead of by coin-flipping. That model is CALIBRATED -- Brier 0.1289 across
 5,014 matches, every probability bucket within 3.4 points -- which is the claim
 that matters for a number presented as a percentage.
 
-WHERE STRENGTH COMES FROM, and this is the honest limit early in a season:
-2026 has a handful of matches, so nearly all of the signal is last season's
-opponent-adjusted net points/set. That prior predicts the following season at
-spearman 0.857, which is strong but is emphatically NOT the same thing as
-knowing how this year's team plays. Every row carries how many 2026 matches its
-teams have actually played, so a 71% built on nothing can be told from one built
-on something.
+WHERE STRENGTH COMES FROM: the same blend the Rankings tab shows -- the
+preseason projection pulled toward this season's results, weight n/(n+k) --
+converted to points/set by one scale fitted on 2025 and checked on held-out
+2025 matches (measure_forecast_calibration.py). Last season alone was the
+source until 2026-09-23 and is now only the fallback. Every row still carries
+how many 2026 matches its teams have played.
 
 HOME ADVANTAGE IS APPLIED ONLY WHERE THERE IS A HOME TEAM. The fitted advantage
 comes from our own ridge solve, not the literature, and scripts/venues.py says
@@ -68,14 +67,33 @@ def et_date(epoch):
 
 
 def build():
-    rating = load("data/rating_2025.json") or {}
+    # ⚠ STRENGTH IS THE BLEND NOW, NOT LAST SEASON (Cody 2026-09-23: "2025
+    # numbers should only be used for baseline and start points"). The same
+    # blend the Rankings tab shows (digby_top25: preseason + 2026 results,
+    # w=n/(n+k)), converted to points/set by ONE scale fitted on 2025 and
+    # scored out of sample (measure_forecast_calibration.py): held-out Brier
+    # 0.172 against 0.187 for last-season-only on the same matches, every
+    # favourite bucket within 1.5 points. Last season stays the fallback,
+    # only when the blend or its calibration receipt is missing.
     strength = {}
-    for t in rating.get("teams", []):
-        v = t.get("adj_net_points_set")
-        if v is not None:
-            strength[t["team"]] = v
+    source = None
+    blend = load("data/digby_top25_%d.json" % SEASON) or {}
+    cal = load("data/forecast_calibration_2025.json") or {}
+    scale = cal.get("scale_pts_per_unit")
+    if scale and blend.get("all"):
+        for t in blend["all"]:
+            if t.get("score") is not None:
+                strength[t["team"]] = float(t["score"]) * float(scale)
+        source = "blend"
     if not strength:
-        print("no 2025 rating to stand on")
+        rating = load("data/rating_2025.json") or {}
+        for t in rating.get("teams", []):
+            v = t.get("adj_net_points_set")
+            if v is not None:
+                strength[t["team"]] = v
+        source = "prior_2025"
+    if not strength:
+        print("no rating to stand on")
         return None
 
     venues = load("data/venues_%d.json" % SEASON) or {}
@@ -190,9 +208,17 @@ def build():
                       "probability, best-of-5 distribution derived analytically"),
             "calibration": ("Brier 0.1289 over 5,014 matches, every bucket within "
                             "3.4 points (measured on 2025)"),
-            "strength_source": ("2025 opponent-adjusted net points/set. 2026 has "
-                                "barely been played, so this is a prior, not a "
-                                "read on this year's teams"),
+            "strength_source": (
+                ("the Rankings blend (preseason projection + 2026 results, "
+                 "w=n/(n+%s)) x %.2f pts/set per unit, scale fitted on 2025 "
+                 "and scored out of sample (held-out Brier %s vs %s for "
+                 "last-season-only)" % (
+                     (blend.get("meta") or {}).get("k_matches"), float(scale),
+                     cal.get("heldout_brier"), cal.get("prior_only_heldout_brier")))
+                if source == "blend" else
+                "FALLBACK: 2025 opponent-adjusted net points/set -- the blend "
+                "or its calibration receipt was missing"),
+            "strength_basis": source,
             "home_advantage_points_per_set": round(home_adv, 4),
             "home_advantage_applied": "except on floors venues.py calls neutral",
             "fixtures": len(rows),

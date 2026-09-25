@@ -294,6 +294,17 @@ def main():
     rho = ((load("data/churn_fit.json") or {}).get("meta") or {}).get("with_churn_rho")
     rho = float(rho) if rho else 0.8379
     k, prior_err = shrinkage_k(sigma2, tau2, rho)
+    k_derived = k
+    # ⚠ SUPERSEDES the "keep the derived value" decision recorded in meta
+    # below (2026-08-27). That test ran BEFORE the hit-eff channel shipped and
+    # could not separate k=10 from 13.5. Re-run on the shipped evidence
+    # (measure_blend_k_hiteff.py, 2025, seven checkpoints, paired bootstrap):
+    # k=10 beats the derived value with the CI clear of zero. Cody 2026-09-23:
+    # "2025 numbers should only be used for baseline and start points" -- so
+    # the measured value is adopted, ONLY while its receipt says it ships.
+    k_rec = load("data/forecast_blend_k_2025.json") or {}
+    if ((k_rec.get("verdicts") or {}).get("k10") or {}).get("verdict") == "SHIPS":
+        k = 10.0
 
     live = load("data/data_%d.json" % SEASON) or {}
     id2name = dict((str(t.get("team_id")), t.get("name_short") or t.get("name_full"))
@@ -470,6 +481,15 @@ def main():
                                "six teams as if it were the best of 348"
                                % (tau2 ** 0.5)),
             "k_matches": round(k, 2),
+            "k_derived": round(k_derived, 2),
+            # The board's switch to the pure-2026 rating stays on the DERIVED
+            # k. Cody 2026-09-23: lean the blend toward 2026 (k=10) but keep
+            # the blend showing rather than flipping tonight -- at k=10 the
+            # median team (11 matches) would have crossed immediately.
+            "k_crossover": round(k_derived, 2),
+            "k_source": ("measured: forecast_blend_k_2025.json (k=10 beats "
+                         "derived, CI clear of zero)" if k != k_derived
+                         else "derived: sigma^2 / (tau^2 (1-rho^2))"),
             "opponent_adjusted": True,
             "home_advantage_pts_per_set": None,   # filled below
             # ⚠ STEP 3 OF THE AUDIT: RE-FIT k, OR STATE WHY NOT. Stating why
