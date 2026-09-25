@@ -125,6 +125,27 @@ def build():
     n = len(teams)
 
     base = np.array([PRIOR_SLOPE * strength[t] + PRIOR_INTERCEPT for t in teams])
+    sd = np.full(n, PRIOR_RESIDUAL_SD)
+    basis = "prior_2025"
+    # ⚠ START FROM THE BLEND, NOT LAST SEASON (Cody 2026-09-24: 2025 is the
+    # starting point only). Mean = the Rankings blend x the calibrated
+    # pts/set scale (forecast_calibration_2025.json); each team's SD NARROWS
+    # with its matches played by the standard normal update
+    # 1/sd^2 = 1/2.12^2 + n/sigma^2. Backtested on 2025 from three
+    # checkpoints (measure_sim_blend.py): median win-total error 2.01 vs
+    # 2.64, CI clear of zero, 80% bands still covering ~87%. Only while the
+    # receipt says SHIPS; last season stays the fallback.
+    _rec = load("data/sim_blend_2025.json") or {}
+    _cal = load("data/forecast_calibration_2025.json") or {}
+    _bl = {r["team"]: r for r in ((load("data/digby_top25_%d.json" % SEASON) or {}).get("all") or [])}
+    if ((_rec.get("mae_improvement") or {}).get("verdict") == "SHIPS"
+            and _cal.get("scale_pts_per_unit") and all(t in _bl for t in teams)):
+        _sc, _s2 = float(_cal["scale_pts_per_unit"]), float(_rec["sigma2"])
+        base = np.array([float(_bl[t]["score"]) * _sc for t in teams])
+        _n = np.array([played[t][0] + played[t][1] for t in teams], dtype=float)
+        sd = 1.0 / np.sqrt(1.0 / PRIOR_RESIDUAL_SD ** 2 + _n / _s2)
+        basis = "blend"
+    print("  strength basis: %s" % basis)
     hi = np.array([idx[f["home"]] for f in fixtures])
     ai = np.array([idx[f["away"]] for f in fixtures])
     # The fitted home edge, zero on a neutral floor. Taken as a constant rather
@@ -196,7 +217,7 @@ def build():
     for _ in range(ITERATIONS):
         # redraw every team's true strength -- the correction that keeps the
         # win-total bands honest
-        s = base + rng.normal(0.0, PRIOR_RESIDUAL_SD, n)
+        s = base + rng.normal(0.0, 1.0, n) * sd
         margin = (s[hi] + adv) - s[ai]
         p = np.clip(0.5 + margin / (2.0 * R), 0.10, 0.90)
 
@@ -309,6 +330,7 @@ def build():
             "seed": SEED,
             "prior_slope": PRIOR_SLOPE,
             "prior_residual_sd": PRIOR_RESIDUAL_SD,
+            "strength_basis": basis,
             "match_model": "rally model, calibrated Brier 0.1289 on 2025",
             "strength_uncertainty": ("each iteration redraws every team's strength "
                                      "from the prior plus its measured residual; "

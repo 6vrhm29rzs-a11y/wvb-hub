@@ -179,12 +179,14 @@ jobs:
           python3 scripts/build_dataset.py
           python3 scripts/rpi_2025.py || echo "RPI needs a game graph; skipping this early"
           python3 scripts/rating_2025.py || echo "rating needs 50 matches; skipping"
+          # The blend FIRST: predict_2026 and simulate_season_2026 stand on
+          # digby_top25 since 2026-09-23/24, so it must be rebuilt before them.
+          python3 scripts/conference_repair.py || echo "conference repair skipped"
+          python3 scripts/digby_top25.py || echo "top 25 needs a projection; skipping"
           python3 scripts/predict_2026.py || echo "prediction needs a prior rating; skipping"
           python3 scripts/simulate_season_2026.py || echo "season sim skipped"
           python3 scripts/score_predictions.py || true
           python3 scripts/project_lineups.py || echo "no lineups yet; continuing"
-          python3 scripts/conference_repair.py || echo "conference repair skipped"
-          python3 scripts/digby_top25.py || echo "top 25 needs a projection; skipping"
           python3 scripts/resume_2025.py || echo "resume not active yet; skipping"
           # the ranking-chain certification step (certified properties,
           # 2026-09-03): certifies ordering_mature_for_public_rank against

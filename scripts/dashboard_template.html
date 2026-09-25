@@ -163,6 +163,18 @@ svg text{font-family:var(--sans)}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--coral);margin-right:6px;vertical-align:1px}
 @media (prefers-reduced-motion:no-preference){.dot{animation:pulse 1.6s ease-in-out infinite}@keyframes pulse{50%{opacity:.25}}}
 .fresh button{font:700 13px var(--sans);padding:9px 14px;border-radius:999px;border:0;background:#F2C766;color:#1B2340;cursor:pointer}
+.formgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.formgrid .chcard:first-child{grid-row:span 2}
+.mini{display:grid;gap:6px}
+.mi{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;font-size:14px}
+.mi .tn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mi b{font:700 14px/1 var(--mono)}
+.hc{display:grid;grid-template-columns:minmax(0,1fr) 120px 52px;gap:8px;align-items:center;font-size:13.5px;padding:3px 0}
+.hc .trk{position:relative;height:12px}
+.hc .trk::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line)}
+.hc .trk i{position:absolute;top:2px;height:8px;border-radius:3px}
+.hc b{font:700 12.5px/1 var(--mono);text-align:right}
+.hc.sep{border-top:1px dashed var(--line);margin-top:6px;padding-top:9px}
 .foot{font-size:12px;color:var(--mute);text-align:center}
 @media (prefers-reduced-motion:no-preference){.bar i{transition:width .5s ease}}
 </style>
@@ -173,7 +185,7 @@ svg text{font-family:var(--sans)}
     <div class="sub" id="sub"></div>
     <div class="kpis" id="kpis"></div>
     <div class="fresh" id="fresh" hidden><button type="button" id="reload">New results are in. Tap to refresh.</button></div>
-    <nav class="nav" aria-label="Sections"><a href="#live" id="livelink" hidden>Live</a><a href="#race">Rank race</a><a href="#top25">Top 25</a><a href="#spot">Team spotlight</a><a href="#stars">Players</a><a href="#results">Results</a><a href="#ahead">Ahead</a><a href="#leaders">Leaders</a><a href="#conf">Conferences</a></nav>
+    <nav class="nav" aria-label="Sections"><a href="#live" id="livelink" hidden>Live</a><a href="#race">Rank race</a><a href="#top25">Top 25</a><a href="#spot">Team spotlight</a><a href="#form">Form</a><a href="#stars">Players</a><a href="#teamlead">Team stats</a><a href="#results">Results</a><a href="#ahead">Ahead</a><a href="#leaders">Leaders</a><a href="#conf">Conferences</a></nav>
   </header>
 
   <section class="panel" id="live" hidden>
@@ -201,10 +213,26 @@ svg text{font-family:var(--sans)}
     </section>
   </div>
 
+  <section class="panel" id="form">
+    <h2>Form, streaks and nerve <small id="formnote"></small></h2>
+    <div class="formgrid">
+      <div class="chcard"><h4>Who's heating up, who's cooling</h4><p class="note">Last five matches' point margin per set against the team's season average. Top 50 teams only.</p><div id="hotcold"></div></div>
+      <div class="chcard"><h4>Active win streaks</h4><div id="streaks" class="mini"></div></div>
+      <div class="chcard"><h4>Five-set record</h4><div id="clutch" class="mini"></div></div>
+      <div class="chcard"><h4>Comebacks (won after losing set 1)</h4><div id="comebacks" class="mini"></div></div>
+      <div class="chcard"><h4>Close sets (decided by 2), best record</h4><div id="closest" class="mini"></div></div>
+    </div>
+  </section>
+
   <section class="panel" id="stars">
     <h2>Players to watch <small id="pnote"></small></h2>
     <div class="seg" id="pseg" role="group" aria-label="Which players"><button type="button" data-p="lead" aria-pressed="true">National leaders</button><button type="button" data-p="stars" aria-pressed="false">Top-25 team stars</button></div>
     <div class="pgrid" id="pgrid"></div>
+  </section>
+
+  <section class="panel" id="teamlead">
+    <h2>Team leaderboards <small id="tlnote"></small></h2>
+    <div class="boards" id="tboards"></div>
   </section>
 
   <div class="row2">
@@ -530,6 +558,32 @@ setInterval(async () => {
     if (!txt.includes(JSON.stringify(D.stamp))) $('#fresh').hidden = false; } catch (e) {}
 }, 300000);
 $('#reload').addEventListener('click', () => location.reload());
+
+// ---------- form, streaks, team boards ----------
+const TM = D.tm;
+$('#formnote').textContent = `all ${TM.n} D-I teams with six or more counted matches`;
+const miRow = (r, v) => `<div class="mi"><span class="tn">${logo(r.t)}${rk(r.rank)}<span>${esc(r.t)}</span></span><b>${v}</b></div>`;
+$('#streaks').innerHTML = TM.streaks.map(r => miRow(r, r.streak.replace('W', 'W ') + ` <span class="note">(${r.w}-${r.l})</span>`)).join('');
+$('#clutch').innerHTML = TM.clutch.map(r => miRow(r, `${r.five[0]}-${r.five[1]}`)).join('');
+$('#comebacks').innerHTML = TM.comebacks.map(r => miRow(r, r.comeback)).join('');
+$('#closest').innerHTML = TM.closest.map(r => miRow(r, `${r.close[0]}-${r.close[1]}`)).join('');
+(function () {
+  const all = TM.hot.concat(TM.cold), mx = Math.max(...all.map(r => Math.abs(r.form)), 1);
+  const row = (r, first) => { const w = Math.abs(r.form) / mx * 50, pos = r.form >= 0;
+    return `<div class="hc${first ? ' sep' : ''}"><span class="tn">${logo(r.t)}${rk(r.rank)}<span>${esc(r.t)}</span></span>
+      <span class="trk" title="season ${r.marg > 0 ? '+' : ''}${r.marg}, last five ${r.last5 > 0 ? '+' : ''}${r.last5}"><i style="${pos ? 'left:50%' : 'right:50%'};width:${w}%;background:${pos ? 'var(--win)' : 'var(--loss)'}"></i></span>
+      <b class="${pos ? 'up' : 'dn'}">${pos ? '+' : ''}${r.form.toFixed(2)}</b></div>`; };
+  $('#hotcold').innerHTML = TM.hot.map(r => row(r)).join('') + TM.cold.map((r, i) => row(r, i === 0)).join('');
+})();
+$('#tlnote').textContent = 'every D-I team with six or more matches; box-score rates include matches against non-D-I opponents';
+$('#tboards').innerHTML = TM.boards.map(([name, key, rows]) => {
+  const vals = rows.map(r => r[key]), lo = Math.min(...vals), hi = Math.max(...vals);
+  const fmt = v => key === 'hit' || key === 'ohit' ? pct3(v) : (key === 'marg' ? (v > 0 ? '+' : '') + v.toFixed(2) : v.toFixed(2));
+  const width = v => key === 'ohit' ? (lo / v * 100) : (v / hi * 100);
+  return `<div class="board"><h3>${esc(name)}</h3>${rows.map((r, i) => `
+    <div class="lr"><span class="i">${i + 1}</span><span class="n"><span class="tn">${logo(r.t)}${rk(r.rank)} ${esc(r.t)}</span><small>${r.w}-${r.l}</small></span><span class="v">${fmt(r[key])}</span>
+    <span class="bar"><i style="width:${Math.max(4, width(r[key])).toFixed(1)}%"></i></span></div>`).join('')}</div>`;
+}).join('');
 
 renderTop(); drawRace(); loadSpot(spotTeam, false); renderPlayers(); renderFeed('big'); drawScat(); drawConf();
 let rT; window.addEventListener('resize', () => { clearTimeout(rT); rT = setTimeout(() => { drawRace(); drawScat(); drawConf(); spotDraw && spotDraw(); }, 150); });

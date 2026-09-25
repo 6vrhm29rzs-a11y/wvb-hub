@@ -617,6 +617,14 @@ def test_blend_k_is_measured_and_forecasts_use_it():
     if os.path.exists(pp):
         basis = (_json.load(open(pp)).get("meta") or {}).get("strength_basis")
         assert basis == "blend", "forecasts stand on %s, not the blend" % basis
+    # the season simulator too, once its own backtest receipt ships
+    sr = os.path.join(REPO, "data", "sim_blend_2025.json")
+    sp = os.path.join(REPO, "data", "season_sim_2026.json")
+    if os.path.exists(sr) and os.path.exists(sp):
+        v = (_json.load(open(sr)).get("mae_improvement") or {}).get("verdict")
+        sb = (_json.load(open(sp)).get("meta") or {}).get("strength_basis")
+        assert v != "SHIPS" or sb == "blend", \
+            "simulator backtest ships but the simulator stands on %s" % sb
     print("  blend k %s (derived %s, crossover %s), forecasts on blend  ok"
           % (k, kd, kc))
 

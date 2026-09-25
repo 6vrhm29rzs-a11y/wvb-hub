@@ -11535,6 +11535,14 @@ details.avhist{margin:14px 0}
 #v-news .nwh{font:700 19px/1.25 var(--disp);margin:0 0 6px;letter-spacing:.01em}
 #v-news .nwitem.nwlead .nwh{font-size:27px;line-height:1.18}
 #v-news .nwmeta{font-size:12px;color:var(--slate);letter-spacing:.02em}
+/* crests beside each headline: winner full-strength, loser dimmed -- the
+   story is about the winner (2026-09-24 UI pass) */
+#v-news .nwtop{display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
+#v-news .nwcrest{display:flex;gap:6px;align-items:center;flex:none;padding-top:2px}
+#v-news .nwcrest .nwc{width:34px;height:34px;object-fit:contain}
+#v-news .nwcrest .nwl{width:24px;height:24px;opacity:.55}
+#v-news .nwitem.nwlead .nwcrest .nwc{width:48px;height:48px}
+#v-news .nwitem.nwlead .nwcrest .nwl{width:30px;height:30px}
 #v-news .nwgo{margin-top:10px;font:600 11px/1 var(--disp);letter-spacing:.1em;
   text-transform:uppercase;color:var(--slate);background:none;
   border:1px solid var(--line);border-radius:var(--r-ctl,8px);
@@ -12063,6 +12071,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
              group header with no items is worse than no group. -->
         <div class="mgroup mgpriv">
           <span class="mglabel" aria-hidden="true">Private workspace</span>
+          <button role="menuitem" data-act="centercourt" onclick="location.href='CENTER-COURT.html'">Center Court dashboard</button>
           <button role="menuitem" data-v="ballot" class="phoneonly">My Ballot</button>
           <!-- AVAIL-MENU-BEGIN -->
           <button role="menuitem" data-v="avail">Availability</button>
@@ -19866,7 +19875,10 @@ function renderNews() {
     if (f.winner_power) bits.push('POWER #' + f.winner_power + ' ' + esc(f.winner));
     if (f.loser_power) bits.push('POWER #' + f.loser_power + ' ' + esc(f.loser));
     return '<article class="nwitem' + (i === 0 ? ' nwlead' : '') + '">' +
-      '<h3 class="nwh">' + esc(s.headline) + '</h3>' +
+      '<div class="nwtop"><h3 class="nwh">' + esc(s.headline) + '</h3>' +
+      ((f.winner || f.loser) ? '<span class="nwcrest" aria-hidden="true">' +
+        logo(f.winner, 'nwc') + logo(f.loser, 'nwc nwl') + '</span>' : '') +
+      '</div>' +
       '<div class="nwmeta munk">' +
         (f.loser_rank ? '<b>AVCA No. ' + f.loser_rank + '</b> beaten &middot; ' : '') +
         bits.join(' &middot; ') +

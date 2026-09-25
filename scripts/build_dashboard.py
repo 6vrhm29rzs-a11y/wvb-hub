@@ -283,7 +283,135 @@ def collect():
     d25 = json.load(open('data/data_2025.json'))
     seo = {t['name_short']: t.get('seoname') for t in d25['teams']}
     seo.update({t['name_short']: t.get('seoname') for t in d['teams'] if t.get('seoname')})
-    need = set(top25) | {p['t'] for p in players}
+    # ---- team metrics: every D-I team, from the same counted finals ----
+    # Box totals per game (kills/errors/attempts/aces/blocks/digs), both sides.
+    tbox = {}
+    for line in open('data/raw/2026/boxscores.jsonl'):
+        try:
+            r = json.loads(line)
+        except ValueError:
+            continue
+        gid = str(r.get('game_id'))
+        if gid not in gid_ok:
+            continue
+        per = {}
+        for t in r.get('teams') or []:
+            k = e = ta = 0
+            for st in (t.get('team_stats') or {}).get('sets') or []:
+                try:
+                    k += int(st.get('kills') or 0); e += int(st.get('attackErrors') or 0)
+                    ta += int(st.get('attackAttempts') or 0)
+                except ValueError:
+                    pass
+            per[str(t.get('team_id'))] = [k, e, ta, 0, 0.0, 0]
+        tbox[gid] = per
+    # aces / blocks / digs come from the player lines (team block has no digs)
+    for line in open('data/raw/2026/playerbox.jsonl'):
+        try:
+            r = json.loads(line)
+        except ValueError:
+            continue
+        gid = str(r.get('game_id'))
+        if gid not in tbox:
+            continue
+        agg = {}
+        for row in r.get('rows') or []:
+            a = agg.setdefault(str(row.get('team_id')), [0, 0.0, 0])
+            try:
+                a[0] += int(row.get('aces') or 0)
+                a[1] += int(row.get('bs') or 0) + 0.5 * int(row.get('ba') or 0)
+                a[2] += int(row.get('digs') or 0)
+            except ValueError:
+                pass
+        for tid, a in agg.items():
+            if tid in tbox[gid]:
+                tbox[gid][tid][3:6] = a
+    # D-I = the 348 the rankings carry, never the feed's division flag (the
+    # feed serves West Florida as div 1 on an all-D-II schedule)
+    di = {name2tid[t] for t in B if t in name2tid}
+    tm = {}
+    for g in games:
+        ts = g['teams']; wi = SC.winner_index(g)
+        ls = g.get('linescores') or []
+        for i in (0, 1):
+            me, op = ts[i], ts[1 - i]
+            if str(me['team_id']) not in di:
+                continue
+            x = tm.setdefault(me['name_short'], dict(res=[], sets=0, five=[0, 0], comeback=0, close=[0, 0],
+                                                    sweeps=0, k=0, e=0, ta=0, ok=0, oe=0, ota=0, aces=0, blk=0.0,
+                                                    dig=0, bsets=0, marg=[]))
+            win = i == wi
+            x['res'].append('W' if win else 'L')
+            mine = [(q.get('home') if me['is_home'] else q.get('visit')) for q in ls]
+            thr = [(q.get('visit') if me['is_home'] else q.get('home')) for q in ls]
+            if ls:
+                x['sets'] += len(ls)
+                x['marg'].append(sum(a - b for a, b in zip(mine, thr)) / len(ls))
+                if len(ls) == 5:
+                    x['five'][0 if win else 1] += 1
+                if win and mine[0] < thr[0]:
+                    x['comeback'] += 1
+                if win and len(ls) == 3:
+                    x['sweeps'] += 1
+                for a, b in zip(mine, thr):
+                    if abs(a - b) <= 2:
+                        x['close'][0 if a > b else 1] += 1
+            bx = tbox.get(g['game_id'], {})
+            mb, ob = bx.get(str(me['team_id'])), bx.get(str(op['team_id']))
+            if mb and ob and mb[2] and ob[2] and ls:
+                x['k'] += mb[0]; x['e'] += mb[1]; x['ta'] += mb[2]
+                x['ok'] += ob[0]; x['oe'] += ob[1]; x['ota'] += ob[2]
+                x['aces'] += mb[3]; x['blk'] += mb[4]; x['dig'] += mb[5]; x['bsets'] += len(ls)
+    teamstats = []
+    for name, x in tm.items():
+        n = len(x['res'])
+        if n < 6:
+            continue
+        streak = 1
+        for r_ in reversed(x['res'][:-1]):
+            if r_ != x['res'][-1]:
+                break
+            streak += 1
+        season = sum(x['marg']) / len(x['marg']) if x['marg'] else None
+        last5 = sum(x['marg'][-5:]) / len(x['marg'][-5:]) if len(x['marg']) >= 5 else None
+        bs = x['bsets']
+        teamstats.append(dict(
+            t=name, n=n, w=x['res'].count('W'), l=x['res'].count('L'),
+            streak=('%s%d' % (x['res'][-1], streak)), sk=streak if x['res'][-1] == 'W' else -streak,
+            five=x['five'], comeback=x['comeback'], close=x['close'],
+            sweep=round(x['sweeps'] / n, 3), marg=round(season, 2) if season is not None else None,
+            last5=round(last5, 2) if last5 is not None else None,
+            form=round(last5 - season, 2) if last5 is not None and season is not None else None,
+            hit=round((x['k'] - x['e']) / x['ta'], 3) if x['ta'] else None,
+            ohit=round((x['ok'] - x['oe']) / x['ota'], 3) if x['ota'] else None,
+            aps=round(x['aces'] / bs, 2) if bs else None, bps=round(x['blk'] / bs, 2) if bs else None,
+            dps=round(x['dig'] / bs, 2) if bs else None, rank=(B.get(name) or {}).get('rank')))
+    def tboard(key, rev=True, n=5, flt=lambda r: True):
+        rows = [r for r in teamstats if r.get(key) is not None and flt(r)]
+        return sorted(rows, key=lambda r: r[key], reverse=rev)[:n]
+    tboards = [
+        ('Hitting %', 'hit', tboard('hit')),
+        ('Opp. hitting % (lowest)', 'ohit', tboard('ohit', rev=False)),
+        ('Point margin / set', 'marg', tboard('marg')),
+        ('Blocks / set', 'bps', tboard('bps')),
+        ('Aces / set', 'aps', tboard('aps')),
+        ('Digs / set', 'dps', tboard('dps')),
+    ]
+    streaks = sorted([r for r in teamstats if r['sk'] >= 3], key=lambda r: -r['sk'])[:8]
+    top50 = lambda r: (r['rank'] or 999) <= 50
+    hot = tboard('form', flt=top50, n=6)
+    cold = tboard('form', rev=False, flt=top50, n=6)
+    clutch = sorted([r for r in teamstats if sum(r['five']) >= 2], key=lambda r: (-(r['five'][0] - r['five'][1]), -r['five'][0]))[:6]
+    comebacks = sorted([r for r in teamstats if r['comeback']], key=lambda r: -r['comeback'])[:6]
+    closest = sorted([r for r in teamstats if sum(r['close']) >= 4], key=lambda r: -(r['close'][0] / float(sum(r['close']))))[:6]
+    tm_payload = dict(boards=tboards, streaks=streaks, hot=hot, cold=cold, clutch=clutch, comebacks=comebacks,
+                      closest=closest, n=len(teamstats))
+    tm_names = set()
+    for _, _, rows in tboards:
+        tm_names |= {r['t'] for r in rows}
+    for grp in (streaks, hot, cold, clutch, comebacks, closest):
+        tm_names |= {r['t'] for r in grp}
+    need = set(top25) | {p['t'] for p in players} | tm_names
     for r in base['res']:
         if (r['rw'] or 99) <= 25 or (r['rl'] or 99) <= 25:
             need |= {r['w'], r['l']}
@@ -293,7 +421,7 @@ def collect():
              for t in sorted(need) if seo.get(t)}
     colors = {k: v.get('primary') for k, v in json.load(open('data/team_colors_2026.json'))['teams'].items() if k in need}
 
-    base.update(trend=trend, trend_days=trend_days, missing=missing, series=series, players=players, logos=logos, colors=colors)
+    base.update(tm=tm_payload, trend=trend, trend_days=trend_days, missing=missing, series=series, players=players, logos=logos, colors=colors)
     return base
 
 
