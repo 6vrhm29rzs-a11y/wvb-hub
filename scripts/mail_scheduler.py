@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """When the daily reports go out (Cody/coordination to-builder 009, review 010).
 
-  mail_scheduler.py morning         run at 06:00 PT: one Morning Brief per date
+  mail_scheduler.py morning         05:40 PT prepares; 06:00 PT dispatches (one per date)
   mail_scheduler.py night-check     run every 15 min, 17:00-21:15 PT
   mail_scheduler.py status          print today's state
 
@@ -15,7 +15,10 @@ Night rules:
     listing what is still live or not logged. A refresh that fails or times
     out falls back to the last built page and the report says so. A day with
     no games gets a short digest.
-  * one Night Desk per date.
+  * one Night Desk per date. Every waiting check also PREPARES the report, so
+    the final attempt has a fallback if its own build fails or runs long.
+  * every step is time-bounded: refresh 360 s, build 150 s, osascript 30-90 s,
+    Outbox wait 150 s -- about 11 min worst case from 21:15.
 
 Delivery state (Cody/data/mail_state.json, private) is named for what is
 known: 'claimed' is persisted BEFORE a send, 'queued_in_outbox' while Mail
@@ -43,7 +46,8 @@ STATE = os.path.join(REPO, "Cody", "data", "mail_state.json")
 UNSENT = os.path.join(REPO, "Cody", "data", "unsent")
 LOG = os.path.expanduser("~/Library/Logs/wvb-mail.log")
 DEADLINE = (21, 30)          # the report is submitted by this time
-FINAL_START = (21, 15)       # the final attempt starts here: refresh <= 6 min + build/submit
+FINAL_START = (21, 15)
+MORNING_DISPATCH = (6, 0)    # target send time; preparation runs before it (05:40)       # the final attempt starts here: refresh <= 6 min + build/submit
 VARIANT_FILE = os.path.join(REPO, "Cody", "data", "mail_variant.txt")
 
 from zoneinfo import ZoneInfo  # noqa: E402
@@ -185,10 +189,23 @@ def variant():
     return "A" if v != "A" else v
 
 
-def build(kind, day, note=""):
-    r = subprocess.run([sys.executable, os.path.join(REPO, "scripts", "mail_report.py"),
-                        kind, "--variant", variant(), "--day", day, "--status", note],
-                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+BUILD_TIMEOUT_S = 150
+PREPARED = os.path.join(REPO, "Cody", "data", "prepared")
+
+
+def prepared_path(kind, day):
+    return os.path.join(PREPARED, "%s-%s.txt" % (kind, day))
+
+
+def build(kind, day, note="", timeout=BUILD_TIMEOUT_S, report=None):
+    """Bounded report build (review 012 finding 2). Raises on failure/timeout."""
+    cmd = [report or os.path.join(REPO, "scripts", "mail_report.py"),
+           kind, "--variant", variant(), "--day", day, "--status", note]
+    try:
+        r = subprocess.run([sys.executable] + cmd, stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        raise RuntimeError("report build exceeded %d s" % timeout)
     body = r.stdout.decode("utf-8")
     if r.returncode != 0 or body.count("\n") < 12:
         raise RuntimeError("report build failed or looks empty: %s"
@@ -196,10 +213,42 @@ def build(kind, day, note=""):
     return body
 
 
+def prepare(kind, day, note):
+    """Build ahead of dispatch and keep it: the fallback if the dispatch-time
+    build fails or runs out of time."""
+    body = build(kind, day, "prepared %s; %s" % (now().strftime("%-I:%M %p PT"), note))
+    os.makedirs(PREPARED, exist_ok=True)
+    tmp = prepared_path(kind, day) + ".tmp"
+    io.open(tmp, "w", encoding="utf-8").write(body)
+    os.replace(tmp, prepared_path(kind, day))
+    return body
+
+
+def body_for_dispatch(kind, day, note, prefer_prepared=False):
+    """Fresh build within its bound; else the prepared report, said so.
+    prefer_prepared: dispatch the report prepared earlier today without
+    rebuilding (the 06:00 morning send, so dispatch time is not spent on
+    preparation)."""
+    p = prepared_path(kind, day)
+    if prefer_prepared and os.path.exists(p):
+        return io.open(p, encoding="utf-8").read(), "prepared earlier today"
+    try:
+        return build(kind, day, note), "fresh"
+    except RuntimeError as e:
+        p = prepared_path(kind, day)
+        if os.path.exists(p):
+            return io.open(p, encoding="utf-8").read(), "prepared (fresh build failed: %s)" % e
+        raise
+
+
 def outbox_count(subject):
     script = ('tell application "Mail" to count (messages of outbox whose subject is "%s")'
               % subject.replace('"', ''))
-    r = subprocess.run(["osascript", "-e", script], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    try:
+        r = subprocess.run(["osascript", "-e", script], stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE, timeout=30)
+    except subprocess.TimeoutExpired:
+        return None
     try:
         return int(r.stdout.decode().strip()) if r.returncode == 0 else None
     except ValueError:
@@ -234,46 +283,66 @@ class Lock(object):
         self.fh.close()
 
 
-# States, named for what is actually known (REVIEW 010 FINDING 3):
-#   claimed               a send was about to be attempted; never resend blindly
-#   queued_in_outbox      Mail accepted it and still holds it
-#   submitted             Mail accepted it and it left the Outbox (handed to the
-#                         server). NOT proof of inbox delivery or of receipt.
-#   not_sent_transport_off / build_failed / send_refused   nothing left the Mac
+# States, named for what is actually known (reviews 010 + 012):
+#   claimed            persisted before the send, with a unique attempt id
+#   queued_in_outbox   Mail still holds this subject
+#   submitted          the send log holds an ok record for THIS attempt id,
+#                      from the WVB sender to the approved recipient, AND the
+#                      Outbox no longer holds it: handed to the mail server.
+#                      NOT proof of inbox delivery or receipt.
+#   needs_review       anything ambiguous: the Outbox could not be checked, or
+#                      it is empty but no matching log record exists (a crash
+#                      between Mail accepting and the log write looks exactly
+#                      like that). HELD for Cody -- never retried
+#                      automatically, never counted as submitted.
+#   not_sent_transport_off / build_failed / send_refused   provably nothing left
 DONE = ("submitted",)
-IN_FLIGHT = ("claimed", "queued_in_outbox")
+IN_FLIGHT = ("claimed", "queued_in_outbox", "needs_review")
+
+
+def _log_match(rec):
+    import mailer
+    for r in mailer.log_records():
+        if (r.get("attempt") and r.get("attempt") == rec.get("attempt")
+                and r.get("ok") is True and r.get("from") == mailer.APPROVED_SENDER
+                and (r.get("to") or "").lower() == mailer.approved_recipient()
+                and r.get("subject") == rec.get("subject")):
+            return True
+    return False
 
 
 def reconcile(rec):
-    """Resolve an in-flight record before any retry, so a message that later
-    left the Outbox is never sent a second time."""
+    """Resolve an in-flight record before any retry. Ambiguity HOLDS: a
+    duplicate report is worse than a missing one, which a human can send."""
     if not rec or rec.get("status") not in IN_FLIGHT:
         return rec
     n = outbox_count(rec["subject"])
-    if n and n > 0:
+    logged = _log_match(rec)
+    if n is None:
+        rec["status"] = "needs_review"
+        rec["why"] = "Mail's Outbox could not be checked"
+    elif n > 0:
         rec["status"] = "queued_in_outbox"
+    elif logged:
+        rec["status"] = "submitted"
     else:
-        logged = False
-        try:
-            for line in io.open(os.path.join(REPO, "Cody", "data", "mail_log.jsonl"), encoding="utf-8"):
-                if rec["subject"] in line:
-                    logged = True
-        except IOError:
-            pass
-        # accepted by the mailer and gone from the Outbox -> submitted;
-        # never accepted -> the claim was abandoned before sending
-        rec["status"] = "submitted" if logged else "claim_abandoned"
+        rec["status"] = "needs_review"
+        rec["why"] = ("Outbox empty but no ok log record for attempt %s -- it may have "
+                      "been accepted before a crash; check WVB Sent Mail before resending"
+                      % rec.get("attempt"))
     rec["reconciled_at"] = now().isoformat(timespec="seconds")
     return rec
 
 
-def deliver(kind, day, note, s, slot):
+def deliver(kind, day, note, s, slot, prefer_prepared=False):
     import mailer
+    import uuid
     title = "Night Desk" if kind == "night" else "Morning Brief"
     subject = "WVB Hub — %s — %s" % (title, day)
     rec = {"at": now().isoformat(timespec="seconds"), "subject": subject, "note": note}
     try:
-        body = build(kind, day, note)
+        body, source = body_for_dispatch(kind, day, note, prefer_prepared)
+        rec["body_source"] = source
     except Exception as e:
         rec.update(status="build_failed", error=str(e)[:300])
         return rec
@@ -282,12 +351,17 @@ def deliver(kind, day, note, s, slot):
         io.open(os.path.join(UNSENT, "%s-%s.txt" % (kind, day)), "w", encoding="utf-8").write(body)
         rec.update(status="not_sent_transport_off")
         return rec
-    rec["status"] = "claimed"                     # persisted BEFORE the send
+    rec.update(status="claimed", attempt=uuid.uuid4().hex)   # persisted BEFORE the send
     slot[kind] = rec
     save_state(s)
-    rc = mailer.send(subject, body)
+    try:
+        rc = mailer.send(subject, body, attempt=rec["attempt"])
+    except Exception as e:
+        # Mail may or may not have accepted it: hold for review, never retry
+        rec.update(status="needs_review", why="send raised: %s" % str(e)[:200])
+        return rec
     if rc != 0:
-        rec.update(status="send_refused", rc=rc)
+        rec.update(status="send_refused", rc=rc)       # refused before Mail was asked
         return rec
     rec.update(status="submitted" if wait_outbox(subject) else "queued_in_outbox")
     return rec
@@ -303,8 +377,20 @@ def run_morning():
             save_state(s)
             log("morning %s already %s -- not sending again" % (day, slot["morning"]["status"]))
             return 0
-        ok, rnote = refresh()
-        slot["morning"] = deliver("morning", day, "06:00 run; " + rnote, s, slot)
+        t = now()
+        if (t.hour, t.minute) < MORNING_DISPATCH:
+            # preparation run (05:40): refresh and build, never send
+            ok, rnote = refresh()
+            try:
+                prepare("morning", day, rnote)
+                log("morning %s prepared for 06:00 dispatch" % day)
+            except Exception as e:
+                log("morning %s preparation failed: %s" % (day, e))
+            save_state(s)
+            return 0
+        # dispatch run (06:00): send what was prepared; build only if nothing was
+        slot["morning"] = deliver("morning", day, "dispatch 06:00", s, slot,
+                                  prefer_prepared=True)
         save_state(s)
         log("morning %s -> %s" % (day, slot["morning"]["status"]))
         return 0 if slot["morning"]["status"] in DONE + ("not_sent_transport_off",) else 1
@@ -325,6 +411,10 @@ def run_night_check():
         ok, rnote = refresh()
         complete, n, nf, why = slate_status(day)
         if not final and not complete:
+            try:
+                prepare("night", day, "%s; %s" % (why, rnote))
+            except Exception as e:
+                log("night %s preparation failed: %s" % (day, e))
             save_state(s)
             log("night %s waiting: %s" % (day, why))
             return 0

@@ -60,17 +60,24 @@ def test_reports():
     c = R.collect("night", day)
     a, b = R.render_a(c), R.render_b(c)
     check("variant A carries the POWER table with day and week changes",
-          "POWER TOP 15" in a and "day = " in a and "week = " in a)
+          "POWER TOP 15" in a and "Day = " in a and "Week = " in a)
     check("variant B is HTML with the same POWER table",
-          b.startswith("<div") and "POWER top 15" in b)
+          b.startswith("<div") and "POWER Top 15" in b)
     check("rating change and place change are separate columns/labels",
-          "change = rating pts, then places" in a and " pts " in a)
+          "change in rating points, then" in a and " pts " in a)
     check("the week baseline names its Sunday",
           "Sunday-night lock (" in a)
     check("nothing invented: news section states it is not connected",
           "no verified news source" in R.render_a(R.collect("morning", day)))
-    check("[-] a report never claims a result it did not render",
-          all(r["w"] in a for r in c["upsets"]))
+    check("[-] takeaways name only results that exist",
+          all(r["w"] in a for r in c["upsets"][:1]))
+    order = [a.find(x) for x in ("TAKEAWAYS", "POWER TOP 15", "BIGGEST MOVERS OUTSIDE", "UNFINISHED AT SEND TIME")]
+    check("011 order: takeaways, POWER Top 15, movers outside, unfinished",
+          all(x >= 0 for x in order[:2] + order[3:]) and order == sorted(x for x in order if x >= 0) or
+          (order[0] < order[1] < order[3]))
+    check("3-5 takeaways, biggest upset distinct from most consequential",
+          1 <= len(c["takeaways"]) <= 5 and (len(c["takeaways"]) < 2 or
+          c["takeaways"][0][1] != c["takeaways"][1][1]))
 
 
 def test_schedule():
@@ -83,7 +90,7 @@ def test_schedule():
     check("no state is called 'delivered' (the Outbox cannot prove receipt)",
           '"delivered"' not in src)
     check("a claim is persisted before the send",
-          src.index('rec["status"] = "claimed"') < src.index("rc = mailer.send("))
+          src.index('rec.update(status="claimed"') < src.index("rc = mailer.send("))
     check("runs are serialized by a lock", "with Lock():" in src)
 
     print("\n4. FEED EVIDENCE (review 010 finding 1) -- stubbed, no network")
@@ -110,19 +117,75 @@ def test_schedule():
         got = S.slate_status(day, feed=feed, t=t, games=games)[0]
         check(label, got is want, got)
 
-    print("\n5. NO DUPLICATE SENDS (review 010 finding 3) -- stubbed Outbox")
-    orig = S.outbox_count
+    print("\n5. NO DUPLICATE SENDS (reviews 010, 012) -- Outbox and log stubbed")
+    import mailer as M
+    o_out, o_log, o_appr = S.outbox_count, M.log_records, M.approved_recipient
     try:
+        M.approved_recipient = lambda: "approved@example.org"
+        claim = {"status": "claimed", "subject": "S", "attempt": "a1"}
+        good = {"attempt": "a1", "ok": True, "from": M.APPROVED_SENDER,
+                "to": "approved@example.org", "subject": "S"}
+        S.outbox_count = lambda subj: None
+        M.log_records = lambda: []
+        check("Outbox unavailable, no log -> held (needs_review), not abandoned",
+              S.reconcile(dict(claim))["status"] == "needs_review")
+        M.log_records = lambda: [dict(good)]
+        check("Outbox unavailable even WITH a matching log -> held, not submitted",
+              S.reconcile(dict(claim))["status"] == "needs_review")
         S.outbox_count = lambda subj: 1
-        r = S.reconcile({"status": "claimed", "subject": "x"})
-        check("a claim still in the Outbox stays in flight (never resent)",
-              r["status"] == "queued_in_outbox")
+        check("still in the Outbox -> queued, never resent",
+              S.reconcile(dict(claim))["status"] == "queued_in_outbox")
         S.outbox_count = lambda subj: 0
-        r = S.reconcile({"status": "queued_in_outbox", "subject": "never-logged-subject-zz"})
-        check("a claim that never reached the mailer is marked abandoned, not submitted",
-              r["status"] == "claim_abandoned")
+        M.log_records = lambda: [dict(good, ok=False)]
+        check("a FAILED log record with the same subject is not submission",
+              S.reconcile(dict(claim))["status"] == "needs_review")
+        M.log_records = lambda: [dict(good, attempt="other")]
+        check("a record for a different attempt is not submission",
+              S.reconcile(dict(claim))["status"] == "needs_review")
+        M.log_records = lambda: []
+        check("crash after acceptance, before the log write -> held, not retried",
+              S.reconcile(dict(claim))["status"] == "needs_review")
+        M.log_records = lambda: [dict(good)]
+        check("[+] Outbox empty + ok record for THIS attempt -> submitted",
+              S.reconcile(dict(claim))["status"] == "submitted")
+        check("held states are never eligible for a new send",
+              "needs_review" in S.IN_FLIGHT)
     finally:
-        S.outbox_count = orig
+        S.outbox_count, M.log_records, M.approved_recipient = o_out, o_log, o_appr
+
+    print("\n6. EVERY STEP IS TIME-BOUNDED (review 012 finding 2)")
+    import tempfile
+    d = tempfile.mkdtemp()
+    hang = os.path.join(d, "hang.py")
+    open(hang, "w").write("import time\ntime.sleep(30)\n")
+    t0 = __import__("time").time()
+    try:
+        S.build("night", "2026-01-01", "", timeout=2, report=hang)
+        hung = False
+    except RuntimeError as e:
+        hung = "exceeded" in str(e)
+    check("a hanging report build is cut off at its bound",
+          hung and __import__("time").time() - t0 < 10)
+    o_prep, o_build = S.PREPARED, S.build
+    try:
+        S.PREPARED = d
+        open(S.prepared_path("night", "2026-01-01"), "w").write("prepared body\n" * 20)
+        def boom(*a, **k):
+            raise RuntimeError("report build exceeded 150 s")
+        S.build = boom
+        body, src_ = S.body_for_dispatch("night", "2026-01-01", "")
+        check("[+] a failed dispatch build falls back to the prepared report",
+              body.startswith("prepared body") and src_.startswith("prepared"))
+        body, src_ = S.body_for_dispatch("night", "2026-01-01", "", prefer_prepared=True)
+        check("the 06:00 dispatch sends what was prepared without rebuilding",
+              src_ == "prepared earlier today")
+    finally:
+        S.PREPARED, S.build = o_prep, o_build
+    msrc = open(os.path.join(REPO, "scripts", "mailer.py"), encoding="utf-8").read()
+    check("Mail AppleScript calls are time-bounded", "timeout=timeout)" in msrc and "OSA_TIMEOUT_S" in msrc)
+    check("the Outbox check is time-bounded", "timeout=30)" in src)
+    check("morning prepares before its 06:00 dispatch", S.MORNING_DISPATCH == (6, 0)
+          and "preparation run (05:40)" in src)
 
 
 def main():

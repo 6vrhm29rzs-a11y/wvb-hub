@@ -2,8 +2,8 @@
 
 Replaces the 07:00 / 23:30 jobs per `Cody/coordination/decisions/2026-09-26-report-schedule-and-variants.md`.
 
-- `com.codyrose.wvb-mail-morning.plist` — 06:00 PT daily → `scripts/mail_scheduler.py morning`
-- `com.codyrose.wvb-mail-night.plist` — every 15 min 17:00–21:30 PT → `scripts/mail_scheduler.py night-check`
+- `com.codyrose.wvb-mail-morning.plist` — 05:40 PT prepares, 06:00 PT dispatches → `scripts/mail_scheduler.py morning`
+- `com.codyrose.wvb-mail-night.plist` — every 15 min 17:00–21:30 PT (final attempt starts 21:15; 21:30 is a late retry) → `scripts/mail_scheduler.py night-check`
   (sends early once the whole slate is final and logged; otherwise at 21:30; once per date)
 
 Times follow the Mac's local clock (America/Los_Angeles), so DST is handled by macOS.

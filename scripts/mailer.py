@@ -117,10 +117,18 @@ def transport():
     return "off"
 
 
-def _osa(script):
+OSA_TIMEOUT_S = 90
+
+
+def _osa(script, timeout=OSA_TIMEOUT_S):
+    """Run AppleScript with a hard time bound (review 012 finding 2).
+    A timeout returns rc 124, never hangs the caller."""
     import subprocess
-    r = subprocess.run(["osascript", "-e", script], stdout=subprocess.PIPE,
-                       stderr=subprocess.STDOUT, timeout=120)
+    try:
+        r = subprocess.run(["osascript", "-e", script], stdout=subprocess.PIPE,
+                           stderr=subprocess.STDOUT, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        return 124, "osascript timed out after %d s" % timeout
     return r.returncode, r.stdout.decode("utf-8", "replace").strip()
 
 
@@ -240,8 +248,27 @@ def preview(subject, body):
     return 0 if (from_ok and to_ok) else 1
 
 
-def send(subject, body, dry=False):
-    # type: (str, str, bool) -> int
+def log_records():
+    """Parsed send-log records (malformed lines skipped, never guessed at)."""
+    out = []
+    try:
+        for line in io.open(LOG, encoding="utf-8"):
+            try:
+                r = json.loads(line)
+            except ValueError:
+                continue
+            if isinstance(r, dict):
+                out.append(r)
+    except IOError:
+        pass
+    return out
+
+
+def send(subject, body, dry=False, attempt=None):
+    # type: (str, str, bool, str) -> int
+    """`attempt` is the scheduler's claim id; it is written into the send
+    log's success record so a later reconcile can match THIS attempt exactly,
+    not a subject substring (review 012 finding 1)."""
     to = recipient()
     if not to:
         print("no recipient on file (%s)" % os.path.relpath(TO_FILE, REPO))
@@ -256,7 +283,7 @@ def send(subject, body, dry=False):
         send_mailapp(to, subject, body)
         rec = {"utc": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
                "subject": subject, "from": APPROVED_SENDER, "to": to,
-               "via": "mailapp",
+               "via": "mailapp", "ok": True, "attempt": attempt,
                "bytes": len(body.encode("utf-8"))}
         with io.open(LOG, "a", encoding="utf-8") as f:
             f.write(json.dumps(rec) + "\n")
@@ -292,6 +319,7 @@ def send(subject, body, dry=False):
         s.send_message(msg)
     rec = {"utc": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
            "subject": subject, "from": SENDER, "to": to, "via": "gmail",
+           "ok": True, "attempt": attempt,
            "bytes": len(body.encode("utf-8"))}
     with io.open(LOG, "a", encoding="utf-8") as f:
         f.write(json.dumps(rec) + "\n")
