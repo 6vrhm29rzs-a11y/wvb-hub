@@ -84,9 +84,12 @@ def transport():
     """
     if os.path.exists(TRANSPORT_FILE):
         v = io.open(TRANSPORT_FILE, encoding="utf-8").read().strip().lower()
-        if v in ("mailapp", "gmail"):
+        if v in ("mailapp", "gmail", "off"):
             return v
-    return "mailapp"
+    # ⚠ OFF BY DEFAULT (2026-09-25, Cody): Mail.app sent the reports from his
+    # PERSONAL address -- "you cannot use my personal gmail". Nothing sends
+    # until a transport that uses only the WVB account is chosen explicitly.
+    return "off"
 
 
 def send_mailapp(to, subject, body):
@@ -117,6 +120,10 @@ def send(subject, body, dry=False):
     to = recipient()
     if not to:
         print("no recipient on file (%s)" % os.path.relpath(TO_FILE, REPO))
+        return 1
+    if transport() == "off" and not dry:
+        print("mail transport is OFF -- nothing sent (report kept); see "
+              "Cody/data/mail_transport.txt")
         return 1
     if transport() == "mailapp" and not dry:
         send_mailapp(to, subject, body)
