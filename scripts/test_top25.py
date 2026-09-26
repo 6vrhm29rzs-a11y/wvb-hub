@@ -211,7 +211,7 @@ def test_the_move_column_states_which_comparison_it_makes():
         # and it failed in CI before it failed here only because CI's clock
         # is UTC, where it was already the next ISO week. The rule is that
         # the column must NAME what it measured against.
-        check(re.match(r"^vs (preseason|last week|last freeze"
+        check(re.match(r"^vs (preseason|last week|last freeze|Sun lock"
                        r"|[A-Z][a-z]{2} \d{1,2})$", m.group(1).strip())
               is not None,
               "and it names the comparison", m.group(1))

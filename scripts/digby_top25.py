@@ -49,7 +49,43 @@ from typing import Any, Dict, List, Optional, Tuple
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SEASON = int(os.environ.get("WVB_SEASON", "2026"))
-OUT = os.path.join(REPO, "data", "digby_top25_%d.json" % SEASON)
+OUT = os.environ.get("WVB_DIGBY_OUT") or os.path.join(
+    REPO, "data", "digby_top25_%d.json" % SEASON)
+# THE WEEKLY LOCK (Cody 2026-09-25: "the +/- should always be based on the
+# weekly lock ... after the last game every sunday night and before the next
+# week's games"). Written each run by recomputing this SAME model with only
+# the finals that started before Monday 00:00 PT. Movement = lock rank minus
+# today's rank: one ruler, so an arrow is exactly the effect of this week's
+# results and never a change of model or a missed archive week.
+WEEKOPEN_OUT = os.path.join(REPO, "data", "digby_weekopen_%d.json" % SEASON)
+
+
+def week_lock_ranks():
+    """team -> rank at this week's Sunday-night lock, from the same model.
+
+    Empty when the week-open file is missing or belongs to another week, so
+    a stale lock can never be read as this week's."""
+    p = WEEKOPEN_OUT
+    if not os.path.exists(p):
+        return {}
+    try:
+        doc = json.load(open(p))
+    except ValueError:
+        return {}
+    lock = (doc.get("meta") or {}).get("week_lock_epoch")
+    if not lock or int(lock) != week_lock_epoch():
+        return {}
+    return dict((r["team"], r["rank"]) for r in (doc.get("all") or []) if r.get("rank"))
+
+
+def week_lock_epoch(now=None):
+    """Monday 00:00 America/Los_Angeles at or before now."""
+    import datetime as _dt
+    from zoneinfo import ZoneInfo
+    now = now or _dt.datetime.now(ZoneInfo("America/Los_Angeles"))
+    d = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    d = d - _dt.timedelta(days=d.weekday())
+    return int(d.timestamp())
 
 SHOWN = 25          # the poll itself
 ALSO = 10           # "also receiving votes" -- the next ten, as the AVCA does
@@ -204,6 +240,7 @@ def zscores(values):
     return dict((k, (v - mu) / sd) for k, v in values.items())
 
 
+OPP_ITERATIONS = 4   # opponent re-scoring passes; converges well before 4
 HIT_CHANNEL_WEIGHT = 0.25
 # ⚠ MEASURED, NOT CHOSEN (2026-09-04, data/blend_hiteff_2025.json): mixing a
 # hitting-efficiency-implied strength into the evidence term at 0.25 beats
@@ -374,37 +411,62 @@ def main():
     # other change measured this session.
     tauh, home_adv_h = hit_scale_2025()
     hit26 = _hit_by_gid(SEASON) if tauh else {}
-    zobs = {}
-    for tid, recs in detail.items():
-        nm = id2name.get(tid)
-        if not nm:
-            continue
-        vals = []
-        for r in recs:
-            opp_nm = id2name.get(r["opp"])
-            zopp = zprior.get(opp_nm) if opp_nm else None
-            if zopp is None:
+    def _zobs_with(zref):
+        zobs = {}
+        for tid, recs in detail.items():
+            nm = id2name.get(tid)
+            if not nm:
                 continue
-            m_impl = zopp + (r["margin"] - home_adv
-                             * (1.0 if r["is_home"] else -1.0)) / tau
-            # the hitting channel, at its measured weight, when this match's
-            # box carries both sides' attack counts; margin-only otherwise
-            h_impl = None
-            if tauh and r.get("gid") in hit26:
-                per = hit26[r["gid"]]
-                mine_h = per.get(tid)
-                opp_h = per.get(r["opp"])
-                if mine_h is not None and opp_h is not None:
-                    hd = (mine_h - opp_h) - home_adv_h * (
-                        1.0 if r["is_home"] else -1.0)
-                    h_impl = zopp + hd / tauh
-            if h_impl is not None:
-                vals.append((1.0 - HIT_CHANNEL_WEIGHT) * m_impl
-                            + HIT_CHANNEL_WEIGHT * h_impl)
-            else:
-                vals.append(m_impl)
-        if vals:
-            zobs[nm] = st.mean(vals)
+            vals = []
+            for r in recs:
+                opp_nm = id2name.get(r["opp"])
+                zopp = zref.get(opp_nm) if opp_nm else None
+                if zopp is None:
+                    continue
+                m_impl = zopp + (r["margin"] - home_adv
+                                 * (1.0 if r["is_home"] else -1.0)) / tau
+                # the hitting channel, at its measured weight, when this match's
+                # box carries both sides' attack counts; margin-only otherwise
+                h_impl = None
+                if tauh and r.get("gid") in hit26:
+                    per = hit26[r["gid"]]
+                    mine_h = per.get(tid)
+                    opp_h = per.get(r["opp"])
+                    if mine_h is not None and opp_h is not None:
+                        hd = (mine_h - opp_h) - home_adv_h * (
+                            1.0 if r["is_home"] else -1.0)
+                        h_impl = zopp + hd / tauh
+                if h_impl is not None:
+                    vals.append((1.0 - HIT_CHANNEL_WEIGHT) * m_impl
+                                + HIT_CHANNEL_WEIGHT * h_impl)
+                else:
+                    vals.append(m_impl)
+            if vals:
+                zobs[nm] = st.mean(vals)
+        return zobs
+
+    # ⚠ OPPONENTS AT THEIR CURRENT STRENGTH, NOT THEIR PRESEASON ONE
+    # (Cody 2026-09-25: "that win over stanford looks less valuable each
+    # day"). Scoring every opponent at its PRESEASON z froze the value of a
+    # win at the day the schedule was made: Arizona St. sat #5 at 9-3 on
+    # the strength of beating a preseason-rated Stanford that has since
+    # fallen to #31 on 2026 results alone. Each result is now re-scored
+    # against the opponent's CURRENT blended rating, iterated to a fixed
+    # point. Measured on 2025 (blend_upgrades_2025.json, V1_iter1/iter2):
+    # predictive AUC -0.00035, CI [-0.0009, +0.0002] -- indistinguishable
+    # from the preseason version. Same accuracy; the ranking now answers
+    # the question a reader is actually asking of it.
+    def _blend_scores(zo_map):
+        out = {}
+        for _nm, _zp in zprior.items():
+            _n = nmatch.get(_nm, 0)
+            _w = (_n / float(_n + k)) if _n and _nm in zo_map else 0.0
+            out[_nm] = (1.0 - _w) * _zp + _w * zo_map.get(_nm, 0.0)
+        return out
+
+    zobs = _zobs_with(zprior)
+    for _it in range(OPP_ITERATIONS):
+        zobs = _zobs_with(_blend_scores(zobs))
     # A team whose opponents we cannot place falls back to the raw margin --
     # worse, but better than dropping the result entirely.
     for nm, v in obs.items():
@@ -617,6 +679,20 @@ def main():
         moved = ("%+d%% season" % round(100 * r["weight_on_season"])) if r["matches"] else "preseason only"
         print("  %2d  %-22s %-6s  %s" % (r["rank"], r["team"], r["record"], moved))
     print("wrote %s" % OUT)
+    if not os.environ.get("WVB_DIGBY_OUT"):
+        _lock = week_lock_epoch()
+        _env = dict(os.environ, WVB_DIGBY_OUT=WEEKOPEN_OUT,
+                    WVB_RATING_CUTOFF_EPOCH=str(_lock))
+        import subprocess as _sp
+        _r = _sp.run([sys.executable, os.path.abspath(__file__)], env=_env,
+                     stdout=_sp.PIPE, stderr=_sp.STDOUT)
+        if _r.returncode == 0:
+            _wo = json.load(open(WEEKOPEN_OUT))
+            _wo["meta"]["week_lock_epoch"] = _lock
+            json.dump(_wo, open(WEEKOPEN_OUT, "w"), indent=1)
+            print("wrote %s (as of the %s lock)" % (WEEKOPEN_OUT, _lock))
+        else:
+            print("week-open ranking FAILED -- movement falls back to the archive")
     return 0
 
 

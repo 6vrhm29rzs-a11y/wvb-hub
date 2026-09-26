@@ -260,6 +260,11 @@ def rating_cutoff_epoch(now=None):
     to-the-minute; this boundary is for the rankings only. On a completed
     season every final predates today, so the filter is a no-op there."""
     import datetime as _dt
+    import os as _os
+    # the WEEK-OPEN ranking (digby_top25 --week-open) recomputes POWER as of
+    # the Sunday-night lock; it sets this in its own subprocess only
+    if _os.environ.get("WVB_RATING_CUTOFF_EPOCH"):
+        return int(_os.environ["WVB_RATING_CUTOFF_EPOCH"])
     try:
         from zoneinfo import ZoneInfo
         now = now or _dt.datetime.now(ZoneInfo("America/Los_Angeles"))
@@ -285,6 +290,11 @@ def verified_result_gids(season=None):
     ledger's and review queue's job. Report files are ET-dated (the
     verifier's convention), so both today's and yesterday's are read to
     cover the PT/ET boundary."""
+    import os as _os
+    if _os.environ.get("WVB_RATING_CUTOFF_EPOCH"):
+        # as-of-the-lock: a final verified AFTER the lock must not count
+        # before it, so the intraday allowance is off
+        return set()
     import datetime as _dt
     out = set()
     now = _dt.datetime.utcnow() - _dt.timedelta(hours=4)

@@ -1350,6 +1350,78 @@ POS_LABEL = {"S": "Setters", "OPP": "Opposites", "OH": "Outside hitters",
              "MB": "Middle blockers", "L/DS": "Libero / defensive specialists",
              "": "Position not listed"}
 
+_LAST_MATCH = None
+
+
+def last_match_map():
+    # type: () -> Dict[str, Dict]
+    """team -> its most recent counted final, and whether POWER has it yet.
+
+    Cody 2026-09-25: "i need to see ... the last match's result so i know
+    what's in or what's not in". Uses the SAME two predicates the blend uses
+    (digby_top25): season_counts.countable(need_line, d1_only) says whether a
+    final can ever enter the rating, rating_input_ok (midnight-PT cutoff or
+    school-verified) says whether it has entered it yet. No third rule.
+    """
+    global _LAST_MATCH
+    if _LAST_MATCH is not None:
+        return _LAST_MATCH
+    import season_counts as _SCL
+    doc = load("data/data_%d.json" % SEASON) or {}
+    games = doc.get("games") or []
+    cutoff = _SCL.rating_cutoff_epoch()
+    verified = _SCL.verified_result_gids()
+    rateable = {str(g.get("game_id")) for g in
+                _SCL.countable(games, SEASON, need_line=True, d1_only=True)}
+    out = {}
+    for g in sorted(_SCL.countable(games, SEASON),
+                    key=lambda x: x.get("start_time_epoch") or 0):
+        if g.get("state") != "F":
+            continue
+        wi = _SCL.winner_index(g)
+        if wi is None:
+            continue
+        gid = str(g.get("game_id"))
+        if gid not in rateable:
+            status = "out"
+        elif _SCL.rating_input_ok(g, cutoff, verified):
+            status = "in"
+        else:
+            status = "pending"
+        ts = g.get("teams") or []
+        try:
+            day = datetime.datetime.fromtimestamp(
+                g.get("start_time_epoch") or 0, PT).strftime("%b %-d")
+        except Exception:
+            day = ""
+        for i in (0, 1):
+            me, op = ts[i], ts[1 - i]
+            out[me.get("name_short")] = {
+                "wl": "W" if i == wi else "L",
+                "score": "%s-%s" % (me.get("sets_won"), op.get("sets_won")),
+                "opp": op.get("name_short"), "at": "vs" if me.get("is_home") else "at",
+                "day": day, "status": status}
+    _LAST_MATCH = out
+    return out
+
+
+def last_match_html(team):
+    # type: (str) -> str
+    m = last_match_map().get(team)
+    if not m:
+        return ""
+    lab = {"in": ("in", "Counted in POWER"),
+           "pending": ("not in yet", "Final, but not in POWER yet: it enters once a "
+                       "school site confirms it or after midnight PT"),
+           "out": ("doesn't count", "Does not enter POWER: non-D-I opponent or no "
+                   "set-by-set score")}[m["status"]]
+    return ('<span class="lastm lm-%s" title="%s">'
+            '<b class="lmr lm%s">%s</b> %s %s %s &middot; %s '
+            '<i class="lms">%s</i></span>'
+            % (m["status"], lab[1], m["wl"], m["wl"], esc(m["score"]), m["at"],
+               esc(m["opp"]), esc(m["day"]), lab[0]))
+
+
 def mover(t):
     """Movement since the LAST WEEKLY FREEZE, the way a poll shows it.
 
@@ -4076,6 +4148,12 @@ def rank_stamp_pt(utc_iso, now_epoch=None):
         return "%s PT yesterday" % clock
     return dt.strftime("%b %d, ") + clock + " PT"
 
+def week_lock_ranks():
+    # type: () -> Dict[str, int]
+    import digby_top25 as _DT
+    return _DT.week_lock_ranks()
+
+
 def _movehead(basis, cmp_row):
     """The movement column's header, naming the interval it actually measures.
 
@@ -4093,6 +4171,8 @@ def _movehead(basis, cmp_row):
     is a permanent condition to render honestly, not a transient one to wait
     out. Blank basis keeps rendering "vs preseason" exactly as before.
     """
+    if basis == "lock":
+        return "vs Sun lock"
     if basis != "week":
         return "vs preseason"
     import datetime as _dt
@@ -4175,7 +4255,14 @@ def top25_view(avca=None):
     from snapshot_rankings import basis as _basis
     hist_p = os.path.join(REPO, "data", "rankings_history_%d.jsonl" % SEASON)
     _cmp_row = None
-    if os.path.exists(hist_p):
+    # THE WEEKLY LOCK FIRST (Cody 2026-09-25): digby_top25 recomputes this
+    # same model as of Monday 00:00 PT each run, so movement is exactly this
+    # week's results on one ruler -- never a missed archive week, never a
+    # change of model. The archive below is the fallback.
+    _lock = week_lock_ranks()
+    if _lock:
+        pre, basis = _lock, "lock"
+    if not pre and os.path.exists(hist_p):
         import datetime as _dt
         this_week = _dt.date.today().isocalendar()
         this_week = "%d-W%02d" % (this_week[0], this_week[1])
@@ -5620,7 +5707,8 @@ def build():
                (_bcolors.get(t["team"]) or {}).get("primary") or "var(--line2)",
                t["rank26"], mover(t),
                logo_img(t["team"], logos), esc(t["team"]),
-               (' <b class="pl6">%s</b>' % t["rot"]) if t.get("rot") and t["rot"] < 6 else "",
+               ((' <b class="pl6">%s</b>' % t["rot"]) if t.get("rot") and t["rot"] < 6 else "")
+               + last_match_html(t["team"]),
                esc(t["conf"]),
                powercell(t),
                resumecell(t, _resume_active),
@@ -10406,6 +10494,18 @@ img.mug,img.pmug,img.phero{cursor:zoom-in}
    look, which is the worst of both. */
 table th{font-family:var(--disp);font-weight:500;letter-spacing:.08em}
 #rbody tr td:not(.tm),#sbody tr td:not(.tm){font-size:13.5px}
+/* last match under each team name, and whether POWER has it (2026-09-25) */
+.rk3 td.tm .lastm{display:block;margin-top:3px;font:500 12px/1.3 var(--sans);
+  color:var(--slate);white-space:nowrap;letter-spacing:0;text-transform:none}
+.rk3 td.tm .lastm .lmr{display:inline-block;min-width:16px;text-align:center;
+  border-radius:3px;font:700 10.5px/16px var(--mono);color:#fff;margin-right:3px}
+.rk3 td.tm .lastm .lmW{background:#2F8A62}
+.rk3 td.tm .lastm .lmL{background:#C04A3C}
+.rk3 td.tm .lastm .lms{font-style:normal;font:700 9.5px/1 var(--sans);letter-spacing:.07em;
+  text-transform:uppercase;padding:2px 5px;border-radius:3px;margin-left:4px;vertical-align:1px}
+.rk3 td.tm .lm-in .lms{color:#2F8A62;background:color-mix(in srgb,#2F8A62 12%,transparent)}
+.rk3 td.tm .lm-pending .lms{color:#A86A00;background:color-mix(in srgb,#E3A21A 18%,transparent)}
+.rk3 td.tm .lm-out .lms{color:var(--slate);background:var(--alt)}
 .panel table td{padding:11px 12px}
 .panel table th{padding:11px 12px}
 /* Team names carry the display face wherever they appear. */

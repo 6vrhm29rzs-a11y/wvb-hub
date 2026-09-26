@@ -41,7 +41,14 @@ jobs:
     # fresh-checkout rebuild, so it is allowed far longer than the refresh --
     # but not GitHub's six-hour default, which would hold the shared
     # concurrency group all morning if a fetch ever hangs.
-    timeout-minutes: 90
+    # ⚠ 90 -> 150 (2026-09-25). Measured on the 09-25 run: crawl 12 min,
+    # rebuild 35 min, and the guard step was still running at 43 min when the
+    # 90-minute cap cancelled it. Every nightly from 09-19 on died this way or
+    # on 502s, and because nothing commits until the guards pass, no weekly
+    # freeze landed after W36 -- the Rankings "Move" column was comparing
+    # against Sep 7. 150 covers the measured ~95 min with headroom and stays
+    # under the three-hour bound test_freshness_refresh enforces.
+    timeout-minutes: 150
     env:
       WVB_SEASON: ${{ github.event.inputs.season || '2026' }}
     steps:

@@ -585,6 +585,17 @@ def build():
             if use:
                 prev_week = use["week"]
                 prev = dict((r["team"], r["rank"]) for r in use.get("teams", []))
+    # THE WEEKLY LOCK FIRST (Cody 2026-09-25): same model, results through
+    # Sunday night. Only when the board shows the blend -- a lock computed on
+    # the blend is not a ruler for the pure-2026 composite.
+    if rank_source == "blend":
+        try:
+            import digby_top25 as _DT
+            _lk = _DT.week_lock_ranks()
+        except Exception:
+            _lk = {}
+        if _lk:
+            prev, prev_week = _lk, "the Sunday-night lock"
     for t in teams:
         pr = prev.get(t["team"])
         t["prev_rank"] = pr
