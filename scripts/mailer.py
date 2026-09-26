@@ -96,6 +96,10 @@ set subj to read POSIX file "{subject}" as «class utf8»
 set bod to read POSIX file "{body}" as «class utf8»
 tell application "Mail"
   set m to make new outgoing message with properties {{subject:subj, content:bod, visible:false, sender:"WVB Hub <{sender}>"}}
+  -- never carry a personal signature: an AppleScript-built message picks up
+  -- Mail's default (Cody's iCloud "Cody Rose") even though the WVB account
+  -- has none -- measured 2026-09-25 with a draft read-back, both ways
+  set message signature of m to missing value
   tell m to make new to recipient at end of to recipients with properties {{address:"{to}"}}
   if (sender of m) does not contain "{sender}" then error "sender did not bind to {sender}"
   send m
@@ -170,6 +174,72 @@ def send_mailapp(to, subject, body):
         raise RuntimeError("Mail.app refused: %s" % out)
 
 
+MAILAPP_PREVIEW = """
+set subj to read POSIX file "{subject}" as «class utf8»
+set bod to read POSIX file "{body}" as «class utf8»
+tell application "Mail"
+  set m to make new outgoing message with properties {{subject:subj, content:bod, visible:false, sender:"WVB Hub <{sender}>"}}
+  set message signature of m to missing value
+  tell m to make new to recipient at end of to recipients with properties {{address:"{to}"}}
+  set s to sender of m
+  set t to ""
+  repeat with r in to recipients of m
+    set t to t & (address of r) & ","
+  end repeat
+  set sj to subject of m
+  delete m
+  return s & linefeed & t & linefeed & sj
+end tell
+"""
+
+
+def preview(subject, body):
+    """Build the message through the SAME Mail.app path the reports use, read
+    back the sender/recipients Mail actually bound, and discard it -- never
+    sent, never saved. Writes Cody/mail/preview-<time>.txt for Cody."""
+    import tempfile
+    to = recipient()
+    ok, why = preflight(to, "mailapp")
+    if not ok:
+        print("PREVIEW REFUSED -- %s" % why)
+        return 1
+    d = tempfile.mkdtemp(prefix="wvbprev-")
+    sp, bp = os.path.join(d, "s.txt"), os.path.join(d, "b.txt")
+    io.open(sp, "w", encoding="utf-8").write(subject)
+    io.open(bp, "w", encoding="utf-8").write(body)
+    try:
+        rc, out = _osa(MAILAPP_PREVIEW.format(subject=sp, body=bp,
+                                              sender=APPROVED_SENDER,
+                                              to=to.replace('"', "")))
+    finally:
+        for f in (sp, bp):
+            if os.path.exists(f):
+                os.remove(f)
+        os.rmdir(d)
+    if rc != 0:
+        print("PREVIEW FAILED -- Mail.app: %s" % out)
+        return 1
+    lines = out.splitlines() + ["", "", ""]
+    bound_from, bound_to, bound_subj = lines[0], lines[1].rstrip(","), lines[2]
+    from_ok = APPROVED_SENDER in bound_from
+    to_ok = bound_to.strip().lower() == approved_recipient()
+    stamp = datetime.datetime.now().strftime("%Y-%m-%d-%H%M")
+    pdir = os.path.join(REPO, "Cody", "mail")
+    os.makedirs(pdir, exist_ok=True)
+    path = os.path.join(pdir, "preview-%s.txt" % stamp)
+    io.open(path, "w", encoding="utf-8").write(
+        "UNSENT PREVIEW -- built by Mail.app, read back, then discarded\n"
+        "From (as Mail bound it): %s   [%s]\n"
+        "To   (as Mail bound it): %s   [%s]\n"
+        "Subject: %s\n\n%s\n"
+        % (bound_from, "OK" if from_ok else "WRONG", bound_to,
+           "OK" if to_ok else "WRONG", bound_subj, body))
+    print("preview: from=%s [%s] to=%s [%s] -> %s"
+          % (bound_from, "OK" if from_ok else "WRONG", bound_to,
+             "OK" if to_ok else "WRONG", os.path.relpath(path, REPO)))
+    return 0 if (from_ok and to_ok) else 1
+
+
 def send(subject, body, dry=False):
     # type: (str, str, bool) -> int
     to = recipient()
@@ -232,4 +302,6 @@ def send(subject, body, dry=False):
 if __name__ == "__main__":
     body = sys.stdin.read()
     subj = sys.argv[1] if len(sys.argv) > 1 else "WVB Hub"
+    if "--preview" in sys.argv:
+        sys.exit(preview(subj, body))
     sys.exit(send(subj, body, dry="--dry" in sys.argv))
