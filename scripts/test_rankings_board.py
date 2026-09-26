@@ -337,6 +337,15 @@ def main():
     # must still not take the board until the MEDIAN team's counted matches
     # reach the blend's own measured crossover k. Stub: validated=True,
     # median gp 3 -- must stay blend.
+    # ⚠ THE HOLD (Cody 2026-09-26) short-circuits the gate. It must be ON,
+    # and must block even a fully mature fit; the counting logic below is
+    # exercised with the hold lifted in-process, then restored.
+    _rich0 = {"meta": {"validated": True},
+              "teams": [{"team": "X", "composite_rank": 1, "games_played": 30}] * 9}
+    check("the Oct-1 switch is HELD pending research (Cody 2026-09-26)",
+          bool(BB.LIVE_SWITCH_HELD) and BB.live_rating_mature(_rich0)[0] is False)
+    _held = BB.LIVE_SWITCH_HELD
+    BB.LIVE_SWITCH_HELD = None
     _fake_mature = {"meta": {"validated": True, "matches": 486},
                     "teams": [{"team": "Lehigh", "composite_rank": 3,
                                "games_played": 3}] * 5}
@@ -372,6 +381,7 @@ def main():
         BB.load_json = _real2
     check("[NEG] a gate that cannot read its constant HOLDS the blend",
           ok4 is False and "unavailable" in (why4 or ""), (ok4, why4))
+    BB.LIVE_SWITCH_HELD = _held
     # and the snapshot shares the ONE definition
     _snap = open(os.path.join(REPO, "scripts", "snapshot_rankings.py")).read()
     # migration commit 4: the archive now requires the CERTIFICATE (the

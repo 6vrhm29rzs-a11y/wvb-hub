@@ -114,6 +114,16 @@ def key(name: str) -> str:
     return ALIAS.get(k, k)
 
 
+# ⚠ HOLD (Cody, 2026-09-26): keep every surface on the blend until the POWER
+# research concludes and he picks the model. Without this the Rankings tab
+# alone would have switched to the pure-2026 rating around Oct 1 (median team
+# at 14 matches) while the Top 25, forecasts, simulator, dashboard and emails
+# stayed on the blend -- two orders on one site. Lifting the hold is an
+# explicit edit, never a date or a count. The certificate and the weekly
+# archive read this same gate, so they hold too.
+LIVE_SWITCH_HELD = "held by Cody 2026-09-26 pending POWER research"
+
+
 def live_rating_mature(live):
     """(ok, why_not) -- may the pure-season composite replace the blend?
 
@@ -122,6 +132,8 @@ def live_rating_mature(live):
     equally). Below that, the typical team's season evidence is still the
     minority voice and the blend keeps the board. k missing -> hold, and
     say so; a gate that cannot read its constant must fail closed."""
+    if LIVE_SWITCH_HELD:
+        return False, LIVE_SWITCH_HELD
     teams = live.get("teams") or []
     gp = sorted(int(t.get("games_played") or 0) for t in teams)
     med = gp[len(gp) // 2] if gp else 0
