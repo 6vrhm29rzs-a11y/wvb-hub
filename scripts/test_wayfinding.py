@@ -125,10 +125,15 @@ def main():
           "teamRankChips(name, rk)" in C and "cs-trk" in C)
     check("today's read routes ranks through the shared chip component",
           "teamRankChips(mAway(m), m.ar)" in C)
-    check("the chip component itself names rulers (title on bare AVCA, "
-          "label on POWER)",
-          "rankHTML('avca', av, 'bare')" in C and
-          "rankHTML('power', pw, true)" in C)
+    # ⚠ REWRITTEN 2026-09-25 on Cody's instruction: "remove 'PWR #24' and
+    # just make it '#24' because i know if it's avca blue, it's avca ranking
+    # and if it's green[/purple], it's power ranking". The ruler is now named
+    # by COLOUR CLASS on every cell, and in words by a title drawn from the one
+    # RULERS table -- so it is still never unnamed, just not printed.
+    check("the chip component itself names rulers (colour class + title "
+          "from RULERS on every cell)",
+          "rkc rkc-avca" in C and "rkc rkc-pow" in C and
+          "RULERS.avca[2]" in C and "RULERS.power[2]" in C)
     check("the readiness panel names ITS ruler -- and it is a different one",
           'rank_badge("digby", c["away_rank"]' in S,
           "preflight_live ranks by Digby's Top 25, not the AVCA poll")
@@ -159,6 +164,9 @@ def main():
             continue
         window = unesc(" ".join(lines[max(0, i - 2):i + 1]))
         if any(lb in window for lb in LABELS):
+            continue
+        # a badge cell names its ruler by colour class + RULERS title
+        if re.search(r"rkc-(avca|vt|pow)", window):
             continue
         bare.append("%d: %s" % (i, line.strip()[:70]))
     check("no rank is concatenated to a '#' without a ruler beside it",

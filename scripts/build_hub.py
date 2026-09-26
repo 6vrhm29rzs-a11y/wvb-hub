@@ -555,20 +555,22 @@ RANK_TITLE = "AVCA coaches poll rank"
 #
 # Values are MEASURED, not picked by eye: every one clears 4.5:1 against both
 # the page ground (#EFECF7) and card white, and the chromatic ones sit at
+# (2026-09-25, Cody: POWER is the site's purple-blue, VT green; RPI moved
+# to keep every hue >= 25 degrees apart)
 # least 25 degrees apart in hue. test_rulers.py re-derives both.
 RULERS = {
     "avca":      ("AVCA", "AVCA", "AVCA coaches poll", "#1D5FC2"),
     "power":     ("POWER", "PWR", "our POWER rating -- how strong a team "
                                   "is. Sourced availability is not an "
-                                  "input.", "#16693F"),
+                                  "input.", "#4238C4"),
     "digby":     ("DIGBY", "DGB", "Digby's Top 25 -- this site's own "
                                   "in-season ranking", "#8A6508"),
     "resume":    ("R\u00c9SUM\u00c9", "RES", "our r\u00e9sum\u00e9 rank -- "
                                            "what a team has earned",
                   "#0B6B66"),
-    "rpi":       ("RPI", "RPI", "official NCAA RPI", "#3F3D9E"),
+    "rpi":       ("RPI", "RPI", "official NCAA RPI", "#A8324A"),
     "ballot":    ("MY BALLOT", "MINE", "your own saved ballot", "#8340B8"),
-    "vt":        ("VT", "VT", "VolleyTalk community poll", "#5D6B80"),
+    "vt":        ("VT", "VT", "VolleyTalk community poll", "#1B7A43"),
     "massey":    ("MASSEY (PRE)", "MSY",
                   "Massey preseason snapshot -- a manual browser capture, "
                   "not current, never a Power input", "#5D6B80"),
@@ -796,6 +798,67 @@ def rank_badge(basis, v, compact=False, text=False):
             '#%s</i> ' % (basis, r[2], label, v))
 
 
+_AVRV = None
+_VTW = None
+
+
+def avca_rv_set():
+    """Teams AVCA lists as receiving votes in its newest poll workbook
+    (crawl_avca_rv.py). Empty when the capture is missing."""
+    global _AVRV
+    if _AVRV is None:
+        _AVRV = set()
+        p = os.path.join(REPO, "data", "raw", str(SEASON), "avca_rv.jsonl")
+        if os.path.exists(p):
+            rows = [json.loads(x) for x in open(p, encoding="utf-8") if x.strip()]
+            if rows:
+                _AVRV = set(r["team"] for r in rows[-1].get("receiving_votes") or []
+                            if r.get("team"))
+    return _AVRV
+
+
+def vt_week_rank():
+    """This week's VolleyTalk poll (private manual capture), or nothing.
+    A capture older than eight days is NOT shown: a stale poll beside a
+    team name reads as current, which is exactly the lingering Cody
+    called out (2026-09-25)."""
+    global _VTW
+    if _VTW is None:
+        _VTW = {}
+        p = os.path.join(REPO, "Cody", "data", "vt_weekly_2026.jsonl")
+        if os.path.exists(p):
+            rows = [json.loads(x) for x in open(p, encoding="utf-8") if x.strip()]
+            if rows:
+                last = rows[-1]
+                try:
+                    posted = datetime.datetime.fromisoformat(last.get("posted_at"))
+                    age = (datetime.datetime.now(posted.tzinfo) - posted).days
+                except Exception:
+                    age = 99
+                if age <= 8:
+                    _VTW = dict((r.get("team"), r.get("rank"))
+                                for r in last.get("rows") or [])
+    return _VTW
+
+
+def rank_cells(avca, rv, vt, power, show_vt):
+    """The ONE badge row beside a team name: fixed-width cells, colour
+    names the ruler (AVCA blue, VT green, POWER gradient), so no text
+    label is needed. Every cell always renders -- NR rather than a gap --
+    so rows line up down a list."""
+    a = ("#%s" % avca) if avca else ("RV" if rv else "NR")
+    # titles come from the ONE ruler table, never a second literal
+    out = ('<span class="rks"><i class="rkc rkc-avca%s" title="%s">%s</i>'
+           % ("" if avca else " rkc-off", esc(RULERS["avca"][2]), a))
+    if show_vt:
+        out += ('<i class="rkc rkc-vt%s" title="%s">%s</i>'
+                % ("" if vt else " rkc-off", esc(RULERS["vt"][2]),
+                   ("#%s" % vt) if vt else "NR"))
+    out += ('<i class="rkc rkc-pow" title="%s">%s</i></span>'
+            % (esc(RULERS["power"][2]), ("#%s" % power) if power else "&ndash;"))
+    return out
+
+
 def team_rank_chips(name, feed_avca, pr, av):
     """Python twin of the page's teamRankChips: both rulers beside a name.
 
@@ -806,13 +869,8 @@ def team_rank_chips(name, feed_avca, pr, av):
     by hours (measured: Indiana 16 -> 21 while the feed still said 16).
     """
     a = av.get(name) or feed_avca
-    p = pr.get(name)
-    out = ""
-    if a:
-        out += '<span class="mrk">%s</span>' % rank_badge("avca", a, compact="bare")
-    if p:
-        out += '<span class="mrk pw">%s</span>' % rank_badge("power", p, compact=True)
-    return out
+    return rank_cells(a, name in avca_rv_set(), vt_week_rank().get(name),
+                      pr.get(name), (not PUBLIC) and bool(vt_week_rank()))
 
 
 def _attr_watch_public():
@@ -2162,6 +2220,10 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
             "wab": t.get("wab"),
             "rank25": t["rank25"],
             "avca": t.get("avca"), "vt": t.get("vt"),
+            # badge row (Cody 2026-09-25): AVCA 1-25 / RV / NR, and this
+            # week's VolleyTalk poll when the capture is current
+            "avrv": 1 if nm in avca_rv_set() else 0,
+            **({} if (PUBLIC or not vt_week_rank()) else {"vtw": vt_week_rank().get(nm)}),
             "massey": t.get("massey"), "rpi": t.get("rpi"),
             # ⚠ THE KEY IS THE PRODUCT'S NAME, so on the public build it is
             # not emitted at all rather than emitted null. Dropping the VALUE
@@ -4861,10 +4923,34 @@ def notes_log_html():
     except ImportError:
         return ""
     notes = NL.load()
+    # ⚠ HE CAN WRITE HERE NOW (2026-09-25): a note typed on the phone posts to
+    # live_server /api/note and lands in this same log, verbatim, marked his.
+    # Claude reads the log at session start (CLAUDE.md "Read first").
+    compose = (
+        '<form class="nlform" id="nlform">'
+        '<label for="nltext" class="nlflab">Send a note, idea or bug</label>'
+        '<textarea id="nltext" rows="4" placeholder="What did you notice? '
+        'It saves to the log and gets read at the start of the next session."></textarea>'
+        '<div class="nlfrow"><select id="nlkind" aria-label="Kind of note">'
+        '<option value="thought">Idea / thought</option>'
+        '<option value="bug">Something looked wrong</option>'
+        '<option value="ask">A question</option>'
+        '<option value="observation">Watching the site</option></select>'
+        '<button type="submit" class="nlsend">Save note</button>'
+        '<span id="nlstatus" class="nlstatus" role="status"></span></div></form>'
+        '<script>(function(){var f=document.getElementById("nlform");if(!f)return;'
+        'f.addEventListener("submit",function(e){e.preventDefault();'
+        'var t=document.getElementById("nltext"),st=document.getElementById("nlstatus");'
+        'if(!t.value.trim()){st.textContent="Type something first.";return;}'
+        'st.textContent="Saving\u2026";'
+        'fetch("/api/note",{method:"POST",headers:{"Content-Type":"application/json"},'
+        'body:JSON.stringify({text:t.value,kind:document.getElementById("nlkind").value})})'
+        '.then(function(r){return r.json();}).then(function(d){'
+        'if(d.ok){st.textContent="Saved as "+d.id+". It shows in this list after the next rebuild.";t.value="";}'
+        'else{st.textContent="Not saved: "+(d.error||"unknown error");}})'
+        '.catch(function(){st.textContent="Not saved: the Mac\u2019s live server is not reachable.";});});})();</script>')
     if not notes:
-        return ('<p class="tnote">No notes logged yet. Start a message with '
-                '&ldquo;thoughts:&rdquo; or &ldquo;from chat gpt:&rdquo; and '
-                'it lands here with a status.</p>')
+        return compose + ('<p class="tnote">No notes logged yet.</p>')
     c = NL.counts(notes)
 
     def card(n):
@@ -4940,7 +5026,7 @@ def notes_log_html():
         out.append('<details class="method"><summary>Not doing &mdash; %d '
                    '(each says why)</summary>%s</details>'
                    % (len(decl_n), "".join(card(n) for n in decl_n)))
-    return "".join(out)
+    return compose + "".join(out)
 
 
 def handoff_html():
@@ -9595,6 +9681,23 @@ td.at{white-space:nowrap}
 .mrow .mrt b{font:700 15.5px/1.15 var(--disp);color:var(--ink);overflow-wrap:anywhere}
 .mrow .mrt.won b{color:var(--ink)}
 .mrk{font:600 11px/1 var(--disp);color:var(--ink3);flex:none}
+/* THE BADGE ROW (2026-09-25): spreadsheet-style fixed cells so names line up.
+   Colour is the ruler's name: AVCA blue, the private community poll green,
+   POWER our purple-blue gradient. RV/NR render muted so a real rank stands
+   out. (This comment ships on the public page -- it may not name a
+   third-party poll; the public gate aborts on the word.) */
+.rks{display:inline-flex;gap:3px;flex:none;vertical-align:1px;margin-right:6px;opacity:1}
+/* (0,2,1)+ so card/tape styles that restyle every <i> cannot fade, recolour
+   or lowercase a badge -- the Today watch cards did exactly that */
+.rks i.rkc,.rks i.rkc:is(*){opacity:1;text-transform:none;filter:none}
+.rks i.rkc{display:inline-block;width:30px;text-align:center;font:700 11px/18px var(--mono);
+  font-style:normal;border-radius:4px;color:#fff;letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums}
+.rks i.rkc-avca{background:var(--vx-avca,#1D5FC2);color:#fff}
+.rks i.rkc-vt{background:var(--vx-vt,#1B7A43);color:#fff}
+.rks i.rkc-pow{background:linear-gradient(120deg,#3B2F9E,#6A4FD8);color:#fff}
+.rks i.rkc-off{background:transparent;color:var(--slate);box-shadow:inset 0 0 0 1px var(--line2);
+  font-size:9.5px;letter-spacing:.04em}
 /* our POWER chip reads quieter than the gold AVCA number -- two rulers,
    two voices, never mistakable for one poll */
 /* .mrk.pw no longer recolours: POWER carries --vx-power like everywhere else */
@@ -11472,6 +11575,17 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
   .nlid{margin-left:0}
   .nltopic{font-size:14.5px}
 }
+/* the Notes compose box (private build only; the notes tab is stripped) */
+.nlform{display:grid;gap:8px;margin:0 0 18px;padding:14px;border-radius:var(--r-card,10px);
+  background:var(--card,#fff);border:1px solid var(--line);box-shadow:var(--float,none)}
+.nlform .nlflab{font:700 12px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase;color:var(--slate)}
+.nlform textarea{width:100%;font:16px/1.45 var(--sans);padding:10px;border-radius:8px;
+  border:1px solid var(--line2);background:var(--page);color:var(--ink);resize:vertical}
+.nlform .nlfrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.nlform select{font:15px var(--sans);padding:8px;border-radius:8px;border:1px solid var(--line2)}
+.nlform .nlsend{font:700 14px var(--sans);padding:10px 16px;border-radius:999px;border:0;
+  background:linear-gradient(120deg,#3B2F9E,#6A4FD8);color:#fff;cursor:pointer}
+.nlform .nlstatus{font-size:13px;color:var(--slate)}
 /* NOTES-CSS-END */
 /* AVAIL-CSS-BEGIN */
 .avrow{border:1px solid var(--line);border-radius:3px;padding:9px 12px;
@@ -14117,12 +14231,19 @@ function rank(v) { return rankHTML('avca', v); }
    does not list. This also keeps the name chip and the disagreement chip on
    one card from quoting two different weeks of the same poll. */
 function teamRankChips(name, feedAvca) {
+  /* ONE badge row, same markup as build_hub.rank_cells (Cody 2026-09-25):
+     fixed-width cells, colour names the ruler -- AVCA blue, VT green (private
+     build, current week only), POWER our gradient -- and every cell always
+     renders (RV / NR / -) so a column of names lines up like a sheet. */
   const T = TEAMS[name] || {};
   const av = T.avca || feedAvca || null;
   const pw = T.rank || null;
-  let out = '';
-  if (av) out += '<span class="mrk">' + rankHTML('avca', av, 'bare') + '</span>';
-  if (pw) out += '<span class="mrk pw">' + rankHTML('power', pw, true) + '</span>';
+  const off = v => v ? '' : ' rkc-off';
+  let out = '<span class="rks"><i class="rkc rkc-avca' + off(av) +
+    '" title="' + esc(RULERS.avca[2]) + '">' + (av ? '#' + esc(String(av)) : (T.avrv ? 'RV' : 'NR')) + '</i>';
+  if ('vtw' in T) out += '<i class="rkc rkc-vt' + off(T.vtw) +
+    '" title="' + esc(RULERS.vt[2]) + '">' + (T.vtw ? '#' + esc(String(T.vtw)) : 'NR') + '</i>';
+  out += '<i class="rkc rkc-pow" title="' + esc(RULERS.power[2]) + '">' + (pw ? '#' + esc(String(pw)) : '\u2013') + '</i></span>';
   return out;
 }
 /* ---- THE WEEK'S HEADLINE MATCHES -------------------------------------

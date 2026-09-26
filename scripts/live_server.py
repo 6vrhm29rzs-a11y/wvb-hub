@@ -715,6 +715,9 @@ class Handler(SimpleHTTPRequestHandler):
         if path == "/api/ballot":
             self._save_ballot()
             return
+        if path == "/api/note":
+            self._save_note()
+            return
         if path != "/api/digby":
             self.send_error(404)
             return
@@ -735,6 +738,35 @@ class Handler(SimpleHTTPRequestHandler):
             self._json({"ok": False, "answer": "could not read the question."}, 400)
             return
         self._json(_digby_answer(question))
+
+    def _save_note(self):
+        """Cody's note from the Notes tab, straight into notes_log (2026-09-25:
+        "somewhere i can ... submit thoughts and ideas without communicating
+        with you directly in terminal"). Trusted hosts only (localhost or his
+        tailnet), verbatim, append-only through notes_log.add."""
+        if not self._is_local():
+            self._json({"ok": False, "error": "local requests only."}, 403)
+            return
+        try:
+            n = int(self.headers.get("Content-Length") or 0)
+        except ValueError:
+            n = 0
+        if n <= 0 or n > 20000:
+            self._json({"ok": False, "error": "note is empty or too long."}, 413)
+            return
+        try:
+            payload = json.loads(self.rfile.read(n).decode("utf-8")) or {}
+            import notes_log as _NL
+            kind = payload.get("kind") if payload.get("kind") in _NL.KIND else "thought"
+            nid = _NL.add(kind, payload.get("text") or "",
+                          topic=(payload.get("topic") or "")[:120], by="cody")
+        except SystemExit as e:
+            self._json({"ok": False, "error": str(e)}, 400)
+            return
+        except Exception as e:                           # noqa: BLE001
+            self._json({"ok": False, "error": "could not save: %s" % e}, 500)
+            return
+        self._json({"ok": True, "id": nid})
 
     def _save_ballot(self):
         """Append one ballot to data/ballots_{SEASON}.jsonl.

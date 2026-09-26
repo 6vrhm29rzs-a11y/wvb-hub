@@ -46,6 +46,11 @@ CRAWL = [
     ["scripts/crawl_2025.py", "boxscores"],
     ["scripts/crawl_2025.py", "players"],
     ["scripts/crawl_pbp.py"],            # optional in CI too
+    # POLLS LOCALLY TOO (2026-09-25). Only the nightly job fetched them, and
+    # with every nightly failing since 09-19 the page showed the Sep 14 AVCA
+    # poll beside every team for a week. Both append only when the poll moves.
+    ["scripts/crawl_polls.py"],
+    ["scripts/crawl_avca_rv.py"],
 ]
 
 # ⚠ MIRRORS refresh.yml -- "Rebuild derived outputs" step, minus --public
