@@ -93,20 +93,26 @@ def _gap(r):
 
 
 def _upset(r):
-    """Conventions, stated in the mail: an AVCA-ranked side beaten by someone it
-    outranks; a POWER top-25 side beaten from 10+ places below; or a win across
-    a 40-place POWER gap."""
+    """Which ruler makes this an upset, or None. ⚠ REVIEW 010 FINDING 5: the
+    old rule mixed rulers -- an AVCA-poll upset was printed beside POWER ranks
+    ("#14 BYU def #22 Baylor"), which reads as nonsense. Each upset now names
+    its ruler and shows the PREGAME ranks on that ruler only.
+      AVCA   the loser was in the AVCA poll in effect, the winner was not or
+             was ranked below it
+      POWER  on pregame POWER (as of the day's midnight): the loser was top 25
+             and the winner 10+ places below, or the gap was 40+ places
+    Conventions, not fitted numbers; they feed nothing."""
     la, wa = r.get("la"), r.get("wa")
+    lp, wp = r.get("lp"), r.get("wp")
+    if lp and wp and ((lp <= 25 and wp >= lp + 10) or (wp - lp) >= 40):
+        return "POWER"
     if la and (wa is None or wa > la):
-        return True
-    lr, wr = r.get("lr"), r.get("wr")
-    if lr and lr <= 25 and (wr or 999) >= lr + 10:
-        return True
-    return _gap(r) >= 40
+        return "AVCA"
+    return None
 
 
 def _close_call(r):
-    lr, wr = r.get("lr"), r.get("wr")
+    lr, wr = r.get("lp"), r.get("wp")
     return bool(lr and wr and wr < lr and (lr - wr) >= 40 and r["ls"] >= 2)
 
 
@@ -154,23 +160,62 @@ def _power_block(base_epoch, base_label, lock_epoch, lock_label, top=15):
             movers.append({"team": t, "rank": v["rank"], "dp": dd[t][0], "dr": dd[t][1]})
     movers.sort(key=lambda m: -abs(m["dp"]))
     return {"rows": rows, "movers": movers[:6], "day_label": base_label,
-            "week_label": lock_label,
+            "week_label": lock_label, "pregame": base,
             "recomputed": meta.get("generated_at_utc")}
+
+
+def _poll_date():
+    p = os.path.join(REPO, "data", "raw", str(SEASON), "polls_avca.jsonl")
+    try:
+        rows = [json.loads(x) for x in io.open(p, encoding="utf-8") if x.strip()]
+        rows = [r for r in rows if r.get("season") == SEASON]
+        st = rows[-1].get("stamp") if rows else None
+        m = re.search(r"([A-Za-z]{3})[A-Za-z.]*\s+(\d{1,2})", st or "")
+        return ("through %s %s" % (m.group(1).title(), m.group(2))) if m else st
+    except (IOError, ValueError):
+        return None
 
 
 def _pt(epoch):
     return datetime.datetime.fromtimestamp(epoch, PT)
 
 
-def collect(kind, day=None):
+def _sunday_complete(lock_epoch):
+    """(n_logged, n_final) for the Sunday before a Monday-00:00 lock, from the
+    logged dataset. Positive only when every logged fixture is final; it
+    cannot prove no game is missing from the log, and says so."""
+    import season_counts as SC
+    sun = (_pt(lock_epoch) - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+    doc = json.load(io.open(os.path.join(REPO, "data", "data_%d.json" % SEASON), encoding="utf-8"))
+    g = [x for x in doc.get("games") or [] if x.get("start_time_epoch") and
+         datetime.datetime.fromtimestamp(x["start_time_epoch"], PT).strftime("%Y-%m-%d") == sun]
+    cls = SC.classify(g, SEASON) if g else {}
+    g = [x for x in g if cls.get(str(x.get("game_id"))) not in ("duplicate", "exhibition")]
+    return len(g), sum(1 for x in g if x.get("state") == "F")
+
+
+def _pregame(res, table):
+    for r in res:
+        r["wp"] = (table.get(r["w"]) or {}).get("rank")
+        r["lp"] = (table.get(r["l"]) or {}).get("rank")
+
+
+def collect(kind, day=None, status_note=""):
     now = datetime.datetime.now(PT)
     day = day or now.strftime("%Y-%m-%d")
     d = datetime.date(*[int(x) for x in day.split("-")])
     teams = _payload("TEAMS") or {}
     lock = PA.week_lock_epoch(now)
     lock_label = "Sunday-night lock (%s)" % (_pt(lock) - datetime.timedelta(days=1)).strftime("%a %b %-d")
+    n_sun, f_sun = _sunday_complete(lock)
+    if n_sun and n_sun == f_sun:
+        lock_label += ", all %d logged Sunday matches final" % n_sun
+    else:
+        lock_label += ", PROVISIONAL: %d of %d logged Sunday matches final" % (f_sun, n_sun)
     out = {"kind": kind, "day": day, "made": now.strftime("%a %b %-d, %-I:%M %p PT"),
-           "site": SITE}
+           "site": SITE, "status_note": status_note,
+           "page_built": datetime.datetime.fromtimestamp(os.path.getmtime(PAGE), PT).strftime("%a %-I:%M %p PT"),
+           "avca_poll": _poll_date()}
     if kind == "night":
         res = _results(teams, day)
         out["results"] = res
@@ -181,7 +226,7 @@ def collect(kind, day=None):
             f["state"] = (g.get("period") if g and g.get("state") == "live" else
                           ("FINAL, not logged yet" if g and g.get("state") == "final" else "not started"))
         out["pending"] = pend
-        out["power"] = _power_block(PA.pt_midnight(d), "since midnight (today's results)",
+        out["power"] = _power_block(PA.pt_midnight(d), "vs start of today (today's results)",
                                     lock, lock_label)
         tmr = _fixtures(teams, (d + datetime.timedelta(days=1)).strftime("%Y-%m-%d"))
         for f in tmr:
@@ -193,7 +238,7 @@ def collect(kind, day=None):
         res = _results(teams, y.strftime("%Y-%m-%d"))
         out["yesterday"] = y.strftime("%a %b %-d")
         out["results"] = res
-        out["power"] = _power_block(PA.pt_midnight(y), "yesterday's results",
+        out["power"] = _power_block(PA.pt_midnight(y), "vs start of yesterday (yesterday's results)",
                                     lock, lock_label)
         fx = _fixtures(teams, day)
         for f in fx:
@@ -203,12 +248,21 @@ def collect(kind, day=None):
         out["watch"] = sorted([f for f in fx if f["ems"] is not None],
                               key=lambda f: -f["ems"])[:5]
     res = out["results"]
-    out["upsets"] = sorted([r for r in res if _upset(r)],
-                           key=lambda r: (r.get("lr") or 999))[:10]
-    out["ranked"] = sorted([r for r in res if r not in out["upsets"]
-                            and min(r.get("wr") or 999, r.get("lr") or 999) <= 25],
-                           key=lambda r: min(r.get("wr") or 999, r.get("lr") or 999))[:12]
-    out["close"] = [r for r in res if _close_call(r) and r not in out["upsets"]][:6]
+    _pregame(res, out["power"]["pregame"])
+    for r in res:
+        r["ruler"] = _upset(r)
+    ups = sorted([r for r in res if r["ruler"]],
+                 key=lambda r: ((r.get("lp") or 999) if r["ruler"] == "POWER" else (r.get("la") or 99)))
+    # ⚠ COMPACT (review 010): a brief leads with a few highlights, not 24 rows
+    out["upsets"] = ups[:5]
+    top = sorted([r for r in res if not r["ruler"]
+                  and min(r.get("wp") or 999, r.get("lp") or 999) <= 25],
+                 key=lambda r: min(r.get("wp") or 999, r.get("lp") or 999))
+    out["ranked"] = top[:6]
+    cc = [r for r in res if _close_call(r) and not r["ruler"]]
+    out["close"] = cc[:3]
+    shown = len(out["upsets"]) + len(out["ranked"]) + len(out["close"])
+    out["more"] = max(0, len(res) - shown)
     return out
 
 
@@ -226,9 +280,31 @@ def _rk(n):
 
 
 def _res_line(r):
+    """Ranks shown are PREGAME POWER (as of that day's midnight), labelled."""
     sets = " ".join("%d-%d" % (a, b) for a, b in r["sets"]) if r.get("sets") else ""
     return "%-4s %-20s def %-4s %-20s %d-%d  %s" % (
-        _rk(r["wr"]), r["w"][:20], _rk(r["lr"]), r["l"][:20], r["ws"], r["ls"], sets)
+        _rk(r.get("wp")), r["w"][:20], _rk(r.get("lp")), r["l"][:20], r["ws"], r["ls"], sets)
+
+
+def _upset_line(r, poll):
+    if r["ruler"] == "AVCA":
+        why = "AVCA upset: %s beat AVCA #%d %s (poll %s)" % (
+            ("AVCA #%d %s" % (r["wa"], r["w"])) if r.get("wa") else ("unranked " + r["w"]),
+            r["la"], r["l"], poll or "in effect")
+    else:
+        why = "POWER upset: pregame #%d %s beat pregame #%d %s (%d places)" % (
+            r["wp"], r["w"], r["lp"], r["l"], r["wp"] - r["lp"])
+    sets = " ".join("%d-%d" % (a, b) for a, b in r["sets"]) if r.get("sets") else ""
+    return "%s, %d-%d  %s" % (why, r["ws"], r["ls"], sets)
+
+
+def _dtxt(dp, dr):
+    """Rating points and places, each labelled (review 010)."""
+    if dp is None:
+        return "—"
+    pts = "0.0 pts" if dp == 0 else ("%+.1f pts" % dp)
+    pl = "=" if not dr else ("%s%d" % ("▲" if dr > 0 else "▼", abs(dr)))
+    return "%s %s" % (pts, pl)
 
 
 def render_a(c):
@@ -236,7 +312,10 @@ def render_a(c):
     W = L.append
     title = "NIGHT DESK" if c["kind"] == "night" else "MORNING BRIEF"
     W("WVB HUB DESK · %s · %s" % (title, c["day"]))
-    W("Made %s. Ranks are our POWER rank." % c["made"])
+    W("Made %s from the page built %s." % (c["made"], c["page_built"]))
+    if c.get("status_note"):
+        W("Data status: %s" % c["status_note"])
+    W("Ranks beside results are PREGAME POWER ranks.")
     W("")
     if c["kind"] == "morning":
         W("YESTERDAY (%s): %d counted results" % (c["yesterday"], len(c["results"])))
@@ -246,9 +325,9 @@ def render_a(c):
     if c["upsets"]:
         W("Upsets")
         for r in c["upsets"]:
-            W("  " + _res_line(r))
+            W("  " + _upset_line(r, c.get("avca_poll")))
     if c["ranked"]:
-        W("Top-25 sides")
+        W("Top-25 sides (pregame POWER)")
         for r in c["ranked"]:
             W("  " + _res_line(r))
     if c["close"]:
@@ -257,20 +336,24 @@ def render_a(c):
             W("  " + _res_line(r))
     if not c["results"]:
         W("  No counted results.")
+    elif c.get("more"):
+        W("  %d more results on the site." % c["more"])
     W("")
     p = c["power"]
-    W("POWER TOP 15  (rating 0-100; change in rating points, then places)")
+    W("POWER TOP 15  (rating 0-100; change = rating pts, then places ▲/▼)")
     W("-" * 58)
-    W("  %-3s %-20s %5s  %-13s  %-13s" % ("#", "Team", "POWER", "vs day", "vs week"))
+    W("  %-3s %-20s %5s  %-13s  %-13s" % ("#", "Team", "POWER", "day", "week"))
     for r in p["rows"]:
         W("  %-3d %-20s %5.1f  %-13s  %-13s" % (
             r["rank"], r["team"][:20], r["power"],
-            "%s %s" % (_sgn(r["dp_day"]), _sgn(r["dr_day"])),
-            "%s %s" % (_sgn(r["dp_wk"]), _sgn(r["dr_wk"]))))
-    W("  vs day = %s. vs week = %s." % (p["day_label"], p["week_label"]))
+            _dtxt(r["dp_day"], r["dr_day"]), _dtxt(r["dp_wk"], r["dr_wk"])))
+    W("  day = %s." % p["day_label"])
+    W("  week = vs the %s." % p["week_label"])
+    W("  Both baselines are the same model recomputed with an earlier cutoff,")
+    W("  using results known now: a late final or correction can change them.")
     if p["movers"]:
         W("  Biggest moves (top 50): " + "; ".join(
-            "%s %s (%s)" % (m["team"], _sgn(m["dp"]), _sgn(m["dr"], " pl")) for m in p["movers"]))
+            "%s %s" % (m["team"], _dtxt(m["dp"], m["dr"])) for m in p["movers"]))
     W("")
     if c["kind"] == "night":
         W("STILL LIVE / NOT LOGGED AT SEND TIME: %d" % len(c["pending"]))
@@ -297,9 +380,9 @@ def render_a(c):
         W("NEWS & GAME THREADS: no verified news source or VolleyTalk thread")
         W("capture is connected yet, so nothing is listed.")
         W("")
-    W("Upset = an AVCA-ranked side beaten by someone it outranks, a POWER")
-    W("top-25 side beaten from 10+ places below, or a 40-place POWER gap.")
-    W("Conventions, not fitted numbers; they feed nothing.")
+    W("Upsets name their ruler. AVCA: the loser was in the poll in effect and")
+    W("the winner was not, or ranked below it. POWER: on pregame POWER, a top-25")
+    W("side beaten from 10+ places below, or a 40+ place gap. Conventions only.")
     W("Site: %s" % c["site"])
     return "\n".join(L)
 
@@ -328,8 +411,10 @@ def _delta_html(dp, dr):
     if dp is None:
         return '<span style="color:%s">—</span>' % MUTE
     col = WIN if dp > 0 else (LOSS if dp < 0 else MUTE)
-    pl = "" if not dr else (" · %s%d pl" % ("▲" if dr > 0 else "▼", abs(dr)))
-    return '<span style="color:%s;font-family:Menlo,monospace">%+.1f</span><span style="color:%s;font-size:11px">%s</span>' % (col, dp, MUTE, pl)
+    pts = "0.0 pts" if dp == 0 else ("%+.1f pts" % dp)
+    pl = "=" if not dr else ("%s%d" % ("▲" if dr > 0 else "▼", abs(dr)))
+    return ('<span style="color:%s;font-family:Menlo,monospace">%s</span>'
+            ' <span style="color:%s;font-size:11px">%s</span>' % (col, pts, MUTE, pl))
 
 
 def _h2(t, sub=""):
@@ -348,7 +433,7 @@ def _res_rows(rows, tag=None):
             '<tr><td style="padding:8px 0;border-bottom:1px solid %s">%s <b>%s</b>'
             ' <span style="color:%s">def.</span> %s %s'
             '<div style="color:%s;font:12px Menlo,monospace;margin-top:2px">%d-%d &nbsp; %s%s</div></td></tr>'
-            % (LINE, _chip(r["wr"]), _e(r["w"]), MUTE, _chip(r["lr"]), _e(r["l"]),
+            % (LINE, _chip(r.get("wp")), _e(r["w"]), MUTE, _chip(r.get("lp")), _e(r["l"]),
                MUTE, r["ws"], r["ls"], _e(sets),
                (' &nbsp;<span style="color:%s;font-weight:700">%s</span>' % (LOSS, tag)) if tag else ""))
     return '<table role="presentation" width="100%%" style="border-collapse:collapse">%s</table>' % "".join(out)
@@ -365,14 +450,16 @@ def render_b(c):
       'color:#fff;padding:18px 20px">'
       '<div style="font:700 11px/1 -apple-system,Helvetica,sans-serif;letter-spacing:.14em;color:#D6D2EE">WVB HUB DESK</div>'
       '<div style="font:800 28px/1.1 -apple-system,Helvetica,sans-serif;margin-top:6px">%s</div>'
-      '<div style="font-size:13px;color:#D6D2EE;margin-top:4px">%s · made %s</div></div>'
-      % (_e(title), _e(c["day"]), _e(c["made"])))
+      '<div style="font-size:13px;color:#D6D2EE;margin-top:4px">%s · made %s</div>%s</div>'
+      % (_e(title), _e(c["day"]), _e(c["made"]),
+         ('<div style="font-size:12px;color:#F2C766;margin-top:4px">Data status: %s</div>' % _e(c["status_note"])) if c.get("status_note") else ""))
     A('<div style="padding:4px 20px 22px">')
     head = ("Yesterday · %s" % c["yesterday"]) if c["kind"] == "morning" else "Today's results"
     A(_h2(head, "%d counted" % len(c["results"])))
     if c["upsets"]:
         A('<div style="font-weight:700;color:%s;font-size:13px;margin-top:6px">Upsets</div>' % LOSS)
-        A(_res_rows(c["upsets"]))
+        for r in c["upsets"]:
+            A('<p style="margin:6px 0;font-size:14px;line-height:1.45">%s</p>' % _e(_upset_line(r, c.get("avca_poll"))))
     if c["ranked"]:
         A('<div style="font-weight:700;color:%s;font-size:13px;margin-top:12px">Top-25 sides</div>' % INK2)
         A(_res_rows(c["ranked"]))
@@ -381,6 +468,8 @@ def render_b(c):
         A(_res_rows(c["close"]))
     if not c["results"]:
         A('<p style="color:%s">No counted results.</p>' % MUTE)
+    elif c.get("more"):
+        A('<p style="color:%s;font-size:12px">%d more results on the site.</p>' % (MUTE, c["more"]))
     p = c["power"]
     A(_h2("POWER top 15", "rating 0-100 · change in points, then places"))
     A('<table role="presentation" width="100%%" style="border-collapse:collapse;font-size:14px">'
@@ -393,7 +482,9 @@ def render_b(c):
           '<td align="right" style="border-top:1px solid %s">%s</td></tr>'
           % (LINE, _chip(r["rank"]), _e(r["team"]), LINE, r["power"], LINE,
              _delta_html(r["dp_day"], r["dr_day"]), LINE, _delta_html(r["dp_wk"], r["dr_wk"])))
-    A('</table><p style="color:%s;font-size:12px;margin:6px 0 0">vs day = %s. vs week = %s.</p>'
+    A('</table><p style="color:%s;font-size:12px;margin:6px 0 0">Day = %s. Week = vs the %s. '
+      'Both baselines are the same model recomputed with an earlier cutoff, using results known now; '
+      'a late final or correction can change them.</p>'
       % (MUTE, _e(p["day_label"]), _e(p["week_label"])))
     if p["movers"]:
         A('<p style="font-size:13px;margin:8px 0 0"><b>Biggest moves (top 50):</b> %s</p>' % " · ".join(
@@ -428,8 +519,9 @@ def render_b(c):
             A('<p style="color:%s;font-size:12px">%d more on the site.</p>' % (MUTE, len(c["slate"]) - 12))
         A(_h2("News & game threads"))
         A('<p style="font-size:14px;color:%s">No verified news source or VolleyTalk thread capture is connected yet, so nothing is listed.</p>' % INK2)
-    A('<p style="color:%s;font-size:11.5px;line-height:1.5;margin-top:22px">Upset = an AVCA-ranked side beaten by someone it outranks, '
-      'a POWER top-25 side beaten from 10+ places below, or a 40-place POWER gap. Conventions, not fitted numbers.</p>' % MUTE)
+    A('<p style="color:%s;font-size:11.5px;line-height:1.5;margin-top:22px">Ranks beside results are pregame POWER. '
+      'Upsets name their ruler: AVCA (poll in effect) or POWER (pregame; top-25 side beaten from 10+ below, or a 40+ gap). '
+      'Conventions only.</p>' % MUTE)
     A('<p style="margin:14px 0 0"><a href="%s" style="color:%s;font-weight:700">Open the hub</a></p>' % (_e(c["site"]), POW))
     A('</div></div></div>')
     return "".join(B)
@@ -443,5 +535,8 @@ if __name__ == "__main__":
     day = None
     if "--day" in sys.argv:
         day = sys.argv[sys.argv.index("--day") + 1]
-    c = collect(kind, day)
+    note = ""
+    if "--status" in sys.argv:
+        note = sys.argv[sys.argv.index("--status") + 1]
+    c = collect(kind, day, note)
     print(render_b(c) if variant == "B" else render_a(c))

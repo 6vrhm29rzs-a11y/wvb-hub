@@ -60,11 +60,11 @@ def test_reports():
     c = R.collect("night", day)
     a, b = R.render_a(c), R.render_b(c)
     check("variant A carries the POWER table with day and week changes",
-          "POWER TOP 15" in a and "vs day" in a and "vs week" in a)
+          "POWER TOP 15" in a and "day = " in a and "week = " in a)
     check("variant B is HTML with the same POWER table",
           b.startswith("<div") and "POWER top 15" in b)
     check("rating change and place change are separate columns/labels",
-          "change in rating points, then places" in a)
+          "change = rating pts, then places" in a and " pts " in a)
     check("the week baseline names its Sunday",
           "Sunday-night lock (" in a)
     check("nothing invented: news section states it is not connected",
@@ -76,19 +76,53 @@ def test_reports():
 def test_schedule():
     print("\n3. SCHEDULE RULES")
     import mail_scheduler as S
-    check("deadline is 21:30", S.DEADLINE == (21, 30))
+    check("the report is submitted by 21:30; the final attempt starts 21:15",
+          S.DEADLINE == (21, 30) and S.FINAL_START == (21, 15))
+    check("refresh is bounded", 0 < S.REFRESH_TIMEOUT_S <= 420)
     src = open(os.path.join(REPO, "scripts", "mail_scheduler.py"), encoding="utf-8").read()
-    check("delivered only after the Outbox clears", 'outbox_clear(subject)' in src
-          and '"delivered" if outbox_clear' in src)
-    check("an early delivery suppresses the deadline run",
-          'already delivered -- nothing to do' in src)
-    check("an unreachable live feed is not completion",
-          "cannot prove the slate is over" in src)
-    check("no fixtures logged is not completion", "no fixtures logged for today" in src)
-    if os.path.exists(os.path.join(REPO, "data", "data_2026.json")):
-        past = (datetime.datetime.now(S.PT).date() - datetime.timedelta(days=2)).strftime("%Y-%m-%d")
-        ok, n, nf, why = S.slate_status(past)
-        check("[+] a finished past day reads complete (%s)" % why, ok or n == 0)
+    check("no state is called 'delivered' (the Outbox cannot prove receipt)",
+          '"delivered"' not in src)
+    check("a claim is persisted before the send",
+          src.index('rec["status"] = "claimed"') < src.index("rc = mailer.send("))
+    check("runs are serialized by a lock", "with Lock():" in src)
+
+    print("\n4. FEED EVIDENCE (review 010 finding 1) -- stubbed, no network")
+    t = S.now().replace(hour=22, minute=0, second=0, microsecond=0)
+    day = t.strftime("%Y-%m-%d")
+    games = [{"game_id": "1", "state": "F", "teams": [],
+              "start_time_epoch": int(t.replace(hour=19).timestamp())}]
+    fresh = "9:58:00 PM PT"
+    cases = [
+        ("an empty 200 is not completion", {"games": [], "updated": fresh}, False),
+        ("a missing games key is not completion", {"updated": fresh}, False),
+        ("a stale feed is not completion", {"games": [{"id": "1", "date": day, "state": "final"}],
+                                            "updated": "8:00:00 PM PT"}, False),
+        ("a malformed feed is not completion", ["x"], False),
+        ("a feed error is not completion", {"games": [], "error": "x", "updated": fresh}, False),
+        ("a live game blocks completion", {"games": [{"id": "1", "date": day, "state": "live"}],
+                                           "updated": fresh}, False),
+        ("a feed final not yet logged blocks completion",
+         {"games": [{"id": "2", "date": day, "state": "final"}], "updated": fresh}, False),
+        ("[+] fresh feed, all final and logged -> complete",
+         {"games": [{"id": "1", "date": day, "state": "final"}], "updated": fresh}, True),
+    ]
+    for label, feed, want in cases:
+        got = S.slate_status(day, feed=feed, t=t, games=games)[0]
+        check(label, got is want, got)
+
+    print("\n5. NO DUPLICATE SENDS (review 010 finding 3) -- stubbed Outbox")
+    orig = S.outbox_count
+    try:
+        S.outbox_count = lambda subj: 1
+        r = S.reconcile({"status": "claimed", "subject": "x"})
+        check("a claim still in the Outbox stays in flight (never resent)",
+              r["status"] == "queued_in_outbox")
+        S.outbox_count = lambda subj: 0
+        r = S.reconcile({"status": "queued_in_outbox", "subject": "never-logged-subject-zz"})
+        check("a claim that never reached the mailer is marked abandoned, not submitted",
+              r["status"] == "claim_abandoned")
+    finally:
+        S.outbox_count = orig
 
 
 def main():
