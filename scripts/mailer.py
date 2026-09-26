@@ -58,13 +58,76 @@ def password():
     return io.open(PW_FILE, encoding="utf-8").read().strip()
 
 
+TRANSPORT_FILE = os.path.join(REPO, "Cody", "data", "mail_transport.txt")
+
+MAILAPP_SCRIPT = """
+set subj to read POSIX file "{subject}" as «class utf8»
+set bod to read POSIX file "{body}" as «class utf8»
+tell application "Mail"
+  set m to make new outgoing message with properties {{subject:subj, content:bod, visible:false}}
+  tell m to make new to recipient at end of to recipients with properties {{address:"{to}"}}
+  send m
+end tell
+"""
+
+
+def transport():
+    """'mailapp' (default) or 'gmail'.
+
+    ⚠ MAIL.APP IS THE DEFAULT SINCE 2026-09-25. Google disabled the
+    wvbhub.desk account twice (Sep 12, Sep 14) and, after it was restored on
+    appeal, still answered every scripted SMTP login with 534
+    WebLoginRequired -- a fresh app password did not change that. Each failed
+    login adds to the record that got it disabled, so the reports no longer
+    touch that account unless mail_transport.txt says 'gmail'. Mail.app sends
+    from an account Cody already uses (iCloud), with no password in this repo.
+    """
+    if os.path.exists(TRANSPORT_FILE):
+        v = io.open(TRANSPORT_FILE, encoding="utf-8").read().strip().lower()
+        if v in ("mailapp", "gmail"):
+            return v
+    return "mailapp"
+
+
+def send_mailapp(to, subject, body):
+    """Hand the message to Mail.app, which sends from its default account.
+    Subject and body travel through temp files, never the command line."""
+    import subprocess
+    import tempfile
+    d = tempfile.mkdtemp(prefix="wvbmail-")
+    sp, bp = os.path.join(d, "s.txt"), os.path.join(d, "b.txt")
+    io.open(sp, "w", encoding="utf-8").write(subject)
+    io.open(bp, "w", encoding="utf-8").write(body)
+    script = MAILAPP_SCRIPT.format(subject=sp, body=bp, to=to.replace('"', ""))
+    try:
+        r = subprocess.run(["osascript", "-e", script], stdout=subprocess.PIPE,
+                           stderr=subprocess.STDOUT, timeout=120)
+    finally:
+        for f in (sp, bp):
+            if os.path.exists(f):
+                os.remove(f)
+        os.rmdir(d)
+    if r.returncode != 0:
+        raise RuntimeError("Mail.app refused: %s"
+                           % r.stdout.decode("utf-8", "replace").strip())
+
+
 def send(subject, body, dry=False):
     # type: (str, str, bool) -> int
     to = recipient()
-    pw = password()
     if not to:
         print("no recipient on file (%s)" % os.path.relpath(TO_FILE, REPO))
         return 1
+    if transport() == "mailapp" and not dry:
+        send_mailapp(to, subject, body)
+        rec = {"utc": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+               "subject": subject, "to": to, "via": "mailapp",
+               "bytes": len(body.encode("utf-8"))}
+        with io.open(LOG, "a", encoding="utf-8") as f:
+            f.write(json.dumps(rec) + "\n")
+        print("sent via Mail.app: %s  (%d bytes)" % (subject, rec["bytes"]))
+        return 0
+    pw = password()
     if not pw:
         print("no app password on file (%s)" % os.path.relpath(PW_FILE, REPO))
         return 1
