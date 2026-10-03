@@ -35,11 +35,14 @@ UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) wvb-hub schedule reader"
 
 SCHEDULE_PATHS = ["/sports/womens-volleyball/schedule",
                   "/sports/wvball/schedule",
+                  # no men's program, so no "womens-" (Clemson, K-State,
+                  # UCF, Miami, Virginia Tech all 404 the two above)
+                  "/sports/volleyball/schedule",
                   "/sports/womens-volleyball/schedule/season/2026"]
 
 # bump when a parser learns a new template family: entries that previously
 # parsed NOTHING are refetched, entries that parsed stay on their cadence
-PARSER_V = 2
+PARSER_V = 6
 
 # the school's own network badge, from its coverage-image filename. Only
 # KNOWN network tokens map; an unrecognised badge stays unlabelled (the
@@ -124,7 +127,7 @@ def fetch(url, timeout=25):
     # type: (str, int) -> Optional[str]
     req = urllib.request.Request(url, headers={"User-Agent": UA})
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as r:
+        with __import__("fetch_policy").urlopen(req, timeout=timeout) as r:
             return r.read().decode("utf-8", errors="replace")
     except Exception:
         return None
@@ -180,15 +183,34 @@ def parse_nuxt(page):
         return None
     events = []
     for i, v in enumerate(data):
-        if not (isinstance(v, dict) and "date" in v and "opponent" in v
-                and "media" in v):
+        # "date" on most SIDEARM payloads, "start_date" on others
+        # (kstatesports.com, ucfknights.com) -- same event, same media block
+        if not (isinstance(v, dict) and ("date" in v or "start_date" in v)
+                and "opponent" in v and "media" in v):
             continue
         ev = _resolve(data, i)
         if not isinstance(ev, dict):
             continue
-        d = str(ev.get("date") or "")[:10]
+        # ⚠ SOME PAYLOADS CARRY THE WHOLE ATHLETICS DEPARTMENT'S RAIL
+        # (kstatesports.com: rowing v Creighton, football v Cincinnati on
+        # ESPN2, soccer v Arizona St. on ESPN+ -- beside the volleyball).
+        # An event that names its sport must name women's indoor
+        # volleyball, or it is not ours to bind to a volleyball fixture.
+        sp = ev.get("sport")
+        if isinstance(sp, dict) and sp:
+            code = str(sp.get("global_sport_shortname") or sp.get("shortname")
+                       or "").lower()
+            title = str(sp.get("title") or "").lower()
+            ok = code in ("wvball", "wvb", "wvolley", "vb", "volleyball") or (
+                "volleyball" in title and "men's" not in title.replace(
+                    "women's", "") and "beach" not in title
+                and "sand" not in title)
+            if not ok:
+                continue
+        d = str(ev.get("date") or ev.get("start_date") or "")[:10]
         opp = ev.get("opponent") or {}
-        opp_title = (opp.get("title") if isinstance(opp, dict) else None) or ""
+        opp_title = ((opp.get("title") or opp.get("name"))
+                     if isinstance(opp, dict) else None) or ""
         media = ev.get("media") or {}
         net = _network_from(media)
         vid = media.get("video") if isinstance(media, dict) else None
@@ -196,6 +218,170 @@ def parse_nuxt(page):
         if re.match(r"\d{4}-\d{2}-\d{2}", d) and opp_title:
             events.append({"date": d, "opponent": opp_title.strip(),
                            "network": net, "watch_url": url})
+    return events or None
+
+
+# WMT networks as the card's own "Watch | <network>" label names them. Only
+# known labels map (same rule as _BADGE); an unknown label keeps the link.
+_WMT_NET = {"btn": "BTN", "b1g+": "B1G+", "big ten plus": "B1G+",
+            "espn": "ESPN", "espn2": "ESPN2", "espnu": "ESPNU",
+            "espn+": "ESPN+", "espnews": "ESPNEWS", "accn": "ACCN",
+            "accnx": "ACCNX", "acc network": "ACCN", "acc network extra": "ACCNX",
+            "secn": "SECN", "sec network": "SECN", "secn+": "SECN+",
+            "sec network+": "SECN+", "fs1": "FS1", "fs2": "FS2",
+            "fox": "FOX", "cbs": "CBS", "cbssn": "CBSSN", "nbc": "NBC",
+            "peacock": "Peacock", "big 12 now": "Big 12 Now",
+            "big 12 now on espn+": "ESPN+", "the cw": "The CW",
+            "flosports": "FloSports", "flovolleyball": "FloVolleyball",
+            "mw network": "MW Network", "pac-12 network": "Pac-12 Network",
+            "abc": "ABC", "truTV".lower(): "truTV", "tnt": "TNT",
+            "max": "Max"}
+
+
+def parse_wmt_cards(page):
+    # type: (str) -> Optional[List[Dict]]
+    """The WMT (Nuxt) schedule family: one `class="schedule-event"` card per
+    match, server-rendered, each carrying its own `Watch | <network>` link
+    (gopsusports.com: "Watch | BTN" -> foxsports.com/live/btn). Evidence
+    binds INSIDE one card, never across (the USC lesson)."""
+    starts = [m.start() for m in
+              re.finditer(r'class="schedule-event"[\s>]', page)]
+    if not starts:
+        return None
+    starts.append(len(page))
+    events = []
+    for a, b in zip(starts, starts[1:]):
+        card = page[a:b]
+        dm = re.search(r'schedule-event-date__day[^>]*>\s*([A-Za-z]{3})[a-z]*'
+                       r'\.?\s+(\d{1,2})', card)
+        om = re.search(r'schedule-event-item-team__name"[^>]*>(.*?)</', card,
+                       re.S)
+        if not dm or not om:
+            continue
+        mon = _MON.get(dm.group(1).lower())
+        if not mon:
+            continue
+        year = SEASON if mon >= 8 else SEASON + 1
+        opp = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", om.group(1))).strip()
+        opp = re.sub(r"^(?:#\d+|No\.\s*\d+|RV)\s+", "", opp)
+        net = url = None
+        for lm in re.finditer(r'<a[^>]+href="([^"]+)"[^>]*class="[^"]*'
+                              r'(?:schedule-event__tv-link|links__link--tv)'
+                              r'[^"]*"[^>]*>(.*?)</a>', card, re.S):
+            title = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ",
+                                               lm.group(2))).strip()
+            title = re.sub(r"\s*Opens in a new window\s*$", "", title)
+            label = re.sub(r"^Watch\s*\|?\s*", "", title).strip()
+            net = net or _WMT_NET.get(label.lower())
+            url = url or lm.group(1)
+        if net or url:
+            events.append({"date": "%04d-%02d-%02d" % (year, mon,
+                                                       int(dm.group(2))),
+                           "opponent": opp, "network": net,
+                           "watch_url": url})
+    return events or None
+
+
+def parse_wmt_grid(page):
+    # type: (str) -> Optional[List[Dict]]
+    """The second WMT family (thesundevils.com): `schedule-event-item` cards
+    with a `schedule-event-grid-date__box` (<time>Sep</time><time>3</time>),
+    the opponent in `schedule-default-event__name`, and the broadcast as a
+    badge reading "TV: ESPN+". Bound inside one card, like every parser."""
+    starts = [m.start() for m in
+              re.finditer(r'class="schedule-event-item[ "]', page)]
+    if not starts:
+        return None
+    starts.append(len(page))
+    events = []
+    for a, b in zip(starts, starts[1:]):
+        card = page[a:b]
+        dm = re.search(r'schedule-event-grid-date__box[^>]*>\s*<time[^>]*>'
+                       r'([A-Za-z]{3})[a-z]*\.?</time>\s*<time[^>]*>(\d{1,2})'
+                       r'</time>', card)
+        # drop the "vs."/"at" divider and HTML comments, then the name is
+        # the rest of the __name element (a rank may sit in a comment block)
+        _c = re.sub(r'<strong[^>]*__divider[^>]*>[^<]*</strong>', "", card)
+        _c = re.sub(r"<!--.*?-->", "", _c, flags=re.S)
+        om = re.search(r'schedule-default-event__name[^>]*>([^<]+)<', _c)
+        if not dm or not om:
+            continue
+        mon = _MON.get(dm.group(1).lower())
+        if not mon:
+            continue
+        opp = re.sub(r"\s+", " ", om.group(1)).strip()
+        opp = re.sub(r"^(?:#\d+|No\.\s*\d+|RV)\s+", "", opp, flags=re.I)
+        net = url = None
+        for lm in re.finditer(r'<(a|strong)([^>]*)class="schedule-event-'
+                              r'badges__item[^"]*"[^>]*>\s*TV:\s*([^<]+)<',
+                              card):
+            label = lm.group(3).strip()
+            net = net or _WMT_NET.get(label.lower())
+            hm = re.search(r'href="([^"]+)"', lm.group(2))
+            url = url or (hm.group(1) if hm else None)
+        if not net:
+            hm = re.search(r'href="([^"]+)"[^>]*class="schedule-event-'
+                           r'badges__item[^"]*"[^>]*>\s*TV:\s*([^<]+)<', card)
+            if hm:
+                net = _WMT_NET.get(hm.group(2).strip().lower())
+                url = url or hm.group(1)
+        if not opp or not (net or url):
+            continue
+        year = SEASON if mon >= 8 else SEASON + 1
+        events.append({"date": "%04d-%02d-%02d" % (year, mon,
+                                                   int(dm.group(2))),
+                       "opponent": opp, "network": net, "watch_url": url})
+    return events or None
+
+
+_NOT_NET = {"stats", "tickets", "live stats", "box score", "recap",
+            "preview", "notes", "radio", "gallery", "highlights", "video",
+            "watch", "listen", "audio", "history", "pdf", "results"}
+
+
+def parse_wmt_items(page):
+    # type: (str) -> Optional[List[Dict]]
+    """The third WMT family (clemsontigers.com, kstatesports.com): cards
+    `class="schedule-event-item"`, date `<time>Sun, Sep 27</time>`, opponent
+    `schedule-event-default__name`, and the broadcast as a link in
+    `schedule-event-item-links` whose TITLE is the network ("ACCNX").
+    Only a title that names a KNOWN network counts; "Stats"/"Tickets" never."""
+    starts = [m.start() for m in
+              re.finditer(r'class="schedule-event-item"', page)]
+    if not starts:
+        return None
+    starts.append(len(page))
+    events = []
+    for a, b in zip(starts, starts[1:]):
+        card = re.sub(r"<!--.*?-->", "", page[a:b], flags=re.S)
+        dm = re.search(r'schedule-event-date__time[^>]*>\s*<time[^>]*>'
+                       r'(?:[A-Za-z]+,?\s+)?([A-Za-z]{3})[a-z]*\.?\s+(\d{1,2})',
+                       card)
+        om = re.search(r'schedule-event-default__name[^>]*>([^<]+)<', card)
+        if not dm or not om:
+            continue
+        mon = _MON.get(dm.group(1).lower())
+        if not mon:
+            continue
+        opp = re.sub(r"^(?:#\d+|No\.\s*\d+|RV)\s+", "",
+                     re.sub(r"\s+", " ", om.group(1)).strip(), flags=re.I)
+        net = url = None
+        for lm in re.finditer(r'<a[^>]+href="([^"]+)"[^>]*class="schedule-'
+                              r'event-item-links__link[^"]*"[^>]*>\s*<span[^>]*'
+                              r'links__title[^>]*>([^<]+)<', card):
+            label = lm.group(2).strip()
+            if label.lower() in _NOT_NET:
+                continue
+            n = _WMT_NET.get(re.sub(r"^watch\s*\|?\s*", "",
+                                    label.lower()).strip())
+            if n:
+                net, url = net or n, url or lm.group(1)
+        if not net:
+            continue
+        year = SEASON if mon >= 8 else SEASON + 1
+        events.append({"date": "%04d-%02d-%02d" % (year, mon,
+                                                   int(dm.group(2))),
+                       "opponent": opp, "network": net, "watch_url": url})
     return events or None
 
 
@@ -258,6 +444,12 @@ def main():
             events = parse_nuxt(page)
             if not events:
                 events = parse_sidearm_html(page)
+            if not events:
+                events = parse_wmt_cards(page)
+            if not events:
+                events = parse_wmt_grid(page)
+            if not events:
+                events = parse_wmt_items(page)
             if events:
                 used = site + path
                 break
@@ -277,7 +469,21 @@ def main():
         else:
             doc[team] = {"status": "no_payload", "parser_v": PARSER_V, "source_url": used,
                          "retrieved": now_s}
-    tmp = OUT + ".tmp"
+    # ⚠ TWO RUNS CAN OVERLAP (the 20-minute local refresh and a manual full
+    # crawl): re-read the file and keep, per school, whichever entry was
+    # retrieved later, so one run never erases the other's work.
+    try:
+        disk = json.load(open(OUT))
+    except (OSError, ValueError):
+        disk = {}
+    for k, v in disk.items():
+        if k.startswith("_") or not isinstance(v, dict):
+            continue
+        mine = doc.get(k)
+        if not isinstance(mine, dict) or \
+                (v.get("retrieved") or "") > (mine.get("retrieved") or ""):
+            doc[k] = v
+    tmp = OUT + ".tmp.%d" % os.getpid()
     json.dump(doc, open(tmp, "w"), indent=1)
     os.replace(tmp, OUT)
     st = {}

@@ -78,9 +78,14 @@ def main():
     check("at most three reason chips", ".slice(0, 3)" in ww)
     check("no reasons and no listing renders no section",
           "if (!rs.length && !watch) return '';" in ww)
-    check("a held TV listing renders; a missing one is OMITTED, never "
-          "phrased as unavailable",
-          "m.tv" in ww and "not televised" not in ww
+    # ⚠ REVISED 2026-09-26 (Cody: every match lists where to watch "and noted
+    # if none were found"). A missing listing now SAYS none was found -- as
+    # unknown, never as a claim the match is untelevised.
+    _ww_plain = ww.replace("not \\u201cnot televised\\u201d", "")
+    check("a held TV listing renders; a missing one says 'none found' as "
+          "UNKNOWN, never as unavailable",
+          "m.tv" in ww and "NOTE_NOTV" in ww and "listing found" in ww
+          and "not televised" not in _ww_plain
           and "unavailable" not in ww)
     check("no outbound stream link is invented (none are held)",
           "http" not in ww)
@@ -179,6 +184,7 @@ def main():
           and "return" in _wc and len(_wc) < 8000, str(len(_wc or "")))
     _js = r"""
 const esc = s => String(s == null ? '' : s);
+const NOTE_NOTV = 'none found';
 const rankHTML = () => '';
 const teamRankChips = () => '';
 const logo = () => '';

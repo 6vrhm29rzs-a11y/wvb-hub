@@ -662,6 +662,527 @@ def season_chart_payload():
             "ranks": dict((t, i + 1) for i, t in enumerate(order[:60]))}
 
 
+# ---- POWER v2 PREVIEW (PRIVATE ONLY; mail 058) ----------------------------
+# A FROZEN, versioned candidate output (Cody/data/power_candidate/
+# v2_preview.json, written by research/power-v2/freeze_preview.py) shown
+# beside Current POWER for review. It feeds NOTHING: no forecast, ballot,
+# movement history, recorder or notification reads this payload, and the
+# public build never includes it (PRIVATE_MARKERS carries its label).
+# Rollback = delete that file; every placeholder then renders empty.
+_V2P_CACHE = []
+
+
+def v2_preview_payload():
+    if _V2P_CACHE:
+        return _V2P_CACHE[0]
+    doc = None if PUBLIC else load("Cody/data/power_candidate/v2_preview.json")
+    if doc:
+        cur = load("data/digby_top25_%d.json" % SEASON) or {}
+        cm = cur.get("meta") or {}
+        doc = dict(doc)
+        doc["current"] = {"rank": dict((r["team"], r.get("rank")) for r in cur.get("all") or []),
+                          "generated_utc": cm.get("generated_at_utc"),
+                          "data_through_epoch": cm.get("data_through_epoch")}
+    _V2P_CACHE.append(doc)
+    return doc
+
+
+V2P_BTN = ('<button class="segb" data-r="v2p" title="Private preview of the '
+           'rebuilt model, shown for review beside Current POWER">'
+           'POWER v2 &mdash; preview</button>')
+
+V2P_JS = r"""
+const V2P = {{V2P_JSON}};
+RULER_WHAT.v2p = '<b>POWER v2 &mdash; preview</b> is a candidate rebuild shown ' +
+  'for review only. <b>Current POWER stays the default</b> and is what every ' +
+  'other part of this site uses.';
+function v2pWhen(ep) {
+  if (!ep) return 'not stated';
+  return new Date(ep * 1000).toLocaleString('en-US', {timeZone: 'America/Los_Angeles',
+    month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'}) + ' PT';
+}
+RULER_VIEWS.v2p = function (host) {
+  const cur = V2P.current || {};
+  const genEp = V2P.generated_utc ? Date.parse(V2P.generated_utc) / 1000 : null;
+  const curGen = cur.generated_utc ? Date.parse(cur.generated_utc) / 1000 : null;
+  const stale = cur.data_through_epoch && V2P.data_through_epoch &&
+    cur.data_through_epoch > V2P.data_through_epoch;
+  const rows = Object.keys(V2P.teams).map(n => Object.assign({team: n}, V2P.teams[n]))
+    .sort((a, b) => a.rank - b.rank);
+  const mv = r => {
+    const c = cur.rank[r.team];
+    if (!c) return '<span title="no current rank">&mdash;</span>';
+    const d = c - r.rank;
+    return d === 0 ? '&ndash;' : (d > 0 ? '<span class="mv-up">&#9650;' + d + '</span>'
+                                        : '<span class="mv-dn">&#9660;' + (-d) + '</span>');
+  };
+  const trs = rows.map(r =>
+    '<tr data-team="' + esc(r.team) + '" tabindex="0" role="link" title="Opens the ' +
+    'team page, which shows Current POWER">' +
+    '<td class="n">' + r.rank + '</td><td class="tm">' + logo(r.team) + esc(r.team) + '</td>' +
+    '<td class="n" style="white-space:nowrap">' + r.record + '</td><td class="n">' + r.power.toFixed(1) + '</td>' +
+    '<td class="n">' + (cur.rank[r.team] || '&mdash;') + '</td><td class="n">' + mv(r) + '</td>' +
+    '<td class="n">' + r.sets + '</td></tr>').join('') +
+    (V2P.unrated || []).map(n =>
+      '<tr data-team="' + esc(n) + '" tabindex="0" role="link"><td class="n">&mdash;</td>' +
+      '<td class="tm">' + logo(n) + esc(n) + '</td><td class="n" colspan="2">unrated: no valid ' +
+      '2026 set line in the snapshot</td><td class="n">' + (cur.rank[n] || '&mdash;') +
+      '</td><td class="n">&mdash;</td><td class="n">0</td></tr>').join('');
+  const fmt = x => (x >= 0 ? '+' : '') + x.toFixed(3);
+  const ex = Object.keys(V2P.explain || {}).map(n => {
+    const t = V2P.teams[n]; if (!t) return '';
+    const ms = V2P.explain[n];
+    const top = ms.slice().sort((a, b) => Math.abs(b.sens) - Math.abs(a.sens)).slice(0, 3);
+    return '<details class="v2pex"><summary><b>' + esc(n) + '</b> &middot; v2 #' + t.rank +
+      ' &middot; current #' + (cur.rank[n] || '&mdash;') + '</summary>' +
+      '<p>Strength ' + t.theta.toFixed(3) + ' = preseason part ' + t.prior_part.toFixed(3) +
+      ' + this-season deviation ' + fmt(t.deviation) + ' (' + t.record + ', ' + t.sets +
+      ' valid sets). The deviation is ' + (t.deviation >= 0 ? 'above' : 'below') +
+      ' zero, so v2 reads its 2026 sets as ' + (t.deviation >= 0 ? 'better' : 'worse') +
+      ' than its preseason expectation once every opponent is fitted. Its rank also ' +
+      'depends on how every other team is rated, so this is not a breakdown of the ' +
+      'difference from current.</p>' +
+      '<p>Most influential matches (strength with the match minus without it): ' +
+      top.map(m => esc(m.opp) + ' ' + m.result + ' ' + m.sets.join(', ') + ' (' +
+        fmt(m.sens) + ')').join('; ') + '.</p>' +
+      '<p class="tnote">Every accepted match: ' + ms.map(m => m.date.slice(5) + ' ' +
+        (m.site === 'away' ? 'at ' : m.site === 'neutral' ? 'v ' : 'vs ') + esc(m.opp) + ' ' +
+        m.result + ' ' + m.sets.join(' ')).join(' &middot; ') + '</p></details>';
+  }).join('');
+  host.innerHTML =
+    '<div class="seasonwarn"><b>Preview, not the default.</b> A frozen snapshot of the ' +
+    'rebuilt model for review. Nothing else on this site uses it; team pages show ' +
+    '<b>Current POWER</b>.' + (stale ? ' <b>Current POWER includes results after this ' +
+    'snapshot</b>, so some differences are timing, not method.' : '') + '</div>' +
+    '<p class="tnote">v2 ' + esc(V2P.version) + ' &middot; results through ' +
+    v2pWhen(V2P.data_through_epoch) + ' &middot; computed ' + v2pWhen(genEp) +
+    ' &middot; ' + V2P.matches + ' matches, ' + V2P.sets + ' sets, ' +
+    (V2P.excluded_invalid || []).length + ' matches excluded for incomplete or ' +
+    'inconsistent set lines. Current POWER: results through ' +
+    v2pWhen(cur.data_through_epoch) + ', computed ' + v2pWhen(curGen) + '.</p>' +
+    '<p>How v2 works: every valid set is one piece of evidence &mdash; the share of that ' +
+    'set’s points each side won. All teams’ strengths are fitted together, so ' +
+    'beating a strong opponent counts for more. A team starts from its preseason ' +
+    'expectation and moves away from it as its sets accumulate. Recent matches are ' +
+    '<b>not</b> weighted more (that did not test better). Missing or inconsistent set ' +
+    'lines are left out. Each set counts once, but a close set and a lopsided one ' +
+    'carry different point shares, so sets do not all move a rating equally. v2 uses ' +
+    'set scores, opponents and the preseason prior only &mdash; no box-score stats yet.</p>' +
+    '<p class="tnote"><b>Accuracy so far:</b> over four weeks of 2026, v2’s forecasts ' +
+    'were slightly <b>worse</b> than Current POWER on average (log loss +0.009, range ' +
+    '−0.008 to +0.028; retrospective). Method note: ' + esc(V2P.method_note) + '.</p>' +
+    ex +
+    '<div class="panel"><div class="scroll"><table class="gaptbl"><thead><tr>' +
+    '<th>v2</th><th class="l">Team</th><th style="white-space:nowrap">W-L</th><th>v2 POWER</th><th>Current</th>' +
+    '<th title="v2 rank compared with the current model, not a daily change">vs current ' +
+    'model</th><th>Sets</th></tr></thead><tbody>' + trs + '</tbody></table></div></div>';
+  host.querySelectorAll('tr[data-team]').forEach(tr => {
+    const open = () => { if (TEAMS[tr.dataset.team]) go(routeFor('teams', slug(tr.dataset.team))); };
+    tr.addEventListener('click', open);
+    tr.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+    });
+  });
+};
+"""
+
+
+# ---- POWER SEASON-ONLY CANDIDATE (PRIVATE ONLY; mail 066) -----------------
+# A second frozen, versioned candidate (Cody/data/power_candidate/
+# v2so_preview.json, written by research/TONIGHT-BUILDER-HANDOFF/work/c066.py).
+# Shown beside Current POWER and the reviewed prior-on v2; feeds NOTHING.
+# Rollback = delete that file; its placeholders then render empty.
+_V2S_CACHE = []
+
+
+def load_sim():
+    """Season simulation for the page: the candidate's private run when DEFAULT_ON (private
+    build only), otherwise the tracked file."""
+    if not PUBLIC and os.path.exists(os.path.join(REPO, "Cody", "data", "power_candidate", "DEFAULT_ON")):
+        doc = load("Cody/data/power_candidate/season_sim_%d.json" % SEASON)
+        if doc and doc.get("teams"):
+            return doc
+    return load("data/season_sim_%d.json" % SEASON) or {}
+
+
+def load_predictions():
+    """Forecasts for the page. PRIVATE DEFAULT (Cody 2026-09-28): when the flag is on, the
+    candidate's forecasts (Cody/data/power_candidate/predictions_2026.json); otherwise, and
+    always on the public build, the tracked data/predictions_2026.json."""
+    if not PUBLIC and os.path.exists(os.path.join(REPO, "Cody", "data", "power_candidate", "DEFAULT_ON")):
+        doc = load("Cody/data/power_candidate/predictions_2026.json")
+        if doc and doc.get("games"):
+            return doc
+    doc = load("data/predictions_%d.json" % SEASON) or {}
+    if PUBLIC and (doc.get("meta") or {}).get("strength_basis") == "candidate":
+        raise SystemExit("public build refuses candidate-based forecasts in data/predictions_%d.json" % SEASON)
+    return doc
+
+
+def v2so_preview_payload():
+    if _V2S_CACHE:
+        return _V2S_CACHE[0]
+    doc = None if PUBLIC else load("Cody/data/power_candidate/v2so_preview.json")
+    if doc:
+        cur = load("data/digby_top25_%d.json" % SEASON) or {}
+        cm = cur.get("meta") or {}
+        doc = dict(doc)
+        doc["current"] = {"rank": dict((r["team"], r.get("rank")) for r in cur.get("all") or []),
+                          "generated_utc": cm.get("generated_at_utc"),
+                          "data_through_epoch": cm.get("data_through_epoch")}
+        doc["default_on"] = (not PUBLIC) and os.path.exists(os.path.join(REPO, "Cody", "data", "power_candidate", "DEFAULT_ON"))
+    _V2S_CACHE.append(doc)
+    return doc
+
+
+V2S_BTN = ('<button class="segb" data-r="v2s" title="Private candidate: 2026 results, '
+           'plus a starting point from returning players\' 2025 production">POWER 2026 &mdash; candidate</button>')
+
+V2S_JS = r"""
+const V2S = {{V2S_JSON}};
+RULER_WHAT.v2s = '<b>POWER 2026 &mdash; candidate</b> rates teams from 2026 results, ' +
+  'starting from what each roster\u2019s players produced in 2025. Shown for comparison. <b>Current POWER stays the default</b> and is ' +
+  'what every other part of this site uses.';
+function v2sWhen(ep) {
+  if (!ep) return 'not stated';
+  return new Date(ep * 1000).toLocaleString('en-US', {timeZone: 'America/Los_Angeles',
+    month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'}) + ' PT';
+}
+/* The mapping was learned with the HOME side listed first (its intercept is a home edge), so:
+   home games use it directly with the home side first; a neutral floor averages both
+   orientations, which makes A-vs-B and B-vs-A add to exactly 100%. */
+function v2sK(a, b) {
+  const m = V2S.win_model, dep = Math.min(1, Math.min(V2S.teams[a].sets || 40, V2S.teams[b].sets || 40) / 40);
+  return m.b + m.c * m.s_now + (m.e || 0) * dep;   /* confidence grows with season and with evidence on both teams */
+}
+function v2sHome(h, a) {
+  const m = V2S.win_model, d = V2S.teams[h].theta - V2S.teams[a].theta + (V2S.home_setshare || 0);
+  return 1 / (1 + Math.exp(-(m.a + v2sK(h, a) * d)));
+}
+function v2sWin(a, b, site) {
+  const m = V2S.win_model; if (!m || !V2S.teams[a] || !V2S.teams[b]) return null;
+  if (site === 1) return v2sHome(a, b);
+  if (site === -1) return 1 - v2sHome(b, a);
+  return 1 / (1 + Math.exp(-(v2sK(a, b) * (V2S.teams[a].theta - V2S.teams[b].theta))));
+}
+function v2sProf(p) {
+  if (!p) return '<td class="n">&mdash;</td><td class="n">&mdash;</td><td class="n">&mdash;</td><td class="n">&mdash;</td>';
+  return p.slice(0, 4).map(x => '<td class="n">' + x.toFixed(2) + '</td>').join('');
+}
+
+// ---- WHY: rating anatomy (Cody, 2026-09-28: "tell me who is good and why ... via visual data").
+// Every figure is read off the frozen file's why block; sentences are assembled from those numbers at render time.
+const V2S_PARTC = {season: '#4B4FBF', start: '#9A8FD8', conf: '#D9A441'};
+function v2sPts(x) { return 12.5 * x / (V2S.theta_sd || 1); }   // theta -> POWER points (the table's own scale)
+function v2sCss() {
+  if (document.getElementById('v2swhycss')) return;
+  const st = document.createElement('style'); st.id = 'v2swhycss';
+  st.textContent = '.v2sw{background:var(--card,#fff);border:1px solid var(--line);border-radius:var(--r-panel,12px);padding:14px 16px;margin:10px 0;box-shadow:var(--float)}' +
+    '.v2sw h3{margin:0 0 6px;font:700 20px/1.1 var(--disp);letter-spacing:.01em}.v2sw h4{margin:14px 0 4px;font:700 10.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink2)}' +
+    '.v2sw .k{font:600 12.5px/1.45 var(--sans);color:var(--ink2)}.v2sw svg{display:block;max-width:100%;height:auto}.v2sw .row{display:flex;gap:14px;flex-wrap:wrap}.v2sw .row>div{flex:1 1 300px;min-width:0}' +
+    '.v2sw .x{float:right;font:600 12px/1 var(--mono);cursor:pointer;background:none;border:1px solid var(--line);border-radius:6px;padding:5px 8px;color:var(--ink2)}.v2sw .lg{display:inline-block;width:10px;height:10px;border-radius:2px;margin:0 4px 0 10px;vertical-align:-1px}' +
+    '.v2sw .fact{font:500 13px/1.5 var(--sans);margin:4px 0}.v2sw .fact b{font-weight:700}';
+  document.head.appendChild(st);
+}
+function v2sSvg(w, h, inner) { return '<svg viewBox="0 0 ' + w + ' ' + h + '" width="' + w + '" height="' + h + '">' + inner + '</svg>'; }
+function v2sPartsOf(t) {
+  const p = t.why.parts, st = p.start || {};
+  const out = [['own 2026 results, beyond start + conference', p.season, 'season']];
+  Object.keys(st).forEach(k => out.push([k, st[k], 'start']));
+  out.push(['conference level (fitted from 2026 results)', p.conf, 'conf']);
+  return out;
+}
+function v2sOverview(box, rows) {
+  if (!box) return; v2sCss();
+  const rated = rows.filter(r => r.why); if (!rated.length) { box.innerHTML = ''; return; }
+  const top = rated.slice(0, 25);
+  const W = 700, rh = 18, lw = 150, rw = 110, span = Math.max(...top.map(r => Math.abs(r.power - 50))) * 1.08 || 1;
+  const sx = v => lw + (W - lw - rw) * (v / span);
+  let g = '';
+  top.forEach((r, i) => {
+    const y = 6 + i * rh; let pos = 0, neg = 0;
+    const parts = v2sPartsOf(r).map(([n, v, c]) => [n, v2sPts(v), c]);
+    const start = parts.filter(x => x[2] === 'start').reduce((a, x) => a + x[1], 0);
+    const segs = [['own 2026 results beyond start + conference', parts[0][1], 'season'], ['2025 start (all four parts, at the weights 2026 results give them)', start, 'start'], ['conference level (fitted from 2026 results)', parts[parts.length - 1][1], 'conf']];
+    segs.forEach(([n, v, c]) => {
+      if (Math.abs(v) < 1e-9) return;
+      const x0 = v >= 0 ? pos : neg + v, wpx = Math.abs(v);
+      g += '<rect x="' + (sx(x0)).toFixed(1) + '" y="' + (y + 2) + '" width="' + ((W - lw - rw) * wpx / span).toFixed(1) + '" height="' + (rh - 5) + '" fill="' + V2S_PARTC[c] + '" opacity=".92"><title>' + esc(r.team) + ' · ' + n + ': ' + (v >= 0 ? '+' : '') + v.toFixed(1) + ' POWER points</title></rect>';
+      if (v >= 0) pos += v; else neg += v;
+    });
+    g += '<text x="' + (lw - 6) + '" y="' + (y + rh - 6) + '" text-anchor="end" font-size="11" fill="var(--ink)">' + r.rank + ' ' + esc(r.team) + '</text>' +
+         '<text x="' + (W - rw + 8) + '" y="' + (y + rh - 6) + '" font-size="11" font-family="var(--mono)" fill="var(--ink2)">' + r.power.toFixed(1) + ' · ' + r.record + '</text>';
+  });
+  g += '<line x1="' + sx(0) + '" y1="4" x2="' + sx(0) + '" y2="' + (6 + top.length * rh) + '" stroke="var(--ink2)" stroke-width="1"/>';
+  const anat = v2sSvg(W, 10 + top.length * rh, g);
+  const rated2 = rated.filter(r => r.opp_avg_rank), SW = 640, SH = 300, pad = {l: 44, r: 12, t: 12, b: 30};
+  const xs = r => pad.l + (SW - pad.l - pad.r) * ((r.opp_avg_rank - 1) / 347), ys = r => pad.t + (SH - pad.t - pad.b) * (1 - (r.power - 20) / 70);
+  let sc = '';
+  for (let v = 30; v <= 90; v += 10) sc += '<line x1="' + pad.l + '" x2="' + (SW - pad.r) + '" y1="' + ys({power: v}) + '" y2="' + ys({power: v}) + '" stroke="var(--line)"/><text x="' + (pad.l - 5) + '" y="' + (ys({power: v}) + 4) + '" text-anchor="end" font-size="10" font-family="var(--mono)" fill="var(--ink2)">' + v + '</text>';
+  [1, 50, 100, 150, 200, 250, 300, 347].forEach(v => sc += '<text x="' + xs({opp_avg_rank: v}) + '" y="' + (SH - 10) + '" text-anchor="middle" font-size="10" font-family="var(--mono)" fill="var(--ink2)">' + v + '</text>');
+  rated2.slice().reverse().forEach(r => {
+    const t25 = r.rank <= 25;
+    sc += '<circle cx="' + xs(r).toFixed(1) + '" cy="' + ys(r).toFixed(1) + '" r="' + (t25 ? 4.5 : 2.6) + '" fill="' + (t25 ? V2S_PARTC.conf : V2S_PARTC.season) + '" opacity="' + (t25 ? .95 : .45) + '"><title>#' + r.rank + ' ' + esc(r.team) + ' · POWER ' + r.power.toFixed(1) + ' · ' + r.record + ' · average opponent rank ' + r.opp_avg_rank + '</title></circle>';
+    if (t25 && r.rank <= 6) sc += '<text x="' + (xs(r) + 6).toFixed(1) + '" y="' + (ys(r) + 3.5).toFixed(1) + '" font-size="10" fill="var(--ink)">' + esc(r.team) + '</text>';
+  });
+  sc += '<text x="' + (SW / 2) + '" y="' + SH + '" text-anchor="middle" font-size="10" font-family="var(--mono)" fill="var(--ink2)" letter-spacing=".08em">AVERAGE OPPONENT RANK (LEFT = TOUGHER SCHEDULE)</text>';
+  const scat = v2sSvg(SW, SH + 4, sc);
+  const most = top.slice().sort((a, b) => v2sPts(a.why.parts.season) - v2sPts(b.why.parts.season));
+  const tough = top.filter(r => r.opp_avg_rank).slice().sort((a, b) => a.opp_avg_rank - b.opp_avg_rank);
+  box.innerHTML = '<div class="v2sw"><h3>Who is good, and why</h3>' +
+    '<p class="k">Left: what each top-25 number is made of, in POWER points either side of the league average (50). ' +
+    '<span class="lg" style="background:' + V2S_PARTC.season + '"></span>the team\u2019s own 2026 results beyond what its start and conference explain (opponent- and floor-adjusted)' +
+    '<span class="lg" style="background:' + V2S_PARTC.start + '"></span>the 2025 start (last season\u2019s results + returning players\u2019 earned points, assists, digs), each at the weight this season\u2019s results give it' +
+    '<span class="lg" style="background:' + V2S_PARTC.conf + '"></span>the conference level, fitted from every 2026 result its members have played. Right: every rated team by the schedule it has actually played against its strength; amber = top 25.</p>' +
+    '<div class="row"><div>' + anat + '</div><div>' + scat + '</div></div>' +
+    '<p class="fact">Read a bar left to right: how far the team sits above (or below) the average team, and which of the three sources put it there. ' +
+    'Largest own-results term in the top 25: <b>' + esc(most[most.length - 1].team) + '</b> (' + (v2sPts(most[most.length - 1].why.parts.season) >= 0 ? '+' : '\u2212') + Math.abs(v2sPts(most[most.length - 1].why.parts.season)).toFixed(1) + ' points beyond its start and conference); most reliant on its start and conference: <b>' + esc(most[0].team) + '</b> (own-results term ' + (v2sPts(most[0].why.parts.season) >= 0 ? '+' : '\u2212') + Math.abs(v2sPts(most[0].why.parts.season)).toFixed(1) + '). ' +
+    (tough.length ? 'Toughest schedule so far in the top 25: <b>' + esc(tough[0].team) + '</b> (average opponent rank ' + tough[0].opp_avg_rank + '); softest: <b>' + esc(tough[tough.length - 1].team) + '</b> (' + tough[tough.length - 1].opp_avg_rank + '). ' : '') +
+    'Click <b>why</b> on any row for that team’s anatomy.</p></div>';
+}
+function v2sWhatIf(r) {
+  const w = r.why && r.why.what_if; if (!w || !w.win || !w.loss) return '';
+  const site = w.site === 'H' ? 'at home' : w.site === 'A' ? 'away' : 'on a neutral floor';
+  const mv = (x) => x.rank === r.rank ? 'stays <b>#' + x.rank + '</b>' : (x.rank < r.rank ? 'rises to <b>#' + x.rank + '</b>' : 'falls to <b>#' + x.rank + '</b>');
+  return '<p class="fact"><b>Next match, what-if</b> (' + w.day.slice(5) + ', ' + site + ' vs ' + (w.opp_rank ? '#' + w.opp_rank + ' ' : '') + esc(w.opp) + '): a 3-0 win at this team’s usual winning margin (' + (w.share_win >= 0 ? '+' : '') + (100 * w.share_win).toFixed(1) + '% set share) and it ' + mv(w.win) + ' (POWER ' + w.win.power.toFixed(1) + ')' + (w.win.rank > r.rank ? ' — a win by less than the model expects against this opponent still counts against it' : '') + '; a 0-3 loss at its usual losing margin and it ' + mv(w.loss) + ' (' + w.loss.power.toFixed(1) + '). Same model re-run with that one result added, everything else as it stands — a projection, not a forecast of who wins.</p>';
+}
+function v2sWhyHtml(r, heading) {
+  v2sCss();
+  const parts = v2sPartsOf(r).map(([n, v, c]) => [n, v2sPts(v), c]);
+  const W = 680, rh = 22, lw = 265, span = Math.max(1, ...parts.map(x => Math.abs(x[1]))) * 1.15;
+  const sx = v => lw + (W - lw - 70) / 2 + (W - lw - 70) / 2 * (v / span);
+  let g = '<line x1="' + sx(0) + '" y1="2" x2="' + sx(0) + '" y2="' + (parts.length * rh + 2) + '" stroke="var(--ink2)"/>';
+  parts.forEach(([n, v, c], i) => {
+    const y = 4 + i * rh;
+    g += '<rect x="' + Math.min(sx(0), sx(v)).toFixed(1) + '" y="' + y + '" width="' + Math.abs(sx(v) - sx(0)).toFixed(1) + '" height="' + (rh - 6) + '" fill="' + V2S_PARTC[c] + '"/>' +
+         '<text x="' + (lw - 6) + '" y="' + (y + rh - 9) + '" text-anchor="end" font-size="11.5" fill="var(--ink)">' + esc(n) + '</text>' +
+         '<text x="' + (v >= 0 ? sx(v) + 5 : sx(v) - 5).toFixed(1) + '" y="' + (y + rh - 9) + '" text-anchor="' + (v >= 0 ? 'start' : 'end') + '" font-size="11" font-family="var(--mono)" fill="var(--ink2)">' + (Math.abs(v) < 0.05 ? '0.0' : (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(1)) + '</text>';
+  });
+  const wf = v2sSvg(W, parts.length * rh + 8, g);
+  const res = r.why.results, LW = 620, lh = 17, nw = 210, half = (LW - nw - 90) / 2, mx = Math.max(0.15, ...res.map(x => Math.abs(x.share)));
+  let l = '<line x1="' + (nw + half) + '" y1="0" x2="' + (nw + half) + '" y2="' + (res.length * lh + 2) + '" stroke="var(--ink2)"/>';
+  res.forEach((x, i) => {
+    const y = 2 + i * lh, bw = half * Math.abs(x.share) / mx, col = x.won ? '#31A36A' : '#E04A5A';
+    l += '<rect x="' + (x.share >= 0 ? nw + half : nw + half - bw).toFixed(1) + '" y="' + (y + 2) + '" width="' + bw.toFixed(1) + '" height="' + (lh - 5) + '" fill="' + col + '" opacity="' + (0.45 + 0.55 * x.w).toFixed(2) + '"><title>' + (x.won ? 'beat ' : 'lost to ') + esc(x.opp) + (x.opp_rank ? ' (#' + x.opp_rank + ')' : '') + ' ' + x.score + ' on ' + x.day + ' · ' + (x.site === 'H' ? 'home' : x.site === 'A' ? 'away' : 'neutral floor') + ' · average set point-share ' + (x.share >= 0 ? '+' : '') + (100 * x.share).toFixed(1) + '%' + (x.earned_diff !== null && x.earned_diff !== undefined ? ' · earned points per set ' + (x.earned_diff >= 0 ? '+' : '') + x.earned_diff.toFixed(2) : '') + ' · recency weight ' + x.w.toFixed(2) + (x.impact_pts !== undefined ? ' · this week: removing this result would move the rating by ' + (x.impact_pts >= 0 ? '−' : '+') + Math.abs(x.impact_pts).toFixed(2) + ' points (rank ' + (x.impact_rank === 0 ? 'unchanged' : (x.impact_rank > 0 ? 'would fall ' + x.impact_rank : 'would rise ' + (-x.impact_rank))) + ')' : '') + '</title></rect>' +
+         '<text x="' + (nw - 6) + '" y="' + (y + lh - 5) + '" text-anchor="end" font-size="11" fill="var(--ink)">' + (x.opp_rank ? '#' + x.opp_rank + ' ' : '') + esc(x.opp) + '</text>' +
+         '<text x="' + (nw + 2 * half + 8) + '" y="' + (y + lh - 5) + '" font-size="10.5" font-family="var(--mono)" fill="' + col + '">' + (x.won ? 'W' : 'L') + ' ' + x.score + ' ' + x.site + (x.impact_pts !== undefined ? '  ' + (x.impact_pts >= 0 ? '+' : '\u2212') + Math.abs(x.impact_pts).toFixed(1) : '') + '</text>';
+  });
+  const ladder = v2sSvg(LW, res.length * lh + 6, l);
+  const tr = r.why.trajectory, TW = 620, TH = 150, tp = {l: 40, r: 60, t: 10, b: 26};
+  const maxr = Math.max(50, ...tr.map(x => x.rank), r.rank_range ? r.rank_range[1] : 0);
+  const tx = i => tp.l + (TW - tp.l - tp.r) * (tr.length > 1 ? i / (tr.length - 1) : 0.5), ty = rk => tp.t + (TH - tp.t - tp.b) * ((rk - 1) / (maxr - 1));
+  let t = '';
+  [1, 10, 25, 50].filter(v => v <= maxr).forEach(v => t += '<line x1="' + tp.l + '" x2="' + (TW - tp.r) + '" y1="' + ty(v) + '" y2="' + ty(v) + '" stroke="var(--line)"/><text x="' + (tp.l - 5) + '" y="' + (ty(v) + 3.5) + '" text-anchor="end" font-size="10" font-family="var(--mono)" fill="var(--ink2)">' + v + '</text>');
+  if (r.rank_range) t += '<rect x="' + (TW - tp.r + 8) + '" y="' + ty(r.rank_range[0]) + '" width="10" height="' + Math.max(2, ty(r.rank_range[1]) - ty(r.rank_range[0])) + '" fill="' + V2S_PARTC.conf + '" opacity=".5"><title>10th–90th percentile rank across 200 season resamples: ' + r.rank_range[0] + '–' + r.rank_range[1] + '</title></rect>';
+  t += '<polyline fill="none" stroke="' + V2S_PARTC.season + '" stroke-width="2" points="' + tr.map((x, i) => tx(i).toFixed(1) + ',' + ty(x.rank).toFixed(1)).join(' ') + '"/>';
+  tr.forEach((x, i) => t += '<circle cx="' + tx(i).toFixed(1) + '" cy="' + ty(x.rank).toFixed(1) + '" r="3.2" fill="' + V2S_PARTC.season + '"><title>through ' + x.through + ': #' + x.rank + ', POWER ' + x.power.toFixed(1) + '</title></circle>' +
+    '<text x="' + tx(i).toFixed(1) + '" y="' + (TH - 8) + '" text-anchor="middle" font-size="9.5" font-family="var(--mono)" fill="var(--ink2)">' + x.through.slice(5) + '</text>');
+  const traj = v2sSvg(TW, TH, t);
+  const W_ = res.filter(x => x.won), L_ = res.filter(x => !x.won);
+  const mean = a => a.length ? a.reduce((s_, x) => s_ + x, 0) / a.length : null;
+  const q = res.filter(x => x.opp_rank && x.opp_rank <= 25), qw = q.filter(x => x.won), qwl = qw.length + '-' + (q.length - qw.length);
+  const bestW = W_.length ? W_.reduce((a, x) => (x.opp_rank || 999) < (a.opp_rank || 999) ? x : a) : null;
+  const worstL = L_.length ? L_.reduce((a, x) => (x.opp_rank || 0) > (a.opp_rank || 0) ? x : a) : null;
+  const road = res.filter(x => x.site !== 'H'), roadW = road.filter(x => x.won).length;
+  const pct = v => (v >= 0 ? '+' : '−') + Math.abs(100 * v).toFixed(1) + '%';
+  const first = tr[0], last = tr[tr.length - 1];
+  const imp = res.filter(x => x.impact_pts !== undefined).slice().sort((a, b) => b.impact_pts - a.impact_pts);
+  const impTxt = imp.length ? '<p class="fact"><b>This week\u2019s results, one at a time:</b> ' + imp.map(x => (x.won ? 'beat ' : 'lost to ') + (x.opp_rank ? '#' + x.opp_rank + ' ' : '') + esc(x.opp) + ' ' + x.score + ' <b>' + (x.impact_pts >= 0 ? '+' : '\u2212') + Math.abs(x.impact_pts).toFixed(1) + '</b>' + (x.impact_rank ? ' (' + (x.impact_rank > 0 ? 'worth ' + x.impact_rank + ' place' + (x.impact_rank > 1 ? 's' : '') : 'costs ' + (-x.impact_rank) + ' place' + (x.impact_rank < -1 ? 's' : '')) + ')' : '')).join('; ') + ' \u2014 each number is the rating with that one result removed versus with it, in POWER points; the numbers after the W/L in the ladder are the same thing.</p>' : '';
+  return (heading || ('<h3>#' + r.rank + ' ' + logo(r.team) + esc(r.team) + ' <span class="k">POWER ' + r.power.toFixed(1) + ' · ' + r.record + (r.conf ? ' · ' + esc(r.conf) : '') + (r.rank_range ? ' · rank range ' + r.rank_range[0] + '–' + r.rank_range[1] : '') + '</span></h3>')) +
+    '<div class="row"><div><h4>What the number is made of (POWER points vs the average team)</h4>' + wf +
+    '<p class="fact">Each bar is one source, in POWER points; they add up to the rating. The start parts carry the weights this season\u2019s results have given them, and the conference level is fitted from 2026 results too. This team\u2019s own 2026 results, adjusted for who and where, sit <b>' + Math.abs(parts[0][1]).toFixed(1) + ' points ' + (parts[0][1] >= 0 ? 'above' : 'below') + '</b> what its start and conference level alone would say.</p></div>' +
+    '<div><h4>Week by week (rank; amber = today’s rank range)</h4>' + traj +
+    '<p class="fact">' + (tr.length > 1 ? 'From <b>#' + first.rank + '</b> after the week ending ' + first.through + ' to <b>#' + last.rank + '</b> now' + (last.rank < first.rank ? ' — up ' + (first.rank - last.rank) : last.rank > first.rank ? ' — down ' + (last.rank - first.rank) : ' — unchanged') + '.' : 'One weekly point so far.') + '</p>' + v2sWhatIf(r) + '</div></div>' +
+    '<h4>Every counted result, sorted by opponent rank (bar = average set point-share; darker = more recent)</h4>' + ladder + impTxt +
+    '<p class="fact">Against the top 25: <b>' + qwl + '</b>. ' +
+    (bestW ? 'Best win: <b>' + esc(bestW.opp) + '</b>' + (bestW.opp_rank ? ' (#' + bestW.opp_rank + ')' : '') + ' ' + bestW.score + ', set point-share ' + pct(bestW.share) + '. ' : 'No wins yet. ') +
+    (worstL ? 'Worst loss: <b>' + esc(worstL.opp) + '</b>' + (worstL.opp_rank ? ' (#' + worstL.opp_rank + ')' : '') + ' ' + worstL.score + ', ' + pct(worstL.share) + '. ' : 'Unbeaten. ') +
+    'Average set point-share in wins ' + (W_.length ? pct(mean(W_.map(x => x.share))) : '—') + ', in losses ' + (L_.length ? pct(mean(L_.map(x => x.share))) : '—') + '. ' +
+    'Away or neutral: <b>' + roadW + '-' + (road.length - roadW) + '</b>. Average opponent rank ' + (r.opp_avg_rank || '—') + '; opponents’ record ' + (r.opp_wl || '—') + '.</p>';
+}
+function v2sWhy(box, rows, team) {
+  if (!box) return;
+  const r = rows.find(x => x.team === team); if (!r || !r.why) { box.hidden = true; return; }
+  box.hidden = false;
+  box.innerHTML = '<div class="v2sw"><button type="button" class="x" id="v2swx">close \u00d7</button>' + v2sWhyHtml(r) + '</div>';
+  document.getElementById('v2swx').addEventListener('click', () => { box.hidden = true; });
+  box.scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+// Team page hook (private only): the same anatomy under the dossier's Overview, when this model is the default.
+function tdWhyRank(t, name) {
+  if (!V2S.default_on || !V2S.teams || !V2S.teams[name] || !V2S.teams[name].why) return '';
+  const r = Object.assign({team: name}, V2S.teams[name]);
+  return '<div class="tdd-box v2sw" style="grid-column:1/-1"><h4>Why this rank</h4>' +
+    v2sWhyHtml(r, '<p class="k">#' + r.rank + ' \u00b7 POWER ' + r.power.toFixed(1) + ' \u00b7 ' + r.record + (r.rank_range ? ' \u00b7 rank range ' + r.rank_range[0] + '\u2013' + r.rank_range[1] : '') + ' \u00b7 read off the fit that produced the rank; <a href="#/rankings/v2s">full table and league view</a></p>') + '</div>';
+}
+RULER_VIEWS.v2s = function (host) {
+  const cur = V2S.current || {}, ref = V2S.ref || {rank: {}};
+  const curGen = cur.generated_utc ? Date.parse(cur.generated_utc) / 1000 : null;
+  const genEp = V2S.generated_utc ? Date.parse(V2S.generated_utc) / 1000 : null;
+  const stale = cur.data_through_epoch && V2S.data_through_epoch &&
+    cur.data_through_epoch !== V2S.data_through_epoch;
+  const rows = Object.keys(V2S.teams).map(n => Object.assign({team: n}, V2S.teams[n]))
+    .sort((a, b) => a.rank - b.rank);
+  const mv = (other, r) => {
+    if (!other) return '<span title="no rank">&mdash;</span>';
+    const d = other - r.rank;
+    return d === 0 ? '&ndash;' : (d > 0 ? '<span class="mv-up">&#9650;' + d + '</span>'
+                                        : '<span class="mv-dn">&#9660;' + (-d) + '</span>');
+  };
+  const trs = rows.map(r =>
+    '<tr data-team="' + esc(r.team) + '" tabindex="0" role="link" title="Opens the ' +
+    'team page, which shows Current POWER">' +
+    '<td class="n">' + r.rank + '</td><td class="tm">' + logo(r.team) + esc(r.team) + '</td>' +
+    '<td class="n">' + (r.why ? '<button type="button" class="lnk v2swhyb" data-why="' + esc(r.team) + '">why</button>' : '&mdash;') + '</td>' +
+    '<td class="n" style="white-space:nowrap" title="how settled this rank is given the matches played: the 10th\u201390th percentile rank across 200 resamples of the season">' +
+      (r.rank_range ? r.rank_range[0] + '\u2013' + r.rank_range[1] : '&mdash;') + '</td>' +
+    '<td class="n" style="white-space:nowrap">' + r.record + '</td><td class="n">' + r.power.toFixed(1) + '</td>' +
+    '<td class="n">' + (cur.rank[r.team] || '&mdash;') + '</td><td class="n">' + mv(cur.rank[r.team], r) + '</td>' +
+    '<td class="n">' + (ref.rank[r.team] || '&mdash;') + '</td><td class="n">' + mv(ref.rank[r.team], r) + '</td>' +
+    '<td class="n" style="white-space:nowrap" title="opponents\u2019 combined D-I record, not counting their matches against this team">' +
+      (r.opp_wl ? r.opp_wl + (r.opp_pct !== null ? ' (' + r.opp_pct.toFixed(3).replace(/^0/, '') + ')' : '') : '&mdash;') +
+    '</td><td class="n">' + (r.opp_avg_rank || '&mdash;') + '</td>' +
+    '<td class="n">' + r.sets + '</td><td class="n">' + (function () {
+      const top = rows[0].team === r.team ? (rows[1] && rows[1].team) : rows[0].team;
+      const p = v2sWin(r.team, top, 0);
+      return p === null ? '&mdash;' : Math.round(p * 100) + '%';
+    })() + '</td><td class="n">' + (r.wl || '&mdash;') + '</td><td class="n" title="' +
+    (r.worst_loss ? 'worst loss: to the #' + r.worst_loss + ' team' : 'no losses') + '">' + (r.lo || '&mdash;') +
+    '</td><td class="n">' + (r.wlc || '&mdash;') + '</td>' + v2sProf(r.prof) + '</tr>').join('') +
+    (V2S.unrated || []).map(n =>
+      '<tr data-team="' + esc(n) + '" tabindex="0" role="link"><td class="n">&mdash;</td>' +
+      '<td class="tm">' + logo(n) + esc(n) + '</td><td class="n">&mdash;</td><td class="n">&mdash;</td><td class="n" colspan="2">unrated: no valid ' +
+      '2026 D-I set line</td><td class="n">' + (cur.rank[n] || '&mdash;') + '</td><td class="n">&mdash;</td>' +
+      '<td class="n">' + (ref.rank[n] || '&mdash;') + '</td><td class="n">&mdash;</td><td class="n">&mdash;</td><td class="n">&mdash;</td><td class="n">0</td><td class="n">&mdash;</td><td class="n">&mdash;</td><td class="n">&mdash;</td><td class="n">&mdash;</td>' + v2sProf(null) + '</tr>').join('');
+  host.innerHTML =
+    (V2S.default_on
+      ? '<div class="seasonwarn"><b>This model is now the private default.</b> The POWER tab and team pages show it. ' +
+        'The &ldquo;Current&rdquo; columns below are the <b>previous POWER</b> model, kept for comparison; forecasts, ' +
+        'the recorder and the weekly archive still use it.'
+      : '<div class="seasonwarn"><b>Candidate, not the default.</b> A frozen snapshot rating ' +
+        'teams from 2026 results only. Nothing else on this site uses it; team pages show ' +
+        '<b>Current POWER</b>.') + (stale ? ' <b>Current POWER&rsquo;s results cut-off differs ' +
+    'from this snapshot</b>, so some differences are timing, not method.' : '') + '</div>' +
+    '<p class="tnote">' + esc(V2S.version) + ' &middot; results through ' +
+    v2sWhen(V2S.data_through_epoch) + ' &middot; computed ' + v2sWhen(genEp) + ' &middot; ' +
+    V2S.matches + ' D-I matches, ' + V2S.sets + ' sets &middot; ' + (V2S.excluded_non_d1 || []).length +
+    ' matches against a non-D-I side left out (West Florida); matches with incomplete or ' +
+    'inconsistent set lines left out. Current POWER: results through ' + v2sWhen(cur.data_through_epoch) +
+    ', computed ' + v2sWhen(curGen) + '. Prior-on v2 comparison: ' + esc(ref.version || '') +
+    ', a frozen snapshot with results through ' + v2sWhen(ref.data_through_epoch) +
+    (ref.data_through_epoch && ref.data_through_epoch !== V2S.data_through_epoch
+      ? ' &mdash; <b>a different cut-off from this candidate</b>, so the &ldquo;vs prior-on&rdquo; column mixes timing with method'
+      : ' (same cut-off)') + '.</p>' +
+    '<p>How it works: every valid 2026 set is one piece of evidence &mdash; the share of ' +
+    'that set’s points each side won. All teams’ strengths are fitted together, so ' +
+    'beating a strong opponent counts for more; neutral floors get no home edge. ' +
+    (V2S.fifth_set_weight && V2S.fifth_set_weight < 1 ? 'A fifth set (to 15) counts ' + V2S.fifth_set_weight + ' of a full set. ' : '') +
+    ((V2S.structure || []).length
+      ? 'A team with a thin record is pulled toward its <b>conference\u2019s level</b> (fitted from 2026 results) rather than the league average, and a result against an opponent we have barely seen counts a little less until that opponent is measured. '
+      : 'A small common pull toward the league average keeps thin records stable. ') +
+    (V2S.player_ballast
+      ? ((V2S.start_parts || []).indexOf('team_results') >= 0
+          ? '<b>Starting point:</b> each team <b>starts from last season\u2019s results and its returning players, then 2026 takes over</b>. Last season counts as pure match results (the same set-score rating run on 2025 &mdash; no poll, no reputation), and it fades as this season\u2019s sets accumulate. Alongside it, '
+          : '<b>Starting point:</b> ') +
+        'each team starts from its <b>returning players\u2019 2025 production</b> ' +
+        '&mdash; ' + ((V2S.start_parts || []).length === 3 ? 'three parts weighted by the data: earned points (kills + aces + blocks), assists and digs per set ' : 'the earned points per set (kills + aces + blocks) ') + 'that the players on this year\u2019s ' +
+        'roster produced last season, transfers counted at their old school. It is the only 2025 input: ' +
+        'no team record, ranking or reputation. Its pull fades as 2026 sets pile up. Teams with no ' +
+        'roster data start at average. ' +
+        (V2S.ballast_active ? 'Each returning player counts in proportion to the share of this season\u2019s ' +
+          'sets she has actually played (a player listed but not playing fades out; everyone counts ' +
+          'fully before a team\u2019s first match) &mdash; read only from the box scores, never guessed. ' : '') +
+        (V2S.height_term ? '<b>Height:</b> each team\u2019s average listed height (from school roster pages, weighted ' +
+          'by who plays) is a small fitted term &mdash; taller teams get a slight edge. About two-thirds of teams list ' +
+          'heights where we can read them; the rest count as average. Tested: a small gain, clearer in 2026 than 2025. ' : '')
+      : '<b>No preseason expectation, no 2025 result and no roster credit</b> goes into any team\u2019s number. ') +
+    (V2S.earned_weight ? 'Each match\u2019s <b>earned-points margin</b> (kills + aces + blocks per set, ' +
+      'yours minus theirs) is added as extra evidence at ' + V2S.earned_weight + ' the weight of the ' +
+      'set scores &mdash; tested on 2025 and 2026 before it was added. ' : '') +
+    (V2S.ramp_w0 && V2S.ramp_w0 < 1
+      ? 'Recent matches count more: weight rises steadily from ' + Math.round(V2S.ramp_w0 * 100) +
+        '% for a match on the first day of practice (Jul 30) to 100% on title day (Dec 20), rescaled so ' +
+        'the total evidence is unchanged and early records are not pulled toward average. This is a ' +
+        'design choice; tested, it neither helped nor hurt measurably. '
+      : 'Recent matches are not weighted more; ') +
+    'unforced errors, other box-score stats, ' +
+    'availability and injury information are not used. The pull’s size and how ratings become ' +
+    'probabilities were chosen using 2025 as development data &mdash; that is a general ' +
+    'setting, not credit for any team. POWER here is a 50-centred rescale of strength, ' +
+    'not a win probability.</p>' +
+    (function () {
+      const a = V2S.accuracy, f = x => (x >= 0 ? '+' : '−') + Math.abs(x).toFixed(3);
+      if (!a) return '<p class="tnote"><b>Accuracy:</b> not measured for this setting.</p>';
+      return '<p class="tnote"><b>Accuracy so far</b> (rebuilt after the fact on 2026 results, ' +
+        'compared with the prior-on model on the same matches): <b>' + (a.overall.mean_diff < 0 ? (a.overall.ci95[1] < 0 ? 'better' : 'better at the point estimate, range spanning zero') : (a.overall.ci95[0] > 0 ? 'worse' : 'worse at the point estimate, range spanning zero')) + '</b> overall, log loss ' +
+        f(a.overall.mean_diff) + ' (range ' + f(a.overall.ci95[0]) + ' to ' + f(a.overall.ci95[1]) +
+        '); latest week ' + f(a.latest_week.mean_diff) + ' (range ' +
+        f(a.latest_week.ci95[0]) + ' to ' + f(a.latest_week.ci95[1]) + '). The movement columns ' +
+        'compare methods, not day-to-day change.</p>';
+    })() +
+    (function () {
+      const t = V2S.stats_test, f = x => (x >= 0 ? '+' : '−') + Math.abs(x).toFixed(3);
+      if (!t) return '';
+      return '<p class="tnote"><b>The four points columns</b> split each team’s scoring: points it ' +
+        'earned (kills, aces, blocks), points the opponent earned, and points given away by unforced ' +
+        'errors (hit out or into the net, service errors, ball-handling and net violations). Getting ' +
+        'blocked is a forced error and counts once, as the other team\u2019s block. Together they add up ' +
+        'to the scoreboard. The feed cannot tell an attack error forced by great defense from a truly ' +
+        'unforced one unless it was blocked. <b>They are shown ' +
+        'to explain; only the earned-points margin feeds this rank (see above).</b> Tested: a ranking ' +
+        'built from these points alone trusts earned points more than errors (weight on errors ' +
+        t.selected_c + '), but it did not beat set scores (2025 log loss ' + f(t.vs_setscore_2025.mean_diff) +
+        ', 2026 ' + f(t.vs_setscore_2026.mean_diff) + '); adding earned points on top of set scores did.</p>';
+    })() +
+    (V2S.win_model ? '<div class="v2swin"><b>Win chance</b> ' +
+      '<select id="v2sA"></select> vs <select id="v2sB"></select> ' +
+      '<select id="v2sSite"><option value="0">neutral floor</option><option value="1">first team at home</option>' +
+      '<option value="-1">second team at home</option></select> <span id="v2sOut"></span>' +
+      '<span class="tnote"> Learned on 2025, tested on 2026: much better than the old percentages early in the ' +
+      'season, about even in the latest week. A chance, not a guarantee.</span></div>' : '') +
+    '<div id="v2sover"></div><div id="v2swhy" hidden></div>' +
+    '<div class="panel"><div class="scroll"><table class="gaptbl"><thead><tr>' +
+    '<th>Rank</th><th class="l">Team</th><th title="opens this team\u2019s rating anatomy: what the number is made of, every result with its margin, and the week-by-week path">Why</th><th title="how settled the rank is (10th\u201390th percentile across 200 season resamples)">Range</th><th style="white-space:nowrap">W-L</th><th>POWER</th>' +
+    '<th>Current</th><th title="season-only rank compared with Current POWER">vs current</th>' +
+    '<th>Prior-on v2</th><th title="season-only rank compared with the reviewed prior-on v2">vs prior-on</th>' +
+    '<th title="opponents&rsquo; combined D-I record, not counting matches against this team (schedule strength)">Opp W-L</th>' +
+    '<th title="average candidate rank of opponents played (lower = tougher schedule)">Avg opp rank</th>' +
+    '<th>Sets</th><th title="chance of beating the current #1 on a neutral floor (the #1 team is shown against #2)">vs #1</th><th title="order from WHO BEAT WHOM only: wins and losses adjusted for opponents, no margins or stats (display only)">W/L order</th>' +
+    '<th title="who you have LOST to, best losses first: unbeaten teams first, then by your worst loss (the weakest team that beat you, by this candidate&rsquo;s rank), then your average loss (display only)">Losses order</th>' +
+    '<th title="W/L order and Losses order averaged into one list (display only)">W/L + losses</th>' +
+    '<th title="kills + aces + blocks per set">Earned/set</th>' +
+    '<th title="opponent kills + aces + blocks per set">Opp earned/set</th>' +
+    '<th title="points per set from opponent UNFORCED errors: attacks hit out or into the net (not blocked), service errors, ball-handling and net violations">Opp unforced err/set</th>' +
+    '<th title="points per set this team gave away by the same unforced errors">Own unforced err/set</th>' +
+    '</tr></thead><tbody>' + trs + '</tbody></table></div></div>';
+  (function () {
+    const A = document.getElementById('v2sA'), B = document.getElementById('v2sB'),
+          T = document.getElementById('v2sSite'), O = document.getElementById('v2sOut');
+    if (!A) return;
+    const opts = rows.map(r => '<option>' + esc(r.team) + '</option>').join('');
+    A.innerHTML = opts; B.innerHTML = opts; B.selectedIndex = 1;
+    const show = () => {
+      const p = v2sWin(A.value, B.value, +T.value);
+      O.textContent = p === null ? '' : A.value + ' ' + Math.round(p * 100) + '% \u00b7 ' + B.value + ' ' + Math.round((1 - p) * 100) + '%';
+    };
+    [A, B, T].forEach(x => x.addEventListener('change', show)); show();
+  })();
+  v2sOverview(document.getElementById('v2sover'), rows);
+  host.querySelectorAll('button.v2swhyb').forEach(b => b.addEventListener('click', e => {
+    e.stopPropagation(); e.preventDefault();
+    v2sWhy(document.getElementById('v2swhy'), rows, b.dataset.why);
+  }));
+  host.querySelectorAll('tr[data-team]').forEach(tr => {
+    const open = () => { if (TEAMS[tr.dataset.team]) go(routeFor('teams', slug(tr.dataset.team))); };
+    tr.addEventListener('click', open);
+    tr.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+    });
+  });
+};
+"""
+
+
 def ruler_key_html(bases):
     """The colour decoder: swatch, the ruler's NAME IN WORDS, what it is.
 
@@ -1324,6 +1845,14 @@ def tv_index():
     # applied second and wins the slot; a transcribed net survives only
     # where no school lists one. School entries are public-safe; the
     # transcribed layer stays private.
+    # ⚠ SCHOOLS SPELL OPPONENTS THEIR OWN WAY ("Michigan State" for the
+    # hub's "Michigan St."), and norm() does not fold State->St -- Penn St.
+    # listed BTN for that match and it joined to nothing. The verifier's
+    # team_norm is the fold every school-schedule reader here already uses.
+    try:
+        from verify_results_daily import team_norm as _tnorm
+    except Exception:                                   # noqa: BLE001
+        _tnorm = _norm
     _autop = os.path.join(REPO, "data", "raw", str(SEASON), "tv_auto.json")
     auto_joined = 0
     if os.path.exists(_autop):
@@ -1337,9 +1866,24 @@ def tv_index():
             if _school.startswith("_") or not isinstance(_ent, dict):
                 continue
             for _e in (_ent.get("events") or []):
+                # a rank prefix in any case ("rv Kansas State", "#19 Kansas")
+                # is not part of the name
+                _o = re.sub(r"^(?:#\d+|No\.\s*\d+|rv)\s+", "",
+                            (_e.get("opponent") or "").strip(), flags=re.I)
                 _byteam.setdefault(
-                    (_norm(_school), _norm(_e.get("opponent"))),
-                    []).append(_e)
+                    (_tnorm(_school), _tnorm(_o)), []).append(_e)
+                # "Howard University" for the hub's "Howard": the verifier's
+                # loose key, ONLY when it names exactly one hub team (R8 --
+                # "Miami" is two schools and binds to neither)
+                try:
+                    from verify_results_daily import (loose_key as _lk,
+                                                      _loose_hub_count as _lc)
+                    _lo = _lk(_o)
+                    if _lo and _lc(_lo) == 1 and _lo != _tnorm(_o):
+                        _byteam.setdefault(
+                            (_tnorm(_school), "~" + _lo), []).append(_e)
+                except Exception:                       # noqa: BLE001
+                    pass
         for gid, rec in FX.canonical_fixtures().items():
             ts = rec.get("teams") or []
             ep = rec.get("start_time_epoch")
@@ -1356,11 +1900,19 @@ def tv_index():
                 ts, key=lambda t: 0 if t.get("is_home") else 1)
             _pick = None
             for t in _homefirst:
-                me = _norm(t.get("name_short"))
-                you = [x for x in _names if _norm(x) != me]
+                me = _tnorm(t.get("name_short"))
+                you = [x for x in _names if _tnorm(x) != me]
                 if not you:
                     continue
-                for _e in _byteam.get((me, _norm(you[0])), []):
+                try:
+                    from verify_results_daily import (loose_key as _lk,
+                                                      _loose_hub_count as _lc)
+                    _ylo = _lk(you[0])
+                    _yloose = ("~" + _ylo) if _ylo and _lc(_ylo) == 1 else None
+                except Exception:                       # noqa: BLE001
+                    _yloose = None
+                for _e in (_byteam.get((me, _tnorm(you[0])), []) +
+                           (_byteam.get((me, _yloose), []) if _yloose else [])):
                     try:
                         _ed = _dt.date.fromisoformat(_e.get("date") or "")
                     except (ValueError, TypeError):
@@ -1469,15 +2021,24 @@ def last_match_html(team):
     if not m:
         return ""
     lab = {"in": ("in", "Counted in POWER"),
-           "pending": ("not in yet", "Final, but not in POWER yet: it enters once a "
+           "pending": ("not in POWER yet", "Final, but not in POWER yet: it enters once a "
                        "school site confirms it or after midnight PT"),
-           "out": ("doesn't count", "Does not enter POWER: non-D-I opponent or no "
+           "out": ("not counted in POWER", "Does not enter POWER: non-D-I opponent or no "
                    "set-by-set score")}[m["status"]]
+    # ⚠ QUIET TEXT, NOT BADGES (Cody + Reviewer, mail 030): the filled
+    # green/red square and the pale-green "IN" chip competed with the team
+    # name, the POWER value and the movement arrow. W/L stays as a letter --
+    # the meaning is in the text, not the colour -- and the ORDINARY state
+    # (counted in POWER) needs no badge at all; its meaning stays in the
+    # tooltip. Only the EXCEPTIONAL states (pending, not counted) print a
+    # word, because those change how the row should be read.
+    note = "" if m["status"] == "in" else (
+        ' &middot; <i class="lms">%s</i>' % lab[0])
     return ('<span class="lastm lm-%s" title="%s">'
-            '<b class="lmr lm%s">%s</b> %s %s %s &middot; %s '
-            '<i class="lms">%s</i></span>'
-            % (m["status"], lab[1], m["wl"], m["wl"], esc(m["score"]), m["at"],
-               esc(m["opp"]), esc(m["day"]), lab[0]))
+            '<b class="lmr lm%s">%s</b> %s %s %s &middot; %s%s</span>'
+            % (m["status"], lab[1], m["wl"], m["wl"],
+               esc(m["score"]).replace("-", "&ndash;"), m["at"],
+               esc(m["opp"]), esc(m["day"]), note))
 
 
 def mover(t):
@@ -1527,11 +2088,7 @@ def nkey(name):
     keys are byte-for-byte unchanged, so no existing join moves; only
     joins that previously FAILED can now succeed."""
     import nameclean as _nc
-    s = _nc.repair(name or "")
-    if any(ord(c) > 0x7F for c in s):
-        s = unicodedata.normalize("NFKD", s)
-        s = s.encode("ascii", "ignore").decode("ascii")
-    return re.sub(r"[^a-z]", "", s.lower())
+    return _nc.join_key(name)
 
 def prior_pos_index():
     """(team_id, name) -> position from last season's box scores.
@@ -2502,7 +3059,10 @@ def leaders(photos=None, honours=None):
         atts = r.get("atts") or 0
         kills = r.get("kills") or 0
         errs = r.get("errors") or 0
-        blocks = (r.get("block_solos") or 0) + 0.5 * (r.get("block_assists") or 0)
+        # individual block credit: solo + assist (a block assist is a block
+        # for each player on it). The half-assist is the TEAM scoring
+        # convention and stays in `pts` below (mail 036).
+        blocks = (r.get("block_solos") or 0) + (r.get("block_assists") or 0)
         pts = kills + (r.get("aces") or 0) + (r.get("block_solos") or 0) \
             + 0.5 * (r.get("block_assists") or 0)
         # serving and serve-receive. `or 0` is right here and NOT the "'' is
@@ -2893,13 +3453,28 @@ def box_and_players(res, photos=None, honours=None, xfer=None,
     boxes = {}
     players = {}
     _skipped_from_totals = set()
+    import nameclean as _nc_id                 # shared, cited identity overrides
+    _pos_over = {}
+    for _po in (load("data/raw/%d/position_overrides.json" % SEASON) or {}).get("overrides") or []:
+        if _po.get("season") == SEASON and _po.get("evidence"):
+            _pos_over[(_po["team"], _po["player"])] = _po["roster_pos"]
+    # ⚠ ONE RECORD PER GAME, LAST WINS -- for the player logs too (mail 047).
+    # BOXES already kept only the last record per gid (`boxes[gid] = rows`),
+    # but the per-player game log kept the "richer" line across EVERY record
+    # of a gid, superseded ones included -- so after the B031 repair appended
+    # a complete box, Logan Wiley's player page still showed the stale
+    # truncated line (2 sets, 0 K) while the box score showed the repaired
+    # one (1 set, 2 K). The log's documented semantics are per-gid last-wins;
+    # both outputs now read that single record.
+    _last = {}
     for line in open(path):
         try:
             rec = json.loads(line)
         except ValueError:
             continue
-        if not isinstance(rec, dict):
-            continue
+        if isinstance(rec, dict):
+            _last[str(rec.get("game_id"))] = rec
+    for rec in _last.values():
         gid = str(rec.get("game_id"))
         rows = []
         # evidenced team-attribution swaps (season_counts.box_team_swaps):
@@ -2908,6 +3483,7 @@ def box_and_players(res, photos=None, honours=None, xfer=None,
         for r in rec.get("rows") or []:
             tid = str(r.get("team_id") or "")
             tid = _swap.get(tid, tid)
+            r = _nc_id.apply_identity_override(dict(r, team_id=tid), gid)   # mail 052
             # the DISPLAY name gets the same feed-corruption repair the
             # aggregate and the keys already run (nameclean, one definition)
             # -- the box-score panel was still printing the feed's mojibake
@@ -2965,7 +3541,11 @@ def box_and_players(res, photos=None, honours=None, xfer=None,
                 "nkey": _nk,
                 "class": _ident.get("class"),
                 "team": row["team"],
-                "pos": row["pos"] or _ident.get("pos") or "",
+                "pos": (_pos_over.get((row["team"], _ident.get("display") or nm))
+                        or row["pos"] or _ident.get("pos") or ""),
+                # the feed's match-box position, kept distinct from the
+                # roster role (mail 052) -- never silently merged
+                "box_pos": row["pos"] or None,
                 "num": row["num"], "games": {},
                 # Her own headshot, so the player panel and the Players table
                 # show the same face as the roster and the stats page.
@@ -3011,6 +3591,10 @@ def box_and_players(res, photos=None, honours=None, xfer=None,
                 # a game log can show 3 aces against 7 errors rather than
                 # only the flattering half
                 "se": row["se"],
+                # attempts too (mail 052): a serve- or reception-only line is
+                # a genuine appearance, and the game log must be able to say so
+                "sa": row["sa"], "ra": row["ra"], "re": row["re"],
+                "src_corrected": r.get("participation_corrected"),
             }
             # Same canonical player, same game: keep the RICHER valid row --
             # more sets, then more counted volume as a deterministic tiebreak,
@@ -3021,6 +3605,25 @@ def box_and_players(res, photos=None, honours=None, xfer=None,
         if rows:
             boxes[gid] = rows
 
+    # ONE COMPLETE-BOX BASIS FOR SEASON AGGREGATES (mail 052). Team rates and
+    # Analysis already leave out a box that does not cover every set of its
+    # match; player season totals now follow the same rule. The match line
+    # stays in the player's game log, flagged `partial_box`, so the evidence
+    # is visible -- it just does not enter a season rate on one screen and
+    # not on another.
+    _tally = {}
+    for _r in (res or []):
+        _tally[str(_r.get("gid"))] = int(_r.get("home_sets") or 0) + int(_r.get("away_sets") or 0)
+    _partial = set()
+    for _g, _rows in boxes.items():
+        _n = _tally.get(str(_g))
+        if not _n:
+            continue
+        _by = {}
+        for _x in _rows:
+            _by.setdefault(_x.get("team"), []).append(float(_x.get("sets") or 0))
+        if len(_by) == 2 and any(max(v) < _n for v in _by.values()):
+            _partial.add(str(_g))
     out = []
     # ⚠ THE BOX SCORES KEEP EVERYONE; THIS LIST DOES NOT. `boxes` is untouched,
     # so a D-II opponent's players still appear in the box score of the match
@@ -3033,9 +3636,14 @@ def box_and_players(res, photos=None, honours=None, xfer=None,
         # THE SEASON IS THE SUM OF THE UNIQUE GAMES, by construction.
         p["games"] = sorted(p["games"].values(), key=lambda g: (g["d"] or ""),
                             reverse=True)
+        for g in p["games"]:
+            if g.get("gid") in _partial:
+                g["partial_box"] = True
+        _season = [g for g in p["games"] if not g.get("partial_box")]
+        p["partial_box_matches"] = len(p["games"]) - len(_season)
         for f in ("sets", "k", "e", "ta", "aces", "digs", "bs", "ba", "ast",
                   "pts"):
-            p[f] = float(sum(g.get(f) or 0 for g in p["games"]))
+            p[f] = float(sum(g.get(f) or 0 for g in _season))
         s_ = p["sets"] or 1
         out.append(dict(p,
                         kps=round(p["k"] / s_, 2),
@@ -3108,7 +3716,7 @@ PROFILE_METRICS = [
     ("aps", "Aces / set", True, "num2"),
     ("dps", "Digs / set", True, "num2"),
     ("asps", "Assists / set", True, "num2"),
-    ("recv_ok_rate", "Reception, clean", True, "pct1"),
+    ("recv_ok_rate", "Receptions w/o error", True, "pct1"),
     ("svc_err_rate", "Serve errors", False, "pct1"),
 ]
 PROFILE_MIN_MATCHES = 3
@@ -3205,6 +3813,21 @@ def time_disputes():
     for r in (doc.get("disagreements") or []):
         _TDIS_CACHE[str(r.get("gid"))] = r
     return _TDIS_CACHE
+
+
+def watch_cell(r):
+    """The Schedule table's Watch cell: the school-published network (a link
+    when the school gives one), or an explicit 'none found' -- never blank,
+    because blank reads as 'we did not look'."""
+    net, url = r.get("tv"), r.get("tvu")
+    if net or url:
+        label = esc(net or "stream")
+        if url and str(url).startswith("https://"):
+            label = ('<a href="%s" target="_blank" rel="noopener">%s</a>'
+                     % (esc(url), label))
+        return '<span class="netchip">%s</span>' % label
+    return ('<span class="notv" title="%s">none found</span>'
+            % esc(NOTV_NOTE))
 
 
 def tdis_html(row):
@@ -3316,6 +3939,79 @@ def team_profiles(tstats):
     return out
 
 
+def _team_total_fallback(boxes, res, cnt_gids):
+    """TEAM-LEVEL FALLBACK FOR COUNTED MATCHES WHOSE PLAYER LINES ARE UNUSABLE
+    (mail 036/037, approved in principle by the Reviewer). The feed served 11
+    boxes whose player rows carry no names, so they never reach BOXES and the
+    match vanished from every team aggregate although the feed's own TEAM
+    totals are valid. Here -- and ONLY here, on a local copy -- each side of
+    such a match gets one pseudo-row built from those official team totals.
+    It never enters BOXES, a player table, a leaderboard or a player page:
+    no player line is invented. A match that already has named rows is never
+    touched, so nothing is counted twice. Attempts the feed reports as 0
+    beside real errors (serve/reception) are passed as 0, which the paired-
+    coverage pooling already treats as unrecorded, not as a measured zero.
+    Returns (boxes_copy, {team: n_team_only_matches})."""
+    import season_counts as _SC
+    try:
+        swaps = _SC.box_team_swaps(SEASON)
+    except Exception:
+        swaps = {}
+    need = {}
+    for r in (res or []):
+        gid = str(r.get("gid") or "")
+        if not gid or (cnt_gids and gid not in cnt_gids):
+            continue
+        have = set(x.get("team") for x in (boxes or {}).get(gid) or [] if x.get("name"))
+        if len(have) < 2:
+            need[gid] = r
+    if not need:
+        return boxes, {}
+    raw = {}
+    path = os.path.join(REPO, "data", "raw", str(SEASON), "boxscores.jsonl")
+    if os.path.exists(path):
+        for ln in io.open(path, encoding="utf-8"):
+            if not any(g in ln for g in need):
+                continue
+            try:
+                rec = json.loads(ln)
+            except ValueError:
+                continue
+            if str(rec.get("game_id")) in need:
+                raw[str(rec.get("game_id"))] = rec          # last wins
+    f = lambda d, k: float(d.get(k) or 0)
+    out, team_only = dict(boxes or {}), {}
+    for gid, rec in raw.items():
+        r = need[gid]
+        sw = swaps.get(gid) or {}
+        by_name = {}
+        for t in rec.get("teams") or []:
+            ts = t.get("team_stats") or {}
+            if not ts.get("gamesPlayed"):
+                continue
+            tid = sw.get(str(t.get("team_id")), str(t.get("team_id")))
+            src = next((x for x in rec.get("teams") or [] if str(x.get("team_id")) == tid), t)
+            nm = team_norm(src.get("name_short") or "")
+            for side in ("home", "away"):
+                if team_norm(r.get(side) or "") == nm:
+                    by_name[r.get(side)] = ts
+        if len(by_name) != 2:
+            continue
+        rows = []
+        for team, ts in by_name.items():
+            rows.append({"team": team, "name": "", "team_total": True,
+                         "sets": f(ts, "gamesPlayed"), "k": f(ts, "kills"),
+                         "e": f(ts, "attackErrors"), "ta": f(ts, "attackAttempts"),
+                         "ast": f(ts, "assists"), "digs": f(ts, "digs"),
+                         "bs": f(ts, "blockSolos"), "ba": f(ts, "blockAssists"),
+                         "aces": f(ts, "serviceAces"), "se": f(ts, "serviceErrors"),
+                         "sa": f(ts, "serveAttempts"), "ra": f(ts, "receptionAttempts"),
+                         "re": f(ts, "receptionErrors")})
+            team_only[team] = team_only.get(team, 0) + 1
+        out[gid] = rows
+    return out, team_only
+
+
 def team_season_stats(boxes, res):
     # type: (Dict, Any) -> Dict[str, Any]
     """Season team totals for 2026, from the same raw counts the box scores use.
@@ -3358,8 +4054,12 @@ def team_season_stats(boxes, res):
     # the page shows both rather than picking one and calling it "points".
     board = {}                                          # type: Dict[str, Dict[str, float]]
     for r in (res or []):
-        sets = r.get("sets") or []
+        sets = [p for p in (r.get("sets") or []) if len(p) == 2]
         if not sets or not r.get("gid"):
+            continue
+        # A line score counts only if it covers EVERY set (mail 047): a
+        # truncated tape must not add sets without their points.
+        if len(sets) != int(r.get("away_sets") or 0) + int(r.get("home_sets") or 0):
             continue
         # `sets` is [[away, home], ...] -- the same order as away_sets/home_sets.
         board[str(r["gid"])] = {
@@ -3375,6 +4075,14 @@ def team_season_stats(boxes, res):
     # record on the same row refuses to count. The counting set is `res` --
     # the same list the record is built from -- so the two cannot disagree.
     _cnt_gids = set(str(r.get("gid")) for r in (res or []) if r.get("gid"))
+    import team_analysis as _TAc
+    _nsets_of = {}
+    for _r in (res or []):
+        _sp = [p for p in (_r.get("sets") or []) if len(p) == 2]
+        _nsets_of[str(_r.get("gid"))] = (   # the tally is the match's sets
+            int(_r.get("away_sets") or 0) + int(_r.get("home_sets") or 0)) or len(_sp)
+    boxes, _team_only = _team_total_fallback(boxes, res, _cnt_gids)
+    _mb = {}                                  # team -> gid -> counted row
     for gid, rows in (boxes or {}).items():
         if _cnt_gids and str(gid) not in _cnt_gids:
             continue                                    # exhibition or otherwise non-counting
@@ -3383,7 +4091,28 @@ def team_season_stats(boxes, res):
             by_team.setdefault(r.get("team"), []).append(r)
         if len(by_team) != 2:
             continue                                    # cannot form an opponent
+        # ⚠ ONE BASIS WITH THE ANALYSIS TAB (mail 030): a box that does not
+        # cover every set of the match (the feed dropped a set's lines --
+        # Nebraska-Georgia Tech 2026-09-12 was a 4-set match with a 3-set box)
+        # is left out of per-set season rates rather than dividing a partial
+        # box by its own partial set count. team_analysis.box_complete is the
+        # one definition; both views call it.
+        _ns = _nsets_of.get(str(gid))
+        if _ns and not _TAc.box_complete(*list(by_team.values()), _ns):
+            for _tn in by_team:
+                _mb.setdefault(_tn, {})[str(gid)] = {"status": "partial"}
+            continue
         names = list(by_team)
+        # PER-MATCH ROWS THE SEASON TOTALS ARE BUILT FROM (mail 045): the
+        # Numbers table renders these, so its population and sums cannot
+        # differ from the Overview's.
+        for _tn in names:
+            _o = by_team[_tn]
+            _c = dict((f, sum(float(r.get(f) or 0) for r in _o))
+                      for f in ("k", "e", "ta", "ast", "digs", "bs", "ba", "aces", "se"))
+            _c["sets"] = max(float(r.get("sets") or 0) for r in _o)
+            _c["status"] = "team_totals" if any(r.get("team_total") for r in _o) else "players"
+            _mb.setdefault(_tn, {})[str(gid)] = _c
         for i, team in enumerate(names):
             opp = names[1 - i]
             mine = acc.setdefault(team, {"own": blank(), "opp": blank(),
@@ -3408,26 +4137,52 @@ def team_season_stats(boxes, res):
                            (by_team[opp], mine["opp_di"])]
             for src, dst in _pairs:
                 sets = 0.0
+                _m = _TAc._blank()
                 for r in src:
                     for f in ("k", "e", "ta", "ast", "digs", "bs", "ba",
                               "aces", "se", "sa", "ra", "re"):
                         dst[f] += float(r.get(f) or 0)
+                        _m[f] += float(r.get(f) or 0)
                     sets = max(sets, float(r.get("sets") or 0))
+                # paired coverage (mail 030): per-serve / per-reception rates
+                # take numerator AND denominator only from matches whose box
+                # recorded that denominator -- one definition, team_analysis
+                _TAc._pool(_m)
+                for f in _TAc.POOL:
+                    dst[f] = dst.get(f, 0.0) + _m[f]
                 dst["sets"] += sets
                 dst["matches"] += 1
                 # The opponent's division, from the same membership set the
                 # listing filter below uses -- one answer to "who is D-I".
                 if _di_ms and opp not in _di_ms:
                     dst["nondi"] += 1
-            mine["own"]["board"] += (board.get(str(gid)) or {}).get(team, 0.0)
-            mine["opp"]["board"] += (board.get(str(gid)) or {}).get(opp, 0.0)
-            if _opp_is_di:
-                mine["own_di"]["board"] += (board.get(str(gid)) or {}).get(team, 0.0)
-                mine["opp_di"]["board"] += (board.get(str(gid)) or {}).get(opp, 0.0)
+            # board is keyed by RESULT-record names, the loop by BOX names;
+            # an alias ("LSU New Orleans") must not silently read as 0 points
+            _bd = board.get(str(gid))
+            if _bd:
+                _mine_pts = _bd.get(team)
+                _opp_pts = _bd.get(opp)
+                if _mine_pts is None and _opp_pts is not None:
+                    _mine_pts = [v for k, v in _bd.items() if k != opp][0]
+                if _opp_pts is None and _mine_pts is not None:
+                    _opp_pts = [v for k, v in _bd.items() if k != team][0]
+            if _bd and _mine_pts is not None and _opp_pts is not None:
+                _bsets = float(_ns or max(float(r.get("sets") or 0) for r in by_team[team]))
+                _sides = [("own", _mine_pts), ("opp", _opp_pts)]
+                if _opp_is_di:
+                    _sides += [("own_di", _mine_pts), ("opp_di", _opp_pts)]
+                for _k, _pts in _sides:
+                    mine[_k]["board"] += _pts
+                    mine[_k]["board_sets"] = mine[_k].get("board_sets", 0) + _bsets
+                    mine[_k]["board_matches"] = mine[_k].get("board_matches", 0) + 1
 
     out = {}
     for team, sides in acc.items():
-        row = {}
+        # counted from the rows actually USED -- a team-totals match that is
+        # itself partial is excluded like any partial box (Jackson St.)
+        row = {"team_total_only_matches": sum(
+                   1 for _r in _mb.get(team, {}).values() if _r.get("status") == "team_totals"),
+               "mbm": _mb.get(team, {})}
         for key in ("own", "opp", "own_di", "opp_di"):
             d = sides[key]
             n = d["sets"] or 0
@@ -3450,16 +4205,18 @@ def team_season_stats(boxes, res):
                 # fact from hitting %, never blended with it. None without
                 # attempts: a rate with no denominator is not a measurement.
                 "killpct": (round(d["k"] / d["ta"], 3) if d["ta"] else None),
-                "serves": (d.get("sa") or 0) or None,
-                "srv_avg": (round((d["aces"] + 0.435 * max(
-                    0.0, d["sa"] - d["aces"] - d.get("se", 0))) / d["sa"], 3)
-                    if d.get("sa") else None),
-                "ace_rate": (round(d["aces"] / d["sa"], 4) if d.get("sa") else None),
-                "svc_err_rate": (round(d.get("se", 0) / d["sa"], 4)
-                                 if d.get("sa") else None),
-                "recv_att": (d.get("ra") or 0) or None,
-                "recv_ok_rate": (round((d["ra"] - d.get("re", 0)) / d["ra"], 4)
-                                 if d.get("ra") else None),
+                "serves": (d.get("sa_s") or 0) or None,
+                "srv_avg": (round((d.get("ace_s", 0) + 0.435 * max(
+                    0.0, d["sa_s"] - d.get("ace_s", 0) - d.get("se_s", 0))) / d["sa_s"], 3)
+                    if d.get("sa_s") else None),
+                "ace_rate": (round(d.get("ace_s", 0) / d["sa_s"], 4) if d.get("sa_s") else None),
+                "svc_err_rate": (round(d.get("se_s", 0) / d["sa_s"], 4)
+                                 if d.get("sa_s") else None),
+                "serve_cov_matches": int(d.get("n_sa", 0)),
+                "recv_att": (d.get("ra_r") or 0) or None,
+                "recv_ok_rate": (round((d["ra_r"] - d.get("re_r", 0)) / d["ra_r"], 4)
+                                 if d.get("ra_r") else None),
+                "recv_cov_matches": int(d.get("n_ra", 0)),
                 "kps": (round(d["k"] / n, 2) if n else None),
                 "asps": (round(d["ast"] / n, 2) if n else None),
                 "dps": (round(d["digs"] / n, 2) if n else None),
@@ -3473,7 +4230,12 @@ def team_season_stats(boxes, res):
                 "pps": (round((d["k"] + d["aces"] + d["bs"] + d["ba"] * 0.5) / n, 2)
                         if n else None),
                 "board": d["board"],
-                "bpps": (round(d["board"] / n, 2) if n else None),
+                # scoreboard points over the sets of matches whose line score
+                # covers every set -- its own population (mail 047)
+                "board_cov_matches": d.get("board_matches", 0),
+                "board_cov_sets": d.get("board_sets", 0),
+                "bpps": (round(d["board"] / d["board_sets"], 2)
+                         if d.get("board_sets") else None),
             }
         out[team] = row
     # ⚠ A LISTING FILTER, NOT A DATA FILTER. The non-D-I side keeps everything
@@ -4156,7 +4918,8 @@ def powercell(t):
     v = t.get("power")
     if v is None:
         return '<td class="n pw">&mdash;</td>'
-    basis = ("this season's results" if t.get("power_basis") == "live"
+    basis = ("the 2026 model (private default)" if t.get("power_basis") == "candidate"
+             else "this season's results" if t.get("power_basis") == "live"
              else "the preseason projection, which reads no 2026 result yet")
     return ('<td class="n pw hx seq" style="--t:%.3f" title="Power %.1f. '
             '50 is an average D-I team; every 12.5 points is one standard '
@@ -4844,6 +5607,12 @@ def conference_lab(bteams, tj):
 # the number itself. No invented injury adjustment, ever, without its
 # own evidence/methodology phase.
 FORECAST_AVAIL_NOTE = "Forecast does not incorporate availability."
+# ONE wording for "we looked and found no broadcast" (Cody, 2026-09-26: every
+# match lists where to watch "and noted if none were found"). Unknown, never
+# "not televised" -- the feed carries no broadcast field at all.
+NOTV_NOTE = ("No TV or stream listing was found in either school\u2019s "
+             "published schedule (the NCAA feed carries none). This means "
+             "unknown, never \u201cnot televised\u201d.")
 RATING_AVAIL_NOTE = "Sourced availability is not an input."
 
 
@@ -5238,7 +6007,9 @@ def extref_strip(meta, teams):
     rows = []
 
     src = "preseason"
-    if any(t.get("rank_source") == "live" for t in teams):
+    if any(t.get("rank_source") == "candidate" for t in teams):
+        src = "2026 model, private default (candidate)"
+    elif any(t.get("rank_source") == "live" for t in teams):
         src = "live (2026 results)"
     elif any(t.get("rank_source") == "blend" for t in teams):
         src = "blend (preseason projection + 2026 results)"
@@ -5411,6 +6182,12 @@ def extref_strip(meta, teams):
 
 
 def build():
+    # PRIVATE DEFAULT flag (Cody 2026-09-28). Never on the public build.
+    _flag = os.path.join(REPO, "Cody", "data", "power_candidate", "DEFAULT_ON")
+    if not PUBLIC and os.path.exists(_flag):
+        os.environ["WVB_POWER_DEFAULT"] = "candidate"
+    else:
+        os.environ.pop("WVB_POWER_DEFAULT", None)
     teams, field, unmatched, n_aq, meta = BOARD.build()
     if PUBLIC:
         # STRIP THE VALUES, NOT JUST THE COLUMNS. Removing the VT and Massey
@@ -5491,11 +6268,11 @@ def build():
                            if t.get("avca")))
     sched = schedule()
     tvrows = tv()
-    sim = load("data/season_sim_%d.json" % SEASON) or {}
+    sim = load_sim()
     sim_of = {r["team"]: r for r in sim.get("teams", [])}
     tourn_of = {r["team"]: r.get("tournament_pct") for r in sim.get("teams", [])}
     rpif_of = {r["team"]: r.get("rpi_rank_p50") for r in sim.get("teams", [])}
-    preds = load("data/predictions_%d.json" % SEASON) or {}
+    preds = load_predictions()
     pred_by_pair = {}
     for r in preds.get("games", []):
         pred_by_pair[(r["date"], r["away"], r["home"])] = r
@@ -5513,6 +6290,44 @@ def build():
     _nrt = attach_ratings(plist)
     # Season team totals for 2026, both what a team does and what it allows.
     tstats = team_season_stats(boxes, res_cnt)
+    # TEAM ANALYSIS (Phase B, Cody 2026-09-26: private site only). Same two
+    # inputs as tstats, so the Analysis tab and every other team number on the
+    # page cannot disagree. Descriptive only -- nothing here reaches a rating.
+    _tan = {"keys": {}, "teams": {}}
+    if not PUBLIC:
+        try:
+            import team_analysis as _TA
+            # ONE TEAM-EVIDENCE POPULATION (mail 045): the Overview's tstats
+            # take nameless-box matches from official team totals; Analysis
+            # must use the same rows or Louisiana reads 15 matches on one
+            # screen and 9 on the next. Team-total rows are TEAM evidence
+            # only -- analyze() keeps them out of every player/setter table.
+            _boxes_team, _ = _team_total_fallback(
+                boxes, res_cnt, set(str(r.get("gid")) for r in res_cnt if r.get("gid")))
+            _tan_raw = _TA.analyze(_boxes_team, res_cnt, SEASON, only=_di_all)
+            for _tm in _tan_raw:
+                _tan_raw[_tm]["recent5"] = _TA.recent_window(_boxes_team, res_cnt, _tm, 5)
+            # ONE DISPLAY NAME PER PLAYER (mail 047): Analysis read the box
+            # score's spelling ("Amare Hernandez") while the player page and
+            # Stats use the school roster's ("Amaré Hernandez"). Same person,
+            # same team, joined on an accent/case-folded key -- a name that
+            # folds to no player-page entry (or to two) keeps its box spelling.
+            _fold = nkey                       # the one identity key
+            _disp = {}
+            for _p in plist:
+                _disp.setdefault((_p.get("team"), _fold(_p.get("name"))), set()).add(_p.get("name"))
+            for _tm, _a in _tan_raw.items():
+                for _pp in _a.get("players") or []:
+                    _c = _disp.get((_tm, _fold(_pp.get("name"))))
+                    if _c and len(_c) == 1:
+                        _pp["name"] = next(iter(_c))
+            _tan = _TA.compact(_tan_raw)
+            # NO DEFAULT HISTORICAL COLUMN (Cody, mail 030): the Texas A&M
+            # 2025 reference was a research case study, not a benchmark for
+            # every team. Its verified reconcile stays in team_analysis /
+            # test_team_analysis; it is no longer rendered on team pages.
+        except Exception as _e:                         # noqa: BLE001
+            print("team analysis skipped: %s" % _e)
     stand = standings(teams, res_cnt)
     for _rows in stand.values():
         for _r in _rows:
@@ -5554,6 +6369,24 @@ def build():
                     sched_n[_k] = sched_n.get(_k, 0) + 1
     tindex = team_index(teams, res_cnt, pred_by_pair, sim_of, ldr_floor,
                         tstats=tstats, aq_of=aq_of, sched_n=sched_n)
+    # ⚠ DISPLAYED PLAYER BLOCKS ARE INDIVIDUAL: (BS + BA) / sets (mail 036).
+    # The Overview's star rows read `bps` from the player-rating MODEL, whose
+    # inputs were fitted on the team-scoring convention (BS + BA/2) -- that
+    # model is NOT retrained here. For display only, a 2026 star row takes
+    # her raw 2026 box counts from the same player season list the Stats and
+    # player pages use, so every view shows one individual number (Stanford's
+    # Lizzy Andrew: 0.66 model value vs (2+49)/40 = 1.28 from counts).
+    _pl_by = dict(((p.get("team"), p.get("nkey")), p) for p in plist)
+    for _tn, _ti in tindex.items():
+        for _st in (_ti.get("stars") or []):
+            if _st.get("hb") != SEASON:
+                continue
+            _p = _pl_by.get((_tn, nkey(_st.get("n") or "")))
+            if _p and _p.get("sets"):
+                _st["bps"] = round(((_p.get("bs") or 0) + (_p.get("ba") or 0))
+                                   / float(_p["sets"]), 2)
+                _st["bps_basis"] = "individual BS+BA per set, 2026 box counts"
+                _st["bps_sets"] = _p["sets"]
     _conflab = conference_lab(teams, tindex)
 
     # ── THE NEWSROOM ────────────────────────────────────────────────────
@@ -5821,7 +6654,29 @@ def build():
     # is read as the second one -- so if we are still showing the first, the
     # page has to say so rather than let the heading imply otherwise.
     _live = [t for t in teams if t.get("rank_source") == "live"]
-    if _live:
+    _cand = [t for t in teams if t.get("rank_source") == "candidate"]
+    if _cand:
+        _cv = (_cand[0].get("cand_version") or "")
+        _rst = rank_stamp_pt(((meta.get("rank_stamp") or {}).get("generated_at_utc")))
+        _rn = (meta.get("rank_stamp") or {}).get("matches_in")
+        _dte = (meta.get("rank_stamp") or {}).get("data_through_epoch")
+        _thr = (datetime.datetime.fromtimestamp(_dte, ZoneInfo("America/Los_Angeles")).strftime("%b %-d, %-I:%M %p PT")
+                if _dte else "the last accepted final")
+        rank_basis = (
+            "<b>POWER &mdash; the 2026 model</b> (private default since Sep 28; version "
+            + esc(_cv) + "). Every 2026 set&rsquo;s point share, opponent-adjusted with "
+            "venue; earned points; recent matches weighted up; a fading start from last "
+            "season&rsquo;s results and this roster&rsquo;s returning production; thin records "
+            "pulled toward their conference&rsquo;s level. <b>Rank range</b> = the 10th&ndash;90th "
+            "percentile across 200 season resamples. <b>Also on this model:</b> match odds and "
+            "the season projections (projected wins, title and tournament odds). <b>Not switched:</b> "
+            "the prospective recorder, Digby&rsquo;s Top 25 and the weekly archive still use the "
+            "previous model. The movement column compares against this model&rsquo;s own Monday "
+            "freeze (first one Sep 28), so it is blank until the second freeze. The previous default "
+            "is kept as <i>previous POWER</i> on the candidate view."
+            + ((" <span class=\"rkstamp\">Recomputed <b>%s</b>, results through <b>%s</b>%s.</span>"
+                % (_rst, _thr, (", from %d accepted D-I finals" % _rn) if _rn else "")) if _rst else ""))
+    elif _live:
         _gp = [t.get("gp") or 0 for t in _live]
         rank_basis = (
             "<b>Our ranking, from 2026 results.</b> %d teams rated on matches "
@@ -6151,7 +7006,7 @@ def build():
             _plog.setdefault(_gid, []).append(_r)
 
     _fwd = {}
-    for _r in ((load("data/predictions_%d.json" % SEASON) or {}).get("games") or []):
+    for _r in (load_predictions().get("games") or []):
         _fwd[str(_r.get("game_id"))] = _r
 
     _epoch_of = {}
@@ -6509,7 +7364,7 @@ def build():
         srows.append(
             '<tr%s%s><td class="cd" data-d="%s">%s</td><td class="n">%s</td><td class="tm">%s%s%s</td>'
             '<td class="at">%s</td><td class="tm">%s%s%s</td>'
-            '<td class="wh l">%s%s</td>'
+            '<td class="wh l">%s%s</td><td class="l">%s</td>'
             '<td class="n pick %s">%s</td></tr>'
             % ((' class="rkd both"' if (r["ar"] and r["hr"])
                 else (' class="rkd"' if (r["ar"] or r["hr"]) else "")),
@@ -6525,7 +7380,7 @@ def build():
                connector,
                team_rank_chips(r["h"], r["hr"], _pr, _av),
                logo_img(r["h"], logos), esc(r["h"]),
-               badge, where,
+               badge, where, watch_cell(r),
                cls, pick))
     srows = "".join(srows)
 
@@ -6625,6 +7480,8 @@ def build():
     return TEMPLATE \
         .replace("{{POLLS_JSON}}", json.dumps(polls, separators=(",", ":"))) \
         .replace("{{FORECAST_NOTE_JSON}}", json.dumps(FORECAST_AVAIL_NOTE)) \
+        .replace("{{NOTV_NOTE_JSON}}", json.dumps(NOTV_NOTE)) \
+        .replace("{{TANALYSIS_JSON}}", json.dumps(_tan, separators=(",", ":"))) \
         .replace("{{R26_JSON}}", json.dumps(
             rating_2026_only(), separators=(",", ":"))) \
         .replace("{{MOVERS_JSON}}", json.dumps(
@@ -6707,6 +7564,12 @@ def build():
             'lines. <a href="rating_history_%d.svg" target="_blank" '
             'rel="noopener">Open the printable version</a>.</p>'
             '</details>' % SEASON)) \
+        .replace("{{V2P_BTN}}", "" if PUBLIC or not v2_preview_payload() else V2P_BTN) \
+        .replace("{{V2S_BTN}}", "" if PUBLIC or not v2so_preview_payload() else V2S_BTN) \
+        .replace("{{V2S_JS}}", "" if PUBLIC or not v2so_preview_payload() else
+                 V2S_JS.replace("{{V2S_JSON}}", json.dumps(v2so_preview_payload(), separators=(",", ":")))) \
+        .replace("{{V2P_JS}}", "" if PUBLIC or not v2_preview_payload() else
+                 V2P_JS.replace("{{V2P_JSON}}", json.dumps(v2_preview_payload(), separators=(",", ":")))) \
         .replace("{{SEASON_CHART_JSON}}", json.dumps(
             season_chart_payload() or {}, separators=(",", ":"))) \
         .replace("{{RULER_KEY}}", ruler_key_html(
@@ -6832,6 +7695,7 @@ def build():
         .replace("{{CONF_JSON}}", json.dumps(sorted(set(t["conf"] for t in teams if t["conf"])))) \
         .replace("{{SLOPE}}", ("%.3f" % slope) if slope else "&mdash;") \
         .replace("{{LAST}}", esc(day_label(first_played) if first_played else "not yet")) \
+        .replace("{{BUILT_EPOCH}}", str(int(time.time()))) \
         .replace("{{BUILT}}", (
             datetime.datetime.now(PT).strftime("%Y-%m-%d %-I:%M %p PT") if PT
             else datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%MZ")))
@@ -9897,6 +10761,7 @@ body.mdlopen{overflow:hidden}
 .mdet .mfact em{font-style:normal;color:var(--slate);margin-right:6px;
   font:600 11px/1 var(--disp);letter-spacing:.12em;text-transform:uppercase}
 .mdet .munk{color:var(--slate);font-style:italic}
+.notv{color:var(--slate);font-style:italic}
 .lmcbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:4px}
 .lmcbtn{appearance:none;background:transparent;border:1px solid var(--line2);
   border-radius:3px;color:var(--ink2);font:600 11px/1 var(--disp);
@@ -10600,15 +11465,26 @@ table th{font-family:var(--disp);font-weight:500;letter-spacing:.08em}
 /* last match under each team name, and whether POWER has it (2026-09-25) */
 .rk3 td.tm .lastm{display:block;margin-top:3px;font:500 12px/1.3 var(--sans);
   color:var(--slate);white-space:nowrap;letter-spacing:0;text-transform:none}
-.rk3 td.tm .lastm .lmr{display:inline-block;min-width:16px;text-align:center;
-  border-radius:3px;font:700 10.5px/16px var(--mono);color:#fff;margin-right:3px}
-.rk3 td.tm .lastm .lmW{background:#2F8A62}
-.rk3 td.tm .lastm .lmL{background:#C04A3C}
-.rk3 td.tm .lastm .lms{font-style:normal;font:700 9.5px/1 var(--sans);letter-spacing:.07em;
-  text-transform:uppercase;padding:2px 5px;border-radius:3px;margin-left:4px;vertical-align:1px}
-.rk3 td.tm .lm-in .lms{color:#2F8A62;background:color-mix(in srgb,#2F8A62 12%,transparent)}
-.rk3 td.tm .lm-pending .lms{color:#A86A00;background:color-mix(in srgb,#E3A21A 18%,transparent)}
-.rk3 td.tm .lm-out .lms{color:var(--slate);background:var(--alt)}
+/* RANKINGS CLEANUP (mail 030): hierarchy is rank + team, then POWER, then
+   quiet context. No filled W/L squares, no "IN" chip, no green heat under
+   POWER, no colour competing with the one directional signal (movement). */
+.rk3 td.tm .lastm .lmr{font:700 12px/1.3 var(--sans);color:var(--ink2);margin-right:2px}
+.rk3 td.tm .lastm .lms{font:italic 500 12px/1.3 var(--sans);letter-spacing:0;
+  text-transform:none;color:var(--slate)}
+.rk3 td.tm .lm-pending .lms{color:#8A5A00}
+.rk3 tbody tr:nth-child(n) td{background:transparent}
+.rk3 tbody tr:nth-child(n){background:transparent}
+.rk3 tbody td.pw{color:var(--ink);font-weight:700}
+/* desktop only: the phone card uses td.pw::before for its "POWER" label and
+   each td is its own block, so these two must not reach it */
+@media (min-width:561px){
+  .rk3 tbody tr.row td{border-bottom:1px solid var(--line)}
+  .rk3 tbody tr.row:hover td{background:var(--sheet)}
+  .rk3 td.pw.hx::before,.rk3 td.pw.hx::after{display:none}
+  .rk3 tbody td.pw.hx b{color:var(--ink)}
+}
+.rk3 tbody tr td.n.c-avca{color:var(--ink2)}
+#rbody tr.row td:first-child::before{opacity:.55}
 .panel table td{padding:11px 12px}
 .panel table th{padding:11px 12px}
 /* Team names carry the display face wherever they appear. */
@@ -11587,6 +12463,15 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
   background:linear-gradient(120deg,#3B2F9E,#6A4FD8);color:#fff;cursor:pointer}
 .nlform .nlstatus{font-size:13px;color:var(--slate)}
 /* NOTES-CSS-END */
+/* TANALYSIS-CSS-BEGIN */
+.tanal{margin-top:14px}
+.tantab tr.tanrow{cursor:pointer}
+.tantab tr.tanrow:hover td,.tantab tr.tanrow:focus-visible td{background:var(--sheet)}
+.tantab tr.tanrow:focus-visible{outline:2px solid var(--cs-cyan);outline-offset:-2px}
+.tantab td,.tantab th{white-space:nowrap}
+.tantab td.l{text-align:left}
+.tanna{margin-top:10px;font-style:italic}
+/* TANALYSIS-CSS-END */
 /* AVAIL-CSS-BEGIN */
 .avrow{border:1px solid var(--line);border-radius:3px;padding:9px 12px;
   margin:0 0 7px;font-size:12.5px;color:var(--ink2)}
@@ -11979,7 +12864,13 @@ details.avhist{margin:14px 0}
     text-transform:uppercase;margin-right:3px}
   .rk3 tr.row td.pw{--lblc:var(--vx-power)}
   .rk3 tr.row td.rs{--lblc:var(--vx-resume)}
-  .rk3 tr.row td.c-avca{--lblc:var(--vx-avca)}
+  .rk3 tr.row td.c-avca{--lblc:var(--slate)}
+  /* mail 030: values in ink, the ruler's colour only on its small label;
+     room at the right edge; the last-result line wraps instead of crowding */
+  .rk3 tr.row{padding-right:16px}
+  .rk3 tbody tr.row td.pw,.rk3 tbody tr.row td.pw b,
+  .rk3 tbody tr.row td.c-avca{color:var(--ink)}
+  .rk3 tr.row td.tm .lastm{white-space:normal;font-size:12.5px;line-height:1.35}
   /* the ruler seg, phone shape (Cody's screenshot, 2026-09-06): five long
      labels wrapped as two rows of big boxes -- same cure as the Scores
      chips: one full-width line of short labels. The .lx spans carry the
@@ -12452,10 +13343,13 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       then any ranked side, then how close the forecast is. There is deliberately
       no single &ldquo;watch rating&rdquo;: one number would hide which fact
       moved it, and every tag on a card names the fact it came from.</p>
-      <p><b>The forecast is a probability, not a pick.</b> It is the rally model
-      backtested on 2025 at a Brier score of 0.1289. It says how often a match
-      like this goes each way &mdash; a 70% side loses three times in ten, and
-      those three are not mistakes.</p>
+      <p><b>The forecast is a probability, not a pick.</b> It says how often a
+      match like this goes each way &mdash; a 70% side loses three times in ten,
+      and those three are not mistakes. Its track record is the 2026 log itself:
+      every forecast is recorded before the listed start and scored afterwards,
+      in two streams (the first forecast ever issued, and the last one before
+      the match). There is no clean 2025 backtest of today&rsquo;s model to
+      quote; older figures measured something else.</p>
       <p><b>After a match is final the forecast comes from the append-only log,
       and only from a row written BEFORE tipoff.</b> The forward-looking file is
       regenerated nightly from everything known at the time, which for a played
@@ -12503,6 +13397,8 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <button class="segb" data-r="digby"><i class="vx-key vx-k-digby"></i>Digby<span class="lx">&rsquo;s Top </span>25</button>
       <button class="segb" data-r="gap"><span class="lx">POWER </span>vs AVCA</button>
       <button class="segb" data-r="cal"><span class="lx">Weekly </span>calendar</button>
+      {{V2P_BTN}}
+      {{V2S_BTN}}
     </div>
     <label class="refsel"><span>Reference</span>
       <select id="refpick" aria-label="Reference ranking">
@@ -12574,10 +13470,11 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
        of buttons there would cost more than it explains. These belong to
        POWER, so they live inside POWER. -->
   <div class="seg basisseg" role="group" aria-label="Which POWER order">
-    <button class="segb on" data-basis="blend">Blend<span class="lx">
-      &nbsp;(preseason + 2026)</span></button>
-    <button class="segb" data-basis="r26">2026 <span class="lx">results
-      </span>only</button>
+    <!-- ⚠ ONE LINE PER LABEL: .segb .lx is white-space:pre, so a newline
+         inside the span rendered as a real line break and the two words
+         overlapped on desktop (mail 032). -->
+    <button class="segb on" data-basis="blend">Blend<span class="lx"> (preseason + 2026)</span></button>
+    <button class="segb" data-basis="r26">2026<span class="lx"> results</span>&nbsp;only</button>
     <button class="segb" data-basis="movers">Movers</button>
   </div>
   <div id="r26panel" hidden></div>
@@ -13109,7 +14006,9 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     never blended: <b>availability</b> is a sourced status &mdash; only an
     attributable public source with its exact wording can set one.
     <b>Participation</b> is an observed match fact: recorded actions, a
-    zero-action listing (the feed&rsquo;s DNP convention), or not in the box.
+    zero-stat listing (in the box with no recorded action &mdash; whether she
+    played is <b>unknown</b>: the feed lists some non-players this way, and a
+    player can also be on court without recording a stat), or not in the box.
     A <b>participation anomaly</b> is a review signal against a stated
     baseline. A <b>sourced match incident</b> is a dated in-match event
     from an attributable source &mdash; it sets no current status, and the
@@ -13346,7 +14245,8 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <thead><tr><th class="l">Date</th><th>Time</th><th class="l">Visitor</th>
       <th></th><th class="l">Home</th>
       <th class="l" title="venue from the feed; conference, non-conference or a named event">Where</th>
-      <th title="rally model, calibrated Brier 0.1289 on 2025">Projected</th></tr></thead>
+      <th class="l" title="network or stream from the schools' own published schedules">Watch</th>
+      <th title="rally-model forecast from the current blend; its record is scored in the 2026 prediction log">Projected</th></tr></thead>
     <tbody id="sbody">{{SCHED_ROWS}}</tbody></table></div>
     <button type="button" class="lanemore" id="schedall" hidden></button></div>
 </section>
@@ -13375,6 +14275,7 @@ const CONFS = {{CONF_JSON}};
 /* the availability-forecast contract, one definition (substituted from
    the python constant so the two cannot drift) */
 const FORECAST_NOTE = {{FORECAST_NOTE_JSON}};
+const NOTE_NOTV = {{NOTV_NOTE_JSON}};
 const $ = s => document.querySelector(s);
 /* ⚠ A NODE THAT NO LONGER EXISTS MUST NOT TAKE THE PAGE WITH IT. The Scoreboard
    rebuild removed the old live / later-today / this-week / legacy-date stack,
@@ -14430,6 +15331,7 @@ async function pollLive() {
     const r = await fetch('/api/live', { cache: 'no-store' });
     if (r.ok) d = await r.json();
   } catch (e) { d = null; }
+  if (d && d.freshness) LIVE_FRESH = d.freshness;
   /* no server: fall back to the schedule that is already on the page */
   const all = (d && d.games && d.games.length) ? d.games : slateFromSchedule();
   /* A match that has ENDED must leave the live band even while the feed still
@@ -14670,7 +15572,8 @@ const PROFILE_ORDER = {{PROFILE_ORDER}};
 const PROFILE_MIN_N = {{PROFILE_MIN_N}};
 const TD_GROUPS = [['overview', 'Overview'], ['matches', 'Matches'],
                    ['roster', 'Roster'], ['numbers', 'Numbers'],
-                   ['scouting', 'Scouting'], ['outlook', 'Outlook']];
+                   ['scouting', 'Scouting'], ['outlook', 'Outlook'],
+                   ['analysis', 'Analysis']];
 /* Heading -> section. A heading nobody has claimed lands in Numbers, which is
    visible and wrong-ish rather than invisible and lost. */
 const TD_MAP = [
@@ -14850,7 +15753,7 @@ function boxHTML(gid) {
       rs.map(r => '<tr><td class="pn">' + r.name + '</td><td>' + (r.pos || '') + '</td>' +
         '<td>' + r.sets + '</td><td>' + r.k + '</td><td>' + r.e + '</td>' +
         '<td>' + r.ta + '</td><td>' + pct(r.hit) + '</td><td>' + r.ast + '</td>' +
-        '<td>' + r.digs + '</td><td>' + (r.bs + r.ba * 0.5) + '</td>' +
+        '<td>' + r.digs + '</td><td title="individual blocks: solo + assist">' + (r.bs + r.ba) + '</td>' +
         '<td>' + r.aces + '</td><td>' + (r.se || 0) + '</td>' +
         '<td>' + r.pts + '</td></tr>').join('') +
       (function () {
@@ -15021,7 +15924,7 @@ function renderPlayers() {
     '<td class="n">' + (p.pos || '') + '</td><td class="n">' + p.sets + '</td>' +
     '<td class="n">' + p.k + '</td><td class="n">' + pct(p.hit) + '</td>' +
     '<td class="n">' + (p.ast || 0) + '</td>' +
-    '<td class="n">' + p.digs + '</td><td class="n">' + (p.bs + p.ba * 0.5) + '</td>' +
+    '<td class="n">' + p.digs + '</td><td class="n" title="individual blocks: solo + assist">' + (p.bs + p.ba) + '</td>' +
     '<td class="n">' + (p.aces || 0) + '</td>' +
     hcell(p.pps, p.pps.toFixed(2), plo, phi, 'high', 'seq') + '</tr>').join('');
   /* ⚠ THE NOT-YET-PLAYED ROWS RENDER UNDER THEIR OWN HEADING RATHER THAN
@@ -15242,7 +16145,8 @@ function showPlayer(p) {
   const tt = (typeof TEAMS !== 'undefined') ? TEAMS[p.team] : null;
   const tctx = tt ? '<div class="pdranks">' +
     (tt.rank ? '<span class="chip">POWER <b>#' + tt.rank + '</b> <i>' +
-      esc(tt.power_basis === 'live' ? '2026 results'
+      esc(tt.power_basis === 'candidate' ? '2026 model'
+          : tt.power_basis === 'live' ? '2026 results'
           : tt.power_basis === 'blend' ? 'blend' : 'preseason') +
       '</i></span>' : '') +
     (tt.avca ? '<span class="chip">AVCA poll <b>#' + tt.avca +
@@ -15271,8 +16175,8 @@ function showPlayer(p) {
   } else if (isMB) {
     addRate('Kills/set', p.kps);
     addRate('Hit%', p.hit, 'pct');
-    addRate('Blocks/set', p.sets
-      ? ((p.bs || 0) + 0.5 * (p.ba || 0)) / p.sets : null);
+    addRate('Blocks/set', p.sets                /* individual: solo + assist */
+      ? ((p.bs || 0) + (p.ba || 0)) / p.sets : null);
   } else if (isLib) {
     addRate('Digs/set', p.dps);
     addRate('Aces/set', p.sets ? (p.aces || 0) / p.sets : null);
@@ -15336,7 +16240,7 @@ function showPlayer(p) {
        zero fields omitted, and a row whose every action is zero says
        plainly that no player stats were recorded -- the feed's DNP
        convention, not a played-with-nothing line. */
-    const blk = g.bs + g.ba * 0.5;
+    const blk = g.bs + g.ba;           /* individual: solo + assist */
     const tok = {};
     if (g.k) tok.K = g.k + ' K';
     if (g.e) tok.E = g.e + ' E';
@@ -17280,6 +18184,10 @@ const DIGBY_BRIEF = `{{DIGBY_BRIEF}}`;
 const DIGBY_WATCH = `{{DIGBY_WATCH}}`;
 
 let LIVE_STAMP = '';
+/* mail 037: the server's freshness block -- poll, last score change, page
+   build, last refresh outcome, feed-overdue starts. null on a static host. */
+let LIVE_FRESH = null;
+const PAGE_BUILT_EPOCH = {{BUILT_EPOCH}};
 let LIVE_BY_ID = {};
 
 /* GAMEDAY-JS-BEGIN */
@@ -19597,7 +20505,10 @@ function matchRow(m, live, dest) {
   if (m.site === 'neutral') _mbits.push('Neutral');
   if (m.event) _mbits.push(esc(m.event));
   if (m.venue) _mbits.push(esc(m.venue) + (m.city ? ', ' + esc(m.city) : ''));
+  /* ⚠ EVERY MATCH SAYS WHERE TO WATCH, OR THAT NOTHING WAS FOUND (Cody,
+     2026-09-26). A finished match needs neither. */
   if (m.tv) _mbits.push(esc(m.tv));
+  else if (st !== 'final') _mbits.push('<span class="notv" title="' + esc(NOTE_NOTV) + '">no TV listing found</span>');
   return '<button type="button" class="mrow ' + (st === 'live' ? 'islive' : '') +
     '" data-match="' + esc(m.gid) + '" data-dest="' + dest + '">' +
     /* a row about ANOTHER DAY names the day (round 5): the weekend list
@@ -19611,7 +20522,7 @@ function matchRow(m, live, dest) {
       : '<span class="mwhen">' + esc(st === 'live'
         ? ((live && live.period) || 'live')
         : ((m.d && m.d !== todayPT() && m.dl ? m.dl + ' \u00b7 ' : '') +
-           (m.t || m.dl || ''))) + '</span>') +
+           (m.t || (st === 'final' ? m.dl || '' : 'Time TBA')))) + '</span>') +
     '<span class="mteams">' + t(mAway(m), m.ar, aw) + t(mHome(m), m.hr, hw) +
       '</span>' +
     rowLinescore(m, live, st) +
@@ -20778,8 +21689,8 @@ function avTeamBlock(team) {
       (L.zero_action && L.zero_action.length
         ? ' \u00b7 zero-action listings: ' +
           L.zero_action.map(esc).join(', ') +
-          ' <i class="avnote">(a participation fact \u2014 reserves sit ' +
-          'routinely; this is not an availability claim)</i>'
+          ' <i class="avnote">(in the box with no recorded action \u2014 ' +
+          'whether they played is unknown; not an availability claim)</i>'
         : '') + '</p>'
        : '<p class="tnote">No completed match with a held box yet.</p>') +
     tl.map(k => {
@@ -21335,7 +22246,10 @@ function renderMatchDetail(gid, dest) {
             (m.tv ? esc(m.tv) : 'stream') +
             (m.tvu ? ' · <a href="' + esc(m.tvu) +
               '" target="_blank" rel="noopener">open stream</a>' : '') +
-            '</span></div>' : '';
+            '</span></div>'
+          : '<div class="wwrow"><span class="tdtag tv">watch</span>' +
+            '<span class="wwfact notv" title="' + esc(NOTE_NOTV) + '">No TV or ' +
+            'stream listing found (unknown, not \u201cnot televised\u201d)</span></div>';
         if (!rs.length && !watch) return '';
         return '<div class="msec"><h3>Why watch</h3>' +
           '<div class="wwlist">' + rs.map(r =>
@@ -22041,11 +22955,53 @@ function csStatus() {
   const feed = LIVE_STAMP
     ? 'feed <b class="cs-fresh">' + esc(String(LIVE_STAMP)) + '</b>'
     : '<b class="cs-stale">feed not connected</b>';
+  /* ⚠ "QUIET" WAS A CLAIM, NOT A READING (mail 037). The feed poll can
+     succeed every 60 s while matches sit at 'pre' long after their listed
+     start; the strip said "quiet" over exactly that. Four facts now, each
+     stated as what it is: when the feed was checked (above), when the scores
+     last CHANGED, matches the NCAA feed still lists as not started past their
+     time, and the last page refresh when it did not succeed. And an open tab
+     learns a newer page exists. */
+  const F = LIVE_FRESH, hm = e => e ? new Intl.DateTimeFormat('en-US',
+    { timeZone: 'America/Los_Angeles', hour: 'numeric', minute: '2-digit' })
+    .format(new Date(e * 1000)) : '';
+  let extra = '';
+  if (F && F.scores_changed_epoch)
+    extra += '<span title="The last time any score, set or match state in the feed moved">scores changed <b>' +
+      esc(hm(F.scores_changed_epoch)) + '</b></span>';
+  const od = (F && F.overdue_listed_pre) || [];
+  if (od.length)
+    extra += '<span title="' + esc(od.map(g => g.away + ' at ' + g.home + ' (' + g.time +
+      ', ' + g.minutes_past + ' min ago)').join('; ')) +
+      '"><b class="cs-stale">' + od.length + ' past start, NCAA feed still says not started</b></span>';
+  /* mail 039/040: when the NCAA feed has not caught up and no automated
+     backup is usable, the honest fallback is a direct route to scoreboards
+     that may have it -- links, never scores copied in. */
+  if (od.length) {
+    const ymd = day.replace(/-/g, '');
+    extra += '<span>check directly: <a target="_blank" rel="noopener" href="https://www.espn.com/womens-college-volleyball/scoreboard/_/date/' +
+      ymd + '/group/90">ESPN D-I scoreboard</a> &middot; <a target="_blank" rel="noopener" href="https://www.ncaa.com/scoreboard/volleyball-women/d1/' +
+      day.replace(/-/g, '/') + '/all-conf">NCAA scoreboard</a></span>';
+  }
+  const bk = F && F.backup;
+  if (bk && bk.enabled && bk.health && bk.health.last_error)
+    extra += '<span title="' + esc(String(bk.health.last_error)) +
+      '"><b class="cs-stale">backup source unavailable</b></span>';
+  const rl = F && F.refresh_last;
+  if (rl && !/^(rebuilt|no_new_final|skipped_locked)$/.test(rl.outcome || ''))
+    extra += '<span title="' + esc(String(rl.step || rl.detail || '')) +
+      '"><b class="cs-stale">page refresh ' + esc(String(rl.outcome).replace(/_/g, ' ')) +
+      ' ' + esc(hm(rl.at_epoch)) + '</b></span>';
+  if (F && F.page_built_epoch && PAGE_BUILT_EPOCH &&
+      F.page_built_epoch > PAGE_BUILT_EPOCH + 60)
+    extra += '<span><a class="cs-stale" href="#" onclick="location.reload();return false">newer page built ' +
+      esc(hm(F.page_built_epoch)) + ' \u2014 reload</a></span>';
+  const word = nlive ? '<b class="cs-fresh cs-livec">' + nlive + ' live</b>'
+    : (od.length ? '<b>none live in feed</b>' : '<b>quiet</b>');
   el.innerHTML =
     '<span>' + esc(today) + ' PT</span>' +
     '<span>' + feed + '</span>' +
-    '<span>' + (nlive ? '<b class="cs-fresh cs-livec">' + nlive + ' live</b>'
-                      : '<b>quiet</b>') + '</span>';
+    '<span>' + word + '</span>' + extra;
 }
 /* COURTSIGNAL-JS-END */
 
@@ -22414,11 +23370,8 @@ function renderDesk() {
            feed carries no broadcast at all. An unmatched fixture says so
            rather than implying it is not televised. */
         (m.tv ? '<span class="wnet">' + esc(m.tv) + '</span>'
-              : '<span class="wnet none" title="The hub holds no verified '
-                + 'TV/stream listing for this fixture. The feed carries no '
-                + 'broadcast information at all, so this means unknown, '
-                + 'never untelevised."'
-                + '>TV/stream listing not held</span>') +
+              : '<span class="wnet none" title="' + esc(NOTE_NOTV) + '"'
+                + '>no TV listing found</span>') +
       '</span>' +
       '<span class="wteams">' +
         teamRankChips(mAway(m), m.ar) + esc(mAway(m)) +
@@ -22584,6 +23537,7 @@ async function deskLive() {
     const r = await fetch('/api/live');
     const j = await r.json();
     LIVE_STAMP = j.updated || '';
+    LIVE_FRESH = j.freshness || null;
     LIVE_BY_ID = {};
     (j.games || []).forEach(g => { LIVE_BY_ID[String(g.id)] = g; });
   } catch (e) {
@@ -23062,11 +24016,19 @@ function renderCalendar() {
     '</div>';
 }
 
+/* Extra ruler views registered by a build layer (the private v2 preview).
+   Shared code names none of them. */
+const RULER_VIEWS = {};
+{{V2P_JS}}
+{{V2S_JS}}
 function renderPoll(which) {
   const host = document.getElementById('pollview');
   const main = document.getElementById('rankpanel');
   const lead = document.getElementById('ranklead');
-  document.querySelectorAll('#v-rankings .segb').forEach(b =>
+  /* ⚠ ONLY THE RULER BUTTONS (data-r). This used to sweep every .segb in the
+     view, which silently un-selected the Blend / 2026-results / Movers
+     toggle at load (found while fixing its labels, mail 032). */
+  document.querySelectorAll('#v-rankings .segb[data-r]').forEach(b =>
     b.classList.toggle('on', b.dataset.r === which));
   /* The reference select shows a choice only while one of ITS views is up, so
      it never looks like the active ruler when POWER is. */
@@ -23097,6 +24059,10 @@ function renderPoll(which) {
   if (which === 'cal') {
     main.hidden = true; lead.hidden = true; host.hidden = false;
     renderCalendar(); return;
+  }
+  if (RULER_VIEWS[which]) {
+    main.hidden = true; lead.hidden = true; host.hidden = false;
+    RULER_VIEWS[which](host); return;
   }
   const p = POLLS[which];
   main.hidden = true; lead.hidden = true; host.hidden = false;
@@ -23137,7 +24103,11 @@ function renderPoll(which) {
       ? 'A number in brackets after a school is its first-place votes. ' : '') +
     'This is a reference ranking &mdash; nothing here feeds our model.</p></div></div>';
 }
-document.querySelectorAll('#v-rankings .segb').forEach(b =>
+/* ⚠ RULER BUTTONS ONLY (data-r). Bound to every .segb in the view, a click on
+   the Blend / 2026-results / Movers toggle also ran renderPoll(undefined):
+   it deselected POWER and drew an external source's "no capture" text over
+   the results-only table (mail 036). Basis and ruler are independent. */
+document.querySelectorAll('#v-rankings .segb[data-r]').forEach(b =>
   b.addEventListener('click', () => {
     renderPoll(b.dataset.r);
     const want = routeFor('rankings', b.dataset.r === 'ours' ? 'power'
@@ -24711,7 +25681,14 @@ function showTeam(name) {
       'box-score definition &mdash; ' + O.earned + ' of them here. ' +
       'From the box scores of <b>' + O.matches +
       (O.matches === 1 ? ' match' : ' matches') + '</b> (' + O.sets +
-      ' sets). Totals: ' + O.kills + ' kills on ' + O.attacks + ' attacks with ' +
+      ' sets)' +
+      /* mail 037: team-complete is not player-complete -- say which. */
+      ((t.tstats && t.tstats.team_total_only_matches)
+        ? ', <b>' + t.tstats.team_total_only_matches + '</b> of them from the ' +
+          'official team totals only &mdash; the feed served those box scores ' +
+          'without player names, so no player line exists for them'
+        : '') +
+      '. Totals: ' + O.kills + ' kills on ' + O.attacks + ' attacks with ' +
       O.errors + ' errors' +
       ((O.killpct !== null && O.killpct !== undefined && O.hit !== null)
         ? ' &mdash; <b>Kill % ' +
@@ -24753,7 +25730,7 @@ function showTeam(name) {
             : '') +
           (O.recv_ok_rate !== null && O.recv_ok_rate !== undefined
             ? '. <b>Receiving:</b> ' + O.recv_att + ' receptions, ' +
-              (O.recv_ok_rate * 100).toFixed(1) + '% handled ' +
+              (O.recv_ok_rate * 100).toFixed(1) + '% without a reception error ' +
               '<span class="munk" title="Binary: a reception either was an ' +
               'error or it was not. It cannot tell a perfect pass from a ' +
               'scramble, which is most of what passing quality means -- the ' +
@@ -24789,16 +25766,25 @@ function showTeam(name) {
     if (games.length && typeof BOXES !== 'undefined') {
       const agg = {k:0,e:0,ta:0,ast:0,digs:0,bs:0,ba:0,aces:0,pts:0,sets:0,n:0};
       const trs = games.map(g => {
-        const mine = (BOXES[g.gid] || []).filter(r => r.team === name);
+        /* mail 045: ONE POPULATION. The rows come from tstats.mbm -- the
+           exact per-match counts the Overview's season totals summed --
+           so a partial box or a team-totals-only match is treated the same
+           here as there. */
+        const MB = (t.tstats && t.tstats.mbm) || {};
+        const c = MB[g.gid];
         const wl = (g.mine > g.theirs ? 'W' : 'L') + ' ' + g.mine + '\u2013' + g.theirs;
         const opp = (g.home ? 'v ' : 'at ') + g.opp + oppChips(g, true) +
           (g.nondi ? ' <i class="dicaveat" title="not a Division-I opponent">non-D-I</i>' : '');
-        if (!mine.length) {
+        if (!c || c.status === 'partial') {
           return '<tr><td class="pn">' + g.d.slice(5) + '</td>' +
             '<td class="pn">' + opp + '</td><td>' + wl + '</td>' +
-            '<td colspan="11" style="color:var(--ink3)">no box score on file</td></tr>';
+            '<td colspan="11" style="color:var(--ink3)">' + (c
+              ? 'partial box score (does not cover every set) \u2014 left out of every total'
+              : 'no box score on file') + '</td></tr>';
         }
-        const x = teamTotals(mine);
+        const x = {k: c.k, e: c.e, ta: c.ta, ast: c.ast, digs: c.digs, bs: c.bs,
+                   ba: c.ba, aces: c.aces, se: c.se, sets: c.sets,
+                   blk: c.bs + c.ba * 0.5, hit: c.ta ? (c.k - c.e) / c.ta : null};
         agg.k += x.k; agg.e += x.e; agg.ta += x.ta; agg.ast += x.ast;
         agg.digs += x.digs; agg.bs += x.bs; agg.ba += x.ba; agg.aces += x.aces;
         agg.se = (agg.se || 0) + (x.se || 0);
@@ -24806,7 +25792,9 @@ function showTeam(name) {
         const earned = x.k + x.aces + x.bs + x.ba * 0.5;
         return '<tr data-match="' + g.gid + '" class="mbmr">' +
           '<td class="pn">' + g.d.slice(5) + '</td>' +
-          '<td class="pn">' + opp + '</td><td>' + wl + '</td>' +
+          '<td class="pn">' + opp + (c.status === 'team_totals'
+            ? ' <i class="dicaveat" title="the feed served this box score without player names; these are its official team totals">team totals only</i>' : '') +
+          '</td><td>' + wl + '</td>' +
           '<td>' + x.sets + '</td><td>' + x.k + '</td><td>' + x.e + '</td>' +
           '<td>' + x.ta + '</td><td>' + pct(x.hit) + '</td><td>' + x.ast + '</td>' +
           '<td>' + x.digs + '</td><td>' + x.blk + '</td><td>' + x.aces + '</td>' +
@@ -25098,11 +26086,20 @@ function showTeam(name) {
                 the 5-1 */
              '<h3>Most-started six, 2025 ' +
              (lu.offense_system_2025
-               ? '<span class="sysbadge" title="' +
+               /* mail 052: this is a HISTORICAL HEURISTIC -- the count of
+                  setters listed in 2025 set-1 starting sixes (1 -> "5-1",
+                  2 -> "6-2", when 80% agree). A starting list cannot show
+                  who sets once play begins (a double-sub 6-2 can have one
+                  setter on the court at a time), so the badge says what it
+                  counts rather than naming a system. */
+               ? '<span class="sysbadge" title="Heuristic, 2025: ' +
                  (lu.offense_system_2025 === '5-1'
-                   ? 'One setter on the floor: five hitters, one setter.'
-                   : 'Two setters, opposite each other: six hitters, two setters.') +
-                 '">' + lu.offense_system_2025 + '</span>' : '') +
+                   ? 'one listed setter in the set-1 starting six'
+                   : 'two listed setters in the set-1 starting six') +
+                 ' in most matches. A starting list cannot establish the offensive system; ' +
+                 'that needs who set during each rotation.">' +
+                 (lu.offense_system_2025 === '5-1' ? '1 setter listed' : '2 setters listed') +
+                 ' (2025)</span>' : '') +
              '</h3><div class="body">' + started + '</div>' +
              '<div class="tnote">Who this team actually started, from set-1 play-by-play. ' +
              'Right-hand number is matches started of ' + (lu.matches_with_lineup || 0) + ' on file' +
@@ -25345,8 +26342,9 @@ function tdLeaders(t, name) {
   const floor = Math.max(3, Math.round(mx * 0.5));
   const CATS = [
     ['kills/set', p => p.k], ['assists/set', p => p.ast],
+    /* individual blocks: solo + assist (mail 036) */
     ['digs/set', p => p.digs], ['blocks/set', p => (p.bs || 0) +
-      0.5 * (p.ba || 0)], ['aces/set', p => p.aces]];
+      (p.ba || 0)], ['aces/set', p => p.aces]];
   const rows = CATS.map(c => {
     const pool = mine.filter(p => (p.sets || 0) >= floor &&
       c[1](p) !== null && c[1](p) !== undefined);
@@ -25414,7 +26412,11 @@ function tdDashboard(t, name) {
       '</div>' +
     '<div class="tddcol">' + tdForm(t, name) + tdLeaders(t, name) +
       tdIntel(t, name) +
-    '</div></div>' + tdOutbox(t, name) + tdProfile(t, name);
+    '</div></div>' +
+    /* WHY-HOOK-BEGIN */
+    (typeof tdWhyRank === 'function' ? tdWhyRank(t, name) : '') +
+    /* WHY-HOOK-END */
+    tdOutbox(t, name) + tdProfile(t, name);
 }
 
 /* THE SQUAD, SEEN. Photographs the roster already holds, at a size a face is
@@ -25543,8 +26545,8 @@ function tdOutbox(t, name) {
     'The reason is not in the data' +
     ' — rest, suspension, eligibility and a scorer’s ' +
     'omission all look identical here, and this is never an injury report. ' +
-    'A listing with a set count but no actions is the feed’s DNP ' +
-    'convention and counts as not appearing.</div></div>';
+    'A listing with a set count but no recorded action counts as no ' +
+    'recorded action \u2014 it does not establish that she did not play.</div></div>';
 }
 
 /* THE PROFILE: what this team does well, drawn against the other 347.
@@ -25672,6 +26674,197 @@ function tdPlayers(t, name) {
     'positions. Serve-receive and back-row share are 2025.</p></div>';
 }
 
+/* TANALYSIS-JS-BEGIN */
+/* TEAM ANALYSIS TAB (Phase B, Cody 2026-09-26: private site only).
+   Descriptive: the ten metrics as the season's story, from summed counts.
+   Nothing here is a rating input. Facts are shown as facts; the setter view
+   is labelled as observed association, never a setter-quality verdict. */
+/* ⚠ HOISTED ON PURPOSE. A `const` here is in the temporal dead zone when the
+   router opens a team page at load (the const TEAMS trap), and the throw took
+   the whole dossier down with it. Function declarations are hoisted with
+   their bodies, so the data exists whenever tanRender is first called. */
+function tanData() {
+  if (!tanData.v) tanData.v = {{TANALYSIS_JSON}};
+  return tanData.v;
+}
+
+function tanDec(row, keys) {
+  const o = {};
+  (keys || []).forEach((k, i) => { o[k] = row[i]; });
+  return o;
+}
+function tanHit(v) {
+  return v == null ? '—' :
+    (v < 0 ? '−' : '') + Math.abs(v).toFixed(3).replace(/^0/, '');
+}
+function tanPct(v) { return v == null ? '—' : (100 * v).toFixed(1) + '%'; }
+function tanPs(v) { return v == null ? '—' : Number(v).toFixed(2); }
+/* [label, key, formatter, opponent key, title/definition] */
+function tanRows() { return [
+  ['Earned pts / set', 'earned_pps', tanPs, 'opp_earned_pps',
+   'kills + aces + team blocks (solo + ½ assist), per set played'],
+  [' kills / set', 'kps', tanPs, 'opp_kps', 'component of earned points'],
+  [' aces / set', 'aps', tanPs, 'opp_aps', 'component of earned points'],
+  [' blocks / set', 'bps', tanPs, 'opp_bps', 'team scoring blocks per set'],
+  ['Scoreboard pts / set', 'board_pps', tanPs, 'board_allowed_pps',
+   'every point on the scoreboard, from the set scores — includes the other side’s errors. ' +
+   'Only matches whose line score covers every set; their own set count is the denominator'],
+  ['Kill %', 'kill_pct', tanPct, 'opp_kill_pct', 'kills ÷ attack attempts'],
+  ['Attack error %', 'err_pct', tanPct, null, 'attack errors ÷ attempts'],
+  ['Hitting %', 'hit_pct', tanHit, 'opp_hit_pct', '(kills − errors) ÷ attempts, summed counts'],
+  ['Attempts / set', 'ta_ps', tanPs, null, 'attack volume'],
+  ['Assists / set', 'ast_ps', tanPs, null, 'credited kill-producing sets — not a setting-quality score'],
+  ['Digs / set', 'digs_ps', tanPs, null, 'depends on how often the other side attacks'],
+  ['Blocks per opp. attempt', 'blk_per_opp_ta', tanPct, null,
+   'team scoring blocks ÷ opponent attack attempts'],
+  ['Aces per serve', 'ace_per_sa', tanPct, 'opp_ace_per_sa', 'aces ÷ serve attempts'],
+  ['Service errors per serve', 'se_per_sa', tanPct, null, 'service errors ÷ serve attempts'],
+  ['Reception errors per reception', 'rec_err_per_ra', tanPct, null,
+   'reception errors ÷ reception attempts — an error rate, not a pass grade']
+]; }
+function tanRender(name) {
+  const TA = tanData();
+  const T = (TA.teams || {})[name];
+  if (!T) return '';
+  const K = TA.keys || {};
+  const s = T.totals || {}, r5 = T.recent5 || null;
+  const head = '<th class="l">Metric</th><th>2026 season</th>' +
+    (r5 ? '<th title="exact totals over the last ' + r5.matches +
+      ' matches with a box score' + (r5.team_total_only_matches ? ', ' +
+      r5.team_total_only_matches + ' of them from official team totals only' : '') +
+      '">Last ' + r5.matches + (r5.team_total_only_matches ? '*' : '') + '</th>' : '') +
+    '<th>Opponents</th>';
+  const rows = tanRows().map(x =>
+    '<tr><td class="l" title="' + esc(x[4]) + '">' + x[0] + '</td>' +
+    '<td>' + x[2](s[x[1]]) + '</td>' +
+    (r5 ? '<td>' + x[2](r5[x[1]]) + '</td>' : '') +
+    '<td>' + (x[3] ? x[2](s[x[3]]) : '') + '</td></tr>').join('');
+  const c = s.counts || {};
+  let out = '<div class="tsec tanal"><h3>Season analysis, 2026</h3>' +
+    '<div class="tnote">' + T.matches_counted + ' counted matches, ' +
+    T.matches_with_box + ' with a box score, ' + (s.sets || 0) + ' sets' +
+    (T.missing_box && T.missing_box.length ? ' \u00b7 <b>' +
+      T.missing_box.length + ' without a box score</b>' : '') +
+    (T.partial_box && T.partial_box.length ? ' \u00b7 <b>' +
+      T.partial_box.length + ' with a partial box score</b> (it does not cover every set)' : '') +
+    ((T.missing_box || []).length + (T.partial_box || []).length ?
+      ' \u2014 left out of every rate, never counted as zero' : '') +
+    /* mail 045: team-complete is not player-complete -- both counts shown */
+    (T.team_total_only ? ' \u00b7 <b>' + T.team_total_only + ' from official ' +
+      'team totals only</b> (the feed served those boxes without player names): ' +
+      'team rates include them; the player table covers the ' + T.player_matches +
+      ' matches with named player lines' : '') +
+    '. Scoreboard points per set use the ' + (s.board_cov_matches || 0) +
+    ' matches whose line score covers every set (' + (s.board_cov_sets || 0) + ' sets)' +
+    '. Serving rates use the ' + (s.serve_cov_matches || 0) + ' matches whose box ' +
+    'recorded serve attempts; reception rates the ' + (s.recv_cov_matches || 0) +
+    ' that recorded receptions' +
+    '. Every rate is summed counts over its own denominator — ' +
+    Math.round(c.k || 0) + ' kills on ' + Math.round(c.ta || 0) +
+    ' attempts, ' + Math.round(c.ace_s || 0) + ' aces and ' +
+    Math.round(c.se_s || 0) + ' service errors on ' + Math.round(c.sa_s || 0) +
+    ' serves (the matches that recorded serves). Hover a metric for its definition.</div>' +
+    '<div class="scroll"><table class="box tantab"><thead><tr>' + head +
+    '</tr></thead><tbody>' + rows + '</tbody></table></div>' +
+
+    '</div>';
+  /* per-match trend */
+  const ser = (T.series || []).map(rw => {
+    const o = tanDec(rw, K.series);
+    o.mm = o.m ? tanDec(o.m, K.m) : null;
+    return o;
+  });
+  const trs = ser.map(m => '<tr class="tanrow" data-match="' + esc(m.gid) +
+    '" tabindex="0" role="link" aria-label="Open match: ' + esc(m.opp || '') + ', ' +
+    esc(m.date || '') + '">' +
+    '<td class="l">' + esc(m.date || '') + '</td>' +
+    '<td class="l">' + (m.site === 'away' ? 'at ' : 'vs ') + esc(m.opp || '') + '</td>' +
+    '<td>' + (m.won ? 'W ' : 'L ') + esc(m.score || '') + '</td>' +
+    (m.mm ? '<td>' + tanPs(m.mm.earned_pps) + '</td><td>' + tanPs(m.mm.opp_earned_pps) +
+      '</td><td>' + tanHit(m.mm.hit_pct) + '</td><td>' + tanHit(m.mm.opp_hit_pct) +
+      '</td><td>' + tanPct(m.mm.ace_per_sa) + '</td><td>' + tanPct(m.mm.se_per_sa) +
+      '</td><td>' + tanPct(m.mm.rec_err_per_ra) + '</td><td>' +
+      esc((m.setters || []).join(' + ') || (m.setters ? 'none listed' : '—')) + '</td>'
+      : '<td colspan="8" class="l">' + esc(m.box_note || 'no box score on file') +
+        ' \u2014 not in the rates</td>') + '</tr>').join('');
+  out += '<div class="tsec tanal"><h3>Match by match: the trend</h3>' +
+    '<div class="scroll"><table class="box tantab"><thead><tr>' +
+    '<th class="l">Date</th><th class="l">Opponent</th><th>Res</th>' +
+    '<th title="earned points per set">PPS</th><th title="opponent earned points per set">Opp PPS</th>' +
+    '<th>Hit%</th><th>Opp hit%</th><th>Ace/serve</th><th>SE/serve</th>' +
+    '<th title="reception errors per reception">Rec err</th>' +
+    '<th class="l" title="listed setters in the set-1 starting six">Setter(s)</th>' +
+    '</tr></thead><tbody>' + trs + '</tbody></table></div>' +
+    '<div class="tnote">Select a row to open that match. One match is a small sample: a swing between two ' +
+    'rows is not a trend on its own. Opponent strength differs row to row ' +
+    '(open a match for its context).</div></div>';
+  /* players and roles */
+  const pl = (T.players || []).map(rw => tanDec(rw, K.players))
+    .filter(p => p.sets > 0);
+  const prow = pl.map(p => '<tr><td class="l">' + esc(p.name) + '</td>' +
+    '<td title="listed position, not where she attacked from">' +
+    esc(p.listed_pos || '—') + '</td><td>' + p.sets + '</td>' +
+    '<td>' + tanPct(p.ta_share) + '</td><td>' + tanPct(p.kill_pct) + '</td>' +
+    '<td>' + tanHit(p.hit_pct) + '</td><td>' + tanPs(p.kps) + '</td>' +
+    '<td>' + tanPs(p.ast_ps) + '</td><td>' + tanPs(p.digs_ps) + '</td>' +
+    '<td>' + tanPs(p.bps) + '</td><td>' + (p.sa ? tanPct(p.ace_per_sa) +
+      ' <small>(' + p.sa + ')</small>' : '\u2014') +
+    '</td><td>' + (p.sa ? tanPct(p.se_per_sa) : '\u2014') + '</td>' +
+    '<td>' + (p.ra ? tanPct(p.rec_err_per_ra) + ' <small>(' + p.ra + ')</small>' : '—') +
+    '</td></tr>').join('');
+  out += '<div class="tsec tanal"><h3>Who carries it: roles</h3>' +
+    '<div class="scroll"><table class="box tantab"><thead><tr>' +
+    '<th class="l">Player</th><th>Pos</th><th>Sets</th>' +
+    '<th title="share of the team’s attack attempts in the ' + (T.player_matches || 0) +
+    ' matches with named player lines">TA share</th>' +
+    '<th>Kill%</th><th>Hit%</th><th>K/S</th><th>A/S</th><th>D/S</th>' +
+    '<th title="individual blocks per set: solo + assist (a block assist counts as a block for each player on it)">B/S</th>' +
+    '<th title="aces per serve (serves)">Ace/serve</th><th>SE/serve</th><th title="reception error rate (receptions)">Rec err</th>' +
+    '</tr></thead><tbody>' + prow + '</tbody></table></div>' +
+    '<div class="tnote">' + (T.team_total_only ? 'Covers the <b>' + T.player_matches +
+      '</b> matches with named player lines; TA share is of the team’s attacks in ' +
+      'those matches only (' + T.team_total_only + ' team-totals-only ' +
+      (T.team_total_only === 1 ? 'match carries' : 'matches carry') +
+      ' no per-player split). ' : '') +
+    'Position is the <b>listed</b> position, not where a ' +
+    'player attacked from. The box score cannot say whether a swing came ' +
+    'in or out of system.</div></div>';
+  /* setter lineups -- association only */
+  const sl = T.setter_lineups || [];
+  if (sl.length) {
+    out += '<div class="tsec tanal"><h3>Setter in the starting six</h3>' +
+      '<div class="scroll"><table class="box tantab"><thead><tr>' +
+      '<th class="l">Listed setter(s), set 1</th><th>Matches</th><th>W</th>' +
+      '<th>Sets</th><th>Hit%</th><th>Kill%</th><th>PPS</th><th>Opp hit%</th>' +
+      '</tr></thead><tbody>' + sl.map(x => '<tr><td class="l">' + esc(x.setters) +
+      '</td><td>' + x.matches + '</td><td>' + x.won + '</td><td>' + x.sets +
+      '</td><td>' + tanHit(x.hit_pct) + '</td><td>' + tanPct(x.kill_pct) +
+      '</td><td>' + tanPs(x.earned_pps) + '</td><td>' + tanHit(x.opp_hit_pct) +
+      '</td></tr>').join('') + '</tbody></table></div>' +
+      '<div class="tnote">Observed association only: who started at setter ' +
+      'beside how the team played in those matches. It is <b>not</b> a ' +
+      'setter-quality verdict — opponents, passing, hitters and lineups ' +
+      'differ between groups. From set-1 starting lineups (' + T.lineup_matches +
+      ' of ' + T.matches_with_box + ' matches carried one). Each row covers ' +
+      'WHOLE matches grouped by who started set 1 at setter \u2014 not who ' +
+      'was on court in later sets, and not the effect of a substitution. ' +
+      'Set quality is not in this data.</div></div>';
+  }
+  out += '<div class="tnote tanna">Not in this analysis (not integrated and ' +
+    'verified): pass grades, set location or tempo, block touches, and 2026 ' +
+    'rally-by-rally play. ' +
+    'Where they would go, the page says so rather than showing zero.</div>';
+  return out;
+}
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const r = e.target && e.target.closest && e.target.closest('tr.tanrow[data-match]');
+  if (!r) return;
+  e.preventDefault();
+  r.click();
+});
+/* TANALYSIS-JS-END */
+
 function teamDossier(box, t, name) {
   /* ⚠ THE STAMP ALONE IS NOT EVIDENCE THE WORK IS STILL THERE, and relying on
      it silently reverted the whole page. `dataset` lives on the #teamcard
@@ -25722,6 +26915,14 @@ function teamDossier(box, t, name) {
      exist before */
   const ov = panels.overview;
   ov.insertAdjacentHTML('beforeend', tdDashboard(t, name) + tdPlayers(t, name));
+  /* TANALYSIS-HOOK-BEGIN */
+  if (typeof tanRender === 'function' && panels.analysis) {
+    /* a failure here must never take the rest of the team page with it */
+    try {
+      panels.analysis.insertAdjacentHTML('beforeend', tanRender(name));
+    } catch (e) { console.error('team analysis:', e); }
+  }
+  /* TANALYSIS-HOOK-END */
   /* The glance strip's "Next" tile is now a strict subset of the card above,
      down to the pre-match pick -- so it is removed rather than shown twice in
      the same viewport. If the card came back empty (no fixture on file) the
@@ -26164,7 +27365,7 @@ ASK_JS = r"""
 })();
 """
 
-PRIVATE_MARKERS = ("VolleyTalk", "Massey Ratings", "Massey Ratings, 2026",
+PRIVATE_MARKERS = ("POWER v2 &mdash; preview", "const V2P =", "POWER 2026 &mdash; candidate", "const V2S =", "VolleyTalk", "Massey Ratings", "Massey Ratings, 2026",
                    # ── EXTERNAL REFERENCES (2026-08-31) ─────────────────
                    # the FIG snapshot, the Massey snapshot labelling and
                    # the discrepancy queue are all reference data that is
@@ -26313,6 +27514,7 @@ def strip_private(html):
                    ("<!-- AVAIL-HTML-BEGIN -->", "<!-- AVAIL-HTML-END -->"),
                    ("/* AVAIL-JS-BEGIN */", "/* AVAIL-JS-END */"),
                    ("/* AVAIL-HOOK-BEGIN */", "/* AVAIL-HOOK-END */"),
+                   ("/* WHY-HOOK-BEGIN */", "/* WHY-HOOK-END */"),
                    ("/* AVAILP-HOOK-BEGIN */", "/* AVAILP-HOOK-END */"),
                    ("/* AVAILS-HOOK-BEGIN */", "/* AVAILS-HOOK-END */"),
                    ("/* AVAIL-ROUTE-BEGIN */", "/* AVAIL-ROUTE-END */"),
@@ -26344,7 +27546,11 @@ def strip_private(html):
                    # refused to build, exactly as it is meant to. Fourth time
                    # private-feature code has been written into shared script;
                    # private code goes inside the feature's own fence, always.
-                   ("/* RKCMP-JS-BEGIN */", "/* RKCMP-JS-END */")):
+                   ("/* RKCMP-JS-BEGIN */", "/* RKCMP-JS-END */"),
+                   # the team Analysis tab is private (Cody, 2026-09-26)
+                   ("/* TANALYSIS-JS-BEGIN */", "/* TANALYSIS-JS-END */"),
+                   ("/* TANALYSIS-HOOK-BEGIN */", "/* TANALYSIS-HOOK-END */"),
+                   ("/* TANALYSIS-CSS-BEGIN */", "/* TANALYSIS-CSS-END */")):
         html = re.sub(re.escape(_a) + r".*?" + re.escape(_b), "", html,
                       flags=re.S)
 

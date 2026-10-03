@@ -41,7 +41,9 @@ def main():
     m = re.search(r"const TD_GROUPS = (\[.*?\]);", src, re.S)
     check("TD_GROUPS is declared", m is not None)
     groups = re.findall(r"\['([a-z]+)'", m.group(1)) if m else []
-    check("six groups", len(groups) == 6, groups)
+    # seven since 2026-09-26: 'analysis' is the private team Analysis tab
+    check("seven groups (six public + private analysis)", len(groups) == 7
+          and groups[-1] == "analysis", groups)
 
     # TD_MAP is an ARRAY of [regex, group] pairs, not an object -- an earlier
     # version of this guard matched it as `{...}`, found no targets, and
@@ -54,7 +56,8 @@ def main():
     check("every TD_MAP target is a real group", not unknown, sorted(unknown))
     # every group except the assembled Overview must be reachable by some rule
     # or by the fallback, or its tab can never appear
-    unreachable = set(groups) - mapped - {"overview", "numbers"}
+    # 'analysis' is filled directly by its own (private) hook, like Overview
+    unreachable = set(groups) - mapped - {"overview", "numbers", "analysis"}
     check("every group is reachable from a rule", not unreachable,
           sorted(unreachable))
 
@@ -360,7 +363,12 @@ console.log('PD-OK');
         check("match-by-match table ships", 'Match by match, 2026' in page)
         _mbm = page[page.find('MATCH BY MATCH, THE TEAM AS A BOX-SCORE LINE'):]
         _mbm = _mbm[:_mbm.find('const rt = t.rot25')] if _mbm else ''
-        check("  ...its rows come from teamTotals()", 'teamTotals(mine)' in _mbm)
+        # mail 045: the rows are the Overview's own counted per-match rows
+        # (tstats.mbm), so the two screens share ONE population -- no longer
+        # a second aggregation over BOXES that saw partial boxes the season
+        # totals exclude and missed the team-totals-only matches.
+        check("  ...its rows come from the Overview's counted rows (tstats.mbm)",
+              't.tstats.mbm' in _mbm and 'BOXES[g.gid]' not in _mbm)
         check("  ...totals recompute hit%% from summed counts",
               '(agg.k - agg.e) / agg.ta' in _mbm)
         check("  ...pts/set recomputed, never averaged",

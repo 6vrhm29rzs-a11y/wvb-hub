@@ -228,6 +228,47 @@
      "text": "Volleyball | #1 Nebraska | Wrigley Field | Chicago, Ill. -- the Sep 6 card on Missouri's own schedule page"
     }
    }
+  },
+  {
+   "game_id": "6624495",
+   "kind": "correction",
+   "matchup": "Creighton at St. John's (NY)",
+   "why": "The NCAA feed lists 21:00Z (2:00 PM PT / 5 PM ET). Both schools' own published schedules say 6:00 PM CT = 7:00 PM ET = 23:00Z (4:00 PM PT): Creighton '6:00 PM CT', St. John's '7 p.m.' at Carnesecca Arena, Queens. Found because Cody saw the hub showing 2 PM PT (2026-09-26); the time check had never asked either school (no-WMT negative cache) -- fixed in the same change (B020, approved by Cody). This entry corrects the SCHEDULED start only. applies_to_final: the completed match corroborates it -- StatBroadcast, reviewed by Cody in his own browser (never automated), records the actual first serve at 07:03 PM ET; that observed start is kept separately in observed_first_serve and is not a ledger field. StatBroadcast's own 'Scheduled Time' field read 01:00 PM ET and is not relied on.",
+   "review_by": "2026-10-03",
+   "fields": {
+    "start_time_epoch": 1790463600
+   },
+   "support": {
+    "start_time_epoch": {
+     "url": "https://gocreighton.com/sports/womens-volleyball/schedule/text",
+     "retrieved": "2026-09-26",
+     "text": "Sep 26 (Sat) | 6:00 PM CT | Away | St. John's -- corroborated by the home school, https://redstormsports.com/sports/womens-volleyball/schedule/text (retrieved 2026-09-26): Sep 26 (Sat) | 7 p.m. | Home | No. 25 Creighton (Queens, NY = Eastern)"
+    }
+   },
+   "observed_first_serve": {
+    "text": "07:03 PM ET",
+    "epoch_utc": 1790463780,
+    "source": "StatBroadcast game page, reviewed in Cody's own browser 2026-09-26 (screenshot: Cody/coordination/research/evidence/2026-09-26-creighton-stjohns-start-time/)",
+    "role": "observed actual start; NOT the scheduled time and NOT a displayed override"
+   },
+   "applies_to_final": true
+  },
+  {
+   "game_id": "6627188",
+   "kind": "correction",
+   "matchup": "Wisconsin at Purdue",
+   "why": "The NCAA scoreboard lists this match at 1:00 PM ET (10:00 AM PT), so it sat in the page's 'past start, NCAA feed still says not started' list all morning. Purdue's official schedule API gives 2026-09-27T20:00Z = 4:00 PM ET / 1:00 PM PT; Cody independently reported the same start time (2026-09-27). Start time only -- nothing else about the fixture is changed.",
+   "review_by": "2026-09-28",
+   "fields": {
+    "start_time_epoch": 1790539200
+   },
+   "support": {
+    "start_time_epoch": {
+     "url": "https://purduesports.com/website-api/schedule-events?filter%5Bschedule.sport_id%5D=18&sort=-datetime&include=opponent",
+     "retrieved": "2026-09-27",
+     "text": "{\"datetime\":\"2026-09-27T20:00:00.000000Z\",\"status\":\"as_scheduled\",\"opponent\":{\"name\":\"Wisconsin\"}}"
+    }
+   }
   }
  ]
 }

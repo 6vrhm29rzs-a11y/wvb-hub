@@ -148,6 +148,46 @@ def per_match_margins(doc):
     return out
 
 
+# CANDIDATE (mail 055, OFF by default; live behaviour unchanged unless set):
+# a match at a venue classified NEUTRAL carries no home-court term. Live
+# POWER applies +/- home_adv from the feed's NOMINAL home flag even at
+# neutral floors (Fiserv Forum, Players Era), crediting an edge nobody had.
+# Confirmed and unconfirmed sites keep today's behaviour (unconfirmed is not
+# neutral). Rollback = unset the variable.
+POWER_CANDIDATE = os.environ.get("WVB_POWER_CANDIDATE") == "1"
+NEUTRAL_SITE_CANDIDATE = POWER_CANDIDATE or os.environ.get("WVB_POWER_NEUTRAL") == "1"
+EQS_CANDIDATE = POWER_CANDIDATE or os.environ.get("WVB_POWER_EQS") == "1"
+_LIVE_OUT = os.path.realpath(os.path.join(REPO, "data", "digby_top25_%d.json" % SEASON))
+if POWER_CANDIDATE or NEUTRAL_SITE_CANDIDATE or EQS_CANDIDATE:
+    # a candidate NEVER writes the live file -- not by default, not by an
+    # explicit path, not through a symlink or relative alias (mail 056)
+    if not os.environ.get("WVB_DIGBY_OUT"):
+        raise SystemExit("candidate mode requires WVB_DIGBY_OUT (a separate output path)")
+    if os.path.realpath(os.environ["WVB_DIGBY_OUT"]) == _LIVE_OUT:
+        raise SystemExit("candidate mode refuses to write the LIVE POWER file (%s)" % _LIVE_OUT)
+
+
+def _set_margin(ls):
+    """Net points per set for the HOME side. Live: raw average over sets.
+    Candidate (equal-set): each set's differential is put on a 25-point
+    scale -- the fifth set to 15 counts x25/15 -- so every set, including
+    the fifth, carries the same weight. No clutch or deuce terms."""
+    if not EQS_CANDIDATE:
+        return sum(l["home"] - l["visit"] for l in ls) / float(len(ls))
+    v = [(l["home"] - l["visit"]) * (25.0 / 15.0 if i == 4 else 1.0) for i, l in enumerate(ls)]
+    return sum(v) / float(len(v))
+
+
+def _neutral_gids():
+    if not NEUTRAL_SITE_CANDIDATE:
+        return set()
+    try:
+        v = json.load(open(os.path.join(REPO, "data", "venues_%d.json" % SEASON)))
+        return set(str(g["game_id"]) for g in v.get("games") or [] if g.get("site") == "neutral")
+    except (OSError, ValueError):
+        return set()
+
+
 def per_match_detail(doc):
     # type: (Dict) -> Dict[str, List[Dict]]
     """team_id -> one record per completed D-I match, with WHO it was against.
@@ -156,17 +196,20 @@ def per_match_detail(doc):
     season term to be scored as if every match were against an average team.
     """
     out = collections.defaultdict(list)
+    neutral = _neutral_gids()
     for g, home, away, ls in _eligible(doc):
         hp = sum(l["home"] for l in ls)
         ap = sum(l["visit"] for l in ls)
         n = float(len(ls))
         gid = str(g.get("game_id"))
+        site = 0.0 if gid in neutral else None      # None = today's nominal rule
+        mh = _set_margin(ls)
         out[str(home["team_id"])].append(
-            {"margin": (hp - ap) / n, "opp": str(away["team_id"]),
-             "is_home": True, "gid": gid})
+            {"margin": mh, "opp": str(away["team_id"]),
+             "is_home": True, "gid": gid, "site": site})
         out[str(away["team_id"])].append(
-            {"margin": (ap - hp) / n, "opp": str(home["team_id"]),
-             "is_home": False, "gid": gid})
+            {"margin": -mh, "opp": str(home["team_id"]),
+             "is_home": False, "gid": gid, "site": site})
     return out
 
 
@@ -178,11 +221,12 @@ def home_advantage(doc):
     with seven results the estimate would be noise, and a home-court term that
     swings week to week would move teams for reasons that are not about them.
     """
+    # ⚠ FIXED CONSTANT (mail 056): always the RAW per-set margin, so a
+    # candidate's margin rule cannot silently re-fit the home advantage
+    # (v1 had moved it 1.0878 -> 1.0981 through per_match_detail).
     vals = []
-    for tid, recs in per_match_detail(doc).items():
-        for r in recs:
-            if r["is_home"]:
-                vals.append(r["margin"])
+    for g, home, away, ls in _eligible(doc):
+        vals.append(sum(l["home"] - l["visit"] for l in ls) / float(len(ls)))
     return st.mean(vals) if vals else 0.0
 
 
@@ -423,8 +467,9 @@ def main():
                 zopp = zref.get(opp_nm) if opp_nm else None
                 if zopp is None:
                     continue
-                m_impl = zopp + (r["margin"] - home_adv
-                                 * (1.0 if r["is_home"] else -1.0)) / tau
+                _s = r.get("site")
+                _s = (1.0 if r["is_home"] else -1.0) if _s is None else _s
+                m_impl = zopp + (r["margin"] - home_adv * _s) / tau
                 # the hitting channel, at its measured weight, when this match's
                 # box carries both sides' attack counts; margin-only otherwise
                 h_impl = None
@@ -433,8 +478,7 @@ def main():
                     mine_h = per.get(tid)
                     opp_h = per.get(r["opp"])
                     if mine_h is not None and opp_h is not None:
-                        hd = (mine_h - opp_h) - home_adv_h * (
-                            1.0 if r["is_home"] else -1.0)
+                        hd = (mine_h - opp_h) - home_adv_h * _s
                         h_impl = zopp + hd / tauh
                 if h_impl is not None:
                     vals.append((1.0 - HIT_CHANNEL_WEIGHT) * m_impl
@@ -668,6 +712,11 @@ def main():
     doc["meta"]["rating_cutoff_epoch"] = _cut
     # today's school-verified finals already counted (the trust cutoff)
     doc["meta"]["verified_intraday_counted"] = _n_intraday
+    if EQS_CANDIDATE or NEUTRAL_SITE_CANDIDATE:
+        doc["meta"]["method"] = "CANDIDATE v1 mechanics: " + " + ".join(
+            (["normalized per-set margin (5th set x25/15)"] if EQS_CANDIDATE else []) +
+            (["no home term at classified-neutral venues"] if NEUTRAL_SITE_CANDIDATE else [])) + \
+            " (home advantage held fixed at the raw-margin 2025 estimate)"
     json.dump(doc, open(OUT, "w"), indent=1, sort_keys=False)
     m = doc["meta"]
     print("k = %.2f matches  (sigma^2 %.2f / tau^2 %.2f)"

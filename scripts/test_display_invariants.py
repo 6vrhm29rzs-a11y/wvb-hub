@@ -365,13 +365,41 @@ def check_team_stats_reconcile_with_their_box_scores():
     # team's `played` list IS the counting set, so the guard and the page
     # cannot disagree about it.
     _cnt = set()
+    _nsets = {}
     for _tn, _tv in T.items():
         for _g in (_tv.get("played") or []):
             if _g.get("gid"):
                 _cnt.add(str(_g["gid"]))
+                _nsets[str(_g["gid"])] = len(_g.get("sets") or []) or (
+                    int(_g.get("mine") or 0) + int(_g.get("theirs") or 0))
+    # ⚠ AND ONLY COMPLETE BOXES (mail 030): tstats leaves out a box that does
+    # not cover every set of its match, by team_analysis.box_complete -- the
+    # same rule, imported, so the guard cannot drift from the page.
+    import team_analysis as _TAg
+    # ⚠ THE TEAM-TOTAL FALLBACK (mail 037): 11 counted matches carry only
+    # nameless player rows, so tstats takes them from the feed's official TEAM
+    # totals. Reconcile against the SAME rule, imported -- exempting those
+    # teams would switch the guard off exactly where the new code runs.
+    import build_hub as _BHg
+    _res = {}
+    for _tn, _tv in T.items():
+        for _g in (_tv.get("played") or []):
+            gid = str(_g.get("gid") or "")
+            if not gid:
+                continue
+            e = _res.setdefault(gid, {"gid": gid})
+            e["home" if _g.get("home") else "away"] = _tn
+            e.setdefault("away" if _g.get("home") else "home", _g.get("opp"))
+    B, _ = _BHg._team_total_fallback(B, list(_res.values()), _cnt)
     agg = {}
     for _gid, rows in B.items():
         if _cnt and str(_gid) not in _cnt:
+            continue
+        _bt = {}
+        for _r in rows:
+            _bt.setdefault(_r["team"], []).append(_r)
+        if len(_bt) == 2 and _nsets.get(str(_gid)) and not _TAg.box_complete(
+                *list(_bt.values()), _nsets[str(_gid)]):
             continue
         for r in rows:
             a = agg.setdefault(r["team"], {"k": 0, "e": 0, "ta": 0, "bs": 0,
@@ -412,6 +440,14 @@ def check_team_stats_reconcile_with_their_box_scores():
         print("  --   no team has 2026 box scores yet; skipping")
         return
     ok("team stats reconcile with their own box scores", n)
+    # the fallback rows are team-level only: none may reach the page's box
+    # payload, where a player table or leaderboard would read them
+    if any(r.get("team_total") for rows in (_grab("BOXES") or {}).values() for r in rows):
+        bad("a team-total fallback row leaked into BOXES", "player views would read it")
+    else:
+        ok("team-total fallback rows never reach BOXES (no invented player lines)")
+    _tt = sum(1 for v in T.values() if ((v.get("tstats") or {}).get("team_total_only_matches") or 0) > 0)
+    ok("team-only coverage is stated per team (%d teams)" % _tt)
 
 
 
@@ -1545,14 +1581,25 @@ def check_phantom_sets_are_harmless():
                 _skip |= set(str(x) for x in _rg(live))
             except Exception:
                 pass
+            try:
+                # the aggregator's shared accepted-result eligibility (mail 055)
+                from season_counts import held_gids as _hg
+                _skip |= set(str(x) for x in _hg(live))
+            except Exception:
+                pass
             justified = {}
             for rec in recs:
                 if str(rec.get("game_id") or rec.get("gid") or "") in _skip:
                     continue
-                rows = rec.get("rows") or []
-                if not rows:
+                import nameclean as _ncov2           # same cited overrides as the aggregate
+                raw_rows = rec.get("rows") or []
+                if not raw_rows:
                     continue
-                uniform = len(set(str(r.get("gp")) for r in rows)) == 1
+                # SAME ORDER AS THE AGGREGATOR: the feed-stamped (uniform-gp)
+                # box is detected on the RAW rows, then the overrides apply
+                uniform = len(set(str(r.get("gp")) for r in raw_rows)) == 1
+                rows = [_ncov2.apply_identity_override(x, str(rec.get("game_id") or rec.get("gid") or ""))
+                        for x in raw_rows]
                 for r in rows:
                     key = _ckey(r)
                     if key not in bitten:
@@ -1638,7 +1685,11 @@ def check_aggregate_excludes_phantom_sets():
                 dict(r, team_id=_sw2.get(str(r.get("team_id")),
                                          r.get("team_id")))
                 for r in _rec2.get("rows") or []])
-        rows = (_rec2.get("rows") or [])
+        # the aggregator applies the shared, cited row overrides (identity
+        # and participation, mail 052); the recount must read the same rows
+        import nameclean as _ncov
+        rows = [_ncov.apply_identity_override(x, str(_rec2.get("game_id")))
+                for x in (_rec2.get("rows") or [])]
         if not rows:
             continue
         broken = (len(set(str(x.get("gp")) for x in rows)) == 1

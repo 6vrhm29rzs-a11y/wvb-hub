@@ -222,6 +222,41 @@ def main():
                         encoding="utf-8").read()
             check("%s runs %s" % (wf, name), name in t)
 
+
+    print("\n7. SCHOOL TEXT SCHEDULES: CLOCKS, ZONES, AND UNKNOWN != AGREE (B020)")
+    import fixture_time_check as F
+    check("'6:00 PM CT' parses with its zone", F.parse_clock("6:00 PM CT") == (18, 0, "CT"))
+    check("'7 p.m.' parses naive", F.parse_clock("7 p.m.") == (19, 0, None))
+    check("'Noon' is 12:00", F.parse_clock("Noon")[:2] == (12, 0))
+    check("[NEG] TBA is not a time", F.parse_clock("TBA") is None and F.parse_clock("") is None)
+    feed = 1790456400                                    # the feed's 2 PM PT
+    cr, _ = F.local_instant("2026-09-26", F.parse_clock("6:00 PM CT"), None)
+    sj, _ = F.local_instant("2026-09-26", F.parse_clock("7 p.m."), "NY")
+    check("Creighton's '6:00 PM CT' is 23:00Z", cr and cr.timestamp() == 1790463600, cr)
+    check("St. John's naive '7 p.m.' in NY is the same instant",
+          sj and sj.timestamp() == 1790463600, sj)
+    check("...and both are 120 minutes after the feed",
+          cr and (cr.timestamp() - feed) / 60 == 120)
+    check("an explicit zone beats the home state",
+          F.local_instant("2026-09-26", F.parse_clock("6:00 PM CT"), "NY")[0] == cr)
+    w, why = F.local_instant("2026-09-26", F.parse_clock("7 p.m."), "TX")
+    check("[NEG] a naive time in a split-zone state is unresolved, never guessed",
+          w is None and why == "naive_time_zone_unknown")
+    w, why = F.local_instant("2026-09-26", F.parse_clock("7 p.m."), None)
+    check("[NEG] a naive time with no known home state is unresolved", w is None)
+    check("a fixture past its (possibly wrong) feed time stays checked",
+          "LOOKBACK_S" in code and "now.timestamp() - LOOKBACK_S" in code)
+    for st in ("no_match", "fetch_failed", "no_reader"):
+        check("unchecked status %r is counted" % st, '"%s"' % st in code)
+    check("[NEG] a cached no-WMT school is still asked (text schedule)",
+          "text_rows(" in code and "if not sid:" in code)
+    if os.path.exists(p):
+        doc = json.load(io.open(p, encoding="utf-8"))
+        sc = doc.get("status_counts")
+        if sc is not None:
+            check("every checked fixture has exactly one status",
+                  sum(sc.values()) == doc.get("fixtures_checked"), sc)
+
     print("\n%s" % ("ALL OUTSIDE-SOURCE GUARDS PASS" if not FAILS else
                     "FAILED: %d\n   - %s" % (len(FAILS), "\n   - ".join(FAILS))))
     return 1 if FAILS else 0

@@ -30,6 +30,7 @@ import json
 import os
 import socket
 import subprocess
+import live_fallback as LF
 import sys
 import time
 import threading
@@ -207,7 +208,9 @@ class Cache(object):
 
     def snapshot(self):
         with self.lock:
-            return dict(self.payload)
+            out = dict(self.payload)
+        out["freshness"] = freshness(out, self)
+        return out
 
     def refresh(self):
         now = _et_now()
@@ -230,6 +233,7 @@ class Cache(object):
                 games.append({
                     "id": g.get("gameID"),
                     "state": state,
+                    "start_epoch": _int_or_none(g.get("startTimeEpoch")),
                     "date": d.isoformat(),
                     "time": _fmt_time(g.get("startTimeEpoch"), g.get("startTime"),
                                      (h.get("names") or {}).get("short")),
@@ -280,6 +284,27 @@ class Cache(object):
             row["away_sets"], row["home_sets"] = row["home_sets"], row["away_sets"]
             row["attribution_corrected"] = sw["note"]
 
+        # ⚠ BACKUP LIVE SOURCE (mails 039/040). The NCAA feed can hold
+        # started matches at `pre` for an hour (2026-09-27); ESPN's public
+        # scoreboard is an INDEPENDENT source. Display only -- see
+        # live_fallback.py for the identity and merge rules. Applied before
+        # the state model so every consumer reads one resolved row.
+        if LF.enabled():
+            if not hasattr(self, "fb_memory"):
+                self.fb_memory = {}
+            evs = []
+            for d in days:
+                doc = LF.fetch(d.strftime("%Y%m%d"))
+                if doc:
+                    evs += LF.parse(doc, time.time())
+            by_date = {}
+            for row in games:
+                ev = LF.identify(row, evs) if evs else None
+                lab = LF.merge(row, ev, self.fb_memory)
+                if lab:
+                    by_date[lab] = by_date.get(lab, 0) + 1
+            self.fb_counts = by_date
+
         # ⚠ ONE STATE MODEL, RESOLVED HERE. Every consumer of this payload --
         # the Match Desk band, the Scores ledger, the match detail -- reads
         # `state6` rather than deciding for itself what "live" or "over" means.
@@ -310,6 +335,8 @@ class Cache(object):
         for row in games:
             if row["state"] not in ("live", "in progress", "i"):
                 continue
+            if row.get("source") == "ESPN":
+                continue          # the NCAA detail call would refill a stale scaffold
             det = _get("/game/%s" % row["id"])
             if not det:
                 continue
@@ -341,6 +368,16 @@ class Cache(object):
             # Keep the last good payload on a failed cycle rather than blanking
             # the board -- a momentary upstream hiccup should not look like
             # "no games tonight".
+            # WHEN DID THE SCORES LAST ACTUALLY CHANGE (mail 037)? A poll
+            # that succeeds every 60 s while the feed repeats itself is not
+            # fresh data; "updated" only ever proved the former.
+            _sig = json.dumps([(x.get("id"), x.get("state"), x.get("period"),
+                                x.get("away_sets"), x.get("home_sets"),
+                                x.get("sets")) for x in games], sort_keys=True)
+            if games and _sig != getattr(self, "_sig", None):
+                self._sig = _sig
+                self.changed_epoch = int(time.time())
+            self.polled_epoch = int(time.time())
             if games or not self.payload.get("games"):
                 self.payload = {
                     "games": games,
@@ -364,6 +401,67 @@ class Cache(object):
                 with self.lock:
                     self.payload["error"] = "poller: %s" % exc
             self.stop.wait(REFRESH_SECONDS)
+
+
+def _int_or_none(v):
+    try:
+        return int(v)
+    except (TypeError, ValueError):
+        return None
+
+
+OVERDUE_MIN = 30   # display floor, not a verdict: a listed start this far
+                   # past with the feed still 'pre' is SAID, never inferred
+
+
+def freshness(payload, cache):
+    """Freshness is four separate facts, never one 'healthy' word (mail 037):
+    the poll ran; the scores last changed; the page was last built; the last
+    refresh cycle's outcome. Plus matches the feed still lists as not started
+    well after their listed time -- the feed's claim, stated as such."""
+    now = int(time.time())
+    page = os.path.join(REPO, "Cody", "START-HERE.html")
+    try:
+        built = int(os.path.getmtime(page))
+    except OSError:
+        built = None
+    status = {}
+    try:
+        status = json.load(open(os.path.join(REPO, "Cody", "data",
+                                             "refresh_status.json")))
+    except (OSError, ValueError):
+        status = {}
+    # cited start-time corrections (fixture_ledger) outrank the feed's
+    # listed time -- Purdue-Wisconsin 2026-09-27 was listed 3 h early
+    fixed = {}
+    try:
+        for e in json.load(open(os.path.join(REPO, "data", "raw", "2026",
+                                             "fixture_ledger.json"))).get("entries") or []:
+            ep = (e.get("fields") or {}).get("start_time_epoch")
+            if ep and e.get("support"):
+                fixed[str(e.get("game_id"))] = int(ep)
+    except (OSError, ValueError):
+        fixed = {}
+    overdue = []
+    for g in payload.get("games") or []:
+        se = fixed.get(str(g.get("id"))) or g.get("start_epoch")
+        if (g.get("state") in ("pre", "p") and se
+                and now - se > OVERDUE_MIN * 60 and now - se < 8 * 3600):
+            overdue.append({"id": g.get("id"), "away": g.get("away"),
+                            "home": g.get("home"), "time": g.get("time"),
+                            "minutes_past": (now - se) // 60})
+    return {"now_epoch": now,
+            "polled_epoch": getattr(cache, "polled_epoch", None),
+            "scores_changed_epoch": getattr(cache, "changed_epoch", None),
+            "page_built_epoch": built,
+            "refresh_last": status.get("last"),
+            "refresh_last_ok": status.get("last_ok"),
+            "refresh_last_rebuilt": status.get("last_rebuilt"),
+            "overdue_listed_pre": overdue,
+            "backup": {"source": "ESPN public scoreboard",
+                       "enabled": LF.enabled(), "health": LF.health(),
+                       "applied": getattr(cache, "fb_counts", {})},
+            "overdue_floor_minutes": OVERDUE_MIN}
 
 
 CACHE = Cache()
@@ -1090,11 +1188,17 @@ def main():
         while True:
             time.sleep(refresh_every)
             try:
-                subprocess.run(
-                    [sys.executable or "python3",
-                     os.path.join(REPO, "scripts", "local_refresh.py")],
-                    cwd=REPO, stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL, timeout=1800)
+                # ⚠ KEEP THE OUTPUT (mail 037). It went to DEVNULL, so a
+                # failed rebuild left no trace anywhere. The last cycle's
+                # output is kept (overwritten each cycle); outcomes are also
+                # recorded durably by local_refresh itself.
+                _outp = os.path.join(REPO, "Cody", "data", "refresh_last_output.txt")
+                with open(_outp, "w") as _fh:
+                    subprocess.run(
+                        [sys.executable or "python3",
+                         os.path.join(REPO, "scripts", "local_refresh.py")],
+                        cwd=REPO, stdout=_fh, stderr=subprocess.STDOUT,
+                        timeout=1800)
             except Exception:                     # never let the loop die
                 pass
 

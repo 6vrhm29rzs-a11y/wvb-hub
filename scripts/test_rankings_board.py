@@ -54,10 +54,13 @@ def main():
     # Three rulers a voter works in, plus the comparison, plus the archive.
     # The Reference select stays separate and is checked below.
     check("the primary rulers are the three a voter works in, plus the tools",
-          rulers == ["ours", "avca", "digby", "gap", "cal"], str(rulers))
+          [r for r in rulers if r not in ("v2p", "v2s")] == ["ours", "avca", "digby", "gap", "cal"]
+          # the private v2 preview (mail 058) may follow the five, on a private build only
+          and (rulers[5:] in ([], ["v2p"], ["v2p", "v2s"])), str(rulers))
     m = re.search(r"const RULER_WHAT = \{(.*?)\n\};", h, re.S)
     check("a purpose map exists", bool(m))
     keys = re.findall(r"^\s*([a-z0-9]+):", m.group(1), re.M) if m else []
+    keys += re.findall(r"RULER_WHAT\.([a-z0-9]+) =", h)   # registered by a build layer
     rsel = re.search(r'<select id="refpick"[^>]*>(.*?)</select>', h, re.S)
     ref = re.findall(r'<option value="([a-z0-9]+)">', rsel.group(1)) if rsel else []
     check("the reference select exists and is separate from the rulers",

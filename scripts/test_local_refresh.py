@@ -12,6 +12,7 @@ Run: python3 scripts/test_local_refresh.py
 No network. Exits non-zero on violation.
 """
 
+import json
 import os
 import re
 import sys
@@ -172,7 +173,55 @@ def check_stamp_reaches_the_page():
         ok("the page states when the rankings were last recomputed")
 
 
+def check_player_ratings_before_page():
+    """mail 055: player ratings rebuilt in the existing cycle, after the crawl
+    re-aggregates and BEFORE the page; a failure stops the cycle (no fresh
+    page with stale ratings). Fake runner -- nothing is executed."""
+    import importlib, tempfile
+    sys.path.insert(0, os.path.join(REPO, "scripts"))
+    L = importlib.import_module("local_refresh")
+    steps = [a[0] for _, a in L.REBUILD]
+    pr, bh = steps.index("scripts/player_rating.py"), steps.index("scripts/build_hub.py")
+    if not (pr < bh and "scripts/player_rating.py" in L.HARD):
+        bad("player ratings are not a required step before the page", str((pr, bh)))
+        return
+    ok("player_rating.py runs before build_hub.py and is required")
+    calls = []
+    fp = iter(["a", "b"])                           # fingerprint changes -> rebuild
+    def fake_run(args, env_extra=None, season="2026"):
+        calls.append(args[0])
+        if args[0] == "scripts/player_rating.py":
+            return 1, "boom"
+        return 0, ""
+    tmp = tempfile.mkdtemp()
+    saved = (L._run, L.fingerprint, L.STATUS_DIR, L.REFRESH_LOG, L.REFRESH_STATUS)
+    L._run, L.fingerprint = fake_run, lambda: next(fp)
+    L.STATUS_DIR, L.REFRESH_LOG, L.REFRESH_STATUS = tmp, os.path.join(tmp, "l.jsonl"), os.path.join(tmp, "s.json")
+    try:
+        rc = L._cycle(False, 0)
+        st = json.load(open(L.REFRESH_STATUS))
+    finally:
+        L._run, L.fingerprint, L.STATUS_DIR, L.REFRESH_LOG, L.REFRESH_STATUS = saved
+    if rc == 1 and "scripts/build_hub.py" not in calls and st["last"]["outcome"] == "rebuild_failed":
+        ok("a failed player-rating step stops the cycle before the page, and is recorded")
+    else:
+        bad("failed player ratings still reached the page build", str((rc, calls[-3:], st.get("last"))))
+    calls.clear(); fp2 = iter(["a", "b"])
+    L._run = lambda args, env_extra=None, season="2026": (calls.append(args[0]) or (0, ""))
+    L.fingerprint = lambda: next(fp2)
+    L.STATUS_DIR, L.REFRESH_LOG, L.REFRESH_STATUS = tmp, os.path.join(tmp, "l.jsonl"), os.path.join(tmp, "s.json")
+    try:
+        rc = L._cycle(False, 0)
+    finally:
+        L._run, L.fingerprint, L.STATUS_DIR, L.REFRESH_LOG, L.REFRESH_STATUS = saved
+    if rc == 0 and calls.index("scripts/player_rating.py") < calls.index("scripts/build_hub.py"):
+        ok("a coherent cycle rebuilds ratings, then the page")
+    else:
+        bad("coherent cycle order wrong", str(calls))
+
+
 def main():
+    check_player_ratings_before_page()
     print("local refresh invariants")
     check_in_step()
     check_negative_control()

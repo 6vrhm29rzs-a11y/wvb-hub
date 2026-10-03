@@ -98,7 +98,12 @@ def main():
     finals = set(str(g.get("game_id")) for g in SC.resolve(games)
                  if g.get("game_state") == "F")
     rev = set(SC.review_gids(2026))       # a disputed result's stats wait
-    box_n = len((boxed & finals) - dup - exh - rev)
+    # every HELD final (empty, self-contradictory, under review) stays out
+    # too -- the shared accepted-result eligibility (mail 055) the
+    # aggregator applies. Omitting it here reported a 25-match "skew"
+    # that was the test applying the pre-055 rule.
+    held = set(str(x) for x in SC.held_gids(2026, games))
+    box_n = len((boxed & finals) - dup - exh - rev - held)
     check("Stats box-universe count == its recomputation",
           stats == box_n, "%s vs %s" % (stats, box_n))
     check("Stats NAMES the box universe beside the number",
@@ -115,7 +120,7 @@ def main():
     recs = load_records_jsonl(
         os.path.join(REPO, "data", "raw", "2026", "playerbox.jsonl"),
         key="game_id")
-    skip = dup | exh | rev
+    skip = dup | exh | rev | held
 
     def _agg_count(records, require_rows):
         n = 0

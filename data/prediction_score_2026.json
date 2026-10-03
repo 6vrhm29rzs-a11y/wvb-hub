@@ -1,499 +1,654 @@
 {
  "meta": {
+  "issuance": "first-issued",
+  "scored": 2390,
+  "logged_after_tipoff_excluded": 2,
+  "timing_unverifiable_excluded": 0,
+  "team_mismatch_excluded": 70,
+  "predictions_on_record": 4813,
+  "brier": 0.1818,
+  "favourite_correct": 1740,
+  "favourite_correct_pct": 72.8,
+  "by_model_version": {
+   "unversioned": 2390
+  },
   "season": 2026,
   "source_tier": "DERIVED",
-  "scored": 1838,
-  "logged_after_tipoff_excluded": 2,
-  "team_mismatch_excluded": 65,
-  "predictions_on_record": 4812,
-  "results_available": 1939,
-  "brier": 0.1772,
-  "brier_reference": "0.25 is what saying 50%% to everything scores; this model backtested at 0.1289 on 2025",
-  "favourite_correct": 1351,
-  "favourite_correct_pct": 73.5
+  "results_available": 2499,
+  "as_of_utc": "2026-10-03T21:25:53Z",
+  "what_this_is": "Recorded forecast performance by issuance stream, as of as_of_utc. Timing is checked against the feed's LISTED start, not the actual first serve; rows logged before 2026-09-26 carry no model version. Not a certified held-out test of any single model version.",
+  "brier_reference": "0.25 is what saying 50% to everything scores"
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 299,
+   "n": 397,
    "said": 55.0,
-   "happened": 55.2
+   "happened": 55.7
   },
   {
    "range": "60-70%",
-   "n": 317,
+   "n": 409,
    "said": 65.2,
-   "happened": 60.9
+   "happened": 60.6
   },
   {
    "range": "70-80%",
-   "n": 306,
-   "said": 75.1,
-   "happened": 66.7
+   "n": 391,
+   "said": 75.2,
+   "happened": 64.7
   },
   {
    "range": "80-90%",
-   "n": 365,
-   "said": 85.2,
-   "happened": 77.0
+   "n": 477,
+   "said": 85.1,
+   "happened": 75.7
   },
   {
    "range": "90-101%",
-   "n": 551,
-   "said": 95.7,
-   "happened": 92.2
+   "n": 716,
+   "said": 95.6,
+   "happened": 91.8
   }
  ],
+ "streams": {
+  "first_issued": {
+   "meta": {
+    "issuance": "first-issued",
+    "scored": 2390,
+    "logged_after_tipoff_excluded": 2,
+    "timing_unverifiable_excluded": 0,
+    "team_mismatch_excluded": 70,
+    "predictions_on_record": 4813,
+    "brier": 0.1818,
+    "favourite_correct": 1740,
+    "favourite_correct_pct": 72.8,
+    "by_model_version": {
+     "unversioned": 2390
+    }
+   },
+   "calibration": [
+    {
+     "range": "50-60%",
+     "n": 397,
+     "said": 55.0,
+     "happened": 55.7
+    },
+    {
+     "range": "60-70%",
+     "n": 409,
+     "said": 65.2,
+     "happened": 60.6
+    },
+    {
+     "range": "70-80%",
+     "n": 391,
+     "said": 75.2,
+     "happened": 64.7
+    },
+    {
+     "range": "80-90%",
+     "n": 477,
+     "said": 85.1,
+     "happened": 75.7
+    },
+    {
+     "range": "90-101%",
+     "n": 716,
+     "said": 95.6,
+     "happened": 91.8
+    }
+   ]
+  },
+  "last_pre_match": {
+   "meta": {
+    "issuance": "last-pre-match",
+    "scored": 278,
+    "logged_after_tipoff_excluded": 0,
+    "timing_unverifiable_excluded": 0,
+    "team_mismatch_excluded": 2,
+    "predictions_on_record": 280,
+    "brier": 0.1544,
+    "favourite_correct": 215,
+    "favourite_correct_pct": 77.3,
+    "by_model_version": {
+     "5f46398+uncommitted-scripts": 278
+    }
+   },
+   "calibration": [
+    {
+     "range": "50-60%",
+     "n": 56,
+     "said": 54.1,
+     "happened": 60.7
+    },
+    {
+     "range": "60-70%",
+     "n": 49,
+     "said": 64.9,
+     "happened": 63.3
+    },
+    {
+     "range": "70-80%",
+     "n": 61,
+     "said": 74.8,
+     "happened": 73.8
+    },
+    {
+     "range": "80-90%",
+     "n": 64,
+     "said": 85.4,
+     "happened": 90.6
+    },
+    {
+     "range": "90-101%",
+     "n": 48,
+     "said": 95.4,
+     "happened": 97.9
+    }
+   ]
+  }
+ },
  "matches": [
   {
    "game_id": "6627232",
    "date": "2026-08-28",
-   "away": "Purdue Fort Wayne",
    "home": "Rutgers",
+   "away": "Purdue Fort Wayne",
    "p_home": 0.993,
    "home_won": false,
-   "brier": 0.986049
+   "brier": 0.986049,
+   "model_version": null
   },
   {
    "game_id": "6639614",
    "date": "2026-09-12",
-   "away": "Charlotte",
    "home": "Texas Southern",
+   "away": "Charlotte",
    "p_home": 0.01,
    "home_won": true,
-   "brier": 0.9801
+   "brier": 0.9801,
+   "model_version": null
+  },
+  {
+   "game_id": "6625673",
+   "date": "2026-09-22",
+   "home": "Southern U.",
+   "away": "A&M-Corpus Christi",
+   "p_home": 0.0163,
+   "home_won": true,
+   "brier": 0.96766569,
+   "model_version": null
   },
   {
    "game_id": "6626655",
    "date": "2026-09-04",
-   "away": "UConn",
    "home": "Florida A&M",
+   "away": "UConn",
    "p_home": 0.0212,
    "home_won": true,
-   "brier": 0.95804944
+   "brier": 0.95804944,
+   "model_version": null
   },
   {
    "game_id": "6627599",
    "date": "2026-09-11",
-   "away": "Sacramento St.",
    "home": "Eastern Wash.",
+   "away": "Sacramento St.",
    "p_home": 0.0223,
    "home_won": true,
-   "brier": 0.95589729
+   "brier": 0.95589729,
+   "model_version": null
   },
   {
    "game_id": "6628087",
    "date": "2026-09-20",
-   "away": "Boston College",
    "home": "Dartmouth",
+   "away": "Boston College",
    "p_home": 0.0276,
    "home_won": true,
-   "brier": 0.94556176
+   "brier": 0.94556176,
+   "model_version": null
   },
   {
    "game_id": "6625536",
    "date": "2026-09-15",
-   "away": "Ole Miss",
    "home": "Memphis",
+   "away": "Ole Miss",
    "p_home": 0.0303,
    "home_won": true,
-   "brier": 0.94031809
+   "brier": 0.94031809,
+   "model_version": null
+  },
+  {
+   "game_id": "6627947",
+   "date": "2026-10-01",
+   "home": "Montana",
+   "away": "Eastern Wash.",
+   "p_home": 0.9696,
+   "home_won": false,
+   "brier": 0.94012416,
+   "model_version": null
   },
   {
    "game_id": "6639575",
    "date": "2026-08-28",
-   "away": "Hampton",
    "home": "Bethune-Cookman",
+   "away": "Hampton",
    "p_home": 0.9686,
    "home_won": false,
-   "brier": 0.93818596
+   "brier": 0.93818596,
+   "model_version": null
+  },
+  {
+   "game_id": "6627224",
+   "date": "2026-10-02",
+   "home": "Yale",
+   "away": "Harvard",
+   "p_home": 0.9683,
+   "home_won": false,
+   "brier": 0.9376048900000001,
+   "model_version": null
   },
   {
    "game_id": "6624402",
    "date": "2026-08-28",
-   "away": "Lindenwood",
    "home": "UIC",
+   "away": "Lindenwood",
    "p_home": 0.9676,
    "home_won": false,
-   "brier": 0.93624976
+   "brier": 0.93624976,
+   "model_version": null
+  },
+  {
+   "game_id": "6638778",
+   "date": "2026-09-24",
+   "home": "Eastern Wash.",
+   "away": "Weber St.",
+   "p_home": 0.033,
+   "home_won": true,
+   "brier": 0.935089,
+   "model_version": null
   },
   {
    "game_id": "6624350",
    "date": "2026-08-28",
-   "away": "Middle Tenn.",
    "home": "Boise St.",
+   "away": "Middle Tenn.",
    "p_home": 0.9668,
    "home_won": false,
-   "brier": 0.93470224
+   "brier": 0.93470224,
+   "model_version": null
   },
   {
    "game_id": "6625596",
    "date": "2026-08-29",
-   "away": "Middle Tenn.",
    "home": "Boise St.",
+   "away": "Middle Tenn.",
    "p_home": 0.9668,
    "home_won": false,
-   "brier": 0.93470224
+   "brier": 0.93470224,
+   "model_version": null
+  },
+  {
+   "game_id": "6628171",
+   "date": "2026-09-24",
+   "home": "Houston Christian",
+   "away": "Northwestern St.",
+   "p_home": 0.9657,
+   "home_won": false,
+   "brier": 0.93257649,
+   "model_version": null
+  },
+  {
+   "game_id": "6627073",
+   "date": "2026-09-26",
+   "home": "Campbell",
+   "away": "UNCW",
+   "p_home": 0.962,
+   "home_won": false,
+   "brier": 0.9254439999999999,
+   "model_version": null
   },
   {
    "game_id": "6627858",
    "date": "2026-09-18",
-   "away": "New Hampshire",
    "home": "Clemson",
+   "away": "New Hampshire",
    "p_home": 0.9617,
    "home_won": false,
-   "brier": 0.92486689
+   "brier": 0.92486689,
+   "model_version": null
   },
   {
    "game_id": "6627893",
    "date": "2026-09-04",
-   "away": "Oral Roberts",
    "home": "Gonzaga",
+   "away": "Oral Roberts",
    "p_home": 0.9613,
    "home_won": false,
-   "brier": 0.9240976900000001
+   "brier": 0.9240976900000001,
+   "model_version": null
   },
   {
    "game_id": "6624411",
    "date": "2026-09-18",
-   "away": "Lindenwood",
    "home": "UTRGV",
+   "away": "Lindenwood",
    "p_home": 0.9609,
    "home_won": false,
-   "brier": 0.92332881
+   "brier": 0.92332881,
+   "model_version": null
   },
   {
    "game_id": "6626639",
    "date": "2026-09-13",
-   "away": "Green Bay",
    "home": "Northwestern",
+   "away": "Green Bay",
    "p_home": 0.9547,
    "home_won": false,
-   "brier": 0.9114520899999999
+   "brier": 0.9114520899999999,
+   "model_version": null
   },
   {
    "game_id": "6624726",
    "date": "2026-09-05",
-   "away": "Milwaukee",
    "home": "St. Thomas (MN)",
+   "away": "Milwaukee",
    "p_home": 0.952,
    "home_won": false,
-   "brier": 0.9063039999999999
+   "brier": 0.9063039999999999,
+   "model_version": null
+  },
+  {
+   "game_id": "6626563",
+   "date": "2026-09-25",
+   "home": "West Virginia",
+   "away": "Arizona St.",
+   "p_home": 0.0482,
+   "home_won": true,
+   "brier": 0.9059232399999999,
+   "model_version": null
   },
   {
    "game_id": "6627892",
    "date": "2026-09-05",
-   "away": "Eastern Wash.",
    "home": "Gonzaga",
+   "away": "Eastern Wash.",
    "p_home": 0.9485,
    "home_won": false,
-   "brier": 0.89965225
+   "brier": 0.89965225,
+   "model_version": null
   },
   {
    "game_id": "6639576",
    "date": "2026-09-05",
-   "away": "Hampton",
    "home": "UMES",
+   "away": "Hampton",
    "p_home": 0.9482,
    "home_won": false,
-   "brier": 0.8990832400000001
+   "brier": 0.8990832400000001,
+   "model_version": null
+  },
+  {
+   "game_id": "6626164",
+   "date": "2026-09-25",
+   "home": "Rice",
+   "away": "East Carolina",
+   "p_home": 0.9451,
+   "home_won": false,
+   "brier": 0.8932140100000001,
+   "model_version": null
   },
   {
    "game_id": "6624409",
    "date": "2026-09-12",
-   "away": "Lindenwood",
    "home": "Illinois St.",
+   "away": "Lindenwood",
    "p_home": 0.9448,
    "home_won": false,
-   "brier": 0.89264704
+   "brier": 0.89264704,
+   "model_version": null
   },
   {
    "game_id": "6625870",
    "date": "2026-08-29",
-   "away": "Idaho St.",
    "home": "Wichita St.",
+   "away": "Idaho St.",
    "p_home": 0.9427,
    "home_won": false,
-   "brier": 0.88868329
+   "brier": 0.88868329,
+   "model_version": null
+  },
+  {
+   "game_id": "6625256",
+   "date": "2026-09-24",
+   "home": "San Diego",
+   "away": "Saint Mary's (CA)",
+   "p_home": 0.9423,
+   "home_won": false,
+   "brier": 0.8879292900000001,
+   "model_version": null
   },
   {
    "game_id": "6624759",
    "date": "2026-09-10",
-   "away": "Louisiana",
    "home": "Florida A&M",
+   "away": "Louisiana",
    "p_home": 0.0578,
    "home_won": true,
-   "brier": 0.8877408400000001
+   "brier": 0.8877408400000001,
+   "model_version": null
   },
   {
    "game_id": "6624908",
    "date": "2026-08-28",
-   "away": "Buffalo",
    "home": "UIC",
+   "away": "Buffalo",
    "p_home": 0.936,
    "home_won": false,
-   "brier": 0.8760960000000001
+   "brier": 0.8760960000000001,
+   "model_version": null
   },
   {
    "game_id": "6628170",
    "date": "2026-09-18",
-   "away": "Northwestern St.",
    "home": "Murray St.",
+   "away": "Northwestern St.",
    "p_home": 0.9349,
    "home_won": false,
-   "brier": 0.8740380099999999
+   "brier": 0.8740380099999999,
+   "model_version": null
   },
   {
    "game_id": "6628283",
    "date": "2026-08-28",
-   "away": "Ark.-Pine Bluff",
    "home": "South Carolina St.",
+   "away": "Ark.-Pine Bluff",
    "p_home": 0.9348,
    "home_won": false,
-   "brier": 0.8738510399999999
+   "brier": 0.8738510399999999,
+   "model_version": null
   },
   {
    "game_id": "6625114",
    "date": "2026-09-04",
-   "away": "Georgia St.",
    "home": "Alabama A&M",
+   "away": "Georgia St.",
    "p_home": 0.0662,
    "home_won": true,
-   "brier": 0.8719824399999999
+   "brier": 0.8719824399999999,
+   "model_version": null
   },
   {
    "game_id": "6626803",
    "date": "2026-09-08",
-   "away": "Jackson St.",
    "home": "Northwestern St.",
+   "away": "Jackson St.",
    "p_home": 0.0734,
    "home_won": true,
-   "brier": 0.8585875599999999
+   "brier": 0.8585875599999999,
+   "model_version": null
   },
   {
    "game_id": "6628456",
    "date": "2026-09-11",
-   "away": "Marist",
    "home": "Bryant",
+   "away": "Marist",
    "p_home": 0.9258,
    "home_won": false,
-   "brier": 0.8571056399999999
+   "brier": 0.8571056399999999,
+   "model_version": null
   },
   {
    "game_id": "6628457",
    "date": "2026-09-12",
-   "away": "Marist",
    "home": "Bryant",
+   "away": "Marist",
    "p_home": 0.9258,
    "home_won": false,
-   "brier": 0.8571056399999999
+   "brier": 0.8571056399999999,
+   "model_version": null
   },
   {
    "game_id": "6624852",
    "date": "2026-09-18",
-   "away": "Coppin St.",
    "home": "UConn",
+   "away": "Coppin St.",
    "p_home": 0.925,
    "home_won": false,
-   "brier": 0.8556250000000001
+   "brier": 0.8556250000000001,
+   "model_version": null
   },
   {
    "game_id": "6624723",
    "date": "2026-09-03",
-   "away": "Milwaukee",
    "home": "UIC",
+   "away": "Milwaukee",
    "p_home": 0.9222,
    "home_won": false,
-   "brier": 0.85045284
+   "brier": 0.85045284,
+   "model_version": null
   },
   {
    "game_id": "6627572",
    "date": "2026-09-05",
-   "away": "San Francisco",
    "home": "Grand Canyon",
+   "away": "San Francisco",
    "p_home": 0.919,
    "home_won": false,
-   "brier": 0.8445610000000001
+   "brier": 0.8445610000000001,
+   "model_version": null
   },
   {
    "game_id": "6624277",
    "date": "2026-09-19",
-   "away": "Seton Hall",
    "home": "New Haven",
+   "away": "Seton Hall",
    "p_home": 0.0827,
    "home_won": true,
-   "brier": 0.8414392900000001
+   "brier": 0.8414392900000001,
+   "model_version": null
   },
   {
    "game_id": "6625597",
    "date": "2026-09-05",
-   "away": "Middle Tenn.",
    "home": "South Alabama",
+   "away": "Middle Tenn.",
    "p_home": 0.9164,
    "home_won": false,
-   "brier": 0.83978896
+   "brier": 0.83978896,
+   "model_version": null
   },
   {
    "game_id": "6625787",
    "date": "2026-08-30",
-   "away": "LMU (CA)",
    "home": "Ole Miss",
+   "away": "LMU (CA)",
    "p_home": 0.9156,
    "home_won": false,
-   "brier": 0.83832336
+   "brier": 0.83832336,
+   "model_version": null
   },
   {
    "game_id": "6628288",
    "date": "2026-09-12",
-   "away": "Ark.-Pine Bluff",
    "home": "Chicago St.",
+   "away": "Ark.-Pine Bluff",
    "p_home": 0.9155,
    "home_won": false,
-   "brier": 0.8381402499999999
+   "brier": 0.8381402499999999,
+   "model_version": null
+  },
+  {
+   "game_id": "6637167",
+   "date": "2026-10-03",
+   "home": "Kansas City",
+   "away": "North Dakota St.",
+   "p_home": 0.0846,
+   "home_won": true,
+   "brier": 0.83795716,
+   "model_version": null
   },
   {
    "game_id": "6626552",
    "date": "2026-09-11",
-   "away": "Lehigh",
    "home": "West Virginia",
+   "away": "Lehigh",
    "p_home": 0.9141,
    "home_won": false,
-   "brier": 0.83557881
+   "brier": 0.83557881,
+   "model_version": null
+  },
+  {
+   "game_id": "6627460",
+   "date": "2026-10-02",
+   "home": "ETSU",
+   "away": "Mercer",
+   "p_home": 0.9139,
+   "home_won": false,
+   "brier": 0.83521321,
+   "model_version": null
   },
   {
    "game_id": "6628417",
    "date": "2026-09-11",
-   "away": "Dartmouth",
    "home": "UAlbany",
+   "away": "Dartmouth",
    "p_home": 0.9136,
    "home_won": false,
-   "brier": 0.8346649599999999
+   "brier": 0.8346649599999999,
+   "model_version": null
   },
   {
    "game_id": "6628058",
    "date": "2026-09-18",
-   "away": "Missouri",
    "home": "Toledo",
+   "away": "Missouri",
    "p_home": 0.0866,
    "home_won": true,
-   "brier": 0.8342995599999999
+   "brier": 0.8342995599999999,
+   "model_version": null
   },
   {
    "game_id": "6627368",
    "date": "2026-09-04",
-   "away": "East Texas A&M",
    "home": "UAB",
+   "away": "East Texas A&M",
    "p_home": 0.9127,
    "home_won": false,
-   "brier": 0.8330212899999999
+   "brier": 0.8330212899999999,
+   "model_version": null
   },
   {
    "game_id": "6628166",
    "date": "2026-09-11",
-   "away": "Northwestern St.",
    "home": "ULM",
+   "away": "Northwestern St.",
    "p_home": 0.9126,
    "home_won": false,
-   "brier": 0.8328387599999999
-  },
-  {
-   "game_id": "6628169",
-   "date": "2026-09-15",
-   "away": "Louisiana Tech",
-   "home": "Northwestern St.",
-   "p_home": 0.093,
-   "home_won": true,
-   "brier": 0.8226490000000001
-  },
-  {
-   "game_id": "6628338",
-   "date": "2026-09-19",
-   "away": "Iowa St.",
-   "home": "Hawaii",
-   "p_home": 0.0968,
-   "home_won": true,
-   "brier": 0.81577024
-  },
-  {
-   "game_id": "6628176",
-   "date": "2026-08-28",
-   "away": "Idaho",
-   "home": "Towson",
-   "p_home": 0.9005,
-   "home_won": false,
-   "brier": 0.81090025
-  },
-  {
-   "game_id": "6627524",
-   "date": "2026-09-10",
-   "away": "UC Davis",
-   "home": "Arizona St.",
-   "p_home": 0.9005,
-   "home_won": false,
-   "brier": 0.81090025
-  },
-  {
-   "game_id": "6625034",
-   "date": "2026-08-30",
-   "away": "UMBC",
-   "home": "West Virginia",
-   "p_home": 0.8996,
-   "home_won": false,
-   "brier": 0.8092801599999999
-  },
-  {
-   "game_id": "6624941",
-   "date": "2026-09-11",
-   "away": "Montana",
-   "home": "Oakland",
-   "p_home": 0.1016,
-   "home_won": true,
-   "brier": 0.8071225599999999
-  },
-  {
-   "game_id": "6627372",
-   "date": "2026-09-12",
-   "away": "East Texas A&M",
-   "home": "Gonzaga",
-   "p_home": 0.8976,
-   "home_won": false,
-   "brier": 0.8056857599999999
-  },
-  {
-   "game_id": "6628300",
-   "date": "2026-09-10",
-   "away": "UT Arlington",
-   "home": "North Texas",
-   "p_home": 0.8958,
-   "home_won": false,
-   "brier": 0.8024576400000001
-  },
-  {
-   "game_id": "6624265",
-   "date": "2026-08-28",
-   "away": "Illinois St.",
-   "home": "Seton Hall",
-   "p_home": 0.1044,
-   "home_won": true,
-   "brier": 0.8020993599999999
-  },
-  {
-   "game_id": "6625902",
-   "date": "2026-09-12",
-   "away": "Miami (FL)",
-   "home": "St. Thomas (MN)",
-   "p_home": 0.1049,
-   "home_won": true,
-   "brier": 0.80120401
-  },
-  {
-   "game_id": "6624846",
-   "date": "2026-09-10",
-   "away": "Coppin St.",
-   "home": "Valparaiso",
-   "p_home": 0.8939,
-   "home_won": false,
-   "brier": 0.7990572100000001
+   "brier": 0.8328387599999999,
+   "model_version": null
   }
  ]
 }

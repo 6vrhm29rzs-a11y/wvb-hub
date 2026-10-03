@@ -64,6 +64,12 @@ def main():
     for a, b in fences:
         outside = re.sub(re.escape(a) + r".*?" + re.escape(b), "", outside,
                          flags=re.S)
+    # PRIVATE_MARKERS is the public gate's abort list -- it names every
+    # private symbol for the same reason the stripper does, so it is excluded
+    # on the same grounds (it runs to the stripper's definition).
+    _pm = outside.find("\nPRIVATE_MARKERS = (")
+    if _pm >= 0:
+        outside = outside[:_pm] + outside[outside.find("\ndef ", _pm):]
     _sp = outside.find("def strip_private")
     if _sp >= 0:
         outside = outside[:_sp] + outside[outside.find("\ndef ", _sp + 10):]

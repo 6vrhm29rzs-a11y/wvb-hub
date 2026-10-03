@@ -1,0 +1,2192 @@
+{
+ "_doc": "Cited, reversible PARTICIPATION overrides (mail 052). One entry = one player in one match whose feed line is contradicted by the school's official full report. Applied at row level by nameclean.apply_identity_override (the one row-override point) in every ingestion path: sets -> the stated value, the feed's value kept as gp_src, a 'participation_corrected' label added. The raw log is never rewritten. Zero-action lines are NEVER changed without such a report (zero actions are not proof of non-participation).",
+ "overrides": [
+  {
+   "gid": "6624778",
+   "team_id": "46003",
+   "player": "Lolo Lambert",
+   "jersey": 2,
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/ragincajuns.com/documents/2026/9/26/Louisiana_Volleyball_at_Troy_09.26.26.PDF?timestamp=20260926095214",
+     "kind": "school_full_report",
+     "pages": 12,
+     "sha256": "9b68744042c699ff414a5023f23b4a841edd38bfb756ae3fe92ed3886c195f2e",
+     "retrieved": "2026-09-27",
+     "text": "Louisiana box lists 11 participants: 0 Armstrong, 4 Henry, 5 Smith, 6 Ervin, 9 Miciotto, 10 Sweeney, 11 Williams, 12 Garis, 17 Gaston, 18 Gustafson, 21 Schnell. Five set-starting lineups (LA: 4 Henry; 6 Ervin; 10 Sweeney; 11 Williams; 12 Garis; 17 Gaston; libero 18 Gustafson; set 5 with 5 Smith). Team totals 60 K / 25 E / 173 TA / 56 A / 68 D equal the NCAA feed exactly."
+    }
+   ],
+   "why": "The NCAA feed lists all 17 dressed Louisiana players with gp=5; the official box lists 11 participants. Lambert (zero actions in the feed) is in no box line, no set-starting lineup and no substitution line. The report records no libero exchanges at all, which does not bear on an outside hitter."
+  },
+  {
+   "gid": "6624778",
+   "team_id": "46003",
+   "player": "Brooklyn Vigil",
+   "jersey": 14,
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/ragincajuns.com/documents/2026/9/26/Louisiana_Volleyball_at_Troy_09.26.26.PDF?timestamp=20260926095214",
+     "kind": "school_full_report",
+     "pages": 12,
+     "sha256": "9b68744042c699ff414a5023f23b4a841edd38bfb756ae3fe92ed3886c195f2e",
+     "retrieved": "2026-09-27",
+     "text": "Louisiana box lists 11 participants: 0 Armstrong, 4 Henry, 5 Smith, 6 Ervin, 9 Miciotto, 10 Sweeney, 11 Williams, 12 Garis, 17 Gaston, 18 Gustafson, 21 Schnell. Five set-starting lineups (LA: 4 Henry; 6 Ervin; 10 Sweeney; 11 Williams; 12 Garis; 17 Gaston; libero 18 Gustafson; set 5 with 5 Smith). Team totals 60 K / 25 E / 173 TA / 56 A / 68 D equal the NCAA feed exactly. Checked individually (mail 053): 'Vigil' appears nowhere in the 12-page report (box, 5 set tables, 5 lineups, all substitution lines); jersey 14 appears only for a Troy player."
+    }
+   ],
+   "why": "Feed line gp=5 with zero actions AND zero serve/reception attempts; absent from Louisiana's official participant list."
+  },
+  {
+   "gid": "6624778",
+   "team_id": "46003",
+   "player": "Nene Hawkins",
+   "jersey": 25,
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/ragincajuns.com/documents/2026/9/26/Louisiana_Volleyball_at_Troy_09.26.26.PDF?timestamp=20260926095214",
+     "kind": "school_full_report",
+     "pages": 12,
+     "sha256": "9b68744042c699ff414a5023f23b4a841edd38bfb756ae3fe92ed3886c195f2e",
+     "retrieved": "2026-09-27",
+     "text": "Louisiana box lists 11 participants: 0 Armstrong, 4 Henry, 5 Smith, 6 Ervin, 9 Miciotto, 10 Sweeney, 11 Williams, 12 Garis, 17 Gaston, 18 Gustafson, 21 Schnell. Five set-starting lineups (LA: 4 Henry; 6 Ervin; 10 Sweeney; 11 Williams; 12 Garis; 17 Gaston; libero 18 Gustafson; set 5 with 5 Smith). Team totals 60 K / 25 E / 173 TA / 56 A / 68 D equal the NCAA feed exactly. Checked individually (mail 053): 'Hawkins' appears nowhere in the 12-page report (box, 5 set tables, 5 lineups, all substitution lines); jersey 25 appears only for a Troy player."
+    }
+   ],
+   "why": "Feed line gp=5 with zero actions AND zero serve/reception attempts; absent from Louisiana's official participant list."
+  },
+  {
+   "gid": "6624778",
+   "team_id": "46003",
+   "player": "Harley Krause",
+   "jersey": 1,
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/ragincajuns.com/documents/2026/9/26/Louisiana_Volleyball_at_Troy_09.26.26.PDF?timestamp=20260926095214",
+     "kind": "school_full_report",
+     "pages": 12,
+     "sha256": "9b68744042c699ff414a5023f23b4a841edd38bfb756ae3fe92ed3886c195f2e",
+     "retrieved": "2026-09-27",
+     "text": "Louisiana box lists 11 participants: 0 Armstrong, 4 Henry, 5 Smith, 6 Ervin, 9 Miciotto, 10 Sweeney, 11 Williams, 12 Garis, 17 Gaston, 18 Gustafson, 21 Schnell. Five set-starting lineups (LA: 4 Henry; 6 Ervin; 10 Sweeney; 11 Williams; 12 Garis; 17 Gaston; libero 18 Gustafson; set 5 with 5 Smith). Team totals 60 K / 25 E / 173 TA / 56 A / 68 D equal the NCAA feed exactly. Checked individually (mail 053): 'Krause' appears nowhere in the 12-page report (box, 5 set tables, 5 lineups, all substitution lines); jersey 1 appears only for a Troy player."
+    }
+   ],
+   "why": "Feed line gp=5 with zero actions AND zero serve/reception attempts; absent from Louisiana's official participant list."
+  },
+  {
+   "gid": "6624778",
+   "team_id": "46003",
+   "player": "Taylor Gaines",
+   "jersey": 15,
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/ragincajuns.com/documents/2026/9/26/Louisiana_Volleyball_at_Troy_09.26.26.PDF?timestamp=20260926095214",
+     "kind": "school_full_report",
+     "pages": 12,
+     "sha256": "9b68744042c699ff414a5023f23b4a841edd38bfb756ae3fe92ed3886c195f2e",
+     "retrieved": "2026-09-27",
+     "text": "Louisiana box lists 11 participants: 0 Armstrong, 4 Henry, 5 Smith, 6 Ervin, 9 Miciotto, 10 Sweeney, 11 Williams, 12 Garis, 17 Gaston, 18 Gustafson, 21 Schnell. Five set-starting lineups (LA: 4 Henry; 6 Ervin; 10 Sweeney; 11 Williams; 12 Garis; 17 Gaston; libero 18 Gustafson; set 5 with 5 Smith). Team totals 60 K / 25 E / 173 TA / 56 A / 68 D equal the NCAA feed exactly. Checked individually (mail 053): 'Gaines' appears nowhere in the 12-page report (box, 5 set tables, 5 lineups, all substitution lines); jersey 15 appears only for a Troy player."
+    }
+   ],
+   "why": "Feed line gp=5 with zero actions AND zero serve/reception attempts; absent from Louisiana's official participant list."
+  },
+  {
+   "gid": "6624778",
+   "team_id": "46003",
+   "player": "Olivia Brown",
+   "jersey": 3,
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/ragincajuns.com/documents/2026/9/26/Louisiana_Volleyball_at_Troy_09.26.26.PDF?timestamp=20260926095214",
+     "kind": "school_full_report",
+     "pages": 12,
+     "sha256": "9b68744042c699ff414a5023f23b4a841edd38bfb756ae3fe92ed3886c195f2e",
+     "retrieved": "2026-09-27",
+     "text": "Louisiana box lists 11 participants: 0 Armstrong, 4 Henry, 5 Smith, 6 Ervin, 9 Miciotto, 10 Sweeney, 11 Williams, 12 Garis, 17 Gaston, 18 Gustafson, 21 Schnell. Five set-starting lineups (LA: 4 Henry; 6 Ervin; 10 Sweeney; 11 Williams; 12 Garis; 17 Gaston; libero 18 Gustafson; set 5 with 5 Smith). Team totals 60 K / 25 E / 173 TA / 56 A / 68 D equal the NCAA feed exactly. Checked individually (mail 053): 'Brown' appears nowhere in the 12-page report (box, 5 set tables, 5 lineups, all substitution lines); jersey 3 appears only for a Troy player."
+    }
+   ],
+   "why": "Feed line gp=5 with zero actions AND zero serve/reception attempts; absent from Louisiana's official participant list."
+  },
+  {
+   "gid": "6628691",
+   "team_id": "46580",
+   "player": "Decelise Champion",
+   "gp": "4",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://uwbadgers.com/documents/download/2026/9/12/Final_UW_3_TAMU_2.PDF",
+     "kind": "school_official_box",
+     "sha256": "205ca8e2b18597ca358ba773781440ae0ff0070ce98822c5cf91b9e3dbf31c45",
+     "retrieved": "2026-09-27",
+     "text": "official box credits S=4"
+    }
+   ],
+   "why": "Independently re-checked by the Builder (mail 053/054) from the official PDF; matches the Architect's Wisconsin case study."
+  },
+  {
+   "gid": "6628691",
+   "team_id": "46580",
+   "player": "Halle Thompson",
+   "gp": "1",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://uwbadgers.com/documents/download/2026/9/12/Final_UW_3_TAMU_2.PDF",
+     "kind": "school_official_box",
+     "sha256": "205ca8e2b18597ca358ba773781440ae0ff0070ce98822c5cf91b9e3dbf31c45",
+     "retrieved": "2026-09-27",
+     "text": "official box credits S=1"
+    }
+   ],
+   "why": "Independently re-checked by the Builder (mail 053/054) from the official PDF; matches the Architect's Wisconsin case study."
+  },
+  {
+   "gid": "6628691",
+   "team_id": "46580",
+   "player": "Jaela Auguste",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://uwbadgers.com/documents/download/2026/9/12/Final_UW_3_TAMU_2.PDF",
+     "kind": "school_official_box",
+     "sha256": "205ca8e2b18597ca358ba773781440ae0ff0070ce98822c5cf91b9e3dbf31c45",
+     "retrieved": "2026-09-27",
+     "text": "player not in the official box; surname appears nowhere in the PDF"
+    }
+   ],
+   "why": "Independently re-checked by the Builder (mail 053/054) from the official PDF; matches the Architect's Wisconsin case study."
+  },
+  {
+   "gid": "6628691",
+   "team_id": "46580",
+   "player": "Jane Manecke",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://uwbadgers.com/documents/download/2026/9/12/Final_UW_3_TAMU_2.PDF",
+     "kind": "school_official_box",
+     "sha256": "205ca8e2b18597ca358ba773781440ae0ff0070ce98822c5cf91b9e3dbf31c45",
+     "retrieved": "2026-09-27",
+     "text": "player not in the official box; surname appears nowhere in the PDF"
+    }
+   ],
+   "why": "Independently re-checked by the Builder (mail 053/054) from the official PDF; matches the Architect's Wisconsin case study."
+  },
+  {
+   "gid": "6628691",
+   "team_id": "46580",
+   "player": "Kymora Scott",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://uwbadgers.com/documents/download/2026/9/12/Final_UW_3_TAMU_2.PDF",
+     "kind": "school_official_box",
+     "sha256": "205ca8e2b18597ca358ba773781440ae0ff0070ce98822c5cf91b9e3dbf31c45",
+     "retrieved": "2026-09-27",
+     "text": "player not in the official box; surname appears nowhere in the PDF"
+    }
+   ],
+   "why": "Independently re-checked by the Builder (mail 053/054) from the official PDF; matches the Architect's Wisconsin case study."
+  },
+  {
+   "gid": "6628691",
+   "team_id": "46580",
+   "player": "Madison Quest",
+   "gp": "1",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://uwbadgers.com/documents/download/2026/9/12/Final_UW_3_TAMU_2.PDF",
+     "kind": "school_official_box",
+     "sha256": "205ca8e2b18597ca358ba773781440ae0ff0070ce98822c5cf91b9e3dbf31c45",
+     "retrieved": "2026-09-27",
+     "text": "official box credits S=1"
+    }
+   ],
+   "why": "Independently re-checked by the Builder (mail 053/054) from the official PDF; matches the Architect's Wisconsin case study."
+  },
+  {
+   "gid": "6628691",
+   "team_id": "46580",
+   "player": "Morgan Van wie",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://uwbadgers.com/documents/download/2026/9/12/Final_UW_3_TAMU_2.PDF",
+     "kind": "school_official_box",
+     "sha256": "205ca8e2b18597ca358ba773781440ae0ff0070ce98822c5cf91b9e3dbf31c45",
+     "retrieved": "2026-09-27",
+     "text": "player not in the official box; surname appears nowhere in the PDF"
+    }
+   ],
+   "why": "Independently re-checked by the Builder (mail 053/054) from the official PDF; matches the Architect's Wisconsin case study."
+  },
+  {
+   "gid": "6628580",
+   "team_id": "46580",
+   "player": "Audrey Flanagan",
+   "gp": "2",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://uwbadgers.com/documents/download/2026/9/13/Final_UT_3_UW_1.PDF",
+     "kind": "school_official_box",
+     "sha256": "457a5811336b7ce50204751f6f01e3c45e8100d000bbedcf6bfbc9228dc5fc99",
+     "retrieved": "2026-09-27",
+     "text": "official box credits S=2"
+    }
+   ],
+   "why": "Independently re-checked by the Builder (mail 053/054) from the official PDF; matches the Architect's Wisconsin case study."
+  },
+  {
+   "gid": "6628580",
+   "team_id": "46580",
+   "player": "Decelise Champion",
+   "gp": "3",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://uwbadgers.com/documents/download/2026/9/13/Final_UT_3_UW_1.PDF",
+     "kind": "school_official_box",
+     "sha256": "457a5811336b7ce50204751f6f01e3c45e8100d000bbedcf6bfbc9228dc5fc99",
+     "retrieved": "2026-09-27",
+     "text": "official box credits S=3"
+    }
+   ],
+   "why": "Independently re-checked by the Builder (mail 053/054) from the official PDF; matches the Architect's Wisconsin case study."
+  },
+  {
+   "gid": "6628580",
+   "team_id": "46580",
+   "player": "Grace Egan",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://uwbadgers.com/documents/download/2026/9/13/Final_UT_3_UW_1.PDF",
+     "kind": "school_official_box",
+     "sha256": "457a5811336b7ce50204751f6f01e3c45e8100d000bbedcf6bfbc9228dc5fc99",
+     "retrieved": "2026-09-27",
+     "text": "player not in the official box; surname appears nowhere in the PDF"
+    }
+   ],
+   "why": "Independently re-checked by the Builder (mail 053/054) from the official PDF; matches the Architect's Wisconsin case study."
+  },
+  {
+   "gid": "6628580",
+   "team_id": "46580",
+   "player": "Halle Thompson",
+   "gp": "3",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://uwbadgers.com/documents/download/2026/9/13/Final_UT_3_UW_1.PDF",
+     "kind": "school_official_box",
+     "sha256": "457a5811336b7ce50204751f6f01e3c45e8100d000bbedcf6bfbc9228dc5fc99",
+     "retrieved": "2026-09-27",
+     "text": "official box credits S=3"
+    }
+   ],
+   "why": "Independently re-checked by the Builder (mail 053/054) from the official PDF; matches the Architect's Wisconsin case study."
+  },
+  {
+   "gid": "6628580",
+   "team_id": "46580",
+   "player": "Jaela Auguste",
+   "gp": "1",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://uwbadgers.com/documents/download/2026/9/13/Final_UT_3_UW_1.PDF",
+     "kind": "school_official_box",
+     "sha256": "457a5811336b7ce50204751f6f01e3c45e8100d000bbedcf6bfbc9228dc5fc99",
+     "retrieved": "2026-09-27",
+     "text": "official box credits S=1"
+    }
+   ],
+   "why": "Independently re-checked by the Builder (mail 053/054) from the official PDF; matches the Architect's Wisconsin case study."
+  },
+  {
+   "gid": "6628580",
+   "team_id": "46580",
+   "player": "Jane Manecke",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://uwbadgers.com/documents/download/2026/9/13/Final_UT_3_UW_1.PDF",
+     "kind": "school_official_box",
+     "sha256": "457a5811336b7ce50204751f6f01e3c45e8100d000bbedcf6bfbc9228dc5fc99",
+     "retrieved": "2026-09-27",
+     "text": "player not in the official box; surname appears nowhere in the PDF"
+    }
+   ],
+   "why": "Independently re-checked by the Builder (mail 053/054) from the official PDF; matches the Architect's Wisconsin case study."
+  },
+  {
+   "gid": "6628580",
+   "team_id": "46580",
+   "player": "Kymora Scott",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://uwbadgers.com/documents/download/2026/9/13/Final_UT_3_UW_1.PDF",
+     "kind": "school_official_box",
+     "sha256": "457a5811336b7ce50204751f6f01e3c45e8100d000bbedcf6bfbc9228dc5fc99",
+     "retrieved": "2026-09-27",
+     "text": "player not in the official box; surname appears nowhere in the PDF"
+    }
+   ],
+   "why": "Independently re-checked by the Builder (mail 053/054) from the official PDF; matches the Architect's Wisconsin case study."
+  },
+  {
+   "gid": "6628580",
+   "team_id": "46580",
+   "player": "Madison Quest",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://uwbadgers.com/documents/download/2026/9/13/Final_UT_3_UW_1.PDF",
+     "kind": "school_official_box",
+     "sha256": "457a5811336b7ce50204751f6f01e3c45e8100d000bbedcf6bfbc9228dc5fc99",
+     "retrieved": "2026-09-27",
+     "text": "player not in the official box; surname appears nowhere in the PDF"
+    }
+   ],
+   "why": "Independently re-checked by the Builder (mail 053/054) from the official PDF; matches the Architect's Wisconsin case study."
+  },
+  {
+   "gid": "6628580",
+   "team_id": "46580",
+   "player": "Morgan Van wie",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://uwbadgers.com/documents/download/2026/9/13/Final_UT_3_UW_1.PDF",
+     "kind": "school_official_box",
+     "sha256": "457a5811336b7ce50204751f6f01e3c45e8100d000bbedcf6bfbc9228dc5fc99",
+     "retrieved": "2026-09-27",
+     "text": "player not in the official box; surname appears nowhere in the PDF"
+    }
+   ],
+   "why": "Independently re-checked by the Builder (mail 053/054) from the official PDF; matches the Architect's Wisconsin case study."
+  },
+  {
+   "gid": "6626357",
+   "team_id": "45986",
+   "player": "Haiti Tautua'a",
+   "gp": "1",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/12/227921.PDF?timestamp=20260912110749",
+     "kind": "school_full_report",
+     "sha256": "9696684d14b821fa19f7fa35e7e7ba6442fd973eeabbbccdd0604a1db6333ee3",
+     "retrieved": "2026-09-27T21:42:14Z",
+     "text": "official box S=1; appears in set tables set2"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626357",
+   "team_id": "45986",
+   "player": "Abbey Emch",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/12/227921.PDF?timestamp=20260912110749",
+     "kind": "school_full_report",
+     "sha256": "9696684d14b821fa19f7fa35e7e7ba6442fd973eeabbbccdd0604a1db6333ee3",
+     "retrieved": "2026-09-27T21:42:14Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626357",
+   "team_id": "45986",
+   "player": "Ayanna Watson",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/12/227921.PDF?timestamp=20260912110749",
+     "kind": "school_full_report",
+     "sha256": "9696684d14b821fa19f7fa35e7e7ba6442fd973eeabbbccdd0604a1db6333ee3",
+     "retrieved": "2026-09-27T21:42:14Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626357",
+   "team_id": "45986",
+   "player": "Lola Sageer",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/12/227921.PDF?timestamp=20260912110749",
+     "kind": "school_full_report",
+     "sha256": "9696684d14b821fa19f7fa35e7e7ba6442fd973eeabbbccdd0604a1db6333ee3",
+     "retrieved": "2026-09-27T21:42:14Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626357",
+   "team_id": "45986",
+   "player": "Jessica Smallwood",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/12/227921.PDF?timestamp=20260912110749",
+     "kind": "school_full_report",
+     "sha256": "9696684d14b821fa19f7fa35e7e7ba6442fd973eeabbbccdd0604a1db6333ee3",
+     "retrieved": "2026-09-27T21:42:14Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626357",
+   "team_id": "45986",
+   "player": "Marina Pezelj",
+   "gp": "2",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/12/227921.PDF?timestamp=20260912110749",
+     "kind": "school_full_report",
+     "sha256": "9696684d14b821fa19f7fa35e7e7ba6442fd973eeabbbccdd0604a1db6333ee3",
+     "retrieved": "2026-09-27T21:42:14Z",
+     "text": "official box S=2; appears in set tables set2,set3"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626357",
+   "team_id": "46635",
+   "player": "Eliana Whittaker",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/12/227921.PDF?timestamp=20260912110749",
+     "kind": "school_full_report",
+     "sha256": "9696684d14b821fa19f7fa35e7e7ba6442fd973eeabbbccdd0604a1db6333ee3",
+     "retrieved": "2026-09-27T21:42:14Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626357",
+   "team_id": "46635",
+   "player": "Morgan Duse-anthony",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/12/227921.PDF?timestamp=20260912110749",
+     "kind": "school_full_report",
+     "sha256": "9696684d14b821fa19f7fa35e7e7ba6442fd973eeabbbccdd0604a1db6333ee3",
+     "retrieved": "2026-09-27T21:42:14Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626357",
+   "team_id": "46635",
+   "player": "Alden Schwartz",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/12/227921.PDF?timestamp=20260912110749",
+     "kind": "school_full_report",
+     "sha256": "9696684d14b821fa19f7fa35e7e7ba6442fd973eeabbbccdd0604a1db6333ee3",
+     "retrieved": "2026-09-27T21:42:14Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626357",
+   "team_id": "46635",
+   "player": "Talia Lardner",
+   "gp": "1",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/12/227921.PDF?timestamp=20260912110749",
+     "kind": "school_full_report",
+     "sha256": "9696684d14b821fa19f7fa35e7e7ba6442fd973eeabbbccdd0604a1db6333ee3",
+     "retrieved": "2026-09-27T21:42:14Z",
+     "text": "official box S=1; appears in set tables set1"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626357",
+   "team_id": "46635",
+   "player": "Jasmine Oduro",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/12/227921.PDF?timestamp=20260912110749",
+     "kind": "school_full_report",
+     "sha256": "9696684d14b821fa19f7fa35e7e7ba6442fd973eeabbbccdd0604a1db6333ee3",
+     "retrieved": "2026-09-27T21:42:14Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626357",
+   "team_id": "46635",
+   "player": "Ryley Boyne",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/12/227921.PDF?timestamp=20260912110749",
+     "kind": "school_full_report",
+     "sha256": "9696684d14b821fa19f7fa35e7e7ba6442fd973eeabbbccdd0604a1db6333ee3",
+     "retrieved": "2026-09-27T21:42:14Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626357",
+   "team_id": "46635",
+   "player": "Kinnady Boothe",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/12/227921.PDF?timestamp=20260912110749",
+     "kind": "school_full_report",
+     "sha256": "9696684d14b821fa19f7fa35e7e7ba6442fd973eeabbbccdd0604a1db6333ee3",
+     "retrieved": "2026-09-27T21:42:14Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6628326",
+   "team_id": "45986",
+   "player": "Sophia Gregoire",
+   "gp": "1",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/13/233176.PDF?timestamp=20260913080112",
+     "kind": "school_full_report",
+     "sha256": "8c108a75d3a63e530df8c45730388c062679f145a256b3aec6f652afbfd8855d",
+     "retrieved": "2026-09-27T21:44:02Z",
+     "text": "official box S=1; appears in set tables set3"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6628326",
+   "team_id": "45986",
+   "player": "Jordyn Dailey",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/13/233176.PDF?timestamp=20260913080112",
+     "kind": "school_full_report",
+     "sha256": "8c108a75d3a63e530df8c45730388c062679f145a256b3aec6f652afbfd8855d",
+     "retrieved": "2026-09-27T21:44:02Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6628326",
+   "team_id": "45986",
+   "player": "Lola Sageer",
+   "gp": "2",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/13/233176.PDF?timestamp=20260913080112",
+     "kind": "school_full_report",
+     "sha256": "8c108a75d3a63e530df8c45730388c062679f145a256b3aec6f652afbfd8855d",
+     "retrieved": "2026-09-27T21:44:02Z",
+     "text": "official box S=2; appears in set tables set1,set2"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6628326",
+   "team_id": "45986",
+   "player": "Jessica Smallwood",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/13/233176.PDF?timestamp=20260913080112",
+     "kind": "school_full_report",
+     "sha256": "8c108a75d3a63e530df8c45730388c062679f145a256b3aec6f652afbfd8855d",
+     "retrieved": "2026-09-27T21:44:02Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6628326",
+   "team_id": "45986",
+   "player": "Marina Pezelj",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/13/233176.PDF?timestamp=20260913080112",
+     "kind": "school_full_report",
+     "sha256": "8c108a75d3a63e530df8c45730388c062679f145a256b3aec6f652afbfd8855d",
+     "retrieved": "2026-09-27T21:44:02Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6628326",
+   "team_id": "45818",
+   "player": "Alisandra Hayes",
+   "gp": "1",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/13/233176.PDF?timestamp=20260913080112",
+     "kind": "school_full_report",
+     "sha256": "8c108a75d3a63e530df8c45730388c062679f145a256b3aec6f652afbfd8855d",
+     "retrieved": "2026-09-27T21:44:02Z",
+     "text": "official box S=1; appears in set tables set2"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6628326",
+   "team_id": "45818",
+   "player": "Abigail Knight",
+   "gp": "2",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/13/233176.PDF?timestamp=20260913080112",
+     "kind": "school_full_report",
+     "sha256": "8c108a75d3a63e530df8c45730388c062679f145a256b3aec6f652afbfd8855d",
+     "retrieved": "2026-09-27T21:44:02Z",
+     "text": "official box S=2; appears in set tables set1,set3"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6628326",
+   "team_id": "45818",
+   "player": "Larsen Terrill",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/13/233176.PDF?timestamp=20260913080112",
+     "kind": "school_full_report",
+     "sha256": "8c108a75d3a63e530df8c45730388c062679f145a256b3aec6f652afbfd8855d",
+     "retrieved": "2026-09-27T21:44:02Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6628326",
+   "team_id": "45818",
+   "player": "Olivia Schmidt",
+   "gp": "1",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/13/233176.PDF?timestamp=20260913080112",
+     "kind": "school_full_report",
+     "sha256": "8c108a75d3a63e530df8c45730388c062679f145a256b3aec6f652afbfd8855d",
+     "retrieved": "2026-09-27T21:44:02Z",
+     "text": "official box S=1; appears in set tables set2"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6628326",
+   "team_id": "45818",
+   "player": "Haidyn Sokoloski",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/13/233176.PDF?timestamp=20260913080112",
+     "kind": "school_full_report",
+     "sha256": "8c108a75d3a63e530df8c45730388c062679f145a256b3aec6f652afbfd8855d",
+     "retrieved": "2026-09-27T21:44:02Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6628326",
+   "team_id": "45818",
+   "player": "Ella Gaona",
+   "gp": "2",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/13/233176.PDF?timestamp=20260913080112",
+     "kind": "school_full_report",
+     "sha256": "8c108a75d3a63e530df8c45730388c062679f145a256b3aec6f652afbfd8855d",
+     "retrieved": "2026-09-27T21:44:02Z",
+     "text": "official box S=2; appears in set tables set1,set3"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6628326",
+   "team_id": "45818",
+   "player": "Khalia Lawrence",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/13/233176.PDF?timestamp=20260913080112",
+     "kind": "school_full_report",
+     "sha256": "8c108a75d3a63e530df8c45730388c062679f145a256b3aec6f652afbfd8855d",
+     "retrieved": "2026-09-27T21:44:02Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6628326",
+   "team_id": "45818",
+   "player": "Sophia Loomis",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/13/233176.PDF?timestamp=20260913080112",
+     "kind": "school_full_report",
+     "sha256": "8c108a75d3a63e530df8c45730388c062679f145a256b3aec6f652afbfd8855d",
+     "retrieved": "2026-09-27T21:44:02Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6628326",
+   "team_id": "45818",
+   "player": "Ella Seeger",
+   "gp": "2",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/pittsburghpanthers.com/documents/2026/9/13/233176.PDF?timestamp=20260913080112",
+     "kind": "school_full_report",
+     "sha256": "8c108a75d3a63e530df8c45730388c062679f145a256b3aec6f652afbfd8855d",
+     "retrieved": "2026-09-27T21:44:02Z",
+     "text": "official box S=2; appears in set tables set2,set3"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6628580",
+   "team_id": "46755",
+   "player": "Camille Presley",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/texassports_com/documents/2026/9/13/VB_2026_09_13_Wisconsin_Box_Score.PDF?timestamp=20260913103919",
+     "kind": "school_full_report",
+     "sha256": "a509e871896baa70dab3da234eb55f8184f44f3587aa32b81f94726d4c91d530",
+     "retrieved": "2026-09-27T21:44:42Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6628580",
+   "team_id": "46755",
+   "player": "Addy Gaido",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/texassports_com/documents/2026/9/13/VB_2026_09_13_Wisconsin_Box_Score.PDF?timestamp=20260913103919",
+     "kind": "school_full_report",
+     "sha256": "a509e871896baa70dab3da234eb55f8184f44f3587aa32b81f94726d4c91d530",
+     "retrieved": "2026-09-27T21:44:42Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6628580",
+   "team_id": "46755",
+   "player": "Callie Krueger",
+   "gp": "3",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/texassports_com/documents/2026/9/13/VB_2026_09_13_Wisconsin_Box_Score.PDF?timestamp=20260913103919",
+     "kind": "school_full_report",
+     "sha256": "a509e871896baa70dab3da234eb55f8184f44f3587aa32b81f94726d4c91d530",
+     "retrieved": "2026-09-27T21:44:42Z",
+     "text": "official box S=3; appears in set tables set1,set2,set3"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6628580",
+   "team_id": "46755",
+   "player": "Genevieve Harris",
+   "gp": "1",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/texassports_com/documents/2026/9/13/VB_2026_09_13_Wisconsin_Box_Score.PDF?timestamp=20260913103919",
+     "kind": "school_full_report",
+     "sha256": "a509e871896baa70dab3da234eb55f8184f44f3587aa32b81f94726d4c91d530",
+     "retrieved": "2026-09-27T21:44:42Z",
+     "text": "official box S=1; appears in set tables set4"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6628580",
+   "team_id": "46755",
+   "player": "Emma Cugino",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/texassports_com/documents/2026/9/13/VB_2026_09_13_Wisconsin_Box_Score.PDF?timestamp=20260913103919",
+     "kind": "school_full_report",
+     "sha256": "a509e871896baa70dab3da234eb55f8184f44f3587aa32b81f94726d4c91d530",
+     "retrieved": "2026-09-27T21:44:42Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6628580",
+   "team_id": "46755",
+   "player": "Mackenzie Collins",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/texassports_com/documents/2026/9/13/VB_2026_09_13_Wisconsin_Box_Score.PDF?timestamp=20260913103919",
+     "kind": "school_full_report",
+     "sha256": "a509e871896baa70dab3da234eb55f8184f44f3587aa32b81f94726d4c91d530",
+     "retrieved": "2026-09-27T21:44:42Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627271",
+   "team_id": "45941",
+   "player": "Ella Lewis",
+   "gp": "4",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/thesundevils-com-prod/2026/09/19/56JBxaByufl195DsMR23bmK8ROv2uqOBkhy2x059.pdf",
+     "kind": "school_full_report",
+     "sha256": "2dac6d5b612330022d693b02942ff1407df9f65a705247ba313c595deefcbb1a",
+     "retrieved": "2026-09-27T22:08:53Z",
+     "text": "official box S=4; appears in set tables set2,set3,set4,set5"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626814",
+   "team_id": "45920",
+   "player": "Bellamie Beus",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/95054678-ma10-ul.pdf",
+     "kind": "school_full_report",
+     "sha256": "2d088da12af98a4c2a8f7ec0ea7f94eb93122812589294d4b47b582111b4055c",
+     "retrieved": "2026-09-27T21:50:14Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626814",
+   "team_id": "45920",
+   "player": "Gracison Saylors",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/95054678-ma10-ul.pdf",
+     "kind": "school_full_report",
+     "sha256": "2d088da12af98a4c2a8f7ec0ea7f94eb93122812589294d4b47b582111b4055c",
+     "retrieved": "2026-09-27T21:50:14Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626814",
+   "team_id": "45920",
+   "player": "Caroline Prihoda",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/95054678-ma10-ul.pdf",
+     "kind": "school_full_report",
+     "sha256": "2d088da12af98a4c2a8f7ec0ea7f94eb93122812589294d4b47b582111b4055c",
+     "retrieved": "2026-09-27T21:50:14Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626814",
+   "team_id": "45920",
+   "player": "Sidney Burley",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/95054678-ma10-ul.pdf",
+     "kind": "school_full_report",
+     "sha256": "2d088da12af98a4c2a8f7ec0ea7f94eb93122812589294d4b47b582111b4055c",
+     "retrieved": "2026-09-27T21:50:14Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626814",
+   "team_id": "45920",
+   "player": "Georgia Watson",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/95054678-ma10-ul.pdf",
+     "kind": "school_full_report",
+     "sha256": "2d088da12af98a4c2a8f7ec0ea7f94eb93122812589294d4b47b582111b4055c",
+     "retrieved": "2026-09-27T21:50:14Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626814",
+   "team_id": "45920",
+   "player": "Molly Berezowitz",
+   "gp": "3",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/95054678-ma10-ul.pdf",
+     "kind": "school_full_report",
+     "sha256": "2d088da12af98a4c2a8f7ec0ea7f94eb93122812589294d4b47b582111b4055c",
+     "retrieved": "2026-09-27T21:50:14Z",
+     "text": "official box S=3; appears in set tables set2,set3,set4"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626814",
+   "team_id": "45920",
+   "player": "Bryah Breaux",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/95054678-ma10-ul.pdf",
+     "kind": "school_full_report",
+     "sha256": "2d088da12af98a4c2a8f7ec0ea7f94eb93122812589294d4b47b582111b4055c",
+     "retrieved": "2026-09-27T21:50:14Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626814",
+   "team_id": "45920",
+   "player": "Hannah Benjamin",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/95054678-ma10-ul.pdf",
+     "kind": "school_full_report",
+     "sha256": "2d088da12af98a4c2a8f7ec0ea7f94eb93122812589294d4b47b582111b4055c",
+     "retrieved": "2026-09-27T21:50:14Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626814",
+   "team_id": "46061",
+   "player": "Hannah Sherman",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/95054678-ma10-ul.pdf",
+     "kind": "school_full_report",
+     "sha256": "2d088da12af98a4c2a8f7ec0ea7f94eb93122812589294d4b47b582111b4055c",
+     "retrieved": "2026-09-27T21:50:14Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626814",
+   "team_id": "46061",
+   "player": "Jessica Drapp",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/95054678-ma10-ul.pdf",
+     "kind": "school_full_report",
+     "sha256": "2d088da12af98a4c2a8f7ec0ea7f94eb93122812589294d4b47b582111b4055c",
+     "retrieved": "2026-09-27T21:50:14Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626814",
+   "team_id": "46061",
+   "player": "Elsi Karjanlahti",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/95054678-ma10-ul.pdf",
+     "kind": "school_full_report",
+     "sha256": "2d088da12af98a4c2a8f7ec0ea7f94eb93122812589294d4b47b582111b4055c",
+     "retrieved": "2026-09-27T21:50:14Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626814",
+   "team_id": "46061",
+   "player": "Elli Strecker",
+   "gp": "1",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/95054678-ma10-ul.pdf",
+     "kind": "school_full_report",
+     "sha256": "2d088da12af98a4c2a8f7ec0ea7f94eb93122812589294d4b47b582111b4055c",
+     "retrieved": "2026-09-27T21:50:14Z",
+     "text": "official box S=1; appears in set tables set3"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626814",
+   "team_id": "46061",
+   "player": "Molly Urban",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/95054678-ma10-ul.pdf",
+     "kind": "school_full_report",
+     "sha256": "2d088da12af98a4c2a8f7ec0ea7f94eb93122812589294d4b47b582111b4055c",
+     "retrieved": "2026-09-27T21:50:14Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626814",
+   "team_id": "46061",
+   "player": "Jordyn Gray",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/95054678-ma10-ul.pdf",
+     "kind": "school_full_report",
+     "sha256": "2d088da12af98a4c2a8f7ec0ea7f94eb93122812589294d4b47b582111b4055c",
+     "retrieved": "2026-09-27T21:50:14Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626814",
+   "team_id": "46061",
+   "player": "Amirra Bailey",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/95054678-ma10-ul.pdf",
+     "kind": "school_full_report",
+     "sha256": "2d088da12af98a4c2a8f7ec0ea7f94eb93122812589294d4b47b582111b4055c",
+     "retrieved": "2026-09-27T21:50:14Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6625211",
+   "team_id": "46755",
+   "player": "Callie Krueger",
+   "gp": "3",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/texassports_com/documents/2026/9/26/VB_2026_09_25_Tennessee_Box_Score.PDF?timestamp=20260926021408",
+     "kind": "school_full_report",
+     "sha256": "125a2d9f5bc46f32e5caf7d8127c90b01915ea6a2fc1dc1a62756b9931ab3882",
+     "retrieved": "2026-09-27T22:01:16Z",
+     "text": "official box S=3; appears in set tables set3,set4,set5"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6625211",
+   "team_id": "46755",
+   "player": "Anja Kujundzic",
+   "gp": "2",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/texassports_com/documents/2026/9/26/VB_2026_09_25_Tennessee_Box_Score.PDF?timestamp=20260926021408",
+     "kind": "school_full_report",
+     "sha256": "125a2d9f5bc46f32e5caf7d8127c90b01915ea6a2fc1dc1a62756b9931ab3882",
+     "retrieved": "2026-09-27T22:01:16Z",
+     "text": "official box S=2; appears in set tables set1,set2"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627027",
+   "team_id": "46216",
+   "player": "Milly Wolf",
+   "gp": "1",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/bceagles.com/documents/2026/9/27/229690.PDF?timestamp=20260927073343",
+     "kind": "school_full_report",
+     "sha256": "dcf3ad2374f144a259ee45d62686dd2c3bca1ff5d5ba96dacc19bf71603b5407",
+     "retrieved": "2026-09-27T22:02:51Z",
+     "text": "official box S=1; appears in set tables set3"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627027",
+   "team_id": "46216",
+   "player": "Savannah Curtis",
+   "gp": "1",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/bceagles.com/documents/2026/9/27/229690.PDF?timestamp=20260927073343",
+     "kind": "school_full_report",
+     "sha256": "dcf3ad2374f144a259ee45d62686dd2c3bca1ff5d5ba96dacc19bf71603b5407",
+     "retrieved": "2026-09-27T22:02:51Z",
+     "text": "official box S=1; appears in set tables set3"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627027",
+   "team_id": "46216",
+   "player": "Chloe Allcroft",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/bceagles.com/documents/2026/9/27/229690.PDF?timestamp=20260927073343",
+     "kind": "school_full_report",
+     "sha256": "dcf3ad2374f144a259ee45d62686dd2c3bca1ff5d5ba96dacc19bf71603b5407",
+     "retrieved": "2026-09-27T22:02:51Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627027",
+   "team_id": "46216",
+   "player": "Laney Blevins",
+   "gp": "1",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/bceagles.com/documents/2026/9/27/229690.PDF?timestamp=20260927073343",
+     "kind": "school_full_report",
+     "sha256": "dcf3ad2374f144a259ee45d62686dd2c3bca1ff5d5ba96dacc19bf71603b5407",
+     "retrieved": "2026-09-27T22:02:51Z",
+     "text": "official box S=1; appears in set tables set1"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627027",
+   "team_id": "46216",
+   "player": "Lucy Mott",
+   "gp": "1",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/bceagles.com/documents/2026/9/27/229690.PDF?timestamp=20260927073343",
+     "kind": "school_full_report",
+     "sha256": "dcf3ad2374f144a259ee45d62686dd2c3bca1ff5d5ba96dacc19bf71603b5407",
+     "retrieved": "2026-09-27T22:02:51Z",
+     "text": "official box S=1; appears in set tables set2"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627027",
+   "team_id": "46216",
+   "player": "Ava Castro",
+   "gp": "2",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/bceagles.com/documents/2026/9/27/229690.PDF?timestamp=20260927073343",
+     "kind": "school_full_report",
+     "sha256": "dcf3ad2374f144a259ee45d62686dd2c3bca1ff5d5ba96dacc19bf71603b5407",
+     "retrieved": "2026-09-27T22:02:51Z",
+     "text": "official box S=2; appears in set tables set2,set3"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627027",
+   "team_id": "46216",
+   "player": "Ali Natt",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/bceagles.com/documents/2026/9/27/229690.PDF?timestamp=20260927073343",
+     "kind": "school_full_report",
+     "sha256": "dcf3ad2374f144a259ee45d62686dd2c3bca1ff5d5ba96dacc19bf71603b5407",
+     "retrieved": "2026-09-27T22:02:51Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627027",
+   "team_id": "46216",
+   "player": "Mia Gold",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/bceagles.com/documents/2026/9/27/229690.PDF?timestamp=20260927073343",
+     "kind": "school_full_report",
+     "sha256": "dcf3ad2374f144a259ee45d62686dd2c3bca1ff5d5ba96dacc19bf71603b5407",
+     "retrieved": "2026-09-27T22:02:51Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627027",
+   "team_id": "46061",
+   "player": "Hannah Sherman",
+   "gp": "1",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/bceagles.com/documents/2026/9/27/229690.PDF?timestamp=20260927073343",
+     "kind": "school_full_report",
+     "sha256": "dcf3ad2374f144a259ee45d62686dd2c3bca1ff5d5ba96dacc19bf71603b5407",
+     "retrieved": "2026-09-27T22:02:51Z",
+     "text": "official box S=1; appears in set tables set3"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627027",
+   "team_id": "46061",
+   "player": "Jessica Drapp",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/bceagles.com/documents/2026/9/27/229690.PDF?timestamp=20260927073343",
+     "kind": "school_full_report",
+     "sha256": "dcf3ad2374f144a259ee45d62686dd2c3bca1ff5d5ba96dacc19bf71603b5407",
+     "retrieved": "2026-09-27T22:02:51Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627027",
+   "team_id": "46061",
+   "player": "Elsi Karjanlahti",
+   "gp": "1",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/bceagles.com/documents/2026/9/27/229690.PDF?timestamp=20260927073343",
+     "kind": "school_full_report",
+     "sha256": "dcf3ad2374f144a259ee45d62686dd2c3bca1ff5d5ba96dacc19bf71603b5407",
+     "retrieved": "2026-09-27T22:02:51Z",
+     "text": "official box S=1; appears in set tables set3"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627027",
+   "team_id": "46061",
+   "player": "Elli Strecker",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/bceagles.com/documents/2026/9/27/229690.PDF?timestamp=20260927073343",
+     "kind": "school_full_report",
+     "sha256": "dcf3ad2374f144a259ee45d62686dd2c3bca1ff5d5ba96dacc19bf71603b5407",
+     "retrieved": "2026-09-27T22:02:51Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627027",
+   "team_id": "46061",
+   "player": "Molly Urban",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/bceagles.com/documents/2026/9/27/229690.PDF?timestamp=20260927073343",
+     "kind": "school_full_report",
+     "sha256": "dcf3ad2374f144a259ee45d62686dd2c3bca1ff5d5ba96dacc19bf71603b5407",
+     "retrieved": "2026-09-27T22:02:51Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627027",
+   "team_id": "46061",
+   "player": "Brooke Bultema",
+   "gp": "2",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/bceagles.com/documents/2026/9/27/229690.PDF?timestamp=20260927073343",
+     "kind": "school_full_report",
+     "sha256": "dcf3ad2374f144a259ee45d62686dd2c3bca1ff5d5ba96dacc19bf71603b5407",
+     "retrieved": "2026-09-27T22:02:51Z",
+     "text": "official box S=2; appears in set tables set1,set2"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627027",
+   "team_id": "46061",
+   "player": "Jordyn Gray",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/bceagles.com/documents/2026/9/27/229690.PDF?timestamp=20260927073343",
+     "kind": "school_full_report",
+     "sha256": "dcf3ad2374f144a259ee45d62686dd2c3bca1ff5d5ba96dacc19bf71603b5407",
+     "retrieved": "2026-09-27T22:02:51Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627027",
+   "team_id": "46061",
+   "player": "Amirra Bailey",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/bceagles.com/documents/2026/9/27/229690.PDF?timestamp=20260927073343",
+     "kind": "school_full_report",
+     "sha256": "dcf3ad2374f144a259ee45d62686dd2c3bca1ff5d5ba96dacc19bf71603b5407",
+     "retrieved": "2026-09-27T22:02:51Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626818",
+   "team_id": "45920",
+   "player": "Bellamie Beus",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/4659a95a-gm12-tex.pdf",
+     "kind": "school_full_report",
+     "sha256": "9fa23e97bddc0534c8a6a7746217cbb02d61538049654a248c5d6467f7c95e19",
+     "retrieved": "2026-09-27T22:03:30Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626818",
+   "team_id": "45920",
+   "player": "Gracison Saylors",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/4659a95a-gm12-tex.pdf",
+     "kind": "school_full_report",
+     "sha256": "9fa23e97bddc0534c8a6a7746217cbb02d61538049654a248c5d6467f7c95e19",
+     "retrieved": "2026-09-27T22:03:30Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626818",
+   "team_id": "45920",
+   "player": "Caroline Prihoda",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/4659a95a-gm12-tex.pdf",
+     "kind": "school_full_report",
+     "sha256": "9fa23e97bddc0534c8a6a7746217cbb02d61538049654a248c5d6467f7c95e19",
+     "retrieved": "2026-09-27T22:03:30Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626818",
+   "team_id": "45920",
+   "player": "Sidney Burley",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/4659a95a-gm12-tex.pdf",
+     "kind": "school_full_report",
+     "sha256": "9fa23e97bddc0534c8a6a7746217cbb02d61538049654a248c5d6467f7c95e19",
+     "retrieved": "2026-09-27T22:03:30Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626818",
+   "team_id": "45920",
+   "player": "Molly Berezowitz",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/4659a95a-gm12-tex.pdf",
+     "kind": "school_full_report",
+     "sha256": "9fa23e97bddc0534c8a6a7746217cbb02d61538049654a248c5d6467f7c95e19",
+     "retrieved": "2026-09-27T22:03:30Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626818",
+   "team_id": "45920",
+   "player": "Bryah Breaux",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/4659a95a-gm12-tex.pdf",
+     "kind": "school_full_report",
+     "sha256": "9fa23e97bddc0534c8a6a7746217cbb02d61538049654a248c5d6467f7c95e19",
+     "retrieved": "2026-09-27T22:03:30Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626818",
+   "team_id": "45920",
+   "player": "Hannah Benjamin",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/4659a95a-gm12-tex.pdf",
+     "kind": "school_full_report",
+     "sha256": "9fa23e97bddc0534c8a6a7746217cbb02d61538049654a248c5d6467f7c95e19",
+     "retrieved": "2026-09-27T22:03:30Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626818",
+   "team_id": "45920",
+   "player": "Morgan Gaerte",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/4659a95a-gm12-tex.pdf",
+     "kind": "school_full_report",
+     "sha256": "9fa23e97bddc0534c8a6a7746217cbb02d61538049654a248c5d6467f7c95e19",
+     "retrieved": "2026-09-27T22:03:30Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626818",
+   "team_id": "46755",
+   "player": "Camille Presley",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/4659a95a-gm12-tex.pdf",
+     "kind": "school_full_report",
+     "sha256": "9fa23e97bddc0534c8a6a7746217cbb02d61538049654a248c5d6467f7c95e19",
+     "retrieved": "2026-09-27T22:03:30Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626818",
+   "team_id": "46755",
+   "player": "Ella Swindle",
+   "gp": "1",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/4659a95a-gm12-tex.pdf",
+     "kind": "school_full_report",
+     "sha256": "9fa23e97bddc0534c8a6a7746217cbb02d61538049654a248c5d6467f7c95e19",
+     "retrieved": "2026-09-27T22:03:30Z",
+     "text": "official box S=1; appears in set tables set1"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626818",
+   "team_id": "46755",
+   "player": "Addy Gaido",
+   "gp": "1",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/4659a95a-gm12-tex.pdf",
+     "kind": "school_full_report",
+     "sha256": "9fa23e97bddc0534c8a6a7746217cbb02d61538049654a248c5d6467f7c95e19",
+     "retrieved": "2026-09-27T22:03:30Z",
+     "text": "official box S=1; appears in set tables set3"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626818",
+   "team_id": "46755",
+   "player": "Callie Krueger",
+   "gp": "1",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/4659a95a-gm12-tex.pdf",
+     "kind": "school_full_report",
+     "sha256": "9fa23e97bddc0534c8a6a7746217cbb02d61538049654a248c5d6467f7c95e19",
+     "retrieved": "2026-09-27T22:03:30Z",
+     "text": "official box S=1; appears in set tables set3"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626818",
+   "team_id": "46755",
+   "player": "Genevieve Harris",
+   "gp": "1",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/4659a95a-gm12-tex.pdf",
+     "kind": "school_full_report",
+     "sha256": "9fa23e97bddc0534c8a6a7746217cbb02d61538049654a248c5d6467f7c95e19",
+     "retrieved": "2026-09-27T22:03:30Z",
+     "text": "official box S=1; appears in set tables set2"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626818",
+   "team_id": "46755",
+   "player": "Mackenzie Collins",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/4659a95a-gm12-tex.pdf",
+     "kind": "school_full_report",
+     "sha256": "9fa23e97bddc0534c8a6a7746217cbb02d61538049654a248c5d6467f7c95e19",
+     "retrieved": "2026-09-27T22:03:30Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6626818",
+   "team_id": "46755",
+   "player": "Abby Vander wal",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/ukathletics-com/2026/09/4659a95a-gm12-tex.pdf",
+     "kind": "school_full_report",
+     "sha256": "9fa23e97bddc0534c8a6a7746217cbb02d61538049654a248c5d6467f7c95e19",
+     "retrieved": "2026-09-27T22:03:30Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627527",
+   "team_id": "46539",
+   "player": "Andi Spies",
+   "gp": "2",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/thesundevils-com-prod/2026/09/27/MTWiSoiFTLs6EXZXeFzArSj3WCX6tMry0kTRt2IR.pdf",
+     "kind": "school_full_report",
+     "sha256": "7604c733ac526ad0cdfdbc8c7df8059c6f37c3a391bf2f0125bfafadff3717b6",
+     "retrieved": "2026-09-27T22:13:57Z",
+     "text": "official box S=2; appears in set tables set3,set4"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627527",
+   "team_id": "46539",
+   "player": "Ava Ledebuhr",
+   "gp": "2",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/thesundevils-com-prod/2026/09/27/MTWiSoiFTLs6EXZXeFzArSj3WCX6tMry0kTRt2IR.pdf",
+     "kind": "school_full_report",
+     "sha256": "7604c733ac526ad0cdfdbc8c7df8059c6f37c3a391bf2f0125bfafadff3717b6",
+     "retrieved": "2026-09-27T22:13:57Z",
+     "text": "official box S=2; appears in set tables set1,set2"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627527",
+   "team_id": "46539",
+   "player": "Kayla Hostetler",
+   "gp": "2",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/thesundevils-com-prod/2026/09/27/MTWiSoiFTLs6EXZXeFzArSj3WCX6tMry0kTRt2IR.pdf",
+     "kind": "school_full_report",
+     "sha256": "7604c733ac526ad0cdfdbc8c7df8059c6f37c3a391bf2f0125bfafadff3717b6",
+     "retrieved": "2026-09-27T22:13:57Z",
+     "text": "official box S=2; appears in set tables set1,set2"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627527",
+   "team_id": "46539",
+   "player": "Lilian Entenmann",
+   "gp": "2",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/thesundevils-com-prod/2026/09/27/MTWiSoiFTLs6EXZXeFzArSj3WCX6tMry0kTRt2IR.pdf",
+     "kind": "school_full_report",
+     "sha256": "7604c733ac526ad0cdfdbc8c7df8059c6f37c3a391bf2f0125bfafadff3717b6",
+     "retrieved": "2026-09-27T22:13:57Z",
+     "text": "official box S=2; appears in set tables set3,set4"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627527",
+   "team_id": "46539",
+   "player": "Julia Horan",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/thesundevils-com-prod/2026/09/27/MTWiSoiFTLs6EXZXeFzArSj3WCX6tMry0kTRt2IR.pdf",
+     "kind": "school_full_report",
+     "sha256": "7604c733ac526ad0cdfdbc8c7df8059c6f37c3a391bf2f0125bfafadff3717b6",
+     "retrieved": "2026-09-27T22:13:57Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627527",
+   "team_id": "46539",
+   "player": "Kayla Edginton",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/thesundevils-com-prod/2026/09/27/MTWiSoiFTLs6EXZXeFzArSj3WCX6tMry0kTRt2IR.pdf",
+     "kind": "school_full_report",
+     "sha256": "7604c733ac526ad0cdfdbc8c7df8059c6f37c3a391bf2f0125bfafadff3717b6",
+     "retrieved": "2026-09-27T22:13:57Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627527",
+   "team_id": "46539",
+   "player": "Tatjana Simeunovic",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/thesundevils-com-prod/2026/09/27/MTWiSoiFTLs6EXZXeFzArSj3WCX6tMry0kTRt2IR.pdf",
+     "kind": "school_full_report",
+     "sha256": "7604c733ac526ad0cdfdbc8c7df8059c6f37c3a391bf2f0125bfafadff3717b6",
+     "retrieved": "2026-09-27T22:13:57Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627527",
+   "team_id": "46539",
+   "player": "Izzy Busignani",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/thesundevils-com-prod/2026/09/27/MTWiSoiFTLs6EXZXeFzArSj3WCX6tMry0kTRt2IR.pdf",
+     "kind": "school_full_report",
+     "sha256": "7604c733ac526ad0cdfdbc8c7df8059c6f37c3a391bf2f0125bfafadff3717b6",
+     "retrieved": "2026-09-27T22:13:57Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627527",
+   "team_id": "46539",
+   "player": "Elliott Mickelberry",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/thesundevils-com-prod/2026/09/27/MTWiSoiFTLs6EXZXeFzArSj3WCX6tMry0kTRt2IR.pdf",
+     "kind": "school_full_report",
+     "sha256": "7604c733ac526ad0cdfdbc8c7df8059c6f37c3a391bf2f0125bfafadff3717b6",
+     "retrieved": "2026-09-27T22:13:57Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627527",
+   "team_id": "45941",
+   "player": "Aurora Papac",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/thesundevils-com-prod/2026/09/27/MTWiSoiFTLs6EXZXeFzArSj3WCX6tMry0kTRt2IR.pdf",
+     "kind": "school_full_report",
+     "sha256": "7604c733ac526ad0cdfdbc8c7df8059c6f37c3a391bf2f0125bfafadff3717b6",
+     "retrieved": "2026-09-27T22:13:57Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627527",
+   "team_id": "45941",
+   "player": "Jillian Neal",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/thesundevils-com-prod/2026/09/27/MTWiSoiFTLs6EXZXeFzArSj3WCX6tMry0kTRt2IR.pdf",
+     "kind": "school_full_report",
+     "sha256": "7604c733ac526ad0cdfdbc8c7df8059c6f37c3a391bf2f0125bfafadff3717b6",
+     "retrieved": "2026-09-27T22:13:57Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627527",
+   "team_id": "45941",
+   "player": "Piper Rama",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/thesundevils-com-prod/2026/09/27/MTWiSoiFTLs6EXZXeFzArSj3WCX6tMry0kTRt2IR.pdf",
+     "kind": "school_full_report",
+     "sha256": "7604c733ac526ad0cdfdbc8c7df8059c6f37c3a391bf2f0125bfafadff3717b6",
+     "retrieved": "2026-09-27T22:13:57Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627527",
+   "team_id": "45941",
+   "player": "Ella Hope",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/thesundevils-com-prod/2026/09/27/MTWiSoiFTLs6EXZXeFzArSj3WCX6tMry0kTRt2IR.pdf",
+     "kind": "school_full_report",
+     "sha256": "7604c733ac526ad0cdfdbc8c7df8059c6f37c3a391bf2f0125bfafadff3717b6",
+     "retrieved": "2026-09-27T22:13:57Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627527",
+   "team_id": "45941",
+   "player": "Ziva Labinjan",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/thesundevils-com-prod/2026/09/27/MTWiSoiFTLs6EXZXeFzArSj3WCX6tMry0kTRt2IR.pdf",
+     "kind": "school_full_report",
+     "sha256": "7604c733ac526ad0cdfdbc8c7df8059c6f37c3a391bf2f0125bfafadff3717b6",
+     "retrieved": "2026-09-27T22:13:57Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627527",
+   "team_id": "45941",
+   "player": "Ella Lewis",
+   "gp": "3",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/thesundevils-com-prod/2026/09/27/MTWiSoiFTLs6EXZXeFzArSj3WCX6tMry0kTRt2IR.pdf",
+     "kind": "school_full_report",
+     "sha256": "7604c733ac526ad0cdfdbc8c7df8059c6f37c3a391bf2f0125bfafadff3717b6",
+     "retrieved": "2026-09-27T22:13:57Z",
+     "text": "official box S=3; appears in set tables set1,set2,set3"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627527",
+   "team_id": "45941",
+   "player": "Aniya Clinton",
+   "gp": "3",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/thesundevils-com-prod/2026/09/27/MTWiSoiFTLs6EXZXeFzArSj3WCX6tMry0kTRt2IR.pdf",
+     "kind": "school_full_report",
+     "sha256": "7604c733ac526ad0cdfdbc8c7df8059c6f37c3a391bf2f0125bfafadff3717b6",
+     "retrieved": "2026-09-27T22:13:57Z",
+     "text": "official box S=3; appears in set tables set1,set2,set4"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627527",
+   "team_id": "45941",
+   "player": "Jadyn Wilgus",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/thesundevils-com-prod/2026/09/27/MTWiSoiFTLs6EXZXeFzArSj3WCX6tMry0kTRt2IR.pdf",
+     "kind": "school_full_report",
+     "sha256": "7604c733ac526ad0cdfdbc8c7df8059c6f37c3a391bf2f0125bfafadff3717b6",
+     "retrieved": "2026-09-27T22:13:57Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627527",
+   "team_id": "45941",
+   "player": "Kiylah Presley",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/thesundevils-com-prod/2026/09/27/MTWiSoiFTLs6EXZXeFzArSj3WCX6tMry0kTRt2IR.pdf",
+     "kind": "school_full_report",
+     "sha256": "7604c733ac526ad0cdfdbc8c7df8059c6f37c3a391bf2f0125bfafadff3717b6",
+     "retrieved": "2026-09-27T22:13:57Z",
+     "text": "not in the official box, per-set tables, lineups or substitutions; surname appears nowhere in the report; feed line has zero actions and zero attempts"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627527",
+   "team_id": "45941",
+   "player": "Grace Martin",
+   "gp": "1",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/thesundevils-com-prod/2026/09/27/MTWiSoiFTLs6EXZXeFzArSj3WCX6tMry0kTRt2IR.pdf",
+     "kind": "school_full_report",
+     "sha256": "7604c733ac526ad0cdfdbc8c7df8059c6f37c3a391bf2f0125bfafadff3717b6",
+     "retrieved": "2026-09-27T22:13:57Z",
+     "text": "official box S=1; appears in set tables set4"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  },
+  {
+   "gid": "6627527",
+   "team_id": "45941",
+   "player": "Antonina Serafinowska",
+   "gp": "2",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://storage.googleapis.com/thesundevils-com-prod/2026/09/27/MTWiSoiFTLs6EXZXeFzArSj3WCX6tMry0kTRt2IR.pdf",
+     "kind": "school_full_report",
+     "sha256": "7604c733ac526ad0cdfdbc8c7df8059c6f37c3a391bf2f0125bfafadff3717b6",
+     "retrieved": "2026-09-27T22:13:57Z",
+     "text": "official box S=2; appears in set tables set3,set4"
+    }
+   ],
+   "why": "mail 054 per-case review"
+  }
+ ],
+ "staged_same_evidence": [],
+ "unresolved": [
+  {
+   "gid": "6627966",
+   "team_id": "46580",
+   "player": "Alyssa Konrad",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://uwbadgers.com/documents/download/2026/9/4/Final_UW_3_AUBURN_0.PDF",
+     "kind": "school_official_box",
+     "sha256": "debabd392b0935bf193048825c45dd1bf52173e618ca030ee7fe51244a4eb83c",
+     "retrieved": "2026-09-27",
+     "text": "player not in the official box; surname appears nowhere in the PDF"
+    }
+   ],
+   "why": "Independently re-checked by the Builder (mail 053/054) from the official PDF; matches the Architect's Wisconsin case study.",
+   "reason": "Konrad source conflict: Wisconsin cumulative report lists 6 sets, audited match boxes credit 3 (Milwaukee). Not overridden on either source alone (mail 054)."
+  },
+  {
+   "gid": "6628691",
+   "team_id": "46580",
+   "player": "Alyssa Konrad",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://uwbadgers.com/documents/download/2026/9/12/Final_UW_3_TAMU_2.PDF",
+     "kind": "school_official_box",
+     "sha256": "205ca8e2b18597ca358ba773781440ae0ff0070ce98822c5cf91b9e3dbf31c45",
+     "retrieved": "2026-09-27",
+     "text": "player not in the official box; surname appears nowhere in the PDF"
+    }
+   ],
+   "why": "Independently re-checked by the Builder (mail 053/054) from the official PDF; matches the Architect's Wisconsin case study.",
+   "reason": "Konrad source conflict: Wisconsin cumulative report lists 6 sets, audited match boxes credit 3 (Milwaukee). Not overridden on either source alone (mail 054)."
+  },
+  {
+   "gid": "6628580",
+   "team_id": "46580",
+   "player": "Alyssa Konrad",
+   "gp": "0",
+   "label": "school-report-corrected participation",
+   "evidence": [
+    {
+     "url": "https://uwbadgers.com/documents/download/2026/9/13/Final_UT_3_UW_1.PDF",
+     "kind": "school_official_box",
+     "sha256": "457a5811336b7ce50204751f6f01e3c45e8100d000bbedcf6bfbc9228dc5fc99",
+     "retrieved": "2026-09-27",
+     "text": "player not in the official box; surname appears nowhere in the PDF"
+    }
+   ],
+   "why": "Independently re-checked by the Builder (mail 053/054) from the official PDF; matches the Architect's Wisconsin case study.",
+   "reason": "Konrad source conflict: Wisconsin cumulative report lists 6 sets, audited match boxes credit 3 (Milwaukee). Not overridden on either source alone (mail 054)."
+  },
+  {
+   "gid": "6639663",
+   "team": "Rutgers",
+   "player": "Kami Dyrstad",
+   "feed_sets": 2.0,
+   "official_sets": null,
+   "src": "https://s3.us-east-2.amazonaws.com/sidearm.nextgen.sites/scarletknights.com/documents/2026/9/26/236151.PDF?timestamp=20260926020351",
+   "kind": "feed line absent from official box",
+   "reason": "surname appears in the report (possible alias/other section) -- not applied"
+  }
+ ]
+}

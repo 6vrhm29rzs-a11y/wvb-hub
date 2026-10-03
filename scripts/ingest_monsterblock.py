@@ -152,7 +152,7 @@ def main():
     else:
         req = urllib.request.Request(URL, headers={"User-Agent":
                                      "wvb-hub reference check (one page per run)"})
-        with urllib.request.urlopen(req, timeout=25) as r:
+        with __import__("fetch_policy").urlopen(req, timeout=25) as r:
             page = r.read().decode("utf-8", "replace")
         fetched = URL
         # We did the fetching, so the retrieval time is a fact this script

@@ -1,0 +1,586 @@
+# POWER: Critical Research Review
+## Volleyball analytics, data access, AI tools, and reliable automation
+
+**Prepared for Cody, Reviewer, and Builder · September 26, 2026**  
+**Status: research for joint review—not an implementation plan or approval.**
+
+This document evaluates the reviewed research packet and current primary-source documentation. It does not reproduce the packet's experiments, certify the working repository, or test any vendor account. No project code, ratings, services, accounts, schedules, or purchases were changed.
+
+**Evidence key.** **P** = packet or dated user-provided system evidence; **V** = verified in an external primary source; **H** = hypothesis or analytical inference; **R** = recommendation; **U** = unresolved. A vendor's documented capability is not an independently measured accuracy result. Source identifiers refer to the source register in Section 8 and link to the primary-source pages.
+
+**Priority key.** **TRY NOW** means the best candidate for a small trial *after joint approval*. **RESEARCH NEXT** means resolve access or evidence first. **LATER** means useful only after a dependency is met. **NOT WORTH IT** means poor fit for the present project—not a universal judgment about the product.
+
+## 1. Conclusions
+
+### 1.1 The main recommendation
+
+**R — Preserve live POWER while investigating two complementary paths:** a better-evaluated predictive system using the data already held, and a richer explanatory system that makes passing, setting, attacking, serving, and availability observable. Neither path requires committing to a database migration, another premium AI subscription, or a national licensed feed now.
+
+The packet supports neither “box scores have no further predictive value” nor “ten weighted metrics will improve forecasts.” Its experiments support a narrower conclusion: particular tested formulations produced small, uncertain, or negative gains under particular evaluation designs. All ten metrics should remain candidates for explanation and properly specified predictive research. [P0: Reviewer addendum; Current Model §7]
+
+### 1.2 Findings that should change the discussion
+
+| Finding | Evidence and consequence |
+|---|---|
+| NCAA women's contact-value research is directly relevant. | Contact-level changes in rally-win probability offer a basis for role-aware analysis—not proof of improved prematch forecasts. [S01] |
+| Measurement may matter more than another feature. | Baseline fidelity, forecast timing, shared snapshots, and neutral-site attribution determine whether apparent gains are interpretable. [P0: Reviewer addendum] |
+| Existing 2025 rally data deserves the first test. | The packet reports data already held. No 2026 in-season service was verified. The reported CSV problem concerns **team-match** data, not proof of incomplete PBP. [P0: C6]; [S04], [S05], [S06] |
+| The Figshare lead is the wrong population. | Its description says **2025 D-I men's volleyball**, not women's. [S07] |
+| Passing averages cannot settle the setter question. | Grade distributions and contact context are missing; the captured candidates still need valid joins and segment scope. [P0: B024; analytical inference] |
+| Existing local infrastructure may be reusable. | September 15 setup evidence lists Ollama, Qwen3 8B, and launchd—not proof of current health or permission to share personal integrations. [P1: §§3, 6–7] |
+| Current product details change costs and permissions. | Claude bare mode requires API credentials; X Search bills fetched items; Firecrawl's Monitor pricing conflicts internally. [S18], [S24], [S29] |
+
+### 1.3 What I would prioritize—and what I would not
+
+**TRY NOW, subject to approval:** an exact-baseline/as-of audit; one descriptive team dossier using existing counts; an existing-2025-PBP serving study; and a sealed extraction benchmark comparing deterministic code, the already-available local model, and at most one metered cloud model.
+
+**RESEARCH NEXT:** a permissioned sample of contact-level data, preferably for the Stanford setter case; a vendor coverage-and-rights questionnaire; a set-aware strength model; and reliability estimates by opportunity count rather than universal match thresholds.
+
+**LATER:** national contact-value rankings, broad player-availability adjustments, paid orchestration, persistent autonomous research agents, and a shared production database.
+
+**NOT WORTH IT now:** buying every AI subscription, rebuilding the hub around another project's dashboard, using social search as an authoritative scoreboard, or trying to automate a source this project is prohibited from accessing.
+
+## 2. Volleyball-model evidence and improvements
+
+### 2.1 What the packet establishes—and what it does not
+
+**P — Exact live reference.** The documented rating blends a preseason projection with season evidence using `w = n / (n + 10)`. With both teams' attack counts, match evidence is 75% opponent-adjusted scoreboard margin per set and 25% opponent-adjusted hitting-efficiency difference; otherwise it is margin-only. Opponent ratings are updated four times. The rating's home adjustment uses nominal home/away labels even at neutral events. Forecast conversion is a separate calibrated stage. [P0: Current Model §§2–4]
+
+The documented hitting-scale helper returns 0.100 because of a floor, whereas its original calibration population yielded an unfloored value near 0.0668. However, the earlier hitting-weight receipt used a different prior blend, `k = 13.5`. The fully current configuration was not established by that receipt alone. The proposed restricted D-I population also requires a fresh scale estimate. [P0: Reviewer addendum items 2–3]
+
+**R — Replace the proposed two-arm C1 comparison with an attribution-preserving diagnostic.** At minimum:
+
+| Arm | Population and scale | Question answered |
+|---|---|---|
+| A | Exact live calibration population, current floor, live `k = 10`, current forecast mapping | What are we actually comparing against? |
+| B | Countable D-I calibration population, same floor rule; all recomputed dependencies disclosed | What changes from population restriction alone? |
+| C | Same population as B, freshly estimated unfloored scale | What changes from removing the floor on that population? |
+
+An optional fourth arm, original population plus unfloored scale, completes the small factorial comparison; this is not a broad parameter search. Initially hold the forecast mapping fixed to expose rating changes. A second, explicitly separate exercise may recalibrate each arm using training-only data. If the floor remains preferable, describe it as regularization, not a measured historical spread. **Cost/access:** existing frozen files and local compute; no service fee. **Fallback:** keep A. **Success:** each change has an interpretable paired comparison, not merely a prettier ranking.
+
+**P — Weak results are not a universal veto.** Round 2's richer candidate had calibrated log loss 0.4640 versus 0.4667 for its development baseline, with a confidence interval spanning no improvement. The W/L-only candidate performed worse but reached tuning-grid edges. Earlier hitting gains and later indistinguishability both remain on record. [P0: Current Model §7]
+
+**R — Treat 2025 as development evidence.** Reused full-season choices and repeated checkpoint forecasts can make confidence intervals look more decisive than genuine forward generalization warrants. Keep prior-only and a reasonable W/L model as references; do not call the latter family disproved. Report a frozen live replica alongside any cleaned or refitted baseline.
+
+### 2.2 What external research contributes
+
+**V — Contact-level player value, NCAA women.** Scott Powers, Luke Stancil, and Naomi Consiglio's February 2, 2024 preprint uses 2022 D-I women's charted data: 4,147 matches, over 600,000 points, and over five million contacts. It models rally states and allocates changes in point-win probability, with hierarchical adjustment for opposing players in adversarial contacts. Its grading representation is not the forum's documented 0–3 scale. **Boundary:** this is evidence for contextual skill valuation, not demonstrated superiority to POWER on future match forecasts; access rights to its underlying charted corpus are not established here. [S01]
+
+**V — Volleyball-specific score likelihood.** Leonardo Egidi and Ioannis Ntzoufras's November 5, 2019 preprint models set wins and conditional losing-team points, with special treatment of extra points. Its Italian men's SuperLega application includes a first-half/second-half predictive exercise. **Boundary:** different sex, league, schedule, and sample; neither its fitted home effect nor its forecasting performance transfers automatically to NCAA women. Its useful contribution is a likelihood respecting volleyball's score structure. [S02]
+
+**V — Hierarchical prediction in women's professional volleyball.** Andrea Gabrio's November 20, 2019 preprint evaluates alternative Bayesian hierarchical specifications using Italian women's Serie A1 2017–18. **Boundary:** it does not validate NCAA parameters or an incremental gain over this hub's margin-based baseline. It supports hierarchical modeling as a credible research family, not a selected replacement. [S03]
+
+**V — Open analytics building blocks.** OpenVolley's `datavolley` reads `.dvw` scouting files and `.vsm` VolleyStation files. `ovlytics` includes data augmentation and setter-choice analysis. Their authors publish MIT-licensed software. **Boundary:** software availability supplies neither scouting observations nor permission to redistribute another owner's data. [S08], [S09]
+
+**U — Public rating-system folklore.** This review did not establish primary documentation for Pablo's exact model specification, prior carryover, blowout treatment, or a transferable NCAA women's home-advantage estimate. RichKern's public page establishes a subscription service, not those parameters. Nor did this review establish a reproducible, target-matched future-forecast comparison for Massey, VolleyDork, or the other external reference systems named in the packet. Use them as dated external benchmarks only when access and archive rights permit; do not borrow undocumented constants. [S10]; [P0: §F]
+
+### 2.3 Fresh hypothesis: make the model understand opportunities and phases
+
+**H — A component can be useful because it changes the interpretation of a result, not because it deserves an additive bonus.** A high-error, high-kill outside hitter and a low-error middle can have identical hitting efficiency while playing very different roles. A serving run can reflect the block behind the server. A dig total can reflect opponent attack volume or failure to terminate earlier rallies. The packet recognizes these distinctions; the modeling opportunity is to represent them explicitly. [P0: ten-metric discussion]
+
+**R — Start with a small, partially pooled count model.** For attacks, model **kill / error / continued rally** as mutually exclusive outcomes, with opponent context and conservative team/player effects. Keep attack share, role labels, and sample size visible. Add actual attack location or in-system status only where observed. For a predictive trial, use lagged, past-only component estimates to explain residual forecast error beyond the live rating—not same-match box scores to “predict” that match.
+
+This separates the question “which processes differ?” from “does that difference predict the next match?” It also avoids treating hitting%, kill%, kills/set, and earned PPS as independent evidence when they share algebraic components. **Access/cost:** existing box counts; $0 additional software required. **Small trial:** six team dossiers and one prespecified lagged component family. **Success:** defensible denominators, useful explanations, and an honest forward comparison. **Fallback:** descriptive-only display.
+
+| Metric family | Useful denominator or decomposition now | What it cannot establish |
+|---|---|---|
+| Kills and hitting | K/TA, E/TA, TA/set, player share of team TA; sum raw counts first | Actual set quality, attack location, or causal hitter value |
+| Serving | Aces/serve attempts and errors/serve attempts; later team rally wins on the player's serves | Isolated server quality or a universal ace:error target |
+| Reception | Reception errors/recorded reception attempts; explicit coverage | A passing grade, perfect-pass share, or setter options |
+| Digging | Digs/opponent TA as an explicitly labeled exposure proxy; opponent volume beside it | True “dig success”: not every opponent attempt is diggable |
+| Blocking | Team scoring blocks/opponent TA; distinguish team scores from individual participation | Touches, funneling, coverage, or who caused a stuff block |
+| Setting | Assists alongside team kills, setter participation, and attack distribution | Set quality or a causal ranking of setters |
+| Earned PPS and points allowed | K + aces + team blocks per set, separate from scoreboard margin | An additive accounting ledger containing overlapping errors/blocks |
+
+The denominators above are proposed analytical conventions unless already defined in the packet, not a claim of one universally standardized volleyball metric set. A source dictionary must accompany each. In particular, **our attack being blocked may count as their block and our attack error**; summing both as separate point losses double-counts the event. [P0: Reviewer addendum item 8; metrics §§1–10]
+
+### 2.4 Fresh hypothesis: serving and first-ball side-out deserve their own study
+
+**R — Use the existing 2025 PBP before pursuing 2026 acquisition.** Estimate the team's rally-win percentage while each player serves, including service errors in the denominator, with opponent and serving-rotation context. Report attempts and intervals. The serving six reconstructed from the packet is not necessarily the on-court six, and a listed starter order is not rotation order. [P0: C6; inventory `rotations_2025`]
+
+**H — First-ball side-out and transition conversion could reveal different strengths hidden by total margin.** They require a rally sequence capable of distinguishing an immediate first attack from a later transition; do not relabel reception errors as first-ball side-out. A first useful comparison is whether server performance persists across matched blocks of opponents and rotations, then whether that estimate predicts *future* serving outcomes.
+
+**Reliability is an empirical question.** There is no supported “stabilizes after X matches” answer here. Estimate it by opportunity count and context. For scale, an ordinary independent-binomial approximation at 40% on 50 serves has standard error about 6.9 percentage points—roughly ±14 points for a crude 95% interval. Actual service runs and shared lineups violate independence, so this is not a valid final player interval. Use clustered or hierarchical estimates and show the effective sample limitation. This calculation illustrates why rankings from a few runs are fragile.
+
+### 2.5 Fresh hypothesis: set-aware evidence and adaptive uncertainty
+
+**H — Averaging match point margin across sets discards informative structure.** A short deciding set and a regulation-length set have different scoring opportunities; match duration is itself related to team parity. The current forecast simulator may respect match rules while the *rating input* still collapses those differences. A set-level likelihood with legal score boundaries and deuce handling is a substantively different candidate from adding more box-score weights. [P0: Current Model §§3–4]; [S02]
+
+**R — Compare one set-aware candidate with the exact live baseline.** Preserve opponent adjustment, separate neutral-site status, and shrink noisy team changes. Evaluate scoreline probabilities as well as match probabilities. Do not resurrect arbitrary margin caps merely because another system reportedly uses them: the packet already contains negative or inconclusive cap tests.
+
+**H — Equal match counts need not imply equal knowledge.** Repeated matches within a weakly connected conference schedule may tell us less about national ordering than diverse cross-conference opponents. Roster continuity, a verified setter change, and uncertain preseason roster joins can also imply different prior uncertainty. Rather than immediately changing the prior mean, investigate team-specific uncertainty and a schedule-connectivity diagnostic. This is not approval to activate the held pure-2026 switch or replace its threshold.
+
+**Small trial:** assess uncertainty and calibration by roster-information quality and schedule connectivity, without changing ratings. **Cost/access:** existing graph, priors, and counts. **Success:** identifies systematic overconfidence rather than merely sorting teams differently. **Fallback:** retain the current prior and display a clearly labeled evidence-quality warning.
+
+### 2.6 Fresh diagnostic: four opponent iterations need a convergence receipt
+
+**H — Mathematical implication of the documented update, not a code finding.** If the implementation is exactly a fixed-prior affine update of the form `z_next = a + W P z`, with P a row-normalized opponent matrix and `W_ii = n_i/(n_i+10)`, its contraction bound is `q = max(W_ii) < 1`. Four iterations do not by themselves prove negligible error. For illustration, `0.524^4 ≈ 0.075`, while `0.75^4 ≈ 0.316`; these are bounds on error contraction in a simplified homogeneous case, **not measured POWER errors**.
+
+**R — On a frozen copy, compare four iterations with a tight-residual solution.** Confirm the implementation actually satisfies those assumptions, including missing-opponent handling. Report maximum score differences, rank crossings, and changes in forecast probabilities. Distinguish convergence error from the separate question of whether opponent rescoring improves prediction. **Access/cost:** read-only source and frozen data, local compute. **Small trial:** three season checkpoints; no writes to production. **Success:** a reproducible numerical tolerance certificate. **Fallback:** document measured deviations before deciding whether any change matters.
+
+### 2.7 Passing and the Stanford setter case: measure the missing mechanism
+
+**P — The 510 rows are candidates, not 510 observations of matches.** They contain team and player lines, unresolved aliases, no game-ID joins, and potentially mixed-scope segments. The one-time capture can miss isolated corrections. Poster identity does not establish grader identity. Nothing supports using these rows as a representative league sample. [P0: B024; Passing Quality]
+
+**H — A mean pass grade is an incomplete state description.** On a 0–3 scale, all passes graded 2 and a mixture of one-third 0s plus two-thirds 3s both average 2.0. Those distributions can imply different error exposure and offensive options. A rounded mean and a count generally cannot recover the category counts.
+
+**R — Request counts by grade, explicit grading rules, and setter/attack context in an authorized sample.** Keep the forum grades separate until row-level segment scope, correction chains, identity, and denominator checks pass. Never infer the undefined GP% threshold or convert the five-level paper coding to 0–3 without a documented mapping.
+
+For Stanford, propose **two authorized matches, approximately 200 receptions, and double-coding of a small blinded subset**. Record pass category, setter contact location or a defined quality rubric, attack option, first attack versus transition, hitter, and opponent. Compare the same hitters in similar pass/phase conditions where feasible. A 5-1/6-2 label inferred from starters should be validated against substitutions and actual setter participation.
+
+**Success:** observers can apply the rubric consistently and the evidence distinguishes “poor pass constrained the setter” from “usable pass, poor set” often enough to support an analysis. **Not success:** proving a setter caused wins or losses from two matches. **Fallback:** an annotated case study with explicit uncertainty. Costs are reviewer time and any permissioned-video/data charge, currently unknown; do not buy a team platform solely for this test.
+
+### 2.8 Champions, availability, and the decision standard
+
+**R — Champion profiles need controls.** Compare champion and non-champion teams at matched dates, opponent levels, and sample sizes. Separate selection into the tournament from winning it. The packet's Texas and Texas A&M examples already contradict a universal earned-PPS floor; full-season champion averages are not October prerequisites. Verify the remaining historical sheet before expanding the analysis. [P0: metric 1]
+
+**R — Availability should begin as scenarios, not unexplained deductions.** “With the recent lineup” and “with a documented replacement scenario” are more honest than converting a box-score absence into an injury adjustment. Model uncertainty about participation separately from the uncertain effect of the replacement. Publicly sourced absence does not establish medical cause or causal player value. [P0: metrics 4–6; availability inventory]
+
+**R — Promotion requires more than a positive AUC delta.** Predeclare a target horizon and primary loss, minimum practically useful gain, acceptable calibration, subgroup failure limits, and operating cost. A confidence interval spanning zero means inconclusive—not equivalent. A confidence interval excluding zero is not enough if the gain is tiny, the data rights unclear, or the model fragile. The numerical thresholds remain a joint-review decision.
+
+## 3. Data opportunities and access reality
+
+### 3.1 Existing sources: improve their contracts before expanding acquisition
+
+**V — The HenryGD NCAA API is a community transport, not an NCAA-issued developer service.** Its README describes a free wrapper around ncaa.com, a public limit of five requests per second per IP, and self-hosting for long-term reliability. The MIT software license is not a blanket license to all underlying content. [S11]
+
+**R — Split the inventory's source label into origin, transport, and transformation.** For example: NCAA-origin → community proxy → parser version → ledger correction. A second school URL may share the same originating statistics provider; source count alone does not prove independent corroboration. Preserve the project's two-source correction policy while making upstream dependence visible. Self-hosting the wrapper would not create another independent source or authorize access elsewhere.
+
+For permitted school pages, prefer documented feeds, structured exports, and existing parsers. Proposed conditional requests, content hashes, and bounded retries can reduce repeated downloads where supported. Store the raw response or a permitted durable snapshot, parser version, and explicit result state. A 200 response containing a challenge or empty schedule is not a successful observation.
+
+### 3.2 Source opportunity matrix
+
+| Source | What is verified / available | Critical limitation | Smallest useful proposed trial |
+|---|---|---|---|
+| Existing school evidence and JSONL corpus | Broad match/box coverage is reported in the packet; local raw files and correction ledgers already exist. | Snapshot counts differ by consumer and time; missing observation timestamps prevent blanket as-of certification. | Reconcile one frozen day's IDs across every surface and retain the manifest. **TRY NOW.** |
+| ncaavolleyballr, Jeffrey R. Stevens | Public women's D-I 2025 files and open package; 2025 rally file already held according to packet. [S04], [S05] | No 2026 in-season publishing commitment verified; team-match CSV issue #24 remains open and says other files look full. [S06] | Audit 20 existing PBP matches against local scorelines and server transitions. **TRY NOW.** |
+| Permissioned scouting export via a school or owner | OpenVolley can consume common scouting formats. [S08] | Permission, grading definitions, completeness, and onward use must be explicit. | Two match files plus dictionary and permitted-use statement. **RESEARCH NEXT.** |
+| Hudl Volleymetrics | Vendor advertises analyst-coded touches, video exchange, and a worldwide database. [S12] | No public quote, public bulk API, all-348-team coverage, or independent fan access established here. | Ask for a sample export and written rights/coverage answer, not a national contract. **RESEARCH NEXT.** |
+| Hudl Balltime | Vendor offers individual subscriptions and AI analysis of uploaded volleyball footage. [S13] | “Any footage” is a vendor claim, not measured grading accuracy; upload rights, export fields, API availability, and price require confirmation. | One owned/authorized clip against a manually coded reference. **RESEARCH NEXT.** |
+| Sportradar Indoor Volleyball v2 | Authenticated API with scores, event timelines, update feeds, and coverage-dependent detail; B2B positioning. [S14], [S15] | NCAA women's 2026 coverage and serve/pass/rotation fields are **not established**. A volleyball API label is insufficient. | Request a coverage matrix and payloads for 10 named matches before a trial. **RESEARCH NEXT.** |
+| Figshare 30472025, Zachary Jacques | Record describes 2025 D-I **men's** match data, 19 performance variables, CC BY 4.0. [S07] | Not the target population; raw schema, DOI/version, and collection method were not confirmed in this review. | Metadata screening is enough to deprioritize direct use. **NOT WORTH IT as a women's data replacement.** |
+| VREN, Xia and coauthors | Research describes rally notation/tasks; linked repository exposes `dataset_full.csv`. [S16], [S17] | Not a 2026 service; the reviewed repository shows no clear reuse license or full operational documentation. | Examine notation/schema only; obtain permission before reuse. **LATER.** |
+| VolleyViz, AggieSportsAnalytics | Repository describes NCAA-stat visualization and ML simulations. [S44] | No reproducible future-forecast comparison, production update service, or reusable license established here. | Review interaction ideas, not migrate or copy unlicensed code. **LATER.** |
+
+**U — No complete, authorized 2026 NCAA women's server/rotation/pass-grade feed was verified.** That is a research outcome, not proof none exists. It must remain unavailable in the application until a real source and rights are established. StatBroadcast and restricted VolleyTalk acquisition remain out of scope; a different browser, proxy, AI provider, or scraping service does not remove that restriction. [P0: C6 and Passing Options]
+
+### 3.3 The vendor/owner questionnaire that prevents an expensive wrong purchase
+
+**R — Require a sample payload, not a feature checklist.** For the same named fixtures, ask for: competition/gender/season coverage; every rally's server; score before and after; substitutions and libero replacements; lineup versus serving-order meaning; reception category/count definitions; set location; attack phase and option; corrections and timestamps; incomplete-match flags; and stable team/player IDs.
+
+Ask separately about historical backfill, latency, rate limits, exports versus API access, personal-research eligibility, storage rights, derived-stat publication, public-site display, model training, account sharing, and total cost. A subscription to watch or analyze a match does not by itself answer all of these questions. Any licensing interpretation must be settled by the owner/vendor, not inferred from a marketing page.
+
+**R — An MCP bridge is not a data license.** Sportradar also documents an Indoor Volleyball MCP server, but that changes how an assistant calls the service—not which competitions, fields, or rights an account receives. For a first data trial, prefer saved versioned API payloads; consider an agent-facing bridge only after the coverage contract is proven. [S14]
+
+**Smallest useful contract outcome:** two permitted files and a written description of allowable use. **Stop condition:** no export, no target coverage, no way to distinguish unknown from zero, or costs that only make sense for a coaching organization.
+
+## 4. Technology and options matrix
+
+### 4.1 The architecture I would trial—not implement yet
+
+**R — Keep deterministic truth and probabilistic assistance separate.**
+
+`permitted source → immutable observation → deterministic parser/validators → review queue → approved normalized data → model/statistics → published view`
+
+An AI tool may propose field extraction, aliases, claim summaries, or parser repairs. It should not silently approve a correction, assign an injury cause, choose rating weights, or overwrite a historical forecast. All external text is untrusted input; instructions embedded in a page are not project authority. A local LLM “airlock” is an additional heuristic, not a security boundary.
+
+Use a small typed evidence envelope: `source_id`, URL/file reference, event time, observed time, source-updated time if present, content hash, parser/model version, field values, supporting text spans, scope, confidence/abstention, and review state. Keep timestamps unknown when unknown. The reviewer should be able to click a disputed value back to its exact source span.
+
+### 4.2 Decision matrix
+
+| Option | Concrete role | Priority | Why not simply adopt it? |
+|---|---|---|---|
+| Existing Python + JSONL + local reports | Truth pipeline and first prototypes | **TRY NOW** | Needs stronger manifests/time contracts, not necessarily replacement |
+| DuckDB sidecar | Query existing JSON/Parquet and produce team histories | **TRY NOW** | A query engine does not repair source quality |
+| Existing Claude Code + ChatGPT/Codex | Builder/reviewer work on bounded tasks | **TRY NOW** | Tool permissions, billing paths, and reproducibility differ |
+| Existing Ollama/Qwen3 8B | Private extraction and triage | **TRY NOW** | Must outperform rules enough to justify latency and review |
+| One paid model API | Structured extraction or difficult evidence review | **TRY NOW, capped trial** | Low token prices do not establish factual reliability |
+| Tavily Search / Firecrawl Scrape | Discovery and difficult permitted pages | **RESEARCH NEXT** | Neither provides source rights or official sports coverage |
+| Google Gemini CLI / Gemini Notebook | Alternative coding review / source-library study | **RESEARCH NEXT** | Added accounts/context and no proven workflow advantage yet |
+| OpenVolley + permissioned scouting files | Passing, setter-choice, and rally analysis | **RESEARCH NEXT** | Data access is the bottleneck, not package installation |
+| launchd + Tailscale Serve | Local execution and private access | **TRY NOW as a readiness review** | Existing operational health is not established today |
+| GitHub Actions | Portable nonurgent audit runs | **LATER** | Scheduled runs can be late or dropped; private data must stay private |
+| n8n / MLX-LM / larger database | Workflow or runtime alternatives | **LATER** | Adds another component before a measured need |
+| Broad autonomous multi-agent operation | Continuous research and code/data changes | **NOT WORTH IT now** | More authority and failure paths than this review requires |
+
+All product documentation below was checked **September 26, 2026**. Prices are published USD list prices unless otherwise indicated, before tax. Proposed cloud trials assume US access; exact account eligibility, organization policy, quotas, and regional routing were not tested. No plan entitlement is inferred merely from using a chat app.
+
+### 4.3 Existing files + DuckDB: analysis without a rewrite
+
+**V — DuckDB** supports direct JSON and other file ingestion, including analytical use of Parquet. It can be used locally rather than as a hosted database. [S30], [S31]
+
+**R — Use case:** query the existing counts and observations to generate opponent-aware histories, coverage summaries, and matched-date champion comparisons. Build a disposable research database or views from frozen inputs; keep JSONL and existing ledgers authoritative initially. Explicit schemas and canonical IDs matter more than inferred column convenience.
+
+**Access/cost/limits:** local Python-compatible environment and selected project files; no hosted subscription needed for this trial. Benchmark memory and query time on the actual machine. It is not a multiuser transaction service or a provenance system by itself.
+
+**Small trial:** one team-history query and one completeness query, compared exactly with existing Python outputs. **Success:** identical totals and materially simpler investigation. **Fallback:** existing Python. **Maintenance/privacy:** low if read-only and reproducibly rebuilt; no cloud upload. **Priority: TRY NOW.** A transactional queue database is a later option only if concurrent editing or recovery demands it; do not introduce two database systems in the first trial.
+
+### 4.4 ChatGPT/Codex, OpenAI: keep the reviewer role bounded
+
+**V — Product class:** consumer workspace/coding agent, with a separate developer API. Current Codex pricing documentation lists inclusion across multiple ChatGPT plans; Plus is $20/month, while limits depend on plan and workload. Codex documents sandbox and approval controls. [S19], [S20]
+
+**R — Use case:** review a frozen model specification, identify leakage tests, inspect an isolated diff, or independently explain a failed invariant. Do not use a second model's agreement as independent source verification.
+
+**Access/cost/limits:** existing entitled account first; $0 incremental subscription only while remaining within its allowance and without enabling overage. API use is separately metered; see Section 5. Cloud/repository access must be explicitly scoped. Source retrieval and reasoning can still fail.
+
+**Small trial:** the same sealed set of five model/data-review tasks given independently to the existing builder and reviewer tools, scored against human-written expected findings. **Success:** additional correct, actionable findings without unsupported claims. **Fallback:** current manual review. **Maintenance/privacy:** avoid connecting personal accounts or granting merge/push authority. **Priority: TRY NOW using existing access; no subscription upgrade recommended.**
+
+### 4.5 Claude Code and Agent SDK, Anthropic: useful automation, with a billing and permission trap
+
+**V — Product class:** coding agent plus programmatic CLI/SDK. Claude Pro is $20/month when billed monthly and includes Claude Code. The current headless documentation says `--bare` skips automatic hooks, plugins, memory, and project instructions; it does **not** use subscription login and requires configured API/provider credentials. Bare mode itself still has file and shell tools available. [S18], [S21]
+
+**R — Use case:** a repeatable parser-diagnostic report or extraction proposal from a fixed source batch. Bare mode can reduce hidden environmental behavior, but it is not a read-only sandbox. Explicitly restrict tools and filesystem/network authority outside the prompt; do not mistake “allowed tools” auto-approval for a complete capability boundary.
+
+**Access/cost/limits:** project-scoped API key for the scripted trial, separate from the interactive subscription; bounded tokens, calls, and wall-clock time. SDK output/cost estimates are not a substitute for billing reconciliation. [S18], [S22]
+
+**Small trial:** ten archived parser failures, structured proposed diagnosis, no edits or live access. **Success:** correct source-backed diagnoses and no out-of-scope actions. **Fallback:** interactive Claude Code review. **Maintenance/privacy:** pin tool/model versions and isolate credentials. **Priority: TRY NOW as a capped comparison, not a new daemon.**
+
+### 4.6 Gemini API, Gemini CLI, and Gemini Notebook, Google: three different capabilities
+
+**V — Gemini API** is metered developer access, not a consumer subscription entitlement. The pricing page lists Gemini 3.5 Flash-Lite at $0.30 input and $2.50 output per million tokens; the page distinguishes free-tier product-improvement use from paid-tier handling. Google Search grounding can issue multiple billable searches per request. [S23]
+
+**V — Gemini CLI** has distinct Google-login and API-key quotas: the reviewed documentation lists 1,000 daily model requests for individual Google login versus 250 for the unpaid API-key path, with availability/minute limits and different paid paths. Those are not 1,000 independent coding tasks. [S25]
+
+**V — NotebookLM's help URL currently redirects to documentation titled Gemini Notebook.** It supports question answering over supplied sources, with a documented 500,000-word or 200MB source limit. This does not establish automatic repository synchronization or a general ingestion API. [S26]
+
+**R — Use case/trial:** API—extract ten source-backed volleyball claims; CLI—one sealed review task; Notebook—one approved, non-sensitive research packet with five citation-check questions. **Success:** verifiable answers and fewer manual steps than existing tools. **Fallback:** current reviewer and local document search. **Access/cost:** separate project Google account or approved API project; use available free/entitled consumer access rather than buying Pro/Ultra for this trial. New subscription prices are not budgeted here. **Privacy/maintenance:** no personal mailbox/Drive connection; confirm source retention and permissions before uploading licensed data. **Priority: RESEARCH NEXT; choose one capability, not all three.**
+
+### 4.7 Grok API with X Search, xAI: discovery, not a complete social feed
+
+**V — Product class:** developer model API with an optional X-search tool. Current documentation lists Grok 4.7; X Search accepts date ranges and up to 20 allowed handles. Its usage documentation says fetched posts/profiles are counted, including repeated retrievals and thread context. Current pricing is per item, not simply per search call. [S24], [S27]
+
+**R — Use case:** find a school's official announcement or a coach's attributable statement, then verify the original evidence. It must not supply authoritative final scores, infer a diagnosis, or claim complete coverage of social posts.
+
+**Access/cost/limits:** separate developer key and billing; consumer Grok access is not assumed to include API usage. See the per-item scenario in Section 5. Handle limits require small batches; search recall remains unknown.
+
+**R — Newsletter alternative:** accept a user-exported newsletter or a dedicated project inbox as a discovery source, retaining sender, publication time, and the original article link. Do not connect personal mail solely to support the volleyball news feed.
+
+**Small trial:** 20 already-known official announcements across a few school accounts, with date bounds. **Success:** high recall of those known items, usable citations, and low false attribution. **Fallback:** school-site/RSS discovery and manual review. **Privacy/maintenance:** only public-source queries, no private passing files. **Priority: RESEARCH NEXT, only if it beats existing discovery.**
+
+### 4.8 Tavily and Firecrawl: test failed pages, not a replacement national crawl
+
+**V — Tavily Search** supplies a developer search/extraction API. Documentation lists 1,000 free credits monthly, basic search at one credit, advanced at two, and pay-as-you-go at $0.008/credit. [S28]
+
+**R — Use case:** find official availability or schedule announcements with source-domain constraints. **Trial:** 50 known school-news items, compared with current discovery. **Success:** additional correct official sources at lower review effort. **Fallback:** existing search/manual evidence. **Access/privacy:** project API key; discovered snippets are not the final authority. **Cost:** the bounded trial fits the published free allowance if unused; shared-account usage must be checked. **Priority: RESEARCH NEXT.** The Raven snapshot already lists Tavily, but does not establish current credits or permission to share its key. [P1: §6]
+
+**V — Firecrawl Scrape** is a hosted extraction service. The current page lists 1,000 monthly free credits, a basic scrape at one credit/page, and Hobby at $19/month monthly billing. Structured-output extras can raise per-page cost. Its Monitor pricing is internally inconsistent: seven credits per page/check in explanatory text, one in the feature table. **That rate is unresolved.** [S29], [S32]
+
+**R — Use case/trial:** ten difficult but permitted school pages, basic text/HTML extraction only, compared against current parsers. **Success:** correct event/side attribution and useful raw evidence, not merely HTTP success. **Fallback:** existing adapters and human export. **Access/limits/privacy:** separate API key; free plan limits include two concurrent requests and 10 requests/minute for selected endpoints; cloud processing is not local. A returned 403/404 may still consume a credit. **Priority: RESEARCH NEXT for narrow gaps; NOT WORTH IT as a blanket replacement or restriction bypass.**
+
+### 4.9 Ollama + Qwen3 8B: the smallest local AI trial is already identifiable
+
+**P — Setup evidence:** the separate September 15 Raven document lists `qwen3:8b` in Ollama and launchd scheduling. Prior user-provided hardware context identifies a 24GB M4 Mac mini; current free RAM, active workloads, and volleyball deployment location have not been re-audited. [P1; user setup context]
+
+**V — Ollama** documents local structured outputs, loopback binding, and an explicit local-only setting that disables cloud features. Its Qwen3 8B listing identifies a roughly 5.2GB Q4 model artifact and Apache 2.0 licensing. That download size is **not** total runtime memory. [S33], [S34], [S35]
+
+**R — Use case:** classify source scope, propose aliases from a supplied candidate list, or extract a source-backed sentence into a review queue. Do arithmetic, joins, winner checks, and statistical estimation in deterministic code. Never give the local model authority to approve corrections.
+
+**Small trial:** 100 saved snippets with known answers, including ambiguous names, mixed aggregates, and malicious embedded instructions; compare rules alone against Qwen plus rules. **Success:** lower human-review effort at a fixed error/abstention standard, acceptable latency, and no interference with existing services. **Fallback:** rules plus manual review. **Access/cost:** approved access to an isolated local runtime; no new model subscription, electricity and maintenance remain real. **Priority: TRY NOW after health/access review.** Keep volleyball inputs separate from Raven's personal memory and credentials.
+
+**Alternative, LATER:** Apple's open `MLX-LM` project supports local generation and quantization on Apple silicon. It is a runtime alternative to benchmark only if Ollama is the measured bottleneck, not a reason to run another server immediately. Use the same snippets, same model family/quantization where possible, peak-memory and latency measurements, and Ollama as fallback. No guaranteed tokens-per-second claim is justified without a device test. [S36]
+
+### 4.10 Document and browser tools: preserve the original evidence
+
+**V — Docling** provides structured document conversion; **Playwright** provides browser automation/testing. Neither is a volleyball data source. [S37], [S38]
+
+**R — Use case:** extract text/tables from user-supplied exports and inspect permitted school-page rendering failures. Prefer an existing text layer; use OCR only for genuinely image-only material, followed by human review of names, decimals, and table alignment. Preserve page coordinates or source spans and the original file hash. An attractive JSON schema does not make extracted numbers true.
+
+**Small trial:** three archived documents or pages, each with a hand-checked reference. **Success:** exact critical numeric fields and correctly surfaced uncertainty; no silent scope changes. **Fallback:** existing PDF extraction, screenshots, and manual transcription. **Access/cost/maintenance:** local software plus dependencies; $0 new subscription for this small trial, but browser downloads/models and parser upkeep are real. Use a project-only browser profile without personal cookies. **Priority: TRY NOW only where existing extraction fails.**
+
+### 4.11 Background execution, private access, and notifications
+
+**R — First reuse the existing scheduler pattern.** The packet already reports a daily shadow job, and the separate Raven snapshot lists launchd. Review health, file ownership, lock handling, retries, atomic writes, and stale-output detection before proposing another recurring job. Do not move volleyball onto Raven merely because both use Python. [P0: validation §E; P1: §6]
+
+**V — GitHub Actions** standard runners are free for public repositories; private accounts have included minutes/storage and paid overages. Official docs warn scheduled runs can be delayed or dropped under load and disabled after 60 days of inactivity in public repositories. [S39], [S40]
+
+**R — Use case/trial:** one manually triggered, sanitized audit producing a manifest—not a pre-serve timing-critical forecast. **Success:** reproducible outputs with no private data/secrets in logs. **Fallback:** existing local run. **Cost/access:** repository workflow permission, standard Linux runner, check storage quota. A later nightly 10-minute run is 300 minutes/month; no need for a public self-hosted runner on the personal Mac. **Priority: LATER.**
+
+**V — Tailscale Serve** exposes a service to the private tailnet; it is distinct from public Funnel. Current Personal pricing is $0 for eligible noncommercial use. [S41], [S42]
+
+**R — Use case/trial:** view a read-only research dossier on the iPhone without making the admin interface public. Confirm actual account/authentication health: September 15's reported login problem is historical, not a diagnosis today. **Success:** intended device can read; unauthorized device cannot; underlying app remains appropriately bound. **Fallback:** local access or a static report. **Maintenance/privacy:** explicit ACLs and separate project services. **Priority: TRY NOW as a readiness check, no network changes authorized here.**
+
+**R — Notifications:** reuse one approved project-only delivery route or a local report inbox. Send only actionable source conflicts, failed jobs, and stale predictions, with deduplication and links to evidence. A delivery log should distinguish “report generated” from “notification received.” Telegram/email/webhook access and any per-message fees require verification before adoption; no personal email connection is necessary for the initial trial.
+
+**V/R — n8n:** its repository grants a Sustainable Use License for personal/noncommercial or internal use, with separate exclusions for enterprise files and other specified content; it is not simply unrestricted open-source software. It can be considered for human approval plus multiple external integrations, but adds deployment and credential maintenance. [S43] **Trial:** only after a real three-system workflow is painful in ordinary scripts; one export-to-review-to-notification flow with zero production writes. **Cost:** self-host infrastructure/operations plus underlying API charges; no cloud-plan price assumed. **Success:** less operational work than scripts; **fallback:** launchd and a queue. **Priority: LATER.**
+
+## 5. Costs, access, and privacy
+
+### 5.1 A comparable workload—not a promise about the final bill
+
+**R — Example monthly extraction workload:** 1,000 documents × 3,000 input tokens and 300 **billed output tokens** each = **3 million input + 0.3 million output tokens**. This assumes short prompts, standard processing, no caching, no search/tools, no retries, no image/video charges, and no extra reasoning beyond the output-token budget. Tokenizers differ; the same text need not generate the same bill across vendors.
+
+| Model/API, current documented option | Input / output per million tokens | Calculated example cost |
+|---|---:|---:|
+| OpenAI GPT-6 Luna, standard short-context | $0.10 / $0.50 | **$0.45** |
+| OpenAI GPT-6 Sol, standard short-context | $2.00 / $10.00 | **$9.00** |
+| Anthropic Claude Haiku 4.5 | $1.00 / $5.00 | **$4.50** |
+| Anthropic Claude Sonnet 5 | $2.00 / $10.00 | **$9.00** |
+| Google Gemini 3.5 Flash-Lite, standard | $0.30 / $2.50 | **$1.65** |
+| xAI Grok 4.7, short-context | $2.00 / $6.00 | **$7.80** |
+
+Rates verified from official pricing pages; arithmetic is this review's calculation. These are **not quality rankings**. Use a small judged task set before selecting a model. Higher-tier/long-context paths, tools, and agent loops can dominate the bill. [S22], [S23], [S24], [S45]
+
+### 5.2 Search and extraction can cost more than generation
+
+| Explicit scenario | Calculated cost / important qualification |
+|---|---|
+| Tavily: 200 basic searches | 200 credits: $0 within an unused 1,000-credit allowance; $1.60 at listed marginal pay-as-you-go rate. [S28] |
+| xAI: 200 requests, each fetching 20 posts; no profiles | 4,000 fetched posts = **$20**, plus tokens. Repeated/quoted/thread posts may count; 200 calls does not mean 200 billable items. [S24], [S27] |
+| Gemini 3.x grounding: 200 actual search queries | Within the listed shared 5,000-query monthly allowance if unused; otherwise 200 × $14/1,000 = **$2.80**, plus tokens. One user request can cause multiple searches. [S23] |
+| Firecrawl: 1,000 basic pages | Fits the listed monthly free credits if unused; structured output extras do not fit the same assumption. **Do not budget Monitor until its conflicting rates are clarified.** [S29] |
+| Cloud coding review: 200,000 input + 50,000 output tokens at Sonnet 5 rates | **$0.90** before tool/runtime costs or repeated agent context. Set a whole-task cap; do not infer cost from the final answer length. [S22] |
+
+**R — Trial spending proposal, not authorization:** cap any initial cloud bake-off at **$10 total**, with overage disabled or independently enforced. A pure local/rules trial needs no new API account. Do not open four paid model accounts just to produce this table.
+
+### 5.3 Costs that token arithmetic misses
+
+**Human time:** alias adjudication, grading agreement, parser failures, source disputes, and reviewing false alerts. Track minutes per accepted observation and per useful finding. Cheap extraction that doubles review time is a loss.
+
+**Acquisition and licensing:** Volleymetrics, Balltime's relevant export tier, and Sportradar's target coverage have **unknown applicable prices**. A precise invented monthly fee would be worse than an honest quote-required entry.
+
+**Local compute:** no marginal token invoice does not mean free electricity or unlimited memory. As an illustrative—not measured—electricity scenario, 20W of *additional* continuous load uses 14.4kWh in 30 days, or $4.32 at an assumed $0.30/kWh. The user's actual tariff, duty cycle, and incremental draw are unknown.
+
+**Privacy and rights:** no-training policies, retention, and permission to upload source content are separate questions. Free and paid API tiers may differ. Restrict prompts to necessary public/project material, redact unrelated private data, and never place secrets in generated static assets or public workflow artifacts. A licensed dataset's owner may prohibit cloud processing even if the model vendor offers good privacy controls.
+
+## 6. Proposed small trials and evaluation contracts
+
+These are a **menu for joint selection**, not instructions to run all of them or a newly approved sequence. The first three can yield value using existing data; the contact-data trial tests a different, richer product goal.
+
+### T1 — Freeze and certify the exact baseline
+
+**Question:** can one immutable input snapshot reproduce the documented live rating and its eligibility rules across multiple cutoffs?
+
+**Scope:** three checkpoints; model constants, source hashes, eligible match-ID set, corrections, forecast mapping, and consumer counts. Include same-day verification, start-time corrections, missing boxes, neutral events, and missing-prior opponents. Run the four-iteration convergence diagnostic as a separately labeled check.
+
+**Success:** exact parity within a stated numerical tolerance and no unexplained count divergence. **Failure response:** document the mismatch; do not refit it away. **Cost/access:** local files plus read-only code after approval; $0 service cost. **Owner question:** which frozen checkout is the canonical baseline, given uncommitted start-time/TV work?
+
+### T2 — Repair the evaluation contract before testing improvements
+
+**Question:** which predictions are genuinely comparable and demonstrably pre-match?
+
+**Scope:** select one forecast horizon per match for the primary analysis; preserve other horizons as separate products. Store `prediction_created_at`, intended information cutoff, observed source IDs, model hash, and the fixture/start-time version used. A later corrected start time must not silently rewrite what was known then. Keep input-data and outcome-label versions separately.
+
+**Success:** every scored observation has a defensible eligibility receipt; uncertain timing is excluded or separately reported. Compare log loss, Brier, calibration intercept/slope, and subgroup reliability. Bootstrap matched differences by time blocks, with a 14-day sensitivity analysis and explicit acknowledgment that teams recur across blocks. **Fallback:** prospective-only scored evidence where historical proof is insufficient. Existing verification logs may salvage bounded subsets, not the whole history. **Cost:** local work, no new scheduler required.
+
+### T3 — Existing-data team dossier and 2025 serving study
+
+**Question:** can richer analysis answer useful volleyball questions before it changes POWER?
+
+**Scope:** six teams across schedule strengths and box-coverage conditions; all ten metrics with raw counts, summed-count rates, role/workload context, and missingness. For 20 checked 2025 PBP matches, reconcile score and server transitions, then estimate team points won while each player serves.
+
+**Success:** totals reconcile, opportunity limitations are understandable, and the dossier correctly answers predefined questions about volume versus efficiency. Report stability by opportunities; no universal stabilization threshold. **Fallback:** retain only verified descriptive panels. **Cost:** $0 new subscription; optional DuckDB/OpenVolley evaluation is separate from production dependencies.
+
+### T4 — One predictive candidate, selected after T1/T2 findings
+
+**Choice A:** the scale/population diagnostic in Section 2.1. **Choice B:** one set-aware likelihood. **Choice C:** one lagged, opponent-aware count-feature family. Do not combine all improvements into an uninterpretable candidate.
+
+**Success contract:** freeze the specification, data rules, target horizon, calibration procedure, primary loss, meaningful-gain threshold, and failure limits before forward scoring. Report missing-box, neutral/unknown-venue, early/late, and conference/non-conference behavior. Future untouched data can qualify; “only the rest of 2026 can ever validate it” is too absolute. [P0: Reviewer addendum]
+
+**Fallback:** exact live model. **Cost:** local compute; no license needed for existing counts. **Important:** past exploratory reuse limits confirmatory interpretation even when a bootstrap interval looks favorable.
+
+### T5 — Passing/setter mechanism microstudy
+
+**Question:** does observed passing/set quality explain Stanford's hitter opportunities better than assists or aggregate hitting alone?
+
+**Scope:** two authorized match exports or videos, defined contact rubric, approximately 200 receptions, independent coding on a subset, explicit unknowns and permissions. Do not use the restricted forum as a new acquisition route.
+
+**Success:** match/player attribution, grader agreement, and a usable contrast between reception constraints and setting choices—not a causal verdict or national player ranking. **Fallback:** source-linked qualitative case study. **Cost:** unknown data/video charge; human annotation dominates. **Dependencies:** access and grading definitions, not a new predictive model.
+
+### T6 — Sealed AI extraction benchmark
+
+**Question:** does any AI option reduce work without creating false facts?
+
+**Scope:** 100 previously saved examples spanning source scope, aliases, decimals, absent fields, quoted duplicates, one-line corrections, and prompt injection. Compare deterministic rules, the existing local Qwen model, and **one** cloud API. Include intentionally unanswerable cases. No model sees the answer key.
+
+**Success:** exact-match accuracy on critical IDs/numbers, evidence-span correctness, appropriate abstention, review time, latency, peak memory, and actual cost. A valid JSON response is not a correct response. Require zero unreviewed changes to truth files. **Fallback:** rules/manual queue. **Cost cap proposed:** $10 for the entire cloud trial; none spent now.
+
+### T7 — Operations failure rehearsal
+
+**Question:** will the research pipeline fail visibly rather than silently publish stale work?
+
+**Scope:** controlled offline tests for missed run, duplicate launch, interrupted write, source timeout, empty success response, credential expiry, and stale report. Reuse current execution patterns; do not install another orchestration service.
+
+**Success:** idempotent reruns, no partial publication, distinct source/build/model failure states, and a single actionable review item. A green process exit is insufficient if input freshness failed. **Fallback:** manual run and last-good artifact clearly labeled stale. **Cost:** local time; notification integration deferred until a route is approved.
+
+## 7. Disagreements, unresolved questions, and stop conditions
+
+### 7.1 Conclusions I would challenge in the earlier packet narrative
+
+**“The useful component signal is mostly already inside margin.”** Plausible for some formulations, but not established across role-aware, phase-aware, or availability-aware models. Preserve the narrower tested-result statement.
+
+**“C1 is a simple two-arm floor test.”** Not while population and scale both change. Preserve an exact live arm and recompute the changed-population scale.
+
+**“Venue recovery can only be tested prospectively.”** The existing 2025 files lack venue fields, but recoverable official schedules or archived reports could support a bounded historical subset. No new collection is authorized by this observation.
+
+**“The model has 11,284 held-out matches.”** Not established: forecast checkpoints may repeat target matches. Also, Brier 0.1289 conditioned on true margin is not the same evaluation as a prematch Brier near 0.1718. The reported 2026 scored counts and the inventory's smaller score-file count require snapshot reconciliation. [P0: Reviewer addendum; Current Model §§4, 9; inventory]
+
+**“More source URLs mean independent verification.”** Not necessarily. Two official pages may inherit one underlying scoring error. Preserve source lineage and the correction policy rather than substituting an AI confidence score.
+
+**“A more capable agent solves data acquisition.”** Not without coverage, definitions, permission, and a durable update contract. A consumer app, developer API, MCP server, licensed feed, and local runtime are different products.
+
+### 7.2 Questions for joint review
+
+| Who / area | Decision or evidence still needed |
+|---|---|
+| Cody: product value | Which first deliverable matters more: a trustworthy team-analysis dossier, the Stanford mechanism case, or a small prospective forecast gain? These need not exclude each other. |
+| Builder: baseline | Which immutable checkout and input manifest define live POWER? Can parity be established beyond the single prior cutoff? |
+| Reviewer + Builder: evaluation | Which forecast horizon, timing evidence, unique-match denominator, and outcome revision policy will be scored? What practical gain warrants complexity? |
+| Builder: operations | What is currently healthy on the volleyball host? Is any Raven infrastructure actually available without personal-data coupling? The September 15 snapshot is not current certification. |
+| Data owner/vendor | Can a personal researcher obtain two contact-level files, their definitions, and storage/analysis/publication rights? What exact NCAA women's 2026 coverage exists? |
+| Passing reviewers | Can mixed posts be split by segment, isolated corrections recovered, aliases joined, and category denominators reconciled? Who actually graded each report? |
+| Model research | Are missing boxes/verification delays related to team strength or conference? Do residual component effects persist forward? Are four iterations numerically sufficient? |
+| Product providers | Which actual account quotas and regional terms apply? Why does Firecrawl's current Monitor page show both one and seven credits? |
+
+### 7.3 Specific external facts not confirmed
+
+Pablo's detailed methodology and home coefficient; a reusable license or independently reproduced forecast benchmark for VolleyViz; the Figshare record's DOI/version, exact raw columns, and acquisition method; 2026 in-season ncaavolleyballr publication; a complete licensed NCAA women's contact feed; nationally representative passing-grade coverage; public bulk APIs/export rights for the applicable Hudl plans; and any universal match count at which serving/passing metrics stabilize.
+
+Some endpoints or downloads could not be inspected, including the Figshare raw API/download and attempted current NCAA statistics-manual URLs. Accordingly, exact raw-schema and independently rechecked current-manual claims are not made. The metric definitions used here are explicitly packet-derived or proposed analytical conventions. Search results, vendor marketing, and paper abstracts were not used to fill those gaps silently.
+
+**Stop conditions for any proposed trial:** inaccessible or unlicensed source; ambiguous population; no reliable identity/time contract; silent missing-to-zero conversion; inability to reproduce the baseline; inability to bound spend or tool authority; or operational complexity exceeding the demonstrable benefit.
+
+**Bottom line:** there is credible room for a richer volleyball system. The strongest route is not indiscriminately increasing model complexity. It is to make more of the volleyball mechanism observable, evaluate improvements against an exact temporal baseline, and use narrowly scoped AI to reduce evidence-handling work—not to replace evidence.
+
+## 8. Source register
+
+All web sources were inspected on **September 26, 2026**. Dates below are publication/update dates only where established; otherwise the page is treated as live documentation. A primary source can still contain marketing claims, incomplete data, or internal contradictions.
+
+**P0 — Primary project evidence.** `POWER-RESEARCH-PACKET-REVIEWED.md`, Builder plus Reviewer, September 26, 2026. Read B024 and the Reviewer addendum as superseding earlier narrative. Principal locations: lines 1–33, 36–59, 205–321, 370–475, 590–657, 675–766, and 770–834. Supplied in this conversation; no independent rerun claimed.
+
+**P1 — Supplementary user-provided setup evidence.** `Raven System Overview 2026-09-15.md`, dated September 15, 2026; Library copy, sections 3, 6, and 7. Used only to identify existing local infrastructure and distinguish a historical setup report from current operating health. No sensitive addresses or credentials are reproduced.
+
+**S01 — Powers, Scott; Stancil, Luke; Consiglio, Naomi.** *Estimating individual contributions to team success in women's college volleyball*, preprint February 2, 2024. NCAA women's charted-data methods; not a POWER benchmark. https://arxiv.org/html/2402.01083v1 — record: https://arxiv.org/abs/2402.01083
+
+**S02 — Egidi, Leonardo; Ntzoufras, Ioannis.** *A Bayesian Quest for Finding a Unified Model for Predicting Volleyball Games*, preprint November 5, 2019, revised manuscript reviewed. https://arxiv.org/html/1911.01815 — record: https://arxiv.org/abs/1911.01815
+
+**S03 — Gabrio, Andrea.** *Bayesian Hierarchical Models for the Prediction of Volleyball Results*, preprint November 20, 2019. https://arxiv.org/abs/1911.08791
+
+**S04 — Stevens, Jeffrey R.** ncaavolleyballr data catalog. https://jeffreyrstevens.github.io/ncaavolleyballr/articles/data.html
+
+**S05 — Stevens, Jeffrey R.** ncaavolleyballr releases; v0.5.1 release listed January 7, 2026. https://github.com/JeffreyRStevens/ncaavolleyballr/releases
+
+**S06 — ncaavolleyballr issue #24.** Reporter `fatfryer`, March 12, 2026; open report about the 2025 team-match CSV, not an independently reproduced completeness audit. https://github.com/JeffreyRStevens/ncaavolleyballr/issues/24
+
+**S07 — Jacques, Zachary.** *NCAA Division I Volleyball Match Data, 2025 Season*, Figshare record posted October 28, 2025; description specifies men's volleyball; CC BY 4.0 shown. https://figshare.com/articles/dataset/NCAA_Division_I_Volleyball_Match_Data_2025_Season/30472025
+
+**S08 — OpenVolley; Raymond, Ben; Ickowicz, Adrien; Widdison, Tyler.** `datavolley`, maintained package documentation and MIT license. https://datavolley.openvolley.org/
+
+**S09 — OpenVolley; Raymond, Ben; Ickowicz, Adrien.** `ovlytics`, maintained package documentation and MIT license. https://ovlytics.openvolley.org/
+
+**S10 — RichKern.com.** Public/free service page; does not establish the detailed Pablo parameters discussed here. https://www.richkern.com/vb/FreePage.asp
+
+**S11 — HenryGD.** `ncaa-api`, project README, MIT software license, service limit. https://github.com/henrygd/ncaa-api
+
+**S12 — Hudl.** Volleymetrics product page; touch-coding and database statements are vendor claims. https://www.hudl.com/products/volleymetrics
+
+**S13 — Hudl.** Balltime product page; upload/AI-analysis statements are vendor claims. https://www.hudl.com/products/balltime
+
+**S14 — Sportradar.** Indoor Volleyball API overview; authenticated endpoints and coverage-dependent detail. https://developer.sportradar.com/volleyball/reference/indoor-volleyball-overview
+
+**S15 — Sportradar.** Getting started; B2B positioning and coverage matrix. https://developer.sportradar.com/getting-started/docs/get-started
+
+**S16 — Xia, Haotian; Tracy, Rhys; Zhao, Yun; Fraisse, Erwan; Wang, Yuan-Fang; Petzold, Linda.** *VREN: Volleyball Rally Dataset with Expression Notation Language*, September 28, 2022. https://arxiv.org/abs/2209.13846
+
+**S17 — Xia, Haotian.** VREN repository; dataset file visible, reusable license not established. https://github.com/haotianxia/VREN
+
+**S18 — Anthropic.** Run Claude Code programmatically; bare-mode, credentials, and execution behavior. https://code.claude.com/docs/en/headless
+
+**S19 — OpenAI.** ChatGPT/Codex plan and usage pricing; current documentation redirect. https://learn.chatgpt.com/docs/pricing
+
+**S20 — OpenAI.** Codex security and permissions. https://learn.chatgpt.com/docs/security
+
+**S21 — Anthropic.** Consumer/team/API product pricing. https://claude.com/pricing
+
+**S22 — Anthropic.** Claude Platform API pricing; standard token rates and separate features. https://platform.claude.com/docs/en/about-claude/pricing
+
+**S23 — Google.** Gemini Developer API pricing; token, grounding, and free/paid data-use distinctions. https://ai.google.dev/gemini-api/docs/pricing
+
+**S24 — xAI.** API pricing; X Search per-post/profile billing. https://docs.x.ai/developers/pricing
+
+**S25 — Google.** Gemini CLI quotas and pricing, page updated June 18, 2026. https://geminicli.com/docs/resources/quota-and-pricing/
+
+**S26 — Google.** Gemini Notebook FAQ; original NotebookLM URL redirects to this current help surface. https://support.google.com/gemininotebook/answer/16269187
+
+**S27 — xAI.** X Search documentation, updated September 22, 2026; per-item usage behavior effective September 21. https://docs.x.ai/developers/tools/x-search
+
+**S28 — Tavily.** Credits and pricing. https://docs.tavily.com/documentation/api-credits
+
+**S29 — Firecrawl.** Pricing, page states effective September 4, 2026; Monitor discrepancy preserved in this review. https://www.firecrawl.dev/pricing
+
+**S30 — DuckDB.** JSON overview. https://duckdb.org/docs/current/data/json/overview
+
+**S31 — DuckDB.** Importing data. https://duckdb.org/docs/current/data/overview
+
+**S32 — Firecrawl.** Scrape API documentation. https://docs.firecrawl.dev/features/scrape
+
+**S33 — Ollama.** FAQ; local-only settings and network binding. https://docs.ollama.com/faq
+
+**S34 — Ollama.** Structured outputs. https://docs.ollama.com/capabilities/structured-outputs
+
+**S35 — Ollama model registry / Qwen.** Qwen3 8B artifact size, quantization, and license listing. https://ollama.com/library/qwen3:8b — author repository: https://github.com/QwenLM/Qwen3
+
+**S36 — Apple ML Explore.** MLX-LM repository. https://github.com/ml-explore/mlx-lm
+
+**S37 — Docling project.** Document conversion documentation. https://docling-project.github.io/docling/
+
+**S38 — Microsoft / Playwright.** Browser automation installation and platform documentation. https://playwright.dev/docs/intro
+
+**S39 — GitHub.** Actions billing and included allowances. https://docs.github.com/en/billing/concepts/product-billing/github-actions
+
+**S40 — GitHub.** Workflow trigger documentation; schedule delays, dropped runs, and inactivity behavior. https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows
+
+**S41 — Tailscale.** Serve documentation. https://tailscale.com/docs/features/tailscale-serve
+
+**S42 — Tailscale.** Current pricing and Personal-plan eligibility. https://tailscale.com/pricing
+
+**S43 — n8n.** Current repository license, including Sustainable Use License limitations and enterprise-file exclusions. https://github.com/n8n-io/n8n/blob/master/LICENSE.md — the attempted documentation license URL returned Page Not Found; no hosted-plan price is inferred.
+
+**S44 — AggieSportsAnalytics.** VolleyViz repository and README. https://github.com/AggieSportsAnalytics/VolleyViz
+
+**S45 — OpenAI.** Developer API pricing; standard short-context rates distinguished from batch, flex, and fast modes. https://developers.openai.com/api/docs/pricing
+
+[S01]: https://arxiv.org/html/2402.01083v1
+[S02]: https://arxiv.org/html/1911.01815
+[S03]: https://arxiv.org/abs/1911.08791
+[S04]: https://jeffreyrstevens.github.io/ncaavolleyballr/articles/data.html
+[S05]: https://github.com/JeffreyRStevens/ncaavolleyballr/releases
+[S06]: https://github.com/JeffreyRStevens/ncaavolleyballr/issues/24
+[S07]: https://figshare.com/articles/dataset/NCAA_Division_I_Volleyball_Match_Data_2025_Season/30472025
+[S08]: https://datavolley.openvolley.org/
+[S09]: https://ovlytics.openvolley.org/
+[S10]: https://www.richkern.com/vb/FreePage.asp
+[S11]: https://github.com/henrygd/ncaa-api
+[S12]: https://www.hudl.com/products/volleymetrics
+[S13]: https://www.hudl.com/products/balltime
+[S14]: https://developer.sportradar.com/volleyball/reference/indoor-volleyball-overview
+[S15]: https://developer.sportradar.com/getting-started/docs/get-started
+[S16]: https://arxiv.org/abs/2209.13846
+[S17]: https://github.com/haotianxia/VREN
+[S18]: https://code.claude.com/docs/en/headless
+[S19]: https://learn.chatgpt.com/docs/pricing
+[S20]: https://learn.chatgpt.com/docs/security
+[S21]: https://claude.com/pricing
+[S22]: https://platform.claude.com/docs/en/about-claude/pricing
+[S23]: https://ai.google.dev/gemini-api/docs/pricing
+[S24]: https://docs.x.ai/developers/pricing
+[S25]: https://geminicli.com/docs/resources/quota-and-pricing/
+[S26]: https://support.google.com/gemininotebook/answer/16269187
+[S27]: https://docs.x.ai/developers/tools/x-search
+[S28]: https://docs.tavily.com/documentation/api-credits
+[S29]: https://www.firecrawl.dev/pricing
+[S30]: https://duckdb.org/docs/current/data/json/overview
+[S31]: https://duckdb.org/docs/current/data/overview
+[S32]: https://docs.firecrawl.dev/features/scrape
+[S33]: https://docs.ollama.com/faq
+[S34]: https://docs.ollama.com/capabilities/structured-outputs
+[S35]: https://ollama.com/library/qwen3:8b
+[S36]: https://github.com/ml-explore/mlx-lm
+[S37]: https://docling-project.github.io/docling/
+[S38]: https://playwright.dev/docs/intro
+[S39]: https://docs.github.com/en/billing/concepts/product-billing/github-actions
+[S40]: https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows
+[S41]: https://tailscale.com/docs/features/tailscale-serve
+[S42]: https://tailscale.com/pricing
+[S43]: https://github.com/n8n-io/n8n/blob/master/LICENSE.md
+[S44]: https://github.com/AggieSportsAnalytics/VolleyViz
+[S45]: https://developers.openai.com/api/docs/pricing

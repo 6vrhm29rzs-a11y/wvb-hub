@@ -332,7 +332,7 @@ def main():
         import urllib.request
         req = urllib.request.Request(url, headers={"User-Agent":
                                                    "wvb-hub pilot (personal)"})
-        with urllib.request.urlopen(req, timeout=60) as r:
+        with __import__("fetch_policy").urlopen(req, timeout=60) as r:
             raw = r.read()
             hdrs = dict(r.headers)
             st = r.status

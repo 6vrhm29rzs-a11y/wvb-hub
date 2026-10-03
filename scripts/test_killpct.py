@@ -78,7 +78,11 @@ def main():
     _real_di = BH.di_teams
     BH.di_teams = lambda: {"Alpha", "Beta", "Errory", "Clean", "Zed",
                            "NoTA", "Ghost"}
-    def box_row(team, k, e, ta, sets=4):
+    # ⚠ sets=3 to match the fixtures' own 3-set results: a box whose sets
+    # disagree with its match is now (correctly) excluded as PARTIAL by
+    # team_analysis.box_complete (mail 030), and the old default of 4 made
+    # every fixture box partial.
+    def box_row(team, k, e, ta, sets=3):
         return {"team": team, "k": k, "e": e, "ta": ta, "sets": sets,
                 "ast": 0, "digs": 0, "bs": 0, "ba": 0, "aces": 0}
     boxes = {
@@ -119,8 +123,8 @@ def main():
           [r.get("gid") for r in res])
     # missing attempts key entirely
     ts2 = BH.team_season_stats(
-        {"g9": [dict(box_row("NoTA", 5, 1, 0), ta=None),
-                box_row("Alpha", 5, 1, 10)]},
+        {"g9": [dict(box_row("NoTA", 5, 1, 0, sets=1), ta=None),
+                box_row("Alpha", 5, 1, 10, sets=1)]},
         [{"gid": "g9", "home": "Alpha", "away": "NoTA",
           "sets": [[25, 20]]}])
     check("missing attempts -> None",
@@ -140,11 +144,24 @@ def main():
         for nm in ("SMU", "Nebraska", "Kentucky"):
             t = teams_p.get(nm) or {}
             row = (tstats.get(nm) or {}).get("own") or {}
-            gids = [str(g.get("gid")) for g in (t.get("played") or [])]
+            played = t.get("played") or []
+            gids = [str(g.get("gid")) for g in played]
             if not gids or not row:
                 continue
+            # the page leaves PARTIAL boxes out of season rates (mail 030);
+            # recompute over the same set with the same imported rule
+            import team_analysis as _TAk
+            nsets = dict((str(g.get("gid")), len(g.get("sets") or []) or
+                          int(g.get("mine") or 0) + int(g.get("theirs") or 0))
+                         for g in played)
             k = e = ta = 0.0
             for gid in gids:
+                _bt = {}
+                for _r in (boxes_p.get(gid) or []):
+                    _bt.setdefault(_r.get("team"), []).append(_r)
+                if len(_bt) == 2 and nsets.get(gid) and not _TAk.box_complete(
+                        *list(_bt.values()), nsets[gid]):
+                    continue
                 for r in (boxes_p.get(gid) or []):
                     if r.get("team") == nm:
                         k += r.get("k") or 0

@@ -81,12 +81,25 @@ async def probe(routes):
                         "deviceScaleFactor": 2, "mobile": True})
             bad = 0
             for route in routes:
-                await call("Page.navigate", {"url": PAGE + "#" + route})
+                # "teams/louisiana@numbers" -> open the route, then click that
+                # team-page tab (mail 051: the default tab is not the page)
+                path, _, tab = route.partition("@")
+                await call("Page.navigate", {"url": PAGE + "#" + path})
                 await asyncio.sleep(1.6)
+                if tab:
+                    r0 = await call("Runtime.evaluate", {"expression":
+                        "(function(){var b=document.querySelector('[data-tdt=\"%s\"]');"
+                        "if(!b)return 'no tab';b.click();return 'ok'})()" % tab,
+                        "returnByValue": True})
+                    if (r0.get("result") or {}).get("value") != "ok":
+                        print("%-22s FLAG  tab %s not found" % (route, tab))
+                        bad += 1
+                        continue
+                    await asyncio.sleep(0.9)
                 r = await call("Runtime.evaluate",
                                {"expression": PROBE, "returnByValue": True})
                 v = json.loads(r["result"]["value"])
-                tag = route.strip("/#").replace("/", "_") or "root"
+                tag = route.strip("/#").replace("/", "_").replace("@", "__") or "root"
                 shot = await call("Page.captureScreenshot", {"format": "png"})
                 open("/tmp/phone_%s.png" % tag, "wb").write(
                     base64.b64decode(shot["data"]))

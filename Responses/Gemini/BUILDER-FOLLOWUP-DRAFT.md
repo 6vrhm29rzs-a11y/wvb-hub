@@ -1,0 +1,13 @@
+# NOT SENT — draft for Cody/Reviewer consolidation
+
+Thanks for the report. Some context first, because you could not see our files. We rate NCAA D-I women's volleyball with a margin-per-set model plus a hitting-efficiency channel, which carries 25% of each match's evidence. Our data comes from the public ncaa.com scoreboard, box score and game API, which works from a datacenter IP. We do not fetch stats.ncaa.org, and we do not bypass bot challenges on any site. The VolleyTalk passing grades are already parsed from saved posts: 709 rows, 510 candidates. Their problems are source quality (self-graders, disagreeing duplicates, an undefined "GP") and a missing join to game ids. OCR does not address either. Held finals are settled by two independent school sources plus a corrections ledger, not by re-querying the feed. For 2025 we have a public play-by-play file that names the server on every rally. For 2026 we have no rally-level source. Please answer precisely and cite primary sources. Say "unknown" where you do not know.
+
+1. You called 0.0668 the "variance" of team hitting efficiency. In our code it is an SD (τ_hit). Please restate Hypothesis 1 with that correction. What evidence, beyond reasoning, would support "the floor acts as a regularizer"?
+2. Cite a primary source for stats.ncaa.org moving to JS-rendered pages and for IP bans against ncaavolleyballr users. If you have none, please withdraw the claim.
+3. What is your source that VolleyTalk uses Cloudflare? We observed a proboards proof-of-work challenge.
+4. SportsStack / Genius: name a primary document showing D-I **women's volleyball** coverage, rally-level events with named servers, the licence terms that allow a public non-commercial site, and actual pricing. Your $500–2,500/month figure had no citation.
+5. PlusLiga 93.6%: give the full paper citation (authors, venue, year). Were the features known before the match? OPI and break-point differentials are computed from the match itself.
+6. Side-out % and break-point % together add up to the scoreboard, as does our margin/set. Is there published evidence that splitting the phases predicts **future** matches better than margin, not just explains the current one? Please give an n and a sport level.
+7. Propose a concrete, rule-based neutral-site definition using only a venue name, city and the two teams' usual home venues. Say how you would handle a tournament hosted by one participant.
+8. Drop Recommendation 5 unless you can say why San Diego is relevant. We never specified a location.
+9. For durable pipelines: given we already have resumable crawls, atomic checkpoints and append-only logs, name a specific failure Temporal would prevent that these do not.

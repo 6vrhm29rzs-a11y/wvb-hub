@@ -117,9 +117,27 @@ def load_events() -> List[Dict]:
     return out
 
 
-def build():
+def load_school_sites():
+    """gid -> verdict from data/raw/{season}/venue_site_evidence.json (school schedules;
+    see venue_site_evidence.py). Absent file -> {}."""
+    p = os.path.join(REPO, "data", "raw", str(SEASON), "venue_site_evidence.json")
+    if not os.path.exists(p):
+        return {}
+    try:
+        return dict((gid, e.get("verdict")) for gid, e in (json.load(open(p)).get("games") or {}).items())
+    except (ValueError, AttributeError):
+        return {}
+
+
+def build(school_sites=None):
     games = load_games()
     declared = load_events()
+    # SCHOOL-DECLARED SITES (Cody, 2026-09-28: "Fix the venue file"). Applied only where
+    # this file's own verdict is no-venue/unknown; a feed-vs-school disagreement is
+    # listed as a conflict, never applied.
+    school = load_school_sites() if school_sites is None else school_sites
+    school_applied = collections.Counter()
+    conflicts = []
     game_date = {}
     for g in games:
         ep = g.get("start_time_epoch")
@@ -220,6 +238,12 @@ def build():
             verdict = "home"
         else:
             verdict = "unknown"          # not enough played to know yet
+        site_source = "feed"
+        _sv = school.get(str(g.get("game_id")))
+        if _sv == "conflict" or (_sv in ("neutral", "home") and verdict not in ("no-venue", "unknown") and _sv != verdict):
+            conflicts.append({"game_id": str(g.get("game_id")), "feed_site": verdict, "school_says": _sv})
+        elif _sv in ("neutral", "home") and verdict in ("no-venue", "unknown"):
+            verdict = _sv; site_source = "school-declared"; school_applied[_sv] += 1
         tally[verdict] += 1
         rows.append({
             "game_id": str(g.get("game_id")),
@@ -229,6 +253,7 @@ def build():
             "venue_owner": venue_owner.get(v) if v else None,
             "event": declared_hit["name"] if declared_hit else None,
             "site": verdict,
+            "site_source": site_source,
         })
 
     # ---- EVENTS: matches clustered by venue and date ---------------------
@@ -297,6 +322,10 @@ def build():
 
     return {
         "meta": {
+            "school_declared_applied": dict(school_applied),
+            "school_feed_conflicts": conflicts,
+            "school_rule": "school-declared Home/Neutral applied only where the feed gave no venue (or was unsure); disagreements listed here, never applied",
+
             "season": SEASON,
             "source_tier": "DERIVED",
             "rule": ("a team's home venue is the venue it is most often listed at "

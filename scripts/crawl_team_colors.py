@@ -127,7 +127,7 @@ def fetch(url):
     # type: (str) -> Optional[str]
     try:
         req = urllib.request.Request(url, headers={"User-Agent": UA})
-        with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
+        with __import__("fetch_policy").urlopen(req, timeout=TIMEOUT) as r:
             return r.read().decode("utf-8", "replace")
     except Exception:                                    # noqa: BLE001
         return None

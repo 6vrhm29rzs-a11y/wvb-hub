@@ -64,9 +64,9 @@ def main():
     src = io.open(os.path.join(REPO, "scripts", "build_hub.py"),
                   encoding="utf-8").read()
     i = src.find("THE SCHOOL-PUBLISHED LAYER")
-    seg = src[i:i + 4000]
+    seg = src[i:i + 9000]
     check("the binder keys on (team, opponent) before any date test",
-          "_norm(_e.get(\"opponent\"))" in seg and "_byteam" in seg)
+          "(_tnorm(_school), _tnorm(_o))" in seg and "_byteam" in seg)
     check("the date is a WINDOW on an opponent match, not the key",
           "abs((_ed - _fd).days) > 1" in seg)
 
@@ -110,6 +110,58 @@ def main():
           "m.tvk === 'linear') w += 25" in src)
     check("the watch line labels the kind",
           "STREAMING \\u00b7" in src and "LINEAR TV \\u00b7" in src)
+
+
+    print("\n7. WMT CARDS, AND EVERY MATCH SAYS WHERE TO WATCH OR 'NONE FOUND'")
+    card = ('<div class="schedule-event" data-aos="x"><span class="schedule-event-date__day">Sep 27</span>'
+            '<span class="schedule-event-item-team__rank">#4</span>'
+            '<strong class="schedule-event-item-team__name">Michigan State</strong>'
+            '<a href="https://www.foxsports.com/live/btn" class="schedule-event__tv-link">'
+            '<span>Watch | BTN</span><span class="sr-only"> Opens in a new window </span></a></div>'
+            '<div class="schedule-event" data-aos="x"><span class="schedule-event-date__day">Oct 1</span>'
+            '<strong class="schedule-event-item-team__name">Nebraska</strong></div>')
+    ev = CT.parse_wmt_cards(card) or []
+    check("a WMT card yields its own network and link",
+          ev and ev[0]["network"] == "BTN" and ev[0]["date"] == "2026-09-27"
+          and "foxsports" in (ev[0]["watch_url"] or ""), ev)
+    check("the opponent is the name, not the rank chip", ev and ev[0]["opponent"] == "Michigan State", ev)
+    check("[NEG] a card with no watch link contributes nothing (never borrowed from its neighbour)",
+          len(ev) == 1, ev)
+    check("[NEG] an unknown label keeps the link but names no network",
+          (CT.parse_wmt_cards(card.replace("Watch | BTN", "Watch | Mystery Net")) or [{}])[0].get("network") is None)
+    src = open(os.path.join(REPO, "scripts", "build_hub.py"), encoding="utf-8").read()
+    check("one wording constant for 'none found'", src.count("NOTV_NOTE = (") == 1)
+    check("the none-found note says unknown, never 'not televised'",
+          "never \\u201cnot televised" in src)
+    check("Scores rows say 'no TV listing found' for a match not yet final",
+          "else if (st !== 'final') _mbits.push('<span class=\"notv\"" in src)
+    check("the Schedule table has a Watch column filled by watch_cell",
+          ">Watch</th>" in src and "watch_cell(r)" in src)
+    check("[NEG] a Schedule row with no listing is never blank",
+          'none found</span>' in src)
+    check("an upcoming row with no clock says Time TBA",
+          "'Time TBA'" in src)
+    import crawl_tv as _C
+    check("a parser upgrade refetches schools that found nothing", _C.PARSER_V >= 3)
+    lr = open(os.path.join(REPO, "scripts", "local_refresh.py"), encoding="utf-8").read()
+    check("broadcast listings are re-read by the local refresh (bounded per cycle)",
+          '"scripts/crawl_tv.py", "--limit=' in lr)
+
+
+    print("\n8. ANOTHER SPORT'S BROADCAST NEVER LANDS ON A VOLLEYBALL MATCH")
+    import json as _j
+    def _pl(sport):
+        return ('<script type="application/json" id="__NUXT_DATA__">' +
+                _j.dumps([{"a": 1}, {"start_date": 2, "opponent": 3, "media": 4, "sport": 5},
+                          "2026-09-26T00:00:00", {"title": 6}, {"tv": 7},
+                          sport, "Cincinnati", "ESPN2"]) + '</script>')
+    fb = CT.parse_nuxt(_pl({"title": 8, "shortname": 9}).replace('"ESPN2"]', '"ESPN2", "Football", "football"]'))
+    vb = CT.parse_nuxt(_pl({"title": 8, "shortname": 9}).replace('"ESPN2"]', '"ESPN2", "Volleyball", "wvball"]'))
+    check("[NEG] a football event on ESPN2 is dropped", not fb, fb)
+    check("the volleyball event with the same shape is kept",
+          vb and vb[0]["network"] == "ESPN2" and vb[0]["date"] == "2026-09-26", vb)
+    mvb = CT.parse_nuxt(_pl({"title": 8}).replace('"ESPN2"]', '"ESPN2", "Men\'s Volleyball"]'))
+    check("[NEG] men's volleyball is not women's volleyball", not mvb, mvb)
 
     print()
     if FAILS:

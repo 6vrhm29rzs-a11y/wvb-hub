@@ -394,12 +394,28 @@ def build():
     for r in (_blend_doc.get("all") or []):
         if r.get("rank"):
             blend_by_team[r["team"]] = r
-    rank_source = ("live" if live_by_team
-                   else ("blend" if blend_by_team else "preseason"))
+    # ⚠ PRIVATE DEFAULT (Cody, 2026-09-28: "make it the private default"): when the
+    # private build sets WVB_POWER_DEFAULT=candidate, the POWER ruler is the frozen
+    # 2026 candidate (Cody/data/power_candidate/v2so_preview.json). One versioned
+    # source, highest precedence, never on the public build (build_hub sets the
+    # env only when not PUBLIC). Rollback = remove the flag file and rebuild.
+    cand_by_team, _cand_doc = {}, {}
+    if os.environ.get("WVB_POWER_DEFAULT") == "candidate":
+        _cand_doc = load_json("Cody/data/power_candidate/v2so_preview.json") or {}
+        for _nm, _rec in (_cand_doc.get("teams") or {}).items():
+            if _rec.get("rank"):
+                cand_by_team[_nm] = _rec
+    rank_source = ("candidate" if cand_by_team
+                   else ("live" if live_by_team
+                         else ("blend" if blend_by_team else "preseason")))
     # The stamp of the ranking actually SHOWN, from that artifact's own meta --
     # never the page build time, which keeps ticking when nothing recomputed.
     _src_meta = ((live.get("meta") or {}) if live_by_team
                  else (_blend_doc.get("meta") or {}))
+    if cand_by_team:
+        _src_meta = {"generated_at_utc": _cand_doc.get("generated_utc"),
+                     "matches_counted": _cand_doc.get("matches"),
+                     "data_through_epoch": _cand_doc.get("data_through_epoch")}
     rank_stamp = {
         "generated_at_utc": _src_meta.get("generated_at_utc"),
         "matches_in": (_src_meta.get("matches") if live_by_team
@@ -420,6 +436,19 @@ def build():
         # rating file under another spelling -- two rulers would mix) from
         # a team the rating GENUINELY declines to rank (Saint Francis: no
         # fixtures, no rank; its page explains itself)
+        if cand_by_team:
+            _c = cand_by_team.get(t["team"])
+            t["rank26"] = (_c or {}).get("rank")
+            t["rank_source"] = "candidate"
+            t["cand_version"] = _cand_doc.get("version")
+            t["cand_range"] = (_c or {}).get("rank_range")
+            t["blend_matches"] = (blend_by_team.get(t["team"]) or {}).get("matches")
+            t["blend_season_weight"] = None
+            t["gp"] = (lr or {}).get("games_played")
+            t["low_conf"] = False
+            t["proj_pps"] = r.get("proj_points_per_set")
+            t["q25"] = r.get("q_2025")
+            continue
         if live_by_team and not lr and _n26(t["team"]) in _live_all_norms:
             raise SystemExit(
                 "live board join miss: %r has no live rank -- a per-team "
@@ -496,6 +525,9 @@ def build():
         # SAME PRECEDENCE AS rank26 ABOVE, and it has to be: scoring one
         # quantity next to a rank built from another is exactly how #7 came to
         # sit above #6 earlier today. Guarded on the built page.
+        if cand_by_team:
+            t["_pv"] = (cand_by_team.get(t["team"]) or {}).get("theta")
+            continue
         t["_pv"] = (lr or {}).get("composite")
         # ⚠ SAME BASIS-PURITY AS rank26 (2026-09-01): on a live board a
         # team the rating declines to rank sits in the unranked TAIL -- and
@@ -523,6 +555,13 @@ def build():
             continue
         z = (c - _mu) / _sd
         t["power"] = round(max(0.0, min(100.0, 50.0 + 12.5 * z)), 1)
+        if cand_by_team:
+            # ONE number per team across every screen: the candidate file's own
+            # POWER (50 + 12.5*theta/sd over its rated set), not a re-derivation
+            # over a different team set (caught: team page 74.3 vs candidate view 74.7).
+            _cp = (cand_by_team.get(t["team"]) or {}).get("power")
+            if _cp is not None:
+                t["power"] = _cp
         t["power_z"] = round(z, 3)
         t["power_c"] = round(c, 4)
         t["power_basis"] = t.get("rank_source") or "preseason"
@@ -577,6 +616,8 @@ def build():
     # Compared against the most recent snapshot that is NOT this week's, so the
     # column answers "since the last published poll", not "since this morning".
     hist_path = os.path.join(REPO, "data", "rankings_history_%d.jsonl" % SEASON)
+    if rank_source == "candidate":       # the candidate's own Monday freezes (private archive)
+        hist_path = os.path.join(REPO, "Cody", "data", "power_candidate", "rankings_history_candidate.jsonl")
     prev = {}
     prev_week = None
     if os.path.exists(hist_path):
@@ -623,7 +664,9 @@ def build():
     # the file was there, the gate just refused it. A log line that
     # mis-states the reason sends the next debugging session to the wrong
     # place.
-    if live_by_team:
+    if cand_by_team:
+        _why = "  (PRIVATE DEFAULT: 2026 candidate %s, %d teams)" % (_cand_doc.get("version"), len(cand_by_team))
+    elif live_by_team:
         _why = "  (%d teams rated on 2026 results)" % len(live_by_team)
     elif _why_hold:
         _why = "  (a validated 2026 fit exists but is HELD: %s)" % _why_hold
@@ -732,7 +775,8 @@ def build():
     # league's MOST LIKELY CHAMPION (conf_title_pct from the same simulator)
     # -- which also retires the Saint Francis artifact: a team with no
     # fixtures has no title odds and can never take a bid.
-    _sim = load_json("data/season_sim_2026.json") or {}
+    _sim = (load_json("Cody/data/power_candidate/season_sim_2026.json")
+            if os.environ.get("WVB_POWER_DEFAULT") == "candidate" else None) or load_json("data/season_sim_2026.json") or {}
     _sim_by = {t["team"]: t for t in _sim.get("teams", [])}
 
     def _committee_key(t):

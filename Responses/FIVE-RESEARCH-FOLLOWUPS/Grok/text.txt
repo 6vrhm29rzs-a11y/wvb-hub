@@ -1,0 +1,13 @@
+Grok
+I’ll recheck the RallyIQ methodology page and the cited sources first, then issue a short correction addendum instead of restating the full report.Confirmed: several RallyIQ numbers I quoted are not on the current methodology page. Next I’ll write a short correction addendum with bounded claims and three investigations only.Addendum is ready for Cody to send. Shared corrections taken as controlling where they conflict with the first report. No implementation recommended.
+Takeaway
+Leave live POWER alone. The analysis page can use box counts you already have. Do not invent first-ball features by renaming reception errors.
+Withdrawn or bounded from my first file: the 0.1718 Brier as a live-model holdout; RallyIQ 74.5/0.465 and 77.6/0.448 (not on the current methodology page); VolleyMetrics as the named source of arXiv:2402.01083; the digs formula that subtracted stuffs and attack errors; DuckDB as a reason to skip SQLite; forecast-neutral handling as an open rating bug (predict_2026.py already zeros classified neutrals).
+Still good: RallyIQ is a joint ridge-binomial on serve and receive; hitting is a separate box adjustment and does not feed their forecasts. Home +0.7 pp and h = 0.027 logits are on /ratings today, not on /methodology. Their NCAA host is unnamed.
+Three investigations only
+	1.	Hitting-scale study with A_live frozen; population and floor as separate factors; recompute τ inside the chosen sample; a CI that includes zero means unresolved, not equivalent.
+	2.	Stratified audit of PBP already in the repo (conference, venue, verification, score reconciliation). Not a 20-match national claim. Stop if serving-team tags are sparse.
+	3.	Descriptive rates from boxes plus 2025 event artifacts, with n and role/opportunity labels. No new POWER weights.
+Worked example remains 2025 Texas A&M: season PPS 18.48, final at 16.67, ten wins below 18 — context, not a coefficient.
+
+https://grok.com/share/c2hhcmQtMw_ceb0bb3d-b7e5-4e36-8cee-c7b0bf11ef2d

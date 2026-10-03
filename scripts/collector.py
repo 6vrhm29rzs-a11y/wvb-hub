@@ -117,7 +117,7 @@ def robots_allows(url):
         try:
             req = urllib.request.Request(host + "/robots.txt",
                                          headers={"User-Agent": UA})
-            body = urllib.request.urlopen(req, timeout=10).read()
+            body = __import__("fetch_policy").urlopen(req, timeout=10).read()
             rp.parse(body.decode("utf-8", "replace").splitlines())
         except Exception:
             rp = None                      # unreadable robots: default allow
@@ -146,7 +146,7 @@ def fetch(url, meta=None):
     req = urllib.request.Request(url, headers=headers)
     _LAST_FETCH[0] = time.time()
     try:
-        r = urllib.request.urlopen(req, timeout=TIMEOUT)
+        r = __import__("fetch_policy").urlopen(req, timeout=TIMEOUT)
         body = r.read().decode("utf-8", "replace")
         return r.status, body, {
             "etag": r.headers.get("ETag"),

@@ -1,0 +1,12 @@
+https://claude.ai/share/0ebabf0c-39be-46ea-bb22-c374a01371ef
+
+I'll read the packet first, then launch the research.
+I've finished the POWER research review. It doesn't support adding more box-score or passing channels to the predictive core yet. The hitting and serve-receive tests were too small to show anything either way, so they don't prove those metrics are useless.
+The report recommends fixing three things before any model tuning:
+	•	Missing timestamps: records don't say when each piece of data was observed.
+	•	Home and neutral handling: the rating uses a home edge of 1.09 pts/set, but the forecast uses only 0.27.
+	•	Too little data to judge changes: the rest of 2026 can probably only detect improvements of about 0.002 log loss or more, which is larger than the effects measured so far.
+The one new idea that's allowed and cheap is working out side-out and break-point rates from the point sequences you already collect.
+On data, ncaavolleyballr covers history only (2020–2025), and its MIT license covers the code, not the NCAA data. Automated collection from StatBroadcast and VolleyTalk is prohibited by their terms, and Volleymetrics data can't be downloaded or shared. There's no individual route to licensed pass-quality data. For the passing grades, the next step is to ask the VolleyTalk poster for permission or a file.
+On tools, nothing needs to be bought. The recommended free trials are timestamps with content hashes, DuckDB reading the existing JSONL files, and a launchd job with a free Healthchecks.io alert for the 05:45 run.
+The report also includes a ranked action list, a three-way breakdown of the hitting test, a staged trial plan with a rule for when to adopt a change, a comparison of sources and tools, and open questions for you, the Builder and the Reviewer. Many tool prices and all commercial data vendors couldn't be checked against official pages, so they're marked unverified.

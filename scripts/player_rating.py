@@ -332,6 +332,8 @@ def _counted_playerbox(year):
             rows = [dict(r, team_id=sw.get(str(r.get("team_id")),
                                            r.get("team_id")))
                     for r in rows]
+        import nameclean as _nci
+        rows = [_nci.apply_identity_override(r, gid) for r in rows]   # mail 052
         out.append((gid, rows))
     _COUNTED_PB_CACHE[year] = out
     return out

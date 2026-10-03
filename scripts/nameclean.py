@@ -52,3 +52,86 @@ def repair(s):
     else:
         s = _C1_PAIR.sub("", s)
     return "".join(c for c in s if unicodedata.category(c) != "Cf")
+
+
+def join_key(name):
+    """THE player identity key -- one definition for every screen (mail 047;
+    Analysis had its own letters-only key, which silently merged names the
+    player page keeps apart). repair() first, then an NFKD accent fold, then
+    lowercase letters only. Pure-ASCII keys are unchanged."""
+    import re as _re
+    import unicodedata as _ud
+    s = repair(name or "")
+    if any(ord(c) > 0x7F for c in s):
+        s = _ud.normalize("NFKD", s).encode("ascii", "ignore").decode("ascii")
+    return _re.sub(r"[^a-z]", "", s.lower())
+
+
+_ID_OVERRIDES = None
+
+
+def _load_id_overrides():
+    global _ID_OVERRIDES
+    if _ID_OVERRIDES is None:
+        import json as _json
+        import os as _os
+        _ID_OVERRIDES = {}
+        repo = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+        p = _os.path.join(repo, "data", "raw", "2026", "player_identity_overrides.json")
+        try:
+            for o in _json.load(open(p, encoding="utf-8")).get("overrides") or []:
+                if not o.get("evidence"):
+                    continue                     # an uncited override is ignored
+                first, _, last = o["canonical"].partition(" ")
+                for g in o.get("gids") or []:
+                    _ID_OVERRIDES[(str(g), str(o["team_id"]), o["feed_spelling"])] = (first, last)
+        except (OSError, ValueError, KeyError):
+            _ID_OVERRIDES = {}
+    return _ID_OVERRIDES
+
+
+def apply_identity_override(row, gid):
+    """ONE shared, cited, team-scoped identity repair (mails 051/052).
+    Matches only the exact (game, team_id, repaired "first last") listed in
+    data/raw/2026/player_identity_overrides.json; returns a COPY with the
+    school's spelling and the feed's kept as first_src/last_src. Any other
+    row is returned unchanged. Never fuzzy."""
+    if not isinstance(row, dict):
+        return row
+    ov = _load_id_overrides()
+    out = row
+    nm = ("%s %s" % (repair(row.get("first") or ""), repair(row.get("last") or ""))).strip()
+    hit = ov.get((str(gid), str(row.get("team_id")), nm)) if ov else None
+    if hit:
+        out = dict(row)
+        out["first_src"], out["last_src"] = row.get("first"), row.get("last")
+        out["first"], out["last"] = hit
+        nm = "%s %s" % hit
+    # participation overrides share the same single row-override point
+    pv = _load_part_overrides().get((str(gid), str(row.get("team_id")), nm))
+    if pv:
+        out = dict(out)
+        out["gp_src"] = out.get("gp")
+        out["gp"] = pv["gp"]
+        out["participation_corrected"] = pv["label"]
+    return out
+
+
+_PART = None
+
+
+def _load_part_overrides():
+    global _PART
+    if _PART is None:
+        import json as _json
+        import os as _os
+        _PART = {}
+        repo = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+        p = _os.path.join(repo, "data", "raw", "2026", "participation_overrides.json")
+        try:
+            for o in _json.load(open(p)).get("overrides") or []:
+                if o.get("evidence"):
+                    _PART[(str(o["gid"]), str(o["team_id"]), o["player"])] = o
+        except (OSError, ValueError, KeyError):
+            _PART = {}
+    return _PART

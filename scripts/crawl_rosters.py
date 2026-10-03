@@ -112,7 +112,7 @@ def fetch(url, _retry=True):
     throttle()
     try:
         req = urllib.request.Request(url, headers={"User-Agent": UA})
-        with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
+        with __import__("fetch_policy").urlopen(req, timeout=TIMEOUT) as r:
             body = r.read().decode("utf-8", "replace")
     except urllib.error.HTTPError as e:
         return None, "http%d" % e.code

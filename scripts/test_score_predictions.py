@@ -144,6 +144,83 @@ def main():
     check("but the prediction is still on record",
           out["meta"]["predictions_on_record"], 1)
 
+
+    print("\n7. FAIL-CLOSED timing (Phase A)")
+    nolog = pred("g1", "A", "B", 0.9); nolog.pop("logged_utc")
+    out = run([nolog], [game("g1", "A", "B", True)])
+    check("[NEG] a row with no logged time is NOT scored", out["meta"]["scored"], 0)
+    check("...and is counted as unverifiable", out["meta"]["timing_unverifiable_excluded"], 1)
+    bad = pred("g1", "A", "B", 0.9, logged="yesterday-ish")
+    out = run([bad], [game("g1", "A", "B", True)])
+    check("[NEG] an unparseable time is NOT scored", out["meta"]["scored"], 0)
+    noep = game("g1", "A", "B", True); noep["start_time_epoch"] = None
+    out = run([pred("g1", "A", "B", 0.9)], [noep])
+    check("[NEG] a match with no stored start is NOT scored", out["meta"]["scored"], 0)
+    eq = pred("g1", "A", "B", 0.9, logged="2026-08-21T18:00:00Z")   # == epoch
+    out = run([eq], [game("g1", "A", "B", True, epoch=1787335200)])
+    check("[NEG] a row logged AT the start counts as late", out["meta"]["logged_after_tipoff_excluded"], 1)
+
+    print("\n8. Two issuance streams, never mixed")
+    import score_predictions as SP
+    tmp = tempfile.mkdtemp(prefix="wvb-latest-")
+    try:
+        lp = os.path.join(tmp, "latest.jsonl")
+        rows = [dict(pred("g1", "A", "B", 0.55, logged="2026-08-20T00:00:00Z"), issuance="last-pre-match"),
+                dict(pred("g1", "A", "B", 0.70, logged="2026-08-21T12:00:00Z"), issuance="last-pre-match"),
+                dict(pred("g1", "A", "B", 0.99, logged="2026-08-21T19:00:00Z"), issuance="last-pre-match")]
+        with open(lp, "w") as fh:
+            for r in rows:
+                fh.write(json.dumps(r) + "\n")
+        prev = SP.LOG_LATEST
+        SP.LOG_LATEST = lp
+        try:
+            res = {"g1": {"epoch": 1787335200, "home": "A", "away": "B",
+                          "home_won": True, "date": "2026-08-21"}}
+            got = SP.load_latest(res)
+            approx("last-pre-match takes the latest row BEFORE the start",
+                   got["g1"]["home_win"], 0.70)
+            check("[NEG] a row logged after the start never becomes the latest",
+                  got["g1"]["home_win"] != 0.99, True)
+        finally:
+            SP.LOG_LATEST = prev
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    out = run([pred("g1", "A", "B", 0.6)], [game("g1", "A", "B", True)])
+    check("streams are reported separately",
+          sorted(out["streams"].keys()), ["first_issued", "last_pre_match"])
+    check("[NEG] the misleading 0.1289 reference is gone",
+          "0.1289" in json.dumps(out["meta"]), False)
+
+    print("\n9. New log rows carry provenance; old rows are never rewritten")
+    import predict_2026 as PR
+    tmp = tempfile.mkdtemp(prefix="wvb-prov-")
+    try:
+        lp = os.path.join(tmp, "log.jsonl")
+        old_line = json.dumps(pred("g0", "X", "Y", 0.5)) + "\n"
+        open(lp, "w").write(old_line)
+        prev = PR.LOG
+        PR.LOG = lp
+        try:
+            prov = {"model_version": "abc1234", "k": 10.0, "hit_weight": 0.25,
+                    "tau_hit": 0.1, "scale_pts_per_unit": 3.05,
+                    "corpus_fingerprint": "f", "rating_cutoff_epoch": 1,
+                    "blend_generated_utc": "t", "input_hash": "h"}
+            PR.append_log([{"game_id": "g1", "date": "d", "away": "B", "home": "A",
+                            "home_win": 0.6, "neutral": False,
+                            "played_2026": {}}], prov)
+            lines = open(lp).read().splitlines(True)
+            check("the pre-existing row is byte-identical", lines[0], old_line)
+            new = json.loads(lines[1])
+            check("a new row carries every provenance field",
+                  all(k in new for k in prov), True)
+            check("a new row says which stream it is", new.get("issuance"), "first-issued")
+        finally:
+            PR.LOG = prev
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    check("provenance() names the model version, k and input hash",
+          all(k in PR.provenance() for k in ("model_version", "k", "input_hash")), True)
+
     print()
     if FAILED:
         print("FAILED: %d" % len(FAILED))

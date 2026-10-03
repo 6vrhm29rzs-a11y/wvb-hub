@@ -94,6 +94,9 @@ def game(gid, home_id, away_id, venue, city="X", state="ZZ", state_code="F"):
     }
 
 
+SCHOOL = {}          # per-run school-declared sites (venue_site_evidence); {} = none
+
+
 def run(games, season=2026):
     """Build venue classifications from a synthetic game log."""
     tmp = tempfile.mkdtemp(prefix="wvb-venues-")
@@ -109,7 +112,7 @@ def run(games, season=2026):
         venues.OUT = os.path.join(tmp, "out.json")
         venues.SEASON = season
         try:
-            out = venues.build()
+            out = venues.build(school_sites=SCHOOL)
         finally:
             venues.GAMES, venues.OUT, venues.SEASON = prev_games, prev_out, prev_season
         return {r["game_id"]: r["site"] for r in out["games"]}
@@ -151,6 +154,19 @@ def main():
     check("one match at one venue is 'unknown', not 'neutral'", sites["solo"], "unknown")
     sites = run([game("nov", "t1", "t2", None)])
     check("a match with no venue reported is 'no-venue'", sites["nov"], "no-venue")
+    # SCHOOL-DECLARED SITES (2026-09-28): applied only where the feed gave no venue / was
+    # unsure; a disagreement with the feed is listed as a conflict, never applied.
+    global SCHOOL
+    SCHOOL = {"nov": "neutral", "solo": "home", "a0": "neutral", "x1": "conflict"}
+    try:
+        check("school-declared neutral fills a no-venue match", run([game("nov", "t1", "t2", None)])["nov"], "neutral")
+        check("school-declared home fills an 'unknown' match", run([game("solo", "t1", "t2", "Unknown Gym")])["solo"], "home")
+        ga = [game("a%d" % i, "team", "opp%d" % i, "Home Arena") for i in range(4)]
+        check("a feed 'home' that a school calls neutral is NOT overridden (conflict)", run(ga)["a0"], "home")
+        gh = [game("h%d" % i, "host", "v%d" % i, "Host Gym") for i in range(3)] + [game("x1", "v9", "v8", "Host Gym")]
+        check("a school-flagged conflict leaves the feed verdict", run(gh)["x1"], "neutral")
+    finally:
+        SCHOOL = {}
 
     print("\n5. The rating actually consumes it")
     # bakeoff reads its season at import time, and _site_factor looks for

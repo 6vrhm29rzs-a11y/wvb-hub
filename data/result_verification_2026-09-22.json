@@ -1,0 +1,363 @@
+{
+ "date": "2026-09-22",
+ "generated_utc": "2026-09-23T03:24:03Z",
+ "counts": {
+  "VERIFIED_BOTH": 4,
+  "CORROBORATED_ONE": 7,
+  "UNVERIFIED": 2,
+  "HELD_BOTH_REPORT": 1
+ },
+ "matches": [
+  {
+   "gid": "6625673",
+   "date": "2026-09-22",
+   "canonical": "Southern U. def. A&M-Corpus Christi 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Southern U.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gojagsports.com/services/schedule_txt.ashx?schedule=311",
+     "assertion": "Southern U. W 3-0 vs Texas A&M - Corpus Christi",
+     "opponent_source": "Texas A&M - Corpus Christi",
+     "site_says": "Home"
+    },
+    "A&M-Corpus Christi": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://goislanders.com/services/schedule_txt.ashx?schedule=286",
+     "assertion": "A&M-Corpus Christi L 0-3 vs Southern",
+     "opponent_source": "Southern",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6628510",
+   "date": "2026-09-22",
+   "canonical": "Bryant def. Central Conn. St. 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Bryant": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://bryantbulldogs.com/services/schedule_txt.ashx?schedule=493",
+     "assertion": "Bryant W 3-0 vs Central Connecticut State University",
+     "opponent_source": "Central Connecticut State University",
+     "site_says": "Away"
+    },
+    "Central Conn. St.": {
+     "state": "SITE_HTTP_MISS",
+     "url": "https://ccsubluedevils.com/sports/womens-volleyball/schedule/text",
+     "http": 404
+    }
+   }
+  },
+  {
+   "gid": "6625507",
+   "date": "2026-09-22",
+   "canonical": "Eastern Mich. def. Central Mich. 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Eastern Mich.": {
+     "state": "NOT_POSTED",
+     "url": "https://emueagles.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 22 (Tue)",
+      "6:30 p.m.",
+      "Away",
+      "Central Michigan",
+      "Mount Pleasant, Mich.",
+      "",
+      "-"
+     ]
+    },
+    "Central Mich.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://cmuchippewas.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Central Mich. L 0-3 vs Eastern Michigan",
+     "opponent_source": "Eastern Michigan",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6637765",
+   "date": "2026-09-22",
+   "canonical": "Queens (NC) def. UNC Asheville 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Queens (NC)": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://queensathletics.com/services/schedule_txt.ashx?schedule=541",
+     "assertion": "Queens (NC) W 3-1 vs UNC Asheville",
+     "opponent_source": "UNC Asheville",
+     "site_says": "Away"
+    },
+    "UNC Asheville": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://uncabulldogs.com/sports/womens-volleyball/schedule/text",
+     "rows_on_date": [
+      "Queens (N.C.)"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6638982",
+   "date": "2026-09-22",
+   "canonical": "Lipscomb def. Tennessee Tech 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Lipscomb": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://lipscombsports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Lipscomb W 3-1 vs Tennessee Tech",
+     "opponent_source": "Tennessee Tech",
+     "site_says": "Home"
+    },
+    "Tennessee Tech": {
+     "state": "SITE_HTTP_MISS",
+     "url": "https://ttusports.com/sports/womens-volleyball/schedule/text",
+     "http": 404
+    }
+   }
+  },
+  {
+   "gid": "6639585",
+   "date": "2026-09-22",
+   "canonical": "South Carolina St. def. Fort Valley St. 3-1",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "South Carolina St.": {
+     "state": "NOT_POSTED",
+     "url": "https://scsuathletics.com/services/schedule_txt.ashx?schedule=320",
+     "row": [
+      "Sep 22 (Tue)",
+      "6:00 PM",
+      "Away",
+      "Fort Valley State University",
+      "Fort Valley, GA",
+      "",
+      ""
+     ]
+    },
+    "Fort Valley St.": {
+     "state": "SITE_NOT_CONFIGURED",
+     "why": "no athletics site on file"
+    }
+   }
+  },
+  {
+   "gid": "6626408",
+   "date": "2026-09-22",
+   "canonical": "Wofford def. Gardner-Webb 3-2",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Wofford": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://athletics.wofford.edu/services/schedule_txt.ashx?schedule=538",
+     "assertion": "Wofford W 3-2 vs Gardner-Webb University",
+     "opponent_source": "Gardner-Webb University",
+     "site_says": "Away"
+    },
+    "Gardner-Webb": {
+     "state": "NOT_POSTED",
+     "url": "https://gwusports.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 22 (Tue)",
+      "6 PM",
+      "Home",
+      "Wofford",
+      "BOILING SPRINGS, NC (Paul Porter Arena)",
+      "",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6624997",
+   "date": "2026-09-22",
+   "canonical": "UNI def. Drake 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "UNI": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://unipanthers.com/sports/womens-volleyball/schedule/text",
+     "assertion": "UNI W 3-0 vs Drake",
+     "opponent_source": "Drake",
+     "site_says": "Away"
+    },
+    "Drake": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://godrakebulldogs.com/services/schedule_txt.ashx?schedule=550",
+     "assertion": "Drake L 0-3 vs UNI",
+     "opponent_source": "UNI",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6628486",
+   "date": "2026-09-22",
+   "canonical": "HELD as self_contradictory -- Texas A&M vs Rice, no counted result",
+   "verdict": "HELD_BOTH_REPORT",
+   "schools": {
+    "Texas A&M": {
+     "state": "REPORTS",
+     "url": "https://12thman.com/website-api/schedule-events?filter%5Bschedule.sport_id%5D=13&filter%5Bpast%5D=true&per_page=25&sort=-datetime&include=opponent,scheduleEventResult",
+     "assertion": "Texas A&M W 3-0 vs Rice",
+     "opponent_source": "Rice",
+     "site_says": "Home",
+     "surface": "wmt_api"
+    },
+    "Rice": {
+     "state": "REPORTS",
+     "url": "https://riceowls.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Rice L 0-3 vs Texas A&M",
+     "opponent_source": "Texas A&M",
+     "site_says": "Away"
+    }
+   },
+   "held_as": "self_contradictory"
+  },
+  {
+   "gid": "6624777",
+   "date": "2026-09-22",
+   "canonical": "Robert Morris def. Youngstown St. 3-2",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Robert Morris": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://rmucolonials.com/services/schedule_txt.ashx?schedule=503",
+     "assertion": "Robert Morris W 3-2 vs Youngstown State",
+     "opponent_source": "Youngstown State",
+     "site_says": "Home"
+    },
+    "Youngstown St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://ysusports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Youngstown St. L 2-3 vs Robert Morris",
+     "opponent_source": "Robert Morris",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6625121",
+   "date": "2026-09-22",
+   "canonical": "Alabama A&M def. Tennessee St. 3-1",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Alabama A&M": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://aamusports.com/services/schedule_txt.ashx?schedule=385",
+     "assertion": "Alabama A&M W 3-1 vs Tennessee State",
+     "opponent_source": "Tennessee State",
+     "site_says": "Home"
+    },
+    "Tennessee St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://tsutigers.com/services/schedule_txt.ashx?schedule=265",
+     "assertion": "Tennessee St. L 1-3 vs Alabama A&M",
+     "opponent_source": "Alabama A&M",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6627050",
+   "date": "2026-09-22",
+   "canonical": "Tarleton St. def. UT Arlington 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Tarleton St.": {
+     "state": "NOT_POSTED",
+     "url": "https://tarletonsports.com/services/schedule_txt.ashx?schedule=308",
+     "row": [
+      "Sep 22 (Tue)",
+      "6 P.M.",
+      "Home",
+      "UT Arlington",
+      "Stephenville, TX (Wisdom Gym)",
+      "",
+      ""
+     ]
+    },
+    "UT Arlington": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://utamavs.com/services/schedule_txt.ashx?schedule=2427",
+     "assertion": "UT Arlington L 1-3 vs Tarleton State",
+     "opponent_source": "Tarleton State",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6624732",
+   "date": "2026-09-22",
+   "canonical": "Iowa def. Milwaukee 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Iowa": {
+     "state": "NOT_POSTED",
+     "url": "https://hawkeyesports.com/sports/wvball/schedule",
+     "row": [
+      "Sep 22",
+      "vs.",
+      "Milwaukee",
+      "Hawkeye Women Rise",
+      "Coralville, Iowa / Xtream Arena",
+      "6:00 PM CDT",
+      "Buy Tickets",
+      "Opens in a new window",
+      "Opens in a new window",
+      "Opens in a new window",
+      "Opens in a new window",
+      "Preview",
+      "Fri"
+     ]
+    },
+    "Milwaukee": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://mkepanthers.com/services/schedule_txt.ashx?schedule=5404",
+     "assertion": "Milwaukee L 1-3 vs Iowa",
+     "opponent_source": "Iowa",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6627784",
+   "date": "2026-09-22",
+   "canonical": "Montana St. def. Montana 3-1",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Montana St.": {
+     "state": "NOT_POSTED",
+     "url": "https://msubobcats.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 22 (Tue)",
+      "7:00 pm MT",
+      "Away",
+      "Montana",
+      "Missoula, MT",
+      "",
+      "-"
+     ]
+    },
+    "Montana": {
+     "state": "NOT_POSTED",
+     "url": "https://gogriz.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Sep 22 (Tue)",
+      "7:00 PM",
+      "Home",
+      "Montana State",
+      "Missoula, Mont. (Dahlberg Arena/Robin Selvig Court)",
+      "",
+      "-"
+     ]
+    }
+   }
+  }
+ ]
+}

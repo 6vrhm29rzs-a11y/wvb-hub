@@ -32,7 +32,7 @@ UA = {"User-Agent": "wvb-hub/0.1"}
 
 
 def fetch(url):
-    return urllib.request.urlopen(urllib.request.Request(url, headers=UA),
+    return __import__("fetch_policy").urlopen(urllib.request.Request(url, headers=UA),
                                   timeout=30).read()
 
 

@@ -205,7 +205,8 @@ def fetch_source(source_key, urlopen=None, now=None, force=False):
     body, err = None, ""
     try:
         if urlopen is None:
-            from urllib.request import Request, urlopen as _uo
+            from urllib.request import Request
+            from fetch_policy import urlopen as _uo      # mail 054: every hop checked
             req = Request(SOURCES[source_key]["url"], headers={"User-Agent": UA})
             body = _uo(req, timeout=TIMEOUT).read().decode("utf-8", "replace")
         else:

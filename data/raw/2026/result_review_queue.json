@@ -3107,42 +3107,555 @@
    }
   }
  },
- "attr-6628171": {
-  "gid": "6628171",
-  "kind": "attribution_suspicion",
-  "teams": [
-   "Houston Christian",
-   "Northwestern St."
-  ],
-  "n_h1_votes": 1,
-  "components": {
-   "record_continuity": {
-    "available": true,
-    "n_observations": 6,
-    "h0_error": 7,
-    "h1_error": 5,
-    "vote": "SUPPORTS_H1"
+ "6628486": {
+  "gid": "6628486",
+  "date": "2026-09-22",
+  "canonical": "HELD as self_contradictory -- Texas A&M vs Rice, no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "Texas A&M": {
+    "state": "REPORTS",
+    "url": "https://12thman.com/website-api/schedule-events?filter%5Bschedule.sport_id%5D=13&filter%5Bpast%5D=true&per_page=25&sort=-datetime&include=opponent,scheduleEventResult",
+    "assertion": "Texas A&M W 3-0 vs Rice",
+    "opponent_source": "Rice",
+    "site_says": "Home",
+    "surface": "wmt_api"
+   },
+   "Rice": {
+    "state": "NOT_POSTED",
+    "url": "https://riceowls.com/sports/womens-volleyball/schedule/text",
+    "row": [
+     "Sep 22 (Tue)",
+     "6 PM",
+     "Away",
+     "#16 Texas A&M",
+     "College Station, TX (Reed Arena)",
+     "",
+     "-"
+    ]
    }
   },
-  "queued_utc": "2026-09-26T14:45:29Z"
+  "held_as": "self_contradictory"
  },
- "attr-6637765": {
-  "gid": "6637765",
-  "kind": "attribution_suspicion",
-  "teams": [
-   "UNC Asheville",
-   "Queens (NC)"
-  ],
-  "n_h1_votes": 1,
-  "components": {
-   "record_continuity": {
-    "available": true,
-    "n_observations": 6,
-    "h0_error": 7,
-    "h1_error": 5,
-    "vote": "SUPPORTS_H1"
+ "6627660": {
+  "gid": "6627660",
+  "date": "2026-09-24",
+  "canonical": "HELD as self_contradictory -- Texas St. vs Utah St., no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "Texas St.": {
+    "state": "REPORTS",
+    "url": "https://txstatebobcats.com/services/schedule_txt.ashx?schedule=360",
+    "assertion": "Texas St. W 3-0 vs Utah State",
+    "opponent_source": "Utah State",
+    "site_says": "Home"
+   },
+   "Utah St.": {
+    "state": "REPORTS",
+    "url": "https://utahstateaggies.com/services/schedule_txt.ashx?schedule=613",
+    "assertion": "Utah St. L 0-3 vs Texas State",
+    "opponent_source": "Texas State",
+    "site_says": "Away"
    }
   },
-  "queued_utc": "2026-09-26T14:45:29Z"
+  "held_as": "self_contradictory"
+ },
+ "6625073": {
+  "gid": "6625073",
+  "date": "2026-09-24",
+  "canonical": "Denver def. Pacific 3-0",
+  "verdict": "SCHOOL_CONFLICT",
+  "schools": {
+   "Denver": {
+    "state": "CONTRADICTS",
+    "url": "https://denverpioneers.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Denver L 0-3 vs Pacific",
+    "opponent_source": "Pacific",
+    "site_says": "Home"
+   },
+   "Pacific": {
+    "state": "AGREE_COMPLETE",
+    "url": "https://pacifictigers.com/services/schedule_txt.ashx?schedule=405",
+    "assertion": "Pacific L 0-3 vs Denver",
+    "opponent_source": "Denver",
+    "site_says": "Away"
+   }
+  }
+ },
+ "6625193": {
+  "gid": "6625193",
+  "date": "2026-09-25",
+  "canonical": "HELD as empty -- Valparaiso vs Belmont, no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "Valparaiso": {
+    "state": "REPORTS",
+    "url": "https://valpoathletics.com/services/schedule_txt.ashx?schedule=455",
+    "assertion": "Valparaiso L 1-3 vs Belmont",
+    "opponent_source": "Belmont",
+    "site_says": "Home"
+   },
+   "Belmont": {
+    "state": "REPORTS",
+    "url": "https://belmontbruins.com/services/schedule_txt.ashx?schedule=251",
+    "assertion": "Belmont W 3-1 vs Valparaiso",
+    "opponent_source": "Valparaiso",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "empty"
+ },
+ "6627586": {
+  "gid": "6627586",
+  "date": "2026-09-25",
+  "canonical": "HELD as empty -- Nevada vs Grand Canyon, no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "Nevada": {
+    "state": "NOT_POSTED",
+    "url": "https://nevadawolfpack.com/services/schedule_txt.ashx?schedule=525",
+    "row": [
+     "Sep 25 (Fri)",
+     "6 PM (PT)",
+     "Home",
+     "Grand Canyon",
+     "Reno, Nev. (Virginia Street Gym)",
+     "",
+     ""
+    ]
+   },
+   "Grand Canyon": {
+    "state": "REPORTS",
+    "url": "https://gculopes.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Grand Canyon W 3-2 vs Nevada",
+    "opponent_source": "Nevada",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "empty"
+ },
+ "6624577": {
+  "gid": "6624577",
+  "date": "2026-09-26",
+  "canonical": "HELD as self_contradictory -- Seattle U vs Portland, no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "Seattle U": {
+    "state": "REPORTS",
+    "url": "https://goseattleu.com/sports/volleyball/schedule",
+    "assertion": "Seattle U L 0-3 vs Portland",
+    "opponent_source": "Portland",
+    "site_says": null,
+    "surface": "modern_card"
+   },
+   "Portland": {
+    "state": "REPORTS",
+    "url": "https://portlandpilots.com/services/schedule_txt.ashx?schedule=1469",
+    "assertion": "Portland W 3-0 vs Seattle U",
+    "opponent_source": "Seattle U",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "self_contradictory"
+ },
+ "6624973": {
+  "gid": "6624973",
+  "date": "2026-09-26",
+  "canonical": "HELD as empty -- Col. of Charleston vs Towson, no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "Col. of Charleston": {
+    "state": "REPORTS",
+    "url": "https://cofcsports.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Col. of Charleston W 3-2 vs Towson",
+    "opponent_source": "Towson",
+    "site_says": "Home"
+   },
+   "Towson": {
+    "state": "REPORTS",
+    "url": "https://towsontigers.com/services/schedule_txt.ashx?schedule=6584",
+    "assertion": "Towson L 2-3 vs Charleston",
+    "opponent_source": "Charleston",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "empty"
+ },
+ "6624495": {
+  "gid": "6624495",
+  "date": "2026-09-26",
+  "canonical": "HELD as self_contradictory -- St. John's (NY) vs Creighton, no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "St. John's (NY)": {
+    "state": "REPORTS",
+    "url": "https://redstormsports.com/sports/womens-volleyball/schedule/text",
+    "assertion": "St. John's (NY) L 1-3 vs Creighton",
+    "opponent_source": "Creighton",
+    "site_says": "Home"
+   },
+   "Creighton": {
+    "state": "REPORTS",
+    "url": "https://gocreighton.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Creighton W 3-1 vs St. John's",
+    "opponent_source": "St. John's",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "self_contradictory"
+ },
+ "6639587": {
+  "gid": "6639587",
+  "date": "2026-09-27",
+  "canonical": "HELD as empty -- Delaware St. vs South Carolina St., no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "Delaware St.": {
+    "state": "REPORTS",
+    "url": "https://dsuhornets.com/services/schedule_txt.ashx?schedule=388",
+    "assertion": "Delaware St. W 3-0 vs South Carolina State",
+    "opponent_source": "South Carolina State",
+    "site_says": "Home"
+   },
+   "South Carolina St.": {
+    "state": "NOT_POSTED",
+    "url": "https://scsuathletics.com/services/schedule_txt.ashx?schedule=320",
+    "row": [
+     "Sep 27 (Sun)",
+     "12:00 PM",
+     "Away",
+     "Delaware State University",
+     "Dover, DE",
+     "",
+     ""
+    ]
+   }
+  },
+  "held_as": "empty"
+ },
+ "6628476": {
+  "gid": "6628476",
+  "date": "2026-09-27",
+  "canonical": "HELD as empty -- Temple vs Charlotte, no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "Temple": {
+    "state": "NOT_POSTED",
+    "url": "https://owlsports.com/sports/womens-volleyball/schedule/text",
+    "row": [
+     "Sep 27 (Sun)",
+     "12:00 p.m.",
+     "Home",
+     "Charlotte",
+     "Philadelphia, Pa. (McGonigle Hall)",
+     "",
+     "-"
+    ]
+   },
+   "Charlotte": {
+    "state": "REPORTS",
+    "url": "https://charlotte49ers.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Charlotte L 0-3 vs Temple",
+    "opponent_source": "Temple",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "empty"
+ },
+ "6624858": {
+  "gid": "6624858",
+  "date": "2026-09-27",
+  "canonical": "HELD as empty -- Norfolk St. vs Coppin St., no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "Norfolk St.": {
+    "state": "NOT_POSTED",
+    "url": "https://nsuspartans.com/services/schedule_txt.ashx?schedule=274",
+    "row": [
+     "Sep 27 (Sun)",
+     "1:00 PM",
+     "Home",
+     "Coppin State",
+     "Norfolk, VA (Gill Gymnasium)",
+     "",
+     ""
+    ]
+   },
+   "Coppin St.": {
+    "state": "REPORTS",
+    "url": "https://coppinstatesports.com/services/schedule_txt.ashx?schedule=313",
+    "assertion": "Coppin St. W 3-0 vs Norfolk State",
+    "opponent_source": "Norfolk State",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "empty"
+ },
+ "6625675": {
+  "gid": "6625675",
+  "date": "2026-09-27",
+  "canonical": "HELD as empty -- Southern U. vs Grambling, no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "Southern U.": {
+    "state": "REPORTS",
+    "url": "https://gojagsports.com/services/schedule_txt.ashx?schedule=311",
+    "assertion": "Southern U. L 0-3 vs Grambling",
+    "opponent_source": "Grambling",
+    "site_says": "Home"
+   },
+   "Grambling": {
+    "state": "REPORTS",
+    "url": "https://gsutigers.com/services/schedule_txt.ashx?schedule=263",
+    "assertion": "Grambling W 3-0 vs Southern University",
+    "opponent_source": "Southern University",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "empty"
+ },
+ "6626340": {
+  "gid": "6626340",
+  "date": "2026-09-27",
+  "canonical": "HELD as empty -- Syracuse vs Notre Dame, no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "Syracuse": {
+    "state": "REPORTS",
+    "url": "https://cuse.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Syracuse L 0-3 vs Notre Dame",
+    "opponent_source": "Notre Dame",
+    "site_says": "Home"
+   },
+   "Notre Dame": {
+    "state": "REPORTS",
+    "url": "https://und.com/website-api/schedule-events?filter%5Bschedule.sport_id%5D=22&filter%5Bpast%5D=true&per_page=25&sort=-datetime&include=opponent,scheduleEventResult",
+    "assertion": "Notre Dame W 3-0 vs Syracuse",
+    "opponent_source": "Syracuse",
+    "site_says": "Away",
+    "surface": "wmt_api"
+   }
+  },
+  "held_as": "empty"
+ },
+ "6625638": {
+  "gid": "6625638",
+  "date": "2026-09-27",
+  "canonical": "HELD as self_contradictory -- Texas A&M vs South Carolina, no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "Texas A&M": {
+    "state": "REPORTS",
+    "url": "https://12thman.com/sports/volleyball/schedule",
+    "assertion": "Texas A&M W 3-0 vs South Carolina",
+    "opponent_source": "South Carolina",
+    "site_says": null,
+    "surface": "modern_card"
+   },
+   "South Carolina": {
+    "state": "SITE_UNPARSED",
+    "url": "https://gamecocksonline.com/news/2021/09/03/textforhelp/"
+   }
+  },
+  "held_as": "self_contradictory"
+ },
+ "6638106": {
+  "gid": "6638106",
+  "date": "2026-09-27",
+  "canonical": "HELD as empty -- Wake Forest vs North Carolina, no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "Wake Forest": {
+    "state": "NOT_POSTED",
+    "url": "https://godeacs.com/sports/womens-volleyball/schedule/text",
+    "row": [
+     "Sep 27 (Sun)",
+     "4 p.m.",
+     "Home",
+     "No. 24 North Carolina",
+     "Winston-Salem, N.C.",
+     "",
+     "-"
+    ]
+   },
+   "North Carolina": {
+    "state": "REPORTS",
+    "url": "https://goheels.com/sports/womens-volleyball/schedule/text",
+    "assertion": "North Carolina W 3-2 vs Wake Forest",
+    "opponent_source": "Wake Forest",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "empty"
+ },
+ "6626074": {
+  "gid": "6626074",
+  "date": "2026-09-29",
+  "canonical": "HELD as self_contradictory -- Niagara vs Canisius, no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "Niagara": {
+    "state": "REPORTS",
+    "url": "https://purpleeagles.com/services/schedule_txt.ashx?schedule=695",
+    "assertion": "Niagara L 0-3 vs Canisius",
+    "opponent_source": "Canisius",
+    "site_says": "Home"
+   },
+   "Canisius": {
+    "state": "REPORTS",
+    "url": "https://gogriffs.com/services/schedule_txt.ashx?schedule=485",
+    "assertion": "Canisius W 3-0 vs Niagara",
+    "opponent_source": "Niagara",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "self_contradictory"
+ },
+ "6628459": {
+  "gid": "6628459",
+  "date": "2026-09-29",
+  "canonical": "HELD as self_contradictory -- Siena vs Marist, no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "Siena": {
+    "state": "REPORTS",
+    "url": "https://sienasaints.com/services/schedule_txt.ashx?schedule=3497",
+    "assertion": "Siena W 3-1 vs Marist",
+    "opponent_source": "Marist",
+    "site_says": "Home"
+   },
+   "Marist": {
+    "state": "REPORTS",
+    "url": "https://goredfoxes.com/services/schedule_txt.ashx?schedule=656",
+    "assertion": "Marist L 1-3 vs Siena College",
+    "opponent_source": "Siena College",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "self_contradictory"
+ },
+ "6639558": {
+  "gid": "6639558",
+  "date": "2026-10-02",
+  "canonical": "HELD as self_contradictory -- Charlotte vs UTSA, no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "Charlotte": {
+    "state": "REPORTS",
+    "url": "https://charlotte49ers.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Charlotte L 1-3 vs UTSA",
+    "opponent_source": "UTSA",
+    "site_says": "Home"
+   },
+   "UTSA": {
+    "state": "EVENT_NOT_FOUND",
+    "url": "https://goutsa.com/website-api/schedule-events?filter%5Bschedule.sport_id%5D=15&filter%5Bpast%5D=true&per_page=25&sort=-datetime&include=opponent,scheduleEventResult",
+    "rows_on_date": []
+   }
+  },
+  "held_as": "self_contradictory"
+ },
+ "6628422": {
+  "gid": "6628422",
+  "date": "2026-10-02",
+  "canonical": "CSU Bakersfield def. Cal St. Fullerton 3-0",
+  "verdict": "SCHOOL_CONFLICT",
+  "schools": {
+   "CSU Bakersfield": {
+    "state": "CONTRADICTS",
+    "url": "https://gorunners.com/services/schedule_txt.ashx?schedule=349",
+    "assertion": "CSU Bakersfield L 0-3 vs Cal State Fullerton",
+    "opponent_source": "Cal State Fullerton",
+    "site_says": "Home"
+   },
+   "Cal St. Fullerton": {
+    "state": "AGREE_COMPLETE",
+    "url": "https://fullertontitans.com/services/schedule_txt.ashx?schedule=265",
+    "assertion": "Cal St. Fullerton L 0-3 vs Cal State Bakersfield",
+    "opponent_source": "Cal State Bakersfield",
+    "site_says": "Away"
+   }
+  }
+ },
+ "6626005": {
+  "gid": "6626005",
+  "date": "2026-10-03",
+  "canonical": "HELD as empty -- Sam Houston vs New Mexico St., no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "Sam Houston": {
+    "state": "EVENT_NOT_FOUND",
+    "url": "https://gobearkats.com/sports/womens-volleyball/schedule/text",
+    "rows_on_date": [
+     "NM State"
+    ]
+   },
+   "New Mexico St.": {
+    "state": "REPORTS",
+    "url": "https://nmstatesports.com/services/schedule_txt.ashx?schedule=3391",
+    "assertion": "New Mexico St. W 3-2 vs Sam Houston",
+    "opponent_source": "Sam Houston",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "empty"
+ },
+ "6628076": {
+  "gid": "6628076",
+  "date": "2026-10-03",
+  "canonical": "HELD as empty -- Binghamton vs Bryant, no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "Binghamton": {
+    "state": "REPORTS",
+    "url": "https://bubearcats.com/services/schedule_txt.ashx?schedule=1638",
+    "assertion": "Binghamton L 2-3 vs Bryant University",
+    "opponent_source": "Bryant University",
+    "site_says": "Home"
+   },
+   "Bryant": {
+    "state": "NOT_POSTED",
+    "url": "https://bryantbulldogs.com/services/schedule_txt.ashx?schedule=493",
+    "row": [
+     "Oct 3 (Sat)",
+     "2:00 PM",
+     "Away",
+     "Binghamton University",
+     "Vestal, NY / West Gym",
+     "",
+     ""
+    ]
+   }
+  },
+  "held_as": "empty"
+ },
+ "6627254": {
+  "gid": "6627254",
+  "date": "2026-10-03",
+  "canonical": "HELD as self_contradictory -- VCU vs George Washington, no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "VCU": {
+    "state": "REPORTS",
+    "url": "https://vcuathletics.com/services/schedule_txt.ashx?schedule=314",
+    "assertion": "VCU L 0-3 vs George Washington",
+    "opponent_source": "George Washington",
+    "site_says": "Home"
+   },
+   "George Washington": {
+    "state": "NOT_POSTED",
+    "url": "https://gwsports.com/sports/womens-volleyball/schedule/text",
+    "row": [
+     "Oct 3 (Sat)",
+     "3 p.m.",
+     "Away",
+     "VCU",
+     "Richmond, VA",
+     "",
+     "-"
+    ]
+   }
+  },
+  "held_as": "self_contradictory"
  }
 }

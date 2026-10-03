@@ -177,9 +177,13 @@ def main():
     check("it never created a status on any date",
           not any(s["player"] == "Jaela Auguste"
                   for s in art["statuses"]))
-    check("her participation timeline SURVIVES expiry (date-agnostic)",
-          any(x["state"] == "zero_action"
-              for x in art["timelines"].get("Wisconsin|Jaela Auguste", [])))
+    # mail 054: her Sep-11 feed line (gp 5, zero actions) was contradicted by
+    # Wisconsin's official box; the corrected state must survive expiry and
+    # carry the feed's value -- not the old zero_action pin
+    _tl = art["timelines"].get("Wisconsin|Jaela Auguste", [])
+    check("her participation timeline SURVIVES expiry (date-agnostic)", bool(_tl))
+    check("...and shows the school-report-corrected match as not_in_official_box",
+          any(x["state"] == "not_in_official_box" for x in _tl))
     check("the honest default is on the page",
           "No current sourced availability" in src)
     check("the anomaly floor is stated, not silently empty",

@@ -591,3 +591,16 @@ def countable(games, season, need_line=False, d1_only=False):
             continue
         out.append(g)
     return out
+
+
+
+def held_gids(season, games=None):
+    """THE shared accepted-result eligibility for PLAYER consumers (mail 055):
+    every final that classify() does not call 'ok' -- empty, self-contradictory,
+    under review, duplicate, exhibition. Raw lines stay in the log; they just
+    do not enter an accepted statistical aggregate. A result repaired through
+    the corrections ledger re-classifies as 'ok' and re-enters automatically."""
+    import gamelog as _gl
+    if games is None:
+        games = _gl.load_games_jsonl(os.path.join(REPO, "data", "raw", str(season), "games.jsonl"))
+    return set(g for g, c in classify(games, season).items() if c != "ok")

@@ -56,6 +56,12 @@ def main():
           "evidence file")
     ev = os.path.join(REPO, "data/raw/2026/availability_evidence.json")
     pred = os.path.join(REPO, "data/predictions_2026.json")
+    # PRIVATE DEFAULT (Cody 2026-09-28): the private page renders the candidate's forecasts from the
+    # private file when the flag is on -- compare against the file the page actually used.
+    _flag = os.path.join(REPO, "Cody", "data", "power_candidate", "DEFAULT_ON")
+    _priv = os.path.join(REPO, "Cody", "data", "power_candidate", "predictions_2026.json")
+    if os.path.exists(_flag) and os.path.exists(_priv):
+        pred = _priv
     env = dict(os.environ, WVB_SEASON="2026")
 
     def run_predict():

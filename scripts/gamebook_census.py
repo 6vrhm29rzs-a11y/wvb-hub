@@ -166,7 +166,7 @@ def main():
                 # would have printed 0% for the format it was measuring.
                 # A negative result from an incomplete scanner is not a
                 # finding. These are 100 KB - 1 MB; read them fully.
-                with urllib.request.urlopen(req, timeout=60) as r:
+                with __import__("fetch_policy").urlopen(req, timeout=60) as r:
                     raw = r.read()
                 fmt, _ = classify(raw)
                 del raw                      # ⚠ discarded

@@ -252,7 +252,10 @@ def main():
     present = set(re.findall(r'id="([A-Za-z0-9_-]+)"', h))
     js = max(re.findall(r"<script>(.*?)</script>", h, re.S), key=len)
     refs = set(re.findall(r"getElementById\('([A-Za-z0-9_-]+)'\)", js))
-    orphans = sorted(refs - present)
+    # An id the script assigns itself (`el.id = 'x'` -- e.g. a style tag
+    # injected once and found again by id) exists by construction.
+    made = set(re.findall(r"\.id\s*=\s*'([A-Za-z0-9_-]+)'", js))
+    orphans = sorted(refs - present - made)
     check("no getElementById target is missing from the page",
           not orphans, str(orphans[:4]))
     check("[+] ...over a page that really does address nodes",

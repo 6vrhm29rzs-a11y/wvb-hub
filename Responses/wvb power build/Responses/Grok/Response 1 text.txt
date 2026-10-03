@@ -1,0 +1,22 @@
+https://grok.com/share/c2hhcmQtMw_05244927-1b9b-465b-a22c-c1ce78ff49f4
+
+I’ll start by verifying current volleyball rating systems, official data sources, and product/API claims against live documentation, then write one research document that separates evidence from recommendations.I have the core rating-system and data-source picture. Next I’ll verify official product pages for AI tools, RallyIQ, Pablo, and home-advantage estimates.I have enough verified product and literature detail to write the research document: evidence first, then options, trials, and open questions.The research file is ready for joint review. It does not approve implementation, purchases, crawls, or live POWER changes.
+What the evidence supports
+POWER already sits in the same family as the public systems that are actually documented: opponent-adjusted points or rallies, plus a prior. Pablo uses point percentage. VolleyDork fits serve-level Bradley–Terry. RallyIQ splits serve and receive strength and, on its own page, keeps box hitting out of forecasts. That agrees with your packet’s narrow result: extra box channels add little match-win prediction on 2025-sized samples.
+It does not agree with a broader veto on richer models. Round-2 C was undistinguishable, not empty. Reception errors failing is not the same as graded pass quality or first-ball side-out failing. Those richer objects live in Hudl VolleyMetrics papers (arXiv:2402.01083; SRP/M), not in ncaa.com boxes.
+Confirmed against current official/project pages (2026-09-26):
+	•	ncaavolleyballr 0.5.1 covers 2020–2025, not in-season 2026. Scraping stats.ncaa.org is slow and ban-prone. Packet question F4 is answered no.
+	•	Named 2026 servers remain unavailable from ncaa.com. Team-level serve/receive splits might still be in your existing PBP; RallyIQ claims they are. That needs a 20-match audit before anyone specifies a shadow.
+	•	VolleyMetrics is quote-only for college and is not a public data API. Club menu prices are the wrong product. Forum crawling stays off the table.
+What I would do first
+Keep live POWER frozen. Sequence:
+	1.	Freeze an exact A_live replica (k=10, τ_hit=0.100, weight 0.25).
+	2.	Run the two-arm hitting-floor check at live k on the countable D-I set.
+	3.	Add observation timestamps (needed before any honest 2026 shadow).
+	4.	Audit 20 verified 2026 PBPs for serving-team tags vs named servers.
+	5.	Parse only Cody-supplied passing exports into a review queue with game-id joins.
+	6.	Build the ten-metric analysis page from boxes you already have.
+	7.	Shadow neutral-site H=0 on 2026 venues.
+	8.	Only then freeze one prospective candidate for the rest of 2026.
+DuckDB over the current JSONL is the only storage experiment that is cheap and reversible. A second coding agent, MotherDuck, Sportradar, or VolleyMetrics is not justified on this pass. Chat subscriptions do not include sports-data licenses.
+Open questions for the three of you are in §7.5 of the file, including which single T5 candidate Cody wants frozen and whether the analysis page ships even if POWER stays unchanged through the tournament.

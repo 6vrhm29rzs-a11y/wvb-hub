@@ -107,8 +107,14 @@ def participation(rows):
                      "assists"))
         state = ("appeared" if gp and acted
                  else "zero_action" if gp else "not_listed")
+        # a cited school-report participation correction (mail 054): the
+        # feed's listing was contradicted by the official box -- said so
+        if r.get("participation_corrected") and not gp:
+            state = "not_in_official_box"
         out.append({"name": nm, "team_id": str(r.get("team_id")),
-                    "sets": gp, "state": state})
+                    "sets": gp, "state": state,
+                    **({"feed_sets": r.get("gp_src"), "corrected_by": r["participation_corrected"]}
+                       if r.get("participation_corrected") else {})})
     return out
 
 
@@ -272,6 +278,11 @@ def build(today=None):
                                                  or 0)
     per_team_latest = {}
     timelines = {}
+    try:
+        import season_counts as _SCd
+        _held_desk = set(str(x) for x in _SCd.held_gids(SEASON))
+    except Exception:
+        _held_desk = set()
     # ⚠ EXPIRED EVIDENCE KEEPS ITS TIMELINE. The watch set once held only
     # current statuses/signals, so the moment an observation expired, the
     # participation history that explains why it was recorded vanished with
@@ -299,6 +310,8 @@ def build(today=None):
                 _rows = [dict(r, team_id=_sw.get(str(r.get("team_id")),
                                                  r.get("team_id")))
                          for r in _rows]
+            import nameclean as _nci
+            _rows = [_nci.apply_identity_override(r, gid) for r in _rows]   # mail 052
             facts = participation(_rows)
             for f in facts:
                 tn = id2n.get(f["team_id"], "")
@@ -315,9 +328,12 @@ def build(today=None):
                 if per_team_latest[tn]["gid"] == gid:
                     per_team_latest[tn]["rows"].append(f)
                 if (tn, f["name"]) in watch:
-                    timelines.setdefault(tn + "|" + f["name"], []).append(
-                        {"gid": gid, "ep": date_of[gid], "sets": f["sets"],
-                         "state": f["state"]})
+                    _e = {"gid": gid, "ep": date_of[gid], "sets": f["sets"], "state": f["state"]}
+                    if gid in _held_desk:
+                        # visible as UNCERTAIN evidence, never as an accepted
+                        # statistical result (mail 055)
+                        _e["held_result"] = True
+                    timelines.setdefault(tn + "|" + f["name"], []).append(_e)
     latest = {}
     for tn, rec in per_team_latest.items():
         zero = [r["name"] for r in rec["rows"] if r["state"] == "zero_action"]

@@ -46,7 +46,8 @@ MEDIA_TAGS = [
 
 def fetch(url):
     req = Request(url, headers={"User-Agent": INTEL.UA})
-    return urlopen(req, timeout=INTEL.TIMEOUT).read().decode("utf-8", "replace")
+    import fetch_policy as _FP                 # mail 054: every hop checked
+    return _FP.urlopen(req, timeout=INTEL.TIMEOUT).read().decode("utf-8", "replace")
 
 
 def main():

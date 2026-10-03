@@ -65,6 +65,29 @@ def load(p, default=None):
     return json.load(open(path)) if os.path.exists(path) else default
 
 
+CAND = None      # set in __main__ when the PRIVATE DEFAULT flag is on (Cody 2026-09-28: "switch the simulator too")
+PRIVATE_OUT = os.path.join(REPO, "Cody", "data", "power_candidate", "season_sim_%d.json" % SEASON)
+
+
+def candidate_strengths(cand, teams, fixtures):
+    """theta -> points/set by ONE scale g: regress the rally-model margin that implies the
+    candidate's neutral win chance on theta-difference across the fixture list (through the
+    origin). Home edge = g x (home set-share + intercept/k), k at full evidence depth."""
+    import predict_2026 as _P
+    T = cand["teams"]; m = cand["win_model"]
+    xs, ys = [], []
+    for f in fixtures:
+        h, a = f["home"], f["away"]
+        if h in T and a in T:
+            d = T[h]["theta"] - T[a]["theta"]
+            p = _P.cand_win(cand, h, a, True)
+            xs.append(d); ys.append(_P.margin_for_win(p))
+    g = sum(x * y for x, y in zip(xs, ys)) / sum(x * x for x in xs)
+    k = m["b"] + m["c"] * m["s_now"] + m.get("e", 0.0) * 1.0
+    adv = g * ((cand.get("home_setshare") or 0.0) + m["a"] / k)
+    return dict((t, g * T[t]["theta"]) for t in teams if t in T), g, adv
+
+
 def build():
     rating = load("data/rating_2025.json") or {}
     strength = {}
@@ -145,13 +168,23 @@ def build():
         _n = np.array([played[t][0] + played[t][1] for t in teams], dtype=float)
         sd = 1.0 / np.sqrt(1.0 / PRIOR_RESIDUAL_SD ** 2 + _n / _s2)
         basis = "blend"
+    home_adv_used = HOME_ADV
+    if CAND is not None:
+        _cs, _g, _cadv = candidate_strengths(CAND, teams, fixtures)
+        if len(_cs) >= len(teams) - 5:
+            _s2 = float((load("data/sim_blend_2025.json") or {}).get("sigma2") or 23.93)
+            base = np.array([_cs.get(t, base[i]) for i, t in enumerate(teams)])
+            _n = np.array([played[t][0] + played[t][1] for t in teams], dtype=float)
+            sd = 1.0 / np.sqrt(1.0 / PRIOR_RESIDUAL_SD ** 2 + _n / _s2)
+            basis = "candidate:%s (g=%.3f pts/set per theta unit, home %.3f)" % (CAND.get("version"), _g, _cadv)
+            home_adv_used = _cadv
     print("  strength basis: %s" % basis)
     hi = np.array([idx[f["home"]] for f in fixtures])
     ai = np.array([idx[f["away"]] for f in fixtures])
     # The fitted home edge, zero on a neutral floor. Taken as a constant rather
     # than re-derived from each fixture's stored margin, because that margin was
     # computed from the UNSHRUNK prior and this simulation uses the shrunk one.
-    adv = np.array([0.0 if f["neutral"] else HOME_ADV for f in fixtures])
+    adv = np.array([0.0 if f["neutral"] else home_adv_used for f in fixtures])
 
     # ---- tournament bids -------------------------------------------------
     # 32 automatic bids go to conference winners; the rest of the field is the
@@ -365,6 +398,21 @@ if __name__ == "__main__":
     if not out:
         sys.exit(1)
     json.dump(out, open(OUT, "w"), indent=1)
+    # PRIVATE DEFAULT: a second run on the 2026 candidate, written to a PRIVATE file;
+    # the tracked OUT above stays exactly what CI produces.
+    _flag = os.path.join(REPO, "Cody", "data", "power_candidate", "DEFAULT_ON")
+    _cp = os.path.join(REPO, "Cody", "data", "power_candidate", "v2so_preview.json")
+    if os.path.exists(_flag) and os.path.exists(_cp):
+        try:
+            CAND = json.load(open(_cp))
+        except ValueError:
+            CAND = None
+        if CAND and CAND.get("win_model"):
+            _c = build()
+            if _c:
+                json.dump(_c, open(PRIVATE_OUT, "w"), indent=1)
+                print("wrote %s (candidate basis)" % PRIVATE_OUT)
+        CAND = None
     m = out["meta"]
     print("wrote %s" % OUT)
     print("  %d iterations over %d fixtures, %d teams"

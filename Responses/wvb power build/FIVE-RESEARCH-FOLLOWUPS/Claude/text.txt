@@ -1,0 +1,21 @@
+Claude
+Launching the correction addendum research now, with the shared-corrections file and the original report's claims folded into the brief so the agent can correct itself against them.
+I've finished the POWER correction addendum. Five earlier claims were wrong and are now fixed:
+	•	Paper authors: the three arXiv papers had the wrong authors attached.
+	•	Volleymetrics: the "cannot be downloaded or shared" rule only covers the VM Network. Teams can buy DVW files for matches within their own level of play as an add-on. It's still unknown what POWER itself is entitled to.
+	•	Home terms: I withdrew the "internal inconsistency" claim about h = 1.0878 versus the 0.2675 forecast intercept. They belong to different stages of the model, so the gap between them doesn't show double-counting. The report sets out a proper venue audit instead.
+	•	Weighting by sets: the 5/3 rally weighting, the scale-equivalence argument and the "12.4%" figure were wrong. Weighting by the number of sets depends on the match result, and the fifth set is only played to 15.
+	•	Detectable effects: the earlier estimate was based on assumed spread values, not measured ones. It's replaced by a formula and a plan to measure those values on 2025 data.
+Three claims hold with caveats:
+	•	Digs: checking digs against opponent attacks kept in play works as a data-quality check, not as a measure of defensive skill.
+	•	Serving team: it can be worked out rally by rally once one server in a set is known, but missing rallies and score corrections break it.
+	•	Data sources: the bans on automated collection by StatBroadcast, ProBoards and Hudl still stand.
+I found no primary estimate of home advantage in NCAA Division I women's volleyball, and no published benchmark scores for forecasting NCAA volleyball in advance. That isn't proof none exist.
+The old 0.172 Brier score is a historical number, not a held-out score for the current model. It shouldn't be compared with the 2026 live figure of 0.1796.
+The report proposes three next tests:
+	1.	A clean chronological re-benchmark of 2025 with the current code, plus the venue audit.
+	2.	One pre-registered test of the hitting channel at the live setting (k=10).
+	3.	A test of the serving-team inference, checked first for data rights, then validated against 2025 files that name every server.
+It also includes a table of data sources with their terms of use, and appendices with the detailed designs.
+
+https://claude.ai/share/0ebabf0c-39be-46ea-bb22-c374a01371ef

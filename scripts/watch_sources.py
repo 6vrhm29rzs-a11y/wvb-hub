@@ -34,7 +34,7 @@ UA = {"User-Agent": "wvb-hub/0.1 (personal project watch)"}
 
 
 def get(url):
-    with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=30) as r:
+    with __import__("fetch_policy").urlopen(urllib.request.Request(url, headers=UA), timeout=30) as r:
         return r.read().decode("utf-8", "replace")
 
 

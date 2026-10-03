@@ -872,6 +872,19 @@ def crawl_players():
         _skip_gids |= _dup_gids
     except Exception:
         pass
+    # ⚠ SHARED ACCEPTED-RESULT ELIGIBILITY (mail 055): every held final --
+    # empty, self-contradictory, under review, duplicate, exhibition --
+    # stays out of the per-player season aggregate the ratings read. It was
+    # skipping exhibitions/duplicates/review only, so 18 empty or
+    # self-contradictory finals still fed player ratings while every other
+    # screen excluded them. A repaired result re-enters automatically.
+    _held_gids = set()
+    try:
+        from season_counts import held_gids as _hg
+        _held_gids = set(str(x) for x in _hg(SEASON))
+        _skip_gids |= _held_gids
+    except Exception:
+        pass
     # a result under review counts nowhere -- including per-player lines
     try:
         from season_counts import review_gids as _rg
@@ -916,6 +929,8 @@ def crawl_players():
             if _swap:
                 r = dict(r, team_id=_swap.get(str(r.get("team_id")),
                                               r.get("team_id")))
+            import nameclean as _nci
+            r = _nci.apply_identity_override(r, gid_key)   # cited, exact (mail 052)
             if _broken and not _has_production(r):
                 dropped_lines += 1
                 continue

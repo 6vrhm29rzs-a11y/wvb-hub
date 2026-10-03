@@ -8,8 +8,10 @@ data/raw/2026/prediction_log.jsonl before it was played -- against the result,
 and reports the two things that matter:
 
   BRIER SCORE. Mean squared error of the probability. 0.25 is what you get by
-  saying 50% to everything, so anything at or above that is worthless. The 2025
-  backtest of this same model scored 0.1289.
+  saying 50% to everything, so anything at or above that is worthless. There is
+  NO clean retrospective number for this model to compare against (the old
+  0.1289 was the rally model fed true margins; the old 0.1718 reused outcomes in
+  fit and evaluation) -- see the research packet, CURRENT-MODEL section 4.
 
   CALIBRATION. Of the matches we called 70%, did about 70% happen? A model can
   have a good Brier score and still be systematically overconfident, and
@@ -21,9 +23,18 @@ against that file would mean re-deriving a "prediction" from data that already
 contains the outcome, which is a fit wearing a forecast's clothes. The log is
 first-write-wins and permanent.
 
-INTEGRITY CHECK. Each logged prediction carries the time it was written, and
-this refuses to score any prediction recorded after its match started. That
-cannot happen by design, and checking is cheap.
+INTEGRITY CHECK (fail-closed since Phase A, 2026-09-26). Each logged
+prediction carries the time it was written; this scores it only when that
+time is STRICTLY before the match's stored start epoch. A missing or
+unparseable time on either side is EXCLUDED and counted -- it used to be scored,
+which let an unverifiable row through. Equal times count as late. The start is
+the feed's LISTED start, not the actual first serve.
+
+TWO STREAMS, NEVER MIXED. `first-issued` (prediction_log.jsonl) is the first
+forecast ever written for a fixture, often days early. `last-pre-match`
+(prediction_log_latest.jsonl) is the latest forecast logged before the listed
+start. They are scored and labelled separately; the top-level meta keeps the
+first-issued stream so older readers see what they always saw.
 
 Python 3.9 target. Writes data/prediction_score_2026.json.
 """
@@ -40,6 +51,7 @@ sys.path.insert(0, os.path.join(REPO, "scripts"))
 import season_counts as _SC  # noqa: E402
 SEASON = int(os.environ.get("WVB_SEASON", "2026"))
 LOG = os.path.join(REPO, "data", "raw", str(SEASON), "prediction_log.jsonl")
+LOG_LATEST = os.path.join(REPO, "data", "raw", str(SEASON), "prediction_log_latest.jsonl")
 GAMES = os.path.join(REPO, "data", "raw", str(SEASON), "games.jsonl")
 OUT = os.path.join(REPO, "data", "prediction_score_%d.json" % SEASON)
 
@@ -103,43 +115,72 @@ def load_results() -> Dict[str, Dict]:
     return out
 
 
-def build():
-    preds = load_predictions()
-    results = load_results()
+def load_latest(results) -> Dict[str, Dict]:
+    """gid -> the LAST row logged strictly before that match's stored start.
+    Rows whose time cannot be compared are skipped here; they can never be the
+    'last pre-match' forecast because nothing proves they were pre-match."""
+    out = {}
+    if not os.path.exists(LOG_LATEST):
+        return out
+    for line in open(LOG_LATEST):
+        try:
+            r = json.loads(line)
+        except ValueError:
+            continue
+        gid = str(r.get("game_id"))
+        res = results.get(gid)
+        lt = _ts(r.get("logged_utc"))
+        if not res or lt is None or not res.get("epoch"):
+            continue
+        if lt >= float(res["epoch"]):
+            continue
+        prev = out.get(gid)
+        if prev is None or lt >= _ts(prev.get("logged_utc")):
+            out[gid] = r
+    return out
 
-    scored, late, mismatched = [], 0, 0
+
+def _ts(v):
+    try:
+        return datetime.datetime.strptime(v, "%Y-%m-%dT%H:%M:%SZ").replace(
+            tzinfo=datetime.timezone.utc).timestamp()
+    except (TypeError, ValueError):
+        return None
+
+
+def score(preds, results, label):
+    scored, late, mismatched, unverifiable = [], 0, 0, 0
     for gid, p in preds.items():
         r = results.get(gid)
         if not r:
             continue
-        # the prediction must predate the match
-        if r.get("epoch") and p.get("logged_utc"):
-            try:
-                logged = datetime.datetime.strptime(
-                    p["logged_utc"], "%Y-%m-%dT%H:%M:%SZ").replace(
-                    tzinfo=datetime.timezone.utc).timestamp()
-                if logged > float(r["epoch"]):
-                    late += 1
-                    continue
-            except ValueError:
-                pass
+        # the prediction must provably predate the match -- fail CLOSED
+        lt = _ts(p.get("logged_utc"))
+        try:
+            ep = float(r.get("epoch")) if r.get("epoch") else None
+        except (TypeError, ValueError):
+            ep = None
+        if lt is None or ep is None:
+            unverifiable += 1
+            continue
+        if lt >= ep:
+            late += 1
+            continue
         # and it must be about the same match
         if p.get("home") != r.get("home") or p.get("away") != r.get("away"):
             mismatched += 1
             continue
         scored.append({
-            "game_id": gid, "date": p.get("date"),
-            "away": r["away"], "home": r["home"],
-            "p_home": p["home_win"], "home_won": r["home_won"],
+            "game_id": gid, "date": p.get("date"), "home": r["home"],
+            "away": r["away"], "p_home": p["home_win"],
+            "home_won": r["home_won"],
             "brier": (p["home_win"] - (1.0 if r["home_won"] else 0.0)) ** 2,
+            "model_version": p.get("model_version"),
         })
-
     n = len(scored)
     brier = sum(s["brier"] for s in scored) / n if n else None
     hits = sum(1 for s in scored
                if (s["p_home"] >= 0.5) == s["home_won"]) if n else 0
-
-    # calibration: bucket by the FAVOURITE's probability
     buckets = []
     for lo, hi in BUCKETS:
         rows = []
@@ -155,23 +196,47 @@ def build():
                 "said": round(100 * sum(x for x, _ in rows) / len(rows), 1),
                 "happened": round(100 * sum(1 for _, w in rows if w) / len(rows), 1),
             })
+    versions = collections.Counter(s["model_version"] or "unversioned" for s in scored)
+    meta = {
+        "issuance": label,
+        "scored": n,
+        "logged_after_tipoff_excluded": late,
+        "timing_unverifiable_excluded": unverifiable,
+        "team_mismatch_excluded": mismatched,
+        "predictions_on_record": len(preds),
+        "brier": round(brier, 4) if brier is not None else None,
+        "favourite_correct": hits,
+        "favourite_correct_pct": round(100.0 * hits / n, 1) if n else None,
+        "by_model_version": dict(versions),
+    }
+    return meta, buckets, scored
 
+
+def build():
+    preds = load_predictions()
+    results = load_results()
+    first, buckets, scored = score(preds, results, "first-issued")
+    latest_m, latest_b, _ls = score(load_latest(results), results, "last-pre-match")
+    meta = dict(first)
+    meta.update({
+        "season": SEASON,
+        "source_tier": "DERIVED",
+        "results_available": len(results),
+        "as_of_utc": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "what_this_is": ("Recorded forecast performance by issuance stream, as of "
+                         "as_of_utc. Timing is checked against the feed's LISTED "
+                         "start, not the actual first serve; rows logged before "
+                         "2026-09-26 carry no model version. Not a certified "
+                         "held-out test of any single model version."),
+        "brier_reference": "0.25 is what saying 50% to everything scores",
+    })
     return {
-        "meta": {
-            "season": SEASON,
-            "source_tier": "DERIVED",
-            "scored": n,
-            "logged_after_tipoff_excluded": late,
-            "team_mismatch_excluded": mismatched,
-            "predictions_on_record": len(preds),
-            "results_available": len(results),
-            "brier": round(brier, 4) if brier is not None else None,
-            "brier_reference": ("0.25 is what saying 50%% to everything scores; "
-                                "this model backtested at 0.1289 on 2025"),
-            "favourite_correct": hits,
-            "favourite_correct_pct": round(100.0 * hits / n, 1) if n else None,
-        },
+        "meta": meta,
         "calibration": buckets,
+        "streams": {
+            "first_issued": {"meta": first, "calibration": buckets},
+            "last_pre_match": {"meta": latest_m, "calibration": latest_b},
+        },
         "matches": sorted(scored, key=lambda s: -s["brier"])[:50],
     }
 
@@ -184,6 +249,12 @@ if __name__ == "__main__":
     print("  predictions on record : %d" % m["predictions_on_record"])
     print("  results available     : %d" % m["results_available"])
     print("  scored                : %d" % m["scored"])
+    if m.get("timing_unverifiable_excluded"):
+        print("  EXCLUDED, timing could not be verified: %d"
+              % m["timing_unverifiable_excluded"])
+    lm = out["streams"]["last_pre_match"]["meta"]
+    print("  last-pre-match stream : %d scored%s" % (
+        lm["scored"], (", Brier %.4f" % lm["brier"]) if lm["brier"] is not None else ""))
     if m["logged_after_tipoff_excluded"]:
         print("  EXCLUDED, logged after the match started: %d"
               % m["logged_after_tipoff_excluded"])
@@ -192,7 +263,7 @@ if __name__ == "__main__":
               "played, which is exactly what you want at this point -- the log "
               "has to be written before the matches, not after.")
         sys.exit(0)
-    print("\n  Brier score      : %.4f   (0.25 = coin flip, 0.1289 = 2025 backtest)"
+    print("\n  Brier score      : %.4f   (0.25 = coin flip; first-issued stream)"
           % m["brier"])
     print("  favourite won    : %d of %d (%.1f%%)"
           % (m["favourite_correct"], m["scored"], m["favourite_correct_pct"]))

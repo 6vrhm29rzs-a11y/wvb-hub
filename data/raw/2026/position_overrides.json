@@ -1,0 +1,158 @@
+{
+ "_doc": "Narrow, cited POSITION overrides (mail 052). Roster role (the school's listing) is kept distinct from the feed's match-box position (box_pos) and from any rotational role. One entry per player; no bulk rewrite. Applied to the player directory (PLAYERS) in build_hub.",
+ "overrides": [
+  {
+   "season": 2026,
+   "team": "Pittsburgh",
+   "player": "Olivia Babcock",
+   "roster_pos": "RS",
+   "evidence": [
+    {
+     "url": "https://pittsburghpanthers.com/sports/womens-volleyball/roster",
+     "kind": "school_roster",
+     "text": "Olivia Babcock -- RS (crawled roster pos_raw, data/raw/2026/rosters_2026.json)"
+    }
+   ],
+   "feed_box_pos": "OH",
+   "why": "The NCAA box lists her OH; Pitt's official roster lists RS. The directory showed the box's OH while the roster table showed OPP (RS mapped). Roster role now shown, box position kept as box_pos."
+  },
+  {
+   "season": 2026,
+   "team": "Nebraska",
+   "player": "Kenna Cogill",
+   "roster_pos": "DS",
+   "feed_box_pos": {
+    "MB": 7
+   },
+   "evidence": [
+    {
+     "url": "https://huskers.com/sports/womens-volleyball/roster",
+     "kind": "school_roster",
+     "text": "crawled official roster lists Kenna Cogill as DS (data/raw/2026/rosters_2026.json)"
+    }
+   ],
+   "why": "Roster ROLE (the school's listing) shown as the directory position; the feed's match-box position kept as box_pos. Neither asserts an on-court role."
+  },
+  {
+   "season": 2026,
+   "team": "Louisville",
+   "player": "Payton Petersen",
+   "roster_pos": "OH",
+   "feed_box_pos": {
+    "OH": 2,
+    "L": 12
+   },
+   "evidence": [
+    {
+     "url": "https://gocards.com/sports/womens-volleyball/roster",
+     "kind": "school_roster",
+     "text": "crawled official roster lists Payton Petersen as OH (data/raw/2026/rosters_2026.json)"
+    }
+   ],
+   "why": "Roster ROLE (the school's listing) shown as the directory position; the feed's match-box position kept as box_pos. Neither asserts an on-court role."
+  },
+  {
+   "season": 2026,
+   "team": "Pittsburgh",
+   "player": "Jessica Smallwood",
+   "roster_pos": "RS",
+   "feed_box_pos": {
+    "OH": 2
+   },
+   "evidence": [
+    {
+     "url": "https://pittsburghpanthers.com/sports/womens-volleyball/roster",
+     "kind": "school_roster",
+     "text": "crawled official roster lists Jessica Smallwood as RS (data/raw/2026/rosters_2026.json)"
+    }
+   ],
+   "why": "Roster ROLE (the school's listing) shown as the directory position; the feed's match-box position kept as box_pos. Neither asserts an on-court role."
+  },
+  {
+   "season": 2026,
+   "team": "Kentucky",
+   "player": "Hannah Benjamin",
+   "roster_pos": "OH",
+   "feed_box_pos": {
+    "MB": 4
+   },
+   "evidence": [
+    {
+     "url": "https://ukathletics.com/sports/womens-volleyball/roster",
+     "kind": "school_roster",
+     "text": "crawled official roster lists Hannah Benjamin as OH (data/raw/2026/rosters_2026.json)"
+    }
+   ],
+   "why": "Roster ROLE (the school's listing) shown as the directory position; the feed's match-box position kept as box_pos. Neither asserts an on-court role."
+  },
+  {
+   "season": 2026,
+   "team": "Arizona St.",
+   "player": "Ella Lewis",
+   "roster_pos": "L",
+   "feed_box_pos": {
+    "OH": 13
+   },
+   "evidence": [
+    {
+     "url": "https://thesundevils.com/sports/womens-volleyball/roster",
+     "kind": "school_roster",
+     "text": "crawled official roster lists Ella Lewis as L (data/raw/2026/rosters_2026.json)"
+    }
+   ],
+   "why": "Roster ROLE (the school's listing) shown as the directory position; the feed's match-box position kept as box_pos. Neither asserts an on-court role."
+  },
+  {
+   "season": 2026,
+   "team": "Purdue",
+   "player": "Sydni Vice",
+   "roster_pos": "OH",
+   "feed_box_pos": {
+    "MB": 8
+   },
+   "evidence": [
+    {
+     "url": "https://purduesports.com/sports/womens-volleyball/roster",
+     "kind": "school_roster",
+     "text": "crawled official roster lists Sydni Vice as OH (data/raw/2026/rosters_2026.json)"
+    }
+   ],
+   "why": "Roster ROLE (the school's listing) shown as the directory position; the feed's match-box position kept as box_pos. Neither asserts an on-court role."
+  },
+  {
+   "season": 2026,
+   "team": "Kansas",
+   "player": "Olivia Hasbrook",
+   "roster_pos": "L",
+   "feed_box_pos": {
+    "DS": 12
+   },
+   "evidence": [
+    {
+     "url": "https://kuathletics.com/sports/womens-volleyball/roster",
+     "kind": "school_roster",
+     "text": "crawled official roster lists Olivia Hasbrook as L (data/raw/2026/rosters_2026.json)"
+    }
+   ],
+   "why": "Roster ROLE (the school's listing) shown as the directory position; the feed's match-box position kept as box_pos. Neither asserts an on-court role."
+  },
+  {
+   "season": 2026,
+   "team": "Texas A&M",
+   "player": "Taryn Morris",
+   "roster_pos": "S",
+   "feed_box_pos": {
+    "OPP": 10,
+    "O": 3
+   },
+   "evidence": [
+    {
+     "url": "https://12thman.com/sports/womens-volleyball/roster",
+     "kind": "school_roster",
+     "text": "crawled official roster lists Taryn Morris as S (data/raw/2026/rosters_2026.json)"
+    }
+   ],
+   "why": "Roster ROLE (the school's listing) shown as the directory position; the feed's match-box position kept as box_pos. Neither asserts an on-court role."
+  }
+ ]
+}

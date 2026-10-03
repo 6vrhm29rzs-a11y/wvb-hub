@@ -4469,6 +4469,71 @@
     }
    ],
    "note": "Found the same afternoon the match was played: test_box_attribution flagged the box, and verify_results_daily then found BOTH schools contradicting the feed. Identical in class and evidence to 6627672. Filed on Cody's explicit go-ahead (2026-09-20), asked for separately from 6627672's -- one approval was not treated as standing permission for the class."
+  },
+  "6628486": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Texas A&M won with sets_won 2-0 -- a REVISION: the feed's first final record carried 3-0, then a later final record dropped A&M to 2, against its own three complete set lines (25-22, 25-12, 25-19). Last-wins took the revision, so the match was held as self-contradictory.",
+   "correct": {
+    "winner_team_id": "46006",
+    "home_sets": 3,
+    "away_sets": 0
+   },
+   "established": "Texas A&M def. Rice 3-0 (25-22, 25-12, 25-19). The feed's own set line, the feed's own earlier final record, Texas A&M's official schedule and the SEC's official recap all agree; only the feed's later sets_won revision disagrees. Winner unchanged -- only the tally is corrected.",
+   "evidence": [
+    {
+     "url": "https://12thman.com/website-api/schedule-events?filter%5Bschedule.sport_id%5D=13&filter%5Bpast%5D=true&per_page=25&sort=-datetime&include=opponent,scheduleEventResult",
+     "kind": "school_site",
+     "school": "Texas A&M",
+     "retrieved": "2026-09-26 (nightly verifier, result_review_queue)",
+     "text": "'Texas A&M W 3-0 vs Rice'",
+     "establishes": "Texas A&M won 3-0"
+    },
+    {
+     "url": "https://www.secsports.com/news/2026/09/no-16-texas-am-sweeps-rice-in-nonconference-finale",
+     "kind": "conference_recap",
+     "school": "SEC",
+     "retrieved": "2026-09-26",
+     "text": "'No. 16 Texas A&M sweeps Rice in nonconference finale' ... 'the Aggies' 3-0 win'",
+     "establishes": "3-0 sweep, from the conference office, independent of the feed"
+    },
+    {
+     "url": "ncaa-api /game/6628486",
+     "kind": "internal_linescores",
+     "retrieved": "raw games.jsonl",
+     "text": "linescores 25-22, 25-12, 25-19, all home; an earlier F record of the same gid carried sets_won 3-0",
+     "establishes": "the feed's own set line is a complete 3-0"
+    }
+   ]
+  },
+  "6627660": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "Texas St. won with sets_won 2-0 -- a REVISION of the feed's own earlier final record (3-0), against its own complete set line 25-23, 25-20, 25-23. Held as self-contradictory under last-wins.",
+   "correct": {
+    "winner_team_id": "46124",
+    "home_sets": 3,
+    "away_sets": 0
+   },
+   "established": "Texas St. def. Utah St. 3-0 (25-23, 25-20, 25-23). Both schools' official schedules agree with the feed's set line and its first final record; winner unchanged, tally corrected.",
+   "evidence": [
+    {
+     "url": "https://txstatebobcats.com/services/schedule_txt.ashx?schedule=360",
+     "kind": "school_site",
+     "school": "Texas St.",
+     "retrieved": "nightly verifier (result_review_queue)",
+     "text": "'Texas St. W 3-0 vs Utah State'",
+     "establishes": "Texas St. won 3-0"
+    },
+    {
+     "url": "https://utahstateaggies.com/services/schedule_txt.ashx?schedule=613",
+     "kind": "school_site",
+     "school": "Utah St.",
+     "retrieved": "nightly verifier (result_review_queue)",
+     "text": "'Utah St. L 0-3 vs Texas State'",
+     "establishes": "Utah St. lost 0-3 -- second independent school"
+    }
+   ]
   }
  }
 }

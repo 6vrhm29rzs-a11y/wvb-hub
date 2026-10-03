@@ -1,0 +1,76 @@
+{
+ "_doc": "Narrow player-identity overrides (mail 051). One entry maps ONE exact feed spelling, on ONE team, in ONE season, to the school's official spelling -- only when official roster AND match evidence establish it is the same player. No fuzzy matching; source spellings are kept in the raw log; each entry cites its evidence. Applied where box names are built (build_hub.box_and_players). Applied at ROW level by nameclean.apply_identity_override(row, gid) in every ingestion path (crawl aggregate, player_rating, availability, availability_desk, build_hub): exact gid + team_id + repaired spelling only; the row keeps first_src/last_src.",
+ "overrides": [
+  {
+   "season": 2026,
+   "team": "St. John's (NY)",
+   "feed_spelling": "Lejla Hadåÿiredåÿepovic",
+   "canonical": "Lejla Hadžiredžepovic",
+   "jersey": 7,
+   "gids": [
+    "6625765",
+    "6624494",
+    "6624495",
+    "6624505",
+    "6624501"
+   ],
+   "evidence": [
+    {
+     "url": "https://redstormsports.com/sports/womens-volleyball/roster/lejla-hadziredzepovic/6340",
+     "kind": "school_roster",
+     "text": "roster player 6340, Lejla Hadziredzepovic, #7"
+    },
+    {
+     "url": "https://redstormsports.com/sports/womens-volleyball/stats/2026/njit/boxscore/15368",
+     "kind": "school_box",
+     "match": "Iona",
+     "sha256": "22f3620ba42169af06dbd0ae44e1c5a77a926768e24738b2e94c4155765b5a7c",
+     "retrieved": "2026-09-27",
+     "text": "box lists 'Hadžiredžepovic, Lejla' (HADžIREDžEPOVIC,LEJLA), uniform 7, rosterPlayerId 6340"
+    },
+    {
+     "url": "https://redstormsports.com/sports/womens-volleyball/stats/2026/iona/boxscore/15369",
+     "kind": "school_box",
+     "match": "Iona",
+     "sha256": "bdaa24e00169f3cf8fa5346a94f2b125fc2b954c886029b941e0f8ff4c7a33ac",
+     "retrieved": "2026-09-27",
+     "text": "box lists 'Hadžiredžepovic, Lejla' (HADžIREDžEPOVIC,LEJLA), uniform 7, rosterPlayerId 6340"
+    },
+    {
+     "url": "https://redstormsports.com/sports/womens-volleyball/stats/2026/rutgers/boxscore/15372",
+     "kind": "school_box",
+     "match": "Rutgers",
+     "sha256": "dcc59dda5cea6178228b0e670cd42c1955f5067ab9eb62f73152a2b3c3e6646f",
+     "retrieved": "2026-09-27",
+     "text": "box lists 'Hadžiredžepovic, Lejla' (HADžIREDžEPOVIC,LEJLA), uniform 7, rosterPlayerId 6340"
+    },
+    {
+     "url": "https://redstormsports.com/sports/womens-volleyball/stats/2026/no-25-creighton/boxscore/15374",
+     "kind": "school_box",
+     "match": "Creighton",
+     "sha256": "cd5ec816991ff35b461dcfe10d48c19865321ac6aa372395629bd324f3cd154b",
+     "retrieved": "2026-09-27",
+     "text": "box lists 'Hadžiredžepovic, Lejla' (HADžIREDžEPOVIC,LEJLA), uniform 7, rosterPlayerId 6340"
+    },
+    {
+     "url": "https://redstormsports.com/sports/womens-volleyball/stats/2026/njit/boxscore/15368",
+     "kind": "school_box",
+     "match": "NJIT",
+     "sha256": "46857edbcfd47360bd0ffa329b347acdbeb9275cc48f2b4b6ea963b8ad6191ff",
+     "retrieved": "2026-10-02",
+     "text": "box lists 'Hadziredzepovic, Lejla  (12' for St. John's #7 (Lejla)"
+    },
+    {
+     "url": "https://redstormsports.com/sports/womens-volleyball/stats/2026/xavier/boxscore/15375",
+     "kind": "school_box",
+     "match": "Xavier",
+     "sha256": "6419620462c60126d613b88064f925b2850b10944f7ca0fe26942ca6faafcdda",
+     "retrieved": "2026-10-02",
+     "text": "box lists 'Hadziredzepovic, Lejla  (17' for St. John's #7 (Lejla)"
+    }
+   ],
+   "why": "The NCAA feed served her surname garbled in 3 of 15 matches (not a recoverable Latin-1/cp1252 mojibake). St. John's own box score for each of those 3 matches names her, with the same roster id and jersey.",
+   "team_id": "45995"
+  }
+ ]
+}

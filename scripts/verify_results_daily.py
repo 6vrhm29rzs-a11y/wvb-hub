@@ -265,13 +265,16 @@ def _fetch(url, timeout=20):
     the final URL is part of the evidence -- /schedule/text 302ing to the JS
     /schedule page is exactly how SITE_UNPARSED happens (review consult,
     2026-09-01)."""
-    class _P308(urllib.request.HTTPRedirectHandler):
+    import fetch_policy as _FP                 # every hop checked (mail 054)
+
+    class _P308(_FP.PolicyRedirect):
         def http_error_308(self, req, fp, code, msg, headers):
             return self.http_error_301(req, fp, 301, msg, headers)
 
     req = urllib.request.Request(url, headers={"User-Agent": UA})
     try:
-        opener = urllib.request.build_opener(_P308)
+        _FP.check(url)
+        opener = _FP.build_opener(_P308)
         with opener.open(req, timeout=timeout) as r:
             return (getattr(r, "status", r.getcode()),
                     r.read().decode("utf-8", "replace"), r.geturl())

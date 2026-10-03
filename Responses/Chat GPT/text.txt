@@ -1,0 +1,24 @@
+Research Volleyball Analytics Tools
+
+Research Volleyball Analytics Tools
+
+Research document
+
+Read the full report — PDF⁠
+Markdown version for review with Builder⁠
+
+The report is 23 pages, with 45 external primary-source references and seven proposed trials. It covers volleyball modeling, data acquisition, current AI products and APIs, local models, storage, browser/document tools, private access, and background execution.
+
+Main conclusion
+
+Preserve live POWER pending joint review, but do not interpret the previous experiments as a reason to abandon richer analytics. The packet supports narrower conclusions about the specific formulations tested. It also leaves baseline, calibration-population, and evaluation-timing issues that must be separated from genuine model improvements. POWER-RESEARCH-PACKET-REVIEWED.md
+
+The findings most likely to change our discussion are:
+
+	•	A stronger foundation for contextual player analysis exists. NCAA women’s volleyball research estimates individual contributions through contact-by-contact changes in rally-win probability. That offers a more principled direction for serving, passing, attacking, blocking, and digging than arbitrary metric bonuses—but it does not demonstrate better prematch forecasts than POWER. 
+	•	Some promising data leads have important limitations. The Figshare “2025 Season” dataset describes men’s volleyball, not women’s. The ncaavolleyballr catalog supports a historical-data opportunity, but I did not verify a 2026 in-season publishing service. These distinctions matter before building around either source. 
+	•	Technology choices need task-level tests, not subscription comparisons. Current documentation exposes consequential differences: Claude Code’s bare scripted mode requires API/provider credentials rather than subscription login; X Search bills fetched posts/profiles; and Firecrawl publishes conflicting Monitor rates. The report separates those costs and permissions rather than treating “AI access” as one entitlement. 
+
+The proposed trials include a numerical-convergence audit of the four opponent iterations, an existing-data serving study, a Stanford passing/setter microstudy, and a controlled extraction benchmark comparing rules, local AI, and one cloud API.
+
+Start with the conclusions on page 2 and the trial menu on pages 18–19. Evidence, hypotheses, recommendations, and unresolved questions are labeled throughout. No project implementation, purchase, installation, or new scheduled job was performed.

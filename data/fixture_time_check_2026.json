@@ -1,14 +1,150 @@
 {
  "season": 2026,
- "generated_utc": "2026-09-21T00:26:01Z",
+ "generated_utc": "2026-10-03T21:44:23Z",
  "window_days": 4,
- "fixtures_checked": 61,
- "schools_answered": 16,
- "timestamps_unresolved": 0,
- "timestamps_unresolved_sample": [],
+ "fixtures_checked": 115,
+ "schools_answered": 125,
+ "timestamps_unresolved": 1065,
+ "timestamps_unresolved_sample": [
+  {
+   "school": "Bucknell",
+   "datetime": "2026-08-28 11 a.m.",
+   "opp": "Ohio",
+   "why": "naive_time_zone_unknown"
+  },
+  {
+   "school": "Bucknell",
+   "datetime": "2026-08-28 7 p.m.",
+   "opp": "Marshall",
+   "why": "naive_time_zone_unknown"
+  },
+  {
+   "school": "Bucknell",
+   "datetime": "2026-08-29 1 p.m.",
+   "opp": "Niagara",
+   "why": "naive_time_zone_unknown"
+  },
+  {
+   "school": "Bucknell",
+   "datetime": "2026-09-04 11 a.m.",
+   "opp": "New Hampshire",
+   "why": "naive_time_zone_unknown"
+  },
+  {
+   "school": "Bucknell",
+   "datetime": "2026-09-04 7 p.m.",
+   "opp": "Boston College",
+   "why": "naive_time_zone_unknown"
+  }
+ ],
  "tolerance_minutes": 15,
  "what_this_is": "Fixtures where the feed's start time and the school's own published start time differ by more than the tolerance.",
  "what_this_is_not": "Not a correction. The hand-curated fixture ledger is the only thing that overrides a displayed time, and it needs a citation.",
- "n": 0,
- "disagreements": []
+ "lookback_hours": 12,
+ "sources": {
+  "wmt_api": 21,
+  "schedule_text": 104
+ },
+ "status_counts": {
+  "agree": 58,
+  "disagree": 7,
+  "no_match": 16,
+  "fetch_failed": 34,
+  "no_reader": 0
+ },
+ "unknown_is_not_agreement": "no_match / fetch_failed / no_reader fixtures were NOT checked.",
+ "n": 7,
+ "disagreements": [
+  {
+   "gid": "6627189",
+   "home": "Oregon",
+   "away": "Purdue",
+   "school_asked": "Purdue",
+   "feed_epoch": 1791097200,
+   "school_epoch": 1790989200.0,
+   "minutes_apart": -1800,
+   "school_url": "https://purduesports.com/schedule",
+   "school_source": "wmt_api",
+   "school_published": null,
+   "claim": "the NCAA feed and this school's own schedule disagree about when this match starts; neither is corrected here"
+  },
+  {
+   "gid": "6626166",
+   "home": "Charlotte",
+   "away": "East Carolina",
+   "school_asked": "Charlotte",
+   "feed_epoch": 1791345600,
+   "school_epoch": 1791410400.0,
+   "minutes_apart": 1080,
+   "school_url": "https://charlotte49ers.com/sports/womens-volleyball/schedule/text",
+   "school_source": "schedule_text",
+   "school_published": "6 P.M.",
+   "claim": "the NCAA feed and this school's own schedule disagree about when this match starts; neither is corrected here"
+  },
+  {
+   "gid": "6628434",
+   "home": "California",
+   "away": "Virginia Tech",
+   "school_asked": "California",
+   "feed_epoch": 1791064800,
+   "school_epoch": 1791075600.0,
+   "minutes_apart": 180,
+   "school_url": "https://calbears.com/sports/womens-volleyball/schedule/text",
+   "school_source": "schedule_text",
+   "school_published": "6:00 p.m.",
+   "claim": "the NCAA feed and this school's own schedule disagree about when this match starts; neither is corrected here"
+  },
+  {
+   "gid": "6626698",
+   "home": "UC Davis",
+   "away": "Air Force",
+   "school_asked": "Air Force",
+   "feed_epoch": 1791054000,
+   "school_epoch": 1791057600.0,
+   "minutes_apart": 60,
+   "school_url": "https://goairforcefalcons.com/sports/womens-volleyball/schedule/text",
+   "school_source": "schedule_text",
+   "school_published": "2:00 pm MT",
+   "claim": "the NCAA feed and this school's own schedule disagree about when this match starts; neither is corrected here"
+  },
+  {
+   "gid": "6628581",
+   "home": "Texas",
+   "away": "Alabama",
+   "school_asked": "Texas",
+   "feed_epoch": 1791136800,
+   "school_epoch": 1791133200.0,
+   "minutes_apart": -60,
+   "school_url": "https://texaslonghorns.com/sports/womens-volleyball/schedule/text",
+   "school_source": "schedule_text",
+   "school_published": "12 p.m. CT",
+   "claim": "the NCAA feed and this school's own schedule disagree about when this match starts; neither is corrected here"
+  },
+  {
+   "gid": "6628674",
+   "home": "Ole Miss",
+   "away": "Vanderbilt",
+   "school_asked": "Vanderbilt",
+   "feed_epoch": 1791136800,
+   "school_epoch": 1791140400.0,
+   "minutes_apart": 60,
+   "school_url": "https://vucommodores.com/schedule",
+   "school_source": "wmt_api",
+   "school_published": null,
+   "claim": "the NCAA feed and this school's own schedule disagree about when this match starts; neither is corrected here"
+  },
+  {
+   "gid": "6627872",
+   "home": "New Mexico",
+   "away": "Nevada",
+   "school_asked": "New Mexico",
+   "feed_epoch": 1791144000,
+   "school_epoch": 1791140400.0,
+   "minutes_apart": -60,
+   "school_url": "https://golobos.com/schedule",
+   "school_source": "wmt_api",
+   "school_published": null,
+   "claim": "the NCAA feed and this school's own schedule disagree about when this match starts; neither is corrected here"
+  }
+ ]
 }
