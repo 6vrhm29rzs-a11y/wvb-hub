@@ -1,10 +1,10 @@
 {
  "season": 2026,
- "generated_utc": "2026-10-03T21:44:23Z",
+ "generated_utc": "2026-10-03T22:16:44Z",
  "window_days": 4,
- "fixtures_checked": 115,
- "schools_answered": 125,
- "timestamps_unresolved": 1065,
+ "fixtures_checked": 109,
+ "schools_answered": 118,
+ "timestamps_unresolved": 1041,
  "timestamps_unresolved_sample": [
   {
    "school": "Bucknell",
@@ -43,17 +43,17 @@
  "lookback_hours": 12,
  "sources": {
   "wmt_api": 21,
-  "schedule_text": 104
+  "schedule_text": 97
  },
  "status_counts": {
-  "agree": 58,
-  "disagree": 7,
+  "agree": 56,
+  "disagree": 5,
   "no_match": 16,
-  "fetch_failed": 34,
+  "fetch_failed": 32,
   "no_reader": 0
  },
  "unknown_is_not_agreement": "no_match / fetch_failed / no_reader fixtures were NOT checked.",
- "n": 7,
+ "n": 5,
  "disagreements": [
   {
    "gid": "6627189",
@@ -69,19 +69,6 @@
    "claim": "the NCAA feed and this school's own schedule disagree about when this match starts; neither is corrected here"
   },
   {
-   "gid": "6626166",
-   "home": "Charlotte",
-   "away": "East Carolina",
-   "school_asked": "Charlotte",
-   "feed_epoch": 1791345600,
-   "school_epoch": 1791410400.0,
-   "minutes_apart": 1080,
-   "school_url": "https://charlotte49ers.com/sports/womens-volleyball/schedule/text",
-   "school_source": "schedule_text",
-   "school_published": "6 P.M.",
-   "claim": "the NCAA feed and this school's own schedule disagree about when this match starts; neither is corrected here"
-  },
-  {
    "gid": "6628434",
    "home": "California",
    "away": "Virginia Tech",
@@ -92,19 +79,6 @@
    "school_url": "https://calbears.com/sports/womens-volleyball/schedule/text",
    "school_source": "schedule_text",
    "school_published": "6:00 p.m.",
-   "claim": "the NCAA feed and this school's own schedule disagree about when this match starts; neither is corrected here"
-  },
-  {
-   "gid": "6626698",
-   "home": "UC Davis",
-   "away": "Air Force",
-   "school_asked": "Air Force",
-   "feed_epoch": 1791054000,
-   "school_epoch": 1791057600.0,
-   "minutes_apart": 60,
-   "school_url": "https://goairforcefalcons.com/sports/womens-volleyball/schedule/text",
-   "school_source": "schedule_text",
-   "school_published": "2:00 pm MT",
    "claim": "the NCAA feed and this school's own schedule disagree about when this match starts; neither is corrected here"
   },
   {

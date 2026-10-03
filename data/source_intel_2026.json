@@ -1,13 +1,13 @@
 {
  "meta": {
   "season": 2026,
-  "generated_at_utc": "2026-10-03T21:26:12Z",
-  "n_claims": 131,
+  "generated_at_utc": "2026-10-03T22:24:25Z",
+  "n_claims": 132,
   "feed_cap": 5,
   "recent_hours": 72,
   "states": {
    "confirmed_official": 95,
-   "corroborated": 13,
+   "corroborated": 14,
    "official_unconfirmed": 0,
    "community_signal": 0,
    "conflicting": 2,
@@ -4040,6 +4040,41 @@
    "review_by": null
   },
   {
+   "id": "09adc338d587",
+   "type": "result_confirmation",
+   "subject": {
+    "kind": "match",
+    "gid": "6625564"
+   },
+   "what": "Result cross-source confirmed",
+   "state": "corroborated",
+   "state_label": "corroborated by independent sources",
+   "why": "2 independent attributable sources agree with the official record",
+   "scope": "the result of this one match",
+   "sources": [
+    {
+     "url": "https://latechsports.com/sports/womens-volleyball/schedule",
+     "excerpt": "class=\"s-game-card s-game-card--standard bg-theme-background-light shadow-level-1 @container/s-game-card-standard w-full rounded-[10px]\" role=\"group\" compact=\"false\" data-v-03a7b599 data-v-ad85b2e4>|vs|Southern Miss|Thomas Assembly Center|Ruston, LA|Rivalries Renewed | White Out|L, |0-3|Sep 25|(Fri)",
+     "retrieved": "2026-09-26T14:45:37Z",
+     "source_class": "school_site"
+    },
+    {
+     "url": "https://southernmiss.com/sports/womens-volleyball/schedule",
+     "excerpt": "class=\"s-game-card s-game-card--standard bg-theme-background-light shadow-level-1 @container/s-game-card-standard w-full rounded-[10px]\" role=\"group\" compact=\"false\" data-v-03a7b599 data-v-ad85b2e4>|at|Louisiana Tech|Ruston, La. / Thomas Assembly Center| TV: ESPN+|W, |3-0|Sep 25|(Fri)| 6 p.m.|Box Sc",
+     "retrieved": "2026-09-26T14:45:37Z",
+     "source_class": "school_site"
+    }
+   ],
+   "public": true,
+   "priority": 30,
+   "route": {
+    "match": "6625564",
+    "ledger": true
+   },
+   "effective": null,
+   "review_by": null
+  },
+  {
    "id": "eb06a881496b",
    "type": "availability",
    "subject": {
@@ -4528,5 +4563,42 @@
    "review_by": "2026-10-04"
   }
  ],
- "feed": []
+ "feed": [
+  {
+   "id": "09adc338d587",
+   "type": "result_confirmation",
+   "subject": {
+    "kind": "match",
+    "gid": "6625564"
+   },
+   "what": "Result cross-source confirmed",
+   "state": "corroborated",
+   "state_label": "corroborated by independent sources",
+   "why": "2 independent attributable sources agree with the official record",
+   "scope": "the result of this one match",
+   "sources": [
+    {
+     "url": "https://latechsports.com/sports/womens-volleyball/schedule",
+     "excerpt": "class=\"s-game-card s-game-card--standard bg-theme-background-light shadow-level-1 @container/s-game-card-standard w-full rounded-[10px]\" role=\"group\" compact=\"false\" data-v-03a7b599 data-v-ad85b2e4>|vs|Southern Miss|Thomas Assembly Center|Ruston, LA|Rivalries Renewed | White Out|L, |0-3|Sep 25|(Fri)",
+     "retrieved": "2026-09-26T14:45:37Z",
+     "source_class": "school_site"
+    },
+    {
+     "url": "https://southernmiss.com/sports/womens-volleyball/schedule",
+     "excerpt": "class=\"s-game-card s-game-card--standard bg-theme-background-light shadow-level-1 @container/s-game-card-standard w-full rounded-[10px]\" role=\"group\" compact=\"false\" data-v-03a7b599 data-v-ad85b2e4>|at|Louisiana Tech|Ruston, La. / Thomas Assembly Center| TV: ESPN+|W, |3-0|Sep 25|(Fri)| 6 p.m.|Box Sc",
+     "retrieved": "2026-09-26T14:45:37Z",
+     "source_class": "school_site"
+    }
+   ],
+   "public": true,
+   "priority": 30,
+   "route": {
+    "match": "6625564",
+    "ledger": true
+   },
+   "effective": null,
+   "review_by": null,
+   "first_seen": "2026-10-03T21:51:25Z"
+  }
+ ]
 }

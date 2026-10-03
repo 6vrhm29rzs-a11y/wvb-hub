@@ -1,12 +1,12 @@
 {
  "date": "2026-10-03",
- "generated_utc": "2026-10-03T21:43:49Z",
+ "generated_utc": "2026-10-03T22:16:14Z",
  "counts": {
-  "VERIFIED_BOTH": 28,
-  "CORROBORATED_ONE": 30,
+  "VERIFIED_BOTH": 31,
+  "CORROBORATED_ONE": 35,
   "HELD_ONE_REPORTS": 1,
   "HELD_BOTH_REPORT": 2,
-  "UNVERIFIED": 2
+  "UNVERIFIED": 4
  },
  "matches": [
   {
@@ -1420,7 +1420,7 @@
    "gid": "6625076",
    "date": "2026-10-03",
    "canonical": "LMU (CA) def. Pacific 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "LMU (CA)": {
      "state": "NOT_POSTED",
@@ -1436,17 +1436,11 @@
      ]
     },
     "Pacific": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://pacifictigers.com/services/schedule_txt.ashx?schedule=405",
-     "row": [
-      "Oct 3 (Sat)",
-      "1 P.M.",
-      "Away",
-      "LMU",
-      "Los Angeles, Calif. (Gersten Pavilion)",
-      "",
-      ""
-     ]
+     "assertion": "Pacific L 0-3 vs LMU",
+     "opponent_source": "LMU",
+     "site_says": "Away"
     }
    }
   },
@@ -1504,20 +1498,14 @@
    "gid": "6627319",
    "date": "2026-10-03",
    "canonical": "Wyoming def. San Jose St. 3-0",
-   "verdict": "UNVERIFIED",
+   "verdict": "CORROBORATED_ONE",
    "schools": {
     "Wyoming": {
-     "state": "NOT_POSTED",
+     "state": "AGREE_COMPLETE",
      "url": "https://gowyo.com/services/schedule_txt.ashx?schedule=1205",
-     "row": [
-      "Oct 3 (Sat)",
-      "2 p.m.",
-      "Away",
-      "San Jose State University",
-      "San Jose, CA",
-      "",
-      ""
-     ]
+     "assertion": "Wyoming W 3-0 vs San Jose State University",
+     "opponent_source": "San Jose State University",
+     "site_says": "Away"
     },
     "San Jose St.": {
      "state": "EVENT_NOT_FOUND",
@@ -1574,6 +1562,292 @@
      "assertion": "Cleveland St. L 0-3 vs Wright State",
      "opponent_source": "Wright State",
      "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6624579",
+   "date": "2026-10-03",
+   "canonical": "Portland def. San Francisco 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Portland": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://portlandpilots.com/services/schedule_txt.ashx?schedule=1469",
+     "assertion": "Portland W 3-0 vs San Francisco",
+     "opponent_source": "San Francisco",
+     "site_says": "Home"
+    },
+    "San Francisco": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://usfdons.com/sports/womens-volleyball/schedule/text",
+     "assertion": "San Francisco L 0-3 vs Portland",
+     "opponent_source": "Portland",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6626698",
+   "date": "2026-10-03",
+   "canonical": "UC Davis def. Air Force 3-1",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "UC Davis": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://ucdavisaggies.com/services/schedule_txt.ashx?schedule=3547",
+     "assertion": "UC Davis W 3-1 vs Air Force",
+     "opponent_source": "Air Force",
+     "site_says": "Home"
+    },
+    "Air Force": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://goairforcefalcons.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Air Force L 1-3 vs UC Davis",
+     "opponent_source": "UC Davis",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6624948",
+   "date": "2026-10-03",
+   "canonical": "Northern Ky. def. Oakland 3-1",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Northern Ky.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://nkunorse.com/services/schedule_txt.ashx?schedule=321",
+     "assertion": "Northern Ky. W 3-1 vs Oakland",
+     "opponent_source": "Oakland",
+     "site_says": "Away"
+    },
+    "Oakland": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://goldengrizzlies.com/services/schedule_txt.ashx?schedule=1366",
+     "assertion": "Oakland L 1-3 vs Northern Kentucky",
+     "opponent_source": "Northern Kentucky",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6625698",
+   "date": "2026-10-03",
+   "canonical": "Radford def. USC Upstate 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Radford": {
+     "state": "NOT_POSTED",
+     "url": "https://radfordathletics.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Oct 3 (Sat)",
+      "4:00 PM",
+      "Away",
+      "USC Upstate",
+      "Spartanburg, SC",
+      "",
+      "-"
+     ]
+    },
+    "USC Upstate": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://upstatespartans.com/sports/womens-volleyball/schedule/text",
+     "assertion": "USC Upstate L 1-3 vs Radford",
+     "opponent_source": "Radford",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6626181",
+   "date": "2026-10-03",
+   "canonical": "Lehigh def. Holy Cross 3-1",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Lehigh": {
+     "state": "NOT_POSTED",
+     "url": "https://lehighsports.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Oct 3 (Sat)",
+      "4:00 PM",
+      "Home",
+      "Holy Cross",
+      "Bethlehem, Pa. (Grace Hall)",
+      "",
+      "-"
+     ]
+    },
+    "Holy Cross": {
+     "state": "NOT_POSTED",
+     "url": "https://goholycross.com/services/schedule_txt.ashx?schedule=562",
+     "row": [
+      "Oct 3 (Sat)",
+      "4:00 PM",
+      "Away",
+      "Lehigh",
+      "Bethlehem, Pa.",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6627758",
+   "date": "2026-10-03",
+   "canonical": "Winthrop def. Presbyterian 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Winthrop": {
+     "state": "NOT_POSTED",
+     "url": "https://winthropeagles.com/services/schedule_txt.ashx?schedule=1016",
+     "row": [
+      "Oct 3 (Sat)",
+      "4:00 p.m.",
+      "Home",
+      "Presbyterian",
+      "Rock Hill, S.C. (Winthrop Coliseum)",
+      "",
+      ""
+     ]
+    },
+    "Presbyterian": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gobluehose.com/services/schedule_txt.ashx?schedule=714",
+     "assertion": "Presbyterian L 1-3 vs Winthrop",
+     "opponent_source": "Winthrop",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6627763",
+   "date": "2026-10-03",
+   "canonical": "American def. Loyola Maryland 3-1",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "American": {
+     "state": "NOT_POSTED",
+     "url": "https://aueagles.com/services/schedule_txt.ashx?schedule=265",
+     "row": [
+      "Oct 3 (Sat)",
+      "4:00 PM",
+      "Home",
+      "Loyola Maryland",
+      "Washington, D.C. (Meltzer Center)",
+      "",
+      ""
+     ]
+    },
+    "Loyola Maryland": {
+     "state": "NOT_POSTED",
+     "url": "https://loyolagreyhounds.com/services/schedule_txt.ashx?schedule=3570",
+     "row": [
+      "Oct 3 (Sat)",
+      "4:00 p.m.",
+      "Away",
+      "American",
+      "Washington, D.C.",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6628063",
+   "date": "2026-10-03",
+   "canonical": "Toledo def. Ball St. 3-1",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Toledo": {
+     "state": "NOT_POSTED",
+     "url": "https://utrockets.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Oct 3 (Sat)",
+      "4 p.m.",
+      "Home",
+      "Ball State",
+      "Toledo, Ohio (Savage Arena)",
+      "",
+      "-"
+     ]
+    },
+    "Ball St.": {
+     "state": "NOT_POSTED",
+     "url": "https://ballstatesports.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Oct 3 (Sat)",
+      "4 p.m.",
+      "Away",
+      "Toledo",
+      "Toledo, OH",
+      "",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6628113",
+   "date": "2026-10-03",
+   "canonical": "Fairfield def. Merrimack 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Fairfield": {
+     "state": "NOT_POSTED",
+     "url": "https://fairfieldstags.com/services/schedule_txt.ashx?schedule=1530",
+     "row": [
+      "Oct 3 (Sat)",
+      "4:00 PM",
+      "Home",
+      "Merrimack",
+      "Fairfield, Conn. (Leo D. Mahoney Arena)",
+      "",
+      ""
+     ]
+    },
+    "Merrimack": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://merrimackathletics.com/services/schedule_txt.ashx?schedule=554",
+     "assertion": "Merrimack L 1-3 vs Fairfield University",
+     "opponent_source": "Fairfield University",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6628548",
+   "date": "2026-10-03",
+   "canonical": "Ohio def. Akron 3-1",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Ohio": {
+     "state": "NOT_POSTED",
+     "url": "https://ohiobobcats.com/sports/wvball/schedule/text",
+     "row": [
+      "Oct 3 (Sat)",
+      "4 p.m. ET",
+      "Home",
+      "Akron",
+      "Athens, Ohio (CONVOCATION CENTER)",
+      "",
+      "-"
+     ]
+    },
+    "Akron": {
+     "state": "NOT_POSTED",
+     "url": "https://gozips.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Oct 3 (Sat)",
+      "4:00 pm",
+      "Away",
+      "Ohio",
+      "Athens, Ohio",
+      "",
+      "-"
+     ]
     }
    }
   }
