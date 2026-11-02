@@ -12,7 +12,13 @@
     "6624494",
     "6624495",
     "6624505",
-    "6624501"
+    "6624501",
+    "6624496",
+    "6626248",
+    "6626394",
+    "6627898",
+    "6626949",
+    "6627899"
    ],
    "evidence": [
     {
@@ -67,6 +73,19 @@
      "sha256": "6419620462c60126d613b88064f925b2850b10944f7ca0fe26942ca6faafcdda",
      "retrieved": "2026-10-02",
      "text": "box lists 'Hadziredzepovic, Lejla  (17' for St. John's #7 (Lejla)"
+    },
+    {
+     "kind": "feed_box_consistency",
+     "retrieved": "2026-11-01",
+     "text": "All 25 St. John's (team_id 45995) box rows with first name Lejla carry jersey 7; each box holds exactly one Lejla row; the garbled spelling never co-occurs with the clean one. The six gids added 2026-11-01 carry the identical feed spelling 'Hadåÿiredåÿepovic' on that same jersey and team.",
+     "gids_added": [
+      "6624496",
+      "6626248",
+      "6626394",
+      "6627898",
+      "6626949",
+      "6627899"
+     ]
     }
    ],
    "why": "The NCAA feed served her surname garbled in 3 of 15 matches (not a recoverable Latin-1/cp1252 mojibake). St. John's own box score for each of those 3 matches names her, with the same roster id and jersey.",

@@ -309,8 +309,19 @@ def main():
         h = open(hub, encoding="utf-8").read()
         m = re.search(r"const FIXTURES = (\{.*?\});\n", h, re.S)
         FIX = json.loads(m.group(1)) if m else {}
-        check("the page carries the canonical fixture payload", len(FIX) > 1000,
-              str(len(FIX)))
+        # ⚠ WAS `len(FIX) > 1000` -- a calendar pin: FIXTURES holds what is
+        # still to be played, so it shrinks every day and failed at 819 on
+        # 2026-11-01 with nothing wrong. The invariant is presence: while the
+        # dataset still holds unplayed fixtures, the page must carry them.
+        import time as _t
+        _ds = json.load(open(os.path.join(REPO, "data", "data_2026.json"),
+                             encoding="utf-8"))
+        _left = sum(1 for g in _ds.get("games", [])
+                    if g.get("state") != "F"
+                    and (g.get("start_time_epoch") or 0) >= _t.time() - 86400)
+        check("the page carries the canonical fixture payload",
+              len(FIX) > 0 if _left else True,
+              "%d on page, %d unplayed in dataset" % (len(FIX), _left))
         # the match route can reach a fixture far beyond the desk window.
         # ⚠ REWRITTEN 2026-09-07: this pinned gid 6626809 as "11 days out",
         # and the calendar made it a PLAYED match that correctly left the

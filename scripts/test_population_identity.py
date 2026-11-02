@@ -72,15 +72,21 @@ za = [g for p in P for g in p["games"] if g["sets"] > 0 and not g.get("src_corre
       (g["k"] + g["ta"] + g["digs"] + g["ast"] + g["aces"] + g["bs"] + g["ba"] + (g.get("sa") or 0) + (g.get("ra") or 0)) == 0]
 check("zero-action lines WITHOUT a school report keep their reported sets (%d kept)" % len(za), len(za) > 0)
 lj = [p for p in P if p["team"] == "St. John's (NY)" and "epovic" in p["name"]]
+# ⚠ STATE FOLLOWS THE LEDGER (2026-11-01): 6624495 was held until both schools'
+# result was filed into result_corrections.json; then it counts like any match.
+import season_counts as _SC0
+_LEDGERED = "6624495" in _SC0.corrections(2026)
+_EXCL = set() if _LEDGERED else {"6624495"}
 # Relative, not pinned: the old "51 sets" broke the day St. John's played again.
-lj_sets = (sum(g["sets"] for g in lj[0]["games"] if not g.get("partial_box") and str(g.get("gid")) != "6624495")
+lj_sets = (sum(g["sets"] for g in lj[0]["games"] if not g.get("partial_box") and str(g.get("gid")) not in _EXCL)
            if len(lj) == 1 else None)
-check("page: ONE Lejla, season sets == her counted game log (held 6624495 excluded)",
+check("page: ONE Lejla, season sets == her counted game log (6624495 %s)" % ("counted, ledgered" if _LEDGERED else "held, excluded"),
       len(lj) == 1 and lj[0]["sets"] == lj_sets, str([(p["name"], p["sets"], lj_sets) for p in lj]))
 # ---- held / accepted transition (mail 055)
 import season_counts as SC, gamelog
 G = gamelog.load_games_jsonl(os.path.join(REPO, "data/raw/2026/games.jsonl"))
-check("St. John's-Creighton (6624495) is held", "6624495" in SC.held_gids(2026, G))
+check("St. John's-Creighton (6624495) is %s" % ("accepted (ledgered)" if _LEDGERED else "held"),
+      ("6624495" not in SC.held_gids(2026, G)) if _LEDGERED else ("6624495" in SC.held_gids(2026, G)))
 agg_lejla = [p for p in pl if "epovic" in (p.get("last") or "")]
 check("held match's lines are out of the season aggregate (aggregate == page's counted sets)",
       len(agg_lejla) == 1 and lj_sets is not None and (agg_lejla[0].get("sets") or agg_lejla[0].get("gp")) == lj_sets,

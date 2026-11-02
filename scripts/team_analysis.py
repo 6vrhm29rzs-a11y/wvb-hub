@@ -311,6 +311,12 @@ def analyze(boxes, res_cnt, season, only=None, recent_n=5):
                 sr["n"] += 1
                 sr["w"] += 1 if won else 0
             # players -- NAMED rows only; a team-total row is never a player
+            # ⚠ ONE PLAYER, ONE MATCH (2026-11-01): the feed can list a player
+            # twice in one box (Rylee Kinnell, George Mason, 6624464: #2 with
+            # her line and #3 all zeros, both gp=3). Stats sum; sets take the
+            # larger row and the match counts once -- the player pages' rule,
+            # so the two screens cannot disagree.
+            _seen_sets = {}
             for x in own_rows:
                 if x.get("team_total") or not x.get("name"):
                     continue
@@ -321,8 +327,15 @@ def analyze(boxes, res_cnt, season, only=None, recent_n=5):
                                                   "c": _blank()})
                 if x.get("pos") and not pl["pos"]:
                     pl["pos"] = x.get("pos")
-                pl["sets"] += float(x.get("sets") or 0)
-                pl["matches"] += 1
+                _xs = float(x.get("sets") or 0)
+                _prev = _seen_sets.get(pk)
+                if _prev is None:
+                    pl["sets"] += _xs
+                    pl["matches"] += 1
+                    _seen_sets[pk] = _xs
+                elif _xs > _prev:
+                    pl["sets"] += _xs - _prev
+                    _seen_sets[pk] = _xs
                 _prow = _blank()
                 _add(_prow, x)
                 _pool(_prow, gate=own)
