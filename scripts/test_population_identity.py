@@ -53,7 +53,8 @@ def grab(pat):
             if d == 0: break
         j += 1
     return json.loads(page[i:j + 1])
-P = grab(r"const PLAYERS = (\[)"); T = grab(r"const TEAMS = (\{)")
+import pageconst as _PCX
+P = _PCX.find(page, "PLAYERS"); T = grab(r"const TEAMS = (\{)")
 lam = [p for p in P if p["name"] == "Lolo Lambert" and p["team"] == "Louisiana"][0]
 tg = [g for g in lam["games"] if g["gid"] == "6624778"][0]
 check("page: Lambert/Troy line shows 0 sets, labelled school-corrected", tg["sets"] == 0 and tg.get("src_corrected"))

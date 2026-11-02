@@ -1,0 +1,66 @@
+{
+ "date": "2026-10-19",
+ "generated_utc": "2026-10-20T01:05:15Z",
+ "counts": {
+  "CORROBORATED_ONE": 1,
+  "UNVERIFIED": 1
+ },
+ "matches": [
+  {
+   "gid": "6625106",
+   "date": "2026-10-19",
+   "canonical": "Alabama A&M def. Mississippi Val. 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Alabama A&M": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://aamusports.com/services/schedule_txt.ashx?schedule=385",
+     "assertion": "Alabama A&M W 3-0 vs Mississippi Valley State",
+     "opponent_source": "Mississippi Valley State",
+     "site_says": "Home"
+    },
+    "Mississippi Val.": {
+     "state": "NOT_POSTED",
+     "url": "https://mvsusports.com/services/schedule_txt.ashx?schedule=413",
+     "row": [
+      "Oct 19 (Mon)",
+      "6:00 PM",
+      "Away",
+      "Alabama A&M",
+      "Huntsville, AL",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6628293",
+   "date": "2026-10-19",
+   "canonical": "Texas Southern def. Ark.-Pine Bluff 3-0",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "Texas Southern": {
+     "state": "NOT_POSTED",
+     "url": "https://athletics.tsu.edu/services/schedule_txt.ashx?schedule=252",
+     "row": [
+      "Oct 19 (Mon)",
+      "6 p.m.",
+      "Away",
+      "Arkansas-Pine Bluff",
+      "Pine Bluff, Ark.",
+      "",
+      ""
+     ]
+    },
+    "Ark.-Pine Bluff": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://uapblionsroar.com/services/schedule_txt.ashx?schedule=1280",
+     "rows_on_date": [
+      "Texas Southern Univ."
+     ]
+    }
+   }
+  }
+ ]
+}

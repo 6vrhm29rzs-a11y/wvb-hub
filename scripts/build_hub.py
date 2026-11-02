@@ -151,6 +151,54 @@ def jblob(o) -> str:
     txt = txt.replace("</", "<\\/")
     return "JSON.parse('" + txt + "')"
 
+# Keys a PLAYERS game row carries that its BOXES line does not.
+_PG_OWN = ("d", "gid", "opp", "nondi", "src_corrected", "partial_box")
+_BOX_ID = ("team", "name", "pos", "num")
+
+def compact_player_games(plist, boxes):
+    """PLAYERS with each game row that is an EXACT copy of a BOXES line
+    replaced by a pointer: [gid, line index, date, opp, extras].
+
+    ⚠ WHY (2026-10-11, Cody: "the site is so slow"). The page was 69 MB and
+    the per-player `games` lists were 21.7 MB of it -- 96% of those rows are
+    byte-for-byte the same stat line BOXES already carries for that match.
+    The browser parsed every number twice.
+
+    ⚠ NO NAME JOIN HAPPENS IN THE BROWSER (R8). The match is made HERE: same
+    gid, same team, same name, and every stat key and value identical. A row
+    that does not match exactly (4% -- spelling variants between roster and
+    box) stays inline, exactly as before. The page expands pointers back into
+    the identical object before anything reads PLAYERS (hydratePlayers), and
+    pageconst.find(html, "PLAYERS") does the same for every Python reader, so
+    no consumer ever sees the compact form.
+    """
+    out = []
+    for p in plist:
+        games = []
+        for g in p.get("games") or []:
+            lines = boxes.get(str(g.get("gid"))) or []
+            stat = {k: v for k, v in g.items() if k not in _PG_OWN}
+            hit = None
+            for i, ln in enumerate(lines):
+                if ln.get("team") != p.get("team") or ln.get("name") != p.get("name"):
+                    continue
+                if {k: v for k, v in ln.items() if k not in _BOX_ID} == stat:
+                    hit = i
+                    break
+            if hit is None:
+                games.append(g)
+                continue
+            extra = {k: g[k] for k in ("nondi", "src_corrected", "partial_box")
+                     if k in g and g[k] not in (None, False)}
+            ptr = [g["gid"], hit, g.get("d"), g.get("opp")]
+            if extra:
+                ptr.append(extra)
+            games.append(ptr)
+        q = dict(p)
+        q["games"] = games
+        out.append(q)
+    return out
+
 def esc(s) -> str:
     return (str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
 
@@ -1438,7 +1486,72 @@ import digby_art as DIGBY_ART            # noqa: E402
 import icons as ICONS                    # noqa: E402
 import trend as TREND                    # noqa: E402
 
-def listed_time(start_time, home_team, epoch=None):
+_SCHOOL_TIME = {"mtime": None, "map": {}}
+
+
+def school_time_for(gid):
+    """The home (or answering) school's own published start, as an epoch, for
+    a fixture whose FEED time is only the placeholder -- or None.
+
+    Cody, 2026-10-28: "use the school's time when the feed shows a
+    placeholder." The feed asserts nothing in that case, so the school's own
+    schedule contradicts nothing; a REAL feed time that disagrees stays a
+    flag (time_disputes), never overwritten. Read fresh on file change so a
+    long-running live_server sees new answers without a restart.
+    """
+    if not gid:
+        return None
+    path = os.path.join(REPO, "data", "fixture_time_check_%d.json" % SEASON)
+    try:
+        mt = os.path.getmtime(path)
+    except OSError:
+        return None
+    if _SCHOOL_TIME["mtime"] != mt:
+        m = {}
+        for r in ((load("data/fixture_time_check_%d.json" % SEASON) or {})
+                  .get("disagreements") or []):
+            try:
+                fe, se = int(r.get("feed_epoch")), int(r.get("school_epoch"))
+            except (TypeError, ValueError):
+                continue
+            # the school's time must describe the same fixture: within a day
+            # of the feed's placeholder, never a different weekend
+            if abs(se - fe) <= 24 * 3600:
+                m[str(r.get("gid"))] = se
+        _SCHOOL_TIME.update(mtime=mt, map=m)
+    return _SCHOOL_TIME["map"].get(str(gid))
+
+
+SCHOOL_TIME_MARK = " (school)"
+
+
+def placeholder_epoch(epoch, home_team):
+    """True when an EPOCH, read on the Eastern clock, is the feed's midnight
+    placeholder. ⚠ Found 2026-10-28: the schedule displays the canonical
+    epoch (games.jsonl) while the sentinel test read the scoreboard STRING --
+    so when the scoreboard had the real '10:00 PM ET' and the stored /game
+    record still held the placeholder, UCLA-Minnesota rendered 12:00 AM PT."""
+    if not epoch or home_team in FAR_WEST_HOME:
+        return False
+    try:
+        from zoneinfo import ZoneInfo
+        clk = datetime.datetime.fromtimestamp(
+            int(epoch), ZoneInfo("America/New_York")).strftime("%-I:%M %p")
+    except Exception:
+        return False
+    return bool(_EARLY_AM.match(clk))
+
+
+def best_epoch(canonical, scoreboard, home_team):
+    """The canonical epoch, unless it is a placeholder and the scoreboard's
+    own epoch is not -- then the scoreboard's real time wins."""
+    if (placeholder_epoch(canonical, home_team) and scoreboard
+            and not placeholder_epoch(scoreboard, home_team)):
+        return scoreboard
+    return canonical or scoreboard
+
+
+def listed_time(start_time, home_team, epoch=None, gid=None):
     """The feed's start time, or "TBA" when that time is a placeholder.
 
     ncaa.com fills an unannounced start with a midnight-ish sentinel that
@@ -1460,7 +1573,12 @@ def listed_time(start_time, home_team, epoch=None):
     st = (start_time or "").strip()
     if not st:
         return st
-    if _EARLY_AM.match(st) and (home_team or "") not in FAR_WEST_HOME:
+    if (_EARLY_AM.match(st) or placeholder_epoch(epoch, home_team or "")) \
+            and (home_team or "") not in FAR_WEST_HOME:
+        se = school_time_for(gid)
+        if se and PT is not None:
+            return (datetime.datetime.fromtimestamp(se, PT)
+                    .strftime("%-I:%M %p PT") + SCHOOL_TIME_MARK)
         return "TBA"
     # Real time -- now show it in Cody's timezone. Converted from the EPOCH,
     # not by re-parsing the Eastern string, so there is one conversion and no
@@ -1552,10 +1670,10 @@ def schedule(limit_days: int = 21) -> List[Dict]:
             # placeholders excluded from the vote across every snapshot of this
             # id, so a fixture whose real time was announced in a later crawl
             # gets the real time here instead of whichever the file held last.
-            _ep = v.get("epoch") or g.get("startTimeEpoch")
+            _ep = best_epoch(v.get("epoch"), g.get("startTimeEpoch"), h)
             rows.append({
                 "d": date, "a": a, "h": h,
-                "t": listed_time(g.get("startTime"), h, _ep),
+                "t": listed_time(g.get("startTime"), h, _ep, gid),
                 "ar": (g.get("away") or {}).get("rank") or "",
                 "hr": (g.get("home") or {}).get("rank") or "",
                 "gid": gid,
@@ -1568,7 +1686,11 @@ def schedule(limit_days: int = 21) -> List[Dict]:
                 # Purdue-SMU time on TODAY, which is where a start time is
                 # actually read, so the flag has to reach the same rows the
                 # clock does.
-                "tdis": _tdis_now.get(gid),
+                # a school-filled placeholder already SHOWS the school's
+                # time -- flagging the same time against itself is noise
+                "tdis": (None if (listed_time(g.get("startTime"), h, _ep, gid)
+                                  or "").endswith(SCHOOL_TIME_MARK)
+                         else _tdis_now.get(gid)),
                 # ⚠ CONFLICT TRAVELS WITH THE FIXTURE. A view that has this and
                 # ignores it is choosing to; a view that never received it
                 # could not have known.
@@ -2396,8 +2518,8 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
             h = (g.get("home") or {}).get("names", {}).get("short")
             if not a or not h:
                 continue
-            t = listed_time(g.get("startTime"), h, g.get("startTimeEpoch"))
             gid = str(g.get("gameID") or g.get("id") or "")
+            t = listed_time(g.get("startTime"), h, g.get("startTimeEpoch"), gid)
             v = vidx.get(gid) or {}
             ac = ((g.get("away") or {}).get("conferences") or [{}])[0].get("conferenceSeo")
             hc = ((g.get("home") or {}).get("conferences") or [{}])[0].get("conferenceSeo")
@@ -2857,7 +2979,8 @@ def team_index(teams, res, pred_by_pair, sim_of, live_floor=0, tstats=None,
             # that never received it could not have known.
             "fixtures": [_opp_ctx(dict(
                 f, pick=_fixture_pick(pred_by_pair, f, nm),
-                tdis=_tdis.get(str(f.get("gid")))))
+                tdis=(None if str(f.get("t") or "").endswith(SCHOOL_TIME_MARK)
+                      else _tdis.get(str(f.get("gid"))))))
                          for f in fixtures.get(team_norm(nm), [])
                          if f["d"] >= today][:40],
         }
@@ -6610,11 +6733,54 @@ def build():
                     + (esc(_rec) if _rec else '<span class="dim">&ndash;</span>')
                     + (('<i class="nvd">+%s nD1</i>' % esc(_recn)) if _recn else '')
                     + '</td>')
+        # PPS AND HITTING % BESIDE POWER, BOTH SIDES OF THE BALL (Cody,
+        # 2026-10-28): own, what opponents did against them, and the spread.
+        # One team_season_stats() row -- the Stats tab and team pages read the
+        # same numbers. PPS = kills + blocks + aces per set; hitting % =
+        # (K - E) / TA from SUMMED counts. Raw box-score rates, not part of
+        # POWER and not opponent-adjusted. No box scores -> a dash (R5).
+        _tsr = (tstats or {}).get(t["team"]) or {}
+        _ts, _to = _tsr.get("own") or {}, _tsr.get("opp") or {}
+        _nm = _ts.get("matches") or 0
+        _dash = '<span class="dim">&ndash;</span>'
+
+        def _h3(v):
+            if v is None:
+                return _dash
+            return ("-" if v < 0 else "") + ("%.3f" % abs(v)).replace("0.", ".", 1)
+
+        def _sg(v, fmt):
+            if v is None:
+                return _dash
+            return ("+" if v > 0 else "&minus;" if v < 0 else "") + fmt(abs(v))
+
+        def _td(cls, lab, tip, val):
+            return ('<td class="n %s" data-l="%s" title="%s, 2026, %d match%s of '
+                    'box scores. Not opponent-adjusted.">%s</td>'
+                    % (cls, lab, tip, _nm, "" if _nm == 1 else "es", val))
+        _p, _op = _ts.get("pps"), _to.get("pps")
+        _hv, _oh = _ts.get("hit"), _to.get("hit")
+        pps_cell = (
+            _td("pps", "PPS", "Points per set: kills + blocks + aces",
+                ("%.2f" % _p) if _p is not None else _dash) +
+            _td("opps", "Opp", "Opponents&rsquo; points per set against this team",
+                ("%.2f" % _op) if _op is not None else _dash) +
+            _td("dpps", "&plusmn;", "PPS minus opponents&rsquo; PPS",
+                _sg(None if _p is None or _op is None else round(_p - _op, 2),
+                    lambda x: "%.2f" % x)))
+        hit_cell = (
+            _td("hitp", "Hit%", "Hitting percentage: (kills - errors) / attacks",
+                _h3(_hv)) +
+            _td("ohit", "Opp", "Opponents&rsquo; hitting percentage against this team",
+                _h3(_oh)) +
+            _td("dhit", "&plusmn;", "Hitting % minus opponents&rsquo; hitting %",
+                _sg(None if _hv is None or _oh is None else round(_hv - _oh, 3),
+                    lambda x: ("%.3f" % x).replace("0.", ".", 1))))
         rrows.append(
             '<tr class="row" data-r="%d" data-team="%s" tabindex="0" role="link" '
             'style="--tc:%s"><td class="rk">%d%s</td>'
             '<td class="tm">%s%s%s</td><td class="cf" data-l="Conf">%s</td>'
-            '%s%s%s<td class="n c-avca" data-l="AVCA">%s</td>'
+            '%s%s%s%s%s<td class="n c-avca" data-l="AVCA">%s</td>'
             '<td class="n hi c-ref" data-l="2025">%s</td>%s'
             '<td class="n c-ref" data-l="RPI">%s</td>%s'
             '<td class="n c-ref" data-l="Ret">%s</td>'
@@ -6630,6 +6796,8 @@ def build():
                + last_match_html(t["team"]),
                esc(t["conf"]),
                powercell(t),
+               pps_cell,
+               hit_cell,
                resumecell(t, _resume_active),
                rec_cell,
                c(t.get("avca")),
@@ -7661,7 +7829,8 @@ def build():
         .replace("{{LOGOS_JSON}}", json.dumps(logos, separators=(",", ":"))) \
         .replace("{{COLORS_JSON}}", json.dumps(team_colors, separators=(",", ":"))) \
         .replace("{{BOXES_JSON}}", json.dumps(boxes, separators=(",", ":"))) \
-        .replace("{{PLAYERS_JSON}}", json.dumps(plist, separators=(",", ":"))) \
+        .replace("{{PLAYERS_JSON}}", json.dumps(
+            compact_player_games(plist, boxes), separators=(",", ":"))) \
         .replace("{{PRANK_JSON}}", json.dumps(
             player_rating_payload(), separators=(",", ":"))) \
         .replace("{{ROSTER_JSON}}", json.dumps(
@@ -10695,7 +10864,11 @@ h4.sbtime span{font:600 11px/1 var(--mono);color:var(--ink3)}
   margin-top:3px}
 .mrow .mtg{font:600 11px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;
   color:var(--slate);border:1px solid var(--line);border-radius:2px;padding:3px 5px}
-.mtg.stale{color:var(--warn,#8a6100);border-color:currentColor;opacity:.95}
+/* quiet on purpose (Cody, 2026-10-09): ncaa.com itself leaves many
+   matches at `pre` past first serve (checked against its own backend,
+   not just the mirror), so a warning colour on dozens of rows was noise
+   about a source limit nobody can fix. */
+.mtg.stale{color:var(--ink3);border-color:transparent;font-style:italic;opacity:.85}
 .mrow .mtg.rv{color:var(--gold);border-color:color-mix(in oklab,var(--gold) 40%,transparent)}
 .mrow .mtg.lv{color:var(--coral);border-color:color-mix(in oklab,var(--coral) 45%,transparent)}
 /* ⚠ A LIVE ROW ALREADY SAYS SO TWICE -- its eyebrow shows the set period and
@@ -12472,7 +12645,15 @@ table.t25 tbody tr:nth-child(-n+3) td.rk{font-size:30px}
 .tantab td.l{text-align:left}
 .tanna{margin-top:10px;font-style:italic}
 /* TANALYSIS-CSS-END */
+.rk3 thead tr:last-child th.srtable{cursor:pointer;user-select:none}
+.rk3 thead tr:last-child th.srtable:hover{color:var(--ink)}
+.rk3 thead tr:last-child th.srt{color:var(--ink);box-shadow:inset 0 -2px 0 var(--vx-power)}
+.srtar{font-size:9px;margin-left:3px}
 /* AVAIL-CSS-BEGIN */
+.avout{display:block;margin:4px 0 0}
+.avout .avmeta{display:block;font-size:11.5px;color:var(--ink3)}
+.tddbsub{display:block;margin:8px 0 2px;font-size:11px;color:var(--ink3);
+  text-transform:uppercase;letter-spacing:.06em}
 .avrow{border:1px solid var(--line);border-radius:3px;padding:9px 12px;
   margin:0 0 7px;font-size:12.5px;color:var(--ink2)}
 .avrow b{color:var(--ink)}
@@ -12834,6 +13015,16 @@ details.avhist{margin:14px 0}
   .rk3 tr.row td.rec{grid-row:2;grid-column:3}
   .rk3 tr.row td.c-avca{grid-row:2;grid-column:4}
   .rk3 tr.row td.rs{grid-row:2;grid-column:5;text-align:right}
+  .rk3 tr.row td.pps{grid-row:3;grid-column:2}
+  .rk3 tr.row td.opps{grid-row:3;grid-column:3}
+  .rk3 tr.row td.dpps{grid-row:3;grid-column:4/6;text-align:right}
+  .rk3 tr.row td.hitp{grid-row:4;grid-column:2}
+  .rk3 tr.row td.ohit{grid-row:4;grid-column:3}
+  .rk3 tr.row td.dhit{grid-row:4;grid-column:4/6;text-align:right}
+  /* the rate rows are reference figures under the headline numbers: a
+     notch smaller, so six of them fit a 390px card beside POWER */
+  .rk3 tr.row td.pps,.rk3 tr.row td.opps,.rk3 tr.row td.dpps,
+  .rk3 tr.row td.hitp,.rk3 tr.row td.ohit,.rk3 tr.row td.dhit{font-size:11.5px}
   .rk3 tr.row td.c-ref{display:none}
   /* ⚠ THE DECADE BANDS ARE A COLUMN DEVICE AND THERE IS NO COLUMN HERE
      (Cody's screenshot, 2026-09-06: "a shadow background over the text ...
@@ -13489,7 +13680,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <thead>
     <tr class="grp">
       <th colspan="3"></th>
-      <th class="g-ours" colspan="3">Our system</th>
+      <th class="g-ours" colspan="9">Our system</th>
       <th class="g-poll" colspan="1">Coaches poll</th>
       <!-- ⚠ Ret and Tourn are OURS and stay out of the reference group. Sweeping
            them under "none of it feeds our model" would be a false label on two
@@ -13500,6 +13691,12 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <tr>
       <th>#</th><th class="l">Team</th><th class="l">Conf</th>
       <th class="n c-pow" title="POWER &mdash; how strong a team is; who would win tomorrow. 50 is an average Division-I team and every 12.5 points is one standard deviation. A monotone rescaling of the rating that produces the rank beside it, not a blend of hand-picked components.">Power <i class="thu">0&ndash;100</i></th>
+      <th class="n c-pps" title="Points per set: kills + blocks + aces per set, 2026 box scores. A raw rate beside the rating, not a part of it, and not opponent-adjusted.">PPS <i class="thu">per set</i></th>
+      <th class="n c-opps" title="Opponents&rsquo; points per set against this team, 2026 box scores">Opp <i class="thu">PPS</i></th>
+      <th class="n c-dpps" title="PPS minus opponents&rsquo; PPS">PPS <i class="thu">&plusmn;</i></th>
+      <th class="n c-hit" title="Hitting percentage: (kills &minus; attack errors) / total attacks, 2026 box scores, from summed counts. A raw rate beside the rating, not a part of it.">Hit% <i class="thu">K&minus;E/TA</i></th>
+      <th class="n c-ohit" title="Opponents&rsquo; hitting percentage against this team, 2026 box scores">Opp <i class="thu">hit%</i></th>
+      <th class="n c-dhit" title="Hitting % minus opponents&rsquo; hitting %">Hit <i class="thu">&plusmn;</i></th>
       <th class="n c-res" title="R&Eacute;SUM&Eacute; &mdash; what a team has EARNED. Ranked by RPI, which beat every alternative against the 64 teams the committee actually selected in 2025. Margin is ignored on purpose: a win is a win. A different question from Power, and the two are meant to disagree.">R&eacute;sum&eacute; <i class="thu">rank</i></th>
       <th class="n rec" title="Won-lost against DIVISION-I opponents this season, the NCAA&rsquo;s own convention. A non-Division-I result is shown beside it and is not counted in the record.">Record</th>
       <th class="n c-avca" title="AVCA coaches poll &mdash; the official poll, published by the American Volleyball Coaches Association. External reference: it does not feed our model.">AVCA&nbsp;Poll</th>
@@ -14016,6 +14213,13 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <b>None of these is a diagnosis</b>, and no reason is ever
     inferred from an absence.</p>
   <div id="avsummary"></div>
+  <h3 class="cfh">Out lately &mdash; regulars who have stopped appearing</h3>
+  <p class="tnote">A <b>regular</b> played at least half of her team&rsquo;s
+    sets; she is listed here when her team&rsquo;s last two or more matches
+    show no recorded action from her. From the box scores only &mdash;
+    <b>no reason is known or implied</b>, and a lineup choice looks exactly
+    like an injury here. Ranked teams first.</p>
+  <div id="avout"></div>
   <h3 class="cfh">Current sourced availability</h3>
   <div id="avstatuses"></div>
   <h3 class="cfh">Sourced match incidents &mdash; current availability
@@ -14949,13 +15153,130 @@ document.querySelectorAll('nav button[role=tab], #moremenu button[data-v]').forE
 const cs = $('#conf');
 CONFS.forEach(c => { const o = document.createElement('option'); o.value = o.textContent = c; cs.appendChild(o); });
 const rrows = [...document.querySelectorAll('#rbody tr.row')];
+/* ── SORT BY ANY COLUMN (Cody, 2026-10-28) ─────────────────────────────
+   Click a header: the first click puts the BEST first (high for ratings,
+   rates and spreads; low for ranks and for what opponents did), a second
+   click reverses. A team with no value always sorts last -- a dash is not
+   a zero. "Top N" follows the active sort, so "Top 50 by PPS" means the 50
+   best PPS teams, not POWER's top 50 reshuffled. Rows are re-ordered in
+   place; nothing is recomputed. */
+const RK_ASC = new Set(['rk', 'c-opps', 'c-ohit', 'c-res', 'c-avca']);
+let RK_SORT = null;          /* {col, asc} or null = POWER order */
+let RK_POS = new Map();      /* row -> position in the active order */
+function rkVal(tr, col) {
+  if (col === 0) return +tr.dataset.r;
+  const td = tr.children[col];
+  if (!td) return null;
+  const txt = (td.innerText || td.textContent || '').trim();
+  if (col === 1 || col === 2) return txt.toLowerCase() || null;
+  const t = txt.replace(/\u2212/g, '-').replace(/[#,%+]/g, ' ');
+  const rec = /^(\d+)-(\d+)/.exec(t.trim());
+  if (td.classList.contains('rec') && rec) {
+    const w = +rec[1], l = +rec[2];
+    return w + l ? w / (w + l) + w * 1e-4 : null;
+  }
+  const m = /-?\d*\.?\d+/.exec(t);
+  return m ? parseFloat(m[0]) : null;
+}
+function rkKind(th, col) {
+  if (col === 0) return 'rk';
+  const k = [...th.classList].find(c => RK_ASC.has(c));
+  if (k) return k;
+  /* a column whose values are printed as ranks ("#12") reads low-first */
+  const isRank = rrows.slice(0, 40).some(tr => {
+    const td = tr.children[col];
+    return td && /^#\d/.test((td.textContent || '').trim());
+  });
+  return isRank ? 'rank' : '';
+}
+function rkApplySort() {
+  const body = $('#rbody');
+  let order = rrows.slice();
+  if (RK_SORT) {
+    const { col, asc } = RK_SORT;
+    const v = new Map(order.map(tr => [tr, rkVal(tr, col)]));
+    order.sort((a, b) => {
+      const x = v.get(a), y = v.get(b);
+      if (x === null && y === null) return +a.dataset.r - +b.dataset.r;
+      if (x === null) return 1;
+      if (y === null) return -1;
+      if (x === y) return +a.dataset.r - +b.dataset.r;
+      const c = typeof x === 'string' ? x.localeCompare(y) : x - y;
+      return asc ? c : -c;
+    });
+  }
+  RK_POS = new Map(order.map((tr, i) => [tr, i + 1]));
+  for (const tr of order) {
+    body.appendChild(tr);
+    const d = body.querySelector('tr.det[data-for="' + tr.dataset.r + '"]');
+    if (d) body.appendChild(d);
+  }
+  document.querySelectorAll('.rk3 thead tr:last-child th').forEach((th, i) => {
+    th.classList.toggle('srt', !!RK_SORT && RK_SORT.col === i);
+    th.setAttribute('aria-sort', RK_SORT && RK_SORT.col === i
+      ? (RK_SORT.asc ? 'ascending' : 'descending') : 'none');
+    const ar = th.querySelector('.srtar');
+    if (ar) ar.textContent = RK_SORT && RK_SORT.col === i ? (RK_SORT.asc ? '\u25b2' : '\u25bc') : '';
+  });
+}
+document.querySelectorAll('.rk3 thead tr:last-child th').forEach((th, i) => {
+  th.classList.add('srtable');
+  th.tabIndex = 0;
+  const ar = document.createElement('span'); ar.className = 'srtar'; th.appendChild(ar);
+  const flip = () => {
+    const firstAsc = rkKind(th, i) !== '' || i === 1 || i === 2;
+    if (RK_SORT && RK_SORT.col === i) {
+      RK_SORT = { col: i, asc: !RK_SORT.asc };
+    } else {
+      RK_SORT = { col: i, asc: firstAsc };
+    }
+    /* clicking # in its natural direction is simply POWER order again */
+    if (i === 0 && RK_SORT.asc) RK_SORT = null;
+    rkApplySort(); renderRank();
+  };
+  th.addEventListener('click', flip);
+  th.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); }
+  });
+});
+/* the same sort as a control, because the phone card hides the headers */
+(function rkSortSelect() {
+  const topSel = document.getElementById('top');
+  if (!topSel) return;
+  const sel = document.createElement('select');
+  sel.id = 'rksort'; sel.setAttribute('aria-label', 'Sort rankings by');
+  const ths = [...document.querySelectorAll('.rk3 thead tr:last-child th')];
+  const lab = th => [...th.childNodes].filter(n => !(n.classList &&
+      n.classList.contains('srtar'))).map(n => n.textContent).join(' ')
+    .replace(/\s+/g, ' ').trim();
+  const opts = [['', 'Sort: POWER rank']];
+  ths.forEach((th, i) => {
+    if (i < 3) return;
+    const L = lab(th);
+    if (L) opts.push([String(i), 'Sort: ' + L]);
+  });
+  sel.innerHTML = opts.map(o => '<option value="' + o[0] + '">' + esc(o[1]) +
+    '</option>').join('');
+  topSel.parentNode.insertBefore(sel, topSel.nextSibling);
+  sel.addEventListener('change', () => {
+    const i = sel.value === '' ? -1 : +sel.value;
+    if (i < 0) RK_SORT = null;
+    else RK_SORT = { col: i, asc: rkKind(ths[i], i) !== '' };
+    rkApplySort(); renderRank();
+  });
+  /* a header click keeps the control honest */
+  ths.forEach(th => th.addEventListener('click', () => {
+    sel.value = RK_SORT ? String(RK_SORT.col) : '';
+    if (sel.value === '' && RK_SORT) sel.value = '';
+  }));
+})();
 function renderRank() {
   const q = $('#q').value.toLowerCase().trim(), c = cs.value, top = +$('#top').value;
   let n = 0;
   for (const tr of rrows) {
     const nm = tr.querySelector('.tm').textContent.toLowerCase();
     const cf = tr.querySelector('.cf').textContent;
-    const r = +tr.dataset.r;
+    const r = RK_SORT ? (RK_POS.get(tr) || +tr.dataset.r) : +tr.dataset.r;
     const show = (!q || nm.includes(q)) && (!c || cf === c) && (!top || r <= top);
     tr.hidden = !show;
     const d = document.querySelector('tr.det[data-for="' + r + '"]');
@@ -15011,7 +15332,7 @@ if (refcols) {
   const applyRef = () => {
     document.querySelector('#v-rankings table.rk3')
       .classList.toggle('hideref', !refcols.checked);
-    if (gOurs) gOurs.colSpan = refcols.checked ? 3 : 2;
+    if (gOurs) gOurs.colSpan = refcols.checked ? 9 : 8;
   };
   refcols.addEventListener('change', applyRef); applyRef();
 }
@@ -15535,6 +15856,26 @@ const LOGOS = {{LOGOS_JSON}};
 const COLORS = {{COLORS_JSON}};
 const BOXES = {{BOXES_JSON}};
 const PLAYERS = {{PLAYERS_JSON}};
+/* Expand the build's game pointers back into full rows, BEFORE anything reads
+   PLAYERS. A pointer is [gid, line#, date, opp, extras?] into BOXES; the
+   build only emits one where every stat matched exactly (compact_player_games),
+   so this is a copy, never a join. */
+(function hydratePlayers() {
+  const ID = {team: 1, name: 1, pos: 1, num: 1};
+  PLAYERS.forEach(p => {
+    if (!p.games) return;
+    p.games = p.games.map(g => {
+      if (!Array.isArray(g)) return g;
+      const ln = (BOXES[g[0]] || [])[g[1]] || {};
+      const x = g[4] || {};
+      const o = {d: g[2], gid: g[0], opp: g[3], nondi: !!x.nondi};
+      for (const k in ln) if (!ID[k]) o[k] = ln[k];
+      o.src_corrected = x.src_corrected === undefined ? null : x.src_corrected;
+      if (x.partial_box !== undefined) o.partial_box = x.partial_box;
+      return o;
+    });
+  });
+})();
 const PRANK = {{PRANK_JSON}};
 const ROSTER = {{ROSTER_JSON}};
 /* ⚠ DECLARED HERE, BESIDE THE PAYLOAD, AND NOT NEXT TO THE CODE THAT USES IT.
@@ -20522,7 +20863,10 @@ function matchRow(m, live, dest) {
       : '<span class="mwhen">' + esc(st === 'live'
         ? ((live && live.period) || 'live')
         : ((m.d && m.d !== todayPT() && m.dl ? m.dl + ' \u00b7 ' : '') +
-           (m.t || (st === 'final' ? m.dl || '' : 'Time TBA')))) + '</span>') +
+           (m.t || (st === 'final' ? m.dl || '' : 'Time TBA')))) +
+        /* the disputed-start flag reaches the Scores row too (2026-10-28:
+           Georgia-Texas sat at the feed's 4:00 PM while Texas listed 5:00) */
+        (st === 'upcoming' ? tdisNote(m) : '') + '</span>') +
     '<span class="mteams">' + t(mAway(m), m.ar, aw) + t(mHome(m), m.hr, hw) +
       '</span>' +
     rowLinescore(m, live, st) +
@@ -20555,7 +20899,7 @@ function matchRow(m, live, dest) {
         'this as scheduled ' + _od + ' minutes later. It may be under way; ' +
         'the source has not updated. Shown after a ' + FEED_OVERDUE_MIN +
         '-minute grace, a display convention, not a judgement about the match.'
-        + '">feed not updated \u00b7 start time passed</span></span>' : '') +
+        + '">awaiting score from feed</span></span>' : '') +
     '</span></button>';
 }
 
@@ -21592,6 +21936,9 @@ function tdAvailability(t, name) {
       (hist.length ? '; ' + hist.length + ' historical item' +
         (hist.length === 1 ? '' : 's') + ' on the desk' : '') + '.</span>';
   }
+  const outl = ((AVAIL.out_lately || {})[name] || []);
+  if (outl.length) body += '<span class="tddbsub">Out lately (box scores; no reason known)</span>' +
+    outl.map(avOutLine).join('');
   return '<div class="tddb"><em>Availability</em>' + body +
     '<a class="tddblink" href="' + routeFor('avail') + '">Availability ' +
     'Desk \u2192</a></div>';
@@ -21705,6 +22052,27 @@ function avTeamBlock(team) {
     }).join('') + '</div>';
 }
 
+function avShortD(iso) {
+  const m = /^(\d{4})-(\d\d)-(\d\d)$/.exec(iso || '');
+  return m ? ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct',
+    'Nov','Dec'][+m[2] - 1] + ' ' + (+m[3]) : (iso || '');
+}
+
+function avOutLine(r) {
+  /* one regular, one line: who, how long, when last seen, and what the
+     box said for each missed match ("listed, no stats" vs "not in box") */
+  const lst = r.missed.filter(m => m.state === 'not_listed').length;
+  return '<span class="avrowline avout"><b>' + esc(r.player) + '</b> \u2014 ' +
+    'no recorded action in the last ' + r.streak + ' match' +
+    (r.streak === 1 ? '' : 'es') +
+    (r.last_played ? ' \u00b7 last appeared ' + esc(avShortD(r.last_played)) : '') +
+    ' <span class="avmeta">' + r.sets + ' of ' + r.team_sets +
+    ' team sets before that' +
+    (lst ? ' \u00b7 not in the box ' + lst + 'x, listed without stats ' +
+      (r.streak - lst) + 'x' : ' \u00b7 listed without stats each time') +
+    '</span></span>';
+}
+
 function renderAvail() {
   const el = document.getElementById('avsummary');
   if (!el || typeof AVAIL === 'undefined' || !AVAIL.meta) return;
@@ -21721,6 +22089,27 @@ function renderAvail() {
       '<div class="cfcard"><em>' + x[0] + '</em><b>' +
       (x[1] === undefined ? '\u2014' : x[1]) + '</b><span>' + x[2] +
       '</span></div>').join('') + '</div>';
+  const avOut = document.getElementById('avout');
+  if (avOut) {
+    const ol = AVAIL.out_lately || {};
+    /* ⚠ renderAvail runs at script load, BEFORE `const TEAMS` is declared:
+       touching it throws in the temporal dead zone, and that throw stopped
+       the rest of the script -- TEAMS was never initialised and the Scores
+       tab rendered empty (2026-10-28). Read it only if it already exists. */
+    let _T = null; try { _T = TEAMS; } catch (e) { _T = null; }
+    const rk = t => (_T && _T[t] && +_T[t].rank) || 999;
+    const ts = Object.keys(ol).sort((a, b) => rk(a) - rk(b) || a.localeCompare(b));
+    const blk = t => '<div class="avrow"><a href="' + routeFor('teams', slug(t)) +
+      '"><b>' + (rk(t) < 999 ? 'POWER #' + rk(t) + ' ' : '') + esc(t) + '</b></a>' +
+      ol[t].map(avOutLine).join('') + '</div>';
+    const top = ts.filter(t => rk(t) <= 25), rest = ts.filter(t => rk(t) > 25);
+    avOut.innerHTML = ts.length
+      ? (top.length ? top.map(blk).join('')
+          : '<p class="tnote">No regular on a top-25 team is currently out.</p>') +
+        (rest.length ? '<details class="method"><summary>' + rest.length +
+          ' more teams</summary>' + rest.map(blk).join('') + '</details>' : '')
+      : '<p class="tnote">None. Every regular appeared in her team\u2019s latest match.</p>';
+  }
   const _proj = AVAIL.projection || [];
   document.getElementById('avstatuses').innerHTML =
     _proj.some(c => c.state === 'status')
@@ -21775,6 +22164,9 @@ function renderAvail() {
       (q.value.length >= 2 && t) ? avTeamBlock(t) : '';
   });
   renderAvail();
+  /* TEAMS is declared later in this script, so the Out-lately ordering can
+     only see ranks once the script has finished: redraw then. */
+  setTimeout(renderAvail, 0);
 })();
 /* AVAIL-JS-END */
 

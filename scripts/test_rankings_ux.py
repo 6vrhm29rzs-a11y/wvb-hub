@@ -135,7 +135,7 @@ def main():
     check("RESUME is compare-only: hidden with the reference set",
           ".rk3.hideref th.c-res,.rk3.hideref td.rs" in page)
     check("...and the group header shrinks with it (colspan sync)",
-          "gOurs.colSpan = refcols.checked ? 3 : 2" in page)
+          "gOurs.colSpan = refcols.checked ? 9 : 8" in page)  # PPS column added 2026-10-28
     check("the sheet Close control exists, 44px, phone-only",
           'id="msheetx"' in page
           and ".moremenu .msheetx{display:none}" in page

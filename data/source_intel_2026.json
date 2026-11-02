@@ -1,17 +1,17 @@
 {
  "meta": {
   "season": 2026,
-  "generated_at_utc": "2026-10-03T22:24:25Z",
+  "generated_at_utc": "2026-11-01T19:56:06Z",
   "n_claims": 132,
   "feed_cap": 5,
   "recent_hours": 72,
   "states": {
-   "confirmed_official": 95,
+   "confirmed_official": 94,
    "corroborated": 14,
    "official_unconfirmed": 0,
    "community_signal": 0,
    "conflicting": 2,
-   "expired": 20,
+   "expired": 21,
    "inaccessible": 1
   }
  },
@@ -3250,34 +3250,6 @@
    "review_by": null
   },
   {
-   "id": "5eb71a16c8f5",
-   "type": "fixture_update",
-   "subject": {
-    "kind": "match",
-    "gid": "6624495"
-   },
-   "what": "start_time_epoch corrected for Creighton at St. John's (NY)",
-   "state": "confirmed_official",
-   "state_label": "confirmed by an official source",
-   "why": "the school's own page contradicts the feed on start_time_epoch; every overridden field carries its own citation",
-   "scope": "the corrected schedule fields only",
-   "sources": [
-    {
-     "url": "https://gocreighton.com/sports/womens-volleyball/schedule/text",
-     "excerpt": "Sep 26 (Sat) | 6:00 PM CT | Away | St. John's -- corroborated by the home school, https://redstormsports.com/sports/womens-volleyball/schedule/text (retrieved 2026-09-26): Sep 26 (Sat) | 7 p.m. | Home | No. 25 Creighton (Queens, NY = Eastern)",
-     "retrieved": "2026-09-26",
-     "source_class": "official_school"
-    }
-   ],
-   "public": true,
-   "priority": 70,
-   "route": {
-    "match": "6624495"
-   },
-   "effective": null,
-   "review_by": "2026-10-03"
-  },
-  {
    "id": "4678803557c1",
    "type": "fixture_evidence",
    "subject": {
@@ -3381,6 +3353,27 @@
    },
    "effective": null,
    "review_by": "2026-09-14"
+  },
+  {
+   "id": "2aadacf87d1c",
+   "type": "fixture_evidence",
+   "subject": {
+    "kind": "match",
+    "gid": "6624495"
+   },
+   "what": "A schedule reading for Creighton at St. John's (NY) passed its review date",
+   "state": "expired",
+   "state_label": "evidence past its review date",
+   "why": "a schedule claim is perishable; this one was not re-verified by its review date",
+   "scope": "a schedule reading, now past its review date",
+   "sources": [],
+   "public": true,
+   "priority": 20,
+   "route": {
+    "match": "6624495"
+   },
+   "effective": null,
+   "review_by": "2026-10-03"
   },
   {
    "id": "bb79b64d7640",
@@ -4563,42 +4556,5 @@
    "review_by": "2026-10-04"
   }
  ],
- "feed": [
-  {
-   "id": "09adc338d587",
-   "type": "result_confirmation",
-   "subject": {
-    "kind": "match",
-    "gid": "6625564"
-   },
-   "what": "Result cross-source confirmed",
-   "state": "corroborated",
-   "state_label": "corroborated by independent sources",
-   "why": "2 independent attributable sources agree with the official record",
-   "scope": "the result of this one match",
-   "sources": [
-    {
-     "url": "https://latechsports.com/sports/womens-volleyball/schedule",
-     "excerpt": "class=\"s-game-card s-game-card--standard bg-theme-background-light shadow-level-1 @container/s-game-card-standard w-full rounded-[10px]\" role=\"group\" compact=\"false\" data-v-03a7b599 data-v-ad85b2e4>|vs|Southern Miss|Thomas Assembly Center|Ruston, LA|Rivalries Renewed | White Out|L, |0-3|Sep 25|(Fri)",
-     "retrieved": "2026-09-26T14:45:37Z",
-     "source_class": "school_site"
-    },
-    {
-     "url": "https://southernmiss.com/sports/womens-volleyball/schedule",
-     "excerpt": "class=\"s-game-card s-game-card--standard bg-theme-background-light shadow-level-1 @container/s-game-card-standard w-full rounded-[10px]\" role=\"group\" compact=\"false\" data-v-03a7b599 data-v-ad85b2e4>|at|Louisiana Tech|Ruston, La. / Thomas Assembly Center| TV: ESPN+|W, |3-0|Sep 25|(Fri)| 6 p.m.|Box Sc",
-     "retrieved": "2026-09-26T14:45:37Z",
-     "source_class": "school_site"
-    }
-   ],
-   "public": true,
-   "priority": 30,
-   "route": {
-    "match": "6625564",
-    "ledger": true
-   },
-   "effective": null,
-   "review_by": null,
-   "first_seen": "2026-10-03T21:51:25Z"
-  }
- ]
+ "feed": []
 }

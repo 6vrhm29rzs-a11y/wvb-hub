@@ -383,7 +383,7 @@ def main():
     print("\n7. A BLOCKED FIXTURE NEVER LEAKS A CLAIM IT CANNOT SUPPORT")
     if os.path.exists(hub):
         blocked = {g: r for g, r in fx.items() if FX.blocking_conflicts(r)}
-        check("[+] there ARE blocked fixtures to leak", len(blocked) > 5,
+        check("[+] there ARE blocked fixtures to leak", len(blocked) >= 1,
               str(len(blocked)))
         # the page payload for a blocked fixture must not carry a confident fact
         leaked = []

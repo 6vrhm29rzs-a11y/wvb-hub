@@ -3658,42 +3658,881 @@
   },
   "held_as": "self_contradictory"
  },
- "attr-6625064": {
-  "gid": "6625064",
-  "kind": "attribution_suspicion",
-  "teams": [
-   "Norfolk St.",
-   "UMES"
-  ],
-  "n_h1_votes": 1,
-  "components": {
-   "record_continuity": {
-    "available": true,
-    "n_observations": 6,
-    "h0_error": 10,
-    "h1_error": 6,
-    "vote": "SUPPORTS_H1"
+ "6625513": {
+  "gid": "6625513",
+  "date": "2026-10-03",
+  "canonical": "HELD as self_contradictory -- Eastern Mich. vs Central Mich., no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "Eastern Mich.": {
+    "state": "REPORTS",
+    "url": "https://emueagles.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Eastern Mich. W 3-0 vs Central Michigan",
+    "opponent_source": "Central Michigan",
+    "site_says": "Home"
+   },
+   "Central Mich.": {
+    "state": "REPORTS",
+    "url": "https://cmuchippewas.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Central Mich. L 0-3 vs Eastern Michigan",
+    "opponent_source": "Eastern Michigan",
+    "site_says": "Away"
    }
   },
-  "queued_utc": "2026-10-04T15:10:44Z"
+  "held_as": "self_contradictory"
  },
- "attr-6625435": {
-  "gid": "6625435",
-  "kind": "attribution_suspicion",
-  "teams": [
-   "Northwestern St.",
-   "LSU New Orleans "
-  ],
-  "n_h1_votes": 1,
-  "components": {
-   "record_continuity": {
-    "available": true,
-    "n_observations": 6,
-    "h0_error": 7,
-    "h1_error": 5,
-    "vote": "SUPPORTS_H1"
+ "6628348": {
+  "gid": "6628348",
+  "date": "2026-10-07",
+  "canonical": "HELD as self_contradictory -- NJIT vs Saint Peter's, no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "NJIT": {
+    "state": "REPORTS",
+    "url": "https://njithighlanders.com/services/schedule_txt.ashx?schedule=467",
+    "assertion": "NJIT L 1-3 vs Saint Peter's",
+    "opponent_source": "Saint Peter's",
+    "site_says": "Home"
+   },
+   "Saint Peter's": {
+    "state": "NOT_POSTED",
+    "url": "https://saintpeterspeacocks.com/services/schedule_txt.ashx?schedule=1302",
+    "row": [
+     "Oct 7 (Wed)",
+     "6:00 p.m.",
+     "Away",
+     "NJIT",
+     "Newark, NJ (Joel & Diane Bloom Wellness and Events Center (WEC))",
+     "",
+     ""
+    ]
    }
   },
-  "queued_utc": "2026-10-04T15:10:44Z"
+  "held_as": "self_contradictory"
+ },
+ "6626642": {
+  "gid": "6626642",
+  "date": "2026-10-08",
+  "canonical": "HELD as empty -- Akron vs Western Mich., no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "Akron": {
+    "state": "REPORTS",
+    "url": "https://gozips.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Akron W 3-2 vs Western Michigan",
+    "opponent_source": "Western Michigan",
+    "site_says": "Home"
+   },
+   "Western Mich.": {
+    "state": "REPORTS",
+    "url": "https://wmubroncos.com/services/schedule_txt.ashx?schedule=2344",
+    "assertion": "Western Mich. L 2-3 vs Akron",
+    "opponent_source": "Akron",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "empty"
+ },
+ "6625566": {
+  "gid": "6625566",
+  "date": "2026-10-09",
+  "canonical": "Georgia St. def. Southern Miss. 3-1",
+  "verdict": "CONTRADICTED_BOTH",
+  "schools": {
+   "Georgia St.": {
+    "state": "CONTRADICTS",
+    "url": "https://georgiastatesports.com/services/schedule_txt.ashx?schedule=360",
+    "assertion": "Georgia St. L 1-3 vs Southern Miss",
+    "opponent_source": "Southern Miss",
+    "site_says": "Away"
+   },
+   "Southern Miss.": {
+    "state": "CONTRADICTS",
+    "url": "https://southernmiss.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Southern Miss. W 3-1 vs Georgia State",
+    "opponent_source": "Georgia State",
+    "site_says": "Home"
+   }
+  }
+ },
+ "6624417": {
+  "gid": "6624417",
+  "date": "2026-10-09",
+  "canonical": "HELD as self_contradictory -- Southeast Mo. St. vs Lindenwood, no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "Southeast Mo. St.": {
+    "state": "REPORTS",
+    "url": "https://semoredhawks.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Southeast Mo. St. L 1-3 vs Lindenwood",
+    "opponent_source": "Lindenwood",
+    "site_says": "Home"
+   },
+   "Lindenwood": {
+    "state": "REPORTS",
+    "url": "https://lindenwoodlions.com/services/schedule_txt.ashx?schedule=1204",
+    "assertion": "Lindenwood W 3-1 vs Southeast Missouri State University",
+    "opponent_source": "Southeast Missouri State University",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "self_contradictory"
+ },
+ "6624659": {
+  "gid": "6624659",
+  "date": "2026-10-10",
+  "canonical": "HELD as self_contradictory -- Tarleton St. vs Abilene Christian, no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "Tarleton St.": {
+    "state": "REPORTS",
+    "url": "https://tarletonsports.com/services/schedule_txt.ashx?schedule=308",
+    "assertion": "Tarleton St. W 3-0 vs Abilene Christian",
+    "opponent_source": "Abilene Christian",
+    "site_says": "Home"
+   },
+   "Abilene Christian": {
+    "state": "REPORTS",
+    "url": "https://acusports.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Abilene Christian L 0-3 vs Tarleton State",
+    "opponent_source": "Tarleton State",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "self_contradictory"
+ },
+ "6626905": {
+  "gid": "6626905",
+  "date": "2026-10-10",
+  "canonical": "HELD as self_contradictory -- UT Martin vs Eastern Ill., no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "UT Martin": {
+    "state": "REPORTS",
+    "url": "https://utmsports.com/sports/womens-volleyball/schedule/text",
+    "assertion": "UT Martin L 0-3 vs Eastern Illinois",
+    "opponent_source": "Eastern Illinois",
+    "site_says": "Home"
+   },
+   "Eastern Ill.": {
+    "state": "REPORTS",
+    "url": "https://eiupanthers.com/services/schedule_txt.ashx?schedule=554",
+    "assertion": "Eastern Ill. W 3-0 vs UT Martin",
+    "opponent_source": "UT Martin",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "self_contradictory"
+ },
+ "6627737": {
+  "gid": "6627737",
+  "date": "2026-10-11",
+  "canonical": "HELD as empty -- Florida A&M vs Grambling, no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "Florida A&M": {
+    "state": "REPORTS",
+    "url": "https://famuathletics.com/services/schedule_txt.ashx?schedule=214",
+    "assertion": "Florida A&M W 3-1 vs Grambling State",
+    "opponent_source": "Grambling State",
+    "site_says": "Home"
+   },
+   "Grambling": {
+    "state": "NOT_POSTED",
+    "url": "https://gsutigers.com/services/schedule_txt.ashx?schedule=263",
+    "row": [
+     "Oct 11 (Sun)",
+     "12 p.m.",
+     "Away",
+     "Florida A&M University",
+     "Tallahassee, FL",
+     "",
+     ""
+    ]
+   }
+  },
+  "held_as": "empty"
+ },
+ "6628477": {
+  "gid": "6628477",
+  "date": "2026-10-11",
+  "canonical": "HELD as empty -- Temple vs North Texas, no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "Temple": {
+    "state": "REPORTS",
+    "url": "https://owlsports.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Temple W 3-2 vs North Texas",
+    "opponent_source": "North Texas",
+    "site_says": "Home"
+   },
+   "North Texas": {
+    "state": "NOT_POSTED",
+    "url": "https://meangreensports.com/sports/womens-volleyball/schedule/text",
+    "row": [
+     "Oct 11 (Sun)",
+     "11 AM CT",
+     "Away",
+     "Temple",
+     "Philadelphia, Pa.",
+     "",
+     "-"
+    ]
+   }
+  },
+  "held_as": "empty"
+ },
+ "6627258": {
+  "gid": "6627258",
+  "date": "2026-10-11",
+  "canonical": "HELD as empty -- George Washington vs Davidson, no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "George Washington": {
+    "state": "REPORTS",
+    "url": "https://gwsports.com/sports/womens-volleyball/schedule/text",
+    "assertion": "George Washington W 3-2 vs Davidson",
+    "opponent_source": "Davidson",
+    "site_says": "Home"
+   },
+   "Davidson": {
+    "state": "NOT_POSTED",
+    "url": "https://davidsonwildcats.com/sports/womens-volleyball/schedule/text",
+    "row": [
+     "Oct 11 (Sun)",
+     "1 p.m.",
+     "Away",
+     "George Washington University",
+     "Washington, D.C",
+     "",
+     "-"
+    ]
+   }
+  },
+  "held_as": "empty"
+ },
+ "6628365": {
+  "gid": "6628365",
+  "date": "2026-10-15",
+  "canonical": "HELD as empty -- Boise St. vs Washington St., no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "Boise St.": {
+    "state": "REPORTS",
+    "url": "https://broncosports.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Boise St. L 2-3 vs Washington State",
+    "opponent_source": "Washington State",
+    "site_says": "Home"
+   },
+   "Washington St.": {
+    "state": "REPORTS",
+    "url": "https://wsucougars.com/sports/womens-volleyball/schedule",
+    "assertion": "Washington St. W 3-2 vs Boise State",
+    "opponent_source": "Boise State",
+    "site_says": null,
+    "surface": "modern_card"
+   }
+  },
+  "held_as": "empty"
+ },
+ "6626553": {
+  "gid": "6626553",
+  "date": "2026-10-17",
+  "canonical": "HELD as empty -- Northern Ky. vs Purdue Fort Wayne, no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "Northern Ky.": {
+    "state": "REPORTS",
+    "url": "https://nkunorse.com/services/schedule_txt.ashx?schedule=321",
+    "assertion": "Northern Ky. W 3-0 vs Purdue Fort Wayne",
+    "opponent_source": "Purdue Fort Wayne",
+    "site_says": "Home"
+   },
+   "Purdue Fort Wayne": {
+    "state": "REPORTS",
+    "url": "https://gomastodons.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Purdue Fort Wayne L 0-3 vs Northern Kentucky",
+    "opponent_source": "Northern Kentucky",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "empty"
+ },
+ "6627379": {
+  "gid": "6627379",
+  "date": "2026-10-17",
+  "canonical": "HELD as empty -- Nicholls vs East Texas A&M, no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "Nicholls": {
+    "state": "REPORTS",
+    "url": "https://geauxcolonels.com/services/schedule_txt.ashx?schedule=458",
+    "assertion": "Nicholls L 0-3 vs East Texas A&M",
+    "opponent_source": "East Texas A&M",
+    "site_says": "Home"
+   },
+   "East Texas A&M": {
+    "state": "REPORTS",
+    "url": "https://lionathletics.com/services/schedule_txt.ashx?schedule=490",
+    "assertion": "East Texas A&M W 3-0 vs Nicholls",
+    "opponent_source": "Nicholls",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "empty"
+ },
+ "6625724": {
+  "gid": "6625724",
+  "date": "2026-10-17",
+  "canonical": "HELD as empty -- North Dakota St. vs South Dakota, no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "North Dakota St.": {
+    "state": "REPORTS",
+    "url": "https://gobison.com/sports/womens-volleyball/schedule/text",
+    "assertion": "North Dakota St. L 2-3 vs South Dakota",
+    "opponent_source": "South Dakota",
+    "site_says": "Home"
+   },
+   "South Dakota": {
+    "state": "REPORTS",
+    "url": "https://goyotes.com/services/schedule_txt.ashx?schedule=331",
+    "assertion": "South Dakota W 3-2 vs North Dakota State",
+    "opponent_source": "North Dakota State",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "empty"
+ },
+ "6628340": {
+  "gid": "6628340",
+  "date": "2026-10-17",
+  "canonical": "HELD as self_contradictory -- Iowa St. vs Utah, no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "Iowa St.": {
+    "state": "NOT_POSTED",
+    "url": "https://cyclones.com/sports/womens-volleyball/schedule/text",
+    "row": [
+     "Oct 17 (Sat)",
+     "2:00 PM",
+     "Home",
+     "Utah",
+     "Ames, Iowa",
+     "",
+     "-"
+    ]
+   },
+   "Utah": {
+    "state": "REPORTS",
+    "url": "https://utahutes.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Utah L 2-3 vs Iowa State",
+    "opponent_source": "Iowa State",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "self_contradictory"
+ },
+ "6626793": {
+  "gid": "6626793",
+  "date": "2026-10-17",
+  "canonical": "HELD as self_contradictory -- Mercyhurst vs Le Moyne, no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "Mercyhurst": {
+    "state": "REPORTS",
+    "url": "https://hurstathletics.com/services/schedule_txt.ashx?schedule=617",
+    "assertion": "Mercyhurst W 3-1 vs Le Moyne",
+    "opponent_source": "Le Moyne",
+    "site_says": "Home"
+   },
+   "Le Moyne": {
+    "state": "NOT_POSTED",
+    "url": "https://lemoynedolphins.com/services/schedule_txt.ashx?schedule=1537",
+    "row": [
+     "Oct 17 (Sat)",
+     "4:00 PM",
+     "Away",
+     "Mercyhurst University",
+     "Erie, Pa.",
+     "",
+     ""
+    ]
+   }
+  },
+  "held_as": "self_contradictory"
+ },
+ "6627771": {
+  "gid": "6627771",
+  "date": "2026-10-22",
+  "canonical": "HELD as self_contradictory -- St. Thomas (MN) vs North Dakota, no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "St. Thomas (MN)": {
+    "state": "REPORTS",
+    "url": "https://tommiesports.com/sports/wvball/schedule/text",
+    "assertion": "St. Thomas (MN) W 3-0 vs North Dakota",
+    "opponent_source": "North Dakota",
+    "site_says": "Home"
+   },
+   "North Dakota": {
+    "state": "REPORTS",
+    "url": "https://fightinghawks.com/services/schedule_txt.ashx?schedule=1539",
+    "assertion": "North Dakota L 0-3 vs St. Thomas",
+    "opponent_source": "St. Thomas",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "self_contradictory"
+ },
+ "6624253": {
+  "gid": "6624253",
+  "date": "2026-10-23",
+  "canonical": "HELD as self_contradictory -- Ohio St. vs Indiana, no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "Ohio St.": {
+    "state": "NOT_POSTED",
+    "url": "https://ohiostatebuckeyes.com/sports/womens-volleyball/schedule/text",
+    "row": [
+     "Oct 23 (Fri)",
+     "7 p.m.",
+     "Home",
+     "#18 Indiana",
+     "Columbus, Ohio (Covelli Center)",
+     "",
+     "-"
+    ]
+   },
+   "Indiana": {
+    "state": "REPORTS",
+    "url": "https://iuhoosiers.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Indiana W 3-0 vs Ohio State",
+    "opponent_source": "Ohio State",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "self_contradictory"
+ },
+ "6624904": {
+  "gid": "6624904",
+  "date": "2026-10-23",
+  "canonical": "HELD as self_contradictory -- Jacksonville St. vs FIU, no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "Jacksonville St.": {
+    "state": "REPORTS",
+    "url": "https://jaxstatesports.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Jacksonville St. L 0-3 vs Florida International",
+    "opponent_source": "Florida International",
+    "site_says": "Home"
+   },
+   "FIU": {
+    "state": "EVENT_NOT_FOUND",
+    "url": "https://fiusports.com/services/schedule_txt.ashx?schedule=378",
+    "rows_on_date": [
+     "Jax State"
+    ]
+   }
+  },
+  "held_as": "self_contradictory"
+ },
+ "6625027": {
+  "gid": "6625027",
+  "date": "2026-10-23",
+  "canonical": "HELD as empty -- Dayton vs Loyola Chicago, no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "Dayton": {
+    "state": "REPORTS",
+    "url": "https://daytonflyers.com/services/schedule_txt.ashx?schedule=3377",
+    "assertion": "Dayton W 3-2 vs Loyola Chicago",
+    "opponent_source": "Loyola Chicago",
+    "site_says": "Home"
+   },
+   "Loyola Chicago": {
+    "state": "REPORTS",
+    "url": "https://loyolaramblers.com/services/schedule_txt.ashx?schedule=252",
+    "assertion": "Loyola Chicago L 2-3 vs Dayton",
+    "opponent_source": "Dayton",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "empty"
+ },
+ "6625349": {
+  "gid": "6625349",
+  "date": "2026-10-24",
+  "canonical": "HELD as self_contradictory -- Ga. Southern vs James Madison, no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "Ga. Southern": {
+    "state": "NOT_POSTED",
+    "url": "https://gseagles.com/sports/womens-volleyball/schedule/text",
+    "row": [
+     "Oct 24 (Sat)",
+     "1 p.m.",
+     "Home",
+     "James Madison",
+     "Statesboro, Ga. (Hanner Fieldhouse)",
+     "",
+     "-"
+    ]
+   },
+   "James Madison": {
+    "state": "REPORTS",
+    "url": "https://jmusports.com/sports/womens-volleyball/schedule/text",
+    "assertion": "James Madison L 1-3 vs Georgia Southern",
+    "opponent_source": "Georgia Southern",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "self_contradictory"
+ },
+ "6624463": {
+  "gid": "6624463",
+  "date": "2026-10-24",
+  "canonical": "HELD as empty -- Saint Louis vs George Mason, no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "Saint Louis": {
+    "state": "REPORTS",
+    "url": "https://slubillikens.com/services/schedule_txt.ashx?schedule=650",
+    "assertion": "Saint Louis W 3-2 vs George Mason",
+    "opponent_source": "George Mason",
+    "site_says": "Home"
+   },
+   "George Mason": {
+    "state": "REPORTS",
+    "url": "https://gomason.com/services/schedule_txt.ashx?schedule=498",
+    "assertion": "George Mason L 2-3 vs Saint Louis",
+    "opponent_source": "Saint Louis",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "empty"
+ },
+ "6624954": {
+  "gid": "6624954",
+  "date": "2026-10-24",
+  "canonical": "HELD as self_contradictory -- Oakland vs Cleveland St., no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "Oakland": {
+    "state": "REPORTS",
+    "url": "https://goldengrizzlies.com/services/schedule_txt.ashx?schedule=1366",
+    "assertion": "Oakland W 3-1 vs Cleveland State",
+    "opponent_source": "Cleveland State",
+    "site_says": "Home"
+   },
+   "Cleveland St.": {
+    "state": "REPORTS",
+    "url": "https://csuvikings.com/services/schedule_txt.ashx?schedule=799",
+    "assertion": "Cleveland St. L 1-3 vs Oakland",
+    "opponent_source": "Oakland",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "self_contradictory"
+ },
+ "6625376": {
+  "gid": "6625376",
+  "date": "2026-10-24",
+  "canonical": "HELD as empty -- Iowa vs UCLA, no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "Iowa": {
+    "state": "REPORTS",
+    "url": "https://hawkeyesports.com/sports/wvball/schedule",
+    "assertion": "Iowa W 3-2 vs UCLA",
+    "opponent_source": "UCLA",
+    "site_says": null,
+    "surface": "modern_card"
+   },
+   "UCLA": {
+    "state": "REPORTS",
+    "url": "https://uclabruins.com/sports/womens-volleyball/schedule",
+    "assertion": "UCLA L 2-3 vs Iowa",
+    "opponent_source": "Iowa",
+    "site_says": "Home",
+    "surface": "modern_card"
+   }
+  },
+  "held_as": "empty"
+ },
+ "6628252": {
+  "gid": "6628252",
+  "date": "2026-10-25",
+  "canonical": "Cincinnati def. Arizona 3-2",
+  "verdict": "SCHOOL_CONFLICT",
+  "schools": {
+   "Cincinnati": {
+    "state": "CONTRADICTS_SETS",
+    "url": "https://gobearcats.com/sports/womens-volleyball/schedule",
+    "assertion": "Cincinnati W 3-0 vs Arizona",
+    "opponent_source": "Arizona",
+    "site_says": null,
+    "surface": "modern_card"
+   },
+   "Arizona": {
+    "state": "AGREE_COMPLETE",
+    "url": "https://arizonawildcats.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Arizona L 2-3 vs Cincinnati",
+    "opponent_source": "Cincinnati",
+    "site_says": "Away"
+   }
+  }
+ },
+ "6628267": {
+  "gid": "6628267",
+  "date": "2026-10-25",
+  "canonical": "N.C. Central def. UMES 3-0",
+  "verdict": "SCHOOL_CONFLICT",
+  "schools": {
+   "N.C. Central": {
+    "state": "CONTRADICTS",
+    "url": "https://nccueaglepride.com/services/schedule_txt.ashx?schedule=345",
+    "assertion": "N.C. Central L 0-3 vs Maryland Eastern Shore",
+    "opponent_source": "Maryland Eastern Shore",
+    "site_says": "Home"
+   },
+   "UMES": {
+    "state": "AGREE_COMPLETE",
+    "url": "https://easternshorehawks.com/services/schedule_txt.ashx?schedule=1306",
+    "assertion": "UMES L 0-3 vs North Carolina Central University",
+    "opponent_source": "North Carolina Central University",
+    "site_says": "Away"
+   }
+  }
+ },
+ "6624343": {
+  "gid": "6624343",
+  "date": "2026-10-25",
+  "canonical": "HELD as self_contradictory -- Wisconsin vs Michigan, no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "Wisconsin": {
+    "state": "NOT_POSTED",
+    "url": "https://uwbadgers.com/sports/womens-volleyball/schedule/text",
+    "row": [
+     "Oct 25 (Sun)",
+     "12 PM",
+     "Home",
+     "Michigan",
+     "Madison, Wis. (UW Field House)",
+     "",
+     "-"
+    ]
+   },
+   "Michigan": {
+    "state": "REPORTS",
+    "url": "https://mgoblue.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Michigan L 1-3 vs Wisconsin",
+    "opponent_source": "Wisconsin",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "self_contradictory"
+ },
+ "6627864": {
+  "gid": "6627864",
+  "date": "2026-10-25",
+  "canonical": "HELD as empty -- Binghamton vs New Hampshire, no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "Binghamton": {
+    "state": "REPORTS",
+    "url": "https://bubearcats.com/services/schedule_txt.ashx?schedule=1638",
+    "assertion": "Binghamton L 2-3 vs University of New Hampshire",
+    "opponent_source": "University of New Hampshire",
+    "site_says": "Home"
+   },
+   "New Hampshire": {
+    "state": "NOT_POSTED",
+    "url": "https://unhwildcats.com/sports/womens-volleyball/schedule/text",
+    "row": [
+     "Oct 25 (Sun)",
+     "1 PM",
+     "Away",
+     "Binghamton",
+     "Vestal, N.Y. (Events Center)",
+     "",
+     "-"
+    ]
+   }
+  },
+  "held_as": "empty"
+ },
+ "6628057": {
+  "gid": "6628057",
+  "date": "2026-10-25",
+  "canonical": "HELD as self_contradictory -- Bucknell vs Lafayette, no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "Bucknell": {
+    "state": "REPORTS",
+    "url": "https://bucknellbison.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Bucknell W 3-0 vs Lafayette",
+    "opponent_source": "Lafayette",
+    "site_says": "Home"
+   },
+   "Lafayette": {
+    "state": "REPORTS",
+    "url": "https://goleopards.com/services/schedule_txt.ashx?schedule=649",
+    "assertion": "Lafayette L 0-3 vs Bucknell",
+    "opponent_source": "Bucknell",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "self_contradictory"
+ },
+ "6626085": {
+  "gid": "6626085",
+  "date": "2026-10-25",
+  "canonical": "HELD as self_contradictory -- Rice vs Tulsa, no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "Rice": {
+    "state": "NOT_POSTED",
+    "url": "https://riceowls.com/sports/womens-volleyball/schedule/text",
+    "row": [
+     "Oct 25 (Sun)",
+     "1 PM",
+     "Home",
+     "Tulsa",
+     "Houston, Texas (Tudor Fieldhouse)",
+     "",
+     "-"
+    ]
+   },
+   "Tulsa": {
+    "state": "REPORTS",
+    "url": "https://tulsahurricane.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Tulsa W 3-1 vs Rice",
+    "opponent_source": "Rice",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "self_contradictory"
+ },
+ "6626296": {
+  "gid": "6626296",
+  "date": "2026-10-25",
+  "canonical": "HELD as empty -- Marquette vs Xavier, no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "Marquette": {
+    "state": "REPORTS",
+    "url": "https://gomarquette.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Marquette W 3-2 vs Xavier",
+    "opponent_source": "Xavier",
+    "site_says": "Home"
+   },
+   "Xavier": {
+    "state": "REPORTS",
+    "url": "https://goxavier.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Xavier L 2-3 vs Marquette",
+    "opponent_source": "Marquette",
+    "site_says": "Away"
+   }
+  },
+  "held_as": "empty"
+ },
+ "6625646": {
+  "gid": "6625646",
+  "date": "2026-10-30",
+  "canonical": "HELD as self_contradictory -- South Carolina vs Vanderbilt, no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "South Carolina": {
+    "state": "SITE_UNPARSED",
+    "url": "https://gamecocksonline.com/news/2021/09/03/textforhelp/"
+   },
+   "Vanderbilt": {
+    "state": "REPORTS",
+    "url": "https://vucommodores.com/website-api/schedule-events?filter%5Bschedule.sport_id%5D=5&filter%5Bpast%5D=true&per_page=25&sort=-datetime&include=opponent,scheduleEventResult",
+    "assertion": "Vanderbilt W 3-0 vs South Carolina",
+    "opponent_source": "South Carolina",
+    "site_says": "Away",
+    "surface": "wmt_api"
+   }
+  },
+  "held_as": "self_contradictory"
+ },
+ "6626464": {
+  "gid": "6626464",
+  "date": "2026-10-30",
+  "canonical": "Western Ill. def. SIUE 3-0",
+  "verdict": "SCHOOL_CONFLICT",
+  "schools": {
+   "Western Ill.": {
+    "state": "CONTRADICTS_SETS",
+    "url": "https://goleathernecks.com/services/schedule_txt.ashx?schedule=459",
+    "assertion": "Western Ill. W 3-1 vs SIUE",
+    "opponent_source": "SIUE",
+    "site_says": "Home"
+   },
+   "SIUE": {
+    "state": "AGREE_COMPLETE",
+    "url": "https://siuecougars.com/services/schedule_txt.ashx?schedule=656",
+    "assertion": "SIUE L 0-3 vs Western Illinois",
+    "opponent_source": "Western Illinois",
+    "site_says": "Away"
+   }
+  }
+ },
+ "6626347": {
+  "gid": "6626347",
+  "date": "2026-10-30",
+  "canonical": "HELD as empty -- Notre Dame vs Georgia Tech, no counted result",
+  "verdict": "HELD_BOTH_REPORT",
+  "schools": {
+   "Notre Dame": {
+    "state": "REPORTS",
+    "url": "https://und.com/website-api/schedule-events?filter%5Bschedule.sport_id%5D=22&filter%5Bpast%5D=true&per_page=25&sort=-datetime&include=opponent,scheduleEventResult",
+    "assertion": "Notre Dame L 2-3 vs Georgia Tech",
+    "opponent_source": "Georgia Tech",
+    "site_says": "Home",
+    "surface": "wmt_api"
+   },
+   "Georgia Tech": {
+    "state": "REPORTS",
+    "url": "https://ramblinwreck.com/website-api/schedule-events?filter%5Bschedule.sport_id%5D=17&filter%5Bpast%5D=true&per_page=25&sort=-datetime&include=opponent,scheduleEventResult",
+    "assertion": "Georgia Tech W 3-2 vs Notre Dame",
+    "opponent_source": "Notre Dame",
+    "site_says": "Away",
+    "surface": "wmt_api"
+   }
+  },
+  "held_as": "empty"
+ },
+ "6627578": {
+  "gid": "6627578",
+  "date": "2026-10-30",
+  "canonical": "HELD as self_contradictory -- Alcorn vs Prairie View, no counted result",
+  "verdict": "HELD_ONE_REPORTS",
+  "schools": {
+   "Alcorn": {
+    "state": "REPORTS",
+    "url": "https://alcornsports.com/services/schedule_txt.ashx?schedule=320",
+    "assertion": "Alcorn L 1-3 vs Prairie View A&M",
+    "opponent_source": "Prairie View A&M",
+    "site_says": "Home"
+   },
+   "Prairie View": {
+    "state": "NOT_POSTED",
+    "url": "https://pvpanthers.com/services/schedule_txt.ashx?schedule=334",
+    "row": [
+     "Oct 30 (Fri)",
+     "6:00 PM",
+     "Away",
+     "Alcorn State",
+     "Alcorn, Mississippi (Dave Whitney Complex)",
+     "",
+     ""
+    ]
+   }
+  },
+  "held_as": "self_contradictory"
  }
 }

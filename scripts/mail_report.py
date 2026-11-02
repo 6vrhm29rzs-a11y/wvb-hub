@@ -181,6 +181,17 @@ def _pt(epoch):
     return datetime.datetime.fromtimestamp(epoch, PT)
 
 
+def _no_takeaways(c):
+    """The empty-takeaways line. It said "No counted results." even on a day
+    that HAD a counted result with nothing notable in it -- directly under a
+    heading reading "1 counted results" (2026-10-28)."""
+    n = len(c.get("results") or [])
+    if not n:
+        return "No counted results."
+    return ("%d counted result%s; none involved a top-25 side or an upset."
+            % (n, "" if n == 1 else "s"))
+
+
 def _takeaways(res, ups, dd, poll):
     """3-5 lead items (011), each built from measured values only.
     The BIGGEST UPSET (largest gap on its own ruler) and the MOST
@@ -382,7 +393,7 @@ def render_a(c):
         for i, (lab, txt) in enumerate(c["takeaways"], 1):
             W("%d. %s: %s" % (i, lab, txt))
     else:
-        W("No counted results.")
+        W(_no_takeaways(c))
     W("")
     p = c["power"]
     W("POWER TOP 15")
@@ -513,7 +524,7 @@ def render_b(c):
             A('<li style="margin:6px 0"><b>%s:</b> %s</li>' % (_e(lab), _e(txt)))
         A('</ol>')
     else:
-        A('<p style="color:%s">No counted results.</p>' % MUTE)
+        A('<p style="color:%s">%s</p>' % (MUTE, _e(_no_takeaways(c))))
     p = c["power"]
     A(_h2("POWER Top 15"))
     A('<table role="presentation" width="100%%" style="border-collapse:collapse;font-size:14px">'

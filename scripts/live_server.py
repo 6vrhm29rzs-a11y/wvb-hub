@@ -159,7 +159,7 @@ def _now_pt():
         return datetime.datetime.now()
 
 
-def _fmt_time(epoch, start_time=None, home_team=None):
+def _fmt_time(epoch, start_time=None, home_team=None, gid=None):
     """A start time, rendered the way the rest of the page renders one.
 
     TWO THINGS THAT MUST NOT BE MERGED. `ET` above decides which DATES to ask
@@ -186,7 +186,7 @@ def _fmt_time(epoch, start_time=None, home_team=None):
     if not st:
         return ""
     try:
-        return _hub().listed_time(st, home_team, epoch)
+        return _hub().listed_time(st, home_team, epoch, gid)
     except Exception:
         return st
 
@@ -236,7 +236,8 @@ class Cache(object):
                     "start_epoch": _int_or_none(g.get("startTimeEpoch")),
                     "date": d.isoformat(),
                     "time": _fmt_time(g.get("startTimeEpoch"), g.get("startTime"),
-                                     (h.get("names") or {}).get("short")),
+                                     (h.get("names") or {}).get("short"),
+                                     g.get("gameID")),
                     "period": g.get("currentPeriod") or "",
                     "away": (a.get("names") or {}).get("short"),
                     "home": (h.get("names") or {}).get("short"),

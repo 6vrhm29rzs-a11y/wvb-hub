@@ -33,7 +33,8 @@ def grab(pattern):
 
 TEAMS = grab(r"const TEAMS = (\{)")
 TAN = grab(r"tanData\.v = (\{)")
-PLAYERS = grab(r"const PLAYERS = (\[)")
+import pageconst as _PCX
+PLAYERS = _PCX.find(html, "PLAYERS")
 KS, KP = TAN["keys"]["series"], TAN["keys"]["players"]
 COMP = ("k", "e", "ta", "ast", "digs", "bs", "ba", "aces", "se")
 

@@ -102,9 +102,12 @@ def participation(rows):
             gp = int(float(r.get("gp") or 0))
         except (TypeError, ValueError):
             gp = 0
+        # ⚠ serve and receive attempts are ACTIONS (2026-10-28): without
+        # them a serving specialist or a passing DS who never touched an
+        # attack read as "zero action" in every match she played
         acted = any(float(r.get(k) or 0) > 0 for k in
                     ("kills", "errors", "atts", "aces", "digs", "bs", "ba",
-                     "assists"))
+                     "assists", "serve_atts", "serve_errors", "recv_atts"))
         state = ("appeared" if gp and acted
                  else "zero_action" if gp else "not_listed")
         # a cited school-report participation correction (mail 054): the
@@ -261,6 +264,69 @@ def projection(ev=None, today=None):
     return out
 
 
+# ── OUT LATELY (Cody, 2026-10-28: "we need to be better at seeing and
+# knowing all"). A REGULAR is a player who appeared in at least half of her
+# team's judgeable sets; she is OUT LATELY when her team's most recent
+# judgeable matches (>= OUT_MIN in a row, ending with the latest) show no
+# appearance. Participation facts only -- never a reason, never "injured".
+# A match is JUDGEABLE only when the team's box lists >= 6 players who
+# recorded an action: a truncated box would otherwise manufacture an
+# absence for everyone missing from it (the Musgrove case).
+REGULAR_SHARE = 0.5
+OUT_MIN = 2
+
+
+def _key(n):
+    return " ".join(n.lower().split())
+
+
+def out_lately(by_team, date_of):
+    res = {}
+    for tn, games in by_team.items():
+        gl = sorted((g for g in games
+                     if sum(1 for f in games[g] if f["state"] == "appeared")
+                     >= 6), key=lambda g: date_of.get(g, 0))
+        if len(gl) < 4:
+            continue
+        team_sets = 0
+        sets = {}
+        disp = {}
+        for g in gl:
+            team_sets += max([f["sets"] for f in games[g]] + [0])
+            for f in games[g]:
+                k = _key(f["name"])
+                disp.setdefault(k, f["name"])
+                if f["state"] == "appeared":
+                    sets[k] = sets.get(k, 0) + f["sets"]
+        if not team_sets:
+            continue
+        rows = []
+        for k, n in sets.items():
+            if n < REGULAR_SHARE * team_sets:
+                continue
+            missed = []
+            last_seen = None
+            for g in reversed(gl):
+                st = {_key(f["name"]): f["state"] for f in games[g]}.get(k)
+                if st == "appeared":
+                    last_seen = g
+                    break
+                missed.append({"gid": g, "d": pt_date(date_of.get(g, 0)),
+                               "state": st or "not_listed"})
+            if len(missed) >= OUT_MIN:
+                rows.append({"player": disp[k], "sets": n,
+                             "team_sets": team_sets,
+                             "streak": len(missed),
+                             "last_played": (pt_date(date_of.get(last_seen,
+                                                                 0))
+                                             if last_seen else None),
+                             "missed": list(reversed(missed))})
+        if rows:
+            rows.sort(key=lambda r: -r["streak"])
+            res[tn] = rows
+    return res
+
+
 def build(today=None):
     today = today or datetime.date.today().isoformat()
     ev = (load("data/raw/%d/availability_evidence.json" % SEASON) or {}) \
@@ -278,6 +344,7 @@ def build(today=None):
                                                  or 0)
     per_team_latest = {}
     timelines = {}
+    by_team = {}
     try:
         import season_counts as _SCd
         _held_desk = set(str(x) for x in _SCd.held_gids(SEASON))
@@ -314,6 +381,10 @@ def build(today=None):
             _rows = [_nci.apply_identity_override(r, gid) for r in _rows]   # mail 052
             facts = participation(_rows)
             for f in facts:
+                _tn = id2n.get(f["team_id"], "")
+                if _tn and gid not in _held_desk:
+                    by_team.setdefault(_tn, {}).setdefault(gid, []).append(f)
+            for f in facts:
                 tn = id2n.get(f["team_id"], "")
                 if not tn:
                     continue
@@ -345,6 +416,8 @@ def build(today=None):
     for k in timelines:
         timelines[k].sort(key=lambda x: x["ep"])
 
+    streaks = out_lately(by_team, date_of)
+
     # anomalies: availability.py's measured baseline flags, passed through
     av = load("data/availability_%d.json" % SEASON) or {}
     anomalies = av.get("flagged") or []
@@ -355,7 +428,8 @@ def build(today=None):
             microsecond=0).isoformat() + "Z",
         "counts": {"statuses": len(statuses), "incidents": len(incidents),
                    "signals": len(signals),
-                   "expired": len(expired), "anomalies": len(anomalies)},
+                   "expired": len(expired), "anomalies": len(anomalies),
+                   "out_lately": sum(len(v) for v in streaks.values())},
         "anomaly_baseline": (av.get("meta") or {}).get("measures"),
         "anomaly_floor": ("availability.py needs %s completed team matches "
                           "for a baseline; leagues below that show no "
@@ -366,7 +440,8 @@ def build(today=None):
         "statuses": statuses, "incidents": incidents,
         "projection": projection(ev, today),
         "signals": signals, "expired": expired,
-        "anomalies": anomalies, "latest": latest, "timelines": timelines}
+        "anomalies": anomalies, "latest": latest, "timelines": timelines,
+        "out_lately": streaks}
     dst = os.path.join(REPO, "data", "availability_desk_%d.json" % SEASON)
     json.dump(out, open(dst, "w"), indent=1)
     c = out["meta"]["counts"]

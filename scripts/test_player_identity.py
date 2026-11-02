@@ -55,8 +55,8 @@ def main():
         return 0
     print("  reading %s\n" % which)
 
-    m = re.search(r"const PLAYERS = (\[.*?\]);\n", h, re.S)
-    P = json.loads(m.group(1)) if m else []
+    import pageconst as _PCX
+    P = _PCX.find(h, "PLAYERS") or []
     check("the player payload is present", bool(P), "0 rows")
 
     print("\n1. ONE AGGREGATE PER CANONICAL (team, name)")

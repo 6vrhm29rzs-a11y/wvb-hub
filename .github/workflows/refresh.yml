@@ -78,7 +78,7 @@ concurrency:
 
 jobs:
   refresh:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04   # 3.9 is not available on ubuntu-latest (26.04) -- pinned 2026-10-28
     # ⚠ BOUND IT. `cancel-in-progress: false` is correct -- a crawl killed
     # mid-write is exactly what the append-only log must never see -- but it
     # means a HUNG run blocks every later one, and with no timeout GitHub's

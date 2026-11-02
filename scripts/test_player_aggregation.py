@@ -242,8 +242,8 @@ def main():
                   all("nondi" not in w
                       for w in ("standings", "indiana", "ending", "sondheim")))
             check("the marker renders at least once", 'class="nondi"' in hp)
-            m3 = re.search(r"const PLAYERS = (\[.*?\]);\n", hp, re.S)
-            PP = json.loads(m3.group(1)) if m3 else []
+            import pageconst as _PCX
+            PP = _PCX.find(hp, "PLAYERS") or []
             flagged = sum(1 for pl in PP for g in pl.get("games", [])
                           if g.get("nondi"))
             total = sum(len(pl.get("games", [])) for pl in PP)

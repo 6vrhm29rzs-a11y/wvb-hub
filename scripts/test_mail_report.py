@@ -75,9 +75,17 @@ def test_reports():
     check("011 order: takeaways, POWER Top 15, movers outside, unfinished",
           all(x >= 0 for x in order[:2] + order[3:]) and order == sorted(x for x in order if x >= 0) or
           (order[0] < order[1] < order[3]))
-    check("3-5 takeaways, biggest upset distinct from most consequential",
-          1 <= len(c["takeaways"]) <= 5 and (len(c["takeaways"]) < 2 or
+    # ⚠ a quiet day legitimately has NO takeaways; the old pin (>=1) failed
+    # the calendar, not the code. What must hold: at most 5, distinct, and an
+    # empty list never claims there were no results when there were.
+    check("at most 5 takeaways, biggest upset distinct from most consequential",
+          len(c["takeaways"]) <= 5 and (len(c["takeaways"]) < 2 or
           c["takeaways"][0][1] != c["takeaways"][1][1]))
+    check("[-] an empty takeaway list never denies results that exist",
+          c["takeaways"] or not c["results"] or "No counted results." not in a)
+    fake = dict(c, takeaways=[], results=[{"w": "A", "l": "B"}])
+    check("[NEG] a quiet day with one result says so",
+          "1 counted result;" in R.render_a(fake))
 
 
 def test_schedule():

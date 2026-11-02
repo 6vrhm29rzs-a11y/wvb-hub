@@ -22,7 +22,7 @@ import re
 from typing import Any, Dict, Optional
 
 
-def find(html, name):
+def _find_raw(html, name):
     # type: (str, str) -> Optional[Any]
     """The decoded value of `const NAME = ...;`, or None if it is not there.
 
@@ -66,6 +66,48 @@ def find(html, name):
         return json.loads(m.group(1).replace("<\\/", "</"))
     except ValueError:
         return None
+
+
+def find(html, name):
+    # type: (str, str) -> Optional[Any]
+    """The decoded value of `const NAME = ...;`, or None if it is not there.
+
+    PLAYERS is returned EXPANDED: the page ships each game row that exactly
+    copies a BOXES line as a pointer (build_hub.compact_player_games), and
+    readers here must see the same full rows the page's hydratePlayers()
+    produces.
+    """
+    v = _find_raw(html, name)
+    if name == "PLAYERS" and isinstance(v, list):
+        boxes = _find_raw(html, "BOXES") or {}
+        hydrate_players(v, boxes)
+    return v
+
+
+def hydrate_players(players, boxes):
+    """In place: pointer game rows -> full rows. Mirrors hydratePlayers()."""
+    for p in players:
+        gs = p.get("games")
+        if not gs:
+            continue
+        out = []
+        for g in gs:
+            if not isinstance(g, list):
+                out.append(g)
+                continue
+            lines = boxes.get(g[0]) or []
+            ln = lines[g[1]] if g[1] < len(lines) else {}
+            x = g[4] if len(g) > 4 else {}
+            o = {"d": g[2], "gid": g[0], "opp": g[3], "nondi": bool(x.get("nondi"))}
+            for k, val in ln.items():
+                if k not in ("team", "name", "pos", "num"):
+                    o[k] = val
+            o["src_corrected"] = x.get("src_corrected")
+            if "partial_box" in x:
+                o["partial_box"] = x["partial_box"]
+            out.append(o)
+        p["games"] = out
+    return players
 
 
 def teams(html):

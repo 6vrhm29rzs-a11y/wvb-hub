@@ -1,0 +1,236 @@
+{
+ "date": "2026-10-14",
+ "generated_utc": "2026-10-15T01:55:34Z",
+ "counts": {
+  "VERIFIED_BOTH": 4,
+  "CORROBORATED_ONE": 5
+ },
+ "matches": [
+  {
+   "gid": "6624866",
+   "date": "2026-10-14",
+   "canonical": "Towson def. Coppin St. 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Towson": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://towsontigers.com/services/schedule_txt.ashx?schedule=6584",
+     "assertion": "Towson W 3-0 vs Coppin State",
+     "opponent_source": "Coppin State",
+     "site_says": "Away"
+    },
+    "Coppin St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://coppinstatesports.com/services/schedule_txt.ashx?schedule=313",
+     "assertion": "Coppin St. L 0-3 vs Towson",
+     "opponent_source": "Towson",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6638586",
+   "date": "2026-10-14",
+   "canonical": "UTSA def. North Texas 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "UTSA": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://goutsa.com/website-api/schedule-events?filter%5Bschedule.sport_id%5D=15&filter%5Bpast%5D=true&per_page=25&sort=-datetime&include=opponent,scheduleEventResult",
+     "rows_on_date": []
+    },
+    "North Texas": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://meangreensports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "North Texas L 0-3 vs UTSA",
+     "opponent_source": "UTSA",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6627061",
+   "date": "2026-10-14",
+   "canonical": "UNCW def. Coastal Carolina 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "UNCW": {
+     "state": "NOT_POSTED",
+     "url": "https://uncwsports.com/services/schedule_txt.ashx?schedule=390",
+     "row": [
+      "Oct 14 (Wed)",
+      "6:00 PM",
+      "Home",
+      "Coastal Carolina",
+      "Wilmington, NC (Hanover Hall)",
+      "",
+      ""
+     ]
+    },
+    "Coastal Carolina": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://goccusports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Coastal Carolina L 1-3 vs UNCW",
+     "opponent_source": "UNCW",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6625518",
+   "date": "2026-10-14",
+   "canonical": "Kent St. def. Central Mich. 3-2",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Kent St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://kentstatesports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Kent St. W 3-2 vs Central Michigan",
+     "opponent_source": "Central Michigan",
+     "site_says": "Away"
+    },
+    "Central Mich.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://cmuchippewas.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Central Mich. L 2-3 vs Kent State",
+     "opponent_source": "Kent State",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6626236",
+   "date": "2026-10-14",
+   "canonical": "Missouri def. Mississippi St. 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Missouri": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://mutigers.com/sports/womens-volleyball/schedule",
+     "assertion": "Missouri W 3-0 vs Mississippi State",
+     "opponent_source": "Mississippi State",
+     "site_says": null,
+     "surface": "modern_card"
+    },
+    "Mississippi St.": {
+     "state": "NOT_POSTED",
+     "url": "https://hailstate.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Oct 14 (Wed)",
+      "6 p.m.",
+      "Away",
+      "Missouri",
+      "Columbia, Mo.",
+      "",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6627663",
+   "date": "2026-10-14",
+   "canonical": "Oregon St. def. Texas St. 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Oregon St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://osubeavers.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Oregon St. W 3-0 vs Texas State",
+     "opponent_source": "Texas State",
+     "site_says": "Away"
+    },
+    "Texas St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://txstatebobcats.com/services/schedule_txt.ashx?schedule=360",
+     "assertion": "Texas St. L 0-3 vs Oregon State",
+     "opponent_source": "Oregon State",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6626392",
+   "date": "2026-10-14",
+   "canonical": "Villanova def. Georgetown 3-1",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Villanova": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://villanova.com/services/schedule_txt.ashx?schedule=660",
+     "assertion": "Villanova W 3-1 vs Georgetown",
+     "opponent_source": "Georgetown",
+     "site_says": "Home"
+    },
+    "Georgetown": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://guhoyas.com/services/schedule_txt.ashx?schedule=1666",
+     "assertion": "Georgetown L 1-3 vs Villanova",
+     "opponent_source": "Villanova",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6628437",
+   "date": "2026-10-14",
+   "canonical": "Virginia def. Virginia Tech 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Virginia": {
+     "state": "NOT_POSTED",
+     "url": "https://virginiasports.com/sports/wvball/schedule",
+     "row": [
+      "Oct 14",
+      "vs.",
+      "Virginia Tech",
+      "(ACC)",
+      "Charlottesville, Va. / Memorial Gymnasium",
+      "home",
+      "presented by",
+      "Opens in a new window",
+      "7:00 PM EDT",
+      "Live Stats",
+      "Preview"
+     ]
+    },
+    "Virginia Tech": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://hokiesports.com/sports/volleyball/schedule",
+     "assertion": "Virginia Tech L 1-3 vs Virginia",
+     "opponent_source": "Virginia",
+     "site_says": "Away",
+     "surface": "modern_card"
+    }
+   }
+  },
+  {
+   "gid": "6626759",
+   "date": "2026-10-14",
+   "canonical": "Southeastern La. def. UIW 3-2",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Southeastern La.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://lionsports.net/services/schedule_txt.ashx?schedule=322",
+     "assertion": "Southeastern La. W 3-2 vs UIW",
+     "opponent_source": "UIW",
+     "site_says": "Away"
+    },
+    "UIW": {
+     "state": "NOT_POSTED",
+     "url": "https://uiwcardinals.com/services/schedule_txt.ashx?schedule=424",
+     "row": [
+      "Oct 14 (Wed)",
+      "6 p.m.",
+      "Home",
+      "Southeastern Louisiana University",
+      "San Antonio, TX (McDermott Center)",
+      "",
+      ""
+     ]
+    }
+   }
+  }
+ ]
+}
