@@ -15498,7 +15498,10 @@ function teamRankChips(name, feedAvca) {
 function slateFromSchedule() {
   const today = new Intl.DateTimeFormat('en-CA',
     { timeZone: 'America/Los_Angeles' }).format(new Date());
-  return WEEK
+  /* DESK, not WEEK: the WEEK payload was deleted as dead in round 5 and this
+     reference survived it, so the no-server path threw ReferenceError. DESK
+     carries the same d/a/h/t/ar/hr fields. */
+  return DESK
     .filter(r => r.d === today)
     .map(r => ({ date: r.d, away: r.a, home: r.h, time: r.t,
                  away_rank: r.ar, home_rank: r.hr, state: 'pre' }));

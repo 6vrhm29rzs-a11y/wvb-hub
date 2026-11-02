@@ -3494,6 +3494,16 @@ def check_week_names_whose_ranking():
         bad("the deleted week surface came back",
             "renderWeek/WEEK were removed on purpose; see round-5 notes")
         return
+    # ⚠ AND NOTHING MAY STILL READ IT (2026-11-01): slateFromSchedule kept
+    # `return WEEK` after the payload was deleted, so the no-server slate
+    # threw ReferenceError inside pollLive. A deleted const with a surviving
+    # reader is silent until the fallback path runs.
+    import re as _re
+    _js = _re.sub(r"/\*.*?\*/", "", src, flags=_re.S)
+    if _re.search(r"(?<![\w.'\"])WEEK(?![\w'\"])\s*[.\[]", _js):
+        bad("a reader of the deleted WEEK payload survives",
+            "slateFromSchedule must read DESK")
+        return
     # 2026-09-01: the "our Top 25: Indiana 38" footnote is RETIRED -- Cody
     # read it as a contradiction (a 38 under a top-25 heading). The invariant
     # it protected -- our rank beside the official one, labelled as ours --

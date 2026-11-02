@@ -4534,5 +4534,28 @@
    }
   },
   "held_as": "self_contradictory"
+ },
+ "6625961": {
+  "gid": "6625961",
+  "date": "2026-11-01",
+  "canonical": "Wisconsin def. UCLA 3-0",
+  "verdict": "SCHOOL_CONFLICT",
+  "schools": {
+   "Wisconsin": {
+    "state": "AGREE_COMPLETE",
+    "url": "https://uwbadgers.com/sports/womens-volleyball/schedule/text",
+    "assertion": "Wisconsin W 3-0 vs UCLA",
+    "opponent_source": "UCLA",
+    "site_says": "Away"
+   },
+   "UCLA": {
+    "state": "CONTRADICTS",
+    "url": "https://uclabruins.com/sports/womens-volleyball/schedule",
+    "assertion": "UCLA W 3-0 vs Wisconsin",
+    "opponent_source": "Wisconsin",
+    "site_says": "Away",
+    "surface": "modern_card"
+   }
+  }
  }
 }

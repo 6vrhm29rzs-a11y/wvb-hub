@@ -4,7 +4,7 @@
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 1242,
+     "records": 10,
      "values": [
       "1788670800",
       "1788742800"
@@ -12,7 +12,7 @@
     },
     {
      "field": "game_state",
-     "records": 1242,
+     "records": 10,
      "values": [
       "P",
       "I",
@@ -21,7 +21,7 @@
     },
     {
      "field": "site",
-     "records": 1242,
+     "records": 10,
      "stale": true,
      "values": [
       "an official reading from 2026-09-14 has passed its review date (2026-09-14)"
@@ -29,7 +29,7 @@
     },
     {
      "field": "venue",
-     "records": 1242,
+     "records": 10,
      "stale": true,
      "values": [
       "an official reading from 2026-09-14 has passed its review date (2026-09-14)"
@@ -37,7 +37,7 @@
     },
     {
      "field": "city",
-     "records": 1242,
+     "records": 10,
      "stale": true,
      "values": [
       "an official reading from 2026-09-14 has passed its review date (2026-09-14)"
@@ -45,7 +45,7 @@
     },
     {
      "field": "state_usps",
-     "records": 1242,
+     "records": 10,
      "stale": true,
      "values": [
       "an official reading from 2026-09-14 has passed its review date (2026-09-14)"
@@ -53,27 +53,13 @@
     }
    ],
    "matchup": "Missouri / Nebraska",
-   "records": 1242
-  },
-  "6627181": {
-   "conflicts": [
-    {
-     "field": "start_time_epoch",
-     "records": 3,
-     "values": [
-      "1793142000",
-      "1793228400"
-     ]
-    }
-   ],
-   "matchup": "Georgia / Texas",
-   "records": 3
+   "records": 10
   },
   "6627436": {
    "conflicts": [
     {
      "field": "start_time_epoch",
-     "records": 620,
+     "records": 5,
      "values": [
       "1791568800",
       "1791586800"
@@ -81,7 +67,7 @@
     },
     {
      "field": "game_state",
-     "records": 620,
+     "records": 5,
      "values": [
       "P",
       "O"
@@ -89,12 +75,34 @@
     }
    ],
    "matchup": "Jacksonville / West Florida",
-   "records": 620
+   "records": 5
+  },
+  "6628451": {
+   "conflicts": [
+    {
+     "field": "start_time_epoch",
+     "records": 3,
+     "values": [
+      "1793509200",
+      "1793563200"
+     ]
+    },
+    {
+     "field": "game_state",
+     "records": 3,
+     "values": [
+      "P",
+      "I"
+     ]
+    }
+   ],
+   "matchup": "Mississippi St. / Alabama",
+   "records": 3
   }
  },
  "by_field": {
   "city": 1,
-  "game_state": 41,
+  "game_state": 37,
   "site": 1,
   "start_time_epoch": 3,
   "state_usps": 1,
@@ -246,7 +254,7 @@
  },
  "counts": {
   "blocked": 3,
-  "conflicted": 42,
+  "conflicted": 37,
   "corrected": 5,
   "fixtures": 4897
  },

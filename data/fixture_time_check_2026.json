@@ -1,39 +1,39 @@
 {
  "season": 2026,
- "generated_utc": "2026-11-01T19:37:57Z",
+ "generated_utc": "2026-11-02T00:39:05Z",
  "window_days": 4,
- "fixtures_checked": 65,
- "schools_answered": 76,
- "timestamps_unresolved": 683,
+ "fixtures_checked": 44,
+ "schools_answered": 45,
+ "timestamps_unresolved": 533,
  "timestamps_unresolved_sample": [
   {
-   "school": "South Fla.",
-   "datetime": "2026-08-05 6 p.m.",
-   "opp": "Green vs. Gold Scrimmage",
+   "school": "Purdue Fort Wayne",
+   "datetime": "2026-08-14 1 PM",
+   "opp": "Western Michigan",
    "why": "naive_time_zone_unknown"
   },
   {
-   "school": "South Fla.",
-   "datetime": "2026-08-15 1 p.m.",
-   "opp": "Stetson",
+   "school": "Purdue Fort Wayne",
+   "datetime": "2026-08-21 2 PM",
+   "opp": "Eastern Michigan",
    "why": "naive_time_zone_unknown"
   },
   {
-   "school": "South Fla.",
-   "datetime": "2026-08-22 1 p.m.",
-   "opp": "UCF",
+   "school": "Purdue Fort Wayne",
+   "datetime": "2026-08-28 11 AM",
+   "opp": "Rutgers",
    "why": "naive_time_zone_unknown"
   },
   {
-   "school": "South Fla.",
-   "datetime": "2026-08-28 2 p.m.",
-   "opp": "Eastern Kentucky",
+   "school": "Purdue Fort Wayne",
+   "datetime": "2026-08-28 4 PM",
+   "opp": "Evansville",
    "why": "naive_time_zone_unknown"
   },
   {
-   "school": "South Fla.",
-   "datetime": "2026-08-29 6 p.m.",
-   "opp": "Kentucky",
+   "school": "Purdue Fort Wayne",
+   "datetime": "2026-08-29 10 AM",
+   "opp": "Bellarmine",
    "why": "naive_time_zone_unknown"
   }
  ],
@@ -42,18 +42,18 @@
  "what_this_is_not": "Not a correction. The hand-curated fixture ledger is the only thing that overrides a displayed time, and it needs a citation.",
  "lookback_hours": 12,
  "sources": {
-  "wmt_api": 15,
-  "schedule_text": 61
+  "wmt_api": 5,
+  "schedule_text": 40
  },
  "status_counts": {
-  "agree": 25,
-  "disagree": 12,
+  "agree": 12,
+  "disagree": 7,
   "no_match": 11,
-  "fetch_failed": 17,
+  "fetch_failed": 14,
   "no_reader": 0
  },
  "unknown_is_not_agreement": "no_match / fetch_failed / no_reader fixtures were NOT checked.",
- "n": 12,
+ "n": 7,
  "disagreements": [
   {
    "gid": "6627210",
@@ -134,58 +134,6 @@
    "claim": "the NCAA feed and this school's own schedule disagree about when this match starts; neither is corrected here"
   },
   {
-   "gid": "6628043",
-   "home": "Colorado",
-   "away": "Texas Tech",
-   "school_asked": "Colorado",
-   "feed_epoch": 1793556000,
-   "school_epoch": 1793563200.0,
-   "minutes_apart": 120,
-   "school_url": "https://cubuffs.com/sports/womens-volleyball/schedule/text",
-   "school_source": "schedule_text",
-   "school_published": "1 p.m.",
-   "claim": "the NCAA feed and this school's own schedule disagree about when this match starts; neither is corrected here"
-  },
-  {
-   "gid": "6628451",
-   "home": "Alabama",
-   "away": "Mississippi St.",
-   "school_asked": "Alabama",
-   "feed_epoch": 1793563200,
-   "school_epoch": 1793570400.0,
-   "minutes_apart": 120,
-   "school_url": "https://rolltide.com/sports/womens-volleyball/schedule/text",
-   "school_source": "schedule_text",
-   "school_published": "4 p.m. CT",
-   "claim": "the NCAA feed and this school's own schedule disagree about when this match starts; neither is corrected here"
-  },
-  {
-   "gid": "6624854",
-   "home": "Southern California",
-   "away": "Minnesota",
-   "school_asked": "Southern California",
-   "feed_epoch": 1793570400,
-   "school_epoch": 1793566800.0,
-   "minutes_apart": -60,
-   "school_url": "https://usctrojans.com:443/sports/womens-volleyball/schedule/text",
-   "school_source": "schedule_text",
-   "school_published": "1:00 p.m. PT",
-   "claim": "the NCAA feed and this school's own schedule disagree about when this match starts; neither is corrected here"
-  },
-  {
-   "gid": "6625961",
-   "home": "UCLA",
-   "away": "Wisconsin",
-   "school_asked": "UCLA",
-   "feed_epoch": 1793574000,
-   "school_epoch": 1793570400.0,
-   "minutes_apart": -60,
-   "school_url": "https://uclabruins.com/schedule",
-   "school_source": "wmt_api",
-   "school_published": null,
-   "claim": "the NCAA feed and this school's own schedule disagree about when this match starts; neither is corrected here"
-  },
-  {
    "gid": "6625626",
    "home": "LSU",
    "away": "Arkansas",
@@ -196,19 +144,6 @@
    "school_url": "https://lsusports.net/schedule",
    "school_source": "wmt_api",
    "school_published": null,
-   "claim": "the NCAA feed and this school's own schedule disagree about when this match starts; neither is corrected here"
-  },
-  {
-   "gid": "6625245",
-   "home": "Missouri",
-   "away": "Tennessee",
-   "school_asked": "Tennessee",
-   "feed_epoch": 1793563200,
-   "school_epoch": 1793561400.0,
-   "minutes_apart": -30,
-   "school_url": "https://utsports.com/sports/womens-volleyball/schedule/text",
-   "school_source": "schedule_text",
-   "school_published": "2:30 p.m. ET",
    "claim": "the NCAA feed and this school's own schedule disagree about when this match starts; neither is corrected here"
   }
  ]

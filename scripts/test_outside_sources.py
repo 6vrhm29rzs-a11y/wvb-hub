@@ -18,7 +18,7 @@ nominates and believes its own evidence has no second witness.
 Run: python3 scripts/test_outside_sources.py -- no network.
 """
 
-import io
+import io, re
 import json
 import os
 import sys
@@ -119,7 +119,10 @@ def main():
                    encoding="utf-8").read()
     bcode = _code_only(bsrc)
     check("the schedule row carries the flag",
-          '"tdis": _tdis_now.get(gid)' in bcode)
+          # the row may wrap the lookup (2026-10-28: a school time filling the
+          # feed's midnight placeholder is not a dispute), but it must read it
+          bool(re.search(r'"tdis":\s*\([^{}]*?_tdis_now\.get\(gid\)', bcode, re.S)
+               or '"tdis": _tdis_now.get(gid)' in bcode))
     check("the DESK payload carries it too",
           bcode.count('"tdis": r.get("tdis")') >= 2,
           bcode.count('"tdis": r.get("tdis")'))
