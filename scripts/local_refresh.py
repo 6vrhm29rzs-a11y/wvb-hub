@@ -72,6 +72,11 @@ REBUILD = [
     # the committed ledger as-is.
     ({}, ["scripts/venue_site_evidence.py"]),
     ({}, ["scripts/venues.py"]),
+    # ⚠ LOCAL TOO (B3, 2026-11-04): only the nightly CI job rebuilt this, and
+    # with that job not completing it sat at 2026-10-04 -- eleven fixtures
+    # judged "its date has not passed" were never re-judged and held the weekly
+    # freeze shut for a month. Same evidence rule, no network.
+    ({}, ["scripts/fixture_disposition.py"]),
     ({}, ["scripts/availability.py"]),
     # ranks what availability.py merely flags: 750 undifferentiated
     # team-match flags are not a thing anyone can read.
@@ -158,6 +163,164 @@ def fingerprint():
     return out.strip() if code == 0 else None
 
 
+# ── B4 (2026-11-04): WHAT ELSE MUST REACH THE PAGE ──────────────────────────
+# The finals fingerprint above was the ONLY trigger, so a school verification,
+# a correction, a poll, a venue citation or the midnight eligibility rollover
+# waited for the next final -- often the next day. Two more digests, compared
+# with the LAST SUCCESSFUL cycle (persisted), not with this cycle's start, so a
+# failed rebuild is retried instead of forgotten:
+#   rating inputs -- change what POWER may count: full rebuild
+#   presentation  -- change what the page shows, not the rating: venues + page
+RAW26 = os.path.join(REPO, "data", "raw", "2026")
+# ⚠ NOT result_verification_log.jsonl: that is a FETCH log (one line per school
+# page fetched, retries included), so hashing it would rebuild every cycle.
+# Verdicts come from the daily reports (verdict_digest); JSON ledgers are
+# hashed with their timestamp fields removed, so a re-check that finds the same
+# thing changes nothing.
+RATING_INPUTS = ("result_corrections.json", "duplicate_listings.json",
+                 "result_evidence.json", "result_evidence_auto.json")
+PRESENTATION_INPUTS = ("polls_avca.jsonl", "polls_rpi.jsonl", "polls_top16.jsonl",
+                       "venue_site_evidence.json")
+# 073 #3: a new weekly freeze must reach the movement labels on its own --
+# these archives are appended BEFORE the gate (--weekly-only), so without them
+# in a digest a freeze-only cycle read "nothing changed".
+WEEKLY_ARCHIVES = (os.path.join(REPO, "data", "rankings_history_2026.jsonl"),
+                   os.path.join(REPO, "Cody", "data", "power_candidate",
+                                "rankings_history_candidate.jsonl"))
+# venues.py now runs before the gate (073 #2), so PRESENT is the page only.
+PRESENT = [
+    ({}, ["scripts/build_hub.py"]),
+]
+# 073 #2: the EFFECTIVE site of each game (home / neutral / no-venue) feeds the
+# candidate fit (no-venue set, home edge), predict_2026 and the simulator
+# (neutral floors). Published POWER (digby_top25, rating_2025) reads the feed's
+# is_home flag only. A site change is therefore a rating input; a citation-only
+# edit to the evidence ledger stays presentation.
+VENUES = os.path.join(REPO, "data", "venues_2026.json")
+PREGATE = [
+    ["scripts/verify_results_daily.py", "--incremental"],
+    ["scripts/season_only_candidate.py", "--weekly-only"],
+    # the site ledger and its application are cheap (~0.4 s) and must run
+    # BEFORE the gate, or a site correction could never reach it
+    ["scripts/venue_site_evidence.py"],
+    ["scripts/venues.py"],
+]
+DIGESTS = os.path.join(REPO, "Cody", "data", "refresh_digests.json")
+
+
+_VOLATILE = ("retriev", "generated", "_utc", "captured", "checked")
+
+
+def _stable(o):
+    if isinstance(o, dict):
+        return dict((k, _stable(v)) for k, v in o.items()
+                    if not any(t in k.lower() for t in _VOLATILE))
+    if isinstance(o, list):
+        return [_stable(x) for x in o]
+    return o
+
+
+def _file_digest(names):
+    import hashlib
+    h = hashlib.sha256()
+    for n in names:
+        p = os.path.join(RAW26, n)
+        h.update(n.encode())
+        if not os.path.exists(p):
+            continue
+        if n.endswith(".json"):
+            try:
+                doc = _stable(json.load(open(p, encoding="utf-8")))
+                h.update(json.dumps(doc, sort_keys=True).encode())
+                continue
+            except ValueError:
+                pass
+        with open(p, "rb") as fh:
+            h.update(hashlib.sha256(fh.read()).digest())
+    return h.hexdigest()[:16]
+
+
+def verdict_digest():
+    """(gid, verdict) pairs from today's and yesterday's Pacific-dated reports --
+    the verdicts themselves, not when they were fetched."""
+    import hashlib, datetime as _dt
+    from zoneinfo import ZoneInfo
+    today = _dt.datetime.now(ZoneInfo("America/Los_Angeles")).date()
+    pairs = []
+    for d in (today - _dt.timedelta(days=1), today):
+        p = os.path.join(REPO, "data", "result_verification_%s.json" % d.isoformat())
+        try:
+            for m in json.load(open(p)).get("matches") or []:
+                pairs.append((str(m.get("gid")), str(m.get("verdict"))))
+        except (IOError, ValueError):
+            continue
+    return hashlib.sha256(json.dumps(sorted(pairs)).encode()).hexdigest()[:16]
+
+
+def pacific_date():
+    import datetime as _dt
+    from zoneinfo import ZoneInfo
+    return _dt.datetime.now(ZoneInfo("America/Los_Angeles")).date().isoformat()
+
+
+def site_digest(path=None):
+    """(gid, effective site) pairs -- the site VALUES, not the citations."""
+    import hashlib
+    try:
+        v = json.load(open(path or VENUES))
+        pairs = sorted((str(g.get("game_id")), str(g.get("site"))) for g in v.get("games") or [])
+    except (IOError, ValueError):
+        pairs = []
+    return hashlib.sha256(json.dumps(pairs).encode()).hexdigest()[:16]
+
+
+def weekly_digest(paths=None):
+    import hashlib
+    h = hashlib.sha256()
+    for p in paths or WEEKLY_ARCHIVES:
+        h.update(p.encode())
+        if os.path.exists(p):
+            h.update(hashlib.sha256(open(p, "rb").read()).digest())
+    return h.hexdigest()[:16]
+
+
+def digests(finals_fp):
+    return {"finals": finals_fp,
+            # the Pacific date is a rating input: the midnight rollover makes
+            # yesterday's unverified finals eligible (season_counts.rating_input_ok)
+            "rating": "%s:%s:%s:%s" % (_file_digest(RATING_INPUTS), verdict_digest(),
+                                       pacific_date(), site_digest()),
+            "presentation": "%s:%s" % (_file_digest(PRESENTATION_INPUTS), weekly_digest())}
+
+
+def load_digests():
+    try:
+        return json.load(open(DIGESTS))
+    except (IOError, ValueError):
+        return {}
+
+
+def save_digests(d):
+    if not os.path.isdir(os.path.dirname(DIGESTS)):
+        return
+    tmp = DIGESTS + ".tmp"
+    json.dump(d, open(tmp, "w"), indent=1)
+    os.replace(tmp, DIGESTS)
+
+
+def decide(prev, cur, force=False):
+    """'full' | 'present' | 'none' -- pure, so it is testable without a cycle."""
+    if force or not prev:
+        return "full"
+    if cur.get("finals") is None:
+        return "full"
+    if cur["finals"] != prev.get("finals") or cur["rating"] != prev.get("rating"):
+        return "full"
+    if cur["presentation"] != prev.get("presentation"):
+        return "present"
+    return "none"
+
+
 STATUS_DIR = os.path.join(REPO, "Cody", "data")
 REFRESH_LOG = os.path.join(STATUS_DIR, "refresh_log.jsonl")
 REFRESH_STATUS = os.path.join(STATUS_DIR, "refresh_status.json")
@@ -225,14 +388,37 @@ def _cycle(force, t0):
             _record("crawl_failed", step=" ".join(args), detail=out[-600:],
                     seconds=round(time.time() - t0))
             return 1
+    # B4/B3: cheap steps that must run EVERY cycle, before the gate --
+    # school verifications (incremental) and the candidate's weekly freeze.
+    for args in PREGATE:
+        code, out = _run(args)
+        if code != 0:
+            print("  %s failed (tolerated): %s" % (args[0], out[-300:]))
     after = fingerprint()
+    cur = digests(after)
+    prev = load_digests()
+    mode = decide(prev, cur, force)
 
-    if not force and before is not None and after == before:
-        print("no new final since the last cycle -- nothing to rebuild")
+    if mode == "none":
+        print("nothing changed since the last successful cycle -- nothing to rebuild")
         _record("no_new_final", fingerprint=after, seconds=round(time.time() - t0))
         return 0
 
-    print("new final(s) landed -- rebuilding (%s -> %s)" % (before, after))
+    if mode == "present":
+        print("presentation inputs changed (polls/venue citations/weekly freeze) -- page only")
+        for env_extra, args in PRESENT:
+            code, out = _run(args, env_extra=env_extra)
+            if code != 0 and args[0] in HARD:
+                print(out[-2000:])
+                _record("rebuild_failed", step=" ".join(args), detail=out[-600:],
+                        seconds=round(time.time() - t0))
+                return 1
+        save_digests(cur)
+        _record("presentation_rebuilt", fingerprint=after,
+                seconds=round(time.time() - t0))
+        return 0
+
+    print("rating inputs changed -- rebuilding (%s -> %s)" % (before, after))
     for env_extra, args in REBUILD:
         code, out = _run(args, env_extra=env_extra)
         if code != 0:
@@ -244,6 +430,7 @@ def _cycle(force, t0):
                 return 1
             print("  %s skipped (as CI tolerates)" % args[0])
     print("local page rebuilt -- rankings now include the new finals")
+    save_digests(cur)
     _record("rebuilt", fingerprint=after, forced=bool(force),
             seconds=round(time.time() - t0))
     return 0

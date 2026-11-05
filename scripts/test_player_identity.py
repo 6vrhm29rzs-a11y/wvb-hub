@@ -137,16 +137,16 @@ def main():
     # core-data pass 2026-08-31: Stats (leaders) is a PRIMARY now -- a
     # rankings/scores/stats site leads with its stats. Six on the private
     # page, five public (the ballot strips).
-    want = (["desk", "scores", "rankings", "leaders", "teams", "ballot"]
+    want = (["scores", "rankings", "leaders", "teams", "ballot"]
             if private
-            else ["desk", "scores", "rankings", "leaders", "teams"])
+            else ["scores", "rankings", "leaders", "teams"])
     check("the primary destinations are the core %d" % len(want),
           prim == want, "%s (expected %s)" % (prim, want))
     check("[-] the nav has not grown back into a tab maze", len(prim) <= 6,
           str(prim))
     more = re.findall(r'<button role="menuitem"[^>]*data-v="([a-z0-9]+)"', h)
     check("the reference tools stay reachable in More, none lost",
-          set(more) >= {"players", "standings", "bracket", "schedule"},
+          set(more) >= {"players", "standings", "bracket"},
           str(more))
     check("Digby's Top 25 is a RANKINGS view, not a top-level tab",
           "top25" not in prim and 'data-r="digby"' in h)
@@ -210,10 +210,8 @@ def main():
     # What this scoping actually buys is robustness when the suite is pointed
     # at the PUBLIC page, which page() falls back to whenever Cody/ is absent.
     # That is a condition I create locally, not one CI produces.
-    if "START-HERE" in (which or ""):
-        check("an unavailable chat states it plainly",
-              "not connected on this local build" in h)
-        check("...and disables its composer", "q.disabled = true" in h)
+    if False:   # Ask Digby retired from both builds (Cody, 2026-11-04)
+        pass
     else:
         check("[+] the private chat is absent from the published page",
               "askform" not in h and "/api/digby" not in h)

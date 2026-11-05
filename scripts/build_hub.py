@@ -879,8 +879,79 @@ def v2so_preview_payload():
                           "generated_utc": cm.get("generated_at_utc"),
                           "data_through_epoch": cm.get("data_through_epoch")}
         doc["default_on"] = (not PUBLIC) and os.path.exists(os.path.join(REPO, "Cody", "data", "power_candidate", "DEFAULT_ON"))
+        doc["incl"] = power_inclusion(doc)
     _V2S_CACHE.append(doc)
     return doc
+
+
+def _complete_line(g):
+    # type: (dict) -> bool
+    """Every set on the line is a finished set (25, or 15 in a fifth, won by 2)."""
+    ls = [l for l in (g.get("linescores") or []) if l.get("home") is not None]
+    if not ls:
+        return False
+    for i, l in enumerate(ls):
+        try:
+            h, v = int(l["home"]), int(l["visit"])
+        except (TypeError, ValueError):
+            return False
+        if max(h, v) < (15 if i == 4 else 25) or abs(h - v) < 2:
+            return False
+    return True
+
+
+def power_inclusion(cand):
+    # type: (dict) -> Dict[str, str]
+    """B4 (2026-11-04): per-final POWER status, for the private page.
+
+    ⚠ ELIGIBLE IS NOT INCLUDED (Reviewer 071). 'in' comes from the INPUT
+    MANIFEST of the last successful POWER artifact -- the candidate file lists
+    every match it used, by gid, in each team's results (3,833 of 3,833
+    verified 2026-11-04) -- never from rating_input_ok alone. A final that is
+    eligible but not yet in that file is pending, with the reason:
+      in   -- in the POWER now shown
+      pc   -- pending: same-day, awaiting a school's confirmation (or midnight)
+      pu   -- pending: eligible, waiting for the next POWER update
+      x:<class> -- not in POWER: exhibition, duplicate, under_review, empty,
+                   self_contradictory, non_d1, incomplete_line, not_used
+                   (not_used = within the fit's window but absent from it)
+    The inclusion POLICY is unchanged; this only reports it."""
+    import gamelog as _GL
+    import season_counts as _SC
+    used = set()
+    for t in (cand.get("teams") or {}).values():
+        for r in (t.get("why") or {}).get("results") or []:
+            used.add(str(r.get("gid")))
+    non_d1 = set(str(x.get("gid")) for x in cand.get("excluded_non_d1") or [])
+    games = _GL.load_games_jsonl(os.path.join(REPO, "data", "raw", str(SEASON), "games.jsonl"))
+    cls = _SC.classify(games, SEASON)
+    cut = _SC.rating_cutoff_epoch()
+    verified = _SC.verified_result_gids(SEASON)
+    through = cand.get("data_through_epoch") or 0
+    by = dict((str(g.get("game_id")), g) for g in _SC.resolve(games))
+    out = {}
+    for gid, c in cls.items():
+        if gid in used:
+            out[gid] = "in"
+        elif c != "ok":
+            out[gid] = "x:" + c
+        elif gid in non_d1 or not all(
+                t.get("division") == 1 for t in (by.get(gid) or {}).get("teams") or []):
+            out[gid] = "x:non_d1"
+        elif not _complete_line(by.get(gid) or {}):
+            # counts toward records, but the feed's set line is missing or
+            # stops mid-set, so a set-score rating cannot read it
+            out[gid] = "x:incomplete_line"
+        elif not _SC.rating_input_ok(by.get(gid) or {}, cut, verified):
+            out[gid] = "pc"
+        elif ((by.get(gid) or {}).get("start_time_epoch") or 0) <= through:
+            # eligible, inside the last fit's window, and absent from it: the
+            # model's own input filter left it out (reason not recorded by the
+            # model) -- NOT pending
+            out[gid] = "x:not_used"
+        else:
+            out[gid] = "pu"
+    return out
 
 
 V2S_BTN = ('<button class="segb" data-r="v2s" title="Private candidate: 2026 results, '
@@ -2173,16 +2244,19 @@ def mover(t):
     mv = t.get("move")
     if mv is None:
         return ""
+    # B3: say WHICH snapshot -- "vs the last weekly snapshot" hid that the
+    # last one could be weeks old (it was Oct 18 on 2026-11-04)
+    vs = esc(t.get("move_vs") or "the last weekly snapshot")
     if mv > 0:
-        return ('<span class="mv up" title="up %d place%s vs the last '
-                'weekly snapshot on the same basis">&#9650;%d</span>'
-                % (mv, '' if mv == 1 else 's', mv))
+        return ('<span class="mv up" title="up %d place%s vs %s '
+                '(same basis)">&#9650;%d</span>'
+                % (mv, '' if mv == 1 else 's', vs, mv))
     if mv < 0:
-        return ('<span class="mv dn" title="down %d place%s vs the last '
-                'weekly snapshot on the same basis">&#9660;%d</span>'
-                % (abs(mv), '' if abs(mv) == 1 else 's', abs(mv)))
-    return ('<span class="mv sm" title="unchanged vs the last weekly '
-            'snapshot on the same basis">&ndash;</span>')
+        return ('<span class="mv dn" title="down %d place%s vs %s '
+                '(same basis)">&#9660;%d</span>'
+                % (abs(mv), '' if abs(mv) == 1 else 's', vs, abs(mv)))
+    return ('<span class="mv sm" title="unchanged vs %s (same basis)">'
+            '&ndash;</span>' % vs)
 
 def pos_bucket(p):
     """School sites and box scores spell positions a dozen ways. Anything we do
@@ -6140,10 +6214,14 @@ def extref_strip(meta, teams):
     stamp = rank_stamp_pt(st.get("generated_at_utc")) or "stamp not held"
     rows.append(("POWER", "the hub&rsquo;s own rating &mdash; "
                  "evidence-qualified counting corpus only",
-                 "basis: %s &middot; last recomputed %s%s" % (
+                 "basis: %s &middot; last recomputed %s%s%s" % (
                      src, stamp,
                      (" &middot; through %d rating-eligible finals"
-                      % st["matches_in"]) if st.get("matches_in") else "")))
+                      % st["matches_in"]) if st.get("matches_in") else "",
+                     # B3: which snapshot the movement arrows measure against
+                     (" &middot; arrows compare with %s" % esc(meta["move_vs"]))
+                     if meta.get("move_vs") else
+                     " &middot; no earlier same-basis snapshot, so no arrows")))
     res = meta.get("resume") or {}
     rows.append(("R&Eacute;SUM&Eacute;", "the hub&rsquo;s own results "
                  "ranking &mdash; same counting corpus",
@@ -6302,6 +6380,10 @@ def extref_strip(meta, teams):
         '<!-- EXTREF-HTML-END -->'
         % ("".join('<tr><th>%s</th><td class="xr">%s</td><td class="xf">'
                    '%s</td></tr>' % r for r in rows), mm_html))
+
+
+RANK_LIVE_SCHEMA = 1
+_RANK_LIVE = []
 
 
 def build():
@@ -7645,7 +7727,22 @@ def build():
     _hero["podium"] = "".join(_pod)
 
     slope = level.get("recommended_slope")
+    # B2 (2026-11-04): the small versioned ranking payload the page can swap
+    # in WITHOUT a reload. Written beside the page by __main__ (one file per
+    # build, atomically consistent: rows, ranks, ratings and stamp together).
+    _rl = {"schema": RANK_LIVE_SCHEMA,
+           "generated_utc": ((meta.get("rank_stamp") or {}).get("generated_at_utc")),
+           "built_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+           "rows_html": "".join(rrows),
+           "teams": dict((t["team"], {"rank": t.get("rank26"), "power": t.get("power")})
+                         for t in teams)}
+    import hashlib as _hl
+    _rl["version"] = _hl.sha256(json.dumps(
+        [_rl["rows_html"], _rl["teams"]], sort_keys=True).encode()).hexdigest()[:16]
+    _RANK_LIVE[:] = [_rl]
     return TEMPLATE \
+        .replace("{{RANK_LIVE_VERSION}}", json.dumps(_rl["version"])) \
+        .replace("{{RANK_LIVE_SCHEMA}}", str(RANK_LIVE_SCHEMA)) \
         .replace("{{POLLS_JSON}}", json.dumps(polls, separators=(",", ":"))) \
         .replace("{{FORECAST_NOTE_JSON}}", json.dumps(FORECAST_AVAIL_NOTE)) \
         .replace("{{NOTV_NOTE_JSON}}", json.dumps(NOTV_NOTE)) \
@@ -7664,11 +7761,11 @@ def build():
                  "          add('VT', t.vt ? '#' + t.vt : '');\n"
                  "          add('Massey preseason snapshot', "
                  "t.massey ? '#' + t.massey : '');") \
-        .replace("{{ASK_CSS}}", "" if PUBLIC else ASK_CSS) \
+        .replace("{{ASK_CSS}}", "") \
         .replace("{{DIGBY_FACE_JS}}",
                  json.dumps("" if PUBLIC else DIGBY_SVG)) \
-        .replace("{{ASK_HTML}}", "" if PUBLIC else ASK_HTML) \
-        .replace("{{ASK_JS}}", "" if PUBLIC else ASK_JS) \
+        .replace("{{ASK_HTML}}", "") \
+        .replace("{{ASK_JS}}", "") \
         .replace("{{DIGBY_CSS}}", "" if PUBLIC else DIGBY_CSS) \
         .replace("{{ICON_CSS}}", ICONS.CSS) \
         .replace("{{ICON_FINAL}}", ICONS.icon("final")) \
@@ -7744,10 +7841,7 @@ def build():
             ["power", "resume", "digby", "avca", "rpi", "committee",
              "massey", "vt"])) \
         .replace("{{WHAT_MAKES_GOOD}}", what_makes_good_html()) \
-        .replace("{{OUTBOX_JSON}}", json.dumps(
-            dict((tm, dict((_nkey_letters(r["player"]), r) for r in rows))
-                 for tm, rows in radar_by_team().items()),
-            separators=(",", ":"))) \
+        .replace("{{OUTBOX_JSON}}", "{}") \
         .replace("{{PROFILE_ORDER}}", json.dumps(
             [m[0] for m in PROFILE_METRICS], separators=(",", ":"))) \
         .replace("{{PROFILE_MIN_N}}", str(PROFILE_MIN_MATCHES)) \
@@ -7837,20 +7931,16 @@ def build():
             roster_index(), separators=(",", ":"))) \
         .replace("{{N_PLAYERS}}", str(len(plist))) \
         .replace("{{LEADERS_JSON}}", json.dumps(ldrs, separators=(",", ":"))) \
-        .replace("{{CONFLAB_JSON}}", json.dumps(_conflab, separators=(",", ":"))) \
+        .replace("{{CONFLAB_JSON}}", "{}") \
         .replace("{{NEWS_JSON}}", json.dumps(_news, separators=(",", ":"))) \
-        .replace("{{AVAIL_JSON}}", json.dumps(
-            load("data/availability_desk_%d.json" % SEASON) or {},
-            separators=(",", ":"))) \
+        .replace("{{AVAIL_JSON}}", "{}") \
         .replace("{{DUP_GIDS_JSON}}", json.dumps(
             sorted(__import__("dupes").duplicate_gids(SEASON)),
             separators=(",", ":"))) \
         .replace("{{CONFIDENCE_JSON}}", json.dumps(
-            load("data/result_confidence_%d.json" % SEASON) or
-            {"meta": {"counts": {}}, "finals": []},
+            _confidence_slim(load("data/result_confidence_%d.json" % SEASON)),
             separators=(",", ":"))) \
-        .replace("{{INTEL_JSON}}", json.dumps(
-            _intel_payload(), separators=(",", ":"))) \
+        .replace("{{INTEL_JSON}}", '{"feed":[],"claims":[],"meta":{}}') \
         .replace("{{TSTATS_JSON}}", blob(
             [dict(team=k, conf=(tindex.get(k) or {}).get("conf"), **v)
              for k, v in sorted(tstats.items())])) \
@@ -9351,6 +9441,12 @@ td.pick b{color:var(--navy)}
   #livetick .tkm:not(.tkall):nth-of-type(n+2){display:none}
   #livetick .tkm b{max-width:11ch}
   #livetick .tkall{margin-left:auto}
+  /* B5 (2026-11-04): the QUIET capsule (two names, two logos, two rank-chip
+     rows, day + time) measured 457px in a 390px rail, and a capsule never
+     shrinks -- so on a phone it sheds its rank chips instead. The live
+     capsule (score-first) is untouched. */
+  #livetick .tklab.tkquiet ~ .tkm .rks{display:none}
+  #livetick .tklab.tkquiet ~ .tkm img{display:none}
   nav .inner{flex-wrap:wrap;overflow-x:visible;scrollbar-width:none;
     -webkit-overflow-scrolling:touch;padding:0 6px;justify-content:center}
   nav .inner::-webkit-scrollbar{display:none}
@@ -13323,8 +13419,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
          pages. These five are the daily job -- follow the day, check a
          ranking, research a team, keep the ballot. The reference tools keep
          every capability they had; they move behind More. -->
-    <button role="tab" aria-selected="true" data-v="desk" class="pri">Today</button>
-    <button role="tab" aria-selected="false" data-v="scores" class="pri">Scores</button>
+    <button role="tab" aria-selected="true" data-v="scores" class="pri">Scores</button>
     <button role="tab" aria-selected="false" data-v="rankings" class="pri">Rankings</button>
     <!-- Stats promoted to a primary (core-data pass, 2026-08-31): this is a
          rankings/scores/STATS site first; the leaders surface is not a
@@ -13351,15 +13446,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
           <button role="menuitem" data-v="players">Players</button>
           <button role="menuitem" data-v="prank">Player ratings</button>
           <button role="menuitem" data-v="standings">Standings</button>
-          <button role="menuitem" data-v="news">Front page</button>
-          <button role="menuitem" data-v="conflab">Conference Lab</button>
-          <button role="menuitem" data-v="schedule">Schedule</button>
-        </div>
-        <div class="mgroup">
-          <span class="mglabel" aria-hidden="true">Reference</span>
-          <button role="menuitem" data-v="confidence">Result Ledger</button>
           <button role="menuitem" data-v="bracket">Projected bracket</button>
-          <button role="menuitem" data-v="tv">On TV</button>
         </div>
         <!-- MOREPRIV-BEGIN. PRIVATE workspace group: every item in it is
              Cody's own (ballot, availability, intel, film, Digby). The
@@ -13369,19 +13456,6 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
           <span class="mglabel" aria-hidden="true">Private workspace</span>
           <button role="menuitem" data-act="centercourt" onclick="location.href='CENTER-COURT.html'">Center Court dashboard</button>
           <button role="menuitem" data-v="ballot" class="phoneonly">My Ballot</button>
-          <!-- AVAIL-MENU-BEGIN -->
-          <button role="menuitem" data-v="avail">Availability</button>
-          <!-- AVAIL-MENU-END -->
-          <!-- NOTES-MENU-BEGIN -->
-          <button role="menuitem" data-v="notes">Notes &amp; ideas</button>
-          <!-- NOTES-MENU-END -->
-          <!-- INTEL-MENU-BEGIN -->
-          <button role="menuitem" data-v="intel">Intel</button>
-          <!-- INTEL-MENU-END -->
-          <!-- FILMROOM-MENU-BEGIN -->
-          <button role="menuitem" data-v="film">Film Room</button>
-          <!-- FILMROOM-MENU-END -->
-          <button role="menuitem" data-act="ask" id="askmenu">Ask Digby</button>
         </div>
         <!-- MOREPRIV-END -->
       </div>
@@ -13670,6 +13744,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   </div>
   <div id="r26panel" hidden></div>
   <div id="moverspanel" hidden></div>
+  <p class="munk rklive" id="rklive" hidden></p>
   <div class="panel" id="rankpanel"><div class="scroll rkscroll"><table class="rk3">
     <!-- ⚠ A GROUPED HEADER, BECAUSE THIRTEEN EQUAL COLUMNS SAY NOTHING ABOUT
          WHAT IS OURS AND WHAT IS SOMEBODY ELSE'S. POWER and R&eacute;sum&eacute;
@@ -14031,7 +14106,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <datalist id="tmlist"></datalist>
   </div>
   <p class="tabhint">Start typing, or click any team on the Rankings, Scores or
-    Schedule tab to open it here.</p>
+    Standings tab to open it here.</p>
   <div id="teamcard"></div>
 </section>
 
@@ -14934,7 +15009,16 @@ function cxLine(pts, o) {
     (o.cap ? '<div class="cxcap">' + o.cap + '</div>' : '') + '</div>';
 }
 
-const ROUTE_ALIASES = { 'match-desk': 'desk' };
+/* Retired views (cleanup, Cody 2026-11-04 -- see RETIRED_VIEWS in
+   build_hub.py). Their routes resolve to a kept view so an old link or
+   bookmark -- and every match link that still names the 'today' parent --
+   lands somewhere real. ⚠ This comment ships in BOTH builds: never name a
+   private feature in it (the public gate aborts on those words). */
+const ROUTE_ALIASES = { 'match-desk': 'scores', 'today': 'scores',
+  'front-page': 'scores', 'conference-lab': 'standings',
+  'result-ledger': 'scores', 'schedule': 'scores', 'tv': 'scores',
+  'availability': 'teams', 'notes': 'scores', 'film-room': 'scores',
+  'intel': 'scores' };
 const ROUTE_OF_VIEW = { desk:'today', scores:'scores', rankings:'rankings',
   teams:'teams', ballot:'ballot', leaders:'stats', players:'players',
   prank:'player-ratings',
@@ -15022,7 +15106,7 @@ function route() {
   const q = raw.split('?');
   const parts = q[0].split('/').filter(Boolean);
   const params = new URLSearchParams(q[1] || '');
-  const view = VIEW_OF_ROUTE[parts[0]] || 'desk';
+  const view = VIEW_OF_ROUTE[parts[0]] || 'scores';
   ROUTE_ORIGIN = params.get('from') || null;
   showView(view);
 
@@ -15270,6 +15354,74 @@ document.querySelectorAll('.rk3 thead tr:last-child th').forEach((th, i) => {
     if (sel.value === '' && RK_SORT) sel.value = '';
   }));
 })();
+
+/* ── B2 (2026-11-04): RANKINGS UPDATE WITHOUT A RELOAD ────────────────────
+   Each build writes rankings_live.json beside the page: the ranking rows,
+   each team's rank and POWER, one version, one timestamp -- one atomically
+   consistent object. Each poll asks for it (the server answers 304 when it is
+   unchanged). A new version with the SAME schema is swapped in place: rows,
+   the active sort and Top-N, every team's rank/POWER in TEAMS, and an open
+   team page -- scroll kept, ballot drafts untouched (they live in local
+   storage, not in these rows). A different schema only offers an update
+   notice; this never reloads the page. Everything else on the page keeps its
+   own build time, and the note says so. */
+const RANK_LIVE_SCHEMA = {{RANK_LIVE_SCHEMA}};
+let RANK_LIVE_VERSION = {{RANK_LIVE_VERSION}};
+async function rankLiveCheck() {
+  let j = null;
+  try {
+    const r = await fetch('rankings_live.json', { cache: 'no-cache' });
+    if (r.ok) j = await r.json();
+  } catch (e) { return; }
+  if (!j || !j.version || j.version === RANK_LIVE_VERSION) return;
+  const note = document.getElementById('rklive');
+  const fmt = iso => iso ? new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Los_Angeles', month: 'short', day: 'numeric',
+    hour: 'numeric', minute: '2-digit' }).format(new Date(iso)) + ' PT' : 'now';
+  if (j.schema !== RANK_LIVE_SCHEMA || typeof j.rows_html !== 'string' || !j.teams) {
+    if (note) { note.hidden = false;
+      note.innerHTML = 'A new ranking is available. <a href="">Refresh the page</a> to see it.'; }
+    return;
+  }
+  const body = $('#rbody');
+  if (!body) return;
+  const tpl = document.createElement('tbody');
+  tpl.innerHTML = j.rows_html;
+  const fresh = [...tpl.querySelectorAll('tr.row')];
+  if (!fresh.length) return;
+  /* keep the reader's place by ANCHOR, not by page offset: the note above the
+     table can appear in this same update and would push the rows down */
+  const anchor = document.getElementById('rankpanel');
+  const top0 = anchor ? anchor.getBoundingClientRect().top : null;
+  body.querySelectorAll('tr.det').forEach(d => d.remove());
+  rrows.length = 0;
+  fresh.forEach(tr => rrows.push(tr));
+  body.innerHTML = '';
+  rrows.forEach(tr => body.appendChild(tr));
+  rkApplySort();
+  renderRank();
+  Object.keys(j.teams).forEach(n => {
+    if (TEAMS[n]) { TEAMS[n].rank = j.teams[n].rank; TEAMS[n].power = j.teams[n].power; }
+  });
+  const tm = (location.hash || '').match(/^#\/teams\/([^/?]+)/);
+  if (tm && typeof showTeam === 'function') {
+    const tn = unslugTeam(decodeURIComponent(tm[1]));
+    const ty = window.scrollY;
+    if (tn) showTeam(tn);
+    if (window.scrollY !== ty) window.scrollTo(0, ty);
+  }
+  RANK_LIVE_VERSION = j.version;
+  if (note) { note.hidden = false;
+    note.textContent = 'POWER updated ' + fmt(j.generated_utc || j.built_utc) +
+      ' (shown without a reload). Other numbers on this page are from ' +
+      fmt(new Date(PAGE_BUILT_EPOCH * 1000).toISOString()) + '; refresh to update them.'; }
+  if (anchor && top0 !== null) {
+    const d = anchor.getBoundingClientRect().top - top0;
+    if (d) window.scrollBy(0, d);
+  }
+}
+
+
 function renderRank() {
   const q = $('#q').value.toLowerCase().trim(), c = cs.value, top = +$('#top').value;
   let n = 0;
@@ -15340,6 +15492,7 @@ renderRank();
 
 /* simple text filters */
 function filter(inputId, bodyId, countId, unit) {
+  if (!$('#' + inputId) || !$('#' + countId)) return;   /* view retired */
   const rows = [...document.querySelectorAll('#' + bodyId + ' tr')];
   const run = () => {
     const q = $('#' + inputId).value.toLowerCase().trim();
@@ -15683,6 +15836,10 @@ async function pollLive() {
      matchState over the schedule payload (39, stuck matches included).
      The set is the one definition; liveState() below reads it. */
   window.LIVE_GIDS = new Set(live.map(g => String(g.id)));
+  /* B1: the same response refreshes Scores, the open ledger, team page and
+     match popout in place (deskApply keeps the last good data on failure). */
+  if (d && typeof deskApply === 'function') { try { deskApply(d); } catch (e) { } }
+  if (typeof rankLiveCheck === 'function') { rankLiveCheck(); }
 
   csTicker(live);
   if (typeof csStatus === 'function') { try { csStatus(); } catch (e) { } }
@@ -18446,7 +18603,7 @@ function lmcRender(gid) {
      2026-08-28, on Stanford-Wisconsin). The per-match resolve is the more
      informed one, so when it lands it OWNS the state note -- same words,
      same table (match_state.py), later knowledge. */
-  const mp = document.getElementById('mpendnote');
+  const mp = $$('mpendnote');
   if (mp && d && !d.unreachable && d.state_label && d.state_note) {
     mp.innerHTML = '<b>' + esc(d.state_label) + '</b><span>' +
       esc(d.state_note) + '</span>';
@@ -21327,6 +21484,7 @@ function renderScoreboard() {
    number on this page is a drillable fact, not a claim. */
 const NEWS = {{NEWS_JSON}};
 
+/* NEWS-JS-BEGIN */
 /* ── FRONT PAGE ──────────────────────────────────────────────────────────
    Renders stories the SERVER composed. Deliberately dumb: the shape system
    that guarantees a headline's numbers are real lives in Python, and nothing
@@ -21334,8 +21492,8 @@ const NEWS = {{NEWS_JSON}};
    given and nothing more -- if a headline is wrong, it is wrong in newsroom.py
    where the facts and the preconditions are, not in a template here. */
 function renderNews() {
-  const lead = document.getElementById('nwlead');
-  const body = document.getElementById('nwbody');
+  const lead = $$('nwlead');
+  const body = $$('nwbody');
   if (!lead || !body) return;
   const st = (NEWS && NEWS.stories) || [];
   if (!st.length) {
@@ -21378,6 +21536,9 @@ function renderNews() {
   if (document.getElementById('v-news')) renderNews();
 })();
 
+/* NEWS-JS-END */
+
+/* CONFLAB-JS-BEGIN */
 const CONFLAB = {{CONFLAB_JSON}};
 let CF_SORT = ['w', -1];
 
@@ -21555,6 +21716,7 @@ function cfDrill(key) {
   });
   renderConfLab();
 })();
+/* CONFLAB-JS-END */
 
 /* ── RESULT CONFIDENCE LEDGER ────────────────────────────────────────────
    The audit surface: what each final's evidence actually is, per field.
@@ -21574,6 +21736,7 @@ const RC_LABEL = { official: 'Official scoreboard \u00b7 independent confirmatio
   confirmed: 'Independently confirmed',
   disputed: 'RESULT UNDER REVIEW \u2014 independent confirmation pending' };
 
+/* RCLEDGER-JS-BEGIN */
 function renderConfidence() {
   const sumEl = document.getElementById('rcsummary');
   if (!sumEl || typeof CONFIDENCE === 'undefined') return;
@@ -21658,6 +21821,8 @@ function renderConfidence() {
             .slice(0, 10)) : '') + '</span>') + '</button>').join('')
     : '<p class="tdquiet">No final in this state.</p>';
 }
+/* RCLEDGER-JS-END */
+
 
 /* ONE WORDING PER VERDICT -- the drill and the row marks share these. */
 function rvWording(v) {
@@ -21714,20 +21879,21 @@ function rvMark(gid) {
      match where nobody disagrees with anything. */
   if (v.indexOf('HELD_') === 0) {
     return '<span class="rvmk" title="' + rvWording(v) +
-      ' \u2014 details in the Result Ledger">held</span>';
+      '">held</span>';
   }
   if (v === 'VERIFIED_BOTH' || v === 'CORROBORATED_ONE') {
     return '<span class="rvmk" title="' + rvWording(v).replace(/^[^ ]+ /, '') +
-      ' \u2014 details in the Result Ledger">' +
+      '">' +
       (v === 'VERIFIED_BOTH' ? '\u2713\u2713' : '\u2713') + '</span>';
   }
   return '<span class="rvmk bad" title="' + rvWording(v) +
-    ' \u2014 details in the Result Ledger">\u26a0 sources disagree</span>';
+    '">\u26a0 sources disagree</span>';
 }
+/* RCLEDGER-JS-BEGIN */
 function rcDrill(gid) {
   const r = (CONFIDENCE.finals || []).filter(x => x.gid === gid)[0];
   if (!r) return;
-  const el = document.getElementById('rcdrill');
+  const el = $$('rcdrill');
   el.hidden = false;
   const st = r.states || {};
   /* ⚠ A DUPLICATE'S DRILL LEADS WITH THE AUDIT, IN ENGLISH (round 12):
@@ -21875,7 +22041,10 @@ function rcDrill(gid) {
       '?from=ledger">Open the match \u2192</a>';
   el.scrollIntoView({ block: 'nearest' });
 }
+/* RCLEDGER-JS-END */
 
+
+/* RCLEDGER-JS-BEGIN */
 (function wireConfidence() {
   const sec = document.getElementById('v-confidence');
   if (!sec) return;
@@ -21893,6 +22062,8 @@ function rcDrill(gid) {
   });
   renderConfidence();
 })();
+
+/* RCLEDGER-JS-END */
 
 /* AVAIL-JS-BEGIN */
 function pdAvailability(p) {
@@ -22218,8 +22389,8 @@ function provenanceTag(gid) {
   if (r && r.result_corrected) {
     const schools = corrSchools(r);
     return '<i class="rcsrctag corrected" title="the feed\u2019s record ' +
-      'was corrected on independently attributable official evidence \u2014 ' +
-      'quotations, URLs and retrieval times in the Result Ledger">' +
+      'was corrected on independently attributable official evidence ' +
+      '(data/raw/2026/result_corrections.json holds the citations)">' +
       'CORRECTED \u00b7 ' +
       esc(schools.length ? schools.join(' + ') + ' official evidence'
                          : 'ledgered official evidence') + '</i>';
@@ -22509,6 +22680,32 @@ function exhTag(m) {
       ' — does not count toward either record">EXH</span>' : '';
 }
 
+/* B4 (2026-11-04): plain-English POWER status for one final. */
+const POWER_INCL_WORDS = {
+  'in': 'included',
+  'pc': 'pending \u2014 awaiting a school\u2019s confirmation (counts after midnight PT if none arrives)',
+  'pu': 'pending \u2014 waiting for the next POWER update',
+  'x:exhibition': 'not counted \u2014 exhibition',
+  'x:duplicate': 'not counted \u2014 duplicate listing',
+  'x:under_review': 'not counted \u2014 result under review',
+  'x:empty': 'not counted \u2014 no result recorded',
+  'x:self_contradictory': 'not counted \u2014 the record contradicts itself',
+  'x:non_d1': 'not in POWER \u2014 non-Division I opponent',
+  'x:incomplete_line': 'not in POWER \u2014 set scores incomplete',
+  'x:not_used': 'not in POWER \u2014 left out by the model'
+};
+function powerInclusionLine(gid) {
+  if (typeof V2S === 'undefined' || !V2S || !V2S.incl) return '';
+  const code = V2S.incl[String(gid)];
+  if (!code) return '';
+  const when = V2S.generated_utc ? new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Los_Angeles', month: 'short', day: 'numeric',
+    hour: 'numeric', minute: '2-digit' }).format(new Date(V2S.generated_utc)) + ' PT' : '';
+  return '<span><em>POWER</em>' + esc(POWER_INCL_WORDS[code] || code) +
+    (code === 'in' && when ? ' <span class="munk">\u00b7 updated ' + esc(when) + '</span>' : '') +
+    '</span>';
+}
+
 function renderMatchDetail(gid, dest) {
   const host = document.getElementById(dest === 'scores' ? 'scoredetail' : 'deskdetail');
   const board = document.getElementById(dest === 'scores' ? 'ledgerwrap' : 'deskboard');
@@ -22563,6 +22760,11 @@ function renderMatchDetail(gid, dest) {
   if (m.event) bits.push('<span><em>Event</em>' + esc(m.event) + '</span>');
   const tvl = (typeof TV !== 'undefined' && TV) ? (TV[m.gid] || null) : null;
   if (tvl) bits.push('<span><em>Watch</em>' + esc(tvl) + '</span>');
+  /* B4: is this result in the POWER now shown? From the last successful
+     POWER file's own input list (V2S.incl), never from eligibility alone.
+     Private page only -- the public page ranks by a different model. */
+  const _pi = powerInclusionLine(m.gid);
+  if (_pi) bits.push(_pi);
 
   /* the forecast, and only one that can be proved to predate first serve */
   let fc = '';
@@ -22654,7 +22856,10 @@ function renderMatchDetail(gid, dest) {
       })() : '') +
       '<div class="msec"><h3>Match facts</h3><div class="mfact">' +
         bits.join('') + '</div></div>' +
-      (st === 'final' ? recapHTML(m) : '') +
+      /* ⚠ NO STATS IN THE POPOUT (Cody, 2026-11-04: box scores off the Scores
+         tab -- he reads live stats on StatBroadcast). The recap comparison,
+         the live stats pulse, players-to-know and the box score were removed;
+         the score ribbon, set line, match facts and forecast remain. */
       /* ⚠ THE HEADING FOLLOWS THE STATE. "Forecast before first serve" is a
          claim about a match that HAS started; on an upcoming match it is
          simply the current forecast, and the two must not be labelled alike. */
@@ -22663,11 +22868,6 @@ function renderMatchDetail(gid, dest) {
             '<div class="mfact"><span>' + fc + '</span>' +
             '<span class="munk fcavail">' + FORECAST_NOTE + '</span>' +
             '</div></div>' : '') +
-      /* live stats sit UNDER the single score ribbon, and only while this
-         match is actually live on this route */
-      /* live statistics, only while this match is live AND the state says
-         team stats exist for it */
-      (st === 'live' ? lmcSection(m.gid) : '') +
       /* AVAIL-MD-BEGIN */
       (typeof avStatusLine === 'function' ? (function () {
         const a = avStatusLine(mAway(m)), h = avStatusLine(mHome(m));
@@ -22679,28 +22879,13 @@ function renderMatchDetail(gid, dest) {
             '</div>' : '') + '</div>';
       })() : '') +
       /* AVAIL-MD-END */
-      starsSection(m) +
-      /* ⚠ ONE SENTENCE PER STATE, FROM THE SHARED TABLE. Each of these is a
-         true statement about the source at that moment -- not a placeholder
-         standing where data should be. */
-      '<div class="msec"><h3>Box score</h3>' +
-        (box ? box
-             : '<div class="mpend" id="mpendnote"><b>' + esc(MSTATE.label[s6] || '') +
-               '</b><span>' + esc(MSTATE.note[s6] || '') + '</span>' +
-               (s6 === 'final_box_pending'
-                 ? '<span class="mfine">It is written to the site by the ' +
-                   'verified crawl, usually within the hour. Nothing is ' +
-                   'estimated in the meantime.</span>' : '') +
-               '</div>') +
-      '</div>' +
       /* where this came from and when -- compact, one line */
       '<p class="msrc">Official NCAA feed' +
         (live && live.updated ? ' &middot; live score updated ' +
           esc(String(live.updated)) : '') +
-        (hasBox ? ' &middot; box score from the verified crawl' : '') +
         '</p>' +
     '</div>';
-  if (st === 'live') { lmcStart(m.gid); } else { lmcStop(); }
+  lmcStop();
   return true;
 }
 
@@ -23603,6 +23788,7 @@ function intelBlock() {
   return '<div class="silist">' + feed.map(intelItem).join('') + '</div>';
 }
 
+/* DESK-RENDER-JS-BEGIN */
 function renderDesk() {
   const todayBox = document.getElementById('desktodaycards');
   if (!todayBox) return;
@@ -23915,6 +24101,7 @@ function renderDesk() {
   Object.keys(LMC_OPEN).forEach(id => { if (LMC_DATA[id]) lmcRender(id); });
   if (typeof mbRenderAll === 'function') mbRenderAll();
 }
+/* DESK-RENDER-JS-END */
 
 /* One delegated listener rather than one per card -- the cards are replaced on
    every poll, and per-card handlers would be re-bound (and leak) each time. */
@@ -23927,18 +24114,28 @@ document.addEventListener('click', ev => {
 
 /* Live is an UPGRADE, never a requirement. On a static host the fetch fails and
    the desk stays a pregame board rather than an error. */
+/* ⚠ ONE LIVE FETCH PER CYCLE (B1, 2026-11-04). This used to fetch on its own
+   and ran ONCE at load, while the 60-second pollLive() fetched the same
+   /api/live and updated only the masthead -- so Scores went stale until a
+   reload. pollLive() now hands its response to deskApply(); deskLive() remains
+   only as a fetch-and-apply wrapper. A failed fetch (null) keeps the last good
+   LIVE_BY_ID instead of wiping it, and re-renders nothing. */
 async function deskLive() {
+  let j = null;
   try {
-    const r = await fetch('/api/live');
-    const j = await r.json();
-    LIVE_STAMP = j.updated || '';
-    LIVE_FRESH = j.freshness || null;
-    LIVE_BY_ID = {};
-    (j.games || []).forEach(g => { LIVE_BY_ID[String(g.id)] = g; });
-  } catch (e) {
-    LIVE_BY_ID = {};
-  }
-  renderDesk();
+    const r = await fetch('/api/live', { cache: 'no-store' });
+    if (r.ok) j = await r.json();
+  } catch (e) { j = null; }
+  deskApply(j);
+}
+function deskApply(j) {
+  if (!j || !Array.isArray(j.games)) return;
+  LIVE_STAMP = j.updated || '';
+  LIVE_FRESH = j.freshness || null;
+  const next = {};
+  j.games.forEach(g => { next[String(g.id)] = g; });
+  LIVE_BY_ID = next;
+  if (typeof renderDesk === 'function') renderDesk();   /* retired view: stripped */
   /* COURTSIGNAL-CALL-BEGIN */ csTape(); csStatus(); /* COURTSIGNAL-CALL-END */
   /* ⚠ THE SCOREBOARD WAS THE ONE VIEW THE POLL NEVER TOLD. renderDesk(), the
      rally tape and the open match detail were all refreshed when live data
@@ -23946,7 +24143,9 @@ async function deskLive() {
      masthead rail said FINAL, and the lane underneath still read SCHEDULED
      with no score and would have until the reader touched a filter.
      Cody saw exactly that and called the page a mess. It was. */
-  if (typeof renderScoreboard === 'function') renderScoreboard();
+  { const _y = window.scrollY;   /* B1: an update never moves the reader */
+    if (typeof renderScoreboard === 'function') renderScoreboard();
+    if (window.scrollY !== _y) window.scrollTo(0, _y); }
   /* ⚠ AND THE LEDGER, WHICH IS THE SAME BUG ONE VIEW ACROSS. The note above
      says the Scoreboard was "the one view the poll never told" -- it was not.
      The full-season ledger reads the identical matchState(m, LIVE_BY_ID[...])
@@ -23972,7 +24171,10 @@ async function deskLive() {
   if (_tm && typeof unslugTeam === 'function' &&
       typeof showTeam === 'function') {
     const _tn = unslugTeam(decodeURIComponent(_tm[1]));
+    /* B1: a poll must not move the reader -- keep the page scroll */
+    const _y = window.scrollY;
     if (_tn) showTeam(_tn);
+    if (window.scrollY !== _y) window.scrollTo(0, _y);
   }
   /* ⚠ THE DETAIL MUST RE-EVALUATE WHEN LIVE DATA LANDS. deskLive() is async and
      resolves AFTER the router has already painted, so a match that is live on
@@ -23982,8 +24184,17 @@ async function deskLive() {
     .split('/').filter(Boolean);
   const view = VIEW_OF_ROUTE[open[0]];
   if ((view === 'desk' || view === 'scores') && open[1]) {
+    /* B1: keep the reader's place inside the open popout and on the page */
+    const _sd = document.getElementById('scoredetail');
+    const _keep = [];
+    for (let el = _sd; el && el !== document.body; el = el.parentElement) {
+      if (el.scrollTop) _keep.push([el, el.scrollTop]);
+    }
+    const _y = window.scrollY;
     renderMatchDetail(decodeURIComponent(open[1]),
                       view === 'scores' ? 'scores' : 'desk');
+    _keep.forEach(([el, t]) => { el.scrollTop = t; });
+    if (window.scrollY !== _y) window.scrollTo(0, _y);
   }
 }
 
@@ -24932,11 +25143,14 @@ if (typeof bwWire === 'function') bwWire();
    chrome. Relocated once at boot -- csTape() renders by id, and the id
    travels with the node, so the poller keeps working. Every other route
    gets the compact masthead + slim ticker only. */
+/* DESK-TAPE-JS-BEGIN */
 (function(){
   const tape = document.getElementById('cstape');
   const today = document.getElementById('v-desk');
   if (tape && today) today.insertBefore(tape, today.firstChild);
 })();
+/* DESK-TAPE-JS-END */
+
 /* launcher wiring lives in the private ask script -- private code for a private feature */
 /* the ranking explainer is CLOSED on a phone (usability finish,
    2026-09-01): the first ranked team must land within one screen. The
@@ -24946,7 +25160,7 @@ if (typeof bwWire === 'function') bwWire();
   if (d && matchMedia('(max-width:560px)').matches)
     d.removeAttribute('open');
 })();
-if (typeof deskLive === 'function') deskLive();
+/* live data arrives through pollLive() -> deskApply(); no second boot fetch */
 /* BALLOT-INIT-END */
 /* ⚠ THE ROUTER BOOTS HERE, NOT AT ITS DEFINITION, AND THIS WAS A LIVE BUG.
    route() reads TEAMS (unslugTeam) and `const TEAMS` is declared near the end
@@ -24958,7 +25172,7 @@ if (typeof deskLive === 'function') deskLive();
    wrongly blamed the crest element.
    ⚠ AND IT MUST STAY OUTSIDE THE BALLOT SENTINEL ABOVE: that block is stripped
    from the public build, and routing is not private. */
-if (!location.hash) { history.replaceState(null, '', routeFor('desk')); }
+if (!location.hash) { history.replaceState(null, '', routeFor('scores')); }
 route();
 if (typeof mbRenderAll === 'function') mbRenderAll();
 /* COURTSIGNAL-CALL2-BEGIN */
@@ -27478,13 +27692,15 @@ renderBracket();
   }).observe(sec, { attributes: true, attributeFilter: ['hidden'] });
 })();
 drawBracketLines();
+/* SCHED-JS-BEGIN */
 /* Schedule filter: text AND rank together. 1,524 fixtures is a list you cannot
    read; 39 of them are Top 25 against Top 25, which is the question actually
    being asked when someone opens a schedule in August. */
 let SCHED_ALL = false;
 
 function filterSchedule() {
-  const q = (document.getElementById('sq').value || '').toLowerCase().trim();
+  if (!document.getElementById('sq')) return;   /* Schedule view retired */
+  const q =(document.getElementById('sq').value || '').toLowerCase().trim();
   const want = document.getElementById('srank').value;
   /* ⚠ A SEARCH REACHES EVERY FIXTURE, NOT JUST THE VISIBLE WINDOW. The
      initial 600 is a display window; the moment someone types, or narrows by
@@ -27516,8 +27732,10 @@ function filterSchedule() {
     btn.hidden = SCHED_ALL ? false : !hiddenBeyond;
   }
 }
-['sq', 'srank'].forEach(id =>
-  document.getElementById(id).addEventListener('input', filterSchedule));
+['sq', 'srank'].forEach(id => {
+  const el = document.getElementById(id);   /* absent: the Schedule view is retired */
+  if (el) el.addEventListener('input', filterSchedule);
+});
 (function () {
   const b = document.getElementById('schedall');
   if (b) b.addEventListener('click', () => {
@@ -27526,6 +27744,8 @@ function filterSchedule() {
 })();
 filterSchedule();
 filter('tq', 'tbody', 'tcnt', 'matches');
+
+/* SCHED-JS-END */
 {{ASK_JS}}
 </script>
 </body></html>"""
@@ -27979,6 +28199,97 @@ def strip_private(html):
     html = re.sub(r"chip\('Massey',[^)]*\)\s*\+\s*", "", html)
     return html
 
+def _confidence_slim(doc):
+    # type: (Optional[dict]) -> dict
+    """The result-confidence payload, cut to what the KEPT views read (the
+    Result Ledger view that read the rest is retired, 2026-11-04): every final
+    keeps its gid and verifier verdict (the scoreboard's check marks); a
+    corrected or disputed final also keeps its correction flag and the schools
+    whose evidence corrected it (the CORRECTED / under-review chips). 4.9 MB
+    -> a few hundred KB; no displayed claim changes."""
+    out = []
+    for r in (doc or {}).get("finals") or []:
+        row = {"gid": r.get("gid")}
+        v = (r.get("verify") or {}).get("v")
+        if v:
+            row["verify"] = {"v": v}
+        if r.get("result_corrected") or r.get("overall") == "disputed":
+            row["overall"] = r.get("overall")
+            row["result_corrected"] = r.get("result_corrected")
+            row["corr_evidence"] = [{"school": e.get("school")}
+                                    for e in (r.get("corr_evidence") or [])
+                                    if e.get("school")]
+        out.append(row)
+    return {"meta": {"counts": {}}, "finals": out}
+
+
+RETIRED_VIEWS = ("v-desk", "v-news", "v-conflab", "v-confidence", "v-schedule",
+                 "v-tv", "v-intel", "v-film", "v-avail", "v-notes")
+
+
+def _drop_section(html, sid):
+    # type: (str, str) -> str
+    """Remove <section id=sid> with everything inside it, nesting-aware --
+    the views hold their own <section> lanes, so a non-greedy regex would stop
+    at the first inner </section> and leave half a view behind."""
+    s = html.find('<section id="%s"' % sid)
+    if s < 0:
+        return html
+    depth = 0
+    for m in re.finditer(r"<section\b|</section>", html[s:]):
+        depth += 1 if m.group(0).startswith("<section") else -1
+        if depth == 0:
+            return html[:s] + html[s + m.end():]
+    raise SystemExit("unbalanced <section> while removing %s" % sid)
+
+
+def strip_retired(html):
+    # type: (str) -> str
+    """Remove the retired views from BOTH builds (Cody, 2026-11-04: "I basically
+    only look at the scores tab, team tab, stats tab, and rankings tab").
+    Kept: Scores, Teams, Stats, Rankings, Standings, Players, Player ratings,
+    Projected bracket, My Ballot. The ranking pipeline is untouched -- this is
+    presentation only. Features that already carried strip fences (Film Room,
+    Availability, Notes, Intel, My Board) are removed through those fences, in
+    every layer, exactly as the public build always removed them."""
+    for sid in RETIRED_VIEWS:
+        html = _drop_section(html, sid)
+    for _a, _b in (("<!-- FILMROOM-HTML-BEGIN -->", "<!-- FILMROOM-HTML-END -->"),
+                   ("/* FILMROOM-JS-BEGIN */", "/* FILMROOM-JS-END */"),
+                   ("/* FILMROOM-CSS-BEGIN */", "/* FILMROOM-CSS-END */"),
+                   ("/* FILMROOM-ROUTE-BEGIN */", "/* FILMROOM-ROUTE-END */"),
+                   ("/* FILMROOM-WIRE-BEGIN */", "/* FILMROOM-WIRE-END */"),
+                   ("/* FILMROOM-HOOK-BEGIN */", "/* FILMROOM-HOOK-END */"),
+                   ("<!-- AVAIL-HTML-BEGIN -->", "<!-- AVAIL-HTML-END -->"),
+                   ("/* AVAIL-JS-BEGIN */", "/* AVAIL-JS-END */"),
+                   ("/* AVAIL-HOOK-BEGIN */", "/* AVAIL-HOOK-END */"),
+                   ("/* AVAILP-HOOK-BEGIN */", "/* AVAILP-HOOK-END */"),
+                   ("/* AVAILS-HOOK-BEGIN */", "/* AVAILS-HOOK-END */"),
+                   ("/* AVAIL-ROUTE-BEGIN */", "/* AVAIL-ROUTE-END */"),
+                   ("/* AVAIL-MD-BEGIN */", "/* AVAIL-MD-END */"),
+                   ("/* AVAIL-CSS-BEGIN */", "/* AVAIL-CSS-END */"),
+                   ("<!-- NOTES-HTML-BEGIN -->", "<!-- NOTES-HTML-END -->"),
+                   ("/* NOTES-ROUTE-BEGIN */", "/* NOTES-ROUTE-END */"),
+                   ("/* NOTES-CSS-BEGIN */", "/* NOTES-CSS-END */"),
+                   ("<!-- INTEL-HTML-BEGIN -->", "<!-- INTEL-HTML-END -->"),
+                   ("/* INTEL-JS-BEGIN */", "/* INTEL-JS-END */"),
+                   ("/* INTEL-CSS-BEGIN */", "/* INTEL-CSS-END */"),
+                   ("/* INTEL-ROUTE-BEGIN */", "/* INTEL-ROUTE-END */"),
+                   ("/* INTEL-WIRE-BEGIN */", "/* INTEL-WIRE-END */"),
+                   ("<!-- MYBOARD-HTML-BEGIN -->", "<!-- MYBOARD-HTML-END -->"),
+                   ("/* MYBOARD-CSS-BEGIN */", "/* MYBOARD-CSS-END */"),
+                   ("/* MYBOARD-WIRE-BEGIN */", "/* MYBOARD-WIRE-END */"),
+                   ("/* MYBOARD-JS-BEGIN */", "/* MYBOARD-JS-END */"),
+                   ("/* CONFLAB-JS-BEGIN */", "/* CONFLAB-JS-END */"),
+                   ("/* DESK-RENDER-JS-BEGIN */", "/* DESK-RENDER-JS-END */"),
+                   ("/* NEWS-JS-BEGIN */", "/* NEWS-JS-END */"),
+                   ("/* RCLEDGER-JS-BEGIN */", "/* RCLEDGER-JS-END */"),
+                   ("/* DESK-TAPE-JS-BEGIN */", "/* DESK-TAPE-JS-END */"),
+                   ("/* SCHED-JS-BEGIN */", "/* SCHED-JS-END */")):
+        html = re.sub(re.escape(_a) + r".*?" + re.escape(_b), "", html, flags=re.S)
+    return html
+
+
 def public_leaks(html):
     # type: (str) -> List[str]
     """Everything private still present in a page about to be published.
@@ -28016,7 +28327,7 @@ def public_leaks(html):
     return found
 
 if __name__ == "__main__":
-    html = build()
+    html = strip_retired(build())
     if PUBLIC:
         html = strip_private(html)
         leaked = public_leaks(html)
@@ -28044,6 +28355,23 @@ if __name__ == "__main__":
         _f.write(html)
     os.replace(_tmp, OUT)
     print("wrote %s (%.0f KB)" % (OUT, os.path.getsize(OUT) / 1024.0))
+    # B2: the ranking sidecar, written AFTER the page so a reader can never
+    # fetch a version newer than the page that knows how to apply it
+    if _RANK_LIVE and PUBLIC:
+        # the published sidecar gets the page's own privacy strip and gate
+        _RANK_LIVE[0]["rows_html"] = strip_private(
+            strip_retired(_RANK_LIVE[0]["rows_html"]))
+        _leak = [m for m in PRIVATE_MARKERS if m in json.dumps(_RANK_LIVE[0])]
+        if _leak:
+            raise SystemExit("PUBLIC BUILD ABORTED: private content in "
+                             "rankings_live.json: %s" % ", ".join(_leak))
+    if _RANK_LIVE:
+        _rlp = os.path.join(os.path.dirname(OUT), "rankings_live.json")
+        _rt = _rlp + ".tmp-%d" % os.getpid()
+        with io.open(_rt, "w", encoding="utf-8") as _f:
+            json.dump(_RANK_LIVE[0], _f, separators=(",", ":"))
+        os.replace(_rt, _rlp)
+        print("wrote %s (%.0f KB)" % (_rlp, os.path.getsize(_rlp) / 1024.0))
 
     if PUBLIC:
         # Cache-bust the redirect. Fastly holds the object for ~10 minutes, so

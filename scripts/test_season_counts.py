@@ -177,8 +177,9 @@ def main():
         check("the Result Ledger's population equals feed_records",
               n_cf == t["feed_records"],
               "%s vs %s" % (n_cf, t["feed_records"]))
-        check("...and the page names that population",
-              "Completed feed records" in page)
+        if 'id="v-confidence"' in page:   # Result Ledger view retired 2026-11-04
+            check("...and the page names that population",
+                  "Completed feed records" in page)
 
         # the three numbers differ for stated reasons; assert the algebra
         check("results_on_display = feed - duplicates - empty",

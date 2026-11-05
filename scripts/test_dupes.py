@@ -200,6 +200,19 @@ def main():
         i = src2.find("function %s(" % name)
         return _js_block(src2, i) if i >= 0 else None
     rc_render, rc_drill = _fn("renderConfidence"), _fn("rcDrill")
+    # The Result Ledger view was retired from BOTH builds (2026-11-04); its
+    # renderers are stripped from the built page. Duplicates are excluded
+    # from every counting surface (sections 1-4, 6 still assert that); this
+    # section tests the ledger's own rendering, so it runs only while the
+    # ledger ships.
+    _pg = os.path.join(REPO, "Cody", "START-HERE.html")
+    if not os.path.exists(_pg):
+        _pg = os.path.join(REPO, "output", "vb_dashboard.html")
+    _ledger_ships = (os.path.exists(_pg) and "function renderConfidence"
+                     in io.open(_pg, encoding="utf-8").read())
+    if not _ledger_ships:
+        print("  Result Ledger view retired -- ledger UI checks skipped")
+        rc_render = None
 
     def run_ui(render_src, drill_src):
         js = """
@@ -260,15 +273,16 @@ console.log('UI-OK'); process.exit(0);
         r = subprocess.run(["node", "-e", js], capture_output=True, text=True)
         return r.returncode == 0, (r.stdout + r.stderr).strip()
 
-    okui, why = run_ui(rc_render, rc_drill)
-    check("BEHAVIOUR: rows + drill render the full duplicate audit",
-          okui, why[:200])
-    # ⚠ PROVE THE FAILURE MODE: with the render branches stripped,
-    # duplicate_of exists only in JSON -- and the same invariant must fail.
-    okstr, whystr = run_ui(rc_render.replace("r.duplicate_of", "false"),
-                           rc_drill.replace("r.duplicate_of", "false"))
-    check("[NEG] duplicate_of living only in JSON is caught",
-          not okstr and "duplicate" in whystr.lower(), whystr[:160])
+    if rc_render:
+        okui, why = run_ui(rc_render, rc_drill)
+        check("BEHAVIOUR: rows + drill render the full duplicate audit",
+              okui, why[:200])
+        # ⚠ PROVE THE FAILURE MODE: with the render branches stripped,
+        # duplicate_of exists only in JSON -- and the same invariant must fail.
+        okstr, whystr = run_ui(rc_render.replace("r.duplicate_of", "false"),
+                               rc_drill.replace("r.duplicate_of", "false"))
+        check("[NEG] duplicate_of living only in JSON is caught",
+              not okstr and "duplicate" in whystr.lower(), whystr[:160])
 
     print("\n6. NEGATIVE CONTROLS")
     check("[NEG] a heuristic that excluded the identical pair on its own "

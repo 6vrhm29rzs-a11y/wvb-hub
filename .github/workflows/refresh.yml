@@ -225,7 +225,7 @@ jobs:
           git config user.name  "wvb-hub bot"
           git config user.email "noreply@github.com"
           git add data/raw
-          git add output/vb_dashboard.html index.html
+          git add output/vb_dashboard.html output/rankings_live.json index.html
           # ⚠ NO data/rankings_history_*.jsonl HERE. The weekly freeze is the
           # daily job's business; a mid-day poll must not add a row.
           if git diff --cached --quiet; then

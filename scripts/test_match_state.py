@@ -137,11 +137,9 @@ def main():
         check("the empty-score trap is handled in the page too",
               "function mNum(" in h and "!v.trim()" in h)
 
-        print("\n7. A FINAL WITHOUT A BOX SCORE SHOWS NO TABLE")
-        check("there is an explicit pending block",
-              'class="mpend"' in h)
-        check("...that says the box score is not published yet",
-              "has not been published yet" in h)
+        print("\n7. THE POPOUT DRAWS NO BOX SCORE (retired 2026-11-04)")
+        check("no box-score section in the match popout",
+              "<h3>Box score</h3>" not in h)
         check("[-] and no zero-filled fallback exists",
               "0</td><td>0</td><td>0" not in h)
 
@@ -260,9 +258,11 @@ def main():
         # and the renderers that consume it must ask, not test truthiness
         wc = hub.find("const watchCard = (x, extraCls) =>")
         wbody = hub[wc:wc + 1400] if wc >= 0 else ""
-        check("a watch card asks the state model, not whether a feed row exists",
-              "matchState(m, live) === 'live'" in wbody,
-              "being on today's scoreboard is not being in progress")
+        # the watch cards lived on the Today board, retired 2026-11-04
+        if wc >= 0:
+            check("a watch card asks the state model, not whether a feed row exists",
+                  "matchState(m, live) === 'live'" in wbody,
+                  "being on today's scoreboard is not being in progress")
         check("...and the 'live now' reason chip does the same",
               "if (matchState(m, live) === 'live') {" in hub)
 

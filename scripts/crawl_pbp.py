@@ -46,6 +46,27 @@ SEASON = int(os.environ.get("WVB_SEASON", "2025"))
 RAW = os.path.join(REPO, "data", "raw", str(SEASON))
 OUT = os.path.join(RAW, "pbp.jsonl")          # raw, only with --keep-raw
 LINEUPS = os.path.join(RAW, "lineups.jsonl")  # the committed artifact
+# ⚠ RALLY EVIDENCE, LOCAL ONLY (work order 071, 2026-11-04): the payload this
+# crawler already fetches carries every scored point with a running score.
+# Instead of discarding it, keep the verbatim scored events plus a derived,
+# flagged rally sequence (scripts/rally_sequence.py) for each NEWLY fetched
+# final. Written under the gitignored Cody/ tree: a season of raw evidence is
+# large and its publication is not approved. No backfill: only finals this
+# crawler fetches anyway.
+RALLIES = os.path.join(REPO, "Cody", "data", "rallies_%d.jsonl" % SEASON)
+
+
+def _rally_record(gid, payload, games_by_id):
+    import datetime as _dt
+    import rally_sequence as RS
+    g = games_by_id.get(str(gid)) or {}
+    ls = [l for l in (g.get("linescores") or []) if l.get("home") is not None]
+    ts = payload.get("teams") or []
+    hid = next((str(t.get("teamId")) for t in ts if t.get("isHome")), None)
+    vid = next((str(t.get("teamId")) for t in ts if not t.get("isHome")), None)
+    return RS.match_record(gid, payload, ls, hid, vid,
+                           _dt.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                           "%s/game/%s/play-by-play" % (API, gid))
 PLAYERBOX = os.path.join(RAW, "playerbox.jsonl")
 GAMES = os.path.join(RAW, "games.jsonl")
 
@@ -148,6 +169,16 @@ def main():
 
     ok = failed = 0
     raw = open(OUT, "a") if keep_raw else None
+    rally_out = None
+    games_by_id = {}
+    if os.path.isdir(os.path.dirname(RALLIES)):
+        try:
+            import gamelog as _GL
+            games_by_id = dict((str(g.get("game_id")), g) for g in
+                               _GL.load_games_jsonl(GAMES) if g.get("game_state") == "F")
+            rally_out = open(RALLIES, "a")
+        except Exception as exc:              # never costs the lineup crawl
+            print("  rally evidence disabled: %s" % exc)
     with open(LINEUPS, "a") as out:
         for n, gid in enumerate(todo, 1):
             try:
@@ -163,12 +194,20 @@ def main():
                 raw.flush()
             out.write(json.dumps(extract(gid, payload, boxidx)) + "\n")
             out.flush()
+            if rally_out is not None:
+                try:
+                    rally_out.write(json.dumps(_rally_record(gid, payload, games_by_id)) + "\n")
+                    rally_out.flush()
+                except Exception as exc:      # evidence is optional; lineups are not
+                    print("  rally record skipped for %s: %s" % (gid, exc))
             ok += 1
             if n % 250 == 0:
                 print("  %d/%d ok=%d fail=%d" % (n, len(todo), ok, failed))
             time.sleep(SLEEP)
     if raw is not None:
         raw.close()
+    if rally_out is not None:
+        rally_out.close()
 
     print("done: ok=%d failed=%d -> %s" % (ok, failed, LINEUPS))
 

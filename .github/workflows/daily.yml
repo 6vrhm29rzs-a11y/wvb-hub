@@ -360,7 +360,7 @@ jobs:
           # carries a content hash: Fastly holds the object ~10 minutes, so
           # without a new URL a deployed fix keeps serving old bytes for long
           # enough that a phone check calls it broken.
-          git add output/vb_dashboard.html index.html
+          git add output/vb_dashboard.html output/rankings_live.json index.html
           # SEPARATE, AND TOLERANT, ON PURPOSE. Under `bash -eo pipefail` an
           # unmatched glob is passed to git literally, git exits 128, and
           # `git add` aborts ATOMICALLY -- so data/raw and the dashboard would

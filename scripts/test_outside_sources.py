@@ -149,14 +149,26 @@ def main():
     # unconditionally is a guard that cries wolf the morning after the match
     # (the exhibition-badge lesson). The MECHANISM is checked above always;
     # the rendered flag is checked only when one is genuinely in range.
+    # The Today desk and Schedule table were retired (2026-11-04), but the
+    # SAME DESK rows feed the Scores rows, which still render the flag
+    # (tdisNote, behaviour-tested in test_corrected_badge.py) -- so the
+    # payload half stays. ⚠ A row whose time the SCHOOL already filled
+    # (ends in SCHOOL_TIME_MARK) is deliberately unflagged (2026-10-28: the
+    # school's time shown against itself is noise); the old check predated
+    # that rule and failed on exactly those rows, blocking CI from Nov 1.
+    import build_hub as _BH
     if desk is not None:
-        live_rows = [r for r in desk if r["gid"] in dis]
+        live_rows = [r for r in desk if r["gid"] in dis
+                     and not str(r.get("t") or "").endswith(_BH.SCHOOL_TIME_MARK)]
+        school_rows = [r for r in desk if r["gid"] in dis
+                       and str(r.get("t") or "").endswith(_BH.SCHOOL_TIME_MARK)]
         if live_rows:
-            check("a disputed fixture in range carries its flag on the desk",
+            check("a disputed fixture in range carries its flag on Scores rows",
                   all(r.get("tdis") for r in live_rows),
                   [r["gid"] for r in live_rows if not r.get("tdis")])
-            check("...and the schedule table renders the badge",
-                  'class="tdisq"' in page)
+            check("[NEG] ...and a school-filled time is NOT flagged against itself",
+                  not any(r.get("tdis") for r in school_rows),
+                  [r["gid"] for r in school_rows if r.get("tdis")])
         else:
             check("no disputed fixture is in the displayed range "
                   "(mechanism checked above)", True)

@@ -1,0 +1,258 @@
+{
+ "date": "2026-11-04",
+ "generated_utc": "2026-11-05T03:13:36Z",
+ "counts": {
+  "HELD_ONE_REPORTS": 1,
+  "VERIFIED_BOTH": 4,
+  "CORROBORATED_ONE": 3,
+  "SCHOOL_CONFLICT": 1,
+  "UNVERIFIED": 1
+ },
+ "matches": [
+  {
+   "gid": "6627742",
+   "date": "2026-11-04",
+   "canonical": "HELD as empty -- Grambling vs Ark.-Pine Bluff, no counted result",
+   "verdict": "HELD_ONE_REPORTS",
+   "schools": {
+    "Grambling": {
+     "state": "REPORTS",
+     "url": "https://gsutigers.com/services/schedule_txt.ashx?schedule=263",
+     "assertion": "Grambling W 3-0 vs University of Arkansas - Pine Bluff",
+     "opponent_source": "University of Arkansas - Pine Bluff",
+     "site_says": "Home"
+    },
+    "Ark.-Pine Bluff": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://uapblionsroar.com/services/schedule_txt.ashx?schedule=1280",
+     "rows_on_date": [
+      "Grambling State Univ."
+     ]
+    }
+   },
+   "held_as": "empty"
+  },
+  {
+   "gid": "6626873",
+   "date": "2026-11-04",
+   "canonical": "Boston College def. Syracuse 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Boston College": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://bceagles.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Boston College W 3-0 vs Syracuse",
+     "opponent_source": "Syracuse",
+     "site_says": "Away"
+    },
+    "Syracuse": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://cuse.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Syracuse L 0-3 vs Boston College",
+     "opponent_source": "Boston College",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6627407",
+   "date": "2026-11-04",
+   "canonical": "Fla. Atlantic def. South Fla. 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Fla. Atlantic": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://fausports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Fla. Atlantic W 3-0 vs South Florida",
+     "opponent_source": "South Florida",
+     "site_says": "Home"
+    },
+    "South Fla.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gousfbulls.com/sports/womens-volleyball/schedule/text",
+     "assertion": "South Fla. L 0-3 vs Florida Atlantic",
+     "opponent_source": "Florida Atlantic",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6627783",
+   "date": "2026-11-04",
+   "canonical": "American def. Loyola Maryland 3-2",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "American": {
+     "state": "NOT_POSTED",
+     "url": "https://aueagles.com/services/schedule_txt.ashx?schedule=265",
+     "row": [
+      "Nov 4 (Wed)",
+      "6:00 PM",
+      "Away",
+      "Loyola Maryland",
+      "Baltimore, Md.",
+      "",
+      ""
+     ]
+    },
+    "Loyola Maryland": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://loyolagreyhounds.com/services/schedule_txt.ashx?schedule=3570",
+     "assertion": "Loyola Maryland L 2-3 vs American",
+     "opponent_source": "American",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6626843",
+   "date": "2026-11-04",
+   "canonical": "Jackson St. def. Mississippi Val. 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Jackson St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gojsutigers.com/services/schedule_txt.ashx?schedule=172",
+     "assertion": "Jackson St. W 3-0 vs Mississippi Valley State",
+     "opponent_source": "Mississippi Valley State",
+     "site_says": "Home"
+    },
+    "Mississippi Val.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://mvsusports.com/services/schedule_txt.ashx?schedule=413",
+     "assertion": "Mississippi Val. L 0-3 vs Jackson State",
+     "opponent_source": "Jackson State",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6627210",
+   "date": "2026-11-04",
+   "canonical": "Purdue def. Ohio St. 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Purdue": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://purduesports.com/sports/volleyball/schedule",
+     "assertion": "Purdue W 3-0 vs Ohio State",
+     "opponent_source": "Ohio State",
+     "site_says": null,
+     "surface": "modern_card"
+    },
+    "Ohio St.": {
+     "state": "NOT_POSTED",
+     "url": "https://ohiostatebuckeyes.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Nov 4 (Wed)",
+      "7 p.m.",
+      "Home",
+      "#14 Purdue",
+      "Columbus, Ohio (Covelli Center)",
+      "",
+      "-"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6626950",
+   "date": "2026-11-04",
+   "canonical": "Xavier def. Butler 3-2",
+   "verdict": "SCHOOL_CONFLICT",
+   "schools": {
+    "Xavier": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://goxavier.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Xavier W 3-2 vs Butler",
+     "opponent_source": "Butler",
+     "site_says": "Home"
+    },
+    "Butler": {
+     "state": "CONTRADICTS",
+     "url": "https://butlersports.com/services/schedule_txt.ashx?schedule=2372",
+     "assertion": "Butler W 3-0 vs Xavier",
+     "opponent_source": "Xavier",
+     "site_says": "Away"
+    }
+   }
+  },
+  {
+   "gid": "6625626",
+   "date": "2026-11-04",
+   "canonical": "Arkansas def. LSU 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Arkansas": {
+     "state": "SITE_HTTP_MISS",
+     "url": "https://arkansasrazorbacks.com/sports/womens-volleyball/schedule/text",
+     "http": 404
+    },
+    "LSU": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://lsusports.net/sports/vb/schedule",
+     "assertion": "LSU L 1-3 vs Arkansas",
+     "opponent_source": "Arkansas",
+     "site_says": null,
+     "surface": "modern_card"
+    }
+   }
+  },
+  {
+   "gid": "6626774",
+   "date": "2026-11-04",
+   "canonical": "UIW def. Houston Christian 3-2",
+   "verdict": "UNVERIFIED",
+   "schools": {
+    "UIW": {
+     "state": "NOT_POSTED",
+     "url": "https://uiwcardinals.com/services/schedule_txt.ashx?schedule=424",
+     "row": [
+      "Nov 4 (Wed)",
+      "6:30 p.m.",
+      "Away",
+      "Houston Christian University",
+      "Houston, TX",
+      "",
+      ""
+     ]
+    },
+    "Houston Christian": {
+     "state": "NOT_POSTED",
+     "url": "https://hbuhuskies.com/services/schedule_txt.ashx?schedule=252",
+     "row": [
+      "Nov 4 (Wed)",
+      "6:30 p.m.",
+      "Home",
+      "UIW",
+      "Houston, Texas (Sharp Gym)",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6627978",
+   "date": "2026-11-04",
+   "canonical": "Oregon St. def. Boise St. 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Oregon St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://osubeavers.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Oregon St. W 3-0 vs Boise State",
+     "opponent_source": "Boise State",
+     "site_says": "Away"
+    },
+    "Boise St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://broncosports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Boise St. L 0-3 vs Oregon State",
+     "opponent_source": "Oregon State",
+     "site_says": "Home"
+    }
+   }
+  }
+ ]
+}

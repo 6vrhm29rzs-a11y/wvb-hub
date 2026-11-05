@@ -33,6 +33,10 @@ def check(label, ok, detail=""):
 
 
 def jsfn(src, name):
+    # the helper's home suite was retired with the Availability desk
+    # (2026-11-04); it still lives in scripts/retired_guards/
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                    "retired_guards"))
     from test_provenance_truth import jsfn as _j
     return _j(src, name)
 

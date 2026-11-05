@@ -138,9 +138,12 @@ def main():
              if p.get("gid") == "6626259"]
     check("UC Davis counts the mirror loss exactly once",
           len(ucd_e) == 1 and ucd_e[0].get("mine") == 2)
-    CL = re.search(r"const CONFLAB\s*=\s*(.*?);\n", page, re.S).group(1)
-    check("Conference Lab counts it exactly once",
-          CL.count('"6626259"') == 1)
+    # Conference Lab retired from the page (2026-11-04): its data file is
+    # still built, so the exactly-once rule is checked there
+    _cl = os.path.join(REPO, "data", "conference_lab_2026.json")
+    if os.path.exists(_cl):
+        check("Conference Lab counts it exactly once",
+              open(_cl).read().count('"6626259"') == 1)
     elig = SC.countable(d["games"], 2026, need_line=True, d1_only=True)
     check("the rating-eligible set includes it exactly once",
           sum(1 for g2 in elig

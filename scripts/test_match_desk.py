@@ -356,8 +356,11 @@ def main():
     pub = os.path.join(REPO, "output", "vb_dashboard.html")
     if os.path.exists(pub):
         ph = open(pub, encoding="utf-8").read()
-        check("the public build HAS the desk (it is neutral)",
-              'data-v="desk"' in ph and "const DESK" in ph)
+        # the Today view was retired from BOTH builds (2026-11-04); its DESK
+        # payload still feeds the Scores rows, so it must remain
+        check("the public build has no Today view, but keeps the DESK rows",
+              'id="v-desk"' not in ph and 'data-v="desk"' not in ph
+              and "const DESK" in ph)
         leaks = BH.public_leaks(ph)
         check("...and the public build is still clean", not leaks, str(leaks))
         for marker in ('id="v-ballot"', "renderBallot", "ballots_"):
@@ -365,26 +368,34 @@ def main():
     else:
         print("  (no public build on disk -- skipping the public checks)")
 
+    # ⚠ The Today board (renderDesk) was retired from BOTH builds on
+    # 2026-11-04. Sections 7-8b test that board's own wording and lanes, so
+    # they run only while it is on the page; the DESK payload checks above and
+    # the score-header/ledger/route/state checks below still guard Scores.
+    has_desk = "function renderDesk" in src
+    if not has_desk:
+        print("\n7-8b. Today board retired -- its lane/wording checks skipped")
+    dcheck = check if has_desk else (lambda *a, **k: None)
     print("\n7. The forecast is presented as a probability, not a pick")
-    check("the page calls it a forecast, not a recommendation",
+    dcheck("the page calls it a forecast, not a recommendation",
           "not a pick" in src or "probability, not a pick" in src)
-    check("it states what a losing favourite means",
+    dcheck("it states what a losing favourite means",
           "loses three times in ten" in src or "expects" in src)
     check("Résumé is named as inactive rather than omitted",
           "not active yet" in src)
 
     print("\n8. THE MATCH BOARD: LANES, ONE FEATURED, NO INVENTED HEADLINE")
-    check("the three lanes exist by name",
+    dcheck("the three lanes exist by name",
           "Live now" in src and "Just finished" in src and "Coming up" in src)
-    check("a featured match states WHY it is featured", "Featured:" in src)
-    check("...and the reason is a stated precedence, not a score",
+    dcheck("a featured match states WHY it is featured", "Featured:" in src)
+    dcheck("...and the reason is a stated precedence, not a score",
           "function pickFeatured" in src and "score" not in
           src.split("function pickFeatured")[1].split("\n}")[0].split("rank =")[0])
-    check("the featured match is not repeated in its own lane",
+    dcheck("the featured match is not repeated in its own lane",
           "notFeat" in src)
-    check("a no-games day names the next real window",
+    dcheck("a no-games day names the next real window",
           "No Division-I matches today" in src and "Next match window" in src)
-    check("...and invents nothing to watch",
+    dcheck("...and invents nothing to watch",
           "things to watch" not in src.lower())
 
     print("\n8b. A FULL MATCH DAY IS CAPPED, AND THE CAP SAYS SO")
@@ -392,23 +403,24 @@ def main():
     # and a 13,593px page -- about ten screens -- with 155 undifferentiated
     # rows in "Coming up". That is the wall the Scores ledger exists to absorb,
     # reappearing on the rundown. Capped to 30 rows / 2,743px.
-    check("each lane has a declared cap", "const LANE_CAP =" in src)
-    check("[-] live is NEVER capped", "live: 0" in src,
+    dcheck("each lane has a declared cap", "const LANE_CAP =" in src)
+    dcheck("[-] live is NEVER capped", "live: 0" in src,
           "every match in progress must be on the board")
     # ⚠ NO SILENT TRUNCATION. A board that quietly shows 10 of 155 reads as
     # "that is all there is", which is a false statement made by omission.
-    check("the omission is stated", "more ' +" in src and "lanemore" in src)
-    check("...with the count of what is not shown",
+    dcheck("the omission is stated", "more ' +" in src and "lanemore" in src)
+    dcheck("...with the count of what is not shown",
           "rows.length - shownRows.length" in src)
     # anchor on the lane renderer itself rather than slicing around braces --
     # the first version split on "};" and landed in unrelated code.
-    lane_fn = src[src.index("const lane = (key, cls, label, rows)"):]
-    lane_fn = lane_fn[:lane_fn.index("\n  };") + 5]
-    check("...and a route to the rest", "routeFor('scores')" in lane_fn)
-    check("the lane header still shows the TRUE total",
+    _li = src.find("const lane = (key, cls, label, rows)")
+    lane_fn = src[_li:] if _li >= 0 else ""
+    lane_fn = lane_fn[:lane_fn.index("\n  };") + 5] if "\n  };" in lane_fn else ""
+    dcheck("...and a route to the rest", "routeFor('scores')" in lane_fn)
+    dcheck("the lane header still shows the TRUE total",
           "rows.length + '</span>" in lane_fn,
           "the header must count all of them, not the shown subset")
-    check("[+] ...and the shown subset is a different variable",
+    dcheck("[+] ...and the shown subset is a different variable",
           "shownRows" in lane_fn and "shownRows.length + '</span>" not in lane_fn)
 
     print("\n9. ONE SCORE HEADER, ONE DEFINITION")
@@ -416,7 +428,7 @@ def main():
     # detail call the SAME function, so a scoreline cannot be phrased two ways
     # and drift apart (R4).
     check("the ribbon is defined once", src.count("function ribbonHTML") == 1)
-    check("the featured match uses it", "ribbonHTML(feat.m" in src)
+    dcheck("the featured match uses it", "ribbonHTML(feat.m" in src)   # Today board only
     check("the match detail uses the same one", "ribbonHTML(m, live, null)" in src)
     check("the detail emits exactly one ribbon",
           src.split("function renderMatchDetail")[1].split("\nfunction ")[0]

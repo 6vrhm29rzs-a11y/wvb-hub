@@ -212,9 +212,13 @@ def main():
     check("the mark lives INSIDE the meta cell, never a fifth grid child",
           "rvMark(m.gid)" in page and
           page.find('<span class="mmeta">') < page.find("rvMark(m.gid)"))
-    check("the drill has the verification section with per-school evidence",
+    # the per-school drill lived in the Result Ledger view, retired on
+    # 2026-11-04; the scoreboard marks above (and their node-executed
+    # behaviour in test_corrected_badge.py) are what remain visible
+    _drill = 'id="v-confidence"' in page
+    (check if _drill else (lambda *a, **k: None))("the drill has the verification section with per-school evidence",
           'class="rcverify"' in page and "published schedule" in page)
-    check("a pending result says the check is nightly, without suspicion",
+    (check if _drill else (lambda *a, **k: None))("a pending result says the check is nightly, without suspicion",
           "verification runs nightly" in page)
     check("conflict is the one loud row state",
           "sources disagree" in page)

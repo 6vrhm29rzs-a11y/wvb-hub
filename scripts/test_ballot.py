@@ -990,9 +990,10 @@ console.log(JSON.stringify(out));
               ph3.count("typeof mbRenderAll === 'function'") >= 1)
     if os.path.exists(priv):
         vh3 = open(priv, encoding="utf-8").read()
-        missing = [x for x in MB_MARKS if not tok(x, vh3)]
-        check("[+] ...and the PRIVATE page has all of it", not missing,
-              str(missing[:4]))
+        # My Board was retired from BOTH builds (Cody, 2026-11-04)
+        present = [x for x in MB_MARKS if tok(x, vh3)]
+        check("[+] ...and My Board is retired on the private page too",
+              not present, str(present[:4]))
 
     print("\n25. THE WATCHLIST REACHES NOTHING ELSE")
     # ⚠ STRUCTURAL. The board lives in localStorage and nowhere else -- no file,
@@ -1054,8 +1055,9 @@ console.log(JSON.stringify(out));
         # core-data pass 2026-08-31: Stats was promoted to a primary --
         # this is a rankings/scores/STATS site first. Six primaries now,
         # and the set is pinned so a seventh still trips.
-        check("the primary set is exactly the six core destinations",
-              prim2 == ["desk", "scores", "rankings", "leaders",
+        # cleanup 2026-11-04: Today retired, Scores leads.
+        check("the primary set is exactly the five core destinations",
+              prim2 == ["scores", "rankings", "leaders",
                         "teams", "ballot"], str(prim2))
         check("...and My Board is not a route",
               "'myboard'" not in src.split("ROUTE_OF_VIEW")[1][:400])

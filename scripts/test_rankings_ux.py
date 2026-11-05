@@ -97,10 +97,11 @@ def main():
     mi = re.search(r"\.moremenu button\{[^}]*font:600 (\d+)px", page)
     check("menu items are >= 14px", mi and int(mi.group(1)) >= 14,
           mi and mi.group(1))
-    check("three labelled groups: Explore / Reference / Private workspace",
-          page.count('class="mglabel"') >= 3
-          and ">Explore<" in page and ">Reference<" in page
-          and "Private workspace" in page)
+    # cleanup 2026-11-04: the Reference group emptied (Result Ledger, On TV
+    # retired; the bracket moved to Explore), so two groups remain
+    check("two labelled groups: Explore / Private workspace",
+          page.count('class="mglabel"') >= 2
+          and ">Explore<" in page and "Private workspace" in page)
     check("hover and focus are visible (background changes to --alt)",
           re.search(r"\.moremenu button:hover,\.moremenu button:"
                     r"focus-visible\{background:var\(--alt\)", page))
@@ -151,17 +152,9 @@ def main():
           and not re.search(r"querySelectorAll\('nav button\[role=tab\], "
                             r"#moremenu button'\)", page))
 
-    print("\n2. THE LAUNCHER LEFT THE NAV")
-    check("Ask Digby: fixed edge trigger base + IN-LAYOUT dock at "
-          "desktop (masthead meta), never nav-appended",
-          ".asklaunch{position:fixed" in page
-          and ".asklaunch.inmast{position:static" in page
-          and "meta.appendChild(b)" in page
-          and "inner.appendChild(b)" not in page)
-    check("phone clearance under the edge trigger",
-          "main{padding-bottom:88px}" in page)
-    check("the More menu carries an Ask Digby item (private group)",
-          'id="askmenu"' in page and "mgpriv" in page)
+    print("\n2. ASK DIGBY IS RETIRED (Cody, 2026-11-04)")
+    check("no Ask Digby launcher or menu item on the page",
+          "asklaunch" not in page and 'id="askmenu"' not in page)
 
     print("\n3. RANKINGS ABOVE THE FOLD")
     sec = page[page.find('id="v-rankings"'):page.find('id="v-teams"')] \
@@ -217,8 +210,8 @@ def main():
     pub_p = os.path.join(REPO, "output", "vb_dashboard.html")
     if os.path.exists(pub_p):
         pub = io.open(pub_p, encoding="utf-8").read()
-        check("public menu keeps Explore/Reference groups",
-              ">Explore<" in pub and ">Reference<" in pub)
+        check("public menu keeps its Explore group",
+              ">Explore<" in pub)
         check("...and carries NO private group, label or Digby item",
               all(x not in pub for x in
                   ("mgpriv", "askmenu", "Private workspace",

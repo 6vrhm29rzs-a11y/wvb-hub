@@ -68,13 +68,18 @@ def main():
     check("no surface treats a feed row as proof of being live", not bad,
           "; ".join(bad))
 
-    print("\n2. A FINISHED MATCH CANNOT BE A FORWARD-LOOKING WATCH")
-    check("the watch list drops a final outright",
+    # The watch list lived on the Today board, retired from both builds on
+    # 2026-11-04; section 2 and its negative controls run only while it ships.
+    watch = "function renderDesk" in h
+    print("\n2. A FINISHED MATCH CANNOT BE A FORWARD-LOOKING WATCH"
+          + ("" if watch else " -- Today board retired, skipped"))
+    wcheck = check if watch else (lambda *a, **k: None)
+    wcheck("the watch list drops a final outright",
           "if (st === 'final') return null;" in h,
           "a completed match can still be offered as something to watch")
-    check("...and the live bonus is applied only to a live match",
+    wcheck("...and the live bonus is applied only to a live match",
           "if (st === 'live') w += 100;" in h)
-    check("today's finals are claimed by the results section",
+    wcheck("today's finals are claimed by the results section",
           "m.d <= today && matchState(m, liveOf(m)) === 'final'" in h,
           "with `m.d < today` a match finishing today belongs to no section, "
           "so nothing takes it out of the watch list")
@@ -104,6 +109,8 @@ def main():
          h.replace("if (typeof renderScoreboard === 'function') renderScoreboard();", ""),
          lambda d: "if (typeof renderScoreboard === 'function') renderScoreboard();" in d),
     ]
+    if not watch:
+        cases = cases[-1:]   # only the Scoreboard-refresh control still applies
     for label, doc, still_ok in cases:
         check("[NEG] %s is caught" % label, not still_ok(doc),
               "the guard above would pass against the broken version")

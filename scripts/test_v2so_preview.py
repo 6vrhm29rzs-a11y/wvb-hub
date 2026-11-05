@@ -19,7 +19,10 @@ readers = [p for p in glob.glob(os.path.join(REPO, "scripts", "*.py"))
                                            "season_only_scorecard.py",     # Cody-approved prospective scorecard (2026-09-28); writes only its own log
                                            "build_rankings_board.py",      # the PRIVATE DEFAULT consumer (Cody 2026-09-28), gated on WVB_POWER_DEFAULT
                                            "predict_2026.py",              # private forecasts (Cody: "switch the forecasts"), gated on the DEFAULT_ON flag; tracked outputs untouched
-                                           "simulate_season_2026.py")]     # private season simulation (Cody: "switch the simulator too"), same gating
+                                           "simulate_season_2026.py",      # private season simulation (Cody: "switch the simulator too"), same gating
+                                           "build_power_research_report.py",  # read-only research report (2026-11-03): reads the frozen candidate, writes only under output/
+                                           "test_freshness_repairs.py",    # read-only guard (071 B4): checks 'included' == the candidate's own input list
+                                           "test_073_corrections.py")]    # 073 guard: writes a preview only inside a temp dir (fake fit), never the real one
 pr = open(os.path.join(REPO, "scripts", "predict_2026.py")).read()
 check('"DEFAULT_ON"' in pr and 'power_candidate", "predictions_2026.json"' in pr, "predict_2026 writes candidate forecasts only to the private file, behind the flag")
 check('os.environ.get("WVB_POWER_DEFAULT") == "candidate"' in open(os.path.join(REPO, "scripts", "build_rankings_board.py")).read(),

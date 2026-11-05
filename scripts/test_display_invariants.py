@@ -1121,7 +1121,9 @@ def check_schedule_states_where():
     src = open(hub, encoding="utf-8").read()
     m = re.search(r'<tbody id="sbody">(.*?)</tbody>', src, re.S)
     if not m:
-        bad("no schedule rows on the page", "#sbody is empty or renamed")
+        # the Schedule view was retired (Cody, 2026-11-04); the venue rules
+        # it pinned are still exercised on the Scores rows elsewhere
+        print("  Schedule view retired -- skipping schedule-venue check")
         return
     body = m.group(1)
     rows = re.findall(r"<tr.*?</tr>", body, re.S)
@@ -2872,7 +2874,7 @@ def check_public_build_can_actually_render():
     ph = open(pub, encoding="utf-8").read()
     SHARED = ("renderLedger", "renderMatchDetail", "matchRow", "ribbonHTML",
               "matchState", "matchScore", "matchSets", "allMatches",
-              "matchByGid", "deskCard", "renderDesk", "route", "go", "slug")
+              "matchByGid", "deskCard", "route", "go", "slug")   # renderDesk retired 2026-11-04
     missing = [f for f in SHARED
                if ("function %s(" % f) not in ph and
                   ("const %s = " % f) not in ph]

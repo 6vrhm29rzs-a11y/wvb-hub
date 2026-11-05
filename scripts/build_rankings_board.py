@@ -172,6 +172,37 @@ def load_pipe(p) -> List[List[str]]:
     return rows
 
 
+def weekly_label(row):
+    """073 #3: name a weekly row by what it actually CONTAINS. A row whose
+    results run past its cutoff Sunday (e.g. W42: cutoff Oct 18, results
+    through Oct 19 4:00 PM PT, captured Oct 19) is NOT a week-ending freeze and
+    must not be called one; the archive row itself is kept unchanged."""
+    import datetime as _dt
+    from zoneinfo import ZoneInfo
+    PT = ZoneInfo("America/Los_Angeles")
+    co = row.get("cutoff")
+    try:
+        d = _dt.date.fromisoformat(co) if co else None
+    except ValueError:
+        d = None
+    ep = row.get("data_through_epoch")
+    if d and ep:
+        boundary = _dt.datetime(d.year, d.month, d.day, tzinfo=PT) + _dt.timedelta(days=1)
+        if ep >= boundary.timestamp():
+            thru = _dt.datetime.fromtimestamp(ep, PT)
+            cap = ""
+            try:
+                c = _dt.datetime.strptime(row.get("captured_utc") or "", "%Y-%m-%dT%H:%M:%SZ")
+                cap = ", captured %s" % c.replace(tzinfo=_dt.timezone.utc).astimezone(PT).strftime("%b %-d")
+            except ValueError:
+                pass
+            return ("the %s snapshot (results through %s%s; not a week-ending freeze)"
+                    % (row.get("week"), thru.strftime("%b %-d %-I:%M %p PT"), cap))
+    if d:
+        return "the week-ending %s freeze" % d.strftime("%b %-d")
+    return "the %s freeze" % row.get("week")
+
+
 def pick_comparison(snaps, this_week, rank_source):
     """The snapshot the movement column should measure against, or None.
 
@@ -620,6 +651,7 @@ def build():
         hist_path = os.path.join(REPO, "Cody", "data", "power_candidate", "rankings_history_candidate.jsonl")
     prev = {}
     prev_week = None
+    prev_label = None
     if os.path.exists(hist_path):
         snaps = []
         for line in open(hist_path):
@@ -638,6 +670,13 @@ def build():
             if use:
                 prev_week = use["week"]
                 prev = dict((r["team"], r["rank"]) for r in use.get("teams", []))
+                # B3: the page names WHICH freeze the arrows compare against
+                _co = use.get("cutoff")
+                try:
+                    _d = _dt.date.fromisoformat(_co) if _co else None
+                except ValueError:
+                    _d = None
+                prev_label = weekly_label(use)
     # THE WEEKLY LOCK FIRST (Cody 2026-09-25): same model, results through
     # Sunday night. Only when the board shows the blend -- a lock computed on
     # the blend is not a ruler for the pure-2026 composite.
@@ -649,9 +688,11 @@ def build():
             _lk = {}
         if _lk:
             prev, prev_week = _lk, "the Sunday-night lock"
+            prev_label = "the Sunday-night lock"
     for t in teams:
         pr = prev.get(t["team"])
         t["prev_rank"] = pr
+        t["move_vs"] = prev_label if pr else None
         # positive = moved UP the table (a smaller rank number)
         t["move"] = (pr - t["rank26"]) if (pr and t.get("rank26")) else None
     if prev_week:
@@ -854,6 +895,7 @@ def build():
         "projected": sum(1 for t in teams if not t.get("unranked")),
         "rank_source": rank_source,
         "rank_stamp": rank_stamp,
+        "move_vs": prev_label,
         "resume_active": resume_active,
         "resume": resume_meta,
         "power_scale": dict(_POWER_SCALE),

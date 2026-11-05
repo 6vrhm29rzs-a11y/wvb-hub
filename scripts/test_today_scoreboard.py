@@ -47,10 +47,11 @@ def main():
     print("  reading %s\n" % which)
 
     # ── 1. TODAY ────────────────────────────────────────────────────────
-    print("1. TODAY IS THE PRIMARY DESTINATION")
+    # cleanup 2026-11-04: the Today desk was retired and Scores leads.
+    print("1. SCORES IS THE PRIMARY DESTINATION")
     tabs = re.findall(r'<button role="tab"[^>]*data-v="([a-z0-9]+)"[^>]*>([^<]*)<', h)
     first = tabs[0] if tabs else ("", "")
-    check("the first primary tab is Today", first == ("desk", "Today"),
+    check("the first primary tab is Scores", first == ("scores", "Scores"),
           str(first))
     # ⚠ SCAN THE MARKUP, NOT THE SCRIPT. The first version searched the whole
     # document for text between angle brackets, which on a page carrying a
@@ -62,11 +63,11 @@ def main():
     check("[-] 'Match Desk' is never a user-facing label",
           not shown, str(shown[:2]))
     check("[+] ...over markup that does carry visible tab labels",
-          ">Today<" in visible and ">Rankings<" in visible)
+          ">Scores<" in visible and ">Rankings<" in visible)
     check("the primary route is /today", "desk:'today'" in src)
     # ⚠ OLD LINKS MUST STILL RESOLVE.
-    check("[-] ...and match-desk survives as an alias",
-          "ROUTE_ALIASES = { 'match-desk': 'desk' }" in src and
+    check("[-] ...and match-desk + today survive as aliases to Scores",
+          "'match-desk': 'scores', 'today': 'scores'" in src and
           "VIEW_OF_ROUTE[k] = ROUTE_ALIASES[k]" in src,
           "every bookmark and saved note points at the old path")
 
@@ -222,9 +223,9 @@ def main():
     for ctl in ("sbPrev", "sbNext", "sbToday", "sbDate"):
         check("  control present: %s" % ctl, 'id="%s"' % ctl in h)
     fl = re.findall(r'data-sbf="([a-z]+)"', h)
-    want = ["all", "board", "ranked", "live", "final", "upcoming"] if private \
-        else ["all", "ranked", "live", "final", "upcoming"]
-    check("the filters are exactly the six (five in public)", fl == want, str(fl))
+    # My Board retired from both builds (2026-11-04): five filters everywhere
+    want = ["all", "ranked", "live", "final", "upcoming"]
+    check("the filters are exactly the five", fl == want, str(fl))
     # ⚠ TOP GAMES LEFT THE SCOREBOARD ENTIRELY (design review via Cody,
     # 2026-08-28): highlights belong on Today; Scores opens straight into
     # Live now. The guard flips from "scoped to the date" to "absent".

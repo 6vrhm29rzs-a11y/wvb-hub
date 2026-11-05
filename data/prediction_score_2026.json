@@ -1,31 +1,31 @@
 {
  "meta": {
   "issuance": "first-issued",
-  "scored": 3868,
+  "scored": 3885,
   "logged_after_tipoff_excluded": 2,
   "timing_unverifiable_excluded": 0,
-  "team_mismatch_excluded": 80,
+  "team_mismatch_excluded": 81,
   "predictions_on_record": 4815,
-  "brier": 0.1872,
-  "favourite_correct": 2768,
+  "brier": 0.1873,
+  "favourite_correct": 2781,
   "favourite_correct_pct": 71.6,
   "by_model_version": {
-   "unversioned": 3866,
+   "unversioned": 3883,
    "470db00+uncommitted-scripts": 2
   },
   "season": 2026,
   "source_tier": "DERIVED",
-  "results_available": 3998,
-  "as_of_utc": "2026-11-02T00:55:22Z",
+  "results_available": 4016,
+  "as_of_utc": "2026-11-05T08:25:10Z",
   "what_this_is": "Recorded forecast performance by issuance stream, as of as_of_utc. Timing is checked against the feed's LISTED start, not the actual first serve; rows logged before 2026-09-26 carry no model version. Not a certified held-out test of any single model version.",
   "brier_reference": "0.25 is what saying 50% to everything scores"
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 661,
+   "n": 666,
    "said": 55.0,
-   "happened": 52.6
+   "happened": 52.9
   },
   {
    "range": "60-70%",
@@ -35,19 +35,19 @@
   },
   {
    "range": "70-80%",
-   "n": 663,
+   "n": 667,
    "said": 75.1,
-   "happened": 65.8
+   "happened": 65.7
   },
   {
    "range": "80-90%",
-   "n": 753,
+   "n": 754,
    "said": 85.3,
-   "happened": 76.2
+   "happened": 76.3
   },
   {
    "range": "90-101%",
-   "n": 1143,
+   "n": 1150,
    "said": 95.7,
    "happened": 89.9
   }
@@ -56,25 +56,25 @@
   "first_issued": {
    "meta": {
     "issuance": "first-issued",
-    "scored": 3868,
+    "scored": 3885,
     "logged_after_tipoff_excluded": 2,
     "timing_unverifiable_excluded": 0,
-    "team_mismatch_excluded": 80,
+    "team_mismatch_excluded": 81,
     "predictions_on_record": 4815,
-    "brier": 0.1872,
-    "favourite_correct": 2768,
+    "brier": 0.1873,
+    "favourite_correct": 2781,
     "favourite_correct_pct": 71.6,
     "by_model_version": {
-     "unversioned": 3866,
+     "unversioned": 3883,
      "470db00+uncommitted-scripts": 2
     }
    },
    "calibration": [
     {
      "range": "50-60%",
-     "n": 661,
+     "n": 666,
      "said": 55.0,
-     "happened": 52.6
+     "happened": 52.9
     },
     {
      "range": "60-70%",
@@ -84,19 +84,19 @@
     },
     {
      "range": "70-80%",
-     "n": 663,
+     "n": 667,
      "said": 75.1,
-     "happened": 65.8
+     "happened": 65.7
     },
     {
      "range": "80-90%",
-     "n": 753,
+     "n": 754,
      "said": 85.3,
-     "happened": 76.2
+     "happened": 76.3
     },
     {
      "range": "90-101%",
-     "n": 1143,
+     "n": 1150,
      "said": 95.7,
      "happened": 89.9
     }
@@ -105,49 +105,51 @@
   "last_pre_match": {
    "meta": {
     "issuance": "last-pre-match",
-    "scored": 1737,
+    "scored": 1754,
     "logged_after_tipoff_excluded": 0,
     "timing_unverifiable_excluded": 0,
-    "team_mismatch_excluded": 10,
-    "predictions_on_record": 1747,
-    "brier": 0.1566,
-    "favourite_correct": 1328,
-    "favourite_correct_pct": 76.5,
+    "team_mismatch_excluded": 11,
+    "predictions_on_record": 1765,
+    "brier": 0.1567,
+    "favourite_correct": 1340,
+    "favourite_correct_pct": 76.4,
     "by_model_version": {
      "5f46398+uncommitted-scripts": 323,
      "fb642d7": 9,
-     "470db00": 232,
-     "470db00+uncommitted-scripts": 1173
+     "470db00": 233,
+     "470db00+uncommitted-scripts": 1173,
+     "391ee24": 6,
+     "de49d9c+uncommitted-scripts": 10
     }
    },
    "calibration": [
     {
      "range": "50-60%",
-     "n": 341,
+     "n": 344,
      "said": 54.9,
-     "happened": 53.4
+     "happened": 53.2
     },
     {
      "range": "60-70%",
-     "n": 328,
+     "n": 333,
      "said": 65.1,
-     "happened": 66.8
+     "happened": 66.7
     },
     {
      "range": "70-80%",
-     "n": 305,
+     "n": 308,
      "said": 75.1,
      "happened": 74.4
     },
     {
      "range": "80-90%",
-     "n": 375,
+     "n": 376,
      "said": 85.3,
-     "happened": 89.3
+     "happened": 89.4
     },
     {
      "range": "90-101%",
-     "n": 388,
+     "n": 393,
      "said": 95.0,
      "happened": 94.1
     }
@@ -383,6 +385,16 @@
    "p_home": 0.9696,
    "home_won": false,
    "brier": 0.94012416,
+   "model_version": null
+  },
+  {
+   "game_id": "6627256",
+   "date": "2026-11-03",
+   "home": "IU Indy",
+   "away": "Purdue Fort Wayne",
+   "p_home": 0.9695,
+   "home_won": false,
+   "brier": 0.9399302500000001,
    "model_version": null
   },
   {
@@ -643,16 +655,6 @@
    "p_home": 0.9451,
    "home_won": false,
    "brier": 0.8932140100000001,
-   "model_version": null
-  },
-  {
-   "game_id": "6627906",
-   "date": "2026-10-08",
-   "home": "UC Davis",
-   "away": "New Mexico",
-   "p_home": 0.9449,
-   "home_won": false,
-   "brier": 0.8928360099999999,
    "model_version": null
   }
  ]

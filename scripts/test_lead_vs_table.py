@@ -63,8 +63,10 @@ def main():
         check("...and its total equals every row in the DOM",
               int(m.group(2).replace(",", "")) == allr,
               (m.group(2), allr))
-    else:
+    elif m or sb:
         check("schedule lead and table both present", bool(m and sb))
+    else:
+        print("  Schedule view retired (2026-11-04) -- nothing to compare")
 
     print("\n3. THE RANKINGS TABLE POPULATION AGAINST ITS LEAD")
     m = re.search(r"(\d+) of (\d+) teams have played", page)
@@ -86,7 +88,7 @@ def main():
     if not m:
         m = re.search(r'"finals": ?(\d+)', page)
     cf = os.path.join(REPO, "data", "result_confidence_2026.json")
-    if m and os.path.exists(cf):
+    if m and os.path.exists(cf) and 'id="v-confidence"' in page:
         import json
         doc = json.load(open(cf))
         n_art = len(doc.get("finals") or [])
