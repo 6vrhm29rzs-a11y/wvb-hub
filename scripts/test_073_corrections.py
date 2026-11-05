@@ -80,6 +80,15 @@ def test_identity():
         make_repo(d, base, {"1": "neutral", "2": "home"})
         i3, m3 = SOC.input_identity(EP, d)
         check(i3 != i0 and m3["sites"] != m0["sites"], "site correction -> identity + manifest change")
+        # a rebuilt 2025 base with only a new generated_at_utc -> unchanged
+        p25 = os.path.join(d, "data", "data_2025.json")
+        json.dump({"meta": {"generated_at_utc": "2026-11-05T15:00:00Z"}, "games": [1]}, open(p25, "w"))
+        ia = SOC.input_identity(EP, d)[0]
+        json.dump({"meta": {"generated_at_utc": "2026-11-05T16:00:00Z"}, "games": [1]}, open(p25, "w"))
+        check(SOC.input_identity(EP, d)[0] == ia, "rebuilt 2025 base with only a new timestamp -> unchanged")
+        json.dump({"meta": {"generated_at_utc": "2026-11-05T16:00:00Z"}, "games": [2]}, open(p25, "w"))
+        check(SOC.input_identity(EP, d)[0] != ia, "2025 base content change -> identity changes")
+        os.remove(p25)
         # box stat revision
         make_repo(d, base, {"1": "home", "2": "home"}, {"2": {"teams": [{"k": 41}]}})
         check(SOC.input_identity(EP, d)[0] != i0, "box-score stat revision -> identity changes")

@@ -38,6 +38,13 @@ def input_identity(ep, repo=None):
         p = os.path.join(repo, rel)
         if not os.path.exists(p):
             return "absent"
+        if rel.endswith(".json"):
+            # content, not bytes: data_2025.json is rebuilt every full cycle with a
+            # fresh generated_at_utc, which would otherwise force a refit each time
+            try:
+                return h(_strip_ts(json.load(open(p, encoding="utf-8"))))
+            except ValueError:
+                pass
         return hashlib.sha256(open(p, "rb").read()).hexdigest()[:16]
 
     try:
@@ -85,7 +92,7 @@ def input_identity(ep, repo=None):
 def _strip_ts(o):
     if isinstance(o, dict):
         return dict((k, _strip_ts(x)) for k, x in o.items()
-                    if not any(t in k.lower() for t in ("fetched", "retriev", "_utc", "captured")))
+                    if not any(t in k.lower() for t in ("fetched", "retriev", "_utc", "captured", "generated")))
     if isinstance(o, list):
         return [_strip_ts(x) for x in o]
     return o
