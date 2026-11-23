@@ -54,6 +54,8 @@ except Exception:                       # pragma: no cover
     ET = None
 
 
+RESULTS_THRU = [None]   # mail 116: set while counting played_2026; written to both metas
+
 def load(p, default=None):
     path = os.path.join(REPO, p)
     return json.load(open(path)) if os.path.exists(path) else default
@@ -159,17 +161,14 @@ def build():
     played = {}
     gpath = os.path.join(REPO, "data/raw/%d/games.jsonl" % SEASON)
     if os.path.exists(gpath):
-        seen = set()
-        for line in open(gpath):
-            try:
-                g = json.loads(line)
-            except ValueError:
-                continue
-            if not isinstance(g, dict) or g.get("game_state") != "F":
-                continue
-            if g.get("game_id") in seen:
-                continue
-            seen.add(g.get("game_id"))
+        # mail 116: the ONE counting chain (gamelog dedup + season_counts
+        # classification), not raw state=='F' with first-seen dedup, which
+        # counted duplicate listings, exhibitions and empty finals as played
+        import gamelog as _GLp
+        import season_counts as _SCp
+        _gl_all = _GLp.load_games_jsonl(gpath)
+        RESULTS_THRU[0] = _SCp.results_through_epoch(_gl_all, SEASON)
+        for g in _SCp.countable(_gl_all, SEASON):
             for t in g.get("teams") or []:
                 nm_raw = (t.get("name_short") or "").strip()
                 nm = _hub_of.get(_pnorm(nm_raw), nm_raw)
@@ -272,7 +271,8 @@ def build():
                                           "win_chance": "the 2026 model's calibrated mapping (season-aware, evidence-depth aware)",
                                           "set_distribution": "rally model at the margin implying that chance"},
                             "home_advantage_points_per_set": round(home_adv, 4), "fixtures": len(cand_rows),
-                            "generated_utc": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")},
+                            "generated_utc": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+                            "results_through_epoch": RESULTS_THRU[0]},
                    "games": cand_rows}, open(_pp, "w"), indent=1)
         # private last-pre-match stream for the candidate (append-only, mirrors append_latest)
         _lp = os.path.join(REPO, "Cody", "data", "power_candidate", "prediction_log_latest_candidate.jsonl")
@@ -295,6 +295,7 @@ def build():
         "meta": {
             "season": SEASON,
             "source_tier": "DERIVED",
+            "results_through_epoch": RESULTS_THRU[0],     # mail 116: the data cutoff (stable between runs)
             "model": ("rally model from simulate_2025.py -- one pooled per-rally "
                       "probability, best-of-5 distribution derived analytically"),
             "calibration": ("rally model: Brier 0.1289 over 5,014 2025 matches "

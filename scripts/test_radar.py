@@ -79,8 +79,19 @@ def main():
     # exists precisely to forbid the thing being searched for. Eleventh time
     # a check here has matched the prose describing it. A diagnosis in a
     # player ROW would be a lie about a person; in the meta it is required.
-    blob = json.dumps(rows).lower()
+    # ⚠ SCAN THE CLAIMS, NOT THE NAMES. "ill " matched "Jill Hanson" (Tulsa)
+    # and, as a word, "Western Ill." / "Eastern Ill." (2026-11-07) -- the
+    # "Massey" lesson: a team or player NAME is not a claim about a person.
+    NAMES = ("team", "player", "name", "team_id")
+    def _claims(rs):
+        return json.dumps([{k: v for k, v in r.items() if k not in NAMES}
+                           for r in rs]).lower()
+    blob = _claims(rows)
     hits = [w for w in banned if w in blob]
+    _ctl = _claims([{"team": "Western Ill.", "player": "Jill Hanson",
+                     "note": "ill for the weekend"}])
+    check("[NEG] a diagnosis in a claim field still trips, names do not",
+          "ill " in _ctl and "jill" not in _ctl and "western ill." not in _ctl)
     check("[NEG] no diagnosis or injury word in any player ROW", not hits,
           hits)
     check("...and the document denies being an injury report in its own "

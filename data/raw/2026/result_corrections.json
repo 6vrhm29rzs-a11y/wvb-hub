@@ -5277,38 +5277,6 @@
    ],
    "note": "Filed 2026-11-01 from the result review queue (verifier verdict HELD_BOTH_REPORT): both schools publish the same result; held matches had sat uncounted with no one filing them."
   },
-  "6625566": {
-   "field": "result",
-   "corr_kind": "contradicted",
-   "feed_said": "['Georgia St.'] credited as winner",
-   "correct": {
-    "winner_team_id": "45868",
-    "away_sets": 1,
-    "home_sets": 3,
-    "linescores": [],
-    "linescores_replace": true
-   },
-   "established": "Southern Miss. def. Georgia St. 3-1. Georgia St. publishes \"Georgia St. L 1-3 vs Southern Miss\" and Southern Miss. publishes \"Southern Miss. W 3-1 vs Georgia State\". The feed's set line does not reproduce this result, so the tape is withheld.",
-   "evidence": [
-    {
-     "url": "https://georgiastatesports.com/services/schedule_txt.ashx?schedule=360",
-     "kind": "school_schedule",
-     "school": "Georgia St.",
-     "retrieved": "2026-10-10",
-     "text": "Georgia St. L 1-3 vs Southern Miss",
-     "establishes": "Georgia St. L 1-3 vs Southern Miss"
-    },
-    {
-     "url": "https://southernmiss.com/sports/womens-volleyball/schedule/text",
-     "kind": "school_schedule",
-     "school": "Southern Miss.",
-     "retrieved": "2026-10-10",
-     "text": "Southern Miss. W 3-1 vs Georgia State",
-     "establishes": "Southern Miss. W 3-1 vs Georgia State"
-    }
-   ],
-   "note": "Filed 2026-11-01 from the result review queue (verifier verdict CONTRADICTED_BOTH): both schools publish the same result; held matches had sat uncounted with no one filing them."
-  },
   "6624417": {
    "field": "result",
    "corr_kind": "contradicted",
@@ -6070,6 +6038,861 @@
     }
    ],
    "note": "Filed 2026-11-01 from the result review queue (verifier verdict HELD_BOTH_REPORT): both schools publish the same result; held matches had sat uncounted with no one filing them."
+  },
+  "6627586": {
+   "field": "result",
+   "corr_kind": "incomplete",
+   "feed_said": "no counted result; held as empty (Nevada 2, Grand Canyon 2)",
+   "correct": {
+    "winner_team_id": "46590",
+    "home_sets": 2,
+    "away_sets": 3
+   },
+   "established": "Grand Canyon def. Nevada 3-2. Nevada publishes \"Nevada L 2-3 vs Grand Canyon\" and Grand Canyon publishes \"Grand Canyon W 3-2 vs Nevada\". The official NCAA table agrees. The feed's set line is complete and names the same result, so it is kept.",
+   "evidence": [
+    {
+     "url": "https://nevadawolfpack.com/services/schedule_txt.ashx?schedule=525",
+     "kind": "school_schedule",
+     "school": "Nevada",
+     "retrieved": "2026-11-22",
+     "text": "Nevada L 2-3 vs Grand Canyon",
+     "establishes": "Nevada L 2-3 vs Grand Canyon"
+    },
+    {
+     "url": "https://gculopes.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Grand Canyon",
+     "retrieved": "2026-11-22",
+     "text": "Grand Canyon W 3-2 vs Nevada",
+     "establishes": "Grand Canyon W 3-2 vs Nevada"
+    },
+    {
+     "url": "https://ncaa-api.henrygd.me/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi",
+     "kind": "ncaa_official_rpi_table",
+     "retrieved": "2026-11-17",
+     "text": "Through Games Nov. 15 2026: Grand Canyon 17-10, Nevada 5-21",
+     "establishes": "The NCAA's official Division I records include one more win for Grand Canyon and one more loss for Nevada than the hub counted without this match."
+    }
+   ],
+   "note": "Filed 2026-11-22 after reconciling the hub against the official NCAA RPI table through Nov. 15."
+  },
+  "6625638": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "no counted result; held as self_contradictory (Texas A&M 2, South Carolina 0)",
+   "correct": {
+    "winner_team_id": "46006",
+    "home_sets": 3,
+    "away_sets": 0
+   },
+   "established": "Texas A&M def. South Carolina 3-0. Texas A&M publishes \"Texas A&M W 3-0 vs South Carolina\". The official NCAA table agrees. The feed's set line is complete and names the same result, so it is kept.",
+   "evidence": [
+    {
+     "url": "https://12thman.com/sports/volleyball/schedule",
+     "kind": "school_schedule",
+     "school": "Texas A&M",
+     "retrieved": "2026-11-22",
+     "text": "Texas A&M W 3-0 vs South Carolina",
+     "establishes": "Texas A&M W 3-0 vs South Carolina"
+    },
+    {
+     "url": "https://ncaa-api.henrygd.me/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi",
+     "kind": "ncaa_official_rpi_table",
+     "retrieved": "2026-11-17",
+     "text": "Through Games Nov. 15 2026: Texas A&M 16-11, South Carolina 9-16",
+     "establishes": "The NCAA's official Division I records include one more win for Texas A&M and one more loss for South Carolina than the hub counted without this match."
+    }
+   ],
+   "note": "Filed 2026-11-22 after reconciling the hub against the official NCAA RPI table through Nov. 15."
+  },
+  "6625742": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "no counted result; held as self_contradictory (Kansas 2, Utah 0)",
+   "correct": {
+    "winner_team_id": "46422",
+    "home_sets": 3,
+    "away_sets": 0
+   },
+   "established": "Kansas def. Utah 3-0. Kansas publishes \"Kansas W 3-0 vs Utah\" and Utah publishes \"Utah L 0-3 vs Kansas\". The official NCAA table agrees. The feed's set line is complete and names the same result, so it is kept.",
+   "evidence": [
+    {
+     "url": "https://kuathletics.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Kansas",
+     "retrieved": "2026-11-22",
+     "text": "Kansas W 3-0 vs Utah",
+     "establishes": "Kansas W 3-0 vs Utah"
+    },
+    {
+     "url": "https://utahutes.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Utah",
+     "retrieved": "2026-11-22",
+     "text": "Utah L 0-3 vs Kansas",
+     "establishes": "Utah L 0-3 vs Kansas"
+    },
+    {
+     "url": "https://ncaa-api.henrygd.me/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi",
+     "kind": "ncaa_official_rpi_table",
+     "retrieved": "2026-11-17",
+     "text": "Through Games Nov. 15 2026: Kansas 19-6, Utah 15-10",
+     "establishes": "The NCAA's official Division I records include one more win for Kansas and one more loss for Utah than the hub counted without this match."
+    }
+   ],
+   "note": "Filed 2026-11-22 after reconciling the hub against the official NCAA RPI table through Nov. 15."
+  },
+  "6626005": {
+   "field": "result",
+   "corr_kind": "incomplete",
+   "feed_said": "no counted result; held as empty (Sam Houston 2, New Mexico St. 2)",
+   "correct": {
+    "winner_team_id": "46605",
+    "home_sets": 2,
+    "away_sets": 3
+   },
+   "established": "New Mexico St. def. Sam Houston 3-2. New Mexico St. publishes \"New Mexico St. W 3-2 vs Sam Houston\". The official NCAA table agrees. The feed's set line is complete and names the same result, so it is kept.",
+   "evidence": [
+    {
+     "url": "https://nmstatesports.com/services/schedule_txt.ashx?schedule=3391",
+     "kind": "school_schedule",
+     "school": "New Mexico St.",
+     "retrieved": "2026-11-22",
+     "text": "New Mexico St. W 3-2 vs Sam Houston",
+     "establishes": "New Mexico St. W 3-2 vs Sam Houston"
+    },
+    {
+     "url": "https://ncaa-api.henrygd.me/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi",
+     "kind": "ncaa_official_rpi_table",
+     "retrieved": "2026-11-17",
+     "text": "Through Games Nov. 15 2026: New Mexico St. 16-13, Sam Houston 17-12",
+     "establishes": "The NCAA's official Division I records include one more win for New Mexico St. and one more loss for Sam Houston than the hub counted without this match."
+    }
+   ],
+   "note": "Filed 2026-11-22 after reconciling the hub against the official NCAA RPI table through Nov. 15."
+  },
+  "6624904": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "no counted result; held as self_contradictory (Jacksonville St. 0, FIU 2)",
+   "correct": {
+    "winner_team_id": "46546",
+    "home_sets": 0,
+    "away_sets": 3
+   },
+   "established": "FIU def. Jacksonville St. 3-0. Jacksonville St. publishes \"Jacksonville St. L 0-3 vs Florida International\". The official NCAA table agrees. The feed's set line is complete and names the same result, so it is kept.",
+   "evidence": [
+    {
+     "url": "https://jaxstatesports.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Jacksonville St.",
+     "retrieved": "2026-11-22",
+     "text": "Jacksonville St. L 0-3 vs Florida International",
+     "establishes": "Jacksonville St. L 0-3 vs Florida International"
+    },
+    {
+     "url": "https://ncaa-api.henrygd.me/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi",
+     "kind": "ncaa_official_rpi_table",
+     "retrieved": "2026-11-17",
+     "text": "Through Games Nov. 15 2026: FIU 16-13, Jacksonville St. 3-25",
+     "establishes": "The NCAA's official Division I records include one more win for FIU and one more loss for Jacksonville St. than the hub counted without this match."
+    }
+   ],
+   "note": "Filed 2026-11-22 after reconciling the hub against the official NCAA RPI table through Nov. 15."
+  },
+  "6625646": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "no counted result; held as self_contradictory (South Carolina 0, Vanderbilt 2)",
+   "correct": {
+    "winner_team_id": "1389023",
+    "home_sets": 0,
+    "away_sets": 3
+   },
+   "established": "Vanderbilt def. South Carolina 3-0. Vanderbilt publishes \"Vanderbilt W 3-0 vs South Carolina\". The official NCAA table agrees. The feed's set line is complete and names the same result, so it is kept.",
+   "evidence": [
+    {
+     "url": "https://vucommodores.com/website-api/schedule-events?filter%5Bschedule.sport_id%5D=5&filter%5Bpast%5D=true&per_page=25&sort=-datetime&include=opponent,scheduleEventResult",
+     "kind": "school_schedule",
+     "school": "Vanderbilt",
+     "retrieved": "2026-11-22",
+     "text": "Vanderbilt W 3-0 vs South Carolina",
+     "establishes": "Vanderbilt W 3-0 vs South Carolina"
+    },
+    {
+     "url": "https://ncaa-api.henrygd.me/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi",
+     "kind": "ncaa_official_rpi_table",
+     "retrieved": "2026-11-17",
+     "text": "Through Games Nov. 15 2026: Vanderbilt 21-3, South Carolina 9-16",
+     "establishes": "The NCAA's official Division I records include one more win for Vanderbilt and one more loss for South Carolina than the hub counted without this match."
+    }
+   ],
+   "note": "Filed 2026-11-22 after reconciling the hub against the official NCAA RPI table through Nov. 15."
+  },
+  "6627578": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "no counted result; held as self_contradictory (Alcorn 1, Prairie View 2)",
+   "correct": {
+    "winner_team_id": "46734",
+    "home_sets": 1,
+    "away_sets": 3
+   },
+   "established": "Prairie View def. Alcorn 3-1. Alcorn publishes \"Alcorn L 1-3 vs Prairie View A&M\" and Prairie View publishes \"Prairie View W 3-1 vs Alcorn State\". The official NCAA table agrees. The feed's set line is complete and names the same result, so it is kept.",
+   "evidence": [
+    {
+     "url": "https://alcornsports.com/services/schedule_txt.ashx?schedule=320",
+     "kind": "school_schedule",
+     "school": "Alcorn",
+     "retrieved": "2026-11-22",
+     "text": "Alcorn L 1-3 vs Prairie View A&M",
+     "establishes": "Alcorn L 1-3 vs Prairie View A&M"
+    },
+    {
+     "url": "https://pvpanthers.com/services/schedule_txt.ashx?schedule=334",
+     "kind": "school_schedule",
+     "school": "Prairie View",
+     "retrieved": "2026-11-22",
+     "text": "Prairie View W 3-1 vs Alcorn State",
+     "establishes": "Prairie View W 3-1 vs Alcorn State"
+    },
+    {
+     "url": "https://ncaa-api.henrygd.me/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi",
+     "kind": "ncaa_official_rpi_table",
+     "retrieved": "2026-11-17",
+     "text": "Through Games Nov. 15 2026: Prairie View 13-16, Alcorn 5-20",
+     "establishes": "The NCAA's official Division I records include one more win for Prairie View and one more loss for Alcorn than the hub counted without this match."
+    }
+   ],
+   "note": "Filed 2026-11-22 after reconciling the hub against the official NCAA RPI table through Nov. 15."
+  },
+  "6627742": {
+   "field": "result",
+   "corr_kind": "incomplete",
+   "feed_said": "no counted result; held as empty (Grambling None, Ark.-Pine Bluff None)",
+   "correct": {
+    "winner_team_id": "46051",
+    "home_sets": 3,
+    "away_sets": 0,
+    "linescores": [],
+    "linescores_replace": true
+   },
+   "established": "Grambling def. Ark.-Pine Bluff 3-0. Grambling publishes \"Grambling W 3-0 vs University of Arkansas - Pine Bluff\". The official NCAA table agrees. The feed's set line does not reproduce this result, so the tape is withheld.",
+   "evidence": [
+    {
+     "url": "https://gsutigers.com/services/schedule_txt.ashx?schedule=263",
+     "kind": "school_schedule",
+     "school": "Grambling",
+     "retrieved": "2026-11-22",
+     "text": "Grambling W 3-0 vs University of Arkansas - Pine Bluff",
+     "establishes": "Grambling W 3-0 vs University of Arkansas - Pine Bluff"
+    },
+    {
+     "url": "https://ncaa-api.henrygd.me/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi",
+     "kind": "ncaa_official_rpi_table",
+     "retrieved": "2026-11-17",
+     "text": "Through Games Nov. 15 2026: Grambling 12-15, Ark.-Pine Bluff 3-24",
+     "establishes": "The NCAA's official Division I records include one more win for Grambling and one more loss for Ark.-Pine Bluff than the hub counted without this match."
+    }
+   ],
+   "note": "Filed 2026-11-22 after reconciling the hub against the official NCAA RPI table through Nov. 15."
+  },
+  "6626117": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "no counted result; held as self_contradictory (Jacksonville St. 0, Kennesaw St. 2)",
+   "correct": {
+    "winner_team_id": "45832",
+    "home_sets": 0,
+    "away_sets": 3
+   },
+   "established": "Kennesaw St. def. Jacksonville St. 3-0. Jacksonville St. publishes \"Jacksonville St. L 0-3 vs Kennesaw State\" and Kennesaw St. publishes \"Kennesaw St. W 3-0 vs Jacksonville State\". The official NCAA table agrees. The feed's set line is complete and names the same result, so it is kept.",
+   "evidence": [
+    {
+     "url": "https://jaxstatesports.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Jacksonville St.",
+     "retrieved": "2026-11-22",
+     "text": "Jacksonville St. L 0-3 vs Kennesaw State",
+     "establishes": "Jacksonville St. L 0-3 vs Kennesaw State"
+    },
+    {
+     "url": "https://ksuowls.com/services/schedule_txt.ashx?schedule=432",
+     "kind": "school_schedule",
+     "school": "Kennesaw St.",
+     "retrieved": "2026-11-22",
+     "text": "Kennesaw St. W 3-0 vs Jacksonville State",
+     "establishes": "Kennesaw St. W 3-0 vs Jacksonville State"
+    },
+    {
+     "url": "https://ncaa-api.henrygd.me/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi",
+     "kind": "ncaa_official_rpi_table",
+     "retrieved": "2026-11-17",
+     "text": "Through Games Nov. 15 2026: Kennesaw St. 13-15, Jacksonville St. 3-25",
+     "establishes": "The NCAA's official Division I records include one more win for Kennesaw St. and one more loss for Jacksonville St. than the hub counted without this match."
+    }
+   ],
+   "note": "Filed 2026-11-22 after reconciling the hub against the official NCAA RPI table through Nov. 15."
+  },
+  "6627541": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "no counted result; held as self_contradictory (Texas Tech 0, Arizona St. 2)",
+   "correct": {
+    "winner_team_id": "45941",
+    "home_sets": 0,
+    "away_sets": 3
+   },
+   "established": "Arizona St. def. Texas Tech 3-0. Texas Tech publishes \"Texas Tech L 0-3 vs Arizona State\" and Arizona St. publishes \"Arizona St. W 3-0 vs Texas Tech\". The official NCAA table agrees. The feed's set line is complete and names the same result, so it is kept.",
+   "evidence": [
+    {
+     "url": "https://texastech.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Texas Tech",
+     "retrieved": "2026-11-22",
+     "text": "Texas Tech L 0-3 vs Arizona State",
+     "establishes": "Texas Tech L 0-3 vs Arizona State"
+    },
+    {
+     "url": "https://thesundevils.com/website-api/schedule-events?filter%5Bschedule.sport_id%5D=19&filter%5Bpast%5D=true&per_page=25&sort=-datetime&include=opponent,scheduleEventResult",
+     "kind": "school_schedule",
+     "school": "Arizona St.",
+     "retrieved": "2026-11-22",
+     "text": "Arizona St. W 3-0 vs Texas Tech",
+     "establishes": "Arizona St. W 3-0 vs Texas Tech"
+    },
+    {
+     "url": "https://ncaa-api.henrygd.me/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi",
+     "kind": "ncaa_official_rpi_table",
+     "retrieved": "2026-11-17",
+     "text": "Through Games Nov. 15 2026: Arizona St. 21-4, Texas Tech 8-18",
+     "establishes": "The NCAA's official Division I records include one more win for Arizona St. and one more loss for Texas Tech than the hub counted without this match."
+    }
+   ],
+   "note": "Filed 2026-11-22 after reconciling the hub against the official NCAA RPI table through Nov. 15."
+  },
+  "6639379": {
+   "field": "result",
+   "corr_kind": "incomplete",
+   "feed_said": "no counted result; held as empty (Rutgers None, Southern California None)",
+   "correct": {
+    "winner_team_id": "46121",
+    "home_sets": 0,
+    "away_sets": 3,
+    "linescores": [],
+    "linescores_replace": true
+   },
+   "established": "Southern California def. Rutgers 3-0. Rutgers publishes \"Rutgers L 0-3 vs USC\" and Southern California publishes \"Southern California W 3-0 vs Rutgers\". The official NCAA table agrees. The feed's set line does not reproduce this result, so the tape is withheld.",
+   "evidence": [
+    {
+     "url": "https://scarletknights.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Rutgers",
+     "retrieved": "2026-11-22",
+     "text": "Rutgers L 0-3 vs USC",
+     "establishes": "Rutgers L 0-3 vs USC"
+    },
+    {
+     "url": "https://www.usctrojans.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Southern California",
+     "retrieved": "2026-11-22",
+     "text": "Southern California W 3-0 vs Rutgers",
+     "establishes": "Southern California W 3-0 vs Rutgers"
+    },
+    {
+     "url": "https://ncaa-api.henrygd.me/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi",
+     "kind": "ncaa_official_rpi_table",
+     "retrieved": "2026-11-17",
+     "text": "Through Games Nov. 15 2026: Southern California 11-15, Rutgers 13-15",
+     "establishes": "The NCAA's official Division I records include one more win for Southern California and one more loss for Rutgers than the hub counted without this match."
+    }
+   ],
+   "note": "Filed 2026-11-22 after reconciling the hub against the official NCAA RPI table through Nov. 15."
+  },
+  "6627508": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "no counted result; held as self_contradictory (CSU Bakersfield 2, California Baptist 0)",
+   "correct": {
+    "winner_team_id": "46035",
+    "home_sets": 3,
+    "away_sets": 0
+   },
+   "established": "CSU Bakersfield def. California Baptist 3-0. CSU Bakersfield publishes \"CSU Bakersfield W 3-0 vs California Baptist\" and California Baptist publishes \"California Baptist L 0-3 vs CSU Bakersfield\". The official NCAA table agrees. The feed's set line is complete and names the same result, so it is kept.",
+   "evidence": [
+    {
+     "url": "https://gorunners.com/services/schedule_txt.ashx?schedule=349",
+     "kind": "school_schedule",
+     "school": "CSU Bakersfield",
+     "retrieved": "2026-11-22",
+     "text": "CSU Bakersfield W 3-0 vs California Baptist",
+     "establishes": "CSU Bakersfield W 3-0 vs California Baptist"
+    },
+    {
+     "url": "https://cbulancers.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "California Baptist",
+     "retrieved": "2026-11-22",
+     "text": "California Baptist L 0-3 vs CSU Bakersfield",
+     "establishes": "California Baptist L 0-3 vs CSU Bakersfield"
+    },
+    {
+     "url": "https://ncaa-api.henrygd.me/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi",
+     "kind": "ncaa_official_rpi_table",
+     "retrieved": "2026-11-17",
+     "text": "Through Games Nov. 15 2026: CSU Bakersfield 13-15, California Baptist 7-20",
+     "establishes": "The NCAA's official Division I records include one more win for CSU Bakersfield and one more loss for California Baptist than the hub counted without this match."
+    }
+   ],
+   "note": "Filed 2026-11-22 after reconciling the hub against the official NCAA RPI table through Nov. 15."
+  },
+  "6624589": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "no counted result; held as self_contradictory (Portland 1, Saint Mary's (CA) 2)",
+   "correct": {
+    "winner_team_id": "46490",
+    "home_sets": 1,
+    "away_sets": 3
+   },
+   "established": "Saint Mary's (CA) def. Portland 3-1. Portland publishes \"Portland L 1-3 vs Saint Mary's\" and Saint Mary's (CA) publishes \"Saint Mary's (CA) W 3-1 vs Portland\". The official NCAA table agrees. The feed's set line is complete and names the same result, so it is kept.",
+   "evidence": [
+    {
+     "url": "https://portlandpilots.com/services/schedule_txt.ashx?schedule=1469",
+     "kind": "school_schedule",
+     "school": "Portland",
+     "retrieved": "2026-11-22",
+     "text": "Portland L 1-3 vs Saint Mary's",
+     "establishes": "Portland L 1-3 vs Saint Mary's"
+    },
+    {
+     "url": "https://smcgaels.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Saint Mary's (CA)",
+     "retrieved": "2026-11-22",
+     "text": "Saint Mary's (CA) W 3-1 vs Portland",
+     "establishes": "Saint Mary's (CA) W 3-1 vs Portland"
+    },
+    {
+     "url": "https://ncaa-api.henrygd.me/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi",
+     "kind": "ncaa_official_rpi_table",
+     "retrieved": "2026-11-17",
+     "text": "Through Games Nov. 15 2026: Saint Mary's (CA) 16-11, Portland 11-12",
+     "establishes": "The NCAA's official Division I records include one more win for Saint Mary's (CA) and one more loss for Portland than the hub counted without this match."
+    }
+   ],
+   "note": "Filed 2026-11-22 after reconciling the hub against the official NCAA RPI table through Nov. 15."
+  },
+  "6627410": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "no counted result; held as self_contradictory (Tulane 2, South Fla. 0)",
+   "correct": {
+    "winner_team_id": "46255",
+    "home_sets": 3,
+    "away_sets": 0
+   },
+   "established": "Tulane def. South Fla. 3-0. Tulane publishes \"Tulane W 3-0 vs South Florida\" and South Fla. publishes \"South Fla. L 0-3 vs Tulane\". The official NCAA table agrees. The feed's set line is complete and names the same result, so it is kept.",
+   "evidence": [
+    {
+     "url": "https://tulanegreenwave.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Tulane",
+     "retrieved": "2026-11-22",
+     "text": "Tulane W 3-0 vs South Florida",
+     "establishes": "Tulane W 3-0 vs South Florida"
+    },
+    {
+     "url": "https://gousfbulls.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "South Fla.",
+     "retrieved": "2026-11-22",
+     "text": "South Fla. L 0-3 vs Tulane",
+     "establishes": "South Fla. L 0-3 vs Tulane"
+    },
+    {
+     "url": "https://ncaa-api.henrygd.me/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi",
+     "kind": "ncaa_official_rpi_table",
+     "retrieved": "2026-11-17",
+     "text": "Through Games Nov. 15 2026: Tulane 20-6, South Fla. 9-17",
+     "establishes": "The NCAA's official Division I records include one more win for Tulane and one more loss for South Fla. than the hub counted without this match."
+    }
+   ],
+   "note": "Filed 2026-11-22 after reconciling the hub against the official NCAA RPI table through Nov. 15."
+  },
+  "6625031": {
+   "field": "result",
+   "corr_kind": "incomplete",
+   "feed_said": "no counted result; held as empty (VCU 2, Dayton 2)",
+   "correct": {
+    "winner_team_id": "46047",
+    "home_sets": 2,
+    "away_sets": 3
+   },
+   "established": "Dayton def. VCU 3-2. VCU publishes \"VCU L 2-3 vs Dayton\" and Dayton publishes \"Dayton W 3-2 vs VCU\". The official NCAA table agrees. The feed's set line is complete and names the same result, so it is kept.",
+   "evidence": [
+    {
+     "url": "https://vcuathletics.com/services/schedule_txt.ashx?schedule=314",
+     "kind": "school_schedule",
+     "school": "VCU",
+     "retrieved": "2026-11-22",
+     "text": "VCU L 2-3 vs Dayton",
+     "establishes": "VCU L 2-3 vs Dayton"
+    },
+    {
+     "url": "https://daytonflyers.com/services/schedule_txt.ashx?schedule=3377",
+     "kind": "school_schedule",
+     "school": "Dayton",
+     "retrieved": "2026-11-22",
+     "text": "Dayton W 3-2 vs VCU",
+     "establishes": "Dayton W 3-2 vs VCU"
+    },
+    {
+     "url": "https://ncaa-api.henrygd.me/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi",
+     "kind": "ncaa_official_rpi_table",
+     "retrieved": "2026-11-17",
+     "text": "Through Games Nov. 15 2026: Dayton 23-8, VCU 11-15",
+     "establishes": "The NCAA's official Division I records include one more win for Dayton and one more loss for VCU than the hub counted without this match."
+    }
+   ],
+   "note": "Filed 2026-11-22 after reconciling the hub against the official NCAA RPI table through Nov. 15."
+  },
+  "6627711": {
+   "field": "result",
+   "corr_kind": "incomplete",
+   "feed_said": "no counted result; held as empty (South Dakota St. 2, North Dakota St. 2)",
+   "correct": {
+    "winner_team_id": "46001",
+    "home_sets": 3,
+    "away_sets": 2
+   },
+   "established": "South Dakota St. def. North Dakota St. 3-2. South Dakota St. publishes \"South Dakota St. W 3-2 vs North Dakota State\" and North Dakota St. publishes \"North Dakota St. L 2-3 vs South Dakota State\". The official NCAA table agrees. The feed's set line is complete and names the same result, so it is kept.",
+   "evidence": [
+    {
+     "url": "https://gojacks.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "South Dakota St.",
+     "retrieved": "2026-11-22",
+     "text": "South Dakota St. W 3-2 vs North Dakota State",
+     "establishes": "South Dakota St. W 3-2 vs North Dakota State"
+    },
+    {
+     "url": "https://gobison.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "North Dakota St.",
+     "retrieved": "2026-11-22",
+     "text": "North Dakota St. L 2-3 vs South Dakota State",
+     "establishes": "North Dakota St. L 2-3 vs South Dakota State"
+    },
+    {
+     "url": "https://ncaa-api.henrygd.me/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi",
+     "kind": "ncaa_official_rpi_table",
+     "retrieved": "2026-11-17",
+     "text": "Through Games Nov. 15 2026: South Dakota St. 15-10, North Dakota St. 15-9",
+     "establishes": "The NCAA's official Division I records include one more win for South Dakota St. and one more loss for North Dakota St. than the hub counted without this match."
+    }
+   ],
+   "note": "Filed 2026-11-22 after reconciling the hub against the official NCAA RPI table through Nov. 15."
+  },
+  "6628623": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "no counted result; held as self_contradictory (Old Dominion 1, ULM 2)",
+   "correct": {
+    "winner_team_id": "46106",
+    "home_sets": 1,
+    "away_sets": 3
+   },
+   "established": "ULM def. Old Dominion 3-1. Old Dominion publishes \"Old Dominion L 1-3 vs ULM\" and ULM publishes \"ULM W 3-1 vs Old Dominion\". The official NCAA table agrees. The feed's set line is complete and names the same result, so it is kept.",
+   "evidence": [
+    {
+     "url": "https://odusports.com/sports/volleyball/schedule",
+     "kind": "school_schedule",
+     "school": "Old Dominion",
+     "retrieved": "2026-11-22",
+     "text": "Old Dominion L 1-3 vs ULM",
+     "establishes": "Old Dominion L 1-3 vs ULM"
+    },
+    {
+     "url": "https://ulmwarhawks.com/services/schedule_txt.ashx?schedule=2333",
+     "kind": "school_schedule",
+     "school": "ULM",
+     "retrieved": "2026-11-22",
+     "text": "ULM W 3-1 vs Old Dominion",
+     "establishes": "ULM W 3-1 vs Old Dominion"
+    },
+    {
+     "url": "https://ncaa-api.henrygd.me/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi",
+     "kind": "ncaa_official_rpi_table",
+     "retrieved": "2026-11-17",
+     "text": "Through Games Nov. 15 2026: ULM 10-20, Old Dominion 7-20",
+     "establishes": "The NCAA's official Division I records include one more win for ULM and one more loss for Old Dominion than the hub counted without this match."
+    }
+   ],
+   "note": "Filed 2026-11-22 after reconciling the hub against the official NCAA RPI table through Nov. 15."
+  },
+  "6624806": {
+   "field": "result",
+   "corr_kind": "incomplete",
+   "feed_said": "no counted result; held as empty (Louisiana None, Coastal Carolina None)",
+   "correct": {
+    "winner_team_id": "46003",
+    "home_sets": 3,
+    "away_sets": 1,
+    "linescores": [],
+    "linescores_replace": true
+   },
+   "established": "Louisiana def. Coastal Carolina 3-1. Louisiana publishes \"Louisiana W 3-1 vs Coastal Carolina\" and Coastal Carolina publishes \"Coastal Carolina L 1-3 vs Louisiana\". The official NCAA table agrees. The feed's set line does not reproduce this result, so the tape is withheld.",
+   "evidence": [
+    {
+     "url": "https://ragincajuns.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Louisiana",
+     "retrieved": "2026-11-22",
+     "text": "Louisiana W 3-1 vs Coastal Carolina",
+     "establishes": "Louisiana W 3-1 vs Coastal Carolina"
+    },
+    {
+     "url": "https://goccusports.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Coastal Carolina",
+     "retrieved": "2026-11-22",
+     "text": "Coastal Carolina L 1-3 vs Louisiana",
+     "establishes": "Coastal Carolina L 1-3 vs Louisiana"
+    },
+    {
+     "url": "https://ncaa-api.henrygd.me/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi",
+     "kind": "ncaa_official_rpi_table",
+     "retrieved": "2026-11-17",
+     "text": "Through Games Nov. 15 2026: Louisiana 16-13, Coastal Carolina 12-14",
+     "establishes": "The NCAA's official Division I records include one more win for Louisiana and one more loss for Coastal Carolina than the hub counted without this match."
+    }
+   ],
+   "note": "Filed 2026-11-22 after reconciling the hub against the official NCAA RPI table through Nov. 15."
+  },
+  "6639418": {
+   "field": "result",
+   "corr_kind": "incomplete",
+   "feed_said": "no counted result; held as empty (Robert Morris None, Green Bay None)",
+   "correct": {
+    "winner_team_id": "46327",
+    "home_sets": 0,
+    "away_sets": 3,
+    "linescores": [],
+    "linescores_replace": true
+   },
+   "established": "Green Bay def. Robert Morris 3-0. Robert Morris publishes \"Robert Morris L 0-3 vs Green Bay\" and Green Bay publishes \"Green Bay W 3-0 vs Robert Morris\". The official NCAA table agrees. The feed's set line does not reproduce this result, so the tape is withheld.",
+   "evidence": [
+    {
+     "url": "https://rmucolonials.com/services/schedule_txt.ashx?schedule=503",
+     "kind": "school_schedule",
+     "school": "Robert Morris",
+     "retrieved": "2026-11-22",
+     "text": "Robert Morris L 0-3 vs Green Bay",
+     "establishes": "Robert Morris L 0-3 vs Green Bay"
+    },
+    {
+     "url": "https://greenbayphoenix.com/services/schedule_txt.ashx?schedule=448",
+     "kind": "school_schedule",
+     "school": "Green Bay",
+     "retrieved": "2026-11-22",
+     "text": "Green Bay W 3-0 vs Robert Morris",
+     "establishes": "Green Bay W 3-0 vs Robert Morris"
+    },
+    {
+     "url": "https://ncaa-api.henrygd.me/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi",
+     "kind": "ncaa_official_rpi_table",
+     "retrieved": "2026-11-17",
+     "text": "Through Games Nov. 15 2026: Green Bay 17-10, Robert Morris 7-20",
+     "establishes": "The NCAA's official Division I records include one more win for Green Bay and one more loss for Robert Morris than the hub counted without this match."
+    }
+   ],
+   "note": "Filed 2026-11-22 after reconciling the hub against the official NCAA RPI table through Nov. 15."
+  },
+  "6626901": {
+   "field": "result",
+   "corr_kind": "incomplete",
+   "feed_said": "no counted result; held as empty (BYU None, Texas Tech None)",
+   "correct": {
+    "winner_team_id": "46575",
+    "home_sets": 3,
+    "away_sets": 0,
+    "linescores": [],
+    "linescores_replace": true
+   },
+   "established": "BYU def. Texas Tech 3-0. BYU publishes \"BYU W 3-0 vs Texas Tech\" and Texas Tech publishes \"Texas Tech L 0-3 vs BYU\". The official NCAA table agrees. The feed's set line does not reproduce this result, so the tape is withheld.",
+   "evidence": [
+    {
+     "url": "https://BYUcougars.com/sports/womens-volleyball/schedule",
+     "kind": "school_schedule",
+     "school": "BYU",
+     "retrieved": "2026-11-22",
+     "text": "BYU W 3-0 vs Texas Tech",
+     "establishes": "BYU W 3-0 vs Texas Tech"
+    },
+    {
+     "url": "https://texastech.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Texas Tech",
+     "retrieved": "2026-11-22",
+     "text": "Texas Tech L 0-3 vs BYU",
+     "establishes": "Texas Tech L 0-3 vs BYU"
+    },
+    {
+     "url": "https://ncaa-api.henrygd.me/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi",
+     "kind": "ncaa_official_rpi_table",
+     "retrieved": "2026-11-17",
+     "text": "Through Games Nov. 15 2026: BYU 21-2, Texas Tech 8-18",
+     "establishes": "The NCAA's official Division I records include one more win for BYU and one more loss for Texas Tech than the hub counted without this match."
+    }
+   ],
+   "note": "Filed 2026-11-22 after reconciling the hub against the official NCAA RPI table through Nov. 15."
+  },
+  "6627800": {
+   "field": "result",
+   "corr_kind": "incomplete",
+   "feed_said": "no counted result; held as empty (Idaho None, Montana St. None)",
+   "correct": {
+    "winner_team_id": "46340",
+    "home_sets": 0,
+    "away_sets": 3,
+    "linescores": [],
+    "linescores_replace": true
+   },
+   "established": "Montana St. def. Idaho 3-0. Idaho publishes \"Idaho L 0-3 vs Montana State\" and Montana St. publishes \"Montana St. W 3-0 vs Idaho\". The official NCAA table agrees. The feed's set line does not reproduce this result, so the tape is withheld.",
+   "evidence": [
+    {
+     "url": "https://govandals.com/services/schedule_txt.ashx?schedule=2489",
+     "kind": "school_schedule",
+     "school": "Idaho",
+     "retrieved": "2026-11-22",
+     "text": "Idaho L 0-3 vs Montana State",
+     "establishes": "Idaho L 0-3 vs Montana State"
+    },
+    {
+     "url": "https://msubobcats.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Montana St.",
+     "retrieved": "2026-11-22",
+     "text": "Montana St. W 3-0 vs Idaho",
+     "establishes": "Montana St. W 3-0 vs Idaho"
+    },
+    {
+     "url": "https://ncaa-api.henrygd.me/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi",
+     "kind": "ncaa_official_rpi_table",
+     "retrieved": "2026-11-17",
+     "text": "Through Games Nov. 15 2026: Montana St. 17-10, Idaho 12-16",
+     "establishes": "The NCAA's official Division I records include one more win for Montana St. and one more loss for Idaho than the hub counted without this match."
+    }
+   ],
+   "note": "Filed 2026-11-22 after reconciling the hub against the official NCAA RPI table through Nov. 15."
+  },
+  "6627217": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "counted with a tied set tally (Davidson 3, Fordham 3)",
+   "correct": {
+    "winner_team_id": "46174",
+    "home_sets": 3,
+    "away_sets": 0,
+    "linescores": [],
+    "linescores_replace": true
+   },
+   "established": "Davidson def. Fordham 3-0. Davidson publishes \"Davidson W 3-0 vs Fordham University\" and Fordham publishes \"Fordham L 0-3 vs Davidson\". The official NCAA table agrees. The feed's set line does not reproduce this result, so the tape is withheld.",
+   "evidence": [
+    {
+     "url": "https://davidsonwildcats.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Davidson",
+     "retrieved": "2026-11-22",
+     "text": "Davidson W 3-0 vs Fordham University",
+     "establishes": "Davidson W 3-0 vs Fordham University"
+    },
+    {
+     "url": "https://fordhamsports.com/services/schedule_txt.ashx?schedule=1735",
+     "kind": "school_schedule",
+     "school": "Fordham",
+     "retrieved": "2026-11-22",
+     "text": "Fordham L 0-3 vs Davidson",
+     "establishes": "Fordham L 0-3 vs Davidson"
+    },
+    {
+     "url": "https://ncaa-api.henrygd.me/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi",
+     "kind": "ncaa_official_rpi_table",
+     "retrieved": "2026-11-17",
+     "text": "Through Games Nov. 15 2026: Davidson 15-14, Fordham 11-20",
+     "establishes": "The NCAA's official Division I records include one more win for Davidson and one more loss for Fordham than the hub counted without this match."
+    }
+   ],
+   "note": "Filed 2026-11-22 after reconciling the hub against the official NCAA RPI table through Nov. 15."
+  },
+  "6625649": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "no counted result; held as self_contradictory (South Carolina 0, Kentucky 2)",
+   "correct": {
+    "winner_team_id": "45920",
+    "home_sets": 0,
+    "away_sets": 3,
+    "linescores": [],
+    "linescores_replace": true
+   },
+   "established": "Kentucky def. South Carolina 3-0. Kentucky publishes \"Kentucky W 3-0 vs South Carolina\". The official NCAA table agrees. The feed's set line does not reproduce this result, so the tape is withheld.",
+   "evidence": [
+    {
+     "url": "https://ukathletics.com/sports/wvball/schedule/",
+     "kind": "school_schedule",
+     "school": "Kentucky",
+     "retrieved": "2026-11-14",
+     "text": "Kentucky W 3-0 vs South Carolina",
+     "establishes": "Kentucky W 3-0 vs South Carolina"
+    },
+    {
+     "url": "https://ncaa-api.henrygd.me/rankings/volleyball-women/d1/ncaa-womens-volleyball-rpi",
+     "kind": "ncaa_official_rpi_table",
+     "retrieved": "2026-11-17",
+     "text": "Through Games Nov. 15 2026: Kentucky 20-5, South Carolina 9-16",
+     "establishes": "The NCAA's official Division I records include this Kentucky win and South Carolina loss."
+    }
+   ],
+   "note": "Filed 2026-11-22 after reconciling the hub against the official NCAA RPI table through Nov. 15."
+  }
+ },
+ "withdrawn": {
+  "6625566": {
+   "field": "result",
+   "corr_kind": "contradicted",
+   "feed_said": "['Georgia St.'] credited as winner",
+   "correct": {
+    "winner_team_id": "45868",
+    "away_sets": 1,
+    "home_sets": 3,
+    "linescores": [],
+    "linescores_replace": true
+   },
+   "established": "Southern Miss. def. Georgia St. 3-1. Georgia St. publishes \"Georgia St. L 1-3 vs Southern Miss\" and Southern Miss. publishes \"Southern Miss. W 3-1 vs Georgia State\". The feed's set line does not reproduce this result, so the tape is withheld.",
+   "evidence": [
+    {
+     "url": "https://georgiastatesports.com/services/schedule_txt.ashx?schedule=360",
+     "kind": "school_schedule",
+     "school": "Georgia St.",
+     "retrieved": "2026-10-10",
+     "text": "Georgia St. L 1-3 vs Southern Miss",
+     "establishes": "Georgia St. L 1-3 vs Southern Miss"
+    },
+    {
+     "url": "https://southernmiss.com/sports/womens-volleyball/schedule/text",
+     "kind": "school_schedule",
+     "school": "Southern Miss.",
+     "retrieved": "2026-10-10",
+     "text": "Southern Miss. W 3-1 vs Georgia State",
+     "establishes": "Southern Miss. W 3-1 vs Georgia State"
+    }
+   ],
+   "note": "Filed 2026-11-01 from the result review queue (verifier verdict CONTRADICTED_BOTH): both schools publish the same result; held matches had sat uncounted with no one filing them.",
+   "withdrawn": "2026-11-22",
+   "withdrawn_why": "Wrong match of a two-match series. Both schools list Oct 8: Georgia St. W 3-1 and Oct 9: Southern Miss. W 3-1. The feed dates these matches a day late, so the Oct 9 school row was matched to the feed's first match, whose own set line (25-20, 20-25, 25-20, 25-20 Georgia St.) was right. The official NCAA records also show the series split."
   }
  }
 }

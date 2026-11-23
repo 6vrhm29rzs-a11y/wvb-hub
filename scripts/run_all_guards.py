@@ -29,6 +29,14 @@ SCRIPTS = os.path.join(REPO, "scripts")
 # to this map is a decision somebody has to defend, which is the point.
 SKIP = {}
 
+# These suites drive Cody's private page or write into his gitignored Cody/ folder,
+# so they cannot run in CI or a fresh checkout. They stand down, printed, ONLY when
+# the private data is genuinely absent; on his machine they always run.
+PRIVATE_MARKER = os.path.join(REPO, "Cody", "data", "power_ledger", "latest.json")
+PRIVATE_ONLY = ("test_bracket_render.py", "test_committee_field.py", "test_conf_tournaments.py",
+                "test_mobile_tapthrough.py", "test_rpi_cutline.py", "test_selection_workspace.py",
+                "test_shell_118.py")
+
 # ⚠ ONE CALLER HAS TO BE ABLE TO BREAK A CYCLE. test_pipeline_fresh_checkout
 # re-runs the daily workflow's own commands inside a throwaway checkout, and
 # this runner is now one of those commands -- so it would run the fresh-checkout
@@ -70,6 +78,10 @@ def main():
         if s in _ENV_EXCLUDE:
             skipped.append((s, "excluded by WVB_GUARD_EXCLUDE (cycle break)"))
             print("SKIP  %-34s excluded by the caller (cycle break)" % s)
+            continue
+        if s in PRIVATE_ONLY and not os.path.exists(PRIVATE_MARKER):
+            skipped.append((s, "needs the private Cody/ data"))
+            print("SKIP  %-34s needs the private Cody/ data (absent here)" % s)
             continue
         if s in SKIP:
             skipped.append((s, SKIP[s]))

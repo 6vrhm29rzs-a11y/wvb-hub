@@ -850,12 +850,20 @@ def build():
     aq, seen_conf = [], set()
     if _have_sim:
         # most likely champion per league; zero-odds teams cannot hold a bid
+        # a league's real tournament champion holds its bid; a team already knocked out cannot
+        import aq_status as _AQ
+        from reconcile_2025 import norm as _aqnorm
+        _aq = _AQ.load()
         _best = {}
         for t in teams:
             c = t["conf"]
             if not c or size.get(c, 0) < MIN_CONF:
                 continue
+            if _aqnorm(t["team"]) in _aq["eliminated"]:
+                continue
             pct = (_sim_by.get(t["team"]) or {}).get("conf_title_pct")
+            if _aqnorm(t["team"]) in _aq["champions"]:
+                pct = 1000.0
             if pct is None or pct <= 0:
                 continue
             if c not in _best or pct > _best[c][0]:
@@ -867,6 +875,7 @@ def build():
         for t in order:
             c = t["conf"]
             if (c and size.get(c, 0) >= MIN_CONF and c not in seen_conf
+                    and _aqnorm(t["team"]) not in _aq["eliminated"]
                     and (_sim_by.get(t["team"]) or {}).get("fixtures")):
                 seen_conf.add(c)
                 aq.append(t)

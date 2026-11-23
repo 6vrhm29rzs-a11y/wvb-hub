@@ -324,13 +324,16 @@ def main():
     try:
         ER.FIG_PATH = os.path.relpath(tmp, REPO)
         mal = ER.fig_latest()
-        check("[NEG] malformed lines are skipped; the last VALID record "
-              "is used", mal is not None
-              and mal.get("rows", [{}])[0].get("record") == "9-9")
-        d_mal = ER.discrepancies(fig=mal, hub={"SMU": "3-0"})
-        check("[NEG] an adversarial snapshot yields only DISPLAY rows -- "
-              "hub record untouched by construction",
-              d_mal["items"] and d_mal["items"][0]["hub_record"] == "3-0")
+        if ER.FIG_RETIRED:      # retired 2026-11-22: even a readable snapshot file is not surfaced
+            check("[NEG] a retired source returns nothing, even from a readable file", mal is None)
+        else:
+            check("[NEG] malformed lines are skipped; the last VALID record "
+                  "is used", mal is not None
+                  and mal.get("rows", [{}])[0].get("record") == "9-9")
+            d_mal = ER.discrepancies(fig=mal, hub={"SMU": "3-0"})
+            check("[NEG] an adversarial snapshot yields only DISPLAY rows -- "
+                  "hub record untouched by construction",
+                  d_mal["items"] and d_mal["items"][0]["hub_record"] == "3-0")
     finally:
         ER.FIG_PATH = real_fig_path
         os.unlink(tmp)
@@ -432,8 +435,11 @@ def main():
                   and "--live" not in page[page.index(".mmrow"):
                                            page.index(".mmrow") + 400])
         else:
-            check("the disclosure states 'no snapshot held' rather than "
-                  "guessing", "no snapshot held" in page)
+            if ER.FIG_RETIRED:
+                check("the retired FIGstats source appears nowhere on the page", "FIGstats" not in page)
+            else:
+                check("the disclosure states 'no snapshot held' rather than "
+                      "guessing", "no snapshot held" in page)
         check("the two Massey states are both labelled, unmistakably",
               "Massey &mdash; current browser-reviewed snapshot" in page
               and "Massey &mdash; preseason snapshot" in page)

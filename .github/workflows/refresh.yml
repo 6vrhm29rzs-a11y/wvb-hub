@@ -183,6 +183,8 @@ jobs:
           # digby_top25 since 2026-09-23/24, so it must be rebuilt before them.
           python3 scripts/conference_repair.py || echo "conference repair skipped"
           python3 scripts/digby_top25.py || echo "top 25 needs a projection; skipping"
+          python3 scripts/rpi_committee.py || echo "committee RPI skipped; continuing"
+          python3 scripts/ingest_conf_tournaments.py || echo "conference tournaments skipped; continuing"
           python3 scripts/predict_2026.py || echo "prediction needs a prior rating; skipping"
           python3 scripts/simulate_season_2026.py || echo "season sim skipped"
           python3 scripts/score_predictions.py || true

@@ -159,9 +159,15 @@ def main():
         check("[+] ...and the stripper did not eat the whole page",
               len(rendered) > len(p) * 0.9,
               "stripped %d of %d chars" % (len(p) - len(rendered), len(p)))
+        # mail 108 removed the ~4,000 HIDDEN result cards (DOM plumbing) that
+        # carried most server-rendered badges; the visible rows render badges
+        # client-side through rankHTML. So the page's server-rendered count is
+        # now single digits, and the non-vacuity check asks only that the
+        # server path still emits SOME basis-classed badge AND that the client
+        # emitter (the path most badges now take) is present.
         n = len(re.findall(r'class="rnk rnk-[a-z]', p))
         check("[+] the page really does render badges (not vacuous)",
-              n > 50, n)
+              n > 0 and "function rankHTML" in p, n)
 
     print("\n8. NEGATIVE CONTROLS")
     real = B.RULERS["power"]

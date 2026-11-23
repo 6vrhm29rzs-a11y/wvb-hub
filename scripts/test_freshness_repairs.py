@@ -53,7 +53,9 @@ def main():
           "fetch(" not in apply_ and apply_)
     check("no second boot fetch through deskLive()",
           "if (typeof deskLive === 'function') deskLive();" not in B)
-    G = "if (!j || !Array.isArray(j.games)) return;"
+    # 074 #2: the early return now goes through liveResponseUsable(), which
+    # also refuses a non-authoritative EMPTY slate (behaviour: test_074)
+    G = "if (!liveResponseUsable(j, Object.keys(LIVE_BY_ID).length)) return;"
 
     def keeps_data(a):
         return 0 <= a.find(G) < a.find("LIVE_BY_ID = ") and "LIVE_BY_ID = {}" not in a
@@ -101,8 +103,50 @@ def main():
         r4 = SO.weekly_freeze(cand, now=mon + datetime.timedelta(days=2))
         check("a late (Wednesday) run with Sunday-bounded data still freezes it",
               r4 == "frozen", r4)
+        # ---- mail 117: the DST week, the exact boundary, Sunday night, and the old orchestration ----
+        arch = os.path.join(td, "rankings_history_candidate.jsonl")
+        if os.path.exists(arch):
+            os.remove(arch)
+        # week ending Sun 2026-11-01 -- the day DST ends (02:00 PDT -> 01:00 PST); boundary Mon 00:00 PST
+        dst_mon = datetime.datetime(2026, 11, 2, 0, 9, tzinfo=PT)
+        b = datetime.datetime(2026, 11, 2, 0, 0, tzinfo=PT).timestamp()
+        check("DST: the boundary is Monday 00:00 PST (08:00 UTC)", int(b) == 1793606400, int(b))
+        write(b - 60)                                           # a match starting Sun 23:59 PST
+        check("DST week: a Sunday 23:59 PST start freezes on the first quiet Monday cycle (00:09)",
+              SO.weekly_freeze(cand, now=dst_mon) == "frozen")
+        os.remove(arch)
+        write(b)                                                # exactly Monday 00:00 PST
+        check("[NEG] a result AT Monday 00:00 PST is after the week -> MISSED, nothing written",
+              SO.weekly_freeze(cand, now=dst_mon) == "missed" and not os.path.exists(arch))
+        write(datetime.datetime(2026, 11, 8, 18, 0, tzinfo=PT).timestamp())
+        r_sun = SO.weekly_freeze(cand, now=datetime.datetime(2026, 11, 8, 22, 0, tzinfo=PT))
+        rows_s = [json.loads(l) for l in open(arch)] if os.path.exists(arch) else []
+        check("Sunday night never freezes the week still in progress (it refers to the PREVIOUS Sunday)",
+              not any(r.get("cutoff") == "2026-11-08" for r in rows_s), (r_sun, [r.get("cutoff") for r in rows_s]))
+        if os.path.exists(arch):
+            os.remove(arch)
+
+        def old_cycle(now, new_final, cand_ep_after_refit):
+            # the pre-B3 orchestration: freeze only after a SUCCESSFUL refit, and only on a Monday
+            if not new_final:
+                return "unchanged"
+            write(cand_ep_after_refit)
+            return SO.weekly_freeze(cand, now=now) if now.weekday() == 0 else "not monday"
+        write(datetime.datetime(2026, 11, 8, 19, 0, tzinfo=PT).timestamp())
+        quiet = [old_cycle(datetime.datetime(2026, 11, 9, h, 9, tzinfo=PT), False, None) for h in range(0, 18)]
+        first_final = old_cycle(datetime.datetime(2026, 11, 9, 19, 9, tzinfo=PT), True,
+                                datetime.datetime(2026, 11, 9, 16, 0, tzinfo=PT).timestamp())
+        check("NEGATIVE CONTROL: the old orchestration misses a quiet Monday (first freeze attempt sees Monday results)",
+              set(quiet) == {"unchanged"} and first_final == "missed" and not os.path.exists(arch))
+        write(datetime.datetime(2026, 11, 8, 19, 0, tzinfo=PT).timestamp())
+        check("...while the current every-cycle freeze captures the same week at Monday 00:09",
+              SO.weekly_freeze(cand, now=datetime.datetime(2026, 11, 9, 0, 9, tzinfo=PT)) == "frozen")
     finally:
         SO.DIR = old_dir
+    lr0 = src("local_refresh.py")
+    check("the PREGATE freeze runs before the gate decides (so a no-new-final cycle still captures)",
+          lr0.find("for args in PREGATE:") < lr0.find("mode = decide(prev, cur, force)")
+          and '"--weekly-only"' in lr0[lr0.find("PREGATE = ["):lr0.find("PREGATE = [") + 400])
     so = src("season_only_candidate.py")
     check("the freeze runs BEFORE any re-fit in main()",
           so.find("weekly_freeze(out)") < so.find('[sys.executable, WORK, "freeze"'))

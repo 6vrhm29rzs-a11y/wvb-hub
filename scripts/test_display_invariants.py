@@ -2544,6 +2544,17 @@ def check_public_build_is_clean():
         # again in the half nobody was watching.
         _split = [k for k, v in _zt.items()
                   if (v.get("sched_n") or 0) > 0 and not (v.get("fixtures") or [])]
+        # a team whose schedule is finished legitimately lists nothing; only a match still to come must appear
+        import glob, time
+        _left = set()
+        for _p in glob.glob(os.path.join(REPO, "data/raw/2026/scoreboard/*.json")):
+            if os.path.basename(_p)[:-5] < time.strftime("%Y-%m-%d"):
+                continue
+            for _e in (json.load(open(_p)).get("games") or []):
+                _g = _e.get("game", _e)
+                if str(_g.get("gameState")).lower() == "pre":
+                    _left.update((_g.get(_x) or {}).get("names", {}).get("short") for _x in ("away", "home"))
+        _split = [k for k in _split if k in _left]
         if _split:
             bad("a team counts scheduled matches but lists none",
                 ", ".join(_split[:5]))

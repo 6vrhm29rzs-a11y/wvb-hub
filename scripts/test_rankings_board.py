@@ -54,9 +54,10 @@ def main():
     # Three rulers a voter works in, plus the comparison, plus the archive.
     # The Reference select stays separate and is checked below.
     check("the primary rulers are the three a voter works in, plus the tools",
-          [r for r in rulers if r not in ("v2p", "v2s")] == ["ours", "avca", "digby", "gap", "cal"]
-          # the private v2 preview (mail 058) may follow the five, on a private build only
-          and (rulers[5:] in ([], ["v2p"], ["v2p", "v2s"])), str(rulers))
+          [r for r in rulers if r not in ("v2p", "v2s", "p20")] == ["ours", "avca", "rpi", "digby", "gap", "cal"]
+          # private only: POWER 2.0 (mail 095) follows the five; the older v2 experiments now sit in the
+          # Reference menu, but a build without the POWER 2.0 snapshot may still show none
+          and (rulers[6:] in ([], ["p20"])), str(rulers))
     m = re.search(r"const RULER_WHAT = \{(.*?)\n\};", h, re.S)
     check("a purpose map exists", bool(m))
     keys = re.findall(r"^\s*([a-z0-9]+):", m.group(1), re.M) if m else []
@@ -64,7 +65,7 @@ def main():
     rsel = re.search(r'<select id="refpick"[^>]*>(.*?)</select>', h, re.S)
     ref = re.findall(r'<option value="([a-z0-9]+)">', rsel.group(1)) if rsel else []
     check("the reference select exists and is separate from the rulers",
-          bool(rsel) and len(ref) >= 2, str(ref))
+          bool(rsel) and len(ref) >= 1, str(ref))
     want = set(rulers) | set(x for x in ref if x)
     missing = sorted(want - set(keys))
     check("...and EVERY selectable ruler has a sentence in it",
@@ -465,9 +466,10 @@ def main():
         check("the field states a committee basis when the simulator exists",
               str(_meta2.get("field_basis", "")).startswith("committee"),
               _meta2.get("field_basis"))
-        _nofix = [t["team"] for t in _field2
-                  if not (_sim_by.get(t["team"]) or {}).get("fixtures")]
-        check("no team without a 2026 fixture is in the projected field",
+        # late in the season a real champion has no fixtures LEFT; the error is a team that never had a 2026 match
+        _no26 = lambda n: not (_sim_by.get(n) or {}).get("fixtures") and not (_sim_by.get(n) or {}).get("played")
+        _nofix = [t["team"] for t in _field2 if _no26(t["team"])]
+        check("no team without a 2026 match is in the projected field",
               not _nofix, str(_nofix[:4]))
         # an AQ without title odds is legal only through the stated fallback
         # -- its WHOLE league lacks odds; a zero-fixture AQ never is.
@@ -481,9 +483,16 @@ def main():
                   and _league_has_odds(t.get("conf"))]
         check("an AQ without title odds only stands when its whole league "
               "lacks them", not _badaq, str(_badaq[:4]))
-        _zaq = [t["team"] for t in _field2 if t["bid"] == "AQ"
-                and not (_sim_by.get(t["team"]) or {}).get("fixtures")]
-        check("no AQ is held by a zero-fixture team", not _zaq, str(_zaq[:4]))
+        _zaq = [t["team"] for t in _field2 if t["bid"] == "AQ" and _no26(t["team"])]
+        check("no AQ is held by a team with no 2026 match", not _zaq, str(_zaq[:4]))
+        import aq_status as _AQS
+        from reconcile_2025 import norm as _aqn
+        _st = _AQS.load()
+        _aqk = set(_aqn(t["team"]) for t in _field2 if t["bid"] == "AQ")
+        check("every real conference champion holds its automatic bid",
+              set(_st["champions"]) <= _aqk, str(sorted(set(_st["champions"]) - _aqk)[:4]))
+        check("no team knocked out of its tournament holds an automatic bid",
+              not (_aqk & _st["eliminated"]), str(sorted(_aqk & _st["eliminated"])[:4]))
         # seeds must be monotone in the committee proxy where it exists
         _ranks = [t.get("rpi_proj") for t in _field2
                   if t.get("rpi_proj") is not None]

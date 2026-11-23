@@ -9,7 +9,9 @@ def check(c, msg):
     global ok
     print(("PASS " if c else "FAIL ") + msg); ok = ok and bool(c)
 src = open(os.path.join(REPO, "scripts", "build_hub.py")).read()
-check('"" if PUBLIC or not v2so_preview_payload() else V2S_BTN' in src, "button emitted only on a private build with a frozen file")
+# 095: the candidate's ruler button moved into the Reference menu as a private-only option
+check('.replace("{{OLDEXP_OPTS}}", "" if PUBLIC else OLDEXP_OPTS)' in src and 'value="v2s"' in src,
+      "the candidate is reachable only on a private build (Reference menu option)")
 check('"" if PUBLIC or not v2so_preview_payload() else' in src.split('"{{V2S_JS}}"')[1][:80], "script emitted only on a private build")
 check('"POWER 2026 &mdash; candidate"' in src and '"const V2S ="' in src, "public gate carries the preview markers (build aborts on leak)")
 readers = [p for p in glob.glob(os.path.join(REPO, "scripts", "*.py"))
@@ -22,7 +24,8 @@ readers = [p for p in glob.glob(os.path.join(REPO, "scripts", "*.py"))
                                            "simulate_season_2026.py",      # private season simulation (Cody: "switch the simulator too"), same gating
                                            "build_power_research_report.py",  # read-only research report (2026-11-03): reads the frozen candidate, writes only under output/
                                            "test_freshness_repairs.py",    # read-only guard (071 B4): checks 'included' == the candidate's own input list
-                                           "test_073_corrections.py")]    # 073 guard: writes a preview only inside a temp dir (fake fit), never the real one
+                                           "test_073_corrections.py",     # 073 guard: writes a preview only inside a temp dir (fake fit), never the real one
+                                           "test_conf_tournaments.py")]   # mail 100 guard: READ-ONLY, uses the candidate's own fit to test the tournament match model
 pr = open(os.path.join(REPO, "scripts", "predict_2026.py")).read()
 check('"DEFAULT_ON"' in pr and 'power_candidate", "predictions_2026.json"' in pr, "predict_2026 writes candidate forecasts only to the private file, behind the flag")
 check('os.environ.get("WVB_POWER_DEFAULT") == "candidate"' in open(os.path.join(REPO, "scripts", "build_rankings_board.py")).read(),

@@ -1,162 +1,175 @@
 {
  "meta": {
   "issuance": "first-issued",
-  "scored": 3885,
-  "logged_after_tipoff_excluded": 2,
+  "scored": 4663,
+  "logged_after_tipoff_excluded": 18,
   "timing_unverifiable_excluded": 0,
-  "team_mismatch_excluded": 81,
-  "predictions_on_record": 4815,
-  "brier": 0.1873,
-  "favourite_correct": 2781,
-  "favourite_correct_pct": 71.6,
+  "team_mismatch_excluded": 85,
+  "predictions_on_record": 4879,
+  "brier": 0.1857,
+  "favourite_correct": 3362,
+  "favourite_correct_pct": 72.1,
   "by_model_version": {
-   "unversioned": 3883,
-   "470db00+uncommitted-scripts": 2
+   "unversioned": 4627,
+   "470db00+uncommitted-scripts": 2,
+   "6d4eb4e0+uncommitted-scripts": 34
   },
   "season": 2026,
   "source_tier": "DERIVED",
-  "results_available": 4016,
-  "as_of_utc": "2026-11-05T08:25:10Z",
+  "results_available": 4917,
+  "as_of_utc": "2026-11-23T19:29:55Z",
   "what_this_is": "Recorded forecast performance by issuance stream, as of as_of_utc. Timing is checked against the feed's LISTED start, not the actual first serve; rows logged before 2026-09-26 carry no model version. Not a certified held-out test of any single model version.",
   "brier_reference": "0.25 is what saying 50% to everything scores"
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 666,
+   "n": 793,
    "said": 55.0,
-   "happened": 52.9
+   "happened": 53.3
   },
   {
    "range": "60-70%",
-   "n": 648,
+   "n": 787,
    "said": 64.9,
-   "happened": 59.0
+   "happened": 60.6
   },
   {
    "range": "70-80%",
-   "n": 667,
-   "said": 75.1,
-   "happened": 65.7
+   "n": 791,
+   "said": 75.0,
+   "happened": 66.5
   },
   {
    "range": "80-90%",
-   "n": 754,
-   "said": 85.3,
-   "happened": 76.3
+   "n": 908,
+   "said": 85.2,
+   "happened": 76.0
   },
   {
    "range": "90-101%",
-   "n": 1150,
-   "said": 95.7,
-   "happened": 89.9
+   "n": 1384,
+   "said": 95.8,
+   "happened": 90.0
   }
  ],
  "streams": {
   "first_issued": {
    "meta": {
     "issuance": "first-issued",
-    "scored": 3885,
-    "logged_after_tipoff_excluded": 2,
+    "scored": 4663,
+    "logged_after_tipoff_excluded": 18,
     "timing_unverifiable_excluded": 0,
-    "team_mismatch_excluded": 81,
-    "predictions_on_record": 4815,
-    "brier": 0.1873,
-    "favourite_correct": 2781,
-    "favourite_correct_pct": 71.6,
+    "team_mismatch_excluded": 85,
+    "predictions_on_record": 4879,
+    "brier": 0.1857,
+    "favourite_correct": 3362,
+    "favourite_correct_pct": 72.1,
     "by_model_version": {
-     "unversioned": 3883,
-     "470db00+uncommitted-scripts": 2
+     "unversioned": 4627,
+     "470db00+uncommitted-scripts": 2,
+     "6d4eb4e0+uncommitted-scripts": 34
     }
    },
    "calibration": [
     {
      "range": "50-60%",
-     "n": 666,
+     "n": 793,
      "said": 55.0,
-     "happened": 52.9
+     "happened": 53.3
     },
     {
      "range": "60-70%",
-     "n": 648,
+     "n": 787,
      "said": 64.9,
-     "happened": 59.0
+     "happened": 60.6
     },
     {
      "range": "70-80%",
-     "n": 667,
-     "said": 75.1,
-     "happened": 65.7
+     "n": 791,
+     "said": 75.0,
+     "happened": 66.5
     },
     {
      "range": "80-90%",
-     "n": 754,
-     "said": 85.3,
-     "happened": 76.3
+     "n": 908,
+     "said": 85.2,
+     "happened": 76.0
     },
     {
      "range": "90-101%",
-     "n": 1150,
-     "said": 95.7,
-     "happened": 89.9
+     "n": 1384,
+     "said": 95.8,
+     "happened": 90.0
     }
    ]
   },
   "last_pre_match": {
    "meta": {
     "issuance": "last-pre-match",
-    "scored": 1754,
+    "scored": 2483,
     "logged_after_tipoff_excluded": 0,
     "timing_unverifiable_excluded": 0,
-    "team_mismatch_excluded": 11,
-    "predictions_on_record": 1765,
-    "brier": 0.1567,
-    "favourite_correct": 1340,
-    "favourite_correct_pct": 76.4,
+    "team_mismatch_excluded": 14,
+    "predictions_on_record": 2497,
+    "brier": 0.1534,
+    "favourite_correct": 1909,
+    "favourite_correct_pct": 76.9,
     "by_model_version": {
-     "5f46398+uncommitted-scripts": 323,
+     "5f46398+uncommitted-scripts": 326,
      "fb642d7": 9,
      "470db00": 233,
-     "470db00+uncommitted-scripts": 1173,
+     "470db00+uncommitted-scripts": 1176,
      "391ee24": 6,
-     "de49d9c+uncommitted-scripts": 10
+     "de49d9c+uncommitted-scripts": 44,
+     "6d4eb4e0+uncommitted-scripts": 689
     }
    },
    "calibration": [
     {
      "range": "50-60%",
-     "n": 344,
+     "n": 485,
      "said": 54.9,
-     "happened": 53.2
+     "happened": 52.6
     },
     {
      "range": "60-70%",
-     "n": 333,
-     "said": 65.1,
-     "happened": 66.7
+     "n": 469,
+     "said": 65.0,
+     "happened": 68.2
     },
     {
      "range": "70-80%",
-     "n": 308,
+     "n": 434,
      "said": 75.1,
-     "happened": 74.4
+     "happened": 73.7
     },
     {
      "range": "80-90%",
-     "n": 376,
-     "said": 85.3,
-     "happened": 89.4
+     "n": 501,
+     "said": 85.2,
+     "happened": 90.0
     },
     {
      "range": "90-101%",
-     "n": 393,
-     "said": 95.0,
-     "happened": 94.1
+     "n": 594,
+     "said": 95.2,
+     "happened": 94.8
     }
    ]
   }
  },
  "matches": [
+  {
+   "game_id": "6628175",
+   "date": "2026-11-07",
+   "home": "UTRGV",
+   "away": "Northwestern St.",
+   "p_home": 0.9997,
+   "home_won": false,
+   "brier": 0.9994000900000001,
+   "model_version": null
+  },
   {
    "game_id": "6628137",
    "date": "2026-10-10",
@@ -268,6 +281,16 @@
    "model_version": null
   },
   {
+   "game_id": "6624519",
+   "date": "2026-11-20",
+   "home": "California Baptist",
+   "away": "UC Santa Barbara",
+   "p_home": 0.0168,
+   "home_won": true,
+   "brier": 0.9666822399999999,
+   "model_version": null
+  },
+  {
    "game_id": "6626903",
    "date": "2026-10-09",
    "home": "UT Martin",
@@ -275,6 +298,16 @@
    "p_home": 0.0186,
    "home_won": true,
    "brier": 0.9631459600000001,
+   "model_version": null
+  },
+  {
+   "game_id": "6624641",
+   "date": "2026-11-05",
+   "home": "Maryland",
+   "away": "Southern California",
+   "p_home": 0.0203,
+   "home_won": true,
+   "brier": 0.95981209,
    "model_version": null
   },
   {
@@ -358,6 +391,16 @@
    "model_version": null
   },
   {
+   "game_id": "6628598",
+   "date": "2026-11-08",
+   "home": "Vanderbilt",
+   "away": "Texas",
+   "p_home": 0.0294,
+   "home_won": true,
+   "brier": 0.94206436,
+   "model_version": null
+  },
+  {
    "game_id": "6625981",
    "date": "2026-10-29",
    "home": "Southern Ind.",
@@ -395,6 +438,16 @@
    "p_home": 0.9695,
    "home_won": false,
    "brier": 0.9399302500000001,
+   "model_version": null
+  },
+  {
+   "game_id": "6628388",
+   "date": "2026-11-12",
+   "home": "Omaha",
+   "away": "Kansas City",
+   "p_home": 0.9694,
+   "home_won": false,
+   "brier": 0.93973636,
    "model_version": null
   },
   {
@@ -445,6 +498,16 @@
    "p_home": 0.9676,
    "home_won": false,
    "brier": 0.93624976,
+   "model_version": null
+  },
+  {
+   "game_id": "6627381",
+   "date": "2026-11-05",
+   "home": "UTRGV",
+   "away": "East Texas A&M",
+   "p_home": 0.9675,
+   "home_won": false,
+   "brier": 0.93605625,
    "model_version": null
   },
   {
@@ -558,6 +621,16 @@
    "model_version": null
   },
   {
+   "game_id": "6627960",
+   "date": "2026-11-14",
+   "home": "Eastern Wash.",
+   "away": "Montana",
+   "p_home": 0.0466,
+   "home_won": true,
+   "brier": 0.90897156,
+   "model_version": null
+  },
+  {
    "game_id": "6627252",
    "date": "2026-10-31",
    "home": "Purdue Fort Wayne",
@@ -585,76 +658,6 @@
    "p_home": 0.0482,
    "home_won": true,
    "brier": 0.9059232399999999,
-   "model_version": null
-  },
-  {
-   "game_id": "6627229",
-   "date": "2026-10-31",
-   "home": "Harvard",
-   "away": "Yale",
-   "p_home": 0.0484,
-   "home_won": true,
-   "brier": 0.90554256,
-   "model_version": null
-  },
-  {
-   "game_id": "6626556",
-   "date": "2026-10-23",
-   "home": "Northern Ky.",
-   "away": "Robert Morris",
-   "p_home": 0.9495,
-   "home_won": false,
-   "brier": 0.90155025,
-   "model_version": null
-  },
-  {
-   "game_id": "6627892",
-   "date": "2026-09-05",
-   "home": "Gonzaga",
-   "away": "Eastern Wash.",
-   "p_home": 0.9485,
-   "home_won": false,
-   "brier": 0.89965225,
-   "model_version": null
-  },
-  {
-   "game_id": "6639576",
-   "date": "2026-09-05",
-   "home": "UMES",
-   "away": "Hampton",
-   "p_home": 0.9482,
-   "home_won": false,
-   "brier": 0.8990832400000001,
-   "model_version": null
-  },
-  {
-   "game_id": "6628174",
-   "date": "2026-10-29",
-   "home": "Northwestern St.",
-   "away": "Houston Christian",
-   "p_home": 0.0521,
-   "home_won": true,
-   "brier": 0.89851441,
-   "model_version": null
-  },
-  {
-   "game_id": "6626445",
-   "date": "2026-10-24",
-   "home": "Valparaiso",
-   "away": "Indiana St.",
-   "p_home": 0.9456,
-   "home_won": false,
-   "brier": 0.89415936,
-   "model_version": null
-  },
-  {
-   "game_id": "6626164",
-   "date": "2026-09-25",
-   "home": "Rice",
-   "away": "East Carolina",
-   "p_home": 0.9451,
-   "home_won": false,
-   "brier": 0.8932140100000001,
    "model_version": null
   }
  ]

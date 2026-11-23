@@ -365,6 +365,21 @@ def bind_fixture(team, opp, date, idx):
     return gids[0] if len(gids) == 1 else None   # ambiguous stays pending
 
 
+def has_series_neighbor(team, opp, date, gid, idx):
+    """Another match between these teams within a day of DATE. In a two-match
+    series the feed can list both a day late (Georgia St.-Southern Miss.,
+    Oct 2026: schools Oct 8/9, feed Oct 9/10), so a date-bound row can land on
+    the sibling match. Such a row cannot prove a result conflict."""
+    from reconcile_2025 import norm
+    pair = tuple(sorted((norm(team), norm(opp))))
+    d0 = datetime.date.fromisoformat(date)
+    for delta in (-1, 0, 1):
+        day = (d0 + datetime.timedelta(days=delta)).isoformat()
+        if any(str(x) != str(gid) for x in idx.get((pair, day)) or []):
+            return True
+    return False
+
+
 # ---- the queue ---------------------------------------------------------
 
 def build_queue(cap=QUEUE_CAP):
@@ -616,6 +631,9 @@ def run(cap=QUEUE_CAP, now=None):
                     continue
                 agrees = result_agrees(g, team, c["result"])
                 if agrees is None:
+                    continue
+                if not agrees and has_series_neighbor(team, opp, c["date"], gid, idx):
+                    stats["pending_unbound"] += 1   # cannot tell which match of the series this row is
                     continue
                 if append_result_evidence(gid, team, url, c["excerpt"],
                                           agrees, stamp):

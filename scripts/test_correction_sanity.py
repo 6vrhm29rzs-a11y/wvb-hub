@@ -147,6 +147,8 @@ def main():
             continue
         if len(schools) == 1 and internal:
             continue          # the documented self-refutation precedent
+        if len(schools) == 1 and any(v.get("kind") == "ncaa_official_rpi_table" for v in ev):
+            continue          # one school plus the NCAA's own published record (2026-11-22)
         bad.append("%s cites %s%s" % (gid, sorted(schools) or "no school",
                                       " (+internal)" if internal else ""))
     check("every RESULT correction has two witnesses, at least one a school",

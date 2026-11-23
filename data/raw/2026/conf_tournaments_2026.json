@@ -1,0 +1,521 @@
+{
+ "meta": {
+  "compiled": "2026-11-06",
+  "by": "Builder (mail 100)",
+  "note": "2026 conference tournament formats from league/host releases. status: VERIFIED = field size and structure stated by a 2026 league or host source; PARTIAL = host/dates sourced, field or structure from the stated 2025 format or an explicit inference; FALLBACK = no 2026 format found -- a labelled default is used. 'structure': standard = single elimination, top seeds receive byes to fill a power-of-two bracket; explicit structures are spelled out. host: neutral | top_seed | higher_seed | school name (that school is at home if it plays).",
+  "regular_season_aq": [
+   "ACC",
+   "Big 12",
+   "WCC"
+  ],
+  "revised": "2026-11-06 mail 101"
+ },
+ "conferences": {
+  "America East": {
+   "field": 4,
+   "structure": "standard",
+   "host": "top_seed",
+   "dates": "Nov 20-22",
+   "status": "PARTIAL",
+   "why": "host = highest seed (Bryant, Binghamton releases); 4-team semifinal start is the 2025 format",
+   "sources": [
+    "https://bryantbulldogs.com/news/2026/4/29/womens-volleyball-volleyball-announces-2026-schedule.aspx",
+    "https://binghamtonbearcats.com/news/2026/6/16/volleyball-announces-2026-schedule.aspx",
+    "https://americaeast.com/news/2025/11/15/2025-aevb-bracket-release.aspx"
+   ],
+   "window": [
+    "2026-11-20",
+    "2026-11-22"
+   ],
+   "window_basis": "sourced dates"
+  },
+  "American": {
+   "field": 8,
+   "structure": "standard",
+   "host": "Rice",
+   "dates": "Nov 20-22",
+   "status": "VERIFIED",
+   "sources": [
+    "https://goutsa.com/news/2026/06/8/2026-utsa-volleyball-schedule-released",
+    "https://gotigersgo.com/news/2026/6/4/womens-volleyball-memphis-volleyball-announces-2026-schedule",
+    "https://meangreensports.com/news/2026/6/15/womens-volleyball-volleyball-releases-2026-schedule"
+   ],
+   "window": [
+    "2026-11-20",
+    "2026-11-22"
+   ],
+   "window_basis": "sourced dates"
+  },
+  "ASUN": {
+   "field": 6,
+   "structure": "standard",
+   "host": "FGCU",
+   "dates": "Nov 19-22",
+   "status": "VERIFIED",
+   "why": "top six to Fort Myers (FGCU); bracket type not stated -- standard single elimination assumed",
+   "sources": [
+    "https://fgcuathletics.com/news/2026/7/29/fgcu-to-host-2026-asun-volleyball-2027-asun-baseball-tournaments.aspx"
+   ],
+   "window": [
+    "2026-11-19",
+    "2026-11-22"
+   ],
+   "window_basis": "sourced dates"
+  },
+  "Atlantic 10": {
+   "field": 6,
+   "structure": "standard",
+   "host": "Loyola Chicago",
+   "dates": "Nov 20-22",
+   "status": "VERIFIED",
+   "sources": [
+    "https://loyolaramblers.com/news/2026/8/3/womens-volleyball-loyola-chicago-hosts-atlantic-10-womens-volleyball-tournament.aspx"
+   ],
+   "window": [
+    "2026-11-20",
+    "2026-11-22"
+   ],
+   "window_basis": "sourced dates"
+  },
+  "Big East": {
+   "field": 4,
+   "structure": "standard",
+   "host": "Creighton",
+   "dates": "Nov 21-22 (D.J. Sokol Arena, Omaha)",
+   "status": "VERIFIED",
+   "why": "top four; 1 v 4, 2 v 3; hosted by Creighton at D.J. Sokol Arena (league page)",
+   "sources": [
+    "https://www.bigeast.com/sports/2026/10/8/WVB_1008262207.aspx"
+   ],
+   "window": [
+    "2026-11-21",
+    "2026-11-22"
+   ],
+   "window_basis": "sourced dates"
+  },
+  "Big Sky": {
+   "field": 8,
+   "structure": "standard",
+   "host": "Northern Ariz.",
+   "dates": "Nov 23-25",
+   "status": "PARTIAL",
+   "why": "top eight of 11 qualify; hosted by Northern Arizona in Flagstaff, Nov 23-25 (league preview). Bracket not published: standard 8-team seeding assumed.",
+   "sources": [
+    "https://bigskyconf.com/news/2026/9/22/womens-volleyball-volleyball-weekly-preview-big-sky-play-begins-with-a-brawl.aspx"
+   ],
+   "window": [
+    "2026-11-23",
+    "2026-11-25"
+   ],
+   "window_basis": "sourced dates",
+   "unresolved": [
+    "bracket pairings"
+   ]
+  },
+  "Big South": {
+   "field": 6,
+   "structure": "standard",
+   "host": "Winthrop",
+   "dates": "Nov 20-22 (Winthrop Coliseum)",
+   "status": "VERIFIED",
+   "why": "top six, seeds 1-2 bye to semifinals; 4 v 5, 3 v 6 (league page), hosted by Winthrop",
+   "sources": [
+    "https://bigsouthsports.com/sports/2026/9/30/WVB_0930265313.aspx"
+   ],
+   "window": [
+    "2026-11-20",
+    "2026-11-22"
+   ],
+   "window_basis": "sourced dates"
+  },
+  "Big Ten": {
+   "field": 15,
+   "structure": "bigten15",
+   "host": "neutral",
+   "dates": "Nov 20-25 (Fishers, Ind.)",
+   "status": "VERIFIED",
+   "why": "seeds 10-15 first round, 5-9 one bye (8 v 9), 1-4 to quarterfinals",
+   "sources": [
+    "https://huskers.com/news/2026/04/16/big-ten-volleyball-tournament-to-debut-in-november-2026",
+    "https://uwbadgers.com/news/2026/4/15/volleyball-inaugural-big-ten-tournament-set-for-2026"
+   ],
+   "window": [
+    "2026-11-20",
+    "2026-11-25"
+   ],
+   "window_basis": "sourced dates"
+  },
+  "Big West": {
+   "field": 6,
+   "structure": "standard",
+   "host": "Cal Poly",
+   "dates": "Nov 25, 27, 28 (Mott Athletics Center)",
+   "status": "VERIFIED",
+   "why": "top six, top two bye; 3 v 6, 4 v 5; 1 v (4/5), 2 v (3/6); Cal Poly hosts (league release)",
+   "sources": [
+    "https://bigwest.org/news/2026/7/29/2026-27-big-west-championships-sites-dates-and-formats-revealed-for-upcoming-season.aspx"
+   ],
+   "window": [
+    "2026-11-25",
+    "2026-11-28"
+   ],
+   "window_basis": "no sourced dates: Nov 17-25 assumed (unresolved)"
+  },
+  "CAA": {
+   "field": 6,
+   "structure": "standard",
+   "host": "Campbell",
+   "dates": "Nov 19-21",
+   "status": "VERIFIED",
+   "sources": [
+    "https://caasports.com/news/2026/6/15/general-caa-announces-dates-and-sites-for-2026-27-conference-championships.aspx"
+   ],
+   "window": [
+    "2026-11-19",
+    "2026-11-21"
+   ],
+   "window_basis": "sourced dates"
+  },
+  "CUSA": {
+   "field": 8,
+   "structure": "standard",
+   "host": "Western Ky.",
+   "dates": "Nov 20-22",
+   "status": "PARTIAL",
+   "why": "host sourced; eight-team format stated as current by the 2027 host release",
+   "sources": [
+    "https://libertyflames.com/news/2026/5/14/womens-volleyball-liberty-reveals-2026-volleyball-schedule",
+    "https://ksuowls.com/news/2026/5/26/ksu-named-host-of-2027-cusa-volleyball-championships.aspx"
+   ],
+   "window": [
+    "2026-11-20",
+    "2026-11-22"
+   ],
+   "window_basis": "sourced dates"
+  },
+  "Horizon": {
+   "field": 8,
+   "structure": "horizon8",
+   "host": "top_seed",
+   "dates": "Nov 19-22",
+   "status": "VERIFIED",
+   "why": "5-8 open Nov 19, winners v 3/4, 1/2 bye to semifinals, at the No. 1 seed",
+   "sources": [
+    "https://ysusports.com/news/2026/8/25/penguins-slated-sixth-in-2026-horizon-league-preseason-volleyball-poll"
+   ],
+   "window": [
+    "2026-11-19",
+    "2026-11-22"
+   ],
+   "window_basis": "sourced dates"
+  },
+  "Ivy League": {
+   "field": 4,
+   "structure": "standard",
+   "host": "top_seed",
+   "dates": "Nov 20-22",
+   "status": "VERIFIED",
+   "sources": [
+    "https://ivyleague.com/news/2026/8/26/womens-volleyball-2026-ivy-league-volleyball-preseason-poll-revealed.aspx"
+   ],
+   "window": [
+    "2026-11-20",
+    "2026-11-22"
+   ],
+   "window_basis": "sourced dates"
+  },
+  "MAAC": {
+   "field": 6,
+   "structure": "standard",
+   "host": "r0_higher_then_top",
+   "dates": "Nov 17 / Nov 20-23",
+   "status": "PARTIAL",
+   "why": "Metro (MAAC): first round hosted by Nos. 3 and 4; semifinal and final hosted by No. 1 (league page). Field of six inferred from the hosting -- not stated.",
+   "sources": [
+    "https://themetro.org/sports/2026/8/3/2026-27-Championships.aspx"
+   ],
+   "window": [
+    "2026-11-17",
+    "2026-11-23"
+   ],
+   "window_basis": "sourced dates",
+   "unresolved": [
+    "field size not stated"
+   ]
+  },
+  "MAC": {
+   "field": 6,
+   "structure": "standard",
+   "host": "Ball St.",
+   "dates": "Nov 20-22",
+   "status": "VERIFIED",
+   "sources": [
+    "https://ballstatesports.com/news/2026/4/28/WVB_2026Schedule",
+    "https://getsomemaction.com/news/2026/4/23/womens-volleyball-mac-releases-2026-volleyball-conference-schedule.aspx"
+   ],
+   "window": [
+    "2026-11-20",
+    "2026-11-22"
+   ],
+   "window_basis": "sourced dates"
+  },
+  "MEAC": {
+   "field": 6,
+   "structure": "standard",
+   "host": "Coppin St.",
+   "dates": "Nov 20-22",
+   "status": "PARTIAL",
+   "why": "host sourced; 2025 used quarterfinals such as 3 v 6 -- six teams assumed",
+   "sources": [
+    "https://coppinstatesports.com/news/2026/7/15/womens-volleyball-volleyball-the-defending-meac-champions-unveils-2026-season-schedule.aspx",
+    "https://meacsports.com/news/2025/11/16/seeds-finalized-for-2025-meac-volleyball-championship.aspx"
+   ],
+   "window": [
+    "2026-11-20",
+    "2026-11-22"
+   ],
+   "window_basis": "sourced dates"
+  },
+  "MVC": {
+   "field": 8,
+   "structure": "standard",
+   "host": "higher_seed",
+   "dates": "Nov 18 / 21 / 24",
+   "status": "PARTIAL",
+   "why": "higher seed hosts each round (league calendar); quarterfinals at seeds 2-4 imply 8 teams with No. 1 also hosting",
+   "sources": [
+    "https://mvc-sports.com/news/2026/8/19/general-missouri-valley-conference-announces-2026-27-championship-schedule.aspx",
+    "https://bradleybraves.com/news/2026/6/29/bradley-volleyball-announces-2026-season-schedule.aspx"
+   ],
+   "window": [
+    "2026-11-18",
+    "2026-11-24"
+   ],
+   "window_basis": "sourced dates"
+  },
+  "Mountain West": {
+   "field": 4,
+   "structure": "standard",
+   "host": "UNLV",
+   "dates": "Nov 24-25",
+   "status": "VERIFIED",
+   "sources": [
+    "https://utepminers.com/news/2026/4/15/utep-volleyball-announces-2026-mountain-west-conference-schedule.aspx",
+    "https://sjsuspartans.com/news/2026/04/15/2026-mountain-west-volleyball-schedule-announced"
+   ],
+   "window": [
+    "2026-11-24",
+    "2026-11-25"
+   ],
+   "window_basis": "sourced dates"
+  },
+  "NEC": {
+   "field": 4,
+   "structure": "standard",
+   "host": "top_seed",
+   "dates": "November",
+   "status": "FALLBACK",
+   "why": "no 2026 format found -- 4 teams at the top seed assumed",
+   "sources": [],
+   "window": [
+    "2026-11-17",
+    "2026-11-25"
+   ],
+   "window_basis": "no sourced dates: Nov 17-25 assumed (unresolved)"
+  },
+  "OVC": {
+   "field": 6,
+   "structure": "standard",
+   "host": "top_seed",
+   "dates": "Nov 22-24",
+   "status": "PARTIAL",
+   "why": "host = top seed (league release); field size not found -- 6 assumed",
+   "sources": [
+    "https://ovcsports.com/news/2026/6/9/ovc-announces-2026-volleyball-conference-schedule.aspx"
+   ],
+   "window": [
+    "2026-11-22",
+    "2026-11-24"
+   ],
+   "window_basis": "sourced dates"
+  },
+  "Pac-12": {
+   "field": 4,
+   "structure": "standard",
+   "host": "Colorado St.",
+   "dates": "Nov 24-25 (Moby Arena, Fort Collins)",
+   "status": "VERIFIED",
+   "why": "Colorado State clinched hosting; 1 v 4, 2 v 3 semifinals Nov 24, final Nov 25 (league release). Field of four inferred from the two semifinals.",
+   "sources": [
+    "https://pac-12.com/news/2026/10/24/womens-volleyball-colorado-state-clinches-as-inaugural-pac-12-championship-host.aspx"
+   ],
+   "window": [
+    "2026-11-24",
+    "2026-11-25"
+   ],
+   "window_basis": "sourced dates"
+  },
+  "Patriot": {
+   "field": 6,
+   "structure": "standard",
+   "host": "r0_higher_then_top",
+   "dates": "Nov 17 / Nov 20-22",
+   "status": "PARTIAL",
+   "why": "first round hosted by Nos. 3 and 4; semifinals and final hosted by No. 1 (league schedule). Field of six (3 v 6, 4 v 5) inferred from the hosting -- not stated.",
+   "sources": [
+    "https://patriotleague.org/sports/2026/5/27/2026-27ChampionshipSchedule.aspx"
+   ],
+   "window": [
+    "2026-11-17",
+    "2026-11-22"
+   ],
+   "window_basis": "no sourced dates: Nov 17-25 assumed (unresolved)",
+   "unresolved": [
+    "field size not stated"
+   ]
+  },
+  "SEC": {
+   "field": 16,
+   "structure": "sec16",
+   "host": "neutral",
+   "dates": "Nov 20-24 (Savannah)",
+   "status": "PARTIAL",
+   "why": "16-team single elimination; seeds 1-4 two byes, 5-8 one bye, 9-16 open (SEC Commissioner's Regulations, Format/Seeding). Higher seed is the designated home team only -- Savannah is neutral. Official 2026 pairings not published: 9v16/10v15/11v14/12v13, then 8,5,6,7 v those winners and 1,4,3,2 in the quarterfinals is INFERRED (standard seed order).",
+   "sources": [
+    "https://storage.googleapis.com/secsports-prod/upload/2025/10/09/bd7f8ab9-003d-481a-a781-d99a17ed5685.pdf",
+    "https://rolltide.com/news/2026/4/22/the-southeastern-conference-announces-2026-league-volleyball-schedule"
+   ],
+   "window": [
+    "2026-11-20",
+    "2026-11-24"
+   ],
+   "window_basis": "sourced dates",
+   "unresolved": [
+    "official 2026 bracket pairings"
+   ]
+  },
+  "SWAC": {
+   "field": 8,
+   "structure": "standard",
+   "host": "Alabama St.",
+   "dates": "Nov 20-22",
+   "status": "FALLBACK",
+   "why": "host sourced; field size not found -- 8 assumed",
+   "sources": [
+    "https://swac.org/news/2026/8/21/general-swac-announces-2026-27-championship-sites.aspx"
+   ],
+   "window": [
+    "2026-11-20",
+    "2026-11-22"
+   ],
+   "window_basis": "sourced dates"
+  },
+  "SoCon": {
+   "field": 10,
+   "structure": "standard",
+   "host": "neutral",
+   "dates": "Nov 19-22 (Harrah's Cherokee Center, Asheville)",
+   "status": "VERIFIED",
+   "why": "10 teams: 8 v 9 and 7 v 10 Thursday; 1 v (8/9), 4 v 5, 2 v (7/10), 3 v 6 Friday (league page). The page's semifinal lines contain typos (\"#2 v Winner of Match 5\"); standard seed-order semifinals (1/8/9/4/5 side v 2/7/10/3/6 side) used.",
+   "sources": [
+    "https://soconsports.com/sports/2026/9/15/60265.aspx"
+   ],
+   "window": [
+    "2026-11-19",
+    "2026-11-22"
+   ],
+   "window_basis": "sourced dates",
+   "unresolved": [
+    "semifinal pairing text on the league page is self-contradictory"
+   ]
+  },
+  "Southland": {
+   "field": 8,
+   "structure": "standard",
+   "host": "A&M-Corpus Christi",
+   "dates": "Nov 20-22",
+   "status": "FALLBACK",
+   "why": "host sourced; field size not found -- 8 assumed",
+   "sources": [
+    "https://www.southland.org/news/2026/4/28/womens-volleyball-southland-conference-announces-2026-volleyball-schedule.aspx"
+   ],
+   "window": [
+    "2026-11-20",
+    "2026-11-22"
+   ],
+   "window_basis": "sourced dates"
+  },
+  "Summit League": {
+   "field": 6,
+   "structure": "standard",
+   "host": "South Dakota St.",
+   "dates": "Nov 22-24",
+   "status": "VERIFIED",
+   "sources": [
+    "https://thesummitleague.org/news/2026/8/27/womens-volleyball-summitvb-weekly-notes-week-1-edition.aspx"
+   ],
+   "window": [
+    "2026-11-22",
+    "2026-11-24"
+   ],
+   "window_basis": "sourced dates"
+  },
+  "Sun Belt": {
+   "field": 10,
+   "structure": "sunbelt10",
+   "host": "neutral",
+   "dates": "Nov 19-22 (Foley Sports Tourism Complex)",
+   "status": "PARTIAL",
+   "why": "top five per division (division-only conference record), official 2026 bracket: W4 v E5 and E4 v W5 first; W2 v E3, E1 v (W4/E5), W1 v (E4/W5), E2 v W3 quarterfinals. DIVISION MEMBERSHIP IS NOT IN A STORED SOURCE: East = App State, Coastal Carolina, Ga. Southern, Georgia St., James Madison, Marshall, Old Dominion; West = Arkansas St., Louisiana, Louisiana Tech, South Alabama, Southern Miss., Troy, ULM (inferred; unresolved). Division seeding here uses projected OVERALL conference record (division-only records not modelled).",
+   "sources": [
+    "https://sunbeltsports.org/documents/2026/7/27/2026_Volleyball_Championship_Bracket.pdf?id=2724",
+    "https://sunbeltsports.org/sports/2024/10/7/wvb_champ_tiebreakers.aspx"
+   ],
+   "window": [
+    "2026-11-19",
+    "2026-11-22"
+   ],
+   "window_basis": "sourced dates",
+   "divisions": {
+    "East": [
+     "App State",
+     "Coastal Carolina",
+     "Ga. Southern",
+     "Georgia St.",
+     "James Madison",
+     "Marshall",
+     "Old Dominion"
+    ],
+    "West": [
+     "Arkansas St.",
+     "Louisiana",
+     "Louisiana Tech",
+     "South Alabama",
+     "Southern Miss.",
+     "Troy",
+     "ULM"
+    ]
+   },
+   "unresolved": [
+    "division membership (inferred)",
+    "division-only records"
+   ]
+  },
+  "UAC": {
+   "field": 6,
+   "structure": "standard",
+   "host": "Little Rock",
+   "dates": "Nov 19-21 (Little Rock)",
+   "status": "VERIFIED",
+   "why": "top six (North Alabama release); the NCAA manual's WAC slot; Little Rock is the host school (home court when it plays)",
+   "sources": [
+    "https://roarlions.com/news/2026/7/9/womens-volleyball-johnson-reveals-2026-volleyball-schedule.aspx"
+   ],
+   "window": [
+    "2026-11-19",
+    "2026-11-21"
+   ],
+   "window_basis": "sourced dates"
+  }
+ }
+}

@@ -18,7 +18,10 @@
     "6626394",
     "6627898",
     "6626949",
-    "6627899"
+    "6627899",
+    "6624499",
+    "6624500",
+    "6626301"
    ],
    "evidence": [
     {
@@ -86,6 +89,25 @@
       "6626949",
       "6627899"
      ]
+    },
+    {
+     "url": "https://redstormsports.com/sports/womens-volleyball/stats/2026/providence/boxscore/15386",
+     "kind": "school_box",
+     "match": "Providence (Nov 6, Carnesecca Arena)",
+     "gid": "6624499",
+     "sha256": "22715efa11f9411d4bcab566d7d4d2b857c93431ded47e9d298c5986c7897720",
+     "retrieved": "2026-11-07",
+     "local_copy": "Cody/coordination/research/sources/stjohns-box-15386/boxscore_15386.html",
+     "text": "box lists 'Hadziredzepovic, Lejla' (HADžIREDžEPOVIC,LEJLA), rosterPlayerId 6340, image 7_Lejla_Hadziredzepovic; attack 27 attempts, .185 = feed row 11 K / 6 E / 27 TA (mail 117)"
+    },
+    {
+     "kind": "feed_box_consistency",
+     "retrieved": "2026-11-22",
+     "gids_added": [
+      "6624500",
+      "6626301"
+     ],
+     "text": "These two later St. John's boxes (team_id 45995) carry the identical feed spelling on jersey 7, position OH, with exactly one Lejla row in each box."
     }
    ],
    "why": "The NCAA feed served her surname garbled in 3 of 15 matches (not a recoverable Latin-1/cp1252 mojibake). St. John's own box score for each of those 3 matches names her, with the same roster id and jersey.",

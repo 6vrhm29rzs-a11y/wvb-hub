@@ -53,7 +53,7 @@ Named totals (reader-facing meaning, used verbatim on the page):
 import io
 import json
 import os
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Set
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -518,6 +518,39 @@ def _d1_both(g):
 def _has_line(g):
     return bool([l for l in (g.get("linescores") or [])
                  if l.get("home") is not None])
+
+
+# mail 116: a fixture that has already been PLAYED is not a remaining match.
+# Every class classify() gives is a played/completed record EXCEPT "empty": an
+# empty final asserts no result (the feed can flip a fixture to F before first
+# serve -- USC at Rutgers, 2026-11-07, F with no winner, no sets, no lines,
+# before its start), so it counts nowhere AND stays forecastable. Everything
+# else -- a counted result, a duplicate listing of one, an exhibition, a
+# disputed or self-contradictory final -- has been played, and simulating it
+# again on top of the tally counts it twice (or invents a result for a match
+# whose result is held for adjudication).
+NOT_COMPLETED = ("empty",)
+
+
+def completed_gids(games, season):
+    # type: (List[Dict], int) -> Set[str]
+    """gids of matches that have been played (any final class except empty)."""
+    return set(gid for gid, c in classify(games, season).items()
+               if c not in NOT_COMPLETED)
+
+
+def remaining_fixtures(rows, completed):
+    """forecast rows minus already-played matches; returns (kept, dropped)."""
+    kept, dropped = [], []
+    for r in rows:
+        (dropped if str(r.get("game_id")) in completed else kept).append(r)
+    return kept, dropped
+
+
+def results_through_epoch(games, season):
+    """mail 116: the data cutoff an artifact was built from -- the latest counted final's start epoch."""
+    ep = [int(g.get("start_time_epoch") or 0) for g in countable(games, season)]
+    return max(ep) if ep else None
 
 
 def totals(games, season):

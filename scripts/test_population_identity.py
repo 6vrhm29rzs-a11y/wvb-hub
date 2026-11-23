@@ -6,7 +6,7 @@ HERE = os.path.dirname(os.path.abspath(__file__)); REPO = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 FAIL = []
 def check(n, ok, x=""):
-    print("  %-72s %s%s" % (n, "ok" if ok else "FAIL", ("  " + x) if x else ""))
+    print("  %-72s %s%s" % (n, "ok" if ok else "FAIL", ("  " + str(x)) if x else ""))
     if not ok: FAIL.append(n)
 import nameclean as N
 # ---- row helper, pure
@@ -15,6 +15,26 @@ o = N.apply_identity_override(r, "6624495")
 check("identity override: exact gid+team+spelling -> school spelling, source kept",
       o["last"] == "Hadžiredžepovic" and o["last_src"] == "Hadåÿiredåÿepovic")
 check("[NEG] same spelling in another game is NOT rewritten", N.apply_identity_override(r, "6624278") is r)
+# mail 117: the 12th garbled game (Nov 6 v Providence), cited to St. John's own box 15386 (rosterPlayerId 6340)
+o2 = N.apply_identity_override(dict(r, gp="4"), "6624499")
+check("mail 117: 6624499 (v Providence, Nov 6) -> school spelling, source kept",
+      o2["last"] == "Hadžiredžepovic" and o2["last_src"] == "Hadåÿiredåÿepovic")
+_other = {"team_id": "45995", "first": "Shiloh", "last": "Carcillo", "gp": "4"}
+check("[NEG] another St. John's player in that same game is untouched",
+      N.apply_identity_override(_other, "6624499") is _other)
+check("[NEG] the same spelling for another team in that game is untouched",
+      N.apply_identity_override(dict(r, team_id="46022"), "6624499").get("last") == "Hadåÿiredåÿepovic")
+import json as _j
+_raw_garbled = set()
+for _ln in open(os.path.join(REPO, "data/raw/2026/playerbox.jsonl"), encoding="utf-8"):
+    if "Lejla" in _ln and "Had\\u00e5\\u00ffired" in _ln or "Hadåÿ" in _ln:   # the raw file escapes non-ASCII
+        _d = _j.loads(_ln)
+        if "Hadåÿ" in _j.dumps(_d, ensure_ascii=False):
+            _raw_garbled.add(str(_d.get("game_id")))
+_led = set(next(x for x in _j.load(open(os.path.join(REPO, "data/raw/2026/player_identity_overrides.json")))["overrides"]
+                if x["feed_spelling"] == "Lejla Hadåÿiredåÿepovic")["gids"])
+check("every raw game carrying the garbled spelling is in the cited ledger (%d games)" % len(_raw_garbled),
+      len(_raw_garbled) >= 11 and _raw_garbled <= _led, sorted(_raw_garbled - _led))
 check("[NEG] same spelling on another team is NOT rewritten",
       N.apply_identity_override(dict(r, team_id="1"), "6624495").get("last") == "Hadåÿiredåÿepovic")
 L = {"team_id": "46003", "first": "Lolo", "last": "Lambert", "gp": "5", "kills": "0"}

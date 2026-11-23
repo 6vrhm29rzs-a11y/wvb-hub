@@ -168,6 +168,11 @@ def main():
         # a badge cell names its ruler by colour class + RULERS title
         if re.search(r"rkc-(avca|vt|pow)", window):
             continue
+        # the cut-line comparison column names its ruler in the <dt> beside
+        # the number, from the payload's own label (D.rk = "RPI" /
+        # "Proj. RPI") -- labelled on screen, just not by a literal here
+        if "<dt>' + esc_(D.rk) + '</dt><dd>' + (b[1] ? '#' + b[1]" in window:
+            continue
         bare.append("%d: %s" % (i, line.strip()[:70]))
     check("no rank is concatenated to a '#' without a ruler beside it",
           not bare, "; ".join(bare[:2]))
@@ -203,7 +208,9 @@ def main():
               "an early return there is exactly the defect")
     # every More-menu route must be reachable and must not claim a primary tab
     more = re.findall(r'<button role="menuitem" data-v="([a-z]+)"', h)
-    check("the More menu carries its routes", len(more) >= 5, more)
+    # mail 118: Bracket is a primary now and My Ballot lives only in More, so the menu carries
+    # Players, Player ratings, Standings and (private) My Ballot -- four routes, not five.
+    check("the More menu carries its routes", len(more) >= 4 and {"players", "prank", "standings"} <= set(more), more)
     prim = set(re.findall(r'<button role="tab"[^>]*data-v="([a-z]+)"', h))
     # ⚠ ONE ROUTE IS DELIBERATELY IN BOTH. My Ballot is a primary tab on a
     # desktop and rides in the More menu on a phone, where only four
@@ -215,7 +222,10 @@ def main():
     overlap = sorted((set(more) & prim) - phoneonly)
     check("[NEG] no route is in both places unless the More copy is "
           "explicitly phone-only", not overlap, overlap)
-    check("...and the phone-only duplicates are declared", sorted(phoneonly))
+    # mail 118: no duplicates remain (the ballot is no longer also a primary), so there is
+    # nothing to declare -- and nothing may be both a primary and a menu item
+    check("...and no route is duplicated between the primaries and More",
+          not (set(more) & prim), sorted(set(more) & prim))
 
     print("\n3. SCORES OPENS ON THE DAY")
     check("the default ledger state is today", "let LEDGER_STATE = 'today';" in h)

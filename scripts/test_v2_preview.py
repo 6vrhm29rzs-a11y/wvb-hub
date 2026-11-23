@@ -9,7 +9,11 @@ def check(c, msg):
     global ok
     print(("PASS " if c else "FAIL ") + msg); ok = ok and bool(c)
 src = open(os.path.join(REPO, "scripts", "build_hub.py")).read()
-check('"" if PUBLIC or not v2_preview_payload() else V2P_BTN' in src, "button emitted only on a private build with a frozen file")
+# mail 118: the preview BUTTON is a retired control (POWER 2.0 replaced it in the Compare menu);
+# it is not restored to satisfy an old guard. Assert the current state: no button is emitted
+# anywhere, and the payload below stays private-only.
+check("{{V2P_BTN}}" not in src and 'data-r="v2p"' not in src.split("V2P_BTN = (")[0],
+      "the retired v2 preview button is not emitted (current shell: POWER 2.0 lives under Compare)")
 check('"" if PUBLIC or not v2_preview_payload() else' in src.split('"{{V2P_JS}}"')[1][:80], "script emitted only on a private build")
 check('"POWER v2 &mdash; preview"' in src and '"const V2P ="' in src, "public gate carries the preview markers (build aborts on leak)")
 readers = [p for p in glob.glob(os.path.join(REPO, "scripts", "*.py"))

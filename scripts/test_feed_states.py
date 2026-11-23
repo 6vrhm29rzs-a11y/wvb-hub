@@ -38,7 +38,7 @@ import sys
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(REPO, "scripts"))
 SEASON = int(os.environ.get("WVB_SEASON", "2026"))
-KNOWN = {"P", "I", "F", "D", "O"}
+KNOWN = {"P", "I", "F", "D", "O", "C"}   # C: UTSA-Memphis 6625554, withdrawn by the source; never a final
 NEVER_COUNT = {"D", "O"}
 
 fails = []

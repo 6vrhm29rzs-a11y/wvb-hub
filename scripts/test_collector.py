@@ -119,6 +119,14 @@ def main():
                              {k2: ["6628586", "6640356"]}) is None)
 
     print("\n4. RESPECT IS MECHANICAL")
+    from reconcile_2025 import norm as _n
+    _pair = tuple(sorted((_n("Georgia St."), _n("Southern Miss."))))
+    _idx = {(_pair, "2026-10-09"): ["A"], (_pair, "2026-10-10"): ["B"]}
+    check("a series sibling a day away blocks a date-bound conflict",
+          C.has_series_neighbor("Southern Miss.", "Georgia St.", "2026-10-09", "A", _idx))
+    check("[NEG] a lone meeting is still able to conflict",
+          not C.has_series_neighbor("Southern Miss.", "Georgia St.", "2026-10-09", "A",
+                                    {(_pair, "2026-10-09"): ["A"]}))
     src = io.open(os.path.join(REPO, "scripts", "collector.py"),
                   encoding="utf-8").read()
     check("robots.txt is consulted before every fetch",

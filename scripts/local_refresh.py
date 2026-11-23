@@ -98,10 +98,19 @@ REBUILD = [
     # the blend first -- forecasts and the simulator stand on it
     ({}, ["scripts/conference_repair.py"]),
     ({}, ["scripts/digby_top25.py"]),
+    # ⚠ LOCAL-ONLY (2026-11-22): the committee-format RPI (Factors I-IV), checked against the newest NCAA table.
+    ({}, ["scripts/rpi_committee.py"]),
+    # ⚠ LOCAL-ONLY (2026-11-22): bind real conference-tournament matches before anything projects them.
+    # Not HARD: a failure keeps the last ledger and observed file.
+    ({}, ["scripts/ingest_conf_tournaments.py"]),
     # ⚠ LOCAL-ONLY, PRIVATE (Cody, 2026-09-27): refreeze the season-only POWER
     # comparison candidate at Current POWER's exact cut-off. Not HARD: a
     # failure leaves the previous frozen file, whose own cut-off the page shows.
     ({}, ["scripts/season_only_candidate.py"]),
+    # ⚠ LOCAL-ONLY, PRIVATE (mail 097): the matched current-POWER / POWER 2.0 snapshot, after the fit
+    # inputs are rebuilt and before build_hub reads it. Refits only when its receipt's fit inputs change.
+    # Not HARD: a failure keeps the last verified snapshot and is retried next cycle (POWER20 pending).
+    ({}, ["scripts/power20_snapshot.py"]),
     # ⚠ LOCAL-ONLY, PRIVATE (Cody, 2026-09-28): prospective scorecard -- logs both
     # models' pre-match win chances once, scores them when final. Not HARD.
     ({}, ["scripts/season_only_scorecard.py"]),
@@ -138,6 +147,23 @@ REBUILD = [
     # cycle, and --if-stale means it lands about daily rather than every 20
     # minutes churning through its own retention window.
     ({}, ["scripts/backup_local.py", "--if-stale"]),
+]
+
+# 074 #1: a FAILED candidate fit must be retried on the next cycle even when
+# nothing else changed. The digests are saved with candidate_pending=True, and
+# a later 'none'/'present' cycle runs this short chain: the candidate, then
+# only the steps that read it, then the page. The last good candidate file is
+# never touched by a failure (the producer writes only on success).
+CANDIDATE = "scripts/season_only_candidate.py"
+POWER20 = "scripts/power20_snapshot.py"
+POWER20_RETRY = [({}, [POWER20]), ({}, ["scripts/build_hub.py"])]
+CANDIDATE_RETRY = [
+    ({}, [CANDIDATE]),
+    ({}, ["scripts/season_only_scorecard.py"]),
+    ({}, ["scripts/predict_2026.py"]),
+    ({}, ["scripts/simulate_season_2026.py"]),
+    ({}, ["scripts/build_hub.py"]),
+    ({}, ["scripts/build_dashboard.py"]),
 ]
 
 # Steps that MUST succeed for the cycle to continue. Everything else is
@@ -399,6 +425,23 @@ def _cycle(force, t0):
     prev = load_digests()
     mode = decide(prev, cur, force)
 
+    if mode in ("none", "present") and prev.get("power20_pending") and not prev.get("candidate_pending"):
+        r = _power20_retry(prev, t0)
+        if r is not None:
+            return r
+        if mode == "none":
+            return 0
+        prev = load_digests()
+
+    if mode in ("none", "present") and prev.get("candidate_pending"):
+        r = _candidate_retry(prev, t0)
+        if r is not None:
+            return r
+        if mode == "none":
+            return 0
+        # retry chain done; fall through so a presentation change still lands
+        prev = load_digests()
+
     if mode == "none":
         print("nothing changed since the last successful cycle -- nothing to rebuild")
         _record("no_new_final", fingerprint=after, seconds=round(time.time() - t0))
@@ -413,14 +456,22 @@ def _cycle(force, t0):
                 _record("rebuild_failed", step=" ".join(args), detail=out[-600:],
                         seconds=round(time.time() - t0))
                 return 1
+        cur["candidate_pending"] = bool(prev.get("candidate_pending"))
+        cur["power20_pending"] = bool(prev.get("power20_pending"))
         save_digests(cur)
         _record("presentation_rebuilt", fingerprint=after,
                 seconds=round(time.time() - t0))
         return 0
 
     print("rating inputs changed -- rebuilding (%s -> %s)" % (before, after))
+    cand_ok = True
+    p20_ok = True
     for env_extra, args in REBUILD:
         code, out = _run(args, env_extra=env_extra)
+        if args[0] == CANDIDATE and code != 0:
+            cand_ok = False
+        if args[0] == POWER20 and code != 0:
+            p20_ok = False
         if code != 0:
             if args[0] in HARD:
                 print("rebuild step failed: %s" % " ".join(args))
@@ -430,10 +481,64 @@ def _cycle(force, t0):
                 return 1
             print("  %s skipped (as CI tolerates)" % args[0])
     print("local page rebuilt -- rankings now include the new finals")
+    if not cand_ok:
+        print("  candidate POWER refit FAILED -- previous candidate kept; retrying next cycle")
+    cur["candidate_pending"] = not cand_ok
+    cur["power20_pending"] = not p20_ok
+    if not p20_ok:
+        print("  POWER 2.0 snapshot FAILED -- previous verified snapshot kept; retrying next cycle")
     save_digests(cur)
+    # page updated and POWER refit are two separate facts (074 #1)
     _record("rebuilt", fingerprint=after, forced=bool(force),
+            candidate="refit_ok" if cand_ok else "refit_failed_pending_retry",
+            power20="ok" if p20_ok else "failed_pending_retry",
             seconds=round(time.time() - t0))
     return 0
+
+
+def _power20_retry(prev, t0):
+    """Retry a POWER 2.0 snapshot that failed on an earlier cycle (097); then rebuild the page."""
+    print("POWER 2.0 snapshot pending from an earlier failure -- retrying")
+    code, out = _run(POWER20_RETRY[0][1])
+    if code != 0:
+        print("  POWER 2.0 retry failed again -- previous snapshot kept: %s" % out[-300:])
+        _record("power20_retry_failed", detail=out[-600:], seconds=round(time.time() - t0))
+        return 0
+    c2, o2 = _run(POWER20_RETRY[1][1])
+    if c2 != 0:
+        print(o2[-2000:])
+        _record("rebuild_failed", step="scripts/build_hub.py", detail=o2[-600:], power20="ok",
+                seconds=round(time.time() - t0))
+        return 1
+    d = dict(prev); d["power20_pending"] = False
+    save_digests(d)
+    _record("power20_retried", power20="ok", seconds=round(time.time() - t0))
+    return None
+
+
+def _candidate_retry(prev, t0):
+    """Re-run a candidate fit that failed on an earlier cycle. Returns a cycle
+    exit code when the cycle should end here, or None to continue."""
+    print("candidate POWER refit pending from an earlier failure -- retrying")
+    code, out = _run(CANDIDATE_RETRY[0][1])
+    if code != 0:
+        print("  candidate retry failed again -- previous candidate kept: %s" % out[-300:])
+        _record("candidate_retry_failed", detail=out[-600:],
+                seconds=round(time.time() - t0))
+        return 0                                # still pending; digests unchanged
+    for env_extra, args in CANDIDATE_RETRY[1:]:
+        c2, o2 = _run(args, env_extra=env_extra)
+        if c2 != 0 and args[0] in HARD:
+            print(o2[-2000:])
+            _record("rebuild_failed", step=" ".join(args), detail=o2[-600:],
+                    candidate="refit_ok", seconds=round(time.time() - t0))
+            return 1                            # page failed; stays pending
+    d = dict(prev)
+    d["candidate_pending"] = False
+    save_digests(d)
+    _record("candidate_retried", candidate="refit_ok",
+            seconds=round(time.time() - t0))
+    return None
 
 
 def main():

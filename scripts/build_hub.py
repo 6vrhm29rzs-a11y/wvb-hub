@@ -867,6 +867,1378 @@ def load_predictions():
     return doc
 
 
+# ---- RPI CUT LINE (PRIVATE; mail 098) --------------------------------------
+CUT_ALIASES = {"metro": "maac"}                  # official RPI table label -> NCAA/config conference key
+
+
+def _ckey(c):
+    import re as _re
+    k = _re.sub(r"[^a-z0-9]", "", (c or "").lower())
+    return CUT_ALIASES.get(k, k)
+
+
+_CT_EXCL = set()
+
+
+_PLAYED_GIDS = None
+
+
+def _played_gids():
+    """mail 116: matches already PLAYED (season_counts.completed_gids -- every final class but 'empty').
+    The projections below skip a fixture whose listed start has passed; this also catches one that was
+    played BEFORE its listed start (the feed's showcase-time errors), which the clock test alone would
+    project a second time on top of its counted result."""
+    global _PLAYED_GIDS
+    if _PLAYED_GIDS is None:
+        import gamelog as _GL
+        import season_counts as _SCp
+        gp = os.path.join(REPO, "data/raw/%d/games.jsonl" % SEASON)
+        _PLAYED_GIDS = _SCp.completed_gids(_GL.load_games_jsonl(gp), SEASON) if os.path.exists(gp) else set()
+    return _PLAYED_GIDS
+
+
+def ct_context():
+    """mail 101/102: which fixtures are CONFERENCE-TOURNAMENT matches. Only AFFIRMATIVE evidence excludes a fixture
+    from the regular-season path (standings, Projected RPI, projected records), and the same classification is
+    applied to actual finals and forecast fixtures:
+      * validated tournament FINAL   -- a ledger result that validates against the counted final (bound to a round)
+      * sourced SCHEDULED fixture    -- a ledger `scheduled_fixtures` entry with a source, whose teams share that
+                                        tournament conference and whose date (when given) is inside the sourced window
+    The date window alone only SURFACES candidates (listed, never excluded). A rejected entry drives nothing."""
+    global _CT_CTX
+    try:
+        return _CT_CTX
+    except NameError:
+        pass
+    import conf_tournaments as CT
+    import season_counts as SC
+    from reconcile_2025 import norm as _norm
+    cfg = CT.load_cfg()["conferences"]
+    led = load("data/raw/%d/conf_tournament_results.json" % SEASON) or {}
+    lines = open(os.path.join(REPO, "data", "raw", "%d" % SEASON, "polls_rpi.jsonl"), encoding="utf-8").read().splitlines()
+    conf_of = {}
+    for r in json.loads(lines[-1])["rows"]:
+        ck = _ckey(r.get("Conf"))
+        conf_of[_norm(r["School"])] = "uac" if ck == "wac" else ck
+    def _ck(c):
+        k = _ckey(c)
+        return "uac" if k == "wac" else k
+    win = {}
+    for cname, row in cfg.items():
+        if row.get("window"):
+            win[_ck(cname)] = (row["window"][0], row["window"][1], cname)
+    def in_window(date, a, b):
+        ca, cb = conf_of.get(_norm(a or "")), conf_of.get(_norm(b or ""))
+        if not ca or ca != cb or ca not in win:
+            return False
+        lo, hi, _ = win[ca]
+        return bool(date) and lo <= date[:10] <= hi
+    # validate ledger results against the counted finals
+    doc = load("data/data_%d.json" % SEASON) or {}
+    finals = {}
+    for g in SC.countable(doc.get("games") or [], SEASON, need_line=False, d1_only=False):
+        if g.get("state") == "F" and len(g.get("teams") or []) == 2 and SC.winner_index(g) is not None:
+            finals[str(g["game_id"])] = g
+    bound, rejected, final_gids = {}, [], set()
+    for x in led.get("results") or []:
+        g = finals.get(str(x.get("game_id")))
+        why = None
+        if g is None:
+            why = "game id is not a counted final"
+        else:
+            nm = [_norm(t.get("name_short") or "") for t in g["teams"]]
+            if set(nm) != set(_norm(t) for t in x.get("teams") or []):
+                why = "teams do not match the final"
+            elif _norm(x.get("winner") or "") != nm[SC.winner_index(g)]:
+                why = "winner does not match the final"
+            elif not x.get("source"):
+                why = "no tournament source"
+            elif not isinstance(x.get("round"), int):
+                why = "no bracket round"
+        if why:
+            rejected.append(dict(x, rejected=why)); continue
+        final_gids.add(str(x["game_id"]))
+        bound.setdefault(_ck(x["conf"]), {})[(x["round"], frozenset(x["teams"]))] = x["winner"]
+    # sourced scheduled tournament fixtures (not results): exclusion evidence for forecasts only
+    sched = {}
+    for x in led.get("scheduled_fixtures") or []:
+        ck = _ck(x.get("conf"))
+        tm = [_norm(t) for t in x.get("teams") or []]
+        why = None
+        if not x.get("game_id"):
+            why = "no game id"
+        elif not x.get("source"):
+            why = "no tournament source"
+        elif ck not in win:
+            why = "conference holds no sourced tournament window"
+        elif len(tm) != 2 or any(conf_of.get(t) != ck for t in tm):
+            why = "teams are not both in that conference"
+        elif x.get("date") and not (win[ck][0] <= x["date"][:10] <= win[ck][1]):
+            why = "date is outside the sourced tournament window"
+        if why:
+            rejected.append(dict(x, rejected=why, kind="scheduled_fixture")); continue
+        sched[str(x["game_id"])] = frozenset(tm)
+    candidates = {}
+    def is_tourn(gid, date, a, b):
+        """True only on affirmative evidence; a window match without evidence is recorded as a candidate."""
+        g = str(gid) if gid is not None else None
+        if g in final_gids:
+            return True
+        if g in sched and sched[g] == frozenset((_norm(a or ""), _norm(b or ""))):
+            return True
+        if in_window(date, a, b):
+            candidates[g or "%s|%s|%s" % (date, a, b)] = {"game_id": g, "date": date, "teams": [a, b]}
+        return False
+    # same-conference finals inside a window WITHOUT provenance: listed, never applied, never excluded
+    unprov = []
+    for gid, g in finals.items():
+        a, b = [t.get("name_short") for t in g["teams"]]
+        d = _dt_et(g.get("start_time_epoch"))
+        if gid not in final_gids and in_window(d, a, b):
+            unprov.append({"game_id": gid, "date": d, "teams": [a, b]})
+    _CT_CTX = {"is_tourn": is_tourn, "bound": bound, "rejected": rejected, "unprovenanced": unprov,
+               "announced": led.get("announced_seeds") or {}, "confirmed_final_gids": final_gids,
+               "scheduled_gids": set(sched), "candidates": candidates, "conf_of": conf_of}
+    return _CT_CTX
+
+
+def _dt_et(ep):
+    import datetime as _d
+    if not ep:
+        return None
+    return (_d.datetime.utcfromtimestamp(ep) - _d.timedelta(hours=5)).strftime("%Y-%m-%d")
+
+
+def project_conf_champions(rpi):
+    """Cody, 2026-11-05: the AQ is the projected REGULAR-SEASON conference champion -- current conference record
+    plus expected wins in the remaining conference matches (current POWER's own match forecasts), assuming the
+    regular-season winner also wins any conference tournament. Ranked by projected conference win percentage;
+    ties broken by current conference win percentage, then official RPI rank. Conferences come from the official
+    RPI table, so a 'conference match' is two teams carrying the same official conference."""
+    import time as _t
+    sys.path.insert(0, os.path.join(REPO, "scripts"))
+    import season_counts as SC
+    from reconcile_2025 import norm as _norm
+    conf_of = dict((_norm(r["team"]), r["ckey"]) for r in rpi)
+    rec = {}
+    def rr(k):
+        return rec.setdefault(k, {"w": 0.0, "l": 0.0, "xw": 0.0, "xl": 0.0, "left": 0})
+    doc = load("data/data_%d.json" % SEASON) or {}
+    for g in SC.countable(doc.get("games") or [], SEASON, need_line=True, d1_only=True):
+        if g.get("state") != "F" or len(g.get("teams") or []) != 2:
+            continue
+        w = SC.winner_index(g)
+        if w is None:
+            continue
+        if str(g.get("game_id")) in ct_context()["confirmed_final_gids"]:
+            continue                                  # a VALIDATED tournament final is not regular-season standings
+        a, b = [_norm(t.get("name_short") or "") for t in g["teams"]]
+        if not conf_of.get(a) or conf_of.get(a) != conf_of.get(b):
+            continue
+        rr(a)["w" if w == 0 else "l"] += 1; rr(b)["w" if w == 1 else "l"] += 1
+    preds = (load("Cody/data/power_candidate/predictions_%d.json" % SEASON) if not PUBLIC else None) or \
+        load("data/predictions_%d.json" % SEASON) or {}
+    now = _t.time(); upcoming = 0
+    for g in preds.get("games") or []:
+        if (g.get("start_epoch") or 0) <= now or g.get("home_win") is None:
+            continue
+        if str(g.get("game_id")) in _played_gids():   # mail 116: played before its listed start
+            continue
+        if ct_context()["is_tourn"](g.get("game_id"), g.get("date"), g.get("home"), g.get("away")):
+            _CT_EXCL.add(str(g.get("game_id"))); continue    # tournament fixture: not the regular-season path
+        h, a = _norm(g.get("home") or ""), _norm(g.get("away") or "")
+        if not conf_of.get(h) or conf_of.get(h) != conf_of.get(a):
+            continue
+        upcoming += 1
+        p = float(g["home_win"])
+        rr(h)["xw"] += p; rr(h)["xl"] += 1 - p; rr(h)["left"] += 1
+        rr(a)["xw"] += 1 - p; rr(a)["xl"] += p; rr(a)["left"] += 1
+    out = {}
+    for r in rpi:
+        k = _norm(r["team"]); x = rec.get(k, {"w": 0.0, "l": 0.0, "xw": 0.0, "xl": 0.0, "left": 0})
+        n_now, n_all = x["w"] + x["l"], x["w"] + x["l"] + x["xw"] + x["xl"]
+        out[r["team"]] = {"cw": int(x["w"]), "cl": int(x["l"]), "pw": x["w"] + x["xw"], "pl": x["l"] + x["xl"],
+                          "left": x["left"], "ppct": (x["w"] + x["xw"]) / n_all if n_all else None,
+                          "cpct": x["w"] / n_now if n_now else None}
+    return out, {"source": preds.get("meta", {}).get("strength_basis") or "unknown",
+                 "generated": preds.get("meta", {}).get("generated_utc"), "upcoming_conf_matches": upcoming}
+
+
+def rpi_futures(extra=None):
+    """Cody, 2026-11-05: projected END-OF-REGULAR-SEASON RPI. Every counted D-I result so far (the shipped RPI
+    loader: classification, corrections, duplicates, D-I membership) plus every remaining scheduled D-I match
+    with a forecast, each given to Current POWER's favourite (home_win >= .5). The committee's full format
+    (rpi_committee.adjust: 25/50/25 plus the Factor IV bonuses and penalties). A derived projection,
+    not the official table; conference tournaments are not scheduled yet and are not included."""
+    import time as _t
+    import rpi_2025 as _R
+    from reconcile_2025 import norm as _norm
+    import rpi_committee as _RC
+    games, tinfo = _R.load_di_games()
+    keys = sorted(tinfo)
+    _conf = dict((k, tinfo[k].get("conference")) for k in keys)
+    _nondi = _RC.split(_RC.counted_games(), keys)[1]         # Factor IV: non-D-I losses and schedule share
+    now_r = _RC.adjust(games, _nondi, keys, _conf)
+    preds = (load("Cody/data/power_candidate/predictions_%d.json" % SEASON) if not PUBLIC else None) or \
+        load("data/predictions_%d.json" % SEASON) or {}
+    now = _t.time(); added, skipped, last = [], 0, None
+    for g in preds.get("games") or []:
+        if (g.get("start_epoch") or 0) <= now or g.get("home_win") is None:
+            continue
+        if str(g.get("game_id")) in _played_gids():   # mail 116: played before its listed start
+            continue
+        if ct_context()["is_tourn"](g.get("game_id"), g.get("date"), g.get("home"), g.get("away")):
+            _CT_EXCL.add(str(g.get("game_id"))); continue    # tournament fixture: not the regular-season path
+        h, a = _norm(g.get("home") or ""), _norm(g.get("away") or "")
+        if h not in tinfo or a not in tinfo:
+            skipped += 1; continue
+        w, l = (h, a) if float(g["home_win"]) >= 0.5 else (a, h)
+        added.append((w, l, "proj-" + str(g.get("game_id"))))
+        last = max(last or "", g.get("date") or "")
+    xtra = [(w, l, gid) for w, l, gid in (extra or []) if w in tinfo and l in tinfo]
+    fut = _RC.adjust(games + added + xtra, _nondi, keys, _conf)
+    rn, rf = dict((k, now_r[k]["rank"]) for k in keys), dict((k, fut[k]["rank"]) for k in keys)
+    out = {}
+    for k in keys:
+        out[k] = {"school": tinfo[k]["school"], "official_rank": tinfo[k].get("official_rank"), "derived_now_rank": rn[k],
+                  "proj_rank": rf[k], "proj_rpi": fut[k]["adj"], "proj_w": fut[k]["wins"], "proj_l": fut[k]["losses"],
+                  "now_w": now_r[k]["wins"], "now_l": now_r[k]["losses"]}
+    return out, {"played_games": len(games), "projected_games": len(added), "scenario_games": len(xtra), "skipped_non_di": skipped,
+                 "last_scheduled_date": last, "forecast_generated": preds.get("meta", {}).get("generated_utc"),
+                 "forecast_basis": preds.get("meta", {}).get("strength_basis"),
+                 "forecast_model": next((g.get("model") for g in preds.get("games") or [] if g.get("model")), None)}
+
+
+def cut_records(projected=False, extra=None):
+    """Overall W-L and D-I share for the at-large gates (.500 overall, >=80% D-I schedule; project_field 2.4).
+    Actual view: every counted 2026 final (non-D-I opponents included). Projected view: plus every remaining
+    scheduled match with a forecast, given to Current POWER's favourite (the same games the Projected RPI adds)."""
+    import time as _t
+    sys.path.insert(0, os.path.join(REPO, "scripts"))
+    import season_counts as SC
+    from reconcile_2025 import norm as _norm
+    doc = load("data/data_%d.json" % SEASON) or {}
+    di = set()
+    rp = load("data/rpi_%d.json" % SEASON) or {}
+    for t in rp.get("teams") or []:
+        di.add(_norm(t["team"]))
+    rec = {}
+    def rr(k):
+        return rec.setdefault(k, {"w": 0, "l": 0, "n": 0, "di": 0})
+    for g in SC.countable(doc.get("games") or [], SEASON, need_line=False, d1_only=False):
+        if g.get("state") != "F" or len(g.get("teams") or []) != 2:
+            continue
+        w = SC.winner_index(g)
+        if w is None:
+            continue
+        ks = [_norm(t.get("name_short") or "") for t in g["teams"]]
+        both = ks[0] in di and ks[1] in di
+        for i, k in enumerate(ks):
+            x = rr(k); x["n"] += 1; x["di"] += 1 if both else 0
+            x["w" if i == w else "l"] += 1
+    if projected:
+        preds = (load("Cody/data/power_candidate/predictions_%d.json" % SEASON) if not PUBLIC else None) or \
+            load("data/predictions_%d.json" % SEASON) or {}
+        now = _t.time()
+        for g in preds.get("games") or []:
+            if (g.get("start_epoch") or 0) <= now or g.get("home_win") is None:
+                continue
+            if str(g.get("game_id")) in _played_gids():   # mail 116: played before its listed start
+                continue
+            if ct_context()["is_tourn"](g.get("game_id"), g.get("date"), g.get("home"), g.get("away")):
+                _CT_EXCL.add(str(g.get("game_id"))); continue
+            h, a = _norm(g.get("home") or ""), _norm(g.get("away") or "")
+            both = h in di and a in di
+            win, lose = (h, a) if float(g["home_win"]) >= 0.5 else (a, h)
+            for k, isw in ((win, True), (lose, False)):
+                x = rr(k); x["n"] += 1; x["di"] += 1 if both else 0; x["w" if isw else "l"] += 1
+    for w, l, _gid in (extra or []):
+        both = w in di and l in di
+        for k, isw in ((w, True), (l, False)):
+            x = rr(k); x["n"] += 1; x["di"] += 1 if both else 0; x["w" if isw else "l"] += 1
+    return rec
+
+
+def rpi_cutline(teams, field, ranking="official", scenario=None, official_ranks=False):
+    """ranking: official | projected | post. scenario (post only): {"games": [(w, l, id)], "aq": {conf_key: team}}"""
+    """Pure: returns the cut-line payload. Raises nothing for missing data; records it."""
+    import project_field as _PF
+    from reconcile_2025 import norm as _norm
+    lines = open(os.path.join(REPO, "data", "raw", "%d" % SEASON, "polls_rpi.jsonl"), encoding="utf-8").read().splitlines()
+    cap = None
+    for ln in reversed(lines):
+        try:
+            d = json.loads(ln)
+        except ValueError:
+            continue
+        if d.get("season") == SEASON and not d.get("is_previous_season") and d.get("source_tier") == "OFFICIAL":
+            cap = d; break
+    if not cap:
+        return {"error": "no stored official %d RPI capture" % SEASON}
+    rows = cap["rows"]
+    fut_meta = None
+    if ranking in ("projected", "post"):
+        fut, fut_meta = rpi_futures(extra=(scenario or {}).get("games") if ranking == "post" else None)
+        if official_ranks:                       # mail 104: a COMPLETED slate the official release covers
+            fut_meta = dict(fut_meta, rank_basis="official")
+        rows = rows if official_ranks else [dict(r, OfficialRank=r.get("Rank"), Rank=str(fut[_norm(r["School"])]["proj_rank"]) if _norm(r["School"]) in fut else "",
+                     Record="%d-%d" % (fut[_norm(r["School"])]["proj_w"], fut[_norm(r["School"])]["proj_l"])
+                     if _norm(r["School"]) in fut else r.get("Record")) for r in rows]
+    byname = dict((_norm(t["team"]), t) for t in teams)
+    rpi = []
+    unresolved_names = []
+    for r in rows:
+        k = _norm(r["School"]); t = byname.get(k)
+        if not t and _norm(r["School"]) not in _PF.INELIGIBLE_2026:     # an ineligible school cannot affect the cut
+            unresolved_names.append(r["School"])
+        rank = int(r["Rank"]) if str(r.get("Rank", "")).isdigit() else None
+        orank = int(r["OfficialRank"]) if str(r.get("OfficialRank", "")).isdigit() else rank
+        rpi.append({"team": t["team"] if t else r["School"], "rank": rank, "orank": orank, "conf": r.get("Conf"), "ckey": _ckey(r.get("Conf")),
+                    "record": r.get("Record"), "eligible": _norm(r["School"]) not in _PF.INELIGIBLE_2026 and
+                    _norm(t["team"] if t else r["School"]) not in _PF.INELIGIBLE_2026})
+    # NCAA conferences that award a bid: the official table's conference labels (resolved), cross-checked
+    # against the AQ config; a config key with fewer than 6 D-I members (WAC: UT Arlington only) cannot award.
+    aqcfg = (load("data/raw/%d/aq_mechanism_%d.json" % (SEASON, SEASON)) or {})
+    cfg = aqcfg.get("conferences", aqcfg)
+    size = {}
+    for r in rpi:
+        size[r["ckey"]] = size.get(r["ckey"], 0) + 1
+    ncaa = sorted(set(r["ckey"] for r in rpi))
+    # the NCAA manual still names the league "WAC"; the current UAC holds that single slot. The config carries both
+    # keys; both resolve to one conference, labelled UAC.
+    cfg_keys = {}
+    for k in sorted(cfg, key=lambda k: (k != "WAC", k)):
+        ck = "uac" if _ckey(k) == "wac" else _ckey(k)
+        cfg_keys[ck] = k
+    not_awarding = sorted(cfg_keys[k] for k in cfg_keys if size.get(k, 0) < 6)
+    missing_cfg = [k for k in ncaa if k not in cfg_keys]
+    label = dict((r["ckey"], cfg_keys.get(r["ckey"], r["conf"])) for r in rpi)
+    by_team = dict((r["team"], r) for r in rpi)
+    # AQs: the projected REGULAR-SEASON champion of each conference (Cody 2026-11-05), eligible teams only.
+    # An ineligible leader passes the bid to the best eligible finisher (project_field's rule).
+    # A conference tournament that has been played outranks any projection: its real champion holds the bid, and a
+    # team already knocked out cannot be projected to win it.
+    import aq_status as _AQ
+    _aq = _AQ.load()
+    proj, proj_meta = project_conf_champions(rpi)
+    aq_by_conf, conflicts = {}, []
+    for ck in ncaa:
+        if size.get(ck, 0) < 6:
+            continue
+        _won = [r for r in rpi if r["ckey"] == ck and _norm(r["team"]) in _aq["champions"]]
+        if _won and _won[0]["eligible"]:
+            aq_by_conf[ck] = dict(_won[0], aq_source="conference tournament champion", proj=proj[_won[0]["team"]],
+                                  runner=None, near_tie=False)
+            continue
+        mem = [r for r in rpi if r["ckey"] == ck and proj[r["team"]]["ppct"] is not None
+               and _norm(r["team"]) not in _aq["eliminated"]]
+        # ONE shared basis in both views: ties fall to current conference win %, then the OFFICIAL RPI rank
+        mem.sort(key=lambda r: (-proj[r["team"]]["ppct"], -(proj[r["team"]]["cpct"] or 0), r["orank"] or 999, r["team"]))
+        if not mem:
+            continue
+        top = mem[0]
+        if not top["eligible"]:
+            conflicts.append("%s leads the %s projection but is championship-ineligible; bid passes" % (top["team"], label[ck]))
+            mem = [r for r in mem if r["eligible"]]
+            if not mem:
+                continue
+        lead = mem[0]
+        tie = len(mem) > 1 and abs(proj[mem[1]["team"]]["ppct"] - proj[lead["team"]]["ppct"]) < 0.005
+        aq_by_conf[ck] = dict(lead, aq_source="projected regular-season champion", proj=proj[lead["team"]],
+                              runner=(mem[1]["team"], proj[mem[1]["team"]]) if len(mem) > 1 else None, near_tie=tie)
+    if ranking == "post" and scenario:
+        for ck, team in (scenario.get("aq") or {}).items():
+            r = by_team.get(team)
+            if r and r["eligible"]:
+                aq_by_conf[ck] = dict(r, aq_source="scenario tournament champion", proj=proj[r["team"]], runner=None, near_tie=False)
+    unresolved_aq = [label[c] for c in ncaa if size.get(c, 0) >= 6 and c not in aq_by_conf]
+    aqs = sorted(aq_by_conf.values(), key=lambda r: (r["rank"] or 999))
+    aq_names = set(r["team"] for r in aqs)
+    n_al = 64 - len(aqs) - len(unresolved_aq)          # an unresolved AQ slot is held open, never given to an at-large
+    recs = cut_records(projected=(ranking in ("projected", "post")),
+                       extra=(scenario or {}).get("games") if ranking == "post" else None)
+    gate_out = []
+    def al_ok(r):
+        x = recs.get(_norm(r["team"]))
+        if not x or not x["n"]:
+            return False, "no counted record"
+        if x["w"] / float(x["n"]) < _PF.MIN_WIN_PCT:
+            return False, "below .500 (%d-%d)" % (x["w"], x["l"])
+        if x["di"] / float(x["n"]) < _PF.MIN_DI_SHARE:
+            return False, "under 80%% D-I schedule (%d of %d)" % (x["di"], x["n"])
+        return True, ""
+    pool = []
+    for r in sorted([r for r in rpi if r["eligible"] and r["team"] not in aq_names and r["rank"]], key=lambda r: r["rank"]):
+        okk, why = al_ok(r)
+        if okk:
+            pool.append(r)
+        else:
+            gate_out.append({"team": r["team"], "rank": r["rank"], "why": why})
+    at_large, out = pool[:n_al], pool[n_al:n_al + 5]
+    cut = at_large[-1]["rank"] if at_large else None
+    fld = [dict(r, bid="AQ") for r in aqs] + [dict(r, bid="At-large") for r in at_large]
+    fld.sort(key=lambda r: (r["rank"] or 999))
+    # mail 103: the selection board -- every team ranked 1-60 with its status, plus AQs below 60
+    al_names = set(r["team"] for r in at_large)
+    gate_why = dict((g["team"], g["why"]) for g in gate_out)
+    board = []
+    for r in sorted([r for r in rpi if r["rank"]], key=lambda r: r["rank"]):
+        if r["rank"] > 60 and r["team"] not in aq_names and r["team"] not in al_names:
+            continue
+        if r["team"] in aq_names:
+            st, why = "AQ", None
+        elif r["team"] in al_names:
+            st, why = "At-large", None
+        elif not r["eligible"]:
+            st, why = "Ineligible", "reclassifying program"
+        elif r["team"] in gate_why:
+            st, why = "Ineligible", gate_why[r["team"]]
+        else:
+            st, why = "Out", None
+        board.append({"rank": r["rank"], "team": r["team"], "conf": label.get(r["ckey"], r["conf"]), "status": st, "why": why,
+                      "record": r["record"]})
+    al_pool = [r["team"] for r in pool]
+    want = [b["team"] for b in board] + [t for t in al_pool if t not in set(b["team"] for b in board)]
+    resumes = cut_resumes(rpi, want, ranking, scenario)
+    return {"ranking": ranking, "futures": fut_meta, "board": board, "resumes": resumes,
+            "ranks_all": dict((r["team"], r["rank"]) for r in rpi if r["rank"]), "al_pool": al_pool,
+            "aq_teams": [r["team"] for r in aqs],
+            "conf_of": dict((r["team"], label.get(r["ckey"], r["conf"])) for r in rpi),
+            "through": cap.get("stamp"), "captured": cap.get("captured_utc"), "n_aq": len(aqs), "n_al": len(at_large),
+            "cut_rank": cut, "last_in": at_large[-1] if at_large else None, "first_out": out,
+            "last_four_in": [{"team": r["team"], "rank": r["rank"], "conf": label.get(r["ckey"], r["conf"])} for r in at_large[-4:]],
+            "aq_below_line": [r["team"] for r in aqs if r["rank"] and cut and r["rank"] > cut],
+            "field": [{"rank": r["rank"], "team": r["team"], "conf": label.get(r["ckey"], r["conf"]), "bid": r["bid"], "record": r["record"],
+                       "conf_now": ("%d-%d" % (proj[r["team"]]["cw"], proj[r["team"]]["cl"])),
+                       "conf_proj": ("%.1f-%.1f" % (proj[r["team"]]["pw"], proj[r["team"]]["pl"])) if r["bid"] == "AQ" else None,
+                       "near_tie": bool(r.get("near_tie")),
+                       "runner": (r.get("runner") or [None])[0]} for r in fld],
+            "proj_meta": proj_meta,
+            "near_ties": [(label[ck], v["team"], v["runner"][0]) for ck, v in aq_by_conf.items() if v.get("near_tie") and v.get("runner")],
+            "unresolved_aq": unresolved_aq, "unresolved_names": unresolved_names, "conflicts": conflicts,
+            "not_awarding": not_awarding, "conf_missing_from_config": missing_cfg, "ncaa_conferences": len(ncaa),
+            "ineligible_listed": sorted(r["team"] for r in rpi if not r["eligible"]),
+            "at_large_gate_out": [g for g in gate_out if cut and g["rank"] <= cut + 15],
+            "aq_under_500": [r["team"] for r in aqs if (lambda x: x and x["n"] and x["w"] / float(x["n"]) < _PF.MIN_WIN_PCT)(recs.get(_norm(r["team"])))],
+            "wac_note": "The NCAA manual's WAC slot is held by the current UAC (one conference, one automatic bid)."}
+
+_CUT_FINALS = None
+
+
+def cut_resumes(rpi, want, ranking, scenario=None):
+    """mail 103: per-team resume for the cut-line comparison. ACTUAL results (every counted final, the same chain as
+    cut_records) and, separately labelled, PROJECTION INPUTS: the remaining forecast matches the projected views add
+    (favourite wins), plus the post view's scenario tournament matches. Opponent ranks are THIS view's ranks."""
+    import time as _t
+    import season_counts as SC
+    from reconcile_2025 import norm as _norm
+    global _CUT_FINALS
+    rank_of = dict((_norm(r["team"]), r["rank"]) for r in rpi if r["rank"])
+    name_of = dict((_norm(r["team"]), r["team"]) for r in rpi)
+    di = set(_norm(r["team"]) for r in rpi)
+    wk = set(_norm(t) for t in want)
+    if _CUT_FINALS is None:
+        doc = load("data/data_%d.json" % SEASON) or {}
+        fins = []
+        for g in SC.countable(doc.get("games") or [], SEASON, need_line=False, d1_only=False):
+            if g.get("state") != "F" or len(g.get("teams") or []) != 2:
+                continue
+            w = SC.winner_index(g)
+            if w is None:
+                continue
+            ts = g["teams"]
+            fins.append((_dt_et(g.get("start_time_epoch")) or "", [_norm(t.get("name_short") or "") for t in ts],
+                         [t.get("name_short") for t in ts], w, [t.get("sets_won") for t in ts],
+                         [bool(t.get("is_home")) for t in ts], str(g.get("game_id"))))
+        _CUT_FINALS = fins
+    out = dict((k, {"actual": [], "proj": []}) for k in wk)
+    for d, ks, nms, w, sw, hm, gid in _CUT_FINALS:
+        for i in (0, 1):
+            if ks[i] not in wk:
+                continue
+            o = 1 - i
+            site = "H" if hm[i] else ("A" if hm[o] else "N")
+            out[ks[i]]["actual"].append([d, name_of.get(ks[o], nms[o]), "W" if i == w else "L",
+                                         "%s-%s" % (sw[i], sw[o]), rank_of.get(ks[o]), 1 if ks[o] in di else 0, site, gid])
+    if ranking in ("projected", "post"):
+        preds = (load("Cody/data/power_candidate/predictions_%d.json" % SEASON) if not PUBLIC else None) or \
+            load("data/predictions_%d.json" % SEASON) or {}
+        now = _t.time()
+        for g in preds.get("games") or []:
+            if (g.get("start_epoch") or 0) <= now or g.get("home_win") is None:
+                continue
+            if str(g.get("game_id")) in _played_gids():   # mail 116: played before its listed start
+                continue
+            if ct_context()["is_tourn"](g.get("game_id"), g.get("date"), g.get("home"), g.get("away")):
+                continue
+            h, a = _norm(g.get("home") or ""), _norm(g.get("away") or "")
+            ph = float(g["home_win"])
+            for me, op, pw in ((h, a, ph), (a, h, 1 - ph)):
+                if me in wk:
+                    out[me]["proj"].append([g.get("date") or "", name_of.get(op, g.get("home") if op == h else g.get("away")),
+                                            "W" if pw >= 0.5 else "L", "forecast %.0f%%" % (100 * pw), rank_of.get(op),
+                                            1 if op in di else 0, "regular season"])
+        if ranking == "post":
+            for w_, l_, gid in (scenario or {}).get("games") or []:
+                for me, op, res in ((w_, l_, "W"), (l_, w_, "L")):
+                    if me in wk:
+                        out[me]["proj"].append(["", name_of.get(op, op), res, "scenario", rank_of.get(op), 1 if op in di else 0,
+                                                "conference tournament scenario"])
+    return dict((name_of.get(k, k), v) for k, v in out.items())
+
+
+def _cut_panel(c, asof, pid, hidden):
+    li, fo = c["last_in"], c["first_out"]
+    proj = c.get("ranking") in ("projected", "post")
+    warn = []
+    if c["unresolved_aq"]:
+        warn.append("No projected AQ for: %s (slot held open, not given to an at-large)." % ", ".join(c["unresolved_aq"]))
+    if c["unresolved_names"]:
+        warn.append("RPI schools not matched to a hub team: %s." % ", ".join(c["unresolved_names"][:8]))
+    if c.get("near_ties"):
+        warn.append("Close conference races (projected records within half a point): %s." % "; ".join("%s: %s vs %s" % t for t in c["near_ties"]))
+    if c["conflicts"]:
+        warn.append("Projection conflicts: %s." % "; ".join(c["conflicts"][:6]))
+    gates = "; ".join("%s (#%s): %s" % (g["team"], g["rank"], g["why"]) for g in c.get("at_large_gate_out") or [])
+    def _line_after(r):
+        return ('<tr class="cl-line"><td colspan="5"><span>Cut line &middot; %s #%s &middot; at-large bids end here; automatic '
+                'qualifiers below still make the field</span></td></tr>' % ("Projected RPI" if proj else "RPI", c["cut_rank"])) \
+            if (r["bid"] == "At-large" and r["rank"] == c["cut_rank"]) else ""
+    fbyteam = dict((r["team"], r) for r in c["field"])
+    def _status(b):
+        r = fbyteam.get(b["team"])
+        if b["status"] == "AQ" and r:
+            return ("<b class=\"cl-s cl-s-aq\">AQ</b> conf %s &rarr; proj. %s%s" % (esc(r["conf_now"]), esc(r["conf_proj"] or ""),
+                    (" <span class=\"cl-tie\" title=\"projected conference record within half a percentage point of %s\">close</span>" % esc(r["runner"] or "")) if r.get("near_tie") else ""))
+        if b["status"] == "At-large":
+            return "<b class=\"cl-s cl-s-al\">At-large</b>"
+        if b["status"] == "Ineligible":
+            return "<b class=\"cl-s cl-s-in\">Ineligible</b> %s" % esc(b["why"] or "")
+        return "<b class=\"cl-s cl-s-out\">Out</b>"
+    cls = {"AQ": "cl-aq", "At-large": "cl-al", "Out": "cl-out", "Ineligible": "cl-inel"}
+    _rows, deep = [], False
+    for b in c.get("board") or []:
+        if b["rank"] > 60 and not deep:
+            deep = True
+            _rows.append('<tr class="cl-deep"><td colspan="5"><span>Below #60: only teams still in the field</span></td></tr>')
+        _rows.append('<tr class="%s"><td class="rk">%s</td><td class="tm l">%s</td><td class="cf l">%s</td><td class="n">%s</td><td class="l">%s</td></tr>'
+                     % (cls[b["status"]], b["rank"], esc(b["team"]), esc(b["conf"] or ""), esc(b["record"] or ""), _status(b))
+                     + _line_after({"bid": b["status"], "rank": b["rank"]}))
+    rows = "".join(_rows)
+    def _ol(items):
+        return "<ol class=\"cl-ol\">" + "".join("<li><b>%s</b> <span>#%s &middot; %s</span></li>" % (esc(x["team"]), x["rank"], esc(x["conf"] or ""))
+                                               for x in items) + "</ol>"
+    last4, out4 = c.get("last_four_in") or [], fo[:4]
+    outs = ", ".join("%s (#%s, %s)" % (esc(r["team"]), r["rank"], esc(r["conf"] or "")) for r in fo[4:5])
+    fm = c.get("futures") or {}
+    if proj:
+        _basis = fm.get("forecast_model") or fm.get("forecast_basis") or "not stated"
+        src = ('<b>Projected RPI</b> at the end of the regular season, in the committee&rsquo;s format (25%% winning percentage, '
+               '50%% opponents&rsquo;, 25%% opponents&rsquo; opponents&rsquo;, <b>plus the NCAA&rsquo;s bonuses and '
+               'penalties</b>). Inputs: every counted D-I result so far plus the %d remaining scheduled D-I matches through %s, '
+               'each given to the favourite in the match forecasts (%s, %s; private Current POWER fit). A derived '
+               'projection, not the official table; conference tournaments are not scheduled yet and are not included.'
+               % (fm.get("projected_games", 0), esc(fm.get("last_scheduled_date") or "the last scheduled date"),
+                  esc(_basis), esc(str(fm.get("forecast_generated") or "")[:10])))
+    else:
+        src = ('Official NCAA RPI <b>%s</b> (captured %s).' % (esc(c["through"] or "date not stated"), esc((c["captured"] or "")[:10])))
+    post = c.get("ranking") == "post"
+    if post:
+        src = src.replace("<b>Projected RPI</b> at the end of the regular season",
+                          "<b>Projected RPI after the conference tournaments</b>, one scenario (the forecast favourite wins every "
+                          "unplayed tournament match; %d tournament matches added)" % ((c.get("futures") or {}).get("scenario_games", 0)))
+        src = src.replace("Automatic bids:", "Automatic bids:")
+    rk = "Projected RPI" if proj else "RPI"
+    return ('<div id="%s"%s>'
+            '<p class="lead"><b>RPI Cut Line</b> &mdash; an RPI scenario, not a bracket prediction: the committee weighs '
+            'other criteria too. %s Automatic bids: one per conference (%d of %d conferences): the real tournament champion where one is decided, otherwise the <b>projected '
+            'regular-season champion</b> among teams still alive &mdash; current conference record plus expected wins in the remaining conference '
+            'matches (Current POWER&rsquo;s match forecasts%s), assuming that team wins any tournament still open. The other %d spots go in strict %s order to eligible teams without an automatic bid.</p>'
+            '<div class="panel cl-sum"><div class="cl-k"><span>Cut line</span><b>%s #%s</b><em>last at-large in: %s</em></div>'
+            '<div class="cl-k"><span>Last four in</span>%s</div>'
+            '<div class="cl-k"><span>First four out</span>%s<em>%s</em></div>'
+            '<p class="tnote">Both lists run in RPI order: the last name in &ldquo;Last four in&rdquo; is the final at-large team, the '
+            'first name in &ldquo;First four out&rdquo; is next in line. Automatic qualifiers ranked below the line still make the field%s.</p>%s</div>'
+            '<div class="panel"><div class="scroll"><table class="r26t cl-t"><thead><tr><th>%s</th><th class="l">Team</th>'
+            '<th class="l">Conf</th><th>%s</th><th class="l">Bid</th></tr></thead><tbody>%s</tbody></table></div>'
+            '<p class="tnote">%d teams: %d projected automatic qualifiers + %d at-large. At-large teams must be .500 or better '
+            'overall and play at least 80%% of their matches against D-I (%s record); automatic qualifiers are exempt%s. '
+            'Not at-large eligible near the line: %s. Ineligible (reclassifying) programs are skipped: %s. %s</p></div>%s</div>'
+            % (pid, " hidden" if hidden else "", src, c["n_aq"], c["ncaa_conferences"],
+               (", computed %s" % esc(str(c["proj_meta"].get("generated") or asof or "")[:10])) if (c["proj_meta"].get("generated") or asof) else "",
+               c["n_al"], rk, rk, c["cut_rank"],
+               ("%s (#%s)" % (esc(li["team"]), li["rank"])) if li else "&mdash;",
+               _ol(last4), _ol(out4), ("Then: " + outs) if outs else "",
+               (": " + esc(", ".join(c["aq_below_line"]))) if c["aq_below_line"] else "",
+               ("<div class=\"seasonwarn\">%s</div>" % " ".join(esc(w) for w in warn)) if warn else "",
+               rk, "Proj. record" if proj else "Record", rows, len(c["field"]), c["n_aq"], c["n_al"],
+               "projected end-of-season" if proj else "current",
+               (" (below .500 but holding an AQ: %s)" % esc(", ".join(c["aq_under_500"]))) if c.get("aq_under_500") else "",
+               esc(gates or "none"), esc(", ".join(c["ineligible_listed"]) or "none listed"),
+               esc(c.get("wac_note") or "") + ((" Not awarding a bid (fewer than six D-I members): %s." % esc(", ".join(c["not_awarding"]))) if c["not_awarding"] else ""),
+               _cut_compare(c, pid)))
+
+def _cut_compare(c, pid):
+    """mail 103: two-team resume comparison (defaults: last in vs first out). Data embedded per view."""
+    proj = c.get("ranking") in ("projected", "post")
+    fm = c.get("futures") or {}
+    basis = ("Projected RPI (forecasts generated %s)" % esc(str(fm.get("forecast_generated") or "")[:16].replace("T", " ") or "date not stated")) \
+        if proj else ("official RPI %s, captured %s" % (esc(c.get("through") or "date not stated"), esc((c.get("captured") or "")[:16].replace("T", " "))))
+    data = {"board": [[b["team"], b["rank"], b["status"], b["conf"]] for b in c.get("board") or []],
+            "res": dict((b["team"], (c.get("resumes") or {}).get(b["team"])) for b in c.get("board") or [] if (c.get("resumes") or {}).get(b["team"])),
+            "a": (c.get("last_in") or {}).get("team"),
+            "b": ((c.get("first_out") or [{}])[0] or {}).get("team"), "rk": "Proj. RPI" if proj else "RPI",
+            "proj": proj, "post": c.get("ranking") == "post"}
+    return ('<div class="panel cl-cmp" data-pid="%s"><h4>Compare two r&eacute;sum&eacute;s</h4>'
+            '<p class="tnote">Opponent ranks are this view&rsquo;s %s. <b>Results</b> are counted finals only; %s'
+            ' KPI: &mdash; (no verified dated KPI is held). The committee weighs these criteria itself: this is evidence, not a verdict.</p>'
+            '<div class="cl-pick"><select class="cl-sa" aria-label="First team"></select><span>vs</span><select class="cl-sb" aria-label="Second team"></select></div>'
+            '<div class="cl-out"></div>'
+            '<script>(window.CLD = window.CLD || {})["%s"] = %s;</script></div>'
+            % (pid, basis,
+               "<b>projection inputs</b> (remaining forecast matches%s) are listed separately and never mixed into the record lines." % (
+                   " and the scenario&rsquo;s conference-tournament matches" if c.get("ranking") == "post" else "") if proj else
+               "today&rsquo;s view uses no projections.",
+               pid, json.dumps(data, separators=(",", ":")).replace("</", "<\\/")))
+
+def committee_basis_prose(cm):
+    """mail 104: the bracket lead when the committee-informed field is on the page."""
+    from committee_field import RANK_LABEL
+    lab = RANK_LABEL[cm["basis"]]
+    return ("A projected 2026 64-team field <b>after the conference tournaments</b>, one coherent scenario: each "
+            "conference&rsquo;s automatic bid goes to the scenario&rsquo;s tournament champion (regular-season champion in the "
+            "ACC, Big 12 and WCC); at-large places follow the hub&rsquo;s <b>quality-win rule</b> on the scenario&rsquo;s "
+            "<b>%s</b> (rank &minus; 2 &times; top-25 wins &minus; 1 &times; top-50 wins; a top-25 win also counts as a top-50 "
+            "win, so it is worth 3 places and a win over #26&ndash;50 is worth 1), with the .500 and 80%% D-I at-large rules. "
+            "Seeds 1&ndash;32 use the same score. The pure-RPI field stays on the "
+            "<a href=\"#/bracket/cutline/post\">RPI Cut Line</a> for comparison." % lab)
+
+
+QUAD_NAME = ("upper left", "lower left", "upper right", "lower right")   # as drawn: Q0/Q1 left half, Q2/Q3 right half
+
+
+def committee_parts(cm):
+    """mail 114: the committee-informed bracket in READING ORDER, as separate pieces the template places:
+    lead (scenario + cutoff), top (regional No.1s), bubble (last in / first out), method, map (model order ->
+    seed line -> region -> pod), gaps, script (the placement the drawing uses). Every value is copied from the
+    ONE committee build -- nothing is derived here, so the pieces cannot disagree with each other."""
+    if not cm:
+        return {}
+    from committee_field import miles, RANK_LABEL
+    if cm.get("error"):
+        return {"top": '<div class="seasonwarn" id="cmfield">Committee-informed field unavailable: %s. The bracket below is '
+                       'the end-of-regular-season RPI field with seed-order pairings, labelled as such.</div>' % esc(cm["error"])}
+    sel, pl, cp = cm["sel"], cm["place"], cm["rpi_post"]
+    fm = cp.get("futures") or {}
+    gen = str(cm.get("gen") or "")[:16].replace("T", " ")
+    if cm["basis"] in ("projected", "provisional"):
+        left = (fm.get("projected_games") or 0) + (fm.get("scenario_games") or 0)
+        basis_short = ("<b>Projected RPI</b> (provisional: %d matches still forecast%s)"
+                       % (left, ("; forecasts generated %s UTC" % esc(gen)) if gen else ""))
+        basis = ("Ranking: <b>Projected RPI</b>, provisional &mdash; %d regular-season and %d conference-tournament matches are "
+                 "still forecast (favourite wins; forecasts generated %s). Played results are counted finals. Not complete "
+                 "because: %s."
+                 % (fm.get("projected_games", 0), fm.get("scenario_games", 0), esc(gen or "date not stated"),
+                    esc("; ".join(cm.get("incomplete_why") or []) or "not stated")))
+    elif cm["basis"] == "official":
+        basis_short = "the <b>official RPI</b>, %s" % esc(cm.get("through") or "")
+        basis = "Ranking: <b>official RPI</b>, %s &mdash; the release covers every played match." % esc(cm.get("through") or "")
+    else:
+        basis_short = "the <b>complete RPI</b> (every match played)"
+        basis = ("Ranking: <b>complete RPI</b> (every match played). The latest official release (%s) does not yet cover "
+                 "the last results, so it is not used." % esc(cm.get("through") or "date not stated"))
+    lead = ("<b>Projected 2026 NCAA bracket</b>: one scenario after the conference tournaments, on %s. Built by this "
+            "hub&rsquo;s rules &mdash; not the committee&rsquo;s bracket, and nothing has been announced." % basis_short)
+    rk = sel["ranks"]
+    def lst(ts):
+        return "<ol class=\"cl-ol\">" + "".join("<li><b>%s</b> <span>#%s</span></li>" % (esc(t), rk.get(t)) for t in ts) + "</ol>"
+    # regional No.1s, in model order
+    ones = sorted(((pl["quad"][q][1], q) for q in range(4)), key=lambda x: x[0]["order"])
+    top = ('<div class="cm-panel" id="cmfield"><div class="cm-regs" aria-label="Regional No. 1 seeds">%s</div></div>'
+           % "".join('<div class="cm-reg"><span>Region &middot; %s</span><b>%s</b><em>Model #%d &middot; %s &middot; %s</em></div>'
+                     % (QUAD_NAME[q], esc(r["team"]), r["order"], esc(r["conf"] or ""),
+                        "automatic bid" if r["bid"] == "AQ" else "at-large") for r, q in ones))
+    rpi_l4 = [x["team"] for x in cp.get("last_four_in") or []]
+    rpi_o4 = [x["team"] for x in (cp.get("first_out") or [])[:4]]
+    bubble = ('<div class="panel cl-sum cm-bubble"><div class="cl-k"><span>Field</span><b>%d teams</b><em>%d automatic + %d at-large</em></div>'
+              '<div class="cl-k"><span>Last four in</span>%s</div><div class="cl-k"><span>First four out</span>%s</div>'
+              '<p class="tnote">%s rank beside each name. Pure ranking order, same scenario and snapshot: last four in %s; first '
+              'four out %s. Why they differ is under <b>How this field is built</b>.</p></div>'
+              % (len(cm["ordered"]), sel["n_aq"], sel["n_al"], lst(sel["last_four_in"]), lst(sel["first_four_out"]),
+                 RANK_LABEL.get(cm["basis"], "Ranking"), esc(", ".join(rpi_l4)), esc(", ".join(rpi_o4))))
+    chg = []
+    for ch in sel["changes"]:
+        head = {"swap": "Field change", "last_in": "Last team in", "next_in_line": "Next in line"}[ch.get("kind", "swap")]
+        chg.append('<div class="cm-chg"><span class="cl-sec">%s</span>%s<p>%s</p><ul>%s</ul></div>'
+                   % (head, ("<p class=\"tnote\">%s</p>" % esc(ch["note"])) if ch.get("note") else "", esc(ch["text"]),
+                      "".join("<li>%s</li>" % esc(e) for e in ch["evidence"])))
+    if not [c for c in sel["changes"] if c.get("kind") == "swap"]:
+        chg.insert(0, '<p class="tnote"><b>Same 32 at-large teams as the pure-RPI field.</b> The quality-win rule only '
+                      'reorders them; the changes at the cut are explained below.</p>')
+    method = ('<p>%s</p><h5 class="cm-h5">Field selection: the changes at the cut</h5>%s' % (basis, "".join(chg)))
+    # the compact mapping: model order -> seed line -> region -> pod, for all 32 seeded teams
+    quad_of, pod_of = {}, {}
+    for q in range(4):
+        for ln in range(1, 9):
+            if pl["quad"][q].get(ln):
+                quad_of[pl["quad"][q][ln]["team"]] = q
+    for p in pl["pods"]:
+        for t in [p["host"], p["seed2"]] + p["un"]:
+            pod_of[t["team"]] = p["host"]["team"]
+    one_of = dict((q, pl["quad"][q][1]["team"]) for q in range(4))
+    maprows = "".join('<tr><td class="rk">%d</td><td class="tm">%s</td><td class="n">%d</td><td class="l">%s</td><td class="l">%s</td></tr>'
+                      % (r["order"], esc(r["team"]), r["line"], esc("%s (%s)" % (one_of[quad_of[r["team"]]], QUAD_NAME[quad_of[r["team"]]])),
+                         esc(pod_of[r["team"]]))
+                      for r in cm["ordered"][:32])
+    pods = []
+    for q in sorted(range(4), key=lambda q: pl["quad"][q][1]["order"]):
+        rows = []
+        for p in [p for p in pl["pods"] if p["q"] == q]:
+            def mi(t, p=p):
+                m = miles(t["team"], p["host"]["team"])
+                return ("~%d mi" % (round(m / 10.0) * 10)) if m is not None else "distance unknown"
+            rows.append("<li><b>%s</b> (line %d, assumed host) &middot; %s (line %d, %s) &middot; %s</li>" % (
+                esc(p["host"]["team"]), p["host"]["line"], esc(p["seed2"]["team"]), p["seed2"]["line"], mi(p["seed2"]),
+                " &middot; ".join("%s (unseeded, %s)" % (esc(u["team"]), mi(u)) for u in p["un"])))
+        pods.append("<div><span class=\"cl-sec\">%s region &middot; %s</span><ul>%s</ul></div>" % (
+            esc(pl["quad"][q][1]["team"]), QUAD_NAME[q], "".join(rows)))
+    mapping = ('<details class="method brdisc"><summary><b>Model order, seed lines and regions</b> &mdash; where each of the '
+               'top 32 sits, and every pod</summary><div class="note">'
+               '<p><b>Three different numbers, kept apart.</b> <b>Model order</b> (#) is the hub&rsquo;s overall order on the '
+               'quality-win rule. <b>Seed line</b> (1&ndash;8) is what the official bracket prints: four teams per line. '
+               '<b>Region</b> is the quadrant, named for its line-1 team. None of these is an official seed; nothing has been '
+               'announced.</p>'
+               '<div class="scroll"><table class="r26t cm-map"><thead><tr><th>#</th><th class="l">Team</th><th>Line</th>'
+               '<th class="l">Region</th><th class="l">Pod host</th></tr></thead><tbody>%s</tbody></table></div>'
+                              '<p class="tnote"><b>How lines 1&ndash;4 reach regions (a 2025-based placement convention, supported by the '
+               'official bracket).</b> The regions of model #1&ndash;#4 hold model order <b>1, 8, 9, 16</b> &middot; '
+               '<b>2, 7, 10, 15</b> &middot; <b>3, 6, 11, 14</b> &middot; <b>4, 5, 12, 13</b>, so no region gets the '
+               'strongest team of every line. This is exactly how the official 2025 bracket placed the committee&rsquo;s '
+               'published top 16 (Nebraska with Louisville, Texas A&amp;M and Kansas; Kentucky with Arizona St., Creighton '
+               'and USC). The manual fixes the seed groups and pairings; it does not spell out this grouping. Lines '
+               '5&ndash;8 are not snaked: they go to the nearest available pod by home state, avoiding first- and '
+               'second-round conference meetings, as the 2025 release says ("assigned geographically").</p>'
+'<div class="cm-quads">%s</div></div></details>' % (maprows, "".join(pods)))
+    gaps = ["Host bids are not public: every top-16 seed is assumed to host its pod, and line-1 teams the regionals.",
+            "Distances are state centre to state centre from each team's most common home-match state, not real travel; "
+            "the 400-mile bus/air distinction is not modelled.",
+            "KPI is not used (no verified dated KPI is held).",
+            "Seed order uses the same quality-win score, not the committee's own seeding discussion; head-to-head and "
+            "common opponents are shown as evidence and change nothing."]
+    if pl["no_geo"]:
+        gaps.append("No home location in our data, placed by conference separation only: %s." % ", ".join(pl["no_geo"]))
+    if pl["notes"]:
+        gaps.append("Placement conflicts: %s." % "; ".join(pl["notes"]))
+    games = [[{"seed": t["order"] if t["order"] <= 32 else 99, "team": t["team"], "conf": t["conf"] or "",
+               "bid": "AQ" if t["bid"] == "AQ" else "at-large"} for t in g] for g in pl["games"]]
+    return {"lead": lead, "top": top, "bubble": bubble, "method": method, "map": mapping,
+            "gaps": '<ul class="cm-gaps">%s</ul>' % "".join("<li>%s</li>" % esc(g) for g in gaps),
+            "script": '<script>window.BRACKET_GAMES = %s;</script>' % json.dumps(games, separators=(",", ":")).replace("</", "<\\/")}
+
+
+def committee_panel_html(cm):
+    """the committee pieces concatenated (kept for the fixtures in test_committee_field.py; the page places the
+    pieces itself, in reading order)."""
+    parts = committee_parts(cm)
+    return "".join(parts.get(k, "") for k in ("top", "bubble", "method", "map", "gaps", "script"))
+
+
+def conf_tournaments(teams, use_observed=True):
+    """mail 100: seeded conference tournaments, AQ probabilities (simulated) and ONE chalk scenario."""
+    import conf_tournaments as CT
+    import project_field as _PF
+    from reconcile_2025 import norm as _norm
+    cfg = CT.load_cfg()
+    lines = open(os.path.join(REPO, "data", "raw", "%d" % SEASON, "polls_rpi.jsonl"), encoding="utf-8").read().splitlines()
+    cap = json.loads(lines[-1])
+    byname = dict((_norm(t["team"]), t["team"]) for t in teams)
+    rpi = []
+    for r in cap["rows"]:
+        nm = byname.get(_norm(r["School"]), r["School"])
+        ck = _ckey(r.get("Conf"))
+        rpi.append({"team": nm, "ckey": "uac" if ck == "wac" else ck, "conf": r.get("Conf"),
+                    "orank": int(r["Rank"]) if str(r.get("Rank", "")).isdigit() else 999,
+                    "eligible": _norm(nm) not in _PF.INELIGIBLE_2026})
+    proj, pmeta = project_conf_champions(rpi)
+    cand = (load("Cody/data/power_candidate/v2so_preview.json") if not PUBLIC else None) or {}
+    # mail 101: actual results ONLY from the provenance ledger, each bound to its bracket round
+    ctx = ct_context()
+    actual = ctx["bound"]
+    observed = ((load("data/conf_tournament_observed_%d.json" % SEASON) or {}).get("leagues") or {}) if use_observed else {}
+    out, scen_games, scen_aq = {}, [], {}
+    names = {}
+    for r in rpi:
+        names.setdefault(r["ckey"], r["conf"])
+    for cname, row in sorted(cfg["conferences"].items()):
+        ck = "uac" if _ckey(cname) == "wac" else _ckey(cname)
+        mem = [r for r in rpi if r["ckey"] == ck and r["eligible"] and proj[r["team"]]["ppct"] is not None]
+        mem.sort(key=lambda r: (-proj[r["team"]]["ppct"], -(proj[r["team"]]["cpct"] or 0), r["orank"], r["team"]))
+        if not mem:
+            out[cname] = {"error": "no projected standings for %s" % cname, "cfg": row}; continue
+        field_n = min(row["field"], len(mem))
+        ann = (ctx["announced"].get(cname) or {}).get("seeds")
+        seed_basis = "projected"
+        if ann:
+            seeds = dict((int(k), v) for k, v in ann.items()); seed_basis = "announced"
+            field_n = len(seeds)
+        elif row.get("structure") == "sunbelt10":
+            per = row["field"] // 2; seeds = {}
+            for di, dname in enumerate(("East", "West")):
+                dm = [r for r in mem if r["team"] in set(row["divisions"][dname])][:per]
+                for i, r in enumerate(dm):
+                    seeds[di * per + i + 1] = r["team"]
+            if len(seeds) != row["field"]:
+                out[cname] = {"error": "division seeding incomplete for %s" % cname, "cfg": row}; continue
+        else:
+            seeds = dict((i + 1, mem[i]["team"]) for i in range(field_n))
+        obs = observed.get(cname)
+        if obs and obs.get("matches"):
+            # a tournament that has started is shown from its REAL matches, never from projected seeds
+            in_it = set(t for m in obs["matches"] for t in (m["a"], m["b"]))
+            lost = len([m for m in obs["matches"] if m["winner"]])
+            need = obs["field"] - lost - len(obs["alive"])
+            byes = [r["team"] for r in mem if r["team"] not in in_it][:max(0, need)]
+            res = CT.project_observed(cname, row, obs, cand, byes=byes)
+            real = dict((i + 1, t) for i, t in enumerate(sorted(in_it | set(byes))))
+            out[cname] = dict(res, cfg=row, host_effective=row.get("host", "neutral"), seeds=real, seed_basis="observed",
+                              standings=[], actual_results_used=lost, observed=obs, inferred_byes=byes)
+            scen_aq[ck] = res["chalk_champion"]
+            for m in res["chalk"]:
+                if m["source"] != "actual":
+                    w, l = (m["a"], m["b"]) if m["winner"] == m["a"] else (m["b"], m["a"])
+                    scen_games.append((_norm(w), _norm(l), "ct-%s-r%d-%s-%s" % (ck, m["round"], _norm(w), _norm(l))))
+            continue
+        host = row.get("host", "neutral")
+        if host not in ("neutral", "top_seed", "higher_seed", "first_half_leader", "r0_higher_then_top") and host not in seeds.values():
+            # a named host school that is not in the projected field plays no home match; the site is neutral
+            host_eff = "neutral"
+        else:
+            host_eff = host
+        res = CT.project(cname, dict(row, host=host_eff), seeds, cand, actual=actual.get(ck))
+        out[cname] = {"cfg": row, "host_effective": host_eff, "seeds": seeds,
+                      "seed_basis": seed_basis,
+                      "standings": [{"team": t, "proj": ("%.1f-%.1f" % (proj[t]["pw"], proj[t]["pl"])) if t in proj else "",
+                                     "now": ("%d-%d" % (proj[t]["cw"], proj[t]["cl"])) if t in proj else ""}
+                                    for _, t in sorted(seeds.items())],
+                      "actual_results_used": len(actual.get(ck, {})), **res}
+        scen_aq[ck] = res["chalk_champion"]
+        for m in res["chalk"]:
+            if m["source"] == "forecast favourite":
+                w, l = (m["a"], m["b"]) if m["winner"] == m["a"] else (m["b"], m["a"])
+                scen_games.append((_norm(w), _norm(l), "ct-%s-r%d-%s-%s" % (ck, m["round"], _norm(w), _norm(l))))
+    return out, {"games": scen_games, "aq": scen_aq, "excluded_tournament_fixtures": sorted(_CT_EXCL),
+                 "ledger_rejected": ctx["rejected"], "unprovenanced_in_window_finals": ctx["unprovenanced"],
+                 "window_candidates_kept_regular": sorted(ctx["candidates"].values(), key=lambda c: (c["date"] or "", str(c["game_id"]))),
+                 "confirmed_scheduled_fixtures": sorted(ctx["scheduled_gids"]),
+                 "selection": "chalk: the forecast favourite wins every unplayed tournament match; regular-season-AQ "
+                              "leagues (ACC, Big 12, WCC) keep their projected regular-season champion"}, pmeta
+
+
+def _ct_observed_card(cname, c):
+    """A tournament that has started: its real results, who is left, and the bid."""
+    o = c["observed"]
+    champ = o.get("champion")
+    if champ:
+        tag, status = "verified", "CHAMPION"
+        head = '<b>%s</b> won the automatic bid.' % esc(champ)
+        if o.get("awaiting_feed"):
+            head += " NCAA.com has posted this; the final&rsquo;s score has not reached our feed yet."
+    else:
+        tag, status = "partial", "IN PROGRESS"
+        head = "%d teams left." % (len(o["alive"]) + len(c.get("inferred_byes") or []))
+    days = {}
+    for m in o["matches"]:
+        days.setdefault(m["date"], []).append(m)
+    rows = []
+    for d in sorted(days):
+        for m in days[d]:
+            if m["winner"]:
+                l = m["b"] if m["winner"] == m["a"] else m["a"]
+                sw = m.get("sets") or []
+                score = ""
+                if len(sw) == 2 and None not in sw:
+                    score = " %d-%d" % (max(sw), min(sw))
+                line = '<b>%s</b> def. %s%s' % (esc(m["winner"]), esc(l), score)
+            else:
+                line = '%s v %s <span class="ct-p">%s</span>' % (esc(m["a"]), esc(m["b"]), "live" if m["state"] == "I" else "upcoming")
+            rows.append('<li><span class="ct-r">%s</span> %s</li>' % (esc(d[5:].replace("-", "/")), line))
+    odds = ""
+    if not champ or o.get("awaiting_feed"):
+        left = sorted(((t, p) for t, p in c["aq_prob"].items() if p > 0), key=lambda kv: -kv[1])
+        if not champ:
+            odds = '<p class="tnote"><b>Chance to win the bid:</b> %s. Later-round pairings are inferred from play order.</p>' % " &middot; ".join(
+                "%s %.0f%%" % (esc(t), 100 * p) for t, p in left)
+    note = ""
+    if c.get("inferred_byes"):
+        note = '<p class="tnote">First-round byes inferred from conference standings: %s.</p>' % esc(", ".join(c["inferred_byes"]))
+    return ('<div class="panel ct-card"><h4>%s <span class="ct-st ct-%s">%s</span></h4><p class="tnote">%s %s &middot; %s.</p>%s%s'
+            '<details class="ct-path" open><summary>Results and schedule</summary><ol>%s</ol></details></div>'
+            % (esc(cname), tag, status, head, esc(o.get("schedule") or ""), esc((o.get("location") or "").rstrip(".")), odds, note, "".join(rows)))
+
+
+def conf_tournaments_html(ct):
+    if not ct:
+        return ""
+    cards = []
+    order = sorted(ct.items(), key=lambda kv: kv[0])
+    for cname, c in order:
+        if c.get("error"):
+            cards.append('<div class="panel ct-card"><h4>%s</h4><div class="seasonwarn">%s</div></div>' % (esc(cname), esc(c["error"])))
+            continue
+        if c.get("seed_basis") == "observed":
+            cards.append(_ct_observed_card(cname, c))
+            continue
+        row = c["cfg"]
+        top = sorted(c["aq_prob"].items(), key=lambda kv: -kv[1])
+        seedrows = "".join(
+            '<tr><td class="rk">%s</td><td class="tm l">%s</td><td class="n">%s</td><td class="n">%s</td><td class="n">%s</td><td class="n"><b>%.1f%%</b></td></tr>'
+            % (sd if row.get("structure") != "sunbelt10" else ("E%d" % sd if sd <= 5 else "W%d" % (sd - 5)), esc(t), esc(c["standings"][sd - 1]["proj"]), esc(c["standings"][sd - 1]["now"]),
+               ("R%d" % (c["entry_round"][t] + 1)) if c["entry_round"].get(t) is not None else "&mdash;", 100 * c["aq_prob"][t])
+            for sd, t in sorted(c["seeds"].items()))
+        rnames = {}
+        path = "".join('<li><span class="ct-r">R%d</span> (%d) %s %s (%d) %s &rarr; <b>%s</b> <span class="ct-p">%s %.0f%%%s</span></li>'
+                       % (m["round"] + 1, m["sa"], esc(m["a"]), "v", m["sb"], esc(m["b"]), esc(m["winner"]),
+                          esc(m["a"]), 100 * m["p_a"], " &middot; actual" if m["source"] == "actual" else "")
+                       for m in sorted(c["chalk"], key=lambda m: m["round"]))
+        st = row.get("status")
+        src = " &middot; ".join('<a href="%s" target="_blank" rel="noopener">source %d</a>' % (esc(u), i + 1) for i, u in enumerate(row.get("sources") or []))
+        host = row.get("host"); he = c.get("host_effective")
+        hostlab = {"neutral": "neutral site", "top_seed": "No. 1 seed hosts", "higher_seed": "higher seed hosts",
+                   "first_half_leader": "best first-half record hosts (projected leader used)",
+                   "r0_higher_then_top": "first round at the higher seed, later rounds at the No. 1 seed"}.get(host, "%s hosts" % host)
+        if he == "neutral" and host not in ("neutral",):
+            hostlab += " (not in the projected field, so neutral here)"
+        cards.append(
+            '<div class="panel ct-card"><h4>%s <span class="ct-st ct-%s">%s</span></h4>'
+            '<p class="tnote">%d teams &middot; %s &middot; %s. %s %s</p>'
+            '<div class="scroll"><table class="r26t ct-t"><thead><tr><th>Seed</th><th class="l">Team</th><th>Proj. conf</th>'
+            '<th>Now</th><th>Starts</th><th>AQ chance</th></tr></thead><tbody>%s</tbody></table></div>'
+            '<details class="ct-path"><summary>One projected bracket outcome (favourite wins each match): <b>%s</b></summary><ol>%s</ol></details>%s</div>'
+            % (esc(cname), esc((st or "").lower()), esc(st or ""), len(c["seeds"]), esc(row.get("dates") or ""), esc(hostlab),
+               esc(row.get("why") or "") + (" Seeds: %s." % ("announced by the league" if c.get("seed_basis") == "announced" else "projected (league seeds not announced yet)"))
+               + ((" Unresolved: %s." % "; ".join(row["unresolved"])) if row.get("unresolved") else ""), src, seedrows, esc(c["chalk_champion"]), path,
+               ('<div class="seasonwarn">No forecast for: %s (50/50 used, labelled).</div>' % esc(", ".join("%s v %s" % x for x in c["fallback_pairs"]))) if c["fallback_pairs"] else ""))
+    return ('<div id="conftour" hidden>'
+            '<p class="lead"><b>Conference tournaments.</b> Real results appear as they finish. Anything still to play is projected, seeded from projected final conference standings (current conference '
+            'record plus expected wins in the remaining conference matches; ties by current conference record, then official '
+            'RPI &mdash; published league tiebreakers are not modelled). Each match uses the hub&rsquo;s match model with the venue '
+            'when known. <b>AQ chance</b> = share of %s simulations (reproducible seed) a team wins its tournament &mdash; separate '
+            'from the single projected outcome under each table. ACC, Big 12 and WCC award their bid to the regular-season champion. '
+            'Status: VERIFIED = format stated by a 2026 league or host source; PARTIAL = host/dates sourced, format from 2025 or '
+            'inferred; FALLBACK = no 2026 format found, labelled default.</p>'
+            '<div class="ct-grid">%s</div></div>' % ("{:,}".format(10000), "".join(cards)))
+
+
+def rpi_cutline_html(teams, field, cp=None, ct=None, cpost=None):
+    c = rpi_cutline(teams, field)
+    if c.get("error"):
+        return '<div class="seasonwarn" id="cutline-error">RPI Cut Line unavailable: %s.</div>' % esc(c["error"])
+    asof = (load("data/season_sim_%d.json" % SEASON) or {}).get("meta", {}).get("generated_utc")
+    try:
+        cp = cp or rpi_cutline(teams, field, ranking="projected")
+        if cp.get("error"):
+            raise ValueError(cp["error"])
+        proj_html = _cut_panel(cp, asof, "cl-proj", True)
+    except Exception as e:                       # the official view must survive a projection failure
+        proj_html = '<div id="cl-proj" hidden><div class="seasonwarn">Projected RPI unavailable: %s</div></div>' % esc(str(e)[:200])
+    post_html = ""
+    if cpost and not cpost.get("error"):
+        try:
+            post_html = _cut_panel(cpost, asof, "cl-post", True).replace(
+                "the <b>projected '\n            'regular-season champion</b>", "the projected champion").replace(
+                "the <b>projected regular-season champion</b> &mdash; current conference record plus expected wins in the remaining conference matches",
+                "the <b>scenario&rsquo;s conference-tournament champion</b> (regular-season champion in the ACC, Big 12 and WCC)")
+        except Exception as e:
+            post_html = '<div id="cl-post" hidden><div class="seasonwarn">Post-tournament scenario unavailable: %s</div></div>' % esc(str(e)[:200])
+    return ('<div class="segrow"><div class="seg" role="tablist" aria-label="Bracket view">'
+            '<button class="segb on" data-bv="bracket">Projected bracket</button>'
+            '<button class="segb" data-bv="cutline">RPI Cut Line</button>'
+            '<button class="segb" data-bv="conftour">Conference tournaments</button></div></div>'
+            '<div id="cutline" hidden>'
+            '<div class="seg cl-sub" role="tablist" aria-label="Which RPI">'
+            '<button class="segb on" data-clv="now">Today&rsquo;s official RPI</button>'
+            '<button class="segb" data-clv="proj">End of regular season</button>'
+            + ('<button class="segb" data-clv="post">After conference tournaments</button>' if post_html else '') + '</div>'
+            + _cut_panel(c, asof, "cl-now", False) + proj_html + post_html + '</div>'
+            + conf_tournaments_html(ct)) + CUTLINE_JS
+
+
+CUTLINE_JS = r"""<style>
+/* mail 114: committee-bracket styles live HERE, in the private-only block, not in the shared sheet */
+.cm-regs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:10px 0 14px}
+@media (max-width:760px){.cm-regs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.cm-reg{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card,10px);padding:10px 12px;min-width:0}
+.cm-reg span{display:block;font:700 10px/1.2 var(--disp);letter-spacing:.1em;text-transform:uppercase;color:var(--ink2)}
+.cm-reg b{display:block;font-size:16.5px;margin-top:5px;overflow-wrap:anywhere}
+.cm-reg em{display:block;font-style:normal;font-size:12px;color:var(--ink2);margin-top:3px}
+.cm-bubble{margin-top:14px}
+.cm-h5{margin:14px 0 6px;font:700 15px/1.2 var(--disp)}
+.cm-map td.l{white-space:normal}
+.cm-panel h4{margin:0 0 4px;font:700 17px/1.2 var(--disp)}.cm-sec{margin-top:12px}.cm-sec h5{margin:0 0 6px;font:700 15px/1.2 var(--disp)}
+.cm-chg{border-left:3px solid var(--line2);padding:4px 0 4px 10px;margin:8px 0}.cm-chg p{margin:4px 0;font-size:14px}.cm-chg ul{margin:4px 0;padding-left:18px;font-size:13px}
+.cm-n{color:var(--ink2);font-size:12px}.cm-quads{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:10px}
+.cm-quads ul{margin:4px 0;padding-left:18px;font-size:13px}.cm-quads li{margin:3px 0}.cm-gaps{font-size:13px;padding-left:18px}
+
+.cl-sub{margin:4px 0 10px}
+.ct-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,460px),1fr));gap:12px}
+.ct-card h4{margin:0 0 4px;font:700 16px/1.2 var(--disp)}
+.ct-st{font:700 10px/1 var(--disp);letter-spacing:.08em;padding:2px 6px;border-radius:6px;margin-left:6px;vertical-align:middle;background:var(--line)}
+.ct-verified{background:color-mix(in oklab,#1f7a4d 18%,transparent);color:#1f7a4d}
+.ct-fallback{background:color-mix(in oklab,#c0392b 16%,transparent);color:#c0392b}
+.ct-path{margin-top:6px;font-size:13px}.ct-path ol{padding-left:18px;margin:6px 0}.ct-r{font:700 10px/1 var(--disp);color:var(--ink2);margin-right:4px}
+.ct-p{color:var(--ink2);font-size:12px}
+@media (max-width:560px){.ct-t th,.ct-t td{padding:7px 3px;letter-spacing:0}.ct-t td:nth-child(4),.ct-t th:nth-child(4){display:none}}
+.cl-sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:12px 14px}
+.cl-sum .tnote,.cl-sum .seasonwarn{grid-column:1/-1}
+.cl-k span{display:block;font:700 10.5px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;color:var(--ink2)}
+.cl-k b{display:block;margin-top:4px;font-size:15px}
+.cl-t tr.cl-aq td{background:color-mix(in oklab,var(--gold,#b07a12) 8%,transparent)}
+.cl-k em{display:block;font-style:normal;font-size:12px;color:var(--ink2);margin-top:4px}
+.cl-ol{margin:6px 0 0;padding-left:20px;font-size:14px}.cl-ol li{margin:2px 0}.cl-ol span{color:var(--ink2);font-size:12px}
+.cl-t tr.cl-line td{padding:0;border-bottom:0}
+.cl-t tr.cl-line td span{display:block;margin:6px 0;padding:6px 8px;border-top:3px solid #c0392b;border-bottom:1px solid #c0392b;
+  font:700 11px/1.3 var(--disp);letter-spacing:.06em;text-transform:uppercase;color:#c0392b;text-align:left;white-space:normal}
+.cl-tie{font:700 10px/1 var(--disp);letter-spacing:.06em;text-transform:uppercase;color:var(--gold,#b07a12);margin-left:4px}
+@media (max-width:560px){.cl-sum{grid-template-columns:1fr}.cl-t th,.cl-t td{padding:7px 3px;letter-spacing:0}.cl-t td:nth-child(4),.cl-t th:nth-child(4){display:none}}
+.cl-t tr.cl-out td{color:var(--ink2)}.cl-t tr.cl-inel td{color:var(--ink2);font-style:italic}
+.cl-s{display:inline-block;font:700 10.5px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase;padding:3px 6px;border-radius:5px;margin-right:4px;font-style:normal}
+.cl-s-aq{background:color-mix(in oklab,var(--gold,#b07a12) 22%,transparent);color:#7a5408}.cl-s-al{background:color-mix(in oklab,#1f7a4d 18%,transparent);color:#1f7a4d}
+.cl-s-out{background:var(--line);color:var(--ink2)}.cl-s-in{background:color-mix(in oklab,#c0392b 14%,transparent);color:#a1281c}
+.cl-t tr.cl-deep td{padding:0;border-bottom:0}.cl-t tr.cl-deep td span{display:block;margin:6px 0;padding:5px 8px;border-top:1px dashed var(--line2);font:700 10.5px/1.3 var(--disp);letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.cl-cmp h4{margin:0 0 4px;font:700 16px/1.2 var(--disp)}.cl-pick{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}
+.cl-pick select{font:600 14px/1.2 inherit;padding:7px 8px;border:1px solid var(--line2);border-radius:8px;background:var(--card,#fff);max-width:100%;min-width:0;flex:1 1 180px}
+.cl-cgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.cl-col h5{margin:0 0 6px;font:700 15px/1.2 var(--disp)}.cl-col dl{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:0 0 8px;font-size:13.5px}
+.cl-col dt{color:var(--ink2)}.cl-col dd{margin:0;font-weight:600}.cl-col ul{margin:2px 0 8px;padding-left:16px;font-size:13px}.cl-col li{margin:1px 0}
+.cl-sec{font:700 10.5px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);margin:10px 0 4px}
+.cl-band{width:100%;border-collapse:collapse;font-size:13px}.cl-band td,.cl-band th{padding:3px 4px;border-bottom:1px solid var(--line);text-align:center}
+.cl-proj{opacity:.85;border-left:3px solid var(--line2);padding-left:8px}
+.cl-both{grid-column:1/-1}
+@media (max-width:560px){.cl-cgrid{grid-template-columns:1fr}.cl-s{padding:3px 4px}.cl-t td:nth-child(3),.cl-t th:nth-child(3){display:none}.cl-t td:nth-child(5){white-space:normal;font-size:12px;line-height:1.35}.cl-t td.tm{white-space:normal}.cl-t{width:100%;table-layout:auto}}
+/* mail 118: the charcoal ground -- the same hues, lifted to read on it */
+body .cl-s-aq{color:#E9B949}body .cl-s-al{color:#46C08A}body .cl-s-in{color:#FF8A7A}
+body .cl-t tr.cl-line td span{color:#FF7A6B;border-color:#FF7A6B}body .ct-fallback{color:#FF7A6B}
+</style>
+<script>
+(function () {
+  function show(v) {
+    const cl = document.getElementById('cutline'); if (!cl) return;
+    const ct = document.getElementById('conftour');
+    cl.hidden = v !== 'cutline';
+    if (ct) ct.hidden = v !== 'conftour';
+    const sub = v !== 'bracket';
+    document.querySelectorAll('#v-bracket [data-bv]').forEach(b => b.classList.toggle('on', b.dataset.bv === v));
+    document.querySelectorAll('#v-bracket > *').forEach(el => {
+      if (el.id === 'cutline' || el.id === 'conftour' || el.classList.contains('segrow') || el.tagName === 'STYLE' || el.tagName === 'SCRIPT') return;
+      el.hidden = sub;
+    });
+  }
+  function sub(v) {
+    const n = document.getElementById('cl-now'), p = document.getElementById('cl-proj'), q = document.getElementById('cl-post');
+    if (!n || !p) return;
+    n.hidden = v !== 'now'; p.hidden = v !== 'proj'; if (q) q.hidden = v !== 'post';
+    document.querySelectorAll('#cutline [data-clv]').forEach(b => b.classList.toggle('on', b.dataset.clv === v));
+  }
+  function fromHash() {
+    if (!/^#\/bracket/.test(location.hash)) return;
+    if (/\/conference$/.test(location.hash)) { show('conftour'); return; }
+    const cl = /\/cutline(\/projected|\/post)?$/.test(location.hash);
+    show(cl ? 'cutline' : 'bracket');
+    if (cl) sub(/\/projected$/.test(location.hash) ? 'proj' : (/\/post$/.test(location.hash) ? 'post' : 'now'));
+  }
+  document.addEventListener('click', e => {
+    const b = e.target.closest && e.target.closest('#cutline [data-clv]'); if (!b) return;
+    const want = b.dataset.clv === 'proj' ? '#/bracket/cutline/projected' : (b.dataset.clv === 'post' ? '#/bracket/cutline/post' : '#/bracket/cutline');
+    if (location.hash !== want) history.replaceState(null, '', want);
+    sub(b.dataset.clv);
+  });
+  document.addEventListener('click', e => {
+    const b = e.target.closest && e.target.closest('#v-bracket [data-bv]'); if (!b) return;
+    const want = b.dataset.bv === 'cutline' ? '#/bracket/cutline' : (b.dataset.bv === 'conftour' ? '#/bracket/conference' : '#/bracket');
+    if (location.hash !== want) history.replaceState(null, '', want);
+    show(b.dataset.bv);
+  });
+
+  function esc_(x) { return String(x == null ? '' : x).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function rk_(r) { return r ? '#' + r : 'unranked'; }
+  function summ(rs) {
+    const a = rs.actual, wl = (L) => L.filter(m => m[2] === 'W').length + '-' + L.filter(m => m[2] === 'L').length;
+    const di = a.filter(m => m[5]);
+    const bands = [['1-25',1,25],['26-50',26,50],['51-100',51,100],['101-200',101,200],['201+',201,9999]];
+    const band = bands.map(([n, lo, hi]) => [n, wl(di.filter(m => m[4] && m[4] >= lo && m[4] <= hi))]);
+    const nr = a.filter(m => !m[5]);
+    const wins = a.filter(m => m[2] === 'W' && m[4]).sort((x, y) => x[4] - y[4]).slice(0, 5);
+    const losses = a.filter(m => m[2] === 'L').sort((x, y) => (y[4] || 9999) - (x[4] || 9999)).slice(0, 5);
+    const road = wl(a.filter(m => m[6] === 'A')), last10 = wl(a.slice().sort((x, y) => x[0] < y[0] ? -1 : 1).slice(-10));
+    return {all: wl(a), di: wl(di), nondi: nr.length ? wl(nr) : '0-0', band, wins, losses, road, last10};
+  }
+  function line(m) { return '<li>' + esc_(m[0]) + ' ' + (m[2] === 'W' ? 'beat ' : 'lost to ') + '<b>' + esc_(m[1]) + '</b> (' + rk_(m[4]) + ') ' + esc_(m[3]) + (m[6] && m[6].length === 1 ? ' &middot; ' + m[6] : '') + '</li>'; }
+  function col(D, t) {
+    const rs = D.res[t] || {actual: [], proj: []}, s = summ(rs), b = D.board.find(x => x[0] === t) || [];
+    let h = '<div class="cl-col"><h5>' + esc_(t) + '</h5><dl><dt>' + esc_(D.rk) + '</dt><dd>' + (b[1] ? '#' + b[1] : '&mdash;') + ' &middot; ' + esc_(b[2] || '') + '</dd>'
+      + '<dt>Conference</dt><dd>' + esc_(b[3] || '') + '</dd><dt>Overall (results)</dt><dd>' + s.all + '</dd><dt>vs D-I</dt><dd>' + s.di + (s.nondi !== '0-0' ? ' &middot; non-D-I ' + s.nondi : '') + '</dd>'
+      + '<dt>Road</dt><dd>' + s.road + '</dd><dt>Last 10</dt><dd>' + s.last10 + '</dd><dt>KPI</dt><dd>&mdash;</dd></dl>'
+      + '<div class="cl-sec">vs D-I by opponent rank</div><table class="cl-band"><tr>' + s.band.map(x => '<th>' + x[0] + '</th>').join('') + '</tr><tr>' + s.band.map(x => '<td>' + x[1] + '</td>').join('') + '</tr></table>'
+      + '<div class="cl-sec">Best wins</div><ul>' + (s.wins.map(line).join('') || '<li>none</li>') + '</ul>'
+      + '<div class="cl-sec">Worst losses</div><ul>' + (s.losses.map(line).join('') || '<li>none</li>') + '</ul>';
+    if (D.proj) {
+      const p = rs.proj, pw = p.filter(m => m[2] === 'W').length;
+      h += '<div class="cl-proj"><div class="cl-sec">Projection inputs, not results (' + p.length + ' matches; favourite gets the win: ' + pw + '-' + (p.length - pw) + ')</div><ul>'
+        + (p.map(m => '<li>' + esc_(m[0] || 'tournament') + ' ' + (m[2] === 'W' ? 'W' : 'L') + ' v <b>' + esc_(m[1]) + '</b> (' + rk_(m[4]) + ') ' + esc_(m[3]) + ' &middot; ' + esc_(m[6]) + '</li>').join('') || '<li>none</li>') + '</ul></div>';
+    }
+    return h + '</div>';
+  }
+  function both(D, a, b) {
+    const A = (D.res[a] || {actual: []}).actual, B = (D.res[b] || {actual: []}).actual;
+    const h2h = A.filter(m => m[1] === b);
+    const oa = {}, ob = {};
+    A.forEach(m => { if (m[1] !== b) (oa[m[1]] = oa[m[1]] || []).push(m); });
+    B.forEach(m => { if (m[1] !== a) (ob[m[1]] = ob[m[1]] || []).push(m); });
+    const com = Object.keys(oa).filter(k => ob[k]).sort();
+    const r = L => L.map(m => m[2] + ' ' + m[3]).join(', ');
+    let wa = 0, wb = 0; com.forEach(k => { wa += oa[k].filter(m => m[2] === 'W').length; wb += ob[k].filter(m => m[2] === 'W').length; });
+    return '<div class="cl-both"><div class="cl-sec">Head to head (results)</div><ul>' + (h2h.map(m => '<li>' + esc_(m[0]) + ': ' + esc_(a) + ' ' + (m[2] === 'W' ? 'won ' : 'lost ') + esc_(m[3]) + (m[6] ? ' &middot; ' + esc_(a) + ' ' + ({H:'home',A:'away',N:'neutral'}[m[6]] || '') : '') + '</li>').join('') || '<li>did not play</li>') + '</ul>'
+      + '<div class="cl-sec">Common opponents (results): ' + com.length + ' &middot; wins ' + esc_(a) + ' ' + wa + ', ' + esc_(b) + ' ' + wb + '</div>'
+      + (com.length ? '<table class="cl-band"><tr><th>Opponent</th><th>' + esc_(a) + '</th><th>' + esc_(b) + '</th></tr>' + com.map(k => '<tr><td>' + esc_(k) + ' (' + rk_(oa[k][0][4]) + ')</td><td>' + r(oa[k]) + '</td><td>' + r(ob[k]) + '</td></tr>').join('') + '</table>' : '<p class="tnote">none</p>') + '</div>';
+  }
+  function initCmp(box) {
+    const D = (window.CLD || {})[box.dataset.pid]; if (!D) throw new Error('no data');
+    const sa = box.querySelector('.cl-sa'), sb = box.querySelector('.cl-sb'), out = box.querySelector('.cl-out');
+    const opts = D.board.map(x => '<option value="' + esc_(x[0]) + '">#' + x[1] + ' ' + esc_(x[0]) + ' (' + x[2] + ')</option>').join('');
+    sa.innerHTML = opts; sb.innerHTML = opts;
+    if (D.a) sa.value = D.a; if (D.b) sb.value = D.b;
+    const draw = () => { out.innerHTML = '<div class="cl-cgrid">' + col(D, sa.value) + col(D, sb.value) + both(D, sa.value, sb.value) + '</div>'; };
+    sa.addEventListener('change', draw); sb.addEventListener('change', draw); draw();
+  }
+  function initAll() { document.querySelectorAll('.cl-cmp').forEach(b => { if (!b.dataset.ok) { b.dataset.ok = 1; try { initCmp(b); } catch (e) { b.querySelector('.cl-out').textContent = 'Comparison unavailable: ' + e.message; } } }); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAll); else initAll();
+  window.addEventListener('hashchange', fromHash);
+  /* this script sits at the TOP of the bracket section, before the elements it hides are parsed */
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fromHash); else fromHash();
+})();
+</script>"""
+
+
+# ---- POWER 2.0 (PRIVATE ONLY; mail 095) ------------------------------------
+# The 2026-only S0 model (B068) beside current POWER, both fitted at the SAME cutoff on the SAME
+# eligible matches, read from the verified on-demand snapshot (rank.py v2, receipt-backed).
+_P20_CACHE = []
+
+
+def p20_payload():
+    if _P20_CACHE:
+        return _P20_CACHE[0]
+    doc = None
+    if not PUBLIC:
+        snap = load("Cody/data/power_s0_ranking/latest.json")
+        if snap and snap.get("receipt_id") and os.path.exists(os.path.join(
+                REPO, "Cody", "data", "power_s0_ranking", "receipts", "%s.json.gz" % snap["receipt_id"])):
+            cand = load("Cody/data/power_candidate/v2so_preview.json") or {}
+            doc = {"cutoff": snap["cutoff"], "finals": snap["finals_used"], "last": snap["last_final_date"],
+                   "generated_utc": snap["generated_utc"], "receipt": snap["receipt_id"],
+                   "current_page_through_epoch": cand.get("data_through_epoch"),
+                   "rows": [[r["team"], r["S0"]["rank"], r["S0"]["share_pp_vs_avg"], r["CTRL"]["rank"],
+                             r["CTRL"]["share_pp_vs_avg"], r["matches"]] for r in snap["teams"]]}
+    _P20_CACHE.append(doc)
+    return doc
+
+
+_P20L_CACHE = []
+
+
+def p20_ledger_payload():
+    """mail 107: the private S0 performance ledger (Cody/data/power_ledger/latest.json), compacted per team for the
+    POWER 2.0 view. Descriptive only; never read by any rating, forecast or bracket code."""
+    if _P20L_CACHE:
+        return _P20L_CACHE[0]
+    doc = None
+    if not PUBLIC:
+        L = load("Cody/data/power_ledger/latest.json")
+        snap = p20_payload()
+        if L and L.get("rows") and snap:
+            from reconcile_2025 import norm as _n
+            names = dict((_n(r[0]), r[0]) for r in snap["rows"])
+            reasons, rows, by = [], [], {}
+            def rid(x):
+                if x not in reasons:
+                    reasons.append(x)
+                return reasons.index(x)
+            for r in L["rows"]:
+                e = r.get("exp") or {}
+                rows.append([r["day"], r["home"], r["away"], 1 if r["home_won"] else 0, r["sets"], r["line"],
+                             r.get("share_home") if r["line_ok"] else None,
+                             e.get("exp_share_home"), e.get("match_p_home"), e.get("cutoff"), e.get("train"),
+                             None if r["line_ok"] else rid(r.get("line_reason") or "invalid set line"),
+                             None if e else rid(r.get("no_exp") or "no expectation"),
+                             r.get("points_vs_result"), r.get("points"),
+                             [[x["arm"], x["written_utc"], x["p_home"], x["exp_share_home"], x.get("p_native_incumbent")] for x in r.get("issued") or []],
+                             r["gid"]])
+                i = len(rows) - 1
+                for k, side in enumerate((r["home"], r["away"])):
+                    t = names.get(_n(side))
+                    if t:
+                        by.setdefault(t, []).append([i, k])           # k: 0 = this team was home, 1 = away
+            doc = {"generated_utc": L["generated_utc"], "label": L["label"], "model": L["model"], "counts": L["counts"],
+                   "pvr": L["points_vs_result"], "last": L.get("last_final_day"),
+                   "last_cutoff": (L.get("checkpoints") or [{}])[-1].get("cutoff"), "reasons": reasons, "rows": rows, "by": by}
+    _P20L_CACHE.append(doc)
+    return doc
+
+
+P20_BTN = ('<button class="segb" data-r="p20" title="2026-only model (no 2025 team or roster inputs), '
+           'beside current POWER on the same matches">POWER 2.0</button>')
+# short labels on purpose: a long option widens the native select, and that select once forced every
+# Rankings route to a 475px layout on phones (mail 096). The full description is in each view's header.
+OLDEXP_OPTS = ('<option value="v2s" title="older experiment: 2026 candidate with a 2025 production start">Old: 2026 candidate</option>'
+               '<option value="v2p" title="older experiment: POWER v2 preview">Old: v2 preview</option>')
+
+P20_JS = r"""
+const P20 = {{P20_JSON}};
+const P20L = {{P20L_JSON}};
+RULER_WHAT.p20 = '<b>POWER 2.0</b> rates teams from <b>2026 results only</b> (no 2025 team results, no roster ' +
+  'inputs), opponent-adjusted, beside <b>current POWER</b> fitted on the same matches. Current POWER stays the ' +
+  'default everywhere else on this site while the comparison is tested.';
+RULER_VIEWS.p20 = function (host) {
+  /* its own table class (r26t base rules), never .rk3: the board's phone rules hide columns by position */
+  if (!document.getElementById('p20css')) {
+    const st = document.createElement('style'); st.id = 'p20css';
+    st.textContent = '.p20q{width:100%;margin:0 0 8px;padding:9px 10px;border:1px solid var(--line);border-radius:8px;' +
+      'background:var(--card);color:var(--ink);font-size:14px}' +
+      '.p20t td.st b{display:block;font-size:14px}.p20t td.st span{display:block;font-size:12px;color:var(--ink2)}' +
+      '@media (max-width:560px){.p20t th,.p20t td{padding:7px 3px;letter-spacing:0}.p20t td.n{font-size:12px;padding-left:6px}' +
+      '.p20t td.tm .lnk img{display:none}.p20t td.tm{white-space:normal;overflow-wrap:anywhere}.p20t th{font-size:10.5px}}' +
+      '.p20lp{margin:0 0 10px}.p20lab{display:block;font-size:14px;margin-bottom:6px}.p20lab select{font-size:15px;padding:8px 10px;min-height:44px;' +
+      'border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);max-width:100%}' +
+      '.p20lt tr.p20lr td{padding-top:11px;padding-bottom:11px}.p20lt tr.p20lr{cursor:pointer}.p20w{color:#1f7a4d}.p20l{color:#a1281c}.p20lx td{font-size:13px;line-height:1.5;background:var(--alt);' +
+      'white-space:normal;overflow-wrap:anywhere;text-align:left}' +
+      '.p20set{display:inline-block;margin:0 10px 4px 0}' +
+      '@media (max-width:560px){.p20lt{width:100%;table-layout:fixed}.p20lt th,.p20lt td{padding:7px 2px;letter-spacing:0;font-size:12px}' +
+      '.p20lt td.n{font-size:11px;text-align:right}' +
+      '.p20lt th:nth-child(1),.p20lt td:nth-child(1){width:12%}.p20lt th:nth-child(2),.p20lt td:nth-child(2){width:29%;white-space:normal;' +
+      'overflow-wrap:anywhere;text-align:left}.p20lt th:nth-child(3),.p20lt td:nth-child(3){width:16%}' +
+      '.p20lt th:nth-child(4),.p20lt td:nth-child(4),.p20lt th:nth-child(5),.p20lt td:nth-child(5),' +
+      '.p20lt th:nth-child(6),.p20lt td:nth-child(6){width:14.3%}.p20lt tr.p20lx td{width:auto}}';
+    document.head.appendChild(st);
+  }
+  const lastTs = P20.last ? new Date(P20.last + 'T12:00:00') : null;
+  const thru = lastTs ? lastTs.toLocaleDateString('en-US', {month: 'short', day: 'numeric'}) : 'not stated';
+  const cur = P20.current_page_through_epoch;
+  const stale = cur && P20.last && new Intl.DateTimeFormat('en-CA', {timeZone: 'America/Los_Angeles'}).format(new Date(cur * 1000)) > P20.last
+    ? '<div class="seasonwarn">This comparison uses results through ' + thru + '. Current POWER elsewhere on this ' +
+      'page may already include later results.</div>' : '';
+  const q = (host.querySelector && host.querySelector('#p20q') || {}).value || '';
+  const rows = P20.rows.filter(r => !q || r[0].toLowerCase().indexOf(q.toLowerCase()) >= 0).slice(0, q ? 80 : 50);
+  const sg = x => (x >= 0 ? '+' : '') + x.toFixed(2);
+  host.innerHTML = stale +
+    '<div class="tnote">Both models are fitted on the <b>same ' + P20.finals + ' finals</b> through ' + thru + '. <b>Strength</b> = ' +
+    'points above 50% a team would be expected to win against an average D-I team on a neutral floor (+10.00 = about 60%). ' +
+    '<b>Model gap</b> compares the two models, not movement over time.</div>' +
+    '<div class="panel"><input id="p20q" class="p20q" placeholder="Find a team (shows its season matches)" value="' + esc(q) + '">' +
+    '<div id="p20ledslot"></div>' +
+    '<div class="scroll"><table class="r26t p20t"><thead><tr><th>#</th><th class="l">Team</th>' +
+    '<th title="POWER 2.0 strength (bold) above current POWER strength, points above 50% vs an average team">Strength<br>2.0 / cur</th>' +
+    '<th title="Current POWER rank on these same matches">Cur.<br>rank</th>' +
+    '<th title="Current POWER rank minus POWER 2.0 rank: a difference between two models, not a move">Model<br>gap</th>' +
+    '</tr></thead><tbody>' + rows.map(r => {
+      const d = r[3] - r[1];
+      return '<tr><td class="rk">' + r[1] + '</td><td class="tm l"><button type="button" class="lnk" data-team="' + esc(r[0]) +
+        '">' + esc(r[0]) + '</button></td><td class="n st"><b>' + sg(r[2]) + '</b><span>cur ' + sg(r[4]) + '</span></td><td class="n">' +
+        r[3] + '</td><td class="n">' + (d > 0 ? '▲' + d : d < 0 ? '▼' + (-d) : '–') + '</td></tr>';
+    }).join('') + '</tbody></table></div></div>' +
+    '<p class="tnote">▲ = POWER 2.0 ranks the team higher than current POWER. Computed ' +
+    new Date(P20.generated_utc).toLocaleString('en-US', {timeZone: 'America/Los_Angeles', month: 'short', day: 'numeric',
+      hour: 'numeric', minute: '2-digit'}) + ' PT (receipt ' + esc(P20.receipt) + '); the local refresh updates it, an open ' +
+    'tab after a reload. Close ranks change order easily.</p>';
+  const inp = host.querySelector('#p20q');
+  inp.addEventListener('input', () => { const v = inp.value; RULER_VIEWS.p20(host); const i = host.querySelector('#p20q');
+    i.focus(); i.setSelectionRange(v.length, v.length); });
+  p20Ledger(host, rows.length === 1 ? rows[0][0] : (host.dataset.p20team || ''));
+};
+
+/* mail 107: the S0 performance ledger -- a team's season match list with points won %, the earlier-only expected
+   points won % (reconstructed weekly forecast) and the difference; a match opens to its set scores. Descriptive only. */
+function p20Ledger(host, team) {
+  if (!P20L) return;
+  let box = host.querySelector('#p20led');
+  if (!box) { box = document.createElement('div'); box.id = 'p20led';
+    (host.querySelector('#p20ledslot') || host).appendChild(box); }
+  const teams = Object.keys(P20L.by).sort();
+  if (team && !P20L.by[team]) team = '';
+  host.dataset.p20team = team;
+  const pc = x => x == null ? '&mdash;' : (100 * x).toFixed(1) + '%';
+  const sel = '<label class="p20lab">Season matches: <select id="p20lt"><option value="">Choose a team</option>' +
+    teams.map(t => '<option' + (t === team ? ' selected' : '') + '>' + esc(t) + '</option>').join('') + '</select></label>';
+  if (!team) {
+    box.innerHTML = '<div class="panel p20lp">' + sel + '<p class="tnote">Pick a team, or search for one above, to see its ' +
+      'season match by match: points won, the points won the model expected before the match, and the difference. ' +
+      'Tap a match for its set scores.</p></div>';
+  } else {
+    const ix = P20L.by[team].slice().sort((a, b) => P20L.rows[a[0]][0] < P20L.rows[b[0]][0] ? -1 : 1);
+    let nOk = 0, nExp = 0, nBoth = 0, sumA = 0, sumE = 0, half = [[0, 0], [0, 0]];
+    const both = [];
+    const body = ix.map(([i, sd]) => {
+      const r = P20L.rows[i], isH = sd === 0;
+      const opp = isH ? r[2] : r[1];
+      const won = isH ? r[3] === 1 : r[3] === 0;
+      const sets = isH ? r[4] : r[4].split('-').reverse().join('-');
+      const act = r[6] == null ? null : (isH ? r[6] : 1 - r[6]);
+      const exp = r[7] == null ? null : (isH ? r[7] : 1 - r[7]);
+      if (act != null) nOk++;
+      if (exp != null) nExp++;
+      let diff = null;
+      if (act != null && exp != null) { diff = 100 * (act - exp); nBoth++; sumA += act; sumE += exp; both.push(diff); }
+      return '<tr class="p20lr" data-i="' + i + '" data-s="' + sd + '"><td class="l">' + r[0].slice(5) + '</td><td class="l">' + (isH ? 'vs ' : 'at ') +
+        esc(opp) + '</td><td class="l"><b class="' + (won ? 'p20w' : 'p20l') + '">' + (won ? 'W' : 'L') + '</b> ' + sets + '</td><td class="n">' +
+        pc(act) + '</td><td class="n">' + pc(exp) + '</td><td class="n">' + (diff == null ? '&mdash;' : (diff >= 0 ? '+' : '') + diff.toFixed(1)) +
+        '</td></tr><tr class="p20lx" hidden><td colspan="6"></td></tr>';
+    }).join('');
+    const h = Math.floor(both.length / 2);
+    const avg = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
+    const f1 = avg(both.slice(0, h)), f2 = avg(both.slice(h));
+    const fm = x => x == null ? '&mdash;' : (x >= 0 ? '+' : '') + x.toFixed(1) + ' pp';
+    box.innerHTML = '<div class="panel p20lp">' + sel +
+      '<p class="tnote"><b>' + ix.length + '</b> counted finals &middot; <b>' + nOk + '</b> with complete set scores (points won %) &middot; <b>' +
+      nExp + '</b> with an earlier-only expectation. ' + (nBoth ? 'On the <b>' + nBoth + '</b> matches that have both: won ' + pc(sumA / nBoth) +
+      ' of points against an expected ' + pc(sumE / nBoth) + ' (' + fm(100 * (sumA - sumE) / nBoth) + '). First ' + h + ' of them: ' + fm(f1) +
+      '; last ' + (both.length - h) + ': ' + fm(f2) + ' (a description, not a trend verdict).' : '') + '</p>' +
+      '<div class="scroll"><table class="r26t p20lt"><thead><tr><th class="l">Date</th><th class="l">Opponent</th><th class="l">Result</th>' +
+      '<th title="share of all points in the match won, complete set scores only">Pts won</th>' +
+      '<th title="expected share from POWER 2.0 refit at the last weekly cutoff before the match (reconstructed weekly forecast)">Expected</th>' +
+      '<th title="points won minus expected, percentage points">Diff</th></tr></thead><tbody>' + body + '</tbody></table></div>' +
+      '<p class="tnote">Tap a match for its set scores. <b>Expected</b> is a <b>reconstructed weekly forecast</b>: POWER 2.0 refit at each weekly cutoff on earlier ' +
+      'matches only, so a match never informs its own expectation. It is not the forecast that was shown at the time. A dash means no ' +
+      'expectation (opening week, a team with no earlier match, or outside the model&rsquo;s match set) or incomplete set scores; tap a ' +
+      'match for the reason. Ledger built ' + new Date(P20L.generated_utc).toLocaleString('en-US', {timeZone: 'America/Los_Angeles',
+      month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'}) + ' PT; latest weekly cutoff ' + esc(P20L.last_cutoff || '') + '.</p></div>';
+  }
+  const s = box.querySelector('#p20lt');
+  s.addEventListener('change', () => p20Ledger(host, s.value));
+  box.querySelectorAll('tr.p20lr').forEach(tr => tr.addEventListener('click', () => {
+    const x = tr.nextElementSibling; if (!x.hidden) { x.hidden = true; return; }
+    const r = P20L.rows[+tr.dataset.i], isH = tr.dataset.s === '0';
+    const parts = [];
+    if (r[11] != null) parts.push('Set scores unavailable for points won %: ' + esc(P20L.reasons[r[11]]) + '.');
+    else {
+      const sets = r[5].map((ln, k) => { const [a, b] = ln.split('-').map(Number); const me = isH ? a : b, op = isH ? b : a;
+        return '<span class="p20set">Set ' + (k + 1) + ' <b>' + me + '&ndash;' + op + '</b> ' + (100 * me / (me + op)).toFixed(1) + '%</span>'; });
+      parts.push(sets.join(' '));
+      const pts = r[14] ? (isH ? r[14] : r[14].split('-').reverse().join('-')) : '';
+      parts.push('Points ' + pts + (r[13] === 'fewer points won' ? ' &middot; the match went to the side with fewer points' :
+        r[13] === 'tied points' ? ' &middot; tied on total points' : ''));
+    }
+    if (r[12] != null) parts.push('No expectation: ' + esc(P20L.reasons[r[12]]) + '.');
+    else parts.push('Expected from the weekly cutoff ' + esc(r[9]) + ' (' + r[10] + ' earlier matches): ' + pc(isH ? r[7] : 1 - r[7]) +
+      ' of points, ' + pc(isH ? r[8] : 1 - r[8]) + ' to win the match.');
+    (r[15] || []).forEach(z => parts.push('Issued forecast (pilot ' + esc(z[0]) + ', written ' + esc(z[1]) + ' UTC, common mapping): ' +
+      pc(isH ? z[2] : 1 - z[2]) + ' to win, ' + pc(isH ? z[3] : 1 - z[3]) + ' of points' +
+      (z[4] != null ? '; incumbent native mapping ' + pc(isH ? z[4] : 1 - z[4]) : '') + '.'));
+    x.firstElementChild.innerHTML = parts.map(p => '<div>' + p + '</div>').join('');
+    x.hidden = false;
+  }));
+}
+"""
+
+
 def v2so_preview_payload():
     if _V2S_CACHE:
         return _V2S_CACHE[0]
@@ -1108,8 +2480,12 @@ function v2sWhyHtml(r, heading) {
   const imp = res.filter(x => x.impact_pts !== undefined).slice().sort((a, b) => b.impact_pts - a.impact_pts);
   const impTxt = imp.length ? '<p class="fact"><b>This week\u2019s results, one at a time:</b> ' + imp.map(x => (x.won ? 'beat ' : 'lost to ') + (x.opp_rank ? '#' + x.opp_rank + ' ' : '') + esc(x.opp) + ' ' + x.score + ' <b>' + (x.impact_pts >= 0 ? '+' : '\u2212') + Math.abs(x.impact_pts).toFixed(1) + '</b>' + (x.impact_rank ? ' (' + (x.impact_rank > 0 ? 'worth ' + x.impact_rank + ' place' + (x.impact_rank > 1 ? 's' : '') : 'costs ' + (-x.impact_rank) + ' place' + (x.impact_rank < -1 ? 's' : '')) + ')' : '')).join('; ') + ' \u2014 each number is the rating with that one result removed versus with it, in POWER points; the numbers after the W/L in the ladder are the same thing.</p>' : '';
   return (heading || ('<h3>#' + r.rank + ' ' + logo(r.team) + esc(r.team) + ' <span class="k">POWER ' + r.power.toFixed(1) + ' · ' + r.record + (r.conf ? ' · ' + esc(r.conf) : '') + (r.rank_range ? ' · rank range ' + r.rank_range[0] + '–' + r.rank_range[1] : '') + '</span></h3>')) +
-    '<div class="row"><div><h4>What the number is made of (POWER points vs the average team)</h4>' + wf +
-    '<p class="fact">Each bar is one source, in POWER points; they add up to the rating. The start parts carry the weights this season\u2019s results have given them, and the conference level is fitted from 2026 results too. This team\u2019s own 2026 results, adjusted for who and where, sit <b>' + Math.abs(parts[0][1]).toFixed(1) + ' points ' + (parts[0][1] >= 0 ? 'above' : 'below') + '</b> what its start and conference level alone would say.</p></div>' +
+    '<div class="row"><div><details class="v2sparts"><summary><b>Fitted terms in the rating</b> (not causal shares)</summary>' + wf +
+    '<p class="fact">These terms are fitted together with unequal shrinkage: the 2026 team term is penalised, the start terms ' +
+    '(2025 results, returning production) and the conference level almost not, so the fit routes shared signal into the cheap ' +
+    'terms. The bars add up to the rating, but their sizes describe the model\u2019s structure, not how much each source ' +
+    'caused it. Measured influence instead: dropping all four start terms (POWER 2.0) made no detectable difference to ' +
+    'late-season forecast accuracy, but forecasts were worse in August\u2013September.</p></details></div>' +
     '<div><h4>Week by week (rank; amber = today’s rank range)</h4>' + traj +
     '<p class="fact">' + (tr.length > 1 ? 'From <b>#' + first.rank + '</b> after the week ending ' + first.through + ' to <b>#' + last.rank + '</b> now' + (last.rank < first.rank ? ' — up ' + (first.rank - last.rank) : last.rank > first.rank ? ' — down ' + (last.rank - first.rank) : ' — unchanged') + '.' : 'One weekly point so far.') + '</p>' + v2sWhatIf(r) + '</div></div>' +
     '<h4>Every counted result, sorted by opponent rank (bar = average set point-share; darker = more recent)</h4>' + ladder + impTxt +
@@ -1176,8 +2552,8 @@ RULER_VIEWS.v2s = function (host) {
   host.innerHTML =
     (V2S.default_on
       ? '<div class="seasonwarn"><b>This model is now the private default.</b> The POWER tab and team pages show it. ' +
-        'The &ldquo;Current&rdquo; columns below are the <b>previous POWER</b> model, kept for comparison; forecasts, ' +
-        'the recorder and the weekly archive still use it.'
+        'The &ldquo;Current&rdquo; columns below are the <b>previous POWER</b> model, kept for comparison; ' +
+        'the recorder and the published weekly archive still use it (match odds and season projections run on this model).'
       : '<div class="seasonwarn"><b>Candidate, not the default.</b> A frozen snapshot rating ' +
         'teams from 2026 results only. Nothing else on this site uses it; team pages show ' +
         '<b>Current POWER</b>.') + (stale ? ' <b>Current POWER&rsquo;s results cut-off differs ' +
@@ -1380,8 +2756,14 @@ def ruler_color_css():
                    % (k, hexv, k, rr, gg, bb))
         out.append("  --vx-%s-lift:%s;" % (k, ruler_lift(hexv)))
     out.append("}")
+    # mail 118: the whole page is the dark charcoal ground, so each ruler TOKEN points at its
+    # lifted hue (same hue and saturation, lightness raised -- ruler_lift). Every consumer
+    # that uses a ruler colour as ink -- badges, the ballot's ruler labels, chips -- then reads
+    # on it. The base hex stays declared above: the table is still the one source.
+    out.append(":root{" + " ".join("--vx-%s:var(--vx-%s-lift);" % (k, k)
+                                  for k in sorted(public_rulers())) + "}")
     for k in sorted(public_rulers()):
-        out.append("i.rnk.rnk-%s{color:var(--vx-%s)}" % (k, k))
+        out.append("i.rnk.rnk-%s{color:var(--vx-%s-lift)}" % (k, k))
     # the legend swatch, same table again -- it was four hand-written rules
     # covering four of eleven rulers, so a key could silently omit a ruler
     # it was supposed to explain.
@@ -3937,12 +5319,9 @@ def rating_2026_only():
     Cody, 2026-09-13: "a POWER 2026 ranking tab that is power ranking solely
     based on 2026 results and not including preseason projections."
 
-    ⚠ THIS IS THE RATING THE BOARD DELIBERATELY DOES NOT USE YET, and the
-    view says so. The main board blends the preseason projection with 2026
-    results because the blend's own measurement says the season is still the
-    minority voice at this point (k = 13.5 matches, median team has 9). This
-    order is what the results say on their own -- interesting precisely
-    because it disagrees, and unstable for exactly the same reason.
+    A comparison view: the board uses its own order. The page copy states
+    only the inputs and the producer's match count / data-through date (078
+    removed hard-coded early-season claims that had gone stale).
     """
     doc = load("data/rating_%d.json" % SEASON) or {}
     rows = []
@@ -6253,17 +7632,17 @@ def extref_strip(meta, teams):
                 "absent from this source snapshot"
                 % (d.get("matched") or 0, len(teams), len(absent))) if f \
         else ""
-    rows.append(("FIGstats unofficial RPI",
-                 "external r&eacute;sum&eacute;-reference signal only "
-                 "&mdash; never a result authority, correction source or "
-                 "POWER input",
-                 ("publisher&rsquo;s own stamp &ldquo;Generated: %s&rdquo; "
-                  "&middot; fetched %s UTC &middot; manual browser snapshot "
-                  "(robots.txt permits no scripted fetch)<br>%s"
-                  % (f["publisher_generated"],
-                     (f["retrieved_utc"] or "").replace("T", " ")
-                     .replace("Z", ""), coverage)) if f
-                 else "no snapshot held"))
+    if f:                                    # retired 2026-11-22: external_refs.fig_latest() returns None
+        rows.append(("FIGstats unofficial RPI",
+                     "external r&eacute;sum&eacute;-reference signal only "
+                     "&mdash; never a result authority, correction source or "
+                     "POWER input",
+                     "publisher&rsquo;s own stamp &ldquo;Generated: %s&rdquo; "
+                     "&middot; fetched %s UTC &middot; manual browser snapshot "
+                     "(robots.txt permits no scripted fetch)<br>%s"
+                     % (f["publisher_generated"],
+                        (f["retrieved_utc"] or "").replace("T", " ")
+                        .replace("Z", ""), coverage)))
     # ⚠ TWO MASSEY STATES, NEVER BLURRED. The preseason capture feeds
     # the board's MSY reference column and is NOT current; the
     # browser-reviewed current snapshot is disclosure-only, with its own
@@ -6920,10 +8299,11 @@ def build():
             "pulled toward their conference&rsquo;s level. <b>Rank range</b> = the 10th&ndash;90th "
             "percentile across 200 season resamples. <b>Also on this model:</b> match odds and "
             "the season projections (projected wins, title and tournament odds). <b>Not switched:</b> "
-            "the prospective recorder, Digby&rsquo;s Top 25 and the weekly archive still use the "
-            "previous model. The movement column compares against this model&rsquo;s own Monday "
-            "freeze (first one Sep 28), so it is blank until the second freeze. The previous default "
-            "is kept as <i>previous POWER</i> on the candidate view."
+            "the prospective recorder, Digby&rsquo;s Top 25 and the PUBLISHED weekly archive still use the "
+            "previous model. This model keeps its own private weekly freeze (one row per completed "
+            "week, results through that Sunday); the movement column compares against the most "
+            "recent one and names it, and a week that was not captured is a gap, never zero "
+            "movement. The previous default is kept as <i>previous POWER</i> on the candidate view."
             + ((" <span class=\"rkstamp\">Recomputed <b>%s</b>, results through <b>%s</b>%s.</span>"
                 % (_rst, _thr, (", from %d accepted D-I finals" % _rn) if _rn else "")) if _rst else ""))
     elif _live:
@@ -7076,6 +8456,7 @@ def build():
                 rec["_is_prev"] = (yr != SEASON)
                 return rec
         return {}
+    rpic = load("data/rpi_committee_%d.json" % SEASON) or None
     polls = {}
     for _n in ("avca", "top16", "rpi"):
         _r = _latest(_n)
@@ -7177,15 +8558,97 @@ def build():
     except (OSError, ValueError):
         pass
 
+    # ---- RPI CUT LINE (PRIVATE; mail 098) -----------------------------------
+    # One projected AQ per eligible conference (the board's own AQ projection, eligibility enforced), then
+    # the at-large slots in STRICT official-RPI order among eligible teams without an AQ. One ranking
+    # source throughout: the latest stored official 2026 RPI capture.
+    cutline_html = ""
+    cut_proj = None
+    if not PUBLIC:
+        try:
+            cut_proj = rpi_cutline(teams, field, ranking="projected")
+            if cut_proj.get("error"):
+                cut_proj = None
+        except Exception:
+            cut_proj = None
+        ct_payload, ct_scen, cut_post = None, None, None
+        try:
+            ct_payload, ct_scen, _ = conf_tournaments(teams)
+            cut_post = rpi_cutline(teams, field, ranking="post", scenario=ct_scen)
+        except Exception as _e:
+            print("  conference tournaments unavailable: %s" % _e)
+        try:
+            cutline_html = rpi_cutline_html(teams, field, cut_proj, ct_payload, cut_post)
+        except Exception as _e:                      # never break the page; say so on the page
+            cutline_html = ('<div class="seasonwarn" id="cutline-error">RPI Cut Line unavailable: %s</div>' % esc(str(_e)[:200]))
+
+    # ---- COMMITTEE-INFORMED FIELD (PRIVATE; mail 104) --------------------------
+    # One coherent post-conference-tournament scenario. While any regular-season or tournament match is still
+    # forecast the ranking is Projected RPI; once the slate is complete, the official release is used only if
+    # its through-date covers the last final, otherwise the complete RPI is labelled as such.
+    committee = None
+    if not PUBLIC and cut_post and not cut_post.get("error"):
+        try:
+            import committee_field as _CF
+            import datetime as _dtm
+            _fm = cut_post.get("futures") or {}
+            _left = (_fm.get("projected_games") or 0) + (_fm.get("scenario_games") or 0)
+            _today = (_dtm.datetime.utcnow() - _dtm.timedelta(hours=8)).date()
+            _complete, _why = _CF.completeness(_left, load("data/fixture_disposition_%d.json" % SEASON), ct_payload, _today)
+            _thru = None
+            try:
+                _thru = _dtm.datetime.strptime(" ".join(str(cut_post.get("through") or "").replace(".", "").split()[-3:]), "%b %d %Y").date()
+            except ValueError:
+                pass
+            _lastf = max((r[0] for r in (_CUT_FINALS or []) if r[0]), default=None)
+            _basis = _CF.basis_for(_complete, _thru, _lastf)
+            _src = cut_post
+            if _basis == "official":
+                # ONE snapshot: the field, the pure-RPI comparison and every label use the official order
+                _src = rpi_cutline(teams, field, ranking="post", scenario=ct_scen, official_ranks=True)
+            committee = dict(_CF.build(_src, _basis), basis=_basis, left=_left, through=cut_post.get("through"),
+                             gen=_fm.get("forecast_generated"), rpi_post=_src, incomplete_why=_why)
+        except Exception as _e:
+            print("  committee-informed field unavailable: %s" % _e)
+            committee = {"error": str(_e)[:200]}
+
     # ---- bracket ---------------------------------------------------------
+    # PRIVATE (mail 099): the bracket shows the corrected END-OF-REGULAR-SEASON field from the RPI Cut Line --
+    # projected regular-season champions as AQs, at-large in Projected RPI order with the .500 / 80% D-I
+    # gates -- seeded in Projected RPI order. The public build keeps the board's field.
+    bracket_field = field
+    if committee and not committee.get("error"):
+        # mail 104: the bracket IS the committee-informed field -- same 64 teams, same order, same bid labels
+        _byname = dict((t["team"], t) for t in teams)
+        bracket_field = [{"seed": r["order"], "team": r["team"], "conf": r["conf"] or _byname.get(r["team"], {}).get("conf") or "",
+                          "bid": "AQ" if r["bid"] == "AQ" else "at-large", "avca": _byname.get(r["team"], {}).get("avca")}
+                         for r in committee["ordered"]]
+    elif cut_proj and not PUBLIC:
+        _byname = dict((t["team"], t) for t in teams)
+        bracket_field = []
+        for i, r in enumerate(sorted(cut_proj["field"], key=lambda r: (r["rank"] or 999, r["team"])), 1):
+            t0 = _byname.get(r["team"], {})
+            bracket_field.append({"seed": i, "team": r["team"], "conf": r["conf"] or t0.get("conf") or "",
+                                  "bid": "AQ" if r["bid"] == "AQ" else "at-large", "avca": t0.get("avca")})
     seeds = []
-    for t in field:
-        seeds.append('<tr><td class="rk">%d</td><td class="tm">%s</td>'
-                     '<td class="cf">%s</td><td class="n %s">%s</td>'
+    # mail 114: the first column is the hub's MODEL ORDER, never an official national seed, and the 32 unseeded
+    # teams carry no seed line at all -- a 33..64 in a "Seed" column read as official seeds 33-64. The drawing
+    # code reads the data-* attributes, not the cell text, so the visible columns can say what they mean.
+    for t in bracket_field:
+        _sl = (t["seed"] + 3) // 4 if t["seed"] <= 32 else None
+        seeds.append('<tr data-seed="%d" data-team="%s" data-conf="%s" data-bid="%s"><td class="rk">%d</td><td class="tm">%s</td>'
+                     '<td class="cf">%s</td><td class="n %s">%s</td><td class="n">%s</td>'
                      '<td class="n">%s</td></tr>'
-                     % (t["seed"], esc(t["team"]), esc(t["conf"]),
+                     % (t["seed"], esc(t["team"]), esc(t["conf"]), esc(t["bid"]), t["seed"], esc(t["team"]), esc(t["conf"]),
                         "aq" if t["bid"] == "AQ" else "al", t["bid"],
+                        ("%d" % _sl) if _sl else '<span class="dim">unseeded</span>',
                         "&mdash;" if t.get("avca") is None else t["avca"]))
+    _cm_ok = bool(committee and not committee.get("error"))
+    _cparts = committee_parts(committee) if committee else {}
+    _br_note = (('<div class="note"><p><b>#</b> is the hub&rsquo;s overall <b>model order</b> on the quality-win rule '
+                 '(rank &minus; 2 &times; top-25 wins &minus; 1 &times; top-50 wins), not an official national seed. '
+                 'The top 32 take seed lines 1&ndash;8, four to a line; the other 32 are unseeded. {{AQ_MECH}}</p></div>')
+                if _cm_ok else '<div class="note">\n      <p><b>Every part of this is soft.</b> Conference champions are projected as each\n      league&rsquo;s highest-rated team, but most leagues award the bid by tournament, so\n      it can go to anyone who wins it. {{AQ_MECH}}</p>\n      <p>Seeding follows the committee&rsquo;s own ruler as far as it can be\n      projected in September: the committee seeds on resume &mdash; RPI, record\n      against the top 25 and 50, head to head &mdash; and with most of the season\n      unplayed the honest committee-predictive number is the <b>projected final\n      RPI</b>, the median rank across 4,000 simulated seasons. KPI is proprietary\n      and absent; that is a known gap, not an oversight. The end-of-season field\n      projector (62 of the actual 64 on 2025) takes over from the simulation as\n      real resumes fill in.</p>\n    </div>')
 
     def _pick(r):
         p = pred_by_pair.get((r["d"], r["a"], r["h"]))
@@ -7744,6 +9207,7 @@ def build():
         .replace("{{RANK_LIVE_VERSION}}", json.dumps(_rl["version"])) \
         .replace("{{RANK_LIVE_SCHEMA}}", str(RANK_LIVE_SCHEMA)) \
         .replace("{{POLLS_JSON}}", json.dumps(polls, separators=(",", ":"))) \
+        .replace("{{RPIC_JSON}}", json.dumps(rpic, separators=(",", ":"))) \
         .replace("{{FORECAST_NOTE_JSON}}", json.dumps(FORECAST_AVAIL_NOTE)) \
         .replace("{{NOTV_NOTE_JSON}}", json.dumps(NOTV_NOTE)) \
         .replace("{{TANALYSIS_JSON}}", json.dumps(_tan, separators=(",", ":"))) \
@@ -7799,12 +9263,28 @@ def build():
         .replace("{{T25_SEASON}}", _t25["season"]) \
         .replace("{{T25_MOVEHEAD}}", _t25["movehead"]) \
         .replace("{{RANK_BASIS}}", rank_basis) \
+        .replace("{{BRACKET_LEAD}}", _cparts.get("lead") if _cm_ok else "{{FIELD_BASIS_PROSE}}") \
+        .replace("{{BRACKET_METHOD}}", "{{FIELD_BASIS_PROSE}}" if _cm_ok else "") \
+        .replace("{{BRK_EXPECT}}", ' data-expect="placed"' if _cm_ok else "") \
+        .replace("{{COMMITTEE_TOP}}", _cparts.get("top", "")) \
+        .replace("{{COMMITTEE_BUBBLE}}", _cparts.get("bubble", "")) \
+        .replace("{{COMMITTEE_METHOD}}", _cparts.get("method", "")) \
+        .replace("{{COMMITTEE_MAP}}", _cparts.get("map", "")) \
+        .replace("{{COMMITTEE_GAPS}}", _cparts.get("gaps", "")) \
+        .replace("{{COMMITTEE_SCRIPT}}", _cparts.get("script", "")) \
+        .replace("{{BRACKET_NOTE}}", _br_note) \
+        .replace("{{TOP16_REGIONS_JSON}}", json.dumps([list(g) for g in __import__("committee_field").TOP16_REGIONS])) \
         .replace("{{AQ_MECH}}", aq_mech) \
         .replace("{{RANK_ROWS}}", "".join(rrows)) \
         .replace("{{LEDGER_JSON}}", json.dumps(ledger)) \
-        .replace("{{SCORE_CARDS}}", "".join(cards) or
-                 '<div class="empty">No completed matches yet.</div>') \
+        .replace("{{SCORE_CARDS}}",
+                 # mail 108: these 4,188 hidden cards were ~109k DOM nodes kept only so the just-finished seam could
+                 # read which matches the archive holds. The archive's game ids carry that exactly; the visible
+                 # rows live in the ledger. The cards are still built above (nothing is dropped from the data).
+                 '<script>window.RESULT_GIDS = %s;</script>' % json.dumps([str(r.get("gid")) for r in res if r.get("gid")],
+                                                                          separators=(",", ":"))) \
         .replace("{{SEED_ROWS}}", "".join(seeds)) \
+        .replace("{{CUTLINE_HTML}}", cutline_html) \
         .replace("{{DESK_JSON}}", _desk_json) \
         .replace("{{SUSPENDED_JSON}}", json.dumps(_susp_disp, separators=(",", ":"))) \
         .replace("{{CHANGED_ROWS}}", _chg_html) \
@@ -7829,8 +9309,19 @@ def build():
             'lines. <a href="rating_history_%d.svg" target="_blank" '
             'rel="noopener">Open the printable version</a>.</p>'
             '</details>' % SEASON)) \
-        .replace("{{V2P_BTN}}", "" if PUBLIC or not v2_preview_payload() else V2P_BTN) \
-        .replace("{{V2S_BTN}}", "" if PUBLIC or not v2so_preview_payload() else V2S_BTN) \
+        .replace('<button class="segb on" data-basis="blend">Blend<span class="lx"> (preseason + 2026)</span></button>',
+                 '<button class="segb on" data-basis="blend">Blend<span class="lx"> (preseason + 2026)</span></button>' if PUBLIC
+                 else '<button class="segb on" data-basis="blend" title="the default board: current POWER">Current POWER</button>') \
+        .replace('<button class="segb" data-basis="r26">2026<span class="lx"> results</span>&nbsp;only</button>',
+                 '<button class="segb" data-basis="r26">2026<span class="lx"> results</span>&nbsp;only</button>' if PUBLIC
+                 else '<button class="segb" data-basis="r26" title="a separate reference model: RPI plus opponent-adjusted scoring margin, 2026 results">RPI&nbsp;+&nbsp;margin</button>') \
+        .replace("'<b>2026 results only.</b> The fitted composite", "'<b>2026 results only.</b> The fitted composite" if PUBLIC
+                 else "'<b>RPI + margin</b> (a reference model, 2026 results only; not POWER 2.0). The fitted composite") \
+        .replace("{{P20_BTN}}", "" if PUBLIC or not p20_payload() else P20_BTN) \
+        .replace("{{OLDEXP_OPTS}}", "" if PUBLIC else OLDEXP_OPTS) \
+        .replace("{{P20_JS}}", "" if PUBLIC or not p20_payload() else
+                 P20_JS.replace("{{P20_JSON}}", json.dumps(p20_payload(), separators=(",", ":")))
+                 .replace("{{P20L_JSON}}", json.dumps(p20_ledger_payload(), separators=(",", ":")).replace("</", "<\\/"))) \
         .replace("{{V2S_JS}}", "" if PUBLIC or not v2so_preview_payload() else
                  V2S_JS.replace("{{V2S_JSON}}", json.dumps(v2so_preview_payload(), separators=(",", ":")))) \
         .replace("{{V2P_JS}}", "" if PUBLIC or not v2_preview_payload() else
@@ -7879,7 +9370,31 @@ def build():
         .replace("{{TV_ROWS}}", trows) \
         .replace("{{N_PLAYED}}", str(played)) \
         .replace("{{N_PLAYED_DEF}}", esc(_SCC.DEFINITIONS["results_on_display"])) \
-        .replace("{{FIELD_BASIS_PROSE}}",
+        .replace("{{BRACKET_PLACE_PROSE}}", (
+                 "<b>What this 2026 bracket does not know: availability and host bids.</b> Forecast does not incorporate "
+                 "availability &mdash; a sourced player status, an out-for-season report included, changes nothing in this "
+                 "projection. <b>Placement is approximated:</b> the top 16 are assumed to host their first- and second-round "
+                 "pods (host bids are not public) and the four line-1 teams the regionals; lines 5&ndash;8 and the unseeded "
+                 "teams go to the nearest pod by home state (state centre to state centre, not real travel), with first- and "
+                 "second-round conference matchups avoided as the 2026 manual requires. Later rounds are left empty rather "
+                 "than projected.") if (committee and not committee.get("error")) else (
+                 "<b>What this 2026 bracket does not know: availability and geography.</b> Forecast does not incorporate "
+                 "availability &mdash; a sourced player status, an out-for-season report included, changes nothing in this "
+                 "projection. The committee brackets to NCAA travel rules &mdash; the top 16 seeds host the first two rounds, "
+                 "and a team inside the bus radius of its site travels by road rather than by air, which moves teams between "
+                 "pods. We hold each venue's city and state but no distances, so pairings here are the seed order alone (seed "
+                 "<i>N</i> against the <i>N</i>th-from-last unseeded team) and will differ from the real 2026 draw. Later "
+                 "rounds are left empty rather than projected.")) \
+        .replace("{{FIELD_BASIS_PROSE}}", (
+                 committee_basis_prose(committee) if (committee and not committee.get("error")) else
+                 "A projected 2026 64-team field at the <b>end of the regular season</b>: each conference&rsquo;s automatic bid "
+                 "goes to its real tournament champion where one is decided, otherwise its <b>projected regular-season champion</b> among teams still alive, and the "
+                 "at-large places and every seed follow <b>Projected RPI</b> (the committee's 25/50/25 formula with its bonuses "
+                 "and penalties, remaining matches given to the forecast favourite), with the .500 and 80%% D-I at-large rules. "
+                 "The same field as the <a href=\"#/bracket/cutline/projected\">RPI Cut Line</a> projected view.%s"
+                 % ((" <b>%d automatic-bid slot(s) unresolved and held open:</b> %s." % (len(cut_proj["unresolved_aq"]), esc(", ".join(cut_proj["unresolved_aq"]))))
+                    if cut_proj["unresolved_aq"] else "")) if (cut_proj and not PUBLIC) else
+                 
                  ("A projected 2026 64-team field on <b>committee criteria</b>: "
                   "each league&rsquo;s automatic bid goes to its <b>most likely "
                   "champion</b> (title odds from 4,000 season simulations), and "
@@ -9447,6 +10962,26 @@ td.pick b{color:var(--navy)}
      capsule (score-first) is untouched. */
   #livetick .tklab.tkquiet ~ .tkm .rks{display:none}
   #livetick .tklab.tkquiet ~ .tkm img{display:none}
+  /* 074 #3: the ONE phone capsule must fit the rail in BOTH states (it
+     measured 439px live in a 390 rail, and quiet lost its time off the right
+     edge behind overflow:hidden). On a phone the capsule may SHRINK, and only
+     the team NAMES give way (ellipsis); score, current-set points, period and
+     time never shrink. Logos and rank chips yield; the action shortens to
+     "All N ->" (count kept). */
+  #livetick .tkm:not(.tkall){flex:1 1 auto;min-width:0;flex-wrap:wrap;
+    align-content:center;row-gap:4px;column-gap:5px;padding:7px 10px;
+    white-space:nowrap}
+  #livetick .tkm:not(.tkall) > *{flex:0 0 auto}
+  #livetick .tkm:not(.tkall) b{flex:0 1 auto;min-width:0;max-width:8.5em;
+    overflow:hidden;text-overflow:ellipsis}
+  #livetick .tkm img, #livetick .tkm .rks{display:none}
+  #livetick .tkall{padding:9px 10px}
+  #livetick .tkall .tkx{display:none}
+  /* the label yields on a phone: the action carries the live count, the
+     masthead pill says live/quiet */
+  #livetick .tklab .tkshown{display:none}
+  /* (#livetick .tklab phone padding moved into SHELL-118's phone block: here it lost to a later rule) */
+  #livetick .tklab.tkquiet{display:none}
   nav .inner{flex-wrap:wrap;overflow-x:visible;scrollbar-width:none;
     -webkit-overflow-scrolling:touch;padding:0 6px;justify-content:center}
   nav .inner::-webkit-scrollbar{display:none}
@@ -9512,9 +11047,11 @@ td.pick b{color:var(--navy)}
      blocking rank numbers". The track is content-sized now and the cell
      refuses to wrap: rank and its arrow sit on one line, always, the same
      convention as every other board. */
+  /* mail 108: gaps/padding tightened (this rule outranks the later .rk3 tr.row grid on specificity) -- at 12px
+     gaps the card's minimum width was 375px and pushed a 360px page to 386px */
   .rk3 tbody tr.row{display:grid;
-    grid-template-columns:minmax(46px,auto) auto auto 1fr;
-    align-items:center;gap:3px 12px;padding:9px 11px 10px;
+    grid-template-columns:minmax(40px,auto) minmax(0,auto) auto minmax(0,1fr);
+    align-items:center;gap:3px 7px;padding:9px 6px 10px;
     border-bottom:1px solid var(--line2)}
   .rk3 tbody tr.row td{border:0;padding:0;background:none}
   /* ⚠ width:48px FROM THE DESKTOP RULE SURVIVES INTO THE GRID. A grid TRACK
@@ -9822,7 +11359,7 @@ b.kres{color:#F2B441}
   margin-top:3px;max-width:42ch}
 .bwbf .none{color:var(--slate);font-style:italic}
 .bwbf .bwrulerline{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 2px}
-.bwbf .bwrulerline i{color:var(--line2);font-style:normal;margin:0 4px}
+.bwbf .bwrulerline i{color:var(--ink3);font-style:normal;margin:0 4px}
 /* ── THE REVIEW QUEUE: one trigger per item, named ───────────────────────── */
 .bwtrig{font:600 11px/1 var(--disp);letter-spacing:.09em;text-transform:uppercase;
   border:1px solid var(--line2);border-radius:2px;padding:3px 6px;color:var(--slate)}
@@ -10097,6 +11634,32 @@ b.kres{color:#F2B441}
   border:1px solid var(--line2);border-radius:var(--r-panel);
   box-shadow:var(--float)}
 #v-rankings .rk3{border-collapse:collapse}
+/* 078: the 2026-only table has its own styling (it used to inherit .rk3 and
+   its phone column-hiding). Six labelled columns at every width; the scroll
+   box contains any overflow; team names are plain links, one row width. */
+.r26t{width:100%;border-collapse:collapse;font-size:13.5px}
+.r26t th{font:700 10.5px/1 var(--disp);letter-spacing:.1em;color:var(--chalk);
+  text-align:right;padding:8px 6px;border-bottom:1px solid var(--line2);position:static}
+.r26t th.l{text-align:left}
+.r26t td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:right;
+  white-space:nowrap}
+.r26t td.rk{font:700 15px/1 var(--disp);color:var(--ink);width:2.2em}
+.r26t td.tm{text-align:left;white-space:normal}
+.r26t td.n,.r26t th:not(.l){width:1%}
+.r26t td.tm .lnk{display:flex;align-items:center;gap:6px;width:100%;min-width:0;
+  border:0;background:none;padding:0;font:600 14px/1.2 var(--sans);color:var(--ink);
+  text-align:left;cursor:pointer;box-shadow:none}
+.r26t td.tm .lnk span{overflow-wrap:normal;word-break:normal;line-height:1.2}
+.r26t td.tm .lnk img{width:18px;height:18px;flex:0 0 auto}
+.r26key{padding:8px 6px 2px}
+@media (max-width:560px){
+  .r26t{font-size:12.5px}
+  #r26panel .r26t th,#r26panel .r26t td{padding:7px 3px;letter-spacing:0}
+  #r26panel .r26t td.n{font-size:12px;padding-left:9px}
+  #r26panel .r26t th:not(.l){padding-left:9px}
+  #r26panel .r26t td.tm .lnk img{display:none}
+  .r26t td.tm .lnk{font-size:13px}
+}
 .rk3 thead tr.grp th{font:600 11px/1 var(--disp);letter-spacing:.16em;
   text-transform:uppercase;padding:11px 10px 7px;color:var(--slate);
   border-bottom:1px solid var(--line)}
@@ -10224,7 +11787,7 @@ textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
   font:var(--mono);margin:2px 0 6px}
 .statline .sv{font:600 15px/1 var(--mono);color:var(--ink)}
 .statline .sl{font:600 11px/1 var(--disp);letter-spacing:.12em;color:var(--slate)}
-.statline .sd{color:var(--line2);font-style:normal;margin:0 3px}
+.statline .sd{color:var(--ink3);font-style:normal;margin:0 3px}
 @media (max-width:560px){.statline .sv{font-size:14px}}
 
 /* ⚠ THE MATCH LOG RAN OFF A 390px PHONE. .gline is a flex row of date,
@@ -10799,7 +12362,7 @@ td.at{white-space:nowrap}
   text-align:left;color:inherit;font:inherit}
 .mrow{position:relative}
 .mrow::after{content:'\203A';position:absolute;right:10px;top:50%;
-  transform:translateY(-50%);font:600 16px/1 var(--sans);color:var(--line2)}
+  transform:translateY(-50%);font:600 16px/1 var(--sans);color:var(--ink3)}
 .mrow:hover::after{color:var(--rally)}
 .mrow:hover{background:var(--sheet)}
 .mrow:last-child{border-bottom:0}
@@ -11599,6 +13162,18 @@ body.mdlopen{overflow:hidden}
 .set.now span{background:#2B1114;color:var(--live)}
 
 /* ---- bracket, drawn like the official one ---- */
+.bregions{display:none}
+@media (max-width:560px){#brkview .bwrap{display:none}#brkview .bregions{display:block}}
+.bregpick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:4px 0 12px}
+.bregpick .segb{min-height:40px;white-space:normal;line-height:1.15}
+.bpod{margin:0 0 14px}
+.bpodh{font:700 10.5px/1.25 var(--disp);letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin:0 0 5px}
+.bpod .bgame+.bgame{margin-top:6px}
+.bregions .bgame{height:auto}
+.bregions .bside{font-size:14.5px;padding:8px 10px}
+.bregions .bnm{white-space:normal;overflow:visible}
+.bregions .bsd{font-size:12px;width:16px}
+.brdisc{margin:12px 0}
 .bwrap{overflow-x:auto;padding-bottom:6px;--bgame-h:62px;--bgame-gap:8px;
   position:relative;display:flex;gap:10px;align-items:flex-start}
 /* Connectors are drawn behind everything and never intercept a click. */
@@ -11740,7 +13315,7 @@ table th{font-family:var(--disp);font-weight:500;letter-spacing:.08em}
 .rk3 td.tm .lastm .lmr{font:700 12px/1.3 var(--sans);color:var(--ink2);margin-right:2px}
 .rk3 td.tm .lastm .lms{font:italic 500 12px/1.3 var(--sans);letter-spacing:0;
   text-transform:none;color:var(--slate)}
-.rk3 td.tm .lm-pending .lms{color:#8A5A00}
+.rk3 td.tm .lm-pending .lms{color:var(--amber)}
 .rk3 tbody tr:nth-child(n) td{background:transparent}
 .rk3 tbody tr:nth-child(n){background:transparent}
 .rk3 tbody td.pw{color:var(--ink);font-weight:700}
@@ -12226,7 +13801,7 @@ td.wh .wu{color:var(--ink3);font-style:italic}
 {{ASK_CSS}}/* A season mismatch is the loudest thing on the view, because a 2025 table
    under a 2026 heading is the error that looks completely correct. */
 .seasonwarn{background:var(--amber-bg);border:1px solid #6B551C;border-left:4px solid var(--amber);
-  border-radius:2px;padding:11px 13px;margin:0 0 12px;font-size:13px;color:#1A1200;max-width:760px}
+  border-radius:2px;padding:11px 13px;margin:0 0 12px;font-size:13px;color:var(--ink);max-width:760px}
 .seg{display:inline-flex;border:1px solid var(--line2);border-radius:var(--r-ctl);
   overflow:hidden;margin:0 0 14px;background:var(--card)}
 .segb{appearance:none;border:0;background:transparent;font:700 11.5px/1 var(--sans);
@@ -13090,8 +14665,8 @@ details.avhist{margin:14px 0}
      screenshot caught it in one look. Explicit row/column placement cannot
      overlap. */
   .rk3 tr.row{position:relative;display:grid;
-    grid-template-columns:32px auto auto minmax(0,1fr) auto;
-    column-gap:10px;row-gap:3px;padding:9px 10px 9px 6px;
+    grid-template-columns:30px minmax(0,auto) auto minmax(0,1fr) auto;
+    column-gap:7px;row-gap:3px;padding:9px 7px 9px 4px;
     border-bottom:1px solid var(--line);align-items:baseline}
   .rk3 tr.row td{display:block;border:0;padding:0;font-size:12.5px;
     white-space:nowrap}
@@ -13107,7 +14682,9 @@ details.avhist{margin:14px 0}
     font-weight:700;min-width:0;white-space:normal;overflow-wrap:anywhere}
   .rk3 tr.row td.pw{grid-row:1;grid-column:5;font:700 17px/1 var(--disp);
     text-align:right}
-  .rk3 tr.row td.cf{grid-row:2;grid-column:2}
+  /* mail 108: a long conference name ("Mountain West", 114px no-wrap) held its auto track open and pushed the card
+     to 411px on a 360px screen. The name may now truncate with an ellipsis when space runs out. */
+  .rk3 tr.row td.cf{grid-row:2;grid-column:2;min-width:0;overflow:hidden;text-overflow:ellipsis}
   .rk3 tr.row td.rec{grid-row:2;grid-column:3}
   .rk3 tr.row td.c-avca{grid-row:2;grid-column:4}
   .rk3 tr.row td.rs{grid-row:2;grid-column:5;text-align:right}
@@ -13122,6 +14699,15 @@ details.avhist{margin:14px 0}
   .rk3 tr.row td.pps,.rk3 tr.row td.opps,.rk3 tr.row td.dpps,
   .rk3 tr.row td.hitp,.rk3 tr.row td.ohit,.rk3 tr.row td.dhit{font-size:11.5px}
   .rk3 tr.row td.c-ref{display:none}
+  /* mail 108: at 360px the content-sized tracks ran ~16px past the screen (the card POWER/diff cells ended at 376px)
+     and widened the whole page to 411px. Tighter gaps and a smaller rank digit below 380px only; 390px and up unchanged. */
+  @media (max-width:380px){
+    .rk3 tr.row{column-gap:6px;padding:9px 6px 9px 4px;grid-template-columns:28px minmax(0,auto) auto minmax(0,1fr) auto}
+    .rk3 tr.row td.rk{font-size:23px;grid-template-columns:minmax(2ch,auto) 22px}
+    .rk3 tr.row td{font-size:12px}
+    .rk3 tr.row td.pps,.rk3 tr.row td.opps,.rk3 tr.row td.dpps,
+    .rk3 tr.row td.hitp,.rk3 tr.row td.ohit,.rk3 tr.row td.dhit{font-size:11px}
+  }
   /* ⚠ THE DECADE BANDS ARE A COLUMN DEVICE AND THERE IS NO COLUMN HERE
      (Cody's screenshot, 2026-09-06: "a shadow background over the text ...
      looks like a mistake"). On desktop tr:nth-child(10n+1..5) tints whole
@@ -13342,6 +14928,164 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
   h1{font-size:26px;margin:2px 0}
   .mast{padding-bottom:2px}
 }
+
+/* ═══ SHELL-118 · SHARED SHELL + CHARCOAL THEME (mail 118) ═══════════════════
+   ONE fenced block, last in the sheet, so it wins ties without rewriting the
+   hundreds of rules above it. The page was a lavender "daylight" theme under a
+   tall decorative masthead; the agreed direction is dark charcoal/slate with
+   off-white names and numbers and ONE restrained warm accent. Tokens first --
+   the site is ~2,000 var() uses -- then only the surfaces that hard-code a
+   light colour. Every value here is checked by the rendered contrast scan in
+   test_shell_118.py, not by eye. */
+:root{
+  --page:#121418; --card:#1A1E24; --alt:#20252D; --sand:#20252D;
+  --ink:#ECEFF4; --ink2:#C3CBD6; --ink3:#9AA5B4; --slate:#9AA5B4; --mid:#9AA5B4;
+  --line:#2A3039; --line2:#38414D;
+  /* --navy is an INK on this ground (43 colour uses vs 7 fills); the fills get
+     their own explicit band colour below */
+  --navy:#A9C7FF; --blue:#8AB4FF; --rally:#5B8DEF;
+  --amber:#E9B949; --gold:#E9B949; --amber-bg:#2B2416;
+  --court:#0E1014; --chrome:#0E1014; --chrome2:#161A20;
+  --good:#46C08A; --bad:#FF7A86; --win:#46C08A; --live:#FF5A66;
+  --sheet:rgba(255,255,255,.035); --sheet2:rgba(255,255,255,.065);
+  --float:0 10px 30px -18px rgba(0,0,0,.65); --float2:0 4px 14px -9px rgba(0,0,0,.55);
+  --cx-track:rgba(255,255,255,.08); --vx-rule:rgba(255,255,255,.12);
+  --cs-cyan:#4FC3D9; --cs-cyan-ink:#7DD3E3;
+  --band:#232A35; --band-ink:#C9D3E0;
+  color-scheme:dark;
+}
+body{background:var(--page)}
+body::after{opacity:.02}
+body::before{opacity:.25}
+a{color:var(--blue)}
+th{background:var(--band);color:var(--band-ink)}
+.rcsrctag.corrected,.si-confirmed_official,.aaNat,.sysbadge,.chip.ours{background:#2C3E5E;border-color:#2C3E5E}
+input,select,textarea{background:var(--card);color:var(--ink);border-color:var(--line2)}
+/* the "floating white panel" layer surfaces hard-coded translucent white; on the
+   charcoal ground they are the card surface (found by the rendered contrast scan) */
+.tdblock,#v-rankings .panel,#teamcard .tsec{background:var(--card)}
+.sbbar,.gl{background:var(--alt)}
+.rk3 thead tr.grp th.g-ours{color:var(--vx-power-lift)}
+#livetick .tklab{color:#FF8A70}
+.aaFirst{color:#1A1200}
+.prkpos,.prkrolet{color:var(--ink2)}
+/* a ruler used as a FILL (scoreboard rank chips): the token is the lifted hue now, so the
+   numeral on it is dark ink, not white */
+.rks i.rkc-avca:not(.rkc-off),.rks i.rkc-vt:not(.rkc-off){color:#0E1014}
+/* the podium bronze, lifted for the charcoal ground (was 4.2:1 at 13.5px) */
+.t25 tbody tr:nth-child(3) td.rk,.rk3 tr.row[data-r="3"] td.rk,#lplayer tbody tr:nth-child(3) td:first-child{color:#D2925C}
+/* 119: with the OPT-IN reference columns on, the desktop table is wider than the page. The
+   default table fits and keeps its page-sticky header (the rkscroll rule above); only this
+   opt-in state scrolls inside its own box, header pinned to that box. */
+.scroll.rkscroll:has(> table.rk3:not(.hideref)){overflow-x:auto}
+.scroll.rkscroll:has(> table.rk3:not(.hideref)) th{top:0}
+.qual .qualbar{background:linear-gradient(90deg,#2A3039 0%,#34405C 45%,#5B7BC4 80%,#9DB8F0 100%)}
+input::placeholder{color:var(--ink3)}
+
+/* ── the compact identity bar: wordmark left, ONE status line right ── */
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;
+  gap:4px 18px;padding:7px max(16px,calc((100% - 1280px) / 2));
+  background:linear-gradient(180deg,#0E1014,#14181E)}
+header .mast{margin:0;flex:0 0 auto;max-width:none;padding:0}
+header .season,header .mast .meta{display:none}
+header h1{font-size:26px;text-shadow:none}
+header .cs-status{margin:0;flex:1 1 auto;justify-content:flex-end;max-width:none;
+  padding:0;font-size:11.5px;gap:4px 14px;align-items:center}
+header .net{flex:1 0 100%;margin:4px 0 0;border-top:2px solid var(--amber);opacity:.85}
+header #cstape,header #livetick{flex:1 0 100%}
+/* mail 118: no permanent score strip across every page -- the tape and the
+   ticker belong to Scores, the live-slate destination */
+body:not([data-view=scores]) #cstape,body:not([data-view=scores]) #livetick{display:none!important}
+.cs-det{display:inline-block;position:relative}
+.cs-det>summary{cursor:pointer;color:var(--ink3);list-style:none;padding:4px 2px;
+  border-bottom:1px dotted var(--ink3);font-size:11px}
+.cs-det>summary::-webkit-details-marker{display:none}
+.cs-det[open]>summary{color:var(--ink)}
+.cs-detb{position:absolute;right:0;top:calc(100% + 6px);z-index:30;min-width:260px;max-width:min(92vw,520px);
+  display:flex;flex-direction:column;gap:6px;padding:10px 12px;background:var(--card);
+  border:1px solid var(--line2);border-radius:var(--r-ctl);box-shadow:var(--float);
+  color:var(--ink2);text-align:left;white-space:normal}
+.cs-detb b{color:var(--ink)}
+
+/* ── navigation: the everyday five + More ── */
+nav{background:rgba(18,20,24,.96);border-bottom:1px solid var(--line)}
+nav button{color:var(--ink3)}
+nav button.pri{color:var(--ink2)}
+nav button:hover,nav button[aria-selected=true]{color:var(--ink)}
+.morebtn{color:var(--ink2)}
+.moremenu{background:var(--card);border-color:var(--line2)}
+.moremenu button{color:var(--ink)}
+.moremenu .mglabel{color:var(--ink3)}
+
+/* ── Rankings: one line, one controls row, one Compare ── */
+.rkline{margin:2px 0 12px;color:var(--ink2);font-size:14px;line-height:1.5;max-width:900px}
+.rkline b{color:var(--ink)}
+.rkline{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px}
+.rkline-scale{color:var(--ink2)}
+.rkline-cut{color:var(--ink3);font-size:13px}
+.rkhelp{margin-left:auto;font-size:13px;color:var(--blue)}
+.rkscale{margin:0 0 9px;color:var(--ink2)}
+#v-rankings .ctl{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:12px}
+#v-rankings .ctl #q{flex:1 1 220px;min-width:0}
+details.rkcmp{position:relative}
+details.rkcmp>summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px;
+  min-height:40px;padding:0 14px;border:1px solid var(--line2);border-radius:var(--r-ctl);
+  background:var(--card);color:var(--ink);font:600 13px/1 var(--disp);letter-spacing:.06em;text-transform:uppercase}
+details.rkcmp>summary::-webkit-details-marker{display:none}
+details.rkcmp>summary::after{content:"\25BE";color:var(--ink3);margin-left:4px}
+details.rkcmp[open]>summary{border-color:var(--amber)}
+.rkcmpv{color:var(--amber);text-transform:none;letter-spacing:0;font-weight:600}
+.rkcmpb{position:absolute;right:0;top:calc(100% + 6px);z-index:25;width:min(760px,92vw);
+  padding:12px 14px;background:var(--card);border:1px solid var(--line2);
+  border-radius:var(--r-panel);box-shadow:var(--float)}
+.rkcmph{font:700 10.5px/1 var(--disp);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink3);margin:12px 0 6px}
+.rkcmph:first-child{margin-top:0}
+.rkcmpb .rulerbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0}
+.rkcmpb .seg{flex-wrap:wrap}
+.rkcmpb .basisseg{margin:0}
+.rkcmpb .refcols{display:inline-flex;gap:6px;align-items:center}
+@media (max-width:560px){
+  header{padding:6px 12px;gap:2px 10px}
+  header h1{font-size:21px}
+  header .cs-status{flex-basis:100%;justify-content:flex-start;font-size:11px}
+  .cs-detb{left:0;right:auto}
+  nav .inner{padding:0 2px;justify-content:space-between}
+  nav button.pri{font-size:12.5px;letter-spacing:.03em;padding:13px 6px}
+  .morebtn{padding-left:6px;padding-right:6px}
+  #v-rankings .ctl #q{flex-basis:100%}
+  #v-rankings .ctl select{flex:1 1 40%;min-height:44px}
+  details.rkcmp{flex:1 1 40%}
+  details.rkcmp>summary{width:100%;justify-content:center;min-height:44px}
+  .rkcmpb{position:fixed;left:8px;right:8px;top:auto;bottom:8px;width:auto;max-height:70vh;overflow:auto}
+  #livetick .tklab{padding:0 9px}
+  /* mail 118/119: with Compare -> Compare sources on, a phone card shows the optional values
+     -- Resume and the reference group -- each on ITS OWN full-width labelled line under the
+     rates. 119: the first version put two per line in the card's content-sized tracks; a
+     track could collapse to zero width (text overflowing it) and Resume stayed in row 2
+     beside AVCA, overprinting it. One value per line cannot share or lose its space.
+     Cells 14-21 are the reference group on both builds (public simply has fewer). */
+  /* 119: at enlarged text a rate cell's "PPS 18.97" outgrew its track and clipped; the label may
+     now wrap above the value instead */
+  .rk3 tr.row td.pps,.rk3 tr.row td.opps,.rk3 tr.row td.dpps,
+  .rk3 tr.row td.hitp,.rk3 tr.row td.ohit,.rk3 tr.row td.dhit{white-space:normal;min-width:0}
+  .rk3:not(.hideref) tr.row td.rs{grid-row:5;grid-column:2/-1;text-align:left;white-space:normal}
+  .rk3:not(.hideref) tr.row td.c-ref{display:block;grid-column:2/-1;font-size:11.5px;text-align:left;
+    white-space:normal;opacity:1;color:var(--ink2)}
+  .rk3:not(.hideref) tr.row td.c-ref::before{content:attr(data-l) " ";color:var(--ink3);
+    font:700 10.5px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase}
+  .rk3:not(.hideref) tr.row td.c-ref:nth-child(14){grid-row:6}
+  .rk3:not(.hideref) tr.row td.c-ref:nth-child(15){grid-row:7}
+  .rk3:not(.hideref) tr.row td.c-ref:nth-child(16){grid-row:8}
+  .rk3:not(.hideref) tr.row td.c-ref:nth-child(17){grid-row:9}
+  .rk3:not(.hideref) tr.row td.c-ref:nth-child(18){grid-row:10}
+  .rk3:not(.hideref) tr.row td.c-ref:nth-child(19){grid-row:11}
+  .rk3:not(.hideref) tr.row td.c-ref:nth-child(20){grid-row:12}
+  .rk3:not(.hideref) tr.row td.c-ref:nth-child(21){grid-row:13}
+}
+/* a ruler FILL chip whose variant is the outlined "off" state keeps the muted ink */
+.rks i.rkc-avca.rkc-off,.rks i.rkc-vt.rkc-off{color:var(--ink3)}
+/* ═══ SHELL-118 END ═══ */
 </style></head><body>
 
 <header>
@@ -13424,11 +15168,12 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <!-- Stats promoted to a primary (core-data pass, 2026-08-31): this is a
          rankings/scores/STATS site first; the leaders surface is not a
          reference tool. -->
-    <button role="tab" aria-selected="false" data-v="leaders" class="pri">Stats</button>
+    <!-- mail 118: the everyday five -- Scores, Rankings, Teams, Stats, Bracket. Bracket is
+         primary (the RPI cut line and conference tournaments live under it, deep links kept);
+         the personal ballot moved into More, where it was already the phone's home for it. -->
     <button role="tab" aria-selected="false" data-v="teams" class="pri">Teams</button>
-    <!-- PRIVATE. Cody's own weekly VolleyTalk ballot, not a ranking this site
-         publishes. Stripped from the public build. -->
-    <button role="tab" aria-selected="false" data-v="ballot" class="pri">My Ballot</button>
+    <button role="tab" aria-selected="false" data-v="leaders" class="pri">Stats</button>
+    <button role="tab" aria-selected="false" data-v="bracket" class="pri">Bracket</button>
     <div class="moreWrap">
       <button type="button" class="morebtn" id="morebtn" aria-haspopup="true"
         aria-expanded="false" aria-controls="moremenu">More<span aria-hidden="true">&#9662;</span></button>
@@ -13446,7 +15191,6 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
           <button role="menuitem" data-v="players">Players</button>
           <button role="menuitem" data-v="prank">Player ratings</button>
           <button role="menuitem" data-v="standings">Standings</button>
-          <button role="menuitem" data-v="bracket">Projected bracket</button>
         </div>
         <!-- MOREPRIV-BEGIN. PRIVATE workspace group: every item in it is
              Cody's own (ballot, availability, intel, film, Digby). The
@@ -13455,7 +15199,7 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
         <div class="mgroup mgpriv">
           <span class="mglabel" aria-hidden="true">Private workspace</span>
           <button role="menuitem" data-act="centercourt" onclick="location.href='CENTER-COURT.html'">Center Court dashboard</button>
-          <button role="menuitem" data-v="ballot" class="phoneonly">My Ballot</button>
+          <button role="menuitem" data-v="ballot">My Ballot</button>
         </div>
         <!-- MOREPRIV-END -->
       </div>
@@ -13655,58 +15399,12 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
        are the same kind of thing as our own order and the coaches poll. They
        are reference. The three a voter actually works in lead; the rest sit in
        a select that does not compete for attention. -->
-  <div class="rulerbar">
-    <div class="seg" role="tablist" aria-label="Which ranking">
-      <button class="segb on" data-r="ours"><i class="vx-key vx-k-power"></i>POWER</button>
-      <button class="segb" data-r="avca"><i class="vx-key vx-k-avca"></i>AVCA<span class="lx"> coaches poll</span></button>
-      <button class="segb" data-r="digby"><i class="vx-key vx-k-digby"></i>Digby<span class="lx">&rsquo;s Top </span>25</button>
-      <button class="segb" data-r="gap"><span class="lx">POWER </span>vs AVCA</button>
-      <button class="segb" data-r="cal"><span class="lx">Weekly </span>calendar</button>
-      {{V2P_BTN}}
-      {{V2S_BTN}}
-    </div>
-    <label class="refsel"><span>Reference</span>
-      <select id="refpick" aria-label="Reference ranking">
-        <option value="">Choose&hellip;</option>
-        <option value="top16">DI Committee top 16</option>
-        <option value="rpi">NCAA RPI</option>
-      </select>
-    </label>
-  </div>
-  <!-- ⚠ THE KEY SITS OUTSIDE THE FOLD ON PURPOSE. It was inside #rkhow,
-       which the phone closes at boot -- so the one element whose whole job
-       is to make the colour code recognisable was invisible on the device
-       it matters most on. That is the #pollview-inside-the-explainer bug
-       repeated, and a height>0 DOM read said "visible" while the screenshot
-       showed a collapsed triangle; the pixels were right. -->
-  {{RULER_KEY}}
-  {{SEASON_CHART}}
-  <details class="rkhow" open id="rkhow">
-    <summary>How this ranking works &middot; basis &amp; freshness</summary>
-  <!-- ⚠ ONE SENTENCE PER RULER, FROM ONE MAP. A rank means nothing without
-       knowing whose ruler it is; this is the line that says so, and it is
-       keyed by view so a new view cannot ship without one. -->
-  <p class="rulerwhat" id="rulerwhat"></p>
-  <!-- ⚠ SAID ONCE. "nothing here feeds the model" was appearing three times on
-       this tab -- in the group header above the columns, in RANK_BASIS, and
-       again here. Repeating a caveat does not make it more believed; it makes
-       the page read as anxious. The group row carries it now. -->
-  <p class="lead" id="ranklead">{{RANK_BASIS}}
-  <!-- ⚠ THE HINT MUST DESCRIBE WHAT THE ROW ACTUALLY DOES. It said "click a
-       team to see the six players the number is built from", which described
-       the in-place expansion this view no longer has -- the projected six
-       lives on the team page, which is where a row now goes. An instruction
-       that no longer works is worse than none. -->
-</p>
-  </details>
-  <!-- ⚠ OUTSIDE THE FOLD. This div held three whole views (AVCA, POWER vs
-       AVCA, the weekly calendar) and sat INSIDE the rkhow details -- which
-       the phone closes at boot, so all three rendered blank on every phone
-       ("missing mystery mess", Cody's screenshots, 2026-09-06) while desktop,
-       where the details ships open, never showed it. A closed details hides
-       every child but its summary; content that IS a view can never live
-       inside an explainer fold. -->
-  <div id="pollview" hidden></div>
+  <!-- mail 118: the screen opens on Current POWER. One line says what the number is and which
+       results it has seen (the RANKING cutoff -- a different clock from the live-score status in
+       the header); the method essay, the season chart and the colour key are named, optional. -->
+  <p class="rkline" id="rkline"><b>POWER</b> <span class="rkline-scale">strength &middot; 0&ndash;100</span>
+    <span class="rkline-cut" id="rklinecut"></span>
+    <a class="rkhelp" href="#rkhow" onclick="var d=document.getElementById('rkhow');if(d){d.open=true;}">How POWER works</a></p>
   <div class="ctl">
     <input type="search" id="q" placeholder="Search a team&hellip;">
     <select id="conf"><option value="">All conferences</option></select>
@@ -13714,26 +15412,33 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
       <option value="50">Top 50</option><option value="64">Top 64</option>
       <option value="100">Top 100</option><option value="0">All</option>
     </select>
-    <label class="refcols" title="show the reference columns beside ours:
-      the final 2025 order, outside reference systems, official RPI, the
-      range the other systems put a team in, returning production and
-      simulated tournament odds. Each column names itself; none of it
-      feeds our model.">
-      <input type="checkbox" id="refcols">
-      <span>Compare sources</span></label>
-    <span class="count" id="cnt"></span>
+    <!-- mail 118: ONE Compare control. The other rankings (AVCA, Digby's Top 25, POWER vs AVCA,
+         the weekly calendar, any private model views, the reference picker), the POWER order variants and the
+         reference columns all live here -- every one still reachable, none on equal footing with
+         Current POWER in the default screen. The views themselves render OUTSIDE this fold
+         (#pollview), because a closed disclosure hides its children. -->
+    <details class="rkcmp" id="rkcompare"><summary><span class="rkcmpl">Compare</span><span class="rkcmpv" id="rkcmpv"></span></summary>
+    <div class="rkcmpb">
+      <div class="rkcmph">Other rankings</div>
+      <div class="rulerbar">
+    <div class="seg" role="tablist" aria-label="Which ranking">
+      <button class="segb on" data-r="ours"><i class="vx-key vx-k-power"></i>POWER</button>
+      <button class="segb" data-r="avca"><i class="vx-key vx-k-avca"></i>AVCA<span class="lx"> coaches poll</span></button>
+      <button class="segb" data-r="rpi">RPI</button>
+      <button class="segb" data-r="digby"><i class="vx-key vx-k-digby"></i>Digby<span class="lx">&rsquo;s Top </span>25</button>
+      <button class="segb" data-r="gap"><span class="lx">POWER </span>vs AVCA</button>
+      <button class="segb" data-r="cal"><span class="lx">Weekly </span>calendar</button>
+      {{P20_BTN}}
+    </div>
+    <label class="refsel"><span>Reference</span>
+      <select id="refpick" aria-label="Reference ranking">
+        <option value="">Choose&hellip;</option>
+        <option value="top16">DI Committee top 16</option>
+        {{OLDEXP_OPTS}}
+      </select>
+    </label>
   </div>
-  <!-- ⚠ ADDRESSED BY ID, NOT BY ".panel". renderPoll() used to reach for
-       `#v-rankings .panel`, which was unique until the comparison view began
-       injecting its own panels into #pollview -- a node that sits EARLIER in
-       this section, so the selector silently started returning the wrong
-       element and switching back to POWER toggled the comparison surface
-       instead. Same shape as the duplicate-id bug that made the just-finished
-       band query the schedule tbody. -->
-  <!-- ⚠ A TOGGLE, NOT A SIXTH TAB. The ruler bar already carries five
-       choices and this phone is the device Cody actually uses; a second row
-       of buttons there would cost more than it explains. These belong to
-       POWER, so they live inside POWER. -->
+      <div class="rkcmph">POWER order</div>
   <div class="seg basisseg" role="group" aria-label="Which POWER order">
     <!-- ⚠ ONE LINE PER LABEL: .segb .lx is white-space:pre, so a newline
          inside the span rendered as a real line break and the two words
@@ -13742,6 +15447,22 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     <button class="segb" data-basis="r26">2026<span class="lx"> results</span>&nbsp;only</button>
     <button class="segb" data-basis="movers">Movers</button>
   </div>
+      <div class="rkcmph">Columns</div>
+    <label class="refcols" title="show the reference columns beside ours:
+      the final 2025 order, outside reference systems, official RPI, the
+      range the other systems put a team in, returning production and
+      simulated tournament odds. Each column names itself; none of it
+      feeds our model.">
+      <input type="checkbox" id="refcols">
+      <span>Compare sources</span></label>
+      <div class="rkcmph">Colour key</div>
+  {{RULER_KEY}}
+    </div></details>
+    <span class="count" id="cnt"></span>
+  </div>
+  <!-- ⚠ OUTSIDE THE FOLD. This div holds whole views (AVCA, POWER vs AVCA, the weekly calendar);
+       content that IS a view can never live inside a disclosure fold. -->
+  <div id="pollview" hidden></div>
   <div id="r26panel" hidden></div>
   <div id="moverspanel" hidden></div>
   <p class="munk rklive" id="rklive" hidden></p>
@@ -13842,6 +15563,29 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
     </div>
     </details>
   </div>
+  <!-- mail 118: on demand, below the table -->
+  {{SEASON_CHART}}
+  <details class="rkhow" id="rkhow">
+    <summary>How POWER works &middot; method, basis &amp; freshness</summary>
+  <!-- ⚠ ONE SENTENCE PER RULER, FROM ONE MAP. A rank means nothing without
+       knowing whose ruler it is; this is the line that says so, and it is
+       keyed by view so a new view cannot ship without one. -->
+  <p class="rkscale"><b>The scale.</b> POWER is a team&rsquo;s strength on a 0&ndash;100 scale: 50 is an
+    average Division-I team and 12.5 points is one standard deviation; higher is stronger. It is a
+    monotone rescaling of the rating that produces the rank beside it.</p>
+  <p class="rulerwhat" id="rulerwhat"></p>
+  <!-- ⚠ SAID ONCE. "nothing here feeds the model" was appearing three times on
+       this tab -- in the group header above the columns, in RANK_BASIS, and
+       again here. Repeating a caveat does not make it more believed; it makes
+       the page read as anxious. The group row carries it now. -->
+  <p class="lead" id="ranklead">{{RANK_BASIS}}
+  <!-- ⚠ THE HINT MUST DESCRIBE WHAT THE ROW ACTUALLY DOES. It said "click a
+       team to see the six players the number is built from", which described
+       the in-place expansion this view no longer has -- the projected six
+       lives on the team page, which is where a row now goes. An instruction
+       that no longer works is worse than none. -->
+</p>
+  </details>
 </section>
 
 <!-- INTEL-HTML-BEGIN -->
@@ -14439,39 +16183,31 @@ input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-o
 </section>
 
 <section id="v-bracket" hidden>
-  <p class="lead">{{FIELD_BASIS_PROSE}} <b>32 teams are seeded</b>
-  and placed four to a line, so the bracket carries four&nbsp;#1s down to
-  four&nbsp;#8s &mdash; the format since 2022. The number on a row is that
-  <b>seed line</b>; its national seed (1&ndash;32) is on the tooltip.</p>
-  <p class="lead"><b>What this 2026 bracket does not know: availability
-  and geography.</b> Forecast does not incorporate availability &mdash; a
-  sourced player status, an out-for-season report included, changes
-  nothing in this projection. The
-  committee brackets to NCAA travel rules &mdash; the top 16 seeds host the
-  first two rounds, and a team inside the bus radius of its site travels by
-  road rather than by air, which moves teams between pods. We hold each venue's
-  city and state but no distances, so pairings here are the seed order alone
-  (seed <i>N</i> against the <i>N</i>th-from-last unseeded team) and will differ
-  from the real 2026 draw. Later rounds are left empty rather than projected.</p>
-  <div id="brkview"></div>
-  <div class="panel"><div class="scroll"><table>
-    <thead><tr><th>Seed</th><th class="l">Team</th><th class="l">Conf</th>
-      <th>Bid</th><th>AVCA</th></tr></thead>
+{{CUTLINE_HTML}}
+  <!-- mail 114: SCENARIO, REGIONAL NO.1s, BRACKET, BUBBLE -- then everything else behind a named fold.
+       Cody's screenshots showed a wall of method before the bracket. Nothing below was dropped: the method,
+       the seed lines, the pods, the gaps and the full field all moved into the disclosures. -->
+  <p class="lead brlead">{{BRACKET_LEAD}}</p>
+{{COMMITTEE_TOP}}
+  <div id="brkview"{{BRK_EXPECT}}></div>
+{{COMMITTEE_BUBBLE}}
+  <details class="method brdisc"><summary><b>How this field is built</b> &mdash; scenario, ranking and seeding rules</summary>
+    <div class="note"><p>{{BRACKET_METHOD}} <b>32 teams are seeded</b> and placed four to a line, so the bracket
+    carries four&nbsp;#1s down to four&nbsp;#8s &mdash; the format since 2022. The number beside a team is its
+    <b>seed line</b> (1&ndash;8), as on the official bracket; unseeded teams carry none. The hub&rsquo;s overall
+    <b>model order</b> is on the tooltip and in the full field &mdash; it is not an official national seed.</p>
+    {{COMMITTEE_METHOD}}</div></details>
+{{COMMITTEE_MAP}}
+  <details class="method brdisc"><summary><b>What this bracket does not know</b> &mdash; availability, hosts, travel</summary>
+    <div class="note"><p>{{BRACKET_PLACE_PROSE}}</p>{{COMMITTEE_GAPS}}</div></details>
+  <details class="method brdisc" id="brkfield"><summary><b>Full field</b> &mdash; all 64 teams: model order, bid and seed line</summary>
+  <div class="panel"><div class="scroll"><table id="brkseeds">
+    <thead><tr><th title="the hub's overall model order -- not an official national seed">#</th><th class="l">Team</th><th class="l">Conf</th>
+      <th>Bid</th><th title="seed line 1-8 for the top 32; the other 32 are unseeded">Seed line</th><th>AVCA</th></tr></thead>
     <tbody>{{SEED_ROWS}}</tbody></table></div>
-    <div class="note">
-      <p><b>Every part of this is soft.</b> Conference champions are projected as each
-      league&rsquo;s highest-rated team, but most leagues award the bid by tournament, so
-      it can go to anyone who wins it. {{AQ_MECH}}</p>
-      <p>Seeding follows the committee&rsquo;s own ruler as far as it can be
-      projected in September: the committee seeds on resume &mdash; RPI, record
-      against the top 25 and 50, head to head &mdash; and with most of the season
-      unplayed the honest committee-predictive number is the <b>projected final
-      RPI</b>, the median rank across 4,000 simulated seasons. KPI is proprietary
-      and absent; that is a known gap, not an oversight. The end-of-season field
-      projector (62 of the actual 64 on 2025) takes over from the simulation as
-      real resumes fill in.</p>
-    </div>
-  </div>
+    {{BRACKET_NOTE}}
+  </div></details>
+{{COMMITTEE_SCRIPT}}
 </section>
 
 <section id="v-schedule" hidden>
@@ -14660,7 +16396,6 @@ function openMore() {
    the old path, and breaking those to rename a tab would trade the reader's
    history for a label. VIEW_OF_ROUTE resolves both; ROUTE_OF_VIEW emits only
    the new one, so nothing new is minted under the old name. */
-/* RKCMP-JS-BEGIN */
 /* THE 2026-ONLY ORDER, AND WHO MOVED. Both live inside POWER rather than as
    new tabs: the ruler bar already carries five choices and a sixth row of
    buttons costs more on a 390px phone than it explains. */
@@ -14670,28 +16405,35 @@ function renderR26() {
   const rows = (R26.rows || []).slice(0, 60);
   if (!rows.length) { host.innerHTML = ''; return; }
   const m = R26.meta || {};
+  /* 078: factual copy only -- the inputs and the producer's own match count
+     and data-through date. No early-season claims (they went stale), no
+     verdict, and it is not the private candidate or the POWER board. */
+  const n = m.matches_in_data || m.matches;
   host.innerHTML = '<div class="panel"><div class="tnote">' +
-    '<b>2026 results only.</b> No preseason projection anywhere in this ' +
-    'order: it is the fitted composite (RPI + opponent-adjusted net points ' +
-    'per set) run on this season’s ' + (m.matches || 0) + ' matches and ' +
-    'nothing else. <b>The board does not use it yet, on purpose</b> — ' +
-    'the blend’s own measurement says this season is still the minority ' +
-    'voice until a team has about 13.5 matches, and the median has 9. That ' +
-    'is exactly why it is worth looking at: it disagrees, and it is ' +
-    'unstable for the same reason.</div>' +
-    '<div class="scroll"><table class="rk3"><thead><tr>' +
-    '<th>#</th><th class="l">Team</th><th>W-L</th><th>M</th>' +
+    '<b>2026 results only.</b> The fitted composite (RPI + opponent-adjusted ' +
+    'net points per set) computed from this season’s results alone, with ' +
+    'no preseason projection' +
+    (n ? ': ' + n + ' matches' : '') +
+    (m.data_through ? ', latest match date ' + esc(m.data_through) + ' (UTC)' : '') + '. ' +
+    'A comparison view; the POWER board uses its own order.</div>' +
+    /* its OWN table class: inheriting .rk3 pulled in the board's positional
+       phone rules, which hid Adj and SOS (078) */
+    '<div class="scroll r26scroll"><table class="r26t"><thead><tr>' +
+    '<th>#</th><th class="l">Team</th><th title="wins-losses">W-L</th>' +
+    '<th title="matches played">M</th>' +
     '<th title="opponent-adjusted net points per set">Adj</th>' +
     '<th title="strength of schedule rank on this same rating">SOS</th>' +
     '</tr></thead><tbody>' + rows.map(r =>
       '<tr><td class="rk">' + r.r + '</td>' +
       '<td class="tm"><button type="button" class="lnk" data-team="' +
-      esc(r.t) + '">' + logo(r.t) + esc(r.t) + '</button></td>' +
+      esc(r.t) + '">' + logo(r.t) + '<span>' + esc(r.t) + '</span></button></td>' +
       '<td class="n">' + (r.w == null ? '—' : r.w + '-' + r.l) + '</td>' +
       '<td class="n">' + (r.gp == null ? '—' : r.gp) + '</td>' +
       '<td class="n">' + (r.adj == null ? '—' : r.adj.toFixed(2)) + '</td>' +
       '<td class="n">' + (r.sos == null ? '—' : '#' + r.sos) + '</td>' +
-      '</tr>').join('') + '</tbody></table></div></div>';
+      '</tr>').join('') + '</tbody></table></div>' +
+    '<div class="cxcap r26key">M = matches played · Adj = opponent-adjusted ' +
+    'net points per set · SOS = strength-of-schedule rank on this rating</div></div>';
 }
 
 /* ⚠ TWO CLOCKS, NAMED SEPARATELY. The daily file is a convenience copy; the
@@ -14756,6 +16498,11 @@ document.addEventListener('click', e => {
   if (b) setBasis(b.dataset.basis);
 });
 
+/* 077: the private fence opens HERE, not above renderR26. It used to wrap
+   the basis toggle (Blend / 2026 only / Movers), so the public build shipped
+   those buttons with no handler. The toggle and its data are public; only the
+   outside-sources comparison below is private. */
+/* RKCMP-JS-BEGIN */
 /* WHERE THE OUTSIDE SOURCES DISAGREE WITH US.
    The job is POLARITY -- do we rate a team higher or lower than they do --
    so it is a diverging chart around a zero rule, not four parallel series
@@ -15074,6 +16821,9 @@ function showView(view) {
      JS -- the Scores control room compresses the hero this way */
   document.body.dataset.view = view;
   const el = $('#v-' + view);
+  /* mail 108: a route whose section is not in this build (the public build strips private views) used to leave every
+     section hidden -- a blank page. Fall back to the scoreboard instead. */
+  if (!el && view !== 'scores' && $('#v-scores')) return showView('scores');
   if (el) el.hidden = false;
   /* ⚠ A STALE NAV CONTROL KEPT BOTH DOM FOCUS AND ITS RING. Setting
      aria-selected is not enough: the button the reader last pressed is still
@@ -15426,7 +17176,8 @@ function renderRank() {
   const q = $('#q').value.toLowerCase().trim(), c = cs.value, top = +$('#top').value;
   let n = 0;
   for (const tr of rrows) {
-    const nm = tr.querySelector('.tm').textContent.toLowerCase();
+    /* the team cell also carries the latest result ("vs LSU"), so search the team's own name only */
+    const nm = (tr.dataset.team || '').toLowerCase();
     const cf = tr.querySelector('.cf').textContent;
     const r = RK_SORT ? (RK_POS.get(tr) || +tr.dataset.r) : +tr.dataset.r;
     const show = (!q || nm.includes(q)) && (!c || cf === c) && (!top || r <= top);
@@ -15713,7 +17464,7 @@ function tkChip(g) {
         ' ' + g.home + ', ' + (g.period || 'in progress')) + '">' +
     teamRankChips(g.away, g.away_rank) + logo(g.away, 'sm') +
     '<b>' + esc(g.away) + '</b> ' +
-    mNum(g.away_sets) + '\u2013' + mNum(g.home_sets) +
+    '<span class="tksc">' + mNum(g.away_sets) + '\u2013' + mNum(g.home_sets) + '</span>' +
     ' <b>' + esc(g.home) + '</b>' + logo(g.home, 'sm') +
     teamRankChips(g.home, g.home_rank) +
     pts +
@@ -15773,7 +17524,7 @@ function csTicker(live) {
       '</span>' + rows.slice(0, TK_CAP).map(tkChip).join('') +
       (live.length > 1
         ? '<button type="button" class="tkm tkall" data-alllive>' +
-          'All ' + live.length + ' live \u2192</button>' : '');
+          'All ' + live.length + '<span class="tkx"> live</span> \u2192</button>' : '');
   } else {
     const q = tkQuietChips();
     if (!q) { el.hidden = true; TK_LAST = ''; return; }
@@ -15798,7 +17549,10 @@ function csTicker(live) {
   }
   /* the "N shown" label reports what SURVIVED the fit, not the render */
   const lab = el.querySelector('.tkshown');
-  const left = el.querySelectorAll('.tkm:not(.tkall)').length;
+  /* 074: count what is VISIBLE -- the phone rail hides capsules 2+ in CSS,
+     and "3 shown" beside one capsule was false */
+  const left = Array.prototype.filter.call(el.querySelectorAll('.tkm:not(.tkall)'),
+    c => c.offsetWidth > 0).length;
   if (lab) lab.textContent = '\u00b7 ' + left + ' shown';
 }
 
@@ -15928,8 +17682,8 @@ async function pollLive() {
   const jbox = document.getElementById('justin');
   const jmeta = $$('justinmeta'), jcards = $$('justincards');
   if (jbox && jmeta && jcards) {
-    const known = new Set([...document.querySelectorAll('#resultcards [data-gid]')]
-      .map(el => el.dataset.gid));
+    /* mail 108: the archive's game ids, not 4k hidden cards (the cards were ~109k DOM nodes of plumbing) */
+    const known = new Set((window.RESULT_GIDS || []).map(String));
     const fresh = justEnded.filter(g => !known.has(String(g.id)));
     if (!fresh.length) { jbox.hidden = true; }
     else {
@@ -22610,7 +24364,7 @@ function starLine(x) {
      rate carries its own season and sample because the basis differs per
      player (2026 once she has played, 2025 prior until then). */
   const bits = [];
-  if (x.role === 'six') bits.push('6-rotation');
+  /* mail 108: the six-rotation role is derived from 2025 play-by-play and is not shown as a 2026 claim */
   if (x.brs != null) {
     bits.push(Math.round(x.brs * 100) + '% back-row attack share');
   }
@@ -23545,45 +25299,92 @@ function csStatus() {
   const F = LIVE_FRESH, hm = e => e ? new Intl.DateTimeFormat('en-US',
     { timeZone: 'America/Los_Angeles', hour: 'numeric', minute: '2-digit' })
     .format(new Date(e * 1000)) : '';
-  let extra = '';
-  if (F && F.scores_changed_epoch)
-    extra += '<span title="The last time any score, set or match state in the feed moved">scores changed <b>' +
-      esc(hm(F.scores_changed_epoch)) + '</b></span>';
+  /* mail 118: ONE CONCISE LIVE STATUS, DIAGNOSTICS BEHIND "Details".
+     Visible: how many matches are live and when a score last CHANGED (that is the
+     live-score freshness -- a successful poll alone is not freshness), plus any
+     material stale/missing/error alert, in short form. Inside Details: the date,
+     the feed-check clock, the page build and result counts, and the external
+     scoreboard links. The ranking/projection cutoff is NOT here: it is stated on
+     Rankings, because it is a different clock. */
+  const alerts = [], det = [];
   const od = (F && F.overdue_listed_pre) || [];
   if (od.length)
-    extra += '<span title="' + esc(od.map(g => g.away + ' at ' + g.home + ' (' + g.time +
+    alerts.push('<span title="' + esc(od.map(g => g.away + ' at ' + g.home + ' (' + g.time +
       ', ' + g.minutes_past + ' min ago)').join('; ')) +
-      '"><b class="cs-stale">' + od.length + ' past start, NCAA feed still says not started</b></span>';
+      '"><b class="cs-stale">' + od.length + ' past start, NCAA feed still says not started</b></span>');
+  const bk = F && F.backup;
+  if (bk && bk.enabled && bk.health && bk.health.last_error)
+    alerts.push('<span title="' + esc(String(bk.health.last_error)) +
+      '"><b class="cs-stale">backup source unavailable</b></span>');
+  const rl = F && F.refresh_last;
+  if (rl && !/^(rebuilt|no_new_final|skipped_locked)$/.test(rl.outcome || ''))
+    alerts.push('<span title="' + esc(String(rl.step || rl.detail || '')) +
+      '"><b class="cs-stale">page refresh ' + esc(String(rl.outcome).replace(/_/g, ' ')) +
+      ' ' + esc(hm(rl.at_epoch)) + '</b></span>');
+  if (F && F.page_built_epoch && PAGE_BUILT_EPOCH &&
+      F.page_built_epoch > PAGE_BUILT_EPOCH + 60)
+    alerts.push('<span><a class="cs-stale" href="#" onclick="location.reload();return false">newer page built ' +
+      esc(hm(F.page_built_epoch)) + ' — reload</a></span>');
+  if (!LIVE_STAMP) alerts.push('<span>' + feed + '</span>');
+  det.push('<span>' + esc(today) + ' PT</span>');
+  if (LIVE_STAMP) det.push('<span title="when this page last asked the live feed">' + feed + '</span>');
+  const meta = document.querySelector('header .mast .meta');
+  if (meta) det.push('<span class="cs-pagemeta">' + meta.innerHTML.replace(/<br\s*\/?>/g, ' &middot; ') + '</span>');
   /* mail 039/040: when the NCAA feed has not caught up and no automated
      backup is usable, the honest fallback is a direct route to scoreboards
      that may have it -- links, never scores copied in. */
   if (od.length) {
     const ymd = day.replace(/-/g, '');
-    extra += '<span>check directly: <a target="_blank" rel="noopener" href="https://www.espn.com/womens-college-volleyball/scoreboard/_/date/' +
+    det.push('<span>check directly: <a target="_blank" rel="noopener" href="https://www.espn.com/womens-college-volleyball/scoreboard/_/date/' +
       ymd + '/group/90">ESPN D-I scoreboard</a> &middot; <a target="_blank" rel="noopener" href="https://www.ncaa.com/scoreboard/volleyball-women/d1/' +
-      day.replace(/-/g, '/') + '/all-conf">NCAA scoreboard</a></span>';
+      day.replace(/-/g, '/') + '/all-conf">NCAA scoreboard</a></span>');
   }
-  const bk = F && F.backup;
-  if (bk && bk.enabled && bk.health && bk.health.last_error)
-    extra += '<span title="' + esc(String(bk.health.last_error)) +
-      '"><b class="cs-stale">backup source unavailable</b></span>';
-  const rl = F && F.refresh_last;
-  if (rl && !/^(rebuilt|no_new_final|skipped_locked)$/.test(rl.outcome || ''))
-    extra += '<span title="' + esc(String(rl.step || rl.detail || '')) +
-      '"><b class="cs-stale">page refresh ' + esc(String(rl.outcome).replace(/_/g, ' ')) +
-      ' ' + esc(hm(rl.at_epoch)) + '</b></span>';
-  if (F && F.page_built_epoch && PAGE_BUILT_EPOCH &&
-      F.page_built_epoch > PAGE_BUILT_EPOCH + 60)
-    extra += '<span><a class="cs-stale" href="#" onclick="location.reload();return false">newer page built ' +
-      esc(hm(F.page_built_epoch)) + ' \u2014 reload</a></span>';
   const word = nlive ? '<b class="cs-fresh cs-livec">' + nlive + ' live</b>'
     : (od.length ? '<b>none live in feed</b>' : '<b>quiet</b>');
+  const changed = (F && F.scores_changed_epoch)
+    ? '<span title="The last time any score, set or match state in the feed moved">scores changed <b>' +
+      esc(hm(F.scores_changed_epoch)) + '</b></span>' : '';
+  /* the reader's choice survives the 60 s re-render (mail 118) */
+  const wasOpen = !!(el.querySelector('details.cs-det') || {}).open;
   el.innerHTML =
-    '<span>' + esc(today) + ' PT</span>' +
-    '<span>' + feed + '</span>' +
-    '<span>' + word + '</span>' + extra;
+    '<span class="cs-now">' + word + '</span>' + changed + alerts.join('') +
+    '<details class="cs-det"' + (wasOpen ? ' open' : '') + '><summary>Details</summary><div class="cs-detb">' +
+    det.join('') + '</div></details>';
 }
 /* COURTSIGNAL-JS-END */
+
+/* mail 118: RANKINGS SHELL HELPERS. (1) The ranking's own cutoff stamp, copied from the
+   method fold into the one-line lead, so the screen says which results the order has
+   seen without opening the essay. (2) The Compare control names the ranking on screen
+   when it is not Current POWER, so a reader never mistakes another ranking for it. */
+function rkShell() {
+  const cut = document.getElementById('rklinecut');
+  const st = document.querySelector('#ranklead .rkstamp');
+  /* 119: the visible line carries ONLY the results cutoff (the ranking's clock); the
+     recompute time and the finals count stay in the fold's full stamp */
+  if (cut && st && !cut.textContent) {
+    const m = st.innerHTML.match(/results through <b>([^<]+)<\/b>/);
+    cut.innerHTML = m ? '&middot; results through <b>' + m[1] + '</b>'
+                      : '&middot; ' + st.innerHTML.replace(/^Recomputed\s*/, 'recomputed ');
+  }
+  const v = document.getElementById('rkcmpv');
+  if (!v) return;
+  const on = document.querySelector('#rkcompare .rulerbar .segb.on');
+  const ref = document.getElementById('refpick');
+  const bs = document.querySelector('#rkcompare .basisseg .segb.on');
+  let lab = '';
+  if (ref && ref.value) lab = ref.options[ref.selectedIndex].text;
+  else if (on && on.dataset.r && on.dataset.r !== 'ours') lab = on.textContent.trim();
+  else if (bs && bs.dataset.basis && bs.dataset.basis !== 'blend') lab = bs.textContent.trim();
+  v.textContent = lab ? ' · ' + lab : '';
+}
+document.addEventListener('click', e => {
+  if (e.target.closest && e.target.closest('#rkcompare')) setTimeout(rkShell, 0);
+});
+document.addEventListener('change', e => {
+  if (e.target && e.target.id === 'refpick') setTimeout(rkShell, 0);
+});
+setTimeout(rkShell, 0);
 
 /* ══ WHY A MATCH IS WORTH YOUR TIME ═══════════════════════════════════════
    ⚠ NAMED REASONS, NOT A RELEVANCE SCORE. Every tag below is a fact about the
@@ -24128,8 +25929,18 @@ async function deskLive() {
   } catch (e) { j = null; }
   deskApply(j);
 }
+/* 074 #2: WHEN MAY A POLL RESPONSE REPLACE THE LIVE MAP? An error, a
+   malformed body, or an EMPTY slate the server did not mark complete keeps the
+   last good scores (a transient upstream blank must not revert live rows). An
+   empty slate the server fetched in full ("complete": true) is authoritative
+   and clears stale matches; so is any populated slate. */
+function liveResponseUsable(j, known) {
+  if (!j || !Array.isArray(j.games)) return false;
+  if (j.games.length) return true;
+  return j.complete === true || !known;
+}
 function deskApply(j) {
-  if (!j || !Array.isArray(j.games)) return;
+  if (!liveResponseUsable(j, Object.keys(LIVE_BY_ID).length)) return;
   LIVE_STAMP = j.updated || '';
   LIVE_FRESH = j.freshness || null;
   const next = {};
@@ -24224,11 +26035,12 @@ $$('sclear').addEventListener('click', () => {
 function renderBracket() {
   const host = document.getElementById('brkview');
   if (!host) return;
-  const seeds = [...document.querySelectorAll('#v-bracket tbody tr')].map(tr => {
-    const c = tr.cells;
-    return { seed: +c[0].textContent, team: c[1].textContent.trim(),
-             conf: c[2].textContent.trim(), bid: c[3].textContent.trim() };
-  });
+  /* the SEED table only: a private subview in this section carries its own tables, and reading
+     those rows as seeds corrupted the drawn bracket (found 2026-11-05) */
+  /* mail 114: read the FIELD from the seed table's data attributes, not its cell text -- the visible columns now
+     say "model order" and "seed line", and a drawing that parsed display text would break the day they changed */
+  const seeds = [...document.querySelectorAll('#brkseeds tbody tr[data-team]')].map(tr => (
+    { seed: +tr.dataset.seed, team: tr.dataset.team, conf: tr.dataset.conf, bid: tr.dataset.bid }));
   if (!seeds.length) return;
 
   /* THE REAL SHAPE, drawn the way the official bracket draws it.
@@ -24262,16 +26074,23 @@ function renderBracket() {
      bottom, Miami top, Kansas bottom).
 
      Each seed line has four teams; they go to four different quadrants, with
-     the overall 1 and 2 placed in opposite halves. ⚠ WHICH quadrant a given
-     team lands in is the committee's call and is driven by GEOGRAPHY, which we
-     do not model -- so this is the right SHAPE with our own ordering inside it,
-     and the page says so. */
+     the overall 1 and 2 placed in opposite halves. Lines 1-4 follow the
+     balanced grouping the 2025 bracket shows (mail 115, TOP16_REGIONS below);
+     lines 5-8 and every first-round pairing are geography the committee does
+     and this fallback does not, so it is the right SHAPE with seed order inside
+     it, and the page says so. */
   const LINE_ORDER = [1, 8, 5, 4, 3, 6, 7, 2];
-  const QUAD_OF_POS = [0, 3, 2, 1];        // overall 1 -> Q0, 2 -> Q3, ...
+  const QUAD_OF_POS = [0, 3, 2, 1];        // region ORIENTATION: overall 1 -> Q0, 2 -> Q3, ...
+  /* mail 115: lines 1-4 use the balanced grouping the official 2025 bracket shows (committee_field.TOP16_REGIONS,
+     substituted at build time -- one definition). Lines 5-8 here keep the plain positional order: this fallback has
+     no geography and says it is seed order. */
+  const TOP16_REGIONS = {{TOP16_REGIONS_JSON}};
+  const regionOf = {};
+  TOP16_REGIONS.forEach((grp, i) => grp.forEach(o => { regionOf[o] = i; }));
   const byQuad = [[], [], [], []];
   seeded.forEach(t => {
     const line = Math.ceil(t.seed / 4);
-    const pos = (t.seed - 1) % 4;
+    const pos = t.seed <= 16 ? regionOf[t.seed] : (t.seed - 1) % 4;
     byQuad[QUAD_OF_POS[pos]][line - 1] = t;   // one team per line per quadrant
   });
 
@@ -24290,6 +26109,24 @@ function renderBracket() {
     });
   });
 
+  /* declared OUTSIDE the fence: a fence that removes a declaration leaves a ReferenceError on the public page */
+  let placed = false;
+  /* CMF-HOOK-BEGIN */
+  /* mail 104 (private): the committee-informed placement replaces the seed-order pairing when it was built */
+  if (window.BRACKET_GAMES && window.BRACKET_GAMES.length === 32) {
+    games.length = 0;
+    window.BRACKET_GAMES.forEach(g => games.push(g));
+    placed = true;
+  }
+  /* CMF-HOOK-END */
+  /* mail 114: NEVER A SILENT FALLBACK. When the page says a placement exists (data-expect) and it did not
+     arrive, seed-order pairings would sit under a field whose regions and pods say something else -- which is
+     exactly what shipped while the hook was being stripped. Withhold the drawing and say why. */
+  if (host.dataset.expect === 'placed' && !placed) {
+    host.innerHTML = '<div class="seasonwarn">Bracket drawing withheld: the placement for this field did not ' +
+      'load, and seed-order pairings would not match the regions and pods listed on this page.</div>';
+    return;
+  }
   const side = (t, cls) => {
     if (!t) return '<div class="bside empty"><span class="bsd"></span>' +
                    '<span class="bnm">&nbsp;</span><span class="bsc"></span></div>';
@@ -24299,7 +26136,8 @@ function renderBracket() {
        opinion. A team with no readable colour gets the neutral line, never an
        invented hue (the same rule the avatars follow). */
     const _tc = (COLORS[t.team] || {}).primary;
-    return '<div class="bside ' + (cls || '') + '"' +
+    /* data-team / data-bid: what the box asserts, readable by a test without parsing display text (mail 114) */
+    return '<div class="bside ' + (cls || '') + '" data-team="' + esc(t.team) + '" data-bid="' + esc(t.bid || '') + '"' +
       (_tc ? ' style="--tc:' + _tc + '"' : '') + '>' +
       /* THE NUMBER ON AN OFFICIAL BRACKET IS THE SEED LINE, NOT THE NATIONAL
          SEED. 32 teams are seeded nationally (1-32, the format since 2022) and
@@ -24313,13 +26151,13 @@ function renderBracket() {
          Unseeded teams show NO number -- not a zero, not a dash, exactly as the
          official bracket prints them. */
       '<span class="bsd"' + (t.seed && t.seed <= 32
-        ? ' title="national seed ' + t.seed + ' of 32"' : '') + '>' +
+        ? ' title="seed line ' + Math.ceil(t.seed / 4) + ' \u00b7 model order ' + t.seed + ' (not an official seed)"' : '') + '>' +
       (t.seed && t.seed <= 32 ? Math.ceil(t.seed / 4) : '') + '</span>' +
       logo(t.team) +
       /* a long name ellipses in a bracket box ("Southern Califor…"), so the
          full one stays reachable rather than simply lost */
       '<span class="bnm" title="' + t.team +
-        (t.seed && t.seed <= 32 ? ' \u2014 national seed ' + t.seed : '') +
+        (t.seed && t.seed <= 32 ? ' \u2014 seed line ' + Math.ceil(t.seed / 4) + ', model order ' + t.seed : '') +
         '">' + t.team + '</span>' +
       '<span class="bsc">' + (t.sets === undefined ? '' : t.sets) + '</span></div>';
   };
@@ -24345,6 +26183,32 @@ function renderBracket() {
     return '<div class="bhalf' + (mirror ? ' mirror' : '') + '">' + cols.join('') + '</div>';
   };
 
+  /* mail 114: ON A PHONE, ONE REGION AT A TIME. The desktop tree is ~1,900px wide; squeezed into 390 it was a
+     long sideways scroll of truncated names. A phone gets the four regions as a selector, each region as its
+     four pods (the two first-round games whose winners meet in round two), names at full size. Same `games`
+     array as the tree, so the two views cannot disagree. Regions are named for their line-1 team and listed
+     in that team's model order. */
+  const regions = [0, 1, 2, 3].map(q => {
+    const gs = games.slice(q * 8, q * 8 + 8);
+    const one = gs.flat().find(t => t && t.seed && t.seed <= 4) ||
+                gs.flat().filter(t => t && t.seed <= 32).sort((a, b) => a.seed - b.seed)[0] || {};
+    return { q: q, gs: gs, one: one };
+  }).sort((a, b) => (a.one.seed || 99) - (b.one.seed || 99));
+  const podHead = pair => {
+    const s = pair.flat().filter(t => t && t.seed <= 32).sort((a, b) => a.seed - b.seed)[0];
+    return placed && s ? 'Pod · ' + s.team + ' (assumed host)' : 'Winners meet in round two';
+  };
+  const regionView =
+    '<div class="bregions">' +
+    '<div class="seg bregpick" role="tablist" aria-label="Region">' +
+      regions.map((r, i) => '<button type="button" class="segb' + (i ? '' : ' on') + '" data-rq="' + r.q +
+        '" role="tab" aria-selected="' + (i ? 'false' : 'true') + '">' + (r.one.team || ('Region ' + (i + 1))) +
+        '</button>').join('') + '</div>' +
+    regions.map((r, i) => '<div class="breg" data-rq="' + r.q + '"' + (i ? ' hidden' : '') + '>' +
+      [0, 2, 4, 6].map(k => '<div class="bpod"><div class="bpodh">' + podHead([r.gs[k], r.gs[k + 1]]) + '</div>' +
+        game(r.gs[k]) + game(r.gs[k + 1]) + '</div>').join('') + '</div>').join('') +
+    '</div>';
+
   host.innerHTML =
     '<div class="bwrap">' +
       half(games.slice(0, 16), false) +
@@ -24352,16 +26216,27 @@ function renderBracket() {
         '<div class="bchamp">2026 national champion</div>' +
         '<div class="bcbox">&mdash;</div></div>' +
       half(games.slice(16), true) +
-    '</div>' +
-    '<p class="tnote">First-round pairings are <b>implied by seed order</b>, not the ' +
-    'committee\u2019s bracket \u2014 it also weighs geography, and nothing has been ' +
-    'announced. Later rounds are <b>empty on purpose</b>: they fill in as matches are ' +
-    'played rather than being guessed.</p>';
+    '</div>' + regionView +
+    (placed
+      ? '<p class="tnote">First-round pods are this hub’s <b>approximate committee-style placement</b>: ' +
+        'seed lines per the 2026 manual, pods by approximate home-state distance, conference meetings avoided. ' +
+        'Host bids are assumed. The number beside a team is its <b>seed line</b>. Later rounds are <b>empty on ' +
+        'purpose</b>: they fill in as matches are played rather than being guessed.</p>'
+      : '<p class="tnote">First-round pairings are <b>implied by seed order</b>, not the ' +
+        'committee’s bracket — it also weighs geography, and nothing has been ' +
+        'announced. Later rounds are <b>empty on purpose</b>: they fill in as matches are ' +
+        'played rather than being guessed.</p>');
+  host.querySelectorAll('.bregpick [data-rq]').forEach(b => b.addEventListener('click', () => {
+    host.querySelectorAll('.bregpick [data-rq]').forEach(x => {
+      x.classList.toggle('on', x === b); x.setAttribute('aria-selected', x === b ? 'true' : 'false'); });
+    host.querySelectorAll('.breg').forEach(x => { x.hidden = x.dataset.rq !== b.dataset.rq; });
+  }));
 }
 
 /* ---- published polls: the AVCA coaches poll and the NCAA RPI, as published,
    so the page answers the question without sending anyone to another site ---- */
 const POLLS = {{POLLS_JSON}};
+const RPIC = {{RPIC_JSON}};
 /* ⚠ ONE SENTENCE PER RULER, AND A VIEW CANNOT SHIP WITHOUT ONE. The tab
    showed five rank tables whose numbers looked identical -- a row could read
    "#1 #1 #1 #1 #1" -- with nothing on screen saying whose ruler each was.
@@ -24370,6 +26245,8 @@ const RULER_WHAT = {
   ours: '<b>POWER</b> is our own predictive order: how strong a team is, ' +
         'who would win tomorrow. Margin drives it. It is not a poll and ' +
         'nobody votes in it.',
+  rpi: '<b>RPI</b> is the NCAA formula the selection committee uses: 25% winning percentage, 50% opponents\u2019, ' +
+       '25% opponents\u2019 opponents\u2019, plus bonuses for quality wins and schedule and penalties for bad losses.',
   avca: '<b>AVCA coaches poll</b> is the external poll voted by coaches and ' +
         'published by the American Volleyball Coaches Association. It is ' +
         'shown for reference and does not feed anything here.',
@@ -24627,6 +26504,30 @@ function renderCalendar() {
 const RULER_VIEWS = {};
 {{V2P_JS}}
 {{V2S_JS}}
+{{P20_JS}}
+if (RPIC) RULER_VIEWS.rpi = function (host) {
+  const m = RPIC.meta, day = d => { const p = (d || '').split('-'); return p.length === 3 ? (+p[1]) + '/' + (+p[2]) : ''; };
+  const pct = x => x.toFixed(4).replace(/^0/, '');
+  const sign = n => n > 0 ? '+' + n : n < 0 ? '\u2212' + (-n) : '0';
+  const why = t => [t.w25 ? t.w25 + ' top-25 win' + (t.w25 > 1 ? 's' : '') + ' (+' + 2 * t.w25 + ')' : '',
+    t.w50 ? t.w50 + ' win' + (t.w50 > 1 ? 's' : '') + ' over 26-50 (+' + t.w50 + ')' : '',
+    t.sb ? 'nonconference schedule (+2)' : '', t.l288 ? t.l288 + ' loss' + (t.l288 > 1 ? 'es' : '') + ' to 288-312 (\u2212' + t.l288 + ')' : '',
+    t.l313 ? t.l313 + ' loss' + (t.l313 > 1 ? 'es' : '') + ' to 313+ or non-D-I (\u2212' + 2 * t.l313 + ')' : '',
+    t.sp ? 'weak nonconference schedule (\u22122)' : ''].filter(Boolean).join(', ') || 'no bonus or penalty';
+  host.innerHTML = '<style>.rpit th.l,.rpit td.l{text-align:left}@media (max-width:560px){.rpit .rx{display:none}}</style>' +
+    '<p class="lead"><b>2026 RPI through ' + day(m.through) + '</b>, from ' + m.n_finals.toLocaleString() + ' Division I results. ' +
+    'The <b>NCAA</b> column is the latest official table (' + esc(m.official_stamp || '') + '). Cut at that same date, this calculation matches ' +
+    m.agree_exact + ' of ' + m.n + ' official ranks exactly and ' + m.agree_within_1 + ' within one place.</p>' +
+    '<div class="panel"><div class="scroll"><table class="rpit"><thead><tr><th>#</th><th class="l">Team</th><th class="rx l">Conf</th><th>Record</th>' +
+    '<th>RPI</th><th>NCAA</th><th title="Factor IV, in approximate RPI positions">Adj</th><th class="rx">W%</th><th class="rx">Opp</th><th class="rx">Opp Opp</th></tr></thead><tbody>' +
+    RPIC.teams.map(t => '<tr class="row"><td class="rk">' + t.rank + '</td><td class="tm"><a href="#/teams/' + slug(t.team) + '">' + esc(t.team) + '</a></td>' +
+      '<td class="rx l">' + esc(t.conf || '') + '</td><td class="n">' + esc(t.rec) + '</td><td class="n"><b>' + pct(t.rpi) + '</b></td><td class="n">' + t.official + '</td>' +
+      '<td class="n" title="' + esc(why(t)) + '">' + sign(t.net) + '</td><td class="n rx">' + pct(t.wp) + '</td><td class="n rx">' + pct(t.owp) + '</td><td class="n rx">' + pct(t.oowp) + '</td></tr>').join('') +
+    '</tbody></table></div><div class="note"><p><b>How it works.</b> 25% Division I winning percentage, 50% opponents\u2019, 25% opponents\u2019 opponents\u2019. ' +
+    '<b>Adj</b> is the committee\u2019s bonus and penalty total in RPI positions: +2 per win over 1-25, +1 per win over 26-50, \u22121 per loss to 288-312, ' +
+    '\u22122 per loss to 313 or below or a non-D-I team, +2 for playing half the nonconference schedule against 1-75, \u22122 for playing half against 263 or below. ' +
+    'The NCAA states these only as approximate positions, so the official table remains the authority.</p></div></div>';
+};
 function renderPoll(which) {
   const host = document.getElementById('pollview');
   const main = document.getElementById('rankpanel');
@@ -24639,10 +26540,13 @@ function renderPoll(which) {
   /* The reference select shows a choice only while one of ITS views is up, so
      it never looks like the active ruler when POWER is. */
   const rp = document.getElementById('refpick');
-  if (rp) rp.value = (which === 'top16' || which === 'rpi') ? which : '';
+  if (rp) rp.value = rp.querySelector('option[value="' + which + '"]') ? which : '';
   /* Say which ruler this is, always. */
   const rw = document.getElementById('rulerwhat');
   if (rw) { rw.innerHTML = RULER_WHAT[which] || ''; rw.hidden = !RULER_WHAT[which]; }
+  /* the POWER line names POWER, so it must not sit above another ruler's table */
+  const rl = document.getElementById('rkline');
+  if (rl) rl.style.display = which === 'ours' ? '' : 'none';
   /* ⚠ DIGBY'S TOP 25 IS A RANKING, SO IT LIVES WITH THE RANKINGS. As a
      top-level tab it competed with Rankings for the same job and a reader had
      to know which of two destinations answered "who is best". The section is
@@ -27263,8 +29167,10 @@ function tdPlayers(t, name) {
       /* posHeadline() is THE definition -- see its note; a second copy here is
          how the match preview kept the bug after the dossier was fixed */
       const head = posHeadline(x);
-      if (head) line2.push(head);
-      if (x.role === 'six') line2.push('all six rotations');
+      /* mail 108: the card's rate is the player rating's SCHEDULE-ADJUSTED value for the season it names (2026 once
+         she has played, else her 2025 prior) -- not the raw 2026 box-score rate in the leaders list, so it says so.
+         The "all six rotations" claim came from 2025 play-by-play and is not 2026 evidence, so it is not shown. */
+      if (head) line2.push(head + (x.hb ? ' (' + x.hb + ', schedule-adjusted' + (x.hs ? ', ' + x.hs + ' sets' : '') + ')' : ''));
       if (x.recv != null && x.recv >= 0.15) {
         line2.push(Math.round(x.recv * 100) + '% serve-receive share');
       }
@@ -27280,7 +29186,8 @@ function tdPlayers(t, name) {
       '</a>';
     }).join('') + '</div>' +
     '<p class="munk">Ranked against her own position only, never across ' +
-    'positions. Serve-receive and back-row share are 2025.</p></div>';
+    'positions. The per-set figure is the player rating\u2019s schedule-adjusted rate for the season shown, so it can ' +
+    'differ from the raw 2026 leader numbers above. Serve-receive share is from 2025 play-by-play.</p></div>';
 }
 
 /* TANALYSIS-JS-BEGIN */
@@ -27980,7 +29887,7 @@ ASK_JS = r"""
 })();
 """
 
-PRIVATE_MARKERS = ("POWER v2 &mdash; preview", "const V2P =", "POWER 2026 &mdash; candidate", "const V2S =", "VolleyTalk", "Massey Ratings", "Massey Ratings, 2026",
+PRIVATE_MARKERS = ("POWER v2 &mdash; preview", "const V2P =", "POWER 2026 &mdash; candidate", "const V2S =", "const P20 =", "const P20L", "POWER 2.0", "RPI Cut Line", "Conference tournaments</b>, seeded", "Old: 2026 candidate", "Old: v2 preview", "VolleyTalk", "Massey Ratings", "Massey Ratings, 2026",
                    # ── EXTERNAL REFERENCES (2026-08-31) ─────────────────
                    # the FIG snapshot, the Massey snapshot labelling and
                    # the discrepancy queue are all reference data that is
@@ -28132,6 +30039,7 @@ def strip_private(html):
                    ("/* WHY-HOOK-BEGIN */", "/* WHY-HOOK-END */"),
                    ("/* AVAILP-HOOK-BEGIN */", "/* AVAILP-HOOK-END */"),
                    ("/* AVAILS-HOOK-BEGIN */", "/* AVAILS-HOOK-END */"),
+                   ("/* CMF-HOOK-BEGIN */", "/* CMF-HOOK-END */"),
                    ("/* AVAIL-ROUTE-BEGIN */", "/* AVAIL-ROUTE-END */"),
                    ("<!-- AVAIL-MENU-BEGIN -->", "<!-- AVAIL-MENU-END -->"),
                    ("/* AVAIL-MD-BEGIN */", "/* AVAIL-MD-END */"),
@@ -28254,6 +30162,10 @@ def strip_retired(html):
     every layer, exactly as the public build always removed them."""
     for sid in RETIRED_VIEWS:
         html = _drop_section(html, sid)
+    # ⚠ NEVER LIST CMF-HOOK HERE (mail 114). This runs on the PRIVATE build too; the committee placement hook
+    # is private-only and is removed from the public page by strip_private() alone. Listing it here stripped
+    # the hook from Cody's own page, so the drawn bracket silently fell back to seed-order pairings while the
+    # committee panel beside it showed a different placement. Guarded in test_bracket_render.py.
     for _a, _b in (("<!-- FILMROOM-HTML-BEGIN -->", "<!-- FILMROOM-HTML-END -->"),
                    ("/* FILMROOM-JS-BEGIN */", "/* FILMROOM-JS-END */"),
                    ("/* FILMROOM-CSS-BEGIN */", "/* FILMROOM-CSS-END */"),
@@ -28372,6 +30284,7 @@ if __name__ == "__main__":
             json.dump(_RANK_LIVE[0], _f, separators=(",", ":"))
         os.replace(_rt, _rlp)
         print("wrote %s (%.0f KB)" % (_rlp, os.path.getsize(_rlp) / 1024.0))
+
 
     if PUBLIC:
         # Cache-bust the redirect. Fastly holds the object for ~10 minutes, so

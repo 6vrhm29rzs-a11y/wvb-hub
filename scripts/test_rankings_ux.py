@@ -195,7 +195,9 @@ def main():
     check("reference header labels are chalk on the navy band, "
           "not ink-on-navy",
           re.search(r"\.rk3 th\.c-ref\{color:var\(--chalk\)", page))
-    chalk, navy = toks.get("chalk"), toks.get("navy")
+    # mail 118: the header band is its own token now (--band); --navy became an ink on the
+    # charcoal ground. Measure the label against the band it actually sits on.
+    chalk, navy = toks.get("chalk"), (toks.get("band") or toks.get("navy"))
     if chalk and navy:
         check("...at >= 4.5:1 even at .85 opacity (band %.1f:1)"
               % contrast(chalk, navy), contrast(chalk, navy) >= 7.0)

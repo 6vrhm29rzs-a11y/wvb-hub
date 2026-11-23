@@ -137,16 +137,14 @@ def main():
     # core-data pass 2026-08-31: Stats (leaders) is a PRIMARY now -- a
     # rankings/scores/stats site leads with its stats. Six on the private
     # page, five public (the ballot strips).
-    want = (["scores", "rankings", "leaders", "teams", "ballot"]
-            if private
-            else ["scores", "rankings", "leaders", "teams"])
+    want = ["scores", "rankings", "teams", "leaders", "bracket"]   # My Ballot now rides in More
     check("the primary destinations are the core %d" % len(want),
           prim == want, "%s (expected %s)" % (prim, want))
     check("[-] the nav has not grown back into a tab maze", len(prim) <= 6,
           str(prim))
     more = re.findall(r'<button role="menuitem"[^>]*data-v="([a-z0-9]+)"', h)
     check("the reference tools stay reachable in More, none lost",
-          set(more) >= {"players", "standings", "bracket"},
+          set(more) >= ({"players", "standings", "ballot"} if private else {"players", "standings"}),
           str(more))
     check("Digby's Top 25 is a RANKINGS view, not a top-level tab",
           "top25" not in prim and 'data-r="digby"' in h)

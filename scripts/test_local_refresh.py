@@ -194,6 +194,9 @@ def check_player_ratings_before_page():
             return 1, "boom"
         return 0, ""
     tmp = tempfile.mkdtemp()
+    # the digests file too: without this the fake cycles wrote "b" into the REAL refresh state (found 2026-11-05)
+    saved_dig = L.DIGESTS
+    L.DIGESTS = os.path.join(tmp, "digests.json")
     saved = (L._run, L.fingerprint, L.STATUS_DIR, L.REFRESH_LOG, L.REFRESH_STATUS)
     L._run, L.fingerprint = fake_run, lambda: next(fp)
     L.STATUS_DIR, L.REFRESH_LOG, L.REFRESH_STATUS = tmp, os.path.join(tmp, "l.jsonl"), os.path.join(tmp, "s.json")
@@ -214,7 +217,8 @@ def check_player_ratings_before_page():
         rc = L._cycle(False, 0)
     finally:
         L._run, L.fingerprint, L.STATUS_DIR, L.REFRESH_LOG, L.REFRESH_STATUS = saved
-    if rc == 0 and calls.index("scripts/player_rating.py") < calls.index("scripts/build_hub.py"):
+    L.DIGESTS = saved_dig
+    if rc == 0 and "scripts/player_rating.py" in calls and calls.index("scripts/player_rating.py") < calls.index("scripts/build_hub.py"):
         ok("a coherent cycle rebuilds ratings, then the page")
     else:
         bad("coherent cycle order wrong", str(calls))

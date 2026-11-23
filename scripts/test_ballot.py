@@ -524,8 +524,15 @@ def main():
         bare = re.findall(r'<i class="rnk"[^>]*>\s*\d+\s*</i>', h)
         check("%s: no external rank renders as a bare numeral" % label,
               not bare, "%d bare badge(s), e.g. %s" % (len(bare), bare[:1]))
+        # mail 108 removed the hidden result cards that held every
+        # SERVER-rendered AVCA badge; visible AVCA badges now render through
+        # the client rankHTML, whose label comes from the RULERS table. Either
+        # path naming AVCA satisfies the rule (never a bare numeral -- checked
+        # just above).
         check("%s: the AVCA badge says AVCA on the page" % label,
-              '<span class="rank-label">AVCA</span>#' in h)
+              '<span class="rank-label">AVCA</span>#' in h
+              or ('"avca":["AVCA",' in h and "function rankHTML" in h
+                  and "'<span class=\"rank-label\">' + esc(compact ? r[1] : r[0])" in h))
         check("%s: the POWER badge says POWER on the page" % label,
               '<span class="rank-label">POWER</span>#' in h)
         # RESUME is inactive: it must SAY so, and must not show a number.
@@ -1057,8 +1064,10 @@ console.log(JSON.stringify(out));
         # and the set is pinned so a seventh still trips.
         # cleanup 2026-11-04: Today retired, Scores leads.
         check("the primary set is exactly the five core destinations",
-              prim2 == ["scores", "rankings", "leaders",
-                        "teams", "ballot"], str(prim2))
+              # mail 118: the everyday five -- Bracket promoted, My Ballot moved into
+              # the More overflow (private group). Pinned so a sixth still trips.
+              prim2 == ["scores", "rankings", "teams",
+                        "leaders", "bracket"], str(prim2))
         check("...and My Board is not a route",
               "'myboard'" not in src.split("ROUTE_OF_VIEW")[1][:400])
 

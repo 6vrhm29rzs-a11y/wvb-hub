@@ -65,6 +65,7 @@ def load(p, default=None):
     return json.load(open(path)) if os.path.exists(path) else default
 
 
+INPUTS = {}      # mail 116: the input generation this run actually used, written to meta
 CAND = None      # set in __main__ when the PRIVATE DEFAULT flag is on (Cody 2026-09-28: "switch the simulator too")
 PRIVATE_OUT = os.path.join(REPO, "Cody", "data", "power_candidate", "season_sim_%d.json" % SEASON)
 
@@ -106,6 +107,27 @@ def build():
     preds = load("data/predictions_%d.json" % SEASON) or {}
     fixtures = [r for r in preds.get("games", [])
                 if r["home"] in strength and r["away"] in strength]
+    # ⚠ mail 116: the forecast file runs from TODAY forward and keeps today's
+    # finished matches (a pick logged before first serve is what gets scored),
+    # so this list used to hold every match already played today -- 60 of 619
+    # on 2026-11-07 -- while the tally below counted the same matches as
+    # results. Each was counted twice. Played matches leave the fixture list
+    # by the ONE completed-match definition (season_counts.completed_gids).
+    _gpath = os.path.join(REPO, "data/raw/%d/games.jsonl" % SEASON)
+    _done, _thru = set(), None
+    if os.path.exists(_gpath):
+        import gamelog as _GL
+        import season_counts as _SCx
+        _gl = _GL.load_games_jsonl(_gpath)
+        _done = _SCx.completed_gids(_gl, SEASON)
+        _thru = _SCx.results_through_epoch(_gl, SEASON)
+        fixtures, _dropped = _SCx.remaining_fixtures(fixtures, _done)
+    else:
+        _dropped = []
+    INPUTS.update({"fixtures_dropped_already_played": len(_dropped),
+                   "results_through_epoch": _thru,
+                   "predictions_generated_utc": (preds.get("meta") or {}).get("generated_utc"),
+                   "predictions_results_through_epoch": (preds.get("meta") or {}).get("results_through_epoch")})
     if not fixtures:
         print("no fixtures to simulate")
         return None
@@ -247,6 +269,14 @@ def build():
     tbl25 = np.array([S.set_win_prob(x, 25) for x in grid])
     tbl15 = np.array([S.set_win_prob(x, 15) for x in grid])
 
+    # Conference tournaments already played are facts: the real champion holds the title and bid in every
+    # iteration, and a team knocked out of its tournament cannot win it.
+    import aq_status as _AQ
+    from reconcile_2025 import norm as _aqnorm
+    _aq = _AQ.load()
+    aq_won = set(i for i, t in enumerate(teams) if _aqnorm(t) in _aq["champions"])
+    aq_out = set(i for i, t in enumerate(teams) if _aqnorm(t) in _aq["eliminated"])
+
     for _ in range(ITERATIONS):
         # redraw every team's true strength -- the correction that keeps the
         # win-total bands honest
@@ -280,7 +310,12 @@ def build():
         for c, members in by_conf.items():
             if len(members) < 2:
                 continue
-            m = np.array(members)
+            decided = [i for i in members if i in aq_won]
+            if decided:
+                conf_titles[decided[0]] += 1.0
+                champions.append(int(decided[0]))
+                continue
+            m = np.array([i for i in members if i not in aq_out] or members)
             best = cw[m].max()
             leaders = m[cw[m] >= best]
             # a shared lead splits the credit rather than picking one at random
@@ -387,6 +422,10 @@ def build():
                              "conference tournaments -- titles here are the "
                              "regular-season race"),
             "fixtures_simulated": len(fixtures),
+            "fixtures_dropped_already_played": INPUTS.get("fixtures_dropped_already_played"),
+            "results_through_epoch": INPUTS.get("results_through_epoch"),
+            "predictions_generated_utc": INPUTS.get("predictions_generated_utc"),
+            "predictions_results_through_epoch": INPUTS.get("predictions_results_through_epoch"),
             "teams": len(teams),
         },
         "teams": rows,

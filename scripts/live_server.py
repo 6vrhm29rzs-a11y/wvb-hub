@@ -44,6 +44,11 @@ import match_state as MS
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WEBROOT = os.path.join(REPO, "Cody")
+# ⚠ mail 110: STATIC FILES ARE AN ALLOWLIST, NOT THE WHOLE FOLDER. WEBROOT is Cody/, which also holds private data
+# (credential file, ballots, coordination, backups); serving it wholesale let any tailnet client read them. Only these
+# root-level files are served -- the page, the live-ranking artifact it fetches, and the two files it links to. Every
+# other path, every directory listing and every unknown file is 404. Decided from the page's actual references.
+STATIC_ALLOW = ("START-HERE.html", "rankings_live.json", "CENTER-COURT.html", "rating_history_2026.svg")
 API = "https://ncaa-api.henrygd.me"
 UA = "wvb-hub/0.1 (personal research project; live scoreboard, 1 req/min)"
 PORT = int(os.environ.get("WVB_LIVE_PORT", "8799"))
@@ -379,9 +384,14 @@ class Cache(object):
                 self._sig = _sig
                 self.changed_epoch = int(time.time())
             self.polled_epoch = int(time.time())
-            if games or not self.payload.get("games"):
+            # 074 #2: an EMPTY slate replaces the board only when every day was
+            # fetched successfully -- then it is authoritative ("complete")
+            # and stale live rows must clear. A partial/failed fetch never
+            # blanks the last good board.
+            if games or err is None or not self.payload.get("games"):
                 self.payload = {
                     "games": games,
+                    "complete": err is None,
                     # ⚠ THE PAGE IS PACIFIC. _et_now() stays Eastern because
                     # the scoreboard is keyed by the Eastern calendar day, but
                     # the stamp a reader SEES must match every other time on
@@ -1012,6 +1022,41 @@ class Handler(SimpleHTTPRequestHandler):
                    "text/javascript", "application/json", "image/svg+xml",
                    "text/plain")
 
+    def _static_target(self):
+        """mail 110: the real path of an allowlisted static file, or None. The request path is decoded exactly once
+        (strict) and must equal an allowlisted ROOT-LEVEL name -- so '..', '//', '%2e%2e', '%2f', backslashes, NULs and
+        double-encoded forms never match. The file's REAL path must sit directly in the real WEBROOT (a symlink cannot
+        escape) and be a regular file."""
+        import urllib.parse as _up
+        raw = self.path.split("?", 1)[0].split("#", 1)[0]
+        try:
+            dec = _up.unquote(raw, errors="strict")
+        except (UnicodeDecodeError, ValueError):
+            return None
+        if not dec.startswith("/") or "\x00" in dec or "\\" in dec:
+            return None
+        name = dec[1:]
+        if name not in STATIC_ALLOW:
+            return None
+        root = os.path.realpath(WEBROOT)
+        real = os.path.realpath(os.path.join(root, name))
+        if os.path.dirname(real) != root or not os.path.isfile(real):
+            return None
+        return real
+
+    def list_directory(self, path):
+        # mail 110: never list a directory (it used to show Cody/'s filenames)
+        self.send_error(404)
+        return None
+
+    def do_HEAD(self):
+        # mail 110: HEAD goes through the SAME allowlist (the base class's HEAD bypassed _serve_static entirely)
+        return self._serve_static()
+
+    def _base_static(self):
+        return (SimpleHTTPRequestHandler.do_HEAD(self) if self.command == "HEAD"
+                else SimpleHTTPRequestHandler.do_GET(self))
+
     def _serve_static(self):
         import gzip as _gzip
         import posixpath
@@ -1028,13 +1073,14 @@ class Handler(SimpleHTTPRequestHandler):
                 self.send_header("Content-Length", "0")
                 self.end_headers()
                 return
-        path = self.translate_path(self.path)
-        if os.path.isdir(path):
-            return SimpleHTTPRequestHandler.do_GET(self)
+        path = self._static_target()
+        if path is None:
+            self.send_error(404)
+            return None
         accepts = "gzip" in (self.headers.get("Accept-Encoding") or "").lower()
         ctype = mimetypes.guess_type(path)[0] or ""
         if not accepts or not ctype.startswith(self._GZIP_TYPES):
-            return SimpleHTTPRequestHandler.do_GET(self)
+            return self._base_static()
         # ⚠ COMPRESSING 43.9 MB ON EVERY REQUEST WAS 0.42 s OF CPU A HIT.
         # The comment above says "gzips this page to 1.5 MB"; that was true
         # when the page was a third of its current size. Today START-HERE.html
@@ -1049,14 +1095,14 @@ class Handler(SimpleHTTPRequestHandler):
         except OSError:
             # ⚠ FALL BACK, NEVER 500. A missing file is the base handler's job
             # to report, and it words it better than this would.
-            return SimpleHTTPRequestHandler.do_GET(self)
+            return self._base_static()
         ent = _GZ_CACHE.get(path)
         if not ent or ent[0] != st.st_mtime_ns or ent[1] != st.st_size:
             try:
                 with open(path, "rb") as fh:
                     raw = fh.read()
             except OSError:
-                return SimpleHTTPRequestHandler.do_GET(self)
+                return self._base_static()
             body = _gzip.compress(raw, 6)
             # Identity, not content: mtime+size+compressed length. A hash of
             # 43.9 MB would reintroduce the cost this cache exists to remove.

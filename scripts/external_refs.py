@@ -44,6 +44,7 @@ SEASON = int(os.environ.get("WVB_SEASON", "2026"))
 
 MASSEY_PATH = "Cody/data/massey_2026_preseason.txt"
 FIG_PATH = "Cody/data/figstats_snapshots.jsonl"
+FIG_RETIRED = True
 MASSEY_SNAP_PATH = "Cody/data/massey_snapshots.jsonl"
 EVOLLVE_PATH = "Cody/data/evollve_snapshots.jsonl"
 
@@ -52,8 +53,6 @@ ROLES = (
      "counting corpus; the only input to any hub number"),
     ("Official school / live-stat evidence", "may corroborate or correct "
      "a result, through the Result Ledger process only"),
-    ("FIGstats unofficial RPI", "external resume-reference signal only -- "
-     "never a result authority, correction source, or Power input"),
     ("Massey preseason snapshot", "external strength-reference snapshot "
      "only -- never a Power input or result source"),
 )
@@ -110,7 +109,13 @@ def massey_latest():
 
 
 def fig_latest():
-    """The most recent FIGstats snapshot record, or None."""
+    """The most recent FIGstats snapshot record, or None.
+
+    RETIRED (Cody, 2026-11-22): the publisher stopped updating its RPI, so the
+    held Aug 31 capture is no longer compared with anything or shown. The file
+    stays on disk as a record."""
+    if FIG_RETIRED:
+        return None
     p = os.path.join(REPO, FIG_PATH)
     if not os.path.exists(p):
         return None

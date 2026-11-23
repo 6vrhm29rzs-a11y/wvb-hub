@@ -199,6 +199,13 @@ jobs:
           # every ledgered correction against both schools.
           python3 scripts/verify_results_daily.py || echo "result verification skipped; continuing"
           python3 scripts/build_dataset.py
+          # bounded official-source collector: 12 schools max, rate-limited,
+          # robots-respecting; daily cadence ONLY -- never the half-hourly job.
+          # It can file a school's conflicting result, which holds that match
+          # and changes the counted corpus, so it must run BEFORE ratings and
+          # certification; the dataset is rebuilt so every later step agrees.
+          python3 scripts/collector.py || echo "collector skipped"
+          python3 scripts/build_dataset.py
           python3 scripts/rpi_2025.py || echo "RPI needs a game graph; skipping this early"
           python3 scripts/rating_2025.py
 
@@ -243,6 +250,8 @@ jobs:
           # one-team 'league' never collects an automatic bid.
           python3 scripts/conference_repair.py || echo "conference repair skipped"
           python3 scripts/digby_top25.py || echo "top 25 needs a projection; skipping"
+          python3 scripts/rpi_committee.py || echo "committee RPI skipped; continuing"
+          python3 scripts/ingest_conf_tournaments.py || echo "conference tournaments skipped; continuing"
           # Forecasts and the season sim stand on the blend (2026-09-23/24).
           # They ran earlier in this job against yesterday's blend; rerun them
           # now that digby_top25 is fresh so the page and the files agree.
@@ -269,9 +278,6 @@ jobs:
           python3 scripts/attribution_suspicion.py || echo "attribution suspicion skipped; continuing"
           python3 scripts/confidence.py || echo "confidence ledger skipped"
           python3 scripts/availability_desk.py || echo "availability desk skipped"
-          # bounded official-source collector: 12 schools max, rate-limited,
-          # robots-respecting; daily cadence ONLY -- never the half-hourly job
-          python3 scripts/collector.py || echo "collector skipped"
           python3 scripts/source_intel.py || echo "source intel skipped"
           # PLAYER RATINGS -- position boards, POWER and RESUME. Cheap and
           # offline: it reads the crawled box scores already on disk. It must
