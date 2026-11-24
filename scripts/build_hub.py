@@ -1221,6 +1221,7 @@ def rpi_cutline(teams, field, ranking="official", scenario=None, official_ranks=
     import aq_status as _AQ
     _aq = _AQ.load()
     proj, proj_meta = project_conf_champions(rpi)
+    _favs = _ct_favourites(teams)
     aq_by_conf, conflicts = {}, []
     for ck in ncaa:
         if size.get(ck, 0) < 6:
@@ -1228,6 +1229,12 @@ def rpi_cutline(teams, field, ranking="official", scenario=None, official_ranks=
         _won = [r for r in rpi if r["ckey"] == ck and _norm(r["team"]) in _aq["champions"]]
         if _won and _won[0]["eligible"]:
             aq_by_conf[ck] = dict(_won[0], aq_source="conference tournament champion", proj=proj[_won[0]["team"]],
+                                  runner=None, near_tie=False)
+            continue
+        # an open tournament: the bid goes to the team most likely to win what is left of the real bracket
+        _fav = by_team.get(_favs.get(ck))
+        if _fav and _fav["eligible"]:
+            aq_by_conf[ck] = dict(_fav, aq_source="most likely tournament champion", proj=proj[_fav["team"]],
                                   runner=None, near_tie=False)
             continue
         mem = [r for r in rpi if r["ckey"] == ck and proj[r["team"]]["ppct"] is not None
@@ -1274,7 +1281,7 @@ def rpi_cutline(teams, field, ranking="official", scenario=None, official_ranks=
             pool.append(r)
         else:
             gate_out.append({"team": r["team"], "rank": r["rank"], "why": why})
-    at_large, out = pool[:n_al], pool[n_al:n_al + 5]
+    at_large, out = pool[:n_al], pool[n_al:n_al + 8]
     cut = at_large[-1]["rank"] if at_large else None
     fld = [dict(r, bid="AQ") for r in aqs] + [dict(r, bid="At-large") for r in at_large]
     fld.sort(key=lambda r: (r["rank"] or 999))
@@ -1300,7 +1307,8 @@ def rpi_cutline(teams, field, ranking="official", scenario=None, official_ranks=
     al_pool = [r["team"] for r in pool]
     want = [b["team"] for b in board] + [t for t in al_pool if t not in set(b["team"] for b in board)]
     resumes = cut_resumes(rpi, want, ranking, scenario)
-    return {"ranking": ranking, "futures": fut_meta, "board": board, "resumes": resumes,
+    _bo = (_BID_ODDS or load("data/bid_odds_%d.json" % SEASON) or {}).get("teams") if ranking == "post" and not PUBLIC else None
+    return {"ranking": ranking, "bid_odds": _bo, "futures": fut_meta, "board": board, "resumes": resumes,
             "ranks_all": dict((r["team"], r["rank"]) for r in rpi if r["rank"]), "al_pool": al_pool,
             "aq_teams": [r["team"] for r in aqs],
             "conf_of": dict((r["team"], label.get(r["ckey"], r["conf"])) for r in rpi),
@@ -1426,10 +1434,9 @@ def _cut_panel(c, asof, pid, hidden):
                      + _line_after({"bid": b["status"], "rank": b["rank"]}))
     rows = "".join(_rows)
     def _ol(items):
-        return "<ol class=\"cl-ol\">" + "".join("<li><b>%s</b> <span>#%s &middot; %s</span></li>" % (esc(x["team"]), x["rank"], esc(x["conf"] or ""))
-                                               for x in items) + "</ol>"
-    last4, out4 = c.get("last_four_in") or [], fo[:4]
-    outs = ", ".join("%s (#%s, %s)" % (esc(r["team"]), r["rank"], esc(r["conf"] or "")) for r in fo[4:5])
+        return "<ol class=\"cl-ol\">" + "".join("<li><b>%s</b> <span>#%s &middot; %s%s</span></li>" % (
+            esc(x["team"]), x["rank"], esc(x["conf"] or ""), _odds_txt(x["team"])) for x in items) + "</ol>"
+    last4, out4, next4 = c.get("last_four_in") or [], fo[:4], fo[4:8]
     fm = c.get("futures") or {}
     if proj:
         _basis = fm.get("forecast_model") or fm.get("forecast_basis") or "not stated"
@@ -1437,7 +1444,7 @@ def _cut_panel(c, asof, pid, hidden):
                '50%% opponents&rsquo;, 25%% opponents&rsquo; opponents&rsquo;, <b>plus the NCAA&rsquo;s bonuses and '
                'penalties</b>). Inputs: every counted D-I result so far plus the %d remaining scheduled D-I matches through %s, '
                'each given to the favourite in the match forecasts (%s, %s; private Current POWER fit). A derived '
-               'projection, not the official table; conference tournaments are not scheduled yet and are not included.'
+               'projection, not the official table. Tournament matches are added in the <b>After conference tournaments</b> view.'
                % (fm.get("projected_games", 0), esc(fm.get("last_scheduled_date") or "the last scheduled date"),
                   esc(_basis), esc(str(fm.get("forecast_generated") or "")[:10])))
     else:
@@ -1445,20 +1452,24 @@ def _cut_panel(c, asof, pid, hidden):
     post = c.get("ranking") == "post"
     if post:
         src = src.replace("<b>Projected RPI</b> at the end of the regular season",
-                          "<b>Projected RPI after the conference tournaments</b>, one scenario (the forecast favourite wins every "
-                          "unplayed tournament match; %d tournament matches added)" % ((c.get("futures") or {}).get("scenario_games", 0)))
+                          "<b>Projected RPI after the conference tournaments</b>, one scenario (each open tournament&rsquo;s likeliest "
+                          "champion wins through and the favourite wins every other match; %d tournament matches added)"
+                          % ((c.get("futures") or {}).get("scenario_games", 0)))
+        src = src.replace(" Tournament matches are added in the <b>After conference tournaments</b> view.", "")
         src = src.replace("Automatic bids:", "Automatic bids:")
     rk = "Projected RPI" if proj else "RPI"
     return ('<div id="%s"%s>'
             '<p class="lead"><b>RPI Cut Line</b> &mdash; an RPI scenario, not a bracket prediction: the committee weighs '
-            'other criteria too. %s Automatic bids: one per conference (%d of %d conferences): the real tournament champion where one is decided, otherwise the <b>projected '
-            'regular-season champion</b> among teams still alive &mdash; current conference record plus expected wins in the remaining conference '
-            'matches (Current POWER&rsquo;s match forecasts%s), assuming that team wins any tournament still open. The other %d spots go in strict %s order to eligible teams without an automatic bid.</p>'
+            'other criteria too. %s Automatic bids: one per conference (%d of %d conferences): the real tournament champion where one is decided, '
+            'otherwise the <b>team most likely to win the rest of its real bracket</b> (ACC, Big 12 and WCC: the regular-season champion, '
+            'from Current POWER&rsquo;s match forecasts%s). The other %d spots go in strict %s order to eligible teams without an automatic bid.</p>'
             '<div class="panel cl-sum"><div class="cl-k"><span>Cut line</span><b>%s #%s</b><em>last at-large in: %s</em></div>'
             '<div class="cl-k"><span>Last four in</span>%s</div>'
-            '<div class="cl-k"><span>First four out</span>%s<em>%s</em></div>'
-            '<p class="tnote">Both lists run in RPI order: the last name in &ldquo;Last four in&rdquo; is the final at-large team, the '
-            'first name in &ldquo;First four out&rdquo; is next in line. Automatic qualifiers ranked below the line still make the field%s.</p>%s</div>'
+            '<div class="cl-k"><span>First four out</span>%s</div>'
+            '<div class="cl-k"><span>Next four out</span>%s</div>'
+            '<p class="tnote">Lists run in RPI order: the last name in &ldquo;Last four in&rdquo; is the final at-large team, the '
+            'first name in &ldquo;First four out&rdquo; is next in line. <b>%% at-large</b> is how often the team earns an at-large place in '
+            'simulations of every remaining match, tournaments included, when it does not win its league&rsquo;s bid. Automatic qualifiers ranked below the line still make the field%s.</p>%s</div>'
             '<div class="panel"><div class="scroll"><table class="r26t cl-t"><thead><tr><th>%s</th><th class="l">Team</th>'
             '<th class="l">Conf</th><th>%s</th><th class="l">Bid</th></tr></thead><tbody>%s</tbody></table></div>'
             '<p class="tnote">%d teams: %d projected automatic qualifiers + %d at-large. At-large teams must be .500 or better '
@@ -1468,7 +1479,7 @@ def _cut_panel(c, asof, pid, hidden):
                (", computed %s" % esc(str(c["proj_meta"].get("generated") or asof or "")[:10])) if (c["proj_meta"].get("generated") or asof) else "",
                c["n_al"], rk, rk, c["cut_rank"],
                ("%s (#%s)" % (esc(li["team"]), li["rank"])) if li else "&mdash;",
-               _ol(last4), _ol(out4), ("Then: " + outs) if outs else "",
+               _ol(last4), _ol(out4), _ol(next4),
                (": " + esc(", ".join(c["aq_below_line"]))) if c["aq_below_line"] else "",
                ("<div class=\"seasonwarn\">%s</div>" % " ".join(esc(w) for w in warn)) if warn else "",
                rk, "Proj. record" if proj else "Record", rows, len(c["field"]), c["n_aq"], c["n_al"],
@@ -1507,7 +1518,8 @@ def committee_basis_prose(cm):
     lab = RANK_LABEL[cm["basis"]]
     return ("A projected 2026 64-team field <b>after the conference tournaments</b>, one coherent scenario: each "
             "conference&rsquo;s automatic bid goes to the scenario&rsquo;s tournament champion (regular-season champion in the "
-            "ACC, Big 12 and WCC); at-large places follow the hub&rsquo;s <b>quality-win rule</b> on the scenario&rsquo;s "
+            "ACC, Big 12 and WCC). At-large places go to the teams that earn one most often across simulations of every "
+            "remaining match, tournaments included; each simulation applies the hub&rsquo;s <b>quality-win rule</b> on its "
             "<b>%s</b> (rank &minus; 2 &times; top-25 wins &minus; 1 &times; top-50 wins; a top-25 win also counts as a top-50 "
             "win, so it is worth 3 places and a win over #26&ndash;50 is worth 1), with the .500 and 80%% D-I at-large rules. "
             "Seeds 1&ndash;32 use the same score. The pure-RPI field stays on the "
@@ -1551,7 +1563,7 @@ def committee_parts(cm):
             "hub&rsquo;s rules &mdash; not the committee&rsquo;s bracket, and nothing has been announced." % basis_short)
     rk = sel["ranks"]
     def lst(ts):
-        return "<ol class=\"cl-ol\">" + "".join("<li><b>%s</b> <span>#%s</span></li>" % (esc(t), rk.get(t)) for t in ts) + "</ol>"
+        return "<ol class=\"cl-ol\">" + "".join("<li><b>%s</b> <span>#%s%s</span></li>" % (esc(t), rk.get(t), _odds_txt(t)) for t in ts) + "</ol>"
     # regional No.1s, in model order
     ones = sorted(((pl["quad"][q][1], q) for q in range(4)), key=lambda x: x[0]["order"])
     top = ('<div class="cm-panel" id="cmfield"><div class="cm-regs" aria-label="Regional No. 1 seeds">%s</div></div>'
@@ -1562,10 +1574,13 @@ def committee_parts(cm):
     rpi_o4 = [x["team"] for x in (cp.get("first_out") or [])[:4]]
     bubble = ('<div class="panel cl-sum cm-bubble"><div class="cl-k"><span>Field</span><b>%d teams</b><em>%d automatic + %d at-large</em></div>'
               '<div class="cl-k"><span>Last four in</span>%s</div><div class="cl-k"><span>First four out</span>%s</div>'
-              '<p class="tnote">%s rank beside each name. Pure ranking order, same scenario and snapshot: last four in %s; first '
-              'four out %s. Why they differ is under <b>How this field is built</b>.</p></div>'
+              '<div class="cl-k"><span>Next four out</span>%s</div>'
+              '<p class="tnote">%s rank beside each name. <b>%% at-large</b> is how often the team earns an at-large place in simulations of every '
+              'remaining match, conference tournaments included, when it does not win its league&rsquo;s bid. Pure ranking order, same scenario and snapshot: last four in %s; first '
+              'four out %s. Why they differ is under <b>How this field is built</b>.</p>%s</div>'
               % (len(cm["ordered"]), sel["n_aq"], sel["n_al"], lst(sel["last_four_in"]), lst(sel["first_four_out"]),
-                 RANK_LABEL.get(cm["basis"], "Ranking"), esc(", ".join(rpi_l4)), esc(", ".join(rpi_o4))))
+                 lst(sel.get("next_four_out") or []), RANK_LABEL.get(cm["basis"], "Ranking"), esc(", ".join(rpi_l4)), esc(", ".join(rpi_o4)),
+                 _bid_odds_table(rk, cp.get("conf_of") or {})))
     chg = []
     for ch in sel["changes"]:
         head = {"swap": "Field change", "last_in": "Last team in", "next_in_line": "Next in line"}[ch.get("kind", "swap")]
@@ -1645,12 +1660,17 @@ def committee_panel_html(cm):
 
 def conf_tournaments(teams, use_observed=True):
     """mail 100: seeded conference tournaments, AQ probabilities (simulated) and ONE chalk scenario."""
+    global _CT_RESULT
+    if use_observed and _CT_RESULT is not None:
+        return _CT_RESULT
     import conf_tournaments as CT
+    import conf_brackets as CB
     import project_field as _PF
     from reconcile_2025 import norm as _norm
     cfg = CT.load_cfg()
     lines = open(os.path.join(REPO, "data", "raw", "%d" % SEASON, "polls_rpi.jsonl"), encoding="utf-8").read().splitlines()
     cap = json.loads(lines[-1])
+    _recs = cut_records()
     byname = dict((_norm(t["team"]), t["team"]) for t in teams)
     rpi = []
     for r in cap["rows"]:
@@ -1660,6 +1680,12 @@ def conf_tournaments(teams, use_observed=True):
                     "orank": int(r["Rank"]) if str(r.get("Rank", "")).isdigit() else 999,
                     "eligible": _norm(nm) not in _PF.INELIGIBLE_2026})
     proj, pmeta = project_conf_champions(rpi)
+    rec_of, crec_of = {}, {}
+    for r in rpi:
+        x = _recs.get(_norm(r["team"]))
+        if x:
+            rec_of[r["team"]] = "%d-%d" % (x["w"], x["l"])
+        crec_of[r["team"]] = "%d-%d" % (proj[r["team"]]["cw"], proj[r["team"]]["cl"])
     cand = (load("Cody/data/power_candidate/v2so_preview.json") if not PUBLIC else None) or {}
     # mail 101: actual results ONLY from the provenance ledger, each bound to its bracket round
     ctx = ct_context()
@@ -1698,6 +1724,30 @@ def conf_tournaments(teams, use_observed=True):
             lost = len([m for m in obs["matches"] if m["winner"]])
             need = obs["field"] - lost - len(obs["alive"])
             byes = [r["team"] for r in mem if r["team"] not in in_it][:max(0, need)]
+            # the real bracket: seeds fitted to the final standings and every real pairing
+            if row.get("structure") == "sunbelt10":
+                _st = [r["team"] for d in ("East", "West") for r in mem if r["team"] in set(row["divisions"][d])]
+            else:
+                _st = [r["team"] for r in mem]
+            _ann = (ctx["announced"].get(cname) or {}).get("seeds")
+            if _ann:
+                _ann = dict((int(k), v) for k, v in _ann.items())
+                _st = [_ann[k] for k in sorted(_ann)]
+            br = CB.build(cname, row, obs, _st, cand, rec_of, crec_of)
+            if br:
+                _official = bool(_ann) and br["seeds"] == _ann      # published seeds must fit every real pairing
+                if _ann and not _official:
+                    print("  %s: published seeds do not fit the real pairings; shown as estimated" % cname)
+                out[cname] = dict(br, cfg=row, host_effective=row.get("host", "neutral"), seed_basis="observed", standings=[],
+                                  seed_official=_official, seed_source=(ctx["announced"].get(cname) or {}).get("source") if _official else None,
+                                  actual_results_used=lost, observed=obs, inferred_byes=[], chalk_champion=br["favourite"],
+                                  entry_round={}, unbound_actuals=[])
+                scen_aq[ck] = br["favourite"]
+                for m in br["chalk"]:
+                    if m["source"] != "actual":
+                        w, l = (m["a"], m["b"]) if m["winner"] == m["a"] else (m["b"], m["a"])
+                        scen_games.append((_norm(w), _norm(l), "ct-%s-r%d-%s-%s" % (ck, m["round"], _norm(w), _norm(l))))
+                continue
             res = CT.project_observed(cname, row, obs, cand, byes=byes)
             real = dict((i + 1, t) for i, t in enumerate(sorted(in_it | set(byes))))
             out[cname] = dict(res, cfg=row, host_effective=row.get("host", "neutral"), seeds=real, seed_basis="observed",
@@ -1721,17 +1771,144 @@ def conf_tournaments(teams, use_observed=True):
                                      "now": ("%d-%d" % (proj[t]["cw"], proj[t]["cl"])) if t in proj else ""}
                                     for _, t in sorted(seeds.items())],
                       "actual_results_used": len(actual.get(ck, {})), **res}
+        if not actual.get(ck):
+            _b = CB.build(cname, dict(row, host=host_eff), None, [], cand, rec_of, crec_of, seeds=seeds)
+            if _b:
+                out[cname].update(bracket=_b["bracket"], round_labels=_b["round_labels"], sampler=_b["sampler"])
         scen_aq[ck] = res["chalk_champion"]
         for m in res["chalk"]:
             if m["source"] == "forecast favourite":
                 w, l = (m["a"], m["b"]) if m["winner"] == m["a"] else (m["b"], m["a"])
                 scen_games.append((_norm(w), _norm(l), "ct-%s-r%d-%s-%s" % (ck, m["round"], _norm(w), _norm(l))))
-    return out, {"games": scen_games, "aq": scen_aq, "excluded_tournament_fixtures": sorted(_CT_EXCL),
-                 "ledger_rejected": ctx["rejected"], "unprovenanced_in_window_finals": ctx["unprovenanced"],
-                 "window_candidates_kept_regular": sorted(ctx["candidates"].values(), key=lambda c: (c["date"] or "", str(c["game_id"]))),
-                 "confirmed_scheduled_fixtures": sorted(ctx["scheduled_gids"]),
-                 "selection": "chalk: the forecast favourite wins every unplayed tournament match; regular-season-AQ "
-                              "leagues (ACC, Big 12, WCC) keep their projected regular-season champion"}, pmeta
+    result = (out, {"games": scen_games, "aq": scen_aq, "excluded_tournament_fixtures": sorted(_CT_EXCL),
+                    "ledger_rejected": ctx["rejected"], "unprovenanced_in_window_finals": ctx["unprovenanced"],
+                    "window_candidates_kept_regular": sorted(ctx["candidates"].values(), key=lambda c: (c["date"] or "", str(c["game_id"]))),
+                    "confirmed_scheduled_fixtures": sorted(ctx["scheduled_gids"]),
+                    "selection": "the team most likely to win each open tournament wins through; the favourite wins every other unplayed "
+                                 "match; regular-season-AQ leagues (ACC, Big 12, WCC) keep their projected regular-season champion"}, pmeta)
+    if use_observed:
+        _CT_RESULT = result
+    return result
+
+
+_CT_RESULT = None
+_BID_ODDS = {}
+
+
+def _ct_favourites(teams):
+    """{conference key: likeliest champion of each open tournament}. Empty without the private match model: a bracket
+    simulated at 50/50 is not evidence of who is favoured."""
+    if PUBLIC:
+        return {}
+    try:
+        ct, scen, _ = conf_tournaments(teams)
+    except Exception as e:
+        print("  tournament favourites unavailable: %s" % e)
+        return {}
+    out = {}
+    for cname, c in ct.items():
+        if c.get("error") or c.get("fallback_pairs") or not c.get("aq_prob"):
+            continue
+        ck = "uac" if _ckey(cname) == "wac" else _ckey(cname)
+        if ck in scen["aq"]:
+            out[ck] = scen["aq"][ck]
+    return out
+
+
+def _remaining_regular():
+    """Every unplayed regular-season D-I match with a forecast: (home key, away key, P(home wins))."""
+    import time as _t
+    from reconcile_2025 import norm as _norm
+    preds = (load("Cody/data/power_candidate/predictions_%d.json" % SEASON) if not PUBLIC else None) or \
+        load("data/predictions_%d.json" % SEASON) or {}
+    now, out = _t.time(), []
+    for g in preds.get("games") or []:
+        if (g.get("start_epoch") or 0) <= now or g.get("home_win") is None or str(g.get("game_id")) in _played_gids():
+            continue
+        if ct_context()["is_tourn"](g.get("game_id"), g.get("date"), g.get("home"), g.get("away")):
+            continue
+        out.append((_norm(g.get("home") or ""), _norm(g.get("away") or ""), float(g["home_win"])))
+    return sorted(out), str(preds.get("meta", {}).get("generated_utc"))
+
+
+def compute_bid_odds(ct, cut_post):
+    """Field odds with every remaining match played out. Reused until a result, fixture or forecast changes."""
+    global _BID_ODDS
+    import hashlib
+    import conf_brackets as CB
+    import project_field as _PF
+    import rpi_2025 as _R
+    import rpi_committee as _RC
+    from reconcile_2025 import norm as _norm
+    games, tinfo = _R.load_di_games()
+    keys = sorted(tinfo)
+    conf = dict((k, tinfo[k].get("conference")) for k in keys)
+    nondi = _RC.split(_RC.counted_games(), keys)[1]
+    future, gen = _remaining_regular()
+    samplers, states = {}, []
+    for cname, c in sorted(ct.items()):
+        if c.get("error") or not c.get("sampler"):
+            continue
+        ck = "uac" if _ckey(cname) == "wac" else _ckey(cname)
+        states.append((ck, [(m.get("game_id"), m.get("winner")) for m in (c.get("observed") or {}).get("matches") or []]))
+        if not c.get("decided"):
+            samplers[ck] = c["sampler"]
+    fixed = {}
+    for t in cut_post["aq_teams"]:
+        ck = _ckey(cut_post["conf_of"].get(t))
+        fixed["uac" if ck == "wac" else ck] = _norm(t)
+    sig = hashlib.sha256(json.dumps([2, sorted(g[2] for g in games), len(nondi), future, gen, states, sorted(fixed.items())],
+                                    default=str).encode()).hexdigest()
+    pth = os.path.join(REPO, "data", "bid_odds_%d.json" % SEASON)
+    old = load("data/bid_odds_%d.json" % SEASON) or {}
+    if old.get("signature") == sig:
+        _BID_ODDS = old
+        return old
+    n = 2000
+    res = CB.bid_odds(games, nondi, keys, conf, future, samplers, fixed,
+                      set(k for k in keys if k not in _PF.INELIGIBLE_2026), cut_records(), _PF.MIN_WIN_PCT, _PF.MIN_DI_SHARE, n=n)
+    doc = {"signature": sig, "n_sims": n, "open_tournaments": len(samplers), "regular_matches_left": len(future),
+           "teams": dict((k, {a: round(b, 4) for a, b in v.items()}) for k, v in res.items())}
+    tmp = pth + ".tmp"
+    json.dump(doc, open(tmp, "w"), separators=(",", ":"))
+    os.replace(tmp, pth)
+    _BID_ODDS = doc
+    return doc
+
+
+def _odds_txt(team):
+    from reconcile_2025 import norm as _norm
+    if not _BID_ODDS:
+        return ""
+    x = (_BID_ODDS.get("teams") or {}).get(_norm(team)) or {}
+    left = 1 - x.get("aq", 0)
+    pct = 100 * x.get("al", 0) / left if left > 0 else 0
+    return " &middot; %s at-large" % ("&lt;1%" if 0 < pct < 1 else "&gt;99%" if 99 < pct < 100 else "%.0f%%" % pct)
+
+
+def _bid_odds_table(ranks, conf_of):
+    """Every team whose place in the field is still undecided, by chance of making it."""
+    from reconcile_2025 import norm as _norm
+    if not _BID_ODDS:
+        return ""
+    by = dict((_norm(t), t) for t in ranks)
+    rows = []
+    for k, x in sorted(_BID_ODDS["teams"].items(), key=lambda kv: (-kv[1]["in"], ranks.get(by.get(kv[0]), 999))):
+        t = by.get(k)
+        if not t or x["in"] >= 0.995 or x["in"] < 0.005:
+            continue
+        rows.append('<tr><td class="tm l">%s</td><td class="cf l">%s</td><td class="n">%s</td><td class="n">%.0f%%</td>'
+                    '<td class="n">%.0f%%</td><td class="n"><b>%.0f%%</b></td></tr>'
+                    % (esc(t), esc(conf_of.get(t) or ""), ranks.get(t, "&mdash;"), 100 * x["aq"], 100 * x["al"], 100 * x["in"]))
+    if not rows:
+        return ""
+    return ('<details class="ct-path" id="bidodds"><summary><b>Bid chances for every team still in question (%d)</b></summary>'
+            '<p class="tnote">%s simulations of the %d regular-season matches left and %d open conference tournaments. Each run '
+            'recomputes the committee-format RPI, gives each league&rsquo;s bid to its tournament champion and fills the at-large '
+            'places by the hub&rsquo;s quality-win rule. It does not model the committee&rsquo;s own judgment.</p>'
+            '<div class="scroll"><table class="r26t"><thead><tr><th class="l">Team</th><th class="l">Conf</th><th>Proj. RPI</th>'
+            '<th>Auto bid</th><th>At-large</th><th>In field</th></tr></thead><tbody>%s</tbody></table></div></details>'
+            % (len(rows), "{:,}".format(_BID_ODDS["n_sims"]), _BID_ODDS["regular_matches_left"], _BID_ODDS["open_tournaments"], "".join(rows)))
 
 
 def _ct_observed_card(cname, c):
@@ -1746,6 +1923,13 @@ def _ct_observed_card(cname, c):
     else:
         tag, status = "partial", "IN PROGRESS"
         head = "%d teams left." % (len(o["alive"]) + len(c.get("inferred_byes") or []))
+    if c.get("bracket"):
+        left = sorted(((t, p) for t, p in c["aq_prob"].items() if p > 0), key=lambda kv: -kv[1])
+        odds = "" if champ else '<p class="tnote"><b>Chance to win the bid:</b> %s.</p>' % " &middot; ".join(
+            "%s %.0f%%" % (esc(t), 100 * p) if p >= 0.01 else "%s &lt;1%%" % esc(t) for t, p in left)
+        return ('<div class="panel ct-card"><h4>%s <span class="ct-st ct-%s">%s</span></h4><p class="tnote">%s %s &middot; %s.</p>%s%s</div>'
+                % (esc(cname), tag, status, head, esc(o.get("schedule") or ""), esc((o.get("location") or "").rstrip(".")), odds,
+                   _ct_bracket_html(c)))
     days = {}
     for m in o["matches"]:
         days.setdefault(m["date"], []).append(m)
@@ -1774,6 +1958,58 @@ def _ct_observed_card(cname, c):
     return ('<div class="panel ct-card"><h4>%s <span class="ct-st ct-%s">%s</span></h4><p class="tnote">%s %s &middot; %s.</p>%s%s'
             '<details class="ct-path" open><summary>Results and schedule</summary><ol>%s</ol></details></div>'
             % (esc(cname), tag, status, head, esc(o.get("schedule") or ""), esc((o.get("location") or "").rstrip(".")), odds, note, "".join(rows)))
+
+
+def _ct_slot(s, won, score, state, est=False):
+    # a pre-match chance beside a match in progress would read as a live win probability, so live shows none
+    pct = "" if state in ("final", "live") else "%.0f%%" % (100 * s["win"]) if s["win"] >= 0.01 else "&lt;1%"
+    val = score if score is not None else pct
+    rec = " &middot; ".join(esc(x) for x in (s.get("rec"), ("conf " + s["conf_rec"]) if s.get("conf_rec") else None) if x)
+    cls = "cb-s" + (" won" if won is True else " lost" if won is False else "") + ("" if s["known"] else " likely")
+    return ('<div class="%s"><span class="cb-sd">%s%d</span><span class="cb-tm"><b>%s</b><em>%s</em></span><span class="cb-v">%s</span></div>'
+            % (cls, "~" if est else "", s["seed"], esc(s["team"]), rec, val))
+
+
+def _ct_node(n, est=False):
+    if not n:
+        return '<div class="cb-kid cb-bye"></div>'
+    st = n["state"]
+    sets = n.get("sets") if st == "final" else None
+    rows = "".join(_ct_slot(s, None if n["winner"] is None else n["winner"] == i, sets[i] if sets else None, st, est)
+                   for i, s in enumerate(n["slots"]))
+    d = (n.get("date") or "")[5:].replace("-", "/")
+    meta = {"final": "Final", "live": "Live", "upcoming": "Upcoming", "future": "Projected"}[st]
+    box = '<div class="cb-m cb-%s"><div class="cb-meta">%s%s</div>%s</div>' % (st, (d + " &middot; ") if d else "", meta, rows)
+    if not (n["kids"][0] or n["kids"][1]):
+        return '<div class="cb-kid"><div class="cb-n">%s</div></div>' % box
+    return ('<div class="cb-kid"><div class="cb-n"><div class="cb-kids">%s%s</div>%s</div></div>'
+            % (_ct_node(n["kids"][0], est), _ct_node(n["kids"][1], est), box))
+
+
+def _ct_start(root, total):
+    """the column a phone opens on: the earliest round with a match still to play"""
+    deepest = [-1]
+    def walk(n):
+        if n:
+            if n["state"] != "final":
+                deepest[0] = max(deepest[0], n["depth"])
+            walk(n["kids"][0]); walk(n["kids"][1])
+    walk(root)
+    return max(0, total - 1 - deepest[0]) if deepest[0] >= 0 else max(0, total - 1)
+
+
+def _ct_bracket_html(c):
+    heads = "".join("<span>%s</span>" % esc(x) for x in c["round_labels"])
+    return ('<div class="cb-wrap" data-start="%d" tabindex="0" role="region" aria-label="Tournament bracket"><div class="cb-inner">'
+            '<div class="cb-heads" style="--cb-rounds:%d">%s</div><div class="cb-tree">%s</div></div></div>'
+            '<p class="tnote">%s Each row shows overall and conference record. Upcoming and projected rows show '
+            'that team&rsquo;s chance to win that match from here; an italic name is the likeliest team to reach it. '
+            'A match in progress shows no chance, and the bid odds update when it goes final.'
+            '<span class="cb-swipe"> Swipe the bracket for other rounds.</span></p>'
+            % (_ct_start(c["bracket"], len(c["round_labels"])), len(c["round_labels"]), heads,
+               _ct_node(c["bracket"], not c.get("seed_official")),
+               ('<b>Official seeds</b> (<a href="%s" target="_blank" rel="noopener">source</a>).' % esc(c["seed_source"])) if c.get("seed_official")
+               else "<b>~ = estimated seed:</b> the closest order to the final standings that fits every real pairing. The league&rsquo;s tiebreakers can differ."))
 
 
 def conf_tournaments_html(ct):
@@ -1818,14 +2054,15 @@ def conf_tournaments_html(ct):
                esc(row.get("why") or "") + (" Seeds: %s." % ("announced by the league" if c.get("seed_basis") == "announced" else "projected (league seeds not announced yet)"))
                + ((" Unresolved: %s." % "; ".join(row["unresolved"])) if row.get("unresolved") else ""), src, seedrows, esc(c["chalk_champion"]), path,
                ('<div class="seasonwarn">No forecast for: %s (50/50 used, labelled).</div>' % esc(", ".join("%s v %s" % x for x in c["fallback_pairs"]))) if c["fallback_pairs"] else ""))
+    for i, (cname, c) in enumerate(order):                 # a tournament not yet started still gets its bracket
+        if c.get("bracket") and c.get("seed_basis") != "observed" and not c.get("error"):
+            cards[i] = cards[i].replace('<details class="ct-path"><summary>One projected', _ct_bracket_html(c) + '<details class="ct-path"><summary>One projected', 1)
     return ('<div id="conftour" hidden>'
-            '<p class="lead"><b>Conference tournaments.</b> Real results appear as they finish. Anything still to play is projected, seeded from projected final conference standings (current conference '
-            'record plus expected wins in the remaining conference matches; ties by current conference record, then official '
-            'RPI &mdash; published league tiebreakers are not modelled). Each match uses the hub&rsquo;s match model with the venue '
-            'when known. <b>AQ chance</b> = share of %s simulations (reproducible seed) a team wins its tournament &mdash; separate '
-            'from the single projected outcome under each table. ACC, Big 12 and WCC award their bid to the regular-season champion. '
-            'Status: VERIFIED = format stated by a 2026 league or host source; PARTIAL = host/dates sourced, format from 2025 or '
-            'inferred; FALLBACK = no 2026 format found, labelled default.</p>'
+            '<p class="lead"><b>2026 conference tournaments.</b> Real results fill the bracket as they finish; every match still to play '
+            'carries its chance from the hub&rsquo;s match model. The NCAA feed carries no seeds: a bracket uses the league&rsquo;s '
+            '<b>official seeds</b> where we hold them, checked against every real pairing, and otherwise marks each as <b>~estimated</b>. '
+            '<b>Chance to win the bid</b> = share of %s simulations of what is left of the bracket. ACC, Big 12 and WCC award their '
+            'bid to the regular-season champion.</p>'
             '<div class="ct-grid">%s</div></div>' % ("{:,}".format(10000), "".join(cards)))
 
 
@@ -1844,10 +2081,7 @@ def rpi_cutline_html(teams, field, cp=None, ct=None, cpost=None):
     post_html = ""
     if cpost and not cpost.get("error"):
         try:
-            post_html = _cut_panel(cpost, asof, "cl-post", True).replace(
-                "the <b>projected '\n            'regular-season champion</b>", "the projected champion").replace(
-                "the <b>projected regular-season champion</b> &mdash; current conference record plus expected wins in the remaining conference matches",
-                "the <b>scenario&rsquo;s conference-tournament champion</b> (regular-season champion in the ACC, Big 12 and WCC)")
+            post_html = _cut_panel(cpost, asof, "cl-post", True)
         except Exception as e:
             post_html = '<div id="cl-post" hidden><div class="seasonwarn">Post-tournament scenario unavailable: %s</div></div>' % esc(str(e)[:200])
     return ('<div class="segrow"><div class="seg" role="tablist" aria-label="Bracket view">'
@@ -1887,8 +2121,34 @@ CUTLINE_JS = r"""<style>
 .ct-fallback{background:color-mix(in oklab,#c0392b 16%,transparent);color:#c0392b}
 .ct-path{margin-top:6px;font-size:13px}.ct-path ol{padding-left:18px;margin:6px 0}.ct-r{font:700 10px/1 var(--disp);color:var(--ink2);margin-right:4px}
 .ct-p{color:var(--ink2);font-size:12px}
+.ct-grid:has(.cb-wrap){grid-template-columns:minmax(0,1fr)}
+.cb-wrap{overflow-x:auto;margin-top:8px;padding-bottom:6px;-webkit-overflow-scrolling:touch}
+.cb-inner{width:max-content;--cb-w:188px;--cb-gap:22px}
+.cb-heads{display:grid;grid-template-columns:repeat(var(--cb-rounds),var(--cb-w));column-gap:var(--cb-gap);margin-bottom:6px}
+.cb-heads span{font:700 10.5px/1.2 var(--disp);letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.cb-tree{display:flex;justify-content:flex-end}
+.cb-n{display:flex;align-items:center;justify-content:flex-end}
+.cb-kids{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;margin-right:var(--cb-gap);position:relative}
+.cb-kid{position:relative;padding:3px 0;display:flex;justify-content:flex-end}
+.cb-bye{height:34px;padding:0}
+.cb-kids>.cb-kid:not(.cb-bye)::after{content:"";position:absolute;right:calc(var(--cb-gap)/-2);top:50%;width:calc(var(--cb-gap)/2);border-top:1px solid var(--line2)}
+.cb-kids>.cb-kid:first-child::before{content:"";position:absolute;right:calc(var(--cb-gap)/-2);top:50%;bottom:0;border-right:1px solid var(--line2)}
+.cb-kids>.cb-kid:last-child::before{content:"";position:absolute;right:calc(var(--cb-gap)/-2);top:0;bottom:50%;border-right:1px solid var(--line2)}
+.cb-kids::after{content:"";position:absolute;right:calc(var(--cb-gap)*-1);top:50%;width:calc(var(--cb-gap)/2);border-top:1px solid var(--line2)}
+.cb-m{width:var(--cb-w);flex:none;background:var(--card);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.cb-upcoming,.cb-live{border-color:var(--line2)}.cb-future{border-style:dashed}
+.cb-live{box-shadow:0 0 0 1px var(--amber,#d9a441)}
+.cb-meta{font:700 9.5px/1 var(--disp);letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);padding:4px 7px 2px}
+.cb-s{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:5px;align-items:center;padding:2px 7px;min-height:30px}
+.cb-sd{font:700 11px/1 var(--mono);color:var(--ink2);text-align:right;white-space:nowrap}
+.cb-tm{min-width:0}.cb-tm b{display:block;font-size:12.5px;line-height:1.15;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cb-tm em{display:block;font-style:normal;font-size:10px;line-height:1.15;color:var(--ink2);white-space:nowrap}
+.cb-v{font:700 12px/1 var(--mono);color:var(--ink2)}
+.cb-s.won b,.cb-s.won .cb-v{font-weight:800;color:var(--ink)}.cb-s.lost b{color:var(--ink2);font-weight:500}
+.cb-s.likely b{font-style:italic;color:var(--ink2)}
+.cb-swipe{display:none}@media (max-width:560px){.cb-swipe{display:inline}}
 @media (max-width:560px){.ct-t th,.ct-t td{padding:7px 3px;letter-spacing:0}.ct-t td:nth-child(4),.ct-t th:nth-child(4){display:none}}
-.cl-sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:12px 14px}
+.cl-sum{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:12px 14px}
 .cl-sum .tnote,.cl-sum .seasonwarn{grid-column:1/-1}
 .cl-k span{display:block;font:700 10.5px/1 var(--disp);letter-spacing:.1em;text-transform:uppercase;color:var(--ink2)}
 .cl-k b{display:block;margin-top:4px;font-size:15px}
@@ -1899,7 +2159,7 @@ CUTLINE_JS = r"""<style>
 .cl-t tr.cl-line td span{display:block;margin:6px 0;padding:6px 8px;border-top:3px solid #c0392b;border-bottom:1px solid #c0392b;
   font:700 11px/1.3 var(--disp);letter-spacing:.06em;text-transform:uppercase;color:#c0392b;text-align:left;white-space:normal}
 .cl-tie{font:700 10px/1 var(--disp);letter-spacing:.06em;text-transform:uppercase;color:var(--gold,#b07a12);margin-left:4px}
-@media (max-width:560px){.cl-sum{grid-template-columns:1fr}.cl-t th,.cl-t td{padding:7px 3px;letter-spacing:0}.cl-t td:nth-child(4),.cl-t th:nth-child(4){display:none}}
+@media (max-width:560px){.cl-sum{grid-template-columns:repeat(2,minmax(0,1fr))}.cl-t th,.cl-t td{padding:7px 3px;letter-spacing:0}.cl-t td:nth-child(4),.cl-t th:nth-child(4){display:none}}
 .cl-t tr.cl-out td{color:var(--ink2)}.cl-t tr.cl-inel td{color:var(--ink2);font-style:italic}
 .cl-s{display:inline-block;font:700 10.5px/1 var(--disp);letter-spacing:.08em;text-transform:uppercase;padding:3px 6px;border-radius:5px;margin-right:4px;font-style:normal}
 .cl-s-aq{background:color-mix(in oklab,var(--gold,#b07a12) 22%,transparent);color:#7a5408}.cl-s-al{background:color-mix(in oklab,#1f7a4d 18%,transparent);color:#1f7a4d}
@@ -1920,6 +2180,17 @@ body .cl-s-aq{color:#E9B949}body .cl-s-al{color:#46C08A}body .cl-s-in{color:#FF8
 body .cl-t tr.cl-line td span{color:#FF7A6B;border-color:#FF7A6B}body .ct-fallback{color:#FF7A6B}
 </style>
 <script>
+(function () {
+  /* a phone opens each bracket on the first round still to play; measured only once it is visible */
+  if (!('IntersectionObserver' in window)) return;
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    const w = e.target; io.unobserve(w);
+    if (w.scrollWidth > w.clientWidth) w.scrollLeft = (+w.dataset.start || 0) * 210;
+  }));
+  const arm = () => document.querySelectorAll('.cb-wrap').forEach(w => io.observe(w));
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', arm); else arm();
+})();
 (function () {
   function show(v) {
     const cl = document.getElementById('cutline'); if (!cl) return;
@@ -8575,6 +8846,7 @@ def build():
         try:
             ct_payload, ct_scen, _ = conf_tournaments(teams)
             cut_post = rpi_cutline(teams, field, ranking="post", scenario=ct_scen)
+            cut_post["bid_odds"] = compute_bid_odds(ct_payload, cut_post)["teams"]
         except Exception as _e:
             print("  conference tournaments unavailable: %s" % _e)
         try:

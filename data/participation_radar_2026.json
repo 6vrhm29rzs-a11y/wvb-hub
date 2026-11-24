@@ -1,6 +1,6 @@
 {
  "season": 2026,
- "generated_utc": "2026-11-23T19:18:17Z",
+ "generated_utc": "2026-11-24T02:54:43Z",
  "what_this_is": "Players established in a team's box scores who have not appeared since a given date. Observed participation only.",
  "what_this_is_not": "Not an availability status, not an injury, not a diagnosis. A player may be rested, suspended, ineligible, or simply omitted by a scorer.",
  "rules": {
@@ -9,7 +9,7 @@
   "zero_action_listing": "counted as NOT appearing -- the feed's DNP convention",
   "ranking": "share of the team's points x matches missed (capped at 5), a display ordering that feeds nothing"
  },
- "n": 296,
+ "n": 297,
  "players": [
   {
    "team": "Marist",
@@ -663,6 +663,25 @@
    "points": 193.0,
    "share_of_team_points": 0.0917,
    "weight": 45.83,
+   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
+  },
+  {
+   "team": "Eastern Wash.",
+   "team_id": "46180",
+   "player": "Aspyn Reed",
+   "missed": 3,
+   "missed_gids": [
+    "6625894",
+    "6637573",
+    "6679385"
+   ],
+   "last_seen_gid": "6627960",
+   "last_seen_epoch": 1794690000,
+   "last_opponent": "Montana",
+   "played_before": 28,
+   "points": 256.0,
+   "share_of_team_points": 0.1492,
+   "weight": 44.77,
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
@@ -1668,21 +1687,23 @@
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
-   "team": "Eastern Wash.",
-   "team_id": "46180",
-   "player": "Aspyn Reed",
-   "missed": 2,
+   "team": "Utah Tech",
+   "team_id": "45886",
+   "player": "Cale Torgerson",
+   "missed": 4,
    "missed_gids": [
-    "6625894",
-    "6637573"
+    "6628107",
+    "6624882",
+    "6624883",
+    "6679385"
    ],
-   "last_seen_gid": "6627960",
-   "last_seen_epoch": 1794690000,
-   "last_opponent": "Montana",
-   "played_before": 28,
-   "points": 256.0,
-   "share_of_team_points": 0.1547,
-   "weight": 30.95,
+   "last_seen_gid": "6628106",
+   "last_seen_epoch": 1794360600,
+   "last_opponent": "Southern Utah",
+   "played_before": 18,
+   "points": 138.0,
+   "share_of_team_points": 0.0777,
+   "weight": 31.09,
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
@@ -1701,33 +1722,6 @@
    "points": 277.5,
    "share_of_team_points": 0.1545,
    "weight": 30.9,
-   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
-  },
-  {
-   "team": "Utah Tech",
-   "team_id": "45886",
-   "player": "Shaylee Dahle",
-   "missed": 11,
-   "missed_gids": [
-    "6627955",
-    "6624879",
-    "6628104",
-    "6624880",
-    "6624881",
-    "6625890",
-    "6628105",
-    "6628106",
-    "6628107",
-    "6624882",
-    "6624883"
-   ],
-   "last_seen_gid": "6627791",
-   "last_seen_epoch": 1792112400,
-   "last_opponent": "Montana St.",
-   "played_before": 15,
-   "points": 106.0,
-   "share_of_team_points": 0.0618,
-   "weight": 30.89,
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
@@ -1881,6 +1875,34 @@
    "points": 159.5,
    "share_of_team_points": 0.0997,
    "weight": 29.91,
+   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
+  },
+  {
+   "team": "Utah Tech",
+   "team_id": "45886",
+   "player": "Shaylee Dahle",
+   "missed": 12,
+   "missed_gids": [
+    "6627955",
+    "6624879",
+    "6628104",
+    "6624880",
+    "6624881",
+    "6625890",
+    "6628105",
+    "6628106",
+    "6628107",
+    "6624882",
+    "6624883",
+    "6679385"
+   ],
+   "last_seen_gid": "6627791",
+   "last_seen_epoch": 1792112400,
+   "last_opponent": "Montana St.",
+   "played_before": 15,
+   "points": 106.0,
+   "share_of_team_points": 0.0597,
+   "weight": 29.85,
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
@@ -2623,25 +2645,6 @@
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
-   "team": "Utah Tech",
-   "team_id": "45886",
-   "player": "Cale Torgerson",
-   "missed": 3,
-   "missed_gids": [
-    "6628107",
-    "6624882",
-    "6624883"
-   ],
-   "last_seen_gid": "6628106",
-   "last_seen_epoch": 1794360600,
-   "last_opponent": "Southern Utah",
-   "played_before": 18,
-   "points": 138.0,
-   "share_of_team_points": 0.0804,
-   "weight": 24.13,
-   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
-  },
-  {
    "team": "Little Rock",
    "team_id": "45805",
    "player": "Lovina Teel",
@@ -3038,6 +3041,26 @@
    "points": 185.0,
    "share_of_team_points": 0.1067,
    "weight": 21.34,
+   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
+  },
+  {
+   "team": "Utah Tech",
+   "team_id": "45886",
+   "player": "Lusia Langi",
+   "missed": 4,
+   "missed_gids": [
+    "6628107",
+    "6624882",
+    "6624883",
+    "6679385"
+   ],
+   "last_seen_gid": "6628106",
+   "last_seen_epoch": 1794360600,
+   "last_opponent": "Southern Utah",
+   "played_before": 17,
+   "points": 94.5,
+   "share_of_team_points": 0.0532,
+   "weight": 21.29,
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
@@ -3701,25 +3724,6 @@
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
-   "team": "Utah Tech",
-   "team_id": "45886",
-   "player": "Lusia Langi",
-   "missed": 3,
-   "missed_gids": [
-    "6628107",
-    "6624882",
-    "6624883"
-   ],
-   "last_seen_gid": "6628106",
-   "last_seen_epoch": 1794360600,
-   "last_opponent": "Southern Utah",
-   "played_before": 17,
-   "points": 94.5,
-   "share_of_team_points": 0.0551,
-   "weight": 16.53,
-   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
-  },
-  {
    "team": "Jacksonville",
    "team_id": "45917",
    "player": "Addison Krieger",
@@ -3916,6 +3920,25 @@
    "points": 83.0,
    "share_of_team_points": 0.0492,
    "weight": 14.76,
+   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
+  },
+  {
+   "team": "Tennessee",
+   "team_id": "46005",
+   "player": "Jolene Oddo",
+   "missed": 3,
+   "missed_gids": [
+    "6679294",
+    "6679290",
+    "6679283"
+   ],
+   "last_seen_gid": "6625249",
+   "last_seen_epoch": 1794765600,
+   "last_opponent": "South Carolina",
+   "played_before": 15,
+   "points": 88.0,
+   "share_of_team_points": 0.0488,
+   "weight": 14.65,
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
@@ -4564,6 +4587,24 @@
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
+   "team": "Eastern Wash.",
+   "team_id": "46180",
+   "player": "Carlyn Rapozo-Kamoku",
+   "missed": 2,
+   "missed_gids": [
+    "6637573",
+    "6679385"
+   ],
+   "last_seen_gid": "6625894",
+   "last_seen_epoch": 1795053600,
+   "last_opponent": "Idaho St.",
+   "played_before": 24,
+   "points": 91.5,
+   "share_of_team_points": 0.0533,
+   "weight": 10.67,
+   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
+  },
+  {
    "team": "Northwestern",
    "team_id": "46238",
    "player": "Ellie Stiernagle",
@@ -4703,21 +4744,21 @@
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
-   "team": "Tennessee",
-   "team_id": "46005",
-   "player": "Jolene Oddo",
+   "team": "St. Thomas (MN)",
+   "team_id": "45998",
+   "player": "Emory Brosnahan",
    "missed": 2,
    "missed_gids": [
-    "6679294",
-    "6679290"
+    "6679379",
+    "6679377"
    ],
-   "last_seen_gid": "6625249",
-   "last_seen_epoch": 1794765600,
-   "last_opponent": "South Carolina",
-   "played_before": 15,
-   "points": 88.0,
-   "share_of_team_points": 0.0511,
-   "weight": 10.23,
+   "last_seen_gid": "6628703",
+   "last_seen_epoch": 1794679200,
+   "last_opponent": "Kansas City",
+   "played_before": 20,
+   "points": 81.5,
+   "share_of_team_points": 0.0505,
+   "weight": 10.1,
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
@@ -5043,6 +5084,23 @@
    "points": 115.0,
    "share_of_team_points": 0.0851,
    "weight": 8.51,
+   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
+  },
+  {
+   "team": "Eastern Ill.",
+   "team_id": "45769",
+   "player": "Emma Hanson",
+   "missed": 1,
+   "missed_gids": [
+    "6679488"
+   ],
+   "last_seen_gid": "6679490",
+   "last_seen_epoch": 1795363200,
+   "last_opponent": "UT Martin",
+   "played_before": 25,
+   "points": 130.0,
+   "share_of_team_points": 0.0829,
+   "weight": 8.29,
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
@@ -5489,23 +5547,6 @@
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
   },
   {
-   "team": "Eastern Wash.",
-   "team_id": "46180",
-   "player": "Carlyn Rapozo-Kamoku",
-   "missed": 1,
-   "missed_gids": [
-    "6637573"
-   ],
-   "last_seen_gid": "6625894",
-   "last_seen_epoch": 1795053600,
-   "last_opponent": "Idaho St.",
-   "played_before": 24,
-   "points": 91.5,
-   "share_of_team_points": 0.0553,
-   "weight": 5.53,
-   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
-  },
-  {
    "team": "Stetson",
    "team_id": "46502",
    "player": "Lelia Fitz",
@@ -5552,23 +5593,6 @@
    "last_opponent": "FDU",
    "played_before": 22,
    "points": 50.0,
-   "share_of_team_points": 0.0517,
-   "weight": 5.17,
-   "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"
-  },
-  {
-   "team": "St. Thomas (MN)",
-   "team_id": "45998",
-   "player": "Emory Brosnahan",
-   "missed": 1,
-   "missed_gids": [
-    "6679379"
-   ],
-   "last_seen_gid": "6628703",
-   "last_seen_epoch": 1794679200,
-   "last_opponent": "Kansas City",
-   "played_before": 20,
-   "points": 81.5,
    "share_of_team_points": 0.0517,
    "weight": 5.17,
    "claim": "has not appeared in a counted box score since this date -- a participation fact, not an availability status, and the reason is not in the data"

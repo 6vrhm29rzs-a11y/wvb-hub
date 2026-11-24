@@ -1,8 +1,9 @@
 {
  "date": "2026-11-23",
- "generated_utc": "2026-11-23T20:20:05Z",
+ "generated_utc": "2026-11-24T02:54:03Z",
  "counts": {
-  "CORROBORATED_ONE": 1
+  "CORROBORATED_ONE": 5,
+  "VERIFIED_BOTH": 2
  },
  "matches": [
   {
@@ -30,6 +31,144 @@
       "Big Sky Tournament",
       "-"
      ]
+    }
+   }
+  },
+  {
+   "gid": "6679376",
+   "date": "2026-11-23",
+   "canonical": "South Dakota def. North Dakota St. 3-0",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "South Dakota": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://goyotes.com/services/schedule_txt.ashx?schedule=331",
+     "assertion": "South Dakota W 3-0 vs North Dakota State",
+     "opponent_source": "North Dakota State",
+     "site_says": "Neutral"
+    },
+    "North Dakota St.": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://gobison.com/sports/womens-volleyball/schedule/text",
+     "rows_on_date": [
+      "(1) South Dakota"
+     ]
+    }
+   }
+  },
+  {
+   "gid": "6679488",
+   "date": "2026-11-23",
+   "canonical": "Southeast Mo. St. def. Eastern Ill. 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Southeast Mo. St.": {
+     "state": "NOT_POSTED",
+     "url": "https://semoredhawks.com/sports/womens-volleyball/schedule/text",
+     "row": [
+      "Nov 23 (Mon)",
+      "3 PM",
+      "Neutral",
+      "Eastern Illinois",
+      "St. Charles, Mo.",
+      "OVC Tournament",
+      "-"
+     ]
+    },
+    "Eastern Ill.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://eiupanthers.com/services/schedule_txt.ashx?schedule=554",
+     "assertion": "Eastern Ill. L 1-3 vs Southeast Missouri",
+     "opponent_source": "Southeast Missouri",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6679283",
+   "date": "2026-11-23",
+   "canonical": "Georgia def. Tennessee 3-2",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Georgia": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://georgiadogs.com/sports/womens-volleyball/schedule/text",
+     "rows_on_date": [
+      "(5) Tennessee"
+     ]
+    },
+    "Tennessee": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://utsports.com/sports/womens-volleyball/schedule/text",
+     "assertion": "Tennessee L 2-3 vs Georgia",
+     "opponent_source": "Georgia",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6679377",
+   "date": "2026-11-23",
+   "canonical": "South Dakota St. def. St. Thomas (MN) 3-0",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "South Dakota St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://gojacks.com/sports/womens-volleyball/schedule/text",
+     "assertion": "South Dakota St. W 3-0 vs St. Thomas",
+     "opponent_source": "St. Thomas",
+     "site_says": "Home"
+    },
+    "St. Thomas (MN)": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://tommiesports.com/sports/wvball/schedule/text",
+     "assertion": "St. Thomas (MN) L 0-3 vs South Dakota State",
+     "opponent_source": "South Dakota State",
+     "site_says": "Neutral"
+    }
+   }
+  },
+  {
+   "gid": "6679489",
+   "date": "2026-11-23",
+   "canonical": "Morehead St. def. Lindenwood 3-2",
+   "verdict": "VERIFIED_BOTH",
+   "schools": {
+    "Morehead St.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://msueagles.com/services/schedule_txt.ashx?schedule=291",
+     "assertion": "Morehead St. W 3-2 vs Lindenwood",
+     "opponent_source": "Lindenwood",
+     "site_says": "Away"
+    },
+    "Lindenwood": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://lindenwoodlions.com/services/schedule_txt.ashx?schedule=1204",
+     "assertion": "Lindenwood L 2-3 vs Morehead State University",
+     "opponent_source": "Morehead State University",
+     "site_says": "Home"
+    }
+   }
+  },
+  {
+   "gid": "6679385",
+   "date": "2026-11-23",
+   "canonical": "Utah Tech def. Eastern Wash. 3-1",
+   "verdict": "CORROBORATED_ONE",
+   "schools": {
+    "Utah Tech": {
+     "state": "EVENT_NOT_FOUND",
+     "url": "https://utahtechtrailblazers.com/services/schedule_txt.ashx?schedule=1390",
+     "rows_on_date": [
+      "Seed Eastern Washington"
+     ]
+    },
+    "Eastern Wash.": {
+     "state": "AGREE_COMPLETE",
+     "url": "https://goeags.com/services/schedule_txt.ashx?schedule=266",
+     "assertion": "Eastern Wash. L 1-3 vs Utah Tech",
+     "opponent_source": "Utah Tech",
+     "site_says": "Neutral"
     }
    }
   }

@@ -59880,6 +59880,18 @@
    },
    "verdict": "neutral"
   },
+  "6679283": {
+   "feed_home": "tennessee",
+   "schools": {
+    "Tennessee": {
+     "assertion": "Tennessee L 2-3 vs Georgia",
+     "report": "result_verification_2026-11-23.json",
+     "site": "neutral",
+     "url": "https://utsports.com/sports/womens-volleyball/schedule/text"
+    }
+   },
+   "verdict": "neutral"
+  },
   "6679290": {
    "feed_home": "texas",
    "schools": {
@@ -59952,6 +59964,36 @@
    },
    "verdict": "neutral"
   },
+  "6679376": {
+   "feed_home": "south dakota",
+   "schools": {
+    "South Dakota": {
+     "assertion": "South Dakota W 3-0 vs North Dakota State",
+     "report": "result_verification_2026-11-23.json",
+     "site": "neutral",
+     "url": "https://goyotes.com/services/schedule_txt.ashx?schedule=331"
+    }
+   },
+   "verdict": "neutral"
+  },
+  "6679377": {
+   "feed_home": "south dakota st",
+   "schools": {
+    "South Dakota St.": {
+     "assertion": "South Dakota St. W 3-0 vs St. Thomas",
+     "report": "result_verification_2026-11-23.json",
+     "site": "home",
+     "url": "https://gojacks.com/sports/womens-volleyball/schedule/text"
+    },
+    "St. Thomas (MN)": {
+     "assertion": "St. Thomas (MN) L 0-3 vs South Dakota State",
+     "report": "result_verification_2026-11-23.json",
+     "site": "neutral",
+     "url": "https://tommiesports.com/sports/wvball/schedule/text"
+    }
+   },
+   "verdict": "conflict"
+  },
   "6679379": {
    "feed_home": "st thomas mn",
    "schools": {
@@ -59981,6 +60023,48 @@
     }
    },
    "verdict": "neutral"
+  },
+  "6679385": {
+   "feed_home": "utah tech",
+   "schools": {
+    "Eastern Wash.": {
+     "assertion": "Eastern Wash. L 1-3 vs Utah Tech",
+     "report": "result_verification_2026-11-23.json",
+     "site": "neutral",
+     "url": "https://goeags.com/services/schedule_txt.ashx?schedule=266"
+    }
+   },
+   "verdict": "neutral"
+  },
+  "6679488": {
+   "feed_home": "southeast mo st",
+   "schools": {
+    "Eastern Ill.": {
+     "assertion": "Eastern Ill. L 1-3 vs Southeast Missouri",
+     "report": "result_verification_2026-11-23.json",
+     "site": "neutral",
+     "url": "https://eiupanthers.com/services/schedule_txt.ashx?schedule=554"
+    }
+   },
+   "verdict": "neutral"
+  },
+  "6679489": {
+   "feed_home": "lindenwood",
+   "schools": {
+    "Lindenwood": {
+     "assertion": "Lindenwood L 2-3 vs Morehead State University",
+     "report": "result_verification_2026-11-23.json",
+     "site": "home",
+     "url": "https://lindenwoodlions.com/services/schedule_txt.ashx?schedule=1204"
+    },
+    "Morehead St.": {
+     "assertion": "Morehead St. W 3-2 vs Lindenwood",
+     "report": "result_verification_2026-11-23.json",
+     "site": "away",
+     "url": "https://msueagles.com/services/schedule_txt.ashx?schedule=291"
+    }
+   },
+   "verdict": "home"
   },
   "6679490": {
    "feed_home": "eastern ill",
@@ -60039,12 +60123,12 @@
  },
  "meta": {
   "counts": {
-   "conflict": 55,
-   "home": 3357,
-   "matches": 3927,
-   "neutral": 515
+   "conflict": 56,
+   "home": 3358,
+   "matches": 3933,
+   "neutral": 519
   },
-  "generated_utc": "2026-11-23T20:20:05Z",
+  "generated_utc": "2026-11-24T02:54:24Z",
   "rule": "neutral if every school row says neutral; home if every row agrees with the feed's home flag; otherwise conflict (listed, never applied)",
   "season": 2026,
   "source": "school athletics schedules via result_verification reports",

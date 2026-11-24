@@ -4,7 +4,51 @@
   "result_fields": "conf (config key), round (bracket round index, 0 = first round), teams [a, b] (hub names), winner, game_id (must be a counted final with exactly these teams and this winner), source (URL naming it a tournament match)",
   "announced_seeds_fields": "conf -> {seeds: {\"1\": team, ...}, source}. Announced seeds replace projected seeds for that league; a league without them stays on projected seeds and says so."
  },
- "announced_seeds": {},
+ "announced_seeds": {
+  "SEC": {
+   "seeds": {
+    "1": "Florida",
+    "2": "Kentucky",
+    "3": "Vanderbilt",
+    "4": "Texas",
+    "5": "Tennessee",
+    "6": "Missouri",
+    "7": "Texas A&M",
+    "8": "Mississippi St.",
+    "9": "Georgia",
+    "10": "LSU",
+    "11": "Auburn",
+    "12": "Arkansas",
+    "13": "Oklahoma",
+    "14": "Alabama",
+    "15": "South Carolina",
+    "16": "Ole Miss"
+   },
+   "source": "https://sports.yahoo.com/articles/where-watch-sec-volleyball-tournament-090001099.html",
+   "retrieved": "2026-11-23"
+  },
+  "Big Ten": {
+   "seeds": {
+    "1": "Nebraska",
+    "2": "Penn St.",
+    "3": "Wisconsin",
+    "4": "Oregon",
+    "5": "Purdue",
+    "6": "Minnesota",
+    "7": "Illinois",
+    "8": "Indiana",
+    "9": "UCLA",
+    "10": "Washington",
+    "11": "Michigan St.",
+    "12": "Michigan",
+    "13": "Southern California",
+    "14": "Rutgers",
+    "15": "Maryland"
+   },
+   "source": "https://bigten.org/sports/2026/10/1/VBT.aspx",
+   "retrieved": "2026-11-23"
+  }
+ },
  "results": [
   {
    "conf": "ASUN",
@@ -1903,6 +1947,84 @@
    "date": "2026-11-23",
    "source": "https://www.ncaa.com/news/volleyball-women/article/2026-11-21/tracking-all-32-automatic-qualifiers-2026-womens-volleyball-tournament",
    "basis": "NCAA tracker round window + single-elimination check"
+  },
+  {
+   "conf": "OVC",
+   "round": 1,
+   "teams": [
+    "Southeast Mo. St.",
+    "Eastern Ill."
+   ],
+   "winner": "Southeast Mo. St.",
+   "game_id": "6679488",
+   "date": "2026-11-23",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2026-11-21/tracking-all-32-automatic-qualifiers-2026-womens-volleyball-tournament",
+   "basis": "NCAA tracker round window + single-elimination check"
+  },
+  {
+   "conf": "Summit League",
+   "round": 1,
+   "teams": [
+    "South Dakota",
+    "North Dakota St."
+   ],
+   "winner": "South Dakota",
+   "game_id": "6679376",
+   "date": "2026-11-23",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2026-11-21/tracking-all-32-automatic-qualifiers-2026-womens-volleyball-tournament",
+   "basis": "NCAA tracker round window + single-elimination check"
+  },
+  {
+   "conf": "Big Sky",
+   "round": 0,
+   "teams": [
+    "Utah Tech",
+    "Eastern Wash."
+   ],
+   "winner": "Utah Tech",
+   "game_id": "6679385",
+   "date": "2026-11-23",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2026-11-21/tracking-all-32-automatic-qualifiers-2026-womens-volleyball-tournament",
+   "basis": "NCAA tracker round window + single-elimination check"
+  },
+  {
+   "conf": "OVC",
+   "round": 1,
+   "teams": [
+    "Lindenwood",
+    "Morehead St."
+   ],
+   "winner": "Morehead St.",
+   "game_id": "6679489",
+   "date": "2026-11-23",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2026-11-21/tracking-all-32-automatic-qualifiers-2026-womens-volleyball-tournament",
+   "basis": "NCAA tracker round window + single-elimination check"
+  },
+  {
+   "conf": "SEC",
+   "round": 3,
+   "teams": [
+    "Tennessee",
+    "Georgia"
+   ],
+   "winner": "Georgia",
+   "game_id": "6679283",
+   "date": "2026-11-23",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2026-11-21/tracking-all-32-automatic-qualifiers-2026-womens-volleyball-tournament",
+   "basis": "NCAA tracker round window + single-elimination check"
+  },
+  {
+   "conf": "Summit League",
+   "round": 1,
+   "teams": [
+    "South Dakota St.",
+    "St. Thomas (MN)"
+   ],
+   "winner": "South Dakota St.",
+   "game_id": "6679377",
+   "date": "2026-11-23",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2026-11-21/tracking-all-32-automatic-qualifiers-2026-womens-volleyball-tournament",
+   "basis": "NCAA tracker round window + single-elimination check"
   }
  ],
  "scheduled_fixtures": [
@@ -2224,6 +2346,66 @@
    ],
    "game_id": "6679386",
    "date": "2026-11-23",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2026-11-21/tracking-all-32-automatic-qualifiers-2026-womens-volleyball-tournament"
+  },
+  {
+   "conf": "Big Ten",
+   "teams": [
+    "Purdue",
+    "Nebraska"
+   ],
+   "game_id": "6679341",
+   "date": "2026-11-24",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2026-11-21/tracking-all-32-automatic-qualifiers-2026-womens-volleyball-tournament"
+  },
+  {
+   "conf": "Big Ten",
+   "teams": [
+    "Wisconsin",
+    "Penn St."
+   ],
+   "game_id": "6679342",
+   "date": "2026-11-24",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2026-11-21/tracking-all-32-automatic-qualifiers-2026-womens-volleyball-tournament"
+  },
+  {
+   "conf": "MVC",
+   "teams": [
+    "Belmont",
+    "UNI"
+   ],
+   "game_id": "6679185",
+   "date": "2026-11-24",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2026-11-21/tracking-all-32-automatic-qualifiers-2026-womens-volleyball-tournament"
+  },
+  {
+   "conf": "Mountain West",
+   "teams": [
+    "New Mexico",
+    "Hawaii"
+   ],
+   "game_id": "6679418",
+   "date": "2026-11-24",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2026-11-21/tracking-all-32-automatic-qualifiers-2026-womens-volleyball-tournament"
+  },
+  {
+   "conf": "Mountain West",
+   "teams": [
+    "UC Davis",
+    "Grand Canyon"
+   ],
+   "game_id": "6679419",
+   "date": "2026-11-24",
+   "source": "https://www.ncaa.com/news/volleyball-women/article/2026-11-21/tracking-all-32-automatic-qualifiers-2026-womens-volleyball-tournament"
+  },
+  {
+   "conf": "Summit League",
+   "teams": [
+    "South Dakota St.",
+    "South Dakota"
+   ],
+   "game_id": "6679375",
+   "date": "2026-11-24",
    "source": "https://www.ncaa.com/news/volleyball-women/article/2026-11-21/tracking-all-32-automatic-qualifiers-2026-womens-volleyball-tournament"
   }
  ]

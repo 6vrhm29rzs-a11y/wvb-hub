@@ -49,6 +49,7 @@ allr = [{"team": (lambda t: t["team"] if t else r["School"])(dict((norm(x["team"
 proj, pm = B.project_conf_champions(allr)
 import aq_status as _AQS
 _aq = _AQS.load()
+_favs = B._ct_favourites(teams)
 bad = []
 for r in [x for x in F if x["bid"] == "AQ"]:
     ck = B._ckey(r["conf"])
@@ -58,11 +59,16 @@ for r in [x for x in F if x["bid"] == "AQ"]:
         if r["team"] != champ[0]:
             bad.append(r["team"])
         continue
+    # an open tournament: the team most likely to win what is left of the real bracket holds it
+    if _favs.get(ck):
+        if r["team"] != _favs[ck]:
+            bad.append(r["team"])
+        continue
     best = max((proj[x["team"]]["ppct"] or 0) for x in allr
                if x["ckey"] == ck and norm(x["team"]) not in inel and norm(x["team"]) not in _aq["eliminated"])
     if norm(r["team"]) in _aq["eliminated"] or abs((proj[r["team"]]["ppct"] or 0) - best) > 1e-12:
         bad.append(r["team"])
-check(not bad and pm["upcoming_conf_matches"] > 0, "every AQ is its league's real champion, or else its best projected record among teams still alive (%d upcoming conference matches used)%s" % (pm["upcoming_conf_matches"], " -- " + ", ".join(bad) if bad else ""))
+check(not bad and pm["upcoming_conf_matches"] > 0, "every AQ is its league's real champion, or else its likeliest tournament champion, or else its best projected record among teams still alive (%d upcoming conference matches used)%s" % (pm["upcoming_conf_matches"], " -- " + ", ".join(bad) if bad else ""))
 # missing-data: a conference with no projection -> its slot is held open, not converted to an extra at-large
 real_p = B.project_conf_champions
 def no_bigten(rpi):
@@ -71,11 +77,14 @@ def no_bigten(rpi):
         if r["ckey"] == "bigten":
             o[r["team"]] = dict(o[r["team"]], ppct=None)
     return o, m
+real_f = B._ct_favourites
 B.project_conf_champions = no_bigten
+B._ct_favourites = lambda _t: {}          # the missing-projection path, with no tournament favourite to fall back on
 try:
     c2 = B.rpi_cutline(teams, field)
 finally:
     B.project_conf_champions = real_p
+    B._ct_favourites = real_f
 check(len(c2["unresolved_aq"]) == 1 and c2["n_al"] == c["n_al"] and len(c2["field"]) == 63,
       "a missing AQ is reported as an unresolved slot and NOT filled by an extra at-large (%s)" % c2["unresolved_aq"])
 

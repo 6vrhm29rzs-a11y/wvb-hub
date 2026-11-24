@@ -414,7 +414,7 @@
      "a": "Northern Colo.",
      "b": "Portland St.",
      "winner": null,
-     "state": "P",
+     "state": "I",
      "sets": null,
      "round": 0
     },
@@ -424,9 +424,12 @@
      "epoch": 1795474800,
      "a": "Utah Tech",
      "b": "Eastern Wash.",
-     "winner": null,
-     "state": "P",
-     "sets": null,
+     "winner": "Utah Tech",
+     "state": "F",
+     "sets": [
+      3,
+      1
+     ],
      "round": 0
     },
     {
@@ -436,13 +439,12 @@
      "a": "Northern Ariz.",
      "b": "Weber St.",
      "winner": null,
-     "state": "P",
+     "state": "I",
      "sets": null,
      "round": 0
     }
    ],
    "alive": [
-    "Eastern Wash.",
     "Idaho St.",
     "Northern Ariz.",
     "Northern Colo.",
@@ -695,6 +697,28 @@
       1
      ],
      "round": 2
+    },
+    {
+     "game_id": "6679341",
+     "date": "2026-11-24",
+     "epoch": 1795561200,
+     "a": "Purdue",
+     "b": "Nebraska",
+     "winner": null,
+     "state": "P",
+     "sets": null,
+     "round": 3
+    },
+    {
+     "game_id": "6679342",
+     "date": "2026-11-24",
+     "epoch": 1795568400,
+     "a": "Wisconsin",
+     "b": "Penn St.",
+     "winner": null,
+     "state": "P",
+     "sets": null,
+     "round": 3
     }
    ],
    "alive": [
@@ -1414,6 +1438,17 @@
       0
      ],
      "round": 1
+    },
+    {
+     "game_id": "6679185",
+     "date": "2026-11-24",
+     "epoch": 1795564800,
+     "a": "Belmont",
+     "b": "UNI",
+     "winner": null,
+     "state": "P",
+     "sets": null,
+     "round": 2
     }
    ],
    "alive": [
@@ -1428,8 +1463,36 @@
    "location": "Each round hosted by higher seed"
   },
   "Mountain West": {
-   "matches": [],
-   "alive": [],
+   "matches": [
+    {
+     "game_id": "6679418",
+     "date": "2026-11-24",
+     "epoch": 1795554000,
+     "a": "New Mexico",
+     "b": "Hawaii",
+     "winner": null,
+     "state": "P",
+     "sets": null,
+     "round": 0
+    },
+    {
+     "game_id": "6679419",
+     "date": "2026-11-24",
+     "epoch": 1795564800,
+     "a": "UC Davis",
+     "b": "Grand Canyon",
+     "winner": null,
+     "state": "P",
+     "sets": null,
+     "round": 0
+    }
+   ],
+   "alive": [
+    "Grand Canyon",
+    "Hawaii",
+    "New Mexico",
+    "UC Davis"
+   ],
    "champion": null,
    "field": 4,
    "awaiting_feed": false,
@@ -1556,9 +1619,12 @@
      "epoch": 1795467600,
      "a": "Southeast Mo. St.",
      "b": "Eastern Ill.",
-     "winner": null,
-     "state": "P",
-     "sets": null,
+     "winner": "Southeast Mo. St.",
+     "state": "F",
+     "sets": [
+      3,
+      1
+     ],
      "round": 1
     },
     {
@@ -1567,15 +1633,16 @@
      "epoch": 1795478400,
      "a": "Lindenwood",
      "b": "Morehead St.",
-     "winner": null,
-     "state": "P",
-     "sets": null,
+     "winner": "Morehead St.",
+     "state": "F",
+     "sets": [
+      2,
+      3
+     ],
      "round": 1
     }
    ],
    "alive": [
-    "Eastern Ill.",
-    "Lindenwood",
     "Morehead St.",
     "Southeast Mo. St."
    ],
@@ -1855,9 +1922,12 @@
      "epoch": 1795474800,
      "a": "Tennessee",
      "b": "Georgia",
-     "winner": null,
-     "state": "P",
-     "sets": null,
+     "winner": "Georgia",
+     "state": "F",
+     "sets": [
+      2,
+      3
+     ],
      "round": 3
     },
     {
@@ -1867,7 +1937,7 @@
      "a": "Kentucky",
      "b": "Vanderbilt",
      "winner": null,
-     "state": "P",
+     "state": "I",
      "sets": null,
      "round": 3
     }
@@ -1875,7 +1945,6 @@
    "alive": [
     "Georgia",
     "Kentucky",
-    "Tennessee",
     "Vanderbilt"
    ],
    "champion": null,
@@ -2282,9 +2351,12 @@
      "epoch": 1795467600,
      "a": "South Dakota",
      "b": "North Dakota St.",
-     "winner": null,
-     "state": "P",
-     "sets": null,
+     "winner": "South Dakota",
+     "state": "F",
+     "sets": [
+      3,
+      0
+     ],
      "round": 1
     },
     {
@@ -2293,17 +2365,29 @@
      "epoch": 1795478400,
      "a": "South Dakota St.",
      "b": "St. Thomas (MN)",
+     "winner": "South Dakota St.",
+     "state": "F",
+     "sets": [
+      3,
+      0
+     ],
+     "round": 1
+    },
+    {
+     "game_id": "6679375",
+     "date": "2026-11-24",
+     "epoch": 1795564800,
+     "a": "South Dakota St.",
+     "b": "South Dakota",
      "winner": null,
      "state": "P",
      "sets": null,
-     "round": 1
+     "round": 2
     }
    ],
    "alive": [
-    "North Dakota St.",
     "South Dakota",
-    "South Dakota St.",
-    "St. Thomas (MN)"
+    "South Dakota St."
    ],
    "champion": null,
    "field": 6,

@@ -1,4 +1,4 @@
-# The ONLY third-party dependency in this project, and it is deliberately one.
+# The only third-party dependencies in this project (numpy and scipy).
 # Everything else runs on the standard library against Python 3.9 (the system
 # interpreter on Cody's machine), which is why there was no requirements file
 # for so long.
@@ -13,3 +13,7 @@
 # products, percentiles and RNG draws, none of which are version-sensitive, and
 # a hard pin would rot silently on a runner image update.
 numpy>=1.24,<3
+
+# scipy: the committee bracket placement (committee_field.place) and two research
+# suites. 1.13 is the last line supporting Python 3.9.
+scipy>=1.10,<1.14

@@ -90,7 +90,9 @@ check(ct["Big East"]["host_effective"] == "Creighton" and ct["Pac-12"]["host_eff
 sbd = cfg["conferences"]["Sun Belt"]["divisions"]
 check(all(ct["Sun Belt"]["seeds"][i] in sbd["East"] for i in range(1, 6)) and all(ct["Sun Belt"]["seeds"][i] in sbd["West"] for i in range(6, 11)),
       "Sun Belt seeded within divisions (E1-E5, W1-W5)")
-check(all(v.get("seed_basis") == "projected" for v in ct.values() if not v.get("error")), "no league has announced seeds yet: every league says projected")
+_ann = json.load(open(os.path.join(REPO, "data", "raw", "2026", "conf_tournament_results.json"))).get("announced_seeds") or {}
+check(all(v.get("seed_basis") == ("announced" if k in _ann else "projected") for k, v in ct.items() if not v.get("error")),
+      "a league uses its published seeds where held (%d), and says projected otherwise" % len(_ann))
 check(len(ct) == 29 and not [k for k, v in ct.items() if v.get("error")], "29 tournament conferences projected, none unresolved")
 check(all(abs(sum(v["aq_prob"].values()) - 1) < 1e-9 for v in ct.values()), "every league's AQ chances sum to 1")
 check(all(len(v["seeds"]) == min(cfg["conferences"][k]["field"], len(v["seeds"])) for k, v in ct.items()), "field sizes follow the sourced format")

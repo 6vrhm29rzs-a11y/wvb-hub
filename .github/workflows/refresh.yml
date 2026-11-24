@@ -97,7 +97,7 @@ jobs:
           python-version: "3.9"
 
       - name: Install dependencies
-        run: pip install --quiet numpy
+        run: pip install --quiet -r requirements.txt
 
       # The freshness semantics are what make a frequent poll safe. If they ever
       # regress, this job would cache a partial day as complete -- so the guard

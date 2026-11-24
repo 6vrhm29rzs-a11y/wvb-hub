@@ -15,7 +15,7 @@ A window match alone is never treated as tournament evidence. If the tracker can
 stored capture is used. Writes conf_tournament_results.json (new rows only) and the derived
 data/conf_tournament_observed_2026.json.
 """
-import hashlib, html, json, os, re, sys, time, urllib.request
+import datetime, hashlib, html, json, os, re, sys, time, urllib.request
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(REPO, "scripts"))
@@ -119,6 +119,26 @@ def league_matches(doc, finals, members, lo, hi):
         seen.add(pair)
         out.append({"game_id": gid, "date": d, "epoch": int(g["start_time_epoch"]), "a": a, "b": b,
                     "winner": winner, "state": state, "sets": sw})
+    # the crawled log holds a fixture only near its date; the stored scoreboard lists the next rounds earlier
+    day, stop = datetime.date.fromisoformat(lo), datetime.date.fromisoformat(hi)
+    while day <= stop:
+        pth = os.path.join(RAW, "scoreboard", "%s.json" % day.isoformat())
+        day += datetime.timedelta(days=1)
+        if not os.path.exists(pth):
+            continue
+        for row in json.load(open(pth, encoding="utf-8")).get("games") or []:
+            g = row.get("game") or {}
+            state = {"pre": "P", "live": "I"}.get(g.get("gameState"))
+            a, b = ((g.get("away") or {}).get("names") or {}).get("short"), ((g.get("home") or {}).get("names") or {}).get("short")
+            if not state or not g.get("startTimeEpoch") or norm(a) not in members or norm(b) not in members:
+                continue
+            d = et_date(g["startTimeEpoch"])
+            pair = (d, frozenset((norm(a), norm(b))))
+            if not lo <= d <= hi or pair in seen:
+                continue
+            seen.add(pair)
+            out.append({"game_id": str(g["gameID"]), "date": d, "epoch": int(g["startTimeEpoch"]), "a": a, "b": b,
+                        "winner": None, "state": state, "sets": None})
     return sorted(out, key=lambda m: (m["epoch"], m["game_id"]))
 
 

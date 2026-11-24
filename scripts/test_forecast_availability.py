@@ -122,8 +122,11 @@ def main():
     tx = teams.get("Texas") or {}
     fx = [f for f in (tx.get("fixtures") or [])
           if f.get("pick") is not None]
-    check("Texas renders a pick beside a current sourced status",
-          bool(fx) and bool(tx.get("digby_avail_withheld")))
+    # A team's fixtures run out as the season ends, so the pick half applies only while one remains.
+    check("Texas keeps its current sourced status withheld note",
+          bool(tx.get("digby_avail_withheld")))
+    if not fx:
+        print("  --   Texas has no remaining pick; the numeric trace below is not applicable")
     if fx:
         gid = str(fx[0].get("gid"))
         check("...and the rendered pick equals the predictions file "

@@ -1,32 +1,32 @@
 {
  "meta": {
   "issuance": "first-issued",
-  "scored": 4663,
+  "scored": 4669,
   "logged_after_tipoff_excluded": 18,
   "timing_unverifiable_excluded": 0,
   "team_mismatch_excluded": 85,
-  "predictions_on_record": 4879,
-  "brier": 0.1857,
-  "favourite_correct": 3362,
+  "predictions_on_record": 4880,
+  "brier": 0.1858,
+  "favourite_correct": 3366,
   "favourite_correct_pct": 72.1,
   "by_model_version": {
    "unversioned": 4627,
    "470db00+uncommitted-scripts": 2,
-   "6d4eb4e0+uncommitted-scripts": 34
+   "6d4eb4e0+uncommitted-scripts": 40
   },
   "season": 2026,
   "source_tier": "DERIVED",
-  "results_available": 4917,
-  "as_of_utc": "2026-11-23T19:29:55Z",
+  "results_available": 4923,
+  "as_of_utc": "2026-11-24T03:06:36Z",
   "what_this_is": "Recorded forecast performance by issuance stream, as of as_of_utc. Timing is checked against the feed's LISTED start, not the actual first serve; rows logged before 2026-09-26 carry no model version. Not a certified held-out test of any single model version.",
   "brier_reference": "0.25 is what saying 50% to everything scores"
  },
  "calibration": [
   {
    "range": "50-60%",
-   "n": 793,
+   "n": 794,
    "said": 55.0,
-   "happened": 53.3
+   "happened": 53.4
   },
   {
    "range": "60-70%",
@@ -36,19 +36,19 @@
   },
   {
    "range": "70-80%",
-   "n": 791,
+   "n": 792,
    "said": 75.0,
    "happened": 66.5
   },
   {
    "range": "80-90%",
-   "n": 908,
-   "said": 85.2,
-   "happened": 76.0
+   "n": 911,
+   "said": 85.3,
+   "happened": 75.9
   },
   {
    "range": "90-101%",
-   "n": 1384,
+   "n": 1385,
    "said": 95.8,
    "happened": 90.0
   }
@@ -57,26 +57,26 @@
   "first_issued": {
    "meta": {
     "issuance": "first-issued",
-    "scored": 4663,
+    "scored": 4669,
     "logged_after_tipoff_excluded": 18,
     "timing_unverifiable_excluded": 0,
     "team_mismatch_excluded": 85,
-    "predictions_on_record": 4879,
-    "brier": 0.1857,
-    "favourite_correct": 3362,
+    "predictions_on_record": 4880,
+    "brier": 0.1858,
+    "favourite_correct": 3366,
     "favourite_correct_pct": 72.1,
     "by_model_version": {
      "unversioned": 4627,
      "470db00+uncommitted-scripts": 2,
-     "6d4eb4e0+uncommitted-scripts": 34
+     "6d4eb4e0+uncommitted-scripts": 40
     }
    },
    "calibration": [
     {
      "range": "50-60%",
-     "n": 793,
+     "n": 794,
      "said": 55.0,
-     "happened": 53.3
+     "happened": 53.4
     },
     {
      "range": "60-70%",
@@ -86,19 +86,19 @@
     },
     {
      "range": "70-80%",
-     "n": 791,
+     "n": 792,
      "said": 75.0,
      "happened": 66.5
     },
     {
      "range": "80-90%",
-     "n": 908,
-     "said": 85.2,
-     "happened": 76.0
+     "n": 911,
+     "said": 85.3,
+     "happened": 75.9
     },
     {
      "range": "90-101%",
-     "n": 1384,
+     "n": 1385,
      "said": 95.8,
      "happened": 90.0
     }
@@ -107,13 +107,13 @@
   "last_pre_match": {
    "meta": {
     "issuance": "last-pre-match",
-    "scored": 2483,
+    "scored": 2489,
     "logged_after_tipoff_excluded": 0,
     "timing_unverifiable_excluded": 0,
     "team_mismatch_excluded": 14,
-    "predictions_on_record": 2497,
-    "brier": 0.1534,
-    "favourite_correct": 1909,
+    "predictions_on_record": 2503,
+    "brier": 0.1538,
+    "favourite_correct": 1913,
     "favourite_correct_pct": 76.9,
     "by_model_version": {
      "5f46398+uncommitted-scripts": 326,
@@ -122,15 +122,16 @@
      "470db00+uncommitted-scripts": 1176,
      "391ee24": 6,
      "de49d9c+uncommitted-scripts": 44,
-     "6d4eb4e0+uncommitted-scripts": 689
+     "6d4eb4e0+uncommitted-scripts": 694,
+     "dbe43058+uncommitted-scripts": 1
     }
    },
    "calibration": [
     {
      "range": "50-60%",
-     "n": 485,
+     "n": 486,
      "said": 54.9,
-     "happened": 52.6
+     "happened": 52.7
     },
     {
      "range": "60-70%",
@@ -140,19 +141,19 @@
     },
     {
      "range": "70-80%",
-     "n": 434,
+     "n": 435,
      "said": 75.1,
-     "happened": 73.7
+     "happened": 73.8
     },
     {
      "range": "80-90%",
-     "n": 501,
+     "n": 504,
      "said": 85.2,
-     "happened": 90.0
+     "happened": 89.7
     },
     {
      "range": "90-101%",
-     "n": 594,
+     "n": 595,
      "said": 95.2,
      "happened": 94.8
     }

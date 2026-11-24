@@ -1,39 +1,39 @@
 {
  "season": 2026,
- "generated_utc": "2026-11-23T19:18:17Z",
+ "generated_utc": "2026-11-24T02:54:43Z",
  "window_days": 4,
- "fixtures_checked": 35,
- "schools_answered": 45,
- "timestamps_unresolved": 376,
+ "fixtures_checked": 34,
+ "schools_answered": 40,
+ "timestamps_unresolved": 330,
  "timestamps_unresolved_sample": [
   {
-   "school": "South Dakota St.",
-   "datetime": "2026-08-08 11:00 a.m.",
-   "opp": "Yellow & Blue Scrimmage",
+   "school": "Weber St.",
+   "datetime": "2026-08-15 3:00 p.m.",
+   "opp": "Utah (Exhibition)",
    "why": "naive_time_zone_unknown"
   },
   {
-   "school": "South Dakota St.",
-   "datetime": "2026-08-14 4:00 p.m.",
-   "opp": "Iowa State (Exhibition)",
-   "why": "naive_time_zone_unknown"
-  },
-  {
-   "school": "South Dakota St.",
+   "school": "Weber St.",
    "datetime": "2026-08-21 6:00 p.m.",
-   "opp": "Southwest Minnesota State (Exhibition)",
+   "opp": "Westminster (Exhibition)",
    "why": "naive_time_zone_unknown"
   },
   {
-   "school": "South Dakota St.",
-   "datetime": "2026-09-02 7:00 p.m.",
-   "opp": "Nebraska",
+   "school": "Weber St.",
+   "datetime": "2026-08-24 6:00 PM",
+   "opp": "Purple and White Scrimmage",
    "why": "naive_time_zone_unknown"
   },
   {
-   "school": "South Dakota St.",
-   "datetime": "2026-09-04 12:30 p.m.",
-   "opp": "Western Illinois",
+   "school": "Weber St.",
+   "datetime": "2026-08-28 6:00 p.m.",
+   "opp": "San Francisco",
+   "why": "naive_time_zone_unknown"
+  },
+  {
+   "school": "Weber St.",
+   "datetime": "2026-08-29 1:30 p.m.",
+   "opp": "San Jose State",
    "why": "naive_time_zone_unknown"
   }
  ],
@@ -43,17 +43,17 @@
  "lookback_hours": 12,
  "sources": {
   "wmt_api": 13,
-  "schedule_text": 32
+  "schedule_text": 27
  },
  "status_counts": {
-  "agree": 22,
-  "disagree": 7,
+  "agree": 24,
+  "disagree": 6,
   "no_match": 3,
-  "fetch_failed": 3,
+  "fetch_failed": 1,
   "no_reader": 0
  },
  "unknown_is_not_agreement": "no_match / fetch_failed / no_reader fixtures were NOT checked.",
- "n": 7,
+ "n": 6,
  "disagreements": [
   {
    "gid": "6625756",
@@ -77,19 +77,6 @@
    "school_epoch": 1795631400.0,
    "minutes_apart": 810,
    "school_url": "https://BYUcougars.com/schedule",
-   "school_source": "wmt_api",
-   "school_published": null,
-   "claim": "the NCAA feed and this school's own schedule disagree about when this match starts; neither is corrected here"
-  },
-  {
-   "gid": "6625807",
-   "home": "LMU (CA)",
-   "away": "Seattle U",
-   "school_asked": "Seattle U",
-   "feed_epoch": 1795640400,
-   "school_epoch": 1795658400.0,
-   "minutes_apart": 300,
-   "school_url": "https://goseattleu.com/schedule",
    "school_source": "wmt_api",
    "school_published": null,
    "claim": "the NCAA feed and this school's own schedule disagree about when this match starts; neither is corrected here"

@@ -214,7 +214,17 @@ def select(c, basis="projected"):
     n_al = 64 - len(aqs) - len(c.get("unresolved_aq") or [])
     pool = list(c["al_pool"])                               # every eligible non-AQ team (checked above)
     qual = dict((t, quality(res[t], ranks)) for t in set(pool) | set(aqs) if t in res)
-    order = sorted(pool, key=lambda t: (score(ranks[t], qual[t]), ranks[t], t))
+    # with simulated odds, at-large order is each team's chance of an at-large place if it does NOT win its league's
+    # bid (one scenario flips on a single rank crossing 25 or 50); the quality-win score breaks ties
+    odds = c.get("bid_odds") or {}
+    def al_chance(t):
+        x = odds.get(_norm(t)) or {}
+        left = 1 - x.get("aq", 0)
+        return round(x.get("al", 0) / left, 3) if left > 0 else 0.0
+    if odds:
+        order = sorted(pool, key=lambda t: (-al_chance(t), score(ranks[t], qual[t]), ranks[t], t))
+    else:
+        order = sorted(pool, key=lambda t: (score(ranks[t], qual[t]), ranks[t], t))
     q_al = order[:n_al]
     rpi_al = [r["team"] for r in c["field"] if r["bid"] == "At-large"]
     ins = [t for t in q_al if t not in rpi_al]
@@ -229,6 +239,9 @@ def select(c, basis="projected"):
         sent = ("%s (%s #%d) %s %s (#%d). %s has %s; %s has %s. "
                 "On the hub's quality-win rule that is a score of %.0f against %.0f (lower is better)."
                 % (a, lab, ranks[a], verb, b, ranks[b], a, _qtxt(qa), b, _qtxt(qb), score(ranks[a], qa), score(ranks[b], qb)))
+        if odds:
+            sent += " Across the simulations of every remaining match, %s earns an at-large place %.0f%% of the time and %s %.0f%%." % (
+                a, 100 * al_chance(a), b, 100 * al_chance(b))
         ev = []
         if h:
             ev.append("Head to head: " + "; ".join("%s %s %s %s %s" % (m[0], a, "beat" if m[2] == "W" else "lost to", b, m[3]) for m in h) + ".")
@@ -256,8 +269,8 @@ def select(c, basis="projected"):
     field = [{"team": t, "bid": "AQ", "rank": ranks.get(t), "conf": c["conf_of"].get(t), "q": qual.get(t)} for t in aqs] + \
             [{"team": t, "bid": "At-large", "rank": ranks[t], "conf": c["conf_of"].get(t), "q": qual[t]} for t in q_al]
     # the four teams either side of the committee-informed cut, in order
-    last4 = q_al[-4:]; first_out = order[n_al:n_al + 4]
-    return {"field": field, "changes": changes, "last_four_in": last4, "first_four_out": first_out,
+    last4 = q_al[-4:]; first_out = order[n_al:n_al + 4]; next_out = order[n_al + 4:n_al + 8]
+    return {"field": field, "changes": changes, "last_four_in": last4, "first_four_out": first_out, "next_four_out": next_out,
             "order": order[:n_al + 8], "n_aq": len(aqs), "n_al": len(q_al), "qual": qual, "ranks": ranks}
 
 

@@ -2,14 +2,14 @@
  "meta": {
   "season": 2026,
   "source_tier": "DERIVED",
-  "generated_at_utc": "2026-11-23T19:30:24Z",
+  "generated_at_utc": "2026-11-24T03:07:05Z",
   "counts": {
    "statuses": 2,
    "incidents": 0,
    "signals": 0,
    "expired": 15,
-   "anomalies": 1180,
-   "out_lately": 267
+   "anomalies": 1181,
+   "out_lately": 269
   },
   "anomaly_baseline": "who did NOT take the floor, from the box score. NOT an injury feed -- the reason for an absence is never in the data and is not inferred here",
   "anomaly_floor": "availability.py needs 4 completed team matches for a baseline; leagues below that show no anomaly rather than a guessed one"
@@ -662,16 +662,16 @@
    "absent": [
     {
      "name": "Kennedi Rogers",
-     "rate": 4.698,
+     "rate": 4.802,
      "played_share": 1.0
     },
     {
      "name": "Anni Tang",
-     "rate": 1.577,
+     "rate": 1.582,
      "played_share": 0.8
     }
    ],
-   "points_per_set_missing": 6.275
+   "points_per_set_missing": 6.384
   },
   {
    "game_id": "6624314",
@@ -1205,16 +1205,16 @@
    "absent": [
     {
      "name": "Hannah Klein",
-     "rate": 3.124,
+     "rate": 3.12,
      "played_share": 1.0
     },
     {
      "name": "Taylor Byl",
-     "rate": 1.707,
+     "rate": 1.717,
      "played_share": 0.75
     }
    ],
-   "points_per_set_missing": 4.831
+   "points_per_set_missing": 4.837
   },
   {
    "game_id": "6628604",
@@ -1397,32 +1397,6 @@
    "points_per_set_missing": 4.735
   },
   {
-   "game_id": "6627781",
-   "team_id": "45847",
-   "team": "North Dakota St.",
-   "absent": [
-    {
-     "name": "Lauren Jansen",
-     "rate": 4.73,
-     "played_share": 0.875
-    }
-   ],
-   "points_per_set_missing": 4.73
-  },
-  {
-   "game_id": "6624572",
-   "team_id": "45847",
-   "team": "North Dakota St.",
-   "absent": [
-    {
-     "name": "Lauren Jansen",
-     "rate": 4.73,
-     "played_share": 0.875
-    }
-   ],
-   "points_per_set_missing": 4.73
-  },
-  {
    "game_id": "6628525",
    "team_id": "46126",
    "team": "Syracuse",
@@ -1488,6 +1462,32 @@
     }
    ],
    "points_per_set_missing": 4.671
+  },
+  {
+   "game_id": "6627781",
+   "team_id": "45847",
+   "team": "North Dakota St.",
+   "absent": [
+    {
+     "name": "Lauren Jansen",
+     "rate": 4.661,
+     "played_share": 0.875
+    }
+   ],
+   "points_per_set_missing": 4.661
+  },
+  {
+   "game_id": "6624572",
+   "team_id": "45847",
+   "team": "North Dakota St.",
+   "absent": [
+    {
+     "name": "Lauren Jansen",
+     "rate": 4.661,
+     "played_share": 0.875
+    }
+   ],
+   "points_per_set_missing": 4.661
   },
   {
    "game_id": "6639580",
@@ -1734,6 +1734,19 @@
    "points_per_set_missing": 4.382
   },
   {
+   "game_id": "6627640",
+   "team_id": "45769",
+   "team": "Eastern Ill.",
+   "absent": [
+    {
+     "name": "Katie Kopshever",
+     "rate": 4.375,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 4.375
+  },
+  {
    "game_id": "6625374",
    "team_id": "46553",
    "team": "Iowa",
@@ -1827,17 +1840,17 @@
    "points_per_set_missing": 4.303
   },
   {
-   "game_id": "6627640",
-   "team_id": "45769",
-   "team": "Eastern Ill.",
+   "game_id": "6627438",
+   "team_id": "46341",
+   "team": "Morehead St.",
    "absent": [
     {
-     "name": "Katie Kopshever",
-     "rate": 4.292,
+     "name": "Hollan Everett",
+     "rate": 4.286,
      "played_share": 1.0
     }
    ],
-   "points_per_set_missing": 4.292
+   "points_per_set_missing": 4.286
   },
   {
    "game_id": "6627342",
@@ -1856,19 +1869,6 @@
     }
    ],
    "points_per_set_missing": 4.276
-  },
-  {
-   "game_id": "6627438",
-   "team_id": "46341",
-   "team": "Morehead St.",
-   "absent": [
-    {
-     "name": "Hollan Everett",
-     "rate": 4.269,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 4.269
   },
   {
    "game_id": "6625878",
@@ -2832,12 +2832,12 @@
     {
      "name": "Aspyn Reed",
      "rate": 2.415,
-     "played_share": 0.75
+     "played_share": 0.6
     },
     {
      "name": "Carlyn Rapozo-Kamoku",
      "rate": 1.102,
-     "played_share": 1.0
+     "played_share": 0.8
     }
    ],
    "points_per_set_missing": 3.517
@@ -3503,6 +3503,19 @@
    "points_per_set_missing": 3.174
   },
   {
+   "game_id": "6627176",
+   "team_id": "45911",
+   "team": "Georgia",
+   "absent": [
+    {
+     "name": "Gigi Artiles",
+     "rate": 3.156,
+     "played_share": 0.875
+    }
+   ],
+   "points_per_set_missing": 3.156
+  },
+  {
    "game_id": "6628270",
    "team_id": "46501",
    "team": "Stanford",
@@ -3646,19 +3659,6 @@
     }
    ],
    "points_per_set_missing": 3.101
-  },
-  {
-   "game_id": "6627176",
-   "team_id": "45911",
-   "team": "Georgia",
-   "absent": [
-    {
-     "name": "Gigi Artiles",
-     "rate": 3.099,
-     "played_share": 0.875
-    }
-   ],
-   "points_per_set_missing": 3.099
   },
   {
    "game_id": "6625900",
@@ -5153,32 +5153,6 @@
    "points_per_set_missing": 2.63
   },
   {
-   "game_id": "6625244",
-   "team_id": "46005",
-   "team": "Tennessee",
-   "absent": [
-    {
-     "name": "Chelsea Sutton",
-     "rate": 2.62,
-     "played_share": 0.875
-    }
-   ],
-   "points_per_set_missing": 2.62
-  },
-  {
-   "game_id": "6625245",
-   "team_id": "46005",
-   "team": "Tennessee",
-   "absent": [
-    {
-     "name": "Chelsea Sutton",
-     "rate": 2.62,
-     "played_share": 0.875
-    }
-   ],
-   "points_per_set_missing": 2.62
-  },
-  {
    "game_id": "6626995",
    "team_id": "45828",
    "team": "Gardner-Webb",
@@ -5270,17 +5244,30 @@
    "points_per_set_missing": 2.589
   },
   {
-   "game_id": "6638114",
-   "team_id": "45998",
-   "team": "St. Thomas (MN)",
+   "game_id": "6625244",
+   "team_id": "46005",
+   "team": "Tennessee",
    "absent": [
     {
-     "name": "Addie Schmotzer",
-     "rate": 2.588,
-     "played_share": 0.625
+     "name": "Chelsea Sutton",
+     "rate": 2.589,
+     "played_share": 0.875
     }
    ],
-   "points_per_set_missing": 2.588
+   "points_per_set_missing": 2.589
+  },
+  {
+   "game_id": "6625245",
+   "team_id": "46005",
+   "team": "Tennessee",
+   "absent": [
+    {
+     "name": "Chelsea Sutton",
+     "rate": 2.589,
+     "played_share": 0.875
+    }
+   ],
+   "points_per_set_missing": 2.589
   },
   {
    "game_id": "6624652",
@@ -5385,6 +5372,19 @@
     }
    ],
    "points_per_set_missing": 2.572
+  },
+  {
+   "game_id": "6638114",
+   "team_id": "45998",
+   "team": "St. Thomas (MN)",
+   "absent": [
+    {
+     "name": "Addie Schmotzer",
+     "rate": 2.564,
+     "played_share": 0.625
+    }
+   ],
+   "points_per_set_missing": 2.564
   },
   {
    "game_id": "6624354",
@@ -5873,6 +5873,19 @@
    "points_per_set_missing": 2.449
   },
   {
+   "game_id": "6625928",
+   "team_id": "46496",
+   "team": "Southeast Mo. St.",
+   "absent": [
+    {
+     "name": "Alaina Lester",
+     "rate": 2.448,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 2.448
+  },
+  {
    "game_id": "6627742",
    "team_id": "46646",
    "team": "Ark.-Pine Bluff",
@@ -6088,7 +6101,7 @@
     {
      "name": "Aspyn Reed",
      "rate": 2.415,
-     "played_share": 0.8
+     "played_share": 0.667
     }
    ],
    "points_per_set_missing": 2.415
@@ -6118,19 +6131,6 @@
     }
    ],
    "points_per_set_missing": 2.401
-  },
-  {
-   "game_id": "6625928",
-   "team_id": "46496",
-   "team": "Southeast Mo. St.",
-   "absent": [
-    {
-     "name": "Alaina Lester",
-     "rate": 2.396,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 2.396
   },
   {
    "game_id": "6626302",
@@ -8725,6 +8725,32 @@
    "points_per_set_missing": 2.045
   },
   {
+   "game_id": "6638778",
+   "team_id": "46180",
+   "team": "Eastern Wash.",
+   "absent": [
+    {
+     "name": "Bria Carlisle",
+     "rate": 2.045,
+     "played_share": 0.875
+    }
+   ],
+   "points_per_set_missing": 2.045
+  },
+  {
+   "game_id": "6625881",
+   "team_id": "46180",
+   "team": "Eastern Wash.",
+   "absent": [
+    {
+     "name": "Bria Carlisle",
+     "rate": 2.045,
+     "played_share": 0.875
+    }
+   ],
+   "points_per_set_missing": 2.045
+  },
+  {
    "game_id": "6626873",
    "team_id": "46126",
    "team": "Syracuse",
@@ -8941,32 +8967,6 @@
      "name": "Clara Vondran",
      "rate": 1.995,
      "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.995
-  },
-  {
-   "game_id": "6638778",
-   "team_id": "46180",
-   "team": "Eastern Wash.",
-   "absent": [
-    {
-     "name": "Bria Carlisle",
-     "rate": 1.995,
-     "played_share": 0.875
-    }
-   ],
-   "points_per_set_missing": 1.995
-  },
-  {
-   "game_id": "6625881",
-   "team_id": "46180",
-   "team": "Eastern Wash.",
-   "absent": [
-    {
-     "name": "Bria Carlisle",
-     "rate": 1.995,
-     "played_share": 0.875
     }
    ],
    "points_per_set_missing": 1.995
@@ -11039,6 +11039,19 @@
    "points_per_set_missing": 1.723
   },
   {
+   "game_id": "6626383",
+   "team_id": "46001",
+   "team": "South Dakota St.",
+   "absent": [
+    {
+     "name": "Taylor Byl",
+     "rate": 1.717,
+     "played_share": 0.833
+    }
+   ],
+   "points_per_set_missing": 1.717
+  },
+  {
    "game_id": "6628619",
    "team_id": "46571",
    "team": "App State",
@@ -11076,19 +11089,6 @@
     }
    ],
    "points_per_set_missing": 1.71
-  },
-  {
-   "game_id": "6626383",
-   "team_id": "46001",
-   "team": "South Dakota St.",
-   "absent": [
-    {
-     "name": "Taylor Byl",
-     "rate": 1.707,
-     "played_share": 0.833
-    }
-   ],
-   "points_per_set_missing": 1.707
   },
   {
    "game_id": "6639891",
@@ -12066,6 +12066,19 @@
    "points_per_set_missing": 1.583
   },
   {
+   "game_id": "6624239",
+   "team_id": "46005",
+   "team": "Tennessee",
+   "absent": [
+    {
+     "name": "Anni Tang",
+     "rate": 1.582,
+     "played_share": 0.875
+    }
+   ],
+   "points_per_set_missing": 1.582
+  },
+  {
    "game_id": "6627831",
    "team_id": "45942",
    "team": "Austin Peay",
@@ -12103,19 +12116,6 @@
     }
    ],
    "points_per_set_missing": 1.579
-  },
-  {
-   "game_id": "6624239",
-   "team_id": "46005",
-   "team": "Tennessee",
-   "absent": [
-    {
-     "name": "Anni Tang",
-     "rate": 1.577,
-     "played_share": 0.875
-    }
-   ],
-   "points_per_set_missing": 1.577
   },
   {
    "game_id": "6627766",
@@ -12254,11 +12254,11 @@
    "absent": [
     {
      "name": "Riley Mccloskey",
-     "rate": 1.544,
+     "rate": 1.542,
      "played_share": 0.714
     }
    ],
-   "points_per_set_missing": 1.544
+   "points_per_set_missing": 1.542
   },
   {
    "game_id": "6627434",
@@ -12267,11 +12267,11 @@
    "absent": [
     {
      "name": "Riley Mccloskey",
-     "rate": 1.544,
+     "rate": 1.542,
      "played_share": 0.75
     }
    ],
-   "points_per_set_missing": 1.544
+   "points_per_set_missing": 1.542
   },
   {
    "game_id": "6627437",
@@ -12280,11 +12280,11 @@
    "absent": [
     {
      "name": "Riley Mccloskey",
-     "rate": 1.544,
+     "rate": 1.542,
      "played_share": 0.625
     }
    ],
-   "points_per_set_missing": 1.544
+   "points_per_set_missing": 1.542
   },
   {
    "game_id": "6624413",
@@ -12293,11 +12293,11 @@
    "absent": [
     {
      "name": "Riley Mccloskey",
-     "rate": 1.544,
+     "rate": 1.542,
      "played_share": 0.875
     }
    ],
-   "points_per_set_missing": 1.544
+   "points_per_set_missing": 1.542
   },
   {
    "game_id": "6679299",
@@ -12389,19 +12389,6 @@
     }
    ],
    "points_per_set_missing": 1.53
-  },
-  {
-   "game_id": "6627694",
-   "team_id": "46001",
-   "team": "South Dakota St.",
-   "absent": [
-    {
-     "name": "Claire Logeais",
-     "rate": 1.528,
-     "played_share": 1.0
-    }
-   ],
-   "points_per_set_missing": 1.528
   },
   {
    "game_id": "6638112",
@@ -12532,6 +12519,19 @@
     }
    ],
    "points_per_set_missing": 1.517
+  },
+  {
+   "game_id": "6627694",
+   "team_id": "46001",
+   "team": "South Dakota St.",
+   "absent": [
+    {
+     "name": "Claire Logeais",
+     "rate": 1.511,
+     "played_share": 1.0
+    }
+   ],
+   "points_per_set_missing": 1.511
   },
   {
    "game_id": "6626655",
@@ -13860,45 +13860,6 @@
    "points_per_set_missing": 1.383
   },
   {
-   "game_id": "6627881",
-   "team_id": "45847",
-   "team": "North Dakota St.",
-   "absent": [
-    {
-     "name": "Courtney Peters",
-     "rate": 1.381,
-     "played_share": 0.875
-    }
-   ],
-   "points_per_set_missing": 1.381
-  },
-  {
-   "game_id": "6627770",
-   "team_id": "45847",
-   "team": "North Dakota St.",
-   "absent": [
-    {
-     "name": "Courtney Peters",
-     "rate": 1.381,
-     "played_share": 0.75
-    }
-   ],
-   "points_per_set_missing": 1.381
-  },
-  {
-   "game_id": "6628382",
-   "team_id": "45847",
-   "team": "North Dakota St.",
-   "absent": [
-    {
-     "name": "Courtney Peters",
-     "rate": 1.381,
-     "played_share": 0.75
-    }
-   ],
-   "points_per_set_missing": 1.381
-  },
-  {
    "game_id": "6625871",
    "team_id": "46680",
    "team": "Idaho St.",
@@ -13990,45 +13951,6 @@
    "points_per_set_missing": 1.363
   },
   {
-   "game_id": "6625712",
-   "team_id": "46364",
-   "team": "South Dakota",
-   "absent": [
-    {
-     "name": "Avery Van hook",
-     "rate": 1.362,
-     "played_share": 0.75
-    }
-   ],
-   "points_per_set_missing": 1.362
-  },
-  {
-   "game_id": "6625713",
-   "team_id": "46364",
-   "team": "South Dakota",
-   "absent": [
-    {
-     "name": "Avery Van hook",
-     "rate": 1.362,
-     "played_share": 0.75
-    }
-   ],
-   "points_per_set_missing": 1.362
-  },
-  {
-   "game_id": "6624526",
-   "team_id": "46364",
-   "team": "South Dakota",
-   "absent": [
-    {
-     "name": "Avery Van hook",
-     "rate": 1.362,
-     "played_share": 0.75
-    }
-   ],
-   "points_per_set_missing": 1.362
-  },
-  {
    "game_id": "6639126",
    "team_id": "46235",
    "team": "New Mexico",
@@ -14055,30 +13977,43 @@
    "points_per_set_missing": 1.36
   },
   {
-   "game_id": "6627166",
-   "team_id": "45911",
-   "team": "Georgia",
+   "game_id": "6627881",
+   "team_id": "45847",
+   "team": "North Dakota St.",
    "absent": [
     {
-     "name": "Alyssa Worden",
-     "rate": 1.356,
-     "played_share": 0.6
+     "name": "Courtney Peters",
+     "rate": 1.358,
+     "played_share": 0.875
     }
    ],
-   "points_per_set_missing": 1.356
+   "points_per_set_missing": 1.358
   },
   {
-   "game_id": "6625987",
-   "team_id": "45911",
-   "team": "Georgia",
+   "game_id": "6627770",
+   "team_id": "45847",
+   "team": "North Dakota St.",
    "absent": [
     {
-     "name": "Alyssa Worden",
-     "rate": 1.356,
-     "played_share": 0.667
+     "name": "Courtney Peters",
+     "rate": 1.358,
+     "played_share": 0.75
     }
    ],
-   "points_per_set_missing": 1.356
+   "points_per_set_missing": 1.358
+  },
+  {
+   "game_id": "6628382",
+   "team_id": "45847",
+   "team": "North Dakota St.",
+   "absent": [
+    {
+     "name": "Courtney Peters",
+     "rate": 1.358,
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 1.358
   },
   {
    "game_id": "6628625",
@@ -14170,6 +14105,45 @@
     }
    ],
    "points_per_set_missing": 1.343
+  },
+  {
+   "game_id": "6625712",
+   "team_id": "46364",
+   "team": "South Dakota",
+   "absent": [
+    {
+     "name": "Avery Van hook",
+     "rate": 1.342,
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 1.342
+  },
+  {
+   "game_id": "6625713",
+   "team_id": "46364",
+   "team": "South Dakota",
+   "absent": [
+    {
+     "name": "Avery Van hook",
+     "rate": 1.342,
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 1.342
+  },
+  {
+   "game_id": "6624526",
+   "team_id": "46364",
+   "team": "South Dakota",
+   "absent": [
+    {
+     "name": "Avery Van hook",
+     "rate": 1.342,
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 1.342
   },
   {
    "game_id": "6628657",
@@ -14417,6 +14391,32 @@
     }
    ],
    "points_per_set_missing": 1.3
+  },
+  {
+   "game_id": "6627166",
+   "team_id": "45911",
+   "team": "Georgia",
+   "absent": [
+    {
+     "name": "Alyssa Worden",
+     "rate": 1.299,
+     "played_share": 0.6
+    }
+   ],
+   "points_per_set_missing": 1.299
+  },
+  {
+   "game_id": "6625987",
+   "team_id": "45911",
+   "team": "Georgia",
+   "absent": [
+    {
+     "name": "Alyssa Worden",
+     "rate": 1.299,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 1.299
   },
   {
    "game_id": "6625550",
@@ -15368,6 +15368,19 @@
    "points_per_set_missing": 1.102
   },
   {
+   "game_id": "6679385",
+   "team_id": "46180",
+   "team": "Eastern Wash.",
+   "absent": [
+    {
+     "name": "Carlyn Rapozo-Kamoku",
+     "rate": 1.102,
+     "played_share": 0.75
+    }
+   ],
+   "points_per_set_missing": 1.102
+  },
+  {
    "game_id": "6625068",
    "team_id": "45976",
    "team": "Norfolk St.",
@@ -15979,6 +15992,32 @@
    "points_per_set_missing": 0.966
   },
   {
+   "game_id": "6625201",
+   "team_id": "46341",
+   "team": "Morehead St.",
+   "absent": [
+    {
+     "name": "Kylie Sharp",
+     "rate": 0.964,
+     "played_share": 0.6
+    }
+   ],
+   "points_per_set_missing": 0.964
+  },
+  {
+   "game_id": "6625455",
+   "team_id": "46341",
+   "team": "Morehead St.",
+   "absent": [
+    {
+     "name": "Kylie Sharp",
+     "rate": 0.964,
+     "played_share": 0.667
+    }
+   ],
+   "points_per_set_missing": 0.964
+  },
+  {
    "game_id": "6628518",
    "team_id": "46054",
    "team": "Houston",
@@ -16016,32 +16055,6 @@
     }
    ],
    "points_per_set_missing": 0.959
-  },
-  {
-   "game_id": "6625201",
-   "team_id": "46341",
-   "team": "Morehead St.",
-   "absent": [
-    {
-     "name": "Kylie Sharp",
-     "rate": 0.956,
-     "played_share": 0.6
-    }
-   ],
-   "points_per_set_missing": 0.956
-  },
-  {
-   "game_id": "6625455",
-   "team_id": "46341",
-   "team": "Morehead St.",
-   "absent": [
-    {
-     "name": "Kylie Sharp",
-     "rate": 0.956,
-     "played_share": 0.667
-    }
-   ],
-   "points_per_set_missing": 0.956
   },
   {
    "game_id": "6624503",
@@ -16200,6 +16213,19 @@
    "points_per_set_missing": 0.862
   },
   {
+   "game_id": "6625117",
+   "team_id": "46496",
+   "team": "Southeast Mo. St.",
+   "absent": [
+    {
+     "name": "Jacey Young",
+     "rate": 0.851,
+     "played_share": 0.875
+    }
+   ],
+   "points_per_set_missing": 0.851
+  },
+  {
    "game_id": "6628152",
    "team_id": "45981",
    "team": "NIU",
@@ -16237,19 +16263,6 @@
     }
    ],
    "points_per_set_missing": 0.844
-  },
-  {
-   "game_id": "6625117",
-   "team_id": "46496",
-   "team": "Southeast Mo. St.",
-   "absent": [
-    {
-     "name": "Jacey Young",
-     "rate": 0.831,
-     "played_share": 0.875
-    }
-   ],
-   "points_per_set_missing": 0.831
   },
   {
    "game_id": "6624260",
@@ -16735,17 +16748,11 @@
    "zero_action": []
   },
   "Georgia": {
-   "gid": "6679289",
-   "d": "2026-11-22",
-   "appeared": 10,
+   "gid": "6679283",
+   "d": "2026-11-23",
+   "appeared": 9,
    "zero_action": [
-    "Arianna Muoneke",
-    "Ceci Gooch",
-    "Keira Steininger",
-    "Taylor Bruce",
-    "Marin Collins",
-    "Emma Bryson",
-    "Rylan Miller"
+    "Kate Yoshimoto"
    ]
   },
   "North Florida": {
@@ -16892,10 +16899,19 @@
    ]
   },
   "Eastern Ill.": {
-   "gid": "6679490",
-   "d": "2026-11-22",
-   "appeared": 11,
-   "zero_action": []
+   "gid": "6679488",
+   "d": "2026-11-23",
+   "appeared": 10,
+   "zero_action": [
+    "Addison Erb",
+    "Mirea Thederahn",
+    "Peyton Castillo",
+    "Emma Hanson",
+    "Mckenna Morton",
+    "Sydney Javes",
+    "Kyla Coolman",
+    "Jasmyne Boone"
+   ]
   },
   "Duquesne": {
    "gid": "6679262",
@@ -17082,10 +17098,12 @@
    "zero_action": []
   },
   "Utah Tech": {
-   "gid": "6624883",
-   "d": "2026-11-20",
+   "gid": "6679385",
+   "d": "2026-11-23",
    "appeared": 11,
-   "zero_action": []
+   "zero_action": [
+    "Lusia Langi"
+   ]
   },
   "Elon": {
    "gid": "6626973",
@@ -17149,10 +17167,17 @@
    "zero_action": []
   },
   "Southeast Mo. St.": {
-   "gid": "6679491",
-   "d": "2026-11-22",
-   "appeared": 10,
-   "zero_action": []
+   "gid": "6679488",
+   "d": "2026-11-23",
+   "appeared": 11,
+   "zero_action": [
+    "Alayna Christner",
+    "Sydney Miller",
+    "Katarina Miscevic",
+    "Ava Mathews",
+    "Brooklyn Ritter",
+    "Harper Highfill"
+   ]
   },
   "Western Ky.": {
    "gid": "6679263",
@@ -17653,14 +17678,16 @@
    ]
   },
   "Lindenwood": {
-   "gid": "6679494",
-   "d": "2026-11-22",
-   "appeared": 10,
+   "gid": "6679489",
+   "d": "2026-11-23",
+   "appeared": 9,
    "zero_action": [
     "Greta Shadewald",
+    "Blair Sitton",
     "Tori Staples",
     "Emma Johnson",
     "Shannon Monahan",
+    "Anna Kraemer",
     "Jade Roth",
     "Valyn Donahoo"
    ]
@@ -17742,8 +17769,8 @@
    "zero_action": []
   },
   "Morehead St.": {
-   "gid": "6679493",
-   "d": "2026-11-22",
+   "gid": "6679489",
+   "d": "2026-11-23",
    "appeared": 11,
    "zero_action": [
     "Mary Rindler",
@@ -17766,12 +17793,10 @@
    "zero_action": []
   },
   "Eastern Wash.": {
-   "gid": "6637573",
-   "d": "2026-11-20",
-   "appeared": 9,
-   "zero_action": [
-    "Ziah Sneva"
-   ]
+   "gid": "6679385",
+   "d": "2026-11-23",
+   "appeared": 11,
+   "zero_action": []
   },
   "North Dakota": {
    "gid": "6625736",
@@ -18077,15 +18102,10 @@
    "zero_action": []
   },
   "South Dakota St.": {
-   "gid": "6627711",
-   "d": "2026-11-14",
-   "appeared": 9,
-   "zero_action": [
-    "Mallory Hartwig",
-    "Patrycja Labucka",
-    "Hannah Mlsna",
-    "Anna Johannson"
-   ]
+   "gid": "6679377",
+   "d": "2026-11-23",
+   "appeared": 10,
+   "zero_action": []
   },
   "Sacramento St.": {
    "gid": "6627608",
@@ -18280,9 +18300,9 @@
    ]
   },
   "Tennessee": {
-   "gid": "6679290",
-   "d": "2026-11-22",
-   "appeared": 12,
+   "gid": "6679283",
+   "d": "2026-11-23",
+   "appeared": 10,
    "zero_action": []
   },
   "Colgate": {
@@ -18457,15 +18477,10 @@
    "zero_action": []
   },
   "South Dakota": {
-   "gid": "6625736",
-   "d": "2026-11-14",
-   "appeared": 12,
-   "zero_action": [
-    "Katherine Holthaus",
-    "Ava Ball",
-    "Cate Legel",
-    "Ella Rogers"
-   ]
+   "gid": "6679376",
+   "d": "2026-11-23",
+   "appeared": 9,
+   "zero_action": []
   },
   "LSU": {
    "gid": "6679291",
@@ -18638,17 +18653,10 @@
    "zero_action": []
   },
   "North Dakota St.": {
-   "gid": "6679378",
-   "d": "2026-11-22",
+   "gid": "6679376",
+   "d": "2026-11-23",
    "appeared": 11,
-   "zero_action": [
-    "Allie Collins",
-    "Aryn Heeke",
-    "Morgan Engel",
-    "Natasha Kidd",
-    "Layla Haritatos",
-    "Cathy Porter"
-   ]
+   "zero_action": []
   },
   "Vanderbilt": {
    "gid": "6679292",
@@ -19123,10 +19131,12 @@
    ]
   },
   "St. Thomas (MN)": {
-   "gid": "6679379",
-   "d": "2026-11-22",
-   "appeared": 9,
-   "zero_action": []
+   "gid": "6679377",
+   "d": "2026-11-23",
+   "appeared": 11,
+   "zero_action": [
+    "Sophia Del Valle"
+   ]
   },
   "Syracuse": {
    "gid": "6639334",
@@ -22400,8 +22410,8 @@
    {
     "player": "McKenna Morton",
     "sets": 61,
-    "team_sets": 99,
-    "streak": 2,
+    "team_sets": 103,
+    "streak": 3,
     "last_played": "2026-11-17",
     "missed": [
      {
@@ -22413,6 +22423,11 @@
       "gid": "6679490",
       "d": "2026-11-22",
       "state": "not_listed"
+     },
+     {
+      "gid": "6679488",
+      "d": "2026-11-23",
+      "state": "zero_action"
      }
     ]
    }
@@ -23036,8 +23051,8 @@
    {
     "player": "Shaylee Dahle",
     "sets": 53,
-    "team_sets": 99,
-    "streak": 11,
+    "team_sets": 103,
+    "streak": 12,
     "last_played": "2026-10-15",
     "missed": [
      {
@@ -23094,14 +23109,19 @@
       "gid": "6624883",
       "d": "2026-11-20",
       "state": "not_listed"
+     },
+     {
+      "gid": "6679385",
+      "d": "2026-11-23",
+      "state": "not_listed"
      }
     ]
    },
    {
     "player": "Cale Torgerson",
     "sets": 65,
-    "team_sets": 99,
-    "streak": 3,
+    "team_sets": 103,
+    "streak": 4,
     "last_played": "2026-11-10",
     "missed": [
      {
@@ -23117,6 +23137,11 @@
      {
       "gid": "6624883",
       "d": "2026-11-20",
+      "state": "not_listed"
+     },
+     {
+      "gid": "6679385",
+      "d": "2026-11-23",
       "state": "not_listed"
      }
     ]
@@ -23124,8 +23149,8 @@
    {
     "player": "Lusia Langi",
     "sets": 54,
-    "team_sets": 99,
-    "streak": 3,
+    "team_sets": 103,
+    "streak": 4,
     "last_played": "2026-11-10",
     "missed": [
      {
@@ -23142,6 +23167,11 @@
       "gid": "6624883",
       "d": "2026-11-20",
       "state": "not_listed"
+     },
+     {
+      "gid": "6679385",
+      "d": "2026-11-23",
+      "state": "zero_action"
      }
     ]
    }
@@ -24876,8 +24906,8 @@
    {
     "player": "Aspyn Reed",
     "sets": 106,
-    "team_sets": 114,
-    "streak": 2,
+    "team_sets": 118,
+    "streak": 3,
     "last_played": "2026-11-14",
     "missed": [
      {
@@ -24888,6 +24918,30 @@
      {
       "gid": "6637573",
       "d": "2026-11-20",
+      "state": "not_listed"
+     },
+     {
+      "gid": "6679385",
+      "d": "2026-11-23",
+      "state": "not_listed"
+     }
+    ]
+   },
+   {
+    "player": "Carlyn Rapozo-Kamoku",
+    "sets": 75,
+    "team_sets": 118,
+    "streak": 2,
+    "last_played": "2026-11-18",
+    "missed": [
+     {
+      "gid": "6637573",
+      "d": "2026-11-20",
+      "state": "not_listed"
+     },
+     {
+      "gid": "6679385",
+      "d": "2026-11-23",
       "state": "not_listed"
      }
     ]
@@ -26283,27 +26337,6 @@
      {
       "gid": "6679163",
       "d": "2026-11-21",
-      "state": "not_listed"
-     }
-    ]
-   }
-  ],
-  "Tennessee": [
-   {
-    "player": "Jolene Oddo",
-    "sets": 48,
-    "team_sets": 94,
-    "streak": 2,
-    "last_played": "2026-11-15",
-    "missed": [
-     {
-      "gid": "6679294",
-      "d": "2026-11-21",
-      "state": "not_listed"
-     },
-     {
-      "gid": "6679290",
-      "d": "2026-11-22",
       "state": "not_listed"
      }
     ]
@@ -27759,6 +27792,27 @@
       "gid": "6625136",
       "d": "2026-11-15",
       "state": "zero_action"
+     }
+    ]
+   }
+  ],
+  "North Dakota St.": [
+   {
+    "player": "Maddy Dombeck",
+    "sets": 93,
+    "team_sets": 101,
+    "streak": 2,
+    "last_played": "2026-11-14",
+    "missed": [
+     {
+      "gid": "6679378",
+      "d": "2026-11-22",
+      "state": "not_listed"
+     },
+     {
+      "gid": "6679376",
+      "d": "2026-11-23",
+      "state": "not_listed"
      }
     ]
    }
@@ -29464,6 +29518,27 @@
       "gid": "6627867",
       "d": "2026-11-15",
       "state": "zero_action"
+     }
+    ]
+   }
+  ],
+  "St. Thomas (MN)": [
+   {
+    "player": "Emory Brosnahan",
+    "sets": 71,
+    "team_sets": 97,
+    "streak": 2,
+    "last_played": "2026-11-14",
+    "missed": [
+     {
+      "gid": "6679379",
+      "d": "2026-11-22",
+      "state": "not_listed"
+     },
+     {
+      "gid": "6679377",
+      "d": "2026-11-23",
+      "state": "not_listed"
      }
     ]
    }
