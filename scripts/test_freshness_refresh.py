@@ -206,6 +206,18 @@ def main():
         check("...and the nightly job too",
               _dm is not None and int(_dm.group(1)) <= 180,
               "unbounded, or longer than three hours")
+        # --fast may skip ONLY the runner's declared NIGHTLY_ONLY suites, and never a data gate
+        import run_all_guards as _RAG
+        _gates = ("test_display_invariants.py", "test_crawl_freshness.py", "test_season_counts.py",
+                  "test_freshness_refresh.py", "test_fixture_corpus.py")
+        check("--fast never skips a data-correctness gate",
+              not any(g in _RAG.NIGHTLY_ONLY for g in _gates),
+              "a gate moved to nightly-only: %r" % sorted(set(_gates) & set(_RAG.NIGHTLY_ONLY)))
+        check("...and every nightly-only suite states its reason",
+              all(isinstance(v, str) and len(v) > 10 for v in _RAG.NIGHTLY_ONLY.values()))
+        _dyf = open(os.path.join(REPO, ".github", "workflows", "daily.yml"), encoding="utf-8").read()
+        check("...and the daily job runs the full set (no --fast)",
+              "run_all_guards.py" in _dyf and "run_all_guards.py --fast" not in _dyf)
         check("...and the fresh-checkout suite is the ONLY thing it skips",
               _excl in ("", "test_pipeline_fresh_checkout.py"),
               "excluding %r on the half-hourly job needs a reason" % _excl)

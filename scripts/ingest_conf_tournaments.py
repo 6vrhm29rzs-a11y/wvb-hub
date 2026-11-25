@@ -45,6 +45,15 @@ def _key(name):
     return re.sub(r"\bstate$", "st", k)              # NCAA.com writes "Wright State", the hub "Wright St."
 
 
+def same_team(a, b):
+    """The tracker's spelling and ours name one school: the alias key, or the shared outside-source normaliser
+    (external_refs._ref_norm, which folds state names: "Southeast Missouri State" is "Southeast Mo. St.")."""
+    if _key(a) == _key(b):
+        return True
+    import external_refs as _X
+    return _X._ref_norm(a or "") == _X._ref_norm(b or "")
+
+
 def parse_tracker(page):
     """{config key: {winner, schedule, location}} from the article's one table."""
     tables = re.findall(r"<table.*?</table>", page, flags=re.S)
@@ -203,7 +212,7 @@ def main():
         champion = alive[0] if len(finals) == field - 1 and len(alive) == 1 else None
         awaiting_feed = False
         if tr.get("winner"):
-            named = [t for t in teams if _key(t) == _key(tr["winner"])]
+            named = [t for t in teams if same_team(t, tr["winner"])]
             if not named:
                 problems.append("NCAA names %s, who is not in the observed tournament" % tr["winner"])
             elif champion and champion != named[0]:

@@ -29,6 +29,19 @@ SCRIPTS = os.path.join(REPO, "scripts")
 # to this map is a decision somebody has to defend, which is the point.
 SKIP = {}
 
+# ⚠ NIGHTLY ONLY, AND EACH ONE SAYS WHY. The half-hourly refresh passes --fast and skips exactly these; the daily job
+# runs everything. Measured on the 2026-11-24 daily run: the refresh had missed its time limit on EVERY run since at
+# least Nov. 15 -- ~14 min of rebuild plus ~12 min of guards against a 25-minute bound -- so nothing it built was
+# published. These four are the slowest suites after the fresh-checkout sandbox (~320 of the ~700 seconds). None
+# is a data-correctness gate for a new final: those (display invariants, crawl freshness, season counts, the
+# corrections and fixture suites) all stay half-hourly. A new suite runs half-hourly unless it is named here.
+NIGHTLY_ONLY = {
+    "test_mail_report.py": "149s in CI; audits the mail ledger, which a new final does not change",
+    "test_visual_system.py": "64s in CI; CSS/type-system checks, which a new final does not change",
+    "test_forecast_availability.py": "63s in CI; re-proves availability is not a forecast input (code, not data)",
+    "test_score_predictions.py": "48s in CI; Brier scoring of the prediction log, a nightly report",
+}
+
 # These suites drive Cody's private page or write into his gitignored Cody/ folder,
 # so they cannot run in CI or a fresh checkout. They stand down, printed, ONLY when
 # the private data is genuinely absent; on his machine they always run.
@@ -82,6 +95,10 @@ def main():
         if s in PRIVATE_ONLY and not os.path.exists(PRIVATE_MARKER):
             skipped.append((s, "needs the private Cody/ data"))
             print("SKIP  %-34s needs the private Cody/ data (absent here)" % s)
+            continue
+        if "--fast" in sys.argv and s in NIGHTLY_ONLY:
+            skipped.append((s, "nightly only: " + NIGHTLY_ONLY[s]))
+            print("SKIP  %-34s nightly only (--fast): %s" % (s, NIGHTLY_ONLY[s]))
             continue
         if s in SKIP:
             skipped.append((s, SKIP[s]))

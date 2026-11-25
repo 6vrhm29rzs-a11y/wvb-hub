@@ -231,7 +231,30 @@ def build(cname, row, obs, standing, cand, records=None, conf_records=None, seed
 
 
 # ---------------------------------------------------------------- full-field bid odds
-def bid_odds(games, nondi, keys, conf, future, samplers, fixed_aq, eligible, recs, min_pct, min_di, n=2000, seed=2026):
+def regular_champion(rec, h2h, new, rank, eligible):
+    """One simulated finish of a regular-season race. rec {team: (w, l)} is the league table now; new is this run's
+    simulated results. Best conference win percentage takes it; a tie goes to head-to-head among the tied teams
+    (real and simulated meetings), then to the better RPI rank in this run. Ineligible teams are skipped."""
+    w = dict((t, float(x[0])) for t, x in rec.items()); n = dict((t, float(x[0] + x[1])) for t, x in rec.items())
+    for a, b in new:
+        if a in w and b in w:
+            w[a] += 1; n[a] += 1; n[b] += 1
+    pool = [t for t in rec if t in eligible and n[t]]
+    if not pool:
+        return None
+    best = max(w[t] / n[t] for t in pool)
+    tied = [t for t in pool if abs(w[t] / n[t] - best) < 1e-9]
+    if len(tied) > 1:
+        ts = set(tied); hw = dict((t, 0) for t in tied)
+        for a, b in list(h2h) + list(new):
+            if a in ts and b in ts:
+                hw[a] += 1
+        top = max(hw.values()); tied = [t for t in tied if hw[t] == top]
+    return min(tied, key=lambda t: (rank(t), t))
+
+
+def bid_odds(games, nondi, keys, conf, future, samplers, fixed_aq, eligible, recs, min_pct, min_di, n=2000, seed=2026,
+             regular=None):
     """Play every remaining match n times; in each run recompute the committee-format RPI and select the field by the
     hub's rule: each league's champion takes its bid, then at-large by rank - 2 x top-25 wins - 1 x top-50 wins, with
     the .500 and 80% D-I gates. Returns {team key: {"aq","al","in"}} as shares of runs."""
@@ -264,6 +287,10 @@ def bid_odds(games, nondi, keys, conf, future, samplers, fixed_aq, eligible, rec
         new = [(w, l) for w, l in new if w in ix and l in ix]
         r = RC.adjust(games + [(w, l, "s%d" % i) for i, (w, l) in enumerate(new)], nondi, keys, conf)
         rank = np.array([r[k]["rank"] for k in keys])
+        for ck, rg in (regular or {}).items():
+            champ = regular_champion(rg["rec"], rg["h2h"], new, lambda t: r[t]["rank"] if t in r else 999, eligible)
+            if champ:
+                aq[ck] = champ
         Wn = np.array([ix[w] for w, _ in new], dtype=int)
         Ln = np.array([ix[l] for _, l in new], dtype=int)
         W, L = np.concatenate([W0, Wn]), np.concatenate([L0, Ln])

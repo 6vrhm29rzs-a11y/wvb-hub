@@ -64,5 +64,32 @@ import build_hub as BH
 slot = {"win": 0.87, "known": True, "seed": 5, "team": "A", "rec": "20-5", "conf_rec": "10-2"}
 check("87%" in BH._ct_slot(slot, None, None, "upcoming"), "an upcoming match shows its chance")
 check("87%" not in BH._ct_slot(slot, None, None, "live"), "NEGATIVE CONTROL: a match in progress never shows a pre-match chance")
+# an OPEN regular-season race is played out per run, never handed to today's leader (2026-11-25: BYU 14-1 v
+# Arizona St. 14-2 with two each to play had been fixed to BYU in every run)
+E = {"a", "b", "c", "d"}
+rec = {"a": (14, 1), "b": (14, 2), "c": (13, 3), "d": (5, 10)}
+check(CB.regular_champion(rec, [], [("a", "d"), ("a", "c")], lambda t: 5, E) == "a", "the leader who wins out takes the title")
+check(CB.regular_champion(rec, [("b", "a")], [("c", "a"), ("a", "d"), ("b", "d")], lambda t: 5, E) == "b",
+      "a tie on win percentage goes to head-to-head")
+check(CB.regular_champion(rec, [("a", "b"), ("b", "a")], [("c", "a"), ("a", "d"), ("b", "d")],
+                          lambda t: {"a": 9, "b": 3}.get(t, 50), E) == "b", "level head-to-head goes to the better RPI rank")
+check(CB.regular_champion(rec, [], [], lambda t: 5, {"b", "c"}) == "b", "an ineligible leader passes the title on")
+fut = [(KEYS[0], KEYS[7], 0.5), (KEYS[14], KEYS[0], 0.5)]
+conf_r = dict(conf); conf_r[KEYS[0]] = conf_r[KEYS[7]] = conf_r[KEYS[14]] = "c0"
+reg = {"c0": {"rec": {KEYS[0]: (10, 1), KEYS[7]: (10, 2), KEYS[14]: (9, 2)}, "h2h": []}}
+fx = dict(fixed); fx.pop("c0")
+o2 = CB.bid_odds(games, [], KEYS, conf_r, fut, {}, fx, set(KEYS), recs, 0.5, 0.8, n=200, regular=reg)
+share = dict((k, o2.get(k, {}).get("aq", 0)) for k in (KEYS[0], KEYS[7], KEYS[14]))
+check(0 < share[KEYS[0]] < 1 and abs(sum(share.values()) - 1) < 1e-9,
+      "an open race splits its bid across contenders (%s)" % share)
+o3 = CB.bid_odds(games, [], KEYS, conf_r, fut, {}, fixed, set(KEYS), recs, 0.5, 0.8, n=200)
+check(o3[KEYS[0]]["aq"] == 1.0, "NEGATIVE CONTROL: without the race, the fixed leader takes every run")
+# the page is 2026 and so is the RPI loader it simulates on (2026-11-25: a manual build read 2025 games)
+import subprocess
+_env = dict(os.environ); _env.pop("WVB_SEASON", None)
+_out = subprocess.run([sys.executable, "-c", "import build_hub, rpi_2025; print(rpi_2025.SEASON)"], env=_env,
+                      cwd=os.path.dirname(os.path.abspath(__file__)), capture_output=True, text=True).stdout.strip()
+check(_out.endswith(str(BH.SEASON)), "build_hub pins the season for the modules it imports (rpi_2025 reads %r)" % _out)
+check("_R.SEASON != SEASON" in open(BH.__file__, encoding="utf-8").read(), "compute_bid_odds refuses a season mismatch")
 print("ALL CONFERENCE BRACKET CHECKS HOLD" if not fails else "CONFERENCE BRACKET CHECKS FAILED")
 sys.exit(1 if fails else 0)

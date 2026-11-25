@@ -39,6 +39,11 @@ except Exception:          # pragma: no cover -- no tz database
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# ⚠ THE PAGE IS 2026, AND SO IS EVERY MODULE IT IMPORTS. rpi_2025, build_dataset and others default WVB_SEASON to
+# 2025, so a manual build without the env var ran the bid-odds simulation on LAST season's games (found 2026-11-25:
+# 2025 Pitt-Louisville meetings feeding the 2026 ACC race). Set before any import; an explicit value still wins and
+# compute_bid_odds refuses a mismatch.
+os.environ.setdefault("WVB_SEASON", "2026")
 import build_rankings_board as BOARD  # noqa: E402
 # The team-name normaliser + alias map that reconcile already owns. Reused
 # rather than re-implemented so the two cannot drift apart.
@@ -1311,6 +1316,10 @@ def rpi_cutline(teams, field, ranking="official", scenario=None, official_ranks=
     return {"ranking": ranking, "bid_odds": _bo, "futures": fut_meta, "board": board, "resumes": resumes,
             "ranks_all": dict((r["team"], r["rank"]) for r in rpi if r["rank"]), "al_pool": al_pool,
             "aq_teams": [r["team"] for r in aqs],
+            # a regular-season league whose race is still open is played out by the bid-odds simulation, not fixed
+            "regular_aq": dict((ck, {"conf": label[ck], "rec": dict((r["team"], [proj[r["team"]]["cw"], proj[r["team"]]["cl"]])
+                                for r in rpi if r["ckey"] == ck)})
+                               for ck, v in aq_by_conf.items() if v.get("aq_source") == "projected regular-season champion"),
             "conf_of": dict((r["team"], label.get(r["ckey"], r["conf"])) for r in rpi),
             "through": cap.get("stamp"), "captured": cap.get("captured_utc"), "n_aq": len(aqs), "n_al": len(at_large),
             "cut_rank": cut, "last_in": at_large[-1] if at_large else None, "first_out": out,
@@ -1840,6 +1849,8 @@ def compute_bid_odds(ct, cut_post):
     import rpi_2025 as _R
     import rpi_committee as _RC
     from reconcile_2025 import norm as _norm
+    if _R.SEASON != SEASON:
+        raise SystemExit("bid odds: rpi_2025 is loaded for %s, the page is %d -- set WVB_SEASON=%d" % (_R.SEASON, SEASON, SEASON))
     games, tinfo = _R.load_di_games()
     keys = sorted(tinfo)
     conf = dict((k, tinfo[k].get("conference")) for k in keys)
@@ -1857,7 +1868,16 @@ def compute_bid_odds(ct, cut_post):
     for t in cut_post["aq_teams"]:
         ck = _ckey(cut_post["conf_of"].get(t))
         fixed["uac" if ck == "wac" else ck] = _norm(t)
-    sig = hashlib.sha256(json.dumps([2, sorted(g[2] for g in games), len(nondi), future, gen, states, sorted(fixed.items())],
+    # a regular-season race with conference matches still to play is decided inside each simulated run
+    regular = {}
+    for ck, v in sorted((cut_post.get("regular_aq") or {}).items()):
+        mem = set(_norm(t) for t in v["rec"])
+        if any(h in mem and a in mem for h, a, _ in future):
+            regular[ck] = {"rec": dict((_norm(t), tuple(wl)) for t, wl in v["rec"].items()),
+                           "h2h": [(w, l) for w, l, _ in games if w in mem and l in mem]}
+            fixed.pop(ck, None)
+    sig = hashlib.sha256(json.dumps([3, sorted(g[2] for g in games), len(nondi), future, gen, states, sorted(fixed.items()),
+                                     sorted((k, sorted(v["rec"].items())) for k, v in regular.items())],
                                     default=str).encode()).hexdigest()
     pth = os.path.join(REPO, "data", "bid_odds_%d.json" % SEASON)
     old = load("data/bid_odds_%d.json" % SEASON) or {}
@@ -1866,8 +1886,10 @@ def compute_bid_odds(ct, cut_post):
         return old
     n = 2000
     res = CB.bid_odds(games, nondi, keys, conf, future, samplers, fixed,
-                      set(k for k in keys if k not in _PF.INELIGIBLE_2026), cut_records(), _PF.MIN_WIN_PCT, _PF.MIN_DI_SHARE, n=n)
+                      set(k for k in keys if k not in _PF.INELIGIBLE_2026), cut_records(), _PF.MIN_WIN_PCT, _PF.MIN_DI_SHARE, n=n,
+                      regular=regular)
     doc = {"signature": sig, "n_sims": n, "open_tournaments": len(samplers), "regular_matches_left": len(future),
+           "open_regular_races": sorted(regular),
            "teams": dict((k, {a: round(b, 4) for a, b in v.items()}) for k, v in res.items())}
     tmp = pth + ".tmp"
     json.dump(doc, open(tmp, "w"), separators=(",", ":"))

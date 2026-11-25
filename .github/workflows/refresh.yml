@@ -87,7 +87,11 @@ jobs:
     # half-hourly cadence, and a timeout here is safe: the crawl checkpoints
     # atomically and nothing publishes until the sanity gate has passed, so
     # a killed run simply does not publish.
-    timeout-minutes: 25
+    # ⚠ 25 WAS TOO TIGHT, AND EVERY RUN FROM AT LEAST NOV. 15 TO NOV. 24 WAS
+    # KILLED BY IT -- rebuild ~14 min + guards ~12 min. Now 30 (still within
+    # the cadence) with the guards on --fast (~6 min): see NIGHTLY_ONLY in
+    # run_all_guards.py for the four suites that wait for the daily job.
+    timeout-minutes: 30
     env:
       WVB_SEASON: ${{ github.event.inputs.season || '2026' }}
     steps:
@@ -218,7 +222,7 @@ jobs:
         env:
           WVB_GUARD_EXCLUDE: test_pipeline_fresh_checkout.py
         run: |
-          python3 scripts/run_all_guards.py
+          python3 scripts/run_all_guards.py --fast
           python3 scripts/provenance.py --check
 
       - name: Commit and publish

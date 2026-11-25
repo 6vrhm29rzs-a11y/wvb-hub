@@ -8,7 +8,7 @@ Everything is keyed by reconcile_2025.norm(). Missing files mean nothing is deci
 """
 import json, os
 
-from ingest_conf_tournaments import OUT, RAW, SNAP, _key
+from ingest_conf_tournaments import OUT, RAW, SNAP, same_team
 from reconcile_2025 import norm
 
 
@@ -27,7 +27,7 @@ def load():
             for conf, tr in rows[-1]["leagues"].items():
                 if not tr.get("winner"):
                     continue
-                hit = [s for s in by_conf.get(conf, []) if _key(s) == _key(tr["winner"])]
+                hit = [s for s in by_conf.get(conf, []) if same_team(s, tr["winner"])]
                 if len(hit) == 1:
                     champions[norm(hit[0])] = conf
     if os.path.exists(OUT):
